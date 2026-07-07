@@ -1,8 +1,17 @@
 database_name: datalake_velo
 table_name: propose
-owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
-description: "Table containing Velo's proposes and contracts"
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: >-
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021.
+  As of 2023, the Velo brand was replaced by QuintoCred. Find out more at:
+  https://docs.google.com/document/d/1n0kpXiUlM3rJDcwcPm7gfCT-rXo7WVDDvSBxdPPn3cc/edit?tab=t.0#heading=h.ysolfio837u9
+  In June 2025, QuintoCred's core operations were shut down, leaving only the
+  debt collection services active. In the first quarter of 2026, the decision was
+  made to terminate the collection operations by July 31, 2026. Therefore, it is
+  important to understand that all Velo and QuintoCred systems are considered legacy,
+  and consequently, the involved tables are as well. Table containing Velo's proposes
+  and contracts
 columns:
   id_propose:
     description: Propose's identification number (ID)
@@ -31,89 +40,169 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.propose.id_tenant_company
   id_primary_person:
-    description: Primary person's identification number (ID). This key connects to the table datalake_velo.propose_person considering only propose's primary person
+    description: Primary person's identification number (ID). This key connects to the table
+      datalake_velo.propose_person considering only propose's primary person
     lineage:
       - datalake_rental_guarantee_platform_clean.propose_person.id_person
   id_origin:
-    description: Origin's identification number (ID). It indicates if the the propose was made by a person or by a business and this key connects to the table datalake_velo.junk
+    description: Origin's identification number (ID). It indicates if the the propose was made by a person or by a
+      business and this key connects to the table datalake_velo.junk
     lineage:
       - datalake_velo.junk.id_junk
   id_propose_status:
-    description: Propose status's identification number (ID). It indicates if the the propose was made by a person or by a business and this key connects to the table datalake_velo.junk
+    description: Propose status's identification number (ID). It indicates if the the propose was made by a person or by
+      a business and this key connects to the table datalake_velo.junk
     lineage:
       - datalake_velo.junk.id_junk
   id_guarantee_status:
-    description: Guarantee status's identification number (ID). It indicates if the the propose was made by a person or by a business and this key connects to the table datalake_velo.junk
+    description: Guarantee status's identification number (ID). It indicates if the the propose was made by a person or
+      by a business and this key connects to the table datalake_velo.junk
     lineage:
       - datalake_velo.junk.id_junk
   id_propose_type:
-    description: Propose type's identification number (ID). It indicates if the the propose was made by a person or by a business and this key connects to the table datalake_velo.junk
+    description: Propose type's identification number (ID). It indicates if the the propose was made by a person or by a
+      business and this key connects to the table datalake_velo.junk
     lineage:
       - datalake_velo.junk.id_junk
   origin:
     description: Origin's description. It indicates if the the propose was made by a person or by a business
-  propose_status:
-    description: Propose status' description
     lineage:
-      - datalake_rental_guarantee_platform_clean.propose_status.name
+      - datalake_rental_guarantee_platform_clean.propose.id_tenant_company
   guarantee_status:
     description: Guarantee status' description
     lineage:
       - datalake_rental_guarantee_platform_clean.contract_status.name
+  propose_status:
+    description: Propose status' description
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_status.name
   propose_type:
     description: Propose type's description. It indicates if the propose is residential or commercial
     lineage:
       - datalake_rental_guarantee_platform_clean.bussines_type.name
   count_persons_included:
     description: How many persons were included on the propose
+    lineage:
+      - datalake_velo.propose_person.id_person
   percentage_income_from_primary_person:
-    description:
-      The percentage of the primary person is related to the total declared
-      income of all persons related to the propose
+    description: The percentage of the primary person is related to the total declared income of all persons related to
+      the propose
+    lineage:
+      - datalake_velo.propose_person.declared_income
   avg_serasa_score:
     description: Average serasa score of the persons included on the propose
+    lineage:
+      - datalake_velo.propose_person.serasa_score
   avg_risk_score:
     description: Average risk score of the persons included on the propose
+    lineage:
+      - datalake_velo.propose_person.risk_score
   avg_declared_income:
     description: Average declared income of the persons included on the propose
+    lineage:
+      - datalake_velo.propose_person.declared_income
   total_declared_income:
     description: Total declared income of the persons included on the propose
+    lineage:
+      - datalake_velo.propose_person.declared_income
   dti:
-    description: Debt-to-income ratio. Indicates the ratio between the debt value by all the gross monthly income declared
+    description: Debt-to-income ratio. Indicates the ratio between the debt value by all the gross monthly income
+      declared
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose.id_company_plan
+      - datalake_rental_guarantee_platform_clean.company_plan.id_plan
+      - datalake_rental_guarantee_platform_clean.plan.pricing
+      - datalake_rental_guarantee_platform_clean.propose_item.value
+      - datalake_velo.propose_person.declared_income
   total_paid_amount:
     description: Propose's total paid value
+    lineage:
+      - datalake_velo.payment.due_amount
+      - datalake_velo.payment.dt_paid
   total_expected_amount:
     description: Propose's total payable value
+    lineage:
+      - datalake_velo.payment.due_amount
   total_due_amount:
     description: Propose's total due value (not paid)
+    lineage:
+      - datalake_velo.payment.due_amount
+      - datalake_velo.payment.dt_paid
   total_occurrences_due_amount:
     description: Propose's total payable occurrences value
+    lineage:
+      - datalake_velo.occurrence.due_amount
   total_occurrences_paid_amount:
     description: Propose's total paid occurrences value
+    lineage:
+      - datalake_velo.occurrence.paid_amount
   total_payments:
     description: Propose's quantity of invoices
+    lineage:
+      - datalake_velo.payment.id_payment
   total_payments_paid:
     description: Propose's quantity of payments (paid invoices)
-  total_payments_expired:
-    description: Propose's quantity of overdue invoices
-  total_occurrences:
-    description: Propose's quantity of occurrences
-  occurrences_solved:
-    description: Propose's quantity of occurrences solved (paid)
-  is_contract:
-    description: If the propose has been turned into a contract
-  is_direct_billing:
-    description: If the propose uses the direct billing model
-  is_grace_period_cancelled:
-    description: If the propose's grace period has expired
-  is_legacy:
-    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
-  is_3p:
-    description: If the propose's comes from 3P flow
-  dt_last_payment:
     lineage:
       - datalake_velo.payment.dt_paid
+  total_payments_expired:
+    description: Propose's quantity of overdue invoices
+    lineage:
+      - datalake_velo.payment.dt_paid
+      - datalake_velo.payment.dt_due
+  total_occurrences:
+    description: Propose's quantity of occurrences
+    lineage:
+      - datalake_velo.occurrence.id_occurrence
+  occurrences_solved:
+    description: Propose's quantity of occurrences solved (paid)
+    lineage:
+      - datalake_velo.occurrence.ts_paid
+  risk_category_neurotech:
+    description: Category of the last risk analysis rating from neurotech.
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
+  max_hspn:
+    description: Maximum hspn value of the propose.
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.serasa_score_hspn_api_v3_list
+      - datalake_velo_neurotech_clean.logs_credit_granting.serasa_score_hspn_bureau
+      - datalake_velo_neurotech_clean.logs_credit_granting.ts_operation
+  min_hspn:
+    description: Minimum hspn value of the propose.
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.serasa_score_hspn_api_v3_list
+      - datalake_velo_neurotech_clean.logs_credit_granting.serasa_score_hspn_bureau
+      - datalake_velo_neurotech_clean.logs_credit_granting.ts_operation
+  last_analysis_result:
+    description: Category of the result from the last analysis.
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.analysis_result
+  is_contract:
+    description: If the propose has been turned into a contract
+    lineage:
+      - datalake_rental_guarantee_platform_clean.contract.id
+  is_direct_billing:
+    description: If the propose uses the direct billing model
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose.billing_model
+  is_grace_period_cancelled:
+    description: If the propose's grace period has expired
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.contract.ts_began
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose.id
+  is_3p:
+    description: If the propose's comes from 3P flow
+    lineage:
+      - datalake_rental_guarantee_platform_clean.plan.plan_name
+      - datalake_rental_guarantee_platform_clean.propose.id_company_plan
+  dt_last_payment:
     description: Propose's last payment date
+    lineage:
+      - datalake_velo.payment.dt_paid
   dt_contract_started:
     description: Date of when status of the contract started
     lineage:
@@ -150,7 +239,8 @@ columns:
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_evaluation_started:
-    description: Timestamp of when the propose's evaluation has started. When 3P proposes, set to be a copy of dt_contract_started.
+    description: Timestamp of when the propose's evaluation has started. When 3P proposes, set to be a copy of
+      dt_contract_started.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
@@ -162,19 +252,20 @@ columns:
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_sign_started:
-    description: Timestamp of when the propose has opened to be sign. When 3P proposes, set to be a copy of dt_contract_started.
-    lineage:
-      - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
-      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
-  ts_paid:
-    description: Timestamp of when the propose has been paid (to turn into a contract)
+    description: Timestamp of when the propose has opened to be sign. When 3P proposes, set to be a copy of
+      dt_contract_started.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
   ts_signed:
     description: Timestamp of when the propose has been finished signing (to turn into a contract)
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
+      - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
+  ts_paid:
+    description: Timestamp of when the propose has been paid (to turn into a contract)
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposehistory_legacy.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
@@ -203,15 +294,3 @@ columns:
       - datalake_velo_clean.fiancavelo_proposehistory.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_history.ts_updated
       - datalake_rental_guarantee_platform_clean.propose_aud.ts_created
-  risk_category_neurotech:
-    description: Category of the last risk analysis rating from neurotech.
-    lineage:
-      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
-  max_hspn:
-    description: Maximum hspn value of the propose.
-  min_hspn:
-    description: Minimum hspn value of the propose.
-  last_analysis_result:
-    description: Category of the result from the last analysis.
-    lineage:
-      - datalake_velo_neurotech_clean.logs_credit_granting.analysis_result

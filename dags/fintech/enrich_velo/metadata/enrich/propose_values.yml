@@ -1,0 +1,104 @@
+database_name: datalake_velo
+table_name: propose_values
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: >-
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021.
+  As of 2023, the Velo brand was replaced by QuintoCred. Find out more at:
+  https://docs.google.com/document/d/1n0kpXiUlM3rJDcwcPm7gfCT-rXo7WVDDvSBxdPPn3cc/edit?tab=t.0#heading=h.ysolfio837u9
+  In June 2025, QuintoCred's core operations were shut down, leaving only the
+  debt collection services active. In the first quarter of 2026, the decision was
+  made to terminate the collection operations by July 31, 2026. Therefore, it is
+  important to understand that all Velo and QuintoCred systems are considered legacy,
+  and consequently, the involved tables are as well. Table containing Velo's proposes
+  detailed info
+columns:
+  id_propose_values:
+    description: Surrogate identifier of the Velo propose pricing breakdown row.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose.id
+      - datalake_rental_guarantee_platform_clean.company_plan.id
+      - datalake_rental_guarantee_platform_clean.plan.id
+  subscription_type:
+    description: Category type of the subscription. Usually monthly or annual
+    lineage:
+      - datalake_velo.payment.id_payment_type
+      - datalake_velo.junk.desc_lvl_1
+  plan_type:
+    description: Category type of the real estate
+    lineage:
+      - datalake_rental_guarantee_platform_clean.bussines_type.name
+  activator_type:
+    description: Category type of the amount paid to activate the guarantee
+  plan:
+    description: Commercial plan name selected for the Velo rental guarantee proposal.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.plan.plan_name
+  subscription_installments:
+    description: Number of installments on the subscription.
+  activator_amount:
+    description: Amount paid to activate the guarantee
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose.activator_value
+  monthly_guarantee:
+    description: Monthly total amount of the guarantee
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose.monthly_value
+  annual_guarantee:
+    description: Annual total amount of the guarantee
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose.annual_value
+  rent_amount:
+    description: Monthly rent amount component in the Velo propose pricing package.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_item.value
+      - datalake_rental_guarantee_platform_clean.item_type.name
+  condo_amount:
+    description: Condominium fee amount included in the Velo propose pricing package.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_item.value
+      - datalake_rental_guarantee_platform_clean.item_type.name
+  light_amount:
+    description: Electricity utility amount included in the Velo propose package.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_item.value
+      - datalake_rental_guarantee_platform_clean.item_type.name
+  water_amount:
+    description: Water utility amount included in the Velo propose pricing package.
+  phone_amount:
+    description: Telephone utility amount included in the Velo propose package.
+  iptu_amount:
+    description: Property tax (IPTU) amount included in the Velo propose package.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_item.value
+      - datalake_rental_guarantee_platform_clean.item_type.name
+  other_amount:
+    description: Other recurring charges included in the Velo propose package.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_item.value
+      - datalake_rental_guarantee_platform_clean.item_type.name
+  total_package_amount:
+    description: Total bundled monthly amount for the Velo guarantee package.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_item.value
+      - datalake_rental_guarantee_platform_clean.item_type.name
+  plan_percent:
+    description: Percentage of the plan in comparison to the package
+    lineage:
+      - datalake_rental_guarantee_platform_clean.plan.pricing
+  plan_coverage:
+    description: Coverage limit configured for the selected Velo guarantee plan.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.plan.coverage
+  plan_damage:
+    description: Damage protection limit configured for the Velo guarantee plan.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.plan.damage
+  plan_commission:
+    description: Commission percentage applied to the Velo guarantee plan.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.plan.commission
+  is_legacy:
+    description: If the propose comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose.id

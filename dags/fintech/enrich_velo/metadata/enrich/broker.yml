@@ -1,0 +1,82 @@
+database_name: datalake_velo
+table_name: broker
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: >-
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021.
+  As of 2023, the Velo brand was replaced by QuintoCred. Find out more at:
+  https://docs.google.com/document/d/1n0kpXiUlM3rJDcwcPm7gfCT-rXo7WVDDvSBxdPPn3cc/edit?tab=t.0#heading=h.ysolfio837u9
+  In June 2025, QuintoCred's core operations were shut down, leaving only the
+  debt collection services active. In the first quarter of 2026, the decision was
+  made to terminate the collection operations by July 31, 2026. Therefore, it is
+  important to understand that all Velo and QuintoCred systems are considered legacy,
+  and consequently, the involved tables are as well. Table containing brokers
+  companies details
+columns:
+  id_broker:
+    description: Broker's identification number (ID)
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company.id
+  broker_comercial_name:
+    description: Trade name of the rental guarantee broker company.
+    lineage:
+      - datalake_company_clean.company.trade_name
+  broker_name:
+    description: Legal company name of the rental guarantee broker.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company.company_name
+  street:
+    description: Broker's establishment street
+    lineage:
+      - datalake_company_clean.address.public_area
+  number:
+    description: Broker's establishment address number
+    lineage:
+      - datalake_company_clean.address.number
+  complement:
+    description: Broker's establishment address complement
+    lineage:
+      - datalake_company_clean.address.complement
+  neighborhood:
+    description: Broker's establishment address neighborhood
+    lineage:
+      - datalake_company_clean.address.neighborhood
+  city:
+    description: Broker's establishment city
+    lineage:
+      - datalake_company_clean.address.city
+  state:
+    description: Broker's establishment state
+    lineage:
+      - core_region.region.state_abbreviation
+      - datalake_company_clean.address.state
+  country_code:
+    description: Broker's establishment country code
+    lineage:
+      - core_region.region.country_code
+  zipcode:
+    description: Broker's establishment zipcode
+    lineage:
+      - datalake_company_clean.address.zip_code
+  creci:
+    description: Broker's certification number (CRECI)
+    lineage:
+      - datalake_company_clean.document.identification_number
+  cnpj:
+    description: Broker's document number (CNPJ)
+    lineage:
+      - datalake_company_clean.document.identification_number
+  is_broker_active:
+    description: Identify if the broker is active in Velo's platform
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_history.ts_inserted
+      - datalake_rental_guarantee_platform_clean.propose_status.id
+      - datalake_rental_guarantee_platform_clean.propose.id_real_estate
+  is_legacy:
+    description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company.id
+  ts_created:
+    description: Moment (timestamp) when the broker was created in Velo's platform
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company.ts_created
