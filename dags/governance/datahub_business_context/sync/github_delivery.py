@@ -242,14 +242,20 @@ def open_sync_pull_request(
 
     # ── No open PR — create branch, commit MD, and open a new PR ──────────────
     base_sha = _get_ref_sha()
+    branch_already_existed = False
     try:
         _create_branch(branch, base_sha)
     except RuntimeError as exc:
         if "Reference already exists" not in str(exc) and "422" not in str(exc):
             raise
+        branch_already_existed = True
 
-    # Read SHA from master (file won't exist on the freshly cut branch)
-    md_sha = _get_file_sha(md_path, GITHUB_DEFAULT_BRANCH)
+    # When the branch was freshly cut from master both refs have the same file SHA.
+    # When the branch already existed (e.g. a previously-merged/closed PR), the file
+    # on the branch may have been updated after the last merge, so its SHA differs from
+    # master — we must read it from the branch or GitHub returns 409 sha-mismatch.
+    sha_ref = branch if branch_already_existed else GITHUB_DEFAULT_BRANCH
+    md_sha = _get_file_sha(md_path, sha_ref)
     _put_file(md_path, md_content, commit_msg, branch, md_sha)
 
     pr_body = (

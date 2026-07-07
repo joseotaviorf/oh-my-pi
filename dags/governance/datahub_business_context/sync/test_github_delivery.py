@@ -191,6 +191,51 @@ class TestOpenSyncPullRequestNewPR:
         pr_body = api_mock.call_args_list[-1][0][2]
         assert pr_body["title"] == "docs(tars-entity-sync): add new-entity"
 
+    def test_reuses_branch_sha_when_branch_already_existed(self):
+        """Regression: 409 sha-mismatch when branch exists but PR was merged/closed.
+
+        _create_branch raises 422 (silently caught). The file on the stale branch has a
+        different SHA from master, so _get_file_sha must be called with the branch ref,
+        not GITHUB_DEFAULT_BRANCH.
+        """
+        create_branch = MagicMock(
+            side_effect=RuntimeError("422 Reference already exists")
+        )
+        put_file = MagicMock()
+        get_file_sha = MagicMock(return_value="branch-sha-deadbeef")
+        api_mock = MagicMock(
+            return_value={
+                "html_url": "https://github.com/org/repo/pull/5",
+                "number": 5,
+            }
+        )
+        with patch.multiple(
+            "sync.github_delivery",
+            _find_open_pr=MagicMock(return_value=None),
+            _get_ref_sha=MagicMock(return_value="master-sha"),
+            _create_branch=create_branch,
+            _get_file_sha=get_file_sha,
+            _put_file=put_file,
+            _api_request=api_mock,
+        ):
+            result = open_sync_pull_request(
+                data_product_id="stale-branch-entity",
+                md_content="# New content\n",
+                document_title="Stale Branch Entity",
+                document_urn="urn:li:document:stale",
+            )
+        # SHA must be read from the branch, not master
+        get_file_sha.assert_called_once_with(
+            "docs/llm_context/business_entities/stale_branch_entity.md",
+            "tars-entity-sync/stale-branch-entity",
+        )
+        put_file.assert_called_once()
+        sha_arg = put_file.call_args[0][
+            4
+        ]  # file_sha positional arg (path, content, msg, branch, sha)
+        assert sha_arg == "branch-sha-deadbeef"
+        assert result.pr_number == 5
+
     def test_edit_pr_title_uses_update_verb(self):
         create_branch = MagicMock()
         put_file = MagicMock()
