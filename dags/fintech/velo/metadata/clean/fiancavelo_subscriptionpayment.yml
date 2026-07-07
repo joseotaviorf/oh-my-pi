@@ -1,56 +1,81 @@
 ---
 database_name: datalake_velo_clean
 table_name: fiancavelo_subscriptionpayment
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per fiancavelo subscriptionpayment from the Velo property management
+  and condominium billing platform, ingested for QuintoAndar fintech
+  reconciliation and accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.id
+    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_propose:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.propose
+    description: Identifier for the propose referenced by this financial record.
   id_user_insert:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.userupdate
+    description: Identifier for the user update referenced by this financial record.
   id_status:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.status
+    description: Identifier for the status referenced by this financial record.
   id_billing_type:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.billingtype
+    description: Identifier for the billing type referenced by this financial record.
   unicid:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.unicid
+    description: Velo platform attribute describing unicid for condominium billing reconciliation.
   customer:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.customer
+    description: Velo platform attribute describing customer for condominium billing reconciliation.
   description:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.description
+    description: Human-readable description of the financial transaction or ledger entry.
   cycle:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.cycle
+    description: Velo platform attribute describing cycle for condominium billing reconciliation.
   value:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.value
+    description: Velo platform attribute describing value for condominium billing reconciliation.
   is_deleted:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.deleted
+    description: Indicates whether deleted applies to this financial record.
   is_active:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.active
+    description: Indicates whether active applies to this financial record.
   dt_next_due:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.nextduedate
+    description: Calendar date associated with next due in the financial workflow.
   dt_created:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.datecreated
+    description: Calendar date associated with created in the financial workflow.
   ts_inserted:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.dateinsert
+    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_raw.fiancavelo_subscriptionpayment.dateupdate
+    description: Timestamp when updated occurred in the upstream fintech system.

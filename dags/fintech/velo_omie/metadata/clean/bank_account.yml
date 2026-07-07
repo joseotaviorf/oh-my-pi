@@ -1,128 +1,168 @@
 ---
 database_name: datalake_velo_omie_clean
 table_name: bank_account
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per bank account from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_account:
     lineage:
       - datalake_velo_omie_raw.bank_account.nCodCC
+    description: Identifier for the account referenced by this financial record.
   id_country:
     lineage:
       - datalake_velo_omie_raw.bank_account.codigo_pais
+    description: Identifier for the country referenced by this financial record.
   id_bank:
     lineage:
       - datalake_velo_omie_raw.bank_account.codigo_banco
+    description: Identifier for the bank referenced by this financial record.
   id_bank_branch:
     lineage:
       - datalake_velo_omie_raw.bank_account.codigo_agencia
+    description: Identifier for the bank branch referenced by this financial record.
   bank_account_number:
     lineage:
       - datalake_velo_omie_raw.bank_account.numero_conta_corrente
+    description: Velo platform attribute describing bank account number for condominium billing reconciliation.
   invoice_instructions:
     lineage:
       - datalake_velo_omie_raw.bank_account.bol_instr1
+    description: Velo platform attribute describing invoice instructions for condominium billing reconciliation.
   description:
     lineage:
       - datalake_velo_omie_raw.bank_account.descricao
+    description: Human-readable description of the financial transaction or ledger entry.
   point_of_sale_category:
     lineage:
       - datalake_velo_omie_raw.bank_account.pdv_categoria
+    description: Velo platform attribute describing point of sale category for condominium billing reconciliation.
   type:
     lineage:
       - datalake_velo_omie_raw.bank_account.tipo
+    description: Velo platform attribute describing type for condominium billing reconciliation.
   bank_account_type:
     lineage:
       - datalake_velo_omie_raw.bank_account.tipo_conta_corrente
+    description: Velo platform attribute describing bank account type for condominium billing reconciliation.
   alteration_user:
     lineage:
       - datalake_velo_omie_raw.bank_account.user_alt
+    description: Velo platform attribute describing alteration user for condominium billing reconciliation.
   creation_user:
     lineage:
       - datalake_velo_omie_raw.bank_account.user_inc
+    description: Velo platform attribute describing creation user for condominium billing reconciliation.
   manager_name:
     lineage:
       - datalake_velo_omie_raw.bank_account.nome_gerente
+    description: Velo platform attribute describing manager name for condominium billing reconciliation.
   address:
     lineage:
       - datalake_velo_omie_raw.bank_account.endereco
+    description: Velo platform attribute describing address for condominium billing reconciliation.
   address_number:
     lineage:
       - datalake_velo_omie_raw.bank_account.numero
+    description: Velo platform attribute describing address number for condominium billing reconciliation.
   state:
     lineage:
       - datalake_velo_omie_raw.bank_account.estado
+    description: Velo platform attribute describing state for condominium billing reconciliation.
   neighbourhood:
     lineage:
       - datalake_velo_omie_raw.bank_account.bairro
+    description: Velo platform attribute describing neighbourhood for condominium billing reconciliation.
   city:
     lineage:
       - datalake_velo_omie_raw.bank_account.cidade
+    description: Velo platform attribute describing city for condominium billing reconciliation.
   zip_code:
     lineage:
       - datalake_velo_omie_raw.bank_account.cep
+    description: Velo platform attribute describing zip code for condominium billing reconciliation.
   email:
     lineage:
       - datalake_velo_omie_raw.bank_account.email
+    description: Velo platform attribute describing email for condominium billing reconciliation.
   city_code:
     lineage:
       - datalake_velo_omie_raw.bank_account.ddd
+    description: Velo platform attribute describing city code for condominium billing reconciliation.
   phone_number:
     lineage:
       - datalake_velo_omie_raw.bank_account.telefone
+    description: Velo platform attribute describing phone number for condominium billing reconciliation.
   point_of_sale_due_days:
     lineage:
       - datalake_velo_omie_raw.bank_account.pdv_dias_venc
+    description: Velo platform attribute describing point of sale due days for condominium billing reconciliation.
   point_of_sale_installments_limit:
     lineage:
       - datalake_velo_omie_raw.bank_account.pdv_limite_pacelas
+    description: Velo platform attribute describing point of sale installments limit for condominium billing reconciliation.
   point_of_sale_installments:
     lineage:
       - datalake_velo_omie_raw.bank_account.pdv_num_parcelas
+    description: Velo platform attribute describing point of sale installments for condominium billing reconciliation.
   point_of_sale_tef_type:
     lineage:
       - datalake_velo_omie_raw.bank_account.pdv_tipo_tef
+    description: Velo platform attribute describing point of sale tef type for condominium billing reconciliation.
   initial_balance:
     lineage:
       - datalake_velo_omie_raw.bank_account.saldo_inicial
+    description: Velo platform attribute describing initial balance for condominium billing reconciliation.
   does_point_of_sale_syncs_analytical_mode:
     lineage:
       - datalake_velo_omie_raw.bank_account.pdv_sincr_analitica
+    description: Velo platform attribute describing does point of sale syncs analytical mode for condominium billing reconciliation.
   does_not_display_account_summary:
     lineage:
       - datalake_velo_omie_raw.bank_account.pdv_enviar
-  nao_resumo:
-    lineage:
-      - datalake_velo_omie_raw.bank_account.nao_resumo
+    description: Velo platform attribute describing does not display account summary for condominium billing reconciliation.
   does_not_display_cash_flow:
     lineage:
       - datalake_velo_omie_raw.bank_account.nao_fluxo
+    description: Velo platform attribute describing does not display cash flow for condominium billing reconciliation.
   is_inactive:
     lineage:
       - datalake_velo_omie_raw.bank_account.inativo
+    description: Indicates whether inactive applies to this financial record.
   is_api_imported:
     lineage:
       - datalake_velo_omie_raw.bank_account.importado_api
+    description: Indicates whether api imported applies to this financial record.
   is_able_emit_account_charge:
     lineage:
       - datalake_velo_omie_raw.bank_account.cobr_sn
+    description: Indicates whether able emit account charge applies to this financial record.
   is_able_emit_invoice_charge:
     lineage:
       - datalake_velo_omie_raw.bank_account.bol_sn
+    description: Indicates whether able emit invoice charge applies to this financial record.
   is_blocked:
     lineage:
       - datalake_velo_omie_raw.bank_account.bloqueado
+    description: Indicates whether blocked applies to this financial record.
   dt_account_balance:
     lineage:
       - datalake_velo_omie_raw.bank_account.saldo_data
+    description: Calendar date associated with account balance in the financial workflow.
   ts_created:
     lineage:
       - datalake_velo_omie_raw.bank_account.data_inc
-  hora_inc:
-    lineage:
-      - datalake_velo_omie_raw.bank_account.hora_inc
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_omie_raw.bank_account.data_alt
-  hora_alt:
-    lineage:
-      - datalake_velo_omie_raw.bank_account.hora_alt
+    description: Timestamp when updated occurred in the upstream fintech system.
+  is_point_of_sale_omie_pdv:
+    lineage: []
+    description: Indicates whether point of sale omie pdv applies to this financial record.

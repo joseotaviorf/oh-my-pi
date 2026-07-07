@@ -1,27 +1,41 @@
 ---
 database_name: datalake_velo_clean
 table_name: quintoandar_integration
-owner: ae-finance-fintech@quintoandar.com.br
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per quintoandar integration from the Velo property management and
+  condominium billing platform, ingested for QuintoAndar fintech
+  reconciliation and accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_velo_raw.quintoandar_integration.id
+    description: Velo platform attribute describing id for condominium billing reconciliation.
   url:
     lineage:
     - datalake_velo_raw.quintoandar_integration.url
+    description: Velo platform attribute describing url for condominium billing reconciliation.
   method:
     lineage:
     - datalake_velo_raw.quintoandar_integration.method
+    description: Velo platform attribute describing method for condominium billing reconciliation.
   request:
     lineage:
     - datalake_velo_raw.quintoandar_integration.request
+    description: Velo platform attribute describing request for condominium billing reconciliation.
   response:
     lineage:
     - datalake_velo_raw.quintoandar_integration.response
+    description: Velo platform attribute describing response for condominium billing reconciliation.
   response_status:
     lineage:
     - datalake_velo_raw.quintoandar_integration.response_status
+    description: Velo platform attribute describing response status for condominium billing reconciliation.
   ts_inserted:
     lineage:
     - datalake_velo_raw.quintoandar_integration.dateinsert
+    description: Timestamp when inserted occurred in the upstream fintech system.
