@@ -1,9 +1,9 @@
 ---
 database_name: datalake_crm_lead
 table_name: lead_tasks
-description: CRM task information about leads
+description: CRM task records linked to supply leads, tracking task order, closure timestamps, and assigned sales representative for lead follow-up workflows.
 domain: Growth
-owner: cristina.cardoso@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   id_lead:
     lineage:

@@ -1,9 +1,9 @@
 database_name: dw_supply_outbound_contacts
 table_name: dim_call
-description: This table details the phone calls made to a owner along the Prospect
-  to Opportunity conversion funnel.
+description: Dimension table for outbound phone calls made to property owners during the Prospect-to-Opportunity conversion
+  funnel, including call outcome and round details.
 domain: Growth
-owner: ae-growth@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_outbound_contact:
     lineage:

@@ -6,7 +6,7 @@ description: This model table the history of contact attempts made to owners alo
   micro-services to carry out the communication. Each line is a contact request made
   by Braze's Canvas to Omnichannel microservices (Wololo or Jaiminho).
 domain: Growth
-owner: ae-growth@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_outbound_contact:
     lineage:
@@ -72,7 +72,14 @@ columns:
   mkt_origin:
     lineage:
     - datalake_supply_outbound_flows.supply_outbound_contacts.mkt_origin
-    description: The prospect origin.
+    description: Marketing origin of the prospect at creation time, propagated from Wololo before the outbound contact attempt.
+    categories:
+      OWNER_PWA: Prospect originated from the owner PWA (Proprietários app).
+      DEFAULT: Default marketing origin when no specific source is mapped.
+      INDICA_AI_GENERAL: Prospect from the Indica Aí general referral program.
+      PRICE_CALCULATOR: Prospect from the rent price calculator self-service flow.
+      PRICE_SUGGESTION_SALE: Prospect from the sale price suggestion self-service flow.
+      INDICA_AI_AGENTS: Prospect from the Indica Aí agents referral program.
   contact_channel:
     lineage:
     - datalake_supply_outbound_flows.supply_outbound_contacts.contact_channel
@@ -86,3 +93,5 @@ columns:
     lineage:
     - datalake_supply_outbound_flows.supply_outbound_contacts.ts_contacted
     description: Timestamp of contact.
+  ts_load:
+    description: Timestamp when this outbound contact record was loaded into the data warehouse.

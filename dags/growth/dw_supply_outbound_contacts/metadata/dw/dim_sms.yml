@@ -1,9 +1,9 @@
 database_name: dw_supply_outbound_contacts
 table_name: dim_sms
-description: This table details the SMS dispatch sent to a owner along the Prospect
-  to Opportunity conversion funnel.
+description: Dimension table for SMS dispatches sent to property owners during the Prospect-to-Opportunity conversion funnel,
+  including message template and delivery status.
 domain: Growth
-owner: ae-growth@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_outbound_contact:
     lineage:

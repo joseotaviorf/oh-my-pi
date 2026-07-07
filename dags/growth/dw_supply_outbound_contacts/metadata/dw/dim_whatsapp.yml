@@ -1,9 +1,9 @@
 database_name: dw_supply_outbound_contacts
 table_name: dim_whatsapp
-description: This table details the Whatsapp's High Structured Message (HSM) sent
-  to a owner along the Prospect to Opportunity conversion funnel.
+description: Dimension table for WhatsApp High Structured Messages (HSM) sent to property owners during the Prospect-to-Opportunity
+  conversion funnel, including template, delivery status, and opt-in flags.
 domain: Growth
-owner: ae-growth@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_outbound_contact:
     lineage:

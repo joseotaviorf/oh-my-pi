@@ -1,8 +1,8 @@
 database_name: datalake_crm_lead
 table_name: lead_score_factor
-description: CRM task information on lead prioritization score
+description: CRM lead prioritization score factors used to rank leads for sales representative task assignment in the supply acquisition workflow.
 domain: Growth
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 columns:
   id_lead:
     lineage:

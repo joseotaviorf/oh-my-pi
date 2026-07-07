@@ -2,9 +2,9 @@ database_name: datalake_supply_flows
 table_name: fallback_taxonomy
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table is repsonsible for storing the fallback taxonomy for the supply flows, ie, |
-  the taxonomy that is used when the supply flow does not have a original taxonomy associated with it |
-  and we want to enrich it with a other events.
+description: |
+  Fallback taxonomy values applied to supply funnel events when primary taxonomy
+  classification is unavailable, ensuring complete channel attribution coverage.
 columns:
   id_lead:
     description: The unique identifier for each lead in the 1P/3P/CIQ tables. In this table is always null.
