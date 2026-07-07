@@ -1,7 +1,7 @@
 dag:
   name: update_oncall_spreadsheet
-  schedule_interval: 0 12 * * *
-  owner: Data People
+  schedule_interval: 0 9 * * *
+  owner: Data Governance
   callback_by_task: False
   documentation:
     dag_purpose: |
