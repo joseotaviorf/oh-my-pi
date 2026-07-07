@@ -57,4 +57,4 @@ LEFT JOIN
         ON mh.assignment_number = es.assignment_number
         AND mh.is_current = TRUE
 WHERE
-    es.is_current_for_person = TRUE
+    es.is_current_for_employee = TRUE

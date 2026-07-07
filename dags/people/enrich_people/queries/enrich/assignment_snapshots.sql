@@ -423,7 +423,7 @@ SELECT
     asr.is_reorganization_termination,
     asr.is_monthly_snapshot,
     asr.is_current,
-    COALESCE(cpar.person_primary_rn = 1, FALSE) AS is_current_for_person,
+    COALESCE(cpar.person_primary_rn = 1, FALSE) AS is_current_for_employee,
     asr.dt_original_hire,
     asr.dt_hired,
     asr.dt_terminated,

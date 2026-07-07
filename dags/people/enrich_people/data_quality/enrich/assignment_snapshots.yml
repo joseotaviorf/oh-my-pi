@@ -93,12 +93,12 @@ column_level_validations:
       severity_level: Error
   one_current_primary_row_per_person:
     custom:
-      # Person-grain exports rely on exactly one is_current_for_person row per id_person.
+      # Employee-grain exports rely on exactly one is_current_for_employee row per id_person.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT id_person
           FROM datalake_people.assignment_snapshots
-          WHERE is_current_for_person = TRUE
+          WHERE is_current_for_employee = TRUE
           GROUP BY id_person
           HAVING COUNT(*) > 1
         )) = 0

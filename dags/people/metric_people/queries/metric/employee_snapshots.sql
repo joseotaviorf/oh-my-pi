@@ -296,7 +296,7 @@ SELECT
     fas.is_monthly_snapshot,
     fas.is_primary_assignment_for_snapshot,
     fas.is_current AND NOT fas.is_transfer_termination AS is_current,
-    fas.is_current_for_person,
+    fas.is_current_for_employee,
     fas.dt_month_reference,
     emp.dt_birth,
     fas.dt_hired,

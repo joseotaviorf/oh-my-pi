@@ -12,4 +12,4 @@
 | **Business consumer** | ITOps |
 | **Operational source of truth** | `metric_people.employee_snapshots`. |
 | **Delivery channel** | Google Sheets tab **(Grupo) PIN_ITOps** in workbook `15cDUEPUHT9FWtWMX5hvgJjRMCIP288FYj1Kvl3hYuwg`. Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
-| **Contract notes** | Legacy Portuguese column names preserved. Contains PII — restricted sheet ACLs. One row per person (`is_current_for_person = TRUE`): for employees with multiple assignments, only the last valid (active-first, then most recent) assignment is sent. |
+| **Contract notes** | Legacy Portuguese column names preserved. Contains PII — restricted sheet ACLs. One row per person (`is_current_for_employee = TRUE`): for employees with multiple assignments, only the last valid (active-first, then most recent) assignment is sent. |

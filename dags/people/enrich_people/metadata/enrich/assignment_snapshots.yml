@@ -191,8 +191,8 @@ columns:
     description: True for the assignment's latest available snapshot. Active assignments use the current date; terminated ones use the termination date. Exactly one row per assignment_number is flagged.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_actual_termination
-  is_current_for_person:
-    description: True when this row is the single current primary assignment for the person. Among rows with is_current and is_primary_assignment_for_snapshot, prefers the active assignment, then the latest dt_reference, then the highest assignment_number.
+  is_current_for_employee:
+    description: True when this row is the single current primary assignment for the employee. Among rows with is_current and is_primary_assignment_for_snapshot, prefers the active assignment, then the latest dt_reference, then the highest assignment_number.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_actual_termination
       - datalake_pin_core_clean.periods_of_service.dt_started
