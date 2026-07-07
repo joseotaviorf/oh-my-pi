@@ -1,0 +1,44 @@
+database_name: datalake_gsheets_people_clean
+table_name: talent_mapping_suggested_plans
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Reference lookup table for the Talent Mapping matrix, defining the nine talent quadrants (Q1-Q9) by their performance
+  and potential combinations, along with descriptive concepts and suggested HR action plans for each quadrant.
+columns:
+  quadrant_id:
+    description: Unique identifier for the talent matrix quadrant (e.g. Q1, Q2, ..., Q9), used to join with the talent mapping
+      base table.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_suggested_plans.quadrant_id
+  concept:
+    description: Business label for the talent quadrant category (e.g. Key Talent, Solid Performer), representing the overall
+      talent classification.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_suggested_plans.concept
+  potential:
+    description: Potential level assigned to this quadrant (e.g. High, Medium, Low), representing the employee's growth and
+      development ceiling.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_suggested_plans.potential
+  performance:
+    description: Performance level assigned to this quadrant (e.g. Outstanding, Above expectations), representing the employee's
+      current contribution level.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_suggested_plans.performance
+  quadrant:
+    description: Full quadrant label combining potential and performance dimensions (e.g. Q1 - High Potential and High Performance)
+      for display in talent review dashboards.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_suggested_plans.quadrant
+  quadrant_description:
+    description: Narrative description of what the talent quadrant means for the employee and the organization, including
+      guidance on how to interpret the placement.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_suggested_plans.quadrant_description
+  suggested_action_plans:
+    description: Recommended HR action plans and development strategies for employees placed in this talent quadrant, provided
+      by the People team methodology.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_suggested_plans.suggested_action_plans
+  ts_load:
+    description: Timestamp when this quadrant reference row was ingested from the Google Sheets source into the People lake.

@@ -1,0 +1,24 @@
+---
+table_name: datalake_gsheets_people_clean.talent_mapping_suggested_plans
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  quadrant_id:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  concept:
+    is_complete:
+      severity_level: Warning
+  potential:
+    is_complete:
+      severity_level: Warning
+  performance:
+    is_complete:
+      severity_level: Warning
