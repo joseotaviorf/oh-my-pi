@@ -8,6 +8,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[6]
 
 _JOB_PATHS = [
     "dags/for_rent/offboarding_categorization/spark_jobs/load_offboarding_categorization_raw.py",
+    "dags/for_rent/vocs_machina/spark_jobs/load_vocs_machina_raw.py",
 ]
 
 

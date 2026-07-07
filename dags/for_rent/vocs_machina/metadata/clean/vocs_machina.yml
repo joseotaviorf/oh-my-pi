@@ -1,0 +1,120 @@
+---
+database_name: datalake_vocs_machina_clean
+table_name: vocs_machina
+owner: data-ae-for-rent@quintoandar.com.br
+domain: For Rent
+description: >
+  Clean Delta table of vocs-machina LLM classification exports, promoted from raw for
+  Trino/Superset access. One row per (id_feedback, id_prompt, prompt_hash) per ingestion
+  partition. Used for NPS/CSAT verbatim analytics for For Rent post-contract teams.
+columns:
+  id_feedback:
+    description: >
+      Unique identifier of the NPS or CSAT feedback record (maps to sk_nps_answer or
+      equivalent in reverse_birdie source tables).
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.feedback_id
+  id_prompt:
+    description: >
+      Identifier of the prompt used for classification (from prompts.yml in vocs-machina).
+      Stable across runs; bumping only when the prompt changes.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.prompt_id
+  id_author:
+    description: >
+      sk_user of the respondent. Null when not available from source.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.author_id
+  id_account:
+    description: >
+      sk_contract (rental) or sk_offer (sale) associated with the feedback. Null when
+      not available from source.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.account_id
+  uuid_run:
+    description: UUID of the vocs-machina run that produced this classification.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.run_id
+  prompt_hash:
+    description: >
+      12-char hash of the compiled prompt content. Changes when the prompt template or
+      taxonomy changes, enabling detection of stale classifications.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.prompt_hash
+  reasoning:
+    description: >
+      Short natural-language justification produced by the LLM for its label decision.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.reasoning
+  verbatim_text:
+    description: Input NPS/CSAT verbatim text submitted to the LLM for classification.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.verbatim_text
+  feedback_kind:
+    description: Type of feedback — "nps" or "csat".
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.feedback_kind
+  source_name:
+    description: >
+      Name of the NPS/CSAT campaign or source (nps_campanha or csat_campanha from reverse_birdie).
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.source_name
+  customer_type:
+    description: >
+      Respondent type — "tenant" or "landlord". Null when not available from source.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.customer_type
+  campaign_name:
+    description: >
+      Fine-grained campaign name (nps_campanha or csat_campanha). Null when unavailable.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.campaign_name
+  llm_model:
+    description: LLM model identifier used for this classification (e.g. gemini/gemini-2.5-flash).
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.llm_model
+  llm_temperature:
+    description: Temperature parameter used for the LLM inference call.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.llm_temperature
+  prompt_collection:
+    description: Logical group the prompt belongs to (from prompts.yml collection field).
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.prompt_collection
+  prompt_opportunity:
+    description: Business opportunity label associated with this prompt.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.prompt_opportunity
+  rating:
+    description: NPS score (0–10) or CSAT score associated with the verbatim.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.rating
+  is_label:
+    description: >
+      Boolean classification output from the LLM for this (feedback, prompt) pair.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.label
+  ts_submitted:
+    description: Timestamp when the respondent submitted the NPS/CSAT feedback.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.submitted_at
+  ts_classified:
+    description: UTC timestamp when the LLM classification was performed by vocs-machina.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.ts_classified
+  ts_load:
+    description: UTC timestamp when this row was written to the raw datalake by the ingestion Spark job.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.ts_load
+  year:
+    description: Hive partition year from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.year
+  month:
+    description: Hive partition month from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.month
+  day:
+    description: Hive partition day from the ingestion date.
+    lineage:
+      - datalake_vocs_machina_raw.vocs_machina.day

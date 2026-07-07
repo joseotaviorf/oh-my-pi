@@ -1,0 +1,53 @@
+dag:
+  name: vocs_machina
+  schedule_start_date: 2026, 6, 1
+  catchup: false
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Ingests daily parquet exports from the vocs-machina LLM classification job
+      (Data Science S3) into the raw datalake, then promotes to a Delta clean table
+      for Trino and Superset access.
+
+      S3 path pattern: post-contract/vocs-machina/raw/year=*/month=*/day=*/prompt_id=*/prompt_hash=*/
+      One row per (feedback_id, prompt_id, prompt_hash) per day. Only finalized partitions are
+      ingested: the read is restricted to part-*.parquet, so partial-*.parquet checkpoints from
+      an in-progress/crashed vocs-machina partition (no _SUCCESS) are never picked up.
+
+      Scheduling: dataset-driven. Triggered after quintoml.post_contract.vocs_machina.inference
+      emits :first-run-of-day. See dags/dependencies.yaml. In production the vocs-machina job runs
+      forward-only (default_processing_mode: forward), so each scheduled event corresponds to the
+      D-1 forward window; this DAG ingests that single day.
+
+      Backfill: the vocs-machina backfill is a SEPARATE, bounded run on its side
+      (mode: backfill, throttled by backfill_max_partitions_per_run), repeated until its logs show
+      deferred_backfill_partitions=0. Once the retroactive window (prompt backfill_days, default 90)
+      is fully finalized on S3, trigger THIS DAG manually with a DagRun JSON conf carrying
+      load_start_date and load_end_date (YYYY-MM-DD, inclusive) covering that window. The Spark job
+      reads one day per partition, derives year/month/day from the load date, and merges idempotently
+      on (feedback_id, prompt_id, prompt_hash, year, month, day) by newest ts_load.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: vocs_machina
+  load_spark_job: load_vocs_machina_raw
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - s3://data-science.s3.data.quintoandar.com.br/post-contract/vocs-machina
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{table_name}"
+    - "{partitions}"
+    - parquet
+
+  tables_customization:
+    vocs_machina:
+      merge_on: [id_feedback, id_prompt, prompt_hash, year, month, day]
+      when_matched_update_condition: source.ts_load >= target.ts_load
+      partitions: [year, month, day]
