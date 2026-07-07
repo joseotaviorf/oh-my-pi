@@ -96,6 +96,13 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: True when alias_get_recommendations_by_company was called in this session.
+  has_actual_recommendations:
+    lineage:
+      - datalake_alias.alias_sessions.has_actual_recommendations
+    description: |
+      True when alias_get_recommendations_by_company returned a non-empty listings array.
+      Handles two response shapes: flat {"listings":[{...}]} and nested {"hlsresult":{"listings":[{...}]}}.
+      Distinct from has_recommendations, which only checks whether the tool was called.
   has_scheduling:
     lineage:
       - datalake_langfuse_clean.observations.name
@@ -124,10 +131,11 @@ columns:
     description: True when alias_register_escalation output contains 'escalation registered successfully'.
   funnel_stage_deepest:
     lineage:
-      - datalake_langfuse_clean.observations.name
+      - datalake_alias.alias_sessions.funnel_stage_deepest
     description: |
-      Deepest funnel stage reached in this session. Values (from deepest to shallowest):
-      visit_intention_registered, escalated, schedule_visit_agent_called, inventory_searched,
+      Deepest funnel stage reached in this session. Priority order (deepest to shallowest):
+      visit_intention_registered (visit tool returned success), escalated, visit_attempt_failed
+      (visit tool called but did not succeed), schedule_visit_agent_called, inventory_searched,
       profile_identified, no_agent.
   ts_profiling:
     lineage:

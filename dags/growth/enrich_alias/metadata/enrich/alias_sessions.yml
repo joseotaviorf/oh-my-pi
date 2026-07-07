@@ -46,12 +46,17 @@ columns:
   funnel_stage_deepest:
     description: >
       Estágio mais profundo do funil conversacional atingido na sessão, derivado dos
-      sub-agentes chamados. Hierarquia em ordem crescente de profundidade: no_agent →
-      profile_identified → inventory_searched → schedule_visit_agent_called →
-      visit_intention_registered → escalated. Permite segmentar sessões por maturidade
+      sub-agentes chamados. Ordem de prioridade (mais profundo primeiro):
+      visit_intention_registered (ferramenta de visita retornou sucesso) → escalated →
+      visit_attempt_failed (ferramenta de visita chamada mas sem sucesso) →
+      schedule_visit_agent_called → inventory_searched → profile_identified → no_agent.
+      Usa visit_registered_success (sucesso confirmado), não has_visit_registered (apenas
+      chamada), como critério de prioridade máxima — evita classificar tentativas de
+      visita que falharam como conversão. Permite segmentar sessões por maturidade
       da conversa sem necessidade de juntar múltiplas flags booleanas.
     lineage:
       - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
   n_user_turns:
     description: >
       Número de turns do usuário na sessão, contado como o total de traces distintos
@@ -147,6 +152,16 @@ columns:
       Indica que o agente listou imóveis recomendados para o lead com base no perfil.
     lineage:
       - datalake_langfuse_clean.observations.name
+  has_actual_recommendations:
+    description: >
+      TRUE se alias_get_recommendations_by_company retornou um array listings não vazio.
+      Trata duas formas de resposta: plana ({"listings":[{...}]}) e aninhada
+      ({"hlsresult":{"listings":[{...}]}}). Distinto de has_recommendations, que indica
+      apenas que a ferramenta foi chamada, independente do resultado.
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+      - datalake_langfuse_clean.observations.type
   has_scheduling:
     description: >
       TRUE se o sub-agente alias_schedule_visit_agentV1 foi chamado na sessão. Indica

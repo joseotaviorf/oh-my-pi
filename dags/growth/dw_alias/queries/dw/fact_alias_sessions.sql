@@ -71,6 +71,7 @@ SELECT
     COALESCE(lsa.has_profiling, FALSE) AS has_profiling,
     COALESCE(lsa.has_inventory, FALSE) AS has_inventory,
     COALESCE(lsa.has_recommendations, FALSE) AS has_recommendations,
+    COALESCE(lsa.has_actual_recommendations, FALSE) AS has_actual_recommendations,
     COALESCE(lsa.has_scheduling, FALSE) AS has_scheduling,
     COALESCE(lsa.has_availability, FALSE) AS has_availability,
     COALESCE(lsa.has_visit_registered, FALSE) AS has_visit_registered,

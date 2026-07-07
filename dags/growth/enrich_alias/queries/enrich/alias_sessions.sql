@@ -66,6 +66,18 @@ session_agg_base AS (
         MAX(CASE WHEN tw.obs_name = 'alias_profile_agentV1' THEN 1 ELSE 0 END) = 1 AS has_profiling,
         MAX(CASE WHEN tw.obs_name = 'alias_inventory_agentV1' THEN 1 ELSE 0 END) = 1 AS has_inventory,
         MAX(CASE WHEN tw.obs_name = 'alias_get_recommendations_by_company' THEN 1 ELSE 0 END) = 1 AS has_recommendations,
+        -- True when alias_get_recommendations_by_company returned a non-empty listings array.
+        -- Handles two response shapes: flat {"listings":[{...}]} and nested {"hlsresult":{"listings":[{...}]}}.
+        -- GET_JSON_OBJECT returns NULL when the array is absent or empty, so IS NOT NULL means >=1 listing.
+        MAX(CASE
+            WHEN tw.obs_name = 'alias_get_recommendations_by_company'
+                AND tw.obs_type = 'TOOL'
+                AND (
+                    GET_JSON_OBJECT(tw.obs_output, '$.listings[0]') IS NOT NULL
+                    OR GET_JSON_OBJECT(tw.obs_output, '$.hlsresult.listings[0]') IS NOT NULL
+                )
+            THEN 1 ELSE 0
+        END) = 1 AS has_actual_recommendations,
         MAX(CASE WHEN tw.obs_name = 'alias_schedule_visit_agentV1' THEN 1 ELSE 0 END) = 1 AS has_scheduling,
         MAX(CASE WHEN tw.obs_name = 'alias_visit_get_availability' THEN 1 ELSE 0 END) = 1 AS has_availability,
         MAX(CASE WHEN tw.obs_name = 'alias_register_visit_intention' THEN 1 ELSE 0 END) = 1 AS has_visit_registered,
@@ -80,11 +92,20 @@ session_agg_base AS (
                 AND LOWER(tw.obs_output) LIKE '%escalation registered successfully%'
             THEN 1 ELSE 0
         END) = 1 AS escalation_registered_success,
+        -- funnel_stage_deepest: uses visit_registered_success (tool returned success) as first priority,
+        -- NOT has_visit_registered (tool was merely called). This prevents sessions where the visit tool
+        -- was called but failed from being classified as visit_intention_registered.
         CASE
-            WHEN MAX(CASE WHEN tw.obs_name = 'alias_register_visit_intention' THEN 1 ELSE 0 END) = 1
+            WHEN MAX(CASE
+                WHEN tw.obs_name = 'alias_register_visit_intention'
+                    AND LOWER(tw.obs_output) LIKE '%registered successfully%'
+                THEN 1 ELSE 0
+            END) = 1
                 THEN 'visit_intention_registered'
             WHEN MAX(CASE WHEN tw.obs_name = 'alias_escalation_agentV1' THEN 1 ELSE 0 END) = 1
                 THEN 'escalated'
+            WHEN MAX(CASE WHEN tw.obs_name = 'alias_register_visit_intention' THEN 1 ELSE 0 END) = 1
+                THEN 'visit_attempt_failed'
             WHEN MAX(CASE WHEN tw.obs_name = 'alias_schedule_visit_agentV1' THEN 1 ELSE 0 END) = 1
                 THEN 'schedule_visit_agent_called'
             WHEN MAX(CASE WHEN tw.obs_name = 'alias_get_recommendations_by_company' THEN 1 ELSE 0 END) = 1
@@ -165,6 +186,7 @@ SELECT
     sa.has_profiling,
     sa.has_inventory,
     sa.has_recommendations,
+    sa.has_actual_recommendations,
     sa.has_scheduling,
     sa.has_availability,
     sa.has_visit_registered,

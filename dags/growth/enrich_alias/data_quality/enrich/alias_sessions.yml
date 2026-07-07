@@ -35,6 +35,7 @@ column_level_validations:
         - 'profile_identified'
         - 'inventory_searched'
         - 'schedule_visit_agent_called'
+        - 'visit_attempt_failed'
         - 'visit_intention_registered'
         - 'escalated'
       severity_level: Error
