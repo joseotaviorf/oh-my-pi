@@ -116,6 +116,8 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/journey_pc.md` — Journey PC (post-contract journey mix): share of For Rent client slots (contract × role) in each support-interaction category — % Seamless / % Digital / % Human Support clients — by month, journey stage (onboarding/ongoing; offboarding excluded) and IQ/PP, plus interaction-volume metrics (% clientes seamless/digital/human sup. / tamanho do universo por etapa). Population counterpart to the NPS Seamless family in `metric_entities/nps_fr.md`. Builds on `business_entities/ticket.md` and `business_entities/chatbot_sessions.md`.
 
+- `metric_entities/turnover.md` — Turnover: official monthly workforce attrition indicator (Leavers / Average Monthly Headcount), with NH Attrition (3/6/12-month), Regrettable Turnover (RL/VRTO), and Voluntary/Involuntary segmentation (turnover / rotatividade / NH attrition / regrettable turnover / VRTO). Builds on `business_entities/employee_details.md`.
+
 ## Company-Wide Glossary
 
 These abbreviations appear across multiple entities and data domains. In column names, they map to specific prefixes:

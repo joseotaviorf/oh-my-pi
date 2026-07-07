@@ -40,6 +40,10 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - `organization.md` — cost center, business unit, and job reference dimensions joined via `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version` on the fact.
 - `org_chart.md` — lightweight current org chart for active employees (`datalake_people_public.org_chart`) when DW joins are not needed.
 
+## Related Metric Entities
+
+- `../metric_entities/turnover.md` — official monthly turnover formula (Global Turnover, NH Attrition, Regrettable Turnover); overrides any generic calculation here for official reporting.
+
 ## Glossary and Synonyms
 
 - **Employee / worker / workforce member / FTE / contractor** (colaborador, funcionário) → `dim_employee` / `fact_assignment_snapshots`; contractors and full-time included when they have a valid assignment
@@ -113,6 +117,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Voluntary terminations** — `is_terminated = TRUE` + `dim_event_definition` filtered by `action_name` / `reason_name`
 - **Turnover / attrition** — terminations via `is_terminated = TRUE`, always **excluding** internal transfers with `is_transfer_termination = FALSE` (equivalently `dim_event_definition.action_name <> 'Global Transfer'`)
 - **Managers vs ICs** — `is_manager`, `is_member_lt`
+- **Turnover / attrition** — official monthly formula lives in `../metric_entities/turnover.md` (never approximate ad hoc); built from `is_terminated`, `dt_terminated`, and `is_monthly_snapshot` headcount snapshots on `fact_assignment_snapshots`
 
 ## Relationships with Other Entities
 
@@ -120,7 +125,8 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 
 - Cost center: `fact.sk_cost_center_version = dw_organization.dim_cost_center.sk_cost_center_version` — the fact carries the version SK valid on `dt_reference`; do not join on date range alone.
 - Business unit: `fact.sk_business_unit = dw_organization.dim_business_unit.sk_business_unit`.
-- Job catalog: `fact.sk_job_version` for versioned job on the snapshot; `dw_organization.dim_job` for current job definitions.
+- Job catalog (versioned, point-in-time): `fact.sk_job_version = dw_employee_details.dim_job.sk_job_version` — SCD Type 2; the fact already carries the version valid on `dt_reference`, no additional date filter needed. Use for historical attribution (e.g. the job/band a person held at termination).
+- Job catalog (current only): `dw_organization.dim_job` (`sk_job`, SCD Type 1) — current job attributes only; do not use it for point-in-time or historical analysis.
 
 ### Compensation (N:1 per snapshot date)
 
@@ -150,6 +156,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - Use `dim_employee` alone for point-in-time analysis — it is always overwritten to current state.
 - Rely on work email history per assignment — only the most recent assignment's email is exposed in the current model.
 - Expect incomplete hierarchy chains to L0 on active employees — gaps are data quality issues.
+- Compute or approximate an official turnover/attrition figure without following `../metric_entities/turnover.md` — it defines the exact formula, exclusions, segments, and the safety rule for missing inputs.
 - Use deprecated People sources for new queries: `datalake_hr_system`, `datalake_employment`, `greenhouse` (v1), `enrich_employee`, `enrich_hr_system`, `enrich_pin`, or the legacy `dw_employee` DAG — prefer `datalake_pin_core_clean`, `datalake_people`, and `dw_*` schemas (see `people_domain.mdc`).
 
 ## Golden Queries
