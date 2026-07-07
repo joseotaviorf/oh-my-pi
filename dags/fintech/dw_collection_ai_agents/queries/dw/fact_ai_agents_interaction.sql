@@ -160,5 +160,5 @@ LEFT JOIN
         ON mcp.id_langfuse_session = s.id_external
 LEFT JOIN
     datalake_ai_collections_quintoandar.messages AS msg
-        ON msg.id_sauron_session = s.id_sauron_session
+        ON msg.id_external = s.id_external
 WHERE s.flag_session_with_trace
