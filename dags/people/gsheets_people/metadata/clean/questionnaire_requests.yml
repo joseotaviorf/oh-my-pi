@@ -1,0 +1,61 @@
+database_name: datalake_gsheets_people_clean
+table_name: questionnaire_requests
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Request log for each AI Teva team effectiveness survey run, tracking who requested the survey, which team members
+  were invited, the survey window, response counts, and the status of the results report delivery.
+columns:
+  survey_invite_id:
+    description: Unique identifier for each survey invitation request, used as a foreign key to join with individual responses
+      in survey_answers.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.unique_id
+  survey_title:
+    description: Title of the survey identifying the team and cycle (e.g. TEVA | FS Post Contract Leadership Team | Jan'26).
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.survey_title
+  requester_email:
+    description: Corporate email address of the person who requested the survey to be sent to the team.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.requester
+  team_members:
+    description: Comma-separated list of corporate email addresses of team members who were invited to participate in the
+      survey.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.team_members
+  survey_status:
+    description: Current status of the survey run (e.g. Open, Closed), indicating whether it is still accepting responses.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.survey_status
+  report_status:
+    description: Status of the results report generation and delivery (e.g. Sent, Pending), indicating whether the team received
+      their feedback report.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.report_status
+  invited_count:
+    description: Total number of team members who received an invitation to participate in this survey run.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.invited
+  answered_count:
+    description: Total number of team members who completed and submitted their survey responses.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.answered
+  dt_survey_started:
+    description: Date when the survey was opened and team members started receiving invitations to respond.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.survey_start_date
+  dt_survey_ended:
+    description: Date when the survey was closed and no longer accepting new responses.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.survey_end_date
+  ts_requested:
+    description: Timestamp when the survey request was submitted through the AI Teva tool.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.timestamp
+  ts_report_email_sent:
+    description: Timestamp when the results report email was sent to the survey requester, parsed from the source field using
+      the same M/d/yyyy HH:mm:ss format as ts_requested.
+    lineage:
+    - datalake_gsheets_people_raw.questionnaire_requests.report_email_sent
+  ts_load:
+    description: Timestamp when this survey request record was ingested from the Google Sheets source into the People lake.
