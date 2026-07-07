@@ -47,9 +47,9 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 ## Glossary and Synonyms
 
 - **Employee / worker / workforce member / FTE / contractor** (colaborador, funcionário) → `dim_employee` / `fact_assignment_snapshots`; contractors and full-time included when they have a valid assignment
-- **Headcount / active workforce / FTE count / quadro** → `COUNT(DISTINCT person_number)` on `fact_assignment_snapshots` where `is_active = TRUE`, `is_current = TRUE`, `is_primary_assignment_for_snapshot = TRUE`; when listing rows (not distinct-counting), also filter `is_transfer_termination = FALSE` to drop frozen rows of assignments closed by transfer
+- **Headcount / active workforce / FTE count / quadro** → `COUNT(DISTINCT person_number)` on `fact_assignment_snapshots` where `is_current_for_employee = TRUE` and `is_active = TRUE`; the same two flags are the correct filter for row-level (not distinct-counting) queries too
 - **Monthly snapshot / month-end headcount / base fotografias** → `fact_assignment_snapshots` with `is_monthly_snapshot = TRUE` and explicit `dt_reference` (typically month-end)
-- **Current state / latest snapshot / as-of today / base completa** → `fact_assignment_snapshots` with `is_current = TRUE`
+- **Current state / latest snapshot / as-of today / base completa** → `fact_assignment_snapshots` with `is_current_for_employee = TRUE`; use `is_current = TRUE` only when you specifically need assignment-grain history (an employee can have multiple `is_current` rows across past assignments)
 - **Snapshot date / as-of date / reference date** → `dt_reference` on the fact (one row per assignment per calendar day)
 - **Person number / employee ID / HR ID / matrícula** → `person_number` — stable business key across assignments
 - **Assignment / employment record / vínculo** → `assignment_number`; one person may have multiple after internal transfers
@@ -99,18 +99,17 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 
 **Critical rules:**
 - **TARS pilot (Trino `delta`):** only `fact_assignment_snapshots`, `dim_employee`, `dim_event_definition`, and `dim_management_hierarchy` from this schema. No salary data. Restricted audience until pilot sign-off.
-- Always filter `fact_assignment_snapshots` by `is_current = TRUE`, `is_monthly_snapshot = TRUE`, or an explicit `dt_reference` — unscoped queries return every historical day per assignment.
+- **Default approach:** for current-state analysis, filter `is_current_for_employee = TRUE`. For historical analysis, filter `is_monthly_snapshot = TRUE` and `is_primary_assignment_for_snapshot = TRUE`. The default approach omits employees who were rehired and/or have multiple terminations and transfers. For these cases, use `is_current` — it stands for is-current-for-assignment and returns the latest information for every assignment, so employees with 2+ assignments appear on multiple rows.
+- **`is_current_for_employee = TRUE`** returns exactly one row per employee — the assignment active today, or their most recent terminated assignment if none is active today.
 - `sk_*_version` keys on the fact are point-in-time join keys, not permanent identifiers for an employee.
 - Use `is_primary_assignment_for_snapshot = TRUE` when an employee has multiple assignments on the same date.
 - `dim_management_hierarchy` exposes L0–L9 (L0 = CEO). Everyone in the same area shares the same L1 VP — filter by `name_l1`…`name_l9` without self-joins.
 - The fact has no `year/month/day` partitions — expect full-table scans when unfiltered.
 - **Internal transfers are not exits.** An internal move terminates the old assignment with `dim_event_definition.action_name = 'Global Transfer'` and opens a new `assignment_number` starting the **next day**. Never count these termination rows as dismissals, turnover, or attrition — the person remains employed. These rows carry `is_transfer_termination = TRUE`; filter it out of any termination analysis.
 - **Transferred employees stay active on the transfer date.** The pipeline keeps `is_active = TRUE` (and `employment_status = 'Active'`) on the old assignment's termination date when it is a Global Transfer, so daily active headcount does not dip on batch transfer dates (e.g. 2026-01-31, ~396 Global Transfers). If a sudden single-day headcount drop still appears, check terminations on that date against `is_transfer_termination` / `action_name = 'Global Transfer'` before reporting it as attrition.
-- **Current-state lists on the fact need `is_transfer_termination = FALSE`.** On `fact_assignment_snapshots`, an assignment closed by a transfer keeps its last snapshot as `is_current = TRUE` (and now also `is_active = TRUE`) forever at the assignment grain. `COUNT(DISTINCT person_number)` is safe, but row-level "current active employees" queries must add `is_transfer_termination = FALSE` or the transferred person appears twice (old + new assignment). `metric_people.employee_snapshots` already demotes these frozen rows to `is_current = FALSE`, so this caveat applies to the fact only.
-
 ## Key Metrics
 
-- **Active headcount** — `COUNT(DISTINCT person_number)` where `is_active = TRUE`, `is_current = TRUE`, `is_primary_assignment_for_snapshot = TRUE`
+- **Active headcount** — `COUNT(DISTINCT person_number)` where `is_current_for_employee = TRUE` and `is_active = TRUE`
 - **Tenure in company** — `days_tenure_in_company`, `months_tenure_in_company` (relative to `dt_reference`)
 - **Tenure in assignment** — `days_tenure_in_assignment` (current role only)
 - **Span of control** — `count_direct_report`, `count_indirect_report` (pre-computed on the fact)
@@ -139,7 +138,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 ## Dos and Don'ts
 
 **Do:**
-- Start from `fact_assignment_snapshots` with `is_current = TRUE` for today's workforce state.
+- Start from `fact_assignment_snapshots` with `is_current_for_employee = TRUE` for today's workforce state, one row per employee; reach for `is_current = TRUE` only when you need assignment-grain history.
 - Use `dim_employee.name` for communications; reserve `dim_documentation.legal_name` for compliance.
 - Join versioned dimensions through the `sk_*_version` keys on the fact for the snapshot date in scope.
 - Use `dt_original_hire` when tenure should credit prior company employment; `dt_hired` for seniority in the current contract only.
@@ -152,7 +151,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - Query `fact_assignment_snapshots` without a date scope — row counts inflate across every historical day.
 - Use `dt_terminated` or `dim_event_definition` to predict **involuntary** layoffs — involuntary termination dates are recorded only after communication.
 - Treat `sk_contact_version` or `sk_hierarchy_version` as stable employee identifiers.
-- Assume one row per employee without `is_primary_assignment_for_snapshot = TRUE` after internal transfers.
+- Assume one row per employee without `is_current_for_employee = TRUE` (current-state queries) or `is_primary_assignment_for_snapshot = TRUE` (assignment-grain queries) after internal transfers.
 - Use `dim_employee` alone for point-in-time analysis — it is always overwritten to current state.
 - Rely on work email history per assignment — only the most recent assignment's email is exposed in the current model.
 - Expect incomplete hierarchy chains to L0 on active employees — gaps are data quality issues.
@@ -188,10 +187,8 @@ LEFT JOIN dw_employee_details.dim_management_hierarchy AS hier
     ON fact.sk_hierarchy_version = hier.sk_hierarchy_version
 LEFT JOIN dw_employee_details.dim_event_definition AS evt
     ON fact.sk_termination_event_definition = evt.sk_event_definition
-WHERE fact.is_current = TRUE
+WHERE fact.is_current_for_employee = TRUE
   AND fact.is_active = TRUE
-  AND fact.is_primary_assignment_for_snapshot = TRUE
-  AND fact.is_transfer_termination = FALSE
 ```
 
 ## DataHub catalog

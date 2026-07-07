@@ -45,8 +45,7 @@ column_level_validations:
         (SELECT COUNT(*) FROM (
           SELECT dt_reference
           FROM datalake_people.assignment_snapshots
-          WHERE COALESCE(is_future_hire, FALSE) = FALSE
-            AND dt_reference >= DATE_SUB(CURRENT_DATE(), 7)
+          WHERE dt_reference >= DATE_SUB(CURRENT_DATE(), 7)
           GROUP BY dt_reference
           HAVING
             MAX(
@@ -91,17 +90,27 @@ column_level_validations:
             AND TRUNC(dt_month_reference, 'MM') != TRUNC(dt_terminated, 'MM')
         )) = 0
       severity_level: Error
-  one_current_primary_row_per_person:
+  one_current_employee_flag_per_employee:
     custom:
       # Employee-grain exports rely on exactly one is_current_for_employee row per id_person.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT id_person
           FROM datalake_people.assignment_snapshots
-          WHERE is_current_for_employee = TRUE
           GROUP BY id_person
-          HAVING COUNT(*) > 1
+          HAVING SUM(CASE WHEN is_current_for_employee THEN 1 ELSE 0 END) != 1
         )) = 0
+      severity_level: Error
+  transfer_termination_is_active_on_current_row:
+    custom:
+      # Transfer terminations (GLB_TRANSFER) must stay is_active = TRUE on their is_current row — the is_current_for_employee fallback depends on it.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.assignment_snapshots
+         WHERE is_current = TRUE
+           AND COALESCE(is_transfer_termination, FALSE) = TRUE
+           AND is_active = FALSE
+        ) = 0
       severity_level: Error
   status_termination_date_consistency:
     custom:

@@ -156,7 +156,7 @@ columns:
     lineage:
       - datalake_people.assignment_snapshots.is_current
   is_current_for_employee:
-    description: True when this row is the single current primary assignment for the employee. Among rows with is_current and is_primary_assignment_for_snapshot, prefers the active assignment, then the latest dt_reference, then the highest assignment_number.
+    description: True on exactly one row per employee, the assignment active today or their most recent terminated assignment. Use this flag to filter for the employee's current state.
     lineage:
       - datalake_people.assignment_snapshots.is_current_for_employee
   dt_original_hire:

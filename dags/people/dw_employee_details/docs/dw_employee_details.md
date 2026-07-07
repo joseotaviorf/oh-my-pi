@@ -99,8 +99,8 @@ Closely related employee topics that live in sibling schemas, not in `dw_employe
 ## Attention and Limitations
 
 * **`sk_*_version` keys are point-in-time, not fixed** : Foreign keys like `sk_contact_version`, `sk_documentation_version`, and `sk_hierarchy_version` in the fact table do not identify a single, stable record for an entity. They identify the version of that attribute that was valid on a specific `dt_reference`. The same employee will have different `sk_contact_version` values across dates if their contact info changed. Treat these as temporal join keys, not as permanent identifiers.
-* **Always scope `dt_reference`** : `fact_assignment_snapshots` contains one row per assignment per calendar day. Querying without a date filter will return every historical day for every assignment, multiplying row counts and producing inflated totals. Use `is_current = TRUE` to get today's state (equivalent to the former *base completa*), or filter to a specific `dt_reference` value. Use `is_monthly_snapshot = TRUE` for monthly headcount, replacing the former *base fotografias* pattern.
-* **Multi-assignment employees** : An employee who transferred internally or was rehired may hold more than one `assignment_number`. Use `is_primary_assignment_for_snapshot = TRUE` for the canonical assignment on a given `dt_reference`. For employee-grain current exports, use `is_current_for_employee = TRUE` to get exactly one row per person.
+* **Always scope `dt_reference`** : `fact_assignment_snapshots` contains one row per assignment per calendar day. Querying without a date filter will return every historical day for every assignment, multiplying row counts and producing inflated totals. For current-state analysis, use `is_current_for_employee = TRUE` — it returns exactly one row per employee (equivalent to the former *base completa*). For historical analysis, use `is_monthly_snapshot = TRUE` and `is_primary_assignment_for_snapshot = TRUE`, replacing the former *base fotografias* pattern. This default approach omits employees who were rehired and/or have multiple terminations and transfers; for these cases, use `is_current = TRUE` — it stands for is-current-for-assignment and returns the latest information for every assignment, so employees with 2+ assignments appear on multiple rows.
+* **Multi-assignment employees** : An employee who transferred internally or was rehired may hold more than one `assignment_number`. Use `is_primary_assignment_for_snapshot = TRUE` for the canonical assignment on a given `dt_reference`. For employee-grain current exports, use `is_current_for_employee = TRUE` : it resolves to the assignment active today, or the employee's most recent terminated assignment if none is active today, giving exactly one row per employee.
 * **Work email history not available** : Each assignment has an associated work email, but the current model exposes only the email from the person's most recent assignment. Emails from previous assignments are not accessible through this schema.
 * **`dim_job` versions can repeat visible attributes** : `sk_job_version` on `dim_job` and on the fact table is the same version key used by `dw_compensation.dim_job`, which also versions on compensation changes (salary table, salary range, targets). Since `dim_job` here excludes those columns, two consecutive versions can show identical title/family/band when only a compensation attribute changed upstream — this preserves the join to the fact and to `dw_compensation.dim_job` and is expected, not a data quality issue.
 * **Hire date semantics** : The fact table exposes two hire dates that serve different purposes. `dt_hired` is the start date of the employee's most recent contract, regardless of any prior employment history. `dt_original_hire` is the start date of their very first contract at the company, which may predate a cross-entity transfer. For tenure calculations that should credit prior employment, use `dt_original_hire`; for calculating seniority within the current contract, use `dt_hired`. The flag `is_internal_transfer` indicates that the current contract began as a transfer from a previous one, meaning the person was already at the company before this assignment started.
@@ -168,9 +168,8 @@ LEFT JOIN
     dw_employee_details.dim_event_definition AS evt
     ON fact.sk_termination_event_definition = evt.sk_event_definition
 WHERE
-    fact.is_current = TRUE
+    fact.is_current_for_employee = TRUE
     AND fact.is_active = TRUE
-    AND fact.is_transfer_termination = FALSE
 ```
 
 ### Analytical Snapshot (Voluntary Terminations by Manager's Chain)
@@ -210,7 +209,7 @@ ORDER BY 1
 
 * **Validity Window** : A period during which specific attributes of an employee remain unchanged and valid, represented by `dt_valid_from` / `dt_valid_to` pairs in dimension tables.
 * **Snapshot** : A representation of data as it existed at a specific point in time. `fact_assignment_snapshots` stores one snapshot per assignment per calendar day.
-* **Current State** : The latest version of the data, with no historical records. `dim_employee` is always current state.
+* **Current State** : The latest version of the data, with no historical records. `dim_employee` is always current state; on `fact_assignment_snapshots`, `is_current_for_employee = TRUE` gives the same one-row-per-employee current state.
 * **SCD (Slowly Changing Dimension)** : A design pattern for storing both current and historical attribute values over time. Most dimensions in this schema use SCD Type 2 (validity windows).
 
 ## See Also

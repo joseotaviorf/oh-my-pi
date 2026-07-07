@@ -922,7 +922,7 @@ columns:
       - dw_employee_details.fact_assignment_snapshots.is_transfer_termination
 
   is_current_for_employee:
-    description: True when this row is the single current primary assignment for the employee. Use for employee-grain exports instead of is_current AND is_primary_assignment_for_snapshot.
+    description: True on exactly one row per employee, the assignment active today or their most recent terminated assignment. Use this flag to filter for the employee's current state.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_current_for_employee

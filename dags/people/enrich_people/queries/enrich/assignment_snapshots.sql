@@ -41,9 +41,7 @@ assignments_daily AS (
         awd.dt_notified_termination,
         awd.dt_series_end,
         dt_reference,
-        (
-            dt_reference < awd.dt_started
-        ) AS is_future_hire
+        dt_reference = DATE('{load_start_date}') AS is_latest_date
     FROM
         assignments_with_dates AS awd
     LATERAL VIEW EXPLODE(dt_reference_array) dt_ref AS dt_reference
@@ -58,10 +56,6 @@ primary_assignment_per_person_day_ranked AS (
                 ad.id_person,
                 ad.dt_reference
             ORDER BY
-                CASE
-                    WHEN NOT ad.is_future_hire THEN 0
-                    ELSE 1
-                END ASC,
                 ad.dt_started DESC
         ) AS rn
     FROM
@@ -99,8 +93,6 @@ hierarchy_with_direct_manager AS (
             ON mh.assignment_number = ad.assignment_number
             AND ad.dt_reference >= mh.dt_valid_from
             AND ad.dt_reference <= mh.dt_valid_to
-    WHERE
-        NOT ad.is_future_hire
 ),
 direct_report_counts AS (
     SELECT
@@ -281,12 +273,12 @@ assignment_snapshots_ranked AS (
         im.dt_original_hired IS NOT NULL
             AND im.dt_original_hired < ad.dt_started AS is_internal_transfer,
         COALESCE(im.is_transfer_termination, FALSE) AS is_transfer_termination,
-        ad.is_future_hire,
+        ad.is_latest_date,
         COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
         lo.id_employee IS NOT NULL AS is_reorganization_termination,
         (
             LAST_DAY(ad.dt_reference) = ad.dt_reference
-            OR ad.dt_reference = DATE('{load_start_date}')
+            OR ad.is_latest_date
             OR ad.dt_reference = ad.dt_series_end
         ) AS is_monthly_snapshot,
         ad.dt_reference = ad.dt_series_end AS is_current,
@@ -361,27 +353,60 @@ assignment_snapshots_ranked AS (
             AND ad.dt_reference >= cv.dt_valid_from
             AND ad.dt_reference <= cv.dt_valid_to
 ),
-current_primary_assignment_ranked AS (
+current_primary_assignment_today AS (
     SELECT
         asr.id_assignment,
+        asr.id_person,
+        asr.dt_reference
+    FROM
+        assignment_snapshots_ranked AS asr
+    WHERE
+        asr.rn = 1
+        AND asr.is_latest_date = TRUE
+        AND asr.is_primary_assignment_for_snapshot = TRUE
+),
+current_primary_assignment_fallback_ranked AS (
+    SELECT
+        asr.id_assignment,
+        asr.id_person,
         asr.dt_reference,
         ROW_NUMBER() OVER (
             PARTITION BY
                 asr.id_person
             ORDER BY
                 CASE
-                    WHEN asr.is_active THEN 0
-                    ELSE 1
-                END,
+                    WHEN asr.is_transfer_termination THEN 1
+                    ELSE 0
+                END ASC,
                 asr.dt_reference DESC,
                 asr.assignment_number DESC
-        ) AS person_primary_rn
+        ) AS fallback_rn
     FROM
         assignment_snapshots_ranked AS asr
     WHERE
         asr.rn = 1
         AND asr.is_current = TRUE
         AND asr.is_primary_assignment_for_snapshot = TRUE
+        AND asr.id_person NOT IN (
+            SELECT id_person FROM current_primary_assignment_today
+        )
+),
+current_primary_assignment_ranked AS (
+    SELECT
+        id_assignment,
+        id_person,
+        dt_reference
+    FROM
+        current_primary_assignment_today
+    UNION ALL
+    SELECT
+        id_assignment,
+        id_person,
+        dt_reference
+    FROM
+        current_primary_assignment_fallback_ranked
+    WHERE
+        fallback_rn = 1
 )
 SELECT
     asr.id_assignment,
@@ -418,12 +443,12 @@ SELECT
     asr.has_emergency_contact,
     asr.is_internal_transfer,
     asr.is_transfer_termination,
-    asr.is_future_hire,
+    asr.is_latest_date,
     asr.is_primary_assignment_for_snapshot,
     asr.is_reorganization_termination,
     asr.is_monthly_snapshot,
     asr.is_current,
-    COALESCE(cpar.person_primary_rn = 1, FALSE) AS is_current_for_employee,
+    cpar.id_assignment IS NOT NULL AS is_current_for_employee,
     asr.dt_original_hire,
     asr.dt_hired,
     asr.dt_terminated,
