@@ -1653,7 +1653,6 @@ bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
 bietlejuice.enrich_atta:
-  - bietlejuice.atta:load-clean-log-isolve-v1:first-run-of-day
   - bietlejuice.atta:load-clean-log-isolve-v2:first-run-of-day
   - bietlejuice.atta:load-clean-partner-info:first-run-of-day
   - bietlejuice.atta:load-clean-proposal:first-run-of-day

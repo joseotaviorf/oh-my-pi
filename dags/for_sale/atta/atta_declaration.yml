@@ -15,8 +15,6 @@ workflow:
   custom_schema: atta
   dbutils_secret_key: ATTA_DB
   tables_customization:
-    banktracking:
-      clean_table_name: bank_tracking
     cliente:
       clean_table_name: client_info
       transactional_datatype_overrides:
@@ -32,24 +30,14 @@ workflow:
       clean_table_name: pre_analysis
     consulta_score_bradesco:
       clean_table_name: pre_analysis_bradesco
-    consulta_score_bradesco_params:
-      clean_table_name: pre_analysis_bradesco_params
-    consulta_score_bradesco_ratings:
-      clean_table_name: pre_analysis_bradesco_ratings
     consulta_score_caixa:
       clean_table_name: pre_analysis_caixa
     consulta_score_cliente_ctrl:
       clean_table_name: pre_analysis_client_ctrl
-    consulta_score_ctrl:
-      clean_table_name: pre_analysis_ctrl
     consulta_score_itau:
       clean_table_name: pre_analysis_itau
-    consulta_score_itau_ratings:
-      clean_table_name: pre_analysis_itau_ratings
     consulta_score_santander:
       clean_table_name: pre_analysis_santander
-    consulta_score_santander_matriz_decisao:
-      clean_table_name: pre_analysis_santander_matrix
     entidade_log:
       clean_table_name: log_isolve_v2
     fornecedores:
@@ -59,8 +47,6 @@ workflow:
       transactional_datatype_overrides:
         Latitude: decimal(38,30)
         Longitude: decimal(38,30)
-    log_proposta_esteira:
-      clean_table_name: log_isolve_v1
     max_usuarios:
       clean_table_name: users_info
     parceiro:
