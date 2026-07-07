@@ -1,48 +1,64 @@
 database_name: datalake_wololo_prospect
 table_name: prospect_calls
-description: This is an enrichment table that brings the calls made by third-party
-  companies to property owners who are not yet registered on our platform (prospects),
-  within the Prospect 2 Opportunity conversion funnel.
+description: Enrich table with one row per outbound call to a Wololo prospect within a contact round. Built from datalake_wololo_clean prospect, contact, and round. Incremental load filtered by ts_contacted date between load_start_date and load_end_date. Partitioned by year, month, and day on ts_contacted — always filter all three partition columns in WHERE clauses.
 domain: Growth
-owner: ae-growth@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   id_prospect:
     lineage:
     - datalake_wololo_clean.prospect.id_reference
-    description: The proespect identifier.
+    description: Supply lead identifier (prospect.id_reference); joins to id_lead_ebdb in supply pipelines.
   id_wololo_prospect:
     lineage:
     - datalake_wololo_clean.prospect.id
-    description: The prospect identifier in the Wololo's Prospect table.
+    description: Wololo internal prospect identifier from datalake_wololo_clean.prospect.id.
   id_call_analyst:
     lineage:
     - datalake_wololo_clean.contact.id_analyst
-    description: The identifier of the third-party call analyst.
+    description: Identifier of the third-party call analyst who performed the outbound contact.
   phone_number:
     lineage:
     - datalake_wololo_clean.contact.phone_number
-    description: The prospect phone number the call was made to.
+    description: Phone number dialed or messaged during the outbound contact attempt.
   channel:
     lineage:
     - datalake_wololo_clean.contact.channel
-    description: Contact channel.
+    description: Outbound contact channel used for the attempt (for example phone or WhatsApp).
   call_output:
     lineage:
     - datalake_wololo_clean.contact.phone_output
-    description: The contact output populated by third-party call analyst.
+    description: Outcome label reported by the third-party analyst for the phone contact attempt.
   round_number:
     lineage:
     - datalake_wololo_clean.round.round_number
-    description: Number of the call round (group of calls).
+    description: Sequential round index grouping contact attempts for the same prospect.
   round_max_tries:
     lineage:
     - datalake_wololo_clean.round.round_max_tries
-    description: Max number of calls allowed in the round.
+    description: Maximum number of contact attempts allowed within the round.
   ts_contacted:
     lineage:
     - datalake_wololo_clean.contact.ts_contacted
-    description: Timestamp of the call.
+    description: Timestamp when the outbound contact attempt was made to the prospect.
   ts_round_started:
     lineage:
     - datalake_wololo_clean.round.ts_created
-    description: Timestamp of the call round start.
+    description: Timestamp when the contact round started, used to attribute calls to the active round window.
+  call_number:
+    description: Sequential call index within the prospect and round, ordered by ts_contacted ascending.
+    lineage:
+    - datalake_wololo_clean.contact.ts_contacted
+  ts_load:
+    description: Timestamp when the enrich row was materialized by the enrich_wololo DAG.
+  year:
+    description: Partition year derived from ts_contacted. Filter in WHERE with month and day for pruning.
+    lineage:
+    - datalake_wololo_clean.contact.ts_contacted
+  month:
+    description: Partition month derived from ts_contacted. Filter in WHERE with year and day for pruning.
+    lineage:
+    - datalake_wololo_clean.contact.ts_contacted
+  day:
+    description: Partition day derived from ts_contacted. Filter in WHERE with year and month for pruning.
+    lineage:
+    - datalake_wololo_clean.contact.ts_contacted
