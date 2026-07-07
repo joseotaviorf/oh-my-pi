@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: discount_entry
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Association between a discount and an accounting entry in Retsuko.
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Association between a discount and an accounting entry in Retsuko.
 columns:
   id:
     description: "Primary key for joins in retsuko"

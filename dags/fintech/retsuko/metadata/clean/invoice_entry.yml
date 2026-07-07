@@ -1,20 +1,27 @@
 database_name: datalake_retsuko_clean
 table_name: invoice_entry
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system.
+  Links between invoices and accounting entries in Seu Barriga.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_invoice:
     lineage:
       - datalake_retsuko_raw.invoice_entry.invoice_id
+    description: Invoice identifier in the billing or payments platform.
   id_entry:
     lineage:
       - datalake_retsuko_raw.invoice_entry.entry_id
+    description: Identifier for the entry referenced by this financial record.
   invoice_accrual_year_month:
     lineage:
       - datalake_retsuko_raw.invoice_entry.invoice_accrual_year_month
+    description: Financial attribute representing invoice accrual year month on the invoice_entry dataset.
   ts_created:
     lineage:
       - datalake_retsuko_raw.invoice_entry.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   year:
     description: Year information
     lineage:

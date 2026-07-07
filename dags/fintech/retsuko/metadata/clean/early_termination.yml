@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: early_termination
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Early termination records for contracts (fees, accounts, notice, publishing).
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Early termination records for contracts (fees, accounts, notice, publishing).
 columns:
   id:
     description: "Primary key for joins in retsuko"
@@ -17,11 +17,11 @@ columns:
     lineage:
       - datalake_retsuko_raw.early_termination.contract_external_id
   id_from_account:
-    description: "Origin account id"
+    description: Identifier for the from account referenced by this financial record.
     lineage:
       - datalake_retsuko_raw.early_termination.from_account_id
   id_to_account:
-    description: "Destination account id"
+    description: Identifier for the to account referenced by this financial record.
     lineage:
       - datalake_retsuko_raw.early_termination.to_account_id
   dont_charge_adm_fee:
@@ -33,11 +33,11 @@ columns:
     lineage:
       - datalake_retsuko_raw.early_termination.prior_notice
   fee_amount_agreed:
-    description: "Agreed fee amount for early termination"
+    description: Financial attribute representing fee amount agreed on the early_termination dataset.
     lineage:
       - datalake_retsuko_raw.early_termination.fee_amount_agreed
   version:
-    description: "Record version"
+    description: Financial attribute representing version on the early_termination dataset.
     lineage:
       - datalake_retsuko_raw.early_termination.version
   source:

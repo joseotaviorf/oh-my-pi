@@ -1,13 +1,13 @@
 database_name: datalake_retsuko_clean
 table_name: manual_entry
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Table from Retsuko source that contains all the audit/manual entries data of the entries.
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Audit and manual accounting entries from Seu Barriga.
 columns:
   id:
     lineage:
       - datalake_retsuko_raw.manual_entry.id
-    description: ID of the table.
+    description: Financial attribute representing id on the manual_entry dataset.
   id_contract:
     lineage:
       - datalake_retsuko_raw.manual_entry.contract_id
@@ -23,7 +23,7 @@ columns:
   id_external:
     lineage:
       - datalake_retsuko_raw.manual_entry.external_id
-    description: ID external.
+    description: Identifier for the external referenced by this financial record.
   id_from_entry:
     lineage:
       - datalake_retsuko_raw.manual_entry.from_entry
@@ -35,7 +35,7 @@ columns:
   id_audit:
     lineage:
       - datalake_retsuko_raw.manual_entry.audit
-    description: ID of the audit.
+    description: Identifier for the audit referenced by this financial record.
   producer:
     lineage:
       - datalake_retsuko_raw.manual_entry.producer
@@ -43,7 +43,7 @@ columns:
   type:
     lineage:
       - datalake_retsuko_raw.manual_entry.type
-    description: Type of the entry bill.
+    description: Financial attribute representing type on the manual_entry dataset.
   description:
     lineage:
       - datalake_retsuko_raw.manual_entry.description
@@ -55,11 +55,11 @@ columns:
   installment_number:
     lineage:
       - datalake_retsuko_raw.manual_entry.installment_number
-    description: Installment number of the entry.
+    description: Financial attribute representing installment number on the manual_entry dataset.
   installment_total_number:
     lineage:
       - datalake_retsuko_raw.manual_entry.installment_total_number
-    description: Total installment number of the entry.
+    description: Financial attribute representing installment total number on the manual_entry dataset.
   installment_total_amount:
     lineage:
       - datalake_retsuko_raw.manual_entry.installment_total_amount
@@ -83,7 +83,7 @@ columns:
   accrual_year_month:
     lineage:
       - datalake_retsuko_raw.manual_entry.accrual_year_month
-    description: Accrual year month of the entry.
+    description: Financial attribute representing accrual year month on the manual_entry dataset.
   dt_accrued:
     lineage:
       - datalake_retsuko_raw.manual_entry.accrued_date

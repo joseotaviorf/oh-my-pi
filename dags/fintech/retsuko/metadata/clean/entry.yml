@@ -1,9 +1,9 @@
 ---
 database_name: datalake_retsuko_clean
 table_name: entry
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the entry table containing invoice entry information and status details
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Invoice entry information and status details from Seu Barriga.
 columns:
   id:
     description: "Unique identifier of the entry in Retsuko"

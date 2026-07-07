@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: monthly_closing_checks
-owner: rodrigo.guedes@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Seu Barriga's checks, alerts and informations about monthly closing"
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Seu Barriga checks, alerts and information about monthly closing.
 columns:
   id:
     description: "Unique ID Internal from the check"

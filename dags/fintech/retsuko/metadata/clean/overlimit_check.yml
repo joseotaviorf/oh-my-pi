@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: overlimit_check
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Records of overlimit verification and resolution linked to agreements and contracts (reference entity, status, verifier and fixer).
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Records of overlimit verification and resolution linked to agreements and contracts (reference entity, status, verifier and fixer).
 columns:
   id:
     description: "Primary key for joins in retsuko"
@@ -52,4 +52,3 @@ columns:
     description: "Record last update datetime in source"
     lineage:
       - datalake_retsuko_raw.overlimit_check.updated_at
-

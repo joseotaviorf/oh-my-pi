@@ -1,24 +1,32 @@
 ---
 database_name: datalake_retsuko_clean
 table_name: invoice_partitioned
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system.
+  Partitioned invoice records from Seu Barriga billing operations.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.id
+    description: Financial attribute representing id on the invoice_partitioned dataset.
   id_external:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.external_id
+    description: Identifier for the external referenced by this financial record.
   id_original_invoice_external:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.original_invoice_external_id
+    description: Identifier for the original invoice external referenced by this financial record.
   id_account:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.account_id
+    description: Identifier for the account referenced by this financial record.
   id_contract:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.contract_id
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_checkout_order:
     description: "External ID that indicates the Order in Checkout product"
     lineage:
@@ -28,7 +36,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.checkout_charge_id
   id_idempotency:
-    description: ""
+    description: Identifier for the idempotency referenced by this financial record.
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.idempotency_id
   payment_unique_payment_identifier:
@@ -38,9 +46,11 @@ columns:
   status:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   substatus:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.sub_status
+    description: Financial attribute representing substatus on the invoice_partitioned dataset.
   payment_status:
     description: "Status from invoice_partitioned payment. It's different from STATUS column. In a chargeback case, payment_status will be as chargeback and status column, will be field with canceled"
     lineage:
@@ -48,12 +58,15 @@ columns:
   paid_via:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.paid_via
+    description: Financial attribute representing paid via on the invoice_partitioned dataset.
   purpose:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.purpose
+    description: Financial attribute representing purpose on the invoice_partitioned dataset.
   closing_mode:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.closing_mode
+    description: Financial attribute representing closing mode on the invoice_partitioned dataset.
   reason:
     description: "Invoices that have the purpose field filled in with the value extras must have the reason field filled in to identify what that invoice_partitioned is about."
     categories:
@@ -69,18 +82,23 @@ columns:
   due_amount:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.due_amount
+    description: Financial attribute representing due amount on the invoice_partitioned dataset.
   paid_amount:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.paid_amount
+    description: Financial attribute representing paid amount on the invoice_partitioned dataset.
   payment_paid_interest_amount:
     lineage:
       - datalake_retusko_raw.invoice_partitioned.payment_paid_interest_amount
+    description: Financial attribute representing payment paid interest amount on the invoice_partitioned dataset.
   payment_paid_fine_amount:
     lineage:
       - datalake_retusko_raw.invoice_partitioned.payment_paid_fine_amount
+    description: Financial attribute representing payment paid fine amount on the invoice_partitioned dataset.
   accrual_year_month:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.accrual_year_month
+    description: Financial attribute representing accrual year month on the invoice_partitioned dataset.
   should_request_boleto:
     description: "Boolean field that indicates if a bill creation request should be done"
     lineage:
@@ -94,7 +112,7 @@ columns:
     lineage:
       - datalake_retusko_raw.invoice_partitioned.payment_company_use_number
   payment_bank_code:
-    description: "Paying Bank Code"
+    description: Financial attribute representing payment bank code on the invoice_partitioned dataset.
     lineage:
       - datalake_retusko_raw.invoice_partitioned.payment_bank_code
   is_write_off:
@@ -108,6 +126,7 @@ columns:
   ts_paid:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.paid_date
+    description: Timestamp when paid occurred in the upstream fintech system.
   ts_payment_confirmation:
     description: "Date that we received bank payment confirmation - In CNAB cases, it's different from ts_paid"
     lineage:
@@ -129,25 +148,29 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.payment_credit_date
   ts_payment_chargeback:
-    description: ""
+    description: Timestamp when payment chargeback occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.payment_chargeback_at
   ts_payment_refunded:
-    description: ""
+    description: Timestamp when payment refunded occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.payment_refunded_at
   ts_canceled:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.canceled_at
+    description: Timestamp when canceled occurred in the upstream fintech system.
   ts_sent:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.sent_at
+    description: Timestamp when sent occurred in the upstream fintech system.
   ts_due:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.due_date
+    description: Timestamp when due occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_synced:
     description: "Data that indicates when data was synced from SB to Retsuko"
     lineage:
@@ -159,9 +182,11 @@ columns:
   ts_retsuko_created:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.retsuko_created_at
+    description: Timestamp when retsuko created occurred in the upstream fintech system.
   ts_retsuko_updated:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.retsuko_updated_at
+    description: Timestamp when retsuko updated occurred in the upstream fintech system.
   year:
     description: Year information
     lineage:
@@ -174,3 +199,6 @@ columns:
     description: Day information
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.day
+  negotiation_status:
+    lineage: []
+    description: Financial attribute representing negotiation status on the invoice_partitioned dataset.

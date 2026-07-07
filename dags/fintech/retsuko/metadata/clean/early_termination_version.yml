@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: early_termination_version
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Versioned snapshots of early termination terms (fees, installments, base due date).
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Versioned snapshots of early termination terms (fees, installments, base due date).
 columns:
   id:
     description: "Primary key for joins in retsuko"
@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.early_termination_version.early_termination_external_id
   version_type:
-    description: "Type of this termination version"
+    description: Financial attribute representing version type on the early_termination_version dataset.
     lineage:
       - datalake_retsuko_raw.early_termination_version.version_type
   is_active:
@@ -25,7 +25,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.early_termination_version.active
   fee_amount_agreed:
-    description: "Agreed fee amount for this version"
+    description: Financial attribute representing fee amount agreed on the early_termination_version dataset.
     lineage:
       - datalake_retsuko_raw.early_termination_version.fee_amount_agreed
   fee_amount_original:
@@ -33,7 +33,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.early_termination_version.fee_amount_original
   number_of_installments:
-    description: "Number of installments in this version"
+    description: Financial attribute representing number of installments on the early_termination_version dataset.
     lineage:
       - datalake_retsuko_raw.early_termination_version.number_of_installments
   ts_base_due:

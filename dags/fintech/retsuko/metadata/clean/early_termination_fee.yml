@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: early_termination_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Fee installments for early termination (amounts, due dates, linked invoice and entries).
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Fee installments for early termination (amounts, due dates, linked invoice and entries).
 columns:
   id:
     description: "Primary key for joins in retsuko"
@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.early_termination_fee.external_id
   id_version_external:
-    description: "External id of the fee version"
+    description: Identifier for the version external referenced by this financial record.
     lineage:
       - datalake_retsuko_raw.early_termination_fee.version_external_id
   id_early_termination_external:
@@ -29,7 +29,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.early_termination_fee.reversed_entry_external_id
   version_type:
-    description: "Type of the fee version"
+    description: Financial attribute representing version type on the early_termination_fee dataset.
     lineage:
       - datalake_retsuko_raw.early_termination_fee.version_type
   accrual_year_month:
@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.early_termination_fee.due_amount
   installment_number:
-    description: "Installment index"
+    description: Financial attribute representing installment number on the early_termination_fee dataset.
     lineage:
       - datalake_retsuko_raw.early_termination_fee.installment_number
   id_invoice_external:

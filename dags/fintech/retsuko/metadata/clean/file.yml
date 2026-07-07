@@ -1,20 +1,28 @@
 database_name: datalake_retsuko_clean
 table_name: file
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system.
+  Files stored and managed through Seu Barriga.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_retsuko_raw.file.id
+    description: Financial attribute representing id on the file dataset.
   name:
     lineage:
       - datalake_retsuko_raw.file.name
+    description: Financial attribute representing name on the file dataset.
   path:
     lineage:
       - datalake_retsuko_raw.file.path
+    description: Financial attribute representing path on the file dataset.
   ts_created:
     lineage:
       - datalake_retsuko_raw.file.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   type:
     lineage:
       - datalake_retsuko_raw.file.type
+    description: Financial attribute representing type on the file dataset.

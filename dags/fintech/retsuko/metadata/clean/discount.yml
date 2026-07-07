@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: discount
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Discount definitions linked to contracts and accounts (rules, amounts, lifecycle).
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Discount definitions linked to contracts and accounts (rules, amounts, lifecycle).
 columns:
   id:
     description: "Primary key for joins in retsuko"
@@ -53,11 +53,11 @@ columns:
     lineage:
       - datalake_retsuko_raw.discount.bill_item
   amount:
-    description: "Discount amount"
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
     lineage:
       - datalake_retsuko_raw.discount.amount
   request_source_name:
-    description: "Name of the request source"
+    description: Financial attribute representing request source name on the discount dataset.
     lineage:
       - datalake_retsuko_raw.discount.request_source_name
   request_as:
