@@ -65,12 +65,6 @@ sheets_info:
     sheet_id: 1MFftdl8Eu_nQr_yTh1sAxZAYf5R6QipQn3jwS3TkcEE
     sheet_name: planos_sugeridos
 
-  team_formation_support:
-    clean_table_name: team_formation_support
-    sheet_context: people
-    sheet_id: 1uyWQMdfjN1AiQ-h5xU6TWKPQO9eiVGPkFck3wHL17AI
-    sheet_name: "2025 Support"
-
   turnover_user_roles:
     clean_table_name: turnover_user_roles
     sheet_context: people

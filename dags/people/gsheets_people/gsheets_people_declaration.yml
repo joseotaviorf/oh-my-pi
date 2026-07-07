@@ -43,9 +43,6 @@ workflow:
     team_formation_product_tech:
       vacuum_retention_hours: 168
       vacuum_lite: true
-    team_formation_support:
-      vacuum_retention_hours: 168
-      vacuum_lite: true
     turnover_user_roles:
       vacuum_retention_hours: 168
       vacuum_lite: true
