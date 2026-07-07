@@ -1,5 +1,10 @@
 database_name: datalake_amplitude_clean
 table_name: 233592_chatcrpp_blocked_message_alert_shown_events
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+description: This table contains chatcrpp_blocked_message_alert_shown events from
+  app 233592. It tracks user interactions and includes relevant metadata and user
+  properties.
 columns:
   id_amplitude:
     lineage:
@@ -265,8 +270,3 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.day
     description: Column day from Amplitude events
-owner: eduardo.soares@quintoandar.com.br
-domain: Growth
-description: This table contains chatcrpp_blocked_message_alert_shown events from
-  app 233592. It tracks user interactions and includes relevant metadata and user
-  properties.

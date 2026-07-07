@@ -1,7 +1,7 @@
 database_name: datalake_amplitude_clean
 table_name: 183047_pv_management_area_viewed_events
-owner: eduardo.soares@quintoandar.com.br
-domain: Growth
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
 description: This table contains pv_management_area_viewed events from app 183047.
   It tracks user interactions and includes relevant metadata and user properties.
 columns:

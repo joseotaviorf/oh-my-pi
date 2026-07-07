@@ -1,5 +1,8 @@
 database_name: datalake_amplitude_clean
 table_name: 233592_chatcrpp_suspicious_message_sent_events
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+description: This table contains chatcrpp_suspicious_message_sent events from app 233592. It tracks user interactions and includes relevant metadata and user properties.
 columns:
   id_amplitude:
     lineage:
@@ -257,28 +260,15 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.year
     description: 'Table partition column (year). Derived from ts_event at clean ingestion. Required in WHERE clauses
-
       for partition pruning — always combine with month and day to restrict scans to the smallest date
-
-      window needed.
-
-      '
+      window needed.'
   month:
     lineage:
     - datalake_amplitude_clean.events.month
     description: 'Table partition column (month, 1–12). Derived from ts_event at clean ingestion. Must be filtered
-
-      together with year and day to avoid full-table scans on this high-volume events subpartition.
-
-      '
+      together with year and day to avoid full-table scans on this high-volume events subpartition.'
   day:
     lineage:
     - datalake_amplitude_clean.events.day
     description: 'Table partition column (day, 1–31). Derived from ts_event at clean ingestion. Always filter with
-
-      year and month — last partition column in the table layout.
-
-      '
-owner: eduardo.soares@quintoandar.com.br
-domain: Growth
-description: This table contains chatcrpp_suspicious_message_sent events from app 233592. It tracks user interactions and includes relevant metadata and user properties.
+      year and month — last partition column in the table layout.'
