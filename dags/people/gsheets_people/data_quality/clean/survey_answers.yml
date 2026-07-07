@@ -1,0 +1,31 @@
+---
+table_name: datalake_gsheets_people_clean.survey_answers
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  answer_id:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  survey_invite_id:
+    is_complete:
+      severity_level: Error
+  email:
+    is_complete:
+      severity_level: Error
+  survey_title:
+    is_complete:
+      severity_level: Warning
+  score_team_performance:
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Warning
+    has_max_value:
+      less_than_or_equal_to: 5
+      severity_level: Warning

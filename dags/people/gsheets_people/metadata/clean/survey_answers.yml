@@ -1,0 +1,108 @@
+database_name: datalake_gsheets_people_clean
+table_name: survey_answers
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Individual survey responses from the AI Teva team effectiveness tool, capturing quantitative scores and open-text
+  feedback across key team health dimensions such as clarity, atmosphere, teamwork, and decision-making for each invited team
+  member.
+columns:
+  answer_id:
+    description: Unique identifier for each individual survey response submitted by a team member.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.answer_id
+  survey_invite_id:
+    description: Foreign key linking this response to the survey invitation in questionnaire_requests, identifying which specific
+      survey run the response belongs to.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.survey_invite_id
+  survey_title:
+    description: Title of the survey identifying the team and cycle (e.g. TEVA | FS Post Contract Leadership Team | Jan'26).
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.survey
+  email:
+    description: Corporate email address of the team member who submitted this survey response.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.email
+  ts_answered:
+    description: Timestamp when the team member submitted their survey response.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.timestamp
+  score_strategic_goals_clarity:
+    description: Self-reported score (1-5) on how clearly the respondent understands the team's strategic goals and direction.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_clear_are_you_on_this_teams_strategic_goals_
+  score_own_role_clarity:
+    description: Self-reported score (1-5) on how clearly the respondent understands their own role, responsibilities, and
+      decision rights within the team.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_clear_is_your_understanding_of_your_role_and_accountabilities_within_the_team__i_e___responsibilities__goals__decision_rights__
+  score_others_role_clarity:
+    description: Self-reported score (1-5) on how clearly the respondent understands the roles, responsibilities, and decision
+      rights of other team members.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_clear_is_your_understanding_of_the_roles_and_accountabilities_of_other_members_on_the_team__i_e___responsibilities__goals__decision_rights__
+  score_team_atmosphere:
+    description: Self-reported score (1-5) on the general atmosphere and psychological safety within the team.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_is_the_atmosphere_within_the_team_
+  score_current_teamwork:
+    description: Self-reported score (1-5) on how effectively team members currently collaborate and work together day-to-day.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_do_team_members_currently_work_together_
+  score_conflict_handling:
+    description: Self-reported score (1-5) on how constructively and effectively conflicts within the team are identified
+      and resolved.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_conflicts_within_this_team_are_handled_
+  score_decision_making_effectiveness:
+    description: Self-reported score (1-5) on the speed, quality, and clarity of the decision-making process within the team.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_effective_is_decision_making_within_the_team__i_e___speed__quality__and_clear_process_decision_rights__
+  score_meeting_effectiveness:
+    description: Self-reported score (1-5) on how effective and productive team meetings are in terms of agenda, outcomes,
+      and time use.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_effective_are_team_meetings_
+  score_team_performance:
+    description: Self-reported overall score (1-5) on how effectively the team operates as a high-performing unit.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_effectively_does_the_team_operate_as_a_high_performing_team_
+  open_top_priorities:
+    description: Open-text response identifying what the respondent considers the top priorities for the team in the current
+      period.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.what_are_the_top_priorities_for_this_team_
+  open_team_challenges:
+    description: Open-text response describing the main internal or external challenges the team faces in meeting its priorities.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.what_are_the_challenges_the_team_is_currently_facing__internally_or_externally__to_meet_these_priorities_
+  open_openness_issues:
+    description: Open-text response identifying specific issues or topics that are impacting psychological safety and openness
+      within the team.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.what_are_the_issues_impacting_openness_
+  open_ideal_teamwork:
+    description: Open-text response describing how team members should ideally collaborate for the team to be most effective.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.how_should_team_members_work_together_for_this_team_to_be_most_effective_
+  open_improvement_to_perfect_score:
+    description: Open-text response explaining what changes would be needed for the respondent to give the team a perfect
+      score of 5.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.what_would_it_take_to_be_a_5_
+  open_team_adjective:
+    description: Single adjective chosen by the respondent to describe the team's current state or culture.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.what_adjective_would_you_use_to_describe_this_team_
+  open_leader_feedback:
+    description: Open-text response offering specific feedback on what the team leader could do differently to improve team
+      effectiveness.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.is_there_anything_you_think__team_leader_name__could_do_differently_
+  open_additional_comments:
+    description: Optional open-text field for any additional observations or feedback the respondent wishes to share beyond
+      the structured questions.
+    lineage:
+    - datalake_gsheets_people_raw.survey_answers.any_additional_comments___optional_
+  ts_load:
+    description: Timestamp when this survey response was ingested from the Google Sheets source into the People lake.
