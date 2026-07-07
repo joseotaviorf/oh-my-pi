@@ -7,7 +7,7 @@ domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_partner:
-    description: Id partner of CIQ.
+    description: CIQ partner identifier from the portfolio control spreadsheet (maps to ciq_id in raw).
     lineage:
       - datalake_gsheets_raw.ciq_portfolio.ciq_id
   portfolio_user_name:
@@ -15,7 +15,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.ciq_portfolio.carteira
   cluster_name:
-    description: Cluster of CIQ.
+    description: Geographic or commercial cluster where the CIQ partner is allocated within the portfolio structure.
     lineage:
       - datalake_gsheets_raw.ciq_portfolio.cluster
   ts_created:

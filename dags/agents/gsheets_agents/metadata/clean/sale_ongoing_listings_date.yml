@@ -9,10 +9,10 @@ columns:
   id_listing:
     lineage:
       - datalake_gsheets_raw.sale_ongoing_listings_date.listing_id
-    description: Listing ID.
+    description: QuintoAndar listing identifier for the in-progress sale property in the ongoing allocation spreadsheet.
   dt_alloc:
     lineage:
       - datalake_gsheets_raw.sale_ongoing_listings_date.dt_alloc
-    description: Allocation date.
+    description: Calendar date when the ongoing sale listing was allocated to an agent per the spreadsheet record.
   ts_load:
     description: Date when the table data was updated.

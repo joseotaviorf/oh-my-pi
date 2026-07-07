@@ -65,11 +65,11 @@ columns:
   ql_solicitation_type:
     lineage:
     - datalake_airtable_raw.jira_tickets.ql_tipo_de_solicitacao
-    description: Type of socilitation.
+    description: Request category selected in Airtable for agent accreditation, suspension, or deaccreditation workflows.
   ql_suspension_type:
     lineage:
     - datalake_airtable_raw.jira_tickets.ql_tipo_de_suspensao
-    description: type of suspension.
+    description: Suspension severity or modality when the ticket concerns temporary agent suspension.
   responsible:
     lineage:
     - datalake_airtable_raw.jira_tickets.responsavel

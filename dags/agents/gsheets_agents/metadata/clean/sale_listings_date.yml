@@ -9,10 +9,10 @@ columns:
   id_listing:
     lineage:
       - datalake_gsheets_raw.sale_listings_date.listing_id
-    description: Listing ID.
+    description: QuintoAndar listing identifier for the for-sale property tracked in the agent allocation spreadsheet.
   dt_alloc:
     lineage:
       - datalake_gsheets_raw.sale_listings_date.dt_alloc
-    description: Allocation date.
+    description: Calendar date when the sale listing was assigned to an agent according to the GSheets allocation log.
   ts_load:
     description: Date when the table data was updated.

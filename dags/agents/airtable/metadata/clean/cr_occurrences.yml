@@ -15,7 +15,7 @@ columns:
   id_issue:
     lineage:
     - datalake_airtable_raw.cr_occurrences.issue_key
-    description: Issue's id.
+    description: Jira issue key linking this customer-relations occurrence to the tracked ticket workflow.
   department:
     lineage:
     - datalake_airtable_raw.cr_occurrences.departamento
@@ -47,11 +47,11 @@ columns:
   ql_resolution:
     lineage:
     - datalake_airtable_raw.cr_occurrences.ql_resolucao
-    description: How to solve this.
+    description: Resolution action or outcome recorded for the occurrence in the Airtable CR base.
   ql_ticket_from:
     lineage:
     - datalake_airtable_raw.cr_occurrences.ql_ticket_e_de
-    description: Who is the criminal.
+    description: Party or channel that originated the linked Jira ticket (internal team, agent, or external source).
   responsible:
     lineage:
     - datalake_airtable_raw.cr_occurrences.responsavel
@@ -63,7 +63,7 @@ columns:
   who_is_complaining:
     lineage:
     - datalake_airtable_raw.cr_occurrences.ql_ql_quem_esta_fazendo_essa_reclamacaodenunciasolicitacao
-    description: Who is complaining.
+    description: Role or identity of the person filing the complaint, report, or service request against the agent.
   ts_created:
     lineage:
     - datalake_airtable_raw.cr_occurrences.created
@@ -71,7 +71,7 @@ columns:
   ts_updated:
     lineage:
     - datalake_airtable_raw.cr_occurrences.last_modified
-    description: Timestamp of updated.
+    description: Timestamp when the occurrence row was last edited in Airtable (last_modified field).
   ts_airtable_record_extracted:
     lineage:
     - datalake_airtable_raw.cr_occurrences.createdTime

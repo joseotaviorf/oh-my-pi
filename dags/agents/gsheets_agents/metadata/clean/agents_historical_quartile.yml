@@ -7,11 +7,11 @@ columns:
   id_user:
     lineage:
       - datalake_gsheets_raw.agents_historical_quartile.id_user
-    description:  Id of the user 
+    description: User identifier for the broker person in the quartile performance spreadsheet.
   id_agent:
     lineage:
       - datalake_gsheets_raw.agents_historical_quartile.id_agent
-    description:  Id of the agent.
+    description: Agent identifier from the spreadsheet, aligned with Ebdb agent dimensions for allocation analytics.
   city_group:
     lineage:
       - datalake_gsheets_raw.agents_historical_quartile.city_group
