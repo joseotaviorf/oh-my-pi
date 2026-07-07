@@ -270,7 +270,7 @@ segments_perspective AS (
       fcc.ts_task_created - INTERVAL '3' HOUR       AS ts_created,
       DATE(fcc.ts_task_created - INTERVAL '3' HOUR) AS dt_created,
       COALESCE(ftc.first_csat_score, sa.satisfaction_score)     AS first_csat_score,
-      COALESCE(ftc.first_csat_comment,sa.respondent_comments)   AS first_csat_comment,        
+      ftc.first_csat_comment   AS first_csat_comment,        
       COALESCE(ftc.ts_first_response, sa.ts_submitted)          AS response_date,
       COALESCE(ftc.is_solved, sa.is_solved)                     AS resolution_survey,
       fcc.is_spoc_task,
@@ -436,7 +436,7 @@ SELECT
     sp.type_call,
     sp.bot,
     sp.group_name,
-    COALESCE(co.company_name, co2.company_name) AS company_name,
+    CAST(NULL AS STRING) AS company_name,
     CASE
       WHEN sp.status = 'TRANSFERRED'
         AND sp.transferred_to != sp.last_department
@@ -466,10 +466,6 @@ SELECT
 FROM segments_perspective AS sp
 LEFT JOIN analyst_start AS ast
   ON sp.agent_email = ast.email
-LEFT JOIN dw_public.dim_company_3p_partners AS co
-  ON sp.customer_email = co.e_mail
-LEFT JOIN dw_public.dim_company_3p_partners AS co2
-  ON sp.customer_phone = co2.phone
 LEFT JOIN contacts AS c
   ON c.sk_contact = sp.sk_contact
 LEFT JOIN first_resolution AS fr
