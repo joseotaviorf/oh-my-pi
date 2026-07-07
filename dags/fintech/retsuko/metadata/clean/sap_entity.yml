@@ -1,50 +1,68 @@
 database_name: datalake_retsuko_clean
 table_name: sap_entity
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system.
+  SAP integration entities synced from Seu Barriga financial operations.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_retsuko_raw.sap_entity.id
+    description: Financial attribute representing id on the sap_entity dataset.
   id_sap_gateway_feature:
     lineage:
       - datalake_retsuko_raw.sap_entity.sap_gateway_feature_id
+    description: Identifier for the sap gateway feature referenced by this financial record.
   id_finance_entity:
     lineage:
       - datalake_retsuko_raw.sap_entity.finance_entity_id
+    description: Identifier for the finance entity referenced by this financial record.
   id_external:
     lineage:
       - datalake_retsuko_raw.sap_entity.external_id
+    description: Identifier for the external referenced by this financial record.
   status:
     lineage:
       - datalake_retsuko_raw.sap_entity.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   version:
     lineage:
       - datalake_retsuko_raw.sap_entity.version
+    description: Financial attribute representing version on the sap_entity dataset.
   event:
     lineage:
       - datalake_retsuko_raw.sap_entity.event
+    description: Financial attribute representing event on the sap_entity dataset.
   failed_status:
     lineage:
       - datalake_retsuko_raw.sap_entity.failed_status
+    description: Financial attribute representing failed status on the sap_entity dataset.
   failed_reason:
     lineage:
       - datalake_retsuko_raw.sap_entity.failed_reason
+    description: Financial attribute representing failed reason on the sap_entity dataset.
   failed_payload:
     lineage:
       - datalake_retsuko_raw.sap_entity.failed_payload
+    description: Financial attribute representing failed payload on the sap_entity dataset.
   ts_created:
     lineage:
       - datalake_retsuko_raw.sap_entity.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_synced:
     lineage:
       - datalake_retsuko_raw.sap_entity.synced_at
+    description: Timestamp when synced occurred in the upstream fintech system.
   ts_skipped:
     lineage:
       - datalake_retsuko_raw.sap_entity.skipped_at
+    description: Timestamp when skipped occurred in the upstream fintech system.
   ts_failed:
     lineage:
       - datalake_retsuko_raw.sap_entity.failed_at
+    description: Timestamp when failed occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_retsuko_raw.sap_entity.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

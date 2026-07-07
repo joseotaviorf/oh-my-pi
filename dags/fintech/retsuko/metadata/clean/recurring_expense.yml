@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: recurring_expense
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Recurring expense definitions linked to contracts and accounts (amounts, installments, billing).
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Recurring expense definitions linked to contracts and accounts (amounts, installments, billing).
 columns:
   id:
     description: "Primary key for joins in retsuko"

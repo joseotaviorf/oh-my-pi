@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: payment_method_config
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Payment method type configuration (code, name, required_fields schema, active flag).
 columns:
@@ -13,11 +13,11 @@ columns:
     lineage:
       - datalake_payout_system_raw.payment_method_config.code
   name:
-    description: Payment method name.
+    description: Financial attribute representing name on the payment_method_config dataset.
     lineage:
       - datalake_payout_system_raw.payment_method_config.name
   description:
-    description: Payment method description.
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
       - datalake_payout_system_raw.payment_method_config.description
   required_fields:
@@ -29,7 +29,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.payment_method_config.is_active
   version:
-    description: Configuration version.
+    description: Financial attribute representing version on the payment_method_config dataset.
     lineage:
       - datalake_payout_system_raw.payment_method_config.version
   ts_created:

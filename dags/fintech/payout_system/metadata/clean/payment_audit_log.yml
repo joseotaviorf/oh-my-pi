@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: payment_audit_log
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Audit trail for payment request changes (field-level old/new value, principal, trace).
 columns:
@@ -25,7 +25,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.payment_audit_log.audit_type
   entity_type:
-    description: Affected entity type.
+    description: Financial attribute representing entity type on the payment_audit_log dataset.
     lineage:
       - datalake_payout_system_raw.payment_audit_log.entity_type
   field_name:
@@ -33,15 +33,15 @@ columns:
     lineage:
       - datalake_payout_system_raw.payment_audit_log.field_name
   old_value:
-    description: Previous value.
+    description: Financial attribute representing old value on the payment_audit_log dataset.
     lineage:
       - datalake_payout_system_raw.payment_audit_log.old_value
   new_value:
-    description: New value.
+    description: Financial attribute representing new value on the payment_audit_log dataset.
     lineage:
       - datalake_payout_system_raw.payment_audit_log.new_value
   change_reason:
-    description: Reason for the change.
+    description: Financial attribute representing change reason on the payment_audit_log dataset.
     lineage:
       - datalake_payout_system_raw.payment_audit_log.change_reason
   trace_id:

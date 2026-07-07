@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: bank_submission_item
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Line items of each bank submission batch; one row per payment request included in the batch.
 columns:

@@ -1,50 +1,68 @@
 database_name: datalake_retsuko_clean
 table_name: recurrent_credit_card
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system.
+  Recurrent credit card subscriptions managed through Seu Barriga.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.id
-  external_id:
-    lineage:
-      - datalake_retsuko_raw.recurrent_credit_card.id_external
-  external_subscription_id:
-    lineage:
-      - datalake_retsuko_raw.recurrent_credit_card.id_external_subscription
-  external_user_id:
-    lineage:
-      - datalake_retsuko_raw.recurrent_credit_card.id_external_user
-  contract_id:
-    lineage:
-      - datalake_retsuko_raw.recurrent_credit_card.id_contract,
+    description: Financial attribute representing id on the recurrent_credit_card dataset.
   status:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   cancel_reason:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.cancel_reason
+    description: Financial attribute representing cancel reason on the recurrent_credit_card dataset.
   service_fee:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.service_fee
+    description: Financial attribute representing service fee on the recurrent_credit_card dataset.
   charge_day:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.charge_day
+    description: Financial attribute representing charge day on the recurrent_credit_card dataset.
   active_from_year_month:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.active_from_year_month
+    description: Financial attribute representing active from year month on the recurrent_credit_card dataset.
   ts_inactive_from:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.ts_inactive_from
+    description: Timestamp when inactive from occurred in the upstream fintech system.
   ts_activated:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.ts_activated
+    description: Timestamp when activated occurred in the upstream fintech system.
   ts_canceled:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.ts_canceled
+    description: Timestamp when canceled occurred in the upstream fintech system.
   ts_event:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.ts_event
+    description: Timestamp when event occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_retsuko_raw.recurrent_credit_card.ts_created
+    description: Timestamp when created occurred in the upstream fintech system.
+  id_external:
+    lineage:
+      - datalake_retsuko_raw.recurrent_credit_card.id_external
+    description: Identifier for the external referenced by this financial record.
+  id_external_user:
+    lineage:
+      - datalake_retsuko_raw.recurrent_credit_card.id_external_user
+    description: Identifier for the external user referenced by this financial record.
+  id_external_subscription:
+    lineage:
+      - datalake_retsuko_raw.recurrent_credit_card.id_external_subscription
+    description: Identifier for the external subscription referenced by this financial record.
+  id_contract:
+    lineage:
+      - datalake_retsuko_raw.recurrent_credit_card.id_contract
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.

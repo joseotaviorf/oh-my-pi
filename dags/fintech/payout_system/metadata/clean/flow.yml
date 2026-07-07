@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: flow
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Payout flow configuration per requester (approval rules, auto-send, company_use, transaction type).
 columns:
@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.flow.id
   id_requester:
-    description: FK to requester.
+    description: Identifier for the requester referenced by this financial record.
     lineage:
       - datalake_payout_system_raw.flow.requester_id
   code:
@@ -17,11 +17,11 @@ columns:
     lineage:
       - datalake_payout_system_raw.flow.code
   name:
-    description: Flow name.
+    description: Financial attribute representing name on the flow dataset.
     lineage:
       - datalake_payout_system_raw.flow.name
   description:
-    description: Flow description.
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
       - datalake_payout_system_raw.flow.description
   transaction_type:
@@ -49,7 +49,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.flow.auto_send_rules
   version:
-    description: Configuration version.
+    description: Financial attribute representing version on the flow dataset.
     lineage:
       - datalake_payout_system_raw.flow.version
   required_metadata:

@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: payee_account
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Bank account details per payee (bank, agency, account number and type).
 columns:
@@ -9,23 +9,23 @@ columns:
     lineage:
       - datalake_payout_system_raw.payee_account.id
   id_payee:
-    description: FK to payee.
+    description: Identifier for the payee referenced by this financial record.
     lineage:
       - datalake_payout_system_raw.payee_account.payee_id
   bank_code:
-    description: Bank code.
+    description: Financial attribute representing bank code on the payee_account dataset.
     lineage:
       - datalake_payout_system_raw.payee_account.bank_code
   agency_number:
-    description: Branch/agency number.
+    description: Financial attribute representing agency number on the payee_account dataset.
     lineage:
       - datalake_payout_system_raw.payee_account.agency_number
   account_number:
-    description: Account number.
+    description: Financial attribute representing account number on the payee_account dataset.
     lineage:
       - datalake_payout_system_raw.payee_account.account_number
   account_type:
-    description: Account type.
+    description: Financial attribute representing account type on the payee_account dataset.
     lineage:
       - datalake_payout_system_raw.payee_account.account_type
   is_savings:

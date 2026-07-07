@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: payee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Payee master data; recipient of payments (name, document CPF/CNPJ).
 columns:
@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.payee.id
   name:
-    description: Payee full name.
+    description: Financial attribute representing name on the payee dataset.
     lineage:
       - datalake_payout_system_raw.payee.name
   document_number:

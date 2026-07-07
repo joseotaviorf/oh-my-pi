@@ -1,8 +1,8 @@
 database_name: datalake_retsuko_clean
 table_name: payment_block
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: This table centralizes contracts that the payment is blocked, like judicial order.
+description: Clean-layer table sourced from Retsuko, a replica of the Seu Barriga rental billing system. Contracts with blocked payments, such as judicial orders.
 columns:
   id:
     description: "primary key for joins in retsuko"
@@ -13,15 +13,15 @@ columns:
     lineage:
       - datalake_retsuko_raw.payment_block.external_id
   id_contract:
-    description: "id from the contract table"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_retsuko_raw.payment_block.contract_id
   id_activated_by_audit:
-    description: "id from table audit"
+    description: Identifier for the activated by audit referenced by this financial record.
     lineage:
       - datalake_retsuko_raw.payment_block.activated_by_audit_id
   id_deactivated_by_audit:
-    description: "id from table audit"
+    description: Identifier for the deactivated by audit referenced by this financial record.
     lineage:
       - datalake_retsuko_raw.payment_block.deactivated_by_audit_id
   ticket_number:
