@@ -1,9 +1,17 @@
 ---
 database_name: dw_datamarts
 table_name: performance_marketing_metrics_demand
-owner: "@data-growth"
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: Table that contains data from tenant prospects, targets and marketing cost by growth marketing Taxonomy
+description: |
+  DW datamart combining rent demand funnel events, tenant prospect status, marketing costs,
+  and growth planning targets for performance marketing analysis. Grain varies by row type:
+  first rent-flow activations (rent_flow_order = 1) with bottom-funnel milestones, daily
+  marketing spend rows, target/budget rows from GSheets, and tenant deactivation events
+  (CHURNED/RENTED). Unified by growth marketing taxonomy (mkt_* / utm_*), city_group, and
+  dt_event. Built from rent_flow_interactions, tenant_prospect_status, daily_costs, and
+  demand target spreadsheets. No table partitioning configured in dw_datamarts_growth_cross
+  DAG; filter on dt_event for query performance.
 columns:
   sk_client:
     description: Client/user id
@@ -22,49 +30,55 @@ columns:
     lineage:
       - dw_datamarts.rent_flow_interactions.id_house
   sk_booking:
-    description: Booking identificator
+    description: Surrogate key of the visit booking associated with the tenant rent flow event.
     lineage:
       - datalake_listing_temp.fact_listing_rent_flows_house.sk_booking
   sk_offer:
-    description: Offer ifentificator
+    description: Surrogate key of the rental offer submitted during the tenant prospect journey.
     lineage:
       - datalake_listing_temp.fact_listing_rent_flows_house.sk_offer
   sk_proposal:
-    description: Proposal ifentificator
+    description: Surrogate key of the rental proposal created after offer approval.
     lineage:
       - datalake_listing_temp.fact_listing_rent_flows_house.sk_proposal
   sk_contract:
-    description: Contract ifentificator
+    description: Surrogate key of the signed rental contract linked to the tenant flow.
     lineage:
       - datalake_listing_temp.fact_listing_rent_flows_house.sk_contract
   dt_booking_created:
-    description: Date of booking creation
+    description: Calendar date when the visit booking was created for the rent flow.
     lineage:
-      - dw_public.dim_date.dt_booking_created
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_booking_created_date
+      - dw_public.dim_date.date
   flg_visit_completed:
-    description: Status of booking visit realization
+    description: Whether the scheduled property visit was completed.
     lineage:
       - datalake_listing_temp.fact_listing_rent_flows_house.flg_visit_completed
   dt_offer_submitted:
-    description: Date of offer submitted
+    description: Calendar date when the tenant submitted a rental offer.
     lineage:
-      - dw_public.dim_date.dt_offer_submitted
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_offer_submitted_date
+      - dw_public.dim_date.date
   dt_offer_approved:
-    description: Date of offer approved
+    description: Calendar date when the rental offer was approved by the owner.
     lineage:
-      - dw_public.dim_date.dt_offer_approved
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_offer_approved_date
+      - dw_public.dim_date.date
   dt_tenant_first_doc_sent:
-    description: Date of tenant first document sent
+    description: Calendar date when the tenant submitted their first documentation.
     lineage:
-      - dw_public.dim_date.dt_tenant_first_doc_sent
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_tenant_first_doc_sent_date
+      - dw_public.dim_date.date
   dt_credit_analysis_approved:
-    description: Date of credit analysis approved
+    description: Calendar date when the tenant credit analysis was approved.
     lineage:
-      - dw_public.dim_date.dt_credit_analysis_approved
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_credit_analysis_approved_date
+      - dw_public.dim_date.date
   dt_contract_signed:
-    description: Date of contract signed
+    description: Calendar date when the rental contract was signed.
     lineage:
-      - dw_public.dim_date.dt_contract_signed
+      - datalake_listing_temp.fact_listing_rent_flows_house.sk_contract_signed_date
+      - dw_public.dim_date.date
   dt_event:
     description: Date of the flow event or status available
     lineage:
@@ -84,7 +98,7 @@ columns:
       - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
       - datalake_gsheets_clean.rental_flows_targets.date
   status:
-    description: Prospect status
+    description: Current tenant prospect lifecycle stage such as active, churned, or rented.
     lineage:
       - dw_datamarts.tenant_prospect_status.status
   status_detail:
@@ -92,7 +106,9 @@ columns:
     lineage:
       - dw_datamarts.tenant_prospect_status.status_detail
   next_status:
-    description: Status after the status at that dt_event
+    description: Tenant prospect status immediately following the current status at dt_event.
+    lineage:
+      - dw_datamarts.tenant_prospect_status.status
   ts_status_start:
     description: Timestamp that started prospect status
     lineage:
@@ -111,17 +127,17 @@ columns:
       - datalake_gsheets_clean.rental_ntp_source_targets.city_group
       - datalake_gsheets_clean.rental_flows_targets.city_group
   country_name:
-    description: Name of country
+    description: Country name associated with the tenant prospect geographic market.
     lineage:
       - dw_public.dim_region.country_name
   flow_event:
-    description: Type of flow
+    description: Rent funnel interaction type such as booking, offer, or talk to agent.
     lineage:
       - dw_datamarts.rent_flow_interactions.flow_event
     categories:
-      Booking: ""
-      Offer: ""
-      Talk to Agent: ""
+      Booking: Property visit booking in the rent funnel
+      Offer: Rental offer submission
+      Talk to Agent: WhatsApp conversation with agent
   mkt_origin:
     description: Level of the Growth Marketing Taxonomy
     lineage:
@@ -191,20 +207,20 @@ columns:
     lineage:
       - datalake_marketing_costs.daily_costs.cost
   rent_flows_target:
-    description: Rent flow target
+    description: Planned monthly rent flow volume target from growth planning spreadsheets.
     lineage:
       - datalake_gsheets_clean.rental_flows_targets.rf_target
   new_rent_flows_target:
-    description: New rent flow target
+    description: Planned monthly new rent flow volume target from demand replanning.
     lineage:
       - datalake_gsheets_clean.demand_targets_replanning.new_rent_flows_target
   new_tenant_prospects_target:
-    description: New tenant prospects target
+    description: Planned monthly volume of newly activated tenant prospects from growth targets.
     lineage:
       - datalake_gsheets_clean.demand_targets_replanning.new_tenant_prospects_target
       - datalake_gsheets_clean.rental_ntp_source_targets.ntp_target
   recovered_tenant_prospects_target:
-    description: Recovered tenant prospects target
+    description: Planned monthly volume of tenant prospects reactivated after churn or rental.
     lineage:
       - datalake_gsheets_clean.rental_ntp_source_targets.rtp_target
   budget:

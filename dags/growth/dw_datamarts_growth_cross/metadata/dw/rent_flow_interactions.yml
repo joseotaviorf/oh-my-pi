@@ -1,102 +1,140 @@
 ---
 database_name: dw_datamarts
 table_name: rent_flow_interactions
-description: reservations, offers and conversations with agents.
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-owner: cristina.cardoso@quintoandar.com.br
+description: |
+  DW datamart of rent demand funnel activation events: property visit bookings, rental offers,
+  and Talk to Agent conversations. Grain is one row per event (flow_event) per client and house
+  (sk_rf = sk_client || id_house). Built by UNION ALL of dw_rent.fact_listing_rent_flows joined
+  to dim_booking and dim_offer, plus datalake_talk_to_agent for RENT business context. Includes
+  growth marketing taxonomy (mkt_* and utm_* fields) and sequential ordering per client (tenant
+  prospect) and per rent flow. Downstream: tenant_prospect_status and
+  performance_marketing_metrics_demand. No table partitioning configured in
+  dw_datamarts_growth_cross DAG; filter on dt_event for query performance.
 columns:
   sk_client:
+    description: Surrogate key of the tenant prospect (client user) who triggered the event.
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_client
       - datalake_talk_to_agent.talk_to_agent.tenant_id
-    description: key of the client user.
+  sk_rf:
+    description: |
+      Composite rent flow key (sk_client concatenated with id_house) identifying a unique
+      client–property journey.
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_client
+      - dw_public.dim_booking.id_property
+      - dw_rent.dim_offer.id_property
+      - datalake_talk_to_agent.talk_to_agent.tenant_id
+      - datalake_talk_to_agent.talk_to_agent.house_id
   sk_house_listing:
+    description: Surrogate key of the house listing associated with the rent flow event.
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_house_listing
       - datalake_talk_to_agent.talk_to_agent.sk_house_listing
-    description: key of the listing of the house after prospect.
   id_house:
+    description: Natural key of the property associated with the rent funnel interaction.
     lineage:
       - dw_public.dim_booking.id_property
       - dw_rent.dim_offer.id_property
       - datalake_talk_to_agent.talk_to_agent.house_id
-    description: key of the house.
-  sk_rf:
-    lineage:
-      - dw_rent.fact_listing_rent_flows.sk_client
-      - datalake_talk_to_agent.talk_to_agent.tenant_id
-      - dw_public.dim_booking.id_property
-      - dw_rent.dim_offer.id_property
-      - datalake_talk_to_agent.talk_to_agent.house_id
-    description: key of the rent flow.
   sk_region:
+    description: Surrogate key of the QuintoAndar geographic region for the listing.
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_region
       - dw_rent.fact_house_listings.sk_region
-    description: key of the region of the QuintoAndar.
+  flow_event:
+    description: |
+      Type of rent demand activation event. Booking from dim_booking visits, Offer from
+      dim_offer submissions, or Talk to Agent from WhatsApp first message.
+    lineage:
+      - dw_public.dim_booking.dt_created
+      - dw_rent.dim_offer.dt_first_sent
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
+    categories:
+      Booking: Property visit booking created
+      Offer: Rental offer submitted
+      Talk to Agent: First WhatsApp message to agent
   mkt_origin:
+    description: Marketing origin from the growth marketing taxonomy at event capture time.
     lineage:
       - dw_public.dim_booking.mkt_origin
       - dw_rent.dim_offer.mkt_origin
       - datalake_talk_to_agent.talk_to_agent.mkt_origin
-    description: Marketing origin as defined by the lead taxonomy.
   mkt_channel:
+    description: Marketing channel from the growth marketing taxonomy at event capture time.
     lineage:
       - dw_public.dim_booking.mkt_channel
       - dw_rent.dim_offer.mkt_channel
       - datalake_talk_to_agent.talk_to_agent.mkt_channel
-    description: Marketing channel as defined by the lead taxonomy.
   mkt_medium:
+    description: Marketing medium from the growth marketing taxonomy at event capture time.
     lineage:
       - dw_public.dim_booking.mkt_medium
       - dw_rent.dim_offer.mkt_medium
       - datalake_talk_to_agent.talk_to_agent.mkt_medium
-    description: Marketing medium as defined by the lead taxonomy.
   mkt_source:
+    description: Marketing source from the growth marketing taxonomy at event capture time.
     lineage:
       - dw_public.dim_booking.mkt_source
       - dw_rent.dim_offer.mkt_source
       - datalake_talk_to_agent.talk_to_agent.mkt_source
-    description: Marketing source as defined by the lead taxonomy.
   utm_medium:
+    description: UTM medium parameter from the campaign configuration at event capture time.
     lineage:
       - dw_public.dim_booking.utm_medium
       - dw_rent.dim_offer.utm_medium
       - datalake_talk_to_agent.talk_to_agent.utm_medium
-    description: Shows the medium or location where the link was shared.
   utm_source:
+    description: UTM source parameter indicating traffic origin at event capture time.
     lineage:
       - dw_public.dim_booking.utm_source
       - dw_rent.dim_offer.utm_source
       - datalake_talk_to_agent.talk_to_agent.utm_source
-    description: The origin of the traffic, which website, advertiser or publication the user came from.
   utm_campaign:
+    description: UTM campaign parameter from marketing platform configuration.
     lineage:
       - dw_public.dim_booking.utm_campaign
       - dw_rent.dim_offer.utm_campaign
       - datalake_talk_to_agent.talk_to_agent.utm_campaign
-    description: Parameter defined at campaing configuration at marketing platforms.
   utm_term:
+    description: UTM term parameter for paid search keyword differentiation.
     lineage:
       - dw_public.dim_booking.utm_term
       - dw_rent.dim_offer.utm_term
       - datalake_talk_to_agent.talk_to_agent.utm_term
-    description: Used to differentiate different keywords in paid search ads.
   utm_content:
+    description: UTM content parameter for ad or creative variant differentiation.
     lineage:
       - dw_public.dim_booking.utm_content
       - dw_rent.dim_offer.utm_content
       - datalake_talk_to_agent.talk_to_agent.utm_content
-    description: Shows content related to the link, especially when similar content is made for different audiences.
+  rent_flow_order:
+    description: |
+      Sequential event number within a rent flow (sk_client + id_house), ordered by ts_event
+      ascending. Value 1 is the first activation in the client–property journey.
+    lineage:
+      - dw_public.dim_booking.dt_created
+      - dw_rent.dim_offer.dt_first_sent
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
+  tenant_prospect_order:
+    description: |
+      Sequential event number across all rent flows for a client (sk_client), ordered by
+      ts_event ascending. Value 1 is the client's first demand activation.
+    lineage:
+      - dw_public.dim_booking.dt_created
+      - dw_rent.dim_offer.dt_first_sent
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
   dt_event:
+    description: Calendar date when the rent funnel interaction occurred.
     lineage:
       - dw_public.dim_booking.dt_created
       - dw_rent.dim_offer.dt_first_sent
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
-    description: Date of when the event occurred.
   ts_event:
+    description: Timestamp when the rent funnel interaction occurred.
     lineage:
       - dw_public.dim_booking.dt_created
       - dw_rent.dim_offer.dt_first_sent
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
-    description: Timestamp of when the event occurred.

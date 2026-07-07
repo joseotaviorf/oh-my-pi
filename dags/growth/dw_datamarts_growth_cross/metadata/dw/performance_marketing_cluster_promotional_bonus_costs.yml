@@ -1,45 +1,60 @@
 ---
 database_name: dw_datamarts
 table_name: performance_marketing_cluster_promotional_bonus_costs
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-owner: isabela.matsumoto@quintoandar.com.br
-description: This table contains information about promotional bonus costs attributed to affiliates.
+description: |
+  DW datamart allocating promotional bonus costs to daily listing events by affiliate, city_group,
+  and business context (rent vs sale). Grain is one row per affiliate (sk_user), listing date
+  (sk_date), and city_group. Distributes monthly promotional_bonus from
+  performance_marketing_cluster_promotional_bonus proportionally across cumulative rent and sale
+  first-conversion listings using daily incremental deltas. Downstream:
+  marketing_demand_supply_branding_costs. Excludes Spinver test users. No table partitioning
+  configured in dw_datamarts_growth_cross DAG; filter on sk_date or listing_date for performance.
 columns:
   sk_user:
-    description: "Unique identifier for the user."
+    description: Surrogate key of the affiliate user receiving the bonus allocation.
     lineage:
       - dw_datamarts.performance_marketing_cluster_promotional_bonus.sk_user
   city_group:
-    description: "The related city group of the bonus cost."
+    description: Geographic market cluster where the listing conversion occurred.
     lineage:
       - dw_public.dim_region.city_group
   sk_date:
-    description: "SK of the date of the bonus calculation."
+    description: Surrogate key (YYYYMMDD integer) of the listing conversion date.
     lineage:
       - dw_public.dim_date.sk_date
   listing_date:
-    description: "Date of the house was listing"
+    description: Calendar date when the affiliate-referred listing first converted.
     lineage:
       - dw_public.dim_date.date
   listing_week_start:
-    description: "Start date of the week in which of the house was listing"
+    description: Monday start date of the week containing the listing conversion.
     lineage:
       - dw_public.dim_date.week_start
   year_month:
-    description: "Year and month of the week in which of the house was listing"
+    description: Calendar year and month (yyyy/MM) of the listing conversion.
     lineage:
       - dw_public.dim_date.year_month
   affiliate_type:
-    description: "The type of affiliate associated with the listing."
+    description: Affiliate program category (Standard, Agent, etc.) from the bonus calculation.
     lineage:
       - dw_datamarts.performance_marketing_cluster_promotional_bonus.affiliate_type
   final_bonus_rent:
-    description: "Calculated final bonus amount for rental-related activities within the promotional campaign."
+    description: |
+      Daily incremental promotional bonus in BRL allocated to rent first-conversion listings,
+      derived as the delta of cumulative rent bonus share between consecutive listing dates.
     lineage:
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus.promotional_bonus
       - dw_datamarts.performance_marketing_cluster_promotional_bonus.cnt_first_conversion_rent_only
-      - dw_datamarts.performance_marketing_cluster_promotional_bonus.total_listings
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus.cnt_first_conversion_hybrid
+      - dw_public.dim_date.date
   final_bonus_sale:
-    description:  "Calculated final bonus amount for sales-related activities within the promotional campaign."
+    description: |
+      Daily incremental promotional bonus in BRL allocated to sale first-conversion listings,
+      derived as the delta of cumulative sale bonus share between consecutive listing dates.
     lineage:
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus.promotional_bonus
       - dw_datamarts.performance_marketing_cluster_promotional_bonus.cnt_first_conversion_sale_only
-      - dw_datamarts.performance_marketing_cluster_promotional_bonus.total_listings
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus.cnt_first_conversion_hybrid
+      - dw_public.dim_date.date

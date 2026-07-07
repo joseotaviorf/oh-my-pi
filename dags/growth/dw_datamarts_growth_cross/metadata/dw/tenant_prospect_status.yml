@@ -1,37 +1,74 @@
 ---
 database_name: dw_datamarts
 table_name: tenant_prospect_status
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: |
+  DW datamart tracking tenant prospect lifecycle status periods per client and city_group.
+  Grain is one row per status period (ts_start to ts_end) for a sk_client in a city_group.
+  Status transitions (ACTIVE, CHURNED, RENTED) are derived from rent_flow_interactions first
+  activations, contract signatures (tenant/dweller/tenant prospect roles), and contract
+  annulments with 28-day inactivity churn logic. Downstream:
+  performance_marketing_metrics_demand. No table partitioning configured in
+  dw_datamarts_growth_cross DAG; filter on ts_start for query performance.
 columns:
   sk_client:
+    description: Surrogate key of the tenant prospect client in the rent demand funnel.
     lineage:
       - dw_datamarts.rent_flow_interactions.sk_client
       - dw_rent.fact_listing_rent_flows.sk_client
       - dw_rent.fact_contract_people.sk_user
   city_group:
+    description: QuintoAndar geographic market cluster for the prospect intent during the status period.
     lineage:
       - dw_public.dim_region.city_group
   ts_start:
+    description: Timestamp when the tenant prospect entered the current status period.
     lineage:
       - dw_datamarts.rent_flow_interactions.ts_event
       - dw_rent.dim_contract.ts_signature
   ts_end:
-    lineage:
-      - dw_datamarts.rent_flow_interactions.ts_event
-      - dw_rent.dim_contract.ts_signature
-  sk_start_date:
-    lineage:
-      - dw_datamarts.rent_flow_interactions.ts_event
-      - dw_rent.dim_contract.ts_signature
-  sk_end_date:
-    lineage:
-      - dw_datamarts.rent_flow_interactions.ts_event
-      - dw_rent.dim_contract.ts_signature
-  ts_first_activation:
+    description: Timestamp when the tenant prospect exited the current status period. Null if still active.
     lineage:
       - dw_datamarts.rent_flow_interactions.ts_event
       - dw_rent.dim_contract.ts_signature
       - dw_rent.dim_contract.dt_annulment
+  sk_start_date:
+    description: Surrogate key (YYYYMMDD string) of the calendar date when the status period started.
+    lineage:
+      - dw_datamarts.rent_flow_interactions.ts_event
+      - dw_rent.dim_contract.ts_signature
+  sk_end_date:
+    description: Surrogate key (YYYYMMDD string) of the calendar date when the status period ended.
+    lineage:
+      - dw_datamarts.rent_flow_interactions.ts_event
+      - dw_rent.dim_contract.ts_signature
+      - dw_rent.dim_contract.dt_annulment
+  status:
+    description: |
+      Tenant prospect lifecycle stage during the period. ACTIVE while searching; CHURNED after
+      28-day inactivity or contract ended; RENTED when a contract is signed.
+    lineage:
+      - dw_datamarts.rent_flow_interactions.flow_event
+      - dw_rent.dim_contract.ts_signature
+    categories:
+      ACTIVE: Prospect is actively searching for a rental
+      CHURNED: Prospect became inactive (28-day rule or contract ended)
+      RENTED: Prospect signed a rental contract
+  status_detail:
+    description: |
+      Detailed reason for the status transition, such as New TP (first activation), recovery
+      after churn, or inactive by renting with role (tenant/dweller/tenant prospect).
+    lineage:
+      - dw_datamarts.rent_flow_interactions.flow_event
+      - dw_rent.dim_contract.ts_signature
+      - dw_rent.fact_contract_people.contract_role
+  ts_first_activation:
+    description: Timestamp of the tenant prospect first-ever activation in the rent demand funnel.
+    lineage:
+      - dw_datamarts.rent_flow_interactions.ts_event
+      - dw_rent.dim_contract.ts_signature
   city_group_first_activation:
+    description: Geographic market cluster where the tenant prospect was first activated.
     lineage:
       - dw_public.dim_region.city_group

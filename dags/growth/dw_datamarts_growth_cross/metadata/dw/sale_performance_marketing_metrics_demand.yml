@@ -1,9 +1,16 @@
 ---
 database_name: dw_datamarts
 table_name: sale_performance_marketing_metrics_demand
-owner: "@data-growth"
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-description: Table that contains data from buyer prospects, targets and marketing cost by growth marketing Taxonomy
+description: |
+  DW datamart combining for-sale demand funnel events, buyer prospect status, marketing costs,
+  and growth planning targets for sale performance marketing analysis. Grain varies by row type:
+  sale flow activations (bookings, offers, Talk to Agent), daily marketing spend, target/budget
+  rows from GSheets, and buyer deactivation events. Unified by growth marketing taxonomy,
+  city_group, and dt_event. Built from dw_sale fact tables, buyer_prospect_status, daily_costs,
+  and sale target spreadsheets. No table partitioning configured in dw_datamarts_growth_cross
+  DAG; filter on dt_event for query performance.
 columns:
   dt_event:
     description: Date of the flow event or status available
@@ -24,7 +31,7 @@ columns:
       - dw_public.dim_date.date
       - dw_datamarts.buyer_prospect_status.ts_start
   status:
-    description: Prospect status
+    description: Current buyer prospect lifecycle stage in the for-sale demand funnel.
     lineage:
       - dw_datamarts.buyer_prospect_status.status
   status_detail:
@@ -69,9 +76,17 @@ columns:
       Santos: ""
       São José dos Campos: ""
   flow_event:
-    description: The specific event within the sales and marketing flow (Booking, Offer, Talk to Agent)
+    description: |
+      Type of for-sale demand activation event: Booking (visit), Offer (purchase offer), or
+      Talk to Agent (WhatsApp first message).
     lineage:
-      - dw_public.dim_booking
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - datalake_talk_to_agent.talk_to_agent.first_message_ts
+    categories:
+      Booking: Property visit booking in the sale funnel
+      Offer: Purchase offer submission
+      Talk to Agent: WhatsApp conversation with agent
   mkt_origin:
     description: Level of the Growth Marketing Taxonomy
     lineage:
@@ -179,15 +194,15 @@ columns:
     lineage:
       - dw_sale.fact_offers.sk_offer
   sk_booking:
-    description: Booking id
+    description: Surrogate key of the property visit booking associated with the buyer flow event.
     lineage:
       - dw_sale.fact_visits.sk_booking
   dt_offer_submitted:
-    description: Date of offer submitted
+    description: Calendar date when the buyer submitted a purchase offer for the listing.
     lineage:
       - dw_public.dim_date.date
   dt_offer_accepted:
-    description: Date of offer accepted
+    description: Calendar date when the purchase offer was accepted by the seller.
     lineage:
       - dw_public.dim_date.date
   dt_sale_agreement_signed:
@@ -199,7 +214,7 @@ columns:
     lineage:
       - dw_public.dim_date.date
   dt_visit_completed:
-    description: Date of visit completed
+    description: Calendar date when the buyer completed the scheduled property visit.
     lineage:
       - dw_public.dim_date.date
   sale_flow_order:
@@ -225,7 +240,7 @@ columns:
     lineage:
       - datalake_gsheets_clean.mkt_cost_per_source.daily_value
   new_buyer_prospects_target:
-    description: Target metrics for acquiring new buyer prospects
+    description: Planned monthly volume of newly activated buyer prospects from sale growth planning spreadsheets.
     lineage:
       - datalake_gsheets_clean.sale_nbp_source_targets.nbp_target
   recovered_buyer_prospects_target:

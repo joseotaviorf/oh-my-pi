@@ -1,98 +1,136 @@
 ---
 database_name: dw_datamarts
 table_name: performance_marketing_cluster_promotional_bonus
-description: this table contains information about the affiliates promotional bonus.
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-owner: henrique.miamoto@quintoandar.com.br
+description: |
+  DW datamart calculating affiliate promotional bonus eligibility and amounts by performance
+  cluster. Grain is one row per affiliate (sk_user) and calendar month (year_month). Counts
+  first-conversion listings by context (Rent, Sale, Hybrid) from lead_listing_flows, assigns
+  cluster from affiliates_clusters, and resolves targets/bonuses from GSheets promotional bonus
+  configs (user-level or cluster-level). Computes base/boost hit flags and promotional_bonus
+  payout plus commission_listing (total_listings × 100). Excludes test users
+  (360754, 912255, 1711931, 2257503). Downstream:
+  performance_marketing_cluster_promotional_bonus_costs and marketing_demand_supply_branding_costs.
+  No table partitioning configured in dw_datamarts_growth_cross DAG.
 columns:
   sk_user:
-    description: key of the affiliate user
+    description: Surrogate key of the affiliate user (referrer).
     lineage:
       - dw_public.dim_lead.usuario_que_indicou_id
   year_month:
-    description: bonus year/month.
+    description: Calendar year and month (yyyy/MM) of the bonus calculation period.
     lineage:
+      - dw_public.dim_date.year_month
       - dw_public.dim_date.date
   affiliate_type:
-    description: type of the affiliate
+    description: Affiliate program category that determines bonus eligibility and cluster assignment.
     lineage:
       - dw_public.dim_user_affiliate.type
   is_active:
-    description: flag that identifies if the affiliate is active
+    description: Whether the affiliate is currently active in the affiliate program.
     lineage:
       - dw_public.dim_user_affiliate.is_active
   cluster:
-    description: affiliate cluster.
+    description: Performance cluster grouping affiliates with similar conversion volume for bonus targets.
     lineage:
       - dw_datamarts.affiliates_clusters.cluster
   cnt_first_conversion_rent_only:
-    description: volume of rent first_listings
+    description: Count of distinct first-conversion listings with Rent-only context in the month.
     lineage:
-      - dw_datamarts.lead_listing_flows
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
+      - dw_public.dim_lead.usuario_que_indicou_id
   cnt_first_conversion_sale_only:
-    description: volume of sale first_listings
+    description: Count of distinct first-conversion listings with Sale-only context in the month.
     lineage:
-      - dw_datamarts.lead_listing_flows
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
+      - dw_public.dim_lead.usuario_que_indicou_id
   cnt_first_conversion_hybrid:
-    description: volume of hybrid first_listings
+    description: Count of distinct first-conversion listings with Hybrid (rent + sale) context in the month.
     lineage:
-      - dw_datamarts.lead_listing_flows
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
+      - dw_public.dim_lead.usuario_que_indicou_id
   total_listings:
-    description: volume of hybrid first_listings
+    description: |
+      Total distinct first-conversion listings in the month (sum of rent-only, sale-only, and
+      hybrid counts).
     lineage:
-      - dw_datamarts.lead_listing_flows
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
+      - dw_public.dim_lead.usuario_que_indicou_id
   target_base:
-    description: the target base for the affiliate gain the bonus base
+    description: Minimum listing volume target for the affiliate to earn the base bonus.
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
   diff_base:
-    description: the volume need to the affiliate hit the base bonus
+    description: |
+      Remaining listings needed to reach the base target (target_base − total_listings),
+      floored at zero.
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
-      - dw_datamarts.lead_listing_flows
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
   bonus_base:
-    description: the value of the bonus base
+    description: BRL bonus amount awarded when total_listings reaches target_base.
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_base
   target_boost:
-    description: the target boost for the affiliate gain the bonus boost
+    description: Minimum listing volume target for the affiliate to earn the boost bonus.
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_boost
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_boost
   diff_boost:
-    description: the volume need to the affiliate hit the boost bonus
+    description: |
+      Remaining listings needed to reach the boost target (target_boost − total_listings),
+      floored at zero.
     lineage:
-      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
-      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
-      - dw_datamarts.lead_listing_flows
+      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_boost
+      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_boost
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
   bonus_boost:
-    description: the value of the bonus boost
+    description: BRL bonus amount awarded when total_listings reaches target_boost.
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_boost
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_boost
   has_hit_base:
-    description: flag that indicates if the affiliate has hitted the base bonus
+    description: Whether total_listings reached target_base in the month.
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
-      - dw_datamarts.lead_listing_flows
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
   has_hit_boost:
-    description: flag that indicates if the affiliate has hitted the boost bonus
+    description: Whether total_listings reached target_boost in the month.
     lineage:
-      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
-      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
-      - dw_datamarts.lead_listing_flows
+      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_boost
+      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_boost
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
   promotional_bonus:
-    description: the value of the promotional bonus.
+    description: |
+      Final promotional bonus in BRL: bonus_boost if boost target hit, else bonus_base if base
+      target hit, else zero.
     lineage:
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_boost
       - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.bonus_base
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_boost
       - datalake_gsheets_clean.promotional_bonus_cluster_targets.bonus_base
+      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_base
+      - datalake_gsheets_clean.promotional_bonus_user_cluster_targets.target_boost
+      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_base
+      - datalake_gsheets_clean.promotional_bonus_cluster_targets.target_boost
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
   commission_listing:
-    description: the value of the commission that the affiliate needs to receive.
+    description: Listing commission amount in BRL (total_listings × 100).
     lineage:
-      - dw_datamarts.lead_listing_flows
+      - dw_datamarts.lead_listing_flows.context_first_listing
+      - dw_datamarts.lead_listing_flows.sk_house_listing
+      - dw_public.dim_lead.usuario_que_indicou_id

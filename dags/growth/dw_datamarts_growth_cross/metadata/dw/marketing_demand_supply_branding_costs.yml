@@ -1,53 +1,96 @@
 ---
 database_name: dw_datamarts
 table_name: marketing_demand_supply_branding_costs
-owner: cristina.cardoso@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table that centralize marketing demand, supply and branding costs.
+description: |
+  DW datamart centralizing growth marketing spend across demand, supply, and branding planning
+  levels. Grain is one row per cost date (dt_cost), city_group, business context (Rental/Sale),
+  and three-level marketing planning hierarchy (planning_mkt_level1/2/3). Aggregates costs from
+  daily_costs, affiliate commissions, promotional bonuses, offline/branding GSheets, CIQ, Spinver
+  partner fees, and provisioned costs. Includes calendar attributes (week, month, quarter,
+  semester) and region tier. No table partitioning configured in dw_datamarts_growth_cross
+  DAG; filter on dt_cost for query performance.
 columns:
   dt_cost:
-    description: Date to which the cost refers to.
+    description: Calendar date to which the marketing cost is attributed.
     lineage:
       - dw_public.dim_date.date
+      - datalake_marketing_costs.daily_costs.id_date
+      - datalake_gsheets_clean.ciq_costs.data
   week_start:
-    description: Week Start (Monday) to which the cost refers to.
+    description: Monday start date (yyyy-MM-dd string) of the week containing dt_cost.
+    lineage:
+      - dw_public.dim_date.date
   month_start:
-    description: Month Start (1st day) to which the cost refers to.
+    description: First day of the month (yyyy-MM-dd string) containing dt_cost.
+    lineage:
+      - dw_public.dim_date.date
   quarter:
-    description: Quarter (number) to which the cost refers to.
+    description: Fiscal quarter number (1–4) derived from dt_cost.
+    lineage:
+      - dw_public.dim_date.date
   halfyear:
-    description: Semester (number) to which the cost refers to.
+    description: Semester number (1 = Jan–Jun, 2 = Jul–Dec) derived from dt_cost.
+    lineage:
+      - dw_public.dim_date.date
+  month_num:
+    description: Month number (1–12) derived from dt_cost.
+    lineage:
+      - dw_public.dim_date.date
   city_group:
-    description: City Group to which the cost refers to.
+    description: QuintoAndar geographic market cluster for cost allocation. Defaults to Not Mapped when missing.
     lineage:
       - dw_datamarts.performance_marketing_cluster_promotional_bonus_costs.city_group
       - datalake_gsheets_clean.affiliates_extra_user_bonus.city_group
       - datalake_gsheets_clean.ciq_costs.city
       - datalake_gsheets_clean.offline_and_branding_marketing_costs.city_group
-      - datalake_gsheets_clean_prod.provisioned_costs_import.city_group
+      - datalake_gsheets_clean.provisioned_costs_import.city_group
       - datalake_marketing_costs.daily_costs.city_group
       - datalake_marketing_costs.offline_manual_costs.city_group
       - dw_public.dim_region.city_group
       - dw_quintoandar.dim_affiliate_cost.city_group
   tier:
-    description: Tier to which the cost refers to.
+    description: Region tier classification from dim_region for the city_group.
     lineage:
       - dw_public.dim_region.tier
   business:
-    description: Business Context (Rent, Sale) to which the cost refers to.
+    description: Business line context for the cost (Rental or Sale).
+    categories:
+      Rental: For-rent business line
+      Sale: For-sale business line
   planning_mkt_level1:
-    description: Context (Demand, Supply or Branding) to which the cost refers to.
+    description: Top-level marketing planning context (Demand, Supply, or Branded).
+    categories:
+      Demand: Tenant/buyer acquisition costs
+      Supply: Landlord/seller acquisition costs
+      Branded: Brand and offline marketing costs
   planning_mkt_level2:
-    description: Sub Context (Affiliates, Paid, Landlords, Classifieds, ...) to which the cost refers to.
+    description: |
+      Second-level marketing planning segment (Affiliates, Paid, Landlords, Classifieds, etc.).
+      Derived from mkt_channel, mkt_origin, or cost category depending on source.
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_channel
+      - datalake_marketing_costs.daily_costs.mkt_origin
+      - datalake_marketing_costs.offline_manual_costs.cost_category
   planning_mkt_level3:
-    description: Mkt_medium for Demand and Mkt_origin for Supply.
+    description: |
+      Third-level marketing planning detail. mkt_medium for demand costs; mkt_origin or
+      affiliate program name for supply; cost category for branding.
     lineage:
       - datalake_gsheets_clean.offline_and_branding_marketing_costs.mkt_channel
-      - datalake_gsheets_clean_prod.provisioned_costs_import.mkt_origin
+      - datalake_gsheets_clean.provisioned_costs_import.mkt_origin
       - datalake_marketing_costs.daily_costs.mkt_medium
       - datalake_marketing_costs.daily_costs.mkt_origin
       - datalake_marketing_costs.offline_manual_costs.cost_category
   costs:
-    description: Costs in BRL.
-  month_num:
-    description: Month (number) to which the cost refers to.
+    description: Marketing spend amount in BRL for the planning segment on dt_cost.
+    lineage:
+      - datalake_marketing_costs.daily_costs.cost
+      - datalake_marketing_costs.offline_manual_costs.cost
+      - datalake_gsheets_clean.offline_and_branding_marketing_costs.cost
+      - datalake_gsheets_clean.ciq_costs.total_costs_ciq_full_for_rent
+      - datalake_gsheets_clean.ciq_costs.total_costs_ciq_full_for_sale
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus_costs.final_bonus_rent
+      - dw_datamarts.performance_marketing_cluster_promotional_bonus_costs.final_bonus_sale
+      - dw_quintoandar.fact_affiliate_costs.cost
