@@ -2,7 +2,7 @@ database_name: datalake_salesforce_growth_clean
 table_name: operation
 description: Clean table for ingesting operation data from the Sales Force tool.
 domain: Growth
-owner: ederson.donde@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   id:
     lineage:

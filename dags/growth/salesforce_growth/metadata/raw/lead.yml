@@ -1,17 +1,27 @@
 ---
 database_name: datalake_salesforce_growth_raw
 table_name: lead
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: |
+  Raw layer for Salesforce Lead objects ingested via the Salesforce API (Navent UAT and production
+  instances). Contains the full Lead SOQL projection including standard fields and QuintoAndar
+  custom fields (Canal__c, Calificado__c, Motivo_no_convierte__c, etc.). Partition columns
+  year, month, and day are derived from LastModifiedDate at ingestion (dt_updated). Incremental
+  load filtered by partition date. Clean transformation in datalake_salesforce_growth_clean.lead.
 columns:
   Phone:
+    description: Lead contact phone number (Salesforce standard Phone field).
     tags:
       - PII
       - Confidential
   Direccion__c:
+    description: Lead street address or location (custom field Direccion__c).
     tags:
       - PII
       - Confidential
   LastName:
+    description: Lead contact last name (Salesforce standard LastName field).
     tags:
       - PII
       - Confidential

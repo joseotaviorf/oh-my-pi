@@ -1,13 +1,22 @@
 ---
 database_name: datalake_salesforce_growth_raw
 table_name: whatslly_thread_message
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: |
+  Raw layer for Whatslly WhatsApp thread messages (whatslly__Whatslly_Thread_Message__c custom
+  object) ingested via the Salesforce API. Contains message content, direction, sender/recipient
+  phones, and links to related Lead, Contact, and Account records. Partition columns year, month,
+  and day are derived from LastModifiedDate at ingestion (dt_updated). Incremental load filtered
+  by partition date. Clean transformation in datalake_salesforce_growth_clean.whatslly_thread_message.
 columns:
   whatslly__Recipient_Phone__c:
+    description: Phone number of the WhatsApp message recipient.
     tags:
       - PII
       - Confidential
   whatslly__Sender_Phone__c:
+    description: Phone number of the WhatsApp message sender.
     tags:
       - PII
       - Confidential

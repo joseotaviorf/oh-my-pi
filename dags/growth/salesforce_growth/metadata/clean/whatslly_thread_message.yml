@@ -2,7 +2,7 @@ database_name: datalake_salesforce_growth_clean
 table_name: whatslly_thread_message
 description: Clean table for ingesting WhatsApp messages data from the Sales Force tool.
 domain: Growth
-owner: ederson.donde@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   id_salesforce:
     lineage:
@@ -48,10 +48,10 @@ columns:
     lineage:
       - datalake_salesforce_growth_raw.whatslly_thread_message.whatslly__Whatslly_Person_Id__c
     description: ID of the person in Whatslly system.
-  id_owner:
+  id_analyst_salesforce:
     lineage:
       - datalake_salesforce_growth_raw.whatslly_thread_message.OwnerId
-    description: ID of the owner of this message record in Sales Force.
+    description: Salesforce User Id (OwnerId) of the analyst responsible for the message record.
   dt_updated:
     lineage:
       - datalake_salesforce_growth_raw.whatslly_thread_message.dt_updated

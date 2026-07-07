@@ -1,62 +1,79 @@
+---
 database_name: datalake_salesforce_growth_clean
 table_name: user
-description: Clean table for ingesting user data from the Sales Force tool.
+owner: gabriel.salla@quintoandar.com
 domain: Growth
-owner: ederson.donde@quintoandar.com.br
+description: |
+  Clean layer for Salesforce growth User records (analysts and operators) ingested via the
+  Salesforce API. Grain is one row per user (id_user_salesforce) per load snapshot, filtered by
+  partition date derived from LastModifiedDate. Includes role, team, country, and sales
+  organization assignment. Source: datalake_salesforce_growth_raw.user. Physically partitioned
+  by year, month, and day from dt_updated (default_partitions in salesforce_growth DAG).
+  Always filter year, month, and day together for partition pruning.
 columns:
-  email:
-    lineage:
-      - datalake_salesforce_growth_raw.user.Email
-    description: Email address of the user.
-  name:
-    lineage:
-      - datalake_salesforce_growth_raw.user.Name
-    description: Full name of the user.
   id_user_salesforce:
+    description: Salesforce native record Id for the User object.
     lineage:
       - datalake_salesforce_growth_raw.user.Id
-    description: Unique identification key for user in Sales Force.
+  email:
+    description: User email address (Email field).
+    lineage:
+      - datalake_salesforce_growth_raw.user.Email
+  name:
+    description: Full display name of the Salesforce growth analyst or operator (Name field).
+    lineage:
+      - datalake_salesforce_growth_raw.user.Name
   role:
+    description: Job title or role of the user (Title field).
     lineage:
       - datalake_salesforce_growth_raw.user.Title
-    description: Role or title of the user.
   team:
+    description: Department or team the user belongs to (Department field).
     lineage:
       - datalake_salesforce_growth_raw.user.Department
-    description: Department or team the user belongs to.
   leadership:
+    description: Division or leadership structure the user reports to (Division field).
     lineage:
       - datalake_salesforce_growth_raw.user.Division
-    description: Division or leadership structure the user belongs to.
-  creation_date:
-    lineage:
-      - datalake_salesforce_growth_raw.user.CreatedDate
-    description: Date when the user was created in Sales Force.
-  last_login_date:
-    lineage:
-      - datalake_salesforce_growth_raw.user.LastLoginDate
-    description: Date of the user's last login to Sales Force.
   country:
+    description: Country where the user operates (Pais__c custom field, BR, MX, etc.).
     lineage:
       - datalake_salesforce_growth_raw.user.Pais__c
-    description: Country where the user is located.
   operation:
+    description: |
+      Sales organization the user belongs to (Organizacion_de_venta__c custom field).
     lineage:
       - datalake_salesforce_growth_raw.user.Organizacion_de_venta__c
-    description: Sales organization or operation the user belongs to.
+  creation_date:
+    description: Timestamp when the user record was created in Salesforce (CreatedDate).
+    lineage:
+      - datalake_salesforce_growth_raw.user.CreatedDate
+  last_login_date:
+    description: Timestamp of the user's most recent Salesforce login (LastLoginDate).
+    lineage:
+      - datalake_salesforce_growth_raw.user.LastLoginDate
   dt_updated:
+    description: |
+      Date of the last Salesforce modification (LastModifiedDate cast to date at raw ingestion).
+      Source column for partition columns year, month, and day. Prefer filtering year/month/day
+      for partition pruning.
     lineage:
       - datalake_salesforce_growth_raw.user.dt_updated
-    description: Last modified date of the user record in Sales Force.
   year:
+    description: |
+      Table partition column (year). Derived from dt_updated (LastModifiedDate) at raw ingestion.
+      Required in WHERE clauses for partition pruning — always combine with month and day.
     lineage:
       - datalake_salesforce_growth_raw.user.year
-    description: Year of the user record.
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from dt_updated at raw ingestion. Must be
+      filtered together with year and day to enable partition pruning.
     lineage:
       - datalake_salesforce_growth_raw.user.month
-    description: Month of the user record.
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from dt_updated at raw ingestion. Filter with
+      year and month to narrow the scan. Example: WHERE year = 2026 AND month = 6 AND day = 15.
     lineage:
       - datalake_salesforce_growth_raw.user.day
-    description: Day of the user record.

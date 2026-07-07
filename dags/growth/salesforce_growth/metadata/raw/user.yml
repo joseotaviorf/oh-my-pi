@@ -1,13 +1,22 @@
 ---
 database_name: datalake_salesforce_growth_raw
 table_name: user
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: |
+  Raw layer for Salesforce User objects ingested via the Salesforce API. Contains the full User
+  SOQL projection including profile, role, department, and QuintoAndar custom fields (Pais__c,
+  Organizacion_de_venta__c, etc.). Partition columns year, month, and day are derived from
+  LastModifiedDate at ingestion (dt_updated). Incremental load filtered by partition date. Clean
+  transformation in datalake_salesforce_growth_clean.user.
 columns:
   Email:
+    description: User email address (Salesforce standard Email field).
     tags:
       - PII
       - Confidential
   Name:
+    description: User full display name (Salesforce standard Name field).
     tags:
       - PII
       - Confidential
