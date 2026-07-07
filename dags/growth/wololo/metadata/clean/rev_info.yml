@@ -1,10 +1,15 @@
+---
 database_name: datalake_wololo_clean
 table_name: rev_info
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Envers revision metadata mapping revision numbers to timestamps. Joined from audit tables to order and filter historical changes in enrich_wololo.lead_sales_company.
 columns:
   rev:
     lineage:
-      - datalake_wololo_raw.revinfo.rev
+    - datalake_wololo_raw.revinfo.rev
+    description: Hibernate Envers revision number linking audit rows to rev_info.
   ts_rev:
     lineage:
-      - datalake_wololo_raw.revinfo.revtstmp
+    - datalake_wololo_raw.revinfo.revtstmp
+    description: Timestamp when the Envers audit revision was recorded in Wololo Postgres.

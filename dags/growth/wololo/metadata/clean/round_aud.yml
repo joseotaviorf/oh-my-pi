@@ -1,28 +1,39 @@
+---
 database_name: datalake_wololo_clean
 table_name: round_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Audit history of contact round configuration changes for prospects. Sourced from Postgres CDC.
 columns:
   id_prospect:
     lineage:
-      - datalake_wololo_raw.round_aud.prospect_id
+    - datalake_wololo_raw.round_aud.prospect_id
+    description: Wololo prospect identifier linking child entities to datalake_wololo_clean.prospect.
   id_reference:
     lineage:
-      - datalake_wololo_raw.round_aud.reference_id
+    - datalake_wololo_raw.round_aud.reference_id
+    description: External lead reference for the prospect; joins to id_lead_ebdb in supply and Rene flows for most records (~80% match rate in production).
   round_number:
     lineage:
-      - datalake_wololo_raw.round_aud.round_count
+    - datalake_wololo_raw.round_aud.round_count
+    description: Sequential round index grouping contact attempts for the same prospect.
   round_max_tries:
     lineage:
-      - datalake_wololo_raw.round_aud.max_tries
+    - datalake_wololo_raw.round_aud.max_tries
+    description: Maximum number of contact attempts allowed within the round.
   mod_round_max_tries:
     lineage:
-      - datalake_wololo_raw.round_aud.maxtries_mod
+    - datalake_wololo_raw.round_aud.maxtries_mod
+    description: Envers flag indicating round max tries changed in this audit revision.
   rev:
     lineage:
-      - datalake_wololo_raw.round_aud.rev
+    - datalake_wololo_raw.round_aud.rev
+    description: Hibernate Envers revision number linking audit rows to rev_info.
   rev_type:
     lineage:
-      - datalake_wololo_raw.round_aud.revtype
+    - datalake_wololo_raw.round_aud.revtype
+    description: Envers revision type code indicating insert, update, or delete on the audited row.
   rev_end:
     lineage:
-      - datalake_wololo_raw.round_aud.revend
+    - datalake_wololo_raw.round_aud.revend
+    description: Envers revision end marker for superseded audit versions when applicable.

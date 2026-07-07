@@ -1,58 +1,79 @@
+---
 database_name: datalake_wololo_clean
 table_name: prospect_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Audit history (Hibernate Envers) of prospect attribute changes. One row per revised prospect field snapshot. Sourced from Postgres CDC and used by enrich_wololo.lead_sales_company.
 columns:
   id:
     lineage:
-      - datalake_wololo_raw.prospect_aud.id
+    - datalake_wololo_raw.prospect_aud.id
+    description: Wololo internal surrogate key for the entity in the Postgres CDC source.
   id_reference:
     lineage:
-      - datalake_wololo_raw.prospect_aud.referenceid
+    - datalake_wololo_raw.prospect_aud.referenceid
+    description: External lead reference for the prospect; joins to id_lead_ebdb in supply and Rene flows for most records (~80% match rate in production).
   id_dimension_entity:
     lineage:
-      - datalake_wololo_raw.prospect_aud.dimensionentity_id
+    - datalake_wololo_raw.prospect_aud.dimensionentity_id
+    description: Foreign key to prospect_dimension holding extended prospect attributes such as sales company.
   country_code:
     lineage:
-      - datalake_wololo_raw.prospect_aud.country
+    - datalake_wololo_raw.prospect_aud.country
+    description: ISO country code of the prospect property or lead geography.
   address:
     lineage:
-      - datalake_wololo_raw.prospect_aud.address
+    - datalake_wololo_raw.prospect_aud.address
+    description: Street address of the prospect property supplied during lead capture.
   rev:
     lineage:
-      - datalake_wololo_raw.prospect_aud.rev
+    - datalake_wololo_raw.prospect_aud.rev
+    description: Hibernate Envers revision number linking audit rows to rev_info.
   revtype:
     lineage:
-      - datalake_wololo_raw.prospect_aud.revtype
+    - datalake_wololo_raw.prospect_aud.revtype
+    description: Envers revision type code indicating insert, update, or delete on the audited row.
   revend:
     lineage:
-      - datalake_wololo_raw.prospect_aud.revend
+    - datalake_wololo_raw.prospect_aud.revend
+    description: Envers revision end marker for superseded audit versions when applicable.
   status:
     lineage:
-      - datalake_wololo_raw.prospect_aud.status
+    - datalake_wololo_raw.prospect_aud.status
+    description: Prospect lifecycle status value captured in this audit revision, not necessarily the current status on prospect.
   whatsappoptedin:
     lineage:
-      - datalake_wololo_raw.prospect_aud.whatsappoptedin
+    - datalake_wololo_raw.prospect_aud.whatsappoptedin
+    description: Historical WhatsApp opt-in flag value on the audited prospect revision.
   longtail:
     lineage:
-      - datalake_wololo_raw.prospect_aud.longtail
+    - datalake_wololo_raw.prospect_aud.longtail
+    description: Historical long-tail flag value on the audited prospect revision.
   scoring_info:
     lineage:
-      - datalake_wololo_raw.prospect_aud.scoringinfo
+    - datalake_wololo_raw.prospect_aud.scoringinfo
+    description: JSON or structured scoring metadata used to prioritize prospect outreach.
   mod_id_reference:
     lineage:
-      - datalake_wololo_raw.prospect_aud.referenceid_mod
+    - datalake_wololo_raw.prospect_aud.referenceid_mod
+    description: Envers flag indicating id_reference changed in this audit revision.
   mod_longtail:
     lineage:
-      - datalake_wololo_raw.prospect_aud.longtail_mod
+    - datalake_wololo_raw.prospect_aud.longtail_mod
+    description: Envers flag indicating the long-tail flag changed in this audit revision.
   mod_whatsappoptedin:
     lineage:
-      - datalake_wololo_raw.prospect_aud.whatsappoptedin_mod
+    - datalake_wololo_raw.prospect_aud.whatsappoptedin_mod
+    description: Envers flag indicating WhatsApp opt-in changed in this audit revision.
   mod_dimension_entity:
     lineage:
-      - datalake_wololo_raw.prospect_aud.dimensionentity_mod
+    - datalake_wololo_raw.prospect_aud.dimensionentity_mod
+    description: Envers flag indicating dimension entity reference changed in this revision.
   mod_status:
     lineage:
-      - datalake_wololo_raw.prospect_aud.status_mod
+    - datalake_wololo_raw.prospect_aud.status_mod
+    description: Envers flag indicating prospect status changed in this audit revision.
   mod_scoring_info:
     lineage:
-      - datalake_wololo_raw.prospect_aud.scoringinfo_mod
+    - datalake_wololo_raw.prospect_aud.scoringinfo_mod
+    description: Envers flag indicating scoring metadata changed in this audit revision.

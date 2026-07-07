@@ -1,10 +1,15 @@
+---
 database_name: datalake_wololo_clean
 table_name: prospect_dimension
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: One row per prospect dimension entity holding extended attributes such as sales company assignment. Sourced from Postgres CDC and joined from prospect via id_dimension_entity.
 columns:
   id:
     lineage:
-      - datalake_wololo_raw.prospectdimension.id
+    - datalake_wololo_raw.prospectdimension.id
+    description: Wololo internal surrogate key for the entity in the Postgres CDC source.
   sales_company:
     lineage:
-      - datalake_wololo_raw.prospectdimension.salescompany
+    - datalake_wololo_raw.prospectdimension.salescompany
+    description: Third-party sales company assigned to contact and convert the prospect in the 1P supply funnel.

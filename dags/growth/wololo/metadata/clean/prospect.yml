@@ -1,115 +1,155 @@
+---
 database_name: datalake_wololo_clean
 table_name: prospect
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: One row per Wololo prospect (1P supply entity after lead-to-prospect transition). Sourced from Postgres CDC via the wololo DAG. id_reference joins to id_lead_ebdb in supply and Rene flows for most records. Consumed by enrich_wololo and supply conversion pipelines.
 columns:
   id:
     lineage:
-      - datalake_wololo_raw.prospect.id
+    - datalake_wololo_raw.prospect.id
+    description: Wololo internal surrogate key for the entity in the Postgres CDC source.
   id_reference:
     lineage:
-      - datalake_wololo_raw.prospect.referenceid
+    - datalake_wololo_raw.prospect.referenceid
+    description: External lead reference for the prospect; joins to id_lead_ebdb in supply and Rene flows for most records (~80% match rate in production).
   id_dimension_entity:
     lineage:
-      - datalake_wololo_raw.prospect.dimensionentity_id
+    - datalake_wololo_raw.prospect.dimensionentity_id
+    description: Foreign key to prospect_dimension holding extended prospect attributes such as sales company.
   id_affiliate:
     lineage:
-      - datalake_wololo_raw.prospect.affiliateid
+    - datalake_wololo_raw.prospect.affiliateid
+    description: Affiliate partner identifier associated with the prospect acquisition source.
   id_task:
     lineage:
-      - datalake_wololo_raw.prospect.taskid
+    - datalake_wololo_raw.prospect.taskid
+    description: Operational task identifier assigned to the prospect in Wololo orchestration.
   id_external:
     lineage:
-      - datalake_wololo_raw.prospect.externalid
+    - datalake_wololo_raw.prospect.externalid
+    description: Rene Descartes lead identifier (house_lead.id) linked to this prospect.
   country_code:
     lineage:
-      - datalake_wololo_raw.prospect.country
+    - datalake_wololo_raw.prospect.country
+    description: ISO country code of the prospect property or lead geography.
   status:
     lineage:
-      - datalake_wololo_raw.prospect.status
+    - datalake_wololo_raw.prospect.status
+    description: Current prospect lifecycle status in the Wololo prospecting funnel.
   address:
     lineage:
-      - datalake_wololo_raw.prospect.address
+    - datalake_wololo_raw.prospect.address
+    description: Street address of the prospect property supplied during lead capture.
   number:
     lineage:
-      - datalake_wololo_raw.prospect.number
+    - datalake_wololo_raw.prospect.number
+    description: Street number component of the prospect property address.
   additional_address:
     lineage:
-      - datalake_wololo_raw.prospect.additionaladdress
+    - datalake_wololo_raw.prospect.additionaladdress
+    description: Complement or additional address details for the prospect property.
   neighborhood:
     lineage:
-      - datalake_wololo_raw.prospect.neighborhood
+    - datalake_wololo_raw.prospect.neighborhood
+    description: Neighborhood of the prospect property.
   city:
     lineage:
-      - datalake_wololo_raw.prospect.city
+    - datalake_wololo_raw.prospect.city
+    description: City of the prospect property.
   zip_code:
     lineage:
-      - datalake_wololo_raw.prospect.zipcode
+    - datalake_wololo_raw.prospect.zipcode
+    description: Postal code of the prospect property.
   sale_price:
     lineage:
-      - datalake_wololo_raw.prospect.saleprice
+    - datalake_wololo_raw.prospect.saleprice
+    description: Declared sale price for the prospect property in local currency.
   rent_price:
     lineage:
-      - datalake_wololo_raw.prospect.rentprice
+    - datalake_wololo_raw.prospect.rentprice
+    description: Declared rent price for the prospect property in local currency.
   condominium:
     lineage:
-      - datalake_wololo_raw.prospect.condominium
+    - datalake_wololo_raw.prospect.condominium
+    description: Monthly condominium fee amount declared for the prospect property.
   name:
     lineage:
-      - datalake_wololo_raw.prospect.name
+    - datalake_wololo_raw.prospect.name
+    description: Prospect owner or contact person name captured at intake.
   email:
     lineage:
-      - datalake_wololo_raw.prospect.email
+    - datalake_wololo_raw.prospect.email
+    description: Prospect email address used for outreach and conversion tracking.
   phone:
     lineage:
-      - datalake_wololo_raw.prospect.phone
+    - datalake_wololo_raw.prospect.phone
+    description: Primary phone number for prospect outreach.
   phone_secondary:
     lineage:
-      - datalake_wololo_raw.prospect.phonesecondary
+    - datalake_wololo_raw.prospect.phonesecondary
+    description: Secondary phone number for prospect outreach attempts.
   phone_tertiary:
     lineage:
-      - datalake_wololo_raw.prospect.phonetertiary
+    - datalake_wololo_raw.prospect.phonetertiary
+    description: Tertiary phone number for prospect outreach attempts.
   origin:
     lineage:
-      - datalake_wololo_raw.prospect.origin
+    - datalake_wololo_raw.prospect.origin
+    description: Acquisition channel or referral source label for the prospect lead.
   origin_phone:
     lineage:
-      - datalake_wololo_raw.prospect.originphone
+    - datalake_wololo_raw.prospect.originphone
+    description: Phone number associated with the acquisition origin when applicable.
   sales_company:
     lineage:
-      - datalake_wololo_raw.prospect.sales_company
+    - datalake_wololo_raw.prospect.sales_company
+    description: Third-party sales company assigned to contact and convert the prospect in the 1P supply funnel.
   lead_type:
     lineage:
-      - datalake_wololo_raw.prospect.leadtype
+    - datalake_wololo_raw.prospect.leadtype
+    description: Classification of the lead type within Wololo prospect orchestration.
   affiliate_type:
     lineage:
-      - datalake_wololo_raw.prospect.affiliatetype
+    - datalake_wololo_raw.prospect.affiliatetype
+    description: Type of affiliate partner that sourced the prospect.
   affiliate_name:
     lineage:
-      - datalake_wololo_raw.prospect.affiliatename
+    - datalake_wololo_raw.prospect.affiliatename
+    description: Display name of the affiliate partner that sourced the prospect.
   mkt_origin:
     lineage:
-      - datalake_wololo_raw.prospect.mktorigin
+    - datalake_wololo_raw.prospect.mktorigin
+    description: Marketing origin tag used for campaign and channel attribution.
   scoring_info:
     lineage:
-      - datalake_wololo_raw.prospect.scoringinfo
+    - datalake_wololo_raw.prospect.scoringinfo
+    description: JSON or structured scoring metadata used to prioritize prospect outreach.
   is_long_tail:
     lineage:
-      - datalake_wololo_raw.prospect.longtail
+    - datalake_wololo_raw.prospect.longtail
+    description: Whether the prospect is flagged as a long-tail lead requiring extended nurturing.
   is_whatsapp_opted_in:
     lineage:
-      - datalake_wololo_raw.prospect.whatsappoptedin
+    - datalake_wololo_raw.prospect.whatsappoptedin
+    description: Whether the prospect opted in to WhatsApp contact for outreach.
   is_for_sale:
     lineage:
-      - datalake_wololo_raw.prospect.forsale
+    - datalake_wololo_raw.prospect.forsale
+    description: Whether the prospect property is offered for sale.
   is_for_rent:
     lineage:
-      - datalake_wololo_raw.prospect.forrent
+    - datalake_wololo_raw.prospect.forrent
+    description: Whether the prospect property is offered for rent.
   is_exclusivity_intent:
     lineage:
-      - datalake_wololo_raw.prospect.exclusivityintent
+    - datalake_wololo_raw.prospect.exclusivityintent
+    description: Whether the prospect expressed intent to grant listing exclusivity.
   ts_created:
     lineage:
-      - datalake_wololo_raw.prospect.created_at
+    - datalake_wololo_raw.prospect.created_at
+    description: Timestamp when the source record was created in Wololo Postgres.
   ts_updated:
     lineage:
-      - datalake_wololo_raw.prospect.updated_at
+    - datalake_wololo_raw.prospect.updated_at
+    description: Timestamp when the source record was last updated in Wololo Postgres.

@@ -1,22 +1,31 @@
+---
 database_name: datalake_wololo_clean
 table_name: prospect_dimension_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Audit history of prospect_dimension changes, including sales company reassignments. Sourced from Postgres CDC and joined to prospect_aud for lead sales company enrichment.
 columns:
   id:
     lineage:
-      - datalake_wololo_raw.prospectdimension_aud.id
+    - datalake_wololo_raw.prospectdimension_aud.id
+    description: Wololo internal surrogate key for the entity in the Postgres CDC source.
   rev:
     lineage:
-      - datalake_wololo_raw.prospectdimension_aud.rev
+    - datalake_wololo_raw.prospectdimension_aud.rev
+    description: Hibernate Envers revision number linking audit rows to rev_info.
   revtype:
     lineage:
-      - datalake_wololo_raw.prospectdimension_aud.revtype
+    - datalake_wololo_raw.prospectdimension_aud.revtype
+    description: Envers revision type code indicating insert, update, or delete on the audited row.
   revend:
     lineage:
-      - datalake_wololo_raw.prospectdimension_aud.revend
+    - datalake_wololo_raw.prospectdimension_aud.revend
+    description: Envers revision end marker for superseded audit versions when applicable.
   sales_company:
     lineage:
-      - datalake_wololo_raw.prospectdimension_aud.salescompany
+    - datalake_wololo_raw.prospectdimension_aud.salescompany
+    description: Third-party sales company assigned to contact and convert the prospect in the 1P supply funnel.
   mod_sales_company:
     lineage:
-      - datalake_wololo_raw.prospectdimension_aud.salescompany_mod
+    - datalake_wololo_raw.prospectdimension_aud.salescompany_mod
+    description: Envers flag indicating sales company assignment changed in this revision.

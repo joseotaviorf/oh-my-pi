@@ -1,25 +1,38 @@
+---
 database_name: datalake_wololo_clean
 table_name: conversion
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: One row per Wololo prospect conversion event linking the prospect to a QuintoAndar user within a business context. Sourced from Postgres CDC for supply funnel reporting.
 columns:
   id:
     lineage:
-      - datalake_wololo_raw.conversion.id
+    - datalake_wololo_raw.conversion.id
+    description: Wololo internal surrogate key for the entity in the Postgres CDC source.
   id_prospect:
     lineage:
-      - datalake_wololo_raw.conversion.prospectid
+    - datalake_wololo_raw.conversion.prospectid
+    description: Wololo prospect identifier linking child entities to datalake_wololo_clean.prospect.
   id_user:
     lineage:
-      - datalake_wololo_raw.conversion.userid
+    - datalake_wololo_raw.conversion.userid
+    description: QuintoAndar user identifier when the prospect converts to a registered platform user.
   business_context:
     lineage:
-      - datalake_wololo_raw.conversion.businesscontext
+    - datalake_wololo_raw.conversion.businesscontext
+    description: Business line context in which the prospect converted to a QuintoAndar user.
+    categories:
+      RENT: For rent business context.
+      SALE: For sale business context.
   sales_company:
     lineage:
-      - datalake_wololo_raw.conversion.salescompany
+    - datalake_wololo_raw.conversion.salescompany
+    description: Third-party sales company assigned to contact and convert the prospect in the 1P supply funnel.
   ts_created:
     lineage:
-      - datalake_wololo_raw.conversion.created_at
+    - datalake_wololo_raw.conversion.created_at
+    description: Timestamp when the source record was created in Wololo Postgres.
   ts_updated:
     lineage:
-      - datalake_wololo_raw.conversion.updated_at
+    - datalake_wololo_raw.conversion.updated_at
+    description: Timestamp when the source record was last updated in Wololo Postgres.

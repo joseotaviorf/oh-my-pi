@@ -1,22 +1,31 @@
+---
 database_name: datalake_wololo_clean
 table_name: whatsapp_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Audit history of WhatsApp opt-in changes per phone number. Sourced from Postgres CDC.
 columns:
   phone_number:
     lineage:
-      - datalake_wololo_raw.whatsapp_aud.phone_number
+    - datalake_wololo_raw.whatsapp_aud.phone_number
+    description: Phone number whose WhatsApp opt-in status changed in this audit revision.
   opt_in:
     lineage:
-      - datalake_wololo_raw.whatsapp_aud.optin
+    - datalake_wololo_raw.whatsapp_aud.optin
+    description: Whether the phone number opted in to receive WhatsApp messages from sales partners.
   mod_opt_in:
     lineage:
-      - datalake_wololo_raw.whatsapp_aud.optin_mod
+    - datalake_wololo_raw.whatsapp_aud.optin_mod
+    description: Envers flag indicating WhatsApp opt-in changed in this audit revision.
   rev:
     lineage:
-      - datalake_wololo_raw.whatsapp_aud.rev
+    - datalake_wololo_raw.whatsapp_aud.rev
+    description: Hibernate Envers revision number linking audit rows to rev_info.
   rev_type:
     lineage:
-      - datalake_wololo_raw.whatsapp_aud.revtype
+    - datalake_wololo_raw.whatsapp_aud.revtype
+    description: Envers revision type code indicating insert, update, or delete on the audited row.
   rev_end:
     lineage:
-      - datalake_wololo_raw.whatsapp_aud.revend
+    - datalake_wololo_raw.whatsapp_aud.revend
+    description: Envers revision end marker for superseded audit versions when applicable.

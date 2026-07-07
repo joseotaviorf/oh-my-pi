@@ -1,34 +1,50 @@
+---
 database_name: datalake_wololo_clean
 table_name: context_discard
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: One row per discarded business context for a prospect, capturing manual or automatic discard reasons during prospect-to-opportunity handling. Sourced from Postgres CDC.
 columns:
   id:
     lineage:
-      - datalake_wololo_raw.context_discard.id
+    - datalake_wololo_raw.context_discard.id
+    description: Wololo internal surrogate key for the entity in the Postgres CDC source.
   id_prospect:
     lineage:
-      - datalake_wololo_raw.context_discard.prospectid
+    - datalake_wololo_raw.context_discard.prospectid
+    description: Wololo prospect identifier linking child entities to datalake_wololo_clean.prospect.
   id_user:
     lineage:
-      - datalake_wololo_raw.context_discard.userid
+    - datalake_wololo_raw.context_discard.userid
+    description: QuintoAndar user identifier associated with the discard action (agent or operator). Nullable when the discard is automatic or has no assigned user.
   business_context:
     lineage:
-      - datalake_wololo_raw.context_discard.businesscontext
+    - datalake_wololo_raw.context_discard.businesscontext
+    description: Business line context of the discarded prospect opportunity.
+    categories:
+      RENT: For rent business context.
+      SALE: For sale business context.
   reason:
     lineage:
-      - datalake_wololo_raw.context_discard.reason
+    - datalake_wololo_raw.context_discard.reason
+    description: Human-readable reason the prospect business context was discarded.
   sales_company:
     lineage:
-      - datalake_wololo_raw.context_discard.salescompany
+    - datalake_wololo_raw.context_discard.salescompany
+    description: Third-party sales company assigned to contact and convert the prospect in the 1P supply funnel.
   is_automatically_discarded:
     lineage:
-      - datalake_wololo_raw.context_discard.automaticallydiscarded
+    - datalake_wololo_raw.context_discard.automaticallydiscarded
+    description: Whether the discard was triggered automatically by Wololo rules.
   attendance_info:
     lineage:
-      - datalake_wololo_raw.context_discard.attendanceinfo
+    - datalake_wololo_raw.context_discard.attendanceinfo
+    description: Structured metadata about attendance or handling of the discarded context.
   ts_created:
     lineage:
-      - datalake_wololo_raw.context_discard.created_at
+    - datalake_wololo_raw.context_discard.created_at
+    description: Timestamp when the source record was created in Wololo Postgres.
   ts_updated:
     lineage:
-      - datalake_wololo_raw.context_discard.updated_at
+    - datalake_wololo_raw.context_discard.updated_at
+    description: Timestamp when the source record was last updated in Wololo Postgres.

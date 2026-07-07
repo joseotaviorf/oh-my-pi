@@ -1,37 +1,53 @@
+---
 database_name: datalake_wololo_clean
 table_name: contact
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: One row per outbound contact attempt by a third-party sales company to a Wololo prospect. Sourced from Postgres CDC. Joined to prospect via id_prospect_reference and used by enrich_wololo.prospect_calls.
 columns:
   id:
     lineage:
-      - datalake_wololo_raw.contact.id
+    - datalake_wololo_raw.contact.id
+    description: Wololo internal surrogate key for the entity in the Postgres CDC source.
   id_prospect_reference:
     lineage:
-      - datalake_wololo_raw.contact.prospectreferenceid
+    - datalake_wololo_raw.contact.prospectreferenceid
+    description: Prospect reference on the contact row; matches prospect.id_reference for join to enrich layers.
   id_analyst:
     lineage:
-      - datalake_wololo_raw.contact.analystid
+    - datalake_wololo_raw.contact.analystid
+    description: Third-party call analyst identifier who performed the outbound contact.
   id_external_call:
     lineage:
-      - datalake_wololo_raw.contact.externalcallid
+    - datalake_wololo_raw.contact.externalcallid
+    description: External telephony provider call identifier for traceability.
   analyst_email:
     lineage:
-      - datalake_wololo_raw.contact.analystemail
+    - datalake_wololo_raw.contact.analystemail
+    description: Email of the third-party analyst who registered the contact attempt.
   channel:
     lineage:
-      - datalake_wololo_raw.contact.channel
+    - datalake_wololo_raw.contact.channel
+    description: Outbound contact channel used for the attempt. Currently all records are phone calls logged by third-party dialers.
+    categories:
+      PHONE: Outbound phone call attempt.
   sales_company:
     lineage:
-      - datalake_wololo_raw.contact.salescompany
+    - datalake_wololo_raw.contact.salescompany
+    description: Third-party sales company assigned to contact and convert the prospect in the 1P supply funnel.
   phone_output:
     lineage:
-      - datalake_wololo_raw.contact.phoneoutput
+    - datalake_wololo_raw.contact.phoneoutput
+    description: Outcome label reported by the telephony provider for the contact attempt.
   phone_number:
     lineage:
-      - datalake_wololo_raw.contact.phonenumber
+    - datalake_wololo_raw.contact.phonenumber
+    description: Phone number dialed or messaged during the outbound contact attempt.
   duration_in_seconds:
     lineage:
-      - datalake_wololo_raw.contact.durationinseconds
+    - datalake_wololo_raw.contact.durationinseconds
+    description: Duration in seconds of the completed phone contact when available.
   ts_contacted:
     lineage:
-      - datalake_wololo_raw.contact.contactedat
+    - datalake_wololo_raw.contact.contactedat
+    description: Timestamp when the outbound contact attempt was made to the prospect.

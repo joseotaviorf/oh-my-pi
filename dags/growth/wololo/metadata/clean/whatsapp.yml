@@ -1,10 +1,15 @@
+---
 database_name: datalake_wololo_clean
 table_name: whatsapp
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Current WhatsApp opt-in status per phone number used in Wololo prospect outreach. Sourced from Postgres CDC.
 columns:
   phone_number:
     lineage:
-      - datalake_wololo_raw.whatsapp.phone_number
+    - datalake_wololo_raw.whatsapp.phone_number
+    description: Phone number whose WhatsApp opt-in status is tracked in Wololo.
   opt_in:
     lineage:
-      - datalake_wololo_raw.whatsapp.optin
+    - datalake_wololo_raw.whatsapp.optin
+    description: Whether the phone number opted in to receive WhatsApp messages from sales partners.

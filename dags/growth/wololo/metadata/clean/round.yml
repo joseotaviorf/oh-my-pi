@@ -1,19 +1,27 @@
+---
 database_name: datalake_wololo_clean
 table_name: round
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: One row per contact round for a prospect, grouping sequential outreach attempts with a configured maximum try count. Sourced from Postgres CDC and used to attribute calls to rounds in enrich_wololo.prospect_calls.
 columns:
   id_prospect:
     lineage:
-      - datalake_wololo_raw.round.prospect_id
+    - datalake_wololo_raw.round.prospect_id
+    description: Wololo prospect identifier linking child entities to datalake_wololo_clean.prospect.
   id_reference:
     lineage:
-      - datalake_wololo_raw.round.reference_id
+    - datalake_wololo_raw.round.reference_id
+    description: External lead reference for the prospect; joins to id_lead_ebdb in supply and Rene flows for most records (~80% match rate in production).
   round_number:
     lineage:
-      - datalake_wololo_raw.round.round_count
+    - datalake_wololo_raw.round.round_count
+    description: Sequential round index grouping contact attempts for the same prospect.
   round_max_tries:
     lineage:
-      - datalake_wololo_raw.round.max_tries
+    - datalake_wololo_raw.round.max_tries
+    description: Maximum number of contact attempts allowed within the round.
   ts_created:
     lineage:
-      - datalake_wololo_raw.round.created_at
+    - datalake_wololo_raw.round.created_at
+    description: Timestamp when the source record was created in Wololo Postgres.
