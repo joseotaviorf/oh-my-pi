@@ -171,6 +171,18 @@ def build_datahub_yaml(
             ],
         }
 
+    # Ownership (## Ownership) — applies to both domain and metric products. Only emit
+    # roles that actually have resolved @quintoandar.com.br emails.
+    owners_block = {
+        role: emails for role, emails in (parsed.owners or {}).items() if emails
+    }
+    if owners_block:
+        spec["owners"] = owners_block
+
+    # MBR (## MBR) — metric products only; the loader clears membership when absent.
+    if data_product_type == DATA_PRODUCT_TYPE_METRIC and parsed.mbr:
+        spec["mbr"] = list(parsed.mbr)
+
     if source_document_urn:
         spec["source_context_document_urn"] = source_document_urn
 

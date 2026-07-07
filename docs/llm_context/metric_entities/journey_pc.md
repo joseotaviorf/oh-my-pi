@@ -1,5 +1,14 @@
 # Journey PC
 
+## Ownership
+
+**Data Owner:**
+- samia.lauar@quintoandar.com.br
+- felipe.abreu@quintoandar.com.br
+
+**Data Steward:**
+- victor.prado@quintoandar.com.br
+
 ## Overview
 
 **Journey PC** (post-contract journey mix) is the family of metrics that measure the **share of
@@ -31,6 +40,10 @@ counted independently for each role. This is intentional and matches the officia
 
 - ticket
 - chatbot_sessions
+
+## MBR
+
+- Post Contract
 
 ## Glossary and Synonyms
 

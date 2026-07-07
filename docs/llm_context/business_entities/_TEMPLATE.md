@@ -17,6 +17,25 @@ Rules:
   • File name: lowercase_snake_case.md (matches the entity slug in the YAML).
 -->
 
+## Ownership
+
+<!--
+Data Owner: accountable for the business definition and approves changes (usually a
+manager/lead). Data Steward: maintains this document day-to-day and is the first point
+of contact for questions. At least one email is required in EACH category (they may
+overlap). Not folded into the DataHub Data Product description (see
+EXCLUDE_HEADING_PATTERNS in generate_and_push_datahub_entities.py) — it is routing
+metadata, not narrative content.
+-->
+
+**Data Owner:**
+- {data_owner_email@quintoandar.com.br}
+
+**Data Steward:**
+- {data_steward_email@quintoandar.com.br}
+
+---
+
 ## Overview
 
 <!--

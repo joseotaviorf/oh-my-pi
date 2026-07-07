@@ -23,6 +23,8 @@ Metric entity docs are **calculation contracts** — they tell TARS (and analyst
 8. **Weight / parameter source** — where do coefficients, targets, or thresholds live (e.g., a GSheets table)? Never hardcode.
 9. **Common analyst mistakes** — the top 2–3 traps that produce a wrong number (drives Dos and Don'ts and the warning in Canonical Filter).
 10. **Superset golden assets** — the reference assets for this metric: canonical Superset virtual datasets and/or the materialized Trino/Databricks `schema.table` tables they map to (e.g. `sandbox.nps_fr`). These are linked as reference assets on the DataHub Data Product Summary. Optional.
+11. **Ownership emails** — at least one **Data Owner** (accountable for the business definition, usually a manager/lead) and at least one **Data Steward** (`@quintoandar.com.br`, maintains this document day-to-day; defaults to the requester if not otherwise specified). The two roles may share the same email.
+12. **MBR membership** — does this metric feed one or more Monthly Business Reviews (MBRs)? If so, which one(s)? Optional — omit if the metric is not part of any MBR. A metric may belong to several MBRs.
 
 Do NOT infer formula details from context — the whole point of this file is to be the definitive source of truth.
 
@@ -50,6 +52,14 @@ Create `docs/llm_context/metric_entities/{metric_slug}.md` following the templat
 ```markdown
 # {Official Metric Name}
 
+## Ownership
+
+**Data Owner:**
+- {data_owner_email@quintoandar.com.br}
+
+**Data Steward:**
+- {data_steward_email@quintoandar.com.br}
+
 ## Overview
 
 **{Name}** is {one-sentence definition}. {How it differs from the naive/component calculation — why the business rule exists}.
@@ -59,6 +69,12 @@ Create `docs/llm_context/metric_entities/{metric_slug}.md` following the templat
 ## Related Business Entities
 
 - {Business Entity Name}
+
+## MBR
+
+<!-- Optional — one bullet per MBR this metric feeds. Omit the whole section if none. -->
+
+- {MBR Name}
 
 ## Glossary and Synonyms
 
@@ -155,6 +171,11 @@ URNs in backticks. Omit this section when no Superset asset exists for this metr
 
 ### Section-by-section guidance
 
+**Ownership:**
+- First section after the title. Two required bold sub-groups, **Data Owner:** and **Data Steward:**, each with at least one `@quintoandar.com.br` email bullet (they may overlap).
+- Ask the user for both in Step 1 if not already provided.
+- Not folded into the DataHub Data Product description (see `EXCLUDE_HEADING_PATTERNS` in `generate_and_push_datahub_entities.py`) — it is routing metadata, not narrative content.
+
 **Overview:**
 - State what the metric is and why a naive calculation is wrong.
 - Always flag product-scope restrictions in bold.
@@ -163,6 +184,11 @@ URNs in backticks. Omit this section when no Superset asset exists for this metr
 **Related Business Entities:**
 - Plain list of entity names (no paths, no descriptions). One bullet per entity.
 - TARS uses this to navigate to the schema file before building SQL.
+
+**MBR:**
+- Optional. Include only when the metric feeds one or more Monthly Business Reviews; omit the section entirely otherwise.
+- One bullet per MBR name (a metric may belong to several). Grain is the whole document — every metric here is treated as part of the listed MBR(s).
+- Not folded into the DataHub Data Product description — CI syncs it to the `data_product.mbr` structured property (filterable in DataHub). It is routing metadata, not narrative content.
 
 **Glossary and Synonyms:**
 - Bullet list format. Include every alias analysts or stakeholders use to ask for this metric.
@@ -231,9 +257,11 @@ If the business entity already has a "Related Metric Entities" section, just add
 Before presenting to the user, verify:
 
 - [ ] File lives at `docs/llm_context/metric_entities/{metric_slug}.md` (lowercase snake_case)
+- [ ] `## Ownership` is the first section after the title, with at least one `@quintoandar.com.br` email under **Data Owner** and one under **Data Steward**
 - [ ] Overview states both what the metric is AND why the naive calculation is wrong
 - [ ] Product-scope restriction is bolded (or absent if the metric is universal)
 - [ ] Related Business Entities lists names only — no paths, no descriptions
+- [ ] MBR section present with one bullet per MBR when the metric feeds an MBR — omitted entirely otherwise (no empty section, no placeholders)
 - [ ] Scope Excluded section covers every known non-qualifying segment/campaign
 - [ ] Canonical Filter lists ALL mandatory predicates, not just the primary one
 - [ ] Warning in Canonical Filter names the specific incorrect result from under-filtering

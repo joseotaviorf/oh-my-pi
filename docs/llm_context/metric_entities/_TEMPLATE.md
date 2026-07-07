@@ -28,6 +28,23 @@ Rules:
     constructs (QUALIFY, GROUP BY ALL, IFF, 3-arg DATEDIFF, variant `col:key`).
 -->
 
+## Ownership
+
+<!--
+Data Owner: accountable for the business definition and approves changes (usually a
+manager/lead). Data Steward: maintains this document day-to-day and is the first point
+of contact for questions. At least one email is required in EACH category (they may
+overlap). Not folded into the DataHub Data Product description (see
+EXCLUDE_HEADING_PATTERNS in generate_and_push_datahub_entities.py) — it is routing
+metadata, not narrative content.
+-->
+
+**Data Owner:**
+- {data_owner_email@quintoandar.com.br}
+
+**Data Steward:**
+- {data_steward_email@quintoandar.com.br}
+
 ## Overview
 
 **{Name}** is {one-sentence definition}. {How it differs from the naive/component calculation / why the business rule exists}.
@@ -43,6 +60,20 @@ find each entity). One bullet per related entity.
 -->
 
 - {Business Entity Name}
+
+## MBR
+
+<!--
+Optional — include ONLY when this metric participates in one or more Monthly Business
+Reviews (MBRs). Grain is the Data Product: this flag marks the WHOLE document, so every
+metric defined here is considered part of the listed MBR(s). One bullet per MBR (a metric
+may feed several). Omit the entire section if the metric is not part of any MBR. Not folded
+into the DataHub Data Product description (see EXCLUDE_HEADING_PATTERNS in
+generate_and_push_datahub_entities.py) — CI syncs it to the `data_product.mbr` structured
+property (filterable in DataHub), it is routing metadata, not narrative content.
+-->
+
+- {MBR Name}
 
 ## DataHub Catalog
 

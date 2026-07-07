@@ -115,10 +115,15 @@ _DEFAULT_BASE_URL = "https://litellm.apps.shared-prd.habitat.zone/v1"
 
 # Markdown ``## `` sections that must NOT be folded into the Data Product description.
 # Aligned with docs/llm_context/{business,metric}_entities/_TEMPLATE.md:
+#   both    — Ownership → routing metadata only, never narrative content (Data Owner /
+#             Data Steward emails must not leak into the public Data Product description)
 #   domain  — Where to query what → datasets; Synonyms → glossary; Golden query(ies) → Query entities
 #   metric  — Related Business Entities → related_data_products SP; Glossary → glossary;
-#             Golden Queries → Query entities; DataHub Catalog → tooling pointer only
+#             Golden Queries → Query entities; DataHub Catalog → tooling pointer only;
+#             MBR → data_product.mbr structured property, not narrative content
 EXCLUDE_HEADING_PATTERNS = [
+    re.compile(r"^## Ownership$", re.I),
+    re.compile(r"^## MBR$", re.I),
     re.compile(r"^## (Tables|Where to query what)$", re.I),
     re.compile(r"^## (Synonyms|Glossary and Synonyms)$", re.I),
     re.compile(r"^## Golden [Qq]uer(y|ies)\b.*$", re.I),
@@ -154,6 +159,22 @@ _SUPERSET_DATASET_URN_RE = re.compile(
     re.I,
 )
 _TRINO_TABLE_REF_RE = re.compile(r"`([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)`")
+
+# Ownership parsing (## Ownership section → owners: block in the YAML).
+# Only real @quintoandar.com.br addresses match — template placeholders such as
+# ``{data_owner_email@quintoandar.com.br}`` are ignored (the leading ``{`` breaks the match).
+_OWNER_EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+-]+@quintoandar\.com\.br$")
+# The two bold sub-groups inside ``## Ownership``; each maps to a DataHub ownership type.
+_OWNER_ROLE_HEADINGS = {
+    "data owner": "data_owner",
+    "data steward": "data_steward",
+}
+_OWNER_ROLE_HEADING_RE = re.compile(r"^\*\*\s*(.+?)\s*:\s*\*\*$")
+_OWNERS_BLOCK_RE = re.compile(r"(?ms)^owners:.*?\n(?=\S|\Z)")
+
+# MBR parsing (## MBR section → mbr: list block in the YAML, metric entities only).
+# Template placeholders such as ``{MBR Name}`` are ignored (the braces break the match).
+_MBR_BLOCK_RE = re.compile(r"(?ms)^mbr:.*?\n(?=\S|\Z)")
 
 
 def md_path_to_data_product_id(md_path: Path) -> str:
@@ -208,6 +229,101 @@ def _extract_related_data_products(md_path: Path) -> list[str]:
             seen.add(product_id)
             ids.append(product_id)
     return ids
+
+
+def _extract_owners(md_path: Path) -> dict[str, list[str]]:
+    """Parse ``## Ownership`` into ``{"data_owner": [...], "data_steward": [...]}``.
+
+    Reads the two bold sub-groups (``**Data Owner:**`` / ``**Data Steward:**``) and the
+    ``@quintoandar.com.br`` email bullets under each. Template placeholders (wrapped in
+    ``{...}``) never match and are silently dropped, so an unfilled template yields empty
+    lists. Emails are de-duplicated per role, preserving document order.
+    """
+    section = _extract_section_body(md_path.read_text(), "ownership")
+    owners: dict[str, list[str]] = {role: [] for role in _OWNER_ROLE_HEADINGS.values()}
+    current_role: str | None = None
+    for line in section.splitlines():
+        stripped = line.strip()
+        heading = _OWNER_ROLE_HEADING_RE.match(stripped)
+        if heading:
+            current_role = _OWNER_ROLE_HEADINGS.get(heading.group(1).strip().lower())
+            continue
+        if current_role is None or not stripped.startswith("- "):
+            continue
+        email = stripped[2:].strip()
+        if _OWNER_EMAIL_RE.match(email) and email not in owners[current_role]:
+            owners[current_role].append(email)
+    return owners
+
+
+def _as_yaml_owners_block(owners: dict[str, list[str]]) -> str:
+    lines = ["owners:"]
+    for role in _OWNER_ROLE_HEADINGS.values():
+        emails = owners.get(role) or []
+        if not emails:
+            continue
+        lines.append(f"  {role}:")
+        lines.extend(f"    - {email}" for email in emails)
+    return "\n".join(lines) + "\n"
+
+
+def _inject_owners(yaml_content: str, owners: dict[str, list[str]]) -> str:
+    """Insert (or replace) the ``owners:`` block with the emails parsed from the MD.
+
+    Drops any LLM-authored ``owners:`` block first (the Markdown is the single source of
+    truth). When no owner emails were parsed the block is omitted entirely — the loader
+    treats a missing block as "no ownership to sync".
+    """
+    yaml_content = _OWNERS_BLOCK_RE.sub("", yaml_content)
+    if not any(owners.get(role) for role in _OWNER_ROLE_HEADINGS.values()):
+        return yaml_content
+    block = _as_yaml_owners_block(owners)
+    if _DATA_PRODUCT_TYPE_RE.search(yaml_content):
+        return _DATA_PRODUCT_TYPE_RE.sub(
+            lambda m: f"{m.group(0)}\n{block.rstrip()}", yaml_content, count=1
+        )
+    return yaml_content.rstrip() + f"\n{block}"
+
+
+def _extract_mbrs(md_path: Path) -> list[str]:
+    """Parse ``## MBR`` bullets into a de-duplicated list of MBR names (metric docs).
+
+    Reads the ``- {MBR name}`` bullets under ``## MBR``. Template placeholders (wrapped
+    in ``{...}``) are ignored, so an unfilled template yields an empty list. Names are
+    de-duplicated case-insensitively, preserving document order.
+    """
+    section = _extract_section_body(md_path.read_text(), "mbr")
+    names: list[str] = []
+    seen: set[str] = set()
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("- "):
+            continue
+        name = stripped[2:].strip().strip("*").strip()
+        if not name or "{" in name or "}" in name:
+            continue
+        if name.lower() not in seen:
+            seen.add(name.lower())
+            names.append(name)
+    return names
+
+
+def _inject_mbr(yaml_content: str, mbrs: list[str]) -> str:
+    """Insert (or replace) the ``mbr:`` list block with the names parsed from the MD.
+
+    Drops any LLM-authored ``mbr:`` block first (the Markdown is the single source of
+    truth). When no MBR names were parsed the block is omitted entirely — the loader
+    treats a missing block on a metric product as "clear MBR membership".
+    """
+    yaml_content = _MBR_BLOCK_RE.sub("", yaml_content)
+    if not mbrs:
+        return yaml_content
+    block = "mbr:\n" + "".join(f"  - {json.dumps(name)}\n" for name in mbrs)
+    if _DATA_PRODUCT_TYPE_RE.search(yaml_content):
+        return _DATA_PRODUCT_TYPE_RE.sub(
+            lambda m: f"{m.group(0)}\n{block.rstrip()}", yaml_content, count=1
+        )
+    return yaml_content.rstrip() + f"\n{block}"
 
 
 def _documentation_link(md_path: Path, entity_slug: str) -> dict[str, str]:
@@ -469,7 +585,7 @@ def _should_exclude_heading(line: str) -> bool:
 
 
 def _extract_description_from_md(md_path: Path) -> str:
-    """Full MD body minus Tables / Synonyms / Golden Queries / DataHub-catalog sections.
+    """Full MD body minus Ownership / Tables / Synonyms / Golden Queries / DataHub-catalog sections.
 
     This is the single source of truth for the Data Product description — the LLM no
     longer authors it (see SKILL.md step 2). Mirrors the audit-proven extraction logic.
@@ -594,8 +710,10 @@ LIVE DATAHUB DOMAIN CATALOG ({domain_count} domains):
 - Glossary term `id` values must match existing DataHub term slugs when the term
   already exists; the loader resolves by display name as fallback.
 - Do NOT hand-author `product_description`. CI overwrites it with the full Markdown body
-  (minus asset-routing, glossary, golden-query, catalog, and upstream-entity sections).
-  Emit a one-line placeholder, e.g. `product_description: "(injected by CI from Markdown)"`.
+  (minus ownership, MBR, asset-routing, glossary, golden-query, catalog, and upstream-entity
+  sections). Emit a one-line placeholder, e.g. `product_description: "(injected by CI from Markdown)"`.
+- Do NOT emit an `owners:` block — CI injects Data Owner / Data Steward emails from the
+  `## Ownership` section (any hand-authored `owners:` is discarded).
 - Set `data_product_type: {data_product_type}` and `lifecycle_stage: prod` unless the
   Markdown clearly indicates draft/review/deprecated.
 - Use `structured_property.qualified_name: br.com.quintoandar.datahub.data_product.golden_query`
@@ -636,6 +754,8 @@ LIVE DATAHUB DOMAIN CATALOG ({domain_count} domains):
   DataHub: Trino/Databricks `schema.table` pairs (materialized metric tables) AND Superset
   virtual-dataset URNs (in backticks). CI injects both into `datasets:` — do not drop either.{asset_rule}
 - Parse glossary from `## Glossary and Synonyms` bullet list (`- **term** → mapping`).
+- Do NOT emit an `mbr:` block — CI injects it from the optional `## MBR` section (a
+  bullet list of MBR names; any hand-authored `mbr:` is discarded).
 - Do NOT hand-author `related_data_products` — CI injects from `## Related Business Entities`.{related_rule}"""
         )
 
@@ -915,8 +1035,10 @@ def main(argv: list[str] | None = None) -> int:
         yaml_content = _inject_documentation_link(
             yaml_content, _documentation_link(md_path, md_path.stem)
         )
+        yaml_content = _inject_owners(yaml_content, _extract_owners(md_path))
         if _md_to_data_product_type(md_path) == "metric":
             yaml_content = _inject_metric_datasets(yaml_content, md_path)
+            yaml_content = _inject_mbr(yaml_content, _extract_mbrs(md_path))
             yaml_content = _inject_related_data_products(
                 yaml_content, _extract_related_data_products(md_path)
             )

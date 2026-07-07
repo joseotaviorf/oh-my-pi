@@ -18,6 +18,10 @@ All four are computed from the pre-joined offboarding table `dw_offboarding.obt_
   
 - Termination- Inspection- Repairs  
 
+## MBR
+
+- Post Contract
+
 ## **Glossary and Synonyms**
 
   

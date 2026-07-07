@@ -20,6 +20,14 @@ _NS = uuid.UUID("a1b2c3d4-e5f6-7890-abcd-ef1234567890")
 
 _SAMPLE_MD = """# Widgets
 
+## Ownership
+
+**Data Owner:**
+- widgets-owner@quintoandar.com.br
+
+**Data Steward:**
+- widgets-steward@quintoandar.com.br
+
 ## Overview
 
 Widgets are the core entity. Critical: always filter status = 'ACTIVE'.
@@ -89,6 +97,9 @@ class ExtractDescriptionTest(unittest.TestCase):
 
     def test_excludes_asset_glossary_gq_sections(self) -> None:
         for drop in (
+            "## Ownership",
+            "widgets-owner@quintoandar.com.br",
+            "widgets-steward@quintoandar.com.br",
             "## Tables",
             "## Glossary and Synonyms",
             "## Golden Queries",
@@ -148,6 +159,14 @@ SELECT 1
 class MetricDescriptionTest(unittest.TestCase):
     _METRIC_MD = """# NPS FR
 
+## Ownership
+
+**Data Owner:**
+- nps-owner@quintoandar.com.br
+
+**Data Steward:**
+- nps-steward@quintoandar.com.br
+
 ## Overview
 
 Official weighted NPS.
@@ -155,6 +174,11 @@ Official weighted NPS.
 ## Related Business Entities
 
 - NPS
+
+## MBR
+
+- Support MBR
+- Retention MBR
 
 ## Glossary and Synonyms
 
@@ -212,7 +236,13 @@ SELECT 1
 
     def test_excludes_metric_routing_sections(self) -> None:
         for drop in (
+            "## Ownership",
+            "nps-owner@quintoandar.com.br",
+            "nps-steward@quintoandar.com.br",
             "## Related Business Entities",
+            "## MBR",
+            "Support MBR",
+            "Retention MBR",
             "## Glossary and Synonyms",
             "## Golden Queries",
             "## DataHub Catalog",
@@ -414,6 +444,126 @@ class InjectDescriptionTest(unittest.TestCase):
         self.assertEqual(
             yaml.safe_load(out)["product_description"].strip(), "Injected body"
         )
+
+
+class OwnersTest(unittest.TestCase):
+    def _md(self, body: str) -> Path:
+        tmp = Path(tempfile.mkdtemp()) / "entity.md"
+        tmp.write_text(body, encoding="utf-8")
+        return tmp
+
+    def test_extract_owners_two_roles_multiple_emails_dedup(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Ownership\n\n"
+            "**Data Owner:**\n"
+            "- felipe.abreu@quintoandar.com.br\n"
+            "- carolina.espinoza@quintoandar.com.br\n"
+            "- felipe.abreu@quintoandar.com.br\n\n"
+            "**Data Steward:**\n"
+            "- gustavo.silva@quintoandar.com.br\n\n"
+            "## Overview\n\nBody.\n"
+        )
+        owners = g._extract_owners(md_path)
+        self.assertEqual(
+            owners["data_owner"],
+            ["felipe.abreu@quintoandar.com.br", "carolina.espinoza@quintoandar.com.br"],
+        )
+        self.assertEqual(owners["data_steward"], ["gustavo.silva@quintoandar.com.br"])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_owners_ignores_template_placeholders(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Ownership\n\n"
+            "**Data Owner:**\n"
+            "- {data_owner_email@quintoandar.com.br}\n\n"
+            "**Data Steward:**\n"
+            "- {data_steward_email@quintoandar.com.br}\n"
+        )
+        owners = g._extract_owners(md_path)
+        self.assertEqual(owners, {"data_owner": [], "data_steward": []})
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_inject_owners_emits_parseable_block(self) -> None:
+        out = g._inject_owners(
+            "data_product_type: domain\n",
+            {
+                "data_owner": ["a@quintoandar.com.br"],
+                "data_steward": ["b@quintoandar.com.br"],
+            },
+        )
+        parsed = yaml.safe_load(out)
+        self.assertEqual(parsed["owners"]["data_owner"], ["a@quintoandar.com.br"])
+        self.assertEqual(parsed["owners"]["data_steward"], ["b@quintoandar.com.br"])
+
+    def test_inject_owners_empty_drops_block_and_strips_llm_authored(self) -> None:
+        llm_yaml = (
+            "data_product_type: domain\n"
+            "owners:\n"
+            "  data_owner:\n"
+            "    - hallucinated@quintoandar.com.br\n"
+        )
+        out = g._inject_owners(llm_yaml, {"data_owner": [], "data_steward": []})
+        parsed = yaml.safe_load(out)
+        self.assertNotIn("owners", parsed)
+
+    def test_inject_owners_omits_empty_role(self) -> None:
+        out = g._inject_owners(
+            "data_product_type: metric\n",
+            {"data_owner": ["a@quintoandar.com.br"], "data_steward": []},
+        )
+        parsed = yaml.safe_load(out)
+        self.assertEqual(parsed["owners"]["data_owner"], ["a@quintoandar.com.br"])
+        self.assertNotIn("data_steward", parsed["owners"])
+
+
+class MbrTest(unittest.TestCase):
+    def _md(self, body: str) -> Path:
+        tmp = Path(tempfile.mkdtemp()) / "entity.md"
+        tmp.write_text(body, encoding="utf-8")
+        return tmp
+
+    def test_extract_mbrs_multiple_dedup_case_insensitive(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## MBR\n\n"
+            "- Support MBR\n"
+            "- Retention MBR\n"
+            "- support mbr\n\n"
+            "## Overview\n\nBody.\n"
+        )
+        self.assertEqual(g._extract_mbrs(md_path), ["Support MBR", "Retention MBR"])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_mbrs_ignores_template_placeholder(self) -> None:
+        md_path = self._md("# Demo\n\n## MBR\n\n- {MBR Name}\n")
+        self.assertEqual(g._extract_mbrs(md_path), [])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_mbrs_absent_section_returns_empty(self) -> None:
+        md_path = self._md("# Demo\n\n## Overview\n\nNo MBR here.\n")
+        self.assertEqual(g._extract_mbrs(md_path), [])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_inject_mbr_emits_parseable_block(self) -> None:
+        out = g._inject_mbr(
+            "data_product_type: metric\n", ["Support MBR", "Retention MBR"]
+        )
+        parsed = yaml.safe_load(out)
+        self.assertEqual(parsed["mbr"], ["Support MBR", "Retention MBR"])
+
+    def test_inject_mbr_empty_drops_block_and_strips_llm_authored(self) -> None:
+        llm_yaml = "data_product_type: metric\nmbr:\n  - Hallucinated MBR\n"
+        out = g._inject_mbr(llm_yaml, [])
+        parsed = yaml.safe_load(out)
+        self.assertNotIn("mbr", parsed)
+
+    def test_inject_mbr_anchors_after_data_product_type(self) -> None:
+        out = g._inject_mbr("data_product_type: metric\n", ["Support MBR"])
+        self.assertRegex(out, r"data_product_type: metric\nmbr:\n")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,14 @@
 # NPS FR
 
+## Ownership
+
+**Data Owner:**
+- samia.lauar@quintoandar.com.br
+- felipe.abreu@quintoandar.com.br
+
+**Data Steward:**
+- victor.prado@quintoandar.com.br
+
 ## Overview
 
 **NPS FR** is the family of Net Promoter Score metrics for the For Rent product. The anchor
@@ -18,6 +27,10 @@ or other products.**
 ## Related Business Entities
 
 - NPS
+
+## MBR
+
+- Post Contract
 
 ## Glossary and Synonyms
 

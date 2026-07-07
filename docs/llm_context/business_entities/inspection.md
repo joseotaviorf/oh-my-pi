@@ -1,5 +1,14 @@
 # Inspection
 
+## Ownership
+
+**Data Owner:**
+- felipe.abreu@quintoandar.com.br
+- carolina.espinoza@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 An inspection is a technical assessment of a property's condition performed at key moments of the rental lifecycle. Inspections are critical for documenting the state of the property, preventing disputes, and identifying damages and responsibilities.

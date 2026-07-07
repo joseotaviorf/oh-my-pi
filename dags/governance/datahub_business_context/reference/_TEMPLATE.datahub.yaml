@@ -33,6 +33,26 @@ domain_urn: urn:li:domain:{domain}
 lifecycle_stage: prod  # draft | review | prod | deprecated
 data_product_type: domain  # domain | metric
 
+# Ownership — CI-injected from the `## Ownership` section of the entity .md; do NOT
+# hand-author. Emails become DataHub owners on the Data Product:
+#   data_owner   -> ownership type Business Owner (urn:li:ownershipType:__system__business_owner)
+#   data_steward -> ownership type Data Steward   (urn:li:ownershipType:__system__data_steward)
+# The block is declaratively synced (owners removed from the .md are removed in DataHub);
+# omit it when the .md has no resolvable @quintoandar.com.br emails. An owner who has no
+# CorpUser yet (never used DataHub) is auto-provisioned as a minimal stub before assignment.
+# owners:
+#   data_owner:
+#     - {data_owner_email@quintoandar.com.br}
+#   data_steward:
+#     - {data_steward_email@quintoandar.com.br}
+
+# MBR — metric products only; CI-injected from the `## MBR` section of the metric .md;
+# do NOT hand-author. Each name becomes a value of the `data_product.mbr` structured
+# property (multi-valued, filterable in DataHub). Declaratively synced: a metric with no
+# `## MBR` section has any previous value cleared. Omit the block when not part of any MBR.
+# mbr:
+#   - {MBR Name}
+
 structured_property:
   qualified_name: br.com.quintoandar.datahub.data_product.golden_query
   legacy_qualified_names_to_drop:

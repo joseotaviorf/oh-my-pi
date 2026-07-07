@@ -29,6 +29,8 @@ class ParsedEntityDocument:
     glossary_terms: list[GlossaryTerm] = field(default_factory=list)
     datasets: list[tuple[str, str]] = field(default_factory=list)
     golden_queries: list[GoldenQuery] = field(default_factory=list)
+    owners: dict[str, list[str]] = field(default_factory=dict)
+    mbr: list[str] = field(default_factory=list)
     raw_markdown: str = ""
 
 
@@ -56,6 +58,16 @@ _FROM_JOIN_RE = re.compile(
     r"(?:FROM|JOIN)\s+([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)",
     re.IGNORECASE,
 )
+
+# Ownership / MBR parsing — mirrors generate_and_push_datahub_entities.py so both the
+# CI path (repo .md → YAML) and the self-service sync path (DataHub document → YAML)
+# produce the same spec keys. Template placeholders (wrapped in ``{...}``) never match.
+_OWNER_EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+-]+@quintoandar\.com\.br$")
+_OWNER_ROLE_HEADINGS = {
+    "data owner": "data_owner",
+    "data steward": "data_steward",
+}
+_OWNER_ROLE_HEADING_RE = re.compile(r"^\*\*\s*(.+?)\s*:\s*\*\*$")
 
 
 def _slugify(text: str) -> str:
@@ -197,6 +209,45 @@ def _parse_golden_queries(section_text: str) -> list[GoldenQuery]:
     return queries
 
 
+def _parse_owners(section_text: str) -> dict[str, list[str]]:
+    """Parse ``## Ownership`` into ``{"data_owner": [...], "data_steward": [...]}``.
+
+    Reads the two bold sub-groups (``**Data Owner:**`` / ``**Data Steward:**``) and the
+    ``@quintoandar.com.br`` email bullets under each. Template placeholders never match.
+    """
+    owners: dict[str, list[str]] = {role: [] for role in _OWNER_ROLE_HEADINGS.values()}
+    current_role: str | None = None
+    for line in section_text.splitlines():
+        stripped = line.strip()
+        heading = _OWNER_ROLE_HEADING_RE.match(stripped)
+        if heading:
+            current_role = _OWNER_ROLE_HEADINGS.get(heading.group(1).strip().lower())
+            continue
+        if current_role is None or not stripped.startswith("- "):
+            continue
+        email = stripped[2:].strip()
+        if _OWNER_EMAIL_RE.match(email) and email not in owners[current_role]:
+            owners[current_role].append(email)
+    return owners
+
+
+def _parse_mbr(section_text: str) -> list[str]:
+    """Parse ``## MBR`` bullets into a de-duplicated list of MBR names (metric docs)."""
+    names: list[str] = []
+    seen: set[str] = set()
+    for line in section_text.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("- "):
+            continue
+        name = stripped[2:].strip().strip("*").strip()
+        if not name or "{" in name or "}" in name:
+            continue
+        if name.lower() not in seen:
+            seen.add(name.lower())
+            names.append(name)
+    return names
+
+
 def _find_section(sections: dict[str, str], *candidates: str) -> str:
     for key, body in sections.items():
         for candidate in candidates:
@@ -235,12 +286,16 @@ def parse_entity_markdown(
     glossary_text = _find_section(sections, "glossary", "synonyms")
     tables_text = _find_section(sections, "tables", "where to query")
     golden_text = _find_section(sections, "golden")
+    ownership_text = _find_section(sections, "ownership")
+    mbr_text = sections.get("mbr", "")
 
     glossary_terms = _parse_glossary(glossary_text)
     datasets = _parse_datasets(tables_text)
     if not datasets:
         datasets = _parse_datasets(markdown)
     golden_queries = _parse_golden_queries(golden_text)
+    owners = _parse_owners(ownership_text)
+    mbr = _parse_mbr(mbr_text)
 
     return ParsedEntityDocument(
         title=title,
@@ -248,6 +303,8 @@ def parse_entity_markdown(
         glossary_terms=glossary_terms,
         datasets=datasets,
         golden_queries=golden_queries,
+        owners=owners,
+        mbr=mbr,
         raw_markdown=markdown,
     )
 

@@ -1,5 +1,14 @@
 # Repairs
 
+## Ownership
+
+**Data Owner:**
+- felipe.abreu@quintoandar.com.br
+- carolina.espinoza@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 A repair is a request to fix, clean, remove, or replace an item in a rental property. Repairs happen in two distinct contexts: **offboarding repairs** arise from the exit inspection (vistoria de saída) when damages or differences are found, and **ongoing repairs** are maintenance issues reported by the tenant during the active rental contract. Entry inspections (vistoria de entrada) do not generate repairs — they only document item conditions as a baseline for future comparison.

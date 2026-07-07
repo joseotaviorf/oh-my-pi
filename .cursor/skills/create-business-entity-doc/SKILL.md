@@ -18,6 +18,7 @@ Entity docs are **routing guides** — they explain concepts, point to tables, g
 3. **Primary DW tables** — which `dw_*` tables are the main source for analysts. If unknown, proceed to Step 2 to discover them.
 4. **Common questions** — what analysts typically ask about this entity. These drive the Golden Queries and Dos/Don'ts sections.
 5. **DataHub domain URN** — the `urn:li:domain:{domain}` for this entity (e.g., `urn:li:domain:growth`, `urn:li:domain:fintech`, `urn:li:domain:supply`). This is required for the companion YAML in Step 6. Common values: `urn:li:domain:fintech`, `urn:li:domain:growth`, `urn:li:domain:people`, `urn:li:domain:supply`, `urn:li:domain:rent`, `urn:li:domain:sale`.
+6. **Ownership emails** — at least one **Data Owner** (accountable for the business definition, usually a manager/lead) and at least one **Data Steward** (`@quintoandar.com.br`, maintains this document day-to-day; defaults to the requester if not otherwise specified). The two roles may share the same email.
 
 Do NOT infer these from context — misalignment here propagates through the entire document.
 
@@ -75,6 +76,14 @@ Create `docs/llm_context/business_entities/{entity_name}.md` following this stru
 
 ```markdown
 # {Entity Name}
+
+## Ownership
+
+**Data Owner:**
+- {data_owner_email@quintoandar.com.br}
+
+**Data Steward:**
+- {data_steward_email@quintoandar.com.br}
 
 ## Overview
 
@@ -142,6 +151,11 @@ Create `docs/llm_context/business_entities/{entity_name}.md` following this stru
 
 ### Section-by-section guidance
 
+**Ownership:**
+- First section after the title. Two required bold sub-groups, **Data Owner:** and **Data Steward:**, each with at least one `@quintoandar.com.br` email bullet (they may overlap).
+- Ask the user for both in Step 1 if not already provided.
+- Not folded into the DataHub Data Product description (see `EXCLUDE_HEADING_PATTERNS` in `generate_and_push_datahub_entities.py`) — it is routing metadata, not narrative content.
+
 **Overview:**
 - State what the entity is, not how tables are structured.
 - Reference lifecycle stages with their key timestamp columns.
@@ -208,6 +222,7 @@ Check if any existing entity docs in `docs/llm_context/business_entities/` refer
 
 Before presenting to the user, verify:
 
+- [ ] `## Ownership` is the first section after the title, with at least one `@quintoandar.com.br` email under **Data Owner** and one under **Data Steward**
 - [ ] No column descriptions duplicated from metadata YAML
 - [ ] Glossary only contains domain-specific terms (no IQ/PP)
 - [ ] Every table in the Tables section has a clear "You need..." trigger

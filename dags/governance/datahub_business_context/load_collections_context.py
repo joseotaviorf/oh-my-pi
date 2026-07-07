@@ -27,10 +27,19 @@ such as ``collections_recovery_bundle.py`` — not by this orchestrator.
 Domain products: link owned ``datasets``, glossary, golden queries, documentation link, lifecycle
 and type structured properties.
 
+Both kinds: the ``owners`` block (``data_owner`` / ``data_steward`` email lists, CI-injected
+from the ``## Ownership`` MD section) is declaratively synced onto the DataHub ownership aspect
+(Business Owner / Data Steward types) — owners removed from the MD are removed in DataHub. An
+accountable owner who never used DataHub (so has no CorpUser) is auto-provisioned as a minimal
+CorpUser stub before assignment, so accountability is never lost to tool-access gaps.
+
 Metric products: link Trino/Databricks tables and Superset dataset URNs from
 ``## Superset Golden Assets`` as reference assets on the product Summary; wire
 ``related_data_products`` to upstream domain products; golden-query ``subjects`` may
-duplicate Trino tables for Query entity wiring.
+duplicate Trino tables for Query entity wiring. The optional ``mbr`` list (CI-injected
+from the ``## MBR`` MD section) is synced onto the ``data_product.mbr`` structured
+property (multi-valued, filterable) — a metric with no ``## MBR`` section has any
+previous value cleared, so MBR membership stays in lockstep with the Markdown.
 
 Full-overwrite semantics: the Markdown/YAML is the single source of truth. A republish
 *reconciles* the product to the YAML — assets dropped from ``datasets`` are unlinked
@@ -1871,7 +1880,7 @@ def _create_or_update_data_product(
 
 
 def curated_push_assets(cfg: dict[str, Any]) -> None:
-    print("\n[1/10] DataProduct assets (datasets only)...")
+    print("\n[1/12] DataProduct assets (datasets only)...")
     pid = str(cfg["data_product_id"])
     pname = cfg.get("product_display_name") or pid
     pdesc_raw = cfg.get("product_description")
@@ -1944,7 +1953,7 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
 
 
 def curated_push_documentation_link(cfg: dict[str, Any]) -> None:
-    print("\n[2/10] Documentation link...")
+    print("\n[2/12] Documentation link...")
     dl = cfg.get("documentation_link")
     if not isinstance(dl, dict) or not dl.get("url") or not dl.get("label"):
         print("  -> skipping documentation_link")
@@ -1982,7 +1991,7 @@ def curated_push_glossary_terms(cfg: dict[str, Any]) -> None:
     After terms are created / verified the function attaches them to the Data Product
     via ``batchAddTerms``.
     """
-    print("\n[3/10] Glossary terms...")
+    print("\n[3/12] Glossary terms...")
     gt_block = cfg.get("glossary_terms")
     if not isinstance(gt_block, dict) or not gt_block.get("terms"):
         print("  -> no glossary_terms block — skipping")
@@ -2099,7 +2108,7 @@ def _curated_extra_query_discovery_urls(cfg: dict[str, Any]) -> list[str]:
 
 
 def curated_purge_discovery_links(cfg: dict[str, Any]) -> None:
-    print("\n[4/10] Purge golden-query deep links...")
+    print("\n[4/12] Purge golden-query deep links...")
     gqs = _get_all_golden_queries(cfg)
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
     ui_base = DATAHUB_UI_ORIGIN.rstrip("/")
@@ -2222,7 +2231,7 @@ def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
     SQL block cannot wipe the rest.
     """
     gqs = _get_all_golden_queries(cfg)
-    print(f"\n[5/10] Golden Query entities ({len(gqs)})...")
+    print(f"\n[5/12] Golden Query entities ({len(gqs)})...")
     if not gqs:
         print("  -> no golden queries in YAML — skipping")
         return []
@@ -2238,7 +2247,7 @@ def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
 def curated_push_sidebar_struct_props(
     cfg: dict[str, Any], query_urns: list[str]
 ) -> None:
-    print("\n[6/10] Sidebar structured property...")
+    print("\n[6/12] Sidebar structured property...")
     spec_sp = cfg.get("structured_property")
     if not isinstance(spec_sp, dict) or not spec_sp.get("qualified_name"):
         raise SystemExit("`structured_property.qualified_name` is required")
@@ -2354,7 +2363,7 @@ def _drop_legacy_structured_properties(
 
 
 def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
-    print("\n[7/10] Re-affirm dataset-only memberships...")
+    print("\n[7/12] Re-affirm dataset-only memberships...")
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
     urns_r = _filter_assignable_urns(
         _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
@@ -2366,7 +2375,7 @@ def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
                 "(Trino tables / Superset URNs may be pending DataHub ingestion)."
             )
             return
-        # Tables may not yet be ingested into DataHub (handled gracefully in step [1/10]).
+        # Tables may not yet be ingested into DataHub (handled gracefully in step [1/12]).
         # Log a warning but do not fail — the description already notes the pending tables.
         print(
             "  ⚠ no DataHub-registered datasets to re-affirm — tables may still be "
@@ -2475,7 +2484,7 @@ def _ensure_upstream_sp_definition() -> bool:
 
 def curated_push_upstream_data_products(cfg: dict[str, Any]) -> None:
     """Wire upstream data product URNs as a structured property on the metric data product."""
-    print("\n[8/10] Upstream data product relationships...")
+    print("\n[8/12] Upstream data product relationships...")
     related = cfg.get("related_data_products")
     if not related or not isinstance(related, list):
         print("  -> no related_data_products — skipping")
@@ -2563,7 +2572,7 @@ def _ensure_lifecycle_sp_definition() -> bool:
 
 def curated_push_lifecycle_stage(cfg: dict[str, Any]) -> None:
     """Upsert the lifecycle_stage structured property on the data product."""
-    print("\n[9/10] Lifecycle stage...")
+    print("\n[9/12] Lifecycle stage...")
     stage = str(cfg.get("lifecycle_stage") or "").strip().lower()
     if not stage:
         print(
@@ -2636,7 +2645,7 @@ def _ensure_type_sp_definition() -> bool:
 
 def curated_push_data_product_type(cfg: dict[str, Any]) -> None:
     """Upsert the data_product.type structured property; defaults to 'domain' if not set."""
-    print("\n[10/10] Data product type...")
+    print("\n[10/12] Data product type...")
     dp_type = str(cfg.get("data_product_type") or _TYPE_SP_DEFAULT).strip().lower()
     if dp_type not in _TYPE_SP_ALLOWED_VALUES:
         _fail(
@@ -2660,17 +2669,338 @@ def curated_push_data_product_type(cfg: dict[str, Any]) -> None:
     _ok(f"Set data_product_type = {dp_type!r}")
 
 
+# ---------------------------------------------------------------------------
+# Mutation 11 — Owners (Data Owner / Data Steward → DataHub ownership aspect)
+# ---------------------------------------------------------------------------
+
+# Maps the two YAML roles to DataHub's built-in system ownership types. Data Owner is
+# the accountable party (Business Owner); Data Steward maintains the entity day-to-day.
+_OWNER_ROLE_TO_OWNERSHIP_TYPE_URN: dict[str, str] = {
+    "data_owner": "urn:li:ownershipType:__system__business_owner",
+    "data_steward": "urn:li:ownershipType:__system__data_steward",
+}
+_MANAGED_OWNERSHIP_TYPE_URNS = frozenset(_OWNER_ROLE_TO_OWNERSHIP_TYPE_URN.values())
+
+_GET_DATA_PRODUCT_OWNERS = """
+query GetDataProductOwners($urn: String!) {
+  dataProduct(urn: $urn) {
+    ownership {
+      owners {
+        owner {
+          ... on CorpUser { urn }
+          ... on CorpGroup { urn }
+        }
+        ownershipType { urn }
+      }
+    }
+  }
+}
+"""
+
+_BATCH_ADD_OWNERS = """
+mutation BatchAddOwners($input: BatchAddOwnersInput!) {
+  batchAddOwners(input: $input)
+}
+"""
+
+_REMOVE_OWNER = """
+mutation RemoveOwner($input: RemoveOwnerInput!) {
+  removeOwner(input: $input)
+}
+"""
+
+
+def _corpuser_urn(email: str) -> str:
+    """QuintoAndar's DataHub keys CorpUsers by full email (matches metadata ``owner:``)."""
+    return f"urn:li:corpuser:{email.strip()}"
+
+
+def _display_name_from_email(email: str) -> str:
+    """``felipe.abreu@quintoandar.com.br`` → ``Felipe Abreu`` (best-effort stub label)."""
+    local = email.strip().split("@", 1)[0]
+    parts = [p for p in re.split(r"[._-]+", local) if p]
+    return " ".join(p.capitalize() for p in parts) or local
+
+
+def _corpuser_exists(owner_urn: str) -> Optional[bool]:
+    """Tri-state existence check: True / False / None (transient HTTP or GraphQL failure).
+
+    None must NOT be treated as "missing" — otherwise a transient blip would trigger a
+    stub UPSERT that clobbers a real user's info (displayName / active).
+    """
+    data = _post(_ENTITY_EXISTS, {"urn": owner_urn})
+    if data is None:
+        return None
+    return bool(data.get("entityExists"))
+
+
+def _provision_corpuser_stub(email: str, owner_urn: str) -> bool:
+    """Create a minimal CorpUser so an accountable owner who never used DataHub still
+    appears (and can be assigned ownership). Enriched later if the person logs in or the
+    identity directory is ingested. Only called when the user is confirmed missing.
+    """
+    aspect = {
+        "active": True,
+        "displayName": _display_name_from_email(email),
+        "email": email,
+    }
+    ok, detail = _gms_ingest_proposal(
+        {
+            "proposal": {
+                "entityType": "corpuser",
+                "entityUrn": owner_urn,
+                "changeType": "UPSERT",
+                "aspectName": "corpUserInfo",
+                "aspect": {
+                    "contentType": "application/json",
+                    "value": json.dumps(aspect),
+                },
+            }
+        }
+    )
+    if not ok:
+        print(
+            f"    [DEBUG] corpUserInfo provisioning failed: {detail}", file=sys.stderr
+        )
+    return ok
+
+
+def _declared_owner_triples(owners_block: dict[str, Any]) -> list[tuple[str, str, str]]:
+    """Flatten the YAML owners block into ``(email, corpuser_urn, ownership_type_urn)``."""
+    triples: list[tuple[str, str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for role, type_urn in _OWNER_ROLE_TO_OWNERSHIP_TYPE_URN.items():
+        emails = owners_block.get(role) or []
+        if not isinstance(emails, list):
+            continue
+        for email in emails:
+            email = str(email).strip()
+            if not email:
+                continue
+            key = (_corpuser_urn(email), type_urn)
+            if key not in seen:
+                seen.add(key)
+                triples.append((email, key[0], type_urn))
+    return triples
+
+
+def _fetch_current_managed_owner_pairs(dp_urn: str) -> Optional[set[tuple[str, str]]]:
+    """Current ``(owner_urn, type_urn)`` pairs on the DP, limited to types we manage.
+
+    Returns ``None`` on HTTP/GraphQL failure so callers can fail-closed instead of
+    treating a transient error as "no owners" (which would wrongly remove everyone).
+    """
+    data = _post(_GET_DATA_PRODUCT_OWNERS, {"urn": dp_urn})
+    if data is None:
+        return None
+    ownership = (_graphql_field(data, "dataProduct").get("ownership")) or {}
+    pairs: set[tuple[str, str]] = set()
+    for entry in ownership.get("owners") or []:
+        owner_urn = str(((entry or {}).get("owner") or {}).get("urn") or "").strip()
+        type_urn = str(
+            ((entry or {}).get("ownershipType") or {}).get("urn") or ""
+        ).strip()
+        if owner_urn and type_urn in _MANAGED_OWNERSHIP_TYPE_URNS:
+            pairs.add((owner_urn, type_urn))
+    return pairs
+
+
+def curated_push_owners(cfg: dict[str, Any]) -> None:
+    """Declaratively sync Data Owner / Data Steward emails onto the Data Product.
+
+    - Adds declared owners that are not present yet. An owner who is accountable but has
+      never used DataHub (e.g. a director) won't exist as a CorpUser, so we auto-provision
+      a minimal CorpUser stub first — ownership is about accountability, not tool access.
+    - Removes owners of the two managed types that are no longer declared in the MD
+      (owners of other types, e.g. a manually-added Technical Owner, are left untouched).
+    - A declared owner is never used to justify a removal even if its lookup/provisioning
+      fails — a transient miss must not drop a still-declared owner.
+    """
+    print("\n[11/12] Owners (Data Owner / Data Steward)...")
+    owners_block = cfg.get("owners")
+    if not isinstance(owners_block, dict):
+        print("  -> no owners block — skipping")
+        return
+
+    declared = _declared_owner_triples(owners_block)
+    declared_set = {(owner_urn, type_urn) for _, owner_urn, type_urn in declared}
+    dp_u = _data_product_urn(str(cfg["data_product_id"]))
+
+    current = _fetch_current_managed_owner_pairs(dp_u)
+    if current is None:
+        _fail(
+            "curated.owners", "prefetch current owners failed — skipping to stay safe"
+        )
+        return
+
+    resolved: list[tuple[str, str]] = []
+    for email, owner_urn, type_urn in declared:
+        exists = _corpuser_exists(owner_urn)
+        if exists is None:
+            print(
+                f"  ! existence check failed for {owner_urn} (transient) — "
+                "skipping this owner for now (will retry next run)",
+                file=sys.stderr,
+            )
+            continue
+        if not exists:
+            if _provision_corpuser_stub(email, owner_urn):
+                print(f"  \u2192 provisioned CorpUser stub for {email}")
+            else:
+                print(
+                    f"  ! could not provision CorpUser for {email} — skipping this owner",
+                    file=sys.stderr,
+                )
+                continue
+        resolved.append((owner_urn, type_urn))
+
+    to_add = [pair for pair in resolved if pair not in current]
+    to_remove = [pair for pair in current if pair not in declared_set]
+
+    if to_add:
+        added = _post(
+            _BATCH_ADD_OWNERS,
+            {
+                "input": {
+                    "owners": [
+                        {
+                            "ownerUrn": owner_urn,
+                            "ownerEntityType": "CORP_USER",
+                            "ownershipTypeUrn": type_urn,
+                        }
+                        for owner_urn, type_urn in to_add
+                    ],
+                    "resources": [{"resourceUrn": dp_u}],
+                }
+            },
+        )
+        if added and added.get("batchAddOwners"):
+            _ok(f"Added {len(to_add)} owner(s)")
+        else:
+            _fail("curated.owners.add", f"unexpected response: {added}")
+            return
+
+    for owner_urn, type_urn in to_remove:
+        removed = _post(
+            _REMOVE_OWNER,
+            {
+                "input": {
+                    "ownerUrn": owner_urn,
+                    "resourceUrn": dp_u,
+                    "ownershipTypeUrn": type_urn,
+                }
+            },
+        )
+        if removed and removed.get("removeOwner") is not False:
+            _ok(f"Removed owner no longer declared: {owner_urn}")
+        else:
+            _fail(
+                "curated.owners.remove",
+                f"unexpected response for {owner_urn}: {removed}",
+            )
+            return
+
+    if not to_add and not to_remove:
+        _ok(f"Owners already in sync ({len(declared_set)} declared)")
+
+
+# ---------------------------------------------------------------------------
+# Mutation 12 — MBR membership (data_product.mbr structured property, metric-only)
+# ---------------------------------------------------------------------------
+
+_MBR_SP_QNAME = "br.com.quintoandar.datahub.data_product.mbr"
+
+
+def _ensure_mbr_sp_definition() -> bool:
+    return _ensure_structured_property(
+        _MBR_SP_QNAME,
+        {
+            "qualifiedName": _MBR_SP_QNAME,
+            "id": _MBR_SP_QNAME,
+            "displayName": "MBR",
+            "description": (
+                "Monthly Business Review(s) this metric Data Product's metrics belong to. "
+                "Multi-valued: a metric may feed more than one MBR. Present only on metric "
+                "Data Products that participate in an MBR; absent = not part of any MBR."
+            ),
+            "valueType": _STRUCTURED_PROPERTY_VALUE_TYPE_STRING,
+            "cardinality": "MULTIPLE",
+            "entityTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT],
+            "settings": {
+                "showInAssetSummary": True,
+                "hideInAssetSummaryWhenEmpty": True,
+                "showInSearchFilters": True,
+                "isHidden": False,
+                # DataHub allows only ONE badge structured property per entity type,
+                # and data_product.type already claims it — keep MBR off the badge.
+                "showAsAssetBadge": False,
+                "showInColumnsTable": False,
+            },
+        },
+        "data_product.mbr",
+    )
+
+
+def curated_push_mbr(cfg: dict[str, Any]) -> None:
+    """Declaratively sync the ``data_product.mbr`` structured property (metric DPs only).
+
+    Multi-valued: a metric may belong to several MBRs. Absent/empty on a metric product
+    clears any previously-set value (flip-off), so removing the ``## MBR`` section from
+    the Markdown removes the membership in DataHub. Non-metric products are skipped —
+    MBR is a metric-only concept.
+    """
+    print("\n[12/12] MBR membership...")
+    is_metric = str(cfg.get("data_product_type") or "").strip().lower() == "metric"
+    if not is_metric:
+        print("  -> not a metric data product — skipping")
+        return
+
+    raw = cfg.get("mbr")
+    if isinstance(raw, str):
+        raw = [raw]
+    mbrs: list[str] = []
+    seen: set[str] = set()
+    for item in raw or []:
+        name = str(item).strip()
+        if name and name.lower() not in seen:
+            seen.add(name.lower())
+            mbrs.append(name)
+
+    if not _ensure_mbr_sp_definition():
+        return
+
+    dp_u = _data_product_urn(str(cfg["data_product_id"]))
+    mbr_sp_urn = structured_property_urn(_MBR_SP_QNAME)
+
+    if not mbrs:
+        # Flip-off: drop the aspect so a metric that left every MBR is not left stale.
+        _drop_legacy_structured_properties(dp_u, frozenset({mbr_sp_urn}))
+        _ok("No MBR declared — cleared any previous value")
+        return
+
+    if not _upsert_sp_on_data_product(
+        dp_u,
+        mbr_sp_urn,
+        [{"stringValue": name} for name in mbrs],
+        "curated.mbr",
+    ):
+        return
+    _ok(f"Set mbr = {mbrs!r}")
+
+
 def run_data_product_curated_entity(spec: dict[str, Any]) -> None:
-    curated_push_assets(spec)  # [1/10]
-    curated_push_documentation_link(spec)  # [2/10]
-    curated_push_glossary_terms(spec)  # [3/10]
-    curated_purge_discovery_links(spec)  # [4/10]
-    query_urns = curated_push_all_golden_queries(spec)  # [5/10]
-    curated_push_sidebar_struct_props(spec, query_urns)  # [6/10]
-    curated_refresh_dataset_assets(spec)  # [7/10]
-    curated_push_upstream_data_products(spec)  # [8/10]
-    curated_push_lifecycle_stage(spec)  # [9/10]
-    curated_push_data_product_type(spec)  # [10/10]
+    curated_push_assets(spec)  # [1/12]
+    curated_push_documentation_link(spec)  # [2/12]
+    curated_push_glossary_terms(spec)  # [3/12]
+    curated_purge_discovery_links(spec)  # [4/12]
+    query_urns = curated_push_all_golden_queries(spec)  # [5/12]
+    curated_push_sidebar_struct_props(spec, query_urns)  # [6/12]
+    curated_refresh_dataset_assets(spec)  # [7/12]
+    curated_push_upstream_data_products(spec)  # [8/12]
+    curated_push_lifecycle_stage(spec)  # [9/12]
+    curated_push_data_product_type(spec)  # [10/12]
+    curated_push_owners(spec)  # [11/12]
+    curated_push_mbr(spec)  # [12/12]
 
 
 def run_full_curated_datahub_bundle(spec: dict[str, Any]) -> None:

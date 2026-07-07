@@ -38,6 +38,7 @@ Each **business entity** file follows a standard structure:
 
 | Section | What it gives you |
 |---------|-------------------|
+| **Ownership** | Data Owner and Data Steward email(s) (at least one each) — routing metadata, not narrative content |
 | **Overview** | What the entity is, its lifecycle stages, and key timestamps — use this to understand the domain before answering |
 | **Related Metric Entities** | Plain list of the official metric(s) that build on this entity — see "Cross-link sections" below |
 | **DataHub catalog** | Direct UI links to the Data Product and golden Query entity; dataset links (CI-published from the MD on merge to master) |
@@ -52,8 +53,10 @@ Each **metric entity** file follows a different, leaner structure focused on the
 
 | Section | What it gives you |
 |---------|-------------------|
+| **Ownership** | Data Owner and Data Steward email(s) (at least one each) — routing metadata, not narrative content |
 | **Overview** | What the official metric is, which product it applies to, and how it differs from the naive/component version |
 | **Related Business Entities** | Plain list of the business entity (or entities) that own the underlying tables, columns, and grain — **start there for schema**, this file does not repeat it; see "Cross-link sections" below |
+| **MBR** | Optional — the Monthly Business Review(s) this metric feeds; routing metadata synced to the `data_product.mbr` structured property (filterable in DataHub). Absent = not part of any MBR |
 | **Glossary and Synonyms** | Names and terms used to ask for this metric — use this to map the user's question to the right metric entity |
 | **Scope** | What is included and excluded (journeys, segments, campaign purposes) — defines the metric's boundary |
 | **Calculation** | The exact official calculation (weighting, aggregation), the **Canonical Filter**, and **Nuances** (weight sources, fallback, dedup) — this **overrides** any generic logic in the business entity |

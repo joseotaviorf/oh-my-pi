@@ -1,5 +1,14 @@
 # Termination
 
+## Ownership
+
+**Data Owner:**
+- felipe.abreu@quintoandar.com.br
+- carolina.espinoza@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 A termination represents the formal process of ending a rental contract at QuintoAndar. It is one of the most complex journeys in the platform, spanning multiple stages and involving several parties (tenant, landlord, and QuintoAndar operations).
