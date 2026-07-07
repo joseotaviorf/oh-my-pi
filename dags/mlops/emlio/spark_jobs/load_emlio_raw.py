@@ -1,5 +1,6 @@
 import json
 from argparse import ArgumentParser
+from collections import OrderedDict
 from datetime import datetime
 
 from pyspark.sql.functions import col, from_json, get_json_object, struct
@@ -15,6 +16,7 @@ from bietlejuice.base.validation.spark_args import (
     resolve_datalake_write_target,
 )
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
@@ -176,22 +178,71 @@ if __name__ == "__main__":
 
     spark_metastore_service.create_database(write_database_name)
 
+    # Register emlio_logs as a partitioned external table. Unlike a Structured Streaming
+    # file sink (writeStream.format(...).toTable()), the foreachBatch batch writer below
+    # produces NO _spark_metadata log and does NOT re-register the table, so this
+    # PARTITIONED BY declaration sticks: reads honor the catalog partitions and
+    # get_table_partition_keys returns [year, month, day] (required by
+    # incremental_partition_sync and EMR/Trino partition pruning). Re-declaring only
+    # rewrites external metadata; the S3 data is untouched. Idempotent: a no-op once the
+    # table already matches, so it does not drop/recreate on every run.
+    canonical_schema = OrderedDict((field.name, "string") for field in value_schema)
+    for partition_col in partition_cols:
+        canonical_schema[partition_col] = "int"
+
+    catalog = spark_client.conn.catalog
+    write_table_fqn = f"{write_database_name}.{write_table_name}"
+    expected_value_columns = {field.name for field in value_schema}
+    needs_recreate = True
+    if catalog.tableExists(write_table_fqn):
+        columns = catalog.listColumns(write_table_name, write_database_name)
+        value_columns = {column.name for column in columns if not column.isPartition}
+        partition_columns = [column.name for column in columns if column.isPartition]
+        columns_match = value_columns == expected_value_columns
+        partitions_match = partition_columns == list(partition_cols)
+        needs_recreate = not (columns_match and partitions_match)
+
+    if needs_recreate:
+        spark_metastore_service.client.run(
+            f"DROP TABLE IF EXISTS `{write_database_name}`.`{write_table_name}`"
+        )
+        spark_metastore_service.create_external_table(
+            database_name=write_database_name,
+            table_name=write_table_name,
+            table_location=load_path,
+            table_schema=canonical_schema,
+            partition_cols=partition_cols,
+            format_options=load_format,
+        )
+
+    s3_loader = S3Loader()
+
+    def write_batch(batch_df, _batch_id):
+        # Batch (non-streaming) partitioned write: it produces no _spark_metadata, so the
+        # partitioned external-table registration above is honored on read. Append is
+        # safe because the streaming checkpoint tracks Kafka offsets exactly once.
+        if batch_df.rdd.isEmpty():
+            return
+        s3_loader.load_df(
+            df=batch_df,
+            s3_path=load_path,
+            format_options=load_format,
+            partitions=partition_cols,
+            write_mode="append",
+            max_records_per_file=max_records_per_file,
+            maxRecordsPerFile=max_records_per_file,
+        )
+
     streaming_query = (
-        part_df.writeStream.partitionBy(partition_cols)
-        .format(load_format)
+        part_df.writeStream.foreachBatch(write_batch)
         .trigger(availableNow=True)
-        .option("maxRecordsPerFile", max_records_per_file)
         .option("checkpointLocation", checkpoints_path)
-        .option("mergeSchema", "true")
-        .outputMode("append")
-        .option("path", load_path)
-        .toTable(f"{write_database_name}.{write_table_name}")
+        .start()
     )
 
     streaming_query.awaitTermination()
 
-    spark_metastore_service.repair_table_partitions(
-        write_database_name, write_table_name
-    )
-
+    # Partition VALUES for this run are registered by the sync-metadata-raw task
+    # (incremental_partition_sync) right after this job; no MSCK here to avoid a full
+    # partition rescan on every run.
     spark_metastore_service.refresh_table(write_database_name, write_table_name)
