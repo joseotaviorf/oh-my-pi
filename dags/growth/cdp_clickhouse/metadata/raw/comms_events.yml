@@ -3,8 +3,8 @@ database_name: datalake_cdp_raw
 table_name: comms_events
 description: |
   Raw Delta mirror of CDP communication events from the ClickHouse comms_events view
-  (staged from events_api). Loaded incrementally by the cdp_clickhouse Spark job using
-  timestamp_dt. Partitioned by event date (year, month, day). Source for
+  (staged from events_api). Loaded incrementally every 30 minutes by the cdp_clickhouse
+  Spark job using ts_event. Partitioned by event date (year, month, day). Source for
   datalake_cdp_clean.comms_events.
 domain: Growth
 owner: marcio.gomes@quintoandar.com.br
@@ -50,13 +50,17 @@ columns:
   event_name:
     description: Event name from the communication hub stream.
   ts_event:
-    description: Client-reported event time in UTC.
+    description: Client-reported event time in UTC; drives incremental load windows on ClickHouse reads.
   ts_egw:
     description: Event Gateway ingestion time in UTC.
+  timestamp_dt:
+    description: Event timestamp in UTC from events_api.timestamp_dt; retained for auditing.
+  egw_updated_at:
+    description: |
+      Event Gateway update epoch in milliseconds from events_api; ReplacingMergeTree
+      version column used for raw deduplication and merge updates.
   _ingested_at:
     description: ClickHouse ingestion timestamp retained from events_api.
-  timestamp_dt:
-    description: Event timestamp in UTC; drives incremental load windows on ClickHouse reads.
   year:
     description: Partition column derived from ts_event at load time.
   month:

@@ -5,7 +5,7 @@ clickhouse_http_port: 8443
 clickhouse_ssl: true
 clickhouse_ssl_mode: NONE
 clickhouse_database: forno
-clickhouse_incremental_column: timestamp_dt
+clickhouse_incremental_column: ts_event
 partition_columns:
   - year
   - month

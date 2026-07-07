@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 
 from pyspark.sql import Window
-from pyspark.sql.functions import coalesce, col, desc, lit, row_number
+from pyspark.sql.functions import col, desc, lit, row_number
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -19,34 +19,6 @@ JOB_NAME = "load_cdp_clickhouse"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-RAW_MERGE_KEYS = ["id_event"]
-RAW_DEDUP_ORDER_COLUMNS = ["ts_egw", "_ingested_at", "timestamp_dt", "ts_event"]
-
-
-def ensure_timestamp_dt(df):
-    if "timestamp_dt" in df.columns:
-        return df.withColumn(
-            "timestamp_dt", coalesce(col("timestamp_dt"), col("ts_event"))
-        )
-    return df.withColumn("timestamp_dt", col("ts_event"))
-
-
-def deduplicate_raw_events(df):
-    order_columns = [
-        column_name
-        for column_name in RAW_DEDUP_ORDER_COLUMNS
-        if column_name in df.columns
-    ]
-    window = Window.partitionBy(*RAW_MERGE_KEYS).orderBy(
-        *[desc(column_name) for column_name in order_columns]
-    )
-    return (
-        df.withColumn("_rn", row_number().over(window))
-        .filter(col("_rn") == 1)
-        .drop("_rn")
-    )
-
-
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod environment")
@@ -56,7 +28,9 @@ if __name__ == "__main__":
     parser.add_argument("table_name", help="Destination datalake raw table name")
     parser.add_argument("extraction_type", help="full or incremental")
     parser.add_argument("load_start_date", help="Load window start date (YYYY-MM-DD)")
-    parser.add_argument("load_end_date", help="Load window end date (YYYY-MM-DD)")
+    parser.add_argument(
+        "load_end_date", help="Load window end date (YYYY-MM-DD, exclusive)"
+    )
     parser.add_argument(
         "-tdn",
         "--target-database-name",
@@ -120,6 +94,11 @@ if __name__ == "__main__":
             "password": clickhouse_password,
             "database": clickhouse_database,
             "table": clickhouse_table,
+            "spark.clickhouse.client.queryTimeout": "600s",
+            "spark.clickhouse.read.settings.socket_timeout": "600000",
+            "spark.clickhouse.read.settings.receive_timeout": "600000",
+            "spark.clickhouse.read.settings.send_timeout": "600000",
+            "spark.clickhouse.read.settings.max_execution_time": "600",
         },
     ).filter(clickhouse_read_filter)
 
@@ -139,8 +118,12 @@ if __name__ == "__main__":
         .create_year_month_day_columns_from_dataframe_column("ts_event")
         .output()
     )
-    df = ensure_timestamp_dt(df)
-    df = deduplicate_raw_events(df)
+    dedup_window = Window.partitionBy("id_event").orderBy(desc("egw_updated_at"))
+    df = (
+        df.withColumn("_rn", row_number().over(dedup_window))
+        .filter(col("_rn") == 1)
+        .drop("_rn")
+    )
 
     full_table_name = f"{database_name}.{write_table_name}"
     table_s3_path = f"{database_location}{write_table_name}"
@@ -151,8 +134,8 @@ if __name__ == "__main__":
         path=table_s3_path,
         source_df=df,
         partition_by=partition_columns,
-        merge_on=RAW_MERGE_KEYS,
-        when_matched_update_condition="source.ts_egw >= target.ts_egw",
+        merge_on=["id_event"],
+        when_matched_update_condition="source.egw_updated_at >= target.egw_updated_at",
     )
 
     logger.info(f"Done. Loaded rows into Delta table {full_table_name}")
