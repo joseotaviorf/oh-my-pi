@@ -1,21 +1,23 @@
 cluster:
-  type: consolidation_s_general_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_s_general_fleet_cluster
   custom_configurations:
     spark_conf:
       spark.sql.session.timeZone: America/Sao_Paulo
-    num_workers: 3
-    driver_node_type_id: r7g.large
-validation:
-  cluster:
-    type: emr_7_12_consolidation_s_general_cluster
-    custom_configurations:
-      core_nodes:
-        instance_count: 2
-      task_nodes:
-        instance_count: 1
-      master_node_type_id: r6g.xlarge
-      spark_conf:
-        spark.driver.memory: 12g
-        spark.driver.memoryOverhead: 4g
-        spark.yarn.am.memory: 4g
+      spark.driver.memory: 12g
+      spark.driver.memoryOverhead: 4g
+      spark.yarn.am.memory: 4g
+    master_node_type_id: r6g.xlarge
+    task_nodes:
+      instance_types:
+      - m6g.xlarge
+      - m7g.xlarge
+      target_on_demand: 0
+      target_spot: 1
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - m6g.xlarge
+      - m7g.xlarge
