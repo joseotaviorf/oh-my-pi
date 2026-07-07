@@ -1,91 +1,91 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: consolidated_invoice
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer consolidated invoice records in SAP Gateway grouping multiple line items before posting to SAP S/4HANA.
 columns:
   id:
-    description: ''
+    description: Financial attribute representing id on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.id
   doc_entry:
-    description: ''
+    description: Financial attribute representing doc entry on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.doc_entry
   status:
-    description: ''
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.status
   amount:
-    description: ''
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.amount
   user_type:
-    description: ''
+    description: Financial attribute representing user type on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.user_type
   source_client:
-    description: ''
+    description: Financial attribute representing source client on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.source_client
   city_state:
-    description: ''
+    description: Financial attribute representing city state on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.city_state
   city:
-    description: ''
+    description: Financial attribute representing city on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.city
   person_card_code:
-    description: ''
+    description: Financial attribute representing person card code on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.person_card_code
   person_document:
-    description: ''
+    description: Financial attribute representing person document on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.person_document
   person_document_type:
-    description: ''
+    description: Financial attribute representing person document type on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.person_document_type
   sequence_code:
-    description: ''
+    description: Financial attribute representing sequence code on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.sequence_code
   description:
-    description: ''
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.description
   cost_center:
-    description: ''
+    description: Financial attribute representing cost center on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.cost_center
   business_place:
-    description: ''
+    description: Financial attribute representing business place on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.business_place
   account_code:
-    description: ''
+    description: Financial attribute representing account code on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.account_code
   account_cfop_code:
-    description: ''
+    description: Financial attribute representing account cfop code on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.account_cfop_code
   account_managerial_center:
-    description: ''
+    description: Financial attribute representing account managerial center on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.account_managerial_center
   reference_year_month:
-    description: ''
+    description: Financial attribute representing reference year month on the consolidated_invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.reference_year_month
   ts_created:
-    description: ''
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.TIMESTAMP(created_at)
   ts_updated:
-    description: ''
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.TIMESTAMP(updated_at)

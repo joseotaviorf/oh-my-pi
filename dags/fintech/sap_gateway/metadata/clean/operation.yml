@@ -1,59 +1,59 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: operation
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer accounting operations in SAP Gateway linking features to business partners and SAP sync jobs for posting orchestration.
 columns:
   id_operation:
-    description: ''
+    description: Primary key of the accounting operation in SAP Gateway clean layer.
     lineage:
     - datalake_sap_gateway_raw.operation.id
   id_feature:
-    description: ''
+    description: Foreign key to the SAP Gateway feature that originated this operation.
     lineage:
     - datalake_sap_gateway_raw.operation.feature_id
   id_business_partner:
-    description: ''
+    description: Foreign key to the business partner involved in the operation.
     lineage:
     - datalake_sap_gateway_raw.operation.business_partner_id
   id_sync_sap_job:
-    description: ''
+    description: Foreign key to the SAP sync job that processed this operation.
     lineage:
     - datalake_sap_gateway_raw.operation.sync_sap_job_id
   description:
-    description: ''
+    description: Human-readable description of the accounting operation purpose.
     lineage:
     - datalake_sap_gateway_raw.operation."description"
   feature_op_ident:
-    description: ''
+    description: Operation identifier within the parent feature payload for traceability.
     lineage:
     - datalake_sap_gateway_raw.operation.feature_op_ident
   ts_reference:
-    description: ''
+    description: Reference timestamp used for accrual and temporality checks on the operation.
     lineage:
     - datalake_sap_gateway_raw.operation.TIMESTAMP(reference_date)
   ts_due:
-    description: ''
+    description: Due date timestamp associated with the accounting operation.
     lineage:
     - datalake_sap_gateway_raw.operation.TIMESTAMP(due_date)
   ts_created:
-    description: ''
+    description: Timestamp when the operation was created in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.operation.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the operation was last updated in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.operation.updated_at
   year:
-    description: ''
+    description: Year partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.operation.year
   month:
-    description: ''
+    description: Month partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.operation.month
   day:
-    description: ''
+    description: Day partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.operation.day

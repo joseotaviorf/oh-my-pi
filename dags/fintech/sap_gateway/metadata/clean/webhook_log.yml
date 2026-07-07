@@ -1,63 +1,63 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: webhook_log
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer webhook callback logs from SAP S/4HANA confirming or rejecting SAP Gateway sync job results.
 columns:
   id_webhook_log:
-    description: ''
+    description: Primary key of the webhook log record in SAP Gateway clean layer.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.id
   webhook_status:
-    description: ''
+    description: HTTP or processing status returned by the SAP webhook endpoint.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.webhook_status
   status:
-    description: ''
+    description: Business status of the synced entity reported by the SAP webhook (e.g. success, failure).
     lineage:
     - datalake_sap_gateway_raw.webhook_log.status
   status_reason:
-    description: ''
+    description: Human-readable reason explaining the webhook status outcome.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.status_reason
   errors:
-    description: ''
+    description: Error details returned by SAP when the webhook reports a failure.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.errors
   job_identifier:
-    description: ''
+    description: Identifier of the SAP Gateway sync job associated with this webhook callback.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.job_identifier
   entity_type:
-    description: ''
+    description: Type of SAP entity referenced in the webhook callback (e.g. invoice, journal entry).
     lineage:
     - datalake_sap_gateway_raw.webhook_log.entity_type
   idoc:
-    description: ''
+    description: SAP IDoc identifier referenced in the webhook callback payload.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.idoc
   payload:
-    description: ''
+    description: Raw JSON payload received from the SAP webhook callback.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.payload
   ts_created:
-    description: ''
+    description: Timestamp when the SAP webhook callback was received and logged by SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the webhook log was last updated in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.updated_at
   year:
-    description: ''
+    description: Year partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.year
   month:
-    description: ''
+    description: Month partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.month
   day:
-    description: ''
+    description: Day partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.webhook_log.day

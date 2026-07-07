@@ -1,183 +1,183 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: invoice
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer individual invoice line items in SAP Gateway generated for fiscal document (NF) posting to SAP S/4HANA.
 columns:
   id:
-    description: ''
+    description: Financial attribute representing id on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.id
   id_feature:
-    description: ''
+    description: Identifier for the feature referenced by this financial record.
     lineage:
     - datalake_sap_gateway_raw.invoice.feature_id
   id_consolidated:
-    description: ''
+    description: Identifier for the consolidated referenced by this financial record.
     lineage:
     - datalake_sap_gateway_raw.invoice.consolidated_id
   id_person:
-    description: ''
+    description: Identifier for the person referenced by this financial record.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_id
   id_business_entity:
-    description: ''
+    description: Identifier for the business entity referenced by this financial record.
     lineage:
     - datalake_sap_gateway_raw.invoice.business_entity_id
   id_finance_entity:
-    description: ''
+    description: Identifier for the finance entity referenced by this financial record.
     lineage:
     - datalake_sap_gateway_raw.invoice.finance_entity_id
   id_external_payment:
-    description: ''
+    description: Identifier for the external payment referenced by this financial record.
     lineage:
     - datalake_sap_gateway_raw.invoice.external_payment_id
   id_finance_entity_entry:
-    description: ''
+    description: Identifier for the finance entity entry referenced by this financial record.
     lineage:
     - datalake_sap_gateway_raw.invoice.finance_entity_entry_id
   amount:
-    description: ''
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
     lineage:
     - datalake_sap_gateway_raw.invoice.amount
   user_type:
-    description: ''
+    description: Financial attribute representing user type on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.user_type
   source_client:
-    description: ''
+    description: Financial attribute representing source client on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.source_client
   status:
-    description: ''
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
     - datalake_sap_gateway_raw.invoice.status
   city_state:
-    description: ''
+    description: Financial attribute representing city state on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.city_state
   city:
-    description: ''
+    description: Financial attribute representing city on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.city
   locale:
-    description: ''
+    description: Financial attribute representing locale on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.locale
   accounting_rule:
-    description: ''
+    description: Financial attribute representing accounting rule on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.accounting_rule
   accounting_type:
-    description: ''
+    description: Financial attribute representing accounting type on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.accounting_type
   person_card_code:
-    description: ''
+    description: Financial attribute representing person card code on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_card_code
   person_document:
-    description: ''
+    description: Financial attribute representing person document on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_document
   person_document_type:
-    description: ''
+    description: Financial attribute representing person document type on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_document_type
   sequence_code:
-    description: ''
+    description: Financial attribute representing sequence code on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.sequence_code
   description:
-    description: ''
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
     - datalake_sap_gateway_raw.invoice.description
   cost_center:
-    description: ''
+    description: Financial attribute representing cost center on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.cost_center
   business_place:
-    description: ''
+    description: Financial attribute representing business place on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.business_place
   account_code:
-    description: ''
+    description: Financial attribute representing account code on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.account_code
   account_cfop_code:
-    description: ''
+    description: Financial attribute representing account cfop code on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.account_cfop_code
   account_managerial_center:
-    description: ''
+    description: Financial attribute representing account managerial center on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.account_managerial_center
   person_address:
-    description: ''
+    description: Financial attribute representing person address on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_address
   person_address_block:
-    description: ''
+    description: Financial attribute representing person address block on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_address_block
   person_address_complement:
-    description: ''
+    description: Financial attribute representing person address complement on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_address_complement
   person_address_number:
-    description: ''
+    description: Financial attribute representing person address number on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_address_number
   person_address_street_suffix:
-    description: ''
+    description: Financial attribute representing person address street suffix on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_address_street_suffix
   person_address_zip_code:
-    description: ''
+    description: Financial attribute representing person address zip code on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_address_zip_code
   person_city:
-    description: ''
+    description: Financial attribute representing person city on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_city
   person_email:
-    description: ''
+    description: Financial attribute representing person email on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_email
   person_name:
-    description: ''
+    description: Financial attribute representing person name on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_name
   person_phone:
-    description: ''
+    description: Financial attribute representing person phone on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_phone
   person_state:
-    description: ''
+    description: Financial attribute representing person state on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.person_state
   reference_year_month:
-    description: ''
+    description: Financial attribute representing reference year month on the invoice dataset.
     lineage:
     - datalake_sap_gateway_raw.invoice.reference_year_month
   is_reversed:
-    description: ''
+    description: Indicates whether reversed applies to this financial record.
     lineage:
     - datalake_sap_gateway_raw.invoice.reversed
   dt_event:
-    description: ''
+    description: Calendar date associated with event in the financial workflow.
     lineage:
     - datalake_sap_gateway_raw.invoice.DATE(event_date)
   dt_due:
-    description: ''
+    description: Calendar date associated with due in the financial workflow.
     lineage:
     - datalake_sap_gateway_raw.invoice.DATE(due_date)
   ts_created:
-    description: ''
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
     - datalake_sap_gateway_raw.invoice.TIMESTAMP(created_at)
   ts_updated:
-    description: ''
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
     - datalake_sap_gateway_raw.invoice.TIMESTAMP(updated_at)

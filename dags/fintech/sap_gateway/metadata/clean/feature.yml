@@ -1,9 +1,9 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: feature
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Clean feature table for SAP Gateway sync and transaction data.
+description: Clean-layer feature records in SAP Gateway representing upstream billing transactions queued for SAP S/4HANA synchronization.
 columns:
   id_feature:
     description: Unique identifier of the feature record in the clean layer.

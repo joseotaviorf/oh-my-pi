@@ -1,14 +1,123 @@
 ---
 database_name: datalake_sap_4hana_clean
 table_name: journal_entries
+description:
+  Clean-layer SAP S/4HANA journal entry lines, one row per posting line replicated for
+  controllership reconciliation, accounting funnel monitoring, and financial close.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   year:
     lineage:
       - datalake_sap_4hana_raw.journal_entries.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_sap_4hana_raw.journal_entries.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_sap_4hana_raw.journal_entries.day
+    description: Day partition derived from the source event timestamp for incremental loading.
+  accounting_rule:
+    lineage: []
+    description: Accounting rule identifier applied when the journal entry line was posted in SAP.
+  source_client:
+    lineage: []
+    description: Upstream client or application that originated the journal entry line.
+  id_external_payment:
+    lineage: []
+    description: External payment identifier linked to the journal entry when applicable.
+  posting_period:
+    lineage: []
+    description: SAP posting period (YYYYMM) in which the journal entry line was recorded.
+  posting_key:
+    lineage: []
+    description: SAP posting key indicating debit or credit direction of the line.
+  hash:
+    lineage: []
+    description: Hash fingerprint of the journal entry line used for deduplication.
+  managerial_code:
+    lineage: []
+    description: Managerial accounting code associated with the journal entry line.
+  memo:
+    lineage: []
+    description: Header-level memo or reference text attached to the journal entry document.
+  id_finance_entity:
+    lineage: []
+    description: Finance entity identifier linking the journal line to the upstream billing record.
+  id_transaction:
+    lineage: []
+    description: SAP transaction identifier grouping related journal entry lines.
+  xblnr:
+    lineage: []
+    description: SAP reference document number (XBLNR) for the journal entry.
+  user_type:
+    lineage: []
+    description: User or counterparty type associated with the journal entry (e.g. tenant, landlord).
+  indicator:
+    lineage: []
+    description: SAP indicator flag classifying the journal entry line type.
+  created_by:
+    lineage: []
+    description: SAP user or system identity that created the journal entry line.
+  fiscal_year:
+    lineage: []
+    description: SAP fiscal year in which the journal entry was posted.
+  account_number:
+    lineage: []
+    description: SAP general ledger account number for the journal entry line.
+  dt_tax:
+    lineage: []
+    description: Tax date associated with the journal entry line in SAP.
+  account_shortname:
+    lineage: []
+    description: Short name or alias of the SAP account on the journal entry line.
+  accrual_year_month:
+    lineage: []
+    description: Accrual period in YYYYMM format for the journal entry line.
+  accounting_type:
+    lineage: []
+    description: Accounting type classification of the journal entry line.
+  cost_center_code:
+    lineage: []
+    description: SAP cost center code allocated to the journal entry line.
+  material:
+    lineage: []
+    description: SAP material code when the journal entry line references a material item.
+  dt_updated:
+    lineage: []
+    description: Date when the journal entry line was last updated in SAP.
+  document_amount:
+    lineage: []
+    description: Monetary amount of the journal entry line in the document currency.
+  id_company:
+    lineage: []
+    description: Company code identifier in SAP for the journal entry line.
+  id_business_entity:
+    lineage: []
+    description: Business entity identifier (e.g. contract) linked to the journal entry line.
+  dt_created:
+    lineage: []
+    description: Date when the journal entry line was created in SAP.
+  id_finance_entity_entry:
+    lineage: []
+    description: Finance entity entry identifier linking the line to a specific billing entry.
+  id_line:
+    lineage: []
+    description: Line number identifier within the journal entry document.
+  location_profit_code:
+    lineage: []
+    description: SAP profit center or location code for the journal entry line.
+  dt_accrual:
+    lineage: []
+    description: Accrual date associated with the journal entry line in SAP.
+  memo_line:
+    lineage: []
+    description: Line-level memo or reference text on the journal entry.
+  comments:
+    lineage: []
+    description: Additional comments or notes attached to the journal entry line.
+  currency_code:
+    lineage: []
+    description: ISO currency code of the journal entry line amount.

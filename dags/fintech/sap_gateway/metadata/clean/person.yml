@@ -1,71 +1,71 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: person
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer person master data in SAP Gateway with tax ID, contact details, and address used for fiscal document generation.
 columns:
   id_person:
-    description: ''
+    description: Primary key of the person record in SAP Gateway clean layer.
     lineage:
     - datalake_sap_gateway_raw.person.id
   id_tax:
-    description: ''
+    description: Tax identifier (CPF/CNPJ) of the person.
     lineage:
     - datalake_sap_gateway_raw.person.tax_id
   id_tax_type:
-    description: ''
+    description: Tax document type of the person (e.g. CPF, CNPJ).
     lineage:
     - datalake_sap_gateway_raw.person.tax_id_type
   person_name:
-    description: ''
+    description: Full name of the person as registered in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.person."name"
   email:
-    description: ''
+    description: Email address of the person for fiscal and billing communications.
     lineage:
     - datalake_sap_gateway_raw.person.email
   phone:
-    description: ''
+    description: Phone number of the person for fiscal and billing communications.
     lineage:
     - datalake_sap_gateway_raw.person.phone
   address:
-    description: ''
+    description: Street name or main address line of the person.
     lineage:
     - datalake_sap_gateway_raw.person.address
   address_complement:
-    description: ''
+    description: Address complement such as apartment or floor details.
     lineage:
     - datalake_sap_gateway_raw.person.address_complement
   address_street_sufix:
-    description: ''
+    description: Street type suffix (e.g. Rua, Avenida) of the person address.
     lineage:
     - datalake_sap_gateway_raw.person.address_street_sufix
   address_number:
-    description: ''
+    description: Street number of the person address.
     lineage:
     - datalake_sap_gateway_raw.person.address_number
   address_block:
-    description: ''
+    description: Neighborhood or block name of the person address.
     lineage:
     - datalake_sap_gateway_raw.person.address_block
   city:
-    description: ''
+    description: City of the person address.
     lineage:
     - datalake_sap_gateway_raw.person.city
   state:
-    description: ''
+    description: State or province code of the person address.
     lineage:
     - datalake_sap_gateway_raw.person.state
   zip_code:
-    description: ''
+    description: Brazilian postal code (CEP) of the person address.
     lineage:
     - datalake_sap_gateway_raw.person.zip_code
   ts_created:
-    description: ''
+    description: Timestamp when the person record was created in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.person.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the person record was last updated in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.person.updated_at

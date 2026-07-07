@@ -1,39 +1,39 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: rule_modifier
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer modifiers applied to SAP Gateway accounting rules based on person type, cost center, and business place.
 columns:
   id:
-    description: ''
+    description: Primary key of the rule modifier record in SAP Gateway clean layer.
     lineage:
     - datalake_sap_gateway_raw.rule_modifier.id
   name:
-    description: ''
+    description: Human-readable name identifying the rule modifier.
     lineage:
     - datalake_sap_gateway_raw.rule_modifier.name
   person_type:
-    description: ''
+    description: Person type condition that triggers this rule modifier (e.g. tenant, landlord).
     lineage:
     - datalake_sap_gateway_raw.rule_modifier.person_type
   cost_center:
-    description: ''
+    description: SAP cost center condition that triggers this rule modifier.
     lineage:
     - datalake_sap_gateway_raw.rule_modifier.cost_center
   business_place:
-    description: ''
+    description: SAP business place condition that triggers this rule modifier.
     lineage:
     - datalake_sap_gateway_raw.rule_modifier.business_place
   sequence_code:
-    description: ''
+    description: Fiscal document sequence code associated with the rule modifier.
     lineage:
     - datalake_sap_gateway_raw.rule_modifier.sequence_code
   ts_created:
-    description: ''
+    description: Timestamp when this rule modifier configuration was first persisted in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.rule_modifier.TIMESTAMP(created_at)
   ts_updated:
-    description: ''
+    description: Timestamp when the rule modifier was last updated in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.rule_modifier.TIMESTAMP(updated_at)

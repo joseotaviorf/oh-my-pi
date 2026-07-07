@@ -1,43 +1,43 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: card_code
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer mapping of SAP business partner card codes by tax profile and counterparty role (landlord, tenant, estate agent, seller).
 columns:
   id_tax:
-    description: ''
+    description: Tax identifier (CPF/CNPJ) used to resolve the SAP card code mapping.
     lineage:
     - datalake_sap_gateway_raw.card_code.tax_id
   id_tax_type:
-    description: ''
+    description: Tax document type associated with the card code mapping (e.g. CPF, CNPJ).
     lineage:
     - datalake_sap_gateway_raw.card_code.tax_id_type
   supplier_landlord_code:
-    description: ''
+    description: SAP supplier card code assigned to landlord counterparty profiles.
     lineage:
     - datalake_sap_gateway_raw.card_code.supplier_landlord_code
   supplier_tenant_code:
-    description: ''
+    description: SAP supplier card code assigned to tenant counterparty profiles.
     lineage:
     - datalake_sap_gateway_raw.card_code.supplier_tenant_code
   supplier_estate_agent_code:
-    description: ''
+    description: SAP supplier card code assigned to estate agent counterparty profiles.
     lineage:
     - datalake_sap_gateway_raw.card_code.supplier_estate_agent_code
   customer_landlord_code:
-    description: ''
+    description: SAP customer card code assigned to landlord counterparty profiles.
     lineage:
     - datalake_sap_gateway_raw.card_code.customer_landlord_code
   customer_tenant_code:
-    description: ''
+    description: SAP customer card code assigned to tenant counterparty profiles.
     lineage:
     - datalake_sap_gateway_raw.card_code.customer_tenant_code
   customer_reservation_code:
-    description: ''
+    description: SAP customer card code assigned to reservation fee counterparty profiles.
     lineage:
     - datalake_sap_gateway_raw.card_code.customer_reservation_code
   customer_seller_code:
-    description: ''
+    description: SAP customer card code assigned to for-sale seller counterparty profiles.
     lineage:
     - datalake_sap_gateway_raw.card_code.customer_seller_code

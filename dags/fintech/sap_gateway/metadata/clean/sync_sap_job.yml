@@ -1,91 +1,91 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: sync_sap_job
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer SAP synchronization jobs tracking payload submission, IDoc response, retry status, and ERP solution from SAP Gateway to S/4HANA.
 columns:
   id_sync_sap_job:
-    description: ''
+    description: Primary key of the SAP sync job in SAP Gateway clean layer.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.id
   id_feature:
-    description: ''
+    description: Foreign key to the SAP Gateway feature that triggered this sync job.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.feature_id
   id_consolidated:
-    description: ''
+    description: Foreign key to the consolidated invoice associated with this sync job, when applicable.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.consolidated_id
   hash:
-    description: ''
+    description: Hash fingerprint of the sync job payload for deduplication and traceability.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job."hash"
   idoc:
-    description: ''
+    description: SAP IDoc identifier returned after submitting the sync job to S/4HANA.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.idoc
   response:
-    description: ''
+    description: Raw response payload returned by SAP after processing the sync job.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.response
   type:
-    description: ''
+    description: Sync job type classification (e.g. NF, journal entry) in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job."type"
   status:
-    description: ''
+    description: Current processing status of the sync job in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job."status"
   erp_solution:
-    description: ''
+    description: Target ERP solution for the sync job (e.g. S4, SAP B1).
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.erp_solution
   sap_payload:
-    description: ''
+    description: JSON payload sent to SAP for this synchronization job.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.sap_payload
   charge_back_of:
-    description: ''
+    description: Identifier of the original sync job when this record is a chargeback reversal.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.charge_back_of
   error:
-    description: ''
+    description: Error message or code returned when the sync job failed in SAP.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.error
   retryable:
-    description: ''
+    description: Indicates whether the failed sync job can be automatically retried.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.retryable
   num_retry:
-    description: ''
+    description: Number of retry attempts performed for this sync job.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.num_retry
   ts_updated_from_webhook:
-    description: ''
+    description: Timestamp when the sync job status was last updated via SAP webhook callback.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.updated_from_webhook_at
   ts_synced:
-    description: ''
+    description: Timestamp when the sync job was successfully synchronized to SAP.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.synced_at
   ts_created:
-    description: ''
+    description: Timestamp when the SAP sync job record was first created after feature submission.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the sync job was last updated in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.updated_at
   year:
-    description: ''
+    description: Year partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.year
   month:
-    description: ''
+    description: Month partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.month
   day:
-    description: ''
+    description: Day partition derived from the source event timestamp for incremental loading.
     lineage:
     - datalake_sap_gateway_raw.sync_sap_job.day

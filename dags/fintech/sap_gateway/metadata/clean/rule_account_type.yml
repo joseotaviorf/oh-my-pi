@@ -1,19 +1,19 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: rule_account_type
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer junction table mapping SAP Gateway accounting rules to GL accounts and their account type classification.
 columns:
   id_rule:
-    description: ''
+    description: Foreign key to the accounting rule that defines posting behavior.
     lineage:
     - datalake_sap_gateway_raw.rule_account_type.rule_id
   id_account:
-    description: ''
+    description: Foreign key to the SAP GL account linked to the accounting rule.
     lineage:
     - datalake_sap_gateway_raw.rule_account_type.account_id
   type:
-    description: ''
+    description: Account type classification (e.g. debit, credit) for the rule-account pair.
     lineage:
     - datalake_sap_gateway_raw.rule_account_type."type"
