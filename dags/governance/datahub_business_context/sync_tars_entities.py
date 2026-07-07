@@ -50,6 +50,30 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
+
+def _resolve_state_path() -> Path:
+    """Return the path to the JSON sync-state file.
+
+    Resolution order:
+    1. ``TARS_SYNC_STATE_PATH`` env var — treated as a directory if it does
+       not end with ``.json``, otherwise used as the full file path.
+    2. ``/dbfs/tmp/governance/<filename>`` when running on Databricks
+       (``DATABRICKS_RUNTIME_VERSION`` is set in the environment).
+    3. ``<script directory>/<filename>`` as the local default.
+    """
+    from sync.constants import SYNC_STATE_FILENAME  # noqa: PLC0415 — late import ok
+
+    env_val = os.environ.get("TARS_SYNC_STATE_PATH", "").strip()
+    if env_val:
+        p = Path(env_val)
+        if p.suffix == ".json":
+            return p
+        return p / SYNC_STATE_FILENAME
+    if "DATABRICKS_RUNTIME_VERSION" in os.environ:
+        return Path("/dbfs/tmp/governance") / SYNC_STATE_FILENAME
+    return _SCRIPT_DIR / SYNC_STATE_FILENAME
+
+
 from sync.constants import (  # noqa: E402
     DATA_PRODUCT_TYPE_METRIC,
     DELIVERY_MODE_DIRECT,
@@ -58,7 +82,6 @@ from sync.constants import (  # noqa: E402
     LIFECYCLE_STAGE_PROD,
     MD_OUTPUT_DIR,
     MD_OUTPUT_DIR_METRICS,
-    SYNC_STATE_FILENAME,
 )
 from sync.datahub_document_client import (  # noqa: E402
     TarsEntityDocument,
@@ -354,14 +377,7 @@ def main() -> int:
         print("ERROR: DATAHUB_GRAPHQL_URL is not set.", file=sys.stderr)
         return 1
 
-    _state_path_env = os.environ.get("TARS_SYNC_STATE_PATH", "").strip()
-    if _state_path_env:
-        state_path = Path(_state_path_env)
-    elif "DATABRICKS_RUNTIME_VERSION" in os.environ:
-        state_path = Path("/dbfs/tmp/governance") / SYNC_STATE_FILENAME
-    else:
-        state_path = _SCRIPT_DIR / SYNC_STATE_FILENAME
-    state = SyncStateStore(state_path)
+    state = SyncStateStore(_resolve_state_path())
 
     if ns.urn:
         doc = fetch_document(ns.urn)
