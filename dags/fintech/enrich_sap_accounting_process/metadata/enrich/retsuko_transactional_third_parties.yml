@@ -1,10 +1,10 @@
 database_name: datalake_sap_accounting_process
 table_name: retsuko_transactional_third_parties
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
   Table to track transactional accounting processes for selected Retsuko bill items between contract, tenant, and landlord accounts,
-  reconciled to SAP ledger account 700004. Same structure and logic as retsuko_transactional, source (SeuBarriga/Retsuko) to SAP via sap gateway,
+  reconciled to SAP ledger account 700004. Same structure and logic as retsuko_transactional, source (Seu Barriga/Retsuko) to SAP via SAP Gateway,
   with completeness, correctness (up to R$0.05 deviation), and temporality (same calendar month as the source trigger, or the next month with at most three Brazilian business days between trigger and SAP reference dates) for monitoring and root-cause analysis.
 columns:
   id_accounting_process:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_retsuko.entry.id_external
   version:
-    description: Identifier of the versions from source system (SeuBarriga), could be v1 or v2.
+    description: Identifier of the versions from source system (Seu Barriga), could be v1 or v2.
     lineage:
       - datalake_retsuko_clean.sap_entity.version
   business_unit:
@@ -48,7 +48,7 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_transactional_third_parties.accounting_name
   source_amount:
-    description: Value from the source system (e.g. SeuBarriga) for the filtered transactional entries.
+    description: Value from the source system (e.g. Seu Barriga) for the filtered transactional entries.
     lineage:
       - datalake_retsuko.entry.amount
   sap_amount:

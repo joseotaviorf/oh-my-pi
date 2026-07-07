@@ -1,9 +1,9 @@
 database_name: datalake_sap_accounting_process
 table_name: retsuko_transactional_third_parties_reverse
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
-  Table to track reverse transactional accounting for SeuBarriga/Retsuko bill-items mapped to SAP account
+  Table to track reverse transactional accounting for Seu Barriga/Retsuko bill-items mapped to SAP account
   700004 (Between contracts), identifying cases where entries exist in SAP Ledger (accounting funnel) but do
   not have a corresponding finance-entity-entry match in Retsuko for that ledger line. These are classified
   as 'reverse straw failure' transactions for monitoring and root-cause analysis. Rows are filtered where
@@ -29,7 +29,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger.id_finance_entity_entry
   version:
-    description: Identifier of the versions from source system (SeuBarriga), could be v1 or v2. NULL when not linked via sap_entity.
+    description: Identifier of the versions from source system (Seu Barriga), could be v1 or v2. NULL when not linked via sap_entity.
     lineage:
       - datalake_retsuko_clean.sap_entity.version
   business_unit:

@@ -1,11 +1,11 @@
 ---
 database_name: datalake_sap_accounting_process
 table_name: retsuko_write_off
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
-  Table to track write-off accounting entries from SeuBarriga/Retsuko system that are synchronized with SAP.
-  It identifies transactions that exist in the source system (SeuBarriga) and validates their presence, correctness, and timeliness in SAP.
+  Table to track write-off accounting entries from Seu Barriga/Retsuko system that are synchronized with SAP.
+  It identifies transactions that exist in the source system (Seu Barriga) and validates their presence, correctness, and timeliness in SAP.
   The final output includes compliance checks (completeness, correctness, temporality - same calendar month as the source trigger or the next month with at most three Brazilian business days between trigger and SAP reference dates) and status classification to support monitoring and root-cause analysis for write-off accounting scenarios.
 columns:
   id_accounting_process:
@@ -25,7 +25,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger.id_finance_entity_entry
   version:
-    description: Identifier of the versions from source system (SeuBarriga), could be v1 or v2.
+    description: Identifier of the versions from source system (Seu Barriga), could be v1 or v2.
     lineage:
       - datalake_retsuko_clean.sap_entity.version
   business_unit:
@@ -49,7 +49,7 @@ columns:
     lineage:
       - datalake_retsuko.entry.bill_item
   source_amount:
-    description: Value from the source system (e.g. SeuBarriga) considering business rules of the account as trigger and bill-items.
+    description: Value from the source system (e.g. Seu Barriga) considering business rules of the account as trigger and bill-items.
     lineage:
       - datalake_retsuko.invoice.due_amount
   sap_amount:

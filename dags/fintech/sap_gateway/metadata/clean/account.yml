@@ -1,35 +1,35 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: account
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer account master data replicated from SAP Gateway, storing GL account codes, descriptions, CFOP, and managerial center used in SAP S/4HANA postings.
 columns:
   id_account:
-    description: ''
+    description: Primary key of the account record in the SAP Gateway clean layer.
     lineage:
     - datalake_sap_gateway_raw.account.id
   account_code:
-    description: ''
+    description: SAP general ledger account code used when posting journal entries.
     lineage:
     - datalake_sap_gateway_raw.account.code
   account_description:
-    description: ''
+    description: Human-readable name or label of the SAP account in the gateway catalog.
     lineage:
     - datalake_sap_gateway_raw.account."description"
   cfop_code:
-    description: ''
+    description: Brazilian CFOP fiscal operation code associated with the account configuration.
     lineage:
     - datalake_sap_gateway_raw.account.cfop_code
   managerial_center:
-    description: ''
+    description: SAP managerial cost center linked to the account for controllership reporting.
     lineage:
     - datalake_sap_gateway_raw.account.managerial_center
   ts_created:
-    description: ''
+    description: Timestamp when the account record was created in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.account.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the account record was last updated in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.account.updated_at

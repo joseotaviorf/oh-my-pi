@@ -1,9 +1,9 @@
 database_name: datalake_sap_accounting_process
 table_name: retsuko_transactional
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
-  Table to track transactional accounting processes, following the invoices' route between source (SeuBarriga/Retsuko) and SAP, considering sap gateway payload system.
+  Table to track transactional accounting processes, following the route between source (Seu Barriga/Retsuko) and SAP via SAP Gateway payload system.
   It applies business rules for IPO to assess completeness, correctness (up to R$0.05 deviation), and temporality (same calendar month as the source trigger, or the next month with at most three Brazilian business days between trigger and SAP reference dates).
   The final output includes a status classification and failure reason to support monitoring and root-cause analysis for transactional entries.
 columns:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_retsuko.entry.id_external
   version:
-    description: Identifier of the versions from source system (SeuBarriga), could be v1 or v2.
+    description: Identifier of the versions from source system (Seu Barriga), could be v1 or v2.
     lineage:
       - datalake_retsuko_clean.sap_entity.version
   business_unit:
@@ -48,7 +48,7 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_transactional.accounting_name
   source_amount:
-    description: Value from the source system (e.g. SeuBarriga) considering business rules of the account as trigger and bill-items.
+    description: Value from the source system (e.g. Seu Barriga) considering business rules of the account as trigger and bill-items.
     lineage:
       - datalake_retsuko.entry.amount
   sap_amount:

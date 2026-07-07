@@ -1,12 +1,12 @@
 database_name: datalake_sap_accounting_process
 table_name: retsuko_transactional_reverse
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description:
   Table to track reverse transactional accounting processes, identifying cases where entries exist
-  in SAP Ledger but do not have a corresponding match in the SeuBarriga/Retsuko source system.
+  in SAP Ledger but do not have a corresponding match in the Seu Barriga/Retsuko source system.
   These are classified as 'reverse straw failure' transactions, indicating potential data
-  inconsistencies or manual entries in SAP that were not originated from the SeuBarriga/Retsuko
+  inconsistencies or manual entries in SAP that were not originated from the Seu Barriga/Retsuko
   system. The table supports monitoring and root-cause analysis for these reverse transactional entries.
 columns:
   id_accounting_process:
@@ -27,7 +27,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger.id_finance_entity_entry
   version:
-    description: Identifier of the versions from source system (SeuBarriga), could be v1 or v2. NULL for reverse transactions as there is no corresponding SeuBarriga entry.
+    description: Identifier of the versions from source system (Seu Barriga), could be v1 or v2. NULL for reverse transactions as there is no corresponding Seu Barriga entry.
     lineage:
       - datalake_retsuko_clean.sap_entity.version
   business_unit:
@@ -47,11 +47,11 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger.account_number
   accounting_name:
-    description: Human readable name for SAP accounts based on bill-items in retsuko. NULL for reverse transactions as there is no corresponding SeuBarriga entry.
+    description: Human readable name for SAP accounts based on bill-items in retsuko. NULL for reverse transactions as there is no corresponding Seu Barriga entry.
     lineage:
       - datalake_sap_accounting_process.retsuko_transactional_reverse.accounting_name
   source_amount:
-    description: Value from the source system (SeuBarriga). NULL for reverse transactions as there is no corresponding SeuBarriga entry.
+    description: Value from the source system (Seu Barriga). NULL for reverse transactions as there is no corresponding Seu Barriga entry.
     lineage:
       - datalake_retsuko.entry.amount
   sap_amount:
@@ -92,7 +92,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger.accrual_year_month
   dt_source_trigger:
-    description: Trigger date based on accounting workflow rules in SeuBarriga. NULL for reverse transactions as there is no SeuBarriga entry.
+    description: Trigger date based on accounting workflow rules in Seu Barriga. NULL for reverse transactions as there is no Seu Barriga entry.
     lineage:
       - datalake_retsuko.entry.ts_created
   dt_sap_reference:

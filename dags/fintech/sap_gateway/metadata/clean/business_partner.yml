@@ -1,39 +1,39 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: business_partner
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer business partner master data replicated from SAP Gateway, linking persons and addresses to SAP S/4HANA sync jobs for accounting integration.
 columns:
   id_business_partner:
-    description: ''
+    description: Primary key of the business partner record in the SAP Gateway clean layer.
     lineage:
     - datalake_sap_gateway_raw.business_partner.id
   id_person:
-    description: ''
+    description: Foreign key to the person record associated with this business partner.
     lineage:
     - datalake_sap_gateway_raw.business_partner.person_id
   id_address:
-    description: ''
+    description: Foreign key to the address record associated with this business partner.
     lineage:
     - datalake_sap_gateway_raw.business_partner.address_id
   id_sync_sap_job:
-    description: ''
+    description: Identifier of the SAP Gateway sync job that last processed this business partner.
     lineage:
     - datalake_sap_gateway_raw.business_partner.sync_sap_job_id
   type:
-    description: ''
+    description: Business partner type or classification defined in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.business_partner."type"
   ts_synced:
-    description: ''
+    description: Timestamp when the business partner was last synchronized to SAP.
     lineage:
     - datalake_sap_gateway_raw.business_partner.synced_at
   ts_created:
-    description: ''
+    description: Timestamp when the business partner record was created in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.business_partner.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the business partner record was last updated in SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.business_partner.updated_at

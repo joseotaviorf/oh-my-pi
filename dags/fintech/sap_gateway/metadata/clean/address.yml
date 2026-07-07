@@ -1,51 +1,51 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: address
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: Clean-layer address master data replicated from SAP Gateway, used to support fiscal documents and business partner registration in SAP S/4HANA.
 columns:
   id_address:
-    description: ''
+    description: Primary key of the address record in the SAP Gateway clean layer.
     lineage:
     - datalake_sap_gateway_raw.address.id
   ibge_code:
-    description: ''
+    description: IBGE municipality code identifying the city associated with the address.
     lineage:
     - datalake_sap_gateway_raw.address.ibge_code
   zip_code:
-    description: ''
+    description: Brazilian postal code (CEP) of the address location.
     lineage:
     - datalake_sap_gateway_raw.address.zip_code
   address_description:
-    description: ''
+    description: Street name or main address line synced from SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.address."address"
   address_block:
-    description: ''
+    description: Neighborhood or block name associated with the address.
     lineage:
     - datalake_sap_gateway_raw.address."block"
   address_city:
-    description: ''
+    description: City name of the address location.
     lineage:
     - datalake_sap_gateway_raw.address.city
   address_complement:
-    description: ''
+    description: Address complement such as apartment, floor, or unit details.
     lineage:
     - datalake_sap_gateway_raw.address.complement
   address_country:
-    description: ''
+    description: Country code or name of the address location.
     lineage:
     - datalake_sap_gateway_raw.address.country
   address_state:
-    description: ''
+    description: State or province code of the address location.
     lineage:
     - datalake_sap_gateway_raw.address."state"
   street_suffix:
-    description: ''
+    description: Street type suffix (for example Rua or Avenida) from SAP Gateway.
     lineage:
     - datalake_sap_gateway_raw.address.street_suffix
   address_number:
-    description: ''
+    description: Street number of the address location.
     lineage:
     - datalake_sap_gateway_raw.address."number"
