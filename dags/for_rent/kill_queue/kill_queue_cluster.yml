@@ -1,18 +1,10 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    driver_node_type_id: r7g.2xlarge
-validation:
-  cluster:
-    type: emr_7_12_consolidation_s_memory_cluster
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      master_node_type_id: r6g.2xlarge
-      spark_conf:
-        spark.driver.memory: 16g
-        spark.driver.memoryOverhead: 4g
-        spark.yarn.am.memory: 4g
+    spark_conf:
+      spark.driver.memory: 16g
+      spark.driver.memoryOverhead: 4g
+      spark.yarn.am.memory: 4g
+    master_node_type_id: r6g.2xlarge
