@@ -1,15 +1,26 @@
 ---
 database_name: datalake_gsheets_fintech_clean
 table_name: quintocred_process_evictions
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  quintocred process evictions. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   parte_contraria_nome:
     tags:
     - PII
     - Confidential
+    description: Value from the Google Sheets source column mapped to parte_contraria_nome for quintocred_process_evictions planning.
   cpf_cnpj:
     tags:
     - Confidential
+    description: Value from the Google Sheets source column mapped to cpf_cnpj for quintocred_process_evictions planning.
   padronizar_cpf:
     tags:
     - Confidential
+    description: Value from the Google Sheets source column mapped to padronizar_cpf for quintocred_process_evictions planning.
