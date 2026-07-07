@@ -1,0 +1,302 @@
+database_name: datalake_gsheets_people_clean
+table_name: talent_mapping_base
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Full employee talent mapping dataset sourced from the official Talent
+  Mapping Google Sheet, combining organizational hierarchy, talent assessment scores,
+  action plans, and successor information used by HR Business Partners for people
+  strategy decisions.
+columns:
+  id_employee:
+    description: Unique identifier for the employee in the talent mapping system,
+      used to join with other People domain tables.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.id
+  employee_name:
+    description: Full name of the employee as recorded in the talent mapping spreadsheet.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.name
+  email:
+    description: Corporate email address of the employee, used as a join key to other
+      People domain tables.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.email
+  company:
+    description: Company or business unit to which the employee belongs within the
+      QuintoAndar group.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.company
+  band:
+    description: Salary band or compensation range associated with the employee's
+      current position.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.band
+  job:
+    description: Job title or role name of the employee as recorded in the talent
+      mapping spreadsheet.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.job
+  job_classification:
+    description: Formal job classification or family that groups similar roles for
+      compensation and career ladder purposes.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.job_classification
+  subdirectorate:
+    description: Sub-directorate organizational unit to which the employee belongs.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.subdirectorate
+  cost_center:
+    description: Cost center code associated with the employee's organizational unit
+      for financial planning.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.cost_center
+  vertical:
+    description: Business vertical to which the employee's team belongs in the organizational
+      hierarchy.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.vertical
+  vp:
+    description: Vice-president organizational level above the employee's directorate
+      in the hierarchy.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.vp
+  directorate:
+    description: Directorate organizational unit to which the employee belongs.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.directorate
+  line:
+    description: Product or functional line to which the employee's team belongs.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.line
+  chapter:
+    description: Engineering or functional chapter within the organizational line.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.chapter
+  l1:
+    description: First-level organizational hierarchy label for the employee's position
+      in the org tree.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.l1
+  l2:
+    description: Second-level organizational hierarchy label for the employee's position
+      in the org tree.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.l2
+  l3:
+    description: Third-level organizational hierarchy label for the employee's position
+      in the org tree.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.l3
+  manager:
+    description: Full name of the employee's direct manager as recorded in the talent
+      mapping spreadsheet.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.manager
+  talent_renewal:
+    description: Talent cycle renewal status for the employee, indicating whether
+      they are part of the current talent review cycle.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.talent_renewal
+  category:
+    description: Talent category score or tier assigned to the employee during the
+      talent review process.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.category
+  matrix_quadrant:
+    description: Quadrant identifier on the talent matrix (performance vs potential)
+      where the employee is plotted.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.matrix_quadrant
+  quadrant_description:
+    description: Descriptive label for the employee's talent matrix quadrant, explaining
+      the combination of performance and potential.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.quadrant_description
+  suggested_action_plan:
+    description: Recommended action plan type for the employee based on their talent
+      matrix position, provided by the HR methodology.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.suggested_action_plan
+  impact:
+    description: Assessment of the employee's organizational impact level as evaluated
+      during the talent review.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.impact
+  behavior:
+    description: Assessment of the employee's behavioral alignment with company values
+      and culture during the talent review.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.behavior
+  leadership:
+    description: Assessment of the employee's leadership capabilities and presence
+      during the talent review process.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.leadership
+  potential:
+    description: Talent potential rating for the employee indicating likelihood of
+      growth and readiness for higher responsibility.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.potential
+  criticality:
+    description: Criticality level of the employee's role, reflecting how essential
+      the position is to business continuity.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.criticality
+  readiness_for_promotion:
+    description: Assessment of the employee's readiness to be promoted to the next
+      career level in the near term.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.readinesse_for_promotion
+  risk_of_loss:
+    description: Risk level that the employee may voluntarily leave the company, used
+      to prioritize retention actions.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.risk_of_loss
+  regrettable_loss:
+    description: Flag indicating whether the employee's departure would be considered
+      a regrettable loss for the organization.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.regrettable_loss
+  motivation_on_compensation:
+    description: Score reflecting the employee's motivation driven by compensation
+      factors as assessed during the talent review.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.motivation_on_compensation
+  motivation_on_challenges_of_current_position:
+    description: Score reflecting the employee's motivation driven by the challenges
+      and growth opportunities in their current role.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.motiovation_on_challenges_of_the_current_position
+  motivation_on_relationship_with_leadership:
+    description: Score reflecting the employee's motivation driven by the quality
+      of their relationship with direct leadership.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.motivation_on_relationship_with_direct_leadership
+  type_of_plan:
+    description: Type of talent development or retention plan assigned to the employee
+      by the HR Business Partner.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.type_of_plan
+  plan_description:
+    description: Detailed description of the talent development or retention plan
+      defined for the employee.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.plan_description
+  status_of_plan:
+    description: Current execution status of the talent development or retention plan
+      for the employee.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.status_of_plan
+  successor_target_position:
+    description: Target position or role for which the employee has been identified
+      as a potential successor.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.to_which_position_person
+  person_action_plan_notes:
+    description: HR Business Partner notes describing the action plan needed to develop
+      this employee for succession or promotion.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.notes_of_this_person_what_action_plan_will_we_have_to_prepare_this_person
+  successor_candidate:
+    description: Name of the employee identified as a possible successor for this
+      position.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.who
+  successor_action_plan_notes:
+    description: HR Business Partner notes describing the development plan for the
+      identified successor candidate.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.notes_of_this_persons_successor_what_action_plan_will_prepare_this_person
+  bp_general_notes:
+    description: General observations and notes from the HR Business Partner about
+      the employee's talent situation.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.bp_general_notes
+  hr_bp_responsible:
+    description: Name of the HR Business Partner responsible for managing this employee's
+      talent development and review.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.hr_bp_responsible
+  status:
+    description: Current employment status of the employee (e.g. active, on leave,
+      terminated) at the time of the talent review.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.status
+  final_evaluation:
+    description: Final consolidated talent evaluation score or tier assigned after
+      the talent review cycle is completed.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.final_evaluation
+  informal_performance_updates:
+    description: Informal or in-progress performance notes recorded outside of the
+      official review cycle.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.no_oficial___on_going_performa_updates_
+  last_editor:
+    description: Name of the person who last updated the employee's talent mapping
+      record in the source spreadsheet.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.last_editor
+  last_movement_recognition_type:
+    description: Type or description of the employee's most recent salary movement,
+      promotion, or formal recognition event.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.type_of_last_movement_recognition
+  salary:
+    description: Current salary value for the employee as recorded in the talent mapping
+      spreadsheet.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.salary
+  salary_range_position:
+    description: Position of the employee's salary within the salary band range (e.g.
+      below midpoint, at midpoint, above midpoint).
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.salary_range_position
+  is_a_leader:
+    description: Flag indicating whether the employee holds a leadership position
+      (Yes/No) in the organizational structure.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.is_a_leader
+  needs_replacement:
+    description: Flag indicating whether this employee's position needs to be filled
+      with a replacement in the near term.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.does_this_person_need_to_be_replaced
+  is_potential_successor:
+    description: Flag indicating whether this employee is identified as a potential
+      successor for another position.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.is_this_person_a_potential_successor
+  has_possible_successor:
+    description: Flag indicating whether a possible successor has been identified
+      for this employee's position.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.does_this_person_have_a_possible_successor
+  dt_plan_deadline:
+    description: Target completion date for the talent development or retention plan
+      defined for the employee.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.deadline_mm_dd_yyyy
+  dt_last_edited:
+    description: Date when the employee's talent mapping record was last updated in
+      the source spreadsheet.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.last_edit_date
+  dt_admitted:
+    description: Date when the employee was admitted to the company, sourced from
+      the talent mapping spreadsheet.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.admission_date
+  dt_terminated:
+    description: Date when the employee's contract was terminated, if applicable;
+      null for active employees.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.termination_date
+  dt_last_movement_recognition:
+    description: Date of the employee's most recent salary movement, promotion, or
+      formal recognition event.
+    lineage:
+    - datalake_gsheets_people_raw.talent_mapping_base.date_of_last_movement_recognition
+  ts_load:
+    description: Timestamp when this talent mapping record was ingested from the Google
+      Sheets source into the People lake.

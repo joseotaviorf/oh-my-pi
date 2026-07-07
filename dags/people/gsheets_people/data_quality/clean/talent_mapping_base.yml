@@ -1,0 +1,24 @@
+---
+table_name: datalake_gsheets_people_clean.talent_mapping_base
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+
+column_level_validations:
+  id_employee:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Warning
+  employee_name:
+    is_complete:
+      severity_level: Warning
+  email:
+    is_complete:
+      severity_level: Warning
+  status:
+    is_complete:
+      severity_level: Warning
