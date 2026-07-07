@@ -56,12 +56,12 @@ columns:
     - dw_performance.dim_committee_meeting.meeting_year
     - dw_performance.dim_committee_meeting.reference_period
   dt_valid_from:
-    description: First calendar date on which this cycle is the operative one for its meeting_type.
+    description: First calendar date on which this cycle is the operative one for its meeting_type. Populated for released cycles only.
     lineage:
     - dw_performance.dim_committee_meeting.meeting_year
     - dw_performance.dim_committee_meeting.reference_period
   dt_valid_to:
-    description: Last calendar date on which this cycle is operative. 9999-12-31 for the most recent cycle of each meeting_type, whether or not that cycle has been released for analytics.
+    description: Last calendar date on which this cycle is operative. 9999-12-31 for the most recent released cycle of each meeting_type. Populated for released cycles only.
     lineage:
     - dw_performance.dim_committee_meeting.meeting_type
     - dw_performance.dim_committee_meeting.meeting_year

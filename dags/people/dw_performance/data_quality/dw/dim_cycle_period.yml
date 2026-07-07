@@ -22,13 +22,25 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
-  dt_valid_from:
-    has_null_count:
-      less_than_or_equal_to: 1
+  dt_valid_from_null_iff_unreleased:
+    custom:
+      # Released cycles must always have a validity start date; unreleased cycles never do.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_performance.dim_cycle_period
+         WHERE (is_released AND dt_valid_from IS NULL)
+            OR (NOT is_released AND dt_valid_from IS NOT NULL)
+        ) = 0
       severity_level: Error
-  dt_valid_to:
-    has_null_count:
-      less_than_or_equal_to: 1
+  dt_valid_to_null_iff_unreleased:
+    custom:
+      # Released cycles must always have a validity end date; unreleased cycles never do.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_performance.dim_cycle_period
+         WHERE (is_released AND dt_valid_to IS NULL)
+            OR (NOT is_released AND dt_valid_to IS NOT NULL)
+        ) = 0
       severity_level: Error
   is_released:
     has_null_count:
