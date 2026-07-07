@@ -1,14 +1,23 @@
 ---
 database_name: datalake_velo_omie_clean
 table_name: projects
+description:
+  The Omie service was discontinued in 2024.
+  One row per projects from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_project:
     lineage:
       - datalake_velo_omie_raw.projects.codigo
+    description: Identifier for the project referenced by this financial record.
   project_name:
     lineage:
       - datalake_velo_omie_raw.projects.nome
+    description: Velo platform attribute describing project name for condominium billing reconciliation.
   is_inactive:
     lineage:
       - datalake_velo_omie_raw.projects.inativo
+    description: Indicates whether inactive applies to this financial record.

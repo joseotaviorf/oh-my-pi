@@ -1,4 +1,11 @@
 ---
 database_name: datalake_velo_omie_raw
 table_name: categories
+description:
+  The Omie service was discontinued in 2024.
+  One row per categories from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
+columns: {}

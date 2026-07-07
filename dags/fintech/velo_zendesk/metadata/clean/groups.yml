@@ -1,37 +1,57 @@
 database_name: datalake_velo_zendesk_clean
 table_name: groups
+description:
+  The Zendesk service was discontinued in July 2026.
+  One row per groups from the Velo property management and condominium billing
+  platform, ingested for QuintoAndar fintech reconciliation and accounts
+  payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_group:
     lineage:
       - datalake_velo_zendesk_raw.groups.id
+    description: Identifier for the group referenced by this financial record.
   url_group:
     lineage:
       - datalake_velo_zendesk_raw.groups.url
+    description: Velo platform attribute describing url group for condominium billing reconciliation.
   name:
     lineage:
       - datalake_velo_zendesk_raw.groups.name
+    description: Velo platform attribute describing name for condominium billing reconciliation.
   is_deleted:
     lineage:
       - datalake_velo_zendesk_raw.groups.deleted
+    description: Indicates whether deleted applies to this financial record.
   dt_extracted:
     lineage:
       - datalake_velo_zendesk_raw.groups.dt
+    description: Calendar date associated with extracted in the financial workflow.
   ts_created_local:
     lineage:
       - datalake_velo_zendesk_raw.groups.created_at
+    description: Timestamp when created local occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_velo_zendesk_raw.groups.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_zendesk_raw.groups.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_zendesk_raw.groups.updated_at
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_zendesk_raw.groups.updated_at
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_zendesk_raw.groups.updated_at
+    description: Day partition derived from the source event timestamp for incremental loading.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

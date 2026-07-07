@@ -1,109 +1,182 @@
 ---
 database_name: datalake_velo_omie_clean
 table_name: clients
+description:
+  The Omie service was discontinued in 2024.
+  One row per clients from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_client:
     lineage:
       - datalake_velo_omie_raw.clients.codigo_cliente_omie
+    description: Identifier for the client referenced by this financial record.
   id_client_integration:
     lineage:
       - datalake_velo_omie_raw.clients.codigo_cliente_integracao
+    description: Identifier for the client integration referenced by this financial record.
   id_bank:
     lineage:
       - datalake_velo_omie_raw.clients.codigo_banco
+    description: Identifier for the bank referenced by this financial record.
   id_bank_branch:
     lineage:
       - datalake_velo_omie_raw.clients.agencia
+    description: Identifier for the bank branch referenced by this financial record.
   id_type_signer:
     lineage:
       - datalake_velo_omie_raw.clients.tipo_assinante
+    description: Identifier for the type signer referenced by this financial record.
   corporate_name:
     lineage:
       - datalake_velo_omie_raw.clients.razao_social
+    description: Velo platform attribute describing corporate name for condominium billing reconciliation.
   client_cpf_cnpj:
     lineage:
       - datalake_velo_omie_raw.clients.cnpj_cpf
+    description: Velo platform attribute describing client cpf cnpj for condominium billing reconciliation.
   name_doing_business_as:
     lineage:
       - datalake_velo_omie_raw.clients.nome_fantasia
+    description: Velo platform attribute describing name doing business as for condominium billing reconciliation.
   phone1_number:
     lineage:
       - datalake_velo_omie_raw.clients.telefone1_ddd
+    description: Velo platform attribute describing phone1 number for condominium billing reconciliation.
   phone2_number:
     lineage:
       - datalake_velo_omie_raw.clients.telefone2_ddd
+    description: Velo platform attribute describing phone2 number for condominium billing reconciliation.
   fax_number:
     lineage:
       - datalake_velo_omie_raw.clients.fax_ddd
+    description: Velo platform attribute describing fax number for condominium billing reconciliation.
   name_person_contact:
     lineage:
       - datalake_velo_omie_raw.clients.contato
+    description: Velo platform attribute describing name person contact for condominium billing reconciliation.
   address:
     lineage:
       - datalake_velo_omie_raw.clients.endereco
+    description: Velo platform attribute describing address for condominium billing reconciliation.
   address_number:
     lineage:
       - datalake_velo_omie_raw.clients.endereco_numero
+    description: Velo platform attribute describing address number for condominium billing reconciliation.
   address_neighborhood:
     lineage:
       - datalake_velo_omie_raw.clients.bairro
+    description: Velo platform attribute describing address neighborhood for condominium billing reconciliation.
   address_state:
     lineage:
       - datalake_velo_omie_raw.clients.estado
+    description: Velo platform attribute describing address state for condominium billing reconciliation.
   address_city:
     lineage:
       - datalake_velo_omie_raw.clients.cidade
+    description: Velo platform attribute describing address city for condominium billing reconciliation.
   address_city_ibge_code:
     lineage:
       - datalake_velo_omie_raw.clients.cidade_ibge
+    description: Velo platform attribute describing address city ibge code for condominium billing reconciliation.
   address_zipcode:
     lineage:
       - datalake_velo_omie_raw.clients.cep
+    description: Velo platform attribute describing address zipcode for condominium billing reconciliation.
   address_country_code:
     lineage:
       - datalake_velo_omie_raw.clients.codigo_pais
+    description: Velo platform attribute describing address country code for condominium billing reconciliation.
   address_complement:
     lineage:
       - datalake_velo_omie_raw.clients.complemento
+    description: Velo platform attribute describing address complement for condominium billing reconciliation.
   email:
     lineage:
       - datalake_velo_omie_raw.clients.email
+    description: Velo platform attribute describing email for condominium billing reconciliation.
   state_registration:
     lineage:
       - datalake_velo_omie_raw.clients.inscricao_estadual
+    description: Velo platform attribute describing state registration for condominium billing reconciliation.
   city_registration:
     lineage:
       - datalake_velo_omie_raw.clients.inscricao_municipal
+    description: Velo platform attribute describing city registration for condominium billing reconciliation.
   business_activity_type:
     lineage:
       - datalake_velo_omie_raw.clients.tipo_atividade
+    description: Velo platform attribute describing business activity type for condominium billing reconciliation.
   cnae:
     lineage:
       - datalake_velo_omie_raw.clients.cnae
+    description: Velo platform attribute describing cnae for condominium billing reconciliation.
   tags:
     lineage:
       - datalake_velo_omie_raw.clients.tags
+    description: Velo platform attribute describing tags for condominium billing reconciliation.
   bank_account_number:
     lineage:
       - datalake_velo_omie_raw.clients.conta_corrente
+    description: Velo platform attribute describing bank account number for condominium billing reconciliation.
   cpf_cnpj_account_owner:
     lineage:
       - datalake_velo_omie_raw.clients.doc_titular
+    description: Velo platform attribute describing cpf cnpj account owner for condominium billing reconciliation.
   name_account_owner:
     lineage:
       - datalake_velo_omie_raw.clients.nome_titular
+    description: Velo platform attribute describing name account owner for condominium billing reconciliation.
   alteration_user:
     lineage:
       - datalake_velo_omie_raw.clients.ualt
+    description: Velo platform attribute describing alteration user for condominium billing reconciliation.
   creation_user:
     lineage:
       - datalake_velo_omie_raw.clients.uinc
+    description: Velo platform attribute describing creation user for condominium billing reconciliation.
   ts_created:
     lineage:
       - datalake_velo_omie_raw.clients.dinc
       - datalake_velo_omie_raw.clients.hinc
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_omie_raw.clients.dalt
       - datalake_velo_omie_raw.clients.halt
+    description: Timestamp when updated occurred in the upstream fintech system.
+  phone2_city_codes:
+    lineage: []
+    description: Velo platform attribute describing phone2 city codes for condominium billing reconciliation.
+  is_natural_person:
+    lineage: []
+    description: Indicates whether natural person applies to this financial record.
+  phone1_city_codes:
+    lineage: []
+    description: Velo platform attribute describing phone1 city codes for condominium billing reconciliation.
+  has_simples_tax_regime:
+    lineage: []
+    description: Indicates whether simples tax regime applies to this financial record.
+  is_default_bank_transfer:
+    lineage: []
+    description: Indicates whether default bank transfer applies to this financial record.
+  is_inactive:
+    lineage: []
+    description: Indicates whether inactive applies to this financial record.
+  is_api_imported:
+    lineage: []
+    description: Indicates whether api imported applies to this financial record.
+  has_default_generate_bill:
+    lineage: []
+    description: Indicates whether default generate bill applies to this financial record.
+  is_foreign:
+    lineage: []
+    description: Indicates whether foreign applies to this financial record.
+  is_billing_blocked:
+    lineage: []
+    description: Indicates whether billing blocked applies to this financial record.
+  fax_city_codes:
+    lineage: []
+    description: Velo platform attribute describing fax city codes for condominium billing reconciliation.

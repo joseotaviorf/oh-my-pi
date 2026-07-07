@@ -1,38 +1,54 @@
 ---
 database_name: datalake_velo_omie_raw
 table_name: clients
+description:
+  The Omie service was discontinued in 2024.
+  One row per clients from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   cnpj_cpf:
     tags:
     - PII
+    description: Velo platform attribute describing cnpj cpf for condominium billing reconciliation.
   email:
     tags:
     - Confidential
+    description: Velo platform attribute describing email for condominium billing reconciliation.
   nome_fantasia:
     tags:
     - PII
+    description: Velo platform attribute describing nome fantasia for condominium billing reconciliation.
   razao_social:
     tags:
     - PII
+    description: Velo platform attribute describing razao social for condominium billing reconciliation.
   telefone1_numero:
     tags:
     - PII
     - Confidential
+    description: Velo platform attribute describing telefone1 numero for condominium billing reconciliation.
   telefone2_numero:
     tags:
     - PII
     - Confidential
+    description: Velo platform attribute describing telefone2 numero for condominium billing reconciliation.
   fax_numero:
     tags:
     - PII
     - Confidential
+    description: Velo platform attribute describing fax numero for condominium billing reconciliation.
   contato:
     tags:
     - PII
+    description: Velo platform attribute describing contato for condominium billing reconciliation.
   nome_titular:
     tags:
     - PII
+    description: Velo platform attribute describing nome titular for condominium billing reconciliation.
   doc_titular:
     tags:
     - PII
+    description: Velo platform attribute describing doc titular for condominium billing reconciliation.

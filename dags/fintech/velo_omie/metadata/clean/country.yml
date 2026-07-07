@@ -1,4 +1,20 @@
 ---
 database_name: datalake_velo_omie_clean
 table_name: country
+description:
+  The Omie service was discontinued in 2024.
+  One row per country from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
+columns:
+  id_country:
+    lineage: []
+    description: Identifier for the country referenced by this financial record.
+  abbreviation:
+    lineage: []
+    description: Velo platform attribute describing abbreviation for condominium billing reconciliation.
+  description:
+    lineage: []
+    description: Human-readable description of the financial transaction or ledger entry.

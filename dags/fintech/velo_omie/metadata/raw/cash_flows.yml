@@ -1,8 +1,15 @@
 ---
 database_name: datalake_velo_omie_raw
 table_name: cash_flows
+description:
+  The Omie service was discontinued in 2024.
+  One row per cash flows from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   cCPFCNPJCliente:
     tags:
     - PII
+    description: Velo platform attribute describing cCPFCNPJCliente for condominium billing reconciliation.

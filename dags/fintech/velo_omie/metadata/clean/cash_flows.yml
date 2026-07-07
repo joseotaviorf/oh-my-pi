@@ -1,215 +1,290 @@
 ---
 database_name: datalake_velo_omie_clean
 table_name: cash_flows
+description:
+  The Omie service was discontinued in 2024.
+  One row per cash flows from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_category:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cCodCateg
+    description: Identifier for the category referenced by this financial record.
   id_integration_securities:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cCodIntTitulo
+    description: Identifier for the integration securities referenced by this financial record.
   id_project:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cCodProjeto
+    description: Identifier for the project referenced by this financial record.
   id_seller:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cCodVendedor
+    description: Identifier for the seller referenced by this financial record.
   id_group:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cGrupo
+    description: Identifier for the group referenced by this financial record.
   id_operation:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cOperacao
+    description: Identifier for the operation referenced by this financial record.
   client_cpf_cnpj:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cCPFCNPJCliente
+    description: Velo platform attribute describing client cpf cnpj for condominium billing reconciliation.
   barcode:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cCodigoBarras
+    description: Velo platform attribute describing barcode for condominium billing reconciliation.
   bill_number:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cNumBoleto
+    description: Velo platform attribute describing bill number for condominium billing reconciliation.
   contract_number:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cNumCtr
+    description: Velo platform attribute describing contract number for condominium billing reconciliation.
   tax_document_number:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cNumDocFiscal
+    description: Velo platform attribute describing tax document number for condominium billing reconciliation.
   service_order_number:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cNumOS
+    description: Velo platform attribute describing service order number for condominium billing reconciliation.
   id_client:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodCliente
+    description: Identifier for the client referenced by this financial record.
   id_buyer:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodComprador
+    description: Identifier for the buyer referenced by this financial record.
   id_write_off:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodBaixa
+    description: Identifier for the write off referenced by this financial record.
   id_bank_account:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodCC
+    description: Identifier for the bank account referenced by this financial record.
   id_contract:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodCtr
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_moviment_bank_account:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodMovCC
+    description: Identifier for the moviment bank account referenced by this financial record.
   id_moviment_bank_account_repeat:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodMovCCRepet
+    description: Identifier for the moviment bank account repeat referenced by this financial record.
   id_invoice:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodNF
+    description: Invoice identifier in the billing or payments platform.
   id_service_order:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodOS
+    description: Identifier for the service order referenced by this financial record.
   id_securities_repeat:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodTitRepet
+    description: Identifier for the securities repeat referenced by this financial record.
   id_securities:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nCodTitulo
+    description: Identifier for the securities referenced by this financial record.
   id_payment_receipt:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cNSU
+    description: Identifier for the payment receipt referenced by this financial record.
   id_installment:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cNumParcela
+    description: Identifier for the installment referenced by this financial record.
   securities_code:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cNumTitulo
+    description: Velo platform attribute describing securities code for condominium billing reconciliation.
   eletronic_invoice_key:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cChaveNFe
+    description: Velo platform attribute describing eletronic invoice key for condominium billing reconciliation.
   origin:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cOrigem
+    description: Velo platform attribute describing origin for condominium billing reconciliation.
   status:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cStatus
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   type:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cTipo
+    description: Velo platform attribute describing type for condominium billing reconciliation.
   financial_nature:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cNatureza
+    description: Velo platform attribute describing financial nature for condominium billing reconciliation.
   alteration_user:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cUsAlt
+    description: Velo platform attribute describing alteration user for condominium billing reconciliation.
   conciliation_user:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cUsConcilia
+    description: Velo platform attribute describing conciliation user for condominium billing reconciliation.
   creation_user:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cUsInc
+    description: Velo platform attribute describing creation user for condominium billing reconciliation.
   discount_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nDesconto
+    description: Velo platform attribute describing discount value for condominium billing reconciliation.
   interest_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nJuros
+    description: Velo platform attribute describing interest value for condominium billing reconciliation.
   fine_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nMulta
+    description: Velo platform attribute describing fine value for condominium billing reconciliation.
   open_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValAberto
+    description: Velo platform attribute describing open value for condominium billing reconciliation.
   net_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValLiquido
+    description: Velo platform attribute describing net value for condominium billing reconciliation.
   paid_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValPago
+    description: Velo platform attribute describing paid value for condominium billing reconciliation.
   bank_account_movement_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValorMovCC
+    description: Velo platform attribute describing bank account movement value for condominium billing reconciliation.
   securities_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValorTitulo
+    description: Velo platform attribute describing securities value for condominium billing reconciliation.
   pis_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValorPIS
+    description: Velo platform attribute describing pis value for condominium billing reconciliation.
   cofins_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValorCOFINS
+    description: Velo platform attribute describing cofins value for condominium billing reconciliation.
   csll_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValorCSLL
+    description: Velo platform attribute describing csll value for condominium billing reconciliation.
   income_tax_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValorIR
+    description: Velo platform attribute describing income tax value for condominium billing reconciliation.
   iss_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValorISS
+    description: Velo platform attribute describing iss value for condominium billing reconciliation.
   inss_value:
     lineage:
       - datalake_velo_omie_raw.cash_flows.nValorINSS
+    description: Velo platform attribute describing inss value for condominium billing reconciliation.
   comments:
     lineage:
       - datalake_velo_omie_raw.cash_flows.observacao
+    description: Velo platform attribute describing comments for condominium billing reconciliation.
   categories:
     lineage:
       - datalake_velo_omie_raw.cash_flows.categorias
+    description: Velo platform attribute describing categories for condominium billing reconciliation.
   is_liquidated:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cLiquidado
+    description: Indicates whether liquidated applies to this financial record.
   is_pis_retained:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cRetPIS
+    description: Indicates whether pis retained applies to this financial record.
   is_cofins_retained:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cRetCOFINS
+    description: Indicates whether cofins retained applies to this financial record.
   is_csll_retained:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cRetCSLL
+    description: Indicates whether csll retained applies to this financial record.
   is_income_tax_retained:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cRetIR
+    description: Indicates whether income tax retained applies to this financial record.
   is_iss_retained:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cRetISS
+    description: Indicates whether iss retained applies to this financial record.
   is_inss_retained:
     lineage:
       - datalake_velo_omie_raw.cash_flows.cRetINSS
+    description: Indicates whether inss retained applies to this financial record.
   dt_credit:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtCredito
+    description: Calendar date associated with credit in the financial workflow.
   dt_issue:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtEmissao
+    description: Calendar date associated with issue in the financial workflow.
   dt_payment:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtPagamento
+    description: Calendar date associated with payment in the financial workflow.
   dt_predicted:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtPrevisao
+    description: Calendar date associated with predicted in the financial workflow.
   dt_register:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtRegistro
+    description: Calendar date associated with register in the financial workflow.
   dt_due:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtVenc
+    description: Calendar date associated with due in the financial workflow.
   ts_modified:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtAlt
       - datalake_velo_omie_raw.cash_flows.cHrAlt
+    description: Timestamp when modified occurred in the upstream fintech system.
   ts_reconciliation:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtConcilia
       - datalake_velo_omie_raw.cash_flows.cHrConcilia
+    description: Timestamp when reconciliation occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_velo_omie_raw.cash_flows.dDtInc
       - datalake_velo_omie_raw.cash_flows.cHrInc
+    description: Timestamp when created occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_omie_raw.cash_flows.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_omie_raw.cash_flows.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_omie_raw.cash_flows.day
+    description: Day partition derived from the source event timestamp for incremental loading.

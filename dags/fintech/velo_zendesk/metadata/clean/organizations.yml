@@ -1,58 +1,82 @@
 database_name: datalake_velo_zendesk_clean
 table_name: organizations
+description:
+  The Zendesk service was discontinued in July 2026.
+  One row per organizations from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_velo_zendesk_raw.organizations.id
+    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_group:
     lineage:
       - datalake_velo_zendesk_raw.organizations.group_id
+    description: Identifier for the group referenced by this financial record.
   id_external:
     lineage:
       - datalake_velo_zendesk_raw.organizations.external_id
+    description: Identifier for the external referenced by this financial record.
   name:
     lineage:
       - datalake_velo_zendesk_raw.organizations.name
+    description: Velo platform attribute describing name for condominium billing reconciliation.
   domain_names:
     lineage:
       - datalake_velo_zendesk_raw.organizations.domain_names
+    description: Velo platform attribute describing domain names for condominium billing reconciliation.
   url:
     lineage:
       - datalake_velo_zendesk_raw.organizations.url
+    description: Velo platform attribute describing url for condominium billing reconciliation.
   organization_fields:
     lineage:
       - datalake_velo_zendesk_raw.organizations.organization_fields
+    description: Velo platform attribute describing organization fields for condominium billing reconciliation.
   has_shared_tickets:
     lineage:
       - datalake_velo_zendesk_raw.organizations.shared_tickets
+    description: Indicates whether shared tickets applies to this financial record.
   has_shared_comments:
     lineage:
       - datalake_velo_zendesk_raw.organizations.shared_comments
+    description: Indicates whether shared comments applies to this financial record.
   tags:
     lineage:
       - datalake_velo_zendesk_raw.organizations.tags
+    description: Velo platform attribute describing tags for condominium billing reconciliation.
   details:
     lineage:
       - datalake_velo_zendesk_raw.organizations.details
+    description: Velo platform attribute describing details for condominium billing reconciliation.
   notes:
     lineage:
       - datalake_velo_zendesk_raw.organizations.notes
+    description: Velo platform attribute describing notes for condominium billing reconciliation.
   ts_updated:
     lineage:
       - datalake_velo_zendesk_raw.organizations.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_velo_zendesk_raw.organizations.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_deleted:
     lineage:
       - datalake_velo_zendesk_raw.organizations.deleted_at
+    description: Timestamp when deleted occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_zendesk_raw.organizations.updated_at
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_zendesk_raw.organizations.updated_at
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_zendesk_raw.organizations.updated_at
+    description: Day partition derived from the source event timestamp for incremental loading.
