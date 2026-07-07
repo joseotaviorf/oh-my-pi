@@ -1,7 +1,7 @@
 database_name: datalake_amplitude_clean
 table_name: 183047_property_performance_hub_price_card_button_clicked_events
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
-domain: Growth
 description: |
   Price card button click events in the Property Performance Hub (Amplitude app 183047, event_type
   property_performance_hub_price_card_button_clicked). One row per click on the price optimization card

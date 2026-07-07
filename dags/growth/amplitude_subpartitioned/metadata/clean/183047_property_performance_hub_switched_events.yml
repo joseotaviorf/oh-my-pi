@@ -1,7 +1,7 @@
 database_name: datalake_amplitude_clean
 table_name: 183047_property_performance_hub_switched_events
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
-domain: Growth
 description: |
   Context switch events in the Property Performance Hub (Amplitude app 183047, event_type
   property_performance_hub_switched). One row per tab or business-context switch within the hub with

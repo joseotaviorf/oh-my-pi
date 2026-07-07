@@ -1,7 +1,7 @@
 database_name: datalake_amplitude_clean
 table_name: 183047_price_edit_review_page_viewed_events
-owner: eduardo.soares@quintoandar.com.br
-domain: Growth
+domain: House and Listing
+owner: bruna.prates@quintoandar.com.br
 description: 'Price Edit Review Page Viewed events from the QuintoAndar product surface (Amplitude app 183047). One row per tracked event, materialized as an incremental subpartition of datalake_amplitude_clean.events filtered by event_type = ''price_edit_review_page_viewed''. Includes parsed event_properties and user_properties fields used for funnel and attribution analysis. Partitioned by year, month, and day — always filter on all three partition columns in WHERE clauses to enable partition pruning; align filters with ts_event or dt_event.
 
   '

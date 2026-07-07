@@ -1,5 +1,10 @@
 database_name: datalake_amplitude_clean
 table_name: 183047_ad_improvements_intent_button_clicked_events
+domain: House and Listing
+owner: bruna.prates@quintoandar.com.br
+description: This table contains ad_improvements_intent_button_clicked events from
+  app 183047. It tracks user interactions and includes relevant metadata and user
+  properties.
 columns:
   id_amplitude:
     lineage:
@@ -217,8 +222,3 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.day
     description: Column day from Amplitude events
-owner: eduardo.soares@quintoandar.com.br
-domain: Growth
-description: This table contains ad_improvements_intent_button_clicked events from
-  app 183047. It tracks user interactions and includes relevant metadata and user
-  properties.
