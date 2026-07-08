@@ -26,6 +26,7 @@ columns:
   id_support_session:
     description: Identifier of the support session that triggered this satisfaction response, carried over from the Chat FUP attendance (chats_chat.session_id). For Support Session Service sessions this is the public_id (UUID); for legacy Sauron sessions it is the numeric session id. NULL when the response comes from the rating source.
     lineage:
+      - datalake_sauron_clean.session.public_id
       - datalake_chat_fup_clean.chats_chat.id_support_session
   id_respondent:
     description: Identifier of the person who answered the form.

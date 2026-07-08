@@ -44,6 +44,8 @@ columns:
       - datalake_bigfone_clean.event.metadata
   score_description:
     description: Main satisfaction score description.
+  is_solved:
+    description: Indicates if the satisfaction response is solved.
   ts_submitted:
     description: Date the satisfaction response was submitted.
     lineage:

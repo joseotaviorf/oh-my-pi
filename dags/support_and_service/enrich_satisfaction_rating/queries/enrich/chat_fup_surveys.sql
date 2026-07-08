@@ -1,4 +1,11 @@
-WITH chat_fup_surveys AS (
+WITH sessions AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (PARTITION BY id, public_id ORDER BY ts_updated DESC) AS session_rn
+    FROM
+        datalake_sauron_clean.session
+),
+chat_fup_surveys AS (
     SELECT
         MD5(CONCAT(r.id_rating, r.year, r.month, r.day)) AS id_answer,
         NULL AS id_ticket,
@@ -27,7 +34,7 @@ WITH chat_fup_surveys AS (
     SELECT DISTINCT
         sa.id AS id_answer,
         cc.id_ticket,
-        cc.id_support_session,
+        COALESCE(s.public_id, cc.id_support_session) AS id_support_session,
         NULL AS id_respondent,
         cc.customer_email AS respondent_email,
         "customer support" AS service_type,
@@ -55,6 +62,13 @@ WITH chat_fup_surveys AS (
     JOIN
         datalake_chat_fup_clean.chats_chat cc
             ON cc.id = ss.id_chat
+    LEFT JOIN
+        sessions AS s
+            ON (
+              s.id = cc.id_support_session
+              OR s.public_id = cc.id_support_session
+            )
+            AND s.session_rn = 1
     WHERE
         COALESCE(CAST(sa.is_solved AS string), CAST(sa.rating AS string)) IS NOT NULL
         AND DATE(sa.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

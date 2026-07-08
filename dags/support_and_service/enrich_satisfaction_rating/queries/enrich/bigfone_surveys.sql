@@ -122,11 +122,12 @@ call_csat AS (
       "customer support" AS service_type,
       service_context,
       "bigfone" AS source_name,
+      csat_1 AS satisfaction_score,
+      "resolution survey" AS score_description,
       CASE
-          WHEN csat_1 = 2 THEN 5
-          ELSE csat_1
-      END AS satisfaction_score,
-      "satisfaction evaluation" AS score_description,
+        WHEN csat_1 = 1 THEN TRUE
+        ELSE FALSE
+      END AS is_solved,
       ts_created_local AS ts_submitted,
       year,
       month,
@@ -146,7 +147,8 @@ call_csat AS (
       service_context,
       "bigfone" AS source_name,
       csat_2 AS satisfaction_score,
-      "resolution survey" AS score_description,
+      "satisfaction evaluation" AS score_description,
+      NULL AS is_solved,
       ts_created_local AS ts_submitted,
       year,
       month,
@@ -170,6 +172,7 @@ call_csat AS (
         WHEN service_context = "call inapp" THEN "chatbot resolution evaluation"
         ELSE "ivr resolution evaluation"
       END AS score_description,
+      NULL AS is_solved,
       ts_created_local AS ts_submitted,
       year,
       month,

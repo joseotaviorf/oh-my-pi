@@ -3904,6 +3904,7 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.gsheets_fintech:done-clean-tenant-entrance-inspection-csat:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-csat-reimbursement-true:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat:first-run-of-day
+  - bietlejuice.sauron:load-clean-session:first-run-of-day
   - bietlejuice.support_session_service:load-clean-support-session:first-run-of-day
 bietlejuice.enrich_search:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events:first-run-of-day
