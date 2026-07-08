@@ -1,0 +1,34 @@
+---
+database_name: datalake_gsheets_clean
+table_name: subhub_regions
+description: Data on the subdivisions of the business units (HUBs) and the regions to which they are linked
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_region:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.id_bairro
+    description: Unique identifier of the subhub region.
+  city:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.cidade
+    description: City where this subhub is located.
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.praca
+    description: City group (market area) that aggregates multiple cities and neighborhoods.
+  region:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.bairro
+    description: Neighborhood/region that composes the subhub area.
+  hub_name:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.hub
+    description: Name of the hub to which the subhub belongs.
+  subhub_name:
+    lineage:
+      - datalake_gsheets_raw.subhub_regions.subhub
+    description: Name of the subhub within the business unit (hub).
+  ts_load:
+    description: Date when the table data was updated.
+

@@ -11,3 +11,9 @@ sheets_info:
     sheet_name: Partners_PF
     clean_table_name: ind_agents_partner_allocation
     sheet_context: agents
+
+  subhub_regions:
+    sheet_id: 1-9okIQsfHo1kcc51msMYEa7Xw35wYWXDKcrWdCmdW8k
+    sheet_name: Detalhamento de SubHubs
+    clean_table_name: subhub_regions
+    sheet_context: agents

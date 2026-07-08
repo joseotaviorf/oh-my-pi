@@ -1,0 +1,30 @@
+---
+table_name: datalake_gsheets_clean.subhub_regions
+alert_channel: "#agents-data-alarms"
+table_level_validations:
+  has_size:
+    greater_than: 400
+    severity_level: Error
+column_level_validations:
+  id_region:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than: 0
+    has_max_value:
+      less_than: 9000
+  city:
+    is_complete:
+      severity_level: Error
+  city_group:
+    is_complete:
+      severity_level: Error
+  region:
+    is_complete:
+      severity_level: Error
+  hub_name:
+    is_complete:
+      severity_level: Error
+  subhub_name:
+    is_complete:
+      severity_level: Error
