@@ -75,7 +75,7 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 
 ### Employee Details (subset — current active only)
 
-- `org_chart.assignment_number` aligns with `dw_employee_details.fact_assignment_snapshots.assignment_number` for the current active snapshot (`is_current = TRUE`, `is_active = TRUE`).
+- `org_chart.assignment_number` aligns with `dw_employee_details.fact_assignment_snapshots.assignment_number` for the current active snapshot (`is_current_for_employee = TRUE`, `is_active = TRUE`).
 - For hierarchy levels L0–L9 (CEO chain), use `dw_employee_details.dim_management_hierarchy` — `org_chart` exposes only the **direct** manager.
 
 ### Organization (denormalized attributes)

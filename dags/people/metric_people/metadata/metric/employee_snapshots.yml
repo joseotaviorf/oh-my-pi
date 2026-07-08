@@ -902,12 +902,6 @@ columns:
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_transfer_termination
 
-  is_monthly_snapshot:
-    description: Snapshot attribute for is_monthly_snapshot on the employee_snapshots wide metric table.
-    dimension: True
-    lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_monthly_snapshot
-
   is_primary_assignment_for_snapshot:
     description: Snapshot attribute for is_primary_assignment_for_snapshot on the employee_snapshots wide metric table.
     dimension: True
@@ -915,11 +909,10 @@ columns:
       - dw_employee_details.fact_assignment_snapshots.is_primary_assignment_for_snapshot
 
   is_current:
-    description: True when this is the person's latest snapshot row. Frozen last rows of assignments closed by an internal transfer are demoted to FALSE so each person has a single current row (the continuation assignment).
+    description: True on exactly one row per employee, the assignment active today or their most recent terminated assignment. Use this flag to filter for the employee's current state.
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_current
-      - dw_employee_details.fact_assignment_snapshots.is_transfer_termination
+      - dw_employee_details.fact_assignment_snapshots.is_current_for_employee
 
   is_current_for_employee:
     description: True on exactly one row per employee, the assignment active today or their most recent terminated assignment. Use this flag to filter for the employee's current state.

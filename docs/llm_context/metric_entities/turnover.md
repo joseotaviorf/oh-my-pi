@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Turnover** is QuintoAndar's official indicator for workforce attrition on `dw_employee_details.fact_assignment_snapshots`, computed **monthly** as leavers over average monthly headcount. The official calculation differs from a naive full-population percentage in three ways: (1) headcount for both ends of the month must come from explicit monthly snapshots — never `is_current`, which reflects today, not the target month; (2) new hires within their first 3/6/12 months are excluded from the main indicator and tracked separately as **NH Attrition**; (3) **Regrettable Turnover** applies a "Regrettable Loss" (RL) filter symmetrically to both numerator and denominator.
+**Turnover** is QuintoAndar's official indicator for workforce attrition on `dw_employee_details.fact_assignment_snapshots`, computed **monthly** as leavers over average monthly headcount. The official calculation differs from a naive full-population percentage in three ways: (1) headcount for both ends of the month must come from explicit monthly snapshots — never `is_current_for_assignment` or `is_current_for_employee`, which reflect today, not the target month; (2) new hires within their first 3/6/12 months are excluded from the main indicator and tracked separately as **NH Attrition**; (3) **Regrettable Turnover** applies a "Regrettable Loss" (RL) filter symmetrically to both numerator and denominator.
 
 **Safety rule:** if any input required by a turnover calculation is unavailable — a missing column, an unresolvable filter, an undefined segment, or an unsupported time scope — do not compute or approximate the figure. Explain what is missing and direct the user to the Enterprise Engineering team. A partial or approximate turnover number is worse than no number.
 
@@ -42,11 +42,11 @@ Turnover (month) = Leavers in month / Average Monthly Headcount
 Average Monthly Headcount = (Active at beginning of month + Active at end of month) / 2
 ```
 
-- **Active at end of month**: a snapshot with `is_monthly_snapshot = TRUE` and `dt_reference` at the last day of the target month — never `is_current`.
+- **Active at end of month**: a snapshot with `is_monthly_snapshot_for_employee = TRUE` and `dt_reference` at the last day of the target month — never `is_current_for_assignment` or `is_current_for_employee`.
 - **Active at beginning of month**: `Active at End of Month + Terminations During the Month − New Hires During the Month`.
   - **Terminations During the Month**: employees where `is_terminated = TRUE` and `dt_terminated` falls within the target month.
   - **New Hires During the Month**: employees where `dt_hired` falls within the target month.
-- For every side of the ratio, count `COUNT(DISTINCT person_number)` where `is_active = TRUE` and `is_primary_assignment_for_snapshot = TRUE` — without the primary-assignment filter, employees with multiple assignment rows on the same `dt_reference` inflate the count.
+- For every side of the ratio, count `COUNT(DISTINCT person_number)` where `is_active = TRUE` and `is_monthly_snapshot_for_employee = TRUE` — this flag already resolves to one row per employee per month, so no separate primary-assignment filter is needed.
 - **Leavers** and **Average Monthly Headcount** must always reference the **same target month**.
 - Count leavers as employees where `is_terminated = TRUE` and `dt_terminated` falls within the target month.
 - **Voluntary / Involuntary segmentation**: apply the Voluntary/Involuntary termination filters already defined in `business_entities/employee_details.md`'s Glossary (via `dim_event_definition.action_name` / `reason_name`) to the leavers side.
@@ -76,11 +76,10 @@ Apply on `dw_employee_details.fact_assignment_snapshots`:
 
 ```sql
 is_active = TRUE
-AND is_primary_assignment_for_snapshot = TRUE
-AND is_monthly_snapshot = TRUE   -- headcount sides only; not applied to the leavers side
+AND is_monthly_snapshot_for_employee = TRUE   -- headcount sides only; not applied to the leavers side
 ```
 
-**Warning**: substituting `is_current` for an explicit `dt_reference` on either side of Average Monthly Headcount silently swaps the target month's headcount for **today's** headcount — every past month in a look-back period would incorrectly return the same current-day number.
+**Warning**: substituting `is_current_for_assignment` or `is_current_for_employee` for an explicit `dt_reference` on either side of Average Monthly Headcount silently swaps the target month's headcount for **today's** headcount — every past month in a look-back period would incorrectly return the same current-day number.
 
 ### Nuances
 
@@ -112,8 +111,8 @@ Relevant `dim_job` columns for turnover segmentation: `job_name`, `job_family`, 
 
 **Do:**
 
-- Scope both sides of Average Monthly Headcount to the **same** target month, deriving beginning-of-month from the end-of-month snapshot plus terminations minus new hires — never `is_current`.
-- Apply `is_primary_assignment_for_snapshot = TRUE` on every headcount count to avoid inflation from internal transfers.
+- Scope both sides of Average Monthly Headcount to the **same** target month, deriving beginning-of-month from the end-of-month snapshot plus terminations minus new hires — never `is_current_for_assignment` or `is_current_for_employee`.
+- Apply `is_monthly_snapshot_for_employee = TRUE` on every headcount count to avoid inflation from internal transfers or multi-assignment employees.
 - Sum monthly percentages when reporting a quarter/semester/year — never recompute the ratio from aggregated raw counts.
 - Apply the RL filter to **both** numerator and denominator when computing Regrettable Turnover.
 - Restrict numerator and denominator to the same tenure group for NH Attrition (3/6/12-month) variants.
@@ -130,7 +129,7 @@ Relevant `dim_job` columns for turnover segmentation: `job_name`, `job_family`, 
 
 ### Query 1 — Monthly Global Turnover
 
-Reuses the headcount pattern already documented in `business_entities/employee_details.md` (`is_active`, `is_primary_assignment_for_snapshot`); what is exclusive to this metric is the beginning/end-of-month derivation and the leavers CTE.
+Reuses the headcount pattern already documented in `business_entities/employee_details.md` (`is_active`, `is_monthly_snapshot_for_employee`); what is exclusive to this metric is the beginning/end-of-month derivation and the leavers CTE.
 
 ```sql
 WITH month_ends AS (
@@ -138,10 +137,9 @@ WITH month_ends AS (
         date_trunc('month', dt_reference) AS ref_month,
         COUNT(DISTINCT person_number) AS active_end_of_month
     FROM dw_employee_details.fact_assignment_snapshots
-    WHERE is_monthly_snapshot = TRUE
-      AND dt_reference = last_day_of_month(dt_reference)   -- guards against the "most recent day" / "termination date" is_monthly_snapshot variants for the current, incomplete month
+    WHERE is_monthly_snapshot_for_employee = TRUE
+      AND dt_reference = last_day_of_month(dt_reference)   -- guards against the "most recent day" / "termination date" is_monthly_snapshot_for_assignment variants for the current, incomplete month
       AND is_active = TRUE
-      AND is_primary_assignment_for_snapshot = TRUE
       AND dt_reference >= DATE '2024-03-01'   -- system migration date; no reliable history before it
     GROUP BY 1
 ),
@@ -151,7 +149,7 @@ terminations AS (
         COUNT(DISTINCT person_number) AS leavers
     FROM dw_employee_details.fact_assignment_snapshots
     WHERE is_terminated = TRUE
-      AND is_primary_assignment_for_snapshot = TRUE
+      AND is_monthly_snapshot_for_employee = TRUE
       AND dt_terminated >= DATE '2024-03-01'   -- system migration date; keep aligned with month_ends' cutoff (first day of a month) to avoid partial-month leaver counts
     GROUP BY 1
 ),
@@ -160,7 +158,7 @@ new_hires AS (
         date_trunc('month', dt_hired) AS ref_month,
         COUNT(DISTINCT person_number) AS hires
     FROM dw_employee_details.fact_assignment_snapshots
-    WHERE is_primary_assignment_for_snapshot = TRUE
+    WHERE is_monthly_snapshot_for_employee = TRUE
       AND dt_hired >= DATE '2024-03-01'   -- system migration date; same cutoff as the other CTEs, aligned to a month boundary
     GROUP BY 1
 ),

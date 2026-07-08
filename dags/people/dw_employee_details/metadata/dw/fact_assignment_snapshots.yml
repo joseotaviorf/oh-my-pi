@@ -147,14 +147,18 @@ columns:
     description: True when the termination was part of an organizational restructuring (layoff/reorg). False for active employees or non-reorg terminations.
     lineage:
       - datalake_people.assignment_snapshots.is_reorganization_termination
-  is_monthly_snapshot:
-    description: True when dt_reference is the last day of the month, the most recent day (current date), or the assignment's termination date. The termination-date row guarantees a monthly snapshot exists for the month an employee left, even when they were terminated mid-month. Use to filter for monthly snapshots only.
+  is_monthly_snapshot_for_assignment:
+    description: True for the assignment's own monthly snapshot, the last day of the month, the most recent day (current date), or the assignment's termination date. The termination-date row guarantees a monthly snapshot exists for the month an employee left, even when they were terminated mid-month. Use this flag to filter for monthly snapshots only.
     lineage:
-      - datalake_people.assignment_snapshots.is_monthly_snapshot
-  is_current:
+      - datalake_people.assignment_snapshots.is_monthly_snapshot_for_assignment
+  is_monthly_snapshot_for_employee:
+    description: True for the assignment that represents an employee's official month-closing snapshot, the latest information for that assignment within the month, on exactly one row per employee per dt_month_reference. Use this flag for historical, employee-grain analysis; it mirrors the legacy base_fotografias table.
+    lineage:
+      - datalake_people.assignment_snapshots.is_monthly_snapshot_for_employee
+  is_current_for_assignment:
     description: True for the assignment's latest available snapshot. Active assignments use the current date; terminated ones use the termination date. Exactly one row per assignment_number is flagged.
     lineage:
-      - datalake_people.assignment_snapshots.is_current
+      - datalake_people.assignment_snapshots.is_current_for_assignment
   is_current_for_employee:
     description: True on exactly one row per employee, the assignment active today or their most recent terminated assignment. Use this flag to filter for the employee's current state.
     lineage:

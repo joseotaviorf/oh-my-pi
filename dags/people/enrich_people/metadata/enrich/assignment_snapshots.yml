@@ -6,8 +6,9 @@ description: |
   Daily snapshot of all active and historical employment assignments. Grain: one row per id_assignment × dt_reference (each calendar day from hire to termination or today, whichever is earlier). Only assignment types E (employee) and C (contingent) are included.
 
   Data modeling patterns:
-  - Current state: filter is_current = TRUE to get the latest available row per assignment — active assignments use today's date; terminated ones use the termination date. Exactly one row per assignment is flagged.
-  - Monthly analysis: filter is_monthly_snapshot = TRUE and join/group by dt_month_reference (last calendar day of the reference month). Gives one row per assignment per closed month, plus a partial snapshot for the current in-progress month.
+  - Current state per employee: filter is_current_for_employee = TRUE for one row per employee, active today or their most recent termination.
+  - Historical state per employee: filter is_monthly_snapshot_for_employee = TRUE for one row per employee per closed month, plus the in-progress current month.
+  - Assignment-grain analysis: filter is_current_for_assignment = TRUE (current state) or is_monthly_snapshot_for_assignment = TRUE (monthly, join/group by dt_month_reference) to get every assignment instead of the employee-grain default above — active assignments use today's date; terminated ones use the termination date. Use only when you need every assignment (e.g. rehires, multiple terminations).
   - Historical point-in-time: filter by a specific dt_reference value to reconstruct the workforce as it stood on any past calendar day.
 
   All job, org, and hierarchy attributes are time-valid: they reflect the state on dt_reference, not the current value. dt_original_hire is the earliest hire date within the current continuous employment cycle and is intended for tenure calculations only.
@@ -182,12 +183,17 @@ columns:
     description: True when the employee's termination was part of an organizational restructuring (layoff/reorg), as recorded in the gsheets layoffs tracker. False for active employees or non-reorg terminations.
     lineage:
       - datalake_gsheets_people_clean.layoffs.is_layoff
-  is_monthly_snapshot:
-    description: True when dt_reference is the last calendar day of the month (month-end closing) or the current date (the in-progress month's partial snapshot, matching the legacy base_fotografias behavior). Each closed month therefore has exactly one monthly snapshot per assignment, and the current month is represented by the current-date snapshot. Employees terminated mid-month still appear on their termination month-end (or the current-date snapshot if terminated in the in-progress month) because the reference-date series extends to the last day of the termination month, capped at the current date.
+  is_monthly_snapshot_for_assignment:
+    description: True for the assignment's own monthly snapshot, when dt_reference is the last calendar day of the month (month-end closing) or the current date (the in-progress month's partial snapshot). Each closed month has exactly one monthly snapshot per assignment, and the current month is represented by the current-date snapshot; assignments terminated mid-month still appear on their termination month-end (or the current-date snapshot if terminated in the in-progress month), because the reference-date series extends to the last day of the termination month, capped at the current date. Grain is one row per assignment, not per employee; an employee with 2+ assignments in the same month can have multiple rows; use is_monthly_snapshot_for_employee for the employee-grain equivalent.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
       - datalake_pin_core_clean.periods_of_service.dt_actual_termination
-  is_current:
+  is_monthly_snapshot_for_employee:
+    description: True for the assignment that represents an employee's official month-closing snapshot, the latest information for that assignment within the month, on exactly one row per employee per dt_month_reference. This is the default flag for historical, employee-grain analysis, mirroring the legacy base_fotografias table. Resolved by ranking candidate rows (is_monthly_snapshot_for_assignment and is_primary_assignment_for_snapshot both true) within each employee and month, preferring the latest dt_reference, then active over inactive, then the highest assignment_number, which collapses the rare case of a mid-month transfer producing two qualifying rows in the same month.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  is_current_for_assignment:
     description: True for the assignment's latest available snapshot. Active assignments use the current date; terminated ones use the termination date. Exactly one row per assignment_number is flagged.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_actual_termination

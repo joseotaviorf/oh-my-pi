@@ -39,7 +39,7 @@ column_level_validations:
           SELECT assignment_number
           FROM dw_employee_details.fact_assignment_snapshots
           GROUP BY assignment_number
-          HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) != 1
+          HAVING SUM(CASE WHEN is_current_for_assignment THEN 1 ELSE 0 END) != 1
         )) = 0
       severity_level: Error
   one_current_primary_row_per_person:

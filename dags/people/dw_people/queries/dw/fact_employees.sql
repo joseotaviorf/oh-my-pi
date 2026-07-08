@@ -13,7 +13,7 @@ SELECT
     asn.business_unit_country,
     asn.months_tenure_in_company AS tenure_months,
     asn.is_active,
-    asn.is_current,
+    asn.is_current_for_assignment AS is_current,
     asn.dt_hired,
     CASE
         WHEN asn.dt_terminated <= DATE('{load_start_date}') THEN asn.dt_terminated
@@ -24,5 +24,4 @@ SELECT
 FROM
     datalake_people.assignment_snapshots AS asn
 WHERE
-    asn.is_monthly_snapshot
-    AND asn.is_primary_assignment_for_snapshot
+    asn.is_monthly_snapshot_for_employee

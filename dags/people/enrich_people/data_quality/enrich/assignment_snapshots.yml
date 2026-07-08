@@ -67,25 +67,25 @@ column_level_validations:
       severity_level: Error
   one_current_snapshot_per_assignment:
     custom:
-      # Every assignment_number must have exactly one is_current row — the latest day for active assignments,
+      # Every assignment_number must have exactly one is_current_for_assignment row — the latest day for active assignments,
       # the termination date for terminated ones. More or fewer signals a broken series-end or dedup logic.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT assignment_number
           FROM datalake_people.assignment_snapshots
           GROUP BY assignment_number
-          HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) != 1
+          HAVING SUM(CASE WHEN is_current_for_assignment THEN 1 ELSE 0 END) != 1
         )) = 0
       severity_level: Error
   termination_month_consistency:
     custom:
-      # For completed terminations, the is_current row must fall in the same calendar month as dt_terminated.
-      # Future-dated terminations still active on is_current (dt_series_end = today) are excluded.
+      # For completed terminations, the is_current_for_assignment row must fall in the same calendar month as dt_terminated.
+      # Future-dated terminations still active on is_current_for_assignment (dt_series_end = today) are excluded.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT assignment_number
           FROM datalake_people.assignment_snapshots
-          WHERE is_current = TRUE
+          WHERE is_current_for_assignment = TRUE
             AND dt_terminated < CURRENT_DATE()
             AND TRUNC(dt_month_reference, 'MM') != TRUNC(dt_terminated, 'MM')
         )) = 0
@@ -101,26 +101,38 @@ column_level_validations:
           HAVING SUM(CASE WHEN is_current_for_employee THEN 1 ELSE 0 END) != 1
         )) = 0
       severity_level: Error
+  one_monthly_snapshot_flag_per_employee_month:
+    custom:
+      # Historical employee-grain exports rely on exactly one is_monthly_snapshot_for_employee row per (id_person, dt_month_reference).
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT id_person, dt_month_reference
+          FROM datalake_people.assignment_snapshots
+          WHERE is_monthly_snapshot_for_employee = TRUE
+          GROUP BY id_person, dt_month_reference
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
   transfer_termination_is_active_on_current_row:
     custom:
-      # Transfer terminations (GLB_TRANSFER) must stay is_active = TRUE on their is_current row — the is_current_for_employee fallback depends on it.
+      # Transfer terminations (GLB_TRANSFER) must stay is_active = TRUE on their is_current_for_assignment row — the is_current_for_employee fallback depends on it.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.assignment_snapshots
-         WHERE is_current = TRUE
+         WHERE is_current_for_assignment = TRUE
            AND COALESCE(is_transfer_termination, FALSE) = TRUE
            AND is_active = FALSE
         ) = 0
       severity_level: Error
   status_termination_date_consistency:
     custom:
-      # Every employee whose termination date is in the past must have is_active = FALSE on their is_current row.
+      # Every employee whose termination date is in the past must have is_active = FALSE on their is_current_for_assignment row.
       # Transfer terminations (is_transfer_termination) are excluded: they stay active on the transfer date
       # because the person continues employed under the continuation assignment.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.assignment_snapshots
-         WHERE is_current = TRUE
+         WHERE is_current_for_assignment = TRUE
            AND is_active = TRUE
            AND COALESCE(is_transfer_termination, FALSE) = FALSE
            AND dt_terminated IS NOT NULL

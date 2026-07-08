@@ -76,7 +76,7 @@ columns:
   is_current:
     description: True when the reference date is the latest observation day in the snapshot series (typically today).
     lineage:
-      - datalake_people.assignment_snapshots.is_current
+      - datalake_people.assignment_snapshots.is_current_for_assignment
   dt_hired:
     description: Date the employee started this assignment.
     lineage:

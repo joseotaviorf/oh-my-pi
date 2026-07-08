@@ -280,8 +280,8 @@ assignment_snapshots_ranked AS (
             LAST_DAY(ad.dt_reference) = ad.dt_reference
             OR ad.is_latest_date
             OR ad.dt_reference = ad.dt_series_end
-        ) AS is_monthly_snapshot,
-        ad.dt_reference = ad.dt_series_end AS is_current,
+        ) AS is_monthly_snapshot_for_assignment,
+        ad.dt_reference = ad.dt_series_end AS is_current_for_assignment,
         im.dt_original_hired AS dt_original_hire,
         ad.dt_started AS dt_hired,
         ad.dt_terminated,
@@ -385,7 +385,7 @@ current_primary_assignment_fallback_ranked AS (
         assignment_snapshots_ranked AS asr
     WHERE
         asr.rn = 1
-        AND asr.is_current = TRUE
+        AND asr.is_current_for_assignment = TRUE
         AND asr.is_primary_assignment_for_snapshot = TRUE
         AND asr.id_person NOT IN (
             SELECT id_person FROM current_primary_assignment_today
@@ -407,6 +407,36 @@ current_primary_assignment_ranked AS (
         current_primary_assignment_fallback_ranked
     WHERE
         fallback_rn = 1
+),
+monthly_snapshot_for_employee_ranked AS (
+    SELECT
+        asr.id_assignment,
+        asr.id_person,
+        asr.dt_reference,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                asr.id_person,
+                asr.dt_month_reference
+            ORDER BY
+                asr.dt_reference DESC,
+                asr.is_active DESC,
+                asr.assignment_number DESC
+        ) AS monthly_rn
+    FROM
+        assignment_snapshots_ranked AS asr
+    WHERE
+        asr.rn = 1
+        AND asr.is_monthly_snapshot_for_assignment = TRUE
+        AND asr.is_primary_assignment_for_snapshot = TRUE
+),
+monthly_snapshot_for_employee AS (
+    SELECT
+        id_assignment,
+        dt_reference
+    FROM
+        monthly_snapshot_for_employee_ranked
+    WHERE
+        monthly_rn = 1
 )
 SELECT
     asr.id_assignment,
@@ -446,8 +476,9 @@ SELECT
     asr.is_latest_date,
     asr.is_primary_assignment_for_snapshot,
     asr.is_reorganization_termination,
-    asr.is_monthly_snapshot,
-    asr.is_current,
+    asr.is_monthly_snapshot_for_assignment,
+    msfe.id_assignment IS NOT NULL AS is_monthly_snapshot_for_employee,
+    asr.is_current_for_assignment,
     cpar.id_assignment IS NOT NULL AS is_current_for_employee,
     asr.dt_original_hire,
     asr.dt_hired,
@@ -462,5 +493,9 @@ LEFT JOIN
     current_primary_assignment_ranked AS cpar
         ON asr.id_assignment = cpar.id_assignment
         AND asr.dt_reference = cpar.dt_reference
+LEFT JOIN
+    monthly_snapshot_for_employee AS msfe
+        ON asr.id_assignment = msfe.id_assignment
+        AND asr.dt_reference = msfe.dt_reference
 WHERE
     asr.rn = 1
