@@ -275,7 +275,12 @@ assignment_snapshots_ranked AS (
         COALESCE(im.is_transfer_termination, FALSE) AS is_transfer_termination,
         ad.is_latest_date,
         COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
-        lo.id_employee IS NOT NULL AS is_reorganization_termination,
+        CASE
+            WHEN ad.dt_terminated IS NOT NULL
+                AND ad.dt_reference >= ad.dt_terminated
+                AND lo.id_employee IS NOT NULL THEN TRUE
+            ELSE NULL
+        END AS is_reorganization_termination,
         (
             LAST_DAY(ad.dt_reference) = ad.dt_reference
             OR ad.is_latest_date
