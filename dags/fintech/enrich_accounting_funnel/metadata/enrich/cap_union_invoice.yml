@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.invoice_all.id_invoice
       - datalake_accounting_funnel.accounts_payable.id_invoice
-    description: "Invoice registered in SeuBarriga"
+    description: "Invoice identifier from Seu Barriga (Retsuko replica)"
   sk_contract:
     lineage:
       - datalake_accounting_funnel.invoice_all.sk_contract
@@ -29,7 +29,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.invoice_all.version
       - datalake_accounting_funnel.accounts_payable.version
-    description: "Contract version"
+    description: Contract version active when the invoice was issued.
   accounting_version:
     lineage:
       - datalake_accounting_funnel.invoice_all.accounting_version
@@ -59,7 +59,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.invoice_all.bill_item
       - datalake_accounting_funnel.accounts_payable.bill_item
-    description: "Bill item indication"
+    description: Bill item type code for the invoice entry (e.g. rent, brokerage, condo).
   description:
     lineage:
       - datalake_accounting_funnel.invoice_all.description
@@ -200,7 +200,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.invoice_all.invoice_paid_amount
       - datalake_accounting_funnel.accounts_payable.invoice_paid_amount
-    description: "Invoice paid value"
+    description: Total amount paid on the invoice.
   accrual_year_month:
     lineage:
       - datalake_accounting_funnel.invoice_all.accrual_year_month
@@ -328,27 +328,27 @@ columns:
     lineage:
       - datalake_accounting_funnel.invoice_all.entry_created_date
       - datalake_accounting_funnel.accounts_payable.entry_created_date
-    description: "Entry creation date"
+    description: Calendar date when the invoice entry was created.
   invoice_created_date:
     lineage:
       - datalake_accounting_funnel.invoice_all.invoice_created_date
       - datalake_accounting_funnel.accounts_payable.invoice_created_date
-    description: "Invoice creation date"
+    description: Calendar date when the invoice was created in Seu Barriga.
   invoice_due_date:
     lineage:
       - datalake_accounting_funnel.invoice_all.invoice_due_date
       - datalake_accounting_funnel.accounts_payable.invoice_due_date
-    description: "Invoice due date"
+    description: Due date of the invoice payment.
   invoice_paid_date:
     lineage:
       - datalake_accounting_funnel.invoice_all.invoice_paid_date
       - datalake_accounting_funnel.accounts_payable.invoice_paid_date
-    description: "Date when the invoice was paid"
+    description: Date when the invoice was marked as paid.
   invoice_canceled_date:
     lineage:
       - datalake_accounting_funnel.invoice_all.invoice_canceled_date
       - datalake_accounting_funnel.accounts_payable.invoice_canceled_date
-    description: "Date when the invoice was canceled"
+    description: Cancellation timestamp from Seu Barriga (ts_canceled) converted to date when the invoice was voided.
   invoice_reversal_date:
     lineage:
       - datalake_accounting_funnel.invoice_all.invoice_reversal_date

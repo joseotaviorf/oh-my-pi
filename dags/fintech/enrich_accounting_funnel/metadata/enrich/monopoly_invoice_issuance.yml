@@ -1,7 +1,7 @@
 ---
 database_name: datalake_accounting_funnel
 table_name: monopoly_invoice_issuance
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "This table brings all Monopoly transactions that suppose to create an invoice in SAP's and check if it was created"
 columns:
@@ -27,7 +27,7 @@ columns:
   account_number:
     lineage:
       - datalake_accounting_funnel.ledger.account_number
-    description: "Account Number from SAP"
+    description: SAP revenue account number matched from ledger for the Monopoly sale entry.
   is_compliance:
     lineage:
       - datalake_monopoly_clean.accounting_entry.credit

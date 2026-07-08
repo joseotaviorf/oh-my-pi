@@ -3,7 +3,7 @@ database_name: datalake_nexxera
 table_name: adjustments
 description: "Table containing adjustments data from nexxera files (id_registration = 12). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   rn_adjustments:
     description: Adjustment row number
@@ -20,7 +20,7 @@ columns:
     lineage:
       - datalake_nexxera_clean.adjustments.id_flag
   flag:
-    description: Flag description
+    description: Card brand or acquirer flag name mapped from Nexxera id_flag.
     lineage:
       - datalake_nexxera_clean.adjustments.id_flag
   installment_number:
@@ -68,7 +68,7 @@ columns:
     lineage:
       - datalake_nexxera_clean.adjustments.adjustment_value
   counter_adjustments:
-    description: Counter of adjustments
+    description: Count of adjustment rows grouped in the enrich aggregation.
     lineage:
       - datalake_nexxera_clean.adjustments.adjustment_value
   ts_ingested:

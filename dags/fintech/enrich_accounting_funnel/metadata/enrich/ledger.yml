@@ -1,9 +1,9 @@
 ---
 database_name: datalake_accounting_funnel
 table_name: ledger
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table ledger from SAP with the last 18 months of data"
+description: "Unified SAP ledger combining SAP B1 template entries before 2024-01-01 and SAP 4hana journal entries thereafter"
 columns:
   id_transaction:
     description: "Identification number of the transaction"
@@ -26,7 +26,7 @@ columns:
       - datalake_accounting_funnel.ledger_new_template.id_finance_entity_entry
       - datalake_sap_4hana_clean.journal_entries.id_finance_entity_entry
   id_external_payment:
-    description: "External ID of the payment"
+    description: Identifier for the external payment referenced by this financial record.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.id_external_payment
       - datalake_sap_4hana_clean.journal_entries.id_external_payment
@@ -44,7 +44,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger_new_template.account_type
   account_number:
-    description: "Account number"
+    description: SAP GL account number in the unified ledger.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.4hana_account_number
       - datalake_sap_4hana_clean.journal_entries.account_number
@@ -54,7 +54,7 @@ columns:
       - datalake_accounting_funnel.ledger_new_template.account_name
       - datalake_sap_4hana_clean.journal_entries.account_shortname
   series:
-    description: "Series description"
+    description: Document series from SAP B1 ledger template; NULL for SAP 4hana entries.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.series
   contra_act:
@@ -70,7 +70,7 @@ columns:
     lineage:
       - datalake_accounting_funnel.ledger_new_template.document_number
   accounting_rule:
-    description: "Accounting rule applied"
+    description: Accounting rule applied to the journal entry.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.accounting_rule
       - datalake_sap_4hana_clean.journal_entries.accounting_rule
@@ -97,18 +97,18 @@ columns:
       - datalake_sap_4hana_clean.journal_entries.memo_line
       - datalake_sap_4hana_clean.journal_entries.comments
   debit_credit:
-    description: "Debit - Credit"
+    description: Net amount as debit minus credit for the journal line.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.debit_credit
       - datalake_sap_4hana_clean.journal_entries.debit
       - datalake_sap_4hana_clean.journal_entries.credit
   debit:
-    description: "Debit value"
+    description: Debit amount posted on the journal line.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.debit
       - datalake_sap_4hana_clean.journal_entries.debit
   credit:
-    description: "Credit value"
+    description: Credit amount posted on the journal line.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.credit
       - datalake_sap_4hana_clean.journal_entries.credit
@@ -118,7 +118,7 @@ columns:
       - datalake_accounting_funnel.ledger_new_template.created_by
       - datalake_sap_4hana_clean.journal_entries.created_by
   location_profit_code:
-    description: "Location profit code"
+    description: SAP profit center or location code for the journal entry.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.location_profit_code
       - datalake_sap_4hana_clean.journal_entries.location_profit_code
@@ -128,31 +128,40 @@ columns:
       - datalake_accounting_funnel.ledger_new_template.4hana_cost_center_code
       - datalake_sap_4hana_clean.journal_entries.cost_center_code
   hash:
-    description: "Unic ID"
+    description: Unique hash identifier for the ledger journal line.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.uuid
       - datalake_sap_4hana_clean.journal_entries.hash
   dt_created:
-    description: "Created date"
+    description: Calendar date associated with created in the financial workflow.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.dt_created
       - datalake_sap_4hana_clean.journal_entries.dt_created
   dt_reference:
-    description: "Reference date"
+    description: Calendar date associated with reference in the financial workflow.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.dt_reference
       - datalake_sap_4hana_clean.journal_entries.dt_accrual
   dt_due:
-    description: "Due date"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.dt_due
   dt_tax:
-    description: "Tax date"
+    description: Calendar date associated with tax in the financial workflow.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.dt_tax
       - datalake_sap_4hana_clean.journal_entries.dt_tax
   accrual_year_month:
-    description: "Accrual date"
+    description: Accrual year-month (YYYYMM) of the journal entry.
     lineage:
       - datalake_accounting_funnel.ledger_new_template.accrual_year_month
       - datalake_sap_4hana_clean.journal_entries.accrual_year_month
+  transaction_type:
+    description: Transaction type from SAP B1 ledger template; NULL for SAP 4hana entries after migration.
+    lineage:
+      - datalake_accounting_funnel.ledger_new_template.transaction_type
+  id_line:
+    description: Line number within the SAP journal entry document.
+    lineage:
+      - datalake_accounting_funnel.ledger_new_template.id_line
+      - datalake_sap_4hana_clean.journal_entries.id_line

@@ -1,9 +1,9 @@
 ---
 database_name: datalake_accounting_funnel
 table_name: erp_gateway_stages_status
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "This table brings all ERP Gateway stages and their respetive statuses"
+description: "Enriched view of ERP Gateway sync stages and statuses, from feature creation through SAP sync job completion"
 columns:
   id_source:
     lineage:

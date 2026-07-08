@@ -10,9 +10,9 @@ WITH trato_feito AS (
         NULL AS reference_3,
         NULL AS reference_4,
         NULL AS reference_5,
-        CAST(p.metadata:paid_amount AS DOUBLE) AS paid_amount,
-        CAST(SPLIT(p.metadata:paid_date, 'T')[0] AS DATE) AS dt_paid,
-        CAST(SPLIT(p.metadata:paid_date, 'T')[0] AS DATE) AS dt_receipt
+        CAST(get_json_object(p.metadata, '$.paid_amount') AS DOUBLE) AS paid_amount,
+        CAST(SPLIT(get_json_object(p.metadata, '$.paid_date'), 'T')[0] AS DATE) AS dt_paid,
+        CAST(SPLIT(get_json_object(p.metadata, '$.paid_date'), 'T')[0] AS DATE) AS dt_receipt
     FROM
         datalake_trato_feito_clean.negotiation n
     INNER JOIN
@@ -27,53 +27,85 @@ WITH trato_feito AS (
 ),
 
 wallstreet AS (
-    SELECT DISTINCT
-        CAST(id as STRING) as id_payment_platform,
-        c.id_business_entity,
+    SELECT
+        id_payment_platform,
+        id_business_entity,
         id_finance_entity,
-        'wallstreet' as payment_platform,
-        charge_status as payment_status,
-        NULL AS reference_1,
-        NULL AS reference_2,
-        NULL AS reference_3,
-        NULL AS reference_4,
-        NULL AS reference_5,
-        CAST(amount/100.00 AS DOUBLE) AS paid_amount,
-        CAST(c.ts_paid AS DATE) AS dt_paid,
-        CAST(c.ts_paid AS DATE) AS dt_receipt
-    FROM
-        datalake_wall_street_clean.charge c
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY c.id_finance_entity ORDER BY c.ts_updated DESC) = 1
+        payment_platform,
+        payment_status,
+        reference_1,
+        reference_2,
+        reference_3,
+        reference_4,
+        reference_5,
+        paid_amount,
+        dt_paid,
+        dt_receipt
+    FROM (
+        SELECT DISTINCT
+            CAST(id as STRING) as id_payment_platform,
+            c.id_business_entity,
+            id_finance_entity,
+            'wallstreet' as payment_platform,
+            charge_status as payment_status,
+            NULL AS reference_1,
+            NULL AS reference_2,
+            NULL AS reference_3,
+            NULL AS reference_4,
+            NULL AS reference_5,
+            CAST(amount/100.00 AS DOUBLE) AS paid_amount,
+            CAST(c.ts_paid AS DATE) AS dt_paid,
+            CAST(c.ts_paid AS DATE) AS dt_receipt,
+            ROW_NUMBER() OVER (PARTITION BY c.id_finance_entity ORDER BY c.ts_updated DESC) AS _rn
+        FROM
+            datalake_wall_street_clean.charge c
+    ) ranked
+    WHERE _rn = 1
 ),
 
 robin_hood AS (
-    SELECT DISTINCT
-        CAST(ae.id AS STRING) AS id_payment_platform,
-        NULL AS id_business_entity,
-        ae.id_external AS id_finance_entity,
-        'robin-hood' AS payment_platform,
-        pr.status AS payment_status,
-        NULL AS reference_1,
-        NULL AS reference_2,
-        NULL AS reference_3,
-        NULL AS reference_4,
-        NULL AS reference_5,
-        ae.due_amount AS paid_amount,
-        pr.dt_paid,
-        dt_paid AS dt_receipt
-    FROM
-        datalake_robin_hood.accounting_entry ae
-    LEFT JOIN
-        datalake_robin_hood_clean.accounting_entry_balance eb
-            ON eb.id_accounting_entry = ae.id
-    LEFT JOIN
-        datalake_robin_hood_clean.payment_request pr
-            ON pr.id = eb.id_payment_request
-    WHERE
-        source_bill_item = 'estate-agent-services'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY ae.id_external ORDER BY pr.ts_created DESC) = 1
+    SELECT
+        id_payment_platform,
+        id_business_entity,
+        id_finance_entity,
+        payment_platform,
+        payment_status,
+        reference_1,
+        reference_2,
+        reference_3,
+        reference_4,
+        reference_5,
+        paid_amount,
+        dt_paid,
+        dt_receipt
+    FROM (
+        SELECT DISTINCT
+            CAST(ae.id AS STRING) AS id_payment_platform,
+            NULL AS id_business_entity,
+            ae.id_external AS id_finance_entity,
+            'robin-hood' AS payment_platform,
+            pr.status AS payment_status,
+            NULL AS reference_1,
+            NULL AS reference_2,
+            NULL AS reference_3,
+            NULL AS reference_4,
+            NULL AS reference_5,
+            ae.due_amount AS paid_amount,
+            pr.dt_paid,
+            dt_paid AS dt_receipt,
+            ROW_NUMBER() OVER (PARTITION BY ae.id_external ORDER BY pr.ts_created DESC) AS _rn
+        FROM
+            datalake_robin_hood.accounting_entry ae
+        LEFT JOIN
+            datalake_robin_hood_clean.accounting_entry_balance eb
+                ON eb.id_accounting_entry = ae.id
+        LEFT JOIN
+            datalake_robin_hood_clean.payment_request pr
+                ON pr.id = eb.id_payment_request
+        WHERE
+            source_bill_item = 'estate-agent-services'
+    ) ranked
+    WHERE _rn = 1
 ),
 
 vans AS (
@@ -131,7 +163,8 @@ CAP AS (
         dt_paid,
         dt_paid AS dt_receipt
     FROM
-        (SELECT
+        (SELECT * FROM (
+        SELECT
           p.id,
           id_related_document,
           p.our_number,
@@ -186,7 +219,8 @@ CAP AS (
             WHEN p.style='41' THEN 'TED'
             WHEN p.style='03' THEN 'DOC'
             ELSE p.style
-        END AS TipoPagamento
+        END AS TipoPagamento,
+          ROW_NUMBER() OVER (PARTITION BY company_use, our_number ORDER BY f.ts_created DESC) AS _rn
         FROM
             datalake_vans_clean.payment p
         INNER JOIN
@@ -199,8 +233,8 @@ CAP AS (
             p.dt_paid >= '2022-12-01'
         AND
             f.type LIKE '%:file.type/payment%'
-        QUALIFY
-            ROW_NUMBER() OVER (PARTITION BY company_use, our_number ORDER BY f.ts_created DESC) = 1
+        ) payment_dedup
+        WHERE _rn = 1
 
         UNION ALL
 
@@ -253,50 +287,114 @@ FROM
 UNION ALL
 
 SELECT
-    CAST(b.id AS STRING) as id_payment_platform,
-    SPLIT(b.company_use, '[a-zA-Z!]')[0] AS id_business_entity,
-    b.id_related_document AS id_finance_entity,
-    'vans_car' AS payment_platform,
-    SPLIT(b.status, "/")[1] AS payment_status,
-    b.company_use AS reference_1,
-    b.our_number AS reference_2,
-    NULL AS reference_3,
-    NULL AS reference_4,
-    NULL AS reference_5,
-    b.paid_amount AS payment_amount,
-    b.dt_paid,
-    nbd.date_next_bd AS dt_receipt
-FROM
-    datalake_vans_clean.boleto b
-INNER JOIN
-    datalake_vans_clean.boleto_file bf
-        ON b.id = bf.id_boleto
-INNER JOIN
-    boleto_file_response bfr
-        ON bfr.id = bf.id_file
-LEFT JOIN
-    next_business_day AS nbd
-        ON nbd.date = b.dt_paid
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY b.id_related_document ORDER BY b.ts_updated DESC) = 1
+    id_payment_platform,
+    id_business_entity,
+    id_finance_entity,
+    payment_platform,
+    payment_status,
+    reference_1,
+    reference_2,
+    reference_3,
+    reference_4,
+    reference_5,
+    paid_amount,
+    dt_paid,
+    dt_receipt
+FROM (
+    SELECT
+        CAST(b.id AS STRING) as id_payment_platform,
+        SPLIT(b.company_use, '[a-zA-Z!]')[0] AS id_business_entity,
+        b.id_related_document AS id_finance_entity,
+        'vans_car' AS payment_platform,
+        SPLIT(b.status, "/")[1] AS payment_status,
+        b.company_use AS reference_1,
+        b.our_number AS reference_2,
+        NULL AS reference_3,
+        NULL AS reference_4,
+        NULL AS reference_5,
+        b.paid_amount AS paid_amount,
+        b.dt_paid,
+        nbd.date_next_bd AS dt_receipt,
+        ROW_NUMBER() OVER (PARTITION BY b.id_related_document ORDER BY b.ts_updated DESC) AS _rn
+    FROM
+        datalake_vans_clean.boleto b
+    INNER JOIN
+        datalake_vans_clean.boleto_file bf
+            ON b.id = bf.id_boleto
+    INNER JOIN
+        boleto_file_response bfr
+            ON bfr.id = bf.id_file
+    LEFT JOIN
+        next_business_day AS nbd
+            ON nbd.date = b.dt_paid
+) boleto_dedup
+WHERE _rn = 1
 )
 
 SELECT
-    *
+    id_payment_platform,
+    id_business_entity,
+    id_finance_entity,
+    payment_platform,
+    payment_status,
+    reference_1,
+    reference_2,
+    reference_3,
+    reference_4,
+    reference_5,
+    paid_amount,
+    dt_paid,
+    dt_receipt
 FROM
     trato_feito
 UNION ALL
 SELECT
-    *
+    id_payment_platform,
+    id_business_entity,
+    id_finance_entity,
+    payment_platform,
+    payment_status,
+    reference_1,
+    reference_2,
+    reference_3,
+    reference_4,
+    reference_5,
+    paid_amount,
+    dt_paid,
+    dt_receipt
 FROM
     wallstreet
 UNION ALL
 SELECT
-    *
+    id_payment_platform,
+    id_business_entity,
+    id_finance_entity,
+    payment_platform,
+    payment_status,
+    reference_1,
+    reference_2,
+    reference_3,
+    reference_4,
+    reference_5,
+    paid_amount,
+    dt_paid,
+    dt_receipt
 FROM
     robin_hood
 UNION ALL
 SELECT
-    *
+    id_payment_platform,
+    id_business_entity,
+    id_finance_entity,
+    payment_platform,
+    payment_status,
+    reference_1,
+    reference_2,
+    reference_3,
+    reference_4,
+    reference_5,
+    paid_amount,
+    dt_paid,
+    dt_receipt
 FROM
     vans

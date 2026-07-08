@@ -1,14 +1,14 @@
 ---
 database_name: datalake_accounting_funnel
 table_name: for_rent_contract_adm_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "This table calculates administration fee by month to all For Rent's contracts"
 columns:
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract.id
-    description: "ID contract from Main"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   adm_fee_charge_type:
     lineage:
       - datalake_ebdb_clean.full_contract_aud.adm_fee_charge_type
@@ -44,26 +44,22 @@ columns:
       - datalake_ebdb_clean.full_contract_aud.promotional_period
     description: "Promotional period (in months) that promotional_adm_fee should be applied"
   promotional_ended_accrual_year_month:
-    description: "Promotional ended accrual year month"
+    description: YYYYMM accrual month when the promotional administration fee period ends.
   invoice_accrual_year_month:
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
     description: "Indicates invoice accrual year month refered"
   is_contract_start_month:
-    description: "Promotional ended accrual year month"
+    description: TRUE when the invoice accrual month is the contract start month (or second month for FromSecondMonth charge type).
   is_contract_closing_month:
-    description: "Promotional ended accrual year month"
+    description: TRUE when the invoice accrual month matches the contract termination month.
   is_birthday_month:
-    description: "Promotional ended accrual year month"
+    description: TRUE when the invoice month is the contract anniversary month.
   has_ended_before_birthday:
-    description: "Promotional ended accrual year month"
+    description: TRUE when the contract ended before the anniversary day within the birthday month.
   dt_contract_started:
     lineage:
       - datalake_ebdb_clean.contract_aud.dt_started
     description: "Indicates when the contract started"
-  dt_contract_end:
-    lineage:
-      - datalake_ebdb_clean.contract_aud.dt_termination
-      - datalake_ebdb_contract.contract.dt_termination
-      - datalake_ebdb_contract.contract.ts_expected_termination
-    description: "Indicates when the contract ended"
+  dt_contract_ended:
+    description: Contract termination date used for administration fee proration at invoice closing.

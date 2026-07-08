@@ -3,10 +3,11 @@ database_name: datalake_nexxera
 table_name: cnab_charges_recupera
 description: "Table containing all cnab charges returns for Recupera. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_bank:
-    description: Bank identification number from file_name
+    description: Bank identification number extracted from the CNAB file name.
+    lineage:
       - datalake_nexxera_clean.cnab_charges_quintoandar
       - datalake_nexxera_clean.cnab_charges_velo
       - datalake_nexxera_clean.cnab_charges_velo_2.id_bank
@@ -17,19 +18,19 @@ columns:
       - datalake_nexxera_clean.cnab_charges_velo
       - datalake_nexxera_clean.cnab_charges_velo_2.id_document_type
   recupera_creditor_name:
-    description: Indicates the document type of cpf_cnpj column (1=CPF or 2=CNPJ)
+    description: Recupera creditor name associated with the CNAB charge return file.
     lineage:
       - datalake_nexxera_clean.cnab_charges_quintoandar
       - datalake_nexxera_clean.cnab_charges_velo
       - datalake_nexxera_clean.cnab_charges_velo_2.recupera_creditor_name
   bank_agency:
-    description: Bank agency number
+    description: Bank branch (agency) number from the CNAB charge return.
     lineage:
       - datalake_nexxera_clean.cnab_charges_quintoandar
       - datalake_nexxera_clean.cnab_charges_velo
       - datalake_nexxera_clean.cnab_charges_velo_2.bank_agency
   bank_account:
-    description: Bank account number
+    description: Bank account number receiving the CNAB charge payment.
     lineage:
       - datalake_nexxera_clean.cnab_charges_quintoandar
       - datalake_nexxera_clean.cnab_charges_velo
@@ -184,3 +185,5 @@ columns:
       - datalake_nexxera_clean.cnab_charges_quintoandar
       - datalake_nexxera_clean.cnab_charges_velo
       - datalake_nexxera_clean.cnab_charges_velo_2.day
+  occurrence_code_description:
+    description: Human-readable description mapped from the CNAB occurrence code.

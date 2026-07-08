@@ -3,21 +3,22 @@ database_name: datalake_nexxera
 table_name: cnab_charges
 description: "Table containing all cnab charges returns. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_bank:
-    description: Bank identification number from file_name
+    description: Bank identification number extracted from the CNAB file name.
+    lineage:
       - datalake_nexxera_clean.cnab_charges_341.id_bank
   id_document_type:
     description: Indicates the document type of cpf_cnpj column (1=CPF or 2=CNPJ)
     lineage:
       - datalake_nexxera_clean.cnab_charges_341.id_document_type
   bank_agency:
-    description: Bank agency number
+    description: Bank branch (agency) number from the CNAB charge return.
     lineage:
       - datalake_nexxera_clean.cnab_charges_341.bank_agency
   bank_account:
-    description: Bank account number
+    description: Bank account number receiving the CNAB charge payment.
     lineage:
       - datalake_nexxera_clean.cnab_charges_341.bank_account
   account_verification_digit:
@@ -120,3 +121,5 @@ columns:
     description: Day of load
     lineage:
       - datalake_nexxera_clean.cnab_charges_341.day
+  occurrence_code_description:
+    description: Human-readable description mapped from the CNAB occurrence code.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_accounting_funnel
 table_name: payment_platforms
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table containing all Payment Platforms in 5A For Rent business model."
 columns:
@@ -68,7 +68,7 @@ columns:
       - datalake_robin_hood.accounting_entry.due_amount
       - datalake_vans_clean.payment.paid_amount
       - datalake_vans_clean.boleto.paid_amount
-    description: "Amount actually paid"
+    description: Amount paid on the payment platform transaction.
   dt_paid:
     lineage:
       - datalake_trato_feito_clean.payment.metadata

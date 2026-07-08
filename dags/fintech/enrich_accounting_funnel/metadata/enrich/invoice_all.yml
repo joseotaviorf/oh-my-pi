@@ -1,9 +1,9 @@
 ---
 database_name: datalake_accounting_funnel
 table_name: invoice_all
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table cointaining invoice data"
+description: "Enriched invoice and entry data for the accounting funnel, sourced from DW payment and Retsuko (Seu Barriga replica)"
 columns:
   id_entry:
     lineage:
@@ -16,7 +16,7 @@ columns:
   id_invoice:
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice
-    description: "Invoice registered in SeuBarriga"
+    description: "Invoice identifier from Seu Barriga (Retsuko replica)"
   sk_contract:
     lineage:
       - dw_payment.fact_invoice_entries.sk_contract
@@ -28,7 +28,7 @@ columns:
   version:
     lineage:
       - dw_rent.dim_contract.version
-    description: "Contract version"
+    description: Contract version active when the invoice was issued.
   accounting_version:
     lineage:
       - datalake_retsuko.entry.accounting_version
@@ -81,7 +81,7 @@ columns:
   bill_item:
     lineage:
       - dw_payment.dim_invoice_entry.entry_type
-    description: "Bill item indication"
+    description: Bill item type code for the invoice entry (e.g. rent, brokerage, condo).
   description:
     lineage:
       - dw_payment.dim_invoice_entry.description
@@ -151,7 +151,7 @@ columns:
   type:
     lineage:
       - dw_rent.dim_contract.type
-    description: "Invoice type"
+    description: Contract type from dim_contract (e.g. for rent).
   due_amount:
     lineage:
       - dw_payment.fact_invoice_entries.brl_entry_due_amount
@@ -163,7 +163,7 @@ columns:
   invoice_paid_amount:
     lineage:
       - dw_payment.fact_invoice_entries.paid_amount
-    description: "Invoice paid value"
+    description: Total amount paid on the invoice.
   accrual_year_month:
     lineage:
       - dw_payment.dim_invoice.accrual_year_month
@@ -182,7 +182,7 @@ columns:
   entry_due_year_month:
     lineage:
       - dw_payment.dim_invoice_entry.due_year_month
-    description: "Entry expense due month"
+    description: Year-month (YYYYMM) from dim_invoice_entry.due_year_month used for entry due scheduling.
   entry_creation_accrual_year_month:
     lineage:
       - dw_payment.dim_invoice_entry.accrual_year_month
@@ -190,23 +190,23 @@ columns:
   entry_created_date:
     lineage:
       - dw_public.dim_date.date
-    description: "Entry creation date"
+    description: Calendar date when the invoice entry was created.
   invoice_created_date:
     lineage:
       - dw_payment.dim_invoice.ts_created
-    description: "Invoice creation date"
+    description: Calendar date when the invoice was created in Seu Barriga.
   invoice_due_date:
     lineage:
       - dw_payment.dim_invoice.dt_due
-    description: "Invoice due date"
+    description: Due date of the invoice payment.
   invoice_sent_date:
     lineage:
       - dw_payment.dim_invoice.dt_sent
-    description: "Date when the invoice was sent"
+    description: Date when the invoice was sent to the tenant or landlord.
   invoice_paid_date:
     lineage:
       - dw_payment.dim_invoice.dt_paid
-    description: "Date when the invoice was paid"
+    description: Date when the invoice was marked as paid.
   invoice_write_off_date:
     lineage:
       - dw_payment.dim_invoice.dt_write_off
@@ -214,7 +214,7 @@ columns:
   invoice_canceled_date:
     lineage:
       - dw_payment.dim_invoice.ts_canceled
-    description: "Date when the invoice was canceled"
+    description: Cancellation timestamp from Seu Barriga (ts_canceled) converted to date when the invoice was voided.
   invoice_reversal_date:
     lineage:
       - datalake_retsuko.entry.ts_created
