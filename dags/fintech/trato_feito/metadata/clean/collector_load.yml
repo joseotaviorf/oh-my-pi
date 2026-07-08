@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: collector_load
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table for storing integrations made with the collector for entity synchronization. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
 columns:
@@ -38,14 +38,17 @@ columns:
     lineage:
       - datalake_trato_feito_raw.collector_load.response_payload
   event_type:
-    description: ""
+    description: Financial attribute representing event type on the collector_load dataset.
     lineage:
       - datalake_trato_feito_raw.collector_load.event_type
   ts_created:
-    description: "Created at"
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.collector_load.created_at
   ts_updated:
-    description: "Updated at"
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.collector_load.updated_at
+  rev:
+    description: Financial attribute representing rev on the collector_load dataset.
+    lineage: []

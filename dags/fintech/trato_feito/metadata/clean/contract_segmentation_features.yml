@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: contract_segmentation_features
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Contract segmentation features table containing calculated features and metrics used for contract segmentation in collection workflows.
 columns:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract_segmentation_features.number_of_not_negativable_invoices
   number_of_monthly_invoices:
-    description: "Number of monthly invoices for the contract"
+    description: Financial attribute representing number of monthly invoices on the contract_segmentation_features dataset.
     lineage:
       - datalake_trato_feito_raw.contract_segmentation_features.number_of_monthly_invoices
   number_of_deals_installments:
@@ -42,11 +42,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract_segmentation_features.number_of_deals_installments
   number_of_invoices_type_other:
-    description: "Number of invoices with type other"
+    description: Financial attribute representing number of invoices type other on the contract_segmentation_features dataset.
     lineage:
       - datalake_trato_feito_raw.contract_segmentation_features.number_of_invoices_type_other
   number_of_overdue_monthly_invoices:
-    description: "Number of overdue monthly invoices"
+    description: Financial attribute representing number of overdue monthly invoices on the contract_segmentation_features dataset.
     lineage:
       - datalake_trato_feito_raw.contract_segmentation_features.number_of_overdue_monthly_invoices
   number_of_overdue_deals_installments:
@@ -54,7 +54,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract_segmentation_features.number_of_overdue_deals_installments
   number_of_overdue_invoices_type_other:
-    description: "Number of overdue invoices with type other"
+    description: Financial attribute representing number of overdue invoices type other on the contract_segmentation_features dataset.
     lineage:
       - datalake_trato_feito_raw.contract_segmentation_features.number_of_overdue_invoices_type_other
   delay_contaminated_original_invoices:

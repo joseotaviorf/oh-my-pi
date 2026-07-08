@@ -1,22 +1,27 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: debtor
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: ""
+description: One row per debtor in the Fintech clean layer, sourced from datalake_trato_feito_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
       - datalake_trato_feito_raw.debtor.id
+    description: Financial attribute representing id on the debtor dataset.
   origin:
     lineage:
       - datalake_trato_feito_raw.debtor.origin
+    description: Financial attribute representing origin on the debtor dataset.
   type:
     lineage:
       - datalake_trato_feito_raw.debtor.type
+    description: Financial attribute representing type on the debtor dataset.
   company_group:
     lineage:
       - datalake_trato_feito_raw.debtor.company_group
+    description: Financial attribute representing company group on the debtor dataset.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.debtor.created_at
+    description: Timestamp when created occurred in the upstream fintech system.

@@ -1,49 +1,63 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: debt
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: ""
+description: One row per debt in the Fintech clean layer, sourced from datalake_trato_feito_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
       - datalake_trato_feito_raw.debt.id
+    description: Financial attribute representing id on the debt dataset.
   id_external:
     lineage:
       - datalake_trato_feito_raw.debt.external_id
+    description: Identifier for the external referenced by this financial record.
   id_negotiation:
     lineage:
       - datalake_trato_feito_raw.debt.negotiation_id
+    description: Identifier for the negotiation referenced by this financial record.
   id_billing:
     lineage:
       - datalake_trato_feito_raw.debt.billing_id
+    description: Identifier for the billing referenced by this financial record.
   interest_fee_amount:
     lineage:
       - datalake_trato_feito_raw.debt.interest_fee_amount
+    description: Financial attribute representing interest fee amount on the debt dataset.
   original_amount:
     lineage:
       - datalake_trato_feito_raw.debt.original_amount
+    description: Financial attribute representing original amount on the debt dataset.
   fine_fee_amount:
     lineage:
       - datalake_trato_feito_raw.debt.fine_fee_amount
+    description: Financial attribute representing fine fee amount on the debt dataset.
   discount_amount:
     lineage:
       - datalake_trato_feito_raw.debt.discount_amount
+    description: Financial attribute representing discount amount on the debt dataset.
   is_write_off:
     lineage:
       - datalake_trato_feito_raw.debt.write_off
+    description: Indicates whether write off applies to this financial record.
   dt_due:
     lineage:
       - datalake_trato_feito_raw.debt.due_date
+    description: Calendar date associated with due in the financial workflow.
   dt_offset:
     lineage:
       - datalake_trato_feito_raw.debt.offset_at
+    description: Calendar date associated with offset in the financial workflow.
   dt_write_off:
-    lineage;
+    lineage:
       - datalake_trato_feito_raw.debt.write_off_at
+    description: Calendar date associated with write off in the financial workflow.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.debt.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_trato_feito_raw.debt.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

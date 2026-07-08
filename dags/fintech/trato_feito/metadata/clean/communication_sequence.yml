@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: communication_sequence
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: It defines a sequence of communication steps to be executed
 columns:
@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.communication_sequence.version
   name:
-    description: "Name of the communication sequence"
+    description: Financial attribute representing name on the communication_sequence dataset.
     lineage:
       - datalake_trato_feito_raw.communication_sequence.name
   description:
@@ -39,4 +39,3 @@ columns:
       - datalake_trato_feito_raw.communication_sequence.updated_at
   ts_load:
     description: "Load timestamp of the table."
-

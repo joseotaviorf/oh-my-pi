@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: contract
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table to store contracts that may or may not be sent to the collector. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
 columns:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.contract.imovel_id
   id_debtor:
-    description: "Internal identifier of the debtor linked to this Trato Feito contract for collections workflows"
+    description: Identifier for the debtor referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.contract.debtor_id
   sync_status:
@@ -105,7 +105,12 @@ columns:
     description: "Entity last synchronized at"
     lineage:
       - datalake_trato_feito_raw.contract.last_received_at
+  rev:
+    description: Financial attribute representing rev on the contract dataset.
+    lineage: []
   ts_consultancy_updated:
-    description: "When the consultancy field was last updated"
-    lineage:
-      - datalake_trato_feito_raw.contract.consultancy_updated_at
+    description: Timestamp when consultancy updated occurred in the upstream fintech system.
+    lineage: []
+  total_amount:
+    description: Financial attribute representing total amount on the contract dataset.
+    lineage: []
