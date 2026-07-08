@@ -1,55 +1,75 @@
 ---
 database_name: datalake_recupera_raw
 table_name: guarantor_contracts
+description:
+  One row per guarantor contracts from the Recupera collections agency
+  integration for outsourced debt recovery on overdue tenant and guarantee
+  balances.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   name:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing name on the guarantor_contracts dataset.
   document:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing document on the guarantor_contracts dataset.
   brazilian_identity_card:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing brazilian identity card on the guarantor_contracts dataset.
   brazilian_identity_card_issuing_federal_unit:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing brazilian identity card issuing federal unit on the guarantor_contracts dataset.
   dt_contact_birth:
     tags:
       - PII
       - Restricted
+    description: Calendar date associated with contact birth in the financial workflow.
   spouse_name:
     tags:
       - Confidential
+    description: Financial attribute representing spouse name on the guarantor_contracts dataset.
   father_name:
     tags:
       - Confidential
+    description: Financial attribute representing father name on the guarantor_contracts dataset.
   mother_name:
     tags:
       - Confidential
+    description: Financial attribute representing mother name on the guarantor_contracts dataset.
   address:
     tags:
       - Restricted
+    description: Financial attribute representing address on the guarantor_contracts dataset.
   address_number:
     tags:
       - Restricted
+    description: Financial attribute representing address number on the guarantor_contracts dataset.
   neighborhood:
     tags:
       - Restricted
+    description: Financial attribute representing neighborhood on the guarantor_contracts dataset.
   city:
     tags:
       - Restricted
+    description: Financial attribute representing city on the guarantor_contracts dataset.
   state:
     tags:
       - Restricted
+    description: Financial attribute representing state on the guarantor_contracts dataset.
   zip_code:
     tags:
       - Restricted
+    description: Financial attribute representing zip code on the guarantor_contracts dataset.
   address_add_on:
     tags:
       - Restricted
+    description: Financial attribute representing address add on on the guarantor_contracts dataset.

@@ -1,14 +1,21 @@
 ---
 database_name: datalake_recupera_raw
 table_name: phone_records
+description:
+  One row per phone records from the Recupera collections agency integration
+  for outsourced debt recovery on overdue tenant and guarantee balances.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   phone_number:
     tags:
       - Confidential
+    description: Financial attribute representing phone number on the phone_records dataset.
   ddd_code:
     tags:
       - Confidential
+    description: Financial attribute representing ddd code on the phone_records dataset.
   dismembered_phone:
     tags:
       - Confidential
+    description: Financial attribute representing dismembered phone on the phone_records dataset.

@@ -1,8 +1,13 @@
 ---
 database_name: datalake_recupera_raw
 table_name: email_records
+description:
+  One row per email records from the Recupera collections agency integration
+  for outsourced debt recovery on overdue tenant and guarantee balances.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   customer_email:
     tags:
       - Confidential
+    description: Financial attribute representing customer email on the email_records dataset.

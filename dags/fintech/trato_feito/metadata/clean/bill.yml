@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: bill
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table for storing debts that may or may not be sent to the collector. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
 columns:
@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.bill.id
   id_contract:
-    description: "Contract Entity ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_trato_feito_raw.bill.contract_id
   id_boleto:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.bill.boleto_identifier
   id_external:
-    description: ""
+    description: Identifier for the external referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.bill.external_id
   sync_status:
@@ -26,15 +26,15 @@ columns:
     lineage:
       - datalake_trato_feito_raw.bill.sync_status
   cyber_sync_status:
-    description: ""
+    description: Financial attribute representing cyber sync status on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.cyber_sync_status
   external_sub_status:
-    description: ""
+    description: Financial attribute representing external sub status on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.external_sub_status
   external_status:
-    description: ""
+    description: Financial attribute representing external status on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.external_status
   purpose:
@@ -50,23 +50,23 @@ columns:
     lineage:
       - datalake_trato_feito_raw.bill.our_number
   entries:
-    description: ""
+    description: Financial attribute representing entries on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.entries
   charge_data:
-    description: ""
+    description: Financial attribute representing charge data on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.charge_data
   payment_method:
-    description: ""
+    description: Financial attribute representing payment method on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.payment_method
   is_tenant_first_invoice:
-    description: ""
+    description: Indicates whether tenant first invoice applies to this financial record.
     lineage:
       - datalake_trato_feito_raw.bill.is_tenant_first_invoice
   previously_negotiated:
-    description: ""
+    description: Financial attribute representing previously negotiated on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.is_tenant_first_invoice
   is_write_off:
@@ -78,11 +78,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.bill.accrual_year_month
   paid_amount:
-    description: "Debt amount paid"
+    description: Financial attribute representing paid amount on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.paid_amount
   due_amount:
-    description: "Due amount"
+    description: Financial attribute representing due amount on the bill dataset.
     lineage:
       - datalake_trato_feito_raw.bill.due_amount
   dt_paid:
@@ -90,7 +90,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.bill.paid_date
   dt_due:
-    description: "Due date"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_trato_feito_raw.bill.due_date
   ts_sent:
@@ -102,11 +102,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.bill.creation_date
   ts_created:
-    description: ""
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.bill.created_at
   ts_updated:
-    description: ""
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.bill.updated_at
   ts_last_received:

@@ -1,90 +1,120 @@
 ---
 database_name: datalake_recupera_raw
 table_name: records
+description:
+  One row per records from the Recupera collections agency integration for
+  outsourced debt recovery on overdue tenant and guarantee balances.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   customer_name:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing customer name on the records dataset.
   customer_document:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing customer document on the records dataset.
   brazilian_identity_card:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing brazilian identity card on the records dataset.
   brazilian_identity_card_issuing_federal_unit:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing brazilian identity card issuing federal unit on the records dataset.
   dt_customer_birth:
     tags:
       - PII
       - Restricted
+    description: Calendar date associated with customer birth in the financial workflow.
   gender:
     tags:
       - PII
       - Restricted
+    description: Financial attribute representing gender on the records dataset.
   marital_status:
     tags:
       - PII
       - Restricted
+    description: Financial attribute representing marital status on the records dataset.
   spouse_name:
     tags:
       - Confidential
+    description: Financial attribute representing spouse name on the records dataset.
   customer_email:
     tags:
       - Confidential
+    description: Financial attribute representing customer email on the records dataset.
   guarantor_address:
     tags:
       - Restricted
+    description: Financial attribute representing guarantor address on the records dataset.
   guarantor_neighborhood:
     tags:
       - Restricted
+    description: Financial attribute representing guarantor neighborhood on the records dataset.
   guarantor_city:
     tags:
       - Restricted
+    description: Financial attribute representing guarantor city on the records dataset.
   guarantor_state:
     tags:
       - Restricted
+    description: Financial attribute representing guarantor state on the records dataset.
   guarantor_zip_code:
     tags:
       - Restricted
+    description: Financial attribute representing guarantor zip code on the records dataset.
   guarantor_address_number:
     tags:
       - Restricted
+    description: Financial attribute representing guarantor address number on the records dataset.
   guarantor_address_complement:
     tags:
       - Restricted
+    description: Financial attribute representing guarantor address complement on the records dataset.
   residential_district:
     tags:
       - Restricted
+    description: Financial attribute representing residential district on the records dataset.
   residential_city:
     tags:
       - Restricted
+    description: Financial attribute representing residential city on the records dataset.
   residential_address:
     tags:
       - Restricted
+    description: Financial attribute representing residential address on the records dataset.
   residential_state:
     tags:
       - Restricted
+    description: Financial attribute representing residential state on the records dataset.
   residential_zip_code:
     tags:
       - Restricted
+    description: Financial attribute representing residential zip code on the records dataset.
   residential_address_number:
     tags:
       - Restricted
+    description: Financial attribute representing residential address number on the records dataset.
   residential_address_complement:
     tags:
       - Restricted
+    description: Financial attribute representing residential address complement on the records dataset.
   company_position:
     tags:
       - Public
+    description: Financial attribute representing company position on the records dataset.
   customer_profession_code:
     tags:
       - Public
+    description: Financial attribute representing customer profession code on the records dataset.
   income_amount:
     tags:
       - Public
+    description: Financial attribute representing income amount on the records dataset.

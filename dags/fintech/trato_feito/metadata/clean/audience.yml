@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: audience
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: It links segments to communication sequences and specifies distribution parameters
 columns:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.audience.communication_sequence_id
   name:
-    description: "Name of the audience"
+    description: Financial attribute representing name on the audience dataset.
     lineage:
       - datalake_trato_feito_raw.audience.name
   version:

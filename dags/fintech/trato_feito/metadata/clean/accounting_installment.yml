@@ -1,31 +1,39 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: accounting_installment
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: ""
+description: One row per accounting installment in the Fintech clean layer, sourced from datalake_trato_feito_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
       - datalake_trato_feito_raw.accounting_installment.id
+    description: Financial attribute representing id on the accounting_installment dataset.
   id_installment:
     lineage:
       - datalake_trato_feito_raw.accounting_installment.installment_id
+    description: Identifier for the installment referenced by this financial record.
   id_external:
     lineage:
       - datalake_trato_feito_raw.accounting_installment.external_id
+    description: Identifier for the external referenced by this financial record.
   external_accountant:
     lineage:
       - datalake_trato_feito_raw.accounting_installment.external_accountant
+    description: Financial attribute representing external accountant on the accounting_installment dataset.
   account_payload:
     lineage:
       - datalake_trato_feito_raw.accounting_installment.account_payload
+    description: Financial attribute representing account payload on the accounting_installment dataset.
   due_amount:
     lineage:
       - datalake_trato_feito_raw.accounting_installment.due_amount
+    description: Financial attribute representing due amount on the accounting_installment dataset.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.accounting_installment.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_trato_feito_raw.accounting_installment.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

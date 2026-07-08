@@ -1,25 +1,35 @@
 ---
 database_name: datalake_recupera_raw
 table_name: receipt
+description:
+  One row per receipt from the Recupera collections agency integration for
+  outsourced debt recovery on overdue tenant and guarantee balances.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   customer_name:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing customer name on the receipt dataset.
   customer_document:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing customer document on the receipt dataset.
   bank_code:
     tags:
       - Restricted
+    description: Financial attribute representing bank code on the receipt dataset.
   bank_agency_number:
     tags:
       - Restricted
+    description: Financial attribute representing bank agency number on the receipt dataset.
   bank_account_number:
     tags:
       - Restricted
+    description: Financial attribute representing bank account number on the receipt dataset.
   check_number:
     tags:
       - Restricted
+    description: Financial attribute representing check number on the receipt dataset.

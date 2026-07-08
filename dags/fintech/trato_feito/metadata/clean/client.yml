@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: client
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "table to store customers that may or may not be sent to the collector, basically it is a representation of the ContraPessoa table in Main. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
 columns:
@@ -34,11 +34,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.client.document
   document_type:
-    description: "Customer document"
+    description: Financial attribute representing document type on the client dataset.
     lineage:
       - datalake_trato_feito_raw.client.document_type
   marital_status:
-    description: "marital status"
+    description: Financial attribute representing marital status on the client dataset.
     lineage:
       - datalake_trato_feito_raw.client.marital_status
   name:
@@ -46,7 +46,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.client.name
   birth_date:
-    description: "Date of birth"
+    description: Financial attribute representing birth date on the client dataset.
     lineage:
       - datalake_trato_feito_raw.client.birth_date
   phones:
@@ -90,11 +90,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.client.negativation_updated_at
   ts_created:
-    description: "Created at"
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.client.created_at
   ts_updated:
-    description: "Updated at"
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.client.updated_at
   ts_cdc_transaction:
@@ -105,17 +105,14 @@ columns:
     description: "Database transaction timestamp"
     lineage:
       - datalake_trato_feito_raw.client.ts_database_transaction
-  year:
-    description: "Partition year"
-    lineage:
-      - datalake_trato_feito_raw.client.year
-  month:
-    description: "Partition month"
-    lineage:
-      - datalake_trato_feito_raw.client.month
-  day:
-    description: "Partition day"
-    lineage:
-      - datalake_trato_feito_raw.client.day
   ts_load:
     description: "Timestamp when the data was loaded"
+  op_cdc:
+    description: CDC operation type captured by Debezium for this row in the source database.
+    lineage:
+      - datalake_trato_feito_raw.client.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.

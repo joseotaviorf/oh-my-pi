@@ -1,17 +1,24 @@
 ---
 database_name: datalake_recupera_raw
 table_name: operators
+description:
+  One row per operators from the Recupera collections agency integration for
+  outsourced debt recovery on overdue tenant and guarantee balances.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   document_type:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing document type on the operators dataset.
   operator_document:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing operator document on the operators dataset.
   encrypted_password:
     tags:
       - Confidential
 
+    description: Financial attribute representing encrypted password on the operators dataset.
