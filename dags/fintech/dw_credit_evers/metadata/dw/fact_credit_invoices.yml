@@ -35,7 +35,7 @@ columns:
   purpose:
     lineage:
       - datalake_retsuko.invoice.purpose
-    description: "Purpose of the invoice."
+    description: Credit analysis attribute describing purpose in the tenant underwriting workflow.
   account_type:
     lineage:
       - datalake_retsuko_clean.account.type
@@ -55,15 +55,15 @@ columns:
   paid_amount:
     lineage:
       - datalake_retsuko.invoice.paid_amount
-    description: "Paid of the invoice."
+    description: Credit analysis attribute describing paid amount in the tenant underwriting workflow.
   contract_guarantee:
     lineage:
       - dw_rent.dim_contract.guarantee
-    description: "Contract guarantee."
+    description: Credit analysis attribute describing contract guarantee in the tenant underwriting workflow.
   contract_country_code:
     lineage:
       - dw_rent.dim_contract.contract_country_code
-    description: "Country code of the contract."
+    description: Credit analysis attribute describing contract country code in the tenant underwriting workflow.
   has_agreement:
     lineage:
       - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
@@ -115,7 +115,7 @@ columns:
   dt_due_calculated:
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
-    description: "Calculated due date."
+    description: Calendar date associated with due calculated in the financial workflow.
   dt_agreement_cancelation:
     lineage:
       - dw_collection_recovery_quintoandar.fact_negotiation.dt_cancellation

@@ -8,33 +8,33 @@ columns:
   sk_credit_evaluation:
     description: Unique identifier of a credit evaluation from DocX.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id
+      - datalake_docx_clean.credit_evaluation.id
   sk_group:
     description: ID group related to the credit evaluation. A group can have more than one credit evaluation. This ID only exists for credit evaluations done through the credit passport.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_group
+      - datalake_docx_clean.credit_evaluation.id_group
   sk_proposal:
     description: ID proposal related to the credit evaluation. A proposal can have more than one credit evaluation. This ID can be null if the credit evaluation was done before offer approval (such as early credit or credit passport pre offer flow).
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_proposal
+      - datalake_docx_clean.credit_evaluation.id_proposal
   sk_user:
     description: ID user who authenticated into 5A platform and submitted the credit evaluation.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_user
+      - datalake_docx_clean.credit_evaluation.id_user
   sk_house:
     description: ID house of the credit evaluation. This column is null if the scope is CITY, which means that the credit evaluation may be used within a city.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_house
+      - datalake_docx_clean.credit_evaluation.id_house
   sk_city:
     description: ID city of the credit evaluation. Identifies the city where the credit passport is valid; populated when the evaluation has city scope.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_city
+      - datalake_docx_clean.credit_evaluation.id_city
   scope:
     description: The scope of the evaluation. It could be HOUSE for the current credit model or CITY (credit passport). All credit evaluations submitted within a passport are valid within a CITY. A credit evaluation submitted after an offer is accepted refers to a proposal and its scope will be HOUSE. Early credit analysis do not have scope.
     lineage:
-    - datalake_docx_clean.credit_evaluation.scope
+      - datalake_docx_clean.credit_evaluation.scope
   credit_evaluation_status:
-    description: The status of the Credit Evaluation.
+    description: Credit analysis attribute describing credit evaluation status in the tenant underwriting workflow.
     categories:
       NOT_SENT: when the credit evaluation was not submitted yet.
       PROCESSING: when the credit evaluation is being processed.
@@ -43,39 +43,39 @@ columns:
       ON_HOLD: when the credit evaluation is blocked.
       CANCELLED: when the credit evaluation was cancelled.
     lineage:
-    - datalake_docx_clean.credit_evaluation.status
+      - datalake_docx_clean.credit_evaluation.status
   pre_evaluation_result:
     description: Result of the credit pre evaluation process, such as early credit evaluation or pre offer credit passport flow.
     lineage:
-    - datalake_docx_clean.credit_evaluation.result
-    - datalake_docx_clean.credit_evaluation.early_result_guarantee_type
+      - datalake_docx_clean.credit_evaluation.result
+      - datalake_docx_clean.credit_evaluation.early_result_guarantee_type
   decision_reason:
     description: The credit analysis decision reason in case of rejection or evaluation positive (FREE or PAID).
     lineage:
-    - datalake_docx_clean.credit_evaluation.reason
+      - datalake_docx_clean.credit_evaluation.reason
   documentation_policy_type:
     description: The documentation policy type requested to the user. This column is NULL for early credit, pre evaluation through credit passport or if the credit evaluation is still being processed.
     categories:
       LIGHT_APPROVAL: when no further documents is requested to the user
       REGULAR: when the documentation policy is FULL or FLEX.
     lineage:
-    - datalake_docx_clean.credit_evaluation.type
+      - datalake_docx_clean.credit_evaluation.type
   user_pre_approved_limit:
     description: The pre-approved limit value attached to the credit passport and presented to the user.
     lineage:
-    - datalake_docx_clean.credit_evaluation.pre_approved_limit
+      - datalake_docx_clean.credit_evaluation.pre_approved_limit
   user_requested_value:
     description: The limit value specified by the user when the person filled up the credit evaluation form.
     lineage:
-    - datalake_docx_clean.credit_evaluation.limit_value
+      - datalake_docx_clean.credit_evaluation.limit_value
   maximum_debit_limit:
     description: Credit engine calculated limit. This value is calculated by the credit models based on the limit value and the group income. It corresponds to the credit risk limit.
     lineage:
-    - datalake_credit_analysis.credit_engine
+      - datalake_credit_analysis.credit_engine
   total_informed_income:
     description: Total informed income submitted by the user when the person filled up the credit evaluation.
     lineage:
-    - datalake_docx_clean.credit_evaluation_proponent.monthly_income
+      - datalake_docx_clean.credit_evaluation_proponent.monthly_income
   credit_evaluation_source:
     description: The credit evaluation source. This column indicates the origin of the credit evaluation.
     categories:
@@ -86,19 +86,19 @@ columns:
   variant:
     description: The variant model of the credit evaluation.
     lineage:
-    - datalake_sorting_hat_clean.policy_report.variant
+      - datalake_sorting_hat_clean.policy_report.variant
   policy_dti:
     description: The percentil classifying the credit evaluation according to its DTI (debit to income).
     lineage:
-    - datalake_sorting_hat_clean.policy_report.policy_dti
+      - datalake_sorting_hat_clean.policy_report.policy_dti
   category:
     description: The category value of the paid guarantee.
     lineage:
-    - datalake_sorting_hat_clean.policy_report.analysis_category
+      - datalake_sorting_hat_clean.policy_report.analysis_category
   risk_category_canon:
-    description: The risk category canon of the credit evaluation.
+    description: Credit analysis attribute describing risk category canon in the tenant underwriting workflow.
     lineage:
-    - datalake_sorting_hat_clean.policy_report.risk_category_canon
+      - datalake_sorting_hat_clean.policy_report.risk_category_canon
   group_type:
     description: The group composition. This column can be null for early credit analysis.
     categories:
@@ -108,12 +108,12 @@ columns:
   number_of_proponents:
     description: The total number of proponents in the group or proposal.
     lineage:
-    -  datalake_sorting_hat_clean.proponent
-    -  datalake_docx_clean.group_member
+      -  datalake_sorting_hat_clean.proponent
+      -  datalake_docx_clean.group_member
   is_automatic:
     description: Boolean indicating if evaluation was automatically run after proposal creation with previous collected credit info from other proposal
     lineage:
-    - datalake_docx_clean.credit_evaluation.is_automatic
+      - datalake_docx_clean.credit_evaluation.is_automatic
   is_early_credit:
     description: Boolean indicating if the credit evaluation refers to an early credit.
   is_bypass:
@@ -125,18 +125,18 @@ columns:
   is_retenant:
     description: Boolean indicating if the user previously had a contract with Quinto Andar (retenants).
     lineage:
-    - datalake_sorting_hat.policy_report.is_retenant
+      - datalake_sorting_hat.policy_report.is_retenant
   ts_created:
     description: Timestamp indicating when the credit evaluation was created in the data source.
     lineage:
-    - datalake_docx_clean.credit_evaluation.ts_created
+      - datalake_docx_clean.credit_evaluation.ts_created
   ts_updated:
     description: Timestamp indicating when the credit evaluation was updated in the data source.
     lineage:
-    - datalake_docx_clean.credit_evaluation.ts_updated
+      - datalake_docx_clean.credit_evaluation.ts_updated
   ts_expired:
     description: Timestamp indicating when the credit evaluation submitted within a credit passport expires.
     lineage:
-    - datalake_docx_clean.credit_evaluation.ts_expires
+      - datalake_docx_clean.credit_evaluation.ts_expires
   ts_load:
     description: Timestamp indicating when the data was refreshed.

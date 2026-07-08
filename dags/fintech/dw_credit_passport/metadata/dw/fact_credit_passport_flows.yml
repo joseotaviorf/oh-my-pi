@@ -46,7 +46,7 @@ columns:
     lineage:
       - datalake_docx.credit_evaluation_events.credit_evaluation_source
   user_first_touchpoint:
-    description: The first touchpoint of the user in the credit passport flow.
+    description: Credit analysis attribute describing user first touchpoint in the tenant underwriting workflow.
     categories:
       listing: when the user accessed the credit passport through the listing page
       offer: when the user accessed the credit passport through the offer page

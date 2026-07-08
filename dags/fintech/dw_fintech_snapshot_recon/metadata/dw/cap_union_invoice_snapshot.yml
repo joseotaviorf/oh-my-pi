@@ -1,7 +1,7 @@
 ---
 database_name: dw_fintech_snapshot_recon
 table_name: cap_union_invoice_snapshot
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Monthly snapshot of datalake_accounting_funnel.cap_union_invoice for finance reconciliation time travel. Runs on the first business day of the month."
 columns:
@@ -24,7 +24,7 @@ columns:
   version:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.version
-    description: "Contract version"
+    description: Contract product version associated with the invoice entry.
   accounting_version:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.accounting_version
@@ -48,7 +48,7 @@ columns:
   bill_item:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.bill_item
-    description: "Bill item indication"
+    description: Bill item name indicating what the invoice entry refers to (for example, rent or condominium).
   description:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.description
@@ -156,7 +156,7 @@ columns:
   invoice_paid_amount:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.invoice_paid_amount
-    description: "Invoice paid value"
+    description: Total amount paid on the invoice in local currency.
   accrual_year_month:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.accrual_year_month
@@ -220,23 +220,23 @@ columns:
   entry_created_date:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.entry_created_date
-    description: "Entry creation date"
+    description: Calendar date on which the Seu Barriga invoice entry was first recorded in the accounting funnel.
   invoice_created_date:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.invoice_created_date
-    description: "Invoice creation date"
+    description: Date when the invoice was created in Seu Barriga.
   invoice_due_date:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.invoice_due_date
-    description: "Invoice due date"
+    description: Scheduled payment due date for the Seu Barriga invoice in the accrual period.
   invoice_paid_date:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.invoice_paid_date
-    description: "Date when the invoice was paid"
+    description: Settlement date when payment for the Seu Barriga invoice was confirmed.
   invoice_canceled_date:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.invoice_canceled_date
-    description: "Date when the invoice was canceled"
+    description: Calendar date when the Seu Barriga invoice was voided or canceled before settlement.
   invoice_reversal_date:
     lineage:
       - datalake_accounting_funnel.cap_union_invoice.invoice_reversal_date
@@ -269,4 +269,3 @@ columns:
     description: "Month of CURRENT_DATE when the snapshot was taken."
   day:
     description: "Day of CURRENT_DATE when the snapshot was taken."
-

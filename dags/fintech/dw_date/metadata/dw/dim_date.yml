@@ -1,8 +1,8 @@
 ---
 database_name: dw_public
 table_name: dim_date
-owner: fintech-ae@quintoandar.com.br
-domain: Cross
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
 description: Table that has all base structures for hadling dates on QuintoAndar
 columns:
   sk_date:
@@ -38,11 +38,11 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.month
   month_name:
-    description: Name of the month
+    description: Financial attribute representing month name on the dim_date dataset.
     lineage:
       - datalake_quintoandar.aux_date.month_name
   bimester:
-    description: Number of the bimester.
+    description: Financial attribute representing bimester on the dim_date dataset.
     categories:
       "1": January to February
       "2": March to April
@@ -53,7 +53,7 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.bimester
   bimester_name:
-    description: Name of the bimester.
+    description: Financial attribute representing bimester name on the dim_date dataset.
     lineage:
       - datalake_quintoandar.aux_date.bimester_name
   quarter:
@@ -70,19 +70,19 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.brz_season
   year:
-    description: Year
+    description: Year recorded on the dim_date dataset.
     lineage:
       - datalake_quintoandar.aux_date.year
   year_calendar_week:
-    description: Week number/year
+    description: Financial attribute representing year calendar week on the dim_date dataset.
     lineage:
       - datalake_quintoandar.aux_date.year_calendar_week
   year_month:
-    description: Year/month
+    description: Financial attribute representing year month on the dim_date dataset.
     lineage:
       - datalake_quintoandar.aux_date.year_month
   year_quarter:
-    description: Year/quarter
+    description: Financial attribute representing year quarter on the dim_date dataset.
     lineage:
       - datalake_quintoandar.aux_date.year_quarter
   working_days_in_month:
@@ -94,7 +94,7 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.working_days_in_month_fintech
   total_working_days_in_month:
-    description: The total of working days in a month
+    description: Financial attribute representing total working days in month on the dim_date dataset.
     lineage:
       - datalake_quintoandar.aux_date.total_working_days_in_month
   total_working_days_in_month_fintech:
@@ -102,7 +102,7 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.total_working_days_in_month_fintech
   total_days_in_month:
-    description: The total of days in a month
+    description: Financial attribute representing total days in month on the dim_date dataset.
     lineage:
       - datalake_quintoandar.aux_date.total_days_in_month
   is_brz_holiday:
@@ -209,3 +209,6 @@ columns:
     description: Previous year (date - 1 year)
     lineage:
       - datalake_quintoandar.aux_date.last_year
+  br_holiday_name:
+    description: Financial attribute representing br holiday name on the dim_date dataset.
+    lineage: []

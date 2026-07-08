@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base.action
   action_description:
-    description: "Description of the action."
+    description: "Description of the action (Arbitral, Extrajudicial or Judicial)"
     lineage:
       - datalake_cyber_legal.evictions_base.action_description
   result:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base.result
   result_description:
-    description: "Description of the result."
+    description: "Description of the case result"
     lineage:
       - datalake_cyber_legal.evictions_base.result_description
   complement:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base.complement
   complement_description:
-    description: "Description of the complement."
+    description: "Description of the complement (Carta)"
     lineage:
       - datalake_cyber_legal.evictions_base.complement_description
   comment:

@@ -1,7 +1,7 @@
 ---
 database_name: dw_fintech_snapshot_recon
 table_name: contract_recon_snapshot
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Monthly snapshot of contract attributes used for accounting funnel reconciliation (Brazil FullService active/finished contracts), aligned with enrich contract logic."
 columns:
@@ -98,10 +98,6 @@ columns:
     lineage:
       - dw_rent.dim_contract.first_rent_charged
     description: "First rent charged configuration from dim_contract."
-  "5A_brokerage_amount":
-    lineage:
-      - "datalake_accounting_funnel.for_rent_contract_brokerage.5A_brokerage_amount"
-    description: "QuintoAndar brokerage amount from accounting funnel contract brokerage table."
   agent_brokerage_amount:
     lineage:
       - datalake_accounting_funnel.for_rent_contract_brokerage.agent_brokerage_amount
@@ -114,14 +110,6 @@ columns:
     lineage:
       - datalake_accounting_funnel.for_rent_contract_brokerage.select_brokerage_amount
     description: "Select brokerage amount from for_rent_contract_brokerage."
-  "3p_brokerage_amount":
-    lineage:
-      - "datalake_accounting_funnel.for_rent_contract_brokerage.3p_brokerage_amount"
-    description: "Third-party brokerage amount from for_rent_contract_brokerage."
-  "5A_brokerage_share":
-    lineage:
-      - "datalake_accounting_funnel.for_rent_contract_brokerage.5A_brokerage_share"
-    description: "QuintoAndar brokerage share from for_rent_contract_brokerage."
   agent_brokerage_share:
     lineage:
       - datalake_accounting_funnel.for_rent_contract_brokerage.agent_brokerage_share
@@ -134,10 +122,6 @@ columns:
     lineage:
       - datalake_accounting_funnel.for_rent_contract_brokerage.select_brokerage_share
     description: "Select brokerage share from for_rent_contract_brokerage."
-  "3p_brokerage_share":
-    lineage:
-      - "datalake_accounting_funnel.for_rent_contract_brokerage.3p_brokerage_share"
-    description: "Third-party brokerage share from for_rent_contract_brokerage."
   contract_type:
     lineage:
       - datalake_ebdb_clean.contract_person.cpf
@@ -150,3 +134,19 @@ columns:
     description: "Month of CURRENT_DATE when the snapshot was taken."
   day:
     description: "Day of CURRENT_DATE when the snapshot was taken."
+  5A_brokerage_amount:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.5A_brokerage_amount
+    description: QuintoAndar brokerage amount from accounting funnel contract brokerage table.
+  3p_brokerage_amount:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.3p_brokerage_amount
+    description: Third-party brokerage amount from for_rent_contract_brokerage.
+  5A_brokerage_share:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.5A_brokerage_share
+    description: QuintoAndar brokerage share from for_rent_contract_brokerage.
+  3p_brokerage_share:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.3p_brokerage_share
+    description: Third-party brokerage share from for_rent_contract_brokerage.

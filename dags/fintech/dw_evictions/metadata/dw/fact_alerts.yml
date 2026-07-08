@@ -30,7 +30,7 @@ columns:
     lineage:
       - datalake_cyber_legal.alerts.alert_type_code
   alert_type_description:
-    description: "Description of the alert type"
+    description: "Description corresponding to the alert type code"
     lineage:
       - datalake_cyber_legal.alerts.alert_type_description
   alert_comment:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_cyber_legal.alerts.agency_name
   last_process_stage:
-    description: "Last process stage"
+    description: "Stage where the legal case is at the moment"
     lineage:
       - datalake_cyber_legal.alerts.last_process_stage
   id_generating_attorney:
@@ -54,7 +54,7 @@ columns:
     lineage:
       - datalake_cyber_legal.alerts.id_revising_attorney
   contract_status:
-    description: "Contract status"
+    description: "Status of the contract (Ativo or Finalizado)"
     lineage:
       - datalake_cyber_legal.alerts.contract_status
   alert_creator:
@@ -98,6 +98,6 @@ columns:
     lineage:
       - datalake_cyber_legal.alerts.dt_reviewed
   ts_load:
-    description: "Timestamp of the load"
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
     lineage:
       - datalake_evictions.alerts.ts_load

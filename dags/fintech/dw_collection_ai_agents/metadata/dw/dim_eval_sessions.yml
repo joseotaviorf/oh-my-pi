@@ -7,116 +7,116 @@ columns:
   id_session:
     lineage:
       - datalake_langfuse_clean.scores.id_session
-    description: "Langfuse session ID"
+    description: "Identifier for the session (Langfuse ID)"
   status_tag_format:
     lineage:
       - datalake_langfuse_clean.scores.name
-    description: "Tag format for the session"
+    description: "Tag format for the session (Old Tag Format for only one string tag per session or New Tag Format for multiple evals per session)"
   old_tag_value:
     lineage:
       - datalake_langfuse_clean.scores.string_value
-    description: "Old tag value for the session"
+    description: "Old tag value for the session (Only available for Old Tag Format)"
   eval_auth_requested:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for authentication requested"
+    description: "Evaluation score when the authentication request is made"
   eval_auth_completed:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for authentication completed"
+    description: "Evaluation score when the authentication is completed"
   eval_debt_presented:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for debt presented"
+    description: "Evaluation score when the debt is presented"
   eval_negotiation_offered:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for negotiation offered"
+    description: "Evaluation score when the negotiation is offered"
   eval_user_requested_alternative:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for user requested alternative"
+    description: "Evaluation score when the user requests an alternative"
   eval_negotiation_closed:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for negotiation closed"
+    description: "Evaluation score when the negotiation is closed"
   eval_bot_encountered_error:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for bot encountered error"
+    description: "Evaluation score when the bot encounters an error"
   eval_no_contract_found:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for no contract found"
+    description: "Evaluation score when no contract is found"
   eval_no_matthew_interaction:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for no Matthew interaction"
+    description: "Evaluation score when no Matthew interaction is found"
   eval_escalated_to_human:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for escalated to human"
+    description: "Evaluation score when the session is escalated to human"
   eval_user_disagreed:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for user disagreed"
+    description: "Evaluation score when the user disagrees"
   status_authentication_requested:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for authentication requested"
+    description: "Filled with 'Authentication Requested' when the authentication request is made"
   status_authentication_completed:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for authentication completed"
+    description: "Filled with 'Authentication Completed' when the authentication is completed"
   status_debt_presented:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for debt presented"
+    description: "Filled with 'Debt Presented' when the debt is presented"
   status_negotiation_offered:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for negotiation offered"
+    description: "Filled with 'Negotiation Offered' when the negotiation is offered"
   status_user_requested_alternative:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for user requested alternative"
+    description: "Filled with 'User Requested Alternative' when the user requests an alternative"
   status_negotiation_closed:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for negotiation closed"
+    description: "Filled with 'Negotiation Closed' when the negotiation is closed"
   status_bot_encountered_error:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for bot encountered error"
+    description: "Filled with 'Bot Encountered Error' when the bot encounters an error"
   status_no_contract_found:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for no contract found"
+    description: "Filled with 'No Contract Found' when no contract is found"
   status_no_matthew_interaction:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for no Matthew interaction"
+    description: "Filled with 'No Matthew Interaction' when no Matthew interaction is found"
   status_escalated_to_human:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for escalated to human"
+    description: "Filled with 'Session Escalated To Human' when the session is escalated to human"
   status_user_disagreed:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for user disagreed"
+    description: "Filled with 'User Disagreed' when the user disagrees"
   status_user_paid_invoice_tool:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for user paid invoice tool"
+    description: "Filled with 'User Used Paid Invoice Toll (IR)' when the user uses the paid invoice tool"
   status_user_not_tenant:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Status for user not tenant"
+    description: "Filled with 'User Flagged as Not Tenant' when the user is flagged as not tenant"
   eval_user_not_tenant:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for user not tenant"
+    description: "Evaluation score when the user is flagged as not tenant"
   eval_user_paid_invoice_tool:
     lineage:
       - datalake_langfuse_clean.scores.value
-    description: "Evaluation score for user paid invoice tool"
+    description: "Evaluation score when the user uses the paid invoice tool"

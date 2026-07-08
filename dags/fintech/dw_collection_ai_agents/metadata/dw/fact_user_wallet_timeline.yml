@@ -77,3 +77,12 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
     description: "Reference date for the timeline data"
+  month:
+    lineage: []
+    description: Month partition derived from the source event timestamp for incremental loading.
+  day:
+    lineage: []
+    description: Day partition derived from the source event timestamp for incremental loading.
+  year:
+    lineage: []
+    description: Year partition derived from the source event timestamp for incremental loading.

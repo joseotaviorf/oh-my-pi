@@ -1,41 +1,41 @@
 database_name: dw_payment
 table_name: dim_occurrence_code
-description: Catalog with the meaning of occurrences codes
+description: Catalog of bank occurrence (return) codes used to interpret CNAB and SISPAG banking file statuses.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_occurrence_code:
     lineage:
-    - datalake_vans_clean.boleto.occurrence_code
-    - datalake_vans_clean.payment.occurrence_code
-    - datalake_vans_clean.payment_boleto.occurrence_code
-    description: ID of occurrence code
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
+    description: Surrogate key for the bank occurrence (return) code used in dimensional joins.
   name:
     lineage:
-    - datalake_vans_clean.boleto.occurrence_code
-    - datalake_vans_clean.payment.occurrence_code
-    - datalake_vans_clean.payment_boleto.occurrence_code
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
     description: Name of occurrence code such as described in banking file guides
       provided by corresponding bank institutions
   last_code:
     lineage:
-    - datalake_vans_clean.boleto.occurrence_code
-    - datalake_vans_clean.payment.occurrence_code
-    - datalake_vans_clean.payment_boleto.occurrence_code
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
     description: The last occurrence code for combined returns from SISPAG, which
       represents the higher detail level of errors
   second_last_code:
     lineage:
-    - datalake_vans_clean.boleto.occurrence_code
-    - datalake_vans_clean.payment.occurrence_code
-    - datalake_vans_clean.payment_boleto.occurrence_code
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
     description: The second last occurrence code for combined returns from SISPAG,
       which represents the second higher detail level of errors
   third_last_code:
     lineage:
-    - datalake_vans_clean.boleto.occurrence_code
-    - datalake_vans_clean.payment.occurrence_code
-    - datalake_vans_clean.payment_boleto.occurrence_code
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
     description: The third last occurrence code for combined returns from SISPAG,
       which represents the third higher detail level of errors
   source_file_type:
@@ -45,6 +45,6 @@ columns:
       cnab: ''
       sispag: ''
   description:
-    description: description of occurrence code
+    description: Human-readable description of the occurrence code meaning as defined in the bank return file guide.
   ts_load:
-    description: Load Timestamp
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
