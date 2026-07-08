@@ -98,6 +98,7 @@ Each **metric entity** file follows a different, leaner structure focused on the
 - `business_entities/recovery_collections_fr_tenants.md` — Overdue debt recovery rate analytics for For-Rent tenants (recuperação / cobrança FR / wallet / recovery rate)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
 - `business_entities/recs.md` — Recommendation exposures and downstream journey attribution (recomendacoes / carrossel de recomendacao)
+- `business_entities/roas_ecm_credit_impact.md` — ROAS / ECM credit impact: measuring whether new eCM (ELTV) model versions improve acquired TP credit quality (mix, OA2CA, ES2EP) via ROAS API calls on VB/OS stored in EMLIO (ROAS / eCM / mix de crédito / EMLIO / eltv)
 - `business_entities/search.md` — Search result impressions, CTR, ranking, and downstream journey attribution (busca / resultado de busca)
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
 - `business_entities/salesforce_sst_pipeline.md` — Salesforce Single Station pipeline health: hourly volume, latency, CDC gaps, Appflow connector status, and contract quality checks in `datalake_sst_metrics` (pipeline SST / saúde do pipeline / Appflow / recovery flow)
