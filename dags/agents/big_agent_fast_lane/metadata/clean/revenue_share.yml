@@ -43,6 +43,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.revenue_share.invalidation_reason
     description: Reason explaining why this record was invalidated, if applicable.
+  author:
+    lineage:
+      - datalake_big_agent_raw.revenue_share.author
+    description: Author responsible for creating the revenue share.
   dt_validity_start:
     lineage:
       - datalake_big_agent_raw.revenue_share.validity_start_at

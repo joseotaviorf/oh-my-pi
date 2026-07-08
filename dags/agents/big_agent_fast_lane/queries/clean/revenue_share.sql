@@ -8,6 +8,7 @@ SELECT
     value,
     status,
     invalidation_reason,
+    author,
     DATE(validity_start_at) as dt_validity_start,
     DATE(validity_end_at) as dt_validity_end,
     TIMESTAMP(created_at) AS ts_created,

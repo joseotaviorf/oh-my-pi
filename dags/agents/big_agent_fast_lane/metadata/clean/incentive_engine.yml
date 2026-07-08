@@ -27,6 +27,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_engine.status
     description: Lifecycle status of the incentive engine configuration (active, inactive, etc.).
+  author:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine.author
+    description: Author responsible for creating the incentive engine.
   ts_validity_started:
     lineage:
       - datalake_big_agent_raw.incentive_engine.validity_start_at
@@ -55,6 +59,3 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_engine.day
     description: Partition day.
-
-
-

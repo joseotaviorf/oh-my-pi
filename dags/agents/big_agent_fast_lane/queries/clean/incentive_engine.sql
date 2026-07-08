@@ -4,6 +4,7 @@ SELECT
     external_condition_type,
     incentive_system,
     status,
+    author,
     TIMESTAMP(validity_start_at) AS ts_validity_started,
     TIMESTAMP(validity_end_at) AS ts_validity_ended,
     TIMESTAMP(created_at) AS ts_created,
