@@ -1,8 +1,8 @@
 database_name: datalake_bob
 table_name: house_draft_business_context
-description: This table contains house draft enriched with house information and business context. Each row means a draft for a business context.
-domain: Growth
 owner: gabriel.salla@quintoandar.com
+domain: Growth
+description: This table contains house draft enriched with house information and business context. Each row means a draft for a business context.
 columns:
   id_draft:
     description: Identifier for house draft.
@@ -18,7 +18,7 @@ columns:
       - datalake_ebdb_clean.house.id_region
       - datalake_bob_clean.location.id_region
   city:
-    description: City of the house draft.
+    description: City of the draft property, from EBDB house when published or Bob location otherwise.
     lineage:
       - datalake_ebdb_clean.house.city
       - datalake_bob_clean.location.city
@@ -32,13 +32,21 @@ columns:
       - datalake_bob.house_draft.is_for_rent
       - datalake_bob.house_draft.is_for_sale
   status:
-    description: Status of the house draft.
+    description: Current Bob draft workflow status at enrich time.
     lineage:
       - datalake_bob.house_draft.status
   type:
-    description: Type of the house draft.
+    description: Bob draft workflow type indicating how the listing registration was initiated. Propagates to supply taxonomy as conversion application.
     lineage:
       - datalake_bob.house_draft.type
+    categories:
+      FULL_SELF_SERVICE: Owner completes listing registration via self-service PWA without assisted operations.
+      OWNER_CONVERSION: Owner conversion PWA onboarding flow.
+      REFERRAL: Draft initiated through a referral or affiliate program.
+      ADMIN_CONFIRMATION: Admin-assisted confirmation flow (CIQ); commonly paired with portfolio manager registration.
+      ISAIAS: Isaias partner-assisted registration channel.
+      PORTFOLIO_MANAGER: Portfolio manager (gestor de carteira) assisted registration.
+      PRIME: Prime B2B service owner registration flow.
   ops_team:
     description: Operations team associated with the house draft.
     lineage:

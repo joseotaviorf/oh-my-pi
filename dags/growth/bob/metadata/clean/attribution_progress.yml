@@ -1,19 +1,30 @@
 database_name: datalake_bob_clean
 table_name: attribution_progress
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Clean layer tracking owner confirmation progress during Bob lead attribution. One row per house draft in attribution flows (REFERRAL, ADMIN_CONFIRMATION, PORTFOLIO_MANAGER types only; ~21% of all drafts).
 columns:
   id_house_draft:
     lineage:
       - datalake_bob_raw.attribution_progress.house_draft_id
+    description: Bob house draft identifier for this attribution record.
   confirmation_attempts:
     lineage:
       - datalake_bob_raw.attribution_progress.confirmation_attempts
+    description: Number of owner confirmation attempts made during lead attribution.
   status:
     lineage:
       - datalake_bob_raw.attribution_progress.status
+    description: Current attribution workflow status for the draft.
+    categories:
+      ATTRIBUTED: Lead attribution confirmed by the owner.
+      WAITING_CONFIRMATION: Awaiting owner confirmation of attribution.
+      INITIAL: Attribution flow started but not yet confirmed.
   ts_created:
     lineage:
       - datalake_bob_raw.attribution_progress.created_at
+    description: Timestamp when the attribution progress record was created in Bob.
   ts_updated:
     lineage:
       - datalake_bob_raw.attribution_progress.updated_at
+    description: Timestamp when the attribution progress record was last updated in Bob.

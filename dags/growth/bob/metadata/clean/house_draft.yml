@@ -1,52 +1,83 @@
 database_name: datalake_bob_clean
 table_name: house_draft
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Clean layer for in-progress property listing drafts from Bob (bob-o-construtor). One row per draft session where owners, portfolio managers, inside sales, or partner-assisted flows register a property before submission to EBDB/Main. Stores JSON payloads for owners, property details, access instructions, pricing, blueprint, and business context (RENT/SALE).
 columns:
   id:
     lineage:
       - datalake_bob_raw.house_draft.id
+    description: Bob house draft primary key.
   id_client_side:
     lineage:
       - datalake_bob_raw.house_draft.client_side_id
+    description: Frontend-generated identifier tracking the draft session in the Bob UI.
   id_original_lead:
     lineage:
       - datalake_bob_raw.house_draft.original_lead_id
+    description: Acquisition lead identifier linked when the draft was initiated. Populated on ~55% of drafts; joins to datalake_ebdb_clean.lead.id for ~99.4% of non-null values.
   registrar:
     lineage:
       - datalake_bob_raw.house_draft.registrar
+    description: Foreign key to datalake_bob_clean.registrar.id for the user who started the draft.
   owners:
     lineage:
       - datalake_bob_raw.house_draft.owners
+    description: JSON array of property owner contact and document details captured in the draft.
   details:
     lineage:
       - datalake_bob_raw.house_draft.details
+    description: JSON struct with property characteristics (furnishing, vacancy, appliances, description).
   access:
     lineage:
       - datalake_bob_raw.house_draft.access
+    description: JSON struct describing property access instructions for visits and photo sessions.
   pricing:
     lineage:
       - datalake_bob_raw.house_draft.pricing
+    description: JSON struct with rent/sale prices, condo fee, IPTU, and administration fee proposals.
   blueprint:
     lineage:
       - datalake_bob_raw.house_draft.blueprint
+    description: JSON struct with bedroom/bathroom counts, property type, and total area.
   status:
     lineage:
       - datalake_bob_raw.house_draft.status
+    description: Current workflow status of the draft in Bob.
+    categories:
+      SUBMITTED: Draft successfully submitted to EBDB/Main.
+      EDITING: Draft still in progress in the Bob UI.
+      DELETED: Draft deleted or abandoned by the user.
+      PROCESSING: Draft being processed by Bob backend before final status.
   business_context:
     lineage:
       - datalake_bob_raw.house_draft.business_context
+    description: JSON struct with businessContextType array listing intents (RENT, SALE, both, or empty). ~14% have empty array; ~0.3% null. Parsed downstream in enrich_bob as is_for_rent/is_for_sale.
   type:
     lineage:
       - datalake_bob_raw.house_draft.type
+    description: Bob draft workflow type indicating how the listing registration was initiated in Bob.
+    categories:
+      FULL_SELF_SERVICE: Owner completes listing registration via self-service PWA without assisted operations.
+      OWNER_CONVERSION: Owner conversion PWA onboarding flow.
+      REFERRAL: Draft initiated through a referral or affiliate program.
+      ADMIN_CONFIRMATION: Admin-assisted confirmation flow (CIQ); commonly paired with portfolio manager registration.
+      ISAIAS: Isaias partner-assisted registration channel.
+      PORTFOLIO_MANAGER: Portfolio manager (gestor de carteira) assisted registration.
+      PRIME: Prime B2B service owner registration flow.
   administrators:
     lineage:
       - datalake_bob_raw.house_draft.administrators
+    description: JSON array of building administrator contact details.
   attendance_info:
     lineage:
-      - datalake_bob_raw.house_draft.administrators
+      - datalake_bob_raw.house_draft.attendance_info
+    description: JSON struct with operations team, company, and contact channel for draft support.
   ts_created:
     lineage:
       - datalake_bob_raw.house_draft.created_at
+    description: Timestamp when the draft was created in Bob.
   ts_updated:
     lineage:
       - datalake_bob_raw.house_draft.updated_at
+    description: Timestamp when the draft was last updated in Bob.

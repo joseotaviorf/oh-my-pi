@@ -1,19 +1,30 @@
 database_name: datalake_bob_clean
 table_name: submission_progress
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Clean layer tracking Bob draft submission to EBDB/Main. One row per draft that entered the submission workflow (~52% of all drafts), recording publish attempts, workflow status, error details, and the external house ID (id_external) assigned after successful submission.
 columns:
   id_house_draft:
     lineage:
       - datalake_bob_raw.submission_progress.house_draft_id
+    description: Bob house draft identifier for this submission record.
   id_external:
     lineage:
       - datalake_bob_raw.submission_progress.external_id
+    description: EBDB/Main house identifier (Imovel.id) assigned after successful draft submission. Populated only when status is SUBMITTED; 100% match to datalake_ebdb_clean.house.id in production.
   attempts:
     lineage:
       - datalake_bob_raw.submission_progress.attempts
+    description: Number of submission attempts made to publish the draft to EBDB/Main.
   status:
     lineage:
       - datalake_bob_raw.submission_progress.status
+    description: Current submission workflow status.
+    categories:
+      SUBMITTED: Draft successfully published to EBDB/Main.
+      FAILED: Most recent submission attempt failed; see error_description.
+      PROCESSING: Submission in progress on Bob backend.
   error_description:
     lineage:
       - datalake_bob_raw.submission_progress.error_description
+    description: Error message from the most recent failed submission attempt, when applicable.

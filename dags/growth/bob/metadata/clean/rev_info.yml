@@ -1,19 +1,26 @@
 database_name: datalake_bob_clean
 table_name: rev_info
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Bob Hibernate Envers revision metadata sourced from the revinfo table. Central audit spine for all Bob _aud tables — each revision row stores the revision number and timestamp. Join as rev_info.rev = {entity}_aud.rev.
 columns:
   rev:
     lineage:
       - datalake_bob_raw.revinfo.rev
+    description: Unique revision number and primary key. Referenced as rev in all Bob _aud tables.
   ts_created:
     lineage:
       - datalake_bob_raw.revinfo.revtstmp
+    description: Timestamp when the revision was created in Bob (Envers revtstmp).
   year:
     lineage:
       - datalake_bob_raw.revinfo.year
+    description: Hive partition year for incremental reads of revision history.
   month:
     lineage:
       - datalake_bob_raw.revinfo.month
+    description: Hive partition month for incremental reads of revision history.
   day:
     lineage:
       - datalake_bob_raw.revinfo.day
+    description: Hive partition day for incremental reads of revision history.

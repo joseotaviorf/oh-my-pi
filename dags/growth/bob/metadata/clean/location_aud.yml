@@ -1,94 +1,130 @@
 database_name: datalake_bob_clean
 table_name: location_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Hibernate Envers audit history for Bob draft location changes. Tracks revisions to address, coordinates, region assignment, and out-of-area status. Join rev to rev_info.
 columns:
   id_house_draft:
     lineage:
       - datalake_bob_raw.location_aud.house_draft_id
+    description: Bob house draft identifier for this location audit row.
   id_region:
     lineage:
       - datalake_bob_raw.location_aud.region_id
+    description: Region identifier value captured in this revision.
   rev:
     lineage:
       - datalake_bob_raw.location_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_bob_clean.rev_info.rev; join on rev to retrieve when the change occurred.
   rev_type:
     lineage:
       - datalake_bob_raw.location_aud.revtype
+    description: Hibernate Envers operation type for this audit row.
+    categories:
+      '0': INSERT — location record created in this revision.
+      '1': UPDATE — location record modified in this revision.
+      '2': DELETE — location record deleted (rare; observed in production).
   address:
     lineage:
       - datalake_bob_raw.location_aud.address
+    description: Street address value captured in this revision.
   number:
     lineage:
       - datalake_bob_raw.location_aud.number
+    description: Street number value captured in this revision.
   floor:
     lineage:
       - datalake_bob_raw.location_aud.floor
+    description: Floor value captured in this revision.
   complement:
     lineage:
       - datalake_bob_raw.location_aud.complement
+    description: Address complement value captured in this revision.
   reference_point:
     lineage:
       - datalake_bob_raw.location_aud.reference_point
+    description: Reference point value captured in this revision.
   neighborhood:
     lineage:
       - datalake_bob_raw.location_aud.neighborhood
+    description: Neighborhood value captured in this revision.
   city:
     lineage:
       - datalake_bob_raw.location_aud.city
+    description: City value captured in this revision.
   state:
     lineage:
       - datalake_bob_raw.location_aud.state
+    description: State value captured in this revision.
   zip_code:
     lineage:
       - datalake_bob_raw.location_aud.zip_code
+    description: Postal code value captured in this revision.
   lat:
     lineage:
       - datalake_bob_raw.location_aud.lat
+    description: Latitude value captured in this revision.
   lng:
     lineage:
       - datalake_bob_raw.location_aud.lng
+    description: Longitude value captured in this revision.
   is_out_of_area:
     lineage:
       - datalake_bob_raw.location_aud.out_of_area
+    description: Out-of-area flag value captured in this revision.
   mod_id_house_draft:
     lineage:
       - datalake_bob_raw.location_aud.house_draft_mod
+    description: Audit flag indicating whether house draft identifier changed in this revision (Hibernate Envers _mod column).
   mod_id_region:
     lineage:
       - datalake_bob_raw.location_aud.region_id_mod
+    description: Audit flag indicating whether region identifier changed in this revision (Hibernate Envers _mod column).
   mod_address:
     lineage:
       - datalake_bob_raw.location_aud.address_mod
+    description: Audit flag indicating whether street address changed in this revision (Hibernate Envers _mod column).
   mod_number:
     lineage:
       - datalake_bob_raw.location_aud.number_mod
+    description: Audit flag indicating whether street number changed in this revision (Hibernate Envers _mod column).
   mod_floor:
     lineage:
       - datalake_bob_raw.location_aud.floor_mod
+    description: Audit flag indicating whether floor changed in this revision (Hibernate Envers _mod column).
   mod_complement:
     lineage:
       - datalake_bob_raw.location_aud.complement_mod
+    description: Audit flag indicating whether address complement changed in this revision (Hibernate Envers _mod column).
   mod_reference_point:
     lineage:
       - datalake_bob_raw.location_aud.reference_point_mod
+    description: Audit flag indicating whether reference point changed in this revision (Hibernate Envers _mod column).
   mod_neighborhood:
     lineage:
       - datalake_bob_raw.location_aud.neighborhood_mod
+    description: Audit flag indicating whether neighborhood changed in this revision (Hibernate Envers _mod column).
   mod_city:
     lineage:
       - datalake_bob_raw.location_aud.city_mod
+    description: Audit flag indicating whether city changed in this revision (Hibernate Envers _mod column).
   mod_state:
     lineage:
       - datalake_bob_raw.location_aud.state_mod
+    description: Audit flag indicating whether state changed in this revision (Hibernate Envers _mod column).
   mod_zip_code:
     lineage:
       - datalake_bob_raw.location_aud.zip_code_mod
+    description: Audit flag indicating whether postal code changed in this revision (Hibernate Envers _mod column).
   mod_lat:
     lineage:
       - datalake_bob_raw.location_aud.lat_mod
+    description: Audit flag indicating whether latitude changed in this revision (Hibernate Envers _mod column).
   mod_lng:
     lineage:
       - datalake_bob_raw.location_aud.lng_mod
+    description: Audit flag indicating whether longitude changed in this revision (Hibernate Envers _mod column).
   mod_is_out_of_area:
     lineage:
       - datalake_bob_raw.location_aud.out_of_area_mod
+    description: Audit flag indicating whether out-of-area flag changed in this revision (Hibernate Envers _mod column).

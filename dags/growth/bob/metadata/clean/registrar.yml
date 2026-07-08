@@ -1,10 +1,14 @@
 database_name: datalake_bob_clean
 table_name: registrar
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Clean mapping table from Bob registrar records to EBDB Main user IDs. Links the Bob-internal registrar identifier to id_main (Usuario.id) for the agent, owner, or portfolio manager who initiated the house draft.
 columns:
   id:
     lineage:
       - datalake_bob_raw.registrar.id
+    description: Bob registrar record primary key.
   id_main:
     lineage:
       - datalake_bob_raw.registrar.main_id
+    description: EBDB Main user identifier (Usuario.id) of the person who initiated the draft. Always populated; joins to datalake_ebdb_clean.user.id for ~99.4% of rows.

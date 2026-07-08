@@ -1,112 +1,167 @@
 database_name: datalake_bob_clean
 table_name: house_draft_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Hibernate Envers audit history for Bob house_draft changes. One row per revision capturing field values and mod_* flags for every audited draft column, including JSON sections (owners, details, pricing). Join rev to datalake_bob_clean.rev_info to resolve the revision timestamp. Partitioned by year/month/day.
 columns:
   id_house_draft:
     lineage:
       - datalake_bob_raw.house_draft_aud.id
+    description: Bob house draft identifier for this audit row.
   id_client_side:
     lineage:
       - datalake_bob_raw.house_draft_aud.client_side_id
+    description: Client-side draft session identifier value in this revision.
   id_original_lead:
     lineage:
       - datalake_bob_raw.house_draft_aud.original_lead_id
+    description: Original lead identifier value in this revision.
   rev:
     lineage:
       - datalake_bob_raw.house_draft_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_bob_clean.rev_info.rev; join on rev to retrieve when the change occurred.
   rev_type:
     lineage:
       - datalake_bob_raw.house_draft_aud.revtype
+    description: Hibernate Envers operation type for this audit row. Null on a small share of legacy rows (~0.03%).
+    categories:
+      '0': INSERT — draft record created in this revision.
+      '1': UPDATE — draft record modified in this revision.
+      '2': DELETE — draft record deleted (supported by Envers; rare in production).
   registrar:
     lineage:
       - datalake_bob_raw.house_draft_aud.registrar
+    description: Registrar foreign key JSON/value captured in this revision.
   owners:
     lineage:
       - datalake_bob_raw.house_draft_aud.owners
+    description: Owners JSON payload value captured in this revision.
   details:
     lineage:
       - datalake_bob_raw.house_draft_aud.details
+    description: Property details JSON payload value captured in this revision.
   access:
     lineage:
       - datalake_bob_raw.house_draft_aud.access
+    description: Property access JSON payload value captured in this revision.
   pricing:
     lineage:
       - datalake_bob_raw.house_draft_aud.pricing
+    description: Pricing JSON payload value captured in this revision.
   blueprint:
     lineage:
       - datalake_bob_raw.house_draft_aud.blueprint
+    description: Blueprint JSON payload value captured in this revision.
   status:
     lineage:
       - datalake_bob_raw.house_draft_aud.status
+    description: Draft workflow status value captured in this revision.
+    categories:
+      SUBMITTED: Draft successfully submitted to EBDB/Main.
+      EDITING: Draft still in progress in the Bob UI.
+      DELETED: Draft deleted or abandoned by the user.
+      PROCESSING: Draft being processed by Bob backend before final status.
   business_context:
     lineage:
       - datalake_bob_raw.house_draft_aud.business_context
+    description: Business context JSON struct (businessContextType array) value captured in this revision.
   type:
     lineage:
       - datalake_bob_raw.house_draft_aud.type
+    description: Draft workflow type value captured in this audit revision.
+    categories:
+      FULL_SELF_SERVICE: Owner completes listing registration via self-service PWA without assisted operations.
+      OWNER_CONVERSION: Owner conversion PWA onboarding flow.
+      REFERRAL: Draft initiated through a referral or affiliate program.
+      ADMIN_CONFIRMATION: Admin-assisted confirmation flow (CIQ); commonly paired with portfolio manager registration.
+      ISAIAS: Isaias partner-assisted registration channel.
+      PORTFOLIO_MANAGER: Portfolio manager (gestor de carteira) assisted registration.
+      PRIME: Prime B2B service owner registration flow.
   administrators:
     lineage:
       - datalake_bob_raw.house_draft_aud.administrators
+    description: Administrators JSON payload value captured in this revision.
   attendance_info:
     lineage:
-      - datalake_bob_raw.house_draft.administrators
+      - datalake_bob_raw.house_draft_aud.attendance_info
+    description: Operations attendance info JSON value captured in this revision.
   mod_id_client_side:
     lineage:
       - datalake_bob_raw.house_draft_aud.client_side_id_mod
+    description: Audit flag indicating whether client-side draft identifier changed in this revision (Hibernate Envers _mod column).
   mod_id_original_lead:
     lineage:
       - datalake_bob_raw.house_draft_aud.original_lead_id_mod
+    description: Audit flag indicating whether original lead identifier changed in this revision (Hibernate Envers _mod column).
   mod_registrar:
     lineage:
       - datalake_bob_raw.house_draft_aud.registrar_mod
+    description: Audit flag indicating whether registrar association changed in this revision (Hibernate Envers _mod column).
   mod_owners:
     lineage:
       - datalake_bob_raw.house_draft_aud.owners_mod
+    description: Audit flag indicating whether owners JSON payload changed in this revision (Hibernate Envers _mod column).
   mod_details:
     lineage:
       - datalake_bob_raw.house_draft_aud.details_mod
+    description: Audit flag indicating whether property details JSON payload changed in this revision (Hibernate Envers _mod column).
   mod_access:
     lineage:
       - datalake_bob_raw.house_draft_aud.access_mod
+    description: Audit flag indicating whether access JSON payload changed in this revision (Hibernate Envers _mod column).
   mod_pricing:
     lineage:
       - datalake_bob_raw.house_draft_aud.pricing_mod
+    description: Audit flag indicating whether pricing JSON payload changed in this revision (Hibernate Envers _mod column).
   mod_blueprint:
     lineage:
       - datalake_bob_raw.house_draft_aud.blueprint_mod
+    description: Audit flag indicating whether blueprint JSON payload changed in this revision (Hibernate Envers _mod column).
   mod_status:
     lineage:
       - datalake_bob_raw.house_draft_aud.status_mod
+    description: Audit flag indicating whether draft status changed in this revision (Hibernate Envers _mod column).
   mod_business_context:
     lineage:
       - datalake_bob_raw.house_draft_aud.business_context_mod
+    description: Audit flag indicating whether business context changed in this revision (Hibernate Envers _mod column).
   mod_type:
     lineage:
       - datalake_bob_raw.house_draft_aud.type_mod
+    description: Audit flag indicating whether draft workflow type changed in this revision (Hibernate Envers _mod column).
   mod_administrators:
     lineage:
       - datalake_bob_raw.house_draft_aud.administrators_mod
+    description: Audit flag indicating whether administrators JSON payload changed in this revision (Hibernate Envers _mod column).
   mod_attendance_info:
     lineage:
-      - datalake_bob_raw.house_draft.attendance_info_mod
+      - datalake_bob_raw.house_draft_aud.attendance_info_mod
+    description: Audit flag indicating whether attendance info JSON payload changed in this revision (Hibernate Envers _mod column).
   mod_ts_created:
     lineage:
       - datalake_bob_raw.house_draft_aud.created_at_mod
+    description: Audit flag indicating whether creation timestamp changed in this revision (Hibernate Envers _mod column).
   mod_ts_updated:
     lineage:
       - datalake_bob_raw.house_draft_aud.updated_at_mod
+    description: Audit flag indicating whether last update timestamp changed in this revision (Hibernate Envers _mod column).
   ts_created:
     lineage:
       - datalake_bob_raw.house_draft_aud.created_at
+    description: Draft creation timestamp value in this revision.
   ts_updated:
     lineage:
       - datalake_bob_raw.house_draft_aud.updated_at
+    description: Draft last-update timestamp value in this revision.
   year:
     lineage:
       - datalake_bob_raw.house_draft_aud.year
+    description: Hive partition year derived from the revision timestamp.
   month:
     lineage:
       - datalake_bob_raw.house_draft_aud.month
+    description: Hive partition month derived from the revision timestamp.
   day:
     lineage:
       - datalake_bob_raw.house_draft_aud.day
+    description: Hive partition day derived from the revision timestamp.

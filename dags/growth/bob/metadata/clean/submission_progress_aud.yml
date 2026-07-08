@@ -1,40 +1,62 @@
 database_name: datalake_bob_clean
 table_name: submission_progress_aud
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Hibernate Envers audit history for Bob submission_progress changes. Tracks revisions to submission attempts, status, error messages, and the linked external house ID.
 columns:
   id_house_draft:
     lineage:
       - datalake_bob_raw.submission_progress_aud.house_draft_id
+    description: Bob house draft identifier for this submission audit row.
   id_external:
     lineage:
       - datalake_bob_raw.submission_progress_aud.external_id
+    description: External house ID value captured in this revision.
   rev:
     lineage:
       - datalake_bob_raw.submission_progress_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_bob_clean.rev_info.rev; join on rev to retrieve when the change occurred.
   rev_type:
     lineage:
       - datalake_bob_raw.submission_progress_aud.revtype
+    description: Hibernate Envers operation type for this audit row.
+    categories:
+      '0': INSERT — submission record created in this revision.
+      '1': UPDATE — submission record modified in this revision.
+      '2': DELETE — submission record deleted (supported by Envers; not observed in production).
   attempts:
     lineage:
       - datalake_bob_raw.submission_progress_aud.attempts
+    description: Submission attempt count value captured in this revision.
   status:
     lineage:
       - datalake_bob_raw.submission_progress_aud.status
+    description: Submission status value captured in this revision.
+    categories:
+      SUBMITTED: Draft successfully published to EBDB/Main.
+      FAILED: Submission attempt failed; error_description may be populated.
+      PROCESSING: Submission in progress on Bob backend.
   error_description:
     lineage:
       - datalake_bob_raw.submission_progress_aud.error_description
+    description: Submission error description value captured in this revision.
   mod_id_house_draft:
     lineage:
       - datalake_bob_raw.submission_progress_aud.house_draft_mod
+    description: Audit flag indicating whether house draft identifier changed in this revision (Hibernate Envers _mod column).
   mod_id_external:
     lineage:
       - datalake_bob_raw.submission_progress_aud.external_id_mod
+    description: Audit flag indicating whether external house identifier changed in this revision (Hibernate Envers _mod column).
   mod_attempts:
     lineage:
       - datalake_bob_raw.submission_progress_aud.attempts_mod
+    description: Audit flag indicating whether submission attempt count changed in this revision (Hibernate Envers _mod column).
   mod_status:
     lineage:
       - datalake_bob_raw.submission_progress_aud.status_mod
+    description: Audit flag indicating whether submission status changed in this revision (Hibernate Envers _mod column).
   mod_error_description:
     lineage:
       - datalake_bob_raw.submission_progress_aud.error_description_mod
+    description: Audit flag indicating whether error description changed in this revision (Hibernate Envers _mod column).

@@ -1,46 +1,62 @@
 database_name: datalake_bob_clean
 table_name: location
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: Clean property address and geolocation for a Bob house draft. One row per draft with a location record (~99.99% of drafts). Links the draft to a QuintoAndar region (id_region) with normalized address fields, coordinates, and an out-of-area flag when evaluated.
 columns:
   id_house_draft:
     lineage:
       - datalake_bob_raw.location.house_draft_id
+    description: Bob house draft identifier for this location record.
   id_region:
     lineage:
       - datalake_bob_raw.location.region_id
+    description: QuintoAndar region identifier assigned to the draft property address. Populated on ~90% of location rows.
   address:
     lineage:
       - datalake_bob_raw.location.address
+    description: Street name of the draft property address.
   number:
     lineage:
       - datalake_bob_raw.location.number
+    description: Street number of the draft property address.
   floor:
     lineage:
       - datalake_bob_raw.location.floor
+    description: Floor or unit level of the draft property, when applicable.
   complement:
     lineage:
       - datalake_bob_raw.location.complement
+    description: Address complement (apartment, block, etc.) for the draft property.
   reference_point:
     lineage:
       - datalake_bob_raw.location.reference_point
+    description: Landmark or reference point helping locate the draft property.
   neighborhood:
     lineage:
       - datalake_bob_raw.location.neighborhood
+    description: Neighborhood (bairro) of the draft property address.
   city:
     lineage:
       - datalake_bob_raw.location.city
+    description: City of the draft property address.
   state:
     lineage:
       - datalake_bob_raw.location.state
+    description: State or province of the draft property address.
   zip_code:
     lineage:
       - datalake_bob_raw.location.zip_code
+    description: Postal code (CEP) of the draft property address.
   lat:
     lineage:
       - datalake_bob_raw.location.lat
+    description: Latitude coordinate of the draft property geocoded address.
   lng:
     lineage:
       - datalake_bob_raw.location.lng
+    description: Longitude coordinate of the draft property geocoded address.
   is_out_of_area:
     lineage:
       - datalake_bob_raw.location.out_of_area
+    description: Flag indicating whether the draft address falls outside QuintoAndar service area. Mostly null (~83%) when not yet evaluated; true on ~1.4% of rows.

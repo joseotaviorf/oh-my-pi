@@ -169,9 +169,17 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft.status
   type:
-    description: Bob draft workflow type indicating how the listing was initiated, such as CIQ or portfolio manager.
+    description: Bob draft workflow type indicating how the listing registration was initiated. Propagates to supply taxonomy as conversion application.
     lineage:
       - datalake_bob_clean.house_draft.type
+    categories:
+      FULL_SELF_SERVICE: Owner completes listing registration via self-service PWA without assisted operations.
+      OWNER_CONVERSION: Owner conversion PWA onboarding flow.
+      REFERRAL: Draft initiated through a referral or affiliate program.
+      ADMIN_CONFIRMATION: Admin-assisted confirmation flow (CIQ); commonly paired with portfolio manager registration.
+      ISAIAS: Isaias partner-assisted registration channel.
+      PORTFOLIO_MANAGER: Portfolio manager (gestor de carteira) assisted registration.
+      PRIME: Prime B2B service owner registration flow.
   is_furnished:
     description: Whether the house is furnished
     lineage:
