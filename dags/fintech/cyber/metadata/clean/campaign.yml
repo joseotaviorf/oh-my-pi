@@ -1,14 +1,14 @@
 ---
 database_name: datalake_cyber_clean
 table_name: campaign
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   The table will contain information about the campaigns that were carried out by QuintoAndar/QuintoCred and Assessorias. The table will be updated through the massive billing process.
   Read more at: https://docs.google.com/document/d/13jNOuN0S-175ijdreKjRBBYL33ynspyL/edit#bookmark=id.26in1rg
 columns:
   id_campaign:
-    description: "Campaign ID"
+    description: Identifier for the campaign referenced by this financial record.
     lineage:
       - datalake_cyber_raw.tb_campanha.CAID
   id_client:
@@ -16,19 +16,11 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_campanha.CASSNUM
   id_agreement:
-    description: "ID negotiation"
+    description: Identifier for the agreement referenced by this financial record.
     lineage:
       - datalake_cyber_raw.tb_campanha.CAAHID
-  offer_number:
-    description: "Offer Number"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CANUMOFERTA
-  billing_group:
-    description: "Billing Group"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CAGRUPO
   cpf_cnpj:
-    description: "Client CPF/CNPJ"
+    description: Financial attribute representing cpf or cnpj on the campaign dataset.
     lineage:
       - datalake_cyber_raw.tb_campanha.CACPFCGC
   ts_boletagem_sent:
@@ -36,7 +28,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_campanha.CADTPROC
   ts_due_boletagem:
-    description: "Boletagem due date"
+    description: Timestamp when due boletagem occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_campanha.CADTVAL
   ts_due_down_payment:
@@ -48,57 +40,21 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_campanha.CAQTDOFER
   agreement_type:
-    description: "Agreement type"
+    description: Financial attribute representing agreement type on the campaign dataset.
     lineage:
       - datalake_cyber_raw.tb_campanha.CATYPE
-  annual_interest_rate:
-    description: "Annual Agreement Installment Interest Rate"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CARATE
-  interest_quota_type:
-    description: "Type of Interest Quotas"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CAPYTYPE
-  total_negotiated_with_fees:
-    description: "Total Negotiated Value of the Agreement (Campaign) with Fees"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CATOTPMT
-  total_negotiated_without_fees:
-    description: "Total Negotiated Value of the Agreement (Campaign) without Fees"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CATOTPMTSH
-  fees_amount:
-    description: "Fees amount"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CAHONO
   frequency:
     description: "Payment frequency for campaign installments"
     lineage:
       - datalake_cyber_raw.tb_campanha.CAFREQ
   origin:
-    description: "Boletagem origin"
+    description: Financial attribute representing origin on the campaign dataset.
     lineage:
       - datalake_cyber_raw.tb_campanha.CAORIGEM
-  billing_account:
-    description: "Billing account (contract) number for correspondence"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CAACCTCOB
-  campaign_queue:
-    description: "Campaign Queue"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CAQUE
-  our_number:
-    description: "Our Number"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CANOSSONUM
   down_payment_percentage:
     description: "First Installment (down_payment) percentage"
     lineage:
       - datalake_cyber_raw.tb_campanha.CAPERENTR
-  agency:
-    description: "agency (advisory)"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CAAGENCY
   down_payment_amount:
     description: "Down payment (entrada do parcelamento) amount"
     lineage:
@@ -115,19 +71,74 @@ columns:
     description: "Leader Contract Delay Days"
     lineage:
       - datalake_cyber_raw.tb_campanha.CAAGING
-  CATIPOBOL:
-    description: "Boletagem type indicator flag"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CATIPOBOL
-  CASTATUSCA:
-    description: "Campaign status code"
-    lineage:
-      - datalake_cyber_raw.tb_campanha.CASTATUSCA
-  CATOTPARC:
-    description: "Total number of installments in campaign"
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  total_invoices:
+    description: Financial attribute representing total invoices on the campaign dataset.
     lineage:
       - datalake_cyber_raw.tb_campanha.CATOTPARC
-  CAQTDPA:
-    description: "Quantity of payments for campaign"
+  agreement_queue:
+    description: Financial attribute representing agreement queue on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAQUE
+  total_installments:
+    description: Financial attribute representing total installments on the campaign dataset.
     lineage:
       - datalake_cyber_raw.tb_campanha.CAQTDPA
+  id_offer:
+    description: Identifier for the offer referenced by this financial record.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CANUMOFERTA
+  contract_group:
+    description: Financial attribute representing contract group on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.PAACCTG
+  id_contract:
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAAHID
+  type_interest_quota:
+    description: Financial attribute representing type interest quota on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAPYTYPE
+  down_payment_our_number:
+    description: Financial attribute representing down payment our number on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CANOSSONUM
+  honorarium_amount:
+    description: Financial attribute representing honorarium amount on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAHONO
+  total_negotiated_with_honorarium:
+    description: Financial attribute representing total negotiated with honorarium on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CATOTPMT
+  installment_interest_rate:
+    description: Financial attribute representing installment interest rate on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CARATE
+  total_negotiated_without_honorarium:
+    description: Financial attribute representing total negotiated without honorarium on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CATOTPMTSH
+  creditor:
+    description: Financial attribute representing creditor on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CACRED
+  id_agency:
+    description: Identifier for the agency referenced by this financial record.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CAAGID
+  is_boletagem:
+    description: Indicates whether boletagem applies to this financial record.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CATIPOBOL
+  campaign_status:
+    description: Financial attribute representing campaign status on the campaign dataset.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CASSTATUS
+  ts_record_updated:
+    description: Timestamp when record updated occurred in the upstream fintech system.
+    lineage:
+      - datalake_cyber_raw.tb_campanha.CADTUPDATE

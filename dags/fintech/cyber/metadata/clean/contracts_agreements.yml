@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: contracts_agreements
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Table with information on contracts related to the agreement.
 columns:
@@ -10,10 +10,21 @@ columns:
     lineage:
       - datalake_cyber_raw.agrdm.ADACCT
   id_agreement:
-    description: ""
+    description: Identifier for the agreement referenced by this financial record.
     lineage:
       - datalake_cyber_raw.agrdm.ADAHID
   contract_group:
-    description: ""
+    description: Financial attribute representing contract group on the contracts_agreements dataset.
     lineage:
       - datalake_cyber_raw.agrdm.ADACCTG
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  creditor:
+    description: Financial attribute representing creditor on the contracts_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agrdm.ADACCTG
+  source:
+    description: Financial attribute representing source on the contracts_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agrdm.ADSOURCE

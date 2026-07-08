@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: campaign_contracts
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Table with data on the contracts/installments involved in the campaign offer.
@@ -20,10 +20,6 @@ columns:
     description: "Contract identifier associated with the campaign"
     lineage:
       - datalake_cyber_raw.tb_campanha_contrato.CCACCTCOB
-  id_client_id:
-    description: "Client identifier code"
-    lineage:
-      - datalake_cyber_raw.tb_campanha_contrato.CCSSNUM
   id_invoice:
     description: "Invoice identifier for the contract"
     lineage:
@@ -45,7 +41,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_campanha_contrato.CCCURBAL
   contract_due_amount:
-    description: "Amount due on the contract"
+    description: Financial attribute representing contract due amount on the campaign_contracts dataset.
     lineage:
       - datalake_cyber_raw.tb_campanha_contrato.CCAMTDLQ
   contract_interest_amount:
@@ -81,7 +77,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_campanha_contrato.CCVLCUSTA
   invoice_residual_honorarium_amount:
-    description: "Residual honorarium amount for the invoice"
+    description: Financial attribute representing invoice residual honorarium amount on the campaign_contracts dataset.
     lineage:
       - datalake_cyber_raw.tb_campanha_contrato.CCHONORARIOS
   invoices_ouverdue_amount:
@@ -126,3 +122,11 @@ columns:
       - datalake_cyber_raw.tb_campanha_contrato.CCDLQDT
   ts_load:
     description: "Timestamp when the record was loaded"
+  id_client:
+    description: Identifier for the client referenced by this financial record.
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCSSNUM
+  ts_record_updated:
+    description: Timestamp when record updated occurred in the upstream fintech system.
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCDTUPDATE

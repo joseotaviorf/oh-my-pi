@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: campaign_label_decision_tree
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Label decision tree for campaign portfolio segmentation. Part of the LBL_DECTBLX series (lbl_dectbl3) used to calculate and update portfolio segmentation labels for campaign classification.
@@ -74,4 +74,3 @@ columns:
       - datalake_cyber_raw.lbl_dectbl3.queue
   ts_load:
     description: "Timestamp when the record was loaded"
-

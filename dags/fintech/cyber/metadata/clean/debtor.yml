@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: debtor
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   This table stores information about people related to the debtor. The first 3 relationships
@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_cyber_raw.relations.RERACCT
   contract_group:
-    description: "TF: debtor.group"
+    description: Financial attribute representing contract group on the debtor dataset (TF debtor.group).
     lineage:
       - datalake_cyber_raw.relations.RERACCTG
   client_type:
@@ -25,17 +25,13 @@ columns:
     lineage:
       - datalake_cyber_raw.relations.RERDESC
   greeting:
-    description: ""
+    description: Financial attribute representing greeting on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERSALCD
   name:
     description: "Name. TF: client.name"
     lineage:
       - datalake_cyber_raw.relations.RERNAME
-  additional_name:
-    description: "Additional Information (Internal ID QuintoAndar uuid). TF: client.person-uuid"
-    lineage:
-      - datalake_cyber_raw.relations.RERNAME2
   address:
     description: "Address. TF: contract.address"
     lineage:
@@ -57,7 +53,7 @@ columns:
     lineage:
       - datalake_cyber_raw.relations.RERZIP
   sequence_number:
-    description: ""
+    description: Financial attribute representing sequence number on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERSEQ
   personal_phone:
@@ -65,51 +61,43 @@ columns:
     lineage:
       - datalake_cyber_raw.relations.RERPHONE
   business_phone:
-    description: "Commercial Phone"
+    description: Financial attribute representing business phone on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERBPHON
   business_phone_extension:
-    description: "Extension (ramal)"
+    description: Financial attribute representing business phone extension on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERBEXT
-  RERIDCLI:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.relations.RERIDCLI
   dt_birth:
     description: "Date of birth. TF: client.birthDate "
     lineage:
       - datalake_cyber_raw.relations.RERDTNASC
   nationality:
-    description: "Nationality"
+    description: Financial attribute representing nationality on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERNATURALID
   nationality_uf:
-    description: "Nationality UF (state)"
+    description: Financial attribute representing nationality uf on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERUFNATUR
   father_name:
-    description: "Father name"
+    description: Financial attribute representing father name on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERNMPAI
   mother_name:
-    description: "Mother name"
+    description: Financial attribute representing mother name on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERNMMAE
   nationality_acronym:
-    description: "Nationality Acronym"
+    description: Financial attribute representing nationality acronym on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.RERNACIONALI
   marital_status:
     description: "marital_status. TF: client.maritalStatus"
     lineage:
       - datalake_cyber_raw.relations.RERESTCIVIL
-  RERCONJNOME:
-    description: "partner Name"
-    lineage:
-      - datalake_cyber_raw.relations.RERCONJNOME
   dt_birth_partner:
-    description: "Date of Birth Partner"
+    description: Calendar date associated with birth partner in the financial workflow.
     lineage:
       - datalake_cyber_raw.relations.RERCONJNASC
   complement:
@@ -125,11 +113,11 @@ columns:
     lineage:
       - datalake_cyber_raw.relations.RERID
   has_spc_credit_denial:
-    description: "SPC bureau"
+    description: Indicates whether spc credit denial applies to this financial record.
     lineage:
       - datalake_cyber_raw.relations.RERFLACSPC
   has_serasa_credit_denial:
-    description: "Serasa bureau"
+    description: Indicates whether serasa credit denial applies to this financial record.
     lineage:
       - datalake_cyber_raw.relations.RERFLACSER
   has_internal_credit_denial:
@@ -137,15 +125,15 @@ columns:
     lineage:
       - datalake_cyber_raw.relations.RERFLACCDL
   has_bvs_credit_denial:
-    description: "BVS bureau"
+    description: Indicates whether bvs credit denial applies to this financial record.
     lineage:
       - datalake_cyber_raw.relations.RERFLACBVS
   email:
-    description: "Email"
+    description: Financial attribute representing email on the debtor dataset.
     lineage:
       - datalake_cyber_raw.relations.REREMAIL
   ts_update:
-    description: "Update date"
+    description: Timestamp when update occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.relations.RERDTALTERACAO
   ts_insert:
@@ -153,6 +141,25 @@ columns:
     lineage:
       - datalake_cyber_raw.relations.RERDTINCLUSAO
   ts_history:
-    description: ""
+    description: Timestamp when history occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.relations.RERHISTDT
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  partner_name:
+    description: Financial attribute representing partner name on the debtor dataset.
+    lineage:
+      - datalake_cyber_raw.relations.RERNMPAI
+  id_quintoandar:
+    description: Identifier for the quintoandar referenced by this financial record.
+    lineage:
+      - datalake_cyber_raw.relations.RERUUIDQUINTOANDAR
+  creditor:
+    description: Financial attribute representing creditor on the debtor dataset.
+    lineage:
+      - datalake_cyber_raw.relations.RERACCTG
+  source:
+    description: Financial attribute representing source on the debtor dataset.
+    lineage:
+      - datalake_cyber_raw.relations.RERSOURCE

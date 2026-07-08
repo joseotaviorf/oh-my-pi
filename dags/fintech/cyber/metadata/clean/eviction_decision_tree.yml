@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: eviction_decision_tree
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Decision tree for eviction work queue assignment, part of the portfolio segmentation process. Contains rules and conditions for routing eviction-related accounts to appropriate work queues.
@@ -72,3 +72,6 @@ columns:
     description: "Queue identifier for account routing"
     lineage:
       - datalake_cyber_raw.que_dectbl5.queue
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

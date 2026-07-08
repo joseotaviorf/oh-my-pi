@@ -73,4 +73,5 @@ columns:
     lineage:
       - datalake_cyber_raw.que_dectbl4.queue
   ts_load:
-    description: Timestamp when the record was loaded into the clean layer.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: campaign_installments
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   This table will contain information about the portions of the offers generated in the campaigns carried out by QuintoAndar/QuintoCred e Assessorias. The table will be updated through the massive billing process.
