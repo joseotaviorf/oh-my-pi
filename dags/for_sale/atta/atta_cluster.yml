@@ -1,6 +1,10 @@
 cluster:
-  type: emr_7_12_consolidation_s_general_fleet_cluster
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
+    emr_ebs_root_volume_size: 32
+    aws_attributes:
+      ebs_volume_count: 1
+      ebs_volume_size: 20
     core_nodes:
       target_on_demand: 2
     task_nodes:

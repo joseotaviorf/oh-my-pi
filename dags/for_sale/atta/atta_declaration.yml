@@ -53,6 +53,10 @@ workflow:
       clean_table_name: partner_info
     parceiro_categoria:
       clean_table_name: partner_category
+    pre_analysis_observation:
+      clean_table_name: pre_analysis_notes
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     produto:
       clean_table_name: product_info
     produto_esteira:

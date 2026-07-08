@@ -1,0 +1,46 @@
+database_name: datalake_atta_clean
+table_name: pre_analysis_notes
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: |
+  Observations and comments recorded by credit analysts and consultants while working a
+  mortgage pre-analysis request in Atta, before a formal financing proposal exists. One
+  row per observation entered on a pre-analysis case, linked to the `pre_analysis` table
+  (via `id_pre_analysis`) and to the analyst/user who wrote it (via `id_user`, linking to
+  `users_info`). Used to audit the back-and-forth discussion and decisions made during
+  credit pre-analysis (e.g. clarifications requested, risk notes, follow-up reminders).
+  This is the modern, actively-written observation mechanism for pre-analysis — it
+  replaced an older legacy table (`pre_analise_observacao`) that is no longer written to
+  by the application. Sourced from the `pre_analysis_observation` table in the Atta
+  operational MySQL database, cleaned with standardized names and types in
+  datalake_atta_clean.
+columns:
+  id:
+    description: |
+      Unique identifier of the observation record. Technical note: sourced from the raw
+      `Id` column, a UUID (char(36)) primary key, unlike most other Atta tables which use
+      auto-incrementing numeric keys.
+    lineage:
+    - datalake_atta_raw.pre_analysis_observation.Id
+  id_pre_analysis:
+    description: |
+      Foreign key to the `pre_analysis` table. Identifies which credit pre-analysis case
+      this observation was written about.
+    lineage:
+    - datalake_atta_raw.pre_analysis_observation.PreAnalysisId
+  id_user:
+    description: |
+      Foreign key to the `users_info` table. Identifies the internal Atta user (credit
+      analyst or consultant) who wrote the observation.
+    lineage:
+    - datalake_atta_raw.pre_analysis_observation.UserId
+  notes:
+    description: |
+      Free-text observation or comment written by the analyst/consultant about the
+      pre-analysis case (e.g. clarifications, risk notes, follow-up context).
+    lineage:
+    - datalake_atta_raw.pre_analysis_observation.Observation
+  ts_created:
+    description: Timestamp when the observation was recorded.
+    lineage:
+    - datalake_atta_raw.pre_analysis_observation.CreatedAt
