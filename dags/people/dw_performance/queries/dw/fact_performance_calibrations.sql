@@ -57,6 +57,11 @@ calibration_rows AS (
       cs.leadership_calibration_variation
     )) AS sk_performance_variation,
     dcm.sk_meeting AS sk_committee_meeting,
+    MD5(CONCAT(
+      dcm.meeting_type,
+      CAST(dcm.meeting_year AS STRING),
+      COALESCE(dcm.reference_period, '-1')
+    )) AS sk_cycle_period,
     dc.person_number,
     dpc.calibrated_behavior_description,
     dpc.calibrated_impact_description,
@@ -116,6 +121,7 @@ ranked AS (
     cr.sk_performance_calibration,
     cr.sk_performance_variation,
     cr.sk_committee_meeting,
+    cr.sk_cycle_period,
     cr.person_number,
     cr.calibrated_behavior_description,
     cr.calibrated_impact_description,
@@ -152,6 +158,7 @@ SELECT
   sk_performance_calibration,
   sk_performance_variation,
   sk_committee_meeting,
+  sk_cycle_period,
   person_number,
   calibrated_behavior_description,
   calibrated_impact_description,

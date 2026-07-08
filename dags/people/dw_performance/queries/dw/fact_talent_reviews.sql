@@ -22,13 +22,19 @@ rating_change AS (
     AS dif_potential
   FROM
     datalake_performance.talent_review
-)
-
+),
+talent_review_base AS (
 SELECT
   MD5(CONCAT(tr.id_period_of_service, tr.id_meeting)) AS sk_talent_review,
   tr.id_period_of_service AS sk_assignment,
   tr.id_meeting AS sk_committee_meeting,
   COALESCE(DATE_FORMAT(tr.dt_committee_meeting, 'yyyyMMdd'), -1) AS sk_committee_meeting_date,
+  MD5(CONCAT(
+    dcm.meeting_type,
+    CAST(dcm.meeting_year AS STRING),
+    COALESCE(dcm.reference_period, '-1')
+  )) AS sk_cycle_period,
+  dcm.ts_meeting AS ts_committee_meeting,
   MD5(CONCAT(
     COALESCE(tr.initial_criticality, -1),
     COALESCE(tr.initial_potential, -1),
@@ -138,6 +144,9 @@ INNER JOIN
   rating_change AS rc
     ON tr.id_period_of_service = rc.id_period_of_service 
     AND tr.id_meeting = rc.id_meeting
+LEFT JOIN
+  dw_performance.dim_committee_meeting AS dcm
+    ON dcm.sk_meeting = tr.id_meeting
 WHERE 
   COALESCE(
     tr.id_risk_loss_rating_level_calibrated,
@@ -149,3 +158,40 @@ WHERE
     tr.id_readiness_rating_level_initial,
     tr.id_potential_rating_level_initial
   ) IS NOT NULL
+)
+SELECT
+  sk_talent_review,
+  sk_assignment,
+  sk_committee_meeting,
+  sk_committee_meeting_date,
+  sk_cycle_period,
+  sk_talent_rating_from_manager,
+  sk_talent_rating_from_calibration,
+  sk_talent_variation_period,
+  sk_talent_variation_calibration,
+  assignment_number,
+  numeric_risk_of_loss_from_manager,
+  numeric_risk_of_loss_from_calibration,
+  numeric_criticality_from_manager,
+  numeric_criticality_from_calibration,
+  numeric_readiness_from_manager,
+  numeric_readiness_from_calibration,
+  numeric_potential_from_manager,
+  numeric_potential_from_calibration,
+  is_regrettable_loss,
+  is_last_cycle,
+  (
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        assignment_number,
+        sk_cycle_period
+      ORDER BY
+        ts_committee_meeting DESC NULLS LAST,
+        sk_committee_meeting DESC
+    ) = 1
+  ) AS is_latest_in_cycle,
+  ts_created,
+  ts_updated,
+  ts_load
+FROM
+  talent_review_base

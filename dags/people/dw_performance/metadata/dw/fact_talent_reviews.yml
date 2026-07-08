@@ -22,6 +22,12 @@ columns:
     description: Surrogate key for the date of the committee meeting, in 'yyyyMMdd' format. Defaults to -1 if the date is NULL. Links to a date dimension.
     lineage:
     - datalake_performance.talent_review.dt_committee_meeting
+  sk_cycle_period:
+    description: Surrogate key of the Talent Review review-period cycle (year and sub-period) this review belongs to. Use this to resolve the cycle and its release status via dim_cycle_period.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_type
+    - dw_performance.dim_committee_meeting.meeting_year
+    - dw_performance.dim_committee_meeting.reference_period
   sk_talent_rating_from_manager:
     description: Composite surrogate key representing the combination of initial talent ratings (criticality, potential, risk of loss, readiness) from the manager before calibration. Links to dim_talent_rating.
     lineage:
@@ -107,6 +113,12 @@ columns:
     lineage:
     - datalake_performance.talent_review.dt_committee_meeting
     - datalake_performance.talent_review.id_period_of_service
+  is_latest_in_cycle:
+    description: TRUE for the official talent-review record of an assignment within its review-period cycle, the latest committee meeting when a cycle spans several. Use this to read one rating per assignment per cycle.
+    lineage:
+    - dw_performance.dim_committee_meeting.ts_meeting
+    - datalake_performance.talent_review.assignment_number
+    - datalake_performance.talent_review.id_meeting
   ts_created:
     description: Timestamp of when the original talent review record was created in the source.
     lineage:

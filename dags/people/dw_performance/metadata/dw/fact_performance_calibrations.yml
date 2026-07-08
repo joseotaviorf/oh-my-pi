@@ -31,6 +31,12 @@ columns:
     - dw_performance.dim_committee_meeting.sk_meeting
     - datalake_performance.performa_calibration_evaluation.id_meeting
     - datalake_performance.performa_calibration_extra_info.id_meeting
+  sk_cycle_period:
+    description: Surrogate key of the Performance Calibration review-period cycle this calibration belongs to. Use this to resolve the cycle and its release status via dim_cycle_period.
+    lineage:
+    - dw_performance.dim_committee_meeting.meeting_type
+    - dw_performance.dim_committee_meeting.meeting_year
+    - dw_performance.dim_committee_meeting.reference_period
   person_number:
     description: Unique identifier for the person (employee) who was evaluated.
     lineage:

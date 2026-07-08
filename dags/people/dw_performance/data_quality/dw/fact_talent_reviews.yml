@@ -22,6 +22,27 @@ column_level_validations:
   is_last_cycle:
     is_complete:
       severity_level: Warning
+  is_latest_in_cycle:
+    is_complete:
+      severity_level: Warning
+  one_latest_in_cycle_per_assignment_and_cycle:
+    custom:
+      # At most one row per assignment per cycle may be flagged is_latest_in_cycle (prevents downstream fan-out).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             assignment_number,
+             sk_cycle_period
+           FROM dw_performance.fact_talent_reviews
+           WHERE is_latest_in_cycle = TRUE
+           GROUP BY
+             assignment_number,
+             sk_cycle_period
+           HAVING COUNT(*) > 1
+         )
+        ) = 0
+      severity_level: Error
   is_regrettable_loss:
     is_complete:
       severity_level: Warning

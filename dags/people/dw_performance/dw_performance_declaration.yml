@@ -22,6 +22,8 @@ workflow:
     fact_performance_calibrations:
       - dim_performance_calibration
       - dim_committee_meeting
+    fact_talent_reviews:
+      - dim_committee_meeting
     dim_cycle_period:
       - dim_committee_meeting
     fact_smoke_detectors:
