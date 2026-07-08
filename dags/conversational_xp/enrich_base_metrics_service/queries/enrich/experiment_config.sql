@@ -337,7 +337,7 @@ FROM VALUES
         "ab_beakman_search_services_feed_sequence_experiment_v2",
         named_struct(
             'begin_date', DATE('2026-05-28'),
-            'end_date', NULL,
+            'end_date', DATE('2026-06-29'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -360,7 +360,7 @@ FROM VALUES
         "ab_beakman_search_services_search_profile_v2",
         named_struct(
             'begin_date', DATE('2026-05-04'),
-            'end_date', NULL,
+            'end_date', DATE('2026-06-29'),
             'variants', to_json(
                 named_struct(
                     'VARIANT_A', 'baseline',
@@ -368,6 +368,98 @@ FROM VALUES
                 )
             ),
             'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
+    ),
+
+    -- SENNA Rent
+    (
+        "ab_beakman_search_services_senna_embedding_rent_experiment_v2",
+        named_struct(
+            'begin_date', DATE('2026-07-08'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
+    ),
+
+    -- SENNA Sale
+    (
+        "ab_beakman_search_services_senna_embedding_sale_experiment_v2",
+        named_struct(
+            'begin_date', DATE('2026-07-08'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
+    ),
+
+    -- Dynamic Carousels Rent
+    (
+        "ab_beakman_search_services_dynamic_carousels_rent_v2",
+        named_struct(
+            'begin_date', DATE('2026-07-08'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
+    ),
+
+    -- Dynamic Carousels Sale
+    (
+        "ab_beakman_search_services_dynamic_carousels_sale_v2",
+        named_struct(
+            'begin_date', DATE('2026-07-08'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'",
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
