@@ -1,5 +1,8 @@
 from airflow.models.baseoperator import BaseOperator
 
+from bietlejuice.base.airflow.job_cluster_engine import (
+    METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
+)
 from bietlejuice.base.airflow.task_creators.register_delta_table_task_creator import (
     RegisterDeltaTableTaskCreator,
 )
@@ -43,4 +46,9 @@ class QubeRegisterDeltaTableTaskCreator(RegisterDeltaTableTaskCreator):
         # The base path for QUBE is: {repo}/qube/jobs/
         # The register_delta_table.py is at: {repo}/qube/jobs/common/register_delta_table.py
         # So we use "common/register_delta_table" as the spark job name
-        return self._create_spark_job_task(self.SPARK_JOB_NAME, task_id, parameters)
+        return self._create_spark_job_task(
+            self.SPARK_JOB_NAME,
+            task_id,
+            parameters,
+            task_spark_conf=METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
+        )

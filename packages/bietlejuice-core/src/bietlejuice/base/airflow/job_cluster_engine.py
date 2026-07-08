@@ -44,6 +44,39 @@ _EMR_STEP_SPARK_CONF_KEYS = (
     "spark.serializer",
 )
 
+# Per-step Spark resource profile for accessory tasks. Appended LAST in
+# `extra_spark_args` so `spark-submit --conf` overrides cluster `spark-defaults`.
+# Only consumed by ``EmrJobClusterEngine``; Databricks tasks ignore the profile
+# because per-task resource overrides are not supported by the CheckJob API.
+
+# Register-table (driver-only Trino REST) and sync-metadata (driver + minimal
+# `df.foreach` over a tiny table-name DataFrame for Hive/metadata-propagator
+# fanout) are I/O-bound accessory tasks with negligible executor compute.
+# Cap at 1 executor / 1g / 1 core so they do not queue behind heavy load
+# tasks for cluster-default 8g executor slots. `minExecutors=1` keeps the
+# single executor pre-warmed to avoid YARN allocation lag on the foreach.
+METADATA_TASK_LIGHTWEIGHT_SPARK_CONF: Dict[str, str] = {
+    "spark.driver.memory": "1g",
+    "spark.driver.memoryOverhead": "512m",
+    "spark.executor.memory": "1g",
+    "spark.executor.memoryOverhead": "384m",
+    "spark.executor.cores": "1",
+    "spark.yarn.am.memory": "512m",
+    "spark.yarn.am.cores": "1",
+    "spark.dynamicAllocation.minExecutors": "1",
+    "spark.dynamicAllocation.maxExecutors": "1",
+}
+
+
+def _spark_conf_to_submit_args(spark_conf: Optional[Dict[str, str]]) -> List[str]:
+    """Flatten ``{key: value}`` into ``["--conf", "key=value", ...]`` for spark-submit."""
+    if not spark_conf:
+        return []
+    args: List[str] = []
+    for key, value in spark_conf.items():
+        args.extend(["--conf", f"{key}={value}"])
+    return args
+
 
 def _merge_spark_sql_extensions(*extension_lists: Optional[str]) -> str:
     """Join comma-separated extension class names without duplicates."""
@@ -127,10 +160,15 @@ class JobClusterEngine(ABC):
         job_parameters: List[Any],
         execution_timeout_hours: int,
         python_interpreter_path: Optional[str] = None,
+        task_spark_conf: Optional[Dict[str, str]] = None,
     ) -> BaseOperator:
         """``python_interpreter_path`` runs the step on the given Python
         interpreter on EMR (sets ``spark.pyspark.[driver.]python``); ignored on
-        Databricks, where the interpreter is cluster-level."""
+        Databricks, where the interpreter is cluster-level.
+
+        ``task_spark_conf`` injects per-step ``spark-submit --conf`` overrides on
+        EMR (appended last so they win over cluster ``spark-defaults``). Ignored
+        on Databricks, which does not support per-task resource overrides."""
         pass
 
     @property
@@ -282,6 +320,7 @@ class DatabricksJobClusterEngine(JobClusterEngine):
         job_parameters: List[Any],
         execution_timeout_hours: int,
         python_interpreter_path: Optional[str] = None,
+        task_spark_conf: Optional[Dict[str, str]] = None,
     ) -> BaseOperator:
 
         if python_interpreter_path is not None:
@@ -290,7 +329,15 @@ class DatabricksJobClusterEngine(JobClusterEngine):
                 " is ignored in Databricks: interpreter is set at the cluster level."
             )
 
+        if task_spark_conf:
+            logging.debug(
+                "[DatabricksJobClusterEngine] Ignoring task_spark_conf for task %s: "
+                "per-task resource overrides are not supported by the CheckJob API.",
+                task_id,
+            )
+
         _ = python_interpreter_path
+        _ = task_spark_conf
 
         return QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id=self._ctx.databricks_conn_id,
@@ -395,6 +442,7 @@ class EmrJobClusterEngine(JobClusterEngine):
         job_parameters: List[Any],
         execution_timeout_hours: int,
         python_interpreter_path: Optional[str] = None,
+        task_spark_conf: Optional[Dict[str, str]] = None,
     ) -> BaseOperator:
         create_id = self._ctx.emr_active_create_cluster_task_id
         if not create_id:
@@ -411,6 +459,9 @@ class EmrJobClusterEngine(JobClusterEngine):
             deploy_mode=str(
                 self._merged_cluster_configuration.get("emr_deploy_mode", "client")
             ),
+            # task_spark_conf appended LAST so its --conf entries override any
+            # matching keys emitted earlier (Delta defaults, OpenLineage,
+            # cluster spark-defaults). spark-submit takes the last --conf per key.
             extra_spark_args=_build_emr_extra_spark_submit_args(
                 self._merged_cluster_configuration
             )
@@ -420,7 +471,8 @@ class EmrJobClusterEngine(JobClusterEngine):
                 f"spark.openlineage.parentJobName={{{{ dag.dag_id }}}}.{task_id}",
                 "--conf",
                 "spark.openlineage.parentJobNamespace=airflow",
-            ],
+            ]
+            + _spark_conf_to_submit_args(task_spark_conf),
         )
         return QuintoAndarEmrSubmitStepsOperator(
             task_id=task_id,

@@ -7,6 +7,7 @@ from airflow.models import DAG
 from airflow.operators.empty import EmptyOperator
 
 from bietlejuice.base.airflow.job_cluster_engine import (
+    METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
     DatabricksJobClusterEngine,
     EmrJobClusterEngine,
     attach_emr_job_cluster_finished_work_prerequisites,
@@ -384,6 +385,101 @@ class TestEmrJobClusterEngineRetries:
         )
         assert "spark.pyspark.python" not in flat
 
+    def test_submit_steps_task_spark_conf_none_is_noop(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="load-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+                task_spark_conf=None,
+            )
+        extra = mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        # Only baseline args (Delta + S3A ACL + runtime env + OpenLineage).
+        assert not any("spark.driver.memory" in a for a in extra)
+        assert not any("spark.executor.memory" in a for a in extra)
+
+    def test_submit_steps_task_spark_conf_injects_all_keys(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        conf = {
+            "spark.driver.memory": "1g",
+            "spark.executor.cores": "1",
+            "spark.dynamicAllocation.maxExecutors": "1",
+        }
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="sync-metadata-clean-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+                task_spark_conf=conf,
+            )
+        flat = " ".join(
+            mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        )
+        assert "spark.driver.memory=1g" in flat
+        assert "spark.executor.cores=1" in flat
+        assert "spark.dynamicAllocation.maxExecutors=1" in flat
+
+    def test_submit_steps_task_spark_conf_appended_after_openlineage(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="optimize-clean-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+                task_spark_conf={"spark.executor.cores": "4"},
+            )
+        extra = mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        # Concatenate ["--conf", "key=value", ...] pairs and locate positions of key markers.
+        pairs = [
+            f"{extra[i]} {extra[i + 1]}"
+            for i in range(0, len(extra), 2)
+            if extra[i] == "--conf"
+        ]
+        openlineage_index = next(
+            i for i, p in enumerate(pairs) if "spark.openlineage.parentJobName" in p
+        )
+        task_conf_index = next(
+            i for i, p in enumerate(pairs) if "spark.executor.cores=4" in p
+        )
+        assert task_conf_index > openlineage_index, (
+            "task_spark_conf must be appended AFTER OpenLineage so spark-submit "
+            "keeps its value when a duplicate key is provided by cluster defaults."
+        )
+
+    def test_submit_steps_metadata_lightweight_profile_shape(self, emr_ctx):
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(submit_cls=mock_submit)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        emr_ctx.emr_active_create_cluster_task_id = "execute-job-cluster"
+        with patcher:
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="register-table-clean-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+                task_spark_conf=METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
+            )
+        flat = " ".join(
+            mock_submit.build_spark_submit_step.call_args.kwargs["extra_spark_args"]
+        )
+        assert "spark.driver.memory=1g" in flat
+        assert "spark.executor.memory=1g" in flat
+        assert "spark.executor.cores=1" in flat
+        assert "spark.dynamicAllocation.maxExecutors=1" in flat
+
     def test_terminate_matches_retry_kwargs(self, emr_ctx):
         emr_ctx.cluster_args["emr_retry_delay_seconds"] = 45
         mock_term = MagicMock()
@@ -604,6 +700,45 @@ class TestDatabricksJobClusterEngineAcl:
         result = engine._get_access_control_list()
         assert result == [self._DEFAULT_ACL[0]]
         config_service.get_config.assert_called_once_with("default_access_control_list")
+
+
+class TestDatabricksJobClusterEngineTaskSparkConf:
+    """task_spark_conf is EMR-only; Databricks must accept it without side effects."""
+
+    def test_databricks_ignores_task_spark_conf_without_error(self):
+        dag = DAG(dag_id="dbr_task_spark_conf", schedule=None)
+        ctx = DagExecutionContext(
+            dag=dag,
+            environment="forno",
+            bucket="b",
+            base_spark_jobs_path="/x/",
+            dag_args={},
+            workflow_args={},
+            cluster_args={"type": "cluster_key"},
+        )
+        ctx.databricks_conn_id = "databricks_default"
+
+        mock_operator = MagicMock()
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine."
+            "QuintoAndarDatabricksCheckJobTaskOperator",
+            mock_operator,
+        ):
+            engine = DatabricksJobClusterEngine(ctx, MagicMock())
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="register-table-clean-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+                task_spark_conf=METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
+            )
+
+        json_arg = mock_operator.call_args.kwargs["json"]
+        # Databricks CheckJob JSON payload has no room for per-task Spark resource
+        # overrides; the profile must be silently dropped.
+        assert "spark_python_task" in json_arg
+        assert "spark_conf" not in json_arg
+        assert "new_cluster" not in json_arg
 
 
 class TestGetJobClusterCompletionSink:

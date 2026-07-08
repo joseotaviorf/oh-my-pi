@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from os import path
-from typing import Union
+from typing import Dict, Optional, Union
 
 from airflow.models.baseoperator import BaseOperator
 
@@ -40,6 +40,7 @@ class BaseTaskCreator(ABC):
         spark_job_prefix: str = None,
         execution_timeout_hours: int = _DEFAULT_EXECUTION_TIMEOUT_HOURS,
         python_interpreter_path: str = None,
+        task_spark_conf: Optional[Dict[str, str]] = None,
     ) -> BaseOperator:
         """
         Returns a task that runs a Spark Job in the base spark jobs path, with the given name, task id, and parameters.
@@ -52,6 +53,11 @@ class BaseTaskCreator(ABC):
         python_interpreter_path: On EMR, run this step on the given Python interpreter
             (sets ``spark.pyspark.[driver.]python``) instead of the default EMR Python.
             Ignored on Databricks.
+        task_spark_conf: On EMR, inject per-step ``spark-submit --conf`` overrides
+            (appended last so they win over cluster ``spark-defaults``). Use this
+            to right-size accessory tasks (register/sync/optimize) whose resource
+            needs differ from the main load steps sharing the same cluster.
+            Ignored on Databricks (per-task resource overrides are unsupported).
         """
         spark_job_directory = self.dag_execution_context.base_spark_jobs_path
         if spark_job_prefix is not None:
@@ -72,6 +78,7 @@ class BaseTaskCreator(ABC):
             job_parameters=job_parameters,
             execution_timeout_hours=execution_timeout_hours,
             python_interpreter_path=python_interpreter_path,
+            task_spark_conf=task_spark_conf,
         )
 
     @classmethod

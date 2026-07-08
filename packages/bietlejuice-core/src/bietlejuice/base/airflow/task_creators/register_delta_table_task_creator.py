@@ -1,5 +1,8 @@
 from airflow.models.baseoperator import BaseOperator
 
+from bietlejuice.base.airflow.job_cluster_engine import (
+    METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
+)
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 
@@ -23,4 +26,9 @@ class RegisterDeltaTableTaskCreator(BaseTaskCreator):
             table_attributes.table_name,
         ]
 
-        return self._create_spark_job_task(self.SPARK_JOB_NAME, task_id, parameters)
+        return self._create_spark_job_task(
+            self.SPARK_JOB_NAME,
+            task_id,
+            parameters,
+            task_spark_conf=METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
+        )

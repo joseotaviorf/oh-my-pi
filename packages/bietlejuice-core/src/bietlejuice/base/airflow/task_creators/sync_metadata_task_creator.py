@@ -1,5 +1,8 @@
 from airflow.models.baseoperator import BaseOperator
 
+from bietlejuice.base.airflow.job_cluster_engine import (
+    METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
+)
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -50,6 +53,7 @@ class SyncMetadataTaskCreator(BaseTaskCreator):
             task_id,
             parameters,
             execution_timeout_hours=self._get_execution_timeout_hours(table_attributes),
+            task_spark_conf=METADATA_TASK_LIGHTWEIGHT_SPARK_CONF,
         )
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
