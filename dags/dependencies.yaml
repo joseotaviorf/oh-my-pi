@@ -4445,6 +4445,10 @@ bietlejuice.metric_people:
   - bietlejuice.dw_employee_details:load-dw-employee-details-fact-assignment-snapshots:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-business-unit:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-dim-cycle-period:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-dim-talent-rating:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-fact-talent-reviews:first-run-of-day
 bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day

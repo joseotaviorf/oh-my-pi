@@ -651,28 +651,47 @@ columns:
       - dw_compensation.dim_event_definition.reason_name_ptb
 
   talent_potential:
-    description: Snapshot attribute for talent_potential on the employee_snapshots wide metric table.
+    description: Employee's calibrated career potential (High, Medium, Low) from the operative Talent Review cycle. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.dim_talent_rating.potential
+      - dw_performance.dim_cycle_period.is_released
 
   talent_criticality:
-    description: Snapshot attribute for talent_criticality on the employee_snapshots wide metric table.
+    description: Employee's calibrated criticality rating from the operative Talent Review cycle. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.dim_talent_rating.criticality
+      - dw_performance.dim_cycle_period.is_released
 
   talent_readiness:
-    description: Snapshot attribute for talent_readiness on the employee_snapshots wide metric table.
+    description: Employee's calibrated readiness for promotion or new roles from the operative Talent Review cycle. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.dim_talent_rating.readiness
+      - dw_performance.dim_cycle_period.is_released
 
   talent_risk_of_loss:
-    description: Snapshot attribute for talent_risk_of_loss on the employee_snapshots wide metric table.
+    description: Employee's calibrated risk-of-loss rating from the operative Talent Review cycle. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.dim_talent_rating.risk_of_loss
+      - dw_performance.dim_cycle_period.is_released
 
   perf_final_range:
-    description: Snapshot attribute for perf_final_range on the employee_snapshots wide metric table.
+    description: Performa Score band (e.g. Meets expectations, Outstanding) from the operative Performance Calibration cycle. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.fact_performance_calibrations.performa_score
+      - dw_performance.dim_cycle_period.is_released
 
   development_matrix:
-    description: Snapshot attribute for development_matrix on the employee_snapshots wide metric table.
+    description: 9-box development placement (Q1-Q9) combining talent potential and the Performa Score band from the operative cycles.
     dimension: True
+    lineage:
+      - dw_performance.dim_talent_rating.potential
+      - dw_performance.fact_performance_calibrations.performa_score
+      - dw_performance.dim_cycle_period.is_released
 
   hierarchy_depth:
     description: Snapshot attribute for hierarchy_depth on the employee_snapshots wide metric table.
@@ -781,24 +800,39 @@ columns:
       - dw_employee_details.fact_assignment_snapshots.count_indirect_report
 
   perf_impact_score:
-    description: Snapshot attribute for perf_impact_score on the employee_snapshots wide metric table.
+    description: Calibrated Impact rating (post-committee) from the operative Performance Calibration cycle. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.fact_performance_calibrations.calibrated_impact_numeric
+      - dw_performance.dim_cycle_period.is_released
 
   perf_behavior_score:
-    description: Snapshot attribute for perf_behavior_score on the employee_snapshots wide metric table.
+    description: Calibrated Behavior rating (post-committee) from the operative Performance Calibration cycle. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.fact_performance_calibrations.calibrated_behavior_numeric
+      - dw_performance.dim_cycle_period.is_released
 
   perf_leadership_score:
-    description: Snapshot attribute for perf_leadership_score on the employee_snapshots wide metric table.
+    description: Calibrated Leadership rating (post-committee) from the operative Performance Calibration cycle. NULL for non-managerial employees or cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.fact_performance_calibrations.calibrated_leadership_numeric
+      - dw_performance.dim_cycle_period.is_released
 
   perf_composite_score:
-    description: Snapshot attribute for perf_composite_score on the employee_snapshots wide metric table.
+    description: Weighted Performa Score summarizing calibrated performance for the operative cycle. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.fact_performance_calibrations.performa_score_numeric
+      - dw_performance.dim_cycle_period.is_released
 
   perf_ipa:
-    description: Snapshot attribute for perf_ipa on the employee_snapshots wide metric table.
+    description: IPA multiplier derived from the Performa Score band, used in the annual PLR bonus calculation. NULL for cycles not yet released for analytics.
     dimension: True
+    lineage:
+      - dw_performance.fact_performance_calibrations.performa_ipa
+      - dw_performance.dim_cycle_period.is_released
 
   has_clock_in:
     description: Snapshot attribute for has_clock_in on the employee_snapshots wide metric table.

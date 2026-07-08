@@ -233,12 +233,25 @@ SELECT
     fc.salary_range,
     fas.tenure_range,
     ev_raise.reason_name_ptb AS last_raise_reason,
-    CAST(NULL AS STRING) AS talent_potential,
-    CAST(NULL AS STRING) AS talent_criticality,
-    CAST(NULL AS STRING) AS talent_readiness,
-    CAST(NULL AS STRING) AS talent_risk_of_loss,
-    CAST(NULL AS STRING) AS perf_final_range,
-    CAST(NULL AS STRING) AS development_matrix,
+    CASE WHEN cp_talent.is_released THEN dtr.potential END AS talent_potential,
+    CASE WHEN cp_talent.is_released THEN dtr.criticality END AS talent_criticality,
+    CASE WHEN cp_talent.is_released THEN dtr.readiness END AS talent_readiness,
+    CASE WHEN cp_talent.is_released THEN dtr.risk_of_loss END AS talent_risk_of_loss,
+    CASE WHEN cp_calibration.is_released THEN pcc.performa_score END AS perf_final_range,
+    -- 9-box: talent potential (rows) x calibrated Performa band (columns), gated by both cycles' is_released.
+    CASE
+        WHEN NOT cp_talent.is_released OR NOT cp_calibration.is_released THEN CAST(NULL AS STRING)
+        WHEN dtr.potential = 'High' AND pcc.performa_score IN ('Outstanding', 'Above expectations') THEN 'Q1'
+        WHEN dtr.potential = 'High' AND pcc.performa_score = 'Meets expectations' THEN 'Q2'
+        WHEN dtr.potential = 'High' AND pcc.performa_score IN ('Partially misses expectations', 'Insufficient') THEN 'Q3'
+        WHEN dtr.potential = 'Medium' AND pcc.performa_score IN ('Outstanding', 'Above expectations') THEN 'Q4'
+        WHEN dtr.potential = 'Medium' AND pcc.performa_score = 'Meets expectations' THEN 'Q5'
+        WHEN dtr.potential = 'Medium' AND pcc.performa_score IN ('Partially misses expectations', 'Insufficient') THEN 'Q6'
+        WHEN dtr.potential = 'Low' AND pcc.performa_score IN ('Outstanding', 'Above expectations') THEN 'Q7'
+        WHEN dtr.potential = 'Low' AND pcc.performa_score = 'Meets expectations' THEN 'Q8'
+        WHEN dtr.potential = 'Low' AND pcc.performa_score IN ('Partially misses expectations', 'Insufficient') THEN 'Q9'
+        ELSE CAST(NULL AS STRING)
+    END AS development_matrix,
     mh.hierarchy_depth,
     FLOOR(
         MONTHS_BETWEEN(fas.dt_reference, emp.dt_birth) / 12
@@ -261,11 +274,11 @@ SELECT
     fc.days_tenure_in_band,
     fc.months_tenure_in_band,
     fas.count_indirect_report,
-    CAST(NULL AS DECIMAL(18, 4)) AS perf_impact_score,
-    CAST(NULL AS DECIMAL(18, 4)) AS perf_behavior_score,
-    CAST(NULL AS DECIMAL(18, 4)) AS perf_leadership_score,
-    CAST(NULL AS DECIMAL(18, 4)) AS perf_composite_score,
-    CAST(NULL AS DECIMAL(18, 4)) AS perf_ipa,
+    CASE WHEN cp_calibration.is_released THEN CAST(pcc.calibrated_impact_numeric AS DECIMAL(18, 4)) END AS perf_impact_score,
+    CASE WHEN cp_calibration.is_released THEN CAST(pcc.calibrated_behavior_numeric AS DECIMAL(18, 4)) END AS perf_behavior_score,
+    CASE WHEN cp_calibration.is_released THEN CAST(pcc.calibrated_leadership_numeric AS DECIMAL(18, 4)) END AS perf_leadership_score,
+    CASE WHEN cp_calibration.is_released THEN CAST(pcc.performa_score_numeric AS DECIMAL(18, 4)) END AS perf_composite_score,
+    CASE WHEN cp_calibration.is_released THEN CAST(pcc.performa_ipa AS DECIMAL(18, 4)) END AS perf_ipa,
     job.has_clock_in,
     dem.has_self_declared_pwd,
     dem.has_medical_disability_record,
@@ -351,3 +364,23 @@ LEFT JOIN
 LEFT JOIN
     dw_compensation.dim_event_definition AS ev_raise
         ON ev_raise.sk_event_definition = fc.sk_event_definition
+LEFT JOIN
+    dw_performance.dim_cycle_period AS cp_calibration
+        ON cp_calibration.meeting_type = 'performance_calibration'
+        AND fas.dt_reference BETWEEN cp_calibration.dt_valid_from AND cp_calibration.dt_valid_to
+LEFT JOIN
+    dw_performance.fact_performance_calibrations AS pcc
+        ON pcc.person_number = fas.person_number
+        AND pcc.sk_cycle_period = cp_calibration.sk_cycle_period
+LEFT JOIN
+    dw_performance.dim_cycle_period AS cp_talent
+        ON cp_talent.meeting_type = 'talent_review'
+        AND fas.dt_reference BETWEEN cp_talent.dt_valid_from AND cp_talent.dt_valid_to
+LEFT JOIN
+    dw_performance.fact_talent_reviews AS ftr
+        ON ftr.assignment_number = fas.assignment_number
+        AND ftr.sk_cycle_period = cp_talent.sk_cycle_period
+        AND ftr.is_latest_in_cycle = TRUE
+LEFT JOIN
+    dw_performance.dim_talent_rating AS dtr
+        ON dtr.sk_talent_rating = ftr.sk_talent_rating_from_calibration
