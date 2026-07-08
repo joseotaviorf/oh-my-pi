@@ -113,6 +113,18 @@ overdue_final as (
     FROM overdue_order AS oo
     WHERE rn = 1
     GROUP BY 1,2,3,4
+),
+collection_agency_at_reference AS (
+    SELECT
+        eb.id_process,
+        at.id_agency AS id_agency_group,
+        at.juridical_agency,
+        at.conventional_agency,
+        COALESCE(DATE(eb.dt_closure), CURRENT_DATE) AS dt_collection_reference
+    FROM datalake_cyber_legal.evictions_base AS eb
+    LEFT JOIN datalake_cyber.agency_timeline AS at
+        ON CAST(eb.contract AS BIGINT) = at.id_contract
+        AND COALESCE(DATE(eb.dt_closure), CURRENT_DATE) = at.dt_reference
 )
 
 SELECT DISTINCT
@@ -141,6 +153,9 @@ SELECT DISTINCT
     e.office AS office,
     CASE
         WHEN e.dt_registered < DATE('2025-10-17') AND e.dt_closure < DATE('2025-12-15') AND e.office = 'VZL' THEN 'PASCHOALOTTO'
+        WHEN UPPER(COALESCE(ca.id_agency_group, '')) IN ('G224', '224') THEN 'BULGARELLI'
+        WHEN UPPER(COALESCE(ca.id_agency_group, '')) IN ('G024', '024') AND ca.dt_collection_reference >= DATE('2026-07-01') THEN 'VZL'
+        WHEN UPPER(COALESCE(ca.id_agency_group, '')) IN ('G024', '024') THEN 'BULGARELLI'
         WHEN e.office = 'VZL' THEN 'BULGARELLI'
         WHEN e.office = 'GDM' THEN 'GONDIM'
         WHEN e.office = 'PLL' THEN 'PELLON'
@@ -410,4 +425,7 @@ LEFT JOIN
 LEFT JOIN
     region r
     ON e.contract = r.sk_contract
+LEFT JOIN
+    collection_agency_at_reference AS ca
+    ON e.id_process = ca.id_process
 GROUP BY ALL
