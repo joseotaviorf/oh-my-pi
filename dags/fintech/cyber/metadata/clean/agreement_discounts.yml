@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: agreement_discounts
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Information on discounts granted in agreements. Table granularity - id_agreement.
 columns:
@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agdscdet.ACFIELD
   field_name:
-    description: "Field"
+    description: Financial attribute representing field name on the agreement_discounts dataset.
     categories:
       "Parcelas Vencidas": "VALOR DO PRINCIPAL DO SOMATÓRIO DAS PARCELAS"
       "Juros Acordo": "VALOR DE JUROS DO CONTRATO"
@@ -22,11 +22,11 @@ columns:
     lineage:
       - datalake_cyber_raw.agdscdet.ADFIELD
   arithmetic_operator:
-    description: ""
+    description: Financial attribute representing arithmetic operator on the agreement_discounts dataset.
     lineage:
       - datalake_cyber_raw.agdscdet.ADOP
   amount_without_discount:
-    description: ""
+    description: Financial attribute representing amount without discount on the agreement_discounts dataset.
     lineage:
       - datalake_cyber_raw.agdscdet.ADORVL
   amount_with_discount:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agdscdet.ADDISCVL
   discount:
-    description: "Discount Amount"
+    description: Financial attribute representing discount on the agreement_discounts dataset.
     lineage:
       - datalake_cyber_raw.agdscdet.ADORVL
       - datalake_cyber_raw.agdscdet.ADDISCVL
@@ -46,3 +46,9 @@ columns:
     description: "Discount Percentage = (amount_without_discount - amount_with_discount)*100/amount_without_discount"
     lineage:
       - datalake_cyber_raw.agdscdet.ADDISCT
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  source:
+    description: Financial attribute representing source on the agreement_discounts dataset.
+    lineage: []

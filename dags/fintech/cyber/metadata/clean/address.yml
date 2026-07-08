@@ -1,9 +1,9 @@
 ---
 database_name: datalake_cyber_clean
 table_name: address
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Debtor address
+description: One row per address from the Cyber credit integration.
 columns:
   id_client:
     description: "Client ID = CPF (TF: client.document)"
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_cyber_raw.address.ADRERID
   id_address:
-    description: ""
+    description: Identifier for the address referenced by this financial record.
     lineage:
       - datalake_cyber_raw.address.ADID
   contract_group:
@@ -26,39 +26,31 @@ columns:
     lineage:
       - datalake_cyber_raw.address.ADACCTG
   address_type:
-    description: ""
+    description: Financial attribute representing address type on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADTYPE
   is_letter_address:
-    description: "Letter sending address"
+    description: Indicates whether letter address applies to this financial record.
     lineage:
       - datalake_cyber_raw.address.ADLETTERS
-  address_1:
-    description: "Address with number / email. TF: client.email[0]"
-    lineage:
-      - datalake_cyber_raw.address.ADADDR1
   neighborhood:
-    description: "Neighborhood"
+    description: Financial attribute representing neighborhood on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADADDR2
   complement:
-    description: "Complement"
+    description: Financial attribute representing complement on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADADDR3
-  primary_address:
-    description: "Primary Address"
-    lineage:
-      - datalake_cyber_raw.address.ADPRI
   city:
-    description: "City"
+    description: Financial attribute representing city on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADCITY
   state:
-    description: "State"
+    description: Financial attribute representing state on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADSTATE
   zip_code:
-    description: "Zip Code"
+    description: Financial attribute representing zip code on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADZIP
   is_active:
@@ -66,19 +58,19 @@ columns:
     lineage:
       - datalake_cyber_raw.address.ADSTATUS
   status_reason:
-    description: ""
+    description: Financial attribute representing status reason on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADSTREASON
   ts_creation:
-    description: ""
+    description: Timestamp when creation occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.address.ADDATE
   manager:
-    description: ""
+    description: Financial attribute representing manager on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADCOLLID
   manager_update_status:
-    description: ""
+    description: Financial attribute representing manager update status on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADSTCOLLID
   ts_status_update:
@@ -86,14 +78,29 @@ columns:
     lineage:
       - datalake_cyber_raw.address.ADSTATDT
   address_longitud:
-    description: "address longitud"
+    description: Financial attribute representing address longitud on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADLNG
   address_latitud:
-    description: "address latitude"
+    description: Financial attribute representing address latitud on the address dataset.
     lineage:
       - datalake_cyber_raw.address.ADLAT
   has_extract_from_cyberselfserve:
-    description: ""
+    description: Indicates whether extract from cyberselfserve applies to this financial record.
     lineage:
       - datalake_cyber_raw.address.ADSELFCURE
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  is_primary_address:
+    description: Indicates whether primary address applies to this financial record.
+    lineage: []
+  creditor:
+    description: Financial attribute representing creditor on the address dataset.
+    lineage: []
+  address:
+    description: Financial attribute representing address on the address dataset.
+    lineage: []
+  source:
+    description: Financial attribute representing source on the address dataset.
+    lineage: []

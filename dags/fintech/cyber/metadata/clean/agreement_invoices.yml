@@ -1,12 +1,12 @@
 ---
 database_name: datalake_cyber_clean
 table_name: agreement_invoices
-owner: bianca.martins@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: Invoices created by the agreements installments. Table granularity - Installment of Negotiation
 columns:
   id_invoice:
-    description: "Invoice/boleo ID"
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLID
   id_client:
@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSSNUM
   id_agreement:
-    description: "ID agreement"
+    description: Identifier for the agreement referenced by this financial record.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMACORDO
   id_contract:
@@ -22,146 +22,142 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCCT
   id_company:
-    description: "Company ID"
+    description: Identifier for the company referenced by this financial record.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCODEMP
   id_agency:
-    description: "Agency ID"
+    description: Identifier for the agency referenced by this financial record.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLAGENCIA
   client_code:
-    description: "Client Code"
+    description: Financial attribute representing client code on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCODCLIENTE
-  transferor:
-    description: "Transferor (cedente)"
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLCEDENTE
   dv_bank_agency:
-    description: "DV bank agency"
+    description: Financial attribute representing dv bank agency on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDVAGENCIA
   bank_account_number:
-    description: "Bank Account number"
+    description: Financial attribute representing bank account number on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCONTCOR
   dv_bank_account:
-    description: "DV Banco account"
+    description: Financial attribute representing dv bank account on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDVCONTCOR
   our_number:
-    description: "Our Number"
+    description: Financial attribute representing our number on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNOSSONUM
   invoice_amount:
-    description: "Invoice/boleto amount"
+    description: Financial attribute representing invoice amount on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLVLBOLETO
   document_number:
-    description: "Document number"
+    description: Financial attribute representing document number on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMDOC
   document_type:
-    description: "Document type"
+    description: Financial attribute representing document type on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLTPDOC
   acceptance_code:
-    description: "Acceptance code"
+    description: Financial attribute representing acceptance code on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLACEITE
   drawer_name:
-    description: "Drawer name"
+    description: Financial attribute representing drawer name on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACNOME
   drawer_cpf_cnpj:
-    description: "Drawer CPF/CNPJ"
+    description: Financial attribute representing drawer cpf cnpj on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACCPFCNPJ
   drawer_address:
-    description: "Drawer address"
+    description: Financial attribute representing drawer address on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACEND
   drawer_neighborhood:
-    description: "Drawer neighborhood"
+    description: Financial attribute representing drawer neighborhood on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACBAIRRO
   drawer_zip_code:
-    description: "Drawer zip code"
+    description: Financial attribute representing drawer zip code on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACCEP
   drawer_city:
-    description: "Drawer city"
+    description: Financial attribute representing drawer city on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACCIDADE
   drawer_state:
-    description: "Drawer state"
+    description: Financial attribute representing drawer state on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACUF
   drawer_address_proof:
-    description: "Drawer address proof"
+    description: Financial attribute representing drawer address proof on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSACENDCMP
   instruction_1:
-    description: "Instruction 1"
+    description: Financial attribute representing instruction 1 on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST1
   instruction_2:
-    description: "Instruction 2"
+    description: Financial attribute representing instruction 2 on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST2
   instruction_3:
-    description: "Instruction 3"
+    description: Financial attribute representing instruction 3 on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST3
   instruction_4:
-    description: "Instruction 4"
+    description: Financial attribute representing instruction 4 on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST4
   instruction_5:
-    description: "Instruction 5"
+    description: Financial attribute representing instruction 5 on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLINST5
   location_1:
-    description: "Location 1"
+    description: Financial attribute representing location 1 on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLLOCAL1
   location_2:
-    description: "Location 2"
+    description: Financial attribute representing location 2 on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLLOCAL2
   digitable_line:
-    description: "Digitable line"
+    description: Financial attribute representing digitable line on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLLINHADIG
   barcode:
-    description: "Barcode"
+    description: Financial attribute representing barcode on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCODBARRA
   installment_number:
-    description: "Installment number"
+    description: Financial attribute representing installment number on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMPARC
   interest_day:
-    description: "Interest day"
+    description: Financial attribute representing interest day on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLJURDIA
   status:
-    description: "Status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     categories:
       cancelado: "Same as Canceled in Trato Feito"
       finalizado: "Invoice has been paid. Same as Finished in Trato Feito. "
     lineage:
       - datalake_cyber_raw.tb_boleto.BLSTATUS
   total_number_installments:
-    description: "Total number of installments"
+    description: Financial attribute representing total number installments on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLQTDEPARC
   debt_amount:
-    description: "Debt amoutn"
+    description: Financial attribute representing debt amount on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLVLDIVIDA
   type_invoice:
-    description: "Invoice type"
+    description: Financial attribute representing type invoice on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLTIPOBOLETO
   contract_group:
@@ -181,15 +177,15 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLFLAG_ARREC
   transferor_of_cnpj:
-    description: "CNPJ of the transferor"
+    description: Financial attribute representing transferor of cnpj on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCEDENTECNPJ
   transferor_cnpj:
-    description: "CNPJ transferor"
+    description: Financial attribute representing transferor cnpj on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCNPJCED
   transferor_bank_check_digit:
-    description: ""
+    description: Financial attribute representing transferor bank check digit on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDVBANCO
   transferor_bank_number:
@@ -197,7 +193,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLNUMBANCO
   invoice_wallet:
-    description: "Invoice/Boleto Wallet"
+    description: Financial attribute representing invoice wallet on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLCARTEIRA
   layout_pefin:
@@ -205,7 +201,7 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLLAYOUTPEFIN
   currency:
-    description: "Currency Type"
+    description: ISO currency code for the monetary amount, typically BRL.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLMOEDA
   has_first_invoice_already_been_issued:
@@ -217,114 +213,80 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_boleto.BLFLENVIOPRT
   main_amount:
-    description: "Main amount"
+    description: Financial attribute representing main amount on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLVLPRINC
   fine_amount:
-    description: "Fine amount"
+    description: Financial attribute representing fine amount on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLMULTA
   paid_amount:
-    description: "Paid amount"
+    description: Financial attribute representing paid amount on the agreement_invoices dataset.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLVLPAGO
-  BLVLIOF:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLVLIOF
-  BLDEMDESP:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLDEMDESP
-  BLVLDOLAR:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLVLDOLAR
-  BLAGCOBR:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLAGCOBR
-  BLBCCOBR:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLBCCOBR
-  BLNUMCC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLNUMCC
-  BLFLENVIOLEG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLFLENVIOLEG
-  BLTIPOBOL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLTIPOBOL
-  BLBOLETO:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLBOLETO
-  BLSACENDNR:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLSACENDNR
-  BLCOLLID:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLCOLLID
-  BLNUMCONVENIO:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLNUMCONVENIO
-  BLBANCOCED:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLBANCOCED
-  BLTIPOREGTIT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLTIPOREGTIT
-  BLDTSOLICREGTIT:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLDTSOLICREGTIT
-  BLRESV3:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLRESV3
-  BLENVIO:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLENVIO
-  BLFLAGENV:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLFLAGENV
-  BLFLGLEG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLFLGLEG
-  BLRETLEG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLRETLEG
-  BLESPECIE:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLESPECIE
-  BLCOPIACOLA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_boleto.BLCOPIACOLA
   ts_due:
-    description: "Due date"
+    description: Timestamp when due occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDTVENC
   ts_document:
-    description: "Document date"
+    description: Timestamp when document occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDTDOC
   ts_processing:
-    description: "Processing date"
+    description: Timestamp when processing occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_boleto.BLDTPROC
+  assignor:
+    description: Financial attribute representing assignor on the agreement_invoices dataset.
+    lineage: []
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  dt_boleto_update:
+    description: Calendar date associated with boleto update in the financial workflow.
+    lineage: []
+  boleto_type:
+    description: Financial attribute representing boleto type on the agreement_invoices dataset.
+    lineage: []
+  document_specie:
+    description: Financial attribute representing document specie on the agreement_invoices dataset.
+    lineage: []
+  dt_request_title_registration_bank:
+    description: Calendar date associated with request title registration bank in the financial workflow.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  originating_bank:
+    description: Financial attribute representing originating bank on the agreement_invoices dataset.
+    lineage: []
+  client_bank:
+    description: Financial attribute representing client bank on the agreement_invoices dataset.
+    lineage: []
+  client_bank_agency:
+    description: Financial attribute representing client bank agency on the agreement_invoices dataset.
+    lineage: []
+  title_type:
+    description: Financial attribute representing title type on the agreement_invoices dataset.
+    lineage: []
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  has_sent_boleto:
+    description: Indicates whether sent boleto applies to this financial record.
+    lineage: []
+  creditor:
+    description: Financial attribute representing creditor on the agreement_invoices dataset.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  copy_paste_pix:
+    description: Financial attribute representing copy paste pix on the agreement_invoices dataset.
+    lineage: []
+  ts_record_updated:
+    description: Timestamp when record updated occurred in the upstream fintech system.
+    lineage: []
+  client_bank_current_account:
+    description: Financial attribute representing client bank current account on the agreement_invoices dataset.
+    lineage: []

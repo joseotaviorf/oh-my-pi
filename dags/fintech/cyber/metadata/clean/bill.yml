@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: bill
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Table for storing debts (contract invoices). Table granularity - invoice entries or invoice (depends on the filter of invoice_or_entry field).
 columns:
@@ -22,19 +22,19 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_parcela.PABICODIGO
   boleto_number:
-    description: ""
+    description: Financial attribute representing boleto number on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PANUMDOBOL
   our_number:
-    description: ""
+    description: Financial attribute representing our number on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PANOSSNUM
   our_number_boleto:
-    description: ""
+    description: Financial attribute representing our number boleto on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PANOSNUMBOL
   invoice_or_entry:
-    description: ""
+    description: Financial attribute representing invoice or entry on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.CASE WHEN PATIPO = "P" THEN "Parcela" WHEN PATIPO
         = "B" THEN "Entry" ELSE PATIPO END
@@ -43,30 +43,30 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_parcela.PAACCTG
   invoice_status:
-    description: ""
+    description: Financial attribute representing invoice status on the bill dataset.
     lineage:
       - "datalake_cyber_raw.tb_parcela.CASE WHEN PASTATUS = 1 THEN \"Ativa (em aberto)\"\
         \ WHEN PASTATUS = 2 THEN \"Paga\" WHEN PASTATUS = 3 THEN \"Cancelada\" WHEN\
         \ PASTATUS = 4 THEN \"Pausa\" WHEN PASTATUS = 5 THEN \"Previamente negociada\"\
         \ WHEN PASTATUS = 6 THEN \"Em negocia\xE7\xE3o\" ELSE PASTATUS END"
   retsuko_status:
-    description: ""
+    description: Financial attribute representing retsuko status on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PASTATFA
   purpose:
-    description: ""
+    description: Financial attribute representing purpose on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PATPDIV
   pause_reason:
-    description: ""
+    description: Financial attribute representing pause reason on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAINDMOTPA
   account_type:
-    description: ""
+    description: Financial attribute representing account type on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PATPCONTA
   accrual_year_month:
-    description: ""
+    description: Financial attribute representing accrual year month on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAAMENVFA
   is_negative_bureaus:
@@ -75,91 +75,91 @@ columns:
       - datalake_cyber_raw.tb_parcela.CASE WHEN PAINDNEG = "S" THEN TRUE ELSE FALSE
         END
   is_tenant_first_invoice:
-    description: ""
+    description: Indicates whether tenant first invoice applies to this financial record.
     lineage:
       - datalake_cyber_raw.tb_parcela.CASE WHEN PAINDPRIFA = "S" THEN TRUE ELSE FALSE
         END
   has_previously_negotiated:
-    description: ""
+    description: Indicates whether previously negotiated applies to this financial record.
     lineage:
       - datalake_cyber_raw.tb_parcela.CASE WHEN PAPREVNEG = "S" THEN TRUE ELSE FALSE
         END
   bank_code:
-    description: ""
+    description: Financial attribute representing bank code on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PACODBANBOL
   bank_digit:
-    description: ""
+    description: Financial attribute representing bank digit on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADIGBANBOL
   bank_name:
-    description: ""
+    description: Financial attribute representing bank name on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PANOMBANBOL
   company_agency_account_digit:
-    description: ""
+    description: Financial attribute representing company agency account digit on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PACODAGBOL
   charge_barcode:
-    description: ""
+    description: Financial attribute representing charge barcode on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.CONCAT(PALINDIG1, '.', PALINDIG2, ' ', PALINDIG3,
         '.', PALINDIG4, ' ', PALINDIG5, '.', PALINDIG6, ' ', PALINDIG7, ' ', PALINDIG8)
   charge_instructions:
-    description: ""
+    description: Financial attribute representing charge instructions on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.CONCAT(PALININSTBOL1, PALININSTBOL2, PALININSTBOL3,
         PALININSTBOL4, PALININSTBOL5, PALININSTBOL6, PALININSTBOL7, PALININSTBOL8)
   payment_location_boleto:
-    description: ""
+    description: Financial attribute representing payment location boleto on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PALOCPAGBOL
   type_transferor:
-    description: ""
+    description: Financial attribute representing type transferor on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.CASE WHEN PATPPECEBOL = "F" THEN "Fisica" WHEN
         PATPPECEBOL = "J" THEN "Juridica" ELSE PATPPECEBOL END
   type_transferor_document:
-    description: ""
+    description: Financial attribute representing type transferor document on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.CASE WHEN PATPDOPCBOL = "1" THEN "CNPJ" WHEN PATPDOPCBOL
         = "2" THEN "CPF" ELSE PATPDOPCBOL END
   transferor_document:
-    description: ""
+    description: Financial attribute representing transferor document on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADOCPECEBOL
   transferor_name:
-    description: ""
+    description: Financial attribute representing transferor name on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PANOCEBOL
   drawer_type:
-    description: ""
+    description: Financial attribute representing drawer type on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.CASE WHEN PATPPESABOL = "F" THEN "Fisica" WHEN
         PATPPESABOL = "J" THEN "Juridica" ELSE PATPPESABOL END
   drawer_document_type:
-    description: ""
+    description: Financial attribute representing drawer document type on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.CASE WHEN PATPDPSABOL = "1" THEN "CNPJ" WHEN PATPDPSABOL
         = "2" THEN "CPF" ELSE PATPDPSABOL END
   drawer_document:
-    description: ""
+    description: Financial attribute representing drawer document on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADOPESABOL
   drawer_name:
-    description: ""
+    description: Financial attribute representing drawer name on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PANOSABOL
   bill_record_sequence_2:
-    description: ""
+    description: Financial attribute representing bill record sequence 2 on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PASEREARBOL
   bill_record_sequence_3:
-    description: ""
+    description: Financial attribute representing bill record sequence 3 on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PASEQREARBOL
   due_amount:
-    description: ""
+    description: Financial attribute representing due amount on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLRORI
   main_amount:
@@ -170,24 +170,16 @@ columns:
     description: "Interest Amount (Valor de Jusos Residuais)"
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLJUR
-  eviction_cost_amount:
-    description: "Evictions rcosts. (pt: Valor Custas Residuais). It is the cost amount of the lawsuit against the debtor for contracts in eviction. The `residual` name is because the costs were generated on previous broken agreements"
-    lineage:
-      - datalake_cyber_raw.tb_parcela.PACUSTAS
   fine_amount:
-    description: "Fine amount"
+    description: Financial attribute representing fine amount on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLMUL
-  evictions_lawyers:
-    description: "Honorários (evictions lawyers)"
-    lineage:
-      - datalake_cyber_raw.tb_parcela.PAHONORARIOS
   entry_title:
-    description: ""
+    description: Financial attribute representing entry title on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PABITITULO
   entry_description:
-    description: ""
+    description: Financial attribute representing entry description on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PABIDESC
   entry_amount:
@@ -195,31 +187,31 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_parcela.PABIVALOR
   bill_amount:
-    description: ""
+    description: Financial attribute representing bill amount on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLRBOL
   bill_discount_amount:
-    description: ""
+    description: Financial attribute representing bill discount amount on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLDESCBOL
   bill_deductions_amount:
-    description: ""
+    description: Financial attribute representing bill deductions amount on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLDEDUBOL
   bill_fees_amount:
-    description: ""
+    description: Financial attribute representing bill fees amount on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLRMOMUBOL
   bill_additions_amount:
-    description: ""
+    description: Financial attribute representing bill additions amount on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLACRBOL
   bill_total_amount:
-    description: ""
+    description: Financial attribute representing bill total amount on the bill dataset.
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLRTOBOL
   ts_creation:
-    description: ""
+    description: Timestamp when creation occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTCRIPA
   ts_due:
@@ -231,50 +223,69 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTVENC
   ts_due_boleto:
-    description: "Boleto due date"
+    description: Timestamp when due boleto occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTVENCBOL
   ts_entry_due:
-    description: ""
+    description: Timestamp when entry due occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PABIDTVENC
   ts_sent:
-    description: ""
+    description: Timestamp when sent occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTENVFA
   ts_limit_pause:
-    description: ""
+    description: Timestamp when limit pause occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTLIMPA
   ts_issue_boleto:
-    description: ""
+    description: Timestamp when issue boleto occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTDOCBOL
   ts_entry_insert:
-    description: ""
+    description: Timestamp when entry insert occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PABIDTINSERT
   ts_entry_update:
-    description: ""
+    description: Timestamp when entry update occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PABIDTUPDATE
   ts_insert:
-    description: ""
+    description: Timestamp when insert occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTINSERT
   ts_update:
-    description: ""
+    description: Timestamp when update occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTUPDATE
   ts_load:
-    description: ""
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
     lineage:
       - datalake_cyber_raw.tb_parcela.NOW()
-  PABIDTEXCLUSAO:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_parcela.PABIDTEXCLUSAO
-  PABIFLGEXCLLOG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_parcela.PABIFLGEXCLLOG
+  is_bill_item_deleted:
+    description: Indicates whether bill item deleted applies to this financial record.
+    lineage: []
+  ts_bill_item_deleted:
+    description: Timestamp when bill item deleted occurred in the upstream fintech system.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  eviction_costs_amount:
+    description: Financial attribute representing eviction costs amount on the bill dataset.
+    lineage: []
+  creditor:
+    description: Financial attribute representing creditor on the bill dataset.
+    lineage: []
+  eviction_honorarium_amount:
+    description: Financial attribute representing eviction honorarium amount on the bill dataset.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_record_updated:
+    description: Timestamp when record updated occurred in the upstream fintech system.
+    lineage: []

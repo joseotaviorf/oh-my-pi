@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: agreement_type
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Configuration table containing types of agreements available in the system with their rules, parameters, and conditions for contract negotiations.
@@ -78,10 +78,6 @@ columns:
     description: "Fine Rate in case of delay in payment of the Agreement installment"
     lineage:
       - datalake_cyber_raw.agrtype.AGRATE2
-  free_days:
-    description: "Number of grace period days with no charges"
-    lineage:
-      - datalake_cyber_raw.agrtype.AGGRDAYS
   max_installments:
     description: "Maximum number of installments allowed"
     lineage:
@@ -114,14 +110,6 @@ columns:
     description: "Self-cure flag indicating automatic resolution capability"
     lineage:
       - datalake_cyber_raw.agrtype.AGSELFCURE
-  AGSTATUS:
-    description: "Status of the agreement type configuration"
-    lineage:
-      - datalake_cyber_raw.agrtype.AGSTATUS
-  AGMINPAR:
-    description: "Minimum number of installments allowed"
-    lineage:
-      - datalake_cyber_raw.agrtype.AGMINPAR
   agreement_channel:
     description: "Check existing settings in the Multichannel story."
     lineage:
@@ -130,3 +118,24 @@ columns:
     description: "BOL = bank slip, CAR = Credit card, DCO = debit account"
     lineage:
       - datalake_cyber_raw.agrtype.AGFORMAPAG
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  agstatus:
+    description: Financial attribute representing agstatus on the agreement_type dataset.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  grace_period_days:
+    description: Financial attribute representing grace period days on the agreement_type dataset.
+    lineage: []
+  agminpar:
+    description: Financial attribute representing agminpar on the agreement_type dataset.
+    lineage: []

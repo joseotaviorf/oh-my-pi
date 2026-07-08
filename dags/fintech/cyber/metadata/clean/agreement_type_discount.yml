@@ -1,18 +1,10 @@
 ---
 database_name: datalake_cyber_clean
 table_name: agreement_type_discount
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Table with information on the fields used to compose the value that will be negotiated with the customer and the % discount that can be applied in each field.
 columns:
-  agreement_type:
-    description: "Agreement type identifier for discount configuration"
-    lineage:
-      - datalake_cyber_raw.agtpdsc.ACTYPE
-  original_field_name:
-    description: "Original CyberFinancial field name for discount calculation"
-    lineage:
-      - datalake_cyber_raw.agtpdsc.ACFIELD
   label:
     description: "Description of the CyberFinancial Field parameterized in the type of agreement."
     lineage:
@@ -22,7 +14,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agtpdsc.ACOP
   accounting_order:
-    description: "Accounting Order"
+    description: Financial attribute representing accounting order on the agreement_type_discount dataset.
     lineage:
       - datalake_cyber_raw.agtpdsc.ACLOADPOS
   max_discount_level_1:
@@ -49,3 +41,12 @@ columns:
     description: "Maximum discount - level 6 - Not used by the consultancy."
     lineage:
       - datalake_cyber_raw.agtpdsc.ACMAXDISC6
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  id_agreement_type:
+    description: Identifier for the agreement type referenced by this financial record.
+    lineage: []
+  field_name:
+    description: Financial attribute representing field name on the agreement_type_discount dataset.
+    lineage: []

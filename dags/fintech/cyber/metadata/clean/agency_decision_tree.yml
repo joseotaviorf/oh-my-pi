@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: agency_decision_tree
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Decision tree table for agency assignment logic containing rules and conditions for routing accounts to appropriate agencies.
@@ -72,3 +72,6 @@ columns:
     description: "Queue identifier for account routing"
     lineage:
       - datalake_cyber_raw.agn_dectbl.queue
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

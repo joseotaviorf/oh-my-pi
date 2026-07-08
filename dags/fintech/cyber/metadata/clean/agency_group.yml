@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: agency_group
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Groups were created that include advisory/agency and internal collection (QuintoAndar).
@@ -21,3 +21,6 @@ columns:
     description: "Commission percentage assigned to the agency"
     lineage:
       - datalake_cyber_raw.tb_grupo_agency.GAPERCREMUN
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

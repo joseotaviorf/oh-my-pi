@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: agreement_installments
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Table with information on the installments of the agreement. Table granularity - installment of agreement.
 columns:
@@ -10,16 +10,12 @@ columns:
     lineage:
       - datalake_cyber_raw.agpmtdet.APAHID
   id_agreement_installment:
-    description: "ID agreement installment = ID Agreement + Installment number"
+    description: Identifier for the agreement installment referenced by this financial record (ID agreement installment = ID Agreement + Installment number).
     lineage:
       - datalake_cyber_raw.agpmtdet.APAHID
       - datalake_cyber_raw.agpmtdet.APDETID
-  id_client:
-    description: "ID Client = CPF (TF: client.document)"
-    lineage:
-      - datalake_cyber_raw.agpmtdet.APSSNUM
   status:
-    description: "Payment status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     categories:
       Programado: "Same as 'registered' in Trato Feito"
       Quebrado: "Same as 'canceled' or 'expired' in Trato Feito"
@@ -27,7 +23,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agpmtdet.APFLAG
   revalued_payment_flag:
-    description: "Revalued payment flag"
+    description: Financial attribute representing revalued payment flag on the agreement_installments dataset.
     lineage:
       - datalake_cyber_raw.agpmtdet.APFLAG2
   installment_number:
@@ -35,25 +31,17 @@ columns:
     lineage:
       - datalake_cyber_raw.agpmtdet.APDETID
   amount_to_pay:
-    description: "Installment amount."
+    description: Financial attribute representing amount to pay on the agreement_installments dataset.
     lineage:
       - datalake_cyber_raw.agpmtdet.APAMT
   payment_amount:
-    description: "Payment amount"
+    description: Financial attribute representing payment amount on the agreement_installments dataset.
     lineage:
       - datalake_cyber_raw.agpmtdet.APAMTPAY
-  interest_amount:
-    description: "Installment Interest amount (pt: Juros de Financiamento, não é o juros do contrato)"
-    lineage:
-      - datalake_cyber_raw.agpmtdet.APINTAMT
   amortization_amount:
     description: "Amount that will be amortized"
     lineage:
       - datalake_cyber_raw.agpmtdet.APAMZAMT
-  balance_amount:
-    description: "Final balance = total agreement amount - amortization amount"
-    lineage:
-      - datalake_cyber_raw.agpmtdet.APBLNC
   credit_card_fee_amount:
     description: "Credit Card Fee “prorated” per installment of the agreement"
     lineage:
@@ -63,10 +51,22 @@ columns:
     lineage:
       - datalake_cyber_raw.agpmtdet.APHONO
   ts_start_payment_term:
-    description: ""
+    description: Timestamp when start payment term occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.agpmtdet.APINDATE
   ts_due_installment:
-    description: "Installment Due Date"
+    description: Timestamp when due installment occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.agpmtdet.APDUEDT
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  installment_interest_amount:
+    description: Financial attribute representing installment interest amount on the agreement_installments dataset.
+    lineage: []
+  agreement_balance_amount:
+    description: Financial attribute representing agreement balance amount on the agreement_installments dataset.
+    lineage: []
+  source:
+    description: Financial attribute representing source on the agreement_installments dataset.
+    lineage: []

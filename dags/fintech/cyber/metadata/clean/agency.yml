@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: agency
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: This table contains demographic and financial information about the agencies and their contacts.
 columns:
@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGAGENCY
   agency_name:
-    description: "Agency Name"
+    description: Financial attribute representing agency name on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGFIRM
   agency_commercial_name:
@@ -18,11 +18,11 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGNICKNAME
   cnpj:
-    description: "Agency CNPJ"
+    description: Brazilian company registry number (CNPJ) for corporate counterparties (PII).
     lineage:
       - datalake_cyber_raw.agency.AGIRSNUM
   agency_type:
-    description: "Agency type"
+    description: Financial attribute representing agency type on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGAGCYCD
   super_agency:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGSTATUS
   distribution_type:
-    description: "Distribution type"
+    description: Financial attribute representing distribution type on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGDISTTYPE
   address:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGADDR1
   neighborhood:
-    description: "Neighborhood"
+    description: Financial attribute representing neighborhood on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGADDR2
   city:
@@ -58,15 +58,15 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGZIP
   address_complement:
-    description: "Address complement"
+    description: Financial attribute representing address complement on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGADDR3
   phone_number:
-    description: "Phone number"
+    description: Financial attribute representing phone number on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGPHONE
   contract_termination_reason:
-    description: "Contract termination reason"
+    description: Financial attribute representing contract termination reason on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGENDOBS
   has_commission:
@@ -90,19 +90,19 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGNUMSAT
   current_amount_recovered:
-    description: "Current amount recovered"
+    description: Financial attribute representing current amount recovered on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGAMTCOL
   current_commission_rate:
-    description: "Current commission rate"
+    description: Financial attribute representing current commission rate on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGCCRATE
   waiting_days_before_paying_commission:
-    description: "Waiting days before paying commission"
+    description: Financial attribute representing waiting days before paying commission on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGCOMLAG
   prior_commission_fee:
-    description: "Prior commission fee"
+    description: Financial attribute representing prior commission fee on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGPCRATE
   amount_satisfied:
@@ -114,7 +114,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agency.AGAMTREL
   current_active_amount:
-    description: "Current active value"
+    description: Financial attribute representing current active amount on the agency dataset.
     lineage:
       - datalake_cyber_raw.agency.AGAMTACT
   ts_start:
