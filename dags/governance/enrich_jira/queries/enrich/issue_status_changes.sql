@@ -1,9 +1,12 @@
 WITH issue_change AS (
-    SELECT DISTINCT 
-        key, 
-        EXPLODE(FROM_JSON(GET_JSON_OBJECT(change_log,'$.histories'), 'array<string>')) AS histories, 
+    SELECT DISTINCT
+        key,
+        EXPLODE(FROM_JSON(GET_JSON_OBJECT(change_log,'$.histories'), 'array<string>')) AS histories,
         EXPLODE(FROM_JSON(GET_JSON_OBJECT(histories,'$.items'), 'array<string>')) AS items
-    FROM datalake_jira_clean.issues
+    FROM
+        datalake_jira_clean.issues
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ), issue_status_change AS (
     SELECT 
         key AS id_issue, 
