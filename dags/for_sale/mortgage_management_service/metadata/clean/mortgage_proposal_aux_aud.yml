@@ -1,44 +1,44 @@
 ---
 database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_proposal_aux_aud
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Hibernate Envers audit history for mortgage_proposal_aux, capturing each revision of bridge identifiers and Envers modification flags."
+description: "Historical audit trail of mortgage_proposal_aux: one row per revision of the bridge linking a mortgage intention to its legacy Atta proposal and pre-analysis records, enabling point-in-time reconstruction of when the mortgage application, proposal, and pre-analysis identifiers were attached. Technical: Hibernate Envers audit table using the ValidityAuditStrategy, so each revision also records when it stopped being valid (rev_end); joins to revinfo via rev for who/what made the change."
 columns:
   id:
-    description: "Primary key of the auxiliary row that was revised, matching mortgage_proposal_aux.id."
+    description: "Identifier of the auxiliary row that was revised, matching mortgage_proposal_aux.id."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.id
   rev:
-    description: "Envers revision identifier linking this audit row to revinfo in the source database."
+    description: "Envers revision identifier linking this audit row to the revinfo metadata table in the source database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.rev
   rev_type:
-    description: "Revision type indicating the operation (0=insert, 1=update, 2=delete)."
+    description: "Envers revision type code for the row change (0=insert, 1=update, 2=delete)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.revtype
   rev_end:
-    description: "Envers revision at which this audit snapshot was superseded, when recorded by the source."
+    description: "Revision at which this audit snapshot was superseded by a later change, marking the end of its validity period (Envers ValidityAuditStrategy)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.revend
   id_mortgage_intention:
-    description: "Mortgage intention identifier as observed at this audit revision."
+    description: "Foreign key to the parent mortgage_intention, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.mortgage_intention_id
   id_mortgage_application:
-    description: "Mortgage application identifier as observed at this audit revision."
+    description: "Foreign key to the local mortgage_application, as observed at this audit revision (see mortgage_proposal_aux.id_mortgage_application)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.mortgage_application_id
   id_proposal_reference:
-    description: "External proposal reference as observed at this audit revision."
+    description: "External proposal reference in the legacy Atta system, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.proposal_reference_id
   id_pre_analysis_reference:
-    description: "External pre-analysis reference as observed at this audit revision."
+    description: "External pre-analysis reference in the legacy Atta system, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.pre_analysis_reference_id
   version:
-    description: "Row version as observed at this audit revision."
+    description: "Row optimistic-locking version number, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.version
   mod_id_mortgage_intention:
@@ -70,11 +70,11 @@ columns:
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.updated_at_mod
   ts_created:
-    description: "Created-at timestamp as observed at this audit revision."
+    description: "Row creation timestamp, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.created_at
   ts_updated:
-    description: "Updated-at timestamp as observed at this audit revision."
+    description: "Row last-update timestamp, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.updated_at
   year:

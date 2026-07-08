@@ -1,28 +1,28 @@
 ---
 database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention_sale_details
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Sale-flow details linked to a mortgage intention, such as sale reference and inspection companion contact data from Mortgage Management Service."
+description: "Post-contract-signing details of the actual property sale tied to a mortgage intention, populated once the deal has progressed past CCV (purchase/sale commitment contract) signing. Connects the buyer's mortgage intention to their concrete property purchase and captures inspection/appraisal contact information. One row per mortgage intention (grain = one sale details record per intention, 1:1 and optional — only present once the sale reaches this stage). Technical: CDC-replicated clean copy of the mortgage_intention_sale_details table from the Mortgage Management Service (MMS) operational database."
 columns:
   id:
-    description: "Primary key of the mortgage intention sale details row in the source service database."
+    description: "Primary key that uniquely identifies the mortgage intention sale details row. Technical: primary key of the row in the source service database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.id
   id_mortgage_intention:
-    description: "Foreign key to the parent mortgage_intention that this sale details row extends."
+    description: "Foreign key (1:1, unique) to mortgage_intention.id identifying the mortgage intention this sale details record extends."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.mortgage_intention_id
   sale_reference_id:
-    description: "External sale or listing reference identifier tying the intention to a concrete sale process."
+    description: "Identifier of the specific sale offer that this mortgage intention's sale is tied to, attached once the CCV (purchase/sale commitment contract) is signed. Technical: alphanumeric ID from the offer record in the external sales-flow service; external reference, not a local foreign key."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.sale_reference_id
   inspection_companion_person_name:
-    description: "Full name of the person expected to accompany the property inspection, when provided by the user."
+    description: "Full name of the person expected to accompany the property inspection/appraisal visit, when provided by the buyer."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.inspection_companion_name
   inspection_companion_phone_number:
-    description: "Phone number for the inspection companion contact, when provided by the user."
+    description: "Phone number for the inspection companion contact, when provided by the buyer. Technical: stored as free text to accommodate multiple national/international formats, including those coming from Atta."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.inspection_companion_phone
   version:

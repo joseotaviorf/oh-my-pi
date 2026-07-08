@@ -1,72 +1,102 @@
 ---
 database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention_aud
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Audit table for mortgage_intention, tracking all historical changes made to mortgage intention records using Hibernate Envers for audit trail purposes."
+description: "Historical audit trail of mortgage_intention: one row per revision of a mortgage intention (status changes, cancellations, updates to declared expenses/savings, etc.), enabling point-in-time reconstruction of how a buyer's mortgage intention evolved. Technical: Hibernate Envers audit table using the ValidityAuditStrategy, so each revision also records when it stopped being valid (rev_end); joins to revinfo via rev for who/what made the change."
 columns:
   id:
-    description: "Primary key of the mortgage intention row that was revised, matching mortgage_intention.id."
+    description: "Identifier of the mortgage intention that was revised, matching mortgage_intention.id."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.id
   rev:
-    description: "Envers revision identifier linking this audit row to the revinfo metadata table in the source database."
+    description: "Envers revision identifier linking this audit row to the revinfo metadata table (revision timestamp and actor) in the source database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.rev
   rev_type:
-    description: "Envers revision type code for the row change, such as insert, update, or delete, as defined by Envers (0=insert, 1=update, 2=delete)."
+    description: "Envers revision type code for the row change (0=insert, 1=update, 2=delete)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.revtype
   rev_end:
-    description: "Envers revision at which this audit snapshot was superseded, when the source records end of validity."
+    description: "Revision at which this audit snapshot was superseded by a later change, marking the end of its validity period (Envers ValidityAuditStrategy)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.revend
   uuid_mortgage_intention:
-    description: "Business UUID of the mortgage intention as observed at this audit revision."
+    description: "Public identifier of the mortgage intention (see mortgage_intention.uuid_mortgage_intention) as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_intention_uuid
   uuid_person:
-    description: "Person UUID associated with the mortgage intention as observed at this audit revision."
+    description: "UUID of the buyer (proponent) associated with the mortgage intention, as observed at this audit revision. References the external Person Service, not a local table."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.person_uuid
   source_name:
-    description: "Intention source label as observed at this audit revision."
+    description: "Channel or business event that originated the mortgage intention, as observed at this audit revision. See mortgage_intention.source_name for the full list of values."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.source
+    categories:
+      CREDIT_FORM: "Intention created from a credit form submission."
+      SALE_OFFER: "Intention created when a sale offer was made."
+      CONVERTED_FROM_CASH: "Intention created when an originally cash purchase was converted to financing."
+      SIGNED_CONTRACT: "Intention created from a signed purchase agreement (CCV)."
+      MANUAL: "Intention created manually by an operator."
+      RECONCILIATION: "Intention created to register a mortgage process already completed by operations but not originally tracked by the system."
   status_name:
-    description: "Intention status as observed at this audit revision."
+    description: "Lifecycle status of the mortgage intention as observed at this audit revision. See mortgage_intention.status_name for the full list of values."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.status
+    categories:
+      ACTIVE: "Intention is currently active and being processed."
+      COMPLETED: "Financing process was completed successfully."
+      CANCELED: "Intention was canceled and is no longer being pursued."
   mortgage_rules_country_code:
-    description: "Mortgage rules country code as observed at this audit revision."
+    description: "Country whose mortgage regulations apply to this intention, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_rules_country
+    categories:
+      BR: "Brazil. Uses Brazilian Real (BRL) and follows local banking laws."
   cancellation_reason:
-    description: "Cancellation reason text as observed at this audit revision, when present."
+    description: "Business cancellation reason as observed at this audit revision, when present. See mortgage_intention.cancellation_reason for the full list of values."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.canceled_reason
+    categories:
+      FOLLOWED_WITH_EXTERNAL_MORTGAGE: "Buyer chose to proceed with a mortgage directly with the bank or another broker."
+      SALE_OFFER_TERMINATED: "The associated sale offer was canceled."
+      DEALMAKER_INSTRUCTED_NO_ACTION: "An internal sales agent (Dealmaker) confirmed no interest after direct contact with the buyer."
+      AUTO_CANCELED_SALE_OFFER_TERMINATED: "System auto-cancellation after the associated sale offer was terminated."
+      AUTO_CANCELED_DUPLICATED: "System auto-cancellation of a duplicate intention created for the same person from equivalent sources."
+      AUTO_CANCELED_RECREATED: "System auto-cancellation because a new intention was created to replace this one."
+      AUTO_CANCELED_SALE_CONVERTED_TO_CASH_PAYMENT: "System auto-cancellation because the sale converted to a cash payment."
+      EARLY_PURCHASE_STAGE: "Buyer has no concrete offer plans yet; too early for a mortgage application."
+      CLIENT_NOT_RETURNING_CONTACTS: "Canceled after multiple failed contact attempts by the field partner."
+      DEALMAKER_BYPASS: "Cancellation initiated by an internal sales agent (Dealmaker) bypass/override."
+      PROPONENT_HAS_RESTRICTIONS: "Buyer has financial or legal restrictions preventing financing."
+      SALE_CONVERTED_TO_CONSORTIUM_PAYMENT: "Sale converted to a consortium (real-estate savings-pool) payment method."
+      SALE_CONVERTED_TO_CASH_PAYMENT: "Manual cancellation because the sale converted to a cash payment."
+      PROPERTY_HAS_RESTRICTIONS: "Property has restrictions preventing financing."
+      AUTO_CANCELED_GENERIC: "System auto-cancellation not matching any specific reason."
+      OTHER: "Cancellation reason not covered by any other category."
   mortgage_term:
-    description: "Mortgage term value as observed at this audit revision."
+    description: "Requested mortgage term in months, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_term
   expenses_amount:
-    description: "Expenses-related monetary amount as observed at this audit revision."
+    description: "Financed transaction expenses amount (see mortgage_intention.expenses_amount), as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.expenses_amount
   savings_amount:
-    description: "Savings monetary amount as observed at this audit revision."
+    description: "FGTS (Fundo de Garantia do Tempo de Serviço) amount applied toward the purchase (see mortgage_intention.savings_amount), as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.savings_amount
   is_will_finance_expenses:
-    description: "Flag for financing expenses as observed at this audit revision."
+    description: "Flag for financing transaction expenses, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.will_finance_expenses
   is_will_use_savings:
-    description: "Flag for using savings as observed at this audit revision."
+    description: "Flag for using FGTS savings toward the mortgage, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.will_use_savings
   version:
-    description: "Aggregate version number as observed at this audit revision."
+    description: "Aggregate optimistic-locking version number as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.version
   mod_uuid_mortgage_intention:
@@ -130,15 +160,15 @@ columns:
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.updated_at_mod
   ts_canceled:
-    description: "Cancellation timestamp as observed at this audit revision."
+    description: "Cancellation timestamp, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.canceled_at
   ts_created:
-    description: "Row creation timestamp as observed at this audit revision."
+    description: "Row creation timestamp, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.created_at
   ts_updated:
-    description: "Row last-update timestamp as observed at this audit revision."
+    description: "Row last-update timestamp, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_aud.updated_at
   year:

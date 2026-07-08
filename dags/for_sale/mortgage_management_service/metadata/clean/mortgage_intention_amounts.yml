@@ -1,40 +1,50 @@
 ---
 database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention_amounts
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Financial breakdown rows linked to a mortgage intention, including financed amount, down payment, property value, and currency from Mortgage Management Service."
+description: "Append-only log of monetary snapshots captured throughout a mortgage intention's journey through the sales and financing funnel — for example the amount declared on a credit form, the value of an accepted sale offer, or the amount at contract signing. One row per capture point (grain = one amounts event per mortgage intention). Each row belongs to a parent mortgage intention via id_mortgage_intention (foreign key to mortgage_intention.id). Technical: CDC-replicated clean copy of the mortgage_intention_amounts table from the Mortgage Management Service (MMS) operational database."
 columns:
   id:
-    description: "Primary key of the mortgage intention amounts row in the source service database."
+    description: "Primary key that uniquely identifies this amounts snapshot row. Technical: primary key of the row in the source service database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts.id
   id_mortgage_intention:
-    description: "Foreign key to the parent mortgage_intention aggregate that owns this amounts snapshot."
+    description: "Foreign key to mortgage_intention.id identifying the mortgage intention this monetary snapshot belongs to."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts.mortgage_intention_id
   source_name:
-    description: "Label identifying which upstream calculation or channel produced this amounts record."
+    description: "Funnel stage or business event that produced this amounts snapshot. Technical: stored as an enum string in the source database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts.source
+    categories:
+      SALE_OFFER_SENT: "Amounts captured when a sale offer was sent to the buyer (initial stage)."
+      SALE_OFFER_ACCEPTED: "Amounts captured when the buyer accepted the sale offer, committing to the proposed terms."
+      CREDIT_FORM_STARTED: "Amounts captured when the buyer starts the credit application form."
+      CCV_SIGNED: "Amounts captured when the CCV (Contrato de Compromisso de Compra e Venda — the official purchase/sale commitment contract) is signed; the final amounts at official contract stage."
+      MULTI_BANKS_FORM: "Amounts entered manually by the field partner in the multi-bank form on the internal iSolve tool."
+      CONVERTED_FROM_CASH: "Amounts captured when a sale offer's payment method was converted from cash to financed."
+      FGTS_USAGE_CHANGED: "Amounts recaptured when the buyer's use of FGTS savings changes (e.g. switching between financed-with-FGTS and financed-without-FGTS)."
   currency_code:
-    description: "ISO-like currency code in which the monetary amounts on this row are expressed."
+    description: "Currency in which the monetary amounts on this row are expressed. Technical: stored as a short enum string, defaults to BRL."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts.currency
+    categories:
+      BRL: "Brazilian Real, Brazil's official currency. Currently the only supported value."
   event_source_reference_id:
-    description: "Opaque identifier from the originating event or integration used to correlate or deduplicate updates."
+    description: "Identifier of the sale offer that produced this amounts snapshot — the same identifier space as mortgage_intention_sale_details.sale_reference_id — used to correlate or deduplicate updates coming from the sales-flow system. Technical: opaque string identifier; external reference, not a local foreign key."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts.event_source_id
   financed_amount:
-    description: "Financed principal amount associated with this intention amounts row, in the stated currency."
+    description: "Principal amount the bank is expected to finance for this snapshot, in the stated currency."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts.financed_amount
   down_payment:
-    description: "Down payment amount associated with this intention amounts row, in the stated currency."
+    description: "Down payment ('entrada') the buyer pays upfront for this snapshot, in the stated currency."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts.down_payment
   property_value:
-    description: "Property value amount used in this amounts snapshot, in the stated currency."
+    description: "Total transaction value of the property for this snapshot, in the stated currency."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts.property_value
   version:

@@ -1,56 +1,66 @@
 ---
 database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention_amounts_aud
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Audit table for mortgage_intention_amounts, tracking all historical changes made to mortgage intention amount records using Hibernate Envers for audit trail purposes."
+description: "Historical audit trail of mortgage_intention_amounts: one row per revision of a mortgage intention's monetary snapshot (financed amount, down payment, property value), enabling point-in-time reconstruction of how the deal's amounts evolved through the sales/financing funnel. Technical: Hibernate Envers audit table using the ValidityAuditStrategy, so each revision also records when it stopped being valid (rev_end); joins to revinfo via rev for who/what made the change."
 columns:
   id:
-    description: 'Id of the mortgage intention amounts.'
+    description: "Identifier of the mortgage intention amounts row that was revised, matching mortgage_intention_amounts.id."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.id
   rev:
-    description: "Envers revision identifier linking this audit row to revinfo in the source database."
+    description: "Envers revision identifier linking this audit row to the revinfo metadata table in the source database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.rev
   rev_type:
-    description: "Envers revision type code describing the kind of change applied at this revision."
+    description: "Envers revision type code for the row change (0=insert, 1=update, 2=delete)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.revtype
   rev_end:
-    description: "Envers revision at which this audit snapshot was superseded, when recorded by the source."
+    description: "Revision at which this audit snapshot was superseded by a later change, marking the end of its validity period (Envers ValidityAuditStrategy)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.revend
   id_mortgage_intention:
-    description: "Parent mortgage intention identifier as observed at this audit revision."
+    description: "Foreign key to the parent mortgage_intention, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.mortgage_intention_id
   source_name:
-    description: "Amounts source label as observed at this audit revision."
+    description: "Funnel stage or business event that produced this amounts snapshot, as observed at this audit revision. See mortgage_intention_amounts.source_name for the full list of values."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.source
+    categories:
+      SALE_OFFER_SENT: "Amounts captured when a sale offer was sent to the buyer."
+      SALE_OFFER_ACCEPTED: "Amounts captured when the buyer accepted the sale offer."
+      CREDIT_FORM_STARTED: "Amounts captured when the buyer starts the credit application form."
+      CCV_SIGNED: "Amounts captured when the CCV (purchase/sale commitment contract) is signed."
+      MULTI_BANKS_FORM: "Amounts entered manually by the field partner in the multi-bank form on the internal iSolve tool."
+      CONVERTED_FROM_CASH: "Amounts captured when a sale offer's payment method was converted from cash to financed."
+      FGTS_USAGE_CHANGED: "Amounts recaptured when the buyer's use of FGTS savings changes."
   currency_code:
-    description: "Currency code as observed at this audit revision."
+    description: "Currency of the monetary amounts on this row, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.currency
+    categories:
+      BRL: "Brazilian Real, Brazil's official currency."
   event_source_reference_id:
-    description: "Event source identifier string as observed at this audit revision."
+    description: "External sale offer reference used to correlate or deduplicate updates (see mortgage_intention_amounts.event_source_reference_id), as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.event_source_id
   financed_amount:
-    description: "Financed amount as observed at this audit revision."
+    description: "Financed principal amount, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.financed_amount
   down_payment:
-    description: "Down payment amount as observed at this audit revision."
+    description: "Down payment amount, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.down_payment
   property_value:
-    description: "Property value amount as observed at this audit revision."
+    description: "Property transaction value, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.property_value
   version:
-    description: "Row version as observed at this audit revision."
+    description: "Row optimistic-locking version number, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.version
   mod_id_mortgage_intention:
@@ -94,11 +104,11 @@ columns:
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.updated_at_mod
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: "Row creation timestamp, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.created_at
   ts_updated:
-    description: "Updated-at timestamp as observed at this audit revision."
+    description: "Row last-update timestamp, as observed at this audit revision."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention_amounts_aud.updated_at
   year:

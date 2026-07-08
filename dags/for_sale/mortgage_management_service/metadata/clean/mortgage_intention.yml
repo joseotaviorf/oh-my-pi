@@ -1,56 +1,86 @@
 ---
 database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Mortgage intention records for users interested in financing a property purchase, including status, amounts, and cancellation context from Mortgage Management Service."
+description: "Central record of a person's mortgage intention: the initial, source-of-truth expression of interest in financing a property purchase, created before any formal bank application exists. One row per intention (grain = one mortgage intention); a person can have more than one intention over time, though active intentions from equivalent sources are deduplicated by application logic. Tracks the buyer's declared expenses/FGTS preferences, applicable mortgage rules country, lifecycle status, and cancellation context. Parent table for mortgage_intention_amounts (1:N monetary snapshots), mortgage_intention_sale_details (1:1 post-contract sale details), and mortgage_proposal_aux (bridge to legacy Atta proposals/pre-analyses), all joined via mortgage_intention_id. Technical: CDC-replicated clean copy of the mortgage_intention table from the Mortgage Management Service (MMS) operational database."
 columns:
   id:
-    description: "Primary key of the mortgage intention row in the source service database."
+    description: "Primary key that uniquely identifies the mortgage intention. Referenced as mortgage_intention_id (foreign key) by mortgage_intention_amounts, mortgage_intention_sale_details, and mortgage_proposal_aux. Technical: primary key of the row in the source service database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.id
   uuid_mortgage_intention:
-    description: "Business UUID that uniquely identifies the mortgage intention across systems."
+    description: "Public identifier of the mortgage intention, used to correlate this record across APIs, domain events, and other systems such as Atta. Technical: business UUID that uniquely identifies the mortgage intention across systems."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.mortgage_intention_uuid
   uuid_person:
-    description: "UUID of the person associated with this mortgage intention."
+    description: "Identifies the buyer (proponent) who expressed interest in financing the property. Foreign key to the person record in the external Person Service (person-api); the person entity itself is not represented as a local table in this domain. Technical: UUID of the person associated with this mortgage intention."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.person_uuid
   source_name:
-    description: "Channel from which the mortgage intention was created."
+    description: "Channel or business event that originated the mortgage intention. Technical: stored as an enum string in the source database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.source
+    categories:
+      CREDIT_FORM: "Intention created from a credit form submission."
+      SALE_OFFER: "Intention created when a sale offer was made."
+      CONVERTED_FROM_CASH: "Intention created when an originally cash purchase was converted to financing."
+      SIGNED_CONTRACT: "Intention created from a signed purchase agreement (CCV)."
+      MANUAL: "Intention created manually by an operator, e.g. retail operation or a customer financing multiple properties at once."
+      RECONCILIATION: "Intention created to register a mortgage process already completed by the operations team but not originally tracked by the system."
   status_name:
-    description: "Current lifecycle status of the mortgage intention as stored in the operational database."
+    description: "Current lifecycle status of the mortgage intention. Technical: stored as an enum string in the source database, defaults to ACTIVE on creation."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.status
+    categories:
+      ACTIVE: "Intention is currently active and being processed."
+      COMPLETED: "Financing process was completed successfully."
+      CANCELED: "Intention was canceled and is no longer being pursued; see cancellation_reason for why."
   mortgage_rules_country_code:
-    description: "Country code used to select which mortgage rules or product constraints apply to this intention."
+    description: "Country whose mortgage regulations and product constraints apply to this intention. Technical: stored as a short enum string, defaults to BR."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.mortgage_rules_country
+    categories:
+      BR: "Brazil. Uses Brazilian Real (BRL) and follows local banking laws. Currently the only supported value."
   cancellation_reason:
-    description: "Enumerated reason to why the mortgage intention was canceled, when applicable."
+    description: "Business reason recorded when the mortgage intention is canceled (populated only when status_name = CANCELED), used for funnel tracking and cancellation analysis. Technical: stored as an enum string in the source database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.canceled_reason
+    categories:
+      FOLLOWED_WITH_EXTERNAL_MORTGAGE: "Buyer chose to proceed with a mortgage directly with the bank or another broker."
+      SALE_OFFER_TERMINATED: "The associated sale offer was canceled."
+      DEALMAKER_INSTRUCTED_NO_ACTION: "An internal sales agent (Dealmaker) confirmed no interest after direct contact with the buyer."
+      AUTO_CANCELED_SALE_OFFER_TERMINATED: "System auto-cancellation after the associated sale offer was terminated."
+      AUTO_CANCELED_DUPLICATED: "System auto-cancellation of a duplicate intention created for the same person from equivalent sources."
+      AUTO_CANCELED_RECREATED: "System auto-cancellation because a new intention was created to replace this one (e.g. after a pre-analysis error)."
+      AUTO_CANCELED_SALE_CONVERTED_TO_CASH_PAYMENT: "System auto-cancellation because the sale converted to a cash payment."
+      EARLY_PURCHASE_STAGE: "Buyer has no concrete offer plans yet; too early in the purchase journey for a mortgage application."
+      CLIENT_NOT_RETURNING_CONTACTS: "Canceled after multiple failed contact attempts by the field partner."
+      DEALMAKER_BYPASS: "Cancellation initiated by an internal sales agent (Dealmaker) bypass/override."
+      PROPONENT_HAS_RESTRICTIONS: "Buyer has financial or legal restrictions (e.g. negative credit score, legal issues, irregular tax situation, insufficient income)."
+      SALE_CONVERTED_TO_CONSORTIUM_PAYMENT: "Sale converted to a consortium (real-estate savings-pool) payment method."
+      SALE_CONVERTED_TO_CASH_PAYMENT: "Manual cancellation because the sale converted to a cash payment."
+      PROPERTY_HAS_RESTRICTIONS: "Property has restrictions preventing financing (e.g. irregular documentation, construction issues, zoning or area restrictions)."
+      AUTO_CANCELED_GENERIC: "System auto-cancellation not matching any of the specific reasons above."
+      OTHER: "Cancellation reason not covered by any other category."
   mortgage_term:
-    description: "Requested mortgage term length in months."
+    description: "Requested mortgage term, i.e. the number of monthly installments the buyer intends to use to pay off the loan. Technical: sourced from the credit form's installments quantity."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.mortgage_term
   expenses_amount:
-    description: "Monetary amount related to expenses the user may finance as part of the intention, in source currency."
+    description: "Monetary amount of transaction-related expenses (e.g. ITBI property transfer tax, registry fees) that the buyer chose to roll into the financed amount instead of paying out of pocket; only meaningful when is_will_finance_expenses is true. In source currency (BRL). Technical: typically calculated as 5% of the financing value when applicable; stored as a decimal(18,4)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.expenses_amount
   savings_amount:
-    description: "Monetary amount of savings (FGTS) the user declared for the mortgage intention, in source currency."
+    description: "Monetary value of the buyer's FGTS (Fundo de Garantia do Tempo de Serviço — a mandatory Brazilian employment severance/guarantee fund) balance being applied toward the property purchase; only meaningful when is_will_use_savings is true. Not general bank savings. In source currency (BRL). Technical: stored as a decimal(18,4)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.savings_amount
   is_will_finance_expenses:
-    description: "Flag indicating whether the user intends to finance related expenses within the mortgage product."
+    description: "Flag indicating whether the buyer chose to finance transaction expenses (see expenses_amount) as part of the mortgage instead of paying them separately."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.will_finance_expenses
   is_will_use_savings:
-    description: "Flag indicating whether the user intends to apply declared savings (FGTS) toward the mortgage intention."
+    description: "Flag indicating whether the buyer intends to apply FGTS funds toward the mortgage (see savings_amount). Technical: derived from the payment method chosen by the buyer (payment methods FINANCED_USING_FGTS / CASH_USING_FGTS)."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.will_use_savings
   version:
@@ -58,7 +88,7 @@ columns:
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.version
   ts_canceled:
-    description: "Timestamp when the mortgage intention was marked as canceled in the operational database."
+    description: "Timestamp when the mortgage intention was marked as canceled in the operational database. Populated only when status_name = CANCELED."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_intention.canceled_at
   ts_created:

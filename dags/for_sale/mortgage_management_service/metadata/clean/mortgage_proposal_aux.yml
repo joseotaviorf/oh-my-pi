@@ -1,28 +1,28 @@
 ---
 database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_proposal_aux
-owner: thiago.bueno@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: "Auxiliary bridge between a mortgage intention, optional mortgage application, and external proposal or pre-analysis identifiers in Mortgage Management Service."
+description: "Linkage/bridge table connecting the new Mortgage Management Service (MMS) to the legacy Atta system during their coexistence and migration period, mapping a mortgage intention (and, once created, its mortgage application) to the corresponding proposal ('proposta') and pre-analysis records in Atta. Ensures operational continuity and data integrity while both systems are active. One row per mortgage intention (grain = one bridge record per intention); the mortgage application and proposal reference fields start empty and are populated as the process advances. Technical: CDC-replicated clean copy of the mortgage_proposal_aux table from the Mortgage Management Service (MMS) operational database."
 columns:
   id:
-    description: "Primary key of the mortgage proposal auxiliary row in the source service database."
+    description: "Primary key that uniquely identifies the mortgage proposal auxiliary row. Technical: primary key of the row in the source service database."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux.id
   id_mortgage_intention:
-    description: "Foreign key to the mortgage_intention that this auxiliary proposal metadata extends."
+    description: "Foreign key to mortgage_intention.id identifying the mortgage intention this bridge record links to its Atta counterpart."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux.mortgage_intention_id
   id_mortgage_application:
-    description: "Optional foreign key to mortgage_application when a formal application exists for this intention."
+    description: "Foreign key to the local mortgage_application table, populated once a formal bank credit application exists for this intention; null while only a pre-analysis or intention exists."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux.mortgage_application_id
   id_proposal_reference:
-    description: "External proposal identifier from upstream sales or credit systems, unique when populated."
+    description: "Identifier of the corresponding proposal ('proposta') in the legacy Atta system, populated once a proposal has been created there. Technical: external reference to Atta (not a local foreign key); unique when populated."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux.proposal_reference_id
   id_pre_analysis_reference:
-    description: "External pre-analysis identifier linking to an upstream credit or underwriting workflow."
+    description: "Identifier of the corresponding pre-analysis record in the legacy Atta system — the preliminary credit-eligibility check performed before or alongside a full proposal. Technical: external reference to Atta, not a local foreign key."
     lineage:
       - datalake_mortgage_management_service_raw.mortgage_proposal_aux.pre_analysis_reference_id
   version:
