@@ -1,5 +1,9 @@
 database_name: datalake_gsheets_clean
 table_name: for_sale_closing_assistance
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for for
+  sale closing assistance. One row per planning or control record used in
+  financial reporting and SLA targets.
 owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 columns:

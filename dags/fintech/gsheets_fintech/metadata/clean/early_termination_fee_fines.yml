@@ -1,131 +1,178 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: early_termination_fee_fines
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for early
+  termination fee fines. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   requester_email:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.solicitante
+    description: Value from the Google Sheets source column mapped to requester_email for early_termination_fee_fines planning.
   requester_team:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.time
+    description: Value from the Google Sheets source column mapped to requester_team for early_termination_fee_fines planning.
   id_request:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.solicitacao
+    description: Identifier for the request referenced by this financial record.
   ticket:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.ticket
+    description: Value from the Google Sheets source column mapped to ticket for early_termination_fee_fines planning.
   id_contract:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.contrato
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_house:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.imovel
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   id_bandaid:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.id_do_bandaid
+    description: Identifier for the bandaid referenced by this financial record.
   fee_fine_type:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.tipo_de_multa
+    description: Value from the Google Sheets source column mapped to fee_fine_type for early_termination_fee_fines planning.
   total_value:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.valor_total
+    description: Value from the Google Sheets source column mapped to total_value for early_termination_fee_fines planning.
   final_negotiated_value:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.valor_final_negociado
+    description: Value from the Google Sheets source column mapped to final_negotiated_value for early_termination_fee_fines planning.
   quantity_installments_collection:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.parcelas_cobranca
+    description: Value from the Google Sheets source column mapped to quantity_installments_collection for early_termination_fee_fines planning.
   quantity_installments_pass_through:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.parcelas_repasses
+    description: Value from the Google Sheets source column mapped to quantity_installments_pass_through for early_termination_fee_fines planning.
   agent_brokerage_fee:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.tx_de_corretagem_corretor
+    description: Value from the Google Sheets source column mapped to agent_brokerage_fee for early_termination_fee_fines planning.
   quintoandar_brokerage_fee:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.tx_de_corretagem_5a
+    description: Value from the Google Sheets source column mapped to quintoandar_brokerage_fee for early_termination_fee_fines planning.
   tenant_document_number:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_cpfcnpj
+    description: Value from the Google Sheets source column mapped to tenant_document_number for early_termination_fee_fines planning.
   tenant_holder:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_titular
+    description: Value from the Google Sheets source column mapped to tenant_holder for early_termination_fee_fines planning.
   tenant_bank_name:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_banco
+    description: Value from the Google Sheets source column mapped to tenant_bank_name for early_termination_fee_fines planning.
   tenant_bank_branch:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_agencia
+    description: Value from the Google Sheets source column mapped to tenant_bank_branch for early_termination_fee_fines planning.
   tenant_account:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_conta
+    description: Value from the Google Sheets source column mapped to tenant_account for early_termination_fee_fines planning.
   tenant_bank_account_type:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dados_iq_tipo_de_conta
+    description: Value from the Google Sheets source column mapped to tenant_bank_account_type for early_termination_fee_fines planning.
   administration_rate:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.taxa_adm
+    description: Value from the Google Sheets source column mapped to administration_rate for early_termination_fee_fines planning.
   reason_manual_task:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.motivo_manual
+    description: Value from the Google Sheets source column mapped to reason_manual_task for early_termination_fee_fines planning.
   installment_zeroing_status:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.fatura_zerada
+    description: Value from the Google Sheets source column mapped to installment_zeroing_status for early_termination_fee_fines planning.
   installment_payment_status:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.fatura_paga
+    description: Value from the Google Sheets source column mapped to installment_payment_status for early_termination_fee_fines planning.
   installment_owner_status:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.fatura_pp_fechada
+    description: Value from the Google Sheets source column mapped to installment_owner_status for early_termination_fee_fines planning.
   bill_code:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.boleto
+    description: Value from the Google Sheets source column mapped to bill_code for early_termination_fee_fines planning.
   admin_updated_status:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.alteracao_admin
+    description: Value from the Google Sheets source column mapped to admin_updated_status for early_termination_fee_fines planning.
   sheet_row_number:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.row
+    description: Value from the Google Sheets source column mapped to sheet_row_number for early_termination_fee_fines planning.
   is_getnet_transaction:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.getnet
+    description: Indicates whether getnet transaction applies to this financial record.
   has_interest_exemption:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.isencao_de_juros
+    description: Indicates whether interest exemption applies to this financial record.
   has_related_bandaid:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.bandaid_aberto
+    description: Indicates whether related bandaid applies to this financial record.
   is_adm_exempt:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.adm_isenta
+    description: Indicates whether adm exempt applies to this financial record.
   is_irent_orent:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.isirentororent
+    description: Indicates whether irent orent applies to this financial record.
   is_manual_task:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.tarefa_manual
+    description: Indicates whether manual task applies to this financial record.
   ts_execution:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.execucao
+    description: Timestamp when execution occurred in the upstream fintech system.
   spent_time:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.tempo_gasto
+    description: Value from the Google Sheets source column mapped to spent_time for early_termination_fee_fines planning.
   ts_request:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.data_de_solicitacao
+    description: Timestamp when request occurred in the upstream fintech system.
   dt_start:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.vigencia
+    description: Calendar date associated with start in the financial workflow.
   dt_termination:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.rescisao
+    description: Calendar date associated with termination in the financial workflow.
   dt_first_pass_through:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dataprimeirorepasse
+    description: Calendar date associated with first pass through in the financial workflow.
   dt_first_collection:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.dataprimeiracobranca
+    description: Calendar date associated with first collection in the financial workflow.
   ts_load:
     lineage:
       - datalake_gsheets_raw.early_termination_fee_fines.ts_load
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: fraud_contracts
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Contracts flagged as fraud by auditors, sourced from Google Sheets."
 columns:

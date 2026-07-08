@@ -1,21 +1,30 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: getnet_return_codes
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for getnet
+  return codes. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   new_code:
     lineage:
-    - datalake_gsheets_raw.getnet_return_codes.codigo_novo
+      - datalake_gsheets_raw.getnet_return_codes.codigo_novo
+    description: Value from the Google Sheets source column mapped to new_code for getnet_return_codes planning.
   old_code:
     lineage:
-    - datalake_gsheets_raw.getnet_return_codes.codigo_antigo
+      - datalake_gsheets_raw.getnet_return_codes.codigo_antigo
+    description: Value from the Google Sheets source column mapped to old_code for getnet_return_codes planning.
   card_brand:
     lineage:
-    - datalake_gsheets_raw.getnet_return_codes.bandeira
+      - datalake_gsheets_raw.getnet_return_codes.bandeira
+    description: Value from the Google Sheets source column mapped to card_brand for getnet_return_codes planning.
   code_type:
     lineage:
-    - datalake_gsheets_raw.getnet_return_codes.tipo_codigo
+      - datalake_gsheets_raw.getnet_return_codes.tipo_codigo
+    description: Value from the Google Sheets source column mapped to code_type for getnet_return_codes planning.
   description:
     lineage:
-    - datalake_gsheets_raw.getnet_return_codes.descricao
+      - datalake_gsheets_raw.getnet_return_codes.descricao
+    description: Human-readable description of the financial transaction or ledger entry.

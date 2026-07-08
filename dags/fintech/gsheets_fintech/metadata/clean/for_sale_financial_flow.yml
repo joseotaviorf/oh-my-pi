@@ -1,68 +1,90 @@
 database_name: datalake_gsheets_clean
 table_name: for_sale_financial_flow
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for for
+  sale financial flow. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
-  month:
-    lineage:
-      - datalake_gsheets_raw.for_sale_financial_flow_raw.month
   account_number:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.account_number
+    description: Value from the Google Sheets source column mapped to account_number for for_sale_financial_flow planning.
   description:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.description
+    description: Human-readable description of the financial transaction or ledger entry.
   dt_launch:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.dt_launch
+    description: Calendar date associated with launch in the financial workflow.
   dt_due:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.dt_due
+    description: Calendar date associated with due in the financial workflow.
   serie:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.serie
+    description: Value from the Google Sheets source column mapped to serie for for_sale_financial_flow planning.
   document_number:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.document_number
+    description: Value from the Google Sheets source column mapped to document_number for for_sale_financial_flow planning.
   transaction_number:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.transaction_number
+    description: Value from the Google Sheets source column mapped to transaction_number for for_sale_financial_flow planning.
   observations:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.observations
+    description: Value from the Google Sheets source column mapped to observations for for_sale_financial_flow planning.
   counterpart:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.counterpart
+    description: Value from the Google Sheets source column mapped to counterpart for for_sale_financial_flow planning.
   counterpart_account:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.counterpart_account
+    description: Value from the Google Sheets source column mapped to counterpart_account for for_sale_financial_flow planning.
   amount:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   balance:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.balance
+    description: Value from the Google Sheets source column mapped to balance for for_sale_financial_flow planning.
   id_region:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.id_region
+    description: Identifier for the region referenced by this financial record.
   cost_center:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.cost_center
+    description: Value from the Google Sheets source column mapped to cost_center for for_sale_financial_flow planning.
   id_offer:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.id_offer
+    description: Identifier for the offer referenced by this financial record.
   payment_method:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.payment_method
+    description: Value from the Google Sheets source column mapped to payment_method for for_sale_financial_flow planning.
   dt_business:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.dt_business
+    description: Calendar date associated with business in the financial workflow.
   invoice_number:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.invoice_number
+    description: Value from the Google Sheets source column mapped to invoice_number for for_sale_financial_flow planning.
   id_flow:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.id_flow
+    description: Identifier for the flow referenced by this financial record.
   event:
     lineage:
       - datalake_gsheets_raw.for_sale_financial_flow_raw.event
 
+    description: Value from the Google Sheets source column mapped to event for for_sale_financial_flow planning.

@@ -1,5 +1,9 @@
 database_name: datalake_gsheets_clean
 table_name: for_sale_casa_mineira_invoice_control
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for for
+  sale casa mineira invoice control. One row per planning or control record
+  used in financial reporting and SLA targets.
 owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 columns:

@@ -1,35 +1,50 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: for_sale_bandaids
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for for
+  sale bandaids. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.id
+    description: Value from the Google Sheets source column mapped to id for for_sale_bandaids planning.
   status:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   id_property:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.id_property
+    description: Identifier for the property referenced by this financial record.
   dt_created:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.dt_created
+    description: Calendar date associated with created in the financial workflow.
   type:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.type
+    description: Value from the Google Sheets source column mapped to type for for_sale_bandaids planning.
   forsale_type:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.forsale_type
+    description: Value from the Google Sheets source column mapped to forsale_type for for_sale_bandaids planning.
   amount:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   client:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.client
+    description: Value from the Google Sheets source column mapped to client for for_sale_bandaids planning.
   category:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.category
+    description: Value from the Google Sheets source column mapped to category for for_sale_bandaids planning.
   bandaid_cause:
     lineage:
       - datalake_gsheets_raw.for_sale_bandaids.bandaid_cause
+    description: Value from the Google Sheets source column mapped to bandaid_cause for for_sale_bandaids planning.

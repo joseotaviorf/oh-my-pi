@@ -1,22 +1,33 @@
 database_name: datalake_gsheets_clean
 table_name: for_sale_sap_invoices
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for for
+  sale sap invoices. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   document_number:
     lineage:
       - datalake_gsheets_raw.for_sale_invoices_20220225.document_number
+    description: Value from the Google Sheets source column mapped to document_number for for_sale_sap_invoices planning.
   dt_launch:
     lineage:
       - datalake_gsheets_raw.for_sale_invoices_20220225.dt_launch
+    description: Calendar date associated with launch in the financial workflow.
   item:
     lineage:
       - datalake_gsheets_raw.for_sale_invoices_20220225.item
+    description: Value from the Google Sheets source column mapped to item for for_sale_sap_invoices planning.
   description:
     lineage:
       - datalake_gsheets_raw.for_sale_invoices_20220225.description
+    description: Human-readable description of the financial transaction or ledger entry.
   amount_after_discount:
     lineage:
       - datalake_gsheets_raw.for_sale_invoices_20220225.amount_after_discount
+    description: Value from the Google Sheets source column mapped to amount_after_discount for for_sale_sap_invoices planning.
   canceled:
     lineage:
       - datalake_gsheets_raw.for_sale_invoices_20220225.canceled
+    description: Value from the Google Sheets source column mapped to canceled for for_sale_sap_invoices planning.
