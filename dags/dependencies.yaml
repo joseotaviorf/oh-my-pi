@@ -4942,5 +4942,7 @@ bietlejuice.text2filter_evals:
   - quintoml.copilot.text2filter_evals.inference:first-run-of-day
 bietlejuice.vespucio_pipeline_plugins:
   - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day
+bietlejuice.text2rank_cross_encoder_dataset:
+  - quintoml.concierge.text2rank_cross_encoder_dataset.inference:first-run-of-day
 bietlejuice.vocs_machina:
   - quintoml.post_contract.vocs_machina.inference:first-run-of-day

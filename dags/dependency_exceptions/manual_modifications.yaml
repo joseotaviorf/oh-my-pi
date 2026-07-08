@@ -1381,6 +1381,9 @@ bietlejuice.search_metrics_service:
 bietlejuice.text2filter_evals:
   add:
     - quintoml.copilot.text2filter_evals.inference:first-run-of-day
+bietlejuice.text2rank_cross_encoder_dataset:
+  add:
+    - quintoml.concierge.text2rank_cross_encoder_dataset.inference:first-run-of-day
 bietlejuice.enrich_sale_salesforce:
   add:
     - bietlejuice.salesforce:load-clean-purchase-sale-contract:first-run-of-day

@@ -1,0 +1,38 @@
+dag:
+  name: text2rank_cross_encoder_dataset
+  schedule_start_date: 2026, 6, 20
+  owner: Data Conversational XP
+  documentation:
+    dag_purpose: |
+      Ingests weekly labeled (query, house) training dataset for the text2rank cross-encoder
+      model from the quintoml text2rank-cross-encoder-dataset job output in S3. Runs every
+      Monday after the upstream weekly quintoml job (schedule alignment; no cross-Airflow
+      sensor). Each run reads one run-date partition (year/month/day) and appends it to the
+      datalake via overwrite-partition semantics.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_text2rank_cross_encoder_dataset_raw
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_start_date') }}"
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - s3://data-science.s3.data.quintoandar.com.br/concierge/text2rank_cross_encoder_dataset/
+    - "{load_start_date}"
+    - "{table_name}"
+    - "{partitions}"
+    - parquet
+
+  default_extraction_type: incremental
+
+  tables_customization:
+    cross_encoder_training_dataset:
+      partitions:
+        - year
+        - month
+        - day

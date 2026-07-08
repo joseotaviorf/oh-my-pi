@@ -1,0 +1,112 @@
+---
+database_name: datalake_text2rank_cross_encoder_dataset_clean
+table_name: cross_encoder_training_dataset
+owner: rafael.guedes@quintoandar.com.br
+domain: Conversational XP
+description: >
+  Weekly labeled (query, house) training dataset for the text2rank cross-encoder reranker,
+  produced by the quintoml text2rank-cross-encoder-dataset job. Each row is one user search
+  query paired with a candidate listing and an LLM-assigned relevance label. Consumed by the
+  Conversational XP ML squad for cross-encoder model training and evaluation.
+
+columns:
+  id_house:
+    description: Unique identifier of the candidate house listing paired with the search query.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.id
+  query:
+    description: Natural-language search query from production concierge traffic used to retrieve and label candidate houses.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.query
+  property_type:
+    description: Listing property type for the candidate house (e.g. APARTMENT, HOUSE).
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.property_type
+  long_description:
+    description: Free-text description of the candidate listing used as cross-encoder document input.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.long_description
+  location:
+    description: Human-readable location string for the candidate listing, typically neighborhood and city.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.location
+  query_type:
+    description: Source category of the query; production queries are labeled as production in the weekly pipeline.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.query_type
+  query_business_context:
+    description: Resolved business context for the query (RENT or SALE), used to select the relevant listing price.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.query_business_context
+  relevance:
+    description: Binary LLM relevance label indicating whether the candidate house matches the search query (1 = relevant, 0 = not relevant).
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.relevance
+  area:
+    description: Usable area of the candidate listing in square meters.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.area
+  bedrooms:
+    description: Number of bedrooms in the candidate listing.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.bedrooms
+  bathrooms:
+    description: Number of bathrooms in the candidate listing.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.bathrooms
+  suites:
+    description: Number of suites in the candidate listing.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.suites
+  parking_slots:
+    description: Number of parking slots available in the candidate listing.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.parking_slots
+  price:
+    description: Listing price in BRL for the query business context (rent or sale).
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.price
+  iptu_per_month:
+    description: Monthly property tax (IPTU) amount in BRL for the candidate listing.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.iptu_per_month
+  condominium_per_month:
+    description: Monthly condominium fee in BRL for the candidate listing.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.condominium_per_month
+  accept_pets:
+    description: True when the candidate listing accepts pets.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.accept_pets
+  is_near_subway:
+    description: True when the candidate listing is near a subway station.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.is_near_subway
+  is_furnished:
+    description: True when the candidate listing is furnished.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.is_furnished
+  dt_ingested:
+    description: Calendar date when the upstream quintoml job wrote this row to S3.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.ingestion_date
+  amenities:
+    description: Array of amenity labels associated with the candidate listing (e.g. pool, gym).
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.amenities
+  installations:
+    description: Array of installation labels associated with the candidate listing (e.g. elevator, security).
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.installations
+  year:
+    description: Year partition derived from the upstream job run date.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.year
+  month:
+    description: Month partition derived from the upstream job run date.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.month
+  day:
+    description: Day partition derived from the upstream job run date.
+    lineage:
+      - datalake_text2rank_cross_encoder_dataset_raw.cross_encoder_training_dataset.day
