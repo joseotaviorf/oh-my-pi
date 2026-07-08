@@ -6,6 +6,7 @@ from functools import reduce
 from typing import List
 
 from pyspark.sql import functions as F
+from pyspark.sql.types import LongType
 from pyspark.sql.window import Window
 from quintoandar_logger import QuintoAndarLogger
 
@@ -64,6 +65,12 @@ PERSISTED_COLUMNS = [
     "run_id",
 ]
 
+# Columns the upstream vocs-machina writer emits as pandas datetime64[ns], i.e.
+# Parquet INT64 (TIMESTAMP(NANOS,true)). With spark.sql.legacy.parquet.nanosAsLong
+# these arrive as LongType (nanos since epoch) and must be cast back to
+# TimestampType so the raw table keeps the schema the clean SQL expects.
+NANOS_TIMESTAMP_COLUMNS = ("submitted_at", "ts_classified")
+
 
 def get_forno_adjusted_data_science_path(
     environment: str, source_root_path: str
@@ -99,6 +106,35 @@ def inclusive_calendar_days(load_start_date: str, load_end_date: str) -> List[st
     return out
 
 
+def _cast_nanos_timestamps(df):
+    # With spark.sql.legacy.parquet.nanosAsLong=true, Parquet INT64
+    # (TIMESTAMP(NANOS,isAdjustedToUTC=true)) columns are read as LongType
+    # (nanoseconds since epoch UTC). Restore TimestampType so the raw table
+    # keeps the schema the clean SQL expects.
+    #
+    # Convert nanos -> micros with integer division, then timestamp_micros.
+    # A float path (col / 1e9 + timestamp_seconds) is NOT safe here: the
+    # nanosecond magnitude is ~1.75e18, far beyond the 2^53 exact-integer
+    # range of a double, so casting the long to double drops sub-microsecond
+    # bits and can shift the value by ~1 us. Integer `div` keeps microsecond
+    # precision exactly (Spark timestamps are microsecond-precision anyway).
+    #
+    # The isinstance(LongType) guard makes this a no-op if a partition was
+    # written with MICROS/MILLIS (older producer), where Spark already yields
+    # TimestampType.
+    for col_name in NANOS_TIMESTAMP_COLUMNS:
+        if col_name in df.columns and isinstance(
+            df.schema[col_name].dataType, LongType
+        ):
+            # `div` is Spark SQL integer division on bigints (exact, no float
+            # coercion); timestamp_micros then reads micros-since-epoch as UTC.
+            df = df.withColumn(
+                col_name,
+                F.expr(f"timestamp_micros(`{col_name}` div 1000)"),
+            )
+    return df
+
+
 def _prepare_day_df(df, date_str):
     missing_cols = [c for c in PERSISTED_COLUMNS if c not in df.columns]
     if missing_cols:
@@ -108,6 +144,14 @@ def _prepare_day_df(df, date_str):
         )
     dt_execution = datetime.strptime(date_str, DATE_FMT)
     out = df.select(*PERSISTED_COLUMNS)
+    out = _cast_nanos_timestamps(out)
+    # Instrumentation (debug session 7256d1): confirm the cast produced
+    # TimestampType with sane values.
+    logger.info(
+        f"m=load_day, date={date_str}, "
+        f"msg=timestamp types after cast, "
+        f"ts_types={ {c: str(out.schema[c].dataType) for c in NANOS_TIMESTAMP_COLUMNS} }"
+    )
     out = out.withColumn("ts_load", F.current_timestamp())
     # year/month/day are derived from the load date rather than read from the
     # parquet, so rows always land in the partition for the day being ingested.
@@ -223,6 +267,28 @@ def main() -> None:
                     "pathGlobFilter": FINALIZED_PARQUET_GLOB,
                 },
             )
+
+            # Instrumentation (debug session 7256d1): surface the inferred
+            # Spark types of the timestamp columns so the post-fix task log
+            # confirms which columns arrived as LongType (nanos) and that the
+            # cast produced sane TimestampType values.
+            ts_types = {
+                c: str(raw_df.schema[c].dataType)
+                for c in NANOS_TIMESTAMP_COLUMNS
+                if c in raw_df.columns
+            }
+            logger.info(
+                f"m=load_day, date={date_str}, uri={day_uri}, "
+                f"msg=inferred timestamp types after read, ts_types={ts_types}"
+            )
+            probe_cols = [c for c in NANOS_TIMESTAMP_COLUMNS if c in raw_df.columns]
+            if probe_cols:
+                probe = raw_df.select(*probe_cols).limit(3).collect()
+                logger.info(
+                    f"m=load_day, date={date_str}, "
+                    f"msg=sample values after read (pre-cast), "
+                    f"samples={[r.asDict() for r in probe]}"
+                )
         except Exception as exc:
             msg = str(exc)
             if "Path does not exist" in msg or "PATH_NOT_FOUND" in msg:
@@ -245,9 +311,26 @@ def main() -> None:
         dfs.append(day_df)
 
     if not dfs:
+        table_exists = spark_client.conn.catalog.tableExists(
+            f"{write_database_name}.{write_table_name}"
+        )
+        if not table_exists:
+            first_uri = build_day_partition_uri(source_root_path, load_start_date)
+            raise RuntimeError(
+                f"m=main, msg=No S3 data found for range "
+                f"{load_start_date}..{load_end_date} and table "
+                f"{write_database_name}.{write_table_name} does not yet exist. "
+                f"Bootstrap the table by triggering a manual backfill for a date "
+                f"that already has vocs-machina output in S3 "
+                f"(expected URI pattern: {first_uri}). "
+                f"The dataset-driven schedule only fires after vocs-machina emits "
+                f"quintoml.post_contract.vocs_machina.inference; manual runs must "
+                f"supply a load_start_date / load_end_date in the DAG conf JSON."
+            )
         logger.warning(
             f"m=main, msg=No data loaded for any day in range "
-            f"{load_start_date}..{load_end_date}; skipping S3 write and metastore."
+            f"{load_start_date}..{load_end_date}; table already initialised, "
+            f"skipping S3 write and metastore update."
         )
         return
 

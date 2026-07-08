@@ -20,6 +20,7 @@ _IMPORT_TIME_MOCKS = {
     "pyspark": MagicMock(),
     "pyspark.sql": MagicMock(),
     "pyspark.sql.functions": MagicMock(),
+    "pyspark.sql.types": MagicMock(LongType=type("LongType", (), {})),
     "pyspark.sql.window": MagicMock(),
     "bietlejuice.base.db": MagicMock(),
     "bietlejuice.base.spark": MagicMock(),
@@ -234,6 +235,129 @@ def test_main_uses_validation_target_for_all_writes():
         table_name="validation_vocs_machina",
         partition_cols=expected_partitions,
     )
+
+
+def test_main_no_data_table_not_exists_raises():
+    """No S3 data + table never created → RuntimeError, no writes attempted."""
+    spark_client = MagicMock()
+    spark_client.conn.catalog.tableExists.return_value = False
+    s3_consumer = MagicMock()
+    s3_consumer.get_data_from_file.side_effect = Exception(
+        "Path does not exist: s3://bucket/vocs-machina/raw/year=2026/month=07/day=07"
+    )
+    s3_loader = MagicMock()
+    spark_metastore_service = MagicMock()
+    spark_metastore_loader = MagicMock()
+
+    argv = [
+        "load_vocs_machina_raw",
+        "prod",
+        "prod-bucket",
+        "vocs_machina",
+        "s3://data-science.s3.data.quintoandar.com.br/post-contract/vocs-machina",
+        "2026-07-07",
+        "2026-07-07",
+        "vocs_machina",
+        "['year','month','day']",
+        "parquet",
+    ]
+
+    with (
+        patch("sys.argv", argv),
+        patch.object(
+            _job, "add_validation_target_args", side_effect=_add_validation_target_args
+        ),
+        patch.object(
+            _job,
+            "resolve_datalake_write_target",
+            return_value=(
+                "datalake_vocs_machina_raw",
+                "vocs_machina",
+                "s3://prod-bucket/prod/datalake_vocs_machina_raw/",
+            ),
+        ),
+        patch.object(
+            _job.DatalakeMetastoreService,
+            "get_db_info",
+            return_value={
+                "db_raw_databricks": "datalake_vocs_machina_raw",
+                "db_raw_path": "s3://prod-bucket/prod/datalake_vocs_machina_raw/",
+            },
+        ),
+        patch.object(_job, "SparkClient", return_value=spark_client),
+        patch.object(_job, "S3Consumer", return_value=s3_consumer),
+        patch.object(_job, "S3Loader", return_value=s3_loader),
+        patch.object(
+            _job, "SparkMetastoreService", return_value=spark_metastore_service
+        ),
+        patch.object(_job, "SparkMetastoreLoader", return_value=spark_metastore_loader),
+    ):
+        with pytest.raises(RuntimeError, match="does not yet exist"):
+            _job.main()
+
+    s3_loader.load_df.assert_not_called()
+    spark_metastore_loader.update_metastore.assert_not_called()
+
+
+def test_main_no_data_table_exists_skips_gracefully():
+    """No S3 data, but table already initialised → returns cleanly without writing."""
+    spark_client = MagicMock()
+    spark_client.conn.catalog.tableExists.return_value = True
+    s3_consumer = MagicMock()
+    s3_consumer.get_data_from_file.side_effect = Exception(
+        "PATH_NOT_FOUND: s3://bucket/vocs-machina/raw/year=2026/month=07/day=07"
+    )
+    s3_loader = MagicMock()
+    spark_metastore_service = MagicMock()
+    spark_metastore_loader = MagicMock()
+
+    argv = [
+        "load_vocs_machina_raw",
+        "prod",
+        "prod-bucket",
+        "vocs_machina",
+        "s3://data-science.s3.data.quintoandar.com.br/post-contract/vocs-machina",
+        "2026-07-07",
+        "2026-07-07",
+        "vocs_machina",
+        "['year','month','day']",
+        "parquet",
+    ]
+
+    with (
+        patch("sys.argv", argv),
+        patch.object(
+            _job, "add_validation_target_args", side_effect=_add_validation_target_args
+        ),
+        patch.object(
+            _job,
+            "resolve_datalake_write_target",
+            return_value=(
+                "datalake_vocs_machina_raw",
+                "vocs_machina",
+                "s3://prod-bucket/prod/datalake_vocs_machina_raw/",
+            ),
+        ),
+        patch.object(
+            _job.DatalakeMetastoreService,
+            "get_db_info",
+            return_value={
+                "db_raw_databricks": "datalake_vocs_machina_raw",
+                "db_raw_path": "s3://prod-bucket/prod/datalake_vocs_machina_raw/",
+            },
+        ),
+        patch.object(_job, "SparkClient", return_value=spark_client),
+        patch.object(_job, "S3Consumer", return_value=s3_consumer),
+        patch.object(_job, "S3Loader", return_value=s3_loader),
+        patch.object(
+            _job, "SparkMetastoreService", return_value=spark_metastore_service
+        ),
+        patch.object(_job, "SparkMetastoreLoader", return_value=spark_metastore_loader),
+    ):
+        _job.main()  # must not raise
+
+    s3_loader.load_df.assert_not_called()
+    spark_metastore_loader.update_metastore.assert_not_called()
 
 
 def test_main_reads_only_finalized_part_files():

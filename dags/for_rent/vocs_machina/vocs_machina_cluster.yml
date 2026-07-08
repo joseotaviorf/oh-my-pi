@@ -6,3 +6,10 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      # vocs-machina writes its timestamp columns (submitted_at, ts_classified)
+      # as pandas datetime64[ns] -> Parquet INT64 (TIMESTAMP(NANOS,true)). Since
+      # Spark 3.2 (SPARK-40819) the Parquet reader refuses NANOS and raises
+      # [PARQUET_TYPE_ILLEGAL]. This legacy flag restores pre-3.2 behaviour:
+      # such columns are read as LongType (nanoseconds since epoch); the spark
+      # job then casts them back to TimestampType (see _cast_nanos_timestamps).
+      spark.sql.legacy.parquet.nanosAsLong: "true"
