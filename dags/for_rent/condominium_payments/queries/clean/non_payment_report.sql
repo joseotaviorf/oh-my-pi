@@ -6,6 +6,8 @@ SELECT
     created_by,
     notification_source,
     rental_management_sync_initiated AS is_rental_management_sync_initiated,
+    rental_management_sync_status,
+    rental_management_sync_error_reason,
     TO_TIMESTAMP(created_at) AS ts_created,
     TO_TIMESTAMP(updated_at) AS ts_updated
 FROM

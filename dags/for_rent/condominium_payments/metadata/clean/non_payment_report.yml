@@ -15,11 +15,11 @@ columns:
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.contract_id
   uuid_third_party_bill:
-    description: UUID of the third-party bill linked to the non-payment report.
+    description: Rental Management identifier returned after creating the payment request for this overdue condominium charge, used to trace the downstream third-party bill associated with the report.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.third_party_bill_uuid
   expense_type:
-    description: Type of condominium payment expense associated with the report.
+    description: Category of condominium charge being reported, distinguishing regular condominium payments from garage, extra fee, fine, and complementary charges in the source workflow.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.expense_type
   created_by:
@@ -34,6 +34,14 @@ columns:
     description: Boolean flag indicating whether synchronization with Rental Management was initiated.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.rental_management_sync_initiated
+  rental_management_sync_status:
+    description: Current status of the synchronization with Rental Management for the non-payment report.
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.rental_management_sync_status
+  rental_management_sync_error_reason:
+    description: Error reason recorded when synchronization with Rental Management fails for the non-payment report.
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.rental_management_sync_error_reason
   ts_created:
     description: Timestamp when the non-payment report was created in the source system.
     lineage:
