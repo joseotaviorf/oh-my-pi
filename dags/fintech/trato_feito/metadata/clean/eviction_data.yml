@@ -1,18 +1,18 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: eviction_data
-owner: isabella.santos@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Overtuning data for the eviction process.
 columns:
   id:
     lineage:
       - datalake_trato_feito_raw.eviction_data.id
-    description: ID of the table.
+    description: Table unique identifier.
   id_external:
     lineage:
       - datalake_trato_feito_raw.eviction_data.external_id
-    description: ID of the contract.
+    description: Identifier for the contract associated with the eviction.
   context:
     lineage:
       - datalake_trato_feito_raw.eviction_data.context
@@ -36,7 +36,7 @@ columns:
   dt_occurrence_due_date_external:
     lineage:
       - datalake_trato_feito_raw.eviction_data.occurrence_due_date_external
-    description: Date of the occurrence due date.
+    description: Calendar date associated with occurrence due date external in the financial workflow.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.eviction_data.created_at

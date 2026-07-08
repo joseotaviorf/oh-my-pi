@@ -1,79 +1,79 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: eviction_aud
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Eviction audition. It stores the historical of eviction status
 columns:
   id:
-    description: ""
+    description: Financial attribute representing id on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.id
   id_eviction:
-    description: ""
+    description: Identifier for the eviction referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.eviction_id
   id_contract:
-    description: ""
+    description: Contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.external_id
   context:
-    description: ""
+    description: Financial attribute representing context on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.context
   law_firm:
-    description: ""
+    description: Financial attribute representing law firm on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.law_firm
   status:
-    description: ""
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.status
   user_registered:
-    description: ""
+    description: Financial attribute representing user registered on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.user_registered
   status_recommendation:
-    description: ""
+    description: Financial attribute representing status recommendation on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.status_recommendation
   status_reason:
-    description: ""
+    description: Financial attribute representing status reason on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.status_reason
   snapshot:
-    description: ""
+    description: Financial attribute representing snapshot on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.snapshot
   sub_status:
-    description: ""
+    description: Financial attribute representing sub status on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.sub_status
   external_metadata:
-    description: ""
+    description: Financial attribute representing external metadata on the eviction_aud dataset.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.external_metadata
   dt_distribution:
-    description: ""
+    description: Calendar date associated with distribution in the financial workflow.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.distribution_date
   ts_created:
-    description: ""
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.created_at
   ts_eviction_created:
-    description: ""
+    description: Timestamp when eviction created occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.eviction_created_at
   ts_eviction_updated:
-    description: ""
+    description: Timestamp when eviction updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.eviction_updated_at
   ts_status_updated:
-    description: ""
+    description: Timestamp when status updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.status_updated_at
   ts_sub_status_updated:
-    description: ""
+    description: Timestamp when sub status updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.eviction_aud.sub_status_updated_at

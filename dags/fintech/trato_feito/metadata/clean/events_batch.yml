@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: events_batch
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table for storing batch processing events. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
 columns:
@@ -18,11 +18,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.events_batch.origin
   batch_type:
-    description: "Type of batch processed"
+    description: Financial attribute representing batch type on the events_batch dataset.
     lineage:
       - datalake_trato_feito_raw.events_batch.batch_type
   batch_payload:
-    description: "Batch event payload"
+    description: Financial attribute representing batch payload on the events_batch dataset.
     lineage:
       - datalake_trato_feito_raw.events_batch.batch_payload
   batch_size:
@@ -38,10 +38,10 @@ columns:
     lineage:
       - datalake_trato_feito_raw.events_batch.finished_at
   ts_created:
-    description: "Created at"
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.events_batch.created_at
   ts_updated:
-    description: "Updated at"
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.events_batch.updated_at

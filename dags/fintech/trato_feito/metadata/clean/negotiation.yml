@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: negotiation
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Data about debt negotiations originated in the Trato Feito platform, including debtor, collector, status, and operational metadata.
 columns:
@@ -53,3 +53,9 @@ columns:
     description: Timestamp of the most recent update to the negotiation record.
     lineage:
       - datalake_trato_feito_raw.negotiation.updated_at
+  payload:
+    description: Financial attribute representing payload on the negotiation dataset.
+    lineage: []
+  manage_type:
+    description: Financial attribute representing manage type on the negotiation dataset.
+    lineage: []

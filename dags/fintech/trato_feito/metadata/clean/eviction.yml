@@ -1,18 +1,18 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: eviction
-owner: isabella.santos@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: This table stores all the data produced by Conka system for the eviction process.
 columns:
   id:
     lineage:
       - datalake_trato_feito_raw.eviction.id
-    description: ID of the table.
+    description: Financial attribute representing id on the eviction dataset.
   id_external:
     lineage:
       - datalake_trato_feito_raw.eviction.external_id
-    description: ID of the contract.
+    description: Identifier for the external referenced by this financial record.
   context:
     lineage:
       - datalake_trato_feito_raw.eviction.context
@@ -29,7 +29,7 @@ columns:
   status:
     lineage:
       - datalake_trato_feito_raw.eviction.status
-    description: Status of the contract.
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     categories:
       ELIGIBLE: ""
       PRE-EVICTION: ""
@@ -37,22 +37,22 @@ columns:
   sub_status:
     lineage:
       - datalake_trato_feito_raw.eviction.sub_status
-    description: ""
+    description: Financial attribute representing sub status on the eviction dataset.
   user_registered:
     lineage:
       - datalake_trato_feito_raw.eviction.user_registered
-    description: User in charge.
+    description: Financial attribute representing user registered on the eviction dataset.
   status_recommendation:
     lineage:
       - datalake_trato_feito_raw.eviction.status_recommendation
-    description: Status of the recommendation.
+    description: Financial attribute representing status recommendation on the eviction dataset.
     categories:
       PRE-EVICTION: ""
       EVICTION: ""
   status_reason:
     lineage:
       - datalake_trato_feito_raw.eviction.status_reason
-    description: Reason of the status.
+    description: Financial attribute representing status reason on the eviction dataset.
     categories:
       fpd7: ""
       negotiation-context: ""
@@ -64,11 +64,11 @@ columns:
   external_metadata:
     lineage:
       - datalake_trato_feito_raw.eviction.external_metadata
-    description: ""
+    description: Financial attribute representing external metadata on the eviction dataset.
   dt_distribution:
     lineage:
       - datalake_trato_feito_raw.eviction.distribution_date
-    description: ""
+    description: Calendar date associated with distribution in the financial workflow.
   ts_status_updated:
     lineage:
       - datalake_trato_feito_raw.eviction.status_updated_at
@@ -76,7 +76,7 @@ columns:
   ts_sub_status_updated:
     lineage:
       - datalake_trato_feito_raw.eviction.sub_status_updated_at
-    description: ""
+    description: Timestamp when sub status updated occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.eviction.created_at

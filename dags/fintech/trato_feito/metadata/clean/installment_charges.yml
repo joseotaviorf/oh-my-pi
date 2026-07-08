@@ -1,16 +1,16 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: installment_charges
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "It is a table that references the billing data that was created at checkout, where their model is built through orders and charges. Here we link a charge (checkout) with an installment (tf)"
 columns:
   id:
-    description: "Table ID"
+    description: Financial attribute representing id on the installment_charges dataset.
     lineage:
       - datalake_trato_feito_raw.installment_charges.id
   id_installment:
-    description: "FK table installment"
+    description: FK for the installment referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.installment_charges.installment_id
   id_order:
@@ -22,11 +22,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.installment_charges.payment_entity_id
   id_scheduler:
-    description: "Scheduler (reminder) ID"
+    description: Identifier for the scheduler (reminder) referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.installment_charges.scheduler_id
   id_charge:
-    description: "Charge ID at checkout"
+    description: Identifier for the charge record inside checkout system.
     lineage:
       - datalake_trato_feito_raw.installment_charges.charge_id
   charge_method:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.installment_charges.status
   rev:
-    description: "Revision"
+    description: Financial attribute representing rev on the installment_charges dataset.
     lineage:
       - datalake_trato_feito_raw.installment_charges.rev
   request_payload:
@@ -62,11 +62,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.installment_charges.metadata
   due_amount:
-    description: "Due amount"
+    description: Financial attribute representing due amount on the installment_charges dataset.
     lineage:
       - datalake_trato_feito_raw.installment_charges.due_amount
   paid_amount:
-    description: "Paid amount"
+    description: Financial attribute representing paid amount on the installment_charges dataset.
     lineage:
       - datalake_trato_feito_raw.installment_charges.paid_amount
   dt_paid:
@@ -74,7 +74,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.installment_charges.paid_date
   dt_due:
-    description: "Due date"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_trato_feito_raw.installment_charges.due_date
   dt_start_processing:

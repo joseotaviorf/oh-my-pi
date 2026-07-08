@@ -1,16 +1,16 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: installment
-owner: athos.sampayo@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Installment table from Trato Feito product"
 columns:
   id:
-    description: "Main ID for installment"
+    description: Financial attribute representing id on the installment dataset.
     lineage:
       - datalake_trato_feito_raw.installment.id
   id_external:
-    description: "External ID"
+    description: Identifier for the external ID referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.installment.external_id
   id_negotiation:
@@ -26,15 +26,15 @@ columns:
     lineage:
       - datalake_trato_feito_raw.installment.billing_id
   status:
-    description: "Status of installment"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_trato_feito_raw.installment.status
   status_reason:
-    description: ""
+    description: Financial attribute representing status reason on the installment dataset.
     lineage:
       - datalake_trato_feito_raw.installment.status_reason
   external_index:
-    description: ""
+    description: Financial attribute representing external index on the installment dataset.
     lineage:
       - datalake_trato_feito_raw.installment.external_index
   adm_fee_amount:
@@ -42,23 +42,23 @@ columns:
     lineage:
       - datalake_trato_feito_raw.installment.adm_fee_amount
   installment_fee_amount:
-    description: "Installment Fee"
+    description: Financial attribute representing installment fee amount on the installment dataset.
     lineage:
       - datalake_trato_feito_raw.installment.installment_fee_amount
   debts_fee_amount:
-    description: "Debts Fee"
+    description: Financial attribute representing debts fee amount on the installment dataset.
     lineage:
       - datalake_trato_feito_raw.installment.debts_fee_amount
   discount_amount:
-    description: "Discount Amount"
+    description: Financial attribute representing discount amount on the installment dataset.
     lineage:
       - datalake_trato_feito_raw.installment.discount_amount
   total_amount:
-    description: "Total Amount"
+    description: Financial attribute representing total amount on the installment dataset.
     lineage:
       - datalake_trato_feito_raw.installment.total_amount
   dt_due:
-    description: "Date Due"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_trato_feito_raw.installment.due_date
   ts_expired:
@@ -73,3 +73,18 @@ columns:
     description: "Timestamp of last update"
     lineage:
       - datalake_trato_feito_raw.installment.updated_at
+  credit_card_fee:
+    description: Financial attribute representing credit card fee on the installment dataset.
+    lineage: []
+  installment_costs:
+    description: Financial attribute representing installment costs on the installment dataset.
+    lineage: []
+  rev:
+    description: Financial attribute representing rev on the installment dataset.
+    lineage: []
+  installment_interest:
+    description: Financial attribute representing installment interest on the installment dataset.
+    lineage: []
+  installment_lawyers_fee:
+    description: Financial attribute representing installment lawyers fee on the installment dataset.
+    lineage: []

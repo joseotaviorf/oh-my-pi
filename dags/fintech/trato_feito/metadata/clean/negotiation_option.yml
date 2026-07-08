@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: negotiation_option
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Catalog of available negotiation options and their financial conditions."
 columns:
@@ -38,7 +38,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.negotiation_option.business_days_until_down_payment
   installments_quantity:
-    description: "Number of installments."
+    description: Financial attribute representing installments quantity on the negotiation_option dataset.
     lineage:
       - datalake_trato_feito_raw.negotiation_option.installments_quantity
   credit_card_fee_percentage:
@@ -50,11 +50,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.negotiation_option.discount_on_fee_percent
   discount_on_additional_charges_percentage:
-    description: "Discount percentage on additional charges."
+    description: Financial attribute representing discount on additional charges percentage on the negotiation_option dataset.
     lineage:
       - datalake_trato_feito_raw.negotiation_option.discount_on_additional_charges_percentage
   discount_on_principal_amount_percentage:
-    description: "Discount percentage on principal amount."
+    description: Financial attribute representing discount on principal amount percentage on the negotiation_option dataset.
     lineage:
       - datalake_trato_feito_raw.negotiation_option.discount_on_principal_amount_percentage
   discount_on_fine_percent:

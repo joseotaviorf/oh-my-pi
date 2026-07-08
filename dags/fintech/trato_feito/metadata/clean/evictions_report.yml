@@ -1,18 +1,18 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: evictions_report
-owner: isabella.santos@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: This table is mainly used by the SWE team. It contains the data that support the tracking of the eviction process.
 columns:
   id:
     lineage:
       - datalake_trato_feito_raw.evictions_report.id
-    description: ID of the table.
+    description: Financial attribute representing id on the evictions_report dataset.
   id_track:
     lineage:
       - datalake_trato_feito_raw.evictions_report.track_id
-    description: ID of the track.
+    description: Identifier for the track referenced by this financial record.
   file_storage_key:
     lineage:
       - datalake_trato_feito_raw.evictions_report.file_storage_key
@@ -20,7 +20,7 @@ columns:
   document_type:
     lineage:
       - datalake_trato_feito_raw.evictions_report.document_type
-    description: Type of the document.
+    description: Financial attribute representing document type on the evictions_report dataset.
     categories:
       p6: ""
       col_b2: ""
@@ -28,7 +28,7 @@ columns:
   status:
     lineage:
       - datalake_trato_feito_raw.evictions_report.status
-    description: Status of the process.
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.evictions_report.created_at
