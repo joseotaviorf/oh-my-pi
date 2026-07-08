@@ -209,3 +209,8 @@ workflow:
       extra_spark_job_arguments:
         - "1PEy7dd54tor157fVI_UK7J3t4SLIDKtgk92x6dHJbmg"
         - "base_pin"
+    # Former notebook: dash_objetivos_performa (Daily Pipeline).
+    performa_employee_base:
+      extra_spark_job_arguments:
+        - "1RO7I-zXLLNKhpIiSxBumbFxtog84xGvvzktEpJNpKO8"
+        - "base_dash (Não apagar)"
