@@ -2,10 +2,26 @@
 database_name: datalake_demand_contact_submission_clean
 table_name: rev_info
 domain: Growth
+owner: gabriel.salla@quintoandar.com
+description: Clean layer for Hibernate Envers revision metadata (rev, ts_rev) backing audit tables in demand_contact_submission.
 columns:
   rev:
     lineage:
       - datalake_demand_contact_submission_raw.revinfo.rev
+    description: Hibernate Envers revision identifier. Primary key referenced by audit tables rev column.
   ts_rev:
     lineage:
       - datalake_demand_contact_submission_raw.revinfo.revtstmp
+    description: Timestamp when the Envers revision was recorded (revtstmp).
+  year:
+    lineage:
+      - datalake_demand_contact_submission_raw.revinfo.revtstmp
+    description: Hive partition year derived from ts_rev for incremental loads.
+  month:
+    lineage:
+      - datalake_demand_contact_submission_raw.revinfo.revtstmp
+    description: Hive partition month derived from ts_rev for incremental loads.
+  day:
+    lineage:
+      - datalake_demand_contact_submission_raw.revinfo.revtstmp
+    description: Hive partition day derived from ts_rev for incremental loads.

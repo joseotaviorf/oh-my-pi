@@ -3,7 +3,7 @@ database_name: datalake_listing_flow
 table_name: listing_flows_with_reprocessed_leads
 description: Describes the most important dates of the listing flow, while including information about reprocessed leads.
 domain: Growth
-owner: ae-growth@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   id:
     lineage:
@@ -12,7 +12,7 @@ columns:
   id_lead:
     lineage:
       - datalake_listing_flow.listing_flow.id_lead
-    description: Id of the lead.
+    description: Lead primary key from datalake_lead.lead used to join supply funnel tables.
   id_conversion:
     lineage:
       - datalake_listing_flow.listing_flow.id_conversion
@@ -24,7 +24,7 @@ columns:
   id_house:
     lineage:
       - datalake_listing_flow.listing_flow.id_house
-    description: Id of the house.
+    description: House identifier from EBDB listing associated with the listing flow milestone.
   id_rep:
     lineage:
       - datalake_listing_flow.listing_flow.id_rep
@@ -85,27 +85,27 @@ columns:
   flow:
     lineage:
       - datalake_listing_flow.listing_flow.flow
-    description: Flow of the listing, which can be organic or self service.
+    description: Listing funnel flow classification. Same values as datalake_listing_flow.listing_flow.flow; see that column metadata for categories.
   acquisition_method:
     lineage:
       - datalake_listing_flow.listing_flow.acquisition_method
-    description: Acquisition method of the listing, which can be self service or non self service.
+    description: Whether the listing was captured via self-service or assisted flow. See listing_flow.acquisition_method for categories.
   acquisition_channel:
     lineage:
       - datalake_listing_flow.listing_flow.acquisition_channel
-    description: Acquisition channel of the listing, which can be admin or organic owner app.
+    description: Detailed acquisition channel label. See listing_flow.acquisition_channel for categories.
   acquisition_source:
     lineage:
       - datalake_listing_flow.listing_flow.acquisition_source
-    description: Acquisition source of the listing, which can be admin or owner app.
+    description: High-level acquisition source grouping. See listing_flow.acquisition_source for categories.
   acquisition_channel_rep:
     lineage:
       - datalake_listing_flow.listing_flow.acquisition_channel
-    description: Acquisition channel of the reprossed lead.
+    description: Acquisition channel of the reprocessed lead.
   affiliate_type:
     lineage:
       - datalake_lead.lead.affiliate_type
-    description: Affiliate type.
+    description: Affiliate program type classification when the lead was referred by an affiliate.
   ts_opt_out_rent:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_opt_out_rent
@@ -162,3 +162,91 @@ columns:
     lineage:
       - datalake_wololo_lead.lead_sales_company.ts_sales_company_sent
     description: Timestamp of when the lead was sent to the Inside Sales company.
+  funnel_step:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.funnel_step
+    description: Current supply funnel stage label (e.g. DiscardedProspect, Listed, DiscardedQualified).
+  lead_context_origin:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.lead_context_origin
+    description: Origin context of the lead within the listing flow pipeline.
+  listing_sale_status:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.listing_sale_status
+    description: Sale listing status at the flow snapshot for rent-side reprocessed leads.
+  is_agent_referral:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.is_agent_referral
+    description: Flag indicating the lead was referred by an agent.
+  is_b2b:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.is_b2b
+    description: Flag indicating the lead originated from a B2B partner source.
+  is_doorman:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.is_doorman
+    description: Flag indicating capture through doorman or portal channel.
+  is_not_reprocessed:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.is_not_reprocessed
+    description: Flag indicating the lead is not a reprocessed duplicate.
+  days_lead_to_first_contact:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_lead_to_first_contact
+    description: Elapsed days from lead creation to first outbound contact.
+  days_lead_to_listing:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_lead_to_listing
+    description: Elapsed days from lead creation to first published listing.
+  days_lead_to_processing:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_lead_to_processing
+    description: Elapsed days from lead creation to prospect processing start.
+  days_lead_to_prospect:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_lead_to_prospect
+    description: Elapsed days from lead creation to prospect creation.
+  days_opportunity_to_listing:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_opportunity_to_listing
+    description: Elapsed days from opportunity milestone to first listing.
+  days_prospect_to_first_contact:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_prospect_to_first_contact
+    description: Elapsed days from prospect creation to first contact.
+  days_prospect_to_qualified:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_prospect_to_qualified
+    description: Elapsed days from prospect creation to qualified milestone.
+  days_qualified_to_opportunity:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.days_qualified_to_opportunity
+    description: Elapsed days from qualified milestone to opportunity.
+  hours_lead_to_first_contact:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_lead_to_first_contact
+    description: Elapsed hours from lead creation to first outbound contact.
+  hours_lead_to_listing:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_lead_to_listing
+    description: Elapsed hours from lead creation to first published listing.
+  hours_lead_to_prospect:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_lead_to_prospect
+    description: Elapsed hours from lead creation to prospect creation.
+  hours_opportunity_to_listing:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_opportunity_to_listing
+    description: Elapsed hours from opportunity milestone to first listing.
+  hours_prospect_to_first_contact:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_prospect_to_first_contact
+    description: Elapsed hours from prospect creation to first contact.
+  hours_prospect_to_qualified:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_prospect_to_qualified
+    description: Elapsed hours from prospect creation to qualified milestone.
+  hours_qualified_to_opportunity:
+    lineage:
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.hours_qualified_to_opportunity
+    description: Elapsed hours from qualified milestone to opportunity.

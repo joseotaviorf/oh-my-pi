@@ -1,29 +1,47 @@
 database_name: datalake_listing_flow
 table_name: discards_reason_by_context
 domain: Growth
+owner: gabriel.salla@quintoandar.com
+description: Lead and prospect discard reasons split by rent and sale context, combining EBDB lead, Wololo prospect discards, Rene Descartes rejections, and Wololo conversions.
 columns:
   id_lead:
     lineage:
       - datalake_lead.lead.id
+    description: Lead identifier from datalake_lead.lead.
   is_for_rent:
     lineage:
       - datalake_lead.lead.is_for_rent
+    description: Flag indicating rental intent on the EBDB lead.
   is_for_sale:
     lineage:
       - datalake_lead.lead.is_for_sale
+    description: Flag indicating sale intent on the EBDB lead.
   lead_discard_rent:
     lineage:
       - datalake_rene_descartes_clean.lead_rejection.reason
+    description: Rent-context discard reason from Rene Descartes lead rejection.
   lead_discard_sale:
     lineage:
       - datalake_rene_descartes_clean.lead_rejection.reason
+    description: Sale-context discard reason from Rene Descartes lead rejection.
   prospect_status:
     lineage:
       - datalake_wololo_clean.prospect.status
+    description: Current Wololo prospect status linked to the lead.
   prospect_discard_rent:
     lineage:
       - datalake_wololo_clean.context_discard.reason
       - datalake_lead.lead.reason_detail
+    description: Rent-context discard reason from Wololo or mapped lead reason_detail.
   prospect_discard_sale:
     lineage:
       - datalake_wololo_clean.context_discard.reason
+    description: Sale-context Wololo prospect discard reason when the linked prospect was discarded.
+  conversion_rent:
+    lineage:
+      - datalake_wololo_clean.conversion.business_context
+    description: String flag ('true') when the linked Wololo prospect converted in rent context; null otherwise.
+  conversion_sale:
+    lineage:
+      - datalake_wololo_clean.conversion.business_context
+    description: String flag ('true') when the linked Wololo prospect converted in sale context; null otherwise.

@@ -2,25 +2,46 @@
 database_name: datalake_demand_contact_submission_clean
 table_name: message
 domain: Growth
+owner: gabriel.salla@quintoandar.com
+description: Clean layer for Kafka message payloads published by the demand contact submission pipeline (destination, headers, payload, publish status).
 columns:
   id_message:
     lineage:
       - datalake_demand_contact_submission_raw.message.id
+    description: Primary key of the Kafka message record.
   id_incremental:
     lineage:
       - datalake_demand_contact_submission_raw.message.incremental_id
+    description: Incremental offset identifier from the message broker.
   destination:
     lineage:
       - datalake_demand_contact_submission_raw.message.destination
+    description: Kafka destination topic for the published message.
   headers:
     lineage:
       - datalake_demand_contact_submission_raw.message.headers
+    description: Serialized message headers from the broker.
   payload:
     lineage:
       - datalake_demand_contact_submission_raw.message.payload
+    description: Serialized message payload body.
   published:
     lineage:
       - datalake_demand_contact_submission_raw.message.published
+    description: Publish status flag from the raw ingestion layer.
   ts_creation:
     lineage:
       - datalake_demand_contact_submission_raw.message.creation_time
+    description: Message creation timestamp converted from broker epoch.
+  year:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.creation_time
+    description: Hive partition year derived from ts_creation for incremental loads.
+  month:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.creation_time
+    description: Hive partition month derived from ts_creation for incremental loads.
+  day:
+    lineage:
+      - datalake_demand_contact_submission_raw.message.creation_time
+    description: Hive partition day derived from ts_creation for incremental loads.

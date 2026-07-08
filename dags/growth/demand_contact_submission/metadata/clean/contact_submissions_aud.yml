@@ -2,76 +2,118 @@
 database_name: datalake_demand_contact_submission_clean
 table_name: contact_submissions_aud
 domain: Growth
+owner: gabriel.salla@quintoandar.com
+description: Hibernate Envers audit history for demand contact submissions. One row per revision with field values and mod_* change flags for message, origin, and contact attributes.
 columns:
   id_contact_submission:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.id
+    description: Primary key of the demand contact submission.
   id_contact_type:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.contact_type_id
+    description: Foreign key to contact_submission_types.
   rev:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.rev
+    description: Hibernate Envers revision identifier. Foreign key to datalake_demand_contact_submission_raw.revinfo.rev.
   revend:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.revend
+    description: Envers revision end marker; NULL when this audit row is the current version.
   revtype:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.revtype
+    description: Hibernate Envers operation type for this audit row.
+    categories:
+      '0': INSERT — contact submission record created in this revision.
+      '1': UPDATE — contact submission record modified in this revision.
+      '2': DELETE — contact submission record deleted (supported by Envers; not observed in production).
   business_context:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.business_context
+    description: Business context of the submission (RENT or SALE).
   business_context_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.business_context_mod
+    description: Audit flag for business_context (Hibernate Envers _mod column indicating the field changed in this revision).
   origin:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.origin
+    description: Submission origin channel or landing surface.
   origin_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.origin_mod
+    description: Audit flag for origin (Hibernate Envers _mod column indicating the field changed in this revision).
   contact_type_id_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.contact_type_id_mod
+    description: Audit flag for contact type id (Hibernate Envers _mod column indicating the field changed in this revision).
   message:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.message
+    description: Free-text message body submitted by the user (PII).
   message_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.message_mod
+    description: Audit flag for message (Hibernate Envers _mod column indicating the field changed in this revision).
   user_name:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.user_name
+    description: Submitter name (PII).
   user_name_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.user_name_mod
+    description: Audit flag for user_name (Hibernate Envers _mod column indicating the field changed in this revision).
   user_email:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.user_email
+    description: Submitter email address (PII).
   user_email_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.user_email_mod
+    description: Audit flag for user_email (Hibernate Envers _mod column indicating the field changed in this revision).
   phone_country_code:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.phone_country_code
+    description: Phone country code prefix (PII).
   phone_country_code_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.phone_country_code_mod
+    description: Audit flag for phone_country_code (Hibernate Envers _mod column indicating the field changed in this revision).
   phone_number:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.phone_number
+    description: Phone number without country code (PII).
   phone_number_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.phone_number_mod
+    description: Audit flag for phone_number (Hibernate Envers _mod column indicating the field changed in this revision).
   metadata:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.metadata
+    description: Raw JSON metadata payload from the submission service.
   metadata_mod:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.metadata_mod
+    description: Audit flag for metadata (Hibernate Envers _mod column indicating the field changed in this revision).
   ts_created_at:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.created_at
+    description: Timestamp when the submission was created.
   ts_updated_at:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submissions_aud.updated_at
+    description: Timestamp when the submission was last updated in the source.
+  year:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions.created_at
+    description: Hive partition year derived from ts_created_at for incremental loads.
+  month:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions.created_at
+    description: Hive partition month derived from ts_created_at for incremental loads.
+  day:
+    lineage:
+      - datalake_demand_contact_submission_raw.contact_submissions.created_at
+    description: Hive partition day derived from ts_created_at for incremental loads.

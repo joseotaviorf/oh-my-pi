@@ -1,41 +1,66 @@
 database_name: datalake_supply_outbound_flows
 table_name: supply_outbound_contacts
 domain: Growth
+owner: gabriel.salla@quintoandar.com
+description: History of outbound contact attempts for Wololo prospects triggered by Braze canvas steps (~21M rows; multiple attempts per prospect). Enriched with Jaiminho notifications and Wololo call outcomes.
 columns:
   id_wololo_prospect:
     lineage:
       - datalake_wololo_clean.prospect.id
+    description: Wololo prospect primary key (prospect.id).
   id_prospect:
     lineage:
       - datalake_wololo_clean.prospect.id_reference
+    description: Reference identifier linking Wololo prospect to supply systems (id_reference).
   id_user_dispatch:
     lineage:
       - datalake_braze_dispatches.webhook_owners.id_user_dispatch
+    description: Braze webhook dispatch user identifier.
   id_user_braze:
     lineage:
       - datalake_braze_dispatches.webhook_owners.id_user_braze
+    description: Braze user identifier from webhook_owners.
   id_canvas:
     lineage:
       - datalake_braze_dispatches.webhook_owners.id_canvas
+    description: Braze canvas identifier that triggered the outbound step.
   id_step_canvas:
     lineage:
       - datalake_braze_dispatches.webhook_owners.id_step_canvas
+    description: Braze canvas step identifier for the outbound touchpoint.
   canvas_name:
     lineage:
       - datalake_braze_details.canvas_step_details.canvas_name
+    description: 'Human-readable Braze canvas name from canvas_step_details.'
   canvas_step_name:
     lineage:
       - datalake_braze_details.canvas_step_details.canvas_step_name
+    description: 'Human-readable Braze canvas step name.'
   phone_number:
     lineage:
       - datalake_wololo_clean.prospect.phone
+    description: Prospect phone number from Wololo (PII).
   mkt_origin:
     lineage:
       - datalake_wololo_clean.prospect.mkt_origin
+    description: Marketing origin taxonomy from Wololo prospect at creation time.
+    categories:
+      INDICA_AI_GENERAL: Prospect from the Indica Aí general referral program.
+      PRICE_SUGGESTION_SALE: Prospect from the sale price calculator flow.
+      OWNER_PWA: Prospect originated from the owner PWA.
+      PRICE_CALCULATOR: Prospect from the rent price calculator flow.
+      INDICA_AI_AGENTS: Prospect from the Indica Aí agents referral program.
+      DEFAULT: Default marketing origin when no specific source is mapped.
   contact_channel:
     lineage:
       - datalake_jaiminho_clean.user_notifications.channel
       - datalake_wololo_prospect.prospect_calls.channel
+    description: Outbound channel used for the contact attempt.
+    categories:
+      PHONE: Outbound phone call attempt.
+      SMS: SMS notification channel.
+      NONE: Contact requested but no channel resolved yet.
+      WHATSAPP: WhatsApp outbound message.
   contact_extra_info:
     lineage:
       - datalake_jaiminho_clean.user_notifications.id
@@ -49,13 +74,17 @@ columns:
       - datalake_wololo_prospect.prospect_calls.round_max_tries
       - datalake_wololo_prospect.prospect_calls.ts_round_started
       - datalake_wololo_clean.whatsapp.optin
+    description: Structured map with channel-specific metadata (call outcome, notification template, WhatsApp opt-in, round number).
   ts_webhook_sent:
     lineage:
       - datalake_braze_dispatches.webhook_owners.ts_webhook_sent
+    description: Timestamp when Braze webhook was sent for this canvas step.
   dt_prospect_created:
     lineage:
       - datalake_wololo_clean.prospect.ts_created
+    description: Calendar date when the Wololo prospect was created.
   ts_contacted:
     lineage:
       - datalake_wololo_prospect.prospect_calls.ts_contacted
       - datalake_jaiminho_clean.user_notifications.ts_sent
+    description: Timestamp when the prospect was contacted via call or notification.
