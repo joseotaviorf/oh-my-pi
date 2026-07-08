@@ -4,8 +4,7 @@ table_name: campaigns_geo_performance
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
-  Table load Ads Performance Report from Google Ads API extraction for geographic view (city and region). 
-  Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v13/overview
+  Google Ads campaign performance broken down by geographic target from the Geo Performance Report. Partitioned by account_snake_case and dt_loaded — include both in WHERE for pruning.
 columns:
   id_external_customer:
     description: Google Ads customer resource identifier extracted from the API performance report.
