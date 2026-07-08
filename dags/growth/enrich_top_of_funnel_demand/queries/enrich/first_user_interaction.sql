@@ -1,4 +1,9 @@
 SELECT
-    *
+    id,
+    id_tof_user,
+    business_context,
+    year,
+    month,
+    day
 FROM
     datalake_top_of_funnel_demand.first_user_interaction_staging

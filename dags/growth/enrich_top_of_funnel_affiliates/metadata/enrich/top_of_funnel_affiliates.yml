@@ -1,43 +1,92 @@
 database_name: datalake_top_of_funnel_affiliates
 table_name: top_of_funnel_affiliates
 domain: Growth
+owner: gabriel.salla@quintoandar.com
+description: Daily aggregation of top-of-funnel traffic for the affiliate channel (Indica
+  Aí program), counting unique users who viewed the affiliate intro page per UTM combination
+  and city. Used by Growth teams to measure affiliate acquisition performance and apply
+  the marketing taxonomy for channel attribution reporting.
 columns:
   city:
+    description: City where the affiliate intro page was viewed, as reported by the
+      Amplitude event.
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.city
+  affiliate_type:
+    description: Affiliate program type for the intro page traffic slice. Hardcoded as Standard in the enrich SQL for all rows.
+    categories:
+      Standard: All intro-page traffic in this funnel is classified as Standard affiliate type.
   utm_source:
+    description: UTM source parameter captured from the affiliate intro page URL, identifying
+      the traffic origin (e.g. google, facebook).
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_source
   utm_medium:
+    description: UTM medium parameter captured from the affiliate intro page URL, indicating
+      the marketing medium (e.g. cpc, email, affiliates).
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_medium
   utm_campaign:
+    description: UTM campaign parameter captured from the affiliate intro page URL,
+      identifying the specific marketing campaign driving affiliate traffic.
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_campaign
   utm_content:
+    description: UTM content parameter captured from the affiliate intro page URL,
+      used to differentiate creatives or ad variants within a campaign.
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_content
   utm_term:
+    description: UTM term parameter captured from the affiliate intro page URL, typically
+      recording the paid search keyword that drove the visit.
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.up_utm_term
+  mkt_origin:
+    description: High-level marketing origin bucket derived from affiliate taxonomy match. Indica Ai - General when UTM maps to taxonomy; Other when unmapped.
+    categories:
+      Indica Ai - General: UTM combination matched an entry in taxonomy_affiliates.
+      Other: UTM combination did not match any taxonomy_affiliates row.
   mkt_channel:
-    lineage:
-      - datalake_gsheets_clean.taxonomy_affiliates.mkt_channel
+    description: Standardised marketing channel label assigned by joining UTM parameters against the affiliate taxonomy lookup table.
+    categories:
+      Paid: Paid media channel from affiliate taxonomy.
+      Organic: Organic traffic channel from affiliate taxonomy.
+      Not Mapped: UTM combination not found in taxonomy_affiliates.
+      CRM/Notification: CRM or notification-driven affiliate traffic.
+      Offline: Offline affiliate acquisition channel.
+      Paid Acquisition: Paid acquisition channel bucket (rare).
   mkt_medium:
+    description: Standardised marketing medium label from the affiliate taxonomy, grouping
+      traffic into strategic buckets such as SEM Branded or Retargeting.
     lineage:
       - datalake_gsheets_clean.taxonomy_affiliates.mkt_medium
   mkt_source:
+    description: Standardised marketing source label from the affiliate taxonomy, providing
+      a cleaner representation of the traffic origin for reporting.
     lineage:
       - datalake_gsheets_clean.taxonomy_affiliates.mkt_source
+  unique_user:
+    description: Count of distinct Amplitude users who viewed the affiliate intro page
+      for the UTM, city, and event-date combination.
+    lineage:
+      - datalake_amplitude_clean.205027_intro_page_viewed_events.id_amplitude
   dt_event:
+    description: Date on which the affiliate intro page was viewed, used as the primary
+      time dimension for daily performance analysis.
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.dt_event
   year:
+    description: Calendar year of the event date, used as a Hive partition column
+      for efficient query pruning.
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.dt_event
   month:
+    description: Calendar month of the event date, used as a Hive partition column
+      alongside year and day.
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.dt_event
   day:
+    description: Calendar day of the event date, used as a Hive partition column alongside
+      year and month.
     lineage:
       - datalake_amplitude_clean.205027_intro_page_viewed_events.dt_event

@@ -1,22 +1,43 @@
 database_name: datalake_top_of_funnel_demand
 table_name: first_user_interaction
 domain: Growth
+owner: henrique.paulo@quintoandar.com.br
+description: Records the very first top-of-funnel interaction for each user and business
+  context, derived by filtering user_interactions to retain only new top-of-funnel users
+  not previously seen. Grain is one row per synthetic id; id_tof_user plus business_context
+  is not unique in production because business_context mixes lowercase and uppercase values.
 columns:
   id:
+    description: Synthetic surrogate key for the first interaction event, inherited
+      from user_interactions and uniquely identifying the record within the partition.
     lineage:
       - datalake_top_of_funnel_demand.first_user_interaction_staging.id
   id_tof_user:
+    description: Top-of-funnel user identifier for the new user, falling back to the
+      device identifier when no logged-in user is available at first touch.
     lineage:
       - datalake_top_of_funnel_demand.first_user_interaction_staging.id_tof_user
   business_context:
+    description: Business context in which the first interaction occurred, distinguishing acquisition flows across product lines. Production mixes lowercase and uppercase spellings.
+    categories:
+      rent: Rent-side first-touch interaction (lowercase, dominant).
+      sale: Sale-side first-touch interaction (lowercase, dominant).
+      RENT: Rent-side first-touch with uppercase business_context from upstream events.
+      SALE: Sale-side first-touch with uppercase business_context from upstream events.
     lineage:
       - datalake_top_of_funnel_demand.first_user_interaction_staging.business_context
   year:
+    description: Calendar year of the first interaction event, used as a Hive partition
+      column for efficient query pruning.
     lineage:
       - datalake_top_of_funnel_demand.first_user_interaction_staging.year
   month:
+    description: Calendar month of the first interaction event, used as a Hive partition
+      column alongside year and day.
     lineage:
       - datalake_top_of_funnel_demand.first_user_interaction_staging.month
   day:
+    description: Calendar day of the first interaction event, used as a Hive partition
+      column alongside year and month.
     lineage:
       - datalake_top_of_funnel_demand.first_user_interaction_staging.day

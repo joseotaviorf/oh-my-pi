@@ -2,56 +2,101 @@
 database_name: datalake_top_of_funnel_supply
 table_name: top_of_funnel_supply
 domain: Growth
+owner: gabriel.salla@quintoandar.com
+description: Daily aggregation of top-of-funnel supply-side traffic from paid campaigns
+  targeting landlords, counting unique users who viewed price-suggestion or landing
+  pages sourced from Google or Facebook performance campaigns. Used by Growth teams
+  to measure landlord acquisition efficiency and apply the supply marketing taxonomy
+  for channel attribution and budget optimisation reporting.
 columns:
   utm_campaign:
+    description: UTM campaign parameter from the paid media campaign that drove the
+      landlord page view, used to join against the marketing cost taxonomy for attribution.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_campaign
   utm_term:
+    description: UTM term parameter of the paid campaign, typically recording the
+      search keyword or ad group that generated the supply-side visit.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_term
   utm_content:
+    description: UTM content parameter of the paid campaign, used to differentiate
+      creatives or ad variants within a supply acquisition campaign.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_content
   city_group:
+    description: Marketing city group associated with the campaign, resolved from
+      the consolidated media metrics and used to segment supply traffic by geography.
     lineage:
       - datalake_consolidated_marketing_metrics.consolidated_media_metrics.city_group
   tier:
+    description: Geographic tier of the city group where the supply traffic occurred,
+      reflecting the market priority classification from the region reference table.
     lineage:
       - datalake_region.region.tier
   mkt_origin:
-    lineage:
-      - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_origin
+    description: Standardised marketing origin from the supply taxonomy, identifying the product entry point for landlord campaigns.
+    categories:
+      Owner PWA: Owner PWA rent-side supply acquisition.
+      Price Calculator: Rent price calculator supply funnel.
+      Owner PWA - Sale: Owner PWA sale-side supply acquisition.
+      Price Calculator - Sale: Sale price calculator supply funnel.
+      New Channels: Experimental or new supply acquisition channels.
   mkt_channel:
-    lineage:
-      - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_channel
+    description: Standardised marketing channel label from the supply taxonomy. Only Paid observed in production for this aggregation.
   mkt_medium:
+    description: Standardised marketing medium from the supply taxonomy, indicating
+      the delivery method used for the landlord acquisition campaign.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_medium
   mkt_source:
+    description: Standardised marketing source from the supply taxonomy, providing
+      a cleaner representation of the traffic origin for supply reporting.
     lineage:
       - datalake_gsheets_clean.marketing_cost_taxonomy.mkt_source
   dt_event:
+    description: Date on which the landlord page view event occurred, used as the
+      primary time dimension for daily supply traffic analysis.
     lineage:
       - datalake_amplitude_clean.183047_landing_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_report_landing_rent_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_report_landing_sale_page_viewed_events.ts_event
   traffic:
+    description: Count of unique users (by Amplitude identifier) who viewed a supply-side
+      page on the given date and campaign combination, representing paid landlord acquisition
+      traffic.
     lineage:
       - datalake_amplitude_clean.183047_landing_page_viewed_events.id_amplitude
       - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.id_amplitude
       - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.183047_price_report_landing_rent_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.183047_price_report_landing_sale_page_viewed_events.id_amplitude
   year:
+    description: Calendar year of the event date, used as a Hive partition column
+      for efficient query pruning.
     lineage:
       - datalake_amplitude_clean.183047_landing_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_report_landing_rent_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_report_landing_sale_page_viewed_events.ts_event
   month:
+    description: Calendar month of the event date, used as a Hive partition column
+      alongside year and day.
     lineage:
       - datalake_amplitude_clean.183047_landing_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_report_landing_rent_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_report_landing_sale_page_viewed_events.ts_event
   day:
+    description: Calendar day of the event date, used as a Hive partition column alongside
+      year and month.
     lineage:
       - datalake_amplitude_clean.183047_landing_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_price_suggestion_page_viewed_events.ts_event
       - datalake_amplitude_clean.183047_price_suggestion_sale_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_report_landing_rent_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_price_report_landing_sale_page_viewed_events.ts_event

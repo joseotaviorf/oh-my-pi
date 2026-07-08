@@ -1,10 +1,13 @@
 database_name: dw_rent
 table_name: dim_rent_flow_taxonomy
-description: This table has data related to the Rent Flow's demand taxonomy, used to categorize a rent flow related to
-  the lead of origin (which can be a TP (Tenant Prospect, if talking about Rent) or BP (Buyer Prospect, if talking about Sale)).
-  Each line is an unique rent flow taxonomy.
+description: Dimension table containing the marketing taxonomy used to categorise rent
+  flow demand leads by acquisition strategy, classifying each lead of origin (Tenant
+  Prospect for Rent or Buyer Prospect for Sale) across channel, medium, source, and
+  platform dimensions. Each row represents a unique taxonomy combination and is used
+  by Growth and Rent Flow teams to attribute demand performance to the correct marketing
+  investment.
 domain: Growth
-owner: thiago.jesus@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_rent_flow_taxonomy:
     lineage:
@@ -30,6 +33,8 @@ columns:
       Not Mapped: Indicates that the TP/BP has an unmapped flow.
       Other: Indicates that the TP/BP has an other flow.
       Self-Service: Indicates that the TP/BP started by the property owner through the Owner PWA.
+      Full Self Service: Full self-service flow variant observed in production taxonomy.
+      Full Self-Service: Hyphenated full self-service flow variant.
   mkt_completion:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.completion
@@ -45,6 +50,8 @@ columns:
     description: Indicates the product from which the TP/BP came from.
     categories:
       Tenants PWA: The web app for QuintoAndar's tenants.
+      Paid Acquisition: Paid media acquisition origin for rent demand.
+      Secretaria: Secretary or assisted-service acquisition origin.
   mkt_channel:
     lineage:
     - datalake_gsheets_clean.taxonomy_demand.channel

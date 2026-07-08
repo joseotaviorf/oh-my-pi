@@ -1,77 +1,66 @@
 database_name: dw_public
 table_name: dim_user_affiliate
-description: Information about affiliates (a subset of all users) registered at QuintoAndar.
-  Each line is a user affiliat
+description: Dimension table describing every user registered in QuintoAndar's affiliate
+  (Indica Aí) program, enriched with marketing tracking attribution and geographic
+  segmentation. Intended grain is one row per affiliate (sk_user_affiliate); a small
+  share of duplicate surrogate keys exists in production and should be handled downstream.
 domain: Growth
-owner: ''
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_user_affiliate:
     lineage:
     - datalake_ebdb_user.affiliate_data.id
-    description: Key of affiliate
+    description: Surrogate key for the affiliate record, sourced from the affiliate_data
+      primary key and used as the primary join key in the data warehouse.
   sk_user:
     lineage:
     - datalake_ebdb_user.user.id
-    description: ''
+    description: Surrogate key linking the affiliate to their corresponding user record
+      in the data warehouse user dimension.
   id_user_affiliate:
     lineage:
     - datalake_ebdb_user.affiliate_data.id
-    description: Key of affiliate
+    description: Natural business identifier of the affiliate record in the source
+      system, equivalent to the affiliate_data primary key.
   sk_user_indicated_by:
     lineage:
     - datalake_ebdb_user.affiliate_data.id_indicated_by
-    description: ''
+    description: Surrogate key of the affiliate who referred this user into the program,
+      enabling referral chain analysis within the affiliate network.
   origin:
     lineage:
     - datalake_ebdb_user.affiliate_data.origin
-    description: Affiliate origin
+    description: Source-system flag describing how the affiliate entered the Indica Aí program.
     categories:
-      OpenLink: ''
-      Untraced: ''
+      OpenLink: Affiliate joined through a generic open referral link without a tracked referrer.
+      Untraced: Affiliate joined with no attributable acquisition origin recorded in the source system.
+      LeadProcessing: Affiliate created through the lead-processing workflow rather than self-service signup.
   type:
     lineage:
     - datalake_ebdb_user.affiliate_data.affiliate_type
     description: Classification of affiliate
     categories:
-      Agent: ''
-      B2BPartner: ''
-      Doorman: ''
-      Doorman & Agent: ''
-      Standard: ''
+      Agent: Real-estate agent affiliate.
+      B2BPartner: B2B partner affiliate.
+      Standard: Standard affiliate program member.
   marketing_city_group:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.city_campaign
     - datalake_region.region.city_group
-    description: City group
-    categories:
-      Belo Horizonte: ''
-      Brasília: ''
-      Campinas: ''
-      Cotia: ''
-      Curitiba: ''
-      Florianópolis: ''
-      Goiânia: ''
-      Mogi das Cruzes: ''
-      Porto Alegre: ''
-      RMSP: ''
-      Recife: ''
-      Ribeirão Preto: ''
-      Rio de Janeiro: ''
-      Salvador: ''
-      Santos: ''
-      Sorocaba: ''
-      São José dos Campos: ''
-      Vitória: ''
+    description: Marketing city group assigned to the affiliate at registration, used for geographic performance segmentation.
   regional:
     lineage:
     - datalake_region.region.regional
-    description: Regional
+    description: Macro regional cluster mapped from the affiliate marketing city group,
+      used for geographic segmentation in Growth affiliate reporting.
     categories:
-      GFPC: ''
-      Nordeste: ''
-      RJPB: ''
-      SPMG: ''
-      Vitória: ''
+      GFPC: Greater Florianópolis and Paraná Coast cluster.
+      Nordeste: Northeast Brazil regional cluster.
+      Norte: North Brazil regional cluster.
+      RJPB: Rio de Janeiro and Paraíba regional cluster.
+      SPMG: São Paulo and Minas Gerais regional cluster.
+      Vitória: Vitória regional cluster.
+      International: International affiliates outside Brazil.
   tracking_source:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.utm_source
@@ -79,86 +68,40 @@ columns:
   tracking_medium:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.utm_medium
-    description: Afiiliate origin medium
-    categories:
-      CPC: ''
-      affiliates: ''
-      b2b: ''
-      banner: ''
-      branding: ''
-      classifieds: ''
-      classifieds&utm_campaign=principal&utm_source=VivaReal: ''
-      componente-cta: ''
-      copy_share: ''
-      cpa: ''
-      cpc: ''
-      cpc?: ''
-      cpc?utm_source=google: ''
-      custom_share: ''
-      display: ''
-      display-b: ''
-      email: ''
-      email?utm_source=QuintoAndar: ''
-      email_SMS: ''
-      evento: ''
-      facebook: ''
-      faq: ''
-      grupos: ''
-      inmail: ''
-      instagram: ''
-      intercom: ''
-      landing: ''
-      landingpage: ''
-      logo: ''
-      materia: ''
-      notifications: ''
-      offline: ''
-      online: ''
-      partnership: ''
-      post: ''
-      postpatrocinado: ''
-      product: ''
-      push: ''
-      reacheferral: ''
-      referral: ''
-      retargeting: ''
-      rodape: ''
-      seo: ''
-      sms: ''
-      social: ''
-      whatsapp: ''
-      youtube: ''
+    description: UTM medium parameter captured when the affiliate registered, indicating the marketing delivery method.
   tracking_campaign:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.utm_campaign
-    description: Afiiliate origin campaign
+    description: Affiliate origin campaign
   tracking_content:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.utm_content
-    description: ''
+    description: UTM content parameter recorded at the moment the affiliate registered,
+      used to differentiate creatives or ad variants within the acquisition campaign.
   tracking_term:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.utm_term
-    description: ''
+    description: UTM term parameter recorded at registration, typically capturing the
+      paid search keyword that drove the affiliate to join the program.
   tracking_platform:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.platform
-    description: Affiliate origin platform
+    description: Web platform used when the affiliate registered for the program.
     categories:
-      web_desktop: ''
-      web_mobile: ''
+      web_desktop: Affiliate registered through the desktop web experience.
+      web_mobile: Affiliate registered through the mobile web experience.
   tracking_device_type:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.device_type
-    description: Affiliate origin device type
+    description: Device type reported by Amplitude when the affiliate registered.
     categories:
-      Android: ''
-      Apple iPad: ''
-      Apple iPhone: ''
-      Chromium OS: ''
-      Linux: ''
-      Mac: ''
-      Windows: ''
+      Android: Android mobile device.
+      Apple iPad: Apple iPad tablet device.
+      Apple iPhone: Apple iPhone mobile device.
+      Chromium OS: Chromium OS device (typically Chromebook).
+      Linux: Linux desktop or laptop device.
+      Mac: macOS desktop or laptop device.
+      Windows: Windows desktop or laptop device.
   tracking_country:
     lineage:
     - datalake_amplitude_user.user_affiliate_origin.user_country
@@ -174,33 +117,46 @@ columns:
   mkt_origin:
     lineage:
     - datalake_gsheets_clean.taxonomy_affiliates.mkt_origin
-    description: ''
+    description: Standardised marketing origin from the affiliate taxonomy, classifying
+      the acquisition program (e.g. Indica Aí - General) for performance segmentation.
     categories:
-      Indica Aí - General: ''
-      Not Mapped: ''
-      Other: ''
+      Indica Aí - General: General Indica Aí affiliate acquisition program.
+      Indica Aí - Agents: Agent-specific Indica Aí acquisition program.
+      Other: Affiliate origin not mapped to a named program bucket.
+      Doorman: Doorman-driven affiliate acquisition (rare).
+      Tenants PWA: Tenant PWA-driven affiliate acquisition (rare).
   mkt_channel:
     lineage:
     - datalake_gsheets_clean.taxonomy_affiliates.mkt_channel
-    description: ''
+    description: Standardised marketing channel from the affiliate taxonomy, grouping
+      the affiliate's acquisition source into strategic channel buckets for reporting.
+    categories:
+      Organic: Organic affiliate acquisition channel.
+      Paid: Paid media affiliate acquisition channel.
+      Not Mapped: UTM combination not matched in the affiliate taxonomy.
+      CRM/Notification: CRM or notification-driven affiliate acquisition channel.
+      Paid Acquisition: Paid acquisition channel bucket (rare).
   mkt_medium:
     lineage:
     - datalake_gsheets_clean.taxonomy_affiliates.mkt_medium
-    description: ''
+    description: Standardised marketing medium from the affiliate taxonomy, indicating
+      the delivery method or strategy used to acquire the affiliate (e.g. SEM Branded,
+      Display, Direct).
     categories:
-      Cross Domain: ''
-      Direct: ''
-      Display: ''
-      Email: ''
-      Not Mapped: ''
-      Retargeting: ''
-      SEM Branded: ''
-      SEM non-branded: ''
-      SMS: ''
+      Cross Domain: Affiliate acquired through cross-domain referral traffic.
+      Direct: Affiliate acquired through direct or untagged traffic.
+      Display: Affiliate acquired through display advertising campaigns.
+      Email: Affiliate acquired through email marketing campaigns.
+      Not Mapped: Affiliate UTM combination not matched in the taxonomy lookup.
+      Retargeting: Affiliate acquired through retargeting campaigns.
+      SEM Branded: Affiliate acquired through branded search engine marketing.
+      SEM non-branded: Affiliate acquired through non-branded search engine marketing.
+      SMS: Affiliate acquired through SMS outreach campaigns.
   mkt_source:
     lineage:
     - datalake_gsheets_clean.taxonomy_affiliates.mkt_source
-    description: ''
+    description: Standardised marketing source from the affiliate taxonomy, providing
+      a cleaner label for the traffic origin that drove the affiliate registration.
   is_realstate_agent:
     lineage:
     - datalake_ebdb_user.agent_data.is_realstate_agent

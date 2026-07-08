@@ -1,22 +1,44 @@
 database_name: datalake_top_of_funnel_demand
 table_name: first_user_interaction_staging
 domain: Growth
+owner: henrique.paulo@quintoandar.com.br
+description: Staging layer that identifies candidate first-touch demand interactions
+  for new top-of-funnel users within a given load window, by selecting user_interactions
+  records that have no prior match in first_user_interaction. This table feeds the
+  incremental deduplication logic that produces the definitive first_user_interaction
+  dataset.
 columns:
   id:
+    description: Synthetic surrogate key for the user interaction event carried through
+      from user_interactions, uniquely identifying the candidate first-touch record.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.id
   id_tof_user:
+    description: Top-of-funnel user identifier, using the device identifier as a fallback
+      when the user is not logged in at the time of the interaction.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.id_tof_user
   business_context:
+    description: Business context of the interaction, used to partition first-touch attribution separately per product line. Inherits mixed casing from user_interactions.
+    categories:
+      rent: Rent-side candidate first-touch (lowercase).
+      sale: Sale-side candidate first-touch (lowercase).
+      RENT: Rent-side candidate with uppercase business_context.
+      SALE: Sale-side candidate with uppercase business_context.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.business_context
   year:
+    description: Calendar year of the interaction event, used as a Hive partition
+      column for efficient query pruning.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.year
   month:
+    description: Calendar month of the interaction event, used as a Hive partition
+      column alongside year and day.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.month
   day:
+    description: Calendar day of the interaction event, used as a Hive partition column
+      alongside year and month.
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.day
