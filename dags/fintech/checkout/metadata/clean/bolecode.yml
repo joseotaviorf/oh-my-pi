@@ -1,183 +1,246 @@
 ---
 database_name: datalake_checkout_clean
 table_name: bolecode
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per bolecode in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.bolecode.id
+    description: Financial attribute representing id on the bolecode dataset.
   id_charge:
     lineage:
     - datalake_checkout_raw.bolecode.charge_id
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
   id_requester:
     lineage:
     - datalake_checkout_raw.bolecode.requester_id
+    description: Identifier for the requester referenced by this financial record.
   id_transaction:
     lineage:
     - datalake_checkout_raw.bolecode.transaction_id
+    description: Identifier for the transaction referenced by this financial record.
   due_amount:
     lineage:
     - datalake_checkout_raw.bolecode.due_amount
+    description: Financial attribute representing due amount on the bolecode dataset.
   interest_amount:
     lineage:
     - datalake_checkout_raw.bolecode.interest_amount
+    description: Financial attribute representing interest amount on the bolecode dataset.
   fine_amount:
     lineage:
     - datalake_checkout_raw.bolecode.fine_amount
+    description: Financial attribute representing fine amount on the bolecode dataset.
   paid_amount:
     lineage:
     - datalake_checkout_raw.bolecode.paid_amount
+    description: Financial attribute representing paid amount on the bolecode dataset.
   interest_paid_amount:
     lineage:
     - datalake_checkout_raw.bolecode.interest_paid_amount
+    description: Financial attribute representing interest paid amount on the bolecode dataset.
   fine_paid_amount:
     lineage:
     - datalake_checkout_raw.bolecode.fine_paid_amount
+    description: Financial attribute representing fine paid amount on the bolecode dataset.
   interest_amount_percentage:
     lineage:
     - datalake_checkout_raw.bolecode.interest_amount_percentage
+    description: Financial attribute representing interest amount percentage on the bolecode dataset.
   fine_amount_percentage:
     lineage:
     - datalake_checkout_raw.bolecode.fine_amount_percentage
+    description: Financial attribute representing fine amount percentage on the bolecode dataset.
   status:
     lineage:
     - datalake_checkout_raw.bolecode.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   payer_identifiable_document:
     lineage:
     - datalake_checkout_raw.bolecode.payer_identifiable_document
+    description: Financial attribute representing payer identifiable document on the bolecode dataset.
   beneficiary_identifiable_document:
     lineage:
     - datalake_checkout_raw.bolecode.beneficiary_identifiable_document
+    description: Financial attribute representing beneficiary identifiable document on the bolecode dataset.
   your_number:
     lineage:
     - datalake_checkout_raw.bolecode.your_number
+    description: Financial attribute representing your number on the bolecode dataset.
   barcode:
     lineage:
     - datalake_checkout_raw.bolecode.barcode
+    description: Financial attribute representing barcode on the bolecode dataset.
   payer_name:
     lineage:
     - datalake_checkout_raw.bolecode.payer_name
+    description: Financial attribute representing payer name on the bolecode dataset.
   payer_person_type:
     lineage:
     - datalake_checkout_raw.bolecode.payer_person_type
+    description: Financial attribute representing payer person type on the bolecode dataset.
   payer_email:
     lineage:
     - datalake_checkout_raw.bolecode.payer_email
+    description: Financial attribute representing payer email on the bolecode dataset.
   payer_city:
     lineage:
     - datalake_checkout_raw.bolecode.payer_city
+    description: Financial attribute representing payer city on the bolecode dataset.
   payer_neighborhood:
     lineage:
     - datalake_checkout_raw.bolecode.payer_neighborhood
+    description: Financial attribute representing payer neighborhood on the bolecode dataset.
   payer_state:
     lineage:
     - datalake_checkout_raw.bolecode.payer_state
+    description: Financial attribute representing payer state on the bolecode dataset.
   payer_street_address:
     lineage:
     - datalake_checkout_raw.bolecode.payer_street_address
+    description: Financial attribute representing payer street address on the bolecode dataset.
   payer_zipcode:
     lineage:
     - datalake_checkout_raw.bolecode.payer_zipcode
+    description: Financial attribute representing payer zipcode on the bolecode dataset.
   beneficiary_name:
     lineage:
     - datalake_checkout_raw.bolecode.beneficiary_name
+    description: Financial attribute representing beneficiary name on the bolecode dataset.
   interest_type:
     lineage:
     - datalake_checkout_raw.bolecode.interest_type
+    description: Financial attribute representing interest type on the bolecode dataset.
   fine_type:
     lineage:
     - datalake_checkout_raw.bolecode.fine_type
+    description: Financial attribute representing fine type on the bolecode dataset.
   beneficiary_account:
     lineage:
     - datalake_checkout_raw.bolecode.beneficiary_account
+    description: Financial attribute representing beneficiary account on the bolecode dataset.
   beneficiary_agency:
     lineage:
     - datalake_checkout_raw.bolecode.beneficiary_agency
+    description: Financial attribute representing beneficiary agency on the bolecode dataset.
   beneficiary_dac:
     lineage:
     - datalake_checkout_raw.bolecode.beneficiary_dac
+    description: Financial attribute representing beneficiary dac on the bolecode dataset.
   our_number_verification_digit:
     lineage:
     - datalake_checkout_raw.bolecode.our_number_verification_digit
+    description: Financial attribute representing our number verification digit on the bolecode dataset.
   bank_dac:
     lineage:
     - datalake_checkout_raw.bolecode.bank_dac
+    description: Financial attribute representing bank dac on the bolecode dataset.
   bank_name:
     lineage:
     - datalake_checkout_raw.bolecode.bank_name
+    description: Financial attribute representing bank name on the bolecode dataset.
   bank_code:
     lineage:
     - datalake_checkout_raw.bolecode.bank_code
+    description: Financial attribute representing bank code on the bolecode dataset.
   dac_agency:
     lineage:
     - datalake_checkout_raw.bolecode.dac_agency
+    description: Financial attribute representing dac agency on the bolecode dataset.
   payment_location:
     lineage:
     - datalake_checkout_raw.bolecode.payment_location
+    description: Financial attribute representing payment location on the bolecode dataset.
   charge_messages:
     lineage:
     - datalake_checkout_raw.bolecode.charge_messages
+    description: Financial attribute representing charge messages on the bolecode dataset.
   typeable_line:
     lineage:
     - datalake_checkout_raw.bolecode.typeable_line
+    description: Financial attribute representing typeable line on the bolecode dataset.
   requester_name:
     lineage:
     - datalake_checkout_raw.bolecode.requester_name
+    description: Financial attribute representing requester name on the bolecode dataset.
   our_number:
     lineage:
     - datalake_checkout_raw.bolecode.our_number
+    description: Financial attribute representing our number on the bolecode dataset.
   pix_link:
     lineage:
     - datalake_checkout_raw.bolecode.pix_link
+    description: Financial attribute representing pix link on the bolecode dataset.
   emv:
     lineage:
     - datalake_checkout_raw.bolecode.emv
+    description: Financial attribute representing emv on the bolecode dataset.
   qr_code:
     lineage:
     - datalake_checkout_raw.bolecode.qr_code
+    description: Financial attribute representing qr code on the bolecode dataset.
   operation_history:
     lineage:
     - datalake_checkout_raw.bolecode.operation_history
+    description: Financial attribute representing operation history on the bolecode dataset.
   written_down_by:
     lineage:
     - datalake_checkout_raw.bolecode.written_down_by
+    description: Financial attribute representing written down by on the bolecode dataset.
   write_down_reason:
     lineage:
     - datalake_checkout_raw.bolecode.write_down_reason
+    description: Financial attribute representing write down reason on the bolecode dataset.
   raw_response:
     lineage:
     - datalake_checkout_raw.bolecode.raw_response
+    description: Financial attribute representing raw response on the bolecode dataset.
   dt_due:
     lineage:
     - datalake_checkout_raw.bolecode.due_date
+    description: Calendar date associated with due in the financial workflow.
   dt_emission:
     lineage:
     - datalake_checkout_raw.bolecode.emission_date
+    description: Calendar date associated with emission in the financial workflow.
   ts_paid:
     lineage:
     - datalake_checkout_raw.bolecode.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   dt_credit:
     lineage:
     - datalake_checkout_raw.bolecode.credit_date
+    description: Calendar date associated with credit in the financial workflow.
   dt_interest_start:
     lineage:
     - datalake_checkout_raw.bolecode.interest_start_at
+    description: Calendar date associated with interest start in the financial workflow.
   dt_fine_start:
     lineage:
     - datalake_checkout_raw.bolecode.fine_start_at
+    description: Calendar date associated with fine start in the financial workflow.
   dt_last_to_pay:
     lineage:
     - datalake_checkout_raw.bolecode.last_date_to_pay
+    description: Calendar date associated with last to pay in the financial workflow.
   ts_written_down:
     lineage:
     - datalake_checkout_raw.bolecode.written_down_at
+    description: Timestamp when written down occurred in the upstream fintech system.
   ts_started_processing:
     lineage:
     - datalake_checkout_raw.bolecode.started_processing_at
+    description: Timestamp when started processing occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_checkout_raw.bolecode.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.bolecode.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

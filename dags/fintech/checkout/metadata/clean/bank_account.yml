@@ -1,24 +1,34 @@
 ---
 database_name: datalake_checkout_clean
 table_name: bank_account
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per bank account in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.bank_account.id
+    description: Financial attribute representing id on the bank_account dataset.
   account:
     lineage:
     - datalake_checkout_raw.bank_account.account
+    description: Financial attribute representing account on the bank_account dataset.
   agency:
     lineage:
     - datalake_checkout_raw.bank_account.agency
+    description: Financial attribute representing agency on the bank_account dataset.
   dac:
     lineage:
     - datalake_checkout_raw.bank_account.dac
+    description: Financial attribute representing dac on the bank_account dataset.
   ts_created:
     lineage:
     - datalake_checkout_raw.bank_account.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.bank_account.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: status_sync
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table for storing indicator synchronization status. See more details at: https://docs.google.com/document/d/1cOK7WBXbYwc7qT1WhPfGqZuOEKTU3z7VQ41SKoVTKK4/"
 columns:
@@ -14,11 +14,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.status_sync.entity_id
   id_collector:
-    description: ""
+    description: Identifier for the collector referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.status_sync.collector_id
   entity_type:
-    description: "What type of indicator"
+    description: Financial attribute representing entity type on the status_sync dataset.
     lineage:
       - datalake_trato_feito_raw.status_sync.entity_type
   status:
@@ -26,10 +26,10 @@ columns:
     lineage:
       - datalake_trato_feito_raw.status_sync.status
   ts_created:
-    description: "Created at"
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.status_sync.created_at
   ts_updated:
-    description: "Updated at"
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.status_sync.updated_at

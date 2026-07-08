@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: segment
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: The Segment entity represents a group of customers with specific characteristics
 columns:
@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.segment.id
   name:
-    description: "Name of the segment"
+    description: Financial attribute representing name on the segment dataset.
     lineage:
       - datalake_trato_feito_raw.segment.name
   description:

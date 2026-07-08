@@ -12,19 +12,19 @@ columns:
   id_entity:
     lineage:
       - datalake_trato_feito_raw.pause_collection.entity_id
-    description: "Entity identifier"
+    description: Identifier for the entity referenced by this financial record.
   entity_type:
     lineage:
       - datalake_trato_feito_raw.pause_collection.entity_type
-    description: "Entity type description"
+    description: Financial attribute representing entity type on the pause_collection dataset.
   version:
     lineage:
       - datalake_trato_feito_raw.pause_collection.version
-    description: "Version number"
+    description: Financial attribute representing version on the pause_collection dataset.
   reason:
     lineage:
       - datalake_trato_feito_raw.pause_collection.reason
-    description: "Reason for the pause collection"
+    description: Financial attribute representing reason on the pause_collection dataset.
   requested_by:
     lineage:
       - datalake_trato_feito_raw.pause_collection.requested_by
@@ -36,11 +36,11 @@ columns:
   dt_started:
     lineage:
       - datalake_trato_feito_raw.pause_collection.start_at
-    description: "Date when started"
+    description: Calendar date associated with started in the financial workflow.
   dt_ended:
     lineage:
       - datalake_trato_feito_raw.pause_collection.end_at
-    description: "Date when ended"
+    description: Calendar date associated with ended in the financial workflow.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.pause_collection.created_at

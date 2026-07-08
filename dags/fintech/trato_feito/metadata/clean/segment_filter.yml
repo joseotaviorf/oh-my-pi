@@ -1,33 +1,33 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: segment_filter
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: null
+description: One row per segment filter in the Fintech clean layer, sourced from datalake_trato_feito_clean for payments, billing, and financial operations reporting.
 columns:
   id_segment_filter:
-    description: ""
+    description: Identifier for the segment filter referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.segment_filter.id
   id_segment:
-    description: ""
+    description: Identifier for the segment referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.segment_filter.segment_id
   version:
-    description: ""
+    description: Financial attribute representing version on the segment_filter dataset.
     lineage:
       - datalake_trato_feito_raw.segment_filter.version
   sql_query:
-    description: ""
+    description: Financial attribute representing sql query on the segment_filter dataset.
     lineage:
       - datalake_trato_feito_raw.segment_filter.sql_query
   ts_created:
-    description: ""
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.segment_filter.created_at
   ts_updated:
-    description: ""
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_raw.segment_filter.updated_at
   ts_load:
-    description: ""
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

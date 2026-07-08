@@ -1,168 +1,226 @@
 ---
 database_name: datalake_checkout_clean
 table_name: boleto
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per boleto in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.boleto.id
+    description: Financial attribute representing id on the boleto dataset.
   id_business_entity:
     lineage:
     - datalake_checkout_raw.boleto.business_entity_id
+    description: Identifier for the business entity referenced by this financial record.
   id_finance_entity:
     lineage:
     - datalake_checkout_raw.boleto.finance_entity_id
+    description: Identifier for the finance entity referenced by this financial record.
   id_charge:
     lineage:
     - datalake_checkout_raw.boleto.charge_id
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
   id_requester:
     lineage:
     - datalake_checkout_raw.boleto.requester_id
+    description: Identifier for the requester referenced by this financial record.
   due_amount:
     lineage:
     - datalake_checkout_raw.boleto.due_amount
+    description: Financial attribute representing due amount on the boleto dataset.
   interest_amount:
     lineage:
     - datalake_checkout_raw.boleto.interest_amount
+    description: Financial attribute representing interest amount on the boleto dataset.
   fine_amount:
     lineage:
     - datalake_checkout_raw.boleto.fine_amount
+    description: Financial attribute representing fine amount on the boleto dataset.
   paid_amount:
     lineage:
     - datalake_checkout_raw.boleto.paid_amount
+    description: Financial attribute representing paid amount on the boleto dataset.
   interest_amount_percentage:
     lineage:
     - datalake_checkout_raw.boleto.interest_amount_percentage
+    description: Financial attribute representing interest amount percentage on the boleto dataset.
   fine_amount_percentage:
     lineage:
     - datalake_checkout_raw.boleto.fine_amount_percentage
+    description: Financial attribute representing fine amount percentage on the boleto dataset.
   interest_paid_amount:
     lineage:
     - datalake_checkout_raw.boleto.interest_paid_amount
+    description: Financial attribute representing interest paid amount on the boleto dataset.
   fine_paid_amount:
     lineage:
     - datalake_checkout_raw.boleto.fine_paid_amount
+    description: Financial attribute representing fine paid amount on the boleto dataset.
   status:
     lineage:
     - datalake_checkout_raw.boleto.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   payer_identifiable_document:
     lineage:
     - datalake_checkout_raw.boleto.payer_identifiable_document
+    description: Financial attribute representing payer identifiable document on the boleto dataset.
   beneficiary_identifiable_document:
     lineage:
     - datalake_checkout_raw.boleto.beneficiary_identifiable_document
+    description: Financial attribute representing beneficiary identifiable document on the boleto dataset.
   your_number:
     lineage:
     - datalake_checkout_raw.boleto.your_number
+    description: Financial attribute representing your number on the boleto dataset.
   barcode:
     lineage:
     - datalake_checkout_raw.boleto.barcode
+    description: Financial attribute representing barcode on the boleto dataset.
   payer_name:
     lineage:
     - datalake_checkout_raw.boleto.payer_name
+    description: Financial attribute representing payer name on the boleto dataset.
   payer_person_type:
     lineage:
     - datalake_checkout_raw.boleto.payer_person_type
+    description: Financial attribute representing payer person type on the boleto dataset.
   payer_email:
     lineage:
     - datalake_checkout_raw.boleto.payer_email
+    description: Financial attribute representing payer email on the boleto dataset.
   payer_city:
     lineage:
     - datalake_checkout_raw.boleto.payer_city
+    description: Financial attribute representing payer city on the boleto dataset.
   payer_neighborhood:
     lineage:
     - datalake_checkout_raw.boleto.payer_neighborhood
+    description: Financial attribute representing payer neighborhood on the boleto dataset.
   payer_state:
     lineage:
     - datalake_checkout_raw.boleto.payer_state
+    description: Financial attribute representing payer state on the boleto dataset.
   payer_street_address:
     lineage:
     - datalake_checkout_raw.boleto.payer_street_address
+    description: Financial attribute representing payer street address on the boleto dataset.
   payer_zipcode:
     lineage:
     - datalake_checkout_raw.boleto.payer_zipcode
+    description: Financial attribute representing payer zipcode on the boleto dataset.
   beneficiary_name:
     lineage:
     - datalake_checkout_raw.boleto.beneficiary_name
+    description: Financial attribute representing beneficiary name on the boleto dataset.
   interest_type:
     lineage:
     - datalake_checkout_raw.boleto.interest_type
+    description: Financial attribute representing interest type on the boleto dataset.
   fine_type:
     lineage:
     - datalake_checkout_raw.boleto.fine_type
+    description: Financial attribute representing fine type on the boleto dataset.
   beneficiary_account:
     lineage:
     - datalake_checkout_raw.boleto.beneficiary_account
+    description: Financial attribute representing beneficiary account on the boleto dataset.
   beneficiary_agency:
     lineage:
     - datalake_checkout_raw.boleto.beneficiary_agency
+    description: Financial attribute representing beneficiary agency on the boleto dataset.
   beneficiary_dac:
     lineage:
     - datalake_checkout_raw.boleto.beneficiary_dac
+    description: Financial attribute representing beneficiary dac on the boleto dataset.
   our_number_verification_digit:
     lineage:
     - datalake_checkout_raw.boleto.our_number_verification_digit
+    description: Financial attribute representing our number verification digit on the boleto dataset.
   charge_messages:
     lineage:
     - datalake_checkout_raw.boleto.charge_messages
+    description: Financial attribute representing charge messages on the boleto dataset.
   typeable_line:
     lineage:
     - datalake_checkout_raw.boleto.typeable_line
+    description: Financial attribute representing typeable line on the boleto dataset.
   requester_name:
     lineage:
     - datalake_checkout_raw.boleto.requester_name
+    description: Financial attribute representing requester name on the boleto dataset.
   our_number:
     lineage:
     - datalake_checkout_raw.boleto.our_number
+    description: Financial attribute representing our number on the boleto dataset.
   operation_history:
     lineage:
     - datalake_checkout_raw.boleto.operation_history
+    description: Financial attribute representing operation history on the boleto dataset.
   written_down_by:
     lineage:
     - datalake_checkout_raw.boleto.written_down_by
+    description: Financial attribute representing written down by on the boleto dataset.
   write_down_reason:
     lineage:
     - datalake_checkout_raw.boleto.write_down_reason
+    description: Financial attribute representing write down reason on the boleto dataset.
   is_inferred_paid_at:
     lineage:
     - datalake_checkout_raw.boleto.is_inferred_paid_at
+    description: Indicates whether inferred paid at applies to this financial record.
   raw_response:
     lineage:
     - datalake_checkout_raw.boleto.raw_response
+    description: Financial attribute representing raw response on the boleto dataset.
   dt_due:
     lineage:
     - datalake_checkout_raw.boleto.due_date
+    description: Calendar date associated with due in the financial workflow.
   dt_emission:
     lineage:
     - datalake_checkout_raw.boleto.emission_date
+    description: Calendar date associated with emission in the financial workflow.
   ts_paid:
     lineage:
     - datalake_checkout_raw.boleto.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   dt_credit:
     lineage:
     - datalake_checkout_raw.boleto.credit_date
+    description: Calendar date associated with credit in the financial workflow.
   dt_interest_start:
     lineage:
     - datalake_checkout_raw.boleto.interest_start_at
+    description: Calendar date associated with interest start in the financial workflow.
   dt_fine_start:
     lineage:
     - datalake_checkout_raw.boleto.fine_start_at
+    description: Calendar date associated with fine start in the financial workflow.
   dt_last_to_pay:
     lineage:
     - datalake_checkout_raw.boleto.last_date_to_pay
+    description: Calendar date associated with last to pay in the financial workflow.
   ts_written_down:
     lineage:
     - datalake_checkout_raw.boleto.written_down_at
+    description: Timestamp when written down occurred in the upstream fintech system.
   ts_last_synced:
     lineage:
     - datalake_checkout_raw.boleto.last_synced_at
+    description: Timestamp when last synced occurred in the upstream fintech system.
   ts_started_processing:
     lineage:
     - datalake_checkout_raw.boleto.started_processing_at
+    description: Timestamp when started processing occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_checkout_raw.boleto.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.boleto.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

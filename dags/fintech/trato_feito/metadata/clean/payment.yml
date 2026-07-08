@@ -1,31 +1,51 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: payment
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Data about the payment of the negotiation installments"
 columns:
   id:
     lineage:
       - datalake_trato_feito_raw.payment.id
+    description: Financial attribute representing id on the payment dataset.
   id_installment:
     lineage:
       - datalake_trato_feito_raw.payment.installment_id
+    description: Identifier for the installment referenced by this financial record.
   type:
     lineage:
       - datalake_trato_feito_raw.payment.type
+    description: Financial attribute representing type on the payment dataset.
   metadata:
     lineage:
       - datalake_trato_feito_raw.payment.metadata
+    description: Structured JSON payload with provider-specific attributes not flattened into columns.
   status:
     lineage:
       - datalake_trato_feito_raw.payment.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   ts_created:
     lineage:
       - datalake_trato_feito_raw.payment.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_trato_feito_raw.payment.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_started_processing:
     lineage:
       - datalake_trato_feito_raw.payment.started_processing_at
+    description: Timestamp when started processing occurred in the upstream fintech system.
+  dt_paid:
+    lineage:
+      - datalake_trato_feito_raw.payment.paid_at
+    description: Calendar date associated with paid in the financial workflow.
+  id_installment_external:
+    lineage:
+      - datalake_trato_feito_raw.payment.installment_external_id
+    description: Identifier for the installment external referenced by this financial record.
+  dt_credit:
+    lineage:
+      - datalake_trato_feito_raw.payment.credit_at
+    description: Calendar date associated with credit in the financial workflow.

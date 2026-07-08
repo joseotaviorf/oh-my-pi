@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: segment_distribution_history
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Segment Distribution History that stores historical link between customers to communication segments and audiences.
 columns:

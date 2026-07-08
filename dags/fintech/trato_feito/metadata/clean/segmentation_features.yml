@@ -1,7 +1,7 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: segmentation_features
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Segmentation features calculated for Trato Feito contracts, used for modeling and collections analysis.
 columns:
@@ -10,15 +10,15 @@ columns:
     lineage:
       - datalake_trato_feito_raw.segmentation_features.id
   id_customer:
-    description: Customer identifier.
+    description: Identifier for the customer referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.customer_id
   id_debtor:
-    description: Debtor identifier.
+    description: Identifier for the debtor referenced by this financial record.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.debtor_id
   id_contract:
-    description: Contract identifier.
+    description: Contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.contract_id
   customer_document:
@@ -38,15 +38,15 @@ columns:
     lineage:
       - datalake_trato_feito_raw.segmentation_features.is_evic_active
   invoices:
-    description: ""
+    description: Financial attribute representing invoices on the segmentation_features dataset.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.invoices
   segment:
-    description: ""
+    description: Financial attribute representing segment on the segmentation_features dataset.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.segment
   customer_document_value:
-    description: ""
+    description: Financial attribute representing customer document value on the segmentation_features dataset.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.customer_document_value
   delay_contaminated_original_invoices:
@@ -78,7 +78,7 @@ columns:
     lineage:
       - datalake_trato_feito_raw.segmentation_features.number_of_invoices_type_other
   number_of_overdue_monthly_invoices:
-    description: Number of overdue monthly invoices.
+    description: Financial attribute representing number of overdue monthly invoices on the segmentation_features dataset.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.number_of_overdue_monthly_invoices
   number_of_overdue_deals_installments:
@@ -94,11 +94,11 @@ columns:
     lineage:
       - datalake_trato_feito_raw.segmentation_features.number_of_contract_has_deal_flag
   dt_contract_start:
-    description: Contract start date.
+    description: Calendar date associated with contract start in the financial workflow.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.contract_start_date
   dt_contract_end:
-    description: Contract end date.
+    description: Calendar date associated with contract end in the financial workflow.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.contract_end_date
   ts_created:
