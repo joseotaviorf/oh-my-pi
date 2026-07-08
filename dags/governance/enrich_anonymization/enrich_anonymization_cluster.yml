@@ -22,10 +22,11 @@ validation:
         instance_count: 2
       task_nodes:
         instance_count: 1
-    custom_libraries:
-    - pypi:
-        package: presidio_analyzer==2.2.357
-    - pypi:
-        package: numpy==1.26.4
-    - whl: '{artifacts_bucket}/spacy-models/en_core_web_lg-3.7.1-py3-none-any.whl'
+      init_scripts:
+        - s3:
+            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_anonymization.sh"
+          args:
+            - "{{ var.value.artifacts_bucket }}"
+            - "{{ var.value.databricks_s3_bucket }}"
+            - "{{ dag.dag_id }}"
   allow_custom_spark_job: true

@@ -231,6 +231,23 @@ steps:
           - "packages/bietlejuice-compiler/scripts/wonka/configure_spark.sh"
         on_empty: false
 
+  export-anonymization-init-script-to-s3-prod:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.data.quintoandar.com.br
+      source: packages/bietlejuice-compiler/scripts/init_script_anonymization.sh
+      target: bi-etl-ejuice/
+      strip_prefix: packages/bietlejuice-compiler/scripts/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+      path: &anonymization_init_script_path
+        include:
+          - "packages/bietlejuice-compiler/scripts/init_script_anonymization.sh"
+        on_empty: false
+
   upload-bi-etl-ejuice-modules-s3-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
     pull: true
@@ -460,6 +477,20 @@ steps:
       event: push
       branch: forno
       path: *wonka_init_scripts_path
+
+  export-anonymization-init-script-to-s3-forno:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.forno.data.quintoandar.com.br
+      source: packages/bietlejuice-compiler/scripts/init_script_anonymization.sh
+      target: bi-etl-ejuice/
+      strip_prefix: packages/bietlejuice-compiler/scripts/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: push
+      branch: forno
+      path: *anonymization_init_script_path
 
   upload-bi-etl-ejuice-modules-s3-forno:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
