@@ -38,7 +38,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 **✅ Data quality flags** : Five smoke-detector signals that surface rating inconsistencies between goal results, self and manager evaluations, and prior-cycle calibration outcomes.
 
-**✅ Peer feedback** : Peer evaluations submitted during Performa cycles, including section ratings and open-text comments. Each row links the evaluated employee to the peer who provided feedback, supporting both received and given feedback analysis.
+**✅ Peer feedback** : Peer and upward leadership evaluations submitted during Performa cycles, including section ratings and open-text comments. Each row links the evaluated employee to the participant who provided feedback, with `participant_role_type` distinguishing colleague feedback (`PEER`) from upward leadership feedback (`LEADERSHIP`). Both received and given feedback analysis are supported.
 
 **✅ Continuous management (Check-in)** : Mid-Year Checkpoint, Individual Development Plan (PDI), and One-on-One sessions registered in PIN, including questionnaire responses and manager feedback linked to each check-in meeting.
 
@@ -113,7 +113,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 * **Smoke detectors** : Five boolean flags (SD1–SD5) surface data quality inconsistencies: goal score misaligned with manager impact band (SD1); self-vs-manager gap of two or more steps on Impact (SD2) or Behavior (SD3); and drift of two or more steps between the resolved manager rating and the prior-cycle calibrated rating on Impact (SD4) or Behavior (SD5). These flags do not block data from other facts — they are additional quality signals.
 
-* **Peer feedback** : Each Performa cycle may include peer nominations where colleagues provide Impact, Behavior, and (when applicable) Leadership ratings plus open-text comments. `fact_peer_evaluations` stores one row per peer submission. Filter on `person_number` to list feedback received; filter on `peer_person_number` to list feedback given. Peer ratings do not feed into Performa Score or IPA — they are analytical inputs only.
+* **Peer feedback** : Colleague and upward leadership evaluations collected during Performa cycles. Participants rate the evaluated employee on Impact, Behavior, and Leadership (when applicable) and may provide open-text comments. `participant_role_type = LEADERSHIP` identifies upward feedback where the participant evaluated their direct manager; `PEER` covers colleague and stakeholder submissions. Distinct from self and manager evaluations modeled in `dim_performance_evaluation`. Stored in `fact_peer_evaluations` because multiple participants can evaluate the same employee in one cycle.
 
 * **Where evaluation text lives (SELF vs MANAGER vs PEER)** : Self and manager questionnaires are modeled as **SCD Type 2 dimensions** (`dim_performance_evaluation`) because each Performa document has exactly one self-assessment and one manager assessment per cycle, and those records can be versioned over time. Peer feedback is modeled as a **fact table** (`fact_peer_evaluations`) because each employee may receive **multiple** peer submissions per cycle (0–N peers). This split is intentional, but it means open-text feedback is not in a single table — use the [unified UNION pattern](#unified-view--all-evaluation-types-union) below when the analysis needs every evaluation type together.
 
@@ -184,13 +184,14 @@ Performa collects four distinct questionnaire perspectives in PIN. In the wareho
 | :--- | :--- | :--- | :--- | :--- |
 | **Meu Questionário** (autoavaliação) | `SELF` | `dim_performance_evaluation` | 1 self-assessment per assignment × cycle (versioned) | `open_evaluation` |
 | **Questionário do Gerente** | `MANAGER` | `dim_performance_evaluation` | 1 manager assessment per assignment × cycle (versioned) | `open_evaluation` |
-| **Participante — Pares/Stakeholders** | `PEER` | `fact_peer_evaluations` | 1 row per peer submission | `open_evaluation` |
+| **Participante — Pares/Stakeholders** | `PEER` | `fact_peer_evaluations` | 1 row per peer submission (`participant_role_type = PEER`) | `open_evaluation` |
+| **Participante — Liderança (upward)** | `LEADERSHIP` | `fact_peer_evaluations` | 1 row per upward leadership submission (`participant_role_type = LEADERSHIP`) | `open_evaluation` |
 | Self + manager side by side (ratings only) | — | `fact_performance_evaluations` | 1 row per assignment × cycle | *(no open text — use the dimension)* |
 
 **Quick rules:**
 
 * Need **self or manager** text or section ratings → `dim_performance_evaluation` with `is_current = TRUE`.
-* Need **peer** text or section ratings → `fact_peer_evaluations`.
+* Need **peer or upward leadership** text or section ratings → `fact_peer_evaluations` (filter `participant_role_type` when the analysis needs only one direction).
 * Need **all types in one result set** → UNION pattern below; resolve `person_number` via `datalake_people.identifier_mapping` for self/manager rows.
 * Peer feedback **does not** affect Performa Score, IPA, or calibration — it is complementary input for people analytics.
 
@@ -314,13 +315,70 @@ ORDER BY
 LIMIT 100
 ```
 
-**Question:** Which colleagues did employee `120469` evaluate as a peer (feedback **given**)?
+**Question:** Which colleagues did employee `123456` evaluate as a peer (feedback **given**), excluding upward leadership feedback to their manager?
 
 ```sql
 SELECT
     fact.peer_person_number AS evaluator_person_number,
     fact.person_number AS evaluated_person_number,
     evaluated.name AS evaluated_name,
+    fact.participant_role_type,
+    fact.cycle_name,
+    fact.participation_status,
+    LENGTH(fact.open_evaluation) AS open_text_length,
+    fact.ts_feedback_completed
+FROM
+    dw_performance.fact_peer_evaluations AS fact
+LEFT JOIN
+    dw_people.dim_employee AS evaluated
+        ON evaluated.person_number = fact.person_number
+WHERE
+    fact.peer_person_number = '123456'
+    AND fact.cycle_name = 'Performa 2025'
+    AND fact.participation_status = 'COMP'
+    AND fact.participant_role_type = 'PEER'
+ORDER BY
+    fact.ts_feedback_completed
+LIMIT 100
+```
+
+**Question:** Which upward leadership evaluations did employee `123456` submit about their manager in Performa 2025?
+
+```sql
+SELECT
+    fact.peer_person_number AS evaluator_person_number,
+    fact.person_number AS evaluated_manager_person_number,
+    evaluated.name AS evaluated_manager_name,
+    fact.participant_role_type,
+    fact.cycle_name,
+    fact.description_impact,
+    fact.description_behavior,
+    fact.description_leadership,
+    LENGTH(fact.open_evaluation) AS open_text_length,
+    fact.ts_feedback_completed
+FROM
+    dw_performance.fact_peer_evaluations AS fact
+LEFT JOIN
+    dw_people.dim_employee AS evaluated
+        ON evaluated.person_number = fact.person_number
+WHERE
+    fact.peer_person_number = '123456'
+    AND fact.cycle_name = 'Performa 2025'
+    AND fact.participation_status = 'COMP'
+    AND fact.participant_role_type = 'LEADERSHIP'
+ORDER BY
+    fact.ts_feedback_completed
+LIMIT 100
+```
+
+**Question:** Which colleagues did employee `120469` evaluate as a peer (feedback **given**), excluding upward leadership feedback to their manager?
+
+```sql
+SELECT
+    fact.peer_person_number AS evaluator_person_number,
+    fact.person_number AS evaluated_person_number,
+    evaluated.name AS evaluated_name,
+    fact.participant_role_type,
     fact.cycle_name,
     fact.participation_status,
     LENGTH(fact.open_evaluation) AS open_text_length,
@@ -334,6 +392,7 @@ WHERE
     fact.peer_person_number = '120469'
     AND fact.cycle_name = 'Performa 2025'
     AND fact.participation_status = 'COMP'
+    AND fact.participant_role_type = 'PEER'
 ORDER BY
     fact.ts_feedback_completed
 LIMIT 100
@@ -384,7 +443,7 @@ peer_feedback AS (
     SELECT
         fact.person_number,
         fact.peer_person_number AS evaluator_person_number,
-        'PEER' AS evaluation_type,
+        fact.participant_role_type AS evaluation_type,
         fact.cycle_name,
         fact.assignment_number,
         fact.open_evaluation,
@@ -441,7 +500,8 @@ ORDER BY
     CASE ev.evaluation_type
         WHEN 'SELF' THEN 1
         WHEN 'MANAGER' THEN 2
-        WHEN 'PEER' THEN 3
+        WHEN 'LEADERSHIP' THEN 3
+        WHEN 'PEER' THEN 4
     END,
     ev.ts_feedback_completed
 LIMIT 100
@@ -453,6 +513,7 @@ LIMIT 100
 | :--- | :--- | :--- |
 | `SELF` | 1 | Same as `person_number` (the employee) |
 | `MANAGER` | 1 | Manager's `person_number` |
+| `LEADERSHIP` | 0–N | Each direct report's `person_number` (upward feedback to the manager) |
 | `PEER` | 0–N | Each peer's `person_number` |
 
 **Question:** Count how many evaluation submissions of each type exist per employee in Performa 2025.
@@ -477,7 +538,7 @@ WITH self_and_manager AS (
 peer_feedback AS (
     SELECT
         fact.person_number,
-        'PEER' AS evaluation_type,
+        fact.participant_role_type AS evaluation_type,
         fact.cycle_name
     FROM
         dw_performance.fact_peer_evaluations AS fact
@@ -579,8 +640,8 @@ LIMIT 100
 * **Performa** : QuintoAndar's annual performance review process, comprising self-assessment, manager evaluation, and committee calibration phases.
 * **IPA (Individual Performance Assessment)** : The numeric multiplier derived from the Performa Score, used in the annual PLR bonus calculation.
 * **Calibration** : The committee review phase where initial manager ratings are reviewed and, when needed, adjusted to ensure consistency across the organization.
-* **Peer feedback** : Colleague evaluations collected during Performa cycles. Peers rate the evaluated employee on Impact, Behavior, and Leadership (when applicable) and may provide open-text comments. Distinct from self and manager evaluations modeled in `dim_performance_evaluation`. Stored in `fact_peer_evaluations` because multiple peers can evaluate the same employee in one cycle.
-* **Evaluation type** : Perspective of a questionnaire submission — `SELF` (employee self-assessment), `MANAGER` (manager assessment), or `PEER` (colleague feedback). Self and manager live in `dim_performance_evaluation`; peers live in `fact_peer_evaluations`.
+* **Peer feedback** : Colleague and upward leadership evaluations collected during Performa cycles. Peers rate the evaluated employee on Impact, Behavior, and Leadership (when applicable) and may provide open-text comments. Distinct from self and manager evaluations modeled in `dim_performance_evaluation`. Stored in `fact_peer_evaluations` because multiple participants can evaluate the same employee in one cycle.
+* **Evaluation type** : Perspective of a questionnaire submission — `SELF` (employee self-assessment), `MANAGER` (manager assessment), `LEADERSHIP` (upward feedback from a direct report), or `PEER` (colleague or stakeholder feedback). Self and manager live in `dim_performance_evaluation`; leadership and peer participant submissions live in `fact_peer_evaluations` (`participant_role_type`).
 * **Continuous management** : Ongoing manager–worker practices in PIN outside the formal Performa evaluation form, including Mid-Year Checkpoint, PDI, and One-on-One sessions.
 * **Mid-Year Checkpoint** : Mid-cycle performance conversation between manager and employee, usually including the manager's written assessment of first-semester delivery and second-semester direction.
 * **PDI (Individual Development Plan)** : Career development document where the employee records goals, strengths, development areas, and action plans for the review period.

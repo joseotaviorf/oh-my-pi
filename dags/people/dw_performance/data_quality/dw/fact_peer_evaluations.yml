@@ -36,6 +36,12 @@ column_level_validations:
     is_contained_in:
       values: ['COMP', 'INPROG', 'AWAITING_REPLY', 'REQUEST_NOT_SENT']
       severity_level: Error
+  participant_role_type:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: ['LEADERSHIP', 'PEER']
+      severity_level: Error
   ts_load:
     is_complete:
       severity_level: Warning

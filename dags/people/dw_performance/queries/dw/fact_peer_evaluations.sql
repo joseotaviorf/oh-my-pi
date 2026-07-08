@@ -108,6 +108,63 @@ peer_open_text AS (
         AND COALESCE(qr.free_text_answer_unlimited, qr.free_text_answer, '') != ''
     GROUP BY
         ep.id_eval_participant
+),
+participant_context AS (
+    SELECT
+        ep.id_eval_participant,
+        ep.id_person AS id_participant_person,
+        e.id_person AS id_evaluated_person,
+        COALESCE(CAST(ep.ts_feedback_completed AS DATE), DATE('{load_start_date}')) AS dt_reference
+    FROM
+        datalake_pin_performance_clean.evaluation_participant AS ep
+    INNER JOIN
+        datalake_pin_performance_clean.evaluation AS e
+            ON e.id_evaluation = ep.id_evaluation
+    WHERE
+        ep.role_type_code = 'PARTICIPANT'
+),
+participant_assignment AS (
+    SELECT
+        pc.id_eval_participant,
+        im.id_assignment
+    FROM
+        participant_context AS pc
+    INNER JOIN
+        datalake_people.identifier_mapping AS im
+            ON im.id_person = pc.id_participant_person
+            AND im.is_valid_assignment
+            AND im.dt_started IS NOT NULL
+            AND pc.dt_reference >= im.dt_started
+            AND pc.dt_reference <= COALESCE(im.dt_actual_termination, DATE('9999-12-31'))
+),
+participant_manager_ranked AS (
+    SELECT
+        pa.id_eval_participant,
+        sup.id_manager,
+        ROW_NUMBER() OVER (
+            PARTITION BY pa.id_eval_participant
+            ORDER BY sup.is_primary DESC, sup.dt_effective_started DESC
+        ) AS rn
+    FROM
+        participant_assignment AS pa
+    INNER JOIN
+        participant_context AS pc
+            ON pc.id_eval_participant = pa.id_eval_participant
+    LEFT JOIN
+        datalake_pin_core_clean.assignment_supervisor AS sup
+            ON sup.id_assignment = pa.id_assignment
+            AND sup.manager_type = 'LINE_MANAGER'
+            AND pc.dt_reference >= sup.dt_effective_started
+            AND pc.dt_reference <= sup.dt_effective_ended
+),
+participant_manager AS (
+    SELECT
+        id_eval_participant,
+        id_manager AS id_participant_line_manager
+    FROM
+        participant_manager_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     MD5(CAST(ep.id_eval_participant AS STRING)) AS sk_peer_evaluation,
@@ -116,6 +173,12 @@ SELECT
     im.assignment_number,
     rpt.review_period_name AS cycle_name,
     ep.participation_status_code AS participation_status,
+    -- Upward leadership feedback uses role_type_code = PARTICIPANT in PIN; classify by
+    -- whether the evaluated person was the participant's line manager at feedback completion.
+    CASE
+        WHEN pc.id_evaluated_person = pm.id_participant_line_manager THEN 'LEADERSHIP'
+        ELSE 'PEER'
+    END AS participant_role_type,
     psr.description_impact,
     psr.description_behavior,
     psr.description_leadership,
@@ -149,5 +212,11 @@ LEFT JOIN
 LEFT JOIN
     peer_open_text AS pot
         ON pot.id_eval_participant = ep.id_eval_participant
+INNER JOIN
+    participant_context AS pc
+        ON pc.id_eval_participant = ep.id_eval_participant
+LEFT JOIN
+    participant_manager AS pm
+        ON pm.id_eval_participant = ep.id_eval_participant
 WHERE
     ep.role_type_code = 'PARTICIPANT'

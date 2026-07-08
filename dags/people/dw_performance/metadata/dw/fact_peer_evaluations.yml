@@ -4,18 +4,18 @@ table_name: fact_peer_evaluations
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Fact table with one row per peer feedback submission in a Performa evaluation cycle. Each row links the evaluated employee (person_number) to the peer who provided feedback (peer_person_number), including section ratings, open-text responses, and participation status. Sources: HRA_EVAL_PARTICIPANTS and HRA_EVAL_RATINGS (pin_performance) with role_type PARTICIPANT, HRQ questionnaire responses (pin_questionnaires), and review period translation (pin_talent). Both directions of analysis are supported: feedback received (filter on person_number) and feedback given (filter on peer_person_number).
+  Fact table with one row per participant feedback submission in a Performa evaluation cycle. Each row links the evaluated employee (person_number) to the participant who provided feedback (peer_person_number), including section ratings, open-text responses, participation status, and participant_role_type (PEER for colleague or stakeholder feedback, LEADERSHIP for upward feedback to the participant's line manager). Sources: PIN performance evaluation participants and ratings (pin_performance) with role_type PARTICIPANT, PIN questionnaire responses (pin_questionnaires), participant assignment crosswalk (enrich_people identifier_mapping), assignment supervisor history (pin_core), and review period translation (pin_talent). Both directions of analysis are supported: feedback received (filter on person_number) and feedback given (filter on peer_person_number).
 columns:
   sk_peer_evaluation:
-    description: MD5 surrogate key derived from the Oracle HCM evaluation participant identifier. Uniquely identifies each peer feedback submission in this fact table.
+    description: MD5 surrogate key derived from the PIN evaluation participant identifier. Uniquely identifies each participant feedback submission in this fact table.
     lineage:
       - datalake_pin_performance_clean.evaluation_participant.id_eval_participant
   person_number:
-    description: Oracle HCM person number of the employee being evaluated (subject of the Performa document). Resolved by joining evaluation.id_person with datalake_pin_core_clean.all_people.
+    description: PIN person number of the employee being evaluated (subject of the Performa document). Resolved by joining evaluation.id_person with datalake_pin_core_clean.all_people.
     lineage:
       - datalake_pin_core_clean.all_people.person_number
   peer_person_number:
-    description: Oracle HCM person number of the peer who provided feedback. Resolved by joining evaluation_participant.id_person with datalake_pin_core_clean.all_people for participants with role_type_code PARTICIPANT.
+    description: PIN person number of the participant who provided feedback. Resolved by joining evaluation_participant.id_person with datalake_pin_core_clean.all_people for participants with role_type_code PARTICIPANT.
     lineage:
       - datalake_pin_core_clean.all_people.person_number
   assignment_number:
@@ -35,6 +35,11 @@ columns:
       INPROG: Peer has started but not yet completed feedback.
       AWAITING_REPLY: Feedback request sent; peer has not yet responded.
       REQUEST_NOT_SENT: Peer was nominated but the feedback request was not yet sent.
+  participant_role_type:
+    description: Use this to separate upward leadership feedback from colleague or stakeholder peer feedback in Performa analysis.
+    categories:
+      LEADERSHIP: Upward leadership evaluation — the participant evaluated their direct manager.
+      PEER: Peer or stakeholder feedback — the evaluated person was not the participant's line manager at feedback time.
   description_impact:
     description: Descriptive Impact rating provided by the peer, resolved from evaluation_rating joined to rating_level_translation. NULL when the peer did not rate Impact or feedback is incomplete.
     lineage:
