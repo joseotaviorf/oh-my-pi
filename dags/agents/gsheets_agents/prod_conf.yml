@@ -1,16 +1,4 @@
 sheets_info:
-  agents_historical_quartile:
-    sheet_id: 172reBsDjSEJp-DnlMXDv-s8tY0W5jr3iutulVcvgfJU
-    sheet_name: dados_quartil_historico
-    clean_table_name: agents_historical_quartile
-    sheet_context: agents
-  
-  agents_targets_tracking:
-    sheet_id: 1NGVOSgoNKG_cTlocCe2zun30tYihRXtHZh2f6tSlQjw
-    sheet_name: dados_targets_input_metrics
-    clean_table_name: agents_targets_tracking
-    sheet_context: agents
-
   ciq_portfolio:
     sheet_id: 1-1lJbv5430DWWVswf9AHTsi4dzAXvL2VBRqoaSv0j-A
     sheet_name: carteira_ciq
@@ -18,38 +6,8 @@ sheets_info:
     sheet_context: agents
     partitioned: true
   
-  ciq_tiers_rent:
-    sheet_id: 1TjK-wY__QbsMz6yQBUW2HDYQoADhvkkk4ynbrFAszxc
-    sheet_name: ciq_tiers_rent
-    clean_table_name: ciq_tiers_rent
-    sheet_context: agents
-  
-  ciq_tiers_sale:
-    sheet_id: 1TjK-wY__QbsMz6yQBUW2HDYQoADhvkkk4ynbrFAszxc
-    sheet_name: ciq_tiers_sale
-    clean_table_name: ciq_tiers_sale
-    sheet_context: agents
-  
   ind_agents_partner_allocation:
     sheet_id: 1CC4BiRxfnHlYOJfsLL4li_GMQktFFrCmtHZzQ9rDFA0
     sheet_name: Partners_PF
     clean_table_name: ind_agents_partner_allocation
-    sheet_context: agents
-
-  sale_listings_date:
-    sheet_id: 1beK8cE7kXJ-fdbrJQB6LkdPtVxhMG7jsoQmNEkpSGXQ
-    sheet_name: listings_date
-    clean_table_name: sale_listings_date
-    sheet_context: agents
-
-  sale_ongoing_listings_date:
-    sheet_id: 1p-LDBU61HTO6qEjW2lujKHfyVIIxlpnZVwyupCJcbN8
-    sheet_name: listings_date_ol
-    clean_table_name: sale_ongoing_listings_date
-    sheet_context: agents
-
-  subhub_regions:
-    sheet_id: 1-9okIQsfHo1kcc51msMYEa7Xw35wYWXDKcrWdCmdW8k
-    sheet_name: Detalhamento de SubHubs
-    clean_table_name: subhub_regions
     sheet_context: agents

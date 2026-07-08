@@ -1,8 +1,0 @@
----
-database_name: datalake_gsheets_raw
-table_name: sale_ongoing_listings_date
-description: |
-  Raw Google Sheets extract of ongoing sale listing allocation dates for listings currently in progress.
-  One row per active listing with its allocation date used by the agents sale operations team.
-domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
