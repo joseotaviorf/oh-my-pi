@@ -263,16 +263,19 @@ columns:
     description: It indicates which platform the case belongs to.
   year:
     lineage:
-      - current_date
-    description: Current year.
+      - datalake_salesforce_clean.events_case.created_date
+      - dw_bpo_performance.tickets_perspective.ts_started
+    description: Year of the case/ticket start date (ts_started). Partition column — always filter on it for partition pruning.
   month:
     lineage:
-      - current_date
-    description: Current month.
+      - datalake_salesforce_clean.events_case.created_date
+      - dw_bpo_performance.tickets_perspective.ts_started
+    description: Month of the case/ticket start date (ts_started). Partition column — always filter on it for partition pruning.
   day:
     lineage:
-      - current_date
-    description: Current day.
+      - datalake_salesforce_clean.events_case.created_date
+      - dw_bpo_performance.tickets_perspective.ts_started
+    description: Day of the case/ticket start date (ts_started). Partition column — always filter on it for partition pruning.
   ts_load:
     lineage:
       - now()

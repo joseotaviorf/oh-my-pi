@@ -14,12 +14,26 @@ WITH weekends_and_holidays AS (
         sch.category = 'Nacional'
 ),
 
+dirty_cases_sf AS (
+    SELECT DISTINCT
+        CAST(case_number AS INT) AS case_number,
+        id_record
+    FROM datalake_salesforce_clean.events_case
+    WHERE last_modified_date BETWEEN DATE('{load_start_date}') - INTERVAL 3 DAYS AND DATE('{load_end_date}')
+),
+
+events_case_dirty AS (
+    SELECT *
+    FROM datalake_salesforce_clean.events_case
+    WHERE CAST(case_number AS INT) IN (SELECT case_number FROM dirty_cases_sf)
+),
+
 deletados as  (SELECT 
 
 id_record,
 event_type
 
-FROM datalake_salesforce_clean.events_case 
+FROM events_case_dirty
 WHERE event_type IN ('DELETE')
 
 ),
@@ -46,7 +60,7 @@ status_historico AS (
             PARTITION BY case_number 
             ORDER BY CAST(last_modified_date AS TIMESTAMP) ASC
         ) AS proximo_status
-    FROM datalake_salesforce_clean.events_Case
+    FROM events_case_dirty
 ),
 
 
@@ -114,17 +128,53 @@ first_reply_sf AS (
     FROM datalake_salesforce_clean.cases c
     INNER JOIN datalake_salesforce_clean.email_message e ON c.id_case = e.id_parent
     WHERE e.ts_message IS NOT NULL AND e.is_incoming = FALSE
+      AND c.id_case IN (SELECT id_record FROM dirty_cases_sf)
     GROUP BY c.id_case, c.case_number, c.ts_created
 ),
 
+fr_agent_ticket AS (
+    SELECT
+        last_agent_email,
+        MIN(ts_solved) AS min_ts_solved,
+        MAX(CASE WHEN ts_solved IS NULL THEN 1 ELSE 0 END) AS has_null_solved
+    FROM dw_bpo_performance.tickets_perspective
+    WHERE last_agent_email IS NOT NULL
+    GROUP BY last_agent_email
+),
+
+fr_agent_case AS (
+    SELECT
+        u.email AS last_agent_email,
+        MIN(c.ts_closed) AS min_case_closed
+    FROM datalake_salesforce_clean.users AS u
+    INNER JOIN datalake_salesforce_clean.cases AS c ON c.id_owner = u.id_user_salesforce
+    WHERE u.email IS NOT NULL
+    GROUP BY u.email
+),
+
 first_resolution AS (
-  SELECT 
-    COALESCE(tp.last_agent_email, u.email) as last_agent_email, 
-    MIN(COALESCE(tp.ts_solved, c.ts_closed)) as first_resolution 
-  FROM dw_bpo_performance.tickets_perspective AS tp
-  LEFT JOIN datalake_salesforce_clean.users as u on u.email = tp.last_agent_email
-  LEFT JOIN datalake_salesforce_clean.cases as c on c.id_owner = u.id_user_salesforce
-  GROUP BY 1 
+    SELECT
+        at.last_agent_email,
+        LEAST(
+            at.min_ts_solved,
+            CASE WHEN at.has_null_solved = 1 THEN ac.min_case_closed END
+        ) AS first_resolution
+    FROM fr_agent_ticket AS at
+    LEFT JOIN fr_agent_case AS ac ON ac.last_agent_email = at.last_agent_email
+),
+
+tp_dirty_ranked AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (PARTITION BY sk_ticket ORDER BY ts_load DESC) AS rn_dirty
+    FROM dw_bpo_performance.tickets_perspective
+    WHERE MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 3 DAYS AND DATE('{load_end_date}')
+),
+
+tp_dirty AS (
+    SELECT *
+    FROM tp_dirty_ranked
+    WHERE rn_dirty = 1
 ),
 
 tickets_perspective AS (
@@ -182,7 +232,7 @@ tickets_perspective AS (
             tp.tipo_de_cliente,
         'Zendesk' as Platform,
         ROW_NUMBER() OVER (PARTITION BY tp.sk_ticket ORDER BY tp.ts_load DESC) AS rn
-    FROM dw_bpo_performance.tickets_perspective as tp
+    FROM tp_dirty as tp
     LEFT JOIN spoc ON tp.sk_contract = spoc.sk_contract
     LEFT JOIN first_resolution AS fr on fr.last_agent_email = tp.last_agent_email
     LEFT JOIN dw_public.dim_date as ddend ON ddend.date = deadline_ticket_reparos
@@ -211,7 +261,7 @@ SELECT DISTINCT
     COUNT(DISTINCT date(wh.dt_non_working)) AS total_non_working,
   ROW_NUMBER() OVER (PARTITION BY c.case_number ORDER BY MAX(c.last_modified_date) DESC) rn
 
-FROM datalake_salesforce_clean.events_case as c
+FROM events_case_dirty as c
 -- Filtramos apenas o primeiro registro de 'Solved' na junção (rn_primeiro_solved = 1)
 LEFT JOIN solved_date as s on s.case_number = CAST(c.case_number as INT) and s.rn = 1 
 LEFT JOIN status_historico as h on h.case_number = CAST(c.case_number as INT) and h.rn = 1
@@ -299,7 +349,7 @@ cases_perspective AS (
         'SalesForce' as Platform,
         ROW_NUMBER() OVER (PARTITION BY c.case_number ORDER BY to_timestamp(c.last_modified_date) DESC) as rn
 
-    FROM datalake_salesforce_clean.events_case as c
+    FROM events_case_dirty as c
     LEFT JOIN record_types as rt on rt.id_record_type = c.id_record_type and rt.rn = 1 
     LEFT JOIN csat as csat on csat.sk_case = c.id_record and csat.rn = 1
     LEFT JOIN sandbox.sla_target_salesforce as sla on sla.theme_type = COALESCE(CONCAT(rt.developer_name, c.type), rt.developer_name)
@@ -371,9 +421,9 @@ SELECT
     supplied_email,
     case_reason,
     Platform,
-    YEAR(CURRENT_DATE) AS year,
-    MONTH(CURRENT_DATE) AS month,
-    DAY(CURRENT_DATE) AS day,
+    YEAR(COALESCE(ts_created, TIMESTAMP('1970-01-01'))) AS year,
+    MONTH(COALESCE(ts_created, TIMESTAMP('1970-01-01'))) AS month,
+    DAY(COALESCE(ts_created, TIMESTAMP('1970-01-01'))) AS day,
     NOW() AS ts_load
 FROM cases_perspective
 WHERE rn = 1 
@@ -434,9 +484,9 @@ SELECT
     NULL AS supplied_email,
     NULL AS case_reason,
     Platform,
-    YEAR(CURRENT_DATE) AS year,
-    MONTH(CURRENT_DATE) AS month,
-    DAY(CURRENT_DATE) AS day,
+    YEAR(COALESCE(ts_started, TIMESTAMP('1970-01-01'))) AS year,
+    MONTH(COALESCE(ts_started, TIMESTAMP('1970-01-01'))) AS month,
+    DAY(COALESCE(ts_started, TIMESTAMP('1970-01-01'))) AS day,
     NOW() AS ts_load
 FROM tickets_perspective
 

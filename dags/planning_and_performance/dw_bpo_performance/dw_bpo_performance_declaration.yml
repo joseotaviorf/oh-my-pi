@@ -18,6 +18,11 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   tables_customization:
+    cases_perspective:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [case_number, Platform]
+      z_order_by: [case_number]
     backlog_metric:
       partitions: [year, month, day]
       extraction_type: full
