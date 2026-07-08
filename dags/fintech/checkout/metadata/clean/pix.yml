@@ -1,90 +1,122 @@
 ---
 database_name: datalake_checkout_clean
 table_name: pix
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per pix in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.pix.id
+    description: Financial attribute representing id on the pix dataset.
   id_charge:
     lineage:
     - datalake_checkout_raw.pix.charge_id
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
   id_transaction:
     lineage:
     - datalake_checkout_raw.pix.transaction_id
+    description: Identifier for the transaction referenced by this financial record.
   id_bank_payment:
     lineage:
     - datalake_checkout_raw.pix.bank_payment_id
+    description: Identifier for the bank payment referenced by this financial record.
   id_requester:
     lineage:
     - datalake_checkout_raw.pix.requester_id
+    description: Identifier for the requester referenced by this financial record.
   due_amount:
     lineage:
     - datalake_checkout_raw.pix.due_amount
+    description: Financial attribute representing due amount on the pix dataset.
   status:
     lineage:
     - datalake_checkout_raw.pix.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   pix_link:
     lineage:
     - datalake_checkout_raw.pix.pix_link
+    description: Financial attribute representing pix link on the pix dataset.
   emv:
     lineage:
     - datalake_checkout_raw.pix.emv
+    description: Financial attribute representing emv on the pix dataset.
   qr_code:
     lineage:
     - datalake_checkout_raw.pix.qr_code
+    description: Financial attribute representing qr code on the pix dataset.
   payer_name:
     lineage:
     - datalake_checkout_raw.pix.payer_name
+    description: Financial attribute representing payer name on the pix dataset.
   payer_identifiable_document:
     lineage:
     - datalake_checkout_raw.pix.payer_identifiable_document
+    description: Financial attribute representing payer identifiable document on the pix dataset.
   payer_person_type:
     lineage:
     - datalake_checkout_raw.pix.payer_person_type
+    description: Financial attribute representing payer person type on the pix dataset.
   payer_email:
     lineage:
     - datalake_checkout_raw.pix.payer_email
+    description: Financial attribute representing payer email on the pix dataset.
   payer_city:
     lineage:
     - datalake_checkout_raw.pix.payer_city
+    description: Financial attribute representing payer city on the pix dataset.
   payer_neighborhood:
     lineage:
     - datalake_checkout_raw.pix.payer_neighborhood
+    description: Financial attribute representing payer neighborhood on the pix dataset.
   payer_state:
     lineage:
     - datalake_checkout_raw.pix.payer_state
+    description: Financial attribute representing payer state on the pix dataset.
   payer_street_address:
     lineage:
     - datalake_checkout_raw.pix.payer_street_address
+    description: Financial attribute representing payer street address on the pix dataset.
   payer_zipcode:
     lineage:
     - datalake_checkout_raw.pix.payer_zipcode
+    description: Financial attribute representing payer zipcode on the pix dataset.
   requester_name:
     lineage:
     - datalake_checkout_raw.pix.requester_name
+    description: Financial attribute representing requester name on the pix dataset.
   expiration_in_seconds:
     lineage:
     - datalake_checkout_raw.pix.expiration_in_seconds
+    description: Financial attribute representing expiration in seconds on the pix dataset.
   payer_solicitation:
     lineage:
     - datalake_checkout_raw.pix.payer_solicitation
+    description: Financial attribute representing payer solicitation on the pix dataset.
   additional_info:
     lineage:
     - datalake_checkout_raw.pix.additional_info
+    description: Financial attribute representing additional info on the pix dataset.
   ts_registered:
     lineage:
     - datalake_checkout_raw.pix.registered_at
+    description: Timestamp when registered occurred in the upstream fintech system.
   ts_started_processing:
     lineage:
     - datalake_checkout_raw.pix.started_processing_at
+    description: Timestamp when started processing occurred in the upstream fintech system.
   ts_paid:
     lineage:
     - datalake_checkout_raw.pix.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_checkout_raw.pix.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.pix.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

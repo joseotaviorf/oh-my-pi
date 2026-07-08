@@ -1,30 +1,42 @@
 ---
 database_name: datalake_checkout_clean
 table_name: payment_gateway_error
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per payment gateway error in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.payment_gateway_error.id
+    description: Financial attribute representing id on the payment_gateway_error dataset.
   id_requester:
     lineage:
     - datalake_checkout_raw.payment_gateway_error.requester_id
+    description: Identifier for the requester referenced by this financial record.
   original_payload:
     lineage:
     - datalake_checkout_raw.payment_gateway_error.original_payload
+    description: Financial attribute representing original payload on the payment_gateway_error dataset.
   payment_gateway_response:
     lineage:
     - datalake_checkout_raw.payment_gateway_error.payment_gateway_response
+    description: Financial attribute representing payment gateway response on the payment_gateway_error dataset.
   payment_gateway:
     lineage:
     - datalake_checkout_raw.payment_gateway_error.payment_gateway
+    description: Financial attribute representing payment gateway on the payment_gateway_error dataset.
   payment_method:
     lineage:
     - datalake_checkout_raw.payment_gateway_error.payment_method
+    description: Financial attribute representing payment method on the payment_gateway_error dataset.
   ts_sent:
     lineage:
     - datalake_checkout_raw.payment_gateway_error.sent_at
+    description: Timestamp when sent occurred in the upstream fintech system.
   ts_error:
     lineage:
     - datalake_checkout_raw.payment_gateway_error.error_at
+    description: Timestamp when error occurred in the upstream fintech system.

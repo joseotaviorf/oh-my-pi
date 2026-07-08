@@ -1,18 +1,26 @@
 ---
 database_name: datalake_checkout_clean
 table_name: requester
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per requester in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.requester.id
+    description: Financial attribute representing id on the requester dataset.
   name:
     lineage:
     - datalake_checkout_raw.requester.name
+    description: Financial attribute representing name on the requester dataset.
   ts_created:
     lineage:
     - datalake_checkout_raw.requester.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.requester.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

@@ -1,18 +1,26 @@
 ---
 database_name: datalake_checkout_clean
 table_name: role_permission
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per role permission in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_role:
     lineage:
     - datalake_checkout_raw.role_permission.role_id
+    description: Identifier for the role referenced by this financial record.
   id_permission:
     lineage:
     - datalake_checkout_raw.role_permission.permission_id
+    description: Identifier for the permission referenced by this financial record.
   ts_created:
     lineage:
     - datalake_checkout_raw.role_permission.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.role_permission.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

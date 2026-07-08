@@ -1,5 +1,6 @@
 database_name: datalake_betopera_clean
 table_name: api_audit_log
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Clean audit log of API requests and responses from Betopera."
 columns:

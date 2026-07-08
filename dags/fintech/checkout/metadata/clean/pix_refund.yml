@@ -1,33 +1,46 @@
 ---
 database_name: datalake_checkout_clean
 table_name: pix_refund
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per pix refund in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.pix_refund.id
+    description: Financial attribute representing id on the pix_refund dataset.
   id_pix:
     lineage:
     - datalake_checkout_raw.pix_refund.pix_id
+    description: Identifier for the pix referenced by this financial record.
   id_bank_refund:
     lineage:
     - datalake_checkout_raw.pix_refund.bank_refund_id
+    description: Identifier for the bank refund referenced by this financial record.
   id_bank_return:
     lineage:
     - datalake_checkout_raw.pix_refund.bank_return_id
+    description: Identifier for the bank return referenced by this financial record.
   refunded_amount:
     lineage:
     - datalake_checkout_raw.pix_refund.refunded_amount
+    description: Financial attribute representing refunded amount on the pix_refund dataset.
   status:
     lineage:
     - datalake_checkout_raw.pix_refund.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   ts_started_processing:
     lineage:
     - datalake_checkout_raw.pix_refund.started_processing_at
+    description: Timestamp when started processing occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_checkout_raw.pix_refund.refunded_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.pix_refund.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

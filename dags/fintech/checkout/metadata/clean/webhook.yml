@@ -1,30 +1,42 @@
 ---
 database_name: datalake_checkout_clean
 table_name: webhook
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per webhook in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.webhook.id
+    description: Financial attribute representing id on the webhook dataset.
   amount:
     lineage:
     - datalake_checkout_raw.webhook.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   success:
     lineage:
     - datalake_checkout_raw.webhook.success
+    description: Financial attribute representing success on the webhook dataset.
   payload:
     lineage:
     - datalake_checkout_raw.webhook.payload
+    description: Financial attribute representing payload on the webhook dataset.
   psp_reference:
     lineage:
     - datalake_checkout_raw.webhook.psp_reference
+    description: Financial attribute representing psp reference on the webhook dataset.
   event_code:
     lineage:
     - datalake_checkout_raw.webhook.event_code
+    description: Financial attribute representing event code on the webhook dataset.
   merchant_account_code:
     lineage:
     - datalake_checkout_raw.webhook.merchant_account_code
+    description: Financial attribute representing merchant account code on the webhook dataset.
   dt_event:
     lineage:
     - datalake_checkout_raw.webhook.event_date
+    description: Calendar date associated with event in the financial workflow.
