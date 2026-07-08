@@ -1,0 +1,41 @@
+database_name: datalake_rene_descartes_clean
+table_name: lead_contact_info
+description: |
+  Consolidated contact information for Supply customers upon form submission or interaction.
+  Maintains a unified and up-to-date customer record enriched with contact details and linked
+  devices after every new engagement. One row per unique customer (id_contact). Sourced from
+  the Rene Descartes microservice (PostgreSQL CDC). Partitioned by year/month/day on ts_updated;
+  z-ordered by id_contact for efficient point lookups.
+domain: "Growth"
+owner: "gabriel.salla@quintoandar.com"
+columns:
+  id_contact:
+    description: "Unique, incremental identifier for each Supply customer in this table. Primary key. Z-ordered — filter on this column for efficient data skipping."
+    lineage:
+      - datalake_rene_descartes_raw.lead_contact_info.id_contact
+  id_person:
+    description: "Unique identifier from the internal person service. Assigned only if the customer has an account or is validated during the lead attribution process."
+    lineage:
+      - datalake_rene_descartes_raw.lead_contact_info.person_id
+  name:
+    description: "The customer's name as provided in the contact capture form."
+    lineage:
+      - datalake_rene_descartes_raw.lead_contact_info.name
+  contact_info:
+    description: "List of JSON objects containing all identified contacts (phone numbers, email, Meta username), their type, value, and validation status."
+    lineage:
+      - datalake_rene_descartes_raw.lead_contact_info.contact_info
+  ts_created:
+    description: "UTC timestamp when this Supply customer contact was first registered in the Rene Descartes service upon initial form submission or interaction."
+    lineage:
+      - datalake_rene_descartes_raw.lead_contact_info.ts_created
+  ts_updated:
+    description: "UTC timestamp of the most recent change to this customer's contact profile — triggered when new contact details are captured, devices are linked, or the person_id is resolved. Drives the partition columns (year, month, day)."
+    lineage:
+      - datalake_rene_descartes_raw.lead_contact_info.ts_updated
+  year:
+    description: "Partition column: year extracted from ts_updated."
+  month:
+    description: "Partition column: month extracted from ts_updated."
+  day:
+    description: "Partition column: day extracted from ts_updated."
