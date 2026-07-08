@@ -54,6 +54,7 @@ column_level_validations:
          FROM (
            SELECT meeting_type
            FROM dw_performance.dim_cycle_period
+           WHERE meeting_type IS NOT NULL
            GROUP BY meeting_type
            HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) <> 1
          )
