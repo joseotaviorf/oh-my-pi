@@ -2,8 +2,8 @@
 
 Airflow-only keys may appear in the merged cluster dict (preset or declaration
 ``custom_configurations``) and are stripped in ``EmrJobClusterEngine`` before EMR
-translation — for example ``airflow_emr_create_cluster_deferrable`` (bool) for the
-create-cluster operator's deferrable wait behaviour.
+translation — for example ``airflow_emr_create_cluster_deferrable`` (bool) to
+opt in to deferrable wait behaviour on EMR Airflow operators.
 """
 
 from __future__ import annotations
