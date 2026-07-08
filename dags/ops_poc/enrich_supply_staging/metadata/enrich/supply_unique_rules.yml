@@ -1,7 +1,12 @@
 ---
 database_name: datalake_supply_staging
 table_name: supply_unique_rules
-description: Marks supply records as unique per house or supply key within business context, using funnel stage and opportunity conversion for ranking.
+description: |
+  Identifies the single canonical supply record per physical property and business context (rent
+  or sale) by applying a deduplication ranking based on the furthest funnel stage reached,
+  recency, and conversion type. Each row is assigned a uniqueness flag so that downstream
+  metrics count each property only once when measuring unique supply funnel volumes. Used by
+  the Growth Supply team to avoid double-counting properties that have multiple associated leads.
 domain: Growth
 owner: fabio.soeiro@quintoandar.com.br
 columns:

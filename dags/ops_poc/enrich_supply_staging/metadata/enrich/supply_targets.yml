@@ -1,7 +1,12 @@
 ---
 database_name: datalake_supply_staging
 table_name: supply_targets
-description: Supply funnel volume targets from QTS budget and OKR sources (rent and sale), unified by date, city group, planning dimensions and company report origin.
+description: |
+  Unified supply funnel volume targets combining QTS budget and OKR sources for both rent and
+  sale business contexts. Each row represents planned volumes across the full supply acquisition
+  funnel — prospects, qualifieds, available qualifieds, opportunities, and first listings —
+  broken down by date, city group, planning dimensions, and company report origin. Used by the
+  Growth Supply team to compare actual funnel performance against official planning targets.
 domain: Growth
 owner: fabio.soeiro@quintoandar.com.br
 columns:
@@ -50,7 +55,7 @@ columns:
       - scalability_metrics.rent_supply_okr_2026.planning_cluster
       - scalability_metrics.sale_supply_okr_2026.planning_cluster
   company_report_origin:
-    description: Indicates the origin within the company that the report targets.
+    description: Acquisition channel for Inside Sales and FSS operations, or conversion source for other operations such as CIQ, Rede, and PP Multi, used to segment supply funnel targets by origin.
     lineage:
       - scalability_metrics.rent_supply_budget_2026.company_report_origin
       - scalability_metrics.sale_supply_budget_2026.company_report_origin
@@ -64,14 +69,14 @@ columns:
       - scalability_metrics.rent_supply_okr_2026.prospects
       - scalability_metrics.sale_supply_okr_2026.prospects
   qualifieds:
-    description: Count of qualified prospects.
+    description: Target number of qualified prospects — owners who met minimum listing criteria and advanced past initial contact — for the given date and planning dimensions.
     lineage:
       - scalability_metrics.rent_supply_budget_2026.qualifieds
       - scalability_metrics.sale_supply_budget_2026.qualifieds
       - scalability_metrics.rent_supply_okr_2026.qualifieds
       - scalability_metrics.sale_supply_okr_2026.qualifieds
   available_qualifieds:
-    description: Count of available qualified prospects.
+    description: Target number of qualified prospects whose properties were confirmed available for listing, representing the actionable subset of qualified supply pipeline.
     lineage:
       - scalability_metrics.rent_supply_budget_2026.available_qualifieds
       - scalability_metrics.sale_supply_budget_2026.available_qualifieds
@@ -85,7 +90,7 @@ columns:
       - scalability_metrics.rent_supply_okr_2026.opportunities
       - scalability_metrics.sale_supply_okr_2026.opportunities
   first_listings:
-    description: Count of first listings.
+    description: Target number of first-time property listings expected to be acquired for the given date, business context, and planning dimensions.
     lineage:
       - scalability_metrics.rent_supply_budget_2026.first_listings
       - scalability_metrics.sale_supply_budget_2026.first_listings

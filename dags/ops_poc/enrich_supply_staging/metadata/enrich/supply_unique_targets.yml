@@ -1,12 +1,18 @@
 ---
 database_name: datalake_supply_staging
 table_name: supply_unique_targets
-description: Unique supply funnel volume targets by date, city group, planning conversion, operation, cluster and company report origin.
+description: |
+  Planned volume targets for the deduplicated (unique) supply funnel, sourced from the 2026
+  scalability metrics dataset. Each row represents the expected number of unique properties —
+  not individual leads — at each funnel stage (prospects, qualifieds, available qualifieds,
+  opportunities, first listings) for a given date, city group, and planning dimension combination,
+  spanning both rent and sale business contexts. Used by the Growth Supply team to set and track
+  goals that reflect actual property-level pipeline rather than raw lead counts.
 domain: Growth
 owner: fabio.soeiro@quintoandar.com.br
 columns:
   date:
-    description: Full date field for detailed temporal tracking.
+    description: Calendar date to which the unique supply funnel volume target applies, enabling daily-level tracking against planning goals.
     lineage:
       - scalability_metrics.supply_funnel_unique_target_2026.date
   city_group:
@@ -14,7 +20,7 @@ columns:
     lineage:
       - scalability_metrics.supply_funnel_unique_target_2026.city_group
   campaign_cluster:
-    description: A grouping of marketing campaigns.
+    description: Grouping of marketing campaigns by strategic affinity or channel type, used to segment unique supply targets at a higher level than individual planning cluster.
     lineage:
       - scalability_metrics.supply_funnel_unique_target_2026.campaign_cluster
   planning_conversion:
@@ -30,7 +36,7 @@ columns:
     lineage:
       - scalability_metrics.supply_funnel_unique_target_2026.planning_cluster
   company_report_origin:
-    description: Indicates the origin within the company that the report targets.
+    description: Acquisition channel for Inside Sales and FSS operations, or conversion source for other operations, indicating the origin used to segment unique supply funnel targets.
     lineage:
       - scalability_metrics.supply_funnel_unique_target_2026.company_report_origin
   volumes_prospects_unique:

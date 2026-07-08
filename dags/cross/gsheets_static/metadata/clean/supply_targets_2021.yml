@@ -6,62 +6,77 @@ domain: Growth
 description: Growth supply funnel targets for 2021 by city group, channel, and time period. Captures planned volumes across prospects, qualifieds, opportunities, and first listings.
 columns:
   city_group:
+    description: Geographic grouping of cities or city clusters used to segment supply acquisition targets by region.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.city_group
     description: QuintoAndar city group associated with the 2021 supply target row.
   first_listings:
+    description: Target number of first-time property listings expected to be acquired for the given period and channel combination.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.first_listings
     description: Planned target count of first listings published in the reference period.
   lead_context:
+    description: Contextual label describing the type or origin of the supply lead associated with the target row.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.lead_context
     description: Business context or segment of the owner lead covered by the supply target.
   opportunities:
+    description: Target volume of supply opportunities — leads that have progressed to the scheduling or inspection stage — expected for the period.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.opportunities
     description: Planned target count of supply opportunities created in the reference period.
   prospects:
+    description: Target volume of supply prospects — owner contacts at the earliest funnel stage — expected to be generated for the given period.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.prospects
     description: Planned target count of owner prospects entering the supply funnel.
   qualifieds:
+    description: Target number of qualified prospects — owners who met minimum criteria and advanced past the initial contact stage — for the given period.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.qualifieds
     description: Planned target count of owner leads qualified for listing in the supply funnel.
   supply_channel:
+    description: Marketing or acquisition channel through which the supply lead was generated (e.g. Inside Sales, Affiliate, Digital).
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.supply_channel
     description: Acquisition or processing channel associated with the supply target row.
   supply_origin:
+    description: Specific origin or sub-channel within the supply channel that produced the lead, providing a more granular breakdown of acquisition source.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.supply_origin
     description: Marketing or operational origin of the supply lead for the target row.
   tier:
+    description: Priority tier assigned to the city group for supply acquisition planning, reflecting strategic importance in the 2021 targets.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.tier
     description: City tier classification used in Growth supply target planning.
   halfyear:
+    description: Half-year period (1 or 2) within the year to which the target row belongs, used for semester-level planning.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.halfyear
     description: Half-year period label associated with the 2021 supply target.
   quarter:
+    description: Calendar quarter (1–4) within 2021 to which the target row belongs, used for quarterly planning cycles.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.quarter
     description: Calendar quarter associated with the 2021 supply target.
   dt_week_started:
+    description: Start date of the week to which this target row applies, enabling weekly-level tracking of supply acquisition plans.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.week_start
     description: Week start date identifying the supply target planning period.
   month:
+    description: Calendar month number (1–12) to which the target row belongs, supporting monthly-level target monitoring.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.month
     description: Calendar month associated with the 2021 supply target.
   year:
+    description: Calendar year of the target, expected to be 2021 for all rows in this table.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.year
     description: Calendar year associated with the 2021 supply target.
   dt_target:
+    description: Specific calendar date to which the supply funnel volume targets in this row are attributed.
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.date
     description: Reference date identifying the supply target period for the row.
