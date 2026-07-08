@@ -1,6 +1,11 @@
+---
 database_name: dw_fintech_snapshot_quintocred
 table_name: quintocred_aging_occurrence
 description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table made to measure PDD of Occurrences.
   Monthly snapshot of dw_velo.quintocred_aging_occurrence for QuintoCred PDD (Provision for
   Doubtful Debts) analysis on occurrence delinquencies. Snapshots run on the first business
   day of each month. Partitioned by year, month, and day — always filter on all three partition
@@ -9,56 +14,61 @@ domain: Fintech
 owner: guilherme.sacramento@quintoandar.com.br
 columns:
   client_cpf_cnpj:
-    description: "For 3.0 cases, it will be the delinquency entry id, for 2.0 cases, it will be the delinquency id"
+    description: For 3.0 cases, it will be the delinquency entry id, for 2.0 cases,
+      it will be the delinquency id
     lineage:
       - dw_velo.quintocred_aging_occurrence.client_cpf_cnpj
   days_delay:
-    description: "Maximum days of delay calculated between the date of register and end the of the month"
+    description: Maximum days of delay calculated between the date of register and
+      end the of the month
     lineage:
       - dw_velo.quintocred_aging_occurrence.days_delay
   delay_range:
-    description: "Range according to the days of delay"
+    description: Range according to the days of delay
     categories:
-      "a.Current": "No delay"
-      "b.1 a 30": "Maximum days of delay between 1 and 30 days"
-      "c.31 a 60": "Maximum days of delay between 31 and 60 days"
-      "d.61 a 90": "Maximum days of delay between 61 and 90 days"
-      "e.91 a 120": "Maximum days of delay between 91 and 120 days"
-      "f.121 a 150": "Maximum days of delay between 121 and 150 days"
-      "g.151 a 180": "Maximum days of delay between 151 and 180 days"
-      "h.>180": "Maximum days of delay bigger than 180 days"
+      a.Current: No delay
+      b.1 a 30: Maximum days of delay between 1 and 30 days
+      c.31 a 60: Maximum days of delay between 31 and 60 days
+      d.61 a 90: Maximum days of delay between 61 and 90 days
+      e.91 a 120: Maximum days of delay between 91 and 120 days
+      f.121 a 150: Maximum days of delay between 121 and 150 days
+      g.151 a 180: Maximum days of delay between 151 and 180 days
+      h.>180: Maximum days of delay bigger than 180 days
     lineage:
       - dw_velo.quintocred_aging_occurrence.delay_range
   discount_value:
-    description: "Value of the discount given when paying the delinquency"
+    description: Value of the discount given when paying the delinquency
     lineage:
       - dw_velo.quintocred_aging_occurrence.discount_value
   dt_analyst_annulment_input:
-    description: "Date of when status of the propose/contract ended was included on system"
+    description: Date of when status of the propose/contract ended was included on
+      system
     lineage:
       - dw_velo.quintocred_aging_occurrence.dt_analyst_annulment_input
   dt_contract_started:
-    description: "Contract start date"
+    description: Contract start date
     lineage:
       - dw_velo.quintocred_aging_occurrence.dt_contract_started
   due_amount:
-    description: "Amount of the original unpaid charge"
+    description: Amount of the original unpaid charge
     lineage:
       - dw_velo.quintocred_aging_occurrence.due_amount
   is_contract_active:
-    description: "Column that identifies whether the contract is active or not"
+    description: Column that identifies whether the contract is active or not
     lineage:
       - dw_velo.quintocred_aging_occurrence.is_contract_active
   open_amount:
-    description: "Difference between the amount paid and the original invoice amount"
+    description: Difference between the amount paid and the original invoice amount
     lineage:
       - dw_velo.quintocred_aging_occurrence.open_amount
   open_amount_guarantee:
-    description: "Difference between the amount paid and the original invoice amount on guarantee delinquencies"
+    description: Difference between the amount paid and the original invoice amount
+      on guarantee delinquencies
     lineage:
       - dw_velo.quintocred_aging_occurrence.open_amount_guarantee
   open_amount_termination:
-    description: "Difference between the amount paid and the original invoice amount on termination delinquencies"
+    description: Difference between the amount paid and the original invoice amount
+      on termination delinquencies
     lineage:
       - dw_velo.quintocred_aging_occurrence.open_amount_termination
   paid_amount:
@@ -72,7 +82,7 @@ columns:
     lineage:
       - dw_velo.quintocred_aging_occurrence.paid_amount_2
   sk_propose:
-    description: "Proposal ID related to payment information"
+    description: Proposal ID related to payment information
     lineage:
       - dw_velo.quintocred_aging_occurrence.sk_propose
   ts_snapshot:

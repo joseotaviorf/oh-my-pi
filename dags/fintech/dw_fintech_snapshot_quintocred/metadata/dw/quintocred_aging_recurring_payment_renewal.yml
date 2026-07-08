@@ -1,6 +1,12 @@
 database_name: dw_fintech_snapshot_quintocred
 table_name: quintocred_aging_recurring_payment_renewal
-description: Table made to measure PDD of renewed Recurring Payments.
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  PDD (Provisão Pagadores Duvidosos - Allowance for Doubtful Accounts) calculation table with Renewal delinquencies.
+  It only considers the overdue monthly fees from annual-value delinquencies.
+  Table made to measure PDD of renewed Recurring Payments.
 domain: Fintech
 owner: guilherme.sacramento@quintoandar.com.br
 columns:
@@ -30,7 +36,7 @@ columns:
     lineage:
       - dw_velo.quintocred_aging_recurring_payment_renewal.dt_due
   dt_renewal:
-    description: "Renewal date"
+    description: "Date when the recurring payment was renewed in the QuintoCred billing cycle."
     lineage:
       - dw_velo.quintocred_aging_recurring_payment_renewal.dt_renewal
   due_amount:
@@ -50,11 +56,11 @@ columns:
     lineage:
       - dw_velo.quintocred_aging_recurring_payment_renewal.open_amount
   paid_amount:
-    description: "Delinquency amount paid"
+    description: "Total amount paid by the tenant towards the delinquency in BRL."
     lineage:
       - dw_velo.quintocred_aging_recurring_payment_renewal.paid_amount
   pdd:
-    description: "PDD value"
+    description: "Provisão para Devedores Duvidosos (PDD) — expected credit loss provision amount calculated for this delinquent recurring payment, in BRL."
     lineage:
       - dw_velo.quintocred_aging_recurring_payment_renewal.pdd
   pdd_percentage:
@@ -73,3 +79,9 @@ columns:
     description: "Open amount overdue"
     lineage:
       - dw_velo.quintocred_aging_recurring_payment_renewal.value_overdue
+  year:
+    description: Snapshot partition year when the recurring payment renewal aging was captured.
+  month:
+    description: Snapshot partition month when the recurring payment renewal aging was captured.
+  day:
+    description: Snapshot partition day when the recurring payment renewal aging was captured.
