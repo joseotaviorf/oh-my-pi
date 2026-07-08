@@ -1,24 +1,34 @@
 ---
 database_name: datalake_checkout_clean
 table_name: credit_card_fee
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per credit card fee in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.credit_card_fee.id
+    description: Financial attribute representing id on the credit_card_fee dataset.
   id_payment_config:
     lineage:
     - datalake_checkout_raw.credit_card_fee.payment_config_id
+    description: Identifier for the payment config referenced by this financial record.
   convenience_fee_percentage:
     lineage:
     - datalake_checkout_raw.credit_card_fee.convenience_fee_percentage
+    description: Financial attribute representing convenience fee percentage on the credit_card_fee dataset.
   transaction_fixed_cost:
     lineage:
     - datalake_checkout_raw.credit_card_fee.fixed_cost_of_transaction
+    description: Financial attribute representing transaction fixed cost on the credit_card_fee dataset.
   ts_created:
     lineage:
     - datalake_checkout_raw.credit_card_fee.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_disabled:
     lineage:
     - datalake_checkout_raw.credit_card_fee.disabled_at
+    description: Timestamp when disabled occurred in the upstream fintech system.

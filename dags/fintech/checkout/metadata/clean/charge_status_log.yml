@@ -1,107 +1,107 @@
 ---
 database_name: datalake_checkout_clean
 table_name: charge_status_log
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: null
+description: One row per charge status log in the Fintech clean layer, sourced from datalake_checkout_clean for payments, billing, and financial operations reporting.
 columns:
   id:
-    description: ''
+    description: Financial attribute representing id on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.id
   id_charge:
-    description: ''
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
     lineage:
     - datalake_checkout_raw.charge_status_log.charge_id
   id_order:
-    description: ''
+    description: Identifier for the order referenced by this financial record.
     lineage:
     - datalake_checkout_raw.charge_status_log.order_id
   id_user_external:
-    description: ''
+    description: Identifier for the user external referenced by this financial record.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_external_id
   id_requester:
-    description: ''
+    description: Identifier for the requester referenced by this financial record.
     lineage:
     - datalake_checkout_raw.charge_status_log.requester_id
   due_amount:
-    description: ''
+    description: Financial attribute representing due amount on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.due_amount
   paid_amount:
-    description: ''
+    description: Financial attribute representing paid amount on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.paid_amount
   status:
-    description: ''
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
     - datalake_checkout_raw.charge_status_log.status
   payment_method:
-    description: ''
+    description: Financial attribute representing payment method on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.payment_method
   user_name:
-    description: ''
+    description: Financial attribute representing user name on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_name
   user_provider:
-    description: ''
+    description: Financial attribute representing user provider on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_provider
   user_identifiable_document:
-    description: ''
+    description: Financial attribute representing user identifiable document on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_identifiable_document
   user_person_type:
-    description: ''
+    description: Financial attribute representing user person type on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_person_type
   user_email:
-    description: ''
+    description: Financial attribute representing user email on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_email
   user_city:
-    description: ''
+    description: Financial attribute representing user city on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_city
   user_neighborhood:
-    description: ''
+    description: Financial attribute representing user neighborhood on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_neighborhood
   user_state:
-    description: ''
+    description: Financial attribute representing user state on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_state
   user_street_address:
-    description: ''
+    description: Financial attribute representing user street address on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_street_address
   user_zipcode:
-    description: ''
+    description: Financial attribute representing user zipcode on the charge_status_log dataset.
     lineage:
     - datalake_checkout_raw.charge_status_log.user_zipcode
   ts_started_processing:
-    description: ''
+    description: Timestamp when started processing occurred in the upstream fintech system.
     lineage:
     - datalake_checkout_raw.charge_status_log.TIMESTAMP(started_processing_at)
   ts_created:
-    description: ''
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
     - datalake_checkout_raw.charge_status_log.TIMESTAMP(created_at)
   ts_paid:
-    description: ''
+    description: Timestamp when paid occurred in the upstream fintech system.
     lineage:
     - datalake_checkout_raw.charge_status_log.TIMESTAMP(paid_at)
   ts_canceled:
-    description: ''
+    description: Timestamp when canceled occurred in the upstream fintech system.
     lineage:
     - datalake_checkout_raw.charge_status_log.TIMESTAMP(canceled_at)
   ts_deleted:
-    description: ''
+    description: Timestamp when deleted occurred in the upstream fintech system.
     lineage:
     - datalake_checkout_raw.charge_status_log.TIMESTAMP(deleted_at)
   ts_updated:
-    description: ''
+    description: Timestamp when updated occurred in the upstream fintech system.
     lineage:
     - datalake_checkout_raw.charge_status_log.TIMESTAMP(updated_at)

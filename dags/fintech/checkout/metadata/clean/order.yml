@@ -1,60 +1,88 @@
 ---
 database_name: datalake_checkout_clean
 table_name: order
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per order in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.order.id
+    description: Financial attribute representing id on the order dataset.
   id_external:
     lineage:
     - datalake_checkout_raw.order.external_id
+    description: Identifier for the external referenced by this financial record.
   id_business_entity:
     lineage:
     - datalake_checkout_raw.order.business_entity_id
+    description: Identifier for the business entity referenced by this financial record.
   id_finance_entity:
     lineage:
     - datalake_checkout_raw.order.finance_entity_id
+    description: Identifier for the finance entity referenced by this financial record.
   id_tracking:
     lineage:
     - datalake_checkout_raw.order.tracking_id
+    description: Identifier for the tracking referenced by this financial record.
   id_requester:
     lineage:
     - datalake_checkout_raw.order.requester_id
+    description: Identifier for the requester referenced by this financial record.
   due_amount:
     lineage:
     - datalake_checkout_raw.order.due_amount
+    description: Financial attribute representing due amount on the order dataset.
   paid_amount:
     lineage:
     - datalake_checkout_raw.order.paid_amount
+    description: Financial attribute representing paid amount on the order dataset.
   discount:
     lineage:
     - datalake_checkout_raw.order.discount
+    description: Financial attribute representing discount on the order dataset.
   status:
     lineage:
     - datalake_checkout_raw.order.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   requester_name:
     lineage:
     - datalake_checkout_raw.order.requester_name
+    description: Financial attribute representing requester name on the order dataset.
   ts_started_processing:
     lineage:
     - datalake_checkout_raw.order.started_processing_at
+    description: Timestamp when started processing occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_checkout_raw.order.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   dt_due:
     lineage:
     - datalake_checkout_raw.order.due_date
+    description: Calendar date associated with due in the financial workflow.
   ts_paid:
     lineage:
     - datalake_checkout_raw.order.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   ts_canceled:
     lineage:
     - datalake_checkout_raw.order.canceled_at
+    description: Timestamp when canceled occurred in the upstream fintech system.
   ts_deleted:
     lineage:
     - datalake_checkout_raw.order.deleted_at
+    description: Timestamp when deleted occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.order.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
+  unique_hash:
+    lineage: []
+    description: Financial attribute representing unique hash on the order dataset.
+  refund_amount:
+    lineage: []
+    description: Financial attribute representing refund amount on the order dataset.

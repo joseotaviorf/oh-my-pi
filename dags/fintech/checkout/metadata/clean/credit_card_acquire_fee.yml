@@ -1,35 +1,35 @@
 ---
 database_name: datalake_checkout_clean
 table_name: credit_card_acquire_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: null
+description: One row per credit card acquire fee in the Fintech clean layer, sourced from datalake_checkout_clean for payments, billing, and financial operations reporting.
 columns:
   id:
-    description: ''
+    description: Financial attribute representing id on the credit_card_acquire_fee dataset.
     lineage:
     - datalake_checkout_raw.credit_card_acquire_fee.id
   acquire_name:
-    description: ''
+    description: Financial attribute representing acquire name on the credit_card_acquire_fee dataset.
     lineage:
     - datalake_checkout_raw.credit_card_acquire_fee.acquire_name
   card_brand:
-    description: ''
+    description: Financial attribute representing card brand on the credit_card_acquire_fee dataset.
     lineage:
     - datalake_checkout_raw.credit_card_acquire_fee.card_brand
   fee_percentage:
-    description: ''
+    description: Financial attribute representing fee percentage on the credit_card_acquire_fee dataset.
     lineage:
     - datalake_checkout_raw.credit_card_acquire_fee.fee_percentage
   installments:
-    description: ''
+    description: Financial attribute representing installments on the credit_card_acquire_fee dataset.
     lineage:
     - datalake_checkout_raw.credit_card_acquire_fee.installments
   ts_created:
-    description: ''
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
     - datalake_checkout_raw.credit_card_acquire_fee.created_at
   ts_disabled:
-    description: ''
+    description: Timestamp when disabled occurred in the upstream fintech system.
     lineage:
     - datalake_checkout_raw.credit_card_acquire_fee.disabled_at

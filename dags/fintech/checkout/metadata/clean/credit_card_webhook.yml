@@ -1,27 +1,38 @@
 ---
 database_name: datalake_checkout_clean
 table_name: credit_card_webhook
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per credit card webhook in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.credit_card_webhook.id
+    description: Financial attribute representing id on the credit_card_webhook dataset.
   id_credit_card:
     lineage:
     - datalake_checkout_raw.credit_card_webhook.credit_card_id
+    description: Identifier for the credit card referenced by this financial record.
   status:
     lineage:
     - datalake_checkout_raw.credit_card_webhook.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   error_message:
     lineage:
     - datalake_checkout_raw.credit_card_webhook.error_message
+    description: Financial attribute representing error message on the credit_card_webhook dataset.
   payload:
     lineage:
     - datalake_checkout_raw.credit_card_webhook.payload
+    description: Financial attribute representing payload on the credit_card_webhook dataset.
   ts_created:
     lineage:
     - datalake_checkout_raw.credit_card_webhook.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.credit_card_webhook.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

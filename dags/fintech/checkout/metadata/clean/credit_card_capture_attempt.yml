@@ -1,63 +1,86 @@
 ---
 database_name: datalake_checkout_clean
 table_name: credit_card_capture_attempt
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per credit card capture attempt in the Fintech clean layer, sourced
+  from datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.id
+    description: Financial attribute representing id on the credit_card_capture_attempt dataset.
   id_credit_card:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.credit_card_id
+    description: Identifier for the credit card referenced by this financial record.
   code:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.code
+    description: Financial attribute representing code on the credit_card_capture_attempt dataset.
   token:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.token
+    description: Financial attribute representing token on the credit_card_capture_attempt dataset.
   status:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   capture_fail_reason:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.capture_fail_reason
+    description: Financial attribute representing capture fail reason on the credit_card_capture_attempt dataset.
   acquire_auth_code:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.acquire_auth_code
+    description: Financial attribute representing acquire auth code on the credit_card_capture_attempt dataset.
   acquire_name:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.acquire_name
+    description: Financial attribute representing acquire name on the credit_card_capture_attempt dataset.
   acquire_nsu:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.acquire_nsu
+    description: Financial attribute representing acquire nsu on the credit_card_capture_attempt dataset.
   acquire_tid:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.acquire_tid
+    description: Financial attribute representing acquire tid on the credit_card_capture_attempt dataset.
   card_brand:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.card_brand
+    description: Financial attribute representing card brand on the credit_card_capture_attempt dataset.
   installments:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.installments
+    description: Financial attribute representing installments on the credit_card_capture_attempt dataset.
   paid_amount:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.paid_amount
+    description: Financial attribute representing paid amount on the credit_card_capture_attempt dataset.
   transaction_fixed_cost:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.fixed_cost_of_transaction
+    description: Financial attribute representing transaction fixed cost on the credit_card_capture_attempt dataset.
   installment_fee_amount:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.installment_fee_amount
+    description: Financial attribute representing installment fee amount on the credit_card_capture_attempt dataset.
   convenience_fee_amount:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.convenience_fee_amount
+    description: Financial attribute representing convenience fee amount on the credit_card_capture_attempt dataset.
   ts_paid:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.credit_card_capture_attempt.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

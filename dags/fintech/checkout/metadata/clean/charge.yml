@@ -1,84 +1,114 @@
 ---
 database_name: datalake_checkout_clean
 table_name: charge
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per charge in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.charge.id
+    description: Financial attribute representing id on the charge dataset.
   id_order:
     lineage:
     - datalake_checkout_raw.charge.order_id
+    description: Identifier for the order referenced by this financial record.
   id_user_external:
     lineage:
     - datalake_checkout_raw.charge.user_external_id
+    description: Identifier for the user external referenced by this financial record.
   due_amount:
     lineage:
     - datalake_checkout_raw.charge.due_amount
+    description: Financial attribute representing due amount on the charge dataset.
   paid_amount:
     lineage:
     - datalake_checkout_raw.charge.paid_amount
+    description: Financial attribute representing paid amount on the charge dataset.
   refund_amount:
     lineage:
     - datalake_checkout_raw.charge.refund_amount
+    description: Financial attribute representing refund amount on the charge dataset.
   status:
     lineage:
     - datalake_checkout_raw.charge.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   payment_method:
     lineage:
     - datalake_checkout_raw.charge.payment_method
+    description: Financial attribute representing payment method on the charge dataset.
   alternative_payment_methods:
     lineage:
     - datalake_checkout_raw.charge.alternative_payment_methods
+    description: Financial attribute representing alternative payment methods on the charge dataset.
   paid_via:
     lineage:
     - datalake_checkout_raw.charge.paid_via
+    description: Financial attribute representing paid via on the charge dataset.
   user_name:
     lineage:
     - datalake_checkout_raw.charge.user_name
+    description: Financial attribute representing user name on the charge dataset.
   user_provider:
     lineage:
     - datalake_checkout_raw.charge.user_provider
+    description: Financial attribute representing user provider on the charge dataset.
   user_identifiable_document:
     lineage:
     - datalake_checkout_raw.charge.user_identifiable_document
+    description: Financial attribute representing user identifiable document on the charge dataset.
   user_person_type:
     lineage:
     - datalake_checkout_raw.charge.user_person_type
+    description: Financial attribute representing user person type on the charge dataset.
   user_email:
     lineage:
     - datalake_checkout_raw.charge.user_email
+    description: Financial attribute representing user email on the charge dataset.
   user_city:
     lineage:
     - datalake_checkout_raw.charge.user_city
+    description: Financial attribute representing user city on the charge dataset.
   user_neighborhood:
     lineage:
     - datalake_checkout_raw.charge.user_neighborhood
+    description: Financial attribute representing user neighborhood on the charge dataset.
   user_state:
     lineage:
     - datalake_checkout_raw.charge.user_state
+    description: Financial attribute representing user state on the charge dataset.
   user_street_address:
     lineage:
     - datalake_checkout_raw.charge.user_street_address
+    description: Financial attribute representing user street address on the charge dataset.
   user_zipcode:
     lineage:
     - datalake_checkout_raw.charge.user_zipcode
+    description: Financial attribute representing user zipcode on the charge dataset.
   ts_started_processing:
     lineage:
     - datalake_checkout_raw.charge.started_processing_at
+    description: Timestamp when started processing occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_checkout_raw.charge.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_paid:
     lineage:
     - datalake_checkout_raw.charge.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   ts_canceled:
     lineage:
     - datalake_checkout_raw.charge.canceled_at
+    description: Timestamp when canceled occurred in the upstream fintech system.
   ts_deleted:
     lineage:
     - datalake_checkout_raw.charge.deleted_at
+    description: Timestamp when deleted occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.charge.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

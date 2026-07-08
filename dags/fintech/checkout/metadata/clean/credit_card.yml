@@ -1,171 +1,230 @@
 ---
 database_name: datalake_checkout_clean
 table_name: credit_card
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per credit card in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.credit_card.id
+    description: Financial attribute representing id on the credit_card dataset.
   id_external:
     lineage:
     - datalake_checkout_raw.credit_card.external_id
+    description: Identifier for the external referenced by this financial record.
   id_business_entity:
     lineage:
     - datalake_checkout_raw.credit_card.business_entity_id
+    description: Identifier for the business entity referenced by this financial record.
   id_finance_entity:
     lineage:
     - datalake_checkout_raw.credit_card.finance_entity_id
+    description: Identifier for the finance entity referenced by this financial record.
   id_requester:
     lineage:
     - datalake_checkout_raw.credit_card.requester_id
+    description: Identifier for the requester referenced by this financial record.
   id_charge:
     lineage:
     - datalake_checkout_raw.credit_card.charge_id
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
   payer_email:
     lineage:
     - datalake_checkout_raw.credit_card.payer_email
+    description: Financial attribute representing payer email on the credit_card dataset.
   card_brand:
     lineage:
     - datalake_checkout_raw.credit_card.card_brand
+    description: Financial attribute representing card brand on the credit_card dataset.
   requester_name:
     lineage:
     - datalake_checkout_raw.credit_card.requester_name
+    description: Financial attribute representing requester name on the credit_card dataset.
   token:
     lineage:
     - datalake_checkout_raw.credit_card.token
+    description: Financial attribute representing token on the credit_card dataset.
   interest_type:
     lineage:
     - datalake_checkout_raw.credit_card.interest_type
+    description: Financial attribute representing interest type on the credit_card dataset.
   payer_zipcode:
     lineage:
     - datalake_checkout_raw.credit_card.payer_zipcode
+    description: Financial attribute representing payer zipcode on the credit_card dataset.
   fine_type:
     lineage:
     - datalake_checkout_raw.credit_card.fine_type
+    description: Financial attribute representing fine type on the credit_card dataset.
   canceled_by_email:
     lineage:
     - datalake_checkout_raw.credit_card.canceled_by_email
+    description: Financial attribute representing canceled by email on the credit_card dataset.
   payer_name:
     lineage:
     - datalake_checkout_raw.credit_card.payer_name
+    description: Financial attribute representing payer name on the credit_card dataset.
   first_six_digits:
     lineage:
     - datalake_checkout_raw.credit_card.first_six_digits
+    description: Financial attribute representing first six digits on the credit_card dataset.
   acquire_name:
     lineage:
     - datalake_checkout_raw.credit_card.acquire_name
+    description: Financial attribute representing acquire name on the credit_card dataset.
   acquire_nsu:
     lineage:
     - datalake_checkout_raw.credit_card.acquire_nsu
+    description: Financial attribute representing acquire nsu on the credit_card dataset.
   payer_neighborhood:
     lineage:
     - datalake_checkout_raw.credit_card.payer_neighborhood
+    description: Financial attribute representing payer neighborhood on the credit_card dataset.
   acquire_tid:
     lineage:
     - datalake_checkout_raw.credit_card.acquire_tid
+    description: Financial attribute representing acquire tid on the credit_card dataset.
   fixed_cost_of_transaction:
     lineage:
     - datalake_checkout_raw.credit_card.fixed_cost_of_transaction
+    description: Financial attribute representing fixed cost of transaction on the credit_card dataset.
   block_entity:
     lineage:
     - datalake_checkout_raw.credit_card.block_entity
+    description: Financial attribute representing block entity on the credit_card dataset.
   status:
     lineage:
     - datalake_checkout_raw.credit_card.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   acquire_auth_code:
     lineage:
     - datalake_checkout_raw.credit_card.acquire_auth_code
+    description: Financial attribute representing acquire auth code on the credit_card dataset.
   payer_state:
     lineage:
     - datalake_checkout_raw.credit_card.payer_state
+    description: Financial attribute representing payer state on the credit_card dataset.
   payer_street_address:
     lineage:
     - datalake_checkout_raw.credit_card.payer_street_address
+    description: Financial attribute representing payer street address on the credit_card dataset.
   cancellation_reason:
     lineage:
     - datalake_checkout_raw.credit_card.cancellation_reason
+    description: Financial attribute representing cancellation reason on the credit_card dataset.
   payer_city:
     lineage:
     - datalake_checkout_raw.credit_card.payer_city
+    description: Financial attribute representing payer city on the credit_card dataset.
   payer_identifiable_document:
     lineage:
     - datalake_checkout_raw.credit_card.payer_identifiable_document
+    description: Financial attribute representing payer identifiable document on the credit_card dataset.
   payer_person_type:
     lineage:
     - datalake_checkout_raw.credit_card.payer_person_type
+    description: Financial attribute representing payer person type on the credit_card dataset.
   convenience_fee_amount:
     lineage:
     - datalake_checkout_raw.credit_card.convenience_fee_amount
+    description: Financial attribute representing convenience fee amount on the credit_card dataset.
   fine_amount_percentage:
     lineage:
     - datalake_checkout_raw.credit_card.fine_amount_percentage
+    description: Financial attribute representing fine amount percentage on the credit_card dataset.
   refund_amount:
     lineage:
     - datalake_checkout_raw.credit_card.refund_amount
+    description: Financial attribute representing refund amount on the credit_card dataset.
   acquire_fee_amount:
     lineage:
     - datalake_checkout_raw.credit_card.acquire_fee_amount
+    description: Financial attribute representing acquire fee amount on the credit_card dataset.
   paid_amount:
     lineage:
     - datalake_checkout_raw.credit_card.paid_amount
+    description: Financial attribute representing paid amount on the credit_card dataset.
   fine_paid_amount:
     lineage:
     - datalake_checkout_raw.credit_card.fine_paid_amount
+    description: Financial attribute representing fine paid amount on the credit_card dataset.
   max_installments:
     lineage:
     - datalake_checkout_raw.credit_card.max_installments
+    description: Financial attribute representing max installments on the credit_card dataset.
   min_installments:
     lineage:
     - datalake_checkout_raw.credit_card.min_installments
+    description: Financial attribute representing min installments on the credit_card dataset.
   installments:
     lineage:
     - datalake_checkout_raw.credit_card.installments
+    description: Financial attribute representing installments on the credit_card dataset.
   interest_amount:
     lineage:
     - datalake_checkout_raw.credit_card.interest_amount
+    description: Financial attribute representing interest amount on the credit_card dataset.
   interest_amount_percentage:
     lineage:
     - datalake_checkout_raw.credit_card.interest_amount_percentage
+    description: Financial attribute representing interest amount percentage on the credit_card dataset.
   interest_paid_amount:
     lineage:
     - datalake_checkout_raw.credit_card.interest_paid_amount
+    description: Financial attribute representing interest paid amount on the credit_card dataset.
   installment_fee_amount:
     lineage:
     - datalake_checkout_raw.credit_card.installment_fee_amount
+    description: Financial attribute representing installment fee amount on the credit_card dataset.
   due_amount:
     lineage:
     - datalake_checkout_raw.credit_card.due_amount
+    description: Financial attribute representing due amount on the credit_card dataset.
   fine_amount:
     lineage:
     - datalake_checkout_raw.credit_card.fine_amount
+    description: Financial attribute representing fine amount on the credit_card dataset.
   last_four_digits:
     lineage:
     - datalake_checkout_raw.credit_card.last_four_digits
+    description: Financial attribute representing last four digits on the credit_card dataset.
   code:
     lineage:
     - datalake_checkout_raw.credit_card.code
+    description: Financial attribute representing code on the credit_card dataset.
   dt_last_date_to_pay:
     lineage:
     - datalake_checkout_raw.credit_card.last_date_to_pay
+    description: Calendar date associated with last date to pay in the financial workflow.
   dt_due:
     lineage:
     - datalake_checkout_raw.credit_card.due_date
+    description: Calendar date associated with due in the financial workflow.
   ts_created:
     lineage:
     - datalake_checkout_raw.credit_card.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_fine_start:
     lineage:
     - datalake_checkout_raw.credit_card.fine_start_at
+    description: Timestamp when fine start occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_checkout_raw.credit_card.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_interest_start:
     lineage:
     - datalake_checkout_raw.credit_card.interest_start_at
+    description: Timestamp when interest start occurred in the upstream fintech system.
   ts_paid:
     lineage:
     - datalake_checkout_raw.credit_card.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   ts_canceled:
     lineage:
     - datalake_checkout_raw.credit_card.canceled_at
+    description: Timestamp when canceled occurred in the upstream fintech system.

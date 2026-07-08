@@ -1,33 +1,46 @@
 ---
 database_name: datalake_checkout_clean
 table_name: payment_config
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per payment config in the Fintech clean layer, sourced from
+  datalake_checkout_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_checkout_raw.payment_config.id
+    description: Financial attribute representing id on the payment_config dataset.
   id_requester:
     lineage:
     - datalake_checkout_raw.payment_config.requester_id
+    description: Identifier for the requester referenced by this financial record.
   id_bank_account:
     lineage:
     - datalake_checkout_raw.payment_config.bank_account_id
+    description: Identifier for the bank account referenced by this financial record.
   status:
     lineage:
     - datalake_checkout_raw.payment_config.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   name:
     lineage:
     - datalake_checkout_raw.payment_config.name
+    description: Financial attribute representing name on the payment_config dataset.
   payment_method:
     lineage:
     - datalake_checkout_raw.payment_config.payment_method
+    description: Financial attribute representing payment method on the payment_config dataset.
   exhibition_name:
     lineage:
     - datalake_checkout_raw.payment_config.exhibition_name
+    description: Financial attribute representing exhibition name on the payment_config dataset.
   document:
     lineage:
     - datalake_checkout_raw.payment_config.document
+    description: Financial attribute representing document on the payment_config dataset.
   pix_key:
     lineage:
     - datalake_checkout_raw.payment_config.pix_key
+    description: Financial attribute representing pix key on the payment_config dataset.
