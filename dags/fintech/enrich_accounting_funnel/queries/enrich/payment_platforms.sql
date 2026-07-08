@@ -163,7 +163,20 @@ CAP AS (
         dt_paid,
         dt_paid AS dt_receipt
     FROM
-        (SELECT * FROM (
+        (SELECT
+          id,
+          id_related_document,
+          our_number,
+          company_use,
+          status,
+          dt_paid,
+          paid_amount,
+          requested_by,
+          id_bank_payment,
+          ts_updated,
+          pagamento,
+          TipoPagamento
+        FROM (
         SELECT
           p.id,
           id_related_document,
