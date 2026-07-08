@@ -128,11 +128,11 @@ Grain: **one row per accounting event × view** (a single event can appear once 
 
 ## Key Metrics
 
-> **Compliance vs diagnostic metrics:** When a user asks about **compliance**, **Straw Compliance**, **Reverse Straw Compliance**, or whether an account is **conciliada / batida**, always use the **amount-weighted formulas** in the section below — **never** event counts or a simple `COUNT(is_compliance) / COUNT(*)`. Compliance is measured by **monetary volume**, grouped by `accrual_year_month` and `account_number`.
+> **Compliance vs diagnostic metrics:** When a user asks about **compliance**, **Straw Compliance**, **Reverse Straw Compliance**, or whether an account is **conciliada / batida**, always use the **amount-weighted formulas** in the section below — **never** event counts or a simple `COUNT(is_compliance) / COUNT(*)`. Compliance is measured by **monetary volume**, grouped by `dt_filter` (cast to month) and `account_number`. Use `accrual_year_month` instead of `dt_filter` only when the user explicitly asks for the accounting accrual/competência view — the two fields represent different concepts (processing date vs. accounting period) and can yield materially different percentages for the same account/month.
 
 ### Compliance Metrics (amount-weighted)
 
-The official **Straw Compliance** and **Reverse Straw Compliance** metrics are **amount-weighted percentages** per `account_number` × `accrual_year_month`.
+The official **Straw Compliance** and **Reverse Straw Compliance** metrics are **amount-weighted percentages** per `account_number` × month, where month is derived from `dt_filter` (`DATE_TRUNC('month', CAST(dt_filter AS DATE))`) by default. Use `accrual_year_month` as the grouping key only for accounting-competência-specific questions.
 
 | Metric | What it measures |
 |--------|------------------|
@@ -213,7 +213,7 @@ Provision and write-off accounting events relate to the losses / AR domain (`dw_
 **Do:**
 
 - Use `dw_sap_accounting_process.fact_sap_accounting_process` as the single entry point — it already unifies every source and both views.
-- When answering **compliance %** questions, use the **amount-weighted formulas** (Straw Compliance / Reverse Straw Compliance) grouped by `accrual_year_month` and `account_number`.
+- When answering **compliance %** questions, use the **amount-weighted formulas** (Straw Compliance / Reverse Straw Compliance) grouped by `dt_filter` (cast to month) and `account_number` by default. Only switch to `accrual_year_month` when the question is explicitly about accounting competência.
 - Always be explicit about the **view**: filter `type = 'straw'` for origin→SAP analysis and `type = 'reverse straw'` for SAP→origin traceability. An account "ties out" only when conformity holds in **both**.
 - Use `dt_filter` (`COALESCE(dt_sap_reference, dt_source_trigger)`) as the canonical date for period filters; `CAST` it to `DATE` when grouping by day.
 - Use `ABS()` on amounts when computing compliance or `diff_systems` — straw vs reverse-straw and debit/credit signs can flip, so compare magnitudes.
@@ -232,6 +232,7 @@ Provision and write-off accounting events relate to the losses / AR domain (`dw_
 - Don't filter on raw `dt_source_trigger` alone for SAP-period analysis — reverse and SAP-driven flows are better filtered by `dt_filter` / `dt_sap_reference`.
 - Don't forget that certain technical/contra accounts (e.g. `'11036X'`, `'11004X'`) are typically excluded from reconciliation analyses — confirm the exclusion list with the finance owners.
 - Don't read `version = 'kill-queue'` rows as normal accounting versions — they come from the kill-queue models and carry NULL `accounting_process_status` / `error_description`.
+- Don't treat `accrual_year_month` and `dt_filter`-derived month as interchangeable — they measure different things (accounting period vs. processing/settlement date) and compliance % for the same account/month can diverge by dozens of points between the two.
 
 ## Golden Queries
 
@@ -309,11 +310,11 @@ ORDER BY accrual_year_month DESC, reverse_straw_breaks DESC, straw_breaks DESC
 
 ### Query 3 — Straw & Reverse Straw Compliance by account and period
 
-Computes the official **amount-weighted** Straw and Reverse Straw Compliance percentages. Filter `account_number` and `accrual_year_month` as needed.
+Computes the official **amount-weighted** Straw and Reverse Straw Compliance percentages. Filter `account_number` and `dt_filter` date range as needed.
 
 ```sql
 SELECT
-  accrual_year_month,
+  DATE_TRUNC('month', CAST(dt_filter AS DATE)) AS month_ref,
   account_number,
   accounting_name,
   100.0 * SUM(IF(is_compliance = TRUE AND type = 'straw', COALESCE(ABS(source_amount), ABS(sap_amount)), 0))
@@ -338,8 +339,9 @@ SELECT
 FROM
   dw_sap_accounting_process.fact_sap_accounting_process
 WHERE account_number NOT IN ('11036X', '11004X')
+  AND CAST(dt_filter AS DATE) BETWEEN :start_date AND :end_date
 GROUP BY 1, 2, 3
-ORDER BY accrual_year_month DESC, account_number
+ORDER BY month_ref DESC, account_number
 ```
 
 **Example filter** for a single account and month:
@@ -347,7 +349,7 @@ ORDER BY accrual_year_month DESC, account_number
 ```sql
 -- account 113406, May 2026 → expect ~97.079% straw, ~79.903% reverse straw
 WHERE account_number = '113406'
-  AND accrual_year_month = 202605
+  AND CAST(dt_filter AS DATE) BETWEEN DATE '2026-05-01' AND DATE '2026-05-31'
 ```
 
 **Notes:**
@@ -355,4 +357,4 @@ WHERE account_number = '113406'
 - `straw_compliance_pct` uses `COALESCE(ABS(source_amount), ABS(sap_amount))` — source amount first.
 - `reverse_straw_compliance_pct` uses `COALESCE(ABS(sap_amount), ABS(source_amount))` — SAP amount first.
 - Reverse Straw Compliance is **NULL** for accounts outside the `IN (...)` list.
-- Group by `accrual_year_month` for monthly compliance reporting.
+- Group by `DATE_TRUNC('month', CAST(dt_filter AS DATE))` for monthly compliance reporting. Use `accrual_year_month` only when the question is explicitly about accounting competência.
