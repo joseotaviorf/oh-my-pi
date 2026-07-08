@@ -1,32 +1,46 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: campaign_bonus
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  campaign bonus. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_offer:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.id_offer
+    description: Identifier for the offer referenced by this financial record.
   id_agent:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.id_agent
+    description: Identifier for the agent referenced by this financial record.
   hub:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.hub
+    description: Value from the Google Sheets source column mapped to hub for campaign_bonus planning.
   campaign:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.campaign
+    description: Value from the Google Sheets source column mapped to campaign for campaign_bonus planning.
   agent_full_name:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.agent_full_name
+    description: Value from the Google Sheets source column mapped to agent_full_name for campaign_bonus planning.
   partner_type:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.partner_type
+    description: Value from the Google Sheets source column mapped to partner_type for campaign_bonus planning.
   campaign_bonus:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.campaign_bonus
+    description: Value from the Google Sheets source column mapped to campaign_bonus for campaign_bonus planning.
   dt_started:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.dt_started
+    description: Calendar date associated with started in the financial workflow.
   dt_ended:
     lineage:
       - datalake_gsheets_raw.campaign_bonus.dt_ended
+    description: Calendar date associated with ended in the financial workflow.

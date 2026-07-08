@@ -1,52 +1,73 @@
 database_name: datalake_gsheets_clean
 table_name: closing_analysts_hierarchy
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for closing
+  analysts hierarchy. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   name:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.name
+    description: Value from the Google Sheets source column mapped to name for closing_analysts_hierarchy planning.
   employee_id:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.employee_id
+    description: Value from the Google Sheets source column mapped to employee_id for closing_analysts_hierarchy planning.
   group_1:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.group_1
+    description: Value from the Google Sheets source column mapped to group_1 for closing_analysts_hierarchy planning.
   group_2:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.group_2
+    description: Value from the Google Sheets source column mapped to group_2 for closing_analysts_hierarchy planning.
   group_3:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.group_3
+    description: Value from the Google Sheets source column mapped to group_3 for closing_analysts_hierarchy planning.
   employee_hiring_type:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.employee_hiring_type
+    description: Value from the Google Sheets source column mapped to employee_hiring_type for closing_analysts_hierarchy planning.
   analyst_3:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.analyst_3
+    description: Value from the Google Sheets source column mapped to analyst_3 for closing_analysts_hierarchy planning.
   managers:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.managers
+    description: Value from the Google Sheets source column mapped to managers for closing_analysts_hierarchy planning.
   email:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.email
+    description: Value from the Google Sheets source column mapped to email for closing_analysts_hierarchy planning.
   name_in_monday:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.name_in_monday
+    description: Value from the Google Sheets source column mapped to name_in_monday for closing_analysts_hierarchy planning.
   status:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   is_trust_employee:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.is_trust_employee
+    description: Indicates whether trust employee applies to this financial record.
   dt_start:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.dt_start
+    description: Calendar date associated with start in the financial workflow.
   dt_first_experience_period_end:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.dt_first_experience_period_end
+    description: Calendar date associated with first experience period end in the financial workflow.
   dt_second_experience_period_end:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.dt_second_experience_period_end
+    description: Calendar date associated with second experience period end in the financial workflow.
   dt_born:
     lineage:
       - datalake_gsheets_raw.closing_analysts_hierarchy.dt_born
+    description: Calendar date associated with born in the financial workflow.

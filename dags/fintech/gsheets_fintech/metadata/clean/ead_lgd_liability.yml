@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: ead_lgd_liability
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Cleaned IFRS liability-side EAD and LGD parameters from Google Sheets, including month and start-date reference windows, delay buckets, exposure at default and LGD coefficients by model version
 columns:

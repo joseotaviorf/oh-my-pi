@@ -6,15 +6,15 @@ owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   active_flow:
-    description: Target for Active Flow
+    description: Value from the Google Sheets source column mapped to active_flow for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Flow
   active_stock:
-    description: Target for Active Stock
+    description: Value from the Google Sheets source column mapped to active_stock for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Stock
   fpd:
-    description: Target for FPD
+    description: Value from the Google Sheets source column mapped to fpd for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.FPD
   property_owners:
@@ -22,11 +22,11 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_targets.Property_Owners
   ended_1_to_90:
-    description: Target for Ended 1-90
+    description: Value from the Google Sheets source column mapped to ended_1_to_90 for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_1_to_90
   ended_91_to_360:
-    description: Target for Ended 91-360
+    description: Value from the Google Sheets source column mapped to ended_91_to_360 for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_91_to_360
   ended_greater_360:
@@ -74,7 +74,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_targets.Eficiencia_Processual
   average_overdue_rent_anomalies_greater_120:
-    description: Target for Average Overdue Rent Anomalies Greater 120
+    description: Value from the Google Sheets source column mapped to average_overdue_rent_anomalies_greater_120 for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Average_Overdue_Rent_Anomalies_greater_120
   working_days_today:
@@ -102,74 +102,74 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_targets.ts_load
   active_flow_forecast:
-    description: Forecast for Active Flow
+    description: Value from the Google Sheets source column mapped to active_flow_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Flow_forecast
   active_stock_forecast:
-    description: Forecast for Active Stock
+    description: Value from the Google Sheets source column mapped to active_stock_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Stock_forecast
   fpd_forecast:
-    description: Forecast for FPD
+    description: Value from the Google Sheets source column mapped to fpd_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.FPD_forecast
   property_owners_forecast:
-    description: Forecast for Property Owners
+    description: Value from the Google Sheets source column mapped to property_owners_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Property_Owners_forecast
   ended_1_to_90_forecast:
-    description: Forecast for Ended 1-90
+    description: Value from the Google Sheets source column mapped to ended_1_to_90_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_1_to_90_forecast
   ended_91_to_360_forecast:
-    description: Forecast for Ended 91-360
+    description: Value from the Google Sheets source column mapped to ended_91_to_360_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_91_to_360_forecast
   ended_greater_360_forecast:
-    description: Forecast for Ended Greater 360
+    description: Value from the Google Sheets source column mapped to ended_greater_360_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_greater_360_forecast
   detractor_index_forecast:
-    description: Forecast for Detractor Index
+    description: Value from the Google Sheets source column mapped to detractor_index_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Detractor_index_forecast
   active_cushion_effectiveness_forecast:
-    description: Forecast for Active Cushion Effectiveness
+    description: Value from the Google Sheets source column mapped to active_cushion_effectiveness_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Cushion_Effectiveness_forecast
   ended_cushion_effectiveness_forecast:
-    description: Forecast for Ended Cushion Effectiveness
+    description: Value from the Google Sheets source column mapped to ended_cushion_effectiveness_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_Cushion_Effectiveness_forecast
   resolution_rate_120d_forecast:
-    description: Forecast for Resolution Rate 120D
+    description: Value from the Google Sheets source column mapped to resolution_rate_120d_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_120D_forecast
   resolution_rate_120_to_240d_forecast:
-    description: Forecast for Resolution Rate 120-240D
+    description: Value from the Google Sheets source column mapped to resolution_rate_120_to_240d_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_120_to_240D_forecast
   resolution_rate_greater_240d_forecast:
-    description: Forecast for Resolution Rate Greater 240D
+    description: Value from the Google Sheets source column mapped to resolution_rate_greater_240d_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_240D_forecast
   resolution_rate_240d_to_360d_forecast:
-    description: Forecast for Resolution Rate 240-360D
+    description: Value from the Google Sheets source column mapped to resolution_rate_240d_to_360d_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_240D_to_360D_forecast
   resolution_rate_greater_360d_forecast:
-    description: Forecast for Resolution Rate Greater 360D
+    description: Value from the Google Sheets source column mapped to resolution_rate_greater_360d_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_360D_forecast
   resolution_rate_mob3_forecast:
-    description: Forecast for Resolution Rate MOB3
+    description: Value from the Google Sheets source column mapped to resolution_rate_mob3_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_MOB3_forecast
   process_efficiency_forecast:
-    description: Forecast for Process Efficiency
+    description: Value from the Google Sheets source column mapped to process_efficiency_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Eficiencia_Processual_forecast
   average_overdue_rent_anomalies_greater_120_forecast:
-    description: Forecast for Average Overdue Rent Anomalies Greater 120
+    description: Value from the Google Sheets source column mapped to average_overdue_rent_anomalies_greater_120_forecast for collections_targets planning.
     lineage:
       - datalake_gsheets_raw.collections_targets.Average_Overdue_Rent_Anomalies_greater_120_forecast

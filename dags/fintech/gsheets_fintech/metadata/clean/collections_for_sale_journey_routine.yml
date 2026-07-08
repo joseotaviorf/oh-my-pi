@@ -1,7 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: collections_for_sale_journey_routine
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Routine journey data for collections in the for sale business, tracking offers, collection status, payment information, and contact history
 columns:
@@ -86,7 +86,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.status_da_offer
   payment_type:
-    description: Type of payment method
+    description: Value from the Google Sheets source column mapped to payment_type for collections_for_sale_journey_routine planning.
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.tipo_pagamento
   product:
@@ -98,11 +98,11 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.partner_rede
   sales_tag:
-    description: Sales tag or label
+    description: Value from the Google Sheets source column mapped to sales_tag for collections_for_sale_journey_routine planning.
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.tag_vendas
   seller:
-    description: Name of the seller
+    description: Value from the Google Sheets source column mapped to seller for collections_for_sale_journey_routine planning.
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.vendedor
   phone:
@@ -150,7 +150,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.demais_contatos
   brokerage_amount:
-    description: Amount of brokerage fee
+    description: Value from the Google Sheets source column mapped to brokerage_amount for collections_for_sale_journey_routine planning.
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.valor_de_corretagem
   balance_received:
@@ -182,7 +182,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.data_diligencia
   dt_cancellation:
-    description: Date of cancellation
+    description: Calendar date associated with cancellation in the financial workflow.
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.data_do_cancelamento
   dt_offer_rescue:
@@ -190,7 +190,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.data_resgate_da_offer
   dt_financing:
-    description: Date of financing
+    description: Calendar date associated with financing in the financial workflow.
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.data_financiamento
   dt_collection_start:
@@ -206,11 +206,11 @@ columns:
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.data_notificacao_ej
   dt_condition:
-    description: Date of condition
+    description: Calendar date associated with condition in the financial workflow.
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.data_condicionante
   dt_first_contact:
-    description: Date of first contact
+    description: Calendar date associated with first contact in the financial workflow.
     lineage:
       - datalake_gsheets_raw.collections_for_sale_journey_routine.data_primeiro_contato
   dt_expected_contact:

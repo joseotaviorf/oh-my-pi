@@ -1,6 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: audit_decisions
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Audit decisions table for credit analysis processes, tracking detailed evaluation criteria, checklist validations, and analyst decisions for proposal assessments
 columns:
@@ -125,11 +126,11 @@ columns:
     lineage:
       - datalake_gsheets_raw.audit_decisions.records_and_updates_pep_risk_special_approvals_notes
   procedure_pillar_income_and_commitments_assessment:
-    description: Procedure pillar for income and commitments assessment
+    description: Value from the Google Sheets source column mapped to procedure_pillar_income_and_commitments_assessment for audit_decisions planning.
     lineage:
       - datalake_gsheets_raw.audit_decisions.procedure_pillar_income_and_commitments_assessment
   procedure_pillar_termination_reminder_zendesk:
-    description: Procedure pillar for termination reminder in Zendesk
+    description: Value from the Google Sheets source column mapped to procedure_pillar_termination_reminder_zendesk for audit_decisions planning.
     lineage:
       - datalake_gsheets_raw.audit_decisions.procedure_pillar_termination_reminder_zendesk
   procedure_pillar_user_block_magiclink:
@@ -153,7 +154,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.audit_decisions.outstrike_classification_error_flagged
   general_feedback_leader_analyst:
-    description: General feedback from leader analyst
+    description: Value from the Google Sheets source column mapped to general_feedback_leader_analyst for audit_decisions planning.
     lineage:
       - datalake_gsheets_raw.audit_decisions.general_feedback_leader_analyst
   internal_comment_audit:
@@ -181,7 +182,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.audit_decisions.selfie_for_identification
   lawsuits:
-    description: Lawsuits evaluation
+    description: Value from the Google Sheets source column mapped to lawsuits for audit_decisions planning.
     lineage:
       - datalake_gsheets_raw.audit_decisions.lawsuits
   income_documentation:
@@ -245,7 +246,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.audit_decisions.exception_notes
   fraud_notes:
-    description: Fraud notes evaluation
+    description: Value from the Google Sheets source column mapped to fraud_notes for audit_decisions planning.
     lineage:
       - datalake_gsheets_raw.audit_decisions.fraud_notes
   other_reasons_notes:
@@ -317,7 +318,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.audit_decisions.dispute_comment
   dispute_status:
-    description: Status of the audit dispute
+    description: Value from the Google Sheets source column mapped to dispute_status for audit_decisions planning.
     lineage:
       - datalake_gsheets_raw.audit_decisions.dispute_status
   dispute_review:

@@ -1,23 +1,34 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: business_rules_bonus
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  business rules bonus. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   service_line:
     lineage:
       - datalake_gsheets_raw.business_rules_bonus.service_line
+    description: Value from the Google Sheets source column mapped to service_line for business_rules_bonus planning.
   offer_flow:
     lineage:
       - datalake_gsheets_raw.business_rules_bonus.offer_flow
+    description: Value from the Google Sheets source column mapped to offer_flow for business_rules_bonus planning.
   partner_type:
     lineage:
       - datalake_gsheets_raw.business_rules_bonus.partner_type
+    description: Value from the Google Sheets source column mapped to partner_type for business_rules_bonus planning.
   brokerage_fee_partner:
     lineage:
       - datalake_gsheets_raw.business_rules_bonus.brokerage_fee_partner
+    description: Value from the Google Sheets source column mapped to brokerage_fee_partner for business_rules_bonus planning.
   dt_started:
     lineage:
       - datalake_gsheets_raw.business_rules_bonus.dt_started
+    description: Calendar date associated with started in the financial workflow.
   dt_ended:
     lineage:
       - datalake_gsheets_raw.business_rules_bonus.dt_ended
+    description: Calendar date associated with ended in the financial workflow.

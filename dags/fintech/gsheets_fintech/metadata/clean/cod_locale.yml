@@ -1,10 +1,17 @@
 database_name: datalake_gsheets_clean
 table_name: cod_locale
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for cod
+  locale. One row per planning or control record used in financial reporting
+  and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_locale:
     lineage:
       - datalake_gsheets_raw.cod_locale.localidade
+    description: Identifier for the locale referenced by this financial record.
   city:
     lineage:
       - datalake_gsheets_raw.cod_locale.cidade
+    description: Value from the Google Sheets source column mapped to city for cod_locale planning.

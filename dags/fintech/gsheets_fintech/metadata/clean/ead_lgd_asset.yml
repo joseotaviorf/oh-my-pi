@@ -1,5 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: ead_lgd_asset
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Cleaned IFRS asset-side EAD and LGD parameters from Google Sheets, with typed dates, delay buckets, and loss given default coefficients by model version
 columns:

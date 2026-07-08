@@ -1,29 +1,42 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: aux_commission
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for aux
+  commission. One row per planning or control record used in financial
+  reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   commission_type:
     lineage:
       - datalake_gsheets_raw.aux_commission.commission_type
+    description: Value from the Google Sheets source column mapped to commission_type for aux_commission planning.
   region:
     lineage:
       - datalake_gsheets_raw.aux_commission.region
+    description: Value from the Google Sheets source column mapped to region for aux_commission planning.
   range_20:
     lineage:
       - datalake_gsheets_raw.aux_commission.faixa_20
+    description: Value from the Google Sheets source column mapped to range_20 for aux_commission planning.
   range_30:
     lineage:
       - datalake_gsheets_raw.aux_commission.faixa_30
+    description: Value from the Google Sheets source column mapped to range_30 for aux_commission planning.
   range_40:
     lineage:
       - datalake_gsheets_raw.aux_commission.faixa_40
+    description: Value from the Google Sheets source column mapped to range_40 for aux_commission planning.
   range_50:
     lineage:
       - datalake_gsheets_raw.aux_commission.faixa_50
+    description: Value from the Google Sheets source column mapped to range_50 for aux_commission planning.
   dt_started_validity:
     lineage:
       - datalake_gsheets_raw.aux_commission.inicio_vigencia
+    description: Calendar date associated with started validity in the financial workflow.
   dt_ended_validity:
     lineage:
       - datalake_gsheets_raw.aux_commission.fim_vigencia
+    description: Calendar date associated with ended validity in the financial workflow.
