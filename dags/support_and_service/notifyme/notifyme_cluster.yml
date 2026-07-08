@@ -1,19 +1,10 @@
 cluster:
-  type: emr_7_12_consolidation_s_general_fleet_cluster
+  type: emr_7_12_consolidation_m_general_fleet_cluster
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
     task_nodes:
-      instance_types:
-      - m6g.xlarge
-      - m7g.xlarge
       target_on_demand: 0
       target_spot: 1
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
-    core_nodes:
-      target_on_demand: 2
-      target_spot: 0
-      instance_types:
-      - m6g.xlarge
-      - m7g.xlarge
