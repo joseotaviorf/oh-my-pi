@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: olos_dialer_label_decision_tree
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Label decision tree for Olos Dialer portfolio segmentation. Part of the LBL_DECTBLX series (lbl_dectbl1) used to calculate and update portfolio segmentation labels for credit qualification and dialer routing.
@@ -74,4 +74,3 @@ columns:
       - datalake_cyber_raw.lbl_dectbl1.queue
   ts_load:
     description: "Timestamp when the record was loaded"
-

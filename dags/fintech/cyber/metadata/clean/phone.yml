@@ -1,12 +1,12 @@
 ---
 database_name: datalake_cyber_clean
 table_name: phone
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: null
+description: One row per phone from the Cyber credit bureau integration, capturing bureau inquiries, scores, and compliance checks for fintech risk decisions.
 columns:
   id_phone:
-    description: "ID Phone"
+    description: Identifier for the phone referenced by this financial record.
     lineage:
       - datalake_cyber_raw.phone.PHID
   id_client:
@@ -22,11 +22,11 @@ columns:
     lineage:
       - datalake_cyber_raw.phone.PHACCTG
   phone_type:
-    description: ""
+    description: Financial attribute representing phone type on the phone dataset.
     lineage:
       - datalake_cyber_raw.phone.PHTYPE
   area_code:
-    description: "DDD"
+    description: Financial attribute representing area code on the phone dataset.
     lineage:
       - datalake_cyber_raw.phone.PHAREACODE
   phone_number:
@@ -34,23 +34,23 @@ columns:
     lineage:
       - datalake_cyber_raw.phone.PHPHONE
   phone_extension:
-    description: "Phone Extension"
+    description: Financial attribute representing phone extension on the phone dataset.
     lineage:
       - datalake_cyber_raw.phone.PHEXT
   is_active:
-    description: ""
+    description: Indicates whether active applies to this financial record.
     lineage:
       - datalake_cyber_raw.phone.PHSTATUS
   manager_status_update:
-    description: ""
+    description: Financial attribute representing manager status update on the phone dataset.
     lineage:
       - datalake_cyber_raw.phone.PHSTCOLLID
   status_reason:
-    description: ""
+    description: Financial attribute representing status reason on the phone dataset.
     lineage:
       - datalake_cyber_raw.phone.PHSTREASON
   manager:
-    description: ""
+    description: Financial attribute representing manager on the phone dataset.
     lineage:
       - datalake_cyber_raw.phone.PHCOLLID
   phone_rank:
@@ -58,30 +58,31 @@ columns:
     lineage:
       - datalake_cyber_raw.phone.PHRANK
   related_number:
-    description: ""
+    description: Financial attribute representing related number on the phone dataset.
     lineage:
       - datalake_cyber_raw.phone.PHRELNUM
   hierarchical_sequence:
-    description: ""
+    description: Financial attribute representing hierarchical sequence on the phone dataset.
     lineage:
       - datalake_cyber_raw.phone.PHRANKORDER
-  PHSELFCURE:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.phone.PHSELFCURE
-  PHRERID:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.phone.PHRERID
   ts_hierarchy_calculation:
-    description: ""
+    description: Timestamp when hierarchy calculation occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.phone.PHUPDDT
   ts_creation:
-    description: ""
+    description: Timestamp when creation occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.phone.PHDATE
   ts_status_update:
     description: "Status change date"
     lineage:
       - datalake_cyber_raw.phone.PHSTATDT
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  creditor:
+    description: Financial attribute representing creditor on the phone dataset.
+    lineage: []
+  source:
+    description: Financial attribute representing source on the phone dataset.
+    lineage: []

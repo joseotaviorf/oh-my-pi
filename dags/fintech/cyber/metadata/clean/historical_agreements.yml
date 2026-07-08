@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: historical_agreements
-owner: bianca.martins@quintoandar.com
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Historical table according to the contracts selected in the negotiation.
@@ -9,114 +9,120 @@ description: |
   Read more at: https://docs.google.com/document/d/1ziYkmVC0XoFdxFh8p7KwCHgMX-P0QKII/edit#bookmark=id.2w5ecyt
 columns:
   id_agreement:
-    description: ""
+    description: Identifier for the agreement referenced by this financial record.
     lineage:
       - datalake_cyber_raw.agr_hist.HAID
   id_contract:
-    description: ""
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_cyber_raw.agr_hist.HAACCT
   id_invoice:
-    description: ""
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_cyber_raw.agr_hist.AHIDPARC
   id_client:
-    description: ""
+    description: Identifier for the client referenced by this financial record.
     lineage:
       - datalake_cyber_raw.agr_hist.AHSSNUM
   contract_group:
-    description: ""
+    description: Financial attribute representing contract group on the historical_agreements dataset.
     lineage:
       - datalake_cyber_raw.agr_hist.HAACCTG
   contract_delay_days:
-    description: ""
+    description: Financial attribute representing contract delay days on the historical_agreements dataset.
     lineage:
       - datalake_cyber_raw.agr_hist.AHDAYS
   ts_due_contract:
-    description: ""
+    description: Timestamp when due contract occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.agr_hist.AHDLQDT
   total_contract_amount:
-    description: ""
+    description: Financial attribute representing total contract amount on the historical_agreements dataset.
     lineage:
       - datalake_cyber_raw.agr_hist.AHCURBAL
   contract_main_overdue_amount:
-    description: ""
+    description: Financial attribute representing contract main overdue amount on the historical_agreements dataset.
     lineage:
       - datalake_cyber_raw.agr_hist.AHAMTDLQ
-  AHVLJURATRA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLJURATRA
-  AHMULTCON:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHMULTCON
-  AHVLVENC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLVENC
-  main_amount_overdue:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLRPRCAG
   main_due_amount:
-    description: ""
+    description: Financial attribute representing main due amount on the historical_agreements dataset.
     lineage:
       - datalake_cyber_raw.agr_hist.AHVLRPRCAVAG
   residual_fine_amount:
-    description: ""
+    description: Financial attribute representing residual fine amount on the historical_agreements dataset.
     lineage:
       - datalake_cyber_raw.agr_hist.AHVLRPRMUAGR
   contract_fine_amount:
-    description: ""
+    description: Financial attribute representing contract fine amount on the historical_agreements dataset.
     lineage:
       - datalake_cyber_raw.agr_hist.AHVLRMUAGR
-  AHVLRPRJUAG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLRPRJUAG
-  AHVLRJUAG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLRJUAG
-  AHVLRCUSAG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLRCUSAG
-  AHVLCUSTASAG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLCUSTASAG
-  AHVLRHOREAG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLRHOREAG
-  AHVLRTXCARAG:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLRTXCARAG
-  AHVLPRINC:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLPRINC
-  AHVLJUR:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLJUR
-  AHVLMUL:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLMUL
-  AHVLCUSTA:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHVLCUSTA
-  AHHONORARIOS:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.agr_hist.AHHONORARIOS
-  AHVLRDESPJUD:
-    description: ""
+  legal_costs_amount:
+    description: Financial attribute representing legal costs amount on the historical_agreements dataset.
     lineage:
       - datalake_cyber_raw.agr_hist.AHVLRDESPJUD
+  credit_card_fee:
+    description: Financial attribute representing credit card fee on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRTXCARAG
+  residual_interest_amount:
+    description: Financial attribute representing residual interest amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRPRJUAG
+  honorarium:
+    description: Financial attribute representing honorarium on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHHONORARIOS
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  contract_interest_amount:
+    description: Financial attribute representing contract interest amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRJUAG
+  invoice_interest_amount:
+    description: Financial attribute representing invoice interest amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLJUR
+  invoice_due_amount:
+    description: Financial attribute representing invoice due amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLPRINC
+  ahvljuratra:
+    description: Financial attribute representing ahvljuratra on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLJURATRA
+  ahmultcon:
+    description: Financial attribute representing ahmultcon on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHMULTCON
+  eviction_costs_amount:
+    description: Financial attribute representing eviction costs amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLCUSTASAG
+  invoice_residual_eviction_costs_amount:
+    description: Financial attribute representing invoice residual eviction costs amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLCUSTA
+  ahvlvenc:
+    description: Financial attribute representing ahvlvenc on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLVENC
+  creditor:
+    description: Financial attribute representing creditor on the historical_agreements dataset.
+    lineage: []
+  invoice_fine_amount:
+    description: Financial attribute representing invoice fine amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLMUL
+  residual_honorarium:
+    description: Financial attribute representing residual honorarium on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRHOREAG
+  total_overdue_amount:
+    description: Financial attribute representing total overdue amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRPRCAG
+  residual_eviction_costs_amount:
+    description: Financial attribute representing residual eviction costs amount on the historical_agreements dataset.
+    lineage:
+      - datalake_cyber_raw.agr_hist.AHVLRCUSAG

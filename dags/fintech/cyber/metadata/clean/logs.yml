@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: logs
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Table that stores all activities, actions taken, results obtained and comments from managers in the
@@ -87,5 +87,4 @@ columns:
       - datalake_cyber_raw.actfil.day
   ts_load:
     description: "Timestamp when the record was loaded into the table"
-    lineage:
-      - datalake_cyber_raw.actfil.NOW()
+    lineage: []

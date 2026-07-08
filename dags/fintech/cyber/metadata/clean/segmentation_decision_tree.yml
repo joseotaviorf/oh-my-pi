@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: segmentation_decision_tree
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Main decision tree for portfolio segmentation work queue assignment. Primary decision network (QUE_DECTBL) used by the portfolio segmentation process to route accounts to appropriate work queues.
@@ -72,3 +72,6 @@ columns:
     description: "Queue identifier for account routing"
     lineage:
       - datalake_cyber_raw.que_dectbl.queue
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

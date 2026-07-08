@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: logs_valid_result_code
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Reference table that relates Action, Result, and Complement codes (VALCODES). Stores valid result codes for each action code, used to determine which activities are related to a specific code. Related to ACTVERTB table.
@@ -11,7 +11,7 @@ columns:
     lineage:
       - datalake_cyber_raw.valcodes.VCACTYPE
   id_action:
-    description: "Action code identifier"
+    description: Identifier for the action referenced by this financial record.
     lineage:
       - datalake_cyber_raw.valcodes.VCACCODE
   result_type:
@@ -19,7 +19,7 @@ columns:
     lineage:
       - datalake_cyber_raw.valcodes.VCRCTYPE
   id_result:
-    description: "Result code identifier"
+    description: Identifier for the result referenced by this financial record.
     lineage:
       - datalake_cyber_raw.valcodes.VCRCCODE
   comment_pre_defined:
@@ -40,4 +40,3 @@ columns:
         END
   ts_load:
     description: "Timestamp when the record was loaded"
-

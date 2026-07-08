@@ -1,75 +1,87 @@
 ---
 database_name: datalake_cyber_clean
 table_name: logs_code_description
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Contains valid action, result, function and screen codes.
 columns:
   code:
-    description: ""
+    description: Financial attribute representing code on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVCODE
   code_type:
-    description: ""
+    description: Financial attribute representing code type on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVTYPE
   code_available_manager:
-    description: ""
+    description: Financial attribute representing code available manager on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVCLTYPE
   user_type:
-    description: ""
+    description: Financial attribute representing user type on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVCUTYPE
   result_code_class:
-    description: ""
+    description: Financial attribute representing result code class on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVCLASS
   is_valid_contact:
-    description: ""
+    description: Indicates whether valid contact applies to this financial record.
     lineage:
       - datalake_cyber_raw.actvertb.AVCNTFLG
   must_add_comment:
-    description: ""
+    description: Financial attribute representing must add comment on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVCOMFLG
   requires_letter:
-    description: ""
+    description: Financial attribute representing requires letter on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVLTRFLG
   days_to_next_contact:
-    description: ""
+    description: Financial attribute representing days to next contact on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVDAYS
   activity_score:
-    description: ""
+    description: Financial attribute representing activity score on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVWEIGHT
   cost:
-    description: ""
+    description: Financial attribute representing cost on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVCOST
   code_description:
-    description: ""
+    description: Financial attribute representing code description on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVDESC
   group:
-    description: ""
+    description: Financial attribute representing group on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVACCTG
   phone_number_rank:
-    description: ""
+    description: Financial attribute representing phone number rank on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVTELRANK
   module:
-    description: ""
+    description: Financial attribute representing module on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVMODULE
-  AVINACCT:
-    description: ""
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  avinacct:
+    description: Financial attribute representing avinacct on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVINACCT
-  AVRESULT:
-    description: ""
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  avresult:
+    description: Financial attribute representing avresult on the logs_code_description dataset.
     lineage:
       - datalake_cyber_raw.actvertb.AVRESULT

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: execution_log
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Table containing execution log data from cyber system.

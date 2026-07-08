@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: payments
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Table granularity - installments of the negotiation that were paid
 columns:
@@ -18,19 +18,19 @@ columns:
     lineage:
       - datalake_cyber_raw.pmtfil.PMID
   contract_group:
-    description: ""
+    description: Financial attribute representing contract group on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMACCTG
   payment_type:
-    description: "Payment Type"
+    description: Financial attribute representing payment type on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMTCODE
   manager:
-    description: ""
+    description: Financial attribute representing manager on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMCOLLID
   queue:
-    description: ""
+    description: Financial attribute representing queue on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMQUE
   payment_method:
@@ -38,43 +38,43 @@ columns:
     lineage:
       - datalake_cyber_raw.pmtfil.PMBATCH
   agency:
-    description: ""
+    description: Financial attribute representing agency on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMAGENCY
   error_code:
-    description: ""
+    description: Financial attribute representing error code on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMTYPE
   field_affected:
-    description: ""
+    description: Financial attribute representing field affected on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMTDCOLM
   trandefs_flag:
-    description: ""
+    description: Financial attribute representing trandefs flag on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMTDFLAG
   trandefs_sequence:
-    description: ""
+    description: Financial attribute representing trandefs sequence on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMTDSEQ
   trandefs_percentage:
-    description: ""
+    description: Financial attribute representing trandefs percentage on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMTDPCNT
   payment_amount:
-    description: "Payment Amount"
+    description: Financial attribute representing payment amount on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMTAMT
   actual_amount:
-    description: ""
+    description: Financial attribute representing actual amount on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMAMOUNT
   previous_field_value:
-    description: ""
+    description: Financial attribute representing previous field value on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMPRVVAL
   field_value_after_calculation:
-    description: ""
+    description: Financial attribute representing field value after calculation on the payments dataset.
     lineage:
       - datalake_cyber_raw.pmtfil.PMCURVAL
   ts_payment:
@@ -82,10 +82,24 @@ columns:
     lineage:
       - datalake_cyber_raw.pmtfil.PMTDATE
   ts_registration_transaction:
-    description: ""
+    description: Timestamp when registration transaction occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.pmtfil.PMEDATE
   ts_transaction_referred:
-    description: ""
+    description: Timestamp when transaction referred occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.pmtfil.PMREFDT
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  id_client:
+    description: Identifier for the client referenced by this financial record.
+    lineage:
+      - datalake_cyber_raw.pmtfil.PMSSNUM
+  creditor:
+    description: Financial attribute representing creditor on the payments dataset.
+    lineage: []
+  source:
+    description: Financial attribute representing source on the payments dataset.
+    lineage:
+      - datalake_cyber_raw.pmtfil.source

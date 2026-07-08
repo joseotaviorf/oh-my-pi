@@ -1,15 +1,18 @@
 ---
 database_name: datalake_cyber_clean
 table_name: queue_agreement_type
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Contains information on valid queues by type of agreement.
 columns:
   id_agreement_type:
-    description: "Agreement type"
+    description: Identifier for the agreement type referenced by this financial record.
     lineage:
       - datalake_cyber_raw.agrvalq.AQTYPE
   id_queue:
     description: "Queue ID. * indicates all queues."
     lineage:
       - datalake_cyber_raw.agrvalq.AQQUE
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
