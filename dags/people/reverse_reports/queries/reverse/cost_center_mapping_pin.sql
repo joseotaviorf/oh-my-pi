@@ -6,7 +6,7 @@ WITH
         FROM
             dw_employee_details.fact_assignment_snapshots AS snap
         WHERE
-            snap.is_current = TRUE
+            snap.is_current_for_assignment = TRUE
             AND COALESCE(snap.is_transfer_termination, FALSE) = FALSE
     ),
     total_headcount AS (

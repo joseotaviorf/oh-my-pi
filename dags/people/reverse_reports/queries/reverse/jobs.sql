@@ -11,8 +11,7 @@ WITH
                 AND emp.is_current
                 AND emp.is_active
         WHERE
-            snap.is_current
-            AND snap.is_primary_assignment_for_snapshot
+            snap.is_current_for_employee
             AND snap.sk_job_version <> '-1'
         GROUP BY
             snap.sk_job_version

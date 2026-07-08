@@ -45,8 +45,8 @@ Outputs: `validation_report.md`, `validation_results.json` in the same folder.
 | Export | Tier-1 note | Tier-2 / sign-off |
 | --- | --- | --- |
 | `cost_center_mapping_pin` | Count match | HC / HRBP drift vs legacy — People Systems sign-off |
-| `pin_current_employee_snapshot`, `pin_systems_employee_roster` | Primary assignment grain (`is_primary_assignment_for_snapshot`); ~10,984 rows with `is_current` (2026-06-25) | Grain remap vs legacy `fact_employees` / all-assignments `fas.is_current`; document Δ in PR |
-| `pin_cost_center_roster` | Primary assignment grain; row count aligns with `employee_snapshots` current primary | Grain remap vs legacy all-assignments export; document Δ in PR |
+| `pin_current_employee_snapshot`, `pin_systems_employee_roster` | Employee-current grain (`is_current_for_employee`); ~10,984 rows (2026-06-25) | Grain now aligned with legacy `fact_employees` one-row-per-employee intent; document any residual Δ in PR |
+| `pin_cost_center_roster` | Employee-current grain (`is_current_for_employee`); row count aligns with `employee_snapshots` | Grain now aligned with employee-current exports; document any residual Δ in PR |
 | `leiturinha_holder_roster` | **2,598 = 2,598** (2026-06-25) vs legacy `dw_employee.fact_employees` | Core cols 0 diffs. `residencia_*` with `TRIM`: **15** symmetric diffs (254 without TRIM). Address upstream fix: [#25191](https://github.com/quintoandar/bi-etl-ejuice/pull/25191) / [DBP-1550](https://quintoandar.atlassian.net/browse/DBP-1550). Residual: legacy `contact.address` vs `address_street` nulls — Benefits sign-off. |
 
 ### Tier 2 — exclude load-time stamps

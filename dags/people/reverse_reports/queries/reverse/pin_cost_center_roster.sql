@@ -7,5 +7,4 @@ SELECT
 FROM
     metric_people.employee_snapshots AS es
 WHERE
-    es.is_current = TRUE
-    AND es.is_primary_assignment_for_snapshot = TRUE
+    es.is_current_for_employee = TRUE

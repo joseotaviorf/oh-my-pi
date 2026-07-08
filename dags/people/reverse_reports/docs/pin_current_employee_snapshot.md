@@ -12,4 +12,4 @@
 | **Business consumer** | People Insights |
 | **Operational source of truth** | `metric_people.employee_snapshots` (+ `dw_compensation.fact_compensations` for `moeda`; `dw_employee_details.fact_assignment_snapshots` + `dim_employee` for `gestor_person_number`). |
 | **Delivery channel** | Google Sheets tab **foto_atual_pin** in workbook `1UJu1xFgPjBtHIIeJTq28kmc4AFNYQv4nvkUIfP5i-A0`. Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
-| **Contract notes** | Legacy Portuguese column names preserved. Primary assignment grain (`is_primary_assignment_for_snapshot = TRUE`). Includes salary and PII columns per legacy contract. Status column aliased as `status` (legacy notebook exported an unaliased `IF` expression — validate header during Tier-2 diff). |
+| **Contract notes** | Legacy Portuguese column names preserved. Employee-current grain (`is_current_for_employee = TRUE`). Includes salary and PII columns per legacy contract. Status column aliased as `status` (legacy notebook exported an unaliased `IF` expression — validate header during Tier-2 diff). |

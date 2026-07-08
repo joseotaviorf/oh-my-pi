@@ -9,17 +9,16 @@ People lake → Google Sheets exports migrated from the legacy Daily Pipeline **
 Employee roster exports in this batch source **`metric_people.employee_snapshots`**. Current-state filter:
 
 ```sql
-es.is_current = TRUE
-AND es.is_primary_assignment_for_snapshot = TRUE
+es.is_current_for_employee = TRUE
 ```
 
 Do not use `es.dt_month_reference = CURRENT_DATE()` — the column is month-end, not today's date.
 
-`cost_center_mapping_pin` is the exception: it aggregates headcount per cost center from `dw_organization.dim_cost_center` and `dw_employee_details.fact_assignment_snapshots`.
+`cost_center_mapping_pin` is the exception: it aggregates headcount per cost center from `dw_organization.dim_cost_center` and `dw_employee_details.fact_assignment_snapshots`, using assignment-grain `is_current_for_assignment` (all current assignments per person, not deduped to one row).
 
 `pin_current_employee_snapshot` adds `dw_*` joins for `currency_code` (`moeda`) and manager `person_number` (`gestor_person_number`).
 
-`leiturinha_holder_roster` adds `is_active = TRUE` and filters on `consolidated_business_unit_name` (SP, SC, MG).
+`leiturinha_holder_roster` adds `is_active = TRUE` alongside `is_current_for_employee` and filters on `consolidated_business_unit_name` (SP, SC, MG).
 
 ---
 

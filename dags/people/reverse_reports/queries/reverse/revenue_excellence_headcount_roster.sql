@@ -112,7 +112,7 @@ LEFT JOIN
 LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS mng_snap
         ON mng_snap.assignment_number = h.manager_assignment_number
-        AND mng_snap.is_current = TRUE
+        AND mng_snap.is_current_for_assignment = TRUE
 LEFT JOIN
     dw_employee_details.dim_employee AS mng_emp
         ON mng_emp.sk_employee = mng_snap.sk_employee
@@ -120,8 +120,7 @@ LEFT JOIN
     dt_inicio_person AS dip
         ON dip.person_number = e.person_number
 WHERE
-    f.is_current = TRUE
-    AND f.is_primary_assignment_for_snapshot = TRUE
+    f.is_current_for_employee = TRUE
     AND f.dt_hired <= CURRENT_DATE()
     AND (LOWER(e.work_email) NOT LIKE '%@ext.%' OR e.work_email IS NULL)
 ORDER BY

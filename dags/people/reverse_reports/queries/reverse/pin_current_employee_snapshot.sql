@@ -31,18 +31,17 @@ FROM
 LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS mgr_fas
         ON mgr_fas.assignment_number = es.manager_assignment_number
-        AND mgr_fas.is_current = TRUE
+        AND mgr_fas.is_current_for_assignment = TRUE
 LEFT JOIN
     dw_employee_details.dim_employee AS mgr_emp
         ON mgr_emp.sk_employee = mgr_fas.sk_employee
 LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS fas
         ON fas.assignment_number = es.assignment_number
-        AND fas.is_current = TRUE
+        AND fas.is_current_for_assignment = TRUE
 LEFT JOIN
     dw_compensation.fact_compensations AS fc
         ON fc.sk_compensation = fas.sk_compensation_version
         AND fas.sk_compensation_version <> '-1'
 WHERE
-    es.is_current = TRUE
-    AND es.is_primary_assignment_for_snapshot = TRUE
+    es.is_current_for_employee = TRUE

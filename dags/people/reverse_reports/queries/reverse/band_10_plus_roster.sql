@@ -29,7 +29,6 @@ LEFT JOIN
     dw_organization.dim_business_unit AS bu
         ON bu.sk_business_unit = es.sk_business_unit
 WHERE
-    es.is_current = TRUE
-    AND es.is_primary_assignment_for_snapshot = TRUE
+    es.is_current_for_employee = TRUE
     AND LOWER(es.status) = 'active'
     AND CAST(es.band AS INT) >= 10

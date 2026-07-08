@@ -5,8 +5,7 @@ WITH
         FROM
             metric_people.employee_snapshots AS es
         WHERE
-            es.is_current = TRUE
-            AND es.is_primary_assignment_for_snapshot = TRUE
+            es.is_current_for_employee = TRUE
     ),
     manager_profile AS (
         SELECT DISTINCT
@@ -96,4 +95,3 @@ LEFT JOIN
         ON c8.assignment_number = mh.assignment_number_l8
 WHERE
     bc.is_active = TRUE
-    OR bc.dt_terminated > CURRENT_DATE()

@@ -10,9 +10,8 @@ WITH active_assignment AS (
     FROM
         dw_employee_details.fact_assignment_snapshots AS snap
     WHERE
-        snap.is_current = TRUE
-        AND snap.is_primary_assignment_for_snapshot = TRUE
-        AND (snap.dt_terminated IS NULL OR snap.dt_terminated >= CURRENT_DATE())
+        snap.is_current_for_employee = TRUE
+        AND snap.is_active = TRUE
 ),
 in_scope_assignment AS (
     SELECT
@@ -99,7 +98,7 @@ LEFT JOIN
 LEFT JOIN
     dw_employee_details.fact_assignment_snapshots AS mgr_snap
         ON mgr_snap.assignment_number = mh.manager_assignment_number
-        AND mgr_snap.is_current = TRUE
+        AND mgr_snap.is_current_for_assignment = TRUE
 LEFT JOIN
     dw_employee_details.dim_employee AS mgr_emp
         ON mgr_snap.sk_employee = mgr_emp.sk_employee

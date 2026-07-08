@@ -25,7 +25,7 @@ People lake → Google Sheets exports that provide the active-employee base for 
 | **Business consumer** | TBD — likely People Systems for PIN / Oracle HCM ingestion (inferred from "base - PIN" tab name). |
 | **Operational source of truth** | DW 2.0 (`dw_employee_details`, `dw_organization`, `dw_compensation`). No external spreadsheet owner — all data sourced from the lake. |
 | **Delivery channel** | Google Sheets tab **base - PIN** in workbook `1lf1CIn8GRvHOnNm0imZ8z01w_NXtjv16zbPqD5GP8-k`. Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
-| **Contract notes** | Column names are legacy Portuguese aliases preserved from the original notebook for sheet compatibility. Active filter: `dt_terminated IS NULL OR dt_terminated >= CURRENT_DATE()` (matches original sandbox logic). |
+| **Contract notes** | Column names are legacy Portuguese aliases preserved from the original notebook for sheet compatibility. Employee-current grain: `is_current_for_employee = TRUE`. Active filter: `dt_terminated IS NULL OR dt_terminated >= CURRENT_DATE()` (matches original sandbox logic). |
 
 ### Column inventory
 

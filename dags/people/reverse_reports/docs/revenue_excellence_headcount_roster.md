@@ -11,7 +11,7 @@
 | **Business consumer** | Revenue Excellence. |
 | **Operational source of truth** | DW 2.0 (`dw_employee_details`, `dw_organization`, `dw_compensation`). No external spreadsheet owner — all data sourced from the lake. |
 | **Delivery channel** | Google Sheets tab **_base** in workbook `1WofTMH4dLnbKEUrHrmeGLjrPjK1AH-HRIRm9egfn368`. Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
-| **Contract notes** | Same org-wide scope as `public_information` (no L1-manager filter). **No active filter**: terminated employees are kept so `dt_desligamento` is meaningful. Both `dt_desligamento` and `status` are gated on `dt_terminated <= CURRENT_DATE()`: a termination on or before today shows the date with `status = 'desligado'`; active employees and not-yet-effective future terminations show an empty `dt_desligamento` and stay `status = 'ativo'` until the date arrives. Future hires (`dt_hired > CURRENT_DATE()`) and external emails (`@ext.`) are excluded. |
+| **Contract notes** | Same org-wide scope as `public_information` (no L1-manager filter). Employee-current grain: `is_current_for_employee = TRUE`. **No active filter**: terminated employees are kept so `dt_desligamento` is meaningful. Both `dt_desligamento` and `status` are gated on `dt_terminated <= CURRENT_DATE()`: a termination on or before today shows the date with `status = 'desligado'`; active employees and not-yet-effective future terminations show an empty `dt_desligamento` and stay `status = 'ativo'` until the date arrives. Future hires (`dt_hired > CURRENT_DATE()`) and external emails (`@ext.`) are excluded. |
 
 ### Column inventory
 

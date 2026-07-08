@@ -12,4 +12,4 @@
 | **Business consumer** | People Insights |
 | **Operational source of truth** | `metric_people.employee_snapshots`. |
 | **Delivery channel** | Google Sheets tab **centro_de_custo_pin** in workbook `1UJu1xFgPjBtHIIeJTq28kmc4AFNYQv4nvkUIfP5i-A0`. Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
-| **Contract notes** | Legacy column names preserved. Primary assignment grain (`is_primary_assignment_for_snapshot = TRUE`) — one row per employee on the current snapshot. |
+| **Contract notes** | Legacy column names preserved. Employee-current grain (`is_current_for_employee = TRUE`) — one row per employee on the current snapshot. |

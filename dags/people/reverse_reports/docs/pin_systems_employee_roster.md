@@ -12,4 +12,4 @@
 | **Business consumer** | DP (Personnel Department) |
 | **Operational source of truth** | `metric_people.employee_snapshots`. |
 | **Delivery channel** | Google Sheets tab **base_pin** in workbook `1il9Cl7fuyXQ7AKrso-AQVN0A4LDEE1-vtgcv-rqSEDU`. Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
-| **Contract notes** | Legacy Portuguese column names preserved. Primary assignment grain (`is_primary_assignment_for_snapshot = TRUE`). Oracle flexfield-style header `país` requires `column_mapping_mode: name`. Same workbook as `dp_employee_master` (different tab). |
+| **Contract notes** | Legacy Portuguese column names preserved. Employee-current grain (`is_current_for_employee = TRUE`). Oracle flexfield-style header `país` requires `column_mapping_mode: name`. Same workbook as `dp_employee_master` (different tab). |

@@ -12,4 +12,4 @@
 | **Business consumer** | Performance and Navent |
 | **Operational source of truth** | Same as `pin_systems_employee_roster` (`metric_people.employee_snapshots`). |
 | **Delivery channel** | Google Sheets tab **base_pin** in workbook `1PEy7dd54tor157fVI_UK7J3t4SLIDKtgk92x6dHJbmg`. Service account editor: `gsheets-people-access@airflow-186119.iam.gserviceaccount.com`. |
-| **Contract notes** | Identical column contract to `pin_systems_employee_roster`. Primary assignment grain. Legacy Portuguese column names preserved. |
+| **Contract notes** | Identical column contract to `pin_systems_employee_roster`. Employee-current grain (`is_current_for_employee = TRUE`). Legacy Portuguese column names preserved. |

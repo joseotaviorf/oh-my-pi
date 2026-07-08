@@ -82,5 +82,4 @@ LEFT JOIN
     dw_employee_details.dim_employee AS de
         ON de.sk_employee = es.sk_employee
 WHERE
-    es.is_current = TRUE
-    AND es.is_primary_assignment_for_snapshot = TRUE
+    es.is_current_for_employee = TRUE
