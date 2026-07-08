@@ -2,9 +2,9 @@
 database_name: datalake_cdp_clean
 table_name: user_tracking_events
 description: |
-  Clean-layer CDP user-tracking Event Gateway events loaded in batch from the ClickHouse
-  user_tracking_events view by the cdp_clickhouse DAG. Staging transformations run in
-  ClickHouse; clean adds ts_kafka and ts_load. Column contract is aligned with the CDP
+  Clean-layer CDP user-tracking Event Gateway events from datalake_cdp_raw.events_api.
+  Staging transformations run in clean SQL (filter egw_event_type = USER_TRACKING);
+  adds ts_kafka and ts_load. Column contract is aligned with the CDP
   stream_user_tracking_clean workflow (datalake_cdp_clean.user_tracking). Primary key grain: id_event with
   event_name and date partitions (year, month, day).
 domain: Growth
@@ -15,260 +15,262 @@ columns:
       Unique event identifier from the EGW hub payload; merge key together with
       event_name and date partitions.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_id
+      - datalake_cdp_raw.events_api.event_id
   id_person:
     description: |
       Person identifier from person_uuid on the governed hub event when identity
       resolution is available.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.person_uuid
+      - datalake_cdp_raw.events_api.person_uuid
   id_user:
     description: |
       Application user identifier attached to the event, cast to BIGINT for analytics
       consumption.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_id
+      - datalake_cdp_raw.events_api.user_id
   id_domain_user:
     description: |
       Domain-scoped user identifier parsed from the domain_user_id field in
       user_properties JSON.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
+      - datalake_cdp_raw.events_api.enrichments
   id_anonymous:
     description: |
       Anonymous device identifier for the user before identity resolution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.device_id
+      - datalake_cdp_raw.events_api.enrichments
+      - datalake_cdp_raw.events_api.user_properties
   event_name:
     description: |
       Name of the user-tracking event emitted by the application or SDK.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_name
+      - datalake_cdp_raw.events_api.event_name
   application:
     description: |
       Lowercased application or product surface that generated the tracking event.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.application
+      - datalake_cdp_raw.events_api.application
   platform:
     description: |
       Platform used by the user, coalesced from event_properties and user_properties
       JSON when present.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.event_properties
+      - datalake_cdp_raw.events_api.user_properties
   country:
     description: |
       Country or market of the user, extracted from the market field in
       event_properties JSON.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   city:
     description: |
       City of the user, extracted from address.city in event_properties JSON.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   region:
     description: |
       Region of the user, extracted from the region field in event_properties JSON.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   app_type:
     description: |
       Type of client application, extracted from os_name in event_properties JSON.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   device_info:
     description: |
       Device manufacturer information extracted from event_properties JSON.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   ip_address:
     description: |
       IP address of the user at event capture time, from event_properties JSON.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   latitude:
     description: |
       Latitude coordinate of the user, parsed from address.lat in event_properties.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   longitude:
     description: |
       Longitude coordinate of the user, parsed from address.lng in event_properties.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   egw_initial_gclid:
     description: |
       Initial Google Click ID from user_properties, used for first-touch attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_fbclid:
     description: |
       Initial Facebook Click ID from user_properties for first-touch attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_gbraid:
     description: |
       Initial Google Braid identifier from user_properties for attribution tracking.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_wbraid:
     description: |
       Initial Wbraid identifier from user_properties for attribution tracking.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_gclid:
     description: |
       Current Google Click ID from user_properties for session attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_fbclid:
     description: |
       Current Facebook Click ID from user_properties for session attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_gbraid:
     description: |
       Current Google Braid identifier from user_properties for attribution tracking.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_wbraid:
     description: |
       Current Wbraid identifier from user_properties for attribution tracking.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_rdt_cid:
     description: |
       Current Reddit Click ID from user_properties for session attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_rdt_cid:
     description: |
       Initial Reddit Click ID from user_properties for first-touch attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_msclkid:
     description: |
       Current Microsoft Click ID from user_properties for session attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_msclkid:
     description: |
       Initial Microsoft Click ID from user_properties for first-touch attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_apps_flyer_id:
     description: |
       AppsFlyer device identifier from user_properties for mobile attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_utm_campaign:
     description: |
       Initial UTM campaign parameter from user_properties for first-touch marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_utm_content:
     description: |
       Initial UTM content parameter from user_properties for first-touch marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_utm_medium:
     description: |
       Initial UTM medium parameter from user_properties for first-touch marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_utm_source:
     description: |
       Initial UTM source parameter from user_properties for first-touch marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_utm_term:
     description: |
       Initial UTM term parameter from user_properties for first-touch marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_utm_campaign:
     description: |
       Current UTM campaign parameter from user_properties for session marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_utm_content:
     description: |
       Current UTM content parameter from user_properties for session marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_utm_medium:
     description: |
       Current UTM medium parameter from user_properties for session marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_utm_source:
     description: |
       Current UTM source parameter from user_properties for session marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_utm_term:
     description: |
       Current UTM term parameter from user_properties for session marketing
       attribution.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_initial_attribution_time:
     description: |
       Initial attribution timestamp in UTC, converted from epoch milliseconds in
       user_properties.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_last_attribution_time:
     description: |
       Last attribution timestamp in UTC, converted from epoch milliseconds in
       user_properties.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   egw_linked_devices:
     description: |
       JSON array of linked devices from user_properties for cross-device identity.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   event_properties:
     description: |
       Raw JSON string of event-specific properties from the governed EGW user-tracking
       hub record.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   user_properties:
     description: |
       Raw JSON string of user-scoped properties from the governed hub, including
       attribution and UTM fields surfaced as dedicated columns where mapped.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   ts_event:
     description: |
       Client-reported event time in UTC, converted from hub timestamp epoch
       milliseconds.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   ts_egw:
     description: |
       Time when Event Gateway ingested the event in UTC, converted from
       egw_timestamp epoch milliseconds.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.egw_timestamp
+      - datalake_cdp_raw.events_api.egw_timestamp
   ts_kafka:
     description: |
       Approximate Kafka-style timestamp built from the calendar components of
       ts_event (year, month, day, hour, minute).
     lineage:
-      - datalake_cdp_raw.user_tracking_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   ts_load:
     description: |
       Databricks processing time when the cdp_clickhouse batch job wrote or updated
@@ -277,14 +279,14 @@ columns:
     description: |
       Partition key; calendar year of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   month:
     description: |
       Partition key; calendar month of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   day:
     description: |
       Partition key; calendar day of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.user_tracking_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt

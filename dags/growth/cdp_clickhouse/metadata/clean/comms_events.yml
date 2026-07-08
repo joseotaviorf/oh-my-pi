@@ -2,8 +2,8 @@
 database_name: datalake_cdp_clean
 table_name: comms_events
 description: |
-  Clean-layer CDP communication Event Gateway events loaded in batch from the ClickHouse
-  comms_events view by the cdp_clickhouse DAG. Staging transformations run in ClickHouse;
+  Clean-layer CDP communication Event Gateway events from datalake_cdp_raw.events_api.
+  Staging transformations run in clean SQL (filter egw_event_type = COMMUNICATION);
   clean adds ts_kafka and ts_load. Column contract is aligned with the CDP stream_comms_clean
   workflow (datalake_cdp_clean.comms).
   Primary key grain: id_event with event_name and date partitions (year, month, day).
@@ -15,132 +15,134 @@ columns:
       Unique event identifier from the EGW hub payload; merge key together with
       event_name and date partitions.
     lineage:
-      - datalake_cdp_raw.comms_events.event_id
+      - datalake_cdp_raw.events_api.event_id
   id_person:
     description: |
       Person identifier from person_uuid on the governed hub event when identity
       resolution is available.
     lineage:
-      - datalake_cdp_raw.comms_events.person_uuid
+      - datalake_cdp_raw.events_api.person_uuid
   id_user:
     description: |
       Application user identifier attached to the communication event as a string.
     lineage:
-      - datalake_cdp_raw.comms_events.user_id
+      - datalake_cdp_raw.events_api.user_id
   id_domain_user:
     description: |
       Domain-scoped user identifier parsed from the domain_user_id field in
       user_properties JSON.
     lineage:
-      - datalake_cdp_raw.comms_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
+      - datalake_cdp_raw.events_api.enrichments
   id_anonymous:
     description: |
       Anonymous device identifier associated with the communication event.
     lineage:
-      - datalake_cdp_raw.comms_events.device_id
+      - datalake_cdp_raw.events_api.enrichments
+      - datalake_cdp_raw.events_api.user_properties
   id_dispatch:
     description: |
       Dispatch identifier parsed from the id_dispatch field in event_properties JSON.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   user_type:
     description: |
       Audience or profile role from event_properties.profile, lowercased for
       consistent categorical analysis.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   channel:
     description: |
       Communication channel used, extracted and lowercased from event_properties JSON.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_type:
     description: |
       Type of communication context, extracted and lowercased from event_properties.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_typology:
     description: |
       Communication typology or category, extracted and lowercased from
       event_properties.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_journey_step:
     description: |
       Journey step for the communication, extracted and lowercased from
       event_properties.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_status:
     description: |
       Delivery or interaction status of the communication, lowercased from
       event_properties.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_name:
     description: |
       Reference name of the communication, extracted and lowercased from
       event_properties.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_rule:
     description: |
       Rule applied to the communication, extracted and lowercased from
       event_properties.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_action:
     description: |
       Action taken for the communication, extracted and lowercased from
       event_properties.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_template:
     description: |
       Template name used for the communication, extracted and lowercased from
       event_properties.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   comms_source:
     description: |
       Source application that originated the communication, lowercased from hub
       application field.
     lineage:
-      - datalake_cdp_raw.comms_events.application
+      - datalake_cdp_raw.events_api.application
   event_properties:
     description: |
       Raw JSON string of communication event properties from the governed EGW hub
       record; source for parsed comms_* fields where applicable.
     lineage:
-      - datalake_cdp_raw.comms_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   user_properties:
     description: |
       Raw JSON string of user-scoped properties from the governed EGW hub record.
     lineage:
-      - datalake_cdp_raw.comms_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   event_name:
     description: |
       Event name from the communication hub stream.
     lineage:
-      - datalake_cdp_raw.comms_events.event_name
+      - datalake_cdp_raw.events_api.event_name
   ts_event:
     description: |
       Client-reported event time in UTC, converted from hub timestamp epoch
       milliseconds.
     lineage:
-      - datalake_cdp_raw.comms_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   ts_egw:
     description: |
       Time when Event Gateway ingested the event in UTC, converted from
       egw_timestamp epoch milliseconds.
     lineage:
-      - datalake_cdp_raw.comms_events.egw_timestamp
+      - datalake_cdp_raw.events_api.egw_timestamp
   ts_kafka:
     description: |
       Approximate Kafka-style timestamp built from the calendar components of
       ts_event (year, month, day, hour, minute).
     lineage:
-      - datalake_cdp_raw.comms_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   ts_load:
     description: |
       Databricks processing time when the cdp_clickhouse batch job wrote or updated
@@ -149,14 +151,14 @@ columns:
     description: |
       Partition key; calendar year of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.comms_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   month:
     description: |
       Partition key; calendar month of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.comms_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   day:
     description: |
       Partition key; calendar day of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.comms_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt

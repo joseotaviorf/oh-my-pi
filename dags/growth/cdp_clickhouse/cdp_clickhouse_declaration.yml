@@ -2,15 +2,14 @@ dag:
   name: cdp_clickhouse
   owner: Data Growth
   schedule_start_date: 2026, 6, 1
-  schedule_interval: 0,30 * * * *
+  schedule_interval: 0 * * * *
   documentation:
     dag_purpose: |
-      Ingests CDP events from ClickHouse views (transactional_events, user_tracking_events,
-      comms_events) built on events_api. Each view applies typed staging transformations in
-      ClickHouse; the Spark job loads incrementally every 30 minutes using ts_event
-      into raw Delta tables, then clean tasks add ts_kafka and ts_load. Schemas mirror
-      customer-data-platform stream_*_clean workflows, merged on id_event, event_name and
-      date partitions.
+      Ingests CDP events from the ClickHouse events_api table into a single raw Delta
+      table, then builds transactional_events, user_tracking_events and comms_events in
+      clean by filtering egw_event_type and applying staging transforms. Loaded
+      incrementally every hour on timestamp_dt; raw deduplicates on event_id using
+      egw_updated_at. Clean schemas mirror customer-data-platform stream_*_clean workflows.
 
 workflow:
   layer: raw
@@ -33,25 +32,25 @@ workflow:
     - "{load_start_date}"
     - "{load_end_date}"
   tables_customization:
-    transactional_events:
+    events_api:
       extraction_type: incremental
       partitions: [year, month, day]
+    transactional_events:
+      raw_table_dependency: events_api
       clean_extraction_type: incremental
       clean_partitions: [year, month, day]
       merge_on: [id_event, event_name, year, month, day]
       when_matched_update_condition: source.ts_egw >= target.ts_egw
       clean_z_order_by: [event_name, id_user]
     user_tracking_events:
-      extraction_type: incremental
-      partitions: [year, month, day]
+      raw_table_dependency: events_api
       clean_extraction_type: incremental
       clean_partitions: [year, month, day]
       merge_on: [id_event, event_name, year, month, day]
       when_matched_update_condition: source.ts_egw >= target.ts_egw
       clean_z_order_by: [event_name, id_user]
     comms_events:
-      extraction_type: incremental
-      partitions: [year, month, day]
+      raw_table_dependency: events_api
       clean_extraction_type: incremental
       clean_partitions: [year, month, day]
       merge_on: [id_event, event_name, year, month, day]

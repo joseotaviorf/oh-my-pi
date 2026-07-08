@@ -2,9 +2,9 @@
 database_name: datalake_cdp_clean
 table_name: transactional_events
 description: |
-  Clean-layer CDP transactional Event Gateway events loaded in batch from the ClickHouse
-  transactional_events view by the cdp_clickhouse DAG. Staging transformations run in
-  ClickHouse; clean adds ts_kafka and ts_load. Column contract is aligned with the CDP
+  Clean-layer CDP transactional Event Gateway events from datalake_cdp_raw.events_api.
+  Staging transformations run in clean SQL (filter egw_event_type = TRANSACTIONAL);
+  adds ts_kafka and ts_load. Column contract is aligned with the CDP
   stream_transactional_clean workflow (datalake_cdp_clean.transactional).
   Primary key grain: id_event with event_name and date partitions (year, month, day).
 domain: Growth
@@ -15,80 +15,83 @@ columns:
       Unique event identifier from the EGW hub payload; merge key together with
       event_name and date partitions.
     lineage:
-      - datalake_cdp_raw.transactional_events.event_id
+      - datalake_cdp_raw.events_api.event_id
   id_person:
     description: |
       Person identifier from person_uuid on the governed hub event when identity
       resolution is available.
     lineage:
-      - datalake_cdp_raw.transactional_events.person_uuid
+      - datalake_cdp_raw.events_api.person_uuid
   id_user:
     description: |
       Application user identifier attached to the event, cast to BIGINT for analytics
       consumption.
     lineage:
-      - datalake_cdp_raw.transactional_events.user_id
+      - datalake_cdp_raw.events_api.user_id
   id_domain_user:
     description: |
       Domain-scoped user identifier parsed from the domain_user_id field in
       user_properties JSON.
     lineage:
-      - datalake_cdp_raw.transactional_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
+      - datalake_cdp_raw.events_api.enrichments
   id_entity:
     description: |
       Entity identifier for the device or other entity that generated the event.
     lineage:
-      - datalake_cdp_raw.transactional_events.device_id
+      - datalake_cdp_raw.events_api.enrichments
+      - datalake_cdp_raw.events_api.user_properties
   id_house:
     description: |
       House identifier extracted from the houseId field in event_properties JSON.
     lineage:
-      - datalake_cdp_raw.transactional_events.event_properties
+      - datalake_cdp_raw.events_api.house_id
+      - datalake_cdp_raw.events_api.event_properties
   application:
     description: |
       Lowercased application or product surface that generated the transactional event.
     lineage:
-      - datalake_cdp_raw.transactional_events.application
+      - datalake_cdp_raw.events_api.application
   journey_step:
     description: |
       Funnel or journey step label associated with the event when defined in tracking.
     lineage:
-      - datalake_cdp_raw.transactional_events.journey_step
+      - datalake_cdp_raw.events_api.journey_step
   event_name:
     description: |
       Lowercased name of the transactional event emitted by the application or SDK.
     lineage:
-      - datalake_cdp_raw.transactional_events.event_name
+      - datalake_cdp_raw.events_api.event_name
   event_properties:
     description: |
       Raw JSON string of event-specific properties from the governed EGW transactional
       hub record.
     lineage:
-      - datalake_cdp_raw.transactional_events.event_properties
+      - datalake_cdp_raw.events_api.event_properties
   user_properties:
     description: |
       Raw JSON string of user-scoped properties from the governed EGW transactional
       hub record.
     lineage:
-      - datalake_cdp_raw.transactional_events.user_properties
+      - datalake_cdp_raw.events_api.user_properties
   ts_event:
     description: |
       Client-reported event time in UTC, converted from hub timestamp epoch
       milliseconds.
     lineage:
-      - datalake_cdp_raw.transactional_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   ts_egw:
     description: |
       Time when Event Gateway ingested the event in UTC, converted from
       egw_timestamp epoch milliseconds.
     lineage:
-      - datalake_cdp_raw.transactional_events.egw_timestamp
+      - datalake_cdp_raw.events_api.egw_timestamp
   ts_kafka:
     description: |
       Approximate Kafka-style timestamp built from the calendar components of
       ts_event (year, month, day, hour, minute).
     lineage:
-      - datalake_cdp_raw.transactional_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   ts_load:
     description: |
       Databricks processing time when the cdp_clickhouse batch job wrote or updated
@@ -97,14 +100,14 @@ columns:
     description: |
       Partition key; calendar year of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.transactional_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   month:
     description: |
       Partition key; calendar month of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.transactional_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt
   day:
     description: |
       Partition key; calendar day of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.transactional_events.timestamp
+      - datalake_cdp_raw.events_api.timestamp_dt

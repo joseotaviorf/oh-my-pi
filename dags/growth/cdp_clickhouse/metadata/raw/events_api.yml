@@ -1,0 +1,53 @@
+---
+database_name: datalake_cdp_raw
+table_name: events_api
+description: |
+  Raw Delta mirror of the ClickHouse events_api table. Loaded incrementally every
+  Loaded incrementally every hour by the cdp_clickhouse Spark job using timestamp_dt. One row per event_id
+  after deduplication on egw_updated_at. Source for datalake_cdp_clean transactional,
+  user_tracking and comms event tables.
+domain: Growth
+owner: marcio.gomes@quintoandar.com.br
+columns:
+  event_id:
+    description: Unique event identifier from the CDP Event Gateway hub.
+  user_id:
+    description: Application user identifier attached to the event.
+  person_uuid:
+    description: Person UUID from the CDP identity graph when resolved.
+  egw_event_type:
+    description: Event Gateway event type used to route clean-layer transformations.
+  application:
+    description: Application or product surface that generated the event.
+  journey_step:
+    description: Funnel or journey step label associated with the event.
+  event_name:
+    description: Event name from the application or SDK.
+  event_properties:
+    description: JSON string of event-specific properties.
+  user_properties:
+    description: JSON string of user-level properties at capture time.
+  timestamp:
+    description: Client-reported event time as Unix epoch milliseconds.
+  egw_timestamp:
+    description: Event Gateway ingestion time as Unix epoch milliseconds.
+  egw_updated_at:
+    description: |
+      Event Gateway update epoch in milliseconds; ReplacingMergeTree version column
+      used for raw deduplication and merge updates.
+  timestamp_dt:
+    description: Event timestamp in UTC; drives incremental load windows on ClickHouse reads.
+  _ingested_at:
+    description: ClickHouse ingestion timestamp.
+  enrichments:
+    description: JSON string of enrichment fields such as device_id and domain_user_id.
+  house_id:
+    description: Native house identifier from events_api when present.
+  contract_id:
+    description: Native contract identifier from events_api when present.
+  year:
+    description: Partition column derived from timestamp_dt at load time.
+  month:
+    description: Partition column derived from timestamp_dt at load time.
+  day:
+    description: Partition column derived from timestamp_dt at load time.

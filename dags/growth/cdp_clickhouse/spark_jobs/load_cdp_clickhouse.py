@@ -55,11 +55,11 @@ if __name__ == "__main__":
     clickhouse_ssl = config_service.get_config("clickhouse_ssl")
     clickhouse_ssl_mode = config_service.get_config("clickhouse_ssl_mode")
     clickhouse_database = config_service.get_config("clickhouse_database")
+    clickhouse_source_table = config_service.get_config("clickhouse_source_table")
     clickhouse_incremental_column = config_service.get_config(
         "clickhouse_incremental_column"
     )
     partition_columns = config_service.get_config("partition_columns")
-    clickhouse_table = args.table_name
 
     dbutils = BaseDBUtils().get_dbutils()
     clickhouse_secret = json.loads(
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     load_start_ts = datetime.strptime(args.load_start_date, "%Y-%m-%d")
     load_end_ts = datetime.strptime(args.load_end_date, "%Y-%m-%d")
     logger.info(
-        f"Reading from ClickHouse view {clickhouse_database}.{clickhouse_table} "
+        f"Reading from ClickHouse table {clickhouse_database}.{clickhouse_source_table} "
         f"at host {clickhouse_host} with pushed filters on "
         f"{clickhouse_incremental_column} in [{load_start_ts}, {load_end_ts})"
     )
@@ -93,7 +93,7 @@ if __name__ == "__main__":
             "user": clickhouse_user,
             "password": clickhouse_password,
             "database": clickhouse_database,
-            "table": clickhouse_table,
+            "table": clickhouse_source_table,
             "spark.clickhouse.client.queryTimeout": "600s",
             "spark.clickhouse.read.settings.socket_timeout": "600000",
             "spark.clickhouse.read.settings.receive_timeout": "600000",
@@ -115,10 +115,10 @@ if __name__ == "__main__":
     df = (
         SparkDataFrameService()
         .input(df)
-        .create_year_month_day_columns_from_dataframe_column("ts_event")
+        .create_year_month_day_columns_from_dataframe_column("timestamp_dt")
         .output()
     )
-    dedup_window = Window.partitionBy("id_event").orderBy(desc("egw_updated_at"))
+    dedup_window = Window.partitionBy("event_id").orderBy(desc("egw_updated_at"))
     df = (
         df.withColumn("_rn", row_number().over(dedup_window))
         .filter(col("_rn") == 1)
@@ -134,7 +134,7 @@ if __name__ == "__main__":
         path=table_s3_path,
         source_df=df,
         partition_by=partition_columns,
-        merge_on=["id_event"],
+        merge_on=["event_id", "year", "month", "day"],
         when_matched_update_condition="source.egw_updated_at >= target.egw_updated_at",
     )
 
