@@ -9,7 +9,7 @@ WITH sale_visit_flows AS (
     CASE
       WHEN v.visit_request_channel IN ('AGENT_PWA', 'AGENT_NATIVE') THEN 'Agent'
       WHEN v.visit_request_channel IN ('TENANT_PWA', 'TENANT_NATIVE') THEN 'Buyer'
-      WHEN su.id_user_5a IS NOT NULL THEN 'Secretaria'
+      WHEN su.id_secretariat_user IS NOT NULL THEN 'Secretaria'
       WHEN u.email LIKE '%quintoandar.com.br' THEN 'Admin/CX'
       ELSE 'Other'
     END AS visit_creation_origin,
@@ -28,8 +28,9 @@ WITH sale_visit_flows AS (
     datalake_ebdb_user.user AS uv
       ON uv.id = v.id_agent
   LEFT JOIN
-    datalake_hub_services.secretariat_hierarchy AS su
-      ON su.id_user_5a = v.id_user_visit_request
+    datalake_secretariat.secretariat_allocation_history AS su
+      ON su.id_secretariat_user = v.id_user_visit_request
+      AND su.is_last_version IS TRUE
   LEFT JOIN
     datalake_ebdb_user.user AS u
       ON u.id = v.id_user_visit_request

@@ -17,7 +17,7 @@ SELECT
     eso.id_user_consultant AS sk_user_consultant,
     eso.id_consultant AS sk_consultant,
     COALESCE(eso.id_closing_specialist, -1) AS sk_closing_specialist,
-    COALESCE(sa_creator.sk_secretariat_user_version, -1) AS sk_secretariat_booking_creator,
+    COALESCE(sa_creator.id_secretariat_user_version, -1) AS sk_secretariat_booking_creator,
     COALESCE(bpt.id_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
     COALESCE(dsps_listing.sk_sale_price_segment, -1) AS sk_listing_price_segment,
     COALESCE(CAST(REPLACE(SUBSTRING(eso.ts_offer_submitted,1, 10),'-','') AS BIGINT), -1) AS sk_offer_submitted_date,
@@ -68,7 +68,7 @@ SELECT
 FROM
     datalake_sale_offer.sale_offer AS eso    
 LEFT JOIN
-    datalake_hub_services.daily_secretariat_allocation AS sa_creator
+    datalake_secretariat.daily_secretariat_allocation AS sa_creator
         ON sa_creator.id_secretariat_user = eso.id_user_secretariat_booking_creator
         AND sa_creator.dt_snapshot = DATE(eso.ts_booking_created)
 LEFT JOIN

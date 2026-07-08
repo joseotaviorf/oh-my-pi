@@ -345,7 +345,7 @@ secretariat_on_visit_date AS (
         FROM
             datalake_ebdb_clean.booking AS b
         JOIN
-            datalake_hub_services.buyer_secretariat_changes AS bsc
+            datalake_secretariat.buyer_secretariat_changes AS bsc
                 ON b.id_visitor = bsc.id_external_lead
                 AND b.dt_booking BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, GREATEST(NOW(), b.dt_booking))
     )
@@ -364,7 +364,7 @@ last_secretariat as (
     FROM
         datalake_ebdb_clean.booking AS b
     JOIN
-        datalake_hub_services.buyer_secretariat_changes AS bsc
+        datalake_secretariat.buyer_secretariat_changes AS bsc
             ON b.id_visitor = bsc.id_external_lead
             AND bsc.is_last_responsible
 ),
@@ -411,7 +411,7 @@ base_booking AS (
         b.id_agent,
         ua.id AS id_user_sale_agent,
         b.id_attendant,
-        su.id_user_5a AS id_user_sale_attendence_5a,
+        su.id_secretariat_user AS id_user_sale_attendence_5a,
         sod.id_user_secretariat_on_visit_date,
         ls.id_user_last_secretariat,
         b.id_rent_flow,
@@ -531,7 +531,7 @@ base_booking AS (
               CASE
                 WHEN fba.id_user_creation = ua.id THEN 'Agent'
                 WHEN fba.id_user_creation = b.id_visitor THEN 'Buyer'
-                WHEN fba.id_user_creation = su.id_user_5a THEN 'Secretaria'
+                WHEN fba.id_user_creation = su.id_secretariat_user THEN 'Secretaria'
                 WHEN u.email LIKE '%quintoandar.com.br' THEN 'Admin/CX'
                 ELSE 'Other'
               END
@@ -656,8 +656,9 @@ base_booking AS (
         datalake_ebdb_clean.user AS ua
             ON ua.id_agent = b.id_agent
     LEFT JOIN
-        datalake_hub_services.secretariat_hierarchy AS su
-            ON su.id_user_5a = fba.id_user_creation
+        datalake_secretariat.secretariat_allocation_history AS su
+            ON su.id_secretariat_user = fba.id_user_creation
+            AND su.is_last_version IS TRUE
     LEFT JOIN
         datalake_ebdb_user.user AS u
             ON u.id = fba.id_user_creation

@@ -37,7 +37,7 @@ columns:
     lineage:
       - datalake_visit.visits.id_user_visit_request
       - datalake_visit.visits.id_visitor
-      - datalake_hub_services.secretariat_hierarchy.id_user_5a
+      - datalake_secretariat.secretariat_allocation_history.id_secretariat_user
       - datalake_visit.visits.id_visit
       - datalake_visit.visits.ts_created
     description: Identifies the type of user who created the sale visit.
@@ -45,7 +45,7 @@ columns:
     lineage:
       - datalake_visit.visits.id_user_visit_request
       - datalake_visit.visits.id_visitor
-      - datalake_hub_services.secretariat_hierarchy.id_user_5a
+      - datalake_secretariat.secretariat_allocation_history.id_secretariat_user
       - datalake_visit.visits.id_visit
     description: Identifies the type of user who created the sale booking.
   visit_code:

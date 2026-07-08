@@ -4,9 +4,11 @@ WITH
 --------------------------------------------
 users_secretaria AS (
     SELECT
-        CAST(id_user_5a AS BIGINT) AS id_user_attendence_5a
+        CAST(id_secretariat_user AS BIGINT) AS id_user_attendence_5a
     FROM
-        datalake_hub_services.secretariat_hierarchy
+        datalake_secretariat.secretariat_allocation_history
+    WHERE
+        is_last_version IS TRUE
 ),
 buyer_prospect_status as (
     SELECT

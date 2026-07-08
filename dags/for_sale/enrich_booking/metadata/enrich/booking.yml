@@ -58,15 +58,15 @@ columns:
       and not by the visitor himself
   id_user_sale_attendence_5a:
     lineage:
-    - datalake_hub_services.secretariat_hierarchy.id_user_5a
+    - datalake_secretariat.secretariat_allocation_history.id_secretariat_user
     description: User id of the secretary who created the booking.
   id_user_secretariat_on_visit_date:
     lineage:
-    - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+    - datalake_secretariat.buyer_secretariat_changes.id_external_responsible
     description: User id of the Sales secretary who was responsible for the buyer during the visit date.
   id_user_last_secretariat:
     lineage:
-    - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+    - datalake_secretariat.buyer_secretariat_changes.id_external_responsible
     description: User id of the last Sales secretary responsible for the buyer.
   id_rent_flow:
     lineage:

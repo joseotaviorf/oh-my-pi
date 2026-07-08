@@ -111,8 +111,8 @@ columns:
       '0': Not active.
   dadossecretaria_ativo:
     lineage:
-    - datalake_hub_services.secretariat_allocation_history.id_secretariat_user
-    - datalake_hub_services.secretariat_allocation_history.ts_allocation_ended
+    - datalake_secretariat.secretariat_allocation_history.id_secretariat_user
+    - datalake_secretariat.secretariat_allocation_history.ts_allocation_ended
     description: Boolean flag that indicates if the user is an active secretariat or not.
   flg_doorman_affiliate:
     lineage:
@@ -138,7 +138,7 @@ columns:
     description: Boolean flag that indicates if the user is an Agent in QuintoAndar working with Rentals.
   is_secretariat_user:
     lineage:
-    - datalake_hub_services.secretariat_allocation_history.id_secretariat_user
+    - datalake_secretariat.secretariat_allocation_history.id_secretariat_user
     description: Boolean flag that indicates if the user is a Secretariat user.
   is_user_merged:
     description: Boolean flag that indicates if the user was merged into a new one.

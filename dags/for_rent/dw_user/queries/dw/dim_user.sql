@@ -63,7 +63,7 @@ booking_counts AS (
         ts_allocation_ended,
         ROW_NUMBER() OVER (PARTITION BY id_secretariat_user ORDER BY version DESC) AS rn
     FROM
-        datalake_hub_services.secretariat_allocation_history
+        datalake_secretariat.secretariat_allocation_history
  ),
  user_secretariat AS (
     SELECT

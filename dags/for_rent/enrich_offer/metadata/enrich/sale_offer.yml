@@ -66,31 +66,31 @@ columns:
     description: Deal Maker user ID on SalesFlow tables
   id_user_secretariat_booking_creator:
     lineage:
-      - datalake_hub_services.secretariat_hierarchy.id_user_5a
+      - datalake_secretariat.secretariat_allocation_history.id_secretariat_user
     description: Id of the secretariat user that created the booking
   id_user_secretariat_on_offer_submitted_date:
     lineage:
-      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+      - datalake_secretariat.buyer_secretariat_changes.id_external_responsible
     description: Id of the secretariat user associated with the buyer when the offer was submitted
   id_user_secretariat_on_offer_accepted_date:
     lineage:
-      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+      - datalake_secretariat.buyer_secretariat_changes.id_external_responsible
     description: Id of the secretariat user associated with the buyer when the offer was accepted
   id_user_secretariat_on_offer_dismissed_date:
     lineage:
-      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+      - datalake_secretariat.buyer_secretariat_changes.id_external_responsible
     description: Id of the secretariat user associated with the buyer when the offer was dismissed
   id_user_secretariat_on_sale_agreement_created_date:
     lineage:
-      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+      - datalake_secretariat.buyer_secretariat_changes.id_external_responsible
     description: Id of the secretariat user associated with the buyer when the sale agreement was created
   id_user_secretariat_on_sale_agreement_signed_date:
     lineage:
-      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+      - datalake_secretariat.buyer_secretariat_changes.id_external_responsible
     description: Id of the secretariat user associated with the buyer when the sale agreement was signed
   id_user_last_secretariat:
     lineage:
-      - datalake_hub_services.buyer_secretariat_changes.id_external_responsible
+      - datalake_secretariat.buyer_secretariat_changes.id_external_responsible
     description: Id of the last secretariat user associated with the buyer
   id_booking:
     lineage:
@@ -149,7 +149,7 @@ columns:
   pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency
-    description: Pendency name
+    description: Human-readable label of the blocking pendency currently assigned to the offer in SalesFlow.
   ccv_type:
     description:
       Type of financed sale agreement considering which financial product
@@ -157,7 +157,7 @@ columns:
   pendency_type:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency_type
-    description: Pendency type
+    description: Category of the active pendency that determines which operation team must resolve it.
   opportunities_of_the_week:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.opportunities_of_the_week
@@ -170,7 +170,7 @@ columns:
     lineage:
       - datalake_gsheets.sale_hub_offer.team_lead_name
       - datalake_sale_offer_flows.sale_offer_flows.team_lead_name
-    description: Team lead name
+    description: Display name of the SalesFlow team lead responsible for the offer funnel.
   consultant_name:
     lineage:
       - datalake_gsheets.sale_hub_offer.executive
@@ -200,47 +200,47 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.offer_status
       - datalake_firestore.monday.offer_status
       - datalake_gsheets.sale_hub_offer.status
-    description: Status of the offer
+    description: Lifecycle status of the offer negotiation in SalesFlow or Monday at consolidation time.
   monday_status:
     lineage:
       - datalake_firestore.monday.status
       - datalake_sale_offer_flows.sale_offer_flows.flow_step
-    description: Status of the offer on Monday
+    description: Current workflow step recorded in Monday.com for this offer before enrichment.
   credit_model:
     lineage:
       - datalake_firestore.monday.credit_model
       - datalake_sale_offer_flows.sale_offer_flows.credit_model
-    description: Offer credit model
+    description: Financing credit model selected for the buyer during offer negotiation.
   closing_status:
     lineage:
       - datalake_firestore.monday.closing_status
       - datalake_sale_offer_flows.sale_offer_flows.closing_status
-    description: Closing status of the offer
+    description: Closing-assistance stage indicating how far the offer progressed toward signature.
   house_dilligence_status:
     lineage:
       - datalake_firestore.monday.house_dilligence_status
       - datalake_sale_offer_flows.sale_offer_flows.house_dilligence_status
-    description: House Diligence status
+    description: Due diligence progress for property documentation required before CCV signing.
   seller_dilligence_status:
     lineage:
       - datalake_firestore.monday.seller_dilligence_status
       - datalake_sale_offer_flows.sale_offer_flows.seller_dilligence_status
-    description: Seller Diligence status
+    description: Due diligence progress for seller documentation required before CCV signing.
   report_dilligence_status:
     lineage:
       - datalake_firestore.monday.report_dilligence_status
       - datalake_sale_offer_flows.sale_offer_flows.report_dilligence_status
-    description: Report Diligence status
+    description: Status of third-party diligence reports requested for the transaction.
   bank_analysis_status:
     lineage:
       - datalake_firestore.monday.bank_analysis_status
       - datalake_sale_offer_flows.sale_offer_flows.bank_analysis_status
-    description: Bank Analysis status
+    description: Progress of the buyer's bank credit analysis for financed purchases.
   payment_status:
     lineage:
       - datalake_firestore.monday.payment_status
       - datalake_sale_offer_flows.sale_offer_flows.payment_status
-    description: Payment status
+    description: Settlement status of buyer payments tied to the offer milestones.
   payment_model:
     lineage:
       - datalake_firestore.monday.payment_model
@@ -252,21 +252,21 @@ columns:
     lineage:
       - datalake_firestore.monday.credit_status
       - datalake_sale_offer_flows.sale_offer_flows.credit_status
-    description: Credit analysis status
+    description: Outcome stage of the buyer's credit approval process for this offer.
   notary_office_status:
     lineage:
       - datalake_firestore.monday.notary_office_status
       - datalake_sale_offer_flows.sale_offer_flows.notary_office_status
-    description: Notary office status
+    description: Progress of notary (cartório) steps required to prepare the CCV.
   notary_office_details:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.notary_office_details
-    description: Notary office details
+    description: Free-text notes about the selected notary office handling the CCV.
   real_estate_register_office_status:
     lineage:
       - datalake_firestore.monday.real_estate_register_office_status
       - datalake_sale_offer_flows.sale_offer_flows.real_estate_register_office_status
-    description: Real estate register office status
+    description: Registration progress at the real-estate registry office after CCV signing.
   early_keys_status:
     lineage:
       - datalake_firestore.monday.early_keys_status
@@ -275,16 +275,16 @@ columns:
     lineage:
       - datalake_firestore.monday.tags_from_salesflow
       - datalake_sale_offer_flows.sale_offer_flows.tags_from_salesflow
-    description: Tags from SalesFlow
+    description: Comma-separated operational tags applied to the offer inside SalesFlow.
   sale_agreement_status:
     lineage:
       - datalake_firestore.monday.sale_agreement_status
       - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_status
-    description: CCV status
+    description: Status of the CCV (sale agreement) contract in the closing pipeline.
   agent_work_contract:
     lineage:
       - datalake_ebdb_agents.agent_contract.work_contract_name
-    description: Work contract of the agent
+    description: Active QuintoAndar work-contract name linked to the broker on the offer.
   financing_bank:
     lineage:
       - datalake_firestore.monday.financing_bank
@@ -339,7 +339,7 @@ columns:
       - datalake_firestore.sale_offer.current_payment_method
       - datalake_sale_offer_flows.sale_offer_flows.payment_method
       - datalake_sale_offer_flows.sale_offer_flows.payment_method
-    description: Current payment method of the offer.
+    description: Payment instrument the buyer is using after the latest offer update.
   offer_acceptance_probability:
     lineage:
       - datalake_firestore.monday.offer_acceptance_probability
@@ -348,7 +348,7 @@ columns:
     lineage:
       - datalake_firestore.sale_offer.sale_price
       - datalake_sale_offer_flows.sale_offer_flows.sale_listing_price
-    description: Sale listing price
+    description: Listing price of the house when the offer was submitted.
   first_price_offered_by_buyer:
     lineage:
       - datalake_firestore.sale_offer.first_price_offered_by_buyer
@@ -408,17 +408,17 @@ columns:
     lineage:
       - datalake_firestore.sale_offer.planned_payment_method
       - datalake_sale_offer_flows.sale_offer_flows.planned_payment_method
-    description: Planned payment method of the offer.
+    description: Payment structure the buyer intends to use at offer submission.
   first_discount_proposed:
     lineage:
       - datalake_firestore.sale_offer.first_discount_proposed
       - datalake_sale_offer_flows.sale_offer_flows.first_discount_proposed
-    description: First discount offered
+    description: First price discount percentage or amount proposed during negotiation.
   last_discount_proposed:
     lineage:
       - datalake_firestore.sale_offer.last_discount_proposed
       - datalake_sale_offer_flows.sale_offer_flows.last_discount_proposed
-    description: Last discount offered
+    description: Most recent discount percentage or amount proposed before acceptance.
   hours_booking_to_offer:
     lineage:
       - datalake_firestore.sale_offer.ts_created
@@ -515,7 +515,7 @@ columns:
     lineage:
       - datalake_firestore.monday.is_ccv_canceled
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_canceled
-    description: If the CCV is canceled
+    description: True when the CCV contract was canceled after being created.
   is_3p_supply_5a:
     lineage:
       - datalake_ebdb_listing.house.is_3p_supply_5a
@@ -539,7 +539,7 @@ columns:
   is_ccv_5a_model:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_5a_model
-    description: If the CCV is 5A model
+    description: True when the CCV follows QuintoAndar's standard contract template.
   dt_sale_agreement_rescued:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_rescued

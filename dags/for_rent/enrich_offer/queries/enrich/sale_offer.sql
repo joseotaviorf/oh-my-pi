@@ -33,7 +33,7 @@
         vs.id_house,
         vs.id_visitor,
         vs.id_agent,
-        su.id_user_5a AS id_user_sale_attendence_5a,
+        su.id_secretariat_user AS id_user_sale_attendence_5a,
         vbm.sk_broker_supply,
         vbm.sk_broker_demand,
         vbm.id_company_supply,
@@ -51,8 +51,9 @@
       FROM
         datalake_visit.visit_schedules AS vs
       LEFT JOIN
-          datalake_hub_services.secretariat_hierarchy AS su
-              ON su.id_user_5a = vs.id_user_creation
+          datalake_secretariat.secretariat_allocation_history AS su
+              ON su.id_secretariat_user = vs.id_user_creation
+              AND su.is_last_version IS TRUE
       LEFT JOIN
           datalake_visit.visit_business_model AS vbm
               ON vs.id_visit = vbm.id_visit
@@ -958,68 +959,98 @@ business_rules AS (
 -- SECRETARIATS
 secretariat_on_offer_submitted_date AS (
     SELECT
-        b.id_offer,
-        bsc.id_external_responsible AS id_user_secretariat_on_offer_submitted_date
-    FROM
-        business_rules AS b
-    JOIN
-        datalake_hub_services.buyer_secretariat_changes AS bsc
-            ON b.id_buyer = bsc.id_external_lead
-            AND b.ts_offer_submitted BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+        id_offer,
+        id_user_secretariat_on_offer_submitted_date
+    FROM (
+        SELECT
+            b.id_offer,
+            bsc.id_external_responsible AS id_user_secretariat_on_offer_submitted_date,
+            ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) AS rn
+        FROM
+            business_rules AS b
+        JOIN
+            datalake_secretariat.buyer_secretariat_changes AS bsc
+                ON b.id_buyer = bsc.id_external_lead
+                AND b.ts_offer_submitted BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    )
+    WHERE
+        rn = 1
 ),
 secretariat_on_offer_accepted_date AS (
     SELECT
-        b.id_offer,
-        bsc.id_external_responsible AS id_user_secretariat_on_offer_accepted_date
-    FROM
-        business_rules AS b
-    JOIN
-        datalake_hub_services.buyer_secretariat_changes AS bsc
-            ON b.id_buyer = bsc.id_external_lead
-            AND b.dt_offer_accepted BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+        id_offer,
+        id_user_secretariat_on_offer_accepted_date
+    FROM (
+        SELECT
+            b.id_offer,
+            bsc.id_external_responsible AS id_user_secretariat_on_offer_accepted_date,
+            ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) AS rn
+        FROM
+            business_rules AS b
+        JOIN
+            datalake_secretariat.buyer_secretariat_changes AS bsc
+                ON b.id_buyer = bsc.id_external_lead
+                AND b.dt_offer_accepted BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    )
+    WHERE
+        rn = 1
 ),
 secretariat_on_offer_dismissed_date AS (
     SELECT
-        b.id_offer,
-        bsc.id_external_responsible AS id_user_secretariat_on_offer_dismissed_date
-    FROM
-        business_rules AS b
-    JOIN
-        datalake_hub_services.buyer_secretariat_changes AS bsc
-            ON b.id_buyer = bsc.id_external_lead
-            AND b.dt_offer_dismissed BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+        id_offer,
+        id_user_secretariat_on_offer_dismissed_date
+    FROM (
+        SELECT
+            b.id_offer,
+            bsc.id_external_responsible AS id_user_secretariat_on_offer_dismissed_date,
+            ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) AS rn
+        FROM
+            business_rules AS b
+        JOIN
+            datalake_secretariat.buyer_secretariat_changes AS bsc
+                ON b.id_buyer = bsc.id_external_lead
+                AND b.dt_offer_dismissed BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    )
+    WHERE
+        rn = 1
 ),
 secretariat_on_sale_agreement_created_date AS (
     SELECT
-        b.id_offer,
-        bsc.id_external_responsible AS id_user_secretariat_on_sale_agreement_created_date
-    FROM
-        business_rules AS b
-    JOIN
-        datalake_hub_services.buyer_secretariat_changes AS bsc
-            ON b.id_buyer = bsc.id_external_lead
-            AND b.dt_sale_agreement_created BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+        id_offer,
+        id_user_secretariat_on_sale_agreement_created_date
+    FROM (
+        SELECT
+            b.id_offer,
+            bsc.id_external_responsible AS id_user_secretariat_on_sale_agreement_created_date,
+            ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) AS rn
+        FROM
+            business_rules AS b
+        JOIN
+            datalake_secretariat.buyer_secretariat_changes AS bsc
+                ON b.id_buyer = bsc.id_external_lead
+                AND b.dt_sale_agreement_created BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    )
+    WHERE
+        rn = 1
 ),
 secretariat_on_sale_agreement_signed_date AS (
     SELECT
-        b.id_offer,
-        bsc.id_external_responsible AS id_user_secretariat_on_sale_agreement_signed_date
-    FROM
-        business_rules AS b
-    JOIN
-        datalake_hub_services.buyer_secretariat_changes AS bsc
-            ON b.id_buyer = bsc.id_external_lead
-            AND b.dt_sale_agreement_signed BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) = 1
+        id_offer,
+        id_user_secretariat_on_sale_agreement_signed_date
+    FROM (
+        SELECT
+            b.id_offer,
+            bsc.id_external_responsible AS id_user_secretariat_on_sale_agreement_signed_date,
+            ROW_NUMBER() OVER(PARTITION BY b.id_offer ORDER BY bsc.ts_assigned DESC) AS rn
+        FROM
+            business_rules AS b
+        JOIN
+            datalake_secretariat.buyer_secretariat_changes AS bsc
+                ON b.id_buyer = bsc.id_external_lead
+                AND b.dt_sale_agreement_signed BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, NOW())
+    )
+    WHERE
+        rn = 1
 ),
 last_secretariat as (
     SELECT
@@ -1028,7 +1059,7 @@ last_secretariat as (
     FROM
         business_rules AS b
     JOIN
-        datalake_hub_services.buyer_secretariat_changes AS bsc
+        datalake_secretariat.buyer_secretariat_changes AS bsc
             ON b.id_buyer = bsc.id_external_lead
             AND bsc.is_last_responsible
 )

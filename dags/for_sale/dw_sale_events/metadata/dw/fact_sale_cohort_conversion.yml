@@ -93,18 +93,15 @@ columns:
   sk_secretariat_booking_creator:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_secretariat_booking_creator
-    description: Surrogate key of the secretariat who created the booking. Can be joined with dw_secretariat.dim_secretariat_user_version,
-      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the creation, such as their team allocation.
+    description: Surrogate key of the secretariat who created the booking. Join with datalake_secretariat.secretariat_allocation_history on id_secretariat_user_version to retrieve team allocation at booking creation time.
   sk_secretariat_on_event:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_secretariat_on_event
-    description: Surrogate key of the secretariat who was associated with the buyer on the date of the event. Can be joined with dw_secretariat.dim_secretariat_user_version,
-      on field sk_secretariat_user_version. This allows you to see information about the secretariat in the moment of the event, such as their team allocation.
+    description: Surrogate key of the secretariat who was associated with the buyer on the date of the event. Join with datalake_secretariat.secretariat_allocation_history on id_secretariat_user_version to retrieve team allocation at event time.
   sk_last_secretariat:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_last_secretariat
-    description: Surrogate key of the secretariat who was last associated with the buyer. Can be joined with dw_secretariat.dim_secretariat_user_version,
-      on field sk_secretariat_user_version.
+    description: Surrogate key of the secretariat who was last associated with the buyer. Join with datalake_secretariat.secretariat_allocation_history on id_secretariat_user_version to retrieve the latest team allocation.
   year:
     lineage:
     - dw_sale.fact_sale_demand_event.year

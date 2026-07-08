@@ -150,7 +150,6 @@ bietlejuice.dw_datamarts_growth_cross:
     - bietlejuice.gsheets_growth:done-clean-indicaai-tax-costs:first-run-of-day
     - bietlejuice.gsheets_growth:done-clean-rental-tof-monthly-targets:first-run-of-day
     - bietlejuice.gsheets_growth:done-clean-sale-nbp-source-targets:first-run-of-day
-    - bietlejuice.enrich_secretariat:load-enrich-secretariat-hierarchy:first-run-of-day
 bietlejuice.dw_datamarts_spark.static:
   override: []
 bietlejuice.dw_date:
@@ -236,14 +235,11 @@ bietlejuice.dw_sale_offers:
   remove:
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
-    - bietlejuice.enrich_secretariat:load-enrich-daily-secretariat-allocation:first-run-of-day
 bietlejuice.dw_sale_visits:
   remove:
     - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
     - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
     - bietlejuice.enrich_secretariat:load-enrich-daily-secretariat-allocation:first-run-of-day
-bietlejuice.dw_secretariat_user:
-  override: []
 bietlejuice.dw_table_snapshot:
   remove:
     - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
@@ -256,9 +252,6 @@ bietlejuice.dw_time:
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent:first-run-of-day
-bietlejuice.dw_user:
-  remove:
-    - bietlejuice.enrich_secretariat:load-enrich-secretariat-allocation-history:first-run-of-day
 bietlejuice.enrich_access_logs:
   remove:
     - bietlejuice.istio:load-clean-istio:first-run-of-day
@@ -323,8 +316,6 @@ bietlejuice.enrich_app_installed:
 bietlejuice.enrich_booking:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
-    - bietlejuice.enrich_secretariat:load-enrich-buyer-secretariat-changes:first-run-of-day
-    - bietlejuice.enrich_secretariat:load-enrich-secretariat-hierarchy:first-run-of-day
 bietlejuice.enrich_braze_events:
   remove:
     - bietlejuice.braze_events:load-clean-events-indica-ai:first-run-of-day
@@ -404,8 +395,6 @@ bietlejuice.enrich_neurotech_quintocred:
   remove:
     - bietlejuice.velo_neurotech:load-clean-logs-credit-granting:first-run-of-day
     - bietlejuice.velo_neurotech:load-clean-logs-scoping-policy:first-run-of-day
-bietlejuice.enrich_secretariat:
-  override: []
 bietlejuice.core_offer:
   add:
     - bietlejuice.rental_transact_fast_lane:load-clean-offer
@@ -646,8 +635,6 @@ bietlejuice.enrich_offer:
     - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer:first-run-of-day
     - bietlejuice.enrich_firestore:load-enrich-rent-offer:first-run-of-day
-    - bietlejuice.enrich_secretariat:load-enrich-buyer-secretariat-changes:first-run-of-day
-    - bietlejuice.enrich_secretariat:load-enrich-secretariat-hierarchy:first-run-of-day
 bietlejuice.enrich_olos_dialer:
   remove:
     - bietlejuice.olos_dialer:load-clean-mailing:first-run-of-day
@@ -753,9 +740,6 @@ bietlejuice.enrich_data_quality:
   remove:
     - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
     - bietlejuice.inmetro:load-clean-data-validations:first-run-of-day
-bietlejuice.enrich_demand_conversion_events:
-  remove:
-    - bietlejuice.enrich_secretariat:load-enrich-secretariat-allocation-history:first-run-of-day
 bietlejuice.enrich_demand_score_report:
   add:
     - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score:first-run-of-day
@@ -808,7 +792,6 @@ bietlejuice.enrich_sale_lead_flows:
     - bietlejuice.casa_mineira_crm:load-clean-neighborhood:first-run-of-day
     - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
-    - bietlejuice.enrich_secretariat:load-enrich-secretariat-hierarchy:first-run-of-day
 bietlejuice.enrich_sale_listings:
   remove:
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
@@ -837,7 +820,6 @@ bietlejuice.enrich_sale_offer:
     - bietlejuice.firestore:load-clean-sale-offer:first-run-of-day
     - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
     - bietlejuice.enrich_buyer_prospect:load-enrich-prospect-status:first-run-of-day
-    - bietlejuice.enrich_secretariat:load-enrich-secretariat-hierarchy:first-run-of-day
 bietlejuice.enrich_sale_demand_events:
   add:
     - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day

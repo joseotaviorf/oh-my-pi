@@ -13,13 +13,14 @@ WITH main_users AS (
         AND TRY_CAST(SUBSTRING(main_phone,6,9) AS INT) NOT IN (111111111,222222222,333333333,444444444,555555555,666666666,777777777,888888888,999999999)
         AND TRY_CAST(SUBSTRING(main_phone,6,8) AS INT) NOT IN (11111111,22222222,33333333,44444444,55555555,66666666,77777777,88888888,99999999)
 ),
-users AS (
+users_ranked AS (
     SELECT
         v.id AS sk_visitor,
         COALESCE(v.id_external, u_email.sk_user,u_phone.sk_user) AS sk_user,
         COALESCE(v.email, u_email.email, u_phone.email) AS email,
         COALESCE(v.phone_number,u_email.main_phone, u_phone.main_phone) AS phone_number,
-        v.ts_updated
+        v.ts_updated,
+        ROW_NUMBER() OVER(PARTITION BY v.id ORDER BY v.ts_updated DESC) AS rn
     FROM
         datalake_hub_services_clean.visitor AS v
     LEFT JOIN
@@ -28,17 +29,35 @@ users AS (
     LEFT JOIN
         main_users AS u_phone
             ON TRIM(u_phone.main_phone) = TRIM(REPLACE(phone_number,'+','')) AND COALESCE(v.id_external, 0) = 0
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY v.id ORDER BY v.ts_updated DESC) = 1
+),
+users AS (
+    SELECT
+        sk_visitor,
+        sk_user,
+        email,
+        phone_number,
+        ts_updated
+    FROM
+        users_ranked
+    WHERE
+        rn = 1
+),
+hs_users_ranked AS (
+  SELECT
+      id AS id_user,
+      id_external,
+      ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) AS rn
+  FROM
+      datalake_hub_services_clean.users
 ),
 hs_users AS (
   SELECT
-      id AS id_user,
+      id_user,
       id_external
   FROM
-      datalake_hub_services_clean.users
-  QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+      hs_users_ranked
+  WHERE
+      rn = 1
 ),
 main_leads AS (
     SELECT
@@ -101,7 +120,7 @@ responsible AS (
         a1.id_last_house,
         a1.date_contact,
         a1.id_responsible AS last_responsible_id,
-        sh.id_user_5a AS last_secretariat_user,
+        sh.id_secretariat_user AS last_secretariat_user,
         a2.ts_assigned AS ts_first_assignment,
         a1.ts_assigned AS ts_last_assignment
     FROM
@@ -114,9 +133,10 @@ responsible AS (
         hs_users AS u
             ON a1.id_responsible = u.id_user
     LEFT JOIN
-        datalake_hub_services.secretariat_hierarchy AS sh
-            ON u.id_external = sh.id_user_5a
-            AND sh.is_active
+        datalake_secretariat.secretariat_allocation_history AS sh
+            ON sh.id_secretariat_user = u.id_external
+            AND sh.is_last_version IS TRUE
+            AND sh.is_active IS TRUE
     WHERE
         a1.last_assignment_marker = 1
 )

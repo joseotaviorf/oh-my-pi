@@ -87,8 +87,8 @@ columns:
     description: User ID of the Closing Specialist (Negotiation Executive / EN) assigned to mediate the negotiation between buyer and seller. Filter <> -1 to restrict to offers with an assigned specialist. Defaults to -1 when not assigned.
   sk_secretariat_booking_creator:
     lineage:
-    - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
-    description: Surrogate key of the secretariat who created the booking, captured as a versioned snapshot at the time of the booking creation. Can be joined with dw_secretariat.dim_secretariat_user_version on field sk_secretariat_user_version to retrieve the secretariat's team allocation at that point in time. Defaults to -1 when not assigned.
+    - datalake_secretariat.daily_secretariat_allocation.id_secretariat_user_version
+    description: Surrogate key of the secretariat who created the booking, captured as a versioned snapshot at the time of the booking creation. Join with datalake_secretariat.secretariat_allocation_history on id_secretariat_user_version to retrieve team allocation at that point in time. Defaults to -1 when not assigned.
   sk_buyer_prospect_type:
     lineage:
     - datalake_sale_offer.sale_offer.id_buyer_prospect_type
