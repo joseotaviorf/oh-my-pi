@@ -43,6 +43,14 @@ columns:
     lineage:
       - datalake_big_agent_raw.revenue_share.invalidation_reason
     description: Reason explaining why this record was invalidated, if applicable.
+  dt_validity_start:
+    lineage:
+      - datalake_big_agent_raw.revenue_share.validity_start_at
+    description: Validity start date of the revenue share.
+  dt_validity_end:
+    lineage:
+      - datalake_big_agent_raw.revenue_share.validity_end_at
+    description: Validity end date of the revenue share, can be null.
   ts_created:
     lineage:
       - datalake_big_agent_raw.revenue_share.created_at
