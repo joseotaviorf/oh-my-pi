@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case_type
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Catalog of all lawsuit types used in CyberLegal (civil, mortgage, criminal, etc.). Defines procedural stages for each type."
 columns:
@@ -10,15 +10,15 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.casetype.CTTYPE
   case_type_description:
-    description: "Description of the case type"
+    description: Description of the case type (Reivindicatoria, Despejo or Execucao).
     lineage:
       - datalake_cyber_legal_raw.casetype.CTDESC
   default_workflow_code:
-    description: "Default workflow code for the case type"
+    description: Financial attribute representing default workflow code on the case_type dataset.
     lineage:
       - datalake_cyber_legal_raw.casetype.CTDWFLOW
   is_sequential_stage_validation:
-    description: "Flag to validate consecutive order of procedural stages - Y = validates consecutive, N = does not validate"
+    description: "Flag to validate consecutive order of procedural stages. TRUE = validates consecutive, FALSE = does not validate"
     lineage:
       - datalake_cyber_legal_raw.casetype.CTVSTG
   ts_load:

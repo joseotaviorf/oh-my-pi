@@ -1,12 +1,12 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case_uda
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing complementary information for legal processes. Variable structure specific to each company."
 columns:
   id_case:
-    description: "Case number - Key to link with case table"
+    description: "Case number. Key to link with case table"
     lineage:
       - datalake_cyber_legal_raw.caseuda.CUCASENO
   cause_loss_possibility_code:
@@ -22,11 +22,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.caseuda.CUCOMARC
   process_subtype:
-    description: "Case subtype identifier"
+    description: Financial attribute representing process subtype on the case_uda dataset.
     lineage:
       - datalake_cyber_legal_raw.caseuda.CUSUBTIP
   reason:
-    description: "Reason for the case"
+    description: Financial attribute representing reason on the case_uda dataset.
     lineage:
       - datalake_cyber_legal_raw.caseuda.CUMOTTOMB
   lov_code:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.caseuda.CULOV
   decimal_value:
-    description: "Decimal value field"
+    description: Financial attribute representing decimal value on the case_uda dataset.
     lineage:
       - datalake_cyber_legal_raw.caseuda.CUDECIMAL
   provisioned_amount:
@@ -46,7 +46,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.caseuda.CUVLTTCAUSA
   procedural_fine_amount:
-    description: "Procedural fine amount"
+    description: Procedural fine amount charged for the case.
     lineage:
       - datalake_cyber_legal_raw.caseuda.CUPEMULT
   contingency_fee_amount:
@@ -68,6 +68,6 @@ columns:
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"
   id_court_case:
-    description: "Court case identifier"
+    description: Identifier for the court. Key to link with court table.
     lineage:
       - datalake_cyber_legal_raw.caseuda.CUPROJUD

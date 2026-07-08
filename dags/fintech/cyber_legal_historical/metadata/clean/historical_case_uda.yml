@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_historical_clean
 table_name: historical_case_uda
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Clean layer table with complementary UDA (user-defined attributes) for historical Cyber Legal processes. Variable structure by company; one row per case attribute line from the legacy extraction. Joins to case history via id_case."
 columns:

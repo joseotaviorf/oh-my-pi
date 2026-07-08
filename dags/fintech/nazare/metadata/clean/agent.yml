@@ -3,7 +3,7 @@ database_name: datalake_nazare_clean
 table_name: agent
 description: Cleaned agent data containing information about real estate agents in the Nazare system.
 domain: Fintech
-owner: data-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_agent:
     lineage:
@@ -20,7 +20,7 @@ columns:
   name:
     lineage:
       - datalake_nazare_raw.agent.name
-    description: Full name of the agent.
+    description: Full legal name of the real estate agent registered in Nazare.
   email:
     lineage:
       - datalake_nazare_raw.agent.email

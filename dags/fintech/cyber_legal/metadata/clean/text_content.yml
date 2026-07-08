@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: text_content
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing contract matching information for E-law migrated cases."
 columns:

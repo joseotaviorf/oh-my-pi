@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: expense_document
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Associative table, contains the id mapping between documents and the expenses of each case."
 columns:

@@ -1,44 +1,44 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: court
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Catalog of courts used in CyberLegal. Contains contact information and court locations."
 columns:
   id_court:
-    description: "Court identification - Primary key"
+    description: "Court identification. Primary key"
     lineage:
       - datalake_cyber_legal_raw.court.CTCRTID
   court_name:
-    description: "Court name"
+    description: "Abbreviated official name of the judicial court as registered in CyberLegal catalogs."
     lineage:
       - datalake_cyber_legal_raw.court.CTNAME
   address_line1:
-    description: "Court address - Street"
+    description: "Address line 1 of the court when available"
     lineage:
       - datalake_cyber_legal_raw.court.CTADDR1
   address_line2:
-    description: "Court address - District"
+    description: "Address line 2 of the court when available"
     lineage:
       - datalake_cyber_legal_raw.court.CTADDR2
   city:
-    description: "Court city location"
+    description: "Address city of the court"
     lineage:
       - datalake_cyber_legal_raw.court.CTCITY
   state:
-    description: "Court state location"
+    description: "Address state of the court"
     lineage:
       - datalake_cyber_legal_raw.court.CTSTATE
   zip_code:
-    description: "Court zip code address"
+    description: "Address zip code of the court"
     lineage:
       - datalake_cyber_legal_raw.court.CTZIP
   country:
-    description: "Court country location"
+    description: "Address country of the court"
     lineage:
       - datalake_cyber_legal_raw.court.CTCOUNTRY
   contact_name:
-    description: "Court contact name"
+    description: "Contact name for the court when available"
     lineage:
       - datalake_cyber_legal_raw.court.CTCNTNAME
   phone_number1:
@@ -50,7 +50,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.court.CTPHONE2
   email_address:
-    description: "Court email address"
+    description: "Email address for the court when available"
     lineage:
       - datalake_cyber_legal_raw.court.CTEMAIL
   url:

@@ -1,26 +1,35 @@
 ---
 database_name: datalake_nazare_clean
 table_name: associate_executive_bonus
+description: Clean layer for Nazare associate executive bonus rules, linking agents and business units to revenue-share bonus periods.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_associate_executive_bonus:
     lineage:
       - datalake_nazare_raw.associate_executive_bonus.id
+    description: Internal identifier of the associate executive bonus record in Nazare.
   id_agent:
     lineage:
       - datalake_nazare_raw.associate_executive_bonus.agent_id
+    description: Nazare agent identifier linked to the bonus rule configuration.
   id_business_unit:
     lineage:
       - datalake_nazare_raw.associate_executive_bonus.business_unit_id
+    description: Business unit identifier where the bonus rule applies.
   current_revision:
     lineage:
       - datalake_nazare_raw.associate_executive_bonus.current_revision
+    description: Active revision number of the bonus configuration, referencing associate_executive_bonus_revision.
   dt_bonus_start:
     lineage:
       - datalake_nazare_raw.associate_executive_bonus.bonus_start_date
+    description: Start date of the bonus validity period for revenue-share calculations.
   dt_bonus_end:
     lineage:
       - datalake_nazare_raw.associate_executive_bonus.bonus_end_date
+    description: End date of the bonus validity period for revenue-share calculations.
   ts_created:
     lineage:
       - datalake_nazare_raw.associate_executive_bonus.created_at
+    description: Timestamp when the bonus record was created in Nazare.

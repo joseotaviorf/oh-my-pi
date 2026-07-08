@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_historical_clean
 table_name: historical_case_status
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing CyberLegal cases change of status history."
 columns:
