@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case_notification_log
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table used in CyberLegal for accounts transferred from CyberCredit to CyberLegal. Contains notifications and requests."
 columns:
@@ -10,11 +10,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNREQID
   id_notification_sequence:
-    description: "Sequence number"
+    description: Identifier for the notification sequence referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNSEQID
   id_contract_group:
-    description: "Account group"
+    description: Identifier for the contract group referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNACCTG
   id_contract:
@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNACCT
   id_case:
-    description: "Case number"
+    description: Identifier for the case referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNCASENO
   id_assigned_attorney:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNLWYRID
   id_manager:
-    description: "Manager identifier"
+    description: Identifier for the manager referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNCOLLID
   client_ssn:
@@ -42,11 +42,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNSSNUM
   debtor_name:
-    description: "Debtor name"
+    description: Financial attribute representing debtor name on the case_notification_log dataset.
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNNAME
   request_comment:
-    description: "Comment text"
+    description: Financial attribute representing request comment on the case_notification_log dataset.
     lineage:
       - datalake_cyber_legal_raw.cantfylg.CNCOMM
   is_case_creation:

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case_alert
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table used in CyberLegal module containing information about legal processes requiring immediate attention due to procedural stages not completed within estimated time."
 columns:
@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.caalert.ALID
   id_case:
-    description: "Case number"
+    description: Identifier for the case referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.caalert.ALCASENO
   id_generating_attorney:
@@ -46,7 +46,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.caalert.ALREVDT
   dt_alert_expired:
-    description: "Alert date"
+    description: Calendar date associated with alert expired in the financial workflow.
     lineage:
       - datalake_cyber_legal_raw.caalert.ALALERTDT
   ts_updated:

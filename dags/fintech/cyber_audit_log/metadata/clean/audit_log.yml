@@ -1,60 +1,68 @@
+---
 database_name: datalake_cyber_audit_log_clean
 table_name: audit_log
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Clean audit log table from CyberFinancial system with available audit fields for security and compliance tracking
+description: >-
+  Clean audit log from CyberFinancial with normalized column names, one row per user or
+  system action. Grain is id_audit_log plus source origin. Consumed by security and
+  compliance teams for incident investigation and user-activity traceability.
 columns:
   id_audit_log:
-    description: Unique identifier for each audit log entry
+    description: Primary key of the audit event, mapped from the CyberFinancial Oracle ALID column.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.ALID
+  id_user:
+    description: Login or user code that performed the audited action in CyberFinancial.
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALUSER
   path_called:
-    description: Path or endpoint called during the audited operation
+    description: Application path, endpoint, or module invoked during the audited operation.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.ALPATH
   method_called:
-    description: HTTP method or database operation method used
+    description: HTTP verb or database operation type executed for the audited request.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.ALMETHOD
-  ts_action:
-    description: Timestamp when the audited action occurred
-    lineage:
-      - datalake_cyber_audit_log_raw.audit_log.ALDATE
-  id_user:
-    description: Identifier of the user who performed the action
-    lineage:
-      - datalake_cyber_audit_log_raw.audit_log.ALUSER
-  ip_address:
-    description: IP address from which the action was performed
-    lineage:
-      - datalake_cyber_audit_log_raw.audit_log.ALIP
   record_content:
-    description: Content or details of the record affected by the action
+    description: Serialized payload or record snapshot affected by the audited action.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.ALRECORD
+  ip_address:
+    description: Client IP address observed when the audited action was executed.
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALIP
+  ts_action:
+    description: Timestamp when the audited action occurred in the CyberFinancial system.
+    lineage:
+      - datalake_cyber_audit_log_raw.audit_log.ALDATE
   source:
-    description: Source system identifier
+    description: >-
+      Origin of the ingested row within the Cyber audit log pipeline, distinguishing the
+      live Oracle table from the historical purge backup.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.source
   ts_ingestion:
-    description: Timestamp when the record was ingested into the data lake
+    description: Timestamp when the Spark ingestion job wrote the row into the raw lake.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.ts_ingestion
   table_partition:
-    description: Partition identifier for data organization
+    description: >-
+      Partition driver derived from ALDATE during ingestion; used to derive year, month,
+      and day hive partitions for incremental loads.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.table_partition
   ts_load:
-    description: Timestamp when the record was processed and loaded into clean layer
+    description: Timestamp when the clean-layer Spark job materialized the row in the lake.
   year:
-    description: Year partition column for data organization
+    description: Calendar year partition derived from table_partition at ingestion time.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.year
   month:
-    description: Month partition column for data organization
+    description: Calendar month partition derived from table_partition at ingestion time.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.month
   day:
-    description: Day partition column for data organization
+    description: Calendar day partition derived from table_partition at ingestion time.
     lineage:
       - datalake_cyber_audit_log_raw.audit_log.day

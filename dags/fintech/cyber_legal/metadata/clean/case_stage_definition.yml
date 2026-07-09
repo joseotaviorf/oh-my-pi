@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case_stage_definition
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Contains the definition of procedural stages by lawsuit type. Defines stages to be controlled, duration and expense limits per stage."
 columns:
@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.castadf.CDTYPE
   id_stage:
-    description: "Stage identifier"
+    description: Identifier for the stage referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.castadf.CDSTGID
   stage_description:
@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.castadf.CDORDER
   stage_subtype_description:
-    description: "Sub-stage description"
+    description: Financial attribute representing stage subtype description on the case_stage_definition dataset.
     lineage:
       - datalake_cyber_legal_raw.castadf.CDSUBTYPE
   max_previous_system_days:
@@ -50,7 +50,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.castadf.CDPOSDYS
   unit_amount:
-    description: "Unit amount for the stage"
+    description: Financial attribute representing unit amount on the case_stage_definition dataset.
     lineage:
       - datalake_cyber_legal_raw.castadf.CDAMTUNIT
   ts_load:

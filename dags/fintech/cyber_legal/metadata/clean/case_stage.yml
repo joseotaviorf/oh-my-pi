@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case_stage
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Contains one record per procedural stage of each legal case. Stores start and end dates of each stage."
 columns:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.casestag.CSORDER
   case_subtype:
-    description: "Case subtype"
+    description: Financial attribute representing case subtype on the case_stage dataset.
     lineage:
       - datalake_cyber_legal_raw.casestag.CSSUBTYPE
   stage_status:

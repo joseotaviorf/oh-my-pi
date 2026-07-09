@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Main table of CyberLegal module containing legal process (case) information. Includes demographic, financial and process progress data. Accounts in legal do NOT appear in delqmst table, only in case."
 columns:
@@ -18,19 +18,19 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CESSNUM
   id_court:
-    description: "Court identification"
+    description: Identifier for the court referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.case.CECRTID
   id_external_attorney:
-    description: "External attorney"
+    description: Identifier for the external attorney referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.case.CEEXTLWYR
   id_responsible_attorney:
-    description: "Responsible attorney"
+    description: Identifier for the responsible attorney referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.case.CERESPLWYR
   id_supervisor_attorney:
-    description: "Supervisor attorney"
+    description: Identifier for the supervisor attorney referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.case.CESUPVLWYR
   id_attorney_agency:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CESTATLWYR
   id_branch:
-    description: "Branch identifier"
+    description: Identifier for the branch referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.case.CEBRANCH
   id_previous_attorney_agency:
@@ -50,7 +50,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CELWYRPRVAGN
   id_previous_agency:
-    description: "Previous agency"
+    description: Identifier for the previous agency referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.case.CEPRVAGN
   plaintiff_name:
@@ -58,19 +58,19 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEACTOR
   debtor_name:
-    description: "Debtor name"
+    description: Financial attribute representing debtor name on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CENAME
   debtor_name_2:
-    description: "Debtor name complement"
+    description: Financial attribute representing debtor name 2 on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CENAME2
   address_line_1:
-    description: "Address - Line 1"
+    description: Financial attribute representing address line 1 on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEADDR1
   address_line_2:
-    description: "Address - Line 2"
+    description: Financial attribute representing address line 2 on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEADDR2
   city:
@@ -90,7 +90,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEPHONE
   business_name:
-    description: "Debtor business name"
+    description: Financial attribute representing business name on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEBNAME
   business_address_line_1:
@@ -106,7 +106,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEBCITY
   business_state:
-    description: "Business state"
+    description: Financial attribute representing business state on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEBSTATE
   business_zip_code:
@@ -118,11 +118,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEBPHONE
   business_phone_extension:
-    description: "Business phone extension"
+    description: Financial attribute representing business phone extension on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEBPEXT
   previous_name:
-    description: "Debtor previous name"
+    description: Financial attribute representing previous name on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEPRVNAM
   previous_name_2:
@@ -142,7 +142,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEPRVCTY
   previous_state:
-    description: "Previous state"
+    description: Financial attribute representing previous state on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEPRVSTA
   previous_zip_code:
@@ -154,11 +154,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CETYPE
   case_subtype:
-    description: "Case subtype"
+    description: Financial attribute representing case subtype on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CESUBTYPE
   product_type:
-    description: "Account type (product)"
+    description: Financial attribute representing product type on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEPROD
   case_comment:
@@ -170,7 +170,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CECLOSECOMM
   currency_code:
-    description: "Currency key"
+    description: Financial attribute representing currency code on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CECURRENCY
   closure_reason:
@@ -178,7 +178,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEREASON
   closure_result:
-    description: "Case final result"
+    description: Financial attribute representing closure result on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CERESULT
   third_party_name:
@@ -186,7 +186,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CETHDACT
   greeting_code:
-    description: "Greeting code"
+    description: Financial attribute representing greeting code on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CESALCD
   action_code_class_1:
@@ -226,15 +226,15 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEACRC3
   last_action_code:
-    description: "Last action code"
+    description: Financial attribute representing last action code on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CELASTAC
   last_letter_code:
-    description: "Last letter code"
+    description: Financial attribute representing last letter code on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CELASTLC
   last_result_code:
-    description: "Last result code"
+    description: Financial attribute representing last result code on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CELASTRC
   case_status:
@@ -258,11 +258,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEASSTAWRD
   unrecoverable_amount:
-    description: "Unrecoverable amount"
+    description: Financial attribute representing unrecoverable amount on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEURCAMT
   lawsuit_amount:
-    description: "Lawsuit amount"
+    description: Financial attribute representing lawsuit amount on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CELWSTAMT
   previous_attorney_amount:
@@ -274,15 +274,15 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CELWYAGNAMT
   accessory_expenses_amount:
-    description: "Accessory expenses"
+    description: Financial attribute representing accessory expenses amount on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEEXPACC
   expense_fees_amount:
-    description: "Expense fees amount"
+    description: Financial attribute representing expense fees amount on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEEXPFEE
   other_expenses_amount:
-    description: "Other expenses"
+    description: Financial attribute representing other expenses amount on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CEEXPOTH
   discount_amount:
@@ -290,7 +290,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEDISCOUNT
   cash_recovered_amount:
-    description: "Amount recovered in cash"
+    description: Financial attribute representing cash recovered amount on the case dataset.
     lineage:
       - datalake_cyber_legal_raw.case.CERCAMT
   recovery_forecast_percentage:
@@ -326,15 +326,15 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CELCLUPD
   dt_last_activity:
-    description: "Last activity date"
+    description: Calendar date associated with last activity in the financial workflow.
     lineage:
       - datalake_cyber_legal_raw.case.CELSTACT
   dt_last_contact:
-    description: "Last contact date"
+    description: Calendar date associated with last contact in the financial workflow.
     lineage:
       - datalake_cyber_legal_raw.case.CELSTCON
   dt_next_contact:
-    description: "Next contact date"
+    description: Calendar date associated with next contact in the financial workflow.
     lineage:
       - datalake_cyber_legal_raw.case.CENXTCON
   dt_unrecoverable_declaration:
@@ -342,7 +342,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.case.CEURCDT
   dt_lawsuit_filed:
-    description: "Lawsuit date"
+    description: Calendar date associated with lawsuit filed in the financial workflow.
     lineage:
       - datalake_cyber_legal_raw.case.CELWSTDT
   dt_status_changed:

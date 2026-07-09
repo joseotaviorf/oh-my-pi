@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case_account
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Defines the relationship between a specific case and the original accounts or credits. If no records exist for a given case, it means it was manually added in CyberLegal."
 columns:
@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.caseacct.CCCASENO
   id_contract_group:
-    description: "Account group code"
+    description: Identifier for the contract group referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.caseacct.CCACCTG
   id_contract:

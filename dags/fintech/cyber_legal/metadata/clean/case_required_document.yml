@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: case_required_document
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Contains information about required documentation when credits are transferred from CyberCredit to CyberLegal (document checklist)."
 columns:
@@ -14,11 +14,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.carqdoc.CQDOCSEQ
   id_document:
-    description: "Document identifier"
+    description: Identifier for the document referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.carqdoc.CQDOCID
   document_description:
-    description: "Document description"
+    description: Financial attribute representing document description on the case_required_document dataset.
     lineage:
       - datalake_cyber_legal_raw.carqdoc.CQDESC
   is_required_flag:

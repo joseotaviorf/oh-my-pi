@@ -1,34 +1,50 @@
+---
 database_name: datalake_cyber_audit_log_raw
 table_name: audit_log
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Raw audit log table from CyberFinancial system capturing all user activities and system operations for security and compliance tracking
+description: >-
+  Raw incremental ingest of the Oracle AUDIT_LOG table from CyberFinancial, one row per
+  user or system action. Grain is the audit event identifier (ALID) plus source origin.
+  Consumed by the clean audit_log table for security investigations, compliance audits,
+  and user-activity traceability in Fintech collections workflows.
 columns:
-  ALPATH:
-    description: Path or endpoint called during the audited operation
-  ALMETHOD:
-    description: HTTP method or database operation method used
-  ALDATE:
-    description: Timestamp when the audited action occurred
-  ALUSER:
-    description: Identifier of the user who performed the action
-  ALIP:
-    description: IP address from which the action was performed
-  ALRECORD:
-    description: Content or details of the record affected by the action
   ALID:
-    description: Unique identifier for each audit log entry
+    description: Primary key of the audit event in the CyberFinancial Oracle source table.
+  ALUSER:
+    description: Login or user code that performed the audited action in CyberFinancial.
+    tags:
+      - Confidential
+  ALPATH:
+    description: Application path, endpoint, or module invoked during the audited operation.
+  ALMETHOD:
+    description: HTTP verb or database operation type executed for the audited request.
+  ALRECORD:
+    description: Serialized payload or record snapshot affected by the audited action.
+    tags:
+      - Confidential
+  ALIP:
+    description: Client IP address observed when the audited action was executed.
+    tags:
+      - Confidential
+  ALDATE:
+    description: Timestamp when the audited action occurred in the CyberFinancial system.
   source:
-    description: Source system identifier
+    description: >-
+      Origin of the ingested row within the Cyber audit log pipeline, distinguishing the
+      live Oracle table from the historical purge backup.
     categories:
-      cyber: CyberFinancial system
+      Original Table: Row loaded from the main Oracle AUDIT_LOG table.
+      Purge Table: Row loaded from the Oracle AUDIT_LOG_ESP purge backup table.
   ts_ingestion:
-    description: Timestamp when the record was ingested into the data lake
+    description: Timestamp when the Spark ingestion job wrote the row into the raw lake.
   table_partition:
-    description: Partition identifier for data organization
+    description: >-
+      Partition driver derived from ALDATE during ingestion; used to derive year, month,
+      and day hive partitions for incremental loads.
   year:
-    description: Year partition column for data organization
+    description: Calendar year partition derived from table_partition at ingestion time.
   month:
-    description: Month partition column for data organization
+    description: Calendar month partition derived from table_partition at ingestion time.
   day:
-    description: Day partition column for data organization
+    description: Calendar day partition derived from table_partition at ingestion time.

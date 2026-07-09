@@ -1,12 +1,12 @@
 ---
 database_name: datalake_cyber_legal_clean
 table_name: card_account
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Contains information about required documentation (checklist) to send an account to CyberLegal through case creation process. Transfer is not completed until all documents are reviewed."
 columns:
   id_request:
-    description: "Request identifier"
+    description: Identifier for the request referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.cardacct.CAREQID
   id_document_sequence:
@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.cardacct.CADOCSEQ
   id_contract_group:
-    description: "Account group code"
+    description: Identifier for the contract group referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.cardacct.CAACCTG
   id_contract:
@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.cardacct.CAACCT
   id_document:
-    description: "Document identifier"
+    description: Identifier for the document referenced by this financial record.
     lineage:
       - datalake_cyber_legal_raw.cardacct.CADOCID
   id_receiving_attorney:
@@ -34,11 +34,11 @@ columns:
     lineage:
       - datalake_cyber_legal_raw.cardacct.CAREVCL
   document_description:
-    description: "Description of the document"
+    description: Financial attribute representing document description on the card_account dataset.
     lineage:
       - datalake_cyber_legal_raw.cardacct.CADESC
   document_comment:
-    description: "Comment for the document"
+    description: Financial attribute representing document comment on the card_account dataset.
     lineage:
       - datalake_cyber_legal_raw.cardacct.CACOMENT
   is_cybercredit_review_flag:

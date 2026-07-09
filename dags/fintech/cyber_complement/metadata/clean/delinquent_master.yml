@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_clean
 table_name: delinquent_master
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Master table with contract data. Table granularity - id_contract + contract_group.
@@ -69,7 +69,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMPTSCOR
   branch:
-    description: "Branch identifier"
+    description: Financial attribute representing branch on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMBRANCH
   manager:
@@ -149,15 +149,15 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMPRVAD2
   business_address:
-    description: "Business address"
+    description: Financial attribute representing business address on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMBADDR1
   additional_business_address:
-    description: "Additional business address"
+    description: Financial attribute representing additional business address on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMBADDR2
   neighborhood_business_address:
-    description: "Neighborhood business address"
+    description: Financial attribute representing neighborhood business address on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMBADDR3
   city:
@@ -189,11 +189,11 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMPEXT
   phone_extension:
-    description: "Phone extension number"
+    description: Financial attribute representing phone extension on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMCPEXT
   main_area_code:
-    description: "Main phone area code"
+    description: Financial attribute representing main area code on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMACODE
   phone_area:
@@ -205,7 +205,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMBNAME
   city_business_address:
-    description: "City business address"
+    description: Financial attribute representing city business address on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMBCITY
   state_business_address:
@@ -213,7 +213,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMBSTATE
   zip_code_business_address:
-    description: "Business address zip code"
+    description: Financial attribute representing zip code business address on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMBZIP
   business_phone:
@@ -269,7 +269,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMSUPV
   reason_last_supervisor_request:
-    description: "Reason for the last supervisor request"
+    description: Financial attribute representing reason last supervisor request on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMSUPCOM
   status_supervisor_code:
@@ -277,7 +277,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMSCODE
   payment_type:
-    description: "payment_type"
+    description: Financial attribute representing payment type on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMID
   review_code:
@@ -376,13 +376,13 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE
   commission_queue:
-    description: "Commission queue"
+    description: Financial attribute representing commission queue on the delinquent_master dataset.
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE2
   agreement_queue:
-    description: "Agreement policy queue"
+    description: Financial attribute representing agreement queue on the delinquent_master dataset.
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
@@ -394,7 +394,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE4
   eviction_queue:
-    description: "Eviction queue"
+    description: Financial attribute representing eviction queue on the delinquent_master dataset.
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
@@ -622,15 +622,15 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMACLC3_5
   score_most_important_activity_class_1:
-    description: "Score for most important activity in class 1"
+    description: Financial attribute representing score most important activity class 1 on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC1
   score_most_important_activity_class_2:
-    description: "Score for most important activity in class 2"
+    description: Financial attribute representing score most important activity class 2 on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC2
   score_most_important_activity_class_3:
-    description: "Score for most important activity in class 3"
+    description: Financial attribute representing score most important activity class 3 on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3
   evictions_label:
@@ -790,7 +790,7 @@ columns:
     lineage:
       - datalake_cyber_raw.delqmst.DMPAYOFF
   next_due_balance_amount:
-    description: "Next due balance amount"
+    description: Financial attribute representing next due balance amount on the delinquent_master dataset.
     lineage:
       - datalake_cyber_raw.delqmst.DMNXTPOF
   total_package_amount:
