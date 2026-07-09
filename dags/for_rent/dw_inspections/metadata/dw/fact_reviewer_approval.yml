@@ -3,7 +3,7 @@ database_name: dw_inspections
 table_name: fact_reviewer_approval
 description: History of approval/disapproval of the inspection report by reviewers
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_reviewer:
     lineage:
@@ -47,12 +47,12 @@ columns:
   year:
     lineage:
       - datalake_inspections.reviewer.year
-    description: Year of update date.
+    description: Year of update date captured in the source operational system.
   month:
     lineage:
       - datalake_inspections.reviewer.month
-    description: Month of update date.
+    description: Month of update date captured in the source operational system.
   day:
     lineage:
       - datalake_inspections.reviewer.day
-    description: Day of update date.
+    description: Day of update date captured in the source operational system.

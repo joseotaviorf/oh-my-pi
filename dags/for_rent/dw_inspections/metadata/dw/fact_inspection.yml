@@ -1,14 +1,14 @@
 ---
 database_name: dw_inspections
 table_name: fact_inspection
-description:
-    This fact table communicates with the inspection, assessment and inspector dimensions, bringing an overview of inspection
-    indicators and metrics, such as the Lead Time of execution, booleans to indicate whether we completed the survey within
-    the expected time frame, whether this survey was canceled at day or the day before the scheduled one, among others.
-    Each row is a unique inspection, identified by the sk_inspection column. This is just not true for data prior to August 19, 2023, because of a bug in the product
-    (read the description of the sk_assessment column for more details).
+description: |
+  This fact table communicates with the inspection, assessment and inspector dimensions, bringing an overview of inspection
+  indicators and metrics, such as the Lead Time of execution, booleans to indicate whether we completed the survey within
+  the expected time frame, whether this survey was canceled at day or the day before the scheduled one, among others.
+  Each row is a unique inspection, identified by the sk_inspection column. This is just not true for data prior to August 19, 2023, because of a bug in the product
+  (read the description of the sk_assessment column for more details).
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
     sk_inspection:
         description:

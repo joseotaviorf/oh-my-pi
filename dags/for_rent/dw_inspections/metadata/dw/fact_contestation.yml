@@ -1,9 +1,9 @@
 ---
 database_name: dw_inspections
 table_name: fact_contestation
-description: This table contains data on repair disputes made by the tenant and owner
+description: Dw layer table for fact contestation from the dw_inspections pipeline used in For Rent analytics.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_contestation:
     lineage:
@@ -36,22 +36,22 @@ columns:
   ts_created:
     lineage:
       - datalake_inspection_services_clean.contestation.ts_created
-    description: Record creation date
+    description: Record creation date captured in the source operational system.
   ts_updated:
     lineage:
       - datalake_inspection_services_clean.contestation.ts_updated
-    description: Record update date
+    description: Record update date captured in the source operational system.
   ts_load:
     description: Date and time when the data was loaded.
   year:
     lineage:
       - datalake_inspection_services_clean.contestation.year
-    description: Year of update date
+    description: Year of update date captured in the source operational system.
   month:
     lineage:
       - datalake_inspection_services_clean.contestation.month
-    description: Month of update date
+    description: Month of update date captured in the source operational system.
   day:
     lineage:
       - datalake_inspection_services_clean.contestation.day
-    description: Day of update date
+    description: Day of update date captured in the source operational system.

@@ -1,12 +1,12 @@
 ---
 database_name: dw_inspections
 table_name: fact_item_attachment
-description:
+description: |
   This table brings data from the item's attachments, which can be a review with media,
   a review without media or just a media without a linked review.
   Each row is a unique attachment, identified by the sk_item_attachment column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_item_attachment:
     description: Unique identifier of item attachment.
@@ -41,10 +41,7 @@ columns:
       - datalake_inspections.item_media.id_external_media
       - datalake_inspections.item_review.id_external_media
   sk_assessment:
-    description: Unique identifier of an Assessment.
-      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
-      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique.
-      It is observed that the extra Assessments are identical, with no data distinction between them.
+    description: Unique identifier of an Assessment. This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug. This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique. It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspections.item_media.id_assessment
       - datalake_inspections.item_review.id_assessment
@@ -57,10 +54,7 @@ columns:
     lineage:
       - datalake_inspections.item_media.id_user
       - datalake_inspections.item_review.id_user
-    description:
-      Unique identifier of attachment creator/responsable (number). This field is legacy,
-      meaning it is no longer updated. The column that currently contains this
-      information is id_reviewer.
+    description: "Unique identifier of attachment creator/responsable (number). This field is legacy, meaning it is no longer updated. The column that currently contains this information is id_reviewer."
   sk_reviewer:
     lineage:
       - datalake_inspections.item_review.id_reviewer

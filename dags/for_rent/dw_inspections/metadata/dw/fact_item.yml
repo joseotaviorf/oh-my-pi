@@ -1,22 +1,19 @@
 ---
 database_name: dw_inspections
 table_name: fact_item
-description:
+description: |
   This fact table relates room, item and item_group dimension data with the most granular information possible,
   so that it is possible to analyze and correlate volumetric indicators, property conditions and even inspection quality.
   Each row is a unique item, identified by the sk_item column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_item:
-    description: Item unique identifier.
+    description: Item unique identifier captured in the source operational system.
     lineage:
       - datalake_inspections.item.id_item
   sk_previous_item:
-    description:
-      If there is a previous evaluation for the item in the same contract, it will be indicated
-      in this column. It is usually completed in offboarding inspections, bringing information from
-      the onboarding or dispute inspection.
+    description: "If there is a previous evaluation for the item in the same contract, it will be indicated in this column. It is usually completed in offboarding inspections, bringing information from the onboarding or dispute inspection."
     lineage:
       - datalake_inspections.item.id_previous_item
   sk_external_item:
@@ -28,14 +25,11 @@ columns:
     lineage:
       - datalake_inspections.item.id_item_group
   sk_room:
-    description: Room unique identifier.
+    description: Room unique identifier captured in the source operational system.
     lineage:
       - datalake_inspections.item.id_room
   sk_assessment:
-    description: Unique identifier of an Assessment.
-      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
-      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique.
-      It is observed that the extra Assessments are identical, with no data distinction between them.
+    description: Unique identifier of an Assessment. This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug. This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique. It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspections.item.id_assessment
   sk_inspection:
@@ -53,11 +47,11 @@ columns:
     lineage:
       - datalake_inspections.item.is_active
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item.ts_updated
   ts_load:

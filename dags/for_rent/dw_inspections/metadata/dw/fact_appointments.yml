@@ -5,7 +5,7 @@ description: |
   Transactional fact table that gathers information about inspection schedules.
   Each row in this table represents a schedule made in IS or main.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_appointment:
     description: Unique scheduling identification key in IS or main.

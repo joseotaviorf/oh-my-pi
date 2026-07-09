@@ -5,7 +5,7 @@ description: |
   Transactional fact table that aims to collect information from inspection steps.
   Each row in this table represents an inspection report with approval data and summary metrics.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_inspection:
     lineage:
@@ -22,13 +22,7 @@ columns:
   total_cost:
     lineage:
       - datalake_inspection_services_clean.budget.total_cost
-    description: |
-      Total cost linked to budget approval (surfaced downstream as
-      obt_offboarding.final_tenant_inspection_cost). It is a gross amount before any automatic
-      discount that may be applied along the termination flow: if the IQ (tenant) receives
-      discounts, this value does not reflect the final amount, only the gross repair value prior
-      to any possible discount. When there is mediation, the value may also change after the
-      negotiation between the parties conducted during mediation.
+    description: "Total cost linked to budget approval (surfaced downstream as obt_offboarding.final_tenant_inspection_cost). It is a gross amount before any automatic discount that may be applied along the termination flow: if the IQ (tenant) receives discounts, this value does not reflect the final amount, only the gross repair value prior to any possible discount. When there is mediation, the value may also change after the negotiation between the parties conducted during mediation."
   owner_amount_payment:
     lineage:
       - datalake_inspection_services_clean.budget.owner_amount_payment
@@ -40,9 +34,7 @@ columns:
   invoice_discount_value:
     lineage:
       - datalake_inspections.automatic_discounts.invoice_discount_value
-    description: |
-      The discount value actually applied (invoice generated). Sourced from automatic_discounts.
-      Only available for inspections with bandaid (has_applied_discount = TRUE).
+    description: "The discount value actually applied (invoice generated). Sourced from automatic_discounts. Only available for inspections with bandaid (has_applied_discount = TRUE)."
   total_tenant_contestation:
     lineage:
       - datalake_inspections.repair_request.id_repair_request
@@ -100,10 +92,7 @@ columns:
       - datalake_inspections.reviewer.is_approved
       - datalake_inspections.automatic_discounts.has_applied_discount
       - datalake_inspection_services_clean.assessment_details.value
-    description: |
-      Boolean indicating whether the inspection reached an agreement by any means.
-      True when any of the following applies: early agreement, both parties approved budget,
-      discount agreement (has_applied_discount), or compulsory agreement (COMPULSORY_OWNER_APPROVAL).
+    description: "Boolean indicating whether the inspection reached an agreement by any means. True when any of the following applies: early agreement, both parties approved budget, discount agreement (has_applied_discount), or compulsory agreement (COMPULSORY_OWNER_APPROVAL)."
   has_early_agreement:
     lineage:
       - datalake_inspection_services_clean.budget.is_early_both_agree
@@ -115,16 +104,11 @@ columns:
   has_discount_agreement:
     lineage:
       - datalake_inspections.automatic_discounts.has_applied_discount
-    description: |
-      Boolean indicating whether a discount agreement was reached for the inspection.
-      Uses has_applied_discount (offered value accepted and applied). The JOIN with automatic_discounts
-      is restricted to bandaid cases only (has_applied_discount = TRUE).
+    description: "Boolean indicating whether a discount agreement was reached for the inspection. Uses has_applied_discount (offered value accepted and applied). The JOIN with automatic_discounts is restricted to bandaid cases only (has_applied_discount = TRUE)."
   has_compulsory_agreement:
     lineage:
       - datalake_inspection_services_clean.assessment_details.value
-    description: |
-      Boolean indicating whether the inspection was settled through compulsory owner approval.
-      Derived from assessment_details where value = 'COMPULSORY_OWNER_APPROVAL'.
+    description: "Boolean indicating whether the inspection was settled through compulsory owner approval. Derived from assessment_details where value = 'COMPULSORY_OWNER_APPROVAL'."
   has_owner_approved_review:
     lineage:
       - datalake_inspections.reviewer.is_approved
@@ -164,11 +148,7 @@ columns:
   ts_automatic_repair_processing:
     lineage:
       - datalake_inspections.inspection_status_change.ts_automatic_repair_processing
-    description: |
-      Timestamp when the tag-based automatic repair identification process started for
-      this inspection [offboarding]. In this flow, repair requests are automatically drafted
-      from tags marked by inspectors — it predates Kirk and is unrelated to Kirk's AI-based
-      report creation and to repair pricing automation.
+    description: "Timestamp when the tag-based automatic repair identification process started for this inspection [offboarding]. In this flow, repair requests are automatically drafted from tags marked by inspectors — it predates Kirk and is unrelated to Kirk's AI-based report creation and to repair pricing automation."
   ts_sent_to_review:
     lineage:
       - datalake_inspections.inspection_status_change.ts_sent_to_review
@@ -180,12 +160,7 @@ columns:
   ts_sent_to_repair_analysis:
     lineage:
       - datalake_inspections.inspection_status_change.ts_sent_to_repair_analysis
-    description: |
-      Date in timestamp format indicating when the report was sent for repair analysis. This
-      marking is only being populated for manual flows, not for the automatic (Kirk) flow, so it
-      must be treated with care: a NULL value does not necessarily mean the inspection skipped
-      repair analysis, it may simply have gone through Kirk's automatic flow, which does not
-      register this timestamp.
+    description: "Date in timestamp format indicating when the report was sent for repair analysis. This marking is only being populated for manual flows, not for the automatic (Kirk) flow, so it must be treated with care: a NULL value does not necessarily mean the inspection skipped repair analysis, it may simply have gone through Kirk's automatic flow, which does not register this timestamp."
   ts_sent_to_owner_review:
     lineage:
       - datalake_inspections.inspection_status_change.ts_sent_to_owner_review
@@ -303,12 +278,12 @@ columns:
   year:
     lineage:
       - datalake_amplitude_inspections.inspection_stages_access.year
-    description: Year of update date
+    description: Year of update date captured in the source operational system.
   month:
     lineage:
       - datalake_amplitude_inspections.inspection_stages_access.month
-    description: Month of update date
+    description: Month of update date captured in the source operational system.
   day:
     lineage:
       - datalake_amplitude_inspections.inspection_stages_access.day
-    description: Day of update date
+    description: Day of update date captured in the source operational system.

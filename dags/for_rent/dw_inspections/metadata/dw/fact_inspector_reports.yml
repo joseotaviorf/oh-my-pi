@@ -1,12 +1,12 @@
 ---
 database_name: dw_inspections
 table_name: fact_inspector_reports
-description:
+description: |
   Fact table that has the function of grouping information from reports made by the surveyor.
   Each row of the table represents an "id_report" which is a combination of all the data
   levels involved in the report.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_report:
     description: Unique identification key for the report record, generated based on all the keys in the context.
