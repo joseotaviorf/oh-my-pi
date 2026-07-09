@@ -18,6 +18,7 @@ class DatabricksGroupNameEnum:
     PEOPLE_ANALYTICS = "people-analytics"
     ANALYTICAL_ENVIRONMENT_COSTS = "analytical-environment-costs"
     AUDITLOGS = "auditlogs"
+    LUIGIJR = "luigijr"
 
     @classmethod
     def get_available_enum_values(cls):

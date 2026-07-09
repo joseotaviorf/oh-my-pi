@@ -45,6 +45,7 @@ ALL_DOMAINS: List[str] = [
     "for_sale",
     "governance",
     "growth",
+    "luigijr",
     "mlops",
     "ops_poc",
     "people",

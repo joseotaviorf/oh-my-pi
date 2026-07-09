@@ -27,9 +27,23 @@ logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser()
 parser.add_argument(dest="s3_bucket")
 parser.add_argument(dest="artifact")
+parser.add_argument(
+    "--include-dir",
+    required=False,
+    help="Only upload artifacts whose path is under dags/<DIR>/ (e.g. luigijr). Used by "
+    "the luigijr esteira to sync ONLY its DAGs to the forno Databricks volume.",
+)
+parser.add_argument(
+    "--exclude-dir",
+    required=False,
+    help="Skip artifacts whose path is under dags/<DIR>/ (e.g. luigijr). Mirrors the "
+    "create_dag_files build barrier so the forno/prod volume never gets luigijr files.",
+)
 args = parser.parse_args()
 s3_bucket = args.s3_bucket
 artifact = args.artifact
+include_dir = args.include_dir
+exclude_dir = args.exclude_dir
 
 S3_DAGS_PACKAGES_PATH_PREFIX = path.join("github-repos/bi-etl-ejuice/", artifact)
 
@@ -63,6 +77,10 @@ files_to_upload = []
 
 for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
     if f"/{artifact}" not in root:
+        continue
+    if include_dir and f"/{include_dir}/" not in f"{root}/":
+        continue
+    if exclude_dir and f"/{exclude_dir}/" in f"{root}/":
         continue
 
     for file_name in files:

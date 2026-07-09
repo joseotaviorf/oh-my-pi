@@ -20,6 +20,17 @@ DAGS_TEMPLATE_FILE_PATH = join(
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--dag_name", "-d", required=False)
+parser.add_argument(
+    "--include-dir",
+    required=False,
+    help="Build only declarations whose path is under dags/<DIR>/ (e.g. luigijr).",
+)
+parser.add_argument(
+    "--exclude-dir",
+    required=False,
+    help="Skip declarations whose path is under dags/<DIR>/ (e.g. luigijr). Used by the "
+    "normal pipeline to keep the luigijr sandbox out of the forno/prod DAG bag.",
+)
 args = parser.parse_args()
 dag_name = args.dag_name if args.dag_name else "*"
 
@@ -34,6 +45,11 @@ with open(DAGS_TEMPLATE_FILE_PATH) as f:
 dag_files = glob(
     pathname=f"{DAG_PACKAGES_ROOT}/**/{dag_name}_declaration.yml", recursive=True
 )
+
+if args.include_dir:
+    dag_files = [f for f in dag_files if f"/{args.include_dir}/" in f]
+if args.exclude_dir:
+    dag_files = [f for f in dag_files if f"/{args.exclude_dir}/" not in f]
 
 for dag_file in dag_files:
     dag_package_path = dirname(dag_file)

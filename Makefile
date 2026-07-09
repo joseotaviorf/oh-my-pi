@@ -1063,12 +1063,24 @@ dag_name ?="*"
 .PHONY: create-dag-files
 ## creates the DAG Python files from the DAG declaration YAML files, as of `{dag_name}_dag.py`.
 ## May receive an optional `dag_name={dag_name}` argument to create only the Python DAG file of the provided DAG.
+## ALWAYS skips dags/luigijr/ — that sandbox is built/deployed only by `create-luigijr-dag-files`
+## (dedicated Astro instance), so the normal forno/prod DAG bag never includes Luigi's DAGs.
 create-dag-files:
 	@echo ""
-	@echo "Creating the DAGs' Python files"
+	@echo "Creating the DAGs' Python files (excluding the luigijr sandbox)"
 	@echo "=========="
 	@echo ""
-	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name) --exclude-dir luigijr
+
+.PHONY: create-luigijr-dag-files
+## creates the DAG Python files for the luigijr sandbox ONLY (dags/luigijr/). Used by the
+## luigijr pipeline that deploys to the dedicated luigijr Astro instance (see release.yml).
+create-luigijr-dag-files:
+	@echo ""
+	@echo "Creating the luigijr sandbox DAGs' Python files (dags/luigijr/ only)"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py --include-dir luigijr
 
 
 
