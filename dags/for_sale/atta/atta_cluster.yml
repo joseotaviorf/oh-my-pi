@@ -6,18 +6,14 @@ cluster:
       ebs_volume_count: 1
       ebs_volume_size: 20
     core_nodes:
-      target_on_demand: 2
-    task_nodes:
-      target_spot: 1
+      target_on_demand: 5
     spark_conf:
-      spark.driver.memory: 4g
-      spark.driver.memoryOverhead: 1g
-      spark.executor.memory: 8g
-      spark.executor.memoryOverhead: 2g
-      spark.yarn.am.memory: 2g
-      spark.executor.cores: '2'
-      spark.dynamicAllocation.maxExecutors: '3'
-      spark.memory.fraction: '0.8'
-      spark.memory.storageFraction: '0.3'
+      spark.driver.memory: 1500m
+      spark.driver.memoryOverhead: 384m
+      spark.executor.cores: 1
+      spark.executor.memory: 5g
+      spark.executor.memoryOverhead: 1g
+      spark.yarn.am.memory: 1g
+      spark.memory.fraction: 0.4
       spark.sql.files.maxPartitionBytes: '67108864'
       spark.sql.shuffle.partitions: '24'
