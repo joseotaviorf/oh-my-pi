@@ -1,13 +1,14 @@
+---
 database_name: dw_rent
 table_name: dim_condo_monitoring_invoice
 description: Dim table containing the invoices from Condo Monitoring.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_invoice:
     lineage:
       - datalake_condo_monitoring.invoice.id_invoice
-    description: Key of the invoice.
+    description: Surrogate key uniquely identifying a Condo Monitoring boleto invoice.
   issuer_cnpj:
     lineage:
       - datalake_condo_monitoring.invoice.issuer_cnpj
@@ -19,12 +20,12 @@ columns:
   barcode:
     lineage:
       - datalake_condo_monitoring.invoice.barcode
-    description: barcode of the invoice.
+    description: Bank slip barcode printed on the condominium invoice used for payment.
   status:
     lineage:
       - datalake_condo_monitoring.invoice.status
-    description: Status of the invoice.
-  communication_sent:
+    description: Payment workflow status of the Condo Monitoring invoice.
+  communications_sent:
     lineage:
       - datalake_condo_monitoring.invoice.communication_sent
     description: Array column to indicate the communications sent to the user.
@@ -39,7 +40,7 @@ columns:
   value:
     lineage:
       - datalake_condo_monitoring.invoice.value
-    description: Invoice's value.
+    description: Monetary amount due on the condominium monitoring invoice in BRL.
   was_reminder_comm_required:
     lineage:
       - datalake_condo_monitoring.invoice.was_reminder_comm_required

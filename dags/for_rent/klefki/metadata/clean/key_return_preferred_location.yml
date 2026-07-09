@@ -1,41 +1,63 @@
 ---
 database_name: datalake_klefki_clean
 table_name: key_return_preferred_location
+description: Landlord's preferred location to return the property keys to when a rental contract is terminated, relisted, or the preference is edited (address, lockbox, or gatehouse).
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_key_return_preferred_location:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.id
+    description: Primary key of the landlord's preferred key return location record in Klefki.
   id_address_location_key:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.address_location_key_id
+    description: Reference to the Klefki address where the landlord prefers to return keys, populated when location is ADDRESS.
   id_property:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.property_id
+    description: EBDB property identifier for the listing associated with this key return preference.
   id_user:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.user_id
+    description: EBDB user identifier of the landlord who set this key return preference.
   location:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.location
+    description: "Preferred key return location type chosen by the landlord."
+    categories:
+      ADDRESS: Keys are returned to a specific address, detailed in the linked address_location_key record.
+      LOCKBOX: Keys are returned to a lock box.
+      GATEHOUSE: Keys are returned to the property's gatehouse or concierge.
   source:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.source
+    description: Business flow that generated or last updated this key return preference.
+    categories:
+      TERMINATION: Preference set as part of the contract termination flow.
+      RELISTING: Preference set as part of the property relisting flow.
+      EDIT: Preference updated directly by the landlord, outside of termination or relisting.
   ts_response:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.response_date
+    description: Timestamp of the landlord's most recent update to this key return preference, set automatically on save.
   ts_created:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.created_at
+    description: Record creation date
   ts_updated:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.updated_at
+    description: Record update date
   year:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.year
+    description: Year partition derived from the preference record update timestamp.
   month:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.month
+    description: Month partition derived from the preference record update timestamp.
   day:
     lineage:
       - datalake_klefki_raw.key_return_preferred_location.day
+    description: Day partition derived from the preference record update timestamp.

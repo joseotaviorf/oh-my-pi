@@ -1,17 +1,16 @@
+---
 database_name: dw_rent
 table_name: fact_contract_people
-description:
+description: |
   Table with events and metrics about people involved in a contract created
   (users or not). Each line is a register of a person, not necessarily unique in database
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_contract_person:
     lineage:
       - datalake_ebdb_contract.contract_person.id_contract_person
-    description:
-      Id of the register of a person involved in a contract created. Note
-      that any unique person might appear in multiple lines.
+    description: Id of the register of a person involved in a contract created. Note that any unique person might appear in multiple lines.
   sk_personal_document:
     lineage:
       - datalake_ebdb_contract.contract_person.personal_document
@@ -19,9 +18,7 @@ columns:
   sk_user:
     lineage:
       - datalake_ebdb_contract.contract_person.id_user_contract_person
-    description:
-      The person's user id at QuintoAndar, if an user (client like owner,
-      tenant or agent).
+    description: "The person's user id at QuintoAndar, if an user (client like owner, tenant or agent)."
   sk_contract:
     lineage:
       - datalake_ebdb_contract.contract_person.id_contract
@@ -37,69 +34,49 @@ columns:
   sk_updated_date:
     lineage:
       - datalake_ebdb_contract.contract_person.ts_updated
-    description:
-      Key for the date in which a contract person's register was updated
-      in database
+    description: Key for the date in which a contract person's register was updated in database
   country_code:
     lineage:
       - datalake_ebdb_contract.contract_person.country_code
-    description: Country code of the user
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   contract_role:
     lineage:
       - datalake_ebdb_contract.contract_person.contract_role
-    description:
-      Role that person performs in contract, such as owner, tenant, dweller
-      (resident), sponsor ("fiador").
+    description: "Role that person performs in contract, such as owner, tenant, dweller (resident), or guarantor (fiador)."
   is_user:
     lineage:
       - datalake_ebdb_contract.contract_person.is_user
-    description:
-      Flag to indicate whether the person is an user in QuintoAndar (uses
-      any app).
+    description: Flag to indicate whether the person is an user in QuintoAndar (uses any app).
   is_valid_cpf:
     lineage:
       - datalake_ebdb_contract.contract_person.is_valid_cpf
-    description:
-      Flag to indicate whether the personal document is a valid CPF, according
-      to the last 2 verification digits.
+    description: "Flag to indicate whether the personal document is a valid CPF, according to the last 2 verification digits."
   is_valid_cnpj:
     lineage:
       - datalake_ebdb_contract.contract_person.is_valid_cnpj
-    description:
-      Flag to indicate whether the personal document is a valid CNPJ, according
-      to the last 2 verification digits.
+    description: "Flag to indicate whether the personal document is a valid CNPJ, according to the last 2 verification digits."
   is_contract_user:
     lineage:
       - datalake_ebdb_contract.contract_person.is_contract_user
-    description:
-      Flag to indicate whether the person is the contract main user (main
-      owner or main tenant). Valid for users only.
+    description: Flag to indicate whether the person is the contract main user (main owner or main tenant). Valid for users only.
   is_rent_flow_user:
     lineage:
       - datalake_ebdb_contract.contract_person.is_rent_flow_user
-    description:
-      Flag to indicate whether the person is present in the Rent Flow in
-      the same contract role.
+    description: Flag to indicate whether the person is present in the Rent Flow in the same contract role.
   is_living:
     lineage:
       - datalake_ebdb_contract.contract_person.is_living
-    description:
-      Flag to indicate if the person will live in the house associated
-      to the contract.
+    description: Flag to indicate if the person will live in the house associated to the contract.
   is_first_contract:
     lineage:
       - datalake_ebdb_contract.contract_person.is_first_contract
-    description:
-      Flag to indicate whether the contract is the first of that person.
-      Valid for users only.
+    description: Flag to indicate whether the contract is the first of that person. Valid for users only.
   is_last_contract:
     lineage:
       - datalake_ebdb_contract.contract_person.is_last_contract
-    description:
-      Flag to indicate whether the contract is the last of that person.
-      Valid for users only.
+    description: Flag to indicate whether the contract is the last of that person. Valid for users only.
   ts_load:
     description: Timestamp in which the register was loaded in database.

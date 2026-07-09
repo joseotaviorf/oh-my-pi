@@ -1,29 +1,26 @@
+---
 database_name: dw_rent
 table_name: fact_condo_monitoring_events
 description: Fact table containing the events from Condo Monitoring.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_condo_monitoring_event:
     lineage:
       - datalake_condo_monitoring.condo_monitoring_events.id_condo_monitoring_event
-    description:
-      Key of the event in this table. It's not related to any product.
-      It's the concatenation of the id_contract, with the event date in yyyyMMdd format, followed by two zero (00) and then the number of the event of the contract in the day.
+    description: "Key of the event in this table. It's not related to any product. It's the concatenation of the id_contract, with the event date in yyyyMMdd format, followed by two zero (00) and then the number of the event of the contract in the day."
   sk_contract:
     lineage:
       - datalake_condo_monitoring.condo_monitoring_events.id_contract
-    description: Key of the contract.
+    description: Surrogate key of the rental contract associated with this monitoring event.
   sk_invoice:
     lineage:
       - datalake_condo_monitoring.condo_monitoring_events.id_invoice
-    description: Key of the invoice.
-      This column will be different from -1 when the event is associated with the invoice.
+    description: "Key of the invoice. This column will be different from -1 when the event is associated with the invoice."
   sk_communication:
     lineage:
       - datalake_condo_monitoring.condo_monitoring_events.id_communication
-    description: Key of the communication.
-      This column will be different from -1 when the event is associated with the communication.
+    description: Key of the communication. This column will be different from -1 when the event is associated with the communication.
   sk_event_type:
     description: Key to identify the event type.
   sk_house_listing:

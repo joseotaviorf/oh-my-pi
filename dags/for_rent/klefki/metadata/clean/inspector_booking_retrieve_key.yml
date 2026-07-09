@@ -1,59 +1,79 @@
 ---
 database_name: datalake_klefki_clean
 table_name: inspector_booking_retrieve_key
+description: Booking of when and where the key used in a property inspection (entry or exit) is made available for collection, created from the inspector's scheduling info once the inspection is finished.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_inspector_booking_retrieve_key:
+    description: Unique identifier of the inspector key retrieval booking in Klefki.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.id
-  inspector_id:
+  id_inspector:
+    description: Identifier of the inspector (vistoriador) who conducted the property inspection linked to this key collection booking.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.inspector_id
-  house_id:
+  id_house:
+    description: EBDB house identifier for the inspected listing whose keys will be collected.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.house_id
   collect_day:
+    description: Scheduled calendar day for the key collection.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.collect_day
   collect_hour:
+    description: Scheduled time for the key collection.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.collect_hour
   zipcode:
+    description: Postal code of the address for this key collection booking.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.zipcode
   street:
+    description: Street name of the address for this key collection booking.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.street
   "number":
+    description: Street number of the address for this key collection booking.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key."number"
   complement:
+    description: Apartment or unit complement for the address of this key collection booking.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.complement
   district:
+    description: Neighborhood of the address for this key collection booking.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.district
   city:
+    description: City of the address for this key collection booking.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.city
   state:
+    description: State abbreviation of the address for this key collection booking.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.state
   instructions:
+    description: Free-text access or delivery notes for the key collection address.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.instructions
   ts_created:
+    description: Timestamp when the key retrieval booking was created in Klefki.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.created_at
   ts_updated:
+    description: Timestamp when the key retrieval booking was last updated.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.updated_at
   year:
+    description: Year partition derived from the booking creation timestamp.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.year
   month:
+    description: Month partition derived from the booking creation timestamp.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.month
   day:
+    description: Day partition derived from the booking creation timestamp.
     lineage:
       - datalake_klefki_raw.inspector_booking_retrieve_key.day

@@ -1,47 +1,63 @@
 ---
 database_name: datalake_klefki_clean
 table_name: address_location_key
+description: Landlord's preferred address to return keys to, used when the return location type in key_return_preferred_location is ADDRESS.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_address_location_key:
     lineage:
       - datalake_klefki_raw.address_location_key.id
+    description: Primary key of the landlord's key return address record in Klefki.
   zipcode:
     lineage:
       - datalake_klefki_raw.address_location_key.zipcode
+    description: Postal code (CEP) of the landlord's key return address.
   street:
     lineage:
       - datalake_klefki_raw.address_location_key.street
+    description: Street name of the landlord's key return address.
   number:
     lineage:
       - datalake_klefki_raw.address_location_key.number
+    description: Street number of the landlord's key return address.
   complement:
     lineage:
       - datalake_klefki_raw.address_location_key.complement
+    description: Apartment, block, or additional details for the landlord's key return address.
   district:
     lineage:
       - datalake_klefki_raw.address_location_key.district
+    description: Neighborhood (bairro) of the landlord's key return address.
   city:
     lineage:
       - datalake_klefki_raw.address_location_key.city
+    description: City of the landlord's key return address.
   state:
     lineage:
       - datalake_klefki_raw.address_location_key.state
+    description: Brazilian state abbreviation of the landlord's key return address.
   instructions:
     lineage:
       - datalake_klefki_raw.address_location_key.instructions
+    description: "Free-text delivery or access notes appended to the landlord's key return address."
   ts_created:
     lineage:
       - datalake_klefki_raw.address_location_key.created_at
+    description: Record creation date
   ts_updated:
     lineage:
       - datalake_klefki_raw.address_location_key.updated_at
+    description: Record update date
   year:
     lineage:
       - datalake_klefki_raw.address_location_key.year
+    description: Year partition derived from the address record update timestamp.
   month:
     lineage:
       - datalake_klefki_raw.address_location_key.month
+    description: Month partition derived from the address record update timestamp.
   day:
     lineage:
       - datalake_klefki_raw.address_location_key.day
+    description: Day partition derived from the address record update timestamp.

@@ -1,8 +1,9 @@
+---
 database_name: dw_rent
 table_name: fact_contracts
 description: Table with the metrics related to the contracts in QuintoAndar and also with the SKs that are related to it.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_contract:
     lineage:
@@ -53,8 +54,6 @@ columns:
   total_non_payment_report_while_active:
     description: Number of non payment reports sent by the user while the Condo Monitoring is active for the respective contract.
   total_non_payment_report_while_inactive:
-    description:
-      Number of non payment reports sent by the user while the Condo Monitoring is inactive for the respective contract.
-      If the contract is not eligible for the Condo Monitoring, the count of the non payment reports will be considered as well.
+    description: "Number of non payment reports sent by the user while the Condo Monitoring is inactive for the respective contract. If the contract is not eligible for the Condo Monitoring, the count of the non payment reports will be considered as well."
   ts_load:
     description: Timestamp in which the register was loaded in database.

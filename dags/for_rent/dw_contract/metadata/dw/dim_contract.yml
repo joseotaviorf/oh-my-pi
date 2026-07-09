@@ -1,13 +1,14 @@
+---
 database_name: dw_rent
 table_name: dim_contract
 description: Information about ForRent contracts. Each line is a unique contract.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_contract:
     lineage:
       - datalake_ebdb_contract.contract.id
-    description: Key of the contract, which must be unique.
+    description: Surrogate key linking to the contract dimension in the warehouse model.
   id_contract:
     lineage:
       - datalake_ebdb_contract.contract.id
@@ -15,7 +16,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_contract.contract.country_code
-    description: Country code related to the contract's country of origin.
+    description: "Country code related to the contract's country of origin."
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.
@@ -47,14 +48,14 @@ columns:
   type:
     lineage:
       - datalake_ebdb_contract.contract.type
-    description: Type of assurance of the contract.
+    description: Type of QuintoAndar service model applied to the contract, indicating whether it includes QuintoAndar's standard administration and services or not.
     categories:
       DealOnly: Contract without QuintoAndar administration and services (old product).
       FullService: Standard contract with QuintoAndar administration and services.
   status:
     lineage:
       - datalake_ebdb_contract.contract.status
-    description: Current status of the contract.
+    description: Current processing state of the record in the source workflow.
     categories:
       Ativo: The contract is active.
       Cancelado: The contract has been canceled.
@@ -64,7 +65,7 @@ columns:
   rental_administrator:
     lineage:
       - datalake_ebdb_contract.contract.rental_administrator
-    description: The rental administrator of the contract/house.
+    description: Current rental administrator responsible for the property.
     categories:
       OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.
       QUINTOANDAR: Default rental administrator, which is QuintoAndar.
@@ -107,7 +108,7 @@ columns:
   condo_monitoring_status:
     lineage:
       - datalake_ebdb_contract.contract.condo_monitoring_status
-    description: Status of the contract in the Condo Monitoring.
+    description: Enrollment and activity status of the contract in the Condo Monitoring product.
   rental_insurance_installments:
     lineage:
       - datalake_ebdb_contract.contract.rental_guarantee_installment
@@ -127,9 +128,7 @@ columns:
   first_rental_commission:
     lineage:
       - datalake_ebdb_contract.contract.fist_rent_comission_fee
-    description:
-      The rent value paid as a comission (the currency type is related to the country of the contract), in decimals.
-      The commission is paid in full to the real estate agent
+    description: The rent value paid as a comission (the currency type is related to the country of the contract), in decimals. The commission is paid in full to the real estate agent
   monthly_administration_fee:
     lineage:
       - datalake_ebdb_contract.contract.monthly_administration_fee
@@ -145,7 +144,7 @@ columns:
   tenant_service_fee:
     lineage:
       - datalake_ebdb_contract.contract.tenant_service_fee
-    description: Rent percentage paid monthly by the tenant as a Service Fee.
+    description: Service fee percentage charged to the tenant on this contract.
   agent_brokerage_share:
     lineage:
       - datalake_ebdb_contract.contract.agent_brokerage_share
@@ -160,7 +159,7 @@ columns:
   closing_status:
     lineage:
       - datalake_ebdb_contract.contract.status_closing
-    description: Contract's closing status.
+    description: Current status of the rental contract closing workflow.
     categories:
       ApoliceSolicitada: Insurance policy requested.
       ChavesEntregues: Keys were handed over to the tenant.
@@ -172,7 +171,7 @@ columns:
   cancellation_reason:
     lineage:
       - datalake_ebdb_contract.contract.cancellation_reason
-    description: Reason of the contract's cancellation.
+    description: Explanation recorded when the reservation was cancelled.
     categories:
       DISAGREEMENT: The parts disagree.
       INCORRECT_INFO: There was some incorrent information on the listing related to the contract.
@@ -254,7 +253,7 @@ columns:
   contract_plan:
     lineage:
       - datalake_ebdb_contract.contract_b2b.contract_plan
-    description: Type of contract plan.
+    description: Commercial plan tier negotiated for B2B rental contracts.
   value_segment:
     lineage:
       - datalake_ebdb_contract.contract.value_segment
@@ -271,7 +270,7 @@ columns:
   brokerage_split_percentage:
     lineage:
       - datalake_ebdb_contract.contract_b2b.brokerage_split_percentage
-    description: The brokerage percentage of the contract.
+    description: Percentage of brokerage commission allocated to partners on the contract.
   is_ongoing_contract:
     lineage:
       - datalake_ebdb_contract.contract.is_ongoing_contract
@@ -279,7 +278,7 @@ columns:
   is_tenant_service_fee_opt_out:
     lineage:
       - datalake_ebdb_contract.contract.is_tenant_service_fee_opt_out
-    description: Boolean indicating if the contract's tenant service fee has been opted out.
+    description: "Boolean indicating if the contract's tenant service fee has been opted out."
   is_exit_inspection_opted_out:
     lineage:
       - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
@@ -315,10 +314,7 @@ columns:
   dt_annulment:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
-    description:
-      Date of the annulment from the contract. The contract being annulled means that it ended
-      after signature, which can be between the signatures and the contract's start or after the start.
-      At this point, the tenant already left the property.
+    description: "Date of the annulment from the contract. The contract being annulled means that it ended after signature, which can be between the signatures and the contract's start or after the start. At this point, the tenant already left the property."
   ts_termination_requested:
     lineage:
       - datalake_terminator.termination.ts_termination_request
@@ -346,9 +342,7 @@ columns:
   ts_canceled:
     lineage:
       - datalake_ebdb_contract.contract.ts_canceled
-    description:
-      Timestamp of when the contract was cancelled. The contract being
-      canceled means that it was ended before the signature.
+    description: Timestamp of when the contract was cancelled. The contract being canceled means that it was ended before the signature.
   ts_tenant_service_fee_opt_out:
     lineage:
       - datalake_ebdb_contract.contract.ts_tenant_service_fee_opt_out
@@ -356,7 +350,7 @@ columns:
   ts_analyst_annulment_input:
     lineage:
       - datalake_ebdb_contract.contract.ts_analyst_annulment_input
-    description: Timestamp of the analyst's annulment input.
+    description: "Timestamp of the analyst's annulment input."
   dt_ended_rental_confirmed:
     lineage:
       - datalake_ebdb_contract.contract.dt_ended_rental_confirmed

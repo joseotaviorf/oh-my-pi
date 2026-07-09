@@ -1,38 +1,51 @@
 ---
 database_name: datalake_klefki_clean
 table_name: notifications_sent
+description: Outbound Klefki notifications about key handoffs and contract milestones sent to tenants and owners.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_notifications_sent:
+    description: Unique identifier of the notification dispatch record in Klefki.
     lineage:
       - datalake_klefki_raw.notifications_sent.id
-  contract_id:
+  id_contract:
+    description: Rental contract identifier associated with the notification context.
     lineage:
       - datalake_klefki_raw.notifications_sent.contract_id
+  id_property:
+    description: Property identifier linked to the notification recipient context.
+    lineage:
+      - datalake_klefki_raw.notifications_sent.property_id
   msg_type:
+    description: Template or business message type that was sent to the recipient.
     lineage:
       - datalake_klefki_raw.notifications_sent.msg_type
   recipient:
+    description: Target audience role for the notification, such as tenant or landlord (property owner).
     lineage:
       - datalake_klefki_raw.notifications_sent.recipient
   channel:
+    description: Delivery channel used for the notification, such as HSM (WhatsApp template) or email.
     lineage:
       - datalake_klefki_raw.notifications_sent.channel
   remaining_days:
+    description: Days remaining until the contract's termination date when the notification was sent (e.g. 14, 7, 3, or 1 for landlord reminders); 0 for post-inspection confirmation notifications.
     lineage:
       - datalake_klefki_raw.notifications_sent.remaining_days
-  property_id:
-    lineage:
-      - datalake_klefki_raw.notifications_sent.property_id
   ts_created:
+    description: Timestamp when the notification was dispatched from Klefki.
     lineage:
       - datalake_klefki_raw.notifications_sent.created_at
   year:
+    description: Year partition derived from the notification dispatch timestamp.
     lineage:
       - datalake_klefki_raw.notifications_sent.year
   month:
+    description: Month partition derived from the notification dispatch timestamp.
     lineage:
       - datalake_klefki_raw.notifications_sent.month
   day:
+    description: Day partition derived from the notification dispatch timestamp.
     lineage:
       - datalake_klefki_raw.notifications_sent.day

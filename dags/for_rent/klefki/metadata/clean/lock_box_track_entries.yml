@@ -1,41 +1,55 @@
 ---
 database_name: datalake_klefki_clean
 table_name: lock_box_track_entries
+description: Audit log of lock box access code requests in Klefki, tracking who requested an access code, for which property and lock box, and the code returned.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_lock_box_track_entries:
+    description: Unique identifier of the lock box access audit record in Klefki.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.id
-  house_id:
+  id_house:
+    description: EBDB house identifier for the listing associated with the lock box.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.house_id
-  lock_box_id:
+  id_lock_box:
+    description: Klefki lock box identifier that was accessed.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.lock_box_id
-  user_id:
+  id_user:
+    description: User identifier of the person who accessed the lock box.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.user_id
   user_email:
+    description: Legacy column originally storing the numeric user id (renamed from user_id in a schema migration); despite its name, it does not contain an email address and is superseded by id_user.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.user_email
   user_role:
+    description: Role(s) of the requesting user, taken as-is from their QuintoAndar authentication roles (e.g. inspector, agent).
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.user_role
   "password":
+    description: Lock box access code (PIN) generated and returned to the requester; stored in plain text, not encrypted.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries."password"
   ts_created:
+    description: Timestamp when the lock box access event was recorded.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.created_at
   ts_updated:
+    description: Timestamp when the lock box access record was last updated.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.updated_at
   year:
+    description: Year partition derived from the access event timestamp.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.year
   month:
+    description: Month partition derived from the access event timestamp.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.month
   day:
+    description: Day partition derived from the access event timestamp.
     lineage:
       - datalake_klefki_raw.lock_box_track_entries.day

@@ -1,9 +1,10 @@
+---
 database_name: dw_rent
 table_name: dim_contract_person
 description: Table with context information about people involved in a contract created
   (users or not). Each line is a register of a person, not necessarily unique in database
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_contract_person:
     lineage:
@@ -14,7 +15,7 @@ columns:
     lineage:
     - datalake_ebdb_contract.contract_person.country_code
     - datalake_ebdb_contract.ongoing_contracts.country_code
-    description: Country code of the user
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
@@ -34,23 +35,19 @@ columns:
   personal_document:
     lineage:
     - datalake_ebdb_contract.contract_person.personal_document
-    description: Contract person's personal id registered in the contract, such as
-      CPF, CNPJ, RG, RNE.
+    description: Contract person's personal id registered in the contract, such as CPF, CNPJ, RG, RNE.
   personal_document_type:
     lineage:
     - datalake_ebdb_contract.contract_person.personal_document_type
-    description: Type of the personal document registered, such as CPF, CPNJ, RG,
-      RNE.
+    description: Identity document type provided by the participant, such as RG or RNE.
   has_ongoing_contract:
     lineage:
     - datalake_ebdb_contract.ongoing_contracts.has_ongoing_contract
-    description: Flag to indicate if contract person has at least one ongoing contract
-      currently, valid for users only.
+    description: Flag to indicate if contract person has at least one ongoing contract currently, valid for users only.
   gender:
     lineage:
     - datalake_ebdb_contract.contract_person.gender
-    description: Contract person's gender, if specified. It might have a high null
-      rate since it is an optional info.
+    description: Contract person's gender, if specified. It might have a high null rate since it is an optional info.
     categories:
       feminine: ''
       masculine: ''
