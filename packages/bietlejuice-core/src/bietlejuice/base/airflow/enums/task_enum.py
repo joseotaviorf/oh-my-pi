@@ -11,6 +11,7 @@ class TaskEnum(Enum):
     LOAD_CDC_RAW = "load_cdc_raw"
     LOAD_CDC_TRANSACTIONAL = "load_cdc_transactional"
     LOAD_API_RAW = "load_api_raw"
+    LOAD_GSHEETS = "load_gsheets"
     LOAD_CUSTOM = "load_custom"
     LOAD_DMS_CDC_CLEAN = "load_dms_cdc_clean"
     LOAD_DMS_CDC_RAW = "load_dms_cdc_raw"

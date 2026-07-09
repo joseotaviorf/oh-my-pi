@@ -1,0 +1,53 @@
+# TEMPLATE — declaration de uma DAG de ingestão de Google Sheets (single-step overwrite).
+#
+# Tipo `gsheets_ingestion` (RawGsheetsIngestionWorkflow). Para cada planilha em
+# tables_customization, a DAG lê a fonte e SOBRESCREVE a tabela direto no schema final
+# (datalake_<custom_schema>_clean). Sem raw, sem clean-SQL, sem create/terminate-cluster,
+# sem branch de 24h. Usa o job cluster efêmero do builder novo.
+#
+# Como usar: copie para dags/<dominio>/<dag_name>/<dag_name>_declaration.yml e ajuste os valores.
+# NÃO precisa de queries/clean nem metadata — a tabela é escrita como a planilha vem.
+# A planilha precisa estar compartilhada (Leitor) com a service account de gsheets.
+
+dag:
+  name: gsheets_luigijr_exemplo            # = nome da pasta da DAG
+  owner: Data Fintech                      # um valor do DAGOwnerEnum
+  schedule_interval: 0 8 * * *
+
+workflow:
+  type: gsheets_ingestion
+  layer: raw                               # roteamento pela RawFactory; o destino é o schema clean
+  custom_schema: gsheets                   # -> escreve em datalake_gsheets_clean.<tabela>
+
+  # Opcionais (defaults no LoadGsheetsTaskCreator):
+  # gsheets_credentials_scope: quintoandar
+  # gsheets_credentials_key: GOOGLE_SERVICE_ACCOUNT_CREDENTIALS
+
+  tables_customization:
+    minha_tabela:                          # = nome da tabela final (datalake_gsheets_clean.minha_tabela)
+      sheet_id: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789"
+      sheet_name: "Sheet1"                 # nome da aba dentro da planilha
+
+    # outra_tabela:
+    #   sheet_id: "..."
+    #   sheet_name: "Pagina1"
+
+# OBRIGATÓRIO: o builder exige config de cluster (este bloco OU um <dag>_cluster.yml).
+# As custom_libraries instalam o que o spark job de gsheets importa (API client + google libs).
+cluster:
+  type: consolidation_xs_general_cluster
+  databricks_conn_id: databricks_new
+  access_control_list:
+    group_name: luigijr
+    permission_level: CAN_MANAGE
+  custom_libraries:
+  - whl: '{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl'
+  - pypi:
+      package: google-auth==2.13.0
+  - pypi:
+      package: google-api-python-client==2.55.0
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

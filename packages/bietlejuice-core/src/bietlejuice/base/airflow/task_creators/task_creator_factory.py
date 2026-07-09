@@ -56,6 +56,9 @@ from bietlejuice.base.airflow.task_creators.load_dms_cdc_clean_task_creator impo
 from bietlejuice.base.airflow.task_creators.load_dms_cdc_raw_task_creator import (
     LoadDMSCDCRawTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.load_gsheets_task_creator import (
+    LoadGsheetsTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.load_mongo_raw_task_creator import (
     LoadMongoRawTaskCreator,
 )
@@ -101,6 +104,7 @@ class TaskCreatorFactory:
         TaskEnum.LOAD_CDC_RAW: LoadCDCRawTaskCreator,
         TaskEnum.LOAD_CDC_TRANSACTIONAL: LoadCDCTransactionalTaskCreator,
         TaskEnum.LOAD_API_RAW: LoadAPIRawTaskCreator,
+        TaskEnum.LOAD_GSHEETS: LoadGsheetsTaskCreator,
         TaskEnum.LOAD_CUSTOM: LoadCustomTaskCreator,
         TaskEnum.LOAD_DMS_CDC_CLEAN: LoadDMSCDCCleanTaskCreator,
         TaskEnum.LOAD_DMS_CDC_RAW: LoadDMSCDCRawTaskCreator,
