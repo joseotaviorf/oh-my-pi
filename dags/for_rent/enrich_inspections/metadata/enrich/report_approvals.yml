@@ -1,11 +1,11 @@
 ---
 database_name: datalake_inspections
 table_name: report_approvals
-description:
+description: |
   Table that follows the inspection granularity, this table aims to gather information related to the approval flow through which the inspection went.
   Here we have a link between the approvals through the review flow and the budget approval flow
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_inspection:
     lineage:
@@ -32,11 +32,11 @@ columns:
   owner_amount_payment:
     lineage:
       - datalake_inspection_services_clean.budget.owner_amount_payment
-    description: Owner payment amount.
+    description: Portion of the approved repair budget, in BRL, that the property owner is responsible for paying. Sourced from the inspection's budget record via a join on id_inspection, so it is populated whenever a budget exists for the inspection, regardless of the row's approval_type.
   tenant_amount_payment:
     lineage:
       - datalake_inspection_services_clean.budget.tenant_amount_payment
-    description: Tenant payment amount.
+    description: Portion of the approved repair budget, in BRL, that the tenant is responsible for paying. Sourced from the inspection's budget record via a join on id_inspection, so it is populated whenever a budget exists for the inspection, regardless of the row's approval_type.
   owner_approved_by:
     lineage:
       - datalake_inspection_services_clean.reviewer.id_reviewer
@@ -51,26 +51,26 @@ columns:
     lineage:
       - datalake_inspection_services_clean.reviewer.approval_comment
       - datalake_inspection_services_clean.budget.owner_approval_comment
-    description: Owner approval comment.
+    description: Free-text comment submitted by the owner when approving or rejecting the inspection report, repair requests, or negotiated repair budget.
   tenant_approval_comment:
     lineage:
       - datalake_inspection_services_clean.reviewer.approval_comment
       - datalake_inspection_services_clean.budget.tenant_approval_comment
-    description: Tenant approval comment.
+    description: Free-text comment submitted by the tenant when approving or rejecting the inspection report, repair requests, or negotiated repair budget.
   owner_approval_reason:
     lineage:
       - datalake_inspection_services_clean.reviewer.approval_reason
       - datalake_inspection_services_clean.budget.owner_approval_reason
-    description: Reason for owner approval.
+    description: Structured reason code recorded when the owner approves or rejects the inspection outcome or repair budget.
   tenant_approval_reason:
     lineage:
       - datalake_inspection_services_clean.reviewer.approval_reason
       - datalake_inspection_services_clean.budget.tenant_approval_reason
-    description: Reason for tenant approval.
+    description: Structured reason code recorded when the tenant approves or rejects the inspection outcome or repair budget.
   approval_type:
     lineage:
       - datalake_inspection_services_clean.reviewer.approval_type
-    description: Type of approval
+    description: Stage of the inspection approval workflow, such as report review, repair analysis, contestation analysis, inspection edit, or budget approval.
   owner_approved:
     lineage:
       - datalake_inspection_services_clean.reviewer.is_approved
@@ -79,7 +79,7 @@ columns:
   tenant_approved:
     lineage:
       - datalake_inspection_services_clean.reviewer.is_approved
-      - datalake_inspection_services_clean.budget.owner_approved
+      - datalake_inspection_services_clean.budget.tenant_approved
     description: Boolean information indicating whether the tenant approved.
   is_early_both_agree:
     lineage:

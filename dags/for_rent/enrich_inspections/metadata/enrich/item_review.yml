@@ -3,10 +3,10 @@ database_name: datalake_inspections
 table_name: item_review
 description: After the inspection, the tenant and the property owner can review the report and contest the result given by the inspector.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_item:
-    description: Item unique identifier.
+    description: Item unique identifier captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.review.id_item
   id_review:
@@ -24,25 +24,20 @@ columns:
   id_user:
     lineage:
       - datalake_inspection_services_clean.review.id_user
-    description: Reviewer user unique identifier (number). This field is legacy,
-      meaning it is no longer updated. The column that currently contains this
-      information is id_reviewer.
+    description: Reviewer user unique identifier (number). This field is legacy, meaning it is no longer updated. The column that currently contains this information is id_reviewer.
   id_reviewer:
     lineage:
       - datalake_inspection_services_clean.review.id_reviewer
     description: Reviewer unique identifier (number)
   id_assessment:
-    description: Unique identifier of an Assessment.
-      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
-      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique.
-      It is observed that the extra Assessments are identical, with no data distinction between them.
+    description: Unique identifier of an Assessment. This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug. This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique. It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspections.item.id_assessment
   id_inspection:
     description: Inspection unique identifier.
     lineage:
       - datalake_inspections.item.id_inspection
-  uuid:
+  uuid_media:
     description: Item Media unique identifier (uuid)
     lineage:
       - datalake_inspection_services_clean.review_media.uuid
@@ -71,11 +66,11 @@ columns:
     lineage:
       - datalake_inspection_services_clean.review_media.ts_updated
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.review.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.review.ts_updated
   year:

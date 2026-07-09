@@ -3,7 +3,7 @@ database_name: datalake_inspections
 table_name: inspection_status_change
 description: This table transforms status changes into date and time columns to facilitate analysis of the inspection lifecycle.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_inspection:
     lineage:
@@ -44,20 +44,11 @@ columns:
   ts_automatic_repair_processing:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.ts_updated
-    description: |
-      Timestamp when the tag-based automatic repair identification process started for
-      this inspection [offboarding]. In this flow, repair requests are automatically drafted
-      from tags marked by inspectors — it predates Kirk and is unrelated to Kirk's AI-based
-      report creation and to repair pricing automation.
+    description: "Timestamp when the tag-based automatic repair identification process started for this inspection [offboarding]. In this flow, repair requests are automatically drafted from tags marked by inspectors — it predates Kirk and is unrelated to Kirk's AI-based report creation and to repair pricing automation."
   ts_sent_to_repair_analysis:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.ts_updated
-    description: |
-      Timestamp. The inspection was sent to the analysis team to identify the need for repairs
-      to the house. This marking is only being populated for manual flows, not for the automatic
-      (Kirk) flow, so it must be treated with care: a NULL value does not necessarily mean the
-      inspection skipped repair analysis, it may simply have gone through Kirk's automatic flow,
-      which does not register this timestamp.
+    description: "Timestamp. The inspection was sent to the analysis team to identify the need for repairs to the house. This marking is only being populated for manual flows, not for the automatic (Kirk) flow, so it must be treated with care: a NULL value does not necessarily mean the inspection skipped repair analysis, it may simply have gone through Kirk's automatic flow, which does not register this timestamp."
   ts_sent_to_owner_review:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.ts_updated
@@ -105,9 +96,6 @@ columns:
   ts_reviewed:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.ts_updated
-    description: |
-      Timestamp.
-      In offboarding: Survey sent to the Operations team to validate interventions proposed by owner/tenant
-      In onboarding: When the review deadline is reached
+    description: "Timestamp. In offboarding: Survey sent to the Operations team to validate interventions proposed by owner/tenant In onboarding: When the review deadline is reached"
   ts_load:
     description: Timestamp when the row was loaded into the table (generated at load time via NOW()).

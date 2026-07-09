@@ -5,7 +5,7 @@ description: |
   Enrichment table that aims to store the processed inspection scheduling data.
   Each line of this table contains a scheduling record linked to the inspection process.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_appointment:
     lineage:
@@ -54,9 +54,7 @@ columns:
   status_made_by:
     lineage:
       - datalake_schedules_clean.appointment_history.category_name
-    description: |
-      Descriptive information indicating who is responsible for the status in question.
-      In the case of a cancelled inspection, this column indicates who cancelled it.
+    description: "Descriptive information indicating who is responsible for the status in question. In the case of a cancelled inspection, this column indicates who cancelled it."
   status_description:
     lineage:
       - datalake_schedules_clean.appointment_history.category_description

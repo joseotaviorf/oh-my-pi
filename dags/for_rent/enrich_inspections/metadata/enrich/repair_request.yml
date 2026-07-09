@@ -3,7 +3,7 @@ database_name: datalake_inspections
 table_name: repair_request
 description: Enrichment table that unifies and applies business rules to repair request context data.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_repair_request:
     lineage:
@@ -28,7 +28,7 @@ columns:
   id_room:
     lineage:
       - datalake_inspection_services_clean.room.id_room
-    description: Room unique identifier.
+    description: Room unique identifier captured in the source operational system.
   id_assessment:
     lineage:
       - datalake_inspection_services_clean.assessment.id_assessment
@@ -40,9 +40,7 @@ columns:
   id_granted_by:
     lineage:
       - datalake_inspection_services_clean.repair_request.id_granted_by
-    description:
-      Reviewer who assessed whether a repair was exempted. Being an owner
-      or member of AN1
+    description: Reviewer who assessed whether a repair was exempted. Being an owner or member of AN1
   id_contestation_requester:
     lineage:
       - datalake_inspection_services_clean.contestation.id_reviewer
@@ -58,7 +56,7 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_clean.repair_request.type
-    description: Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories).
+    description: "Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories)."
     categories:
       REPAIR: Make item repair.
       CLEAN: Clean the item.
@@ -81,19 +79,12 @@ columns:
     lineage:
       - datalake_inspection_services_clean.repair_request_history.cost
       - datalake_inspection_services_clean.repair_request_history.origin
-    description:
-      Repair cost in BRL as set at the Repair Analysis (AR) stage, before any
-      negotiation. Aggregated as MAX(cost) from repair_request_history rows with
-      origin REPAIR_ANALYSIS; null when no AR-stage pricing exists for the repair.
+    description: "Repair cost in BRL as set at the Repair Analysis (AR) stage, before any negotiation. Aggregated as MAX(cost) from repair_request_history rows with origin REPAIR_ANALYSIS; null when no AR-stage pricing exists for the repair."
   ar_cost_source:
     lineage:
       - datalake_inspection_services_clean.repair_request_history.cost_source
       - datalake_inspection_services_clean.repair_request_history.origin
-    description: |
-      Origin of the AR-stage pricing: MANUAL (set by the OPS team) or AUTOMATIC
-      (set by InspectionsService). Null when no AR-stage cost was recorded.
-      Aggregated as MAX(cost_source) from repair_request_history rows with
-      origin REPAIR_ANALYSIS.
+    description: "Origin of the AR-stage pricing: MANUAL (set by the OPS team) or AUTOMATIC (set by InspectionsService). Null when no AR-stage cost was recorded. Aggregated as MAX(cost_source) from repair_request_history rows with origin REPAIR_ANALYSIS."
   repair_type:
     lineage:
       - datalake_inspection_services_clean.repair_request.type
@@ -144,9 +135,7 @@ columns:
   is_exempted:
     lineage:
       - datalake_inspection_services_clean.repair_request.is_exempted
-    description:
-      Indicates whether the repair suggested by the AN1 team was exempted
-      by the owner or a analyst
+    description: Indicates whether the repair suggested by the AN1 team was exempted by the owner or a analyst
   is_exempted_by_owner_from_budget:
     lineage:
       - datalake_inspection_services_clean.repair_request.is_exempted_from_budget
@@ -173,40 +162,32 @@ columns:
   has_automatically_identified:
     lineage:
       - datalake_inspection_services_clean.repair_request.has_automatically_identified
-    description: |
-      Boolean indicating whether this repair request was automatically drafted from inspector
-      tags (tag-based flow). This flow predates Kirk and is unrelated to Kirk's
-      AI-based repair report creation and to repair pricing automation.
+    description: "Boolean indicating whether this repair request was automatically drafted from inspector tags (tag-based flow). This flow predates Kirk and is unrelated to Kirk's AI-based repair report creation and to repair pricing automation."
   has_automatic_identification_accepted:
     lineage:
       - datalake_inspection_services_clean.repair_request.has_automatic_identification_accepted
-    description: |
-      Boolean indicating whether the automatically drafted repair request (from the
-      tag-based flow) was accepted. This flow predates Kirk and is unrelated to Kirk's
-      AI-based repair report creation and to repair pricing automation.
+    description: "Boolean indicating whether the automatically drafted repair request (from the tag-based flow) was accepted. This flow predates Kirk and is unrelated to Kirk's AI-based repair report creation and to repair pricing automation."
   ts_granted:
     lineage:
       - datalake_inspection_services_clean.repair_request.ts_granted
-    description:
-      Indicates the time at which the repair request exempted assessment
-      was made
+    description: Indicates the time at which the repair request exempted assessment was made
   ts_created:
     lineage:
       - datalake_inspection_services_clean.repair_request.ts_created
-    description: Record creation date
+    description: Record creation date captured in the source operational system.
   ts_updated:
     lineage:
       - datalake_inspection_services_clean.repair_request.ts_updated
-    description: Record update date
+    description: Record update date captured in the source operational system.
   year:
     lineage:
       - datalake_inspection_services_clean.repair_request.year
-    description: Year of update date
+    description: Year of update date captured in the source operational system.
   month:
     lineage:
       - datalake_inspection_services_clean.repair_request.month
-    description: Month of update date
+    description: Month of update date captured in the source operational system.
   day:
     lineage:
       - datalake_inspection_services_clean.repair_request.day
-    description: Day of update date
+    description: Day of update date captured in the source operational system.

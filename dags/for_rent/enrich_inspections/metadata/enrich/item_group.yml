@@ -1,11 +1,11 @@
 ---
 database_name: datalake_inspections
 table_name: item_group
-description:
+description: |
   This table deals with the objects that were evaluated during the inspection. It is worth noting that,
   when dealing with IS data, the item_group object refers to window, door, floor, etc.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_item_group:
     description: Item Group unique identifier.
@@ -16,7 +16,7 @@ columns:
     lineage:
       - datalake_inspection_services_clean.item_group_type.id_item_group_type
   id_room:
-    description: Room unique identifier.
+    description: Room unique identifier captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.item_group.id_room
   id_main:
@@ -52,11 +52,11 @@ columns:
     lineage:
       - datalake_inspection_services_clean.item_group.is_active_inferior_quality
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.item_group.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.item_group.ts_updated
   year:
