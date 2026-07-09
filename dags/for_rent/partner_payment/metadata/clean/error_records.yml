@@ -3,29 +3,29 @@ database_name: datalake_partner_payment_clean
 table_name: error_records
 description: |
   This table contains the errors that need manual attention.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.error_records.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_operation_event:
     lineage:
       - datalake_partner_payment_raw.error_records.operation_event_id
-    description: ID of the operation event.
+    description: Foreign key to the Partner Payment operation event that triggered this error.
   id_operation_payment:
     lineage:
       - datalake_partner_payment_raw.error_records.operation_payment_id
-    description: ID of the operation payment.
+    description: Foreign key to the operation payment record associated with this error.
   id_agent_payment:
     lineage:
       - datalake_partner_payment_raw.error_records.agent_payment_id
-    description: ID of the agent payment.
+    description: Foreign key to the agent payment consolidation affected by this error.
   version:
     lineage:
       - datalake_partner_payment_raw.error_records.version
-    description: Error records version.
+    description: Optimistic locking revision counter for concurrent update safety.
   error_date:
     lineage:
       - datalake_partner_payment_raw.error_records.error_date
@@ -33,15 +33,15 @@ columns:
   status:
     lineage:
       - datalake_partner_payment_raw.error_records.status
-    description: Status of the error.
+    description: Status assigned to the error record when it is created.
   message_error:
     lineage:
       - datalake_partner_payment_raw.error_records.message_error
-    description: Message of the error.
+    description: Detailed error text returned by the payment processing system.
   error_category:
     lineage:
       - datalake_partner_payment_raw.error_records.error_category
-    description: Category of the error.
+    description: Classification grouping errors by type for manual triage and routing.
   source_reference:
     lineage:
       - datalake_partner_payment_raw.error_records.source_reference

@@ -2,30 +2,30 @@
 database_name: datalake_partner_payment_clean
 table_name: agent_payments
 description: |
-  This table contains the corrections related to previous payments.
-owner: data-for-rent@quintoandar.com.br
+  This table contains the consolidated payments to be made to agents (inspectors or photographers), aggregating operation payments, campaigns, discounts, agenda availability charges, and corrections for a given payment period.
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.agent_payments.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_user:
     lineage:
       - datalake_partner_payment_raw.agent_payments.user_id
-    description: ID of the user.
+    description: QuintoAndar user identifier for the agent receiving this consolidated payment.
   uuid_company:
     lineage:
       - datalake_partner_payment_raw.agent_payments.company_uuid
-    description: UUID of the company.
+    description: External identifier of the field-services partner organization responsible for this agent payout.
   id_agent:
     lineage:
       - datalake_partner_payment_raw.agent_payments.agent_id
-    description: ID of the agent.
+    description: Identifier of the inspector or photographer agent receiving this payment.
   version:
     lineage:
       - datalake_partner_payment_raw.agent_payments.version
-    description: Agent Payment version. 
+    description: Optimistic locking revision counter for concurrent update safety.
   source_error_reference:
     lineage:
       - datalake_partner_payment_raw.agent_payments.source_error_reference
@@ -33,7 +33,7 @@ columns:
   status:
     lineage:
       - datalake_partner_payment_raw.agent_payments.status
-    description: Status of the agent payment.
+    description: Current stage of the consolidated payment as it progresses through invoice generation and SAP payment processing.
   total_basic_payments:
     lineage:
       - datalake_partner_payment_raw.agent_payments.total_basic_payments

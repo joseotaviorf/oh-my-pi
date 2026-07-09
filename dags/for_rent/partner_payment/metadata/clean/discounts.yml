@@ -3,13 +3,13 @@ database_name: datalake_partner_payment_clean
 table_name: discounts
 description: |
   This table contains the discounts to be applied to the agents (inspector or photographer).
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.discounts.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_agent:
     lineage:
       - datalake_partner_payment_raw.discounts.agent_id
@@ -21,11 +21,11 @@ columns:
   version:
     lineage:
       - datalake_partner_payment_raw.discounts.version
-    description: Discount Version.
+    description: Optimistic locking revision counter for concurrent update safety.
   discount_type:
     lineage:
       - datalake_partner_payment_raw.discounts.discount_type
-    description: Type of the discount (D0, D-1, No Show, etc).
+    description: "Type of the discount (D0, D-1, No Show, etc)."
   agent_contract_type:
     lineage:
       - datalake_partner_payment_raw.discounts.agent_contract_type

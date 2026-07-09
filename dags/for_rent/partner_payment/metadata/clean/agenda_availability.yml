@@ -3,13 +3,13 @@ database_name: datalake_partner_payment_clean
 table_name: agenda_availability
 description: |
   This table contains extra charges related to the available agenda of an agent when they have a fixed contract type.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.agenda_availability.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_agent:
     lineage:
       - datalake_partner_payment_raw.agenda_availability.agent_id
@@ -21,7 +21,7 @@ columns:
   version:
     lineage:
       - datalake_partner_payment_raw.agenda_availability.version
-    description: Agenda availability record version.
+    description: Optimistic locking revision counter for concurrent update safety.
   amount:
     lineage:
       - datalake_partner_payment_raw.agenda_availability.amount

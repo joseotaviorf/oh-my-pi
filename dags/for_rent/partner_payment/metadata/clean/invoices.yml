@@ -5,7 +5,7 @@ description: |
   Clean mirror of the invoices table from the Partner Payment service.
   One row per invoice. Primary key: id. Related to bills via id_bill (FK to bills).
   Tracks invoice documents stored in BlobVault and their internal processing status.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:

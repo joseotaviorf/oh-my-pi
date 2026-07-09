@@ -5,7 +5,7 @@ description: |
   Audit history table for the invoices entity in the Partner Payment service.
   Tracks all data changes to invoice records, with one row per revision.
   Composite primary key: (id, rev). Used to reconstruct the historical state of any invoice at a given revision.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -31,7 +31,7 @@ columns:
   revtype:
     lineage:
       - datalake_partner_payment_raw.invoices_aud.revtype
-    description: Type of revision action performed on the invoice record. 0 = ADD, 1 = MOD, 2 = DEL.
+    description: "Type of revision action performed on the invoice record. 0 = ADD, 1 = MOD, 2 = DEL."
   status:
     lineage:
       - datalake_partner_payment_raw.invoices_aud.status

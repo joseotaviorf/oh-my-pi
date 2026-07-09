@@ -3,13 +3,13 @@ database_name: datalake_partner_payment_clean
 table_name: agent_payment_corrections
 description: |
   This table contains the corrections related to previous payments.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.agent_payment_corrections.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_operation_payment:
     lineage:
       - datalake_partner_payment_raw.agent_payment_corrections.operation_payment_id
@@ -25,7 +25,7 @@ columns:
   version:
     lineage:
       - datalake_partner_payment_raw.agent_payment_corrections.version
-    description: Agent Payments Corrections version.
+    description: Optimistic locking revision counter for concurrent update safety.
   request_type:
     lineage:
       - datalake_partner_payment_raw.agent_payment_corrections.request_type

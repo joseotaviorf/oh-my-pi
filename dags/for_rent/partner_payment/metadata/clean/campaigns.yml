@@ -3,13 +3,13 @@ database_name: datalake_partner_payment_clean
 table_name: campaigns
 description: |
   This table contains the campaigns to be paid to the agents (inspector or photographer).
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.campaigns.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_agent_payment:
     lineage:
       - datalake_partner_payment_raw.campaigns.agent_payment_id
@@ -17,11 +17,11 @@ columns:
   id_agent:
     lineage:
       - datalake_partner_payment_raw.campaigns.agent_id
-    description: ID of the agent.
+    description: Identifier of the inspector or photographer eligible for this campaign payout.
   version:
     lineage:
       - datalake_partner_payment_raw.campaigns.version
-    description: Campaign version.
+    description: Optimistic locking revision counter for concurrent update safety.
   description:
     lineage:
       - datalake_partner_payment_raw.campaigns.description
@@ -33,7 +33,7 @@ columns:
   name:
     lineage:
       - datalake_partner_payment_raw.campaigns.name
-    description: Name of the campaign.
+    description: Human-readable label of the promotional or bonus campaign.
   approving_user:
     lineage:
       - datalake_partner_payment_raw.campaigns.approving_user
@@ -53,7 +53,7 @@ columns:
   dt_campaign:
     lineage:
       - datalake_partner_payment_raw.campaigns.campaign_date
-    description: Date of the campaign.
+    description: Calendar date when the campaign amount applies to agent compensation.
   ts_created:
     lineage:
       - datalake_partner_payment_raw.campaigns.created_at

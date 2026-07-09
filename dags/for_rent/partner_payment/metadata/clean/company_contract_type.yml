@@ -5,7 +5,7 @@ description: |
   This table contains the contract type for companies paid through Partner Payment service.
   Each row represents the active contract configuration for a company, defining how inspection
   agents associated with that company are paid (contract type, payment mode, and validity period).
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:

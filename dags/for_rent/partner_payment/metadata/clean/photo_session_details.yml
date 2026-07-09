@@ -3,13 +3,13 @@ database_name: datalake_partner_payment_clean
 table_name: photo_session_details
 description: |
   This table contains the details of the photo session checked by the LQ Team.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.photo_session_details.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_photo_session:
     lineage:
       - datalake_partner_payment_raw.photo_session_details.photo_sesion_id
@@ -17,7 +17,7 @@ columns:
   version:
     lineage:
       - datalake_partner_payment_raw.photo_session_details.version
-    description: Photo Session Details version.
+    description: Optimistic locking revision counter for concurrent update safety.
   video:
     lineage:
       - datalake_partner_payment_raw.photo_session_details.video
