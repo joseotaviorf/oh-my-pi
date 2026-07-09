@@ -4,9 +4,9 @@ cluster:
     aws_attributes:
       ebs_volume_size: 400
     core_nodes:
-      instance_count: 2
+      instance_count: 6
     task_nodes:
-      instance_count: 4
+      instance_count: 0
     spark_conf:
       spark.sql.shuffle.partitions: '400'
       spark.dynamicAllocation.maxExecutors: '8'
