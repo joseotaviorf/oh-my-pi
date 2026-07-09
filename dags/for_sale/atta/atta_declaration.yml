@@ -13,7 +13,7 @@ workflow:
   source_database: atta
   source_schema: atta
   custom_schema: atta
-  max_tables_per_cluster: 30
+  max_tables_per_cluster: 15
   dbutils_secret_key: ATTA_DB
   tables_customization:
     cliente:

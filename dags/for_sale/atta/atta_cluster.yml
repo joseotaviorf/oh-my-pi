@@ -1,19 +1,7 @@
 cluster:
-  type: emr_7_12_consolidation_s_memory_fleet_cluster
+  type: emr_7_12_consolidation_m_memory_cluster
   custom_configurations:
-    emr_ebs_root_volume_size: 32
+    emr_ebs_root_volume_size: 50
     aws_attributes:
       ebs_volume_count: 1
-      ebs_volume_size: 20
-    core_nodes:
-      target_on_demand: 5
-    spark_conf:
-      spark.driver.memory: 1500m
-      spark.driver.memoryOverhead: 384m
-      spark.executor.cores: 1
-      spark.executor.memory: 5g
-      spark.executor.memoryOverhead: 1g
-      spark.yarn.am.memory: 1g
-      spark.memory.fraction: 0.4
-      spark.sql.files.maxPartitionBytes: '67108864'
-      spark.sql.shuffle.partitions: '24'
+      ebs_volume_size: 100
