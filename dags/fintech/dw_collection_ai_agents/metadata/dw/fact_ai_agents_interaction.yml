@@ -51,7 +51,7 @@ columns:
   flag_matthew_talked_to_user:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.flag_matthew_talked_to_user
-    description: "1 when Matthew was detected in the session AND the Matthew V3 planner sent a message directly to the user (a 'CollectionsAgentV3 - ReactPlanner' observation invoked the TalkToUserTool); else 0. Distinguishes sessions where Matthew actually spoke to the user from those where it only ran tools internally. V3-only in practice — the ReactPlanner talk signal is emitted only by the V3 (MCP) agent, so V1/V1.5/V2 sessions are 0 by construction; do not use it to compare Matthew generations."
+    description: "1 when Matthew actually spoke to the user in the session, unified across all Matthew agent versions; else 0. Two branches: (1) Matthew is the WhatsApp host (bot='matthew') — always counts, since the host talks to the user directly even when it never calls the collections agent (V1/V1.5 are host-only); (2) Matthew runs inside the Wall-e host — counts only when Matthew was detected AND the collections agent relayed a message: V3 via the ReactPlanner TalkToUserTool or legacy V2 via the CollectionsInput 'RESPOND EXACTLY' relay instruction. Distinguishes sessions where Matthew engaged the user from Wall-e-hosted sessions where the collections agent only ran tools internally."
   matthew_version:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.matthew_version

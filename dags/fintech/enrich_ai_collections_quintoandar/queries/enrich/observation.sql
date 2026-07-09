@@ -34,6 +34,14 @@ SELECT
             ELSE 0
         END
     ) AS flag_react_planner_talk_to_user,
+    MAX(
+        CASE
+            WHEN LOWER(obs.name) = 'collectionsinput'
+                AND GET_JSON_OBJECT(obs.output, '$.values') LIKE '%RESPOND EXACTLY%'
+            THEN 1
+            ELSE 0
+        END
+    ) AS flag_collectionsinput_talk_to_user,
     -- Group 4: Helpers and edge-case handlers
     MAX(CASE WHEN LOWER(obs.name) = 'debt_summary_display_helper' THEN 1 ELSE 0 END) AS flag_debt_summary_display_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'original_invoice_values_disagreement_helper' THEN 1 ELSE 0 END) AS flag_original_invoice_values_disagreement_helper,

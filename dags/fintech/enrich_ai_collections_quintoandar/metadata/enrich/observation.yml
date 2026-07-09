@@ -97,6 +97,11 @@ columns:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.output
     description: "1 if the session contains at least one 'CollectionsAgentV3 - ReactPlanner' observation whose output JSON carries a TalkToUserToolInput tool call (detected via output LIKE '%TalkToUserToolInput%'), signalling that the Matthew V3 planner chose to send a message directly to the user; else 0. V3-only signal — the ReactPlanner observation exists only for the V3 (MCP) agent, so this is 0 for V1/V1.5/V2 sessions."
+  flag_collectionsinput_talk_to_user:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+    description: "1 if the session contains at least one 'CollectionsInput' observation whose output values array carries the legacy V2 verbatim-relay instruction (detected via GET_JSON_OBJECT(output, '$.values') LIKE '%RESPOND EXACTLY%'), signalling that the Matthew V2 collections sub-agent handed the host a message to relay to the user; else 0. Legacy V2 signal — the CollectionsInput 'RESPOND EXACTLY' mechanism is the V2 counterpart of the V3 TalkToUserTool; V3 sessions use flag_react_planner_talk_to_user instead."
   flag_debt_summary_display_helper:
     lineage:
       - datalake_langfuse_clean.observations.name

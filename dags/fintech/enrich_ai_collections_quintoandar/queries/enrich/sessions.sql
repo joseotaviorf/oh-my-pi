@@ -94,14 +94,17 @@ sessions_enriched AS (
             OR COALESCE(o.flag_debt_finder_tool, 0) = 1
         ) AS is_matthew_in_session,
         CASE
+            WHEN m.bot = 'matthew' THEN 1
             WHEN (
                 COALESCE(o.flag_collectionsinput_agent, 0) = 1
                 OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
                 OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
                 OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
                 OR COALESCE(o.flag_debt_finder_tool, 0) = 1
-            ) AND COALESCE(o.flag_react_planner_talk_to_user, 0) = 1
-            THEN 1
+            ) AND (
+                COALESCE(o.flag_react_planner_talk_to_user, 0) = 1
+                OR COALESCE(o.flag_collectionsinput_talk_to_user, 0) = 1
+            ) THEN 1
             ELSE 0
         END AS flag_matthew_talked_to_user,
         CASE
