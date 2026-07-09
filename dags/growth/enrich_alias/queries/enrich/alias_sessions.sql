@@ -12,6 +12,22 @@ WITH traces_in_window AS (
             AND s.bot = 'alias'
     WHERE
         t.id_session IS NOT NULL
+        AND (
+            t.year > YEAR(DATE('{load_start_date}') - INTERVAL 1 DAY)
+            OR (t.year  = YEAR(DATE('{load_start_date}') - INTERVAL 1 DAY)
+                AND t.month > MONTH(DATE('{load_start_date}') - INTERVAL 1 DAY))
+            OR (t.year  = YEAR(DATE('{load_start_date}') - INTERVAL 1 DAY)
+                AND t.month = MONTH(DATE('{load_start_date}') - INTERVAL 1 DAY)
+                AND t.day  >= DAY(DATE('{load_start_date}') - INTERVAL 1 DAY))
+        )
+        AND (
+            t.year < YEAR(DATE('{load_end_date}'))
+            OR (t.year  = YEAR(DATE('{load_end_date}'))
+                AND t.month < MONTH(DATE('{load_end_date}')))
+            OR (t.year  = YEAR(DATE('{load_end_date}'))
+                AND t.month = MONTH(DATE('{load_end_date}'))
+                AND t.day   < DAY(DATE('{load_end_date}')))
+        )
         AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
         AND MAKE_TIMESTAMP(t.year, t.month, t.day, t.hour, 0, 0) < TIMESTAMP('{load_end_date}')
         AND t.ts_created >= DATE('{load_start_date}') - INTERVAL 1 DAY
@@ -30,6 +46,22 @@ observations_in_window AS (
         datalake_langfuse_clean.observations AS o
     WHERE
         o.type IN ('GENERATION', 'AGENT', 'TOOL')
+        AND (
+            o.year > YEAR(DATE('{load_start_date}') - INTERVAL 1 DAY)
+            OR (o.year  = YEAR(DATE('{load_start_date}') - INTERVAL 1 DAY)
+                AND o.month > MONTH(DATE('{load_start_date}') - INTERVAL 1 DAY))
+            OR (o.year  = YEAR(DATE('{load_start_date}') - INTERVAL 1 DAY)
+                AND o.month = MONTH(DATE('{load_start_date}') - INTERVAL 1 DAY)
+                AND o.day  >= DAY(DATE('{load_start_date}') - INTERVAL 1 DAY))
+        )
+        AND (
+            o.year < YEAR(DATE('{load_end_date}'))
+            OR (o.year  = YEAR(DATE('{load_end_date}'))
+                AND o.month < MONTH(DATE('{load_end_date}')))
+            OR (o.year  = YEAR(DATE('{load_end_date}'))
+                AND o.month = MONTH(DATE('{load_end_date}'))
+                AND o.day   < DAY(DATE('{load_end_date}')))
+        )
         AND MAKE_TIMESTAMP(o.year, o.month, o.day, o.hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
         AND MAKE_TIMESTAMP(o.year, o.month, o.day, o.hour, 0, 0) < TIMESTAMP('{load_end_date}')
 ),

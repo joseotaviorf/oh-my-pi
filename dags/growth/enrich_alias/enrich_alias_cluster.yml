@@ -1,20 +1,5 @@
 cluster:
-  type: databricks_16_4_med_memory_2_workers_general_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_med_memory_general_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
     spark_conf:
       spark.driver.maxResultSize: '0'
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    aws_attributes:
-      ebs_volume_size: 200
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_conf:
-        spark.driver.maxResultSize: '0'
