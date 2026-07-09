@@ -1,18 +1,29 @@
 ---
 database_name: datalake_wall_street_clean
 table_name: invoice_subscription_item
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per invoice subscription item in the Fintech clean layer, sourced
+  from datalake_wall_street_clean for payments, billing, and financial
+  operations reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_wall_street_raw.invoicesubscriptionitem.id
+    description: Financial attribute representing id on the invoice_subscription_item dataset.
   id_subscription_item:
     lineage:
     - datalake_wall_street_raw.invoicesubscriptionitem.subscriptionitemid
+    description: Identifier for the subscription item referenced by this financial record.
   ts_created:
     lineage:
     - datalake_wall_street_raw.invoicesubscriptionitem.createdat
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_wall_street_raw.invoicesubscriptionitem.updatedat
+    description: Timestamp when updated occurred in the upstream fintech system.
+  id_invoice:
+    lineage: []
+    description: Invoice identifier in the billing or payments platform.

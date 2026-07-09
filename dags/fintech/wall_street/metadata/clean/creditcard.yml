@@ -1,33 +1,46 @@
 ---
 database_name: datalake_wall_street_clean
 table_name: creditcard
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per creditcard in the Fintech clean layer, sourced from
+  datalake_wall_street_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_wall_street_raw.creditcard.id
+    description: Financial attribute representing id on the creditcard dataset.
   token:
     lineage:
     - datalake_wall_street_raw.creditcard.token
+    description: Financial attribute representing token on the creditcard dataset.
   first_six_digits:
     lineage:
     - datalake_wall_street_raw.creditcard.firstSixDigits
+    description: Financial attribute representing first six digits on the creditcard dataset.
   last_four_digits:
     lineage:
     - datalake_wall_street_raw.creditcard.lastFourDigits
+    description: Financial attribute representing last four digits on the creditcard dataset.
   holder_name:
     lineage:
     - datalake_wall_street_raw.creditcard.holderName
+    description: Financial attribute representing holder name on the creditcard dataset.
   holder_document:
     lineage:
     - datalake_wall_street_raw.creditcard.holderDocument
+    description: Financial attribute representing holder document on the creditcard dataset.
   brand:
     lineage:
     - datalake_wall_street_raw.creditcard.brand
+    description: Financial attribute representing brand on the creditcard dataset.
   expiration_month:
     lineage:
     - datalake_wall_street_raw.creditcard.expirationMonth
+    description: Financial attribute representing expiration month on the creditcard dataset.
   expiration_year:
     lineage:
     - datalake_wall_street_raw.creditcard.expirationYear
+    description: Financial attribute representing expiration year on the creditcard dataset.

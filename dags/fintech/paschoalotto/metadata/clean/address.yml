@@ -1,40 +1,40 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: address
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Contact Address
+description: One row per address in the Fintech clean layer, sourced from datalake_paschoalotto_clean for payments, billing, and financial operations reporting.
 columns:
   id_address:
-    description: ""
+    description: Identifier for the address referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.id_geqlendereco_int
   id_customer:
-    description: ""
+    description: Identifier for the customer referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.id_geqlcliente_int
   address:
-    description: "Address description"
+    description: Financial attribute representing address on the address dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.endereco_str
   additional_address:
-    description: "Address complement"
+    description: Financial attribute representing additional address on the address dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.complemento_str
   neighborhood:
-    description: "Neighborhood"
+    description: Financial attribute representing neighborhood on the address dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.bairro_str
   zip_code:
-    description: "Zip Code"
+    description: Financial attribute representing zip code on the address dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.cep_str
   city:
-    description: "City"
+    description: Financial attribute representing city on the address dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.cidade_str
   state:
-    description: "State"
+    description: Financial attribute representing state on the address dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.estado_str
   context:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.context
   classification:
-    description: "Address quality"
+    description: Financial attribute representing classification on the address dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.classificacao_str
   is_deleted:
@@ -61,9 +61,8 @@ columns:
     description: "Datetime the record was updated"
     lineage:
       - datalake_paschoalotto_raw.geqlendereco.tstamp_mdm_alteracao
-  ts_timestamp:
-    description: "Timestamp the line was added/updated"
-    lineage:
-      - datalake_paschoalotto_raw.geqlendereco.tstamp
   ts_load:
     description: "Timestamp of ingestion"
+  timestamp:
+    description: Financial attribute representing timestamp on the address dataset.
+    lineage: []

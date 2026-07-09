@@ -1,95 +1,84 @@
 database_name: datalake_wall_street_clean
 table_name: subscription
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per subscription in the Fintech clean layer, sourced from
+  datalake_wall_street_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_wall_street_raw.subscription.id
+    description: Financial attribute representing id on the subscription dataset.
   id_external:
     lineage:
       - datalake_wall_street_raw.subscription.externalid
+    description: Identifier for the external referenced by this financial record.
   id_customer:
     lineage:
       - datalake_wall_street_raw.subscription.customerId
+    description: Identifier for the customer referenced by this financial record.
   id_store:
     lineage:
       - datalake_wall_street_raw.subscription.storeId
+    description: Identifier for the store referenced by this financial record.
   id_credit_card:
     lineage:
       - datalake_wall_street_raw.subscription.creditcardid
+    description: Identifier for the credit card referenced by this financial record.
   id_business_entity:
     lineage:
       - datalake_wall_street_raw.subscription.businessEntityId
+    description: Identifier for the business entity referenced by this financial record.
   id_finance_entity:
     lineage:
       - datalake_wall_street_raw.subscription.financeEntityId
+    description: Identifier for the finance entity referenced by this financial record.
   code:
     lineage:
       - datalake_wall_street_raw.subscription.code
+    description: Financial attribute representing code on the subscription dataset.
   recurrence:
     lineage:
       - datalake_wall_street_raw.subscription.recurrence
+    description: Financial attribute representing recurrence on the subscription dataset.
   status:
     lineage:
       - datalake_wall_street_raw.subscription.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   currency:
     lineage:
       - datalake_wall_street_raw.subscription.currency
+    description: ISO currency code for the monetary amount, typically BRL.
   acquire:
     lineage:
       - datalake_wall_street_raw.subscription.acquire
+    description: Financial attribute representing acquire on the subscription dataset.
   payer_name:
     lineage:
       - datalake_wall_street_raw.subscription.payername
+    description: Financial attribute representing payer name on the subscription dataset.
   payer_document_number:
     lineage:
       - datalake_wall_street_raw.subscription.payerdocumentnumber
+    description: Financial attribute representing payer document number on the subscription dataset.
   ts_created:
     lineage:
       - datalake_wall_street_raw.subscription.createdat
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_canceled:
     lineage:
       - datalake_wall_street_raw.subscription.canceledat
+    description: Timestamp when canceled occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_wall_street_raw.subscription.updatedat
+    description: Timestamp when updated occurred in the upstream fintech system.
   dt_start:
     lineage:
       - datalake_wall_street_raw.subscription.startat
-  id_subscription_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.subscriptionAudId
-  id_subscription_item_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.subscriptionItemAudId
-  id_store_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.storeAudId
-  id_customer_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.customerAudId
-  id_business_entity_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.businessEntityAudId
-  id_finance_entity_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.financeEntityAudId
-  id_subscription_aud_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.subscriptionAudAudId
-  id_subscription_item_aud_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.subscriptionItemAudAudId
-  id_store_aud_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.storeAudAudId
-  id_customer_aud_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.customerAudAudId
-  id_business_entity_aud_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.businessEntityAudAudId
-  id_finance_entity_aud_aud:
-    lineage:
-      - datalake_wall_street_raw.subscription.financeEntityAudAudId
+    description: Calendar date associated with start in the financial workflow.
+  risk_entities:
+    lineage: []
+    description: Financial attribute representing risk entities on the subscription dataset.

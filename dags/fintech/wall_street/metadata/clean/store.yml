@@ -1,18 +1,26 @@
 ---
 database_name: datalake_wall_street_clean
 table_name: store
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per store in the Fintech clean layer, sourced from
+  datalake_wall_street_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_wall_street_raw.store.id
+    description: Financial attribute representing id on the store dataset.
   secret:
     lineage:
     - datalake_wall_street_raw.store.secret
+    description: Financial attribute representing secret on the store dataset.
   description:
     lineage:
     - datalake_wall_street_raw.store.description
+    description: Human-readable description of the financial transaction or ledger entry.
   secret_hook:
     lineage:
     - datalake_wall_street_raw.store.secretHook
+    description: Financial attribute representing secret hook on the store dataset.

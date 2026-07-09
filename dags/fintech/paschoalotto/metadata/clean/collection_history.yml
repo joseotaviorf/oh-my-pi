@@ -1,7 +1,7 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: collection_history
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Situation history in customer contact status
 columns:
@@ -21,39 +21,35 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_cbsituacaocontrato_int
   id_negotiation:
-    description: "Negotiation code"
+    description: Identifier for the negotiation referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.codigo_int
   id_customer:
     description: "CRM customer identification number(Wallet number) fixed value 465"
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_gecliente_int
-  id_geqlresponsavel_int:
-    description: "Sequential autoincremental primary key (PK) of the geqlresponsavel table"
-    lineage:
-      - datalake_paschoalotto_raw.cbsitcontato.id_geqlresponsavel_int
   id_geqlsituacao:
     description: "Sequential autoincremental primary key (PK) of the geqlsituacao table"
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_geqlsituacao_int
   id_geaplicacao:
-    description: "ID of geaplicacao table"
+    description: Identifier for the geaplicacao referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_geaplicacao_int
   id_getipodocumento:
-    description: ""
+    description: Identifier for the getipodocumento referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_getipodocumento_int
   id_gegrupotipodocumento:
-    description: ""
+    description: Identifier for the gegrupotipodocumento referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_gegrupotipodocumento_int
   id_cbvalortipodespesa:
-    description: "cbvalortipodespesa table ID"
+    description: Identifier for the cbvalortipodespesa referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_cbvalortipodespesa_int
   id_sysatdinamico:
-    description: "Id do AtDinamico"
+    description: Identifier for the sysatdinamico referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_sysatdinamico_int
   id_jutipocontrole:
@@ -65,11 +61,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.context
   delinquency_reason:
-    description: "Deliquency reason"
+    description: Financial attribute representing delinquency reason on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.id_gemotivoinadimplencia_int
   contact_type:
-    description: "Contact type"
+    description: Financial attribute representing contact type on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.tipo_contato_str
   trigger_type:
@@ -81,19 +77,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.codigo_banco_str
   contact_description:
-    description: "Contact description"
+    description: Financial attribute representing contact description on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.descricao_str
   historical_user_contact_description:
-    description: "User contact description"
+    description: Financial attribute representing historical user contact description on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.historico_padrao_str
   description:
-    description: "Contact description"
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.at_str
   contact_classification:
-    description: "Contact classification"
+    description: Financial attribute representing contact classification on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.classificacao_str
   is_positive_call:
@@ -118,19 +114,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.email_automatico_str
   email_subject:
-    description: "Email subject"
+    description: Financial attribute representing email subject on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.assunto_email_auto_txt
   document_name:
-    description: "Document name"
+    description: Financial attribute representing document name on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.doc_str
   collection_status:
-    description: "Colection status"
+    description: Financial attribute representing collection status on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.situacao_cobranca_str
   installment_status:
-    description: "Installment status"
+    description: Financial attribute representing installment status on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.situacao_parcela_int
   has_collection:
@@ -162,7 +158,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.atualiza_data_contato_manual_str
   is_classifies_at_asm:
-    description: "Classifies AT ASM"
+    description: Indicates whether classifies at asm applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.class_at_str
   has_answer:
@@ -254,7 +250,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.apenas_aberto_str
   is_unique_release:
-    description: ""
+    description: Indicates whether unique release applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.lancamento_unico_str
   is_release_depends:
@@ -274,7 +270,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.agendamento_unico_str
   scheduled_by:
-    description: "Scheduled by"
+    description: Financial attribute representing scheduled by on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.agendamento_por_str
   npcob_description:
@@ -282,7 +278,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.descricao_npcob_web_str
   lawsuit:
-    description: "Lawsuit"
+    description: Financial attribute representing lawsuit on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.tp_acao_str
   has_npjur_panel:
@@ -290,11 +286,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.painel_npjur_str
   has_panel_jur_npjur:
-    description: ""
+    description: Indicates whether panel jur npjur applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.painel_jur_npjur_str
   has_cost_panel_npjur:
-    description: "Cost panel NPJUR"
+    description: Indicates whether cost panel npjur applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.painel_custas_npjur_str
   has_launched_movement_npjur:
@@ -302,7 +298,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.lanca_movimento_npjur_str
   type_protocol_npjur:
-    description: "NPJUR protocol type"
+    description: Financial attribute representing type protocol npjur on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.tipo_protocolo_npjur_bit
   is_mora_purge_panel:
@@ -342,7 +338,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.atualiza_data_ultimo_contato_str
   pending_time:
-    description: "Pending time"
+    description: Financial attribute representing pending time on the collection_history dataset.
     lineage:
       - datalake_paschoalotto_raw.cbsitcontato.proxima_chamada_tim
   limit_standby:
@@ -379,3 +375,6 @@ columns:
       - datalake_paschoalotto_raw.cbsitcontato.tstamp
   ts_load:
     description: "Timestamp of ingestion"
+  id_geqlresponsavel:
+    description: Identifier for the geqlresponsavel referenced by this financial record.
+    lineage: []

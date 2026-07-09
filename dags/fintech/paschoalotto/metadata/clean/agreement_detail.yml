@@ -1,12 +1,12 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: agreement_detail
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: detail of the agreement generated
 columns:
   id_agreement_detail:
-    description: "Table sequence/ID"
+    description: Identifier for the agreement detail referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_cbitembordero_int
   id_negotiation:
@@ -30,23 +30,23 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_geusuario_int
   id_cbinstrucao1:
-    description: ""
+    description: Identifier for the cbinstrucao1 referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_cbinstrucao1_int
   id_cbinstrucao2:
-    description: ""
+    description: Identifier for the cbinstrucao2 referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_cbinstrucao2_int
   id_geusuario_boleto:
-    description: ""
+    description: Identifier for the geusuario boleto referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_geusuario_boleto_int
   id_gecidade:
-    description: ""
+    description: Identifier for the gecidade referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.id_gecidade_int
   id_agreement:
-    description: "Agreement number"
+    description: Identifier for the agreement referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.acordo_int
   context:
@@ -59,11 +59,11 @@ columns:
       - datalake_paschoalotto_raw.cbitembordero.nosso_numero_str
       - datalake_paschoalotto_raw.cbitembordero.nosso_numero_int
   bank_slip:
-    description: ""
+    description: Financial attribute representing bank slip on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.boleto_int
   command:
-    description: ""
+    description: Financial attribute representing command on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.comando_str
   email_destination:
@@ -79,51 +79,47 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.cod_barra_str
   bank_slip_bar:
-    description: "Bank slip bar"
+    description: Financial attribute representing bank slip bar on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.barra_str
-  dv:
-    description: "Bank slip dv (verifying digit)"
-    lineage:
-      - datalake_paschoalotto_raw.cbitembordero.dv_int
   instruction_1:
-    description: ""
+    description: Financial attribute representing instruction 1 on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.instrucao_1_str
   instruction_2:
-    description: ""
+    description: Financial attribute representing instruction 2 on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.instrucao_2_str
   instruction_3:
-    description: ""
+    description: Financial attribute representing instruction 3 on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.instrucao_3_str
   instruction_4:
-    description: ""
+    description: Financial attribute representing instruction 4 on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.instrucao_4_str
   instruction_5:
-    description: ""
+    description: Financial attribute representing instruction 5 on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.instrucao_5_str
   instruction_6:
-    description: ""
+    description: Financial attribute representing instruction 6 on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.instrucao_6_str
   instruction_7:
-    description: ""
+    description: Financial attribute representing instruction 7 on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.instrucao_7_str
   final_instruction:
-    description: ""
+    description: Financial attribute representing final instruction on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.instrucao_final_str
   installment:
-    description: ""
+    description: Financial attribute representing installment on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.parcelamento_str
   payment_status:
-    description: "Payment status"
+    description: Financial attribute representing payment status on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.pago_str
   is_settlement:
@@ -131,7 +127,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.quitacao_str
   bank_slip_note:
-    description: ""
+    description: Financial attribute representing bank slip note on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.observacao_boleto_str
   type_destiny:
@@ -144,19 +140,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.tipo_destino_str
   bank_slip_installment:
-    description: ""
+    description: Financial attribute representing bank slip installment on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.boleto_parcelamento_str
   is_generated_by_operator:
-    description: ""
+    description: Indicates whether generated by operator applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.tipo_geracao_str"
   id_installment:
-    description: ""
+    description: Identifier for the installment referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.codigo_parcelamento_ws_str
   is_sent_action_api:
-    description: ""
+    description: Indicates whether sent action api applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.acao_enviado_api_int
   is_sent_billing:
@@ -164,27 +160,27 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.boletagem_enviada_int
   carta_boleto:
-    description: ""
+    description: Financial attribute representing carta boleto on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.carta_boleto_quintoandar_str
   is_boletagem_remessa:
-    description: ""
+    description: Indicates whether boletagem remessa applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.boletagem_remessa_quintoandar_str
   formalized_agreement:
-    description: ""
+    description: Financial attribute representing formalized agreement on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.acordo_formalizado_int
   third_file:
-    description: ""
+    description: Financial attribute representing third file on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.arquivo_terc_str
   jpg_sent:
-    description: ""
+    description: Financial attribute representing jpg sent on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.envio_jpg_str
   origin_ws:
-    description: ""
+    description: Financial attribute representing origin ws on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.origem_ws_int
   bank_slip_discount_amount:
@@ -192,31 +188,27 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.valor_desconto_num
   main_amount:
-    description: "Main amount"
+    description: Financial attribute representing main amount on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.principal_num
   cp:
-    description: ""
+    description: Financial attribute representing cp on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.cp_num
   cp_original:
-    description: ""
+    description: Financial attribute representing cp original on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.cp_original_num
   fine_amount:
-    description: "Fine amount"
+    description: Financial attribute representing fine amount on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.multa_num
-  notification:
-    description: "Notification"
-    lineage:
-      - datalake_paschoalotto_raw.cbitembordero.notificacao_num
   bank_expense:
-    description: "Bank Expense"
+    description: Financial attribute representing bank expense on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.despesa_banco_num
   discount_amount:
-    description: "Discount amount"
+    description: Financial attribute representing discount amount on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.desconto_num
   write_off:
@@ -232,7 +224,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.honorarios_num
   commissioning:
-    description: "Commissioning"
+    description: Financial attribute representing commissioning on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.comissionamento_num
   total_amount:
@@ -240,39 +232,39 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.valor_total_num
   retained:
-    description: ""
+    description: Financial attribute representing retained on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.retido_num
   addition:
-    description: ""
+    description: Financial attribute representing addition on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.acrescimo_num
   addition_np:
-    description: ""
+    description: Financial attribute representing addition np on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.acrescimo_np_num
   discount_percentage:
-    description: ""
+    description: Financial attribute representing discount percentage on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.perc_desc_num
   principal_original:
-    description: ""
+    description: Financial attribute representing principal original on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.principal_original_num
   discount_original:
-    description: ""
+    description: Financial attribute representing discount original on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.desconto_original_num
   pc_ho:
-    description: ""
+    description: Financial attribute representing pc ho on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.pc_ho_num
   pc_commissioning:
-    description: ""
+    description: Financial attribute representing pc commissioning on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.pc_comissionamento_num
   hour_bank_skip:
-    description: "Emission Hour"
+    description: Financial attribute representing hour bank skip on the agreement_detail dataset.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.hora_boleto_tim
   dt_due:
@@ -280,19 +272,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.vencimento_dat
   dt_shipping:
-    description: "Shipping date"
+    description: Calendar date associated with shipping in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.data_envio_dat
   dt_resend:
-    description: "Resend date"
+    description: Calendar date associated with resend in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.data_reenvio_dat
   dt_discount:
-    description: "Discount date"
+    description: Calendar date associated with discount in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.data_desconto_dat
   dt_emission:
-    description: "Emission date"
+    description: Calendar date associated with emission in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.emissao_dat
   dt_bank_slip:
@@ -312,7 +304,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.tstamp_mdm_alteracao
   ts_tstamp:
-    description: ""
+    description: Timestamp when tstamp occurred in the upstream fintech system.
     lineage:
       - datalake_paschoalotto_raw.cbitembordero.tstamp
   ts_timestamp:
@@ -321,3 +313,9 @@ columns:
       - datalake_paschoalotto_raw.cbitembordero.timestamp
   ts_load:
     description: "Timestamp of ingestion"
+  has_notification:
+    description: Indicates whether notification applies to this financial record.
+    lineage: []
+  bank_slip_dv:
+    description: Financial attribute representing bank slip dv on the agreement_detail dataset.
+    lineage: []

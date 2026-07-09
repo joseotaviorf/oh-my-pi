@@ -1,12 +1,12 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: agreement_payment
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Agreement payment information
+description: One row per agreement payment in the Fintech clean layer, sourced from datalake_paschoalotto_clean for payments, billing, and financial operations reporting.
 columns:
   id_agreement_payment:
-    description: "Table sequence/ID"
+    description: Identifier for the agreement payment referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_cbpagamento_int
   id_agreement_detail:
@@ -37,22 +37,18 @@ columns:
     description: "Branch (city) extract from table gefilial"
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_gefilial_int
-  sequence:
-    description: "Bank slip sequence"
-    lineage:
-      - datalake_paschoalotto_raw.cbpagamento.sequencia_int
   receipt_series:
-    description: ""
+    description: Financial attribute representing receipt series on the agreement_payment dataset.
     categories:
       CDB: ""
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.serie_recibo_str
   observation:
-    description: ""
+    description: Financial attribute representing observation on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.observacao_txt
   receipt_type:
-    description: ""
+    description: Financial attribute representing receipt type on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.tipo_recibo_str
   bill_status:
@@ -60,19 +56,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.situacao_str
   magnetic:
-    description: ""
+    description: Financial attribute representing magnetic on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.pc_magnetico_str
   is_paid:
-    description: "Payment status"
+    description: Indicates whether paid applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.situacao_pagto_str
   type_payment:
-    description: "Payment type"
+    description: Financial attribute representing type payment on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.tipo_pagamento_str
   payment_type:
-    description: ""
+    description: Financial attribute representing payment type on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.id_cbtipopagamento_int
   is_paid_in_installments:
@@ -80,11 +76,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.parcelado_str
   bank_slip_note:
-    description: ""
+    description: Financial attribute representing bank slip note on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.observacao_boleto_str
   product:
-    description: "Product"
+    description: Financial attribute representing product on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.produto_str
   is_settlement:
@@ -92,27 +88,27 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.quitacao_str
   password:
-    description: ""
+    description: Financial attribute representing password on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.senha_str
   access_key:
-    description: ""
+    description: Financial attribute representing access key on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.chave_acesso_int
   modality:
-    description: ""
+    description: Financial attribute representing modality on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.modalidade_num
   installment:
-    description: "Installment"
+    description: Financial attribute representing installment on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.parcelamento_str
   mattress:
-    description: ""
+    description: Financial attribute representing mattress on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.colchao_str
   has_notification:
-    description: "Notification"
+    description: Indicates whether notification applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.notificacao_num
   has_bank_expense:
@@ -132,23 +128,23 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.comissionamento_num
   main_amount:
-    description: "Main amount"
+    description: Financial attribute representing main amount on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.principal_num
   cp:
-    description: ""
+    description: Financial attribute representing cp on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.cp_num
   fine_amount:
-    description: "Fine amount"
+    description: Financial attribute representing fine amount on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.multa_num
   discount_amount:
-    description: "Discount amount"
+    description: Financial attribute representing discount amount on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.desconto_num
   main_discount:
-    description: "Main discount"
+    description: Financial attribute representing main discount on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.desconto_principal_num
   default_interest:
@@ -160,31 +156,31 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.valor_total_num
   retained:
-    description: ""
+    description: Financial attribute representing retained on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.retido_num
   receipt:
-    description: ""
+    description: Financial attribute representing receipt on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.recibo_num
   addition:
-    description: ""
+    description: Financial attribute representing addition on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.acrescimo_num
   addition_np:
-    description: ""
+    description: Financial attribute representing addition np on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.acrescimo_np_num
   percentage_discount:
-    description: "Percentage discount"
+    description: Financial attribute representing percentage discount on the agreement_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.percentual_desconto_num
   dt_calculation:
-    description: "Calculation date"
+    description: Calendar date associated with calculation in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.data_calculo_dat
   dt_payment:
-    description: "Payment date"
+    description: Calendar date associated with payment in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.data_pagamento_dat
   dt_register:
@@ -192,11 +188,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.data_cadastro_dat
   dt_return:
-    description: ""
+    description: Calendar date associated with return in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.data_retorno_dat
   dt_bank_return:
-    description: ""
+    description: Calendar date associated with bank return in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbpagamento.data_retorno_banco_dat
   ts_insert:
@@ -213,3 +209,9 @@ columns:
       - datalake_paschoalotto_raw.cbpagamento.tstamp
   ts_load:
     description: "Timestamp of ingestion"
+  id_geempresa:
+    description: Identifier for the geempresa referenced by this financial record.
+    lineage: []
+  bank_slip_sequence:
+    description: Financial attribute representing bank slip sequence on the agreement_payment dataset.
+    lineage: []

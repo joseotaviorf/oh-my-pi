@@ -1,7 +1,7 @@
 ---
 database_name: datalake_wall_street_clean
 table_name: hook
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: >-
   Clean layer mirror of Wall Street hook records from MySQL CDC: one row per asynchronous

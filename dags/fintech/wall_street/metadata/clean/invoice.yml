@@ -1,45 +1,65 @@
 ---
 database_name: datalake_wall_street_clean
 table_name: invoice
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per invoice in the Fintech clean layer, sourced from
+  datalake_wall_street_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_wall_street_raw.invoice.id
+    description: Financial attribute representing id on the invoice dataset.
   id_subscription:
     lineage:
     - datalake_wall_street_raw.invoice.subscriptionid
+    description: Identifier for the subscription referenced by this financial record.
   id_charge:
     lineage:
     - datalake_wall_street_raw.invoice.chargeid
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
   id_external:
     lineage:
     - datalake_wall_street_raw.invoice.externalid
+    description: Identifier for the external referenced by this financial record.
   id_store:
     lineage:
     - datalake_wall_street_raw.invoice.storeid
+    description: Identifier for the store referenced by this financial record.
   price_in_cents:
     lineage:
     - datalake_wall_street_raw.invoice.priceincents
+    description: Financial attribute representing price in cents on the invoice dataset.
   status:
     lineage:
     - datalake_wall_street_raw.invoice.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   ts_created_external:
     lineage:
     - datalake_wall_street_raw.invoice.externalcreatedat
+    description: Timestamp when created external occurred in the upstream fintech system.
   ts_due:
     lineage:
     - datalake_wall_street_raw.invoice.dueat
+    description: Timestamp when due occurred in the upstream fintech system.
   ts_billing:
     lineage:
     - datalake_wall_street_raw.invoice.billingat
+    description: Timestamp when billing occurred in the upstream fintech system.
   ts_canceled:
     lineage:
     - datalake_wall_street_raw.invoice.canceledat
+    description: Timestamp when canceled occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_wall_street_raw.invoice.createdat
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
     - datalake_wall_street_raw.invoice.updatedat
+    description: Timestamp when updated occurred in the upstream fintech system.
+  ts_paid:
+    lineage: []
+    description: Timestamp when paid occurred in the upstream fintech system.

@@ -1,11 +1,11 @@
 database_name: datalake_wall_street_clean
 table_name: user_blocklist
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: These table brings blocked users and the respective blocked date for credit card payments, based on chargeback fraud analysis. It's a legacy table (05/2020 to 10/2024), the current one is blocklist.
 columns:
   id_user:
-    description: ID user from Main
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_wall_street_raw.userblocklist.userId
   ts_created:
