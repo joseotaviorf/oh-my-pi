@@ -1,98 +1,102 @@
 database_name: datalake_crawlers_listings
 table_name: viva_real
-description: Table with information about the listings of Viva Real.
-domain: Growth
-owner: andre.melo@quintoandar.com.br
+description: >
+  Enriched property listing data crawled from Viva Real, a major Brazilian real estate classified platform,
+  used by the Growth team for competitive market intelligence. Each row represents a single active listing
+  with full address, property characteristics, pricing (rent and sale), and advertiser contact details,
+  enabling QuintoAndar to benchmark competitor supply coverage, pricing, and inventory across Brazilian markets.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_house_platform:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.id
-    description: ID from platform
+    description: Native listing identifier assigned by Viva Real, used to uniquely identify a property on the competitor platform.
   id_house:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.id
-    description: ID with the competitor name together
+    description: Composite identifier combining the platform listing ID with the platform name (e.g. "123VivaReal"), enabling cross-platform deduplication when comparing listings across multiple competitor crawlers.
   platform:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.origin
-    description: Competitor name
+    description: Name of the real estate classified platform from which the listing was crawled (e.g. "VivaReal"), used to distinguish the data source in cross-platform analyses.
   country:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.address
-    description: House listing country name
+    description: Country where the listed property is located, extracted from the Viva Real address structure (predominantly Brazil).
   state:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.address
-    description: House listing state name
+    description: Brazilian state where the listed property is located, used to segment competitor inventory and pricing analysis by region.
   address_city:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.address
     - datalake_crawlers_listings_clean.viva_real.city
-    description: House listing primary column name
+    description: Cleansed and normalised city name for the listed property, derived from the address JSON with fallback to the raw city field, serving as the primary city attribute for geographic analysis.
   city:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.city
-    description: House listing secondary column for city name
+    description: Raw city name as captured directly by the Viva Real crawler, retained as a secondary reference alongside the normalised address_city field.
   neighborhood:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.address
-    description: House listing neighborhood name
+    description: Neighbourhood within the city where the listed property is situated, enabling fine-grained competitor supply analysis at the sub-city level.
   street:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.address
-    description: House listing street name
+    description: Street name where the property is located as published on Viva Real, forming part of the full listing address.
   street_number:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.address
-    description: House listing number
+    description: Street number of the listed property, completing the property address alongside the street name.
   zip_code:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.address
-    description: House listing zip code
+    description: Brazilian postal code (CEP) of the listed property, used to map competitor listings to geographic zones for market coverage analysis.
   latitude:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.geolocation
-    description: House listing latitude
+    description: Geographic latitude coordinate of the listed property, enabling geospatial proximity analysis between Viva Real listings and QuintoAndar supply.
   longitude:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.geolocation
-    description: House listing longitude
+    description: Geographic longitude coordinate of the listed property, paired with latitude to precisely locate competitor listings on a map.
   listing_name:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.listing_name
-    description: House listing description
+    description: Title or name of the property listing as published by the advertiser on Viva Real, providing a human-readable description of the property for reference and text analysis.
   total_area:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: House listing total area
+    description: Total usable area of the listed property in square metres, used for price-per-m2 calculations and property size comparisons across competitor platforms.
   amenities:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: All amenities in house listing
+    description: List of amenities advertised for the property (e.g. pool, gym, balcony), used for feature-level competitive benchmarking against QuintoAndar supply.
   bathrooms:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: Total listing bathrooms
+    description: Number of bathrooms in the listed property, used as a property characteristic for competitor inventory segmentation.
   bedrooms:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: Total listing bedrooms
+    description: Number of bedrooms in the listed property, a key attribute for filtering and segmenting competitor listings by property type.
   floors:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: Building floors
+    description: Floor number or total number of floors in the building where the listed property is located, used for property profile comparisons.
   parking_spaces:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: Parking spaces available for the listing
+    description: Number of parking spaces included with the listed property, an important attribute for property comparability in urban Brazilian markets.
   suites:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: Total listing suites
+    description: Number of suites (bedrooms with en-suite bathroom) in the listed property, a common differentiator in the Brazilian real estate market.
   unit_type:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: Listing unit type
+    description: Property category of the listed unit as classified by Viva Real (e.g. APARTMENT, HOME, CONDOMINIUM), used to filter and compare competitor inventory by property type.
     categories:
       CONDOMINIUM: ''
       KITNET: ''
@@ -109,65 +113,74 @@ columns:
   usage_type:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.house_info
-    description: Listing usage type
-    categories:
-      RESIDENTIAL: ''
-      RESIDENTIAL, COMMERCIAL: ''
+    description: >
+      Intended use classification of the listed property, used to distinguish residential from mixed-use
+      competitor inventory. The crawler stores this field as a JSON array; after extraction it appears as
+      a string literal — residential-only listings are ["RESIDENTIAL"], and mixed-use listings are
+      ["RESIDENTIAL","COMMERCIAL"].
   advertiser_name:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.contact_information
-    description: Who published the listing
+    description: Name of the entity (owner, real estate agency, or broker) that published the listing on Viva Real, used to identify advertiser types and market participation patterns.
   advertiser_phone:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.contact_information
-    description: The phone number of the advertiser
+    description: Contact phone number of the entity that published the listing on Viva Real, used for advertiser identification and market research purposes.
   condo_fee:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.price
-    description: House listing condo price
+    description: Monthly condominium fee (taxa de condomínio) for the listed property in BRL, used in total occupancy cost calculations for competitive pricing analysis.
   iptu:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.price
-    description: House listing iptu price
+    description: Annual municipal property tax (IPTU) amount in BRL for the listed property, included in total cost comparisons between QuintoAndar and competitor listings.
   price_rental:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.price
-    description: House listing rent price
+    description: Monthly rental price in BRL advertised on Viva Real for the property, used as the primary metric in competitor rental pricing benchmarks.
   price_sale:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.price
-    description: House listing sale price
+    description: Sale asking price in BRL for the listed property on Viva Real, used in competitor sales market analysis.
   is_for_rent:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.type
-    description: If this listings if for rent
+    description: Boolean flag indicating whether the property is available for rental on Viva Real, used to filter the dataset to the rental market segment relevant to QuintoAndar's core business.
   is_for_sale:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.type
-    description: If this listing is for sale
+    description: Boolean flag indicating whether the property is listed for sale on Viva Real, used to separate sales inventory from rental listings in competitor analysis.
   ts_created:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.date_info
-    description: Timestamp when listing was created in platform
+    description: Timestamp when the property listing was first published on Viva Real, used to calculate listing age and track when competitor inventory entered the market.
   ts_updated:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.date_info
-    description: Timestamp when listing was last updated in platform
+    description: Timestamp of the most recent update to the listing on Viva Real, used to identify recently modified competitor listings and detect price or attribute changes.
   year:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.year
-    description: Year when listing was created on platform
+    description: Calendar year of the crawler run that collected this listing snapshot, used as a partitioning key for incremental data loads.
   month:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.month
-    description: Month when listing was created on platform
+    description: Calendar month of the crawler run, used together with year and day as a partitioning key for efficient date-range queries.
   day:
     lineage:
     - datalake_crawlers_listings_clean.viva_real.day
-    description: Day when listing was created on platform
+    description: Calendar day of the crawler run, completing the date partition key for daily incremental snapshot loads from the Viva Real enrichment pipeline.
   is_hybrid:
-    description: If this listing is both for rent and for sale
+    lineage:
+    - datalake_crawlers_listings_clean.viva_real.type
+    description: Boolean flag indicating whether the property is simultaneously listed for both rent and sale on Viva Real, used to identify dual-purpose listings in competitive supply analysis.
   price_m2_rental:
-    description: House listing rent m² price
+    lineage:
+    - datalake_crawlers_listings_clean.viva_real.price
+    - datalake_crawlers_listings_clean.viva_real.house_info
+    description: Rental price per square metre in BRL, calculated by dividing the monthly rent by the total area, used as a normalised pricing metric for cross-listing competitor benchmarks.
   price_m2_sale:
-    description: House listing sale m² price
+    lineage:
+    - datalake_crawlers_listings_clean.viva_real.price
+    - datalake_crawlers_listings_clean.viva_real.house_info
+    description: Sale price per square metre in BRL, calculated by dividing the asking sale price by the total area, enabling area-normalised comparisons of competitor sales pricing.

@@ -1,111 +1,116 @@
 ---
 database_name: datalake_hmb_ada_clean
 table_name: backoffices
-owner: isabela.matsumoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains records of contact from HMB for backoffice operations.
+description: >
+  Captures individual agent-contact interactions recorded by the HMB ADA backoffice platform used by the
+  supply team's outreach operations. Each row represents one contact event — linked to a campaign, agent,
+  mailing list, and business entity — with up to nine free-choice menu options that reflect the conversation
+  outcome. Used by the Growth supply team to monitor agent productivity, campaign effectiveness, and contact
+  quality across outbound communication channels.
 columns:
   id_backoffice_record:
-    description: "Unique identifier of the backoffice record."
+    description: Unique identifier for each backoffice contact record in the HMB ADA platform, serving as the primary key for this table.
     lineage:
       - datalake_hmb_data_raw.id
   id_channel:
-    description: "Identifier for the channel of communication."
+    description: Identifier for the communication channel through which the contact occurred (e.g. WhatsApp, phone), used to segment outreach performance by channel.
     lineage:
       - datalake_hmb_data_raw.channel
   id_contact:
-    description: "Unique identifier for the contact."
+    description: Unique identifier assigned to the individual contact (person being reached) within the HMB ADA platform, enabling deduplication across multiple interactions.
     lineage:
       - datalake_hmb_data_raw.uniqueId
   id_table:
-    description: "Identifier for the associated table."
+    description: Identifier referencing the HMB ADA dialler table (list partition) from which this contact was drawn, used to track which specific outreach list segment was worked.
     lineage:
       - datalake_hmb_data_raw.tableId
   id_campaign:
-    description: "Unique identifier for the campaign."
+    description: Identifier for the outreach campaign under which this contact event took place, enabling campaign-level performance aggregation.
     lineage:
       - datalake_hmb_data_raw.campaignId
   id_agent:
-    description: "Identifier for the agent handling the contact."
+    description: Identifier for the supply team agent who conducted the backoffice interaction, used for agent-level productivity and quality reporting.
     lineage:
       - datalake_hmb_data_raw.agentId
   id_line_mailing:
-    description: "Identifier for the line mailing associated with the contact."
+    description: Identifier for the specific mailing list line (individual entry within a mailing) associated with this contact event, enabling granular traceability within bulk outreach lists.
     lineage:
       - datalake_hmb_data_raw.lineMailingId
   id_business:
-    description: "Unique identifier for the business related to the contact."
+    description: Identifier for the business entity (e.g. property or landlord account) associated with the contact, enabling linkage between outreach activity and supply business records.
     lineage:
       - datalake_hmb_data_raw.businessId
   id_mailing:
-    description: "Identifier for the mailing record."
+    description: Identifier for the mailing batch (campaign send) from which this contact originated, used to group interactions by outreach wave.
     lineage:
       - datalake_hmb_data_raw.mailingId
   phone_number:
-    description: "CLient Phone number associated with the contact."
+    description: Phone number of the client reached during the backoffice contact event, used for outreach record-keeping and contact rate analysis.
     lineage:
       - datalake_hmb_data_raw.phone
   option_1:
-    description: "Option 1 provided during contact."
+    description: First menu option selected or outcome recorded by the agent during this contact interaction, representing the primary disposition or response captured in the HMB ADA dialler.
     lineage:
       - datalake_hmb_data_raw.option1
   option_2:
-    description: "Option 2 provided during contact."
+    description: Second menu option or secondary disposition recorded during the contact, providing additional granularity on the interaction outcome.
     lineage:
       - datalake_hmb_data_raw.option2
   option_3:
-    description: "Option 3 provided during contact."
+    description: Third configurable field capturing an additional disposition or agent note recorded during the contact interaction.
     lineage:
       - datalake_hmb_data_raw.option3
   option_4:
-    description: "Option 4 provided during contact."
+    description: Fourth configurable field for recording supplementary contact outcome details as defined by the active campaign configuration.
     lineage:
       - datalake_hmb_data_raw.option4
   option_5:
-    description: "Option 5 provided during contact."
+    description: Fifth configurable field capturing additional interaction metadata as defined by the campaign's dialler script.
     lineage:
       - datalake_hmb_data_raw.option5
   option_6:
-    description: "Option 6 provided during contact."
+    description: Sixth configurable field for recording additional structured outcome information during the backoffice interaction.
     lineage:
       - datalake_hmb_data_raw.option6
   option_7:
-    description: "Option 7 provided during contact."
+    description: Seventh configurable field capturing a further disposition detail as configured per campaign in the HMB ADA dialler.
     lineage:
       - datalake_hmb_data_raw.option7
   option_8:
-    description: "Option 8 provided during contact."
+    description: Eighth configurable field used to record additional structured agent notes or outcomes for this backoffice contact.
     lineage:
       - datalake_hmb_data_raw.option8
   option_9:
-    description: "Option 9 provided during contact."
+    description: Ninth and final configurable field for capturing structured interaction outcome data as defined by the campaign's operational script.
     lineage:
       - datalake_hmb_data_raw.option9
   crm_attribute_json:
-    description: "JSON containing CRM attributes related to the contact."
+    description: JSON payload carrying CRM-specific attributes for the contact, such as lead status, property interest level, or enrichment data passed from the CRM system into the HMB ADA backoffice.
     lineage:
       - datalake_hmb_data_raw.crmAttributeJson
   crm_tab_json:
-    description: "JSON containing CRM tab information."
+    description: JSON blob representing the CRM tab data displayed to the agent during the interaction, capturing the structured view of the contact's profile and history as shown in the backoffice interface.
     lineage:
       - datalake_hmb_data_raw.crmTabJson
   ts_contact_start:
-    description: "Time when the contact interaction started."
+    description: Timestamp marking the start of the agent-contact interaction session, used to measure contact duration and calculate agent occupancy metrics.
     lineage:
       - datalake_hmb_data_raw.startTime
   ts_updated:
-    description: "Timestamp when the record was last updated."
+    description: Timestamp of the most recent update to this backoffice record, reflecting changes made after the initial contact event was logged.
     lineage:
       - datalake_hmb_data_raw.updatedAt
   year:
-    description: "Year the contact interaction occurred."
+    description: Calendar year extracted from the contact start timestamp, used as a partitioning key for efficient date-range queries on this table.
     lineage:
       - datalake_hmb_data_raw.year
   month:
-    description: "Month the contact interaction occurred."
+    description: Calendar month extracted from the contact start timestamp, used together with year and day as a partitioning key.
     lineage:
       - datalake_hmb_data_raw.month
   day:
-    description: "Day the contact interaction occurred."
+    description: Calendar day extracted from the contact start timestamp, completing the date partition key for daily incremental loads.
     lineage:
       - datalake_hmb_data_raw.day

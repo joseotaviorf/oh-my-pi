@@ -1,40 +1,76 @@
 database_name: datalake_rene_descartes_clean
 table_name: house_lead
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: >
+  Central entity of the Rene Descartes supply acquisition microservice, recording every house lead generated
+  during the top-of-funnel supply process. Each row represents a single property lead tied to an owner, an
+  address, and an acquisition campaign, with a lifecycle status that progresses as the lead moves through
+  the supply pipeline. This table is the primary input for supply acquisition analytics and funnel reporting
+  used by the Growth team.
 columns:
   id:
+    description: Unique identifier for the house lead within the Rene Descartes system, serving as the primary key for all downstream joins.
     lineage:
       - datalake_rene_descartes_raw.house_lead.id
   id_house_owner:
+    description: Reference to the property owner associated with this lead, linking the lead to the owner entity for contact and conversion tracking.
     lineage:
       - datalake_rene_descartes_raw.house_lead.house_owner_id
   id_acquisition:
+    description: Reference to the acquisition miscellaneous data record that stores campaign and supplementary house information for this lead.
     lineage:
       - datalake_rene_descartes_raw.house_lead.acquisition_id
   id_address:
+    description: Reference to the property address record, used to geolocate the lead and route it to the appropriate supply territory.
     lineage:
       - datalake_rene_descartes_raw.house_lead.address_id
   id_referred_by:
+    description: Identifier of the agent or entity that referred this lead into the system, enabling referral attribution and incentive calculations.
     lineage:
       - datalake_rene_descartes_raw.house_lead.referred_by
   id_external_reference:
+    description: Reference to an external system or third-party source that originated the lead, used to reconcile Rene Descartes leads with upstream data providers.
     lineage:
       - datalake_rene_descartes_raw.house_lead.external_reference_id
   id_lead_ebdb:
+    description: Identifier of this lead in the legacy EBDB (Elasticsearch/backend database) system, maintained for backward compatibility and cross-system traceability.
     lineage:
       - datalake_rene_descartes_raw.house_lead.new_id
   external_reference_name:
+    description: Human-readable name of the external source or partner that referred this lead, complementing the external reference identifier for reporting.
     lineage:
       - datalake_rene_descartes_raw.house_lead.external_reference_name
   reason:
+    description: Business reason or motivation recorded for the lead's current status, providing context for acceptance, rejection, or conversion decisions.
     lineage:
       - datalake_rene_descartes_raw.house_lead.reason
   status:
+    description: Current lifecycle status of the house lead (NEW, PROCESSED, CONVERTED, DISCARDED), used to measure funnel progression and supply pipeline health.
     lineage:
       - datalake_rene_descartes_raw.house_lead.status
+    categories:
+      NEW: Lead recently created in Rene Descartes, awaiting initial processing by the supply acquisition pipeline.
+      PROCESSED: Lead evaluated by Rene discard and qualification rules but not yet converted or discarded.
+      CONVERTED: Lead approved by Rene and advanced to the next supply funnel stage (typically prospect handoff to Wololo).
+      DISCARDED: Lead disqualified by Rene discard rules before reaching the prospect stage; see lead_rejection for the rejection reason.
   ts_created:
+    description: Timestamp marking when the house lead was first generated in the Rene Descartes system, used as the start point for lead-age and funnel-velocity metrics.
     lineage:
       - datalake_rene_descartes_raw.house_lead.created_at
   ts_updated:
+    description: Timestamp of the most recent change to the lead record, used to detect status transitions and calculate time-in-stage metrics.
+    lineage:
+      - datalake_rene_descartes_raw.house_lead.updated_at
+  year:
+    description: Calendar year extracted from `ts_updated`, used as a Hive partition for incremental reads of house lead records.
+    lineage:
+      - datalake_rene_descartes_raw.house_lead.updated_at
+  month:
+    description: Calendar month extracted from `ts_updated`, used as a Hive partition alongside year and day.
+    lineage:
+      - datalake_rene_descartes_raw.house_lead.updated_at
+  day:
+    description: Calendar day extracted from `ts_updated`, used as a Hive partition alongside year and month.
     lineage:
       - datalake_rene_descartes_raw.house_lead.updated_at

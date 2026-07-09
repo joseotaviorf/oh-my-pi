@@ -1,4 +1,3 @@
----
 database_name: datalake_rene_descartes_clean
 table_name: house_lead_conversion
 owner: gabriel.salla@quintoandar.com
@@ -6,34 +5,34 @@ domain: Growth
 description: This table has data about events of lead conversion in houses.
 columns:
   id:
-    description: 'Unique identifier of the conversion'
+    description: Unique identifier of the conversion
     lineage:
     - datalake_rene_descartes_raw.house_lead_conversion.id
   id_lead:
-    description: 'Unique identifier of lead'
+    description: Unique identifier of lead
     lineage:
     - datalake_rene_descartes_raw.house_lead_conversion.house_lead_id
   id_house:
-    description: 'Unique identifier of house'
+    description: Unique identifier of house
     lineage:
     - datalake_rene_descartes_raw.house_lead_conversion.property_id
   ts_created:
-    description: 'Timestamp when the row was created'
+    description: Timestamp when the row was created
     lineage:
     - datalake_rene_descartes_raw.house_lead_conversion.created_at
   ts_updated:
-    description: 'Timestamp when the row was updated'
+    description: Timestamp when the row was updated
     lineage:
     - datalake_rene_descartes_raw.house_lead_conversion.updated_at
   year:
-    description: 'Year in which the line was created'
+    description: Year in which the line was created
     lineage:
     - datalake_rene_descartes_raw.house_lead_conversion.year
   month:
-    description: 'Month in which the line was created'
+    description: Month in which the line was created
     lineage:
     - datalake_rene_descartes_raw.house_lead_conversion.month
   day:
-    description: 'Day in which the line was created'
+    description: Day in which the line was created
     lineage:
     - datalake_rene_descartes_raw.house_lead_conversion.day

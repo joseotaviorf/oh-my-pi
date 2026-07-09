@@ -1,19 +1,41 @@
 database_name: datalake_rene_descartes_clean
 table_name: phone
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: >
+  Stores the phone contacts associated with property owners and other entities managed by the Rene Descartes
+  supply microservice. Each record links a phone number to its owner entity, supporting outreach activities
+  such as SMS campaigns and call-centre operations used by the Growth supply acquisition team.
 columns:
   id:
+    description: Unique identifier for the phone contact record within the Rene Descartes system.
     lineage:
       - datalake_rene_descartes_raw.phone.id
   id_owner:
+    description: Reference to the entity — typically a property owner or lead — that holds this phone number, enabling contact lookup and outreach routing.
     lineage:
       - datalake_rene_descartes_raw.phone.owner_id
   phone_number:
+    description: Normalised phone number string associated with the owner, used for outbound communication in supply acquisition campaigns.
     lineage:
       - datalake_rene_descartes_raw.phone.phone_nr
   ts_created:
+    description: Timestamp when the phone contact was first registered in the Rene Descartes system.
     lineage:
       - datalake_rene_descartes_raw.phone.created_at
   ts_updated:
+    description: Timestamp of the most recent update to the phone record, reflecting corrections or ownership changes.
+    lineage:
+      - datalake_rene_descartes_raw.phone.updated_at
+  year:
+    description: Calendar year extracted from `ts_updated`, used as a Hive partition for incremental reads of phone contact records.
+    lineage:
+      - datalake_rene_descartes_raw.phone.updated_at
+  month:
+    description: Calendar month extracted from `ts_updated`, used as a Hive partition alongside year and day.
+    lineage:
+      - datalake_rene_descartes_raw.phone.updated_at
+  day:
+    description: Calendar day extracted from `ts_updated`, used as a Hive partition alongside year and month.
     lineage:
       - datalake_rene_descartes_raw.phone.updated_at

@@ -1,49 +1,82 @@
 database_name: datalake_rene_descartes_clean
 table_name: address
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: >
+  Contains the standardised physical address records managed by the Rene Descartes supply microservice,
+  representing the locations of properties associated with house leads. Each row holds a full address breakdown
+  from country down to complement, together with geocoordinates, enabling geospatial analysis of the supply
+  acquisition pipeline by the Growth team.
 columns:
   id:
+    description: Unique identifier for an address record, referenced by house lead and other entities in the Rene Descartes domain to associate a property with its physical location.
     lineage:
       - datalake_rene_descartes_raw.address.id
   country_code:
+    description: Anonymised token derived from the raw country field, representing the country where the property is located without exposing PII in the clean layer.
     lineage:
       - datalake_rene_descartes_raw.address.country
   zip:
+    description: Postal code (CEP in Brazil) for the property address, used to map supply leads to geographic zones for coverage and campaign analysis.
     lineage:
       - datalake_rene_descartes_raw.address.zip
   state:
+    description: Brazilian state abbreviation (e.g. SP, RJ) where the property is situated, used for regional supply reporting.
     lineage:
       - datalake_rene_descartes_raw.address.state
   city:
+    description: Municipality name where the property is located, used to segment supply acquisition activity by city.
     lineage:
       - datalake_rene_descartes_raw.address.city
   neighbourhood:
+    description: Neighbourhood within the city where the property is located, enabling fine-grained geographic targeting and supply density analysis.
     lineage:
       - datalake_rene_descartes_raw.address.neighbourhood
   street_name:
+    description: Name of the street where the property is situated, forming part of the full property address.
     lineage:
       - datalake_rene_descartes_raw.address.street_name
   house_number:
+    description: Street number of the property within its street, completing the primary address line.
     lineage:
       - datalake_rene_descartes_raw.address.house_number
   complement:
+    description: Additional address detail such as apartment number, block, or floor that further qualifies the property location.
     lineage:
       - datalake_rene_descartes_raw.address.complement
   reference:
+    description: Nearby landmark or reference point provided to help locate the property, commonly used in Brazilian addresses where street numbering may be imprecise.
     lineage:
       - datalake_rene_descartes_raw.address.reference
   lat:
+    description: Geographic latitude coordinate of the property, used for geospatial queries and map-based supply visualisations.
     lineage:
       - datalake_rene_descartes_raw.address.lat
   lng:
+    description: Geographic longitude coordinate of the property, paired with latitude to pinpoint the exact location on a map.
     lineage:
       - datalake_rene_descartes_raw.address.lng
   region:
+    description: Internal business region classification assigned to the property address, used for territory management and supply team routing.
     lineage:
       - datalake_rene_descartes_raw.address.region
   ts_created:
+    description: Timestamp recording when this address record was first created in the Rene Descartes system.
     lineage:
       - datalake_rene_descartes_raw.address.created_at
   ts_updated:
+    description: Timestamp of the most recent modification to this address record, reflecting corrections or geocoordinate updates.
+    lineage:
+      - datalake_rene_descartes_raw.address.updated_at
+  year:
+    description: Calendar year extracted from `ts_updated`, used as a Hive partition for incremental reads of address records.
+    lineage:
+      - datalake_rene_descartes_raw.address.updated_at
+  month:
+    description: Calendar month extracted from `ts_updated`, used as a Hive partition alongside year and day.
+    lineage:
+      - datalake_rene_descartes_raw.address.updated_at
+  day:
+    description: Calendar day extracted from `ts_updated`, used as a Hive partition alongside year and month.
     lineage:
       - datalake_rene_descartes_raw.address.updated_at

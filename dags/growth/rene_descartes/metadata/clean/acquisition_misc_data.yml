@@ -1,19 +1,42 @@
 database_name: datalake_rene_descartes_clean
 table_name: acquisition_misc_data
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: >
+  Stores supplementary acquisition metadata captured by the Rene Descartes supply microservice for each house lead.
+  Each record links a house to its acquisition campaign and carries a free-form JSON payload with additional house
+  information collected during the supply acquisition flow. Used by the Growth supply team to analyse campaign
+  attribution and enrich lead records with operational context.
 columns:
   id:
+    description: Unique surrogate identifier for the acquisition miscellaneous data record, used to join this supplementary information back to its corresponding house lead.
     lineage:
       - datalake_rene_descartes_raw.acquisition_misc_data.id
   house_info:
+    description: JSON blob containing additional house attributes collected at the time of acquisition, such as property type or size details not captured in the core lead fields.
     lineage:
       - datalake_rene_descartes_raw.acquisition_misc_data.house_info
   acquisition_campaign:
+    description: Name or code of the marketing or outreach campaign responsible for generating this house lead, enabling attribution analysis across supply acquisition channels.
     lineage:
       - datalake_rene_descartes_raw.acquisition_misc_data.acquisition_campaign
   ts_created:
+    description: Timestamp marking when this acquisition miscellaneous data record was first created in the Rene Descartes system.
     lineage:
       - datalake_rene_descartes_raw.acquisition_misc_data.created_at
   ts_updated:
+    description: Timestamp of the most recent update to this record, used to track changes to campaign attribution or house information over time.
+    lineage:
+      - datalake_rene_descartes_raw.acquisition_misc_data.updated_at
+  year:
+    description: Calendar year extracted from `ts_updated`, used as a Hive partition for incremental reads of acquisition metadata.
+    lineage:
+      - datalake_rene_descartes_raw.acquisition_misc_data.updated_at
+  month:
+    description: Calendar month extracted from `ts_updated`, used as a Hive partition alongside year and day.
+    lineage:
+      - datalake_rene_descartes_raw.acquisition_misc_data.updated_at
+  day:
+    description: Calendar day extracted from `ts_updated`, used as a Hive partition alongside year and month.
     lineage:
       - datalake_rene_descartes_raw.acquisition_misc_data.updated_at

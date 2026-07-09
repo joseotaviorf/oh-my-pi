@@ -1,25 +1,54 @@
 database_name: datalake_rene_descartes_clean
 table_name: lead_rejection
+owner: gabriel.salla@quintoandar.com
 domain: Growth
+description: >
+  Records the rejection decisions made against house leads in the Rene Descartes supply microservice,
+  capturing the reason, business context, and originating system for each disqualification. Used by the
+  Growth supply team to analyse rejection patterns, identify quality issues in acquisition channels,
+  and improve the lead screening process.
 columns:
   id:
+    description: Unique identifier for the lead rejection record within the Rene Descartes system.
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.id
   id_house_lead:
+    description: Reference to the house lead that was rejected, linking this rejection record to the corresponding lead in the house_lead table.
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.house_lead_id
   business_context:
+    description: High-level business area or domain context in which the rejection decision was made, helping to distinguish rejections triggered by different parts of the supply qualification process.
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.business_context
   reason:
+    description: Specific reason code or description explaining why the house lead was rejected, used to categorise disqualifications for quality monitoring and process improvement.
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.reason
   origin:
+    description: Funnel stage or channel that originated the rejection decision (LEAD, PROSPECT, MANUAL), enabling analysis of rejection source and consistency.
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.origin
+    categories:
+      LEAD: Rejection triggered by Rene Descartes discard rules while the house lead is still at the lead funnel stage.
+      PROSPECT: Rejection recorded when the entity was already at the prospect stage, typically after handoff to Wololo.
+      MANUAL: Rejection entered manually by an ops agent or reviewer outside automated discard rules.
   ts_created:
+    description: Timestamp when the rejection record was created, marking the moment the lead was formally disqualified in the supply pipeline.
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.created_at
   ts_updated:
+    description: Timestamp of the most recent update to the rejection record, reflecting any corrections or reclassifications of the rejection reason.
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.updated_at
+  year:
+    description: Calendar year extracted from `ts_updated`, used as a Hive partition for incremental reads of lead rejection records.
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.updated_at
+  month:
+    description: Calendar month extracted from `ts_updated`, used as a Hive partition alongside year and day.
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.updated_at
+  day:
+    description: Calendar day extracted from `ts_updated`, used as a Hive partition alongside year and month.
     lineage:
       - datalake_rene_descartes_raw.lead_rejection.updated_at

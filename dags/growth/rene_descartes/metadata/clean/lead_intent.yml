@@ -6,40 +6,40 @@ description: |
   they do not immediately activate the owner acquisition funnel. One row per intent demonstrated
   (id_intent). Sourced from the Rene Descartes microservice (PostgreSQL CDC). Partitioned by
   year/month/day on ts_created; z-ordered by id_contact for efficient lookups by customer.
-domain: "Growth"
-owner: "gabriel.salla@quintoandar.com"
+domain: Growth
+owner: gabriel.salla@quintoandar.com
 columns:
   id_intent:
-    description: "Unique, sequential identifier representing each intent demonstrated by the customer. Primary key."
+    description: Unique, sequential identifier representing each intent demonstrated by the customer. Primary key.
     lineage:
       - datalake_rene_descartes_raw.lead_intent.id_intent
   id_contact:
-    description: "Foreign key linking back to the Supply customer record in lead_contact_info (lead_contact_info.id_contact). Z-ordered — filter on this column for efficient data skipping when querying by customer."
+    description: Foreign key linking back to the Supply customer record in lead_contact_info (lead_contact_info.id_contact). Z-ordered — filter on this column for efficient data skipping when querying by customer.
     lineage:
       - datalake_rene_descartes_raw.lead_intent.contact_id
   origin:
-    description: "The specific product through which the customer demonstrated intent."
+    description: The specific product through which the customer demonstrated intent.
     lineage:
       - datalake_rene_descartes_raw.lead_intent.origin
   supply_source:
-    description: "Label classifying which Supply funnel the customer entered — determines the validation and outreach path the lead follows in lead_attribution."
+    description: Label classifying which Supply funnel the customer entered — determines the validation and outreach path the lead follows in lead_attribution.
     lineage:
       - datalake_rene_descartes_raw.lead_intent.supply_source
   detailed_route:
-    description: "Detailed route branching off the origin to attribute the specific path the customer used to reach the product."
+    description: Detailed route branching off the origin to attribute the specific path the customer used to reach the product.
     lineage:
       - datalake_rene_descartes_raw.lead_intent.detailed_route
   experiments:
-    description: "JSON tags for A/B tests the customer was involved in when the intent was demonstrated."
+    description: JSON tags for A/B tests the customer was involved in when the intent was demonstrated.
     lineage:
       - datalake_rene_descartes_raw.lead_intent.experiments
   ts_created:
-    description: "UTC timestamp when the customer submitted the contact capture form on the landing page, marking the exact moment of intent demonstration. Drives the partition columns (year, month, day)."
+    description: UTC timestamp when the customer submitted the contact capture form on the landing page, marking the exact moment of intent demonstration. Drives the partition columns (year, month, day).
     lineage:
       - datalake_rene_descartes_raw.lead_intent.ts_created
   year:
-    description: "Partition column: year extracted from ts_created."
+    description: Calendar year extracted from `ts_created`, used as a Hive partition for incremental reads of intent records.
   month:
-    description: "Partition column: month extracted from ts_created."
+    description: Calendar month extracted from `ts_created`, used as a Hive partition alongside year and day.
   day:
-    description: "Partition column: day extracted from ts_created."
+    description: Calendar day extracted from `ts_created`, used as a Hive partition alongside year and month.

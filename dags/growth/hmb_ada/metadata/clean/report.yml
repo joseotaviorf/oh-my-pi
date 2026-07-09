@@ -1,123 +1,127 @@
 ---
 database_name: datalake_hmb_ada_clean
 table_name: report
-owner: isabela.matsumoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains reporting data from WhatsApp communication, including interactions, agent information, and campaign details.
+description: >
+  Contains detailed reporting data for WhatsApp-based outreach interactions conducted via the HMB ADA platform
+  by the supply team. Each row captures a single communication event including the agent responsible, campaign
+  attribution, interaction type and duration, and up to nine configurable disposition fields. Used by the Growth
+  supply team to measure campaign effectiveness, agent performance, and contact quality across WhatsApp outreach.
 columns:
   id_contact:
-    description: "Unique identifier for the contact."
+    description: Unique identifier assigned to the individual contact in the HMB ADA platform, enabling deduplication and tracking across multiple WhatsApp interaction events.
     lineage:
       - datalake_hmb_data_raw.uniqueid
   id_other_unique:
-    description: "Other unique identifier for the interaction, if applicable."
+    description: Secondary unique identifier used when the same interaction is referenced across multiple systems or when an alternate platform ID exists for the same contact event.
     lineage:
       - datalake_hmb_data_raw.otheruniqueid
   phone_number:
-    description: "Phone number associated with the interaction."
+    description: WhatsApp phone number of the client involved in this interaction, used for contact traceability and deduplication in campaign reporting.
     lineage:
       - datalake_hmb_data_raw.number
   id_integrated:
-    description: "Indicates whether the data is integrated."
+    description: Flag or identifier indicating whether this interaction record has been synchronised with an integrated CRM or downstream system, used for reconciliation monitoring.
     lineage:
       - datalake_hmb_data_raw.integrated
   channel:
-    description: "Channel through which the interaction occurred."
+    description: Communication channel through which the interaction took place (e.g. WhatsApp, SMS), enabling analysis of outreach performance by channel type.
     lineage:
       - datalake_hmb_data_raw.channel
   type:
-    description: "Type of interaction."
+    description: Classification of the interaction type (e.g. inbound, outbound, automated message), used to distinguish agent-driven contacts from automated flows in performance analysis.
     lineage:
       - datalake_hmb_data_raw.tipo
   status:
-    description: "Current status of the interaction."
+    description: Final status of the interaction at the close of the session (e.g. completed, failed, no-answer), used to measure successful contact rates in outreach campaigns.
     lineage:
       - datalake_hmb_data_raw.status
   total_time:
-    description: "Total duration of the interaction."
+    description: Total elapsed duration of the interaction session in seconds, used to compute average handle time and agent productivity metrics.
     lineage:
       - datalake_hmb_data_raw.total
   error:
-    description: "Error information, if any."
+    description: Error code or message recorded when the interaction encountered a technical failure, used to monitor platform reliability and diagnose delivery issues.
     lineage:
       - datalake_hmb_data_raw.error
   campaign:
-    description: "Campaign associated with the interaction."
+    description: Name of the outreach campaign under which this interaction was conducted, enabling aggregated performance measurement across supply acquisition campaigns.
     lineage:
       - datalake_hmb_data_raw.campaign
   agent_login:
-    description: "Login of the agent handling the interaction."
+    description: Login credential (username) of the supply team agent who handled this WhatsApp interaction, used for agent-level performance attribution in reports.
     lineage:
       - datalake_hmb_data_raw.login
   destination_login:
-    description: "Destination login for the interaction."
+    description: Login of the destination agent or queue to which the interaction was transferred or escalated, used to track hand-off patterns within the supply team.
     lineage:
       - datalake_hmb_data_raw.loginDestino
   model:
-    description: "Model associated with the interaction."
+    description: Chatbot or scripted conversation model template used to drive the WhatsApp interaction, allowing comparison of model effectiveness across outreach campaigns.
     lineage:
       - datalake_hmb_data_raw.model
   max_response_delay:
-    description: "Maximum response delay for the interaction."
+    description: Maximum time elapsed (in seconds) between a message sent and the corresponding client or agent reply during the interaction, used to measure responsiveness and service quality.
     lineage:
       - datalake_hmb_data_raw.maxresponsedelay
   replied_message:
-    description: "Message replied by the user."
+    description: Content of the message sent by the client in response to the outreach, capturing the client's reply for qualitative analysis and conversation auditing.
     lineage:
       - datalake_hmb_data_raw.repliedmessage
   last_text:
-    description: "Last text sent in the interaction."
+    description: Final message text exchanged in the interaction session, providing a quick reference to how the conversation concluded.
     lineage:
       - datalake_hmb_data_raw.lasttext
   option_1:
-    description: "Option 1 provided during interaction."
+    description: First configurable disposition or outcome field recorded by the agent at the close of the WhatsApp interaction, representing the primary contact result.
     lineage:
       - datalake_hmb_data_raw.option1
   option_2:
-    description: "Option 2 provided during interaction."
+    description: Second configurable outcome field providing additional granularity on the interaction result as defined by the active campaign script.
     lineage:
       - datalake_hmb_data_raw.option2
   option_3:
-    description: "Option 3 provided during interaction."
+    description: Third configurable outcome field for recording supplementary interaction details as configured per WhatsApp campaign.
     lineage:
       - datalake_hmb_data_raw.option3
   option_4:
-    description: "Option 4 provided during interaction."
+    description: Fourth configurable outcome field capturing structured disposition data as set up in the campaign's HMB ADA configuration.
     lineage:
       - datalake_hmb_data_raw.option4
   option_5:
-    description: "Option 5 provided during interaction."
+    description: Fifth configurable outcome field for further categorisation of the WhatsApp interaction result.
     lineage:
       - datalake_hmb_data_raw.option5
   option_6:
-    description: "Option 6 provided during interaction."
+    description: Sixth configurable outcome field recording additional structured data about the interaction as defined by the campaign operator.
     lineage:
       - datalake_hmb_data_raw.option6
   option_7:
-    description: "Option 7 provided during interaction."
+    description: Seventh configurable outcome field for capturing campaign-specific interaction disposition details.
     lineage:
       - datalake_hmb_data_raw.option7
   option_8:
-    description: "Option 8 provided during interaction."
+    description: Eighth configurable outcome field for recording additional interaction metadata as required by specific campaigns.
     lineage:
       - datalake_hmb_data_raw.option8
   option_9:
-    description: "Option 9 provided during interaction."
+    description: Ninth and final configurable outcome field for capturing the last structured disposition detail in the campaign's interaction script.
     lineage:
       - datalake_hmb_data_raw.option9
   ts_report:
-    description: "Timestamp when the report was created."
+    description: Timestamp marking when this WhatsApp interaction event was recorded in the HMB ADA platform, representing the business moment the communication took place.
     lineage:
       - datalake_hmb_data_raw.dt
   year:
-    description: "Year when the interaction occurred."
+    description: Calendar year of the interaction timestamp, used as a partitioning key for efficient date-range queries.
     lineage:
       - datalake_hmb_data_raw.year
   month:
-    description: "Month when the interaction occurred."
+    description: Calendar month of the interaction timestamp, used together with year and day as a partitioning key for incremental loads.
     lineage:
       - datalake_hmb_data_raw.month
   day:
-    description: "Day when the interaction occurred."
+    description: Calendar day of the interaction timestamp, completing the date partition key for daily incremental loads from the HMB ADA platform.
     lineage:
       - datalake_hmb_data_raw.day
