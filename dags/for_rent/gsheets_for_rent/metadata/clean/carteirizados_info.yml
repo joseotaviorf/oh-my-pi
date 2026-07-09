@@ -1,26 +1,37 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: carteirizados_info
+description: |
+  Google Sheets registry of accredited carteirizados clients with proposal and contact
+  details. One row per client accreditation event used by closing operations.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_client:
     lineage:
       - datalake_gsheets_raw.carteirizados_info.sk_client
+    description: Client identifier from the carteirizados accreditation sheet.
   id_proposal:
     lineage:
       - datalake_gsheets_raw.carteirizados_info.sk_proposal
+    description: Proposal identifier linked to the accredited client record.
   name:
     lineage:
       - datalake_gsheets_raw.carteirizados_info.name
+    description: Client full name as recorded in the accreditation sheet.
   email:
     lineage:
       - datalake_gsheets_raw.carteirizados_info.email
+    description: Client email address used for carteirizados communication.
   phone_number:
     lineage:
       - datalake_gsheets_raw.carteirizados_info.phone_number
+    description: Client phone number from the accreditation sheet.
   closing_group:
     lineage:
       - datalake_gsheets_raw.carteirizados_info.closing_group
+    description: Closing squad or group responsible for the client accreditation.
   dt_accreditation_week:
     lineage:
       - datalake_gsheets_raw.carteirizados_info.dt_inclusion
+    description: Date when the client was included in the carteirizados program.

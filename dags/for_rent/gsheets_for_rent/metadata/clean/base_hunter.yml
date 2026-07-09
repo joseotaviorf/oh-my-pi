@@ -1,16 +1,25 @@
+---
 database_name: datalake_gsheets_clean
 table_name: base_hunter
+description: |
+  Google Sheets hunter campaign outreach list for property owner prospects. One row per
+  owner with cluster assignment and message send date for acquisition tracking.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_owner:
     lineage:
       - datalake_gsheets_raw.base_hunter.sk_pp
+    description: Identifier of the property owner targeted by the hunter campaign.
   prospects:
     lineage:
       - datalake_gsheets_raw.base_hunter.prospects
+    description: Prospect segment or volume count assigned to the owner in the campaign sheet.
   cluster:
     lineage:
       - datalake_gsheets_raw.base_hunter.cluster
+    description: Hunter cluster grouping used to tailor owner acquisition strategy.
   dt_message_sent:
     lineage:
       - datalake_gsheets_raw.base_hunter.data_envio_msg
+    description: Date when the outreach message was sent to the owner.

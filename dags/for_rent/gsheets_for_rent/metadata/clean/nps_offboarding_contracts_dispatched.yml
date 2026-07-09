@@ -1,22 +1,33 @@
+---
 database_name: datalake_gsheets_clean
 table_name: nps_offboarding_contracts_dispatched
+description: |
+  Google Sheets tracker of NPS offboarding survey dispatches per contract. One row per
+  ticket opened for post-termination satisfaction research.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
       - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.sk_ticket
+    description: Support ticket identifier created for the offboarding NPS dispatch.
   id_user:
     lineage:
       - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.sk_user
+    description: User identifier of the tenant or party surveyed in the offboarding flow.
   id_contract:
     lineage:
       - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.sk_contract
+    description: Rental contract identifier associated with the offboarding NPS dispatch.
   status:
     lineage:
       - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.status
+    description: Current dispatch status of the offboarding NPS ticket.
   is_pp_multi:
     lineage:
       - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.is_pp_multi
+    description: Whether the contract belongs to a PP Multi landlord portfolio.
   dt_opened:
     lineage:
       - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.data_abertura
+    description: Date when the offboarding NPS ticket was opened.

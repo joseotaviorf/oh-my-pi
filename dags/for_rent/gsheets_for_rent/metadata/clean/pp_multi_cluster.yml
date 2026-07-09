@@ -1,9 +1,9 @@
 database_name: datalake_gsheets_clean
 table_name: pp_multi_cluster
-description: 
+description: |
   Clean table with information about which cluster each PP Multi belongs to, identified by id_owner.
 domain: For Rent
-owner: gustavo.rompe@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_owner:
     lineage:
@@ -14,4 +14,4 @@ columns:
       - datalake_gsheets_raw.pp_multi_cluster.cluster
     description: Cluster of the PP Multi. (Short Stay, Corporate Or Investors)
   ts_load:
-    description: Date when the table data was updated.
+    description: Timestamp when the clean table row was materialized.

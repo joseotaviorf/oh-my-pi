@@ -1,41 +1,56 @@
 ---
 database_name: datalake_gsheets_for_rent_clean
 table_name: proj_agent_manager
+description: |
+  Google Sheets structure mapping agents to manager supervisors and mentorship lifecycle.
+  One row per agent portfolio assignment with key transition dates for operations reporting.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_user:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(IdUser AS BIGINT)
+      - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(IdUser AS BIGINT)
+    description: Agent user identifier in the manager portfolio structure.
   id_user_supervisor:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(IdUserSupervisor AS BIGINT)
+      - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(IdUserSupervisor AS BIGINT)
+    description: Supervisor user identifier overseeing the agent.
   condition:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.Condicao
+      - datalake_gsheets_raw.estrutura_gerente_corretor.Condicao
+    description: Portfolio assignment condition or contract type for the agent-manager link.
   mentorship_status:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.StatusMentoria
+      - datalake_gsheets_raw.estrutura_gerente_corretor.StatusMentoria
+    description: Current mentorship program status for the agent.
   abandonment_reason:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.MotivoAbandono
+      - datalake_gsheets_raw.estrutura_gerente_corretor.MotivoAbandono
+    description: Documented reason when the agent left the mentorship program.
   responsible_analyst:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.AnalistaResponsavel
+      - datalake_gsheets_raw.estrutura_gerente_corretor.AnalistaResponsavel
+    description: Analyst accountable for monitoring the agent mentorship.
   weeks:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(Semanas AS SMALLINT)
+      - datalake_gsheets_raw.estrutura_gerente_corretor.CAST(Semanas AS SMALLINT)
+    description: Number of weeks the agent remained in the assigned portfolio.
   dt_started:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataInicioCarteira,
-      'dd/MM/yyyy')
+      - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataInicioCarteira,
+        'dd/MM/yyyy')
+    description: Date when the portfolio assignment officially started.
   dt_entrance:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataEntradaCarteira,
-      'dd/MM/yyyy')
+      - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataEntradaCarteira,
+        'dd/MM/yyyy')
+    description: Date when the agent entered the manager portfolio.
   dt_ended:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(NULLIF(DataSaidaCarteira,
-      ''), 'dd/MM/yyyy')
+      - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(NULLIF(DataSaidaCarteira,
+        ''), 'dd/MM/yyyy')
+    description: Date when the agent exited the portfolio, if applicable.
   dt_mentorship_nh_ended:
     lineage:
-    - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataFimMentoriaNH, 'dd/MM/yyyy')
+      - datalake_gsheets_raw.estrutura_gerente_corretor.TO_DATE(DataFimMentoriaNH, 'dd/MM/yyyy')
+    description: Date when the new-hire mentorship period ended.

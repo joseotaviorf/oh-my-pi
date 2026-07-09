@@ -2,6 +2,7 @@
 database_name: datalake_gsheets_raw
 table_name: carteirizados_info
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   name:
     tags:

@@ -1,62 +1,86 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: base_bandaids
+description: |
+  Jira-derived bandaid expense records for For Rent operations. One row per issue
+  tracking manual adjustments, refunds or exceptional payments tied to contracts and
+  departments.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   key:
     lineage:
       - datalake_gsheets_raw.base_bandaids.key
+    description: Jira issue key uniquely identifying the bandaid ticket.
   issue_type:
     lineage:
       - datalake_gsheets_raw.base_bandaids.issue_type
+    description: Jira issue type classification for the bandaid record.
   status:
     lineage:
       - datalake_gsheets_raw.base_bandaids.status
+    description: Current workflow status of the bandaid ticket in Jira.
   summary:
     lineage:
       - datalake_gsheets_raw.base_bandaids.summary
+    description: Short title describing the bandaid case from Jira.
   ba_bandaid_type:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_tipo_de_bandaid
+    description: Bandaid category selected in the Jira custom field ba_tipo_de_bandaid.
   ba_contract:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_codigo_do_contrato
+    description: Rental contract identifier associated with the bandaid expense.
   ba_department:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_departamento
+    description: Department accountable for the bandaid in the general taxonomy.
   ba_department_for_rent:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_forrent_departamento
+    description: For Rent department accountable for the bandaid expense.
   ba_expense_category_for_rent:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_categoria_do_gasto_forrent
+    description: For Rent expense category applied to the bandaid cost.
   ba_expense_category:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_categoria_do_gasto
+    description: General expense category linked to the bandaid.
   ba_expense_category_relatory:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_categoria_do_gasto_relatorio
+    description: Reporting expense category used in bandaid summaries.
   ba_bandaid_cause:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_causa_do_bandaid
+    description: Stated cause of the bandaid recorded in Jira.
   ba_bandaid_cause_relatory:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_causa_do_bandaid_relatorio
+    description: Reporting-friendly cause label derived for dashboards.
   ba_bandaid_root_cause_for_rent:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_causa_raiz_do_bandaid_forrent
+    description: Root cause classification specific to For Rent bandaids.
   ba_bandaid_root_cause:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_causa_raiz_do_bandaid
+    description: Root cause classification across business lines.
   ba_bandaid_value:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ba_qual_o_valor_total_do_bandaid
+    description: Total monetary value of the bandaid from the general custom field.
   ba_bandaid_value_for_rent:
     lineage:
-      - datalake_gsheets_raw.base_bandaids.ba_valor_bandaid_for_rent
+      - datalake_gsheets_raw.base_bandaids.ba_valor_band_aid_for_rent
+    description: For Rent monetary value attributed to the bandaid.
   ts_created:
     lineage:
       - datalake_gsheets_raw.base_bandaids.created
+    description: Timestamp when the Jira ticket was created.
   ts_load:
     lineage:
       - datalake_gsheets_raw.base_bandaids.ts_load
+    description: Timestamp when the row was ingested into the raw layer.

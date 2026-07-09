@@ -2,20 +2,20 @@ database_name: datalake_gsheets_clean
 table_name: ppmulti_goals_am
 description: Google Sheets with Account Managers Daily PP Multi Goals.
 domain: For Rent
-owner: mariana.kralco@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   date:
     lineage:
       - datalake_gsheets_raw.ppmulti_goals_am.date
-    description:  Date of the target.
+    description: Calendar date of the daily PP Multi goal target.
   month:
     lineage:
       - datalake_gsheets_raw.ppmulti_goals_am.month
-    description: Month of the target.
+    description: Calendar month of the PP Multi goal target.
   year:
     lineage:
       - datalake_gsheets_raw.ppmulti_goals_am.year
-    description: Year of the target.
+    description: Calendar year of the PP Multi goal target.
   account:
     lineage:
       - datalake_gsheets_raw.ppmulti_goals_am.account
@@ -27,8 +27,8 @@ columns:
   goal_value:
     lineage:
       - datalake_gsheets_raw.ppmulti_goals_am.goal_value
-    description: Goal Value in the day.
+    description: Numeric goal value assigned to the account manager for the day.
   goal_name:
     lineage:
       - datalake_gsheets_raw.ppmulti_goals_am.goal_name
-    description: Goal name.
+    description: Name of the PP Multi performance goal being tracked.

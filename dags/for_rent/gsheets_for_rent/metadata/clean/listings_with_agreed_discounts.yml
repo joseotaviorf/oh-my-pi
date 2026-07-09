@@ -1,32 +1,45 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: listings_with_agreed_discounts
+description: |
+  Google Sheets log of rental listings with negotiated administration fee discounts. One row
+  per discounted listing approval tracked by operations teams.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.house_id
+    description: House identifier receiving the agreed rental listing discount.
   discounted_fee:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.discounted_fee
+    description: Agreed discounted administration fee percentage or amount from the sheet.
   discount_mode:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.discount_mode
+    description: Discount mechanism applied such as percentage reduction or fixed fee.
   discount_reason:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.discount_reason
+    description: Business justification recorded for granting the listing discount.
   responsible_team:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.responsible_team
+    description: Internal team that approved or registered the discount.
   user_email:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.user_email
+    description: Email of the operator who registered the discount in the sheet.
   comments:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.comments
+    description: Free-text notes explaining the discount decision.
   fee_value:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.fee_value
+    description: Original or resulting administration fee value after parsing the sheet entry.
   ts_discount_registered:
     lineage:
-       - datalake_gsheets_raw.listings_with_agreed_discounts.dt_discount_registered
+      - datalake_gsheets_raw.listings_with_agreed_discounts.dt_discount_registered
+    description: Timestamp when the discount was registered in the tracking sheet.

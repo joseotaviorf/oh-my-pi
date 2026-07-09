@@ -1,44 +1,62 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: auxiliary_region
+description: |
+  Google Sheets neighbourhood-to-region mapping for For Rent operations. One row per
+  neighbourhood with city, state, regional hierarchy, DDD and tier attributes used to
+  segment rental reporting and downstream enrich models.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_gsheets_raw.aux_regiao.id
+    description: Surrogate key from the source sheet identifying the auxiliary region row.
   neighbourhood:
     lineage:
       - datalake_gsheets_raw.aux_regiao.neighbourhood
+    description: Neighbourhood name covered by this auxiliary region mapping.
   city:
     lineage:
       - datalake_gsheets_raw.aux_regiao.city
+    description: City where the mapped neighbourhood is located.
   region_code:
     lineage:
       - datalake_gsheets_raw.aux_regiao.region_code
+    description: Active QuintoAndar region code assigned to the neighbourhood.
   region_code_deprecated:
     lineage:
       - datalake_gsheets_raw.aux_regiao.region_code_deprecated
+    description: Legacy region code retained for historical reporting compatibility.
   region_code_inspector:
     lineage:
       - datalake_gsheets_raw.aux_regiao.region_code_inspector
+    description: Region code used by inspection operations for this neighbourhood.
   state:
     lineage:
       - datalake_gsheets_raw.aux_regiao.state
+    description: Brazilian state abbreviation for the neighbourhood geography.
   city_group:
     lineage:
       - datalake_gsheets_raw.aux_regiao.city_group
+    description: City grouping used in rental supply and demand planning.
   ddd:
     lineage:
       - datalake_gsheets_raw.aux_regiao.ddd
+    description: Area dialling code linked to the neighbourhood geography.
   regional:
     lineage:
       - datalake_gsheets_raw.aux_regiao.regional
+    description: Current regional manager grouping for rental operations.
   regional_deprecated:
     lineage:
       - datalake_gsheets_raw.aux_regiao.regional_deprecated
+    description: Former regional grouping kept for historical comparisons.
   regional_inspection:
     lineage:
       - datalake_gsheets_raw.aux_regiao.regional_inspection
+    description: Regional grouping applied to inspection workflows.
   tier:
     lineage:
       - datalake_gsheets_raw.aux_regiao.tier
+    description: City tier classification used to prioritize rental market strategy.

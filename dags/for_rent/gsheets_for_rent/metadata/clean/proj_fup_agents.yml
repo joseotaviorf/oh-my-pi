@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: proj_fup_agents
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 description: |
   Projection of the FUP Agents historical Google Sheet into the clean layer for
   reporting and analysis. Provides visitor, house, owner, offer and agent identifiers,
