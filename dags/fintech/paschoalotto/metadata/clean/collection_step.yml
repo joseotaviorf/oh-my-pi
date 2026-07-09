@@ -1,20 +1,20 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: collection_step
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Customer billing stage
 columns:
   id_collection_step:
-    description: ""
+    description: Identifier for the collection step referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbetapa.id_cbetapa_int
   id_user:
-    description: ""
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_paschoalotto_raw.cbetapa.id_geusuario_int
   id_customer:
-    description: ""
+    description: Identifier for the customer referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbetapa.id_gecliente_int
   context:
@@ -22,11 +22,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbetapa.context
   code:
-    description: "Step code"
+    description: Financial attribute representing code on the collection_step dataset.
     lineage:
       - datalake_paschoalotto_raw.cbetapa.codigo_str
   description:
-    description: "Step description"
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
       - datalake_paschoalotto_raw.cbetapa.descricao_str
   ts_timestamp:

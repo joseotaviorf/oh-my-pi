@@ -1,28 +1,28 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: debt_payment
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Payment details in debt
+description: One row per debt payment in the Fintech clean layer, sourced from datalake_paschoalotto_clean for payments, billing, and financial operations reporting.
 columns:
   id_debt_payment:
-    description: ""
+    description: Identifier for the debt payment referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.id_cbparcelapagamento_int
   id_agreement_payment:
-    description: ""
+    description: Identifier for the agreement payment referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.id_cbpagamento_int
   id_debt:
-    description: ""
+    description: Identifier for the debt referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.id_cbparcela_int
   id_user:
-    description: ""
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.id_geusuario_int
   main_amount:
-    description: "Main amount"
+    description: Financial attribute representing main amount on the debt_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.principal_num
   context:
@@ -30,27 +30,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.context
   cp:
-    description: ""
+    description: Financial attribute representing cp on the debt_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.cp_num
   fine_amount:
-    description: "Fine amount"
+    description: Financial attribute representing fine amount on the debt_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.multa_num
-  notification:
-    description: "Notification"
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelapagamento.notificacao_num
-  bank_expense:
-    description: "Bank Expense"
-    lineage:
-      - datalake_paschoalotto_raw.cbparcelapagamento.despesa_banco_num
   discount_amount:
-    description: "Discount amount"
+    description: Financial attribute representing discount amount on the debt_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.desconto_num
   main_discount:
-    description: ""
+    description: Financial attribute representing main discount on the debt_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.desconto_principal_num
   is_write_off:
@@ -66,7 +58,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.honorarios_num
   has_commissioning:
-    description: "Commissioning"
+    description: Indicates whether commissioning applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.comissionamento_num
   total_amount:
@@ -74,15 +66,15 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.valor_total_num
   retained:
-    description: ""
+    description: Financial attribute representing retained on the debt_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.retido_num
   addition:
-    description: ""
+    description: Financial attribute representing addition on the debt_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.acrescimo_num
   addition_np:
-    description: ""
+    description: Financial attribute representing addition np on the debt_payment dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelapagamento.acrescimo_np_num
   dt_due:
@@ -103,3 +95,9 @@ columns:
       - datalake_paschoalotto_raw.cbparcelapagamento.tstamp
   ts_load:
     description: "Timestamp of ingestion"
+  has_notification:
+    description: Indicates whether notification applies to this financial record.
+    lineage: []
+  has_bank_expense:
+    description: Indicates whether bank expense applies to this financial record.
+    lineage: []

@@ -1,36 +1,36 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: followup
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Data from the last contact with the customer (or attempted contact)
 columns:
   id_followup:
-    description: "Table sequence/ID"
+    description: Identifier for the followup referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_cbfollowup_int
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_cbcontrato_int
   id_debt:
-    description: "Debt ID"
+    description: Identifier for the debt referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_cbparcela_int
   id_collection_history:
-    description: "Collection History ID"
+    description: Identifier for the collection history referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_cbsitcontato_int
   id_contact:
-    description: "Contact ID"
+    description: Identifier for the contact referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_geqlcontato_int
   id_user:
-    description: "User ID"
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_geusuario_int
   id_deliquency_reason:
-    description: "Deliquency reason ID"
+    description: Identifier for the deliquency reason referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.id_gemotivoinadimplencia_int
   context:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.historico_str
   contact_type:
-    description: "Contact type"
+    description: Financial attribute representing contact type on the followup dataset.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.tipo_contato_str
   is_sent_to_api:
@@ -58,23 +58,23 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.alterado_str
   status_record:
-    description: "Record status"
+    description: Financial attribute representing status record on the followup dataset.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.status_registro_str
   call_key:
-    description: "Call key"
+    description: Financial attribute representing call key on the followup dataset.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.call_key_str
   instance:
-    description: "Instantiation"
+    description: Financial attribute representing instance on the followup dataset.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.instancia_str
   call_duration:
-    description: "Call duration"
+    description: Financial attribute representing call duration on the followup dataset.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.tempo_ligacao_tim
   dt_event:
-    description: "Event date"
+    description: Calendar date associated with event in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.data_evento_dat
   dt_followup:
@@ -86,19 +86,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.data_stand_by_dat
   dt_collection:
-    description: "Collection date"
+    description: Calendar date associated with collection in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.data_cobranca_dat
   ts_collection_start:
-    description: "Collection start time"
+    description: Timestamp when collection start occurred in the upstream fintech system.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.cobranca_inicio_tim
   ts_collection_end:
-    description: "Collection end time"
+    description: Timestamp when collection end occurred in the upstream fintech system.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.cobranca_final_tim
   ts_collection_hour:
-    description: "Collection hour"
+    description: Timestamp when collection hour occurred in the upstream fintech system.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.hora_cobranca_tim
   ts_hour:
@@ -114,7 +114,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.tstamp_mdm_inclusao
   ts_update:
-    description: "Record update"
+    description: Timestamp when update occurred in the upstream fintech system.
     lineage:
       - datalake_paschoalotto_raw.cbfollowup.tstamp_mdm_alteracao
   ts_load:

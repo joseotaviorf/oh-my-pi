@@ -1,28 +1,28 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: contract
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: General customer data
 columns:
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.id_cbcontrato_int
   id_product:
-    description: ""
+    description: Identifier for the product referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.id_cbtiponegocio_int
   id_user:
-    description: ""
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.id_geusuario_int
   id_customer_history:
-    description: ""
+    description: Identifier for the customer history referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.id_cbsituacaocontrato_int
   id_collection_step:
-    description: ""
+    description: Identifier for the collection step referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.id_cbetapa_int
   context:
@@ -42,11 +42,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.cpf_str
   address:
-    description: "Customer address"
+    description: Financial attribute representing address on the contract dataset.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.endereco_str
   additional_address:
-    description: "Address complement"
+    description: Financial attribute representing additional address on the contract dataset.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.complemento_str
   neighborhood:
@@ -54,7 +54,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.bairro_str
   zip_code:
-    description: "ZIP code"
+    description: Financial attribute representing zip code on the contract dataset.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.cep_str
   city:
@@ -66,7 +66,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.estado_str
   telephone:
-    description: "Telephone number"
+    description: Financial attribute representing telephone on the contract dataset.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.telefone_str
   marital_status:
@@ -78,7 +78,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.observacao_str
   email:
-    description: "Customer email"
+    description: Financial attribute representing email on the contract dataset.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.email_str
   is_customer_located:
@@ -90,7 +90,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.data_stand_by_dat
   dt_contact:
-    description: "Contract date"
+    description: Calendar date associated with contact in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbcontrato.data_contato_dat
   dt_first_distribution:

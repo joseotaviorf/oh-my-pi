@@ -1,24 +1,24 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: contact
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Type of contact made with the customer
 columns:
   id_contact:
-    description: "Table sequence/ID"
+    description: Identifier for the contact referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geqlcontato_int
   id_customer:
-    description: ""
+    description: Identifier for the customer referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geqlcliente_int
   id_address:
-    description: ""
+    description: Identifier for the address referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geqlendereco_int
   id_customer_map_keys:
-    description: ""
+    description: Identifier for the customer map keys referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geqlcontrato_int
   id_user:
@@ -26,15 +26,15 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geusuario_int
   id_geqltipocontato:
-    description: ""
+    description: Identifier for the geqltipocontato referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geqltipocontato_int
   id_cemiterio:
-    description: "Cemetery ID"
+    description: Identifier for the cemiterio referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_cemiterio_int
   id_geusuario_inclusao:
-    description: ""
+    description: Identifier for the geusuario inclusao referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.id_geusuario_inclusao_int
   context:
@@ -46,27 +46,27 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.contato_str
   phone_classification:
-    description: "Phone classification"
+    description: Financial attribute representing phone classification on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.classificacao_str
   origin_table:
-    description: "Phone origin table"
+    description: Financial attribute representing origin table on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.tabela_origem_str
   note:
-    description: "Observation/note"
+    description: Financial attribute representing note on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.observacao_str
   contact_name:
-    description: "Contact name"
+    description: Financial attribute representing contact name on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.nome_contato_str
   cpf:
-    description: "Customer CPF"
+    description: Brazilian individual taxpayer registry number (CPF) used for identity verification (PII).
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.cpf_str
   rg:
-    description: "Customer RG"
+    description: Financial attribute representing rg on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.rg_str
   is_deleted:
@@ -74,15 +74,15 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.excluido_bit
   old_contact:
-    description: "Old or obsolete contact"
+    description: Financial attribute representing old contact on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.contato_antigo_str
   score:
-    description: "Phone score"
+    description: Financial attribute representing score on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.score
   score_lemit:
-    description: "Lemit score"
+    description: Financial attribute representing score lemit on the contact dataset.
     categories:
       "0": " "
       "1": " "
@@ -93,7 +93,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.score_lemit_int
   person_type:
-    description: "person type"
+    description: Financial attribute representing person type on the contact dataset.
     categories:
       AVALISTA: ""
       DEVEDOR: ""
@@ -108,11 +108,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.whatsapp_str
   holiday_lock:
-    description: ""
+    description: Financial attribute representing holiday lock on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.trava_feriado_str
   reason:
-    description: "Reason"
+    description: Financial attribute representing reason on the contact dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.motivo_str
   is_pagoufacil:
@@ -120,7 +120,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.contatopagoufacil_bit
   ranking_lemit:
-    description: "Lemit ranking"
+    description: Financial attribute representing ranking lemit on the contact dataset.
     categories:
       "1": ""
       "2": ""
@@ -140,15 +140,15 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.obs_inibicao_tel_suspeito_str
   dt_score:
-    description: "Score date"
+    description: Calendar date associated with score in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.data_score_dat
   dt_score_update:
-    description: "Score update date"
+    description: Calendar date associated with score update in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.data_alteracao_score_dat
   dt_ranking_update:
-    description: "Ranking update date"
+    description: Calendar date associated with ranking update in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.geqlcontato.data_alteracao_ranking_dat
   ts_sent:

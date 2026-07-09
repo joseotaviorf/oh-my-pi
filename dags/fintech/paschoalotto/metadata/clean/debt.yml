@@ -1,28 +1,28 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: debt
-owner: bianca.martins@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: General customer debt data
 columns:
   id_debt:
-    description: "Table sequence/ID"
+    description: Identifier for the debt referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.id_cbparcela_int
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.id_cbcontrato_int
   id_user:
-    description: "Contract ID"
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.id_geusuario_int
   id_esregua:
-    description: "Contract ID"
+    description: Identifier for the esregua referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.id_esregua_int
   id:
-    description: "Contract ID"
+    description: Financial attribute representing id on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.id_str
   context:
@@ -30,132 +30,132 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcela.context
   installment:
-    description: ""
+    description: Financial attribute representing installment on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.parcela_int
   installment_status:
-    description: "Installment status"
+    description: Financial attribute representing installment status on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.situacao_int
   installment_status_note:
-    description: "Note on installment status"
+    description: Financial attribute representing installment status note on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.observacao_str
   id_invoice_seubarriga:
-    description: "SeuBarriga ID Invoice"
+    description: Identifier for the invoice seubarriga referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.numero_unico_str
   id_contract_quintoandar:
-    description: "QuintoAndar Contract"
+    description: Identifier for the contract quintoandar referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.quintoandar_des_contr_str
   type:
-    description: ""
+    description: Financial attribute representing type on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.tipo_str
   cpf:
-    description: "cpf"
+    description: Brazilian individual taxpayer registry number (CPF) used for identity verification (PII).
     lineage:
       - datalake_paschoalotto_raw.cbparcela.es_des_regis_str
   contract:
-    description: ""
+    description: Financial attribute representing contract on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.contrato_int
   contract_rao:
-    description: ""
+    description: Financial attribute representing contract rao on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.contrato_rao_str
   index:
-    description: ""
+    description: Financial attribute representing index on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.desc_indice_str
   changed:
-    description: ""
+    description: Financial attribute representing changed on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.alterado_edi_str
   reference:
-    description: ""
+    description: Financial attribute representing reference on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.referencia_str
   status_record:
-    description: ""
+    description: Financial attribute representing status record on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.status_registro_str
   manual:
-    description: ""
+    description: Financial attribute representing manual on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.manual_str
   product:
-    description: ""
+    description: Financial attribute representing product on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.produto_int
   product_name:
-    description: ""
+    description: Financial attribute representing product name on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.nome_produto_str
   modality:
-    description: ""
+    description: Financial attribute representing modality on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.modalidade_int
   agency:
-    description: ""
+    description: Financial attribute representing agency on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.agencia_int
   mci:
-    description: ""
+    description: Financial attribute representing mci on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.mci_int
   bearer_name:
-    description: ""
+    description: Financial attribute representing bearer name on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.nome_portador_str
   card_cycle:
-    description: ""
+    description: Financial attribute representing card cycle on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.ciclo_cartao_str
   card_age:
-    description: ""
+    description: Financial attribute representing card age on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.ciclo_cartao_str
   status_cacs:
-    description: ""
+    description: Financial attribute representing status cacs on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.situacao_cacs_str
   delay_cycle:
-    description: ""
+    description: Financial attribute representing delay cycle on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.ciclo_atraso_str
       - datalake_paschoalotto_raw.cbparcela.ciclo_atraso_int
   notified:
-    description: ""
+    description: Financial attribute representing notified on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.notificado_str
   invoice:
-    description: ""
+    description: Financial attribute representing invoice on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.nota_fiscal_str
   attribution:
-    description: ""
+    description: Financial attribute representing attribution on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.atribuicao_str
   segment:
-    description: ""
+    description: Financial attribute representing segment on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.segmento_str
   beat:
-    description: ""
+    description: Financial attribute representing beat on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.batimento_str
   accounting_text:
-    description: ""
+    description: Financial attribute representing accounting text on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.texto_contabil_str
   system:
-    description: ""
+    description: Financial attribute representing system on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.sistema_str
   payment_format:
-    description: ""
+    description: Financial attribute representing payment format on the debt dataset.
     categories:
       Boleto Bancario: ""
       Cartao de Credito: ""
@@ -163,135 +163,135 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcela.forma_pagamento_str
   our_number:
-    description: "Our number"
+    description: Financial attribute representing our number on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.nosso_numero_int
   velo_real_estate:
-    description: ""
+    description: Financial attribute representing velo real estate on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_imobiliaria_str
   velo_contracts:
-    description: ""
+    description: Financial attribute representing velo contracts on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_contratos_str
   velo_person_type:
-    description: ""
+    description: Financial attribute representing velo person type on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_pf_str
   delay_days:
-    description: "Delay days"
+    description: Financial attribute representing delay days on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.dias_atraso_int
   corrected_amount:
-    description: ""
+    description: Financial attribute representing corrected amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.es_valor_corrigido_num
   charges_amount:
-    description: ""
+    description: Financial attribute representing charges amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.es_valor_encargos_num
   minimum_amount:
-    description: ""
+    description: Financial attribute representing minimum amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.es_valor_minimo_num
   main_amount:
-    description: "Main amount"
+    description: Financial attribute representing main amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_principal_num
   paid_amount:
-    description: "Amount paid"
+    description: Financial attribute representing paid amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_pago_num
   total_debt_amount:
-    description: ""
+    description: Financial attribute representing total debt amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.vlr_devedor_total_num
   debt_balance:
-    description: ""
+    description: Financial attribute representing debt balance on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.saldo_devedor_num
   debt_amount:
-    description: ""
+    description: Financial attribute representing debt amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_devedor_num
   expired_amount:
-    description: ""
+    description: Financial attribute representing expired amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.vencidop_num
   fine_amount:
-    description: "Fine amount"
+    description: Financial attribute representing fine amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_multa_num
   fine_settlement_amount:
-    description: ""
+    description: Financial attribute representing fine settlement amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_multa_quitacao_num
   commission_amount:
-    description: "Commission amount"
+    description: Financial attribute representing commission amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_comissao_perm_num
   currency_amount:
-    description: ""
+    description: Financial attribute representing currency amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.qtd_moeda_num
   currency_index:
-    description: ""
+    description: Financial attribute representing currency index on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.indice_moeda_num
   fare_charge:
-    description: ""
+    description: Financial attribute representing fare charge on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.tarifa_cobranca_num
   cp_installment:
-    description: ""
+    description: Financial attribute representing cp installment on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.cp_parcela_num
   limit_amount:
-    description: ""
+    description: Financial attribute representing limit amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_limite_num
   spent_amount:
-    description: ""
+    description: Financial attribute representing spent amount on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.valor_gastos_num
   last_payment:
-    description: ""
+    description: Financial attribute representing last payment on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.ultimo_pagamento_num
   max_balance:
-    description: ""
+    description: Financial attribute representing max balance on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.saldo_maximo_num
   min_balance:
-    description: ""
+    description: Financial attribute representing min balance on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.saldo_minimo_num
   velo_rentals:
-    description: ""
+    description: Financial attribute representing velo rentals on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_alugueis_num
   velo_damage:
-    description: ""
+    description: Financial attribute representing velo damage on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_danos_num
   velo_rescission:
-    description: ""
+    description: Financial attribute representing velo rescission on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_rescisao_num
   velo_condominium:
-    description: ""
+    description: Financial attribute representing velo condominium on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_condominio_num
   velo_signature:
-    description: ""
+    description: Financial attribute representing velo signature on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_assinatura_num
   velo_fine:
-    description: ""
+    description: Financial attribute representing velo fine on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_multa_num
   velo_fees:
-    description: ""
+    description: Financial attribute representing velo fees on the debt dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.velo_juros_num
   dt_due:
@@ -299,7 +299,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_vencimento_dat
   dt_payment:
-    description: "Payment day"
+    description: Calendar date associated with payment in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_pagamento_dat
   dt_first_contract_distribution:
@@ -311,59 +311,59 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_ultima_distrib_dat
   dt_deadline_return:
-    description: ""
+    description: Calendar date associated with deadline return in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_limite_retorno_dat
   dt_performance:
-    description: ""
+    description: Calendar date associated with performance in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_performance_dat
   dt_riscocl:
-    description: ""
+    description: Calendar date associated with riscocl in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_riscocl_dat
   dt_entry:
-    description: ""
+    description: Calendar date associated with entry in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_entrada_ca_dat
   dt_frozen:
-    description: ""
+    description: Calendar date associated with frozen in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_congelada_dat
   dt_last_invoice:
-    description: ""
+    description: Calendar date associated with last invoice in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_ultima_fatura_dat
   dt_conventional_calculation:
-    description: ""
+    description: Calendar date associated with conventional calculation in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.calculo_convencionais_dat
   dt_status:
-    description: ""
+    description: Calendar date associated with status in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_status_dat
   dt_expiration:
-    description: ""
+    description: Calendar date associated with expiration in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_validade_dat
   dt_last_payment:
-    description: ""
+    description: Calendar date associated with last payment in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.ultimo_pagamento_dat
   dt_closing:
-    description: ""
+    description: Calendar date associated with closing in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_fechamento_dat
   dt_max_balance:
-    description: ""
+    description: Calendar date associated with max balance in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_saldo_maximo_dat
   dt_min_balance:
-    description: ""
+    description: Calendar date associated with min balance in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.data_saldo_minimo_dat
   dt_emission:
-    description: ""
+    description: Calendar date associated with emission in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcela.emissao_dat
   ts_insert:
@@ -392,3 +392,6 @@ columns:
     description: "Day based on the date the file was made available"
     lineage:
       - datalake_paschoalotto_raw.cbparcela.day
+  dt_velo_inclusion:
+    description: Calendar date associated with velo inclusion in the financial workflow.
+    lineage: []

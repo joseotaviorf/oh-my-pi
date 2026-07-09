@@ -1,20 +1,20 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: customer_map_keys
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Key to relationship with Customer contact data
 columns:
   id_customer_map_keys:
-    description: ""
+    description: Identifier for the customer map keys referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontrato.id_geqlcontrato_int
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_paschoalotto_raw.geqlcontrato.id_cbcontrato_int
   id_product:
-    description: ""
+    description: Identifier for the product referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlcontrato.id_cbtiponegocio_int
   context:
@@ -22,12 +22,15 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.geqlcontrato.context
   contract:
-    description: ""
+    description: Financial attribute representing contract on the customer_map_keys dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlcontrato.contrato_str
   ts_timestamp:
-    description: ""
+    description: Timestamp when timestamp occurred in the upstream fintech system.
     lineage:
       - datalake_paschoalotto_raw.geqlcontrato.tstamp
   ts_load:
     description: "Timestamp of ingestion"
+  id_customer:
+    description: Identifier for the customer referenced by this financial record.
+    lineage: []

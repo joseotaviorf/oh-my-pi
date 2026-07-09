@@ -1,12 +1,12 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: negotiation
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Negotiation/Bordereau data
 columns:
   id_negotiation:
-    description: "Table sequence/ID"
+    description: Identifier for the negotiation referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_cbbordero_int
   id_product:
@@ -23,15 +23,15 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_geusuario_int
   id_geempresa:
-    description: ""
+    description: Identifier for the geempresa referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_geempresa_int
   id_geusuario_execut:
-    description: ""
+    description: Identifier for the geusuario execut referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_geusuario_execut_int
   bordereau:
-    description: "bordereau number"
+    description: Financial attribute representing bordereau on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.bordero_int
   context:
@@ -63,19 +63,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbbordero.id_cbconvenio_int
   items:
-    description: ""
+    description: Financial attribute representing items on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.itens_int
   status:
-    description: "status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.situacao_int
   file:
-    description: ""
+    description: Financial attribute representing file on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.arquivo_str
   portfolio:
-    description: ""
+    description: Financial attribute representing portfolio on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.carteira_int
   bill_creation:
@@ -83,19 +83,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbbordero.gerado_str
   is_followup:
-    description: ""
+    description: Indicates whether followup applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.followup_str
   letter_template:
-    description: ""
+    description: Financial attribute representing letter template on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.modelo_carta_int
   our_number_type:
-    description: ""
+    description: Financial attribute representing our number type on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.tipo_nosso_numero_int
   repeat_contract:
-    description: ""
+    description: Financial attribute representing repeat contract on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.repete_contrato_str
   is_settlement:
@@ -103,36 +103,36 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbbordero.quitacao_str
   bordereau_type:
-    description: "Bordereau type"
+    description: Financial attribute representing bordereau type on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.tipo_bordero_str
   origin:
-    description: ""
+    description: Financial attribute representing origin on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.origem_str
   payment_type_recupera:
-    description: ""
+    description: Financial attribute representing payment type recupera on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.forma_pagamento_api_recupera_str
   card_link:
-    description: ""
+    description: Financial attribute representing card link on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.link_cartao_api_recupera_str
   calculation:
-    description: ""
+    description: Financial attribute representing calculation on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.seq_calculo
   agreement_number_ws:
-    description: ""
+    description: Financial attribute representing agreement number ws on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.numero_acordo_ws_int
       - datalake_paschoalotto_raw.cbbordero.numero_acordo_ws_str
   total_amount:
-    description: "Total amount"
+    description: Financial attribute representing total amount on the negotiation dataset.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.total_num
   dt_bordereau:
-    description: "Bordereau date"
+    description: Calendar date associated with bordereau in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbbordero.data_dat
   ts_tstamp:

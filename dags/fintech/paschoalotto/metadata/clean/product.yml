@@ -1,12 +1,12 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: product
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Customer product specification
 columns:
   id_product:
-    description: ""
+    description: Identifier for the product referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.id_cbtiponegocio_int
   code:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.inclusao_despesa_str
   description_npjur:
-    description: ""
+    description: Financial attribute representing description npjur on the product dataset.
     categories:
       "0": "Consórcio"
       "1": "Crédito Pessoal"
@@ -56,31 +56,27 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.cgc_str
   zip_code:
-    description: "Customer zip code"
+    description: Financial attribute representing zip code on the product dataset.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.cep_str
   address_complement:
-    description: "Address complement"
+    description: Financial attribute representing address complement on the product dataset.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.endereco1_str
   address:
-    description: "Address"
+    description: Financial attribute representing address on the product dataset.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.endereco2_str
   state:
-    description: "State of the City"
+    description: Financial attribute representing state on the product dataset.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.neg_uf_str
   neighborhood:
-    description: "Neighborhood"
+    description: Financial attribute representing neighborhood on the product dataset.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.neg_bairro_str
-  npjur_id_jupessoa:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.cbtiponegocio.npjur_id_jupessoa
   annual_interest_rate:
-    description: "Annual interest rate"
+    description: Financial attribute representing annual interest rate on the product dataset.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.taxa_ano_str
   days_for_payment:
@@ -92,11 +88,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.parcelas_num
   fine_amount:
-    description: "Fine amount"
+    description: Financial attribute representing fine amount on the product dataset.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.valor_mora_num
   amount_cp:
-    description: ""
+    description: Financial attribute representing amount cp on the product dataset.
     lineage:
       - datalake_paschoalotto_raw.cbtiponegocio.valor_cp_num
   ts_timestamp:
@@ -105,3 +101,6 @@ columns:
       - datalake_paschoalotto_raw.cbtiponegocio.tstamp
   ts_load:
     description: "Timestamp of ingestion"
+  id_npjur:
+    description: Identifier for the npjur referenced by this financial record.
+    lineage: []

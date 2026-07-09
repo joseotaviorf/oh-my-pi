@@ -1,24 +1,24 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: email
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Contact e-mail
 columns:
   id_email:
-    description: ""
+    description: Identifier for the email referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlemail.id_geqlemail_int
   id_customer:
-    description: ""
+    description: Identifier for the customer referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.geqlemail.id_geqlcliente_int
   email:
-    description: "Email"
+    description: Financial attribute representing email on the email dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlemail.email_str
   classification:
-    description: "Email quality"
+    description: Financial attribute representing classification on the email dataset.
     lineage:
       - datalake_paschoalotto_raw.geqlemail.classificacao_str
   context:

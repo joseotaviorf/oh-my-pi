@@ -1,24 +1,24 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: debt_negotiation_details
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Negotiation detail in debt view
 columns:
   id_debt_negotiation_details:
-    description: "Table sequence/ID"
+    description: Identifier for the debt negotiation details referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbparcelaitembordero_int
   id_user:
-    description: ""
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.id_geusuario_int
   id_agreement_detail:
-    description: ""
+    description: Identifier for the agreement detail referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbitembordero_int
   id_debt:
-    description: ""
+    description: Identifier for the debt referenced by this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.id_cbparcela_int
   context:
@@ -26,11 +26,11 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.context
   is_selected:
-    description: ""
+    description: Indicates whether selected applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.selecionado_int
   has_notification:
-    description: "Notification"
+    description: Indicates whether notification applies to this financial record.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.notificacao_num
   has_bank_expense:
@@ -50,19 +50,19 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.comissionamento_num
   main_amount:
-    description: "Main amount"
+    description: Financial attribute representing main amount on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.principal_num
   cp:
-    description: ""
+    description: Financial attribute representing cp on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.cp_num
   fine_amount:
-    description: "Fine amount"
+    description: Financial attribute representing fine amount on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.multa_num
   discount_amount:
-    description: "Discount amoun"
+    description: Financial attribute representing discount amount on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.desconto_num
   default_interest:
@@ -75,31 +75,31 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.valor_total_num
   retained:
-    description: ""
+    description: Financial attribute representing retained on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.retido_num
   addition:
-    description: ""
+    description: Financial attribute representing addition on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.acrescimo_num
   addition_np:
-    description: ""
+    description: Financial attribute representing addition np on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.acrescimo_np_num
   installment_amount:
-    description: "Installment amount"
+    description: Financial attribute representing installment amount on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.valor_parcela_num
   discount_percentage:
-    description: "Discount percentage"
+    description: Financial attribute representing discount percentage on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.percentual_desconto_num
   cp_original_amount:
-    description: ""
+    description: Financial attribute representing cp original amount on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.cp_original_num
   original_discount:
-    description: ""
+    description: Financial attribute representing original discount on the debt_negotiation_details dataset.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.desconto_original_num
   dt_due:
@@ -107,7 +107,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.data_vencimento_dat
   dt_file:
-    description: ""
+    description: Calendar date associated with file in the financial workflow.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.data_arquivo_dat
   ts_insert:
@@ -119,7 +119,7 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.tstamp_mdm_alteracao
   ts_timestamp:
-    description: ""
+    description: Timestamp when timestamp occurred in the upstream fintech system.
     lineage:
       - datalake_paschoalotto_raw.cbparcelaitembordero.timestamp
   ts_load:
