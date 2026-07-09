@@ -18,17 +18,31 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   tables_customization:
-    account: {}
-    address: {}
-    business_partner: {}
-    card_code: {}
-    consolidated_invoice: {}
-    feature: {}
-    invoice: {}
-    operation: {}
-    person: {}
-    rule_account_type: {}
-    rule_modifier: {}
-    rule: {}
-    sync_sap_job: {}
-    webhook_log: {}
+    account:
+      run_optimize: false
+    address:
+      run_optimize: false
+    business_partner:
+      run_optimize: false
+    card_code:
+      run_optimize: false
+    consolidated_invoice:
+      run_optimize: false
+    feature:
+      run_optimize: false
+    invoice:
+      run_optimize: false
+    operation:
+      run_optimize: false
+    person:
+      run_optimize: false
+    rule_account_type:
+      run_optimize: false
+    rule_modifier:
+      run_optimize: false
+    rule:
+      run_optimize: false
+    sync_sap_job:
+      run_optimize: false
+    webhook_log:
+      run_optimize: false
