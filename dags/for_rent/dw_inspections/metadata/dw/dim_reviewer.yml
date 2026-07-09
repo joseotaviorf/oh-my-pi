@@ -4,7 +4,7 @@ table_name: dim_reviewer
 description: Data referring to the reviewers of the inspection report.
   Each row is a unique item, identified by the sk_reviewer column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_reviewer:
     description: Review unique identifier (number)
@@ -17,7 +17,7 @@ columns:
   reviewer_type:
     lineage:
       - datalake_inspections.reviewer.reviewer_type
-    description: The types of reviewers.
+    description: The types of reviewers captured in the source operational system.
     categories:
       OWNER: Owner of the property.
       TENANT: Tenant of the property.
@@ -26,17 +26,21 @@ columns:
     description: This date refers to the creation of the reviewer.
     lineage:
       - datalake_inspections.reviewer.ts_created
+  ts_updated:
+    description: Timestamp of the most recent update to the reviewer record in the source system.
+    lineage:
+      - datalake_inspections.reviewer.ts_updated
   ts_load:
     description: Date and time when the data was loaded.
   year:
-    description: Year of create date.
+    description: Year of update date captured in the source operational system.
     lineage:
-      - datalake_inspections.reviewer.ts_created
+      - datalake_inspections.reviewer.ts_updated
   month:
-    description: Month of create date.
+    description: Month of update date captured in the source operational system.
     lineage:
-      - datalake_inspections.reviewer.ts_created
+      - datalake_inspections.reviewer.ts_updated
   day:
-    description: Day of create date.
+    description: Day of update date captured in the source operational system.
     lineage:
-      - datalake_inspections.reviewer.ts_created
+      - datalake_inspections.reviewer.ts_updated

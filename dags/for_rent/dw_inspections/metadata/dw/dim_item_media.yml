@@ -1,12 +1,12 @@
 ---
 database_name: dw_inspections
 table_name: dim_item_media
-description:
+description: |
   This dimension table carries data from photos and videos (media) generated during inspection,
   by the inspector, both those generated during the review, by the tenant and owner.
   Each row is a unique media, identified by the sk_item_media column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_item_media:
     description: Item Media unique identifier.
@@ -29,12 +29,12 @@ columns:
       - datalake_inspections.item_media.media_path
       - datalake_inspections.item_review.media_path
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item_media.ts_created
       - datalake_inspections.item_review.ts_media_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item_media.ts_updated
       - datalake_inspections.item_review.ts_media_updated

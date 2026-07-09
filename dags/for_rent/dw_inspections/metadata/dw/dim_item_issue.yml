@@ -1,13 +1,13 @@
 ---
 database_name: dw_inspections
 table_name: dim_item_issue
-description:
+description: |
   This dimension provides information on the problems or sub-problems linked to the condition of an evaluated item.
   Here we find what type of problem was found, what was the comment, tag or checklist marked by the surveyor and the
   suggestion for repairing the problem.
   Each row is a unique issue, identified by the sk_item_issue column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_item_issue:
     description: Item Issue unique identifier.
@@ -35,17 +35,15 @@ columns:
     lineage:
       - datalake_inspectionss.item_issue.issue_comment
   repair_suggestion:
-    description:
-      This column would keep repair suggestions for presentation in the report,
-      but this functionality was not integrated.
+    description: "This column would keep repair suggestions for presentation in the report, but this functionality was not integrated."
     lineage:
       - datalake_inspectionss.item_issue.repair_suggestion
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspectionss.item_issue.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspectionss.item_issue.ts_updated
   ts_load:

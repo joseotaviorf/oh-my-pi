@@ -1,15 +1,15 @@
 ---
 database_name: dw_inspections
 table_name: dim_room
-description:
+description: |
   This dimension refers to the descriptive data of the inspected room, such as the name and type of room.
   Although simple, this table supports analysis with granular fact_item data.
   Each row is a unique room, identified by the sk_room column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_room:
-    description: Room unique identifier.
+    description: Room unique identifier captured in the source operational system.
     lineage:
       - datalake_inspections.room.id_room
   room_name:
@@ -21,11 +21,11 @@ columns:
     lineage:
       - datalake_inspections.room.room_type
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspections.room.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspections.room.ts_updated
   ts_load:

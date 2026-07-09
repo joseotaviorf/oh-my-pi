@@ -5,7 +5,7 @@ description: |
   Dimension table that creates a combination of descriptive data about the appointment context.
   Each row in this table is a combination of descriptive appointment data.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_appointment_component:
     description: Unique identification key for the combination of descriptive data.
@@ -21,13 +21,11 @@ columns:
     lineage:
       - datalake_inspections.appointment_inspection.type
   status:
-    description: Appointment status.
+    description: Appointment status captured in the source operational system.
     lineage:
       - datalake_inspections.appointment_inspection.status
   status_made_by:
-    description: |
-      Descriptive information indicating who was responsible for the status,
-      in the case of cancellation, for example, it would be who carried out the cancellation.
+    description: "Descriptive information indicating who was responsible for the status, in the case of cancellation, for example, it would be who carried out the cancellation."
     lineage:
       - datalake_inspections.appointment_inspection.status_made_by
   status_description:

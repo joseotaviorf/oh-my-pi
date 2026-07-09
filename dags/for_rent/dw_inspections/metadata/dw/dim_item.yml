@@ -1,23 +1,23 @@
 ---
 database_name: dw_inspections
 table_name: dim_item
-description:
+description: |
   This dimension brings the characterization of the inspected item, such as its type, status and the inspector's
   comments regarding the conditions in which this item was found.
   Each row is a unique item, identified by the sk_item column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_item:
-    description: Item unique identifier.
+    description: Item unique identifier captured in the source operational system.
     lineage:
       - datalake_inspections.item.id_item
   item_type:
-    description: Item problem name.
+    description: Item problem name captured in the source operational system.
     lineage:
       - datalake_inspections.item.item_type
   item_media_type:
-    description: Supported media type.
+    description: Supported media type captured in the source operational system.
     categories:
       PHOTO: images
     lineage:
@@ -27,11 +27,11 @@ columns:
     lineage:
       - datalake_inspections.item.comment
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item.ts_updated
   ts_load:

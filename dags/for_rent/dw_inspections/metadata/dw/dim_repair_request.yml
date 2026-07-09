@@ -3,7 +3,7 @@ database_name: dw_inspections
 table_name: dim_repair_request
 description: Dimension describing each repair request at its most recent state (one row per repair request, deduplicated by ts_updated), including type, cost, responsibility, service, and the item/room it refers to.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_repair_request:
     lineage:
@@ -12,7 +12,7 @@ columns:
   type:
     lineage:
       - datalake_inspections.repair_request.type
-    description: Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories).
+    description: "Type of action requested in the repair request, indicating whether the item should be repaired, cleaned, removed, replaced, or another action (see categories)."
     categories:
       REPAIR: Make item repair.
       CLEAN: Clean the item.
@@ -50,7 +50,7 @@ columns:
   ts_created:
     lineage:
       - datalake_inspections.repair_request.ts_created
-    description: Creation date
+    description: Creation date captured in the source operational system.
   ts_updated:
     lineage:
       - datalake_inspections.repair_request.ts_updated
@@ -60,12 +60,12 @@ columns:
   year:
     lineage:
       - datalake_inspections.repair_request.year
-    description: Year of update date.
+    description: Year of update date captured in the source operational system.
   month:
     lineage:
       - datalake_inspections.repair_request.month
-    description: Month of update date.
+    description: Month of update date captured in the source operational system.
   day:
     lineage:
       - datalake_inspections.repair_request.day
-    description: Day of update date.
+    description: Day of update date captured in the source operational system.

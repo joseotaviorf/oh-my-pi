@@ -1,19 +1,19 @@
 ---
 database_name: dw_inspections
 table_name: dim_item_review
-description:
+description: |
   This dimension brings reviews performed by tenants and/or landlords for an inspection.
   Here we find the user's comment with his review and the type of user who created the review.
   Each row is a unique review, identified by the sk_item_review column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_item_review:
     description: Review unique identifier.
     lineage:
       - datalake_inspections.item_review.id_review
   sk_item:
-    description: Item unique identifier.
+    description: Item unique identifier captured in the source operational system.
     lineage:
       - datalake_inspections.item_review.id_item
   review_comment:
@@ -25,11 +25,11 @@ columns:
     lineage:
       - datalake_inspections.item_review.user_type
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item_review.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item_review.ts_updated
   ts_load:

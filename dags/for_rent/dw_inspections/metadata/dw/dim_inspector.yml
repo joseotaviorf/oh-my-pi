@@ -1,18 +1,18 @@
 ---
 database_name: dw_inspections
 table_name: dim_inspector
-description:
+description: |
   This dimension provides general information about the inspector responsible for inspecting the property.
   Each line is a register of an inspector, identified by the sk_inspector column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_inspector:
     description: Unique identifier of the inspector.
     lineage:
       - datalake_gsheets_clean.inspectors_control.id_inspector
   inspector_name:
-    description: Inspector's full name.
+    description: Inspector's full name captured in the source operational system.
     lineage:
       - datalake_gsheets_clean.inspectors_control.inspector_name
   inspector_email:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_gsheets_clean.inspectors_control.inspector_corporate_name
   beneficiary_name:
-    description: Beneficiary name.
+    description: Beneficiary name captured in the source operational system.
     lineage:
       - datalake_gsheets_clean.inspectors_control.beneficiary_name
   employee_contract_type:

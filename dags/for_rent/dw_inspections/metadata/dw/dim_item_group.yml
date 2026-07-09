@@ -1,13 +1,13 @@
 ---
 database_name: dw_inspections
 table_name: dim_item_group
-description:
+description: |
   This dimension refers to the inspected object, bringing descriptive data about what this object is,
   what the situation is and if there were any comments from the inspector. It's worth noting that the
   item_group refers to things like a window, door, floor, cabinets, etc.
   Each row is a unique item_group, identified by the sk_item_group column.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_item_group:
     description: Item Group unique identifier.
@@ -48,11 +48,11 @@ columns:
     lineage:
       - datalake_inspections.item_group.is_active_inferior_quality
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item_group.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspections.item_group.ts_updated
   ts_load:
