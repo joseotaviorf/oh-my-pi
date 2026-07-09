@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: item_group_specification
 description: Lookup table of possible specifications (variants) for each item group type evaluated during inspections (e.g. couch sizes, bed types, floor materials).
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_item_group_specification:
     lineage:

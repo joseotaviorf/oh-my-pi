@@ -15,16 +15,15 @@ columns:
   id_contract:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.contract_id
-    description: The contract ID.
+    description: Rental contract identifier linked to the inspection discount evaluation.
   uuid_inspection:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.inspection_uuid
-    description: The inspection UUID.
+    description: UUID of the inspection for which the discount was evaluated.
   id_checkpoint:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.checkpoint_id
-    description: |
-      The checkpoint ID identifies the customer journey step where the discount was informed/adopted.
+    description: The checkpoint ID identifies the customer journey step where the discount was informed/adopted.
     categories:
       REVIEW: Discount applied at the 1st review stage due to disagreement.
       REVIEW_COMPULSORY: Discount applied at the 1st review stage due to lack of response.
@@ -42,14 +41,11 @@ columns:
   inspection_cost:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.inspection_cost
-    description: |
-      The sum of the cost of all repairs identified, budgeted, and non-exempted in the inspection.
+    description: The sum of the cost of all repairs identified, budgeted, and non-exempted in the inspection.
   disputed_inspection_cost:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.disputed_inspection_cost
-    description: |
-      The sum of the cost of repairs identified, budgeted, non-exempted, and contested by the tenant,
-      therefore in dispute.
+    description: The sum of the cost of repairs identified, budgeted, non-exempted, and contested by the tenant, therefore in dispute.
   discount_value:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_value
@@ -93,9 +89,7 @@ columns:
   discount_reviewed_value:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_reviewed_value
-    description: |
-      The discount value after restriction evaluations calculated at persist/update time.
-      This is the final discount value.
+    description: The discount value after restriction evaluations calculated at persist/update time. This is the final discount value.
   discount_acceptance_by:
     lineage:
       - datalake_inspection_services_raw.invoice_discount.discount_acceptance_by

@@ -1,11 +1,11 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: inspection_aud
-description:
-  Inspection audit table, which is responsible for the survey scheduling process,
-  including cancellations and rescheduling, until the survey actually takes place.
+description: |
+  Inspection audit history for scheduling, cancellations, and rescheduling until the
+  survey takes place. One row per inspection state change in the inspection services platform.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_inspection:
     lineage:
@@ -14,10 +14,7 @@ columns:
   id_previous_inspection:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.previous_inspection_id
-    description:
-      If there is a previous inspection for the same contract, it will
-      be indicated in this column. It is usually completed in offboarding inspections,
-      bringing the identification of the onboarding or dispute inspection.
+    description: If there is a previous inspection for the same contract, it will be indicated in this column. It is usually completed in offboarding inspections, bringing the identification of the onboarding or dispute inspection.
   id_client_side:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.client_side_id
@@ -33,9 +30,7 @@ columns:
   id_inspector:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.inspector_id
-    description:
-      Unique identifier of the inspector responsible for carrying out the
-      inspection
+    description: Unique identifier of the inspector responsible for carrying out the inspection
   id_schedule:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.schedule_id
@@ -92,9 +87,7 @@ columns:
   is_comparative:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.comparative
-    description:
-      Field that indicates whether a previous inspection will be used as
-      a basis for comparison
+    description: Field that indicates whether a previous inspection will be used as a basis for comparison
   has_early_mediation:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.has_early_mediation
@@ -174,15 +167,11 @@ columns:
   ts_created:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.created_at
-    description:
-      Timestamp of when the inspection request was synchronized in the
-      database product
+    description: Timestamp of when the inspection request was synchronized in the database product
   ts_updated:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.updated_at
-    description:
-      Timestamp of when the inspection request was updated in the database
-      product
+    description: Timestamp of when the inspection request was updated in the database product
   year:
     lineage:
       - datalake_inspection_services_raw.inspection_aud.year

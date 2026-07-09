@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: issue_type_aud
 description: Behind the standardized subtypes of item issues that we can have within the application.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_issue_type:
     lineage:
@@ -16,25 +16,19 @@ columns:
   inspection_type:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.inspection_type
-    description: "-"
+    description: Inspection type (onboarding, offboarding, verification, or portability) this issue subtype applies to.
   repair_suggestion:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.repair_suggestion
-    description:
-      This column would keep repair suggestions for presentation in the
-      report, but this functionality was not integrated
+    description: This column would keep repair suggestions for presentation in the report, but this functionality was not integrated
   responsibility:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.responsibility
-    description:
-      This column would keep the person responsible for the damage, but
-      this functionality was not implemented
+    description: This column would keep the person responsible for the damage, but this functionality was not implemented
   severity:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.severity
-    description:
-      This column would store the degree of severity of data in the objects,
-      but this functionality was not implemented
+    description: This column would store the degree of severity of data in the objects, but this functionality was not implemented
   type:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.type
@@ -42,9 +36,7 @@ columns:
   require_manual_analysis:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.require_manual_analysis
-    description:
-      This column presents whether this year needs to undergo a manual
-      assessment
+    description: This column presents whether this issue type needs to undergo a manual assessment
   number_order:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.order
@@ -68,11 +60,11 @@ columns:
   is_enabled:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.enabled
-    description: " "
+    description: Indicates whether this issue type is enabled for use in inspections.
   is_protected:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.protected
-    description: " "
+    description: Indicates whether this issue type is protected from deletion or modification.
   is_deleted:
     lineage:
       - datalake_inspection_services_raw.issue_type_aud.deleted

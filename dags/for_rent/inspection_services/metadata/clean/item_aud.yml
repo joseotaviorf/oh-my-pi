@@ -1,11 +1,11 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: item_aud
-description:
+description: |
   The item object found in the database refers to a sub-item or sub-conditions within an item,
   for example breakdowns, humidity, door problem, etc.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_item:
     lineage:
@@ -18,10 +18,7 @@ columns:
   id_previous_item:
     lineage:
       - datalake_inspection_services_raw.item_aud.previous_item_id
-    description:
-      If there is a previous evaluation for the item in the same contract,
-      it will be indicated in this column. It is usually completed in offboarding
-      inspections, bringing information from the onboarding or dispute inspection.
+    description: If there is a previous evaluation for the item in the same contract, it will be indicated in this column. It is usually completed in offboarding inspections, bringing information from the onboarding or dispute inspection.
   id_type:
     lineage:
       - datalake_inspection_services_raw.item_aud.type_id
@@ -45,7 +42,7 @@ columns:
   status:
     lineage:
       - datalake_inspection_services_raw.item_aud.status
-    description: " "
+    description: Indicates the evaluation status of the item sub-condition during inspection.
   is_present:
     lineage:
       - datalake_inspection_services_raw.item_aud.present

@@ -1,11 +1,11 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: item_group_aud
-description:
+description: |
   This table deals with the items that were evaluated during the inspection. It is worth emphasizing
   that, when dealing with IS data, the item_group object refers to an item, such as window, door, floor, etc.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_item_group:
     lineage:
@@ -34,9 +34,7 @@ columns:
   name:
     lineage:
       - datalake_inspection_services_raw.item_group_aud.name
-    description:
-      Description of the item group, for example floor, paint, lighting,
-      etc. (typed by inspector)
+    description: Description of the item group, for example floor, paint, lighting, etc. (typed by inspector)
   comment:
     lineage:
       - datalake_inspection_services_raw.item_group_aud.comment
