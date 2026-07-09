@@ -3,7 +3,7 @@ database_name: datalake_rental_management_clean
 table_name: managed_rental_users
 description: |
   Users linked to a managed rental with roles, profiles, and invitation lifecycle status.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -25,7 +25,7 @@ columns:
   version:
     lineage:
       - datalake_rental_management_raw.managed_rental_users.version
-    description: Optimistic locking version for the managed rental user row.
+    description: Optimistic locking revision counter for concurrent update safety.
   status:
     lineage:
       - datalake_rental_management_raw.managed_rental_users.status

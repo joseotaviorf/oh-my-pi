@@ -3,7 +3,7 @@ database_name: datalake_rental_management_clean
 table_name: managed_rental
 description: |
   Managed rental enrollment per contract UUID within rental management (managed rental program).
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -17,11 +17,11 @@ columns:
   contract_uuid:
     lineage:
       - datalake_rental_management_raw.managed_rental.contract_uuid
-    description: UUID of the rental contract associated with managed rental.
+    description: Rental contract UUID linked to the managed rental enrollment program.
   version:
     lineage:
       - datalake_rental_management_raw.managed_rental.version
-    description: Optimistic locking version for the managed rental row.
+    description: Optimistic locking revision counter for concurrent update safety.
   ts_created:
     lineage:
       - datalake_rental_management_raw.managed_rental.created_at

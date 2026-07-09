@@ -3,38 +3,38 @@ database_name: datalake_rental_management_clean
 table_name: key_location_return_address
 description: Table containing about the key location return addresses, including the key location return address ID, the zip code, the street name, the number, the neighborhood, the complement, the city, the state, the creation timestamp, and the update timestamp.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
-    description: Key location return address ID
+    description: Surrogate primary key of the postal address for returning property keys.
     lineage:
       - datalake_rental_management_raw.key_location_return_address.id
   zip_code:
-    description: Zip code related to the key location return address
+    description: Postal code where keys must be returned after contract termination.
     lineage:
       - datalake_rental_management_raw.key_location_return_address.zip_code
   street_name:
-    description: Street name related to the key location return address
+    description: Thoroughfare name for the key return destination address.
     lineage:
       - datalake_rental_management_raw.key_location_return_address.street_name
   number:
-    description: Number related to the key location return address
+    description: Street number for the key return destination address.
     lineage:
       - datalake_rental_management_raw.key_location_return_address.number
   neighborhood:
-    description: Neighborhood related to the key location return address
+    description: Bairro or district name within the city for the mailing address where rental property keys must be returned at contract end.
     lineage:
       - datalake_rental_management_raw.key_location_return_address.neighborhood
   complement:
-    description: Complement related to the key location return address
+    description: Address complement such as apartment or block for key return.
     lineage:
       - datalake_rental_management_raw.key_location_return_address.complement
   city:
-    description: City related to the key location return address
+    description: City where keys must be returned after contract termination.
     lineage:
       - datalake_rental_management_raw.key_location_return_address.city
   state:
-    description: State related to the key location return address
+    description: State or region of the key return destination address.
     lineage:
       - datalake_rental_management_raw.key_location_return_address.state
   ts_created:

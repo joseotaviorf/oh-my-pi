@@ -2,8 +2,9 @@
 database_name: datalake_rental_management_clean
 table_name: third_party_bills
 description: |
-  This table contains information about the third party bills.
-owner: data-for-rent@quintoandar.com.br
+  Third-party utility and service bills managed in rental management. One row per
+  external bill linked to contracts, properties, and payment reconciliation flows.
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -15,7 +16,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.third_party_bills.third_party_bills_uuid
   id_contract:
-    description: ID of the contract.
+    description: ID of the contract captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.third_party_bills.contract_id
   id_invoice:
@@ -71,7 +72,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.third_party_bills.digitable_line
   version:
-    description: Version of the third party bill.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.third_party_bills.version
   updated_amount:
@@ -95,7 +96,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.third_party_bills.discount
   payment_request_status:
-    description: Payment request status of the third party bill.
+    description: Workflow status of the third-party bill payment request in billing operations.
     lineage:
       - datalake_rental_management_raw.third_party_bills.payment_request_status
   payment_flow:

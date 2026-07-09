@@ -3,7 +3,7 @@ database_name: datalake_rental_management_clean
 table_name: managed_rental_users_log
 description: |
   Audit log of changes and events on managed rental users within rental management.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:

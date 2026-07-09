@@ -2,10 +2,10 @@
 database_name: datalake_rental_management_clean
 table_name: non_payment_report
 description: |
-  Non-payment reports filed for rental contracts. One row per report. Links a boleto (invoice) or third-party bill
+  Non-payment reports filed for rental contracts. One row per report. Links an invoice or third-party bill
   that was not paid on time. Used to track overdue payment escalation, request origin (support vs self-service),
   and lifecycle status of the report.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -13,11 +13,11 @@ columns:
     lineage:
       - datalake_rental_management_raw.non_payment_report.id
   id_invoice:
-    description: Foreign key to the invoice (boleto) table. Nullable when the report is not linked to an invoice.
+    description: Foreign key to the invoice table. Nullable when the report is not linked to an invoice.
     lineage:
       - datalake_rental_management_raw.non_payment_report.boleto_id
   id_original_invoice:
-    description: Foreign key to the original invoice (boleto) before any reissuing. Nullable.
+    description: Foreign key to the original invoice before any reissuing. Nullable.
     lineage:
       - datalake_rental_management_raw.non_payment_report.original_boleto_id
   id_contract:
@@ -33,7 +33,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.non_payment_report.digitable_line
   request_origin:
-    description: Origin channel of the non-payment report request.
+    description: Channel where the overdue payment report was filed, such as support or self-service.
     categories:
       Support: Report filed via customer support (CX).
       SelfService: Report filed directly by the landlord through self-service.
@@ -50,7 +50,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.non_payment_report.status
   version:
-    description: Optimistic locking version counter for the non-payment report.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.non_payment_report.version
   dt_due:
@@ -58,7 +58,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.non_payment_report.due_date
   dt_original_dues:
-    description: Array of due dates from the original invoice (boleto).
+    description: Array of due dates from the original invoice.
     lineage:
       - datalake_rental_management_raw.non_payment_report.original_due_dates
   ts_created:

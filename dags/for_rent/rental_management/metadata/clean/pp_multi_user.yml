@@ -2,39 +2,42 @@
 database_name: datalake_rental_management_clean
 table_name: pp_multi_user
 description: |
-  This table contains the payment plan multi-user records, representing users enrolled in multi-party payment plans.
-owner: data-for-rent@quintoandar.com.br
+  PP Multi enrollment records. PP Multi is a relationship program for landlords who own a
+  portfolio of properties (owners that reach a minimum number of active rental listings become
+  eligible), giving each enrolled owner a dedicated account manager and, optionally, a
+  management fee (see pp_multi_fee). One row per enrolled person UUID.
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
-    description: ID of the payment plan multi-user record.
+    description: Surrogate primary key of the PP Multi enrollment record.
     lineage:
       - datalake_rental_management_raw.pp_multi_user.id
   id_account_manager:
-    description: ID of the account manager responsible for the payment plan multi-user record.
+    description: ID (from the main/ebdb system) of the account manager assigned to this PP Multi landlord.
     lineage:
       - datalake_rental_management_raw.pp_multi_user.account_manager_id
   pp_multi_uuid:
-    description: UUID of the payment plan multi-user record.
+    description: Business UUID identifying this PP Multi enrollment.
     lineage:
       - datalake_rental_management_raw.pp_multi_user.pp_multi_uuid
   person_uuid:
-    description: UUID of the person associated with the payment plan multi-user record.
+    description: Person UUID (Person API) of the landlord enrolled in the PP Multi program.
     lineage:
       - datalake_rental_management_raw.pp_multi_user.person_uuid
   status:
-    description: Status of the payment plan multi-user record.
+    description: Enrollment status of the PP Multi landlord (e.g. ACTIVE, INACTIVE).
     lineage:
       - datalake_rental_management_raw.pp_multi_user.status
   version:
-    description: Version of the payment plan multi-user record.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.pp_multi_user.version
   ts_created:
-    description: Timestamp of the creation of the payment plan multi-user record.
+    description: Timestamp when the PP Multi enrollment record was created.
     lineage:
       - datalake_rental_management_raw.pp_multi_user.created_at
   ts_updated:
-    description: Timestamp of the last update of the payment plan multi-user record.
+    description: Timestamp of the last update to the PP Multi enrollment record.
     lineage:
       - datalake_rental_management_raw.pp_multi_user.updated_at

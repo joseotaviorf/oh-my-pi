@@ -3,7 +3,7 @@ database_name: datalake_rental_management_clean
 table_name: managed_rental_users_invitation
 description: |
   Invitation channel and acceptance timestamps for managed rental users pending enrollment.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -25,7 +25,7 @@ columns:
   version:
     lineage:
       - datalake_rental_management_raw.managed_rental_users_invitation.version
-    description: Optimistic locking version for the invitation row.
+    description: Optimistic locking revision counter for concurrent update safety.
   ts_last_sent:
     lineage:
       - datalake_rental_management_raw.managed_rental_users_invitation.last_sent_at
