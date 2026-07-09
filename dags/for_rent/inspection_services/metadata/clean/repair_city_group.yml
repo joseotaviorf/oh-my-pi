@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: repair_city_group
 description: Named city groups used to adjust repair pricing rates for a pricing configuration.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_repair_city_group:
     lineage:

@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: rent_value_rate
 description: Rent value range rows with rate multipliers for a pricing table configuration.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_rent_value_rate:
     lineage:

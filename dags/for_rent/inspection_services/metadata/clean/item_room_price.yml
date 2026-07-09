@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: item_room_price
 description: Price per item group, repair service, room type, and property area band for a pricing configuration.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_item_room_price:
     lineage:

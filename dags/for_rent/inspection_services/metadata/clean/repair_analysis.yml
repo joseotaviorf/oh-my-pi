@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: repair_analysis
 description: Stores repair analysis records linked to inspections, tracking automated and manual analysis status and pricing information for property repairs.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_repair_analysis:
     lineage:

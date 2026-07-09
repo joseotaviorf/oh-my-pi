@@ -1,11 +1,11 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: repair_request_aud
-description:
+description: |
   This table provides information on repair requests after the inspection
   process.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_repair_request:
     lineage:
@@ -30,9 +30,7 @@ columns:
   id_granted_by:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.granted_by_id
-    description:
-      Reviewer who assessed whether a repair was exempted. Being an owner
-      or member of AN1
+    description: Reviewer who assessed whether a repair was exempted. Being an owner or member of AN1
   id_repair_suggestion:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.repair_suggestion_id
@@ -44,7 +42,7 @@ columns:
   type:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.type
-    description: A repair request type.
+    description: Action type requested for the repair, such as repair, clean, remove, or replace.
     categories:
       REPAIR: Make item repair.
       CLEAN: Clean the item.
@@ -90,9 +88,7 @@ columns:
   is_exempted:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.exempted
-    description:
-      Indicates whether the repair suggested by the AN1 team was exempted
-      by the owner or a member of AN1
+    description: Indicates whether the repair suggested by the AN1 team was exempted by the owner or a member of AN1
   is_exempted_from_budget:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.is_exempted_from_budget
@@ -242,9 +238,7 @@ columns:
   ts_granted:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.granted_at
-    description:
-      Indicates the time at which the repair request exempted assessment
-      was made
+    description: Indicates the time at which the repair request exempted assessment was made
   ts_created:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.created_at

@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: pricing_table_configuration
 description: Versioned configuration for automatic repair pricing tables, including approval metadata and optimistic locking.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_pricing_table_configuration:
     lineage:
@@ -24,7 +24,7 @@ columns:
   version:
     lineage:
       - datalake_inspection_services_raw.pricing_table_configuration.version
-    description: JPA optimistic concurrency version counter
+    description: Optimistic locking revision counter for concurrent update safety.
   is_active:
     lineage:
       - datalake_inspection_services_raw.pricing_table_configuration.active
