@@ -2,8 +2,9 @@
 database_name: datalake_rental_management_clean
 table_name: billback
 description: |
-  This table contains information about the billback.
-owner: data-for-rent@quintoandar.com.br
+  Billback charge records from rental management billing. One row per billback cart
+  linking recovered expenses to rental contracts and payment workflows.
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -23,7 +24,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.billback.contractual_penalty
   amount:
-    description: Amount of the billback.
+    description: Amount of the billback captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.billback.amount
   currency:
@@ -31,7 +32,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.billback.currency
   status:
-    description: Status of the billback.
+    description: Status of the billback captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.billback.status
   cart_idempotency_key:
@@ -39,7 +40,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.billback.cart_idempotency_key
   version:
-    description: Version of the billback.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.billback.version
   ts_created:

@@ -1,29 +1,29 @@
 ---
 database_name: datalake_rental_management_clean
 table_name: invoice_user
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: |
   This table contains the users associated with the invoices.
 columns:
   id:
-    description: ID of the invoice user.
+    description: Surrogate key identifying this invoice user record in the rental_management pipeline.
     lineage:
       - datalake_rental_management_raw.boleto_user.id
   id_external:
     lineage:
       - datalake_rental_management_raw.boleto_user.external_id
-    description: External ID of the invoice user.
+    description: Identifier assigned by the external billing platform for this payer profile.
   id_main_user:
-    description: ID of the user.
+    description: ID of the user captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto_user.main_user_id
   request_status:
-    description: Request status.
+    description: Request status captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto_user.request_status
   version:
-    description: Version of the invoice user.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.boleto_user.version
   is_active:

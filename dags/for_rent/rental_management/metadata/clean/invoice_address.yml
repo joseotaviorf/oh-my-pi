@@ -3,35 +3,35 @@ database_name: datalake_rental_management_clean
 table_name: invoice_address
 description: |
   This table contains information about the address of the invoices.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
-    description: ID of the invoice.
+    description: Surrogate key identifying this invoice address record in the rental_management pipeline.
     lineage:
       - datalake_rental_management_raw.boleto_address.id
   id_invoice:
-    description: ID of the invoice.
+    description: Foreign key to the invoice this address belongs to.
     lineage:
-      - datalake_rental_management_raw.boleto_address.id
+      - datalake_rental_management_raw.boleto_address.boleto_id
   uf:
-    description: State of the invoice.
+    description: State of the invoice captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto_address.uf
   city:
-    description: City of the invoice.
+    description: City of the invoice captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto_address.city
   zip_code:
-    description: Zip code of the invoice.
+    description: Postal code of the address registered for the invoice's payer (DDA owner data), used to match the invoice against the correct rental property.
     lineage:
       - datalake_rental_management_raw.boleto_address.zip_code
   street:
-    description: Street of the invoice.
+    description: Street of the invoice captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto_address.street
   version:
-    description: Version of the invoice.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.boleto_address.version
   ts_created:

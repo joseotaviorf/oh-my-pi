@@ -3,37 +3,37 @@ database_name: datalake_rental_management_clean
 table_name: invoice_user_issuer
 description: |
   This table contains the users issuers associated with the invoices.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.id
-    description: ID of the invoice user issuer.
+    description: Surrogate primary key linking a payer profile to an invoice issuer.
   id_invoice_user:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.boleto_user_id
-    description: ID of the invoice user.
+    description: ID of the invoice user captured in the source operational system.
   id_invoice_issuer:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.boleto_issuer_id
-    description: ID of the invoice issuer.
+    description: Foreign key to the invoice issuer (condo administrator or bill beneficiary) configured for this payer, not a bank.
   id_contract:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.contract_id
-    description: ID of the contract.
+    description: ID of the contract captured in the source operational system.
   request_status:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.request_status
-    description: Request status.
+    description: Request status captured in the source operational system.
   version:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.version
-    description: Version of the invoice user issuer.
+    description: Optimistic locking revision counter for concurrent update safety.
   dt_monitoring_started:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.monitoring_start_date
-    description: Monitoring start date.
+    description: Timestamp when condo invoice monitoring started for this payer-issuer-contract enrollment. Source column is a timestamp, not a calendar date.
   dt_due:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.due_date

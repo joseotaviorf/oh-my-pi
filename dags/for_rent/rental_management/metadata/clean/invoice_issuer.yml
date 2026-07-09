@@ -3,25 +3,25 @@ database_name: datalake_rental_management_clean
 table_name: invoice_issuer
 description: |
   This table contains the issuers of the invoices.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_rental_management_raw.boleto_issuer.id
-    description: ID of the invoice issuer.
+    description: Surrogate primary key of the invoice issuer record. The issuer is the condo administrator or bill beneficiary registered to receive the invoice's payment, not a bank.
   name:
     lineage:
       - datalake_rental_management_raw.boleto_issuer.name
-    description: Name of the invoice issuer.
+    description: Legal or trade name of the condo administrator or bill beneficiary registered as the invoice issuer. Defaults to a generic administrator label when not informed.
   document:
     lineage:
       - datalake_rental_management_raw.boleto_issuer.document
-    description: Document of the invoice issuer.
+    description: Tax identifier (CPF or CNPJ) of the condo administrator or bill beneficiary registered as the invoice issuer.
   document_type:
     lineage:
       - datalake_rental_management_raw.boleto_issuer.document_type
-    description: Type of document of the invoice issuer.
+    description: Tax document category of the issuer, such as CPF or CNPJ.
   ts_created:
     lineage:
       - datalake_rental_management_raw.boleto_issuer.created_at

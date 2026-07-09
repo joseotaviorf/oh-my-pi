@@ -3,7 +3,7 @@ database_name: datalake_rental_management_clean
 table_name: condo_monitoring_actions
 description: |
   This table contains the actions performed by the condo monitoring system.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -11,7 +11,7 @@ columns:
       - datalake_rental_management_raw.condo_monitoring_actions.id
     description: ID of the condo monitoring action.
   id_contract:
-    description: ID of the contract.
+    description: ID of the contract captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.contract_id
   id_action_main_user:
@@ -47,7 +47,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.boleto_issuer_document
   version:
-    description: Version of the condo monitoring action.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_actions.version
   ts_created:

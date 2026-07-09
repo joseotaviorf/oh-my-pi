@@ -5,7 +5,7 @@ description: |
   Audit log of invoice status changes in rental-management, with one row per recorded status transition
   or initial invoice status insertion. Used to analyze Condo Monitoring invoice lifecycle events and the
   channel or automated flow that produced each change.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:

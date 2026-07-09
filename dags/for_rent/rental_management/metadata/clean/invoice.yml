@@ -3,51 +3,51 @@ database_name: datalake_rental_management_clean
 table_name: invoice
 description: |
   This table contains the invoices.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
-    description: ID of the invoice.
+    description: ID of the invoice captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto.id
   id_external:
-    description: External ID of the invoice.
+    description: Identifier assigned by the external payment provider for this invoice.
     lineage:
       - datalake_rental_management_raw.boleto.external_id
   id_invoice_user:
-    description: ID of the invoice user.
+    description: ID of the invoice user captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto.boleto_user_id
   id_contract:
-    description: ID of the contract.
+    description: ID of the contract captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto.contract_id
   id_invoice_issuer:
-    description: ID of the invoice issuer.
+    description: Foreign key to the invoice issuer — the condo administrator or bill beneficiary registered to receive this invoice's payment, not a bank.
     lineage:
       - datalake_rental_management_raw.boleto.boleto_issuer_id
   value:
-    description: Value of the invoice.
+    description: Value of the invoice captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto.value
   status:
-    description: Status of the invoice.
+    description: Status of the invoice captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto.status
   digitable_line:
-    description: Digitable line of the invoice.
+    description: Digitable line of the invoice — the typed numeric representation used for bank payment. Distinct from the invoice's barcode, which is stored inside raw_data.
     lineage:
       - datalake_rental_management_raw.boleto.digitable_line
   our_number:
-    description: Our number of the invoice.
+    description: Bank-assigned reference number used for tracking this invoice.
     lineage:
       - datalake_rental_management_raw.boleto.our_number
   version:
-    description: Version of the invoice.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.boleto.version
   raw_data:
-    description: Raw data of the invoice.
+    description: Serialized invoice payload received from the DDA partner registry system, captured on creation and refreshed on subsequent partner updates.
     lineage:
       - datalake_rental_management_raw.boleto.raw_data
   dt_due:

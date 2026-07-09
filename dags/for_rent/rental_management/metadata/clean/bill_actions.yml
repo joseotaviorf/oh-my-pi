@@ -16,18 +16,15 @@ columns:
     lineage:
       - datalake_rental_management_raw.bill_actions.bill_id
   id_notification_entity:
-    description: |
-      Optional identifier of the entity that received the notification for this action.
+    description: Optional identifier of the entity that received the notification for this action.
     lineage:
       - datalake_rental_management_raw.bill_actions.notification_entity_id
   action_type:
-    description: |
-      Type of action performed on the bill (bill_action_type enum from rental_management).
+    description: Type of action performed on the bill (bill_action_type enum from rental_management).
     lineage:
       - datalake_rental_management_raw.bill_actions.action_type
   notification_entity_name:
-    description: |
-      Optional name of the entity that received the notification for this action.
+    description: Optional name of the entity that received the notification for this action.
     lineage:
       - datalake_rental_management_raw.bill_actions.notification_entity_name
   ts_created:

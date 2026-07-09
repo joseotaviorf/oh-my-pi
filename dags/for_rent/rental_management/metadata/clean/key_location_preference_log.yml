@@ -3,7 +3,7 @@ database_name: datalake_rental_management_clean
 table_name: key_location_preference_log
 description: Table containing about the key location preference logs, every change in the key location preference is logged.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     description: Key location preference log ID. It's a auto-incremented ID.
@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.key_location_preference_log.key_location_preference_id
   author_user_type:
-    description: Author user type.
+    description: Author user type captured in the source operational system.
     categories:
       PERSON: Who is doing the change is an identifiable person. When we're able to get the user logged in, we will use the personUUID.
       SERVICE: Who is doing the change is a service.
@@ -25,7 +25,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.key_location_preference_log.author_user_change_identifier
   event_log_type:
-    description: Event log type.
+    description: Event log type captured in the source operational system.
     categories:
       INITIAL_LOCATION_PREFERENCE_OPT_OUT: The initial event occurs when we use a Reminder at D-5 to consult the endpoint eligibility and the tenant's input, and decide that it is an OPT_OUT scenario (e.g., we have easy entry access). FRONTDOOR, LOCKBOX, PASSWORD.
       OPT_OUT_CHANGED_PREFERENCE: In the scenario where the event INITIAL_LOCATION_PREFERENCE_OPT_OUT occurred, the user can still change the key location preference. This event should log this change.
@@ -47,6 +47,6 @@ columns:
     lineage:
       - datalake_rental_management_raw.key_location_preference_log.description
   ts_created:
-    description: Log timestamp creation.
+    description: Log timestamp creation captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.key_location_preference_log.created_at

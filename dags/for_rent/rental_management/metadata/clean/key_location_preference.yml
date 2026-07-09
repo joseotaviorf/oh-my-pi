@@ -3,14 +3,14 @@ database_name: datalake_rental_management_clean
 table_name: key_location_preference
 description: Table containing about the key location preferences, including the key location preference ID, the contract ID, the termination ID, the key holder preference ID, the key location return address ID, the access key, and the observation.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
-    description: Key location preference ID.
+    description: Surrogate primary key of the key handover preference record.
     lineage:
       - datalake_rental_management_raw.key_location_preference.id
   uuid_key_location_preference:
-    description: Key location preference UUID.
+    description: Business UUID identifying the key handover preference for a contract termination.
     lineage:
       - datalake_rental_management_raw.key_location_preference.key_location_preference_uuid
   id_contract:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.key_location_preference.contract_id
   id_termination:
-    description: Termination ID related to the key location preference.
+    description: Foreign key to the contract termination driving the key return workflow.
     lineage:
       - datalake_rental_management_raw.key_location_preference.termination_id
   id_key_holder_preference:
@@ -30,7 +30,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.key_location_preference.key_location_return_address_id
   access_key:
-    description: Access key type.
+    description: Access key type captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.key_location_preference.access_key
   observation:

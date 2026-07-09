@@ -3,17 +3,17 @@ database_name: datalake_rental_management_clean
 table_name: condo_monitoring_eligibility
 description: |
   This table contains the eligibility of the condo monitoring system.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
-    description: ID of the condo monitoring eligibility.
+    description: Surrogate primary key of the condo monitoring eligibility record.
     lineage:
       - datalake_rental_management_raw.condo_monitoring_eligibility.id
   id_contract:
     lineage:
       - datalake_rental_management_raw.condo_monitoring_eligibility.contract_id
-    description: ID of the contract.
+    description: ID of the contract captured in the source operational system.
   eligibility:
     lineage:
       - datalake_rental_management_raw.condo_monitoring_eligibility.eligibility
@@ -21,7 +21,7 @@ columns:
   version:
     lineage:
       - datalake_rental_management_raw.condo_monitoring_eligibility.version
-    description: Version of the condo monitoring eligibility.
+    description: Optimistic locking revision counter for concurrent update safety.
   ts_created:
     lineage:
       - datalake_rental_management_raw.condo_monitoring_eligibility.created_at

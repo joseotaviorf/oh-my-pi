@@ -4,7 +4,7 @@ table_name: attachment
 description: |
   File attachments stored via Blob Vault. Each attachment is linked to a non-payment report through
   the non_payment_report_attachment join table. Tracks commitment status of uploaded files.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -27,7 +27,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.attachment.status
   version:
-    description: Optimistic locking version counter for the attachment.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.attachment.version
   ts_created:

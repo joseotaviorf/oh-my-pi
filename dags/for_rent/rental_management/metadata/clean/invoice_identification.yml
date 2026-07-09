@@ -3,27 +3,27 @@ database_name: datalake_rental_management_clean
 table_name: invoice_identification
 description: |
   This table contains information about the identification of the invoices.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
-    description: ID of the invoice.
+    description: Surrogate key identifying this invoice identification record in the rental_management pipeline.
     lineage:
       - datalake_rental_management_raw.boleto_identification.id
   id_invoice:
-    description: ID of the invoice.
+    description: ID of the invoice captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto_identification.id_invoice
   status:
-    description: Status of the invoice.
+    description: Status of the invoice captured in the source operational system.
     lineage:
       - datalake_rental_management_raw.boleto_identification.status
   status_reason:
-    description: Status reason of the invoice.
+    description: Explanation code for the current invoice identification status outcome.
     lineage:
       - datalake_rental_management_raw.boleto_identification.status_reason
   version:
-    description: Version of the invoice.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_rental_management_raw.boleto_identification.version
   ts_identified:

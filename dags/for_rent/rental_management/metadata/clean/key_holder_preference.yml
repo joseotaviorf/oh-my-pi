@@ -3,18 +3,19 @@ database_name: datalake_rental_management_clean
 table_name: key_holder_preference
 description: Table containing about the key holders, including their contact information such as name and phone number.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     description: Key holder preference ID. It's a auto-incremented ID.
     lineage:
       - datalake_rental_management_raw.key_holder_preference.id
   name:
-    description: Key holder name
+    description: Display or legal name associated with this record.
     lineage:
       - datalake_rental_management_raw.key_holder_preference.name
   phone:
-    description: Key holder phone
+    description: Contact phone number of the key holder, used to coordinate key handover during contract termination.
+    lineage:
       - datalake_rental_management_raw.key_holder_preference.phone
   ts_created:
     description: Key holder preference creation timestamp
