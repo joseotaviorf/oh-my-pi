@@ -3,7 +3,6 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    master_node_type_id: m6g.xlarge
     task_nodes:
       instance_types:
       - r6g.xlarge
