@@ -35,6 +35,7 @@ SELECT
     s.ai_agent_source,
     s.ai_agent_source_legacy,
     s.is_matthew_in_session,
+    s.flag_matthew_talked_to_user,
     s.matthew_version,
     s.flag_eval_matthew_in_chat,
     s.is_escalation,

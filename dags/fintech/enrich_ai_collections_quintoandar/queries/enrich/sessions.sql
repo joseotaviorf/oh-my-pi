@@ -1,4 +1,4 @@
-WITH trace_first AS (
+WITH trace_first_ranked AS (
     SELECT
         t.id_session AS id_langfuse_session,
         GET_JSON_OBJECT(t.input, '$.user_context.user_last_notifications[0].sent_at') AS notif_ts_extracted,
@@ -12,7 +12,8 @@ WITH trace_first AS (
                 AND GET_JSON_OBJECT(t.input, '$.user_context.user_roles') NOT LIKE '%TENANT%'
                 THEN 1
             ELSE 0
-        END AS is_owner_only
+        END AS is_owner_only,
+        ROW_NUMBER() OVER (PARTITION BY t.id_session ORDER BY t.ts_created ASC) AS rn
     FROM
         datalake_langfuse_clean.traces AS t
     INNER JOIN
@@ -24,8 +25,21 @@ WITH trace_first AS (
         AND t.ts_created >= TIMESTAMP('{load_start_date}')
         AND t.environment = 'prod'
         AND t.id_session IS NOT NULL
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY t.id_session ORDER BY t.ts_created ASC) = 1
+),
+trace_first AS (
+    SELECT
+        id_langfuse_session,
+        notif_ts_extracted,
+        notif_text_extracted,
+        notif_template_extracted,
+        user_roles_raw,
+        is_tenant,
+        is_owner,
+        is_owner_only
+    FROM
+        trace_first_ranked
+    WHERE
+        rn = 1
 ),
 score_matthew AS (
     SELECT
@@ -44,83 +58,165 @@ score_matthew AS (
         AND s.id_session IS NOT NULL
     GROUP BY
         s.id_session
-)
-SELECT
-    m.id_session,
-    m.id_sauron_session,
-    m.id_sss_session,
-    m.id_langfuse_session AS id_external,
-    m.id_ticket,
-    IF(m.id_user = '', NULL, m.id_user) AS id_user,
-    m.bot,
-    m.first_queue,
-    m.last_queue,
-    CASE
-        WHEN m.bot = 'matthew' THEN 'Matthew in Whatsapp'
-        WHEN m.bot = 'wall-e' AND (
-            COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
-            OR COALESCE(o.flag_collectionsinput_agent, 0) = 1
+),
+sessions_enriched AS (
+    SELECT
+        m.id_session,
+        m.id_sauron_session,
+        m.id_sss_session,
+        m.id_langfuse_session AS id_external,
+        m.id_ticket,
+        IF(m.id_user = '', NULL, m.id_user) AS id_user,
+        m.bot,
+        m.first_queue,
+        m.last_queue,
+        CASE
+            WHEN m.bot = 'matthew' THEN 'Matthew in Whatsapp'
+            WHEN m.bot = 'wall-e' AND (
+                COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
+                OR COALESCE(o.flag_collectionsinput_agent, 0) = 1
+                OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
+                OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
+                OR COALESCE(o.flag_debt_finder_tool, 0) = 1
+            ) THEN 'Matthew in Chat'
+            ELSE 'Wall-e'
+        END AS ai_agent_source,
+        CASE
+            WHEN m.bot = 'matthew' THEN 'Matthew in Whatsapp'
+            WHEN m.bot = 'wall-e' AND COALESCE(sm.flag_score_matthew_in_session, 0) = 1 THEN 'Matthew in Chat'
+            ELSE 'Wall-e'
+        END AS ai_agent_source_legacy,
+        (
+            COALESCE(o.flag_collectionsinput_agent, 0) = 1
+            OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
             OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
             OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
             OR COALESCE(o.flag_debt_finder_tool, 0) = 1
-        ) THEN 'Matthew in Chat'
-        ELSE 'Wall-e'
-    END AS ai_agent_source,
-    CASE
-        WHEN m.bot = 'matthew' THEN 'Matthew in Whatsapp'
-        WHEN m.bot = 'wall-e' AND COALESCE(sm.flag_score_matthew_in_session, 0) = 1 THEN 'Matthew in Chat'
-        ELSE 'Wall-e'
-    END AS ai_agent_source_legacy,
-    (
-        COALESCE(o.flag_collectionsinput_agent, 0) = 1
-        OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
-        OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
-        OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
-        OR COALESCE(o.flag_debt_finder_tool, 0) = 1
-    ) AS is_matthew_in_session,
-    CASE
-        WHEN COALESCE(o.flag_collectionsinputv3_agent, 0) = 1 THEN 'V3'
-        WHEN COALESCE(o.flag_collectionsinput_agent, 0) = 1 THEN 'V2'
-        WHEN COALESCE(o.flag_debt_retriever_tool, 0) = 1
-            OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1 THEN 'V1.5'
-        WHEN COALESCE(o.flag_debt_finder_tool, 0) = 1 THEN 'V1'
-        ELSE NULL
-    END AS matthew_version,
-    CASE
-        WHEN m.bot = 'wall-e' AND (COALESCE(o.flag_collectionsinput_agent, 0) = 1 OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1) THEN TRUE
-        ELSE FALSE
-    END AS flag_eval_matthew_in_chat,
-    m.is_escalated AS is_escalation,
-    tf.id_langfuse_session IS NOT NULL AS flag_session_with_trace,
-    tf.notif_ts_extracted,
-    tf.notif_text_extracted,
-    tf.notif_template_extracted,
-    tf.user_roles_raw,
-    tf.is_tenant,
-    tf.is_owner,
-    tf.is_owner_only,
-    DATE(m.ts_created) AS dt_session_created,
-    m.ts_created,
-    m.ts_updated,
-    YEAR(m.ts_updated) AS year,
-    MONTH(m.ts_updated) AS month,
-    DAYOFMONTH(m.ts_updated) AS day
+        ) AS is_matthew_in_session,
+        CASE
+            WHEN (
+                COALESCE(o.flag_collectionsinput_agent, 0) = 1
+                OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
+                OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
+                OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
+                OR COALESCE(o.flag_debt_finder_tool, 0) = 1
+            ) AND COALESCE(o.flag_react_planner_talk_to_user, 0) = 1
+            THEN 1
+            ELSE 0
+        END AS flag_matthew_talked_to_user,
+        CASE
+            WHEN COALESCE(o.flag_collectionsinputv3_agent, 0) = 1 THEN 'V3'
+            WHEN COALESCE(o.flag_collectionsinput_agent, 0) = 1 THEN 'V2'
+            WHEN COALESCE(o.flag_debt_retriever_tool, 0) = 1
+                OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1 THEN 'V1.5'
+            WHEN COALESCE(o.flag_debt_finder_tool, 0) = 1 THEN 'V1'
+            ELSE NULL
+        END AS matthew_version,
+        CASE
+            WHEN m.bot = 'wall-e' AND (COALESCE(o.flag_collectionsinput_agent, 0) = 1 OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1) THEN TRUE
+            ELSE FALSE
+        END AS flag_eval_matthew_in_chat,
+        m.is_escalated AS is_escalation,
+        tf.id_langfuse_session IS NOT NULL AS flag_session_with_trace,
+        tf.notif_ts_extracted,
+        tf.notif_text_extracted,
+        tf.notif_template_extracted,
+        tf.user_roles_raw,
+        tf.is_tenant,
+        tf.is_owner,
+        tf.is_owner_only,
+        DATE(m.ts_created) AS dt_session_created,
+        m.ts_created,
+        m.ts_updated,
+        YEAR(m.ts_updated) AS year,
+        MONTH(m.ts_updated) AS month,
+        DAYOFMONTH(m.ts_updated) AS day
+    FROM
+        datalake_chatbot.sessions AS m
+    LEFT JOIN
+        datalake_ai_collections_quintoandar.observation AS o
+            ON o.id_langfuse_session = m.id_langfuse_session
+    LEFT JOIN
+        trace_first AS tf
+            ON tf.id_langfuse_session = m.id_langfuse_session
+    LEFT JOIN
+        score_matthew AS sm
+            ON sm.id_langfuse_session = m.id_langfuse_session
+    WHERE
+        m.bot IN ('matthew', 'wall-e')
+        AND m.ts_updated >= '{load_start_date}'
+),
+sessions_deduped AS (
+    SELECT
+        id_session,
+        id_sauron_session,
+        id_sss_session,
+        id_external,
+        id_ticket,
+        id_user,
+        bot,
+        first_queue,
+        last_queue,
+        ai_agent_source,
+        ai_agent_source_legacy,
+        is_matthew_in_session,
+        flag_matthew_talked_to_user,
+        matthew_version,
+        flag_eval_matthew_in_chat,
+        is_escalation,
+        flag_session_with_trace,
+        notif_ts_extracted,
+        notif_text_extracted,
+        notif_template_extracted,
+        user_roles_raw,
+        is_tenant,
+        is_owner,
+        is_owner_only,
+        dt_session_created,
+        ts_created,
+        ts_updated,
+        year,
+        month,
+        day,
+        ROW_NUMBER() OVER (
+            PARTITION BY COALESCE(CAST(id_sss_session AS STRING), CONCAT('id:', CAST(id_session AS STRING)))
+            ORDER BY ts_updated DESC NULLS LAST, id_session DESC NULLS LAST
+        ) AS rn
+    FROM
+        sessions_enriched
+)
+SELECT
+    id_session,
+    id_sauron_session,
+    id_sss_session,
+    id_external,
+    id_ticket,
+    id_user,
+    bot,
+    first_queue,
+    last_queue,
+    ai_agent_source,
+    ai_agent_source_legacy,
+    is_matthew_in_session,
+    flag_matthew_talked_to_user,
+    matthew_version,
+    flag_eval_matthew_in_chat,
+    is_escalation,
+    flag_session_with_trace,
+    notif_ts_extracted,
+    notif_text_extracted,
+    notif_template_extracted,
+    user_roles_raw,
+    is_tenant,
+    is_owner,
+    is_owner_only,
+    dt_session_created,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day
 FROM
-    datalake_chatbot.sessions AS m
-LEFT JOIN
-    datalake_ai_collections_quintoandar.observation AS o
-        ON o.id_langfuse_session = m.id_langfuse_session
-LEFT JOIN
-    trace_first AS tf
-        ON tf.id_langfuse_session = m.id_langfuse_session
-LEFT JOIN
-    score_matthew AS sm
-        ON sm.id_langfuse_session = m.id_langfuse_session
+    sessions_deduped
 WHERE
-    m.bot IN ('matthew', 'wall-e')
-    AND m.ts_updated >= '{load_start_date}'
-QUALIFY
-    ROW_NUMBER() OVER (
-        PARTITION BY COALESCE(CAST(m.id_sss_session AS STRING), CONCAT('id:', CAST(m.id_session AS STRING)))
-        ORDER BY m.ts_updated DESC NULLS LAST, m.id_session DESC NULLS LAST
-    ) = 1
+    rn = 1

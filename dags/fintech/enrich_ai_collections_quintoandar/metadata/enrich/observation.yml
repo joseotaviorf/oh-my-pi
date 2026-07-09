@@ -1,4 +1,4 @@
-database_name: enrich_ai_collections_quintoandar
+database_name: datalake_ai_collections_quintoandar
 table_name: observation
 description: Per-session summary of Langfuse observations for Matthew (collections AI agent) sessions, with flags grouping negotiation flow signals, technical-state signals, and trace volume aggregates.
 domain: Fintech
@@ -92,6 +92,11 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: "1 if the session invoked the NegotiationProposerTool tool at least once, else 0."
+  flag_react_planner_talk_to_user:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+    description: "1 if the session contains at least one 'CollectionsAgentV3 - ReactPlanner' observation whose output JSON carries a TalkToUserToolInput tool call (detected via output LIKE '%TalkToUserToolInput%'), signalling that the Matthew V3 planner chose to send a message directly to the user; else 0. V3-only signal — the ReactPlanner observation exists only for the V3 (MCP) agent, so this is 0 for V1/V1.5/V2 sessions."
   flag_debt_summary_display_helper:
     lineage:
       - datalake_langfuse_clean.observations.name

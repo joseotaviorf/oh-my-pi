@@ -1,4 +1,4 @@
-database_name: enrich_ai_collections_quintoandar
+database_name: datalake_ai_collections_quintoandar
 table_name: sessions
 description: Universe of chatbot sessions that could contain Matthew (collections AI agent) interactions, with the AI agent source derived from Langfuse observation flags and trace presence. One row per SSS session (id_sss_session), falling back to id_session when SSS id is absent.
 domain: Fintech
@@ -63,6 +63,15 @@ columns:
       - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
       - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
     description: "Boolean flag indicating that any Matthew agent version (V1, V1.5, V2 or V3) was detected in the session via observation signals, derived from the OR of CollectionsInputV3, CollectionsInput, DebtRetrieverTool, UserDebtClassifierTool and DebtFinderTool. Note: this is observation-derived only and is strictly narrower than ai_agent_source — historical bot='matthew' (Whatsapp) sessions without recorded traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE simultaneously. For the canonical 'Matthew was involved' question use ai_agent_source <> 'Wall-e'."
+  flag_matthew_talked_to_user:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinputv3_agent
+      - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
+      - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
+      - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
+      - datalake_ai_collections_quintoandar.observation.flag_react_planner_talk_to_user
+    description: "1 when Matthew was detected in the session (is_matthew_in_session logic) AND the Matthew V3 planner sent a message directly to the user, i.e. a 'CollectionsAgentV3 - ReactPlanner' observation invoked the TalkToUserTool (observation.flag_react_planner_talk_to_user = 1); else 0. Captures sessions where Matthew actually spoke to the user rather than only running tools internally. V3-only in practice — the ReactPlanner talk signal is emitted only by the V3 (MCP) agent, so V1/V1.5/V2 sessions are 0 by construction; do not use it to compare Matthew generations."
   matthew_version:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent

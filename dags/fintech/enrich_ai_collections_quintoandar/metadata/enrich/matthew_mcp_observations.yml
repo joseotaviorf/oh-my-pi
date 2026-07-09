@@ -1,4 +1,4 @@
-database_name: enrich_ai_collections_quintoandar
+database_name: datalake_ai_collections_quintoandar
 table_name: matthew_mcp_observations
 description: One row per Langfuse session aggregating all MCP tool activity and derived
   business signals for Matthew V3 agent conversations. Sourced from

@@ -1,4 +1,4 @@
-database_name: enrich_ai_collections_quintoandar
+database_name: datalake_ai_collections_quintoandar
 table_name: messages
 description: Agglutinated chatbot conversation per unified session key (id_session_key), with all messages concatenated into a single ordered string for downstream LLM analysis of Matthew (collections AI agent) interactions.
 domain: Fintech

@@ -26,6 +26,14 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'debtfindertool' THEN 1 ELSE 0 END) AS flag_debt_finder_tool,
     MAX(CASE WHEN LOWER(obs.name) = 'get_yearly_paid_invoices_report_tool' THEN 1 ELSE 0 END) AS flag_get_yearly_paid_invoices_report_tool,
     MAX(CASE WHEN LOWER(obs.name) = 'negotiationproposertool' THEN 1 ELSE 0 END) AS flag_negotiation_proposer_tool,
+    MAX(
+        CASE
+            WHEN LOWER(obs.name) = 'collectionsagentv3 - reactplanner'
+                AND obs.output LIKE '%TalkToUserToolInput%'
+            THEN 1
+            ELSE 0
+        END
+    ) AS flag_react_planner_talk_to_user,
     -- Group 4: Helpers and edge-case handlers
     MAX(CASE WHEN LOWER(obs.name) = 'debt_summary_display_helper' THEN 1 ELSE 0 END) AS flag_debt_summary_display_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'original_invoice_values_disagreement_helper' THEN 1 ELSE 0 END) AS flag_original_invoice_values_disagreement_helper,
@@ -108,6 +116,7 @@ WHERE
         'handle_finance_fetch_error',
         'collectionsagentv1input',
         'collectionsagentv3input',
+        'collectionsagentv3 - reactplanner',
         'get_annual_tax_report_v1',
         'get_paid_invoices_annual_report_v1'
     )

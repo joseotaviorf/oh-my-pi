@@ -1,4 +1,4 @@
-database_name: enrich_ai_collections_quintoandar
+database_name: datalake_ai_collections_quintoandar
 table_name: mcp_tool_logs
 description: One row per downstream service call recorded inside BFB MCP tool-call
   request logs (application_payload.domain_info.calls), exploded from

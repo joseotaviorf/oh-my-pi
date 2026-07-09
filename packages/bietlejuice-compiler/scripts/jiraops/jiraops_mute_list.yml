@@ -13,7 +13,6 @@ DAG:
     - bietlejuice.dw_eval_model_seamless
     - bietlejuice.dw_recon_quintocred_snapshot
     - bietlejuice.dw_support_journey
-    - bietlejuice.enrich_ai_collections_quintoandar
     - bietlejuice.enrich_atlas_db_quality_metrics
     - bietlejuice.enrich_agents_matias
     - bietlejuice.enrich_crawler_chaves_na_mao
