@@ -8,7 +8,7 @@ description: >-
   when the interaction failed. Primarily used to drive the compulsory-approval decision process,
   where the service determines whether both parties have completed their review steps.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_assessment_interaction:
     description: "Auto-generated primary key for the assessment interaction record."

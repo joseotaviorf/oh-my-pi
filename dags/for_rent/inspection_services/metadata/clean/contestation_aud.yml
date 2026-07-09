@@ -1,11 +1,11 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: contestation_aud
-description:
+description: |
   When an repair of an object is requested and the tenant understand it
   as improper, it is possible to contest the repair request.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_contestation:
     lineage:
@@ -14,7 +14,7 @@ columns:
   id_repair_request:
     lineage:
       - datalake_inspection_services_raw.contestation_aud.repair_request_id
-    description: ID of the repair the contestation is referring to
+    description: ID of the repair request being contested by the reviewer (tenant or owner) as improper, unfair, or with a disputed responsibility/cost.
   id_reviewer:
     lineage:
       - datalake_inspection_services_raw.contestation_aud.reviewer_id

@@ -9,15 +9,15 @@ columns:
   id_automatic_invoice:
     lineage:
       - datalake_inspection_services_raw.automatic_invoice_aud.id
-    description: ID of the table. It's the primary key.
+    description: Primary key of the automatic invoice record in the inspections-service database.
   uuid_inspection:
     lineage:
       - datalake_inspection_services_raw.automatic_invoice_aud.inspection_uuid
-    description: UUID of the inspection.
+    description: UUID of the exit inspection whose repair budget triggered this automatic invoice.
   id_contract:
     lineage:
       - datalake_inspection_services_raw.automatic_invoice_aud.contract_id
-    description: ID of the contract.
+    description: Rental contract identifier linked to the inspection and invoice settlement.
   rev:
     lineage:
       - datalake_inspection_services_raw.automatic_invoice_aud.rev

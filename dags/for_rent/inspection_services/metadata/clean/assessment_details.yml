@@ -9,7 +9,7 @@ description: >-
   type in use is 'MEDIATION'; additional types may be introduced in the future. Filter on
   id_assessment + type together to leverage the source index.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_assessment_detail:
     description: "Primary key. Unique auto-generated identifier for each assessment detail record."

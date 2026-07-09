@@ -1,9 +1,14 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: annotation
-description: This table contains annotations and metadata associated with inspections, allowing for flexible storage of key-value pairs related to inspection processes.
+description: |
+  One row per inspection UUID and annotation key from the inspections-service PostgreSQL database.
+  Stores flexible key-value metadata attached to property inspections, mainly feature-rollout and
+  A/B test group assignments (for example automatic-repair-pricing eligibility, repair-mediation
+  rollout, and single-clear-journey flows). Consumed by dw_inspections and offboarding analytics via
+  uuid_inspection joins.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   uuid_inspection:
     description: Unique identifier of the inspection (UUID format) that this annotation belongs to.

@@ -1,22 +1,25 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: automatic_invoice
-description: This table contains information about the automatic invoices from the inspection services.
+description: |
+  One row per automatically generated repair invoice from the inspections-service PostgreSQL database.
+  Links an exit-inspection repair budget to tenant and owner payment amounts, installments, and
+  generation context tags. Consumed by offboarding billing analytics and dw_offboarding cost metrics.
 domain: For Rent
 owner: gustavo.silva@quintoandar.com.br
 columns:
   id_automatic_invoice:
     lineage:
       - datalake_inspection_services_raw.automatic_invoice.id
-    description: ID of the table. It's the primary key.
+    description: Primary key of the automatic invoice record in the inspections-service database.
   uuid_inspection:
     lineage:
       - datalake_inspection_services_raw.automatic_invoice.inspection_uuid
-    description: UUID of the inspection.
+    description: UUID of the exit inspection whose repair budget triggered this automatic invoice.
   id_contract:
     lineage:
       - datalake_inspection_services_raw.automatic_invoice.contract_id
-    description: ID of the contract.
+    description: Rental contract identifier linked to the inspection and invoice settlement.
   payment_method:
     lineage:
       - datalake_inspection_services_raw.automatic_invoice.payment_method

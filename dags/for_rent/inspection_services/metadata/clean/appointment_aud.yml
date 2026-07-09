@@ -1,9 +1,12 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: appointment_aud
-description: This table contains data on scheduling, scheduling and canceling dates for property inspections.
+description: |
+  Audit history of inspection appointment changes from the inspections-service PostgreSQL database.
+  One row per appointment and Hibernate Envers revision, tracking inserts, updates, and deletions.
+  Used for scheduling forensics and appointment lifecycle analysis in For Rent inspection analytics.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_appointment:
     description: Unique ID of the inspection schedule.
@@ -54,7 +57,7 @@ columns:
     lineage:
       - datalake_inspection_services_raw.appointment_aud.revtype
   rev_end:
-    description: ""
+    description: Revision number of the next change to this appointment record; null when this is the latest revision.
     lineage:
       - datalake_inspection_services_raw.appointment_aud.revend
   status:
@@ -70,7 +73,7 @@ columns:
     lineage:
       - datalake_inspection_services_raw.appointment_aud.status_mod
   mod_inspection:
-    description: ""
+    description: Flag indicating whether the inspection field changed in this revision.
     lineage:
       - datalake_inspection_services_raw.appointment_aud.inspection_mod
   observation:
@@ -90,9 +93,7 @@ columns:
     lineage:
       - datalake_inspection_services_raw.appointment_aud.cancellation_reason_mod
   is_fixed_agent:
-    description:
-      Indicates whether the inspection was scheduled with a specific agent,
-      rather than a temporary random assignment.
+    description: Indicates whether the inspection was scheduled with a specific agent, rather than a temporary random assignment.
     lineage:
       - datalake_inspection_services_raw.appointment_aud.fixed_agent
   mod_is_fixed_agent:

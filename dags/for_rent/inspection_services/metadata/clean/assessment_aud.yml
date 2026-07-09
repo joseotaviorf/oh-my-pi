@@ -1,21 +1,18 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: assessment_aud
-description:
+description: |
   It deals with data on when and how the inspection of the property took place.
   An Assessment must be unique per inspection, however for dates before August 19, 2023 there is residual data of a product bug.
   This bug erroneously created more than one Assessment per inspection. Therefore, for these cases, the Assessment will not be unique per inspection.
   It is observed that the extra Assessments are identical, with no data distinction between them.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_assessment:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.id
-    description: Assessment unique identifier.
-      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
-      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique.
-      It is observed that the extra Assessments are identical, with no data distinction between them.
+    description: Assessment unique identifier. This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug. This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique. It is observed that the extra Assessments are identical, with no data distinction between them.
   id_inspection:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.inspection_id
@@ -23,10 +20,7 @@ columns:
   id_previous_assessment:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.previous_assessment_id
-    description:
-      If there was any previous assessment for the same contract, it will
-      be indicated in this column. Usually references an assessment from an onboarding
-      or contestation inspection.
+    description: If there was any previous assessment for the same contract, it will be indicated in this column. Usually references an assessment from an onboarding or contestation inspection.
   key_location:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.key_location
@@ -34,29 +28,19 @@ columns:
   key_location_details:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.key_location_details
-    description:
-      If the key_location column is filled in as 'other', the inspector
-      must describe the location and this information is saved in this column.
+    description: If the key_location column is filled in as 'other', the inspector must describe the location and this information is saved in this column.
   source:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.source
-    description:
-      Identifies whether the inspection source was the PWA or was created
-      directly in the new application. If it is from the PWA, it will be filled in
-      as INSPETOR_BUGIGANGA, if it is from the new app, it will be filled in as INSPECTORS_FLUTTER.
+    description: Identifies whether the inspection source was the PWA or was created directly in the new application. If it is from the PWA, it will be filled in as INSPETOR_BUGIGANGA, if it is from the new app, it will be filled in as INSPECTORS_FLUTTER.
   house_supplies:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.house_supplies
-    description:
-      Indicates the operating condition of the water, gas and electricity
-      supply. However, this field is no longer populated in the database, serving
-      only for historical consultation.
+    description: Indicates the operating condition of the water, gas and electricity supply. However, this field is no longer populated in the database, serving only for historical consultation.
   scheduling_key_recovery:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.scheduling_key_recovery
-    description:
-      Indicates the place where the keys were left after the inspection
-      was carried out
+    description: Indicates the place where the keys were left after the inspection was carried out.
   key_information:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.key_information
@@ -80,25 +64,19 @@ columns:
   ai_processing_failure_reason:
     lineage: 
       - datalake_inspection_services_raw.assessment.ai_processing_failure_reason
-    description:
-      Indicates the reason why Kirk failed to process the request. This column is only populated when a failure occurs.
+    description: Indicates the reason why Kirk failed to process the request. This column is only populated when a failure occurs.
   repair_request_ai_flow:
     lineage: 
       - datalake_inspection_services_raw.assessment.repair_request_ai_flow
-    description:
-      Boolean flag indicating whether the AI flow succeeded.
+    description: Boolean flag indicating whether the Kirk automatic laudo (repair request AI) flow succeeded for this assessment.
   ai_repair_analysis_control_group:
     lineage: 
       - datalake_inspection_services_raw.assessment.ai_repair_analysis_control_group
-    description:
-      Boolean flag indicating whether the assessment belongs to the Control Group. 
-      If TRUE, the case passed the eligibility criteria for its current wave but was 
-      not processed by Kirk.
+    description: Boolean flag indicating whether the assessment belongs to the Kirk control group. If TRUE, the case passed the eligibility criteria for its current wave but was not processed by Kirk.
   ai_repair_analysis_wave_name:
     lineage: 
       - datalake_inspection_services_raw.assessment.ai_repair_analysis_wave_name
-    description:
-      Specifies the rollout wave of the Kirk launch. Possible values are Shadow Mode, Wave 1, Wave 2, Wave 3, Wave 4.
+    description: Specifies the rollout wave of the Kirk launch. Possible values are Shadow Mode, Wave 1, Wave 2, Wave 3, Wave 4.
   mod_id_previous_assessment:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.previous_assessment_id_mod
@@ -186,15 +164,11 @@ columns:
   dt_owner_limit_revision:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.owner_limit_revision_date
-    description:
-      Indicates the deadline for the owner to conclude its review of the report.
-      After this date, completion is compulsory.
+    description: Indicates the deadline for the owner to conclude its review of the report. After this date, completion is compulsory.
   dt_tenant_limit_revision:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.tenant_limit_revision_date
-    description:
-      Indicates the deadline for tenant to complete its review of the report.
-      After this date, completion is compulsory.
+    description: Indicates the deadline for tenant to complete its review of the report. After this date, completion is compulsory.
   ts_created:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.created_at
@@ -202,19 +176,15 @@ columns:
   ts_finished:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.finished_at
-    description:
-      This column should display the time when the inspector finished carrying
-      out the inspection (local timezone).
+    description: This column should display the time when the inspector finished carrying out the inspection (local timezone).
   ts_started:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.started_at
-    description:
-      This column should display the time when the inspector started to
-      perform the inspection (local timezone).
+    description: This column should display the time when the inspector started to perform the inspection (local timezone).
   ts_updated:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.updated_at
-    description: Assessment update date
+    description: Assessment update date.
   dt_limit_budget_approval:
     lineage:
       - datalake_inspection_services_raw.assessment_aud.limit_budget_approval_date
