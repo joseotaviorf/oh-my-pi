@@ -15,8 +15,9 @@ column_level_validations:
   cnpj:
     custom:
       # HubSpot company: no duplicate effective CNPJ among active sale members (non-archived, not merged).
-      # Effective CNPJ = COALESCE(cnpj_unique, cnpj); matches brokers_members dedup in hubspot_brokers_history.sql.
-      # Duplicates would break sk_broker join logic and the table grain.
+      # Effective CNPJ = COALESCE(cnpj_unique, cnpj); matches the brokers_members_ranked dedup in hubspot_brokers_history.sql.
+      # This validates uniqueness on the HubSpot side only — core_brokers.brokers may legitimately contain
+      # multiple sk_broker rows with the same CNPJ (legacy duplicate registrations); that fan-out is intentional.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT

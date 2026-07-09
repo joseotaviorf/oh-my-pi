@@ -2,10 +2,10 @@ database_name: datalake_brokers
 table_name: hubspot_brokers_history
 description: >
   Enriched change-event history that links HubSpot Rede Sale company revisions to the broker model in
-  core_brokers.brokers via CNPJ. Grain is one row per detected change per id_hubspot_company: a row is
-  emitted when broker_status, company_cluster, cluster_performance, or id_hubspot_owner transitions
-  (NULL-safe for owner changes), plus the first observed revision per sk_broker. broker_status maps
-  sale_lead_status to ACTIVE when the value is Membro and INACTIVE otherwise. Consumed by
+  core_brokers.brokers via CNPJ. Grain is one row per detected change per sk_broker: a row is emitted
+  when broker_status, company_cluster, cluster_performance, or id_hubspot_owner transitions (NULL-safe
+  for owner changes), plus the first observed revision per sk_broker. broker_status maps sale_lead_status
+  to ACTIVE when the value is Membro and INACTIVE otherwise. Consumed by
   datalake_brokers.broker_status_history for HubSpot-sourced membership periods (through 2026-01-31),
   dw_brokers.dim_broker for the current account manager, and dw_brokers.dim_broker_account_manager_history
   for owner assignment timelines. Only HubSpot companies that have ever been Rede Sale members, are not
@@ -18,6 +18,10 @@ description: >
   member (sale_lead_status = Membro), then a company with a non-null id_hubspot_owner, then a populated
   cnpj_unique, then the most recently updated company, with id_company as the final tie-breaker. This
   prevents a lost or owner-less duplicate company from masking the active broker's account manager.
+  Because core_brokers.brokers may contain legacy duplicate registrations sharing the same CNPJ (with
+  distinct sk_broker values), the join by CNPJ fans out the HubSpot history to all matching sk_broker
+  rows; broker_version and is_current are therefore scoped per sk_broker so that each broker receives
+  its own current row and a non-null account manager in dw_brokers.dim_broker.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
@@ -33,7 +37,9 @@ columns:
       - datalake_hubspot.company_history.id_company
     description: >
       HubSpot company object id for the deduplicated Rede Sale member company whose history revision
-      produced this change event. Versioning columns broker_version and is_current are scoped to this id.
+      produced this change event. A single id_hubspot_company may be associated with multiple sk_broker
+      values when legacy duplicate registrations share the same CNPJ; broker_version and is_current are
+      scoped per sk_broker, not per id_hubspot_company.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_owner
@@ -72,13 +78,16 @@ columns:
       Performance tier of the company cluster on this revision. A value change triggers a new change event.
   broker_version:
     description: >
-      Sequential version number of change events within the same id_hubspot_company, ordered by ts_updated
-      descending. Version 1 is the most recent event; higher numbers are older events.
+      Sequential version number of change events per sk_broker, ordered by ts_updated descending.
+      Version 1 is the most recent event for that broker; higher numbers are older events. When multiple
+      sk_broker rows share the same CNPJ and id_hubspot_company, each sk_broker has its own independent
+      version sequence.
   is_current:
     description: >
-      True for the most recent change event per id_hubspot_company (broker_version = 1). Use with
-      id_hubspot_owner to read the current HubSpot account manager assignment for that company; dim_broker
-      joins on sk_broker with is_current = true for the broker-level current manager.
+      True for the most recent change event per sk_broker (broker_version = 1). Multiple rows with
+      is_current = TRUE may exist simultaneously when legacy duplicate registrations share the same CNPJ,
+      each corresponding to a distinct sk_broker. dim_broker joins on sk_broker with is_current = TRUE
+      to resolve the current account manager for every broker, including duplicates.
   has_3p_access_control:
     description: >
       Boolean flag indicating that this event is subject to 3P Partners access control policies.

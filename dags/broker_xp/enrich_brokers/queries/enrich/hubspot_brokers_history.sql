@@ -67,8 +67,8 @@ SELECT
   bh.broker_status,
   bh.company_cluster,
   bh.cluster_performance,
-  ROW_NUMBER() OVER(PARTITION BY bh.id_hubspot_company ORDER BY bh.ts_updated DESC) AS broker_version,
-  ROW_NUMBER() OVER(PARTITION BY bh.id_hubspot_company ORDER BY bh.ts_updated DESC) = 1 AS is_current,
+  ROW_NUMBER() OVER (PARTITION BY bh.sk_broker ORDER BY bh.ts_updated DESC) AS broker_version,
+  ROW_NUMBER() OVER (PARTITION BY bh.sk_broker ORDER BY bh.ts_updated DESC) = 1 AS is_current,
   bh.has_3p_access_control,
   bh.ts_updated,
   CURRENT_TIMESTAMP() AS ts_load

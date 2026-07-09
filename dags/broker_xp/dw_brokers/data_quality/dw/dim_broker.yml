@@ -23,6 +23,26 @@ column_level_validations:
            AND LOWER(account_manager) NOT LIKE '%@quintoandar.%'
         ) = 0
       severity_level: Warning
+  account_manager_consistent_across_duplicate_cnpj:
+    custom:
+      # Among brokers sharing the same CNPJ, those linked to hubspot_brokers_history with a declared
+      # owner (id_hubspot_owner IS NOT NULL, is_current = TRUE) must all have the same account_manager.
+      # Brokers not present in hubspot_brokers_history, or present but without an owner, legitimately
+      # have account_manager = NULL and are excluded from this check.
+      # Inconsistent values indicate a regression in the is_current grain in hubspot_brokers_history.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT db.cnpj
+          FROM dw_brokers.dim_broker AS db
+          INNER JOIN datalake_brokers.hubspot_brokers_history AS hbh
+            ON db.sk_broker = hbh.sk_broker
+            AND hbh.is_current
+            AND hbh.id_hubspot_owner IS NOT NULL
+          WHERE db.cnpj IS NOT NULL
+          GROUP BY db.cnpj
+          HAVING COUNT(DISTINCT db.account_manager) > 1
+        ) AS inconsistent_am) = 0
+      severity_level: Warning
   has_3p_access_control:
     is_complete:
       severity_level: Error
