@@ -1,7 +1,7 @@
 ---
 database_name: datalake_fintech_order_clean
 table_name: order
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Order table stores the order's owner and the control dates (important to provide data necessary to group orders and generate the bill).
 columns:

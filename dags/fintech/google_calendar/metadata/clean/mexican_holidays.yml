@@ -1,39 +1,54 @@
 ---
 database_name: datalake_google_calendar_clean
 table_name: mexican_holidays
-domain: Cross
-owner: data-ae-fintech@quintoandar.com.br
+description:
+  One row per mexican holidays in the Fintech clean layer, sourced from
+  datalake_google_calendar_clean for payments, billing, and financial
+  operations reporting.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.id
+    description: Financial attribute representing id on the mexican_holidays dataset.
   holiday_category:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.description
+    description: Financial attribute representing holiday category on the mexican_holidays dataset.
   holiday_name:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.summary
+    description: Financial attribute representing holiday name on the mexican_holidays dataset.
   status:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   dt_holiday_start:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.DATE(start.date)
+    description: Calendar date associated with holiday start in the financial workflow.
   dt_holiday_end:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.DATE(end.date)
+    description: Calendar date associated with holiday end in the financial workflow.
   ts_updated:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.updated
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_created:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.created
+    description: Timestamp when created occurred in the upstream fintech system.
   year:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
     - datalake_google_calendar_raw.mexican_holidays.day
+    description: Day partition derived from the source event timestamp for incremental loading.

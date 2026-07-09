@@ -1,7 +1,7 @@
 ---
 database_name: datalake_fintech_order_clean
 table_name: order_item
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Order_item table stores items and information related to financial movement.
 columns:
@@ -22,11 +22,11 @@ columns:
     lineage:
       - datalake_fintech_order_raw.order_item.metadata
   from_actor_account_name:
-    description: Account name of the actor who initiated the order item
+    description: Financial attribute representing from actor account name on the order_item dataset.
     lineage:
       - datalake_fintech_order_raw.order_item.from_actor_account_name
   to_actor_account_name:
-    description: Account name of the actor who is the recipient of the order item
+    description: Financial attribute representing to actor account name on the order_item dataset.
     lineage:
       - datalake_fintech_order_raw.order_item.to_actor_account_name
   dt_accrual:

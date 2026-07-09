@@ -1,16 +1,16 @@
 ---
 database_name: datalake_grb_clean
 table_name: operators
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: This table contains information about employees, including their roles, contact details, and employment history. It includes details such as the employee's name, email, and job title, as well as their supervisor's name and employment dates. This data can be used to manage employee information, track employment history, and analyze workforce trends. It can also be used to identify patterns in employee turnover and to assess the impact of different leadership styles on employee performance.
 columns:
   id_operator_cyber:
-    description: Cyber operator login
+    description: Identifier for the operator cyber referenced by this financial record.
     lineage:
       - datalake_grb_raw.tab_funcionario.id_operador_cyber
   id_operator_grb:
-    description: GRB operator login
+    description: Identifier for the operator grb referenced by this financial record.
     lineage:
       - datalake_grb_raw.tab_funcionario.id_operador_assessoria
   name:

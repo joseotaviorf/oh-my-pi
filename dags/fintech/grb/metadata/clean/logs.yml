@@ -1,7 +1,7 @@
 ---
 database_name: datalake_grb_clean
 table_name: logs
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: The 'tab_ocorrencia' table contains data on various occurrences related to customer interactions, including details such as the actions taken, results, and additional comments. This data can be utilized to track communication history, customer satisfaction levels, and assess the effectiveness of different contact channels. It enables the organization to analyze trends in customer interactions, identify areas for process improvement, and evaluate the performance of customer service representatives.
 columns:
@@ -10,11 +10,11 @@ columns:
     lineage:
       - datalake_grb_raw.tab_ocorrencia.id_ocorrencia
   id_operator_cyber:
-    description: "Cyber operator login"
+    description: Identifier for the operator cyber referenced by this financial record.
     lineage:
       - datalake_grb_raw.tab_ocorrencia.id_operador_cyber
   id_operator_grb:
-    description: "GRB operator login"
+    description: Identifier for the operator grb referenced by this financial record.
     lineage:
       - datalake_grb_raw.tab_ocorrencia.id_operador_assessoria
   id_contract:

@@ -1,4 +1,9 @@
 database_name: datalake_google_calendar_raw
 table_name: mexican_holidays
-domain: Cross
-owner: data-ae-fintech@quintoandar.com.br
+description:
+  One row per mexican holidays in the Fintech raw layer, sourced from
+  datalake_google_calendar_raw for payments, billing, and financial operations
+  reporting.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns: {}

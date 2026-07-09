@@ -8,105 +8,130 @@ description: |
   at 08:00 and 15:00 BRT; the Spark job ingests only the latest export batch available
   at each run (morning export ~01:00; afternoon export ~12:00 when SeuBarriga runs it).
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id_contract:
     description: EBDB contract identifier for the rental contract associated with the preview billing line.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.contract-id
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   contract_version:
     description: Contract version string exported by SeuBarriga for the preview row.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.version
+    description: Financial attribute representing contract version on the invoice_preview dataset.
   paid_from:
     description: Start date of the billing or accrual period covered by the preview entry.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.from
+    description: Financial attribute representing paid from on the invoice_preview dataset.
   paid_to:
     description: End date of the billing or accrual period covered by the preview entry.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.to
+    description: Financial attribute representing paid to on the invoice_preview dataset.
   payment_description:
     description: Human-readable description of the preview billing line as shown in SeuBarriga.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.description
+    description: Financial attribute representing payment description on the invoice_preview dataset.
   item_category:
     description: SeuBarriga item or category code for the preview entry, such as rent or utilities.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.item
+    description: Financial attribute representing item category on the invoice_preview dataset.
   tenant_status:
     description: Preview status label for the tenant-side monthly invoice in SeuBarriga.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.tenant-status
+    description: Financial attribute representing tenant status on the invoice_preview dataset.
   landlord_status:
     description: Preview status label for the landlord-side monthly invoice in SeuBarriga.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.landlord-status
+    description: Financial attribute representing landlord status on the invoice_preview dataset.
   payment_purpose:
     description: Invoice purpose code exported by SeuBarriga for the preview billing line.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.purpose
+    description: Financial attribute representing payment purpose on the invoice_preview dataset.
   country:
     description: Country code associated with the contract in the SeuBarriga preview export.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.country
+    description: Financial attribute representing country on the invoice_preview dataset.
   paid_amount:
     description: Monetary amount of the preview billing line in the currency exported by SeuBarriga.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.amount
+    description: Financial attribute representing paid amount on the invoice_preview dataset.
   is_blocked:
     description: Boolean flag indicating whether the contract is blocked from invoicing in the preview snapshot.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.blocked
+    description: Indicates whether blocked applies to this financial record.
   entry_accrual_year_month:
     description: Accrual year-month of the preview entry as an integer in YYYYMM format from the CSV export.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.year-month
+    description: Financial attribute representing entry accrual year month on the invoice_preview dataset.
   invoice_accrual_year_month:
     description: Accrual year-month parsed from the source invoice preview CSV filename.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.invoice_filename
+    description: Financial attribute representing invoice accrual year month on the invoice_preview dataset.
   dt_due:
     description: Due date of the preview entry as exported by SeuBarriga.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.due-date
+    description: Calendar date associated with due in the financial workflow.
   dt_tenant_due:
     description: Tenant invoice due date recorded in the preview snapshot.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.tenant-due-date
+    description: Calendar date associated with tenant due in the financial workflow.
   dt_tenant_paid:
     description: Tenant paid date recorded in the preview export when a payment date is available.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.tenant-paid-date
+    description: Calendar date associated with tenant paid in the financial workflow.
   dt_landlord_due:
     description: Landlord invoice due date recorded in the preview snapshot.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.landlord-due-date
+    description: Calendar date associated with landlord due in the financial workflow.
   dt_landlord_paid:
     description: Landlord paid date recorded in the preview export when a payment date is available.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.landlord-paid-date
+    description: Calendar date associated with landlord paid in the financial workflow.
   dt_tenant_invoice_created_at:
     description: Date the tenant monthly invoice was created, when already present in the preview export.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.tenant-invoice-created-at
+    description: Calendar date associated with tenant invoice created at in the financial workflow.
   dt_landlord_invoice_created_at:
     description: Date the landlord monthly invoice was created, when already present in the preview export.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.landlord-invoice-created-at
+    description: Calendar date associated with landlord invoice created at in the financial workflow.
   year:
     description: Partition year of the calendar date when the preview snapshot was loaded into the datalake.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     description: Partition month of the calendar date when the preview snapshot was loaded into the datalake.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     description: Partition day of the calendar date when the preview snapshot was loaded into the datalake.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_load:
     description: Timestamp when the preview row was ingested into the datalake by the invoice_preview Spark job.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.ts_load
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

@@ -1,16 +1,16 @@
 ---
 database_name: datalake_grb_clean
 table_name: login_time
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: This table contains data related to the work hours of employees in the organization. It includes details such as the total time spent on breaks, logged-in time, talking time, and time without assistance. This data can be used to analyze work patterns, identify potential productivity issues, and evaluate the effectiveness of training programs. It can also help in tracking individual employee performance and identifying areas for improvement.
 columns:
   id_operator_cyber:
-    description: Cyber operator login
+    description: Identifier for the operator cyber referenced by this financial record.
     lineage:
       - datalake_grb_raw.tab_tempos.id_operador_cyber
   id_operator_grb:
-    description: GRB operator login
+    description: Identifier for the operator grb referenced by this financial record.
     lineage:
       - datalake_grb_raw.tab_tempos.id_operador_assessoria
   total_pause_time:
