@@ -89,6 +89,7 @@ columns:
   contract_bureau_code:
     description: Contract code as registered in the bureau
     lineage:
-    - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_CTR_BUREAU
+      - datalake_cyber_bureau_raw.tb_criticados_mnr.CD_CTR_BUREAU
   ts_load:
-    description: Timestamp when the record was loaded into the clean layer.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

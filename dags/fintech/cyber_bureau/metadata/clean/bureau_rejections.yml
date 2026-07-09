@@ -10,7 +10,7 @@ description: 'Stores information about contracts that were rejected by the burea
   '
 columns:
   ts_billing_cycle:
-    description: Timestamp marking the billing cycle of the rejected bureau submission.
+    description: Timestamp when billing cycle occurred in the upstream fintech system.
     lineage:
     - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.DT_CICLO_COBRANCA
   cpf_cnpj:
@@ -56,6 +56,7 @@ columns:
   detail_line:
     description: The full detail line that was rejected by the bureau
     lineage:
-    - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.LN_DETALHE
+      - datalake_cyber_bureau_raw.tb_rejeicoes_bureau.LN_DETALHE
   ts_load:
-    description: Timestamp when the record was loaded into the clean layer.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

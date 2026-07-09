@@ -20,6 +20,7 @@ columns:
   id_bureau:
     description: Bureau ID that defines this rejection reason
     lineage:
-    - datalake_cyber_bureau_raw.tb_motivos_rejeicoes_mnr.CD_BUREAU
+      - datalake_cyber_bureau_raw.tb_motivos_rejeicoes_mnr.CD_BUREAU
   ts_load:
-    description: Timestamp when the record was loaded into the clean layer.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

@@ -11,7 +11,7 @@ description: 'Internal table of CyberFinancial that contains the processes relat
   '
 columns:
   process_code:
-    description: Code identifying the bureau process type in CyberEngine configuration.
+    description: Financial attribute representing process code on the bureau_process dataset.
     lineage:
     - datalake_cyber_bureau_raw.tb_processo_bureau.CODIGO
   process_name:
@@ -29,6 +29,7 @@ columns:
   is_active:
     description: Flag indicating if the process is currently active
     lineage:
-    - datalake_cyber_bureau_raw.tb_processo_bureau.ATIVO
+      - datalake_cyber_bureau_raw.tb_processo_bureau.ATIVO
   ts_load:
-    description: Timestamp when the record was loaded into the clean layer.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

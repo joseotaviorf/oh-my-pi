@@ -68,3 +68,4 @@ columns:
     - datalake_cyber_bureau_raw.tb_empresa_bureau.OPERADOR
   ts_load:
     description: Timestamp when the record was loaded into the clean layer.
+    lineage: []

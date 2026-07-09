@@ -1,12 +1,12 @@
 ---
 database_name: datalake_cyber_clean
 table_name: users
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: This Table Contains all general data on system users.
 columns:
   id_user:
-    description: "Id user"
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_cyber_raw.collid.CLCOLLID
   id_unique_user:
@@ -17,12 +17,8 @@ columns:
     description: "Identifier in LDAP (if applicable)."
     lineage:
       - datalake_cyber_raw.collid.CLLDAPID
-  agency:
-    description: "Agency the user work for."
-    lineage:
-      - datalake_cyber_raw.collid.CLAGENCY
   record_type:
-    description: "Record type"
+    description: Financial attribute representing record type on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLRTYPE
   manager_type:
@@ -30,19 +26,19 @@ columns:
     lineage:
       - datalake_cyber_raw.collid.CLCTYPE
   user_type:
-    description: "User type"
+    description: Financial attribute representing user type on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLUTYPE
   administer_mode:
-    description: "Administer Mode"
+    description: Financial attribute representing administer mode on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLMODE
   supervisor:
-    description: "Supervisor"
+    description: Financial attribute representing supervisor on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLSUPV
   user_profile:
-    description: "User profile"
+    description: Financial attribute representing user profile on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLPROF
   time_inactivity:
@@ -53,36 +49,28 @@ columns:
     description: "User access status. Users will be registered with default value: 2 - 'Aberta' "
     lineage:
       - datalake_cyber_raw.collid.CLSTATUS
-  name:
-    description: "Name"
-    lineage:
-      - datalake_cyber_raw.collid.CLNAME
-  email:
-    description: "Email"
-    lineage:
-      - datalake_cyber_raw.collid.CLMAIL
   phone:
-    description: "Phone"
+    description: Financial attribute representing phone on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLPHONE
   phone_extension:
-    description: "Phone extension"
+    description: Financial attribute representing phone extension on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLEXT
   department:
-    description: ""
+    description: Financial attribute representing department on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLDEPT
   level:
-    description: ""
+    description: Financial attribute representing level on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLNIVEL
   title:
-    description: "Title (posto)"
+    description: Financial attribute representing title (posto) on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLTITLE
   greeting:
-    description: "Greeting code"
+    description: Financial attribute representing greeting on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLSALCD
   type_legal:
@@ -94,7 +82,7 @@ columns:
     lineage:
       - datalake_cyber_raw.collid.CLGROUP
   printer:
-    description: "Destination printer"
+    description: Financial attribute representing printer on the users dataset.
     lineage:
       - datalake_cyber_raw.collid.CLPRINT
   is_enabled:
@@ -102,7 +90,7 @@ columns:
     lineage:
       - datalake_cyber_raw.collid.CLENABLED
   ts_last_access:
-    description: "Date of last access"
+    description: Timestamp when last access occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.collid.CLLSTACSDT
   longitud_manager:
@@ -117,11 +105,26 @@ columns:
     description: "Indicate whether the user has read-only or normal (bypass option) access. Option valid only for assistants and managers (not supervisors)."
     lineage:
       - datalake_cyber_raw.collid.CLRONLY
-  CLCREUSER:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.collid.CLCREUSER
-  CLCHGUSER:
-    description: ""
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  ts_user_updated:
+    description: Timestamp when user updated occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_raw.collid.CLCHGUSER
+  ts_user_created:
+    description: Timestamp when user created occurred in the upstream fintech system.
+    lineage:
+      - datalake_cyber_raw.collid.CLCREUSER
+  user_email:
+    description: Financial attribute representing user email on the users dataset.
+    lineage:
+      - datalake_cyber_raw.collid.CLMAIL
+  user_name:
+    description: Financial attribute representing user name on the users dataset.
+    lineage:
+      - datalake_cyber_raw.collid.CLNAME
+  id_agency:
+    description: Identifier for the agency referenced by this financial record.
+    lineage:
+      - datalake_cyber_raw.collid.CLAGENCY

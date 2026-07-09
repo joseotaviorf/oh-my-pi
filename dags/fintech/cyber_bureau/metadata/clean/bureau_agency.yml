@@ -21,6 +21,7 @@ columns:
   company_cnpj:
     description: Company CNPJ (tax identification number)
     lineage:
-    - datalake_cyber_bureau_raw.tb_empresa.CD_EMP_CNPJ
+      - datalake_cyber_bureau_raw.tb_empresa.CD_EMP_CNPJ
   ts_load:
-    description: Timestamp when the record was loaded into the clean layer.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

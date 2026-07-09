@@ -1,8 +1,13 @@
 ---
 database_name: datalake_cyber_raw
 table_name: collid
+description:
+  One row per collid from the Cyber credit bureau integration, capturing
+  bureau inquiries, scores, and compliance checks for fintech risk decisions.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   CLPASSWD:
     tags:
       - Confidential
+    description: Financial attribute representing CLPASSWD on the collid dataset.

@@ -1,6 +1,6 @@
 database_name: datalake_cyber_audit_log_clean
 table_name: audit_log
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Clean audit log table from CyberFinancial system with available audit fields for security and compliance tracking
 columns:
