@@ -23,6 +23,12 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 class RawCDCWorkflow(BaseWorkflow):
     MAX_TABLES_PER_CLUSTER = 13
 
+    def _max_tables_per_cluster(self) -> int:
+        value = self.workflow_args.get("max_tables_per_cluster")
+        if value is None:
+            return self.MAX_TABLES_PER_CLUSTER
+        return int(value)
+
     def build_dag(self):
         dag = self.dag_instance()
         bucket = self.config_service.get_config("datalake_bucket")
@@ -161,7 +167,8 @@ class RawCDCWorkflow(BaseWorkflow):
         cluster_raw_tables = []
         cluster_clean_tables = []
         execute_job_cluster_local_id = 1
-        n_clusters = len(tables_customization) // self.MAX_TABLES_PER_CLUSTER + 1
+        max_tables_per_cluster = self._max_tables_per_cluster()
+        n_clusters = len(tables_customization) // max_tables_per_cluster + 1
         tables_per_cluster = math.ceil(len(tables_customization) / n_clusters)
         n_tables_so_far = 0
 

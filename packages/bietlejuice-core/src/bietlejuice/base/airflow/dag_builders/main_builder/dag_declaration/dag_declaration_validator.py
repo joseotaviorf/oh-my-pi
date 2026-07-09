@@ -78,6 +78,11 @@ class DAGDeclarationValidator(Validator):
                     "min": 1,
                     "required": False,
                 },
+                "max_tables_per_cluster": {
+                    "type": "integer",
+                    "min": 1,
+                    "required": False,
+                },
                 "optimize_parallelism": {
                     "type": "integer",
                     "min": 1,
