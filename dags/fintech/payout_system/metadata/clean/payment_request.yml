@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: payment_request
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Payment request (amount, payee, flow, status, due/paid dates and amounts).
 columns:
@@ -9,15 +9,15 @@ columns:
     lineage:
       - datalake_payout_system_raw.payment_request.id
   id_requester:
-    description: FK to requester.
+    description: Identifier for the requester referenced by this financial record.
     lineage:
       - datalake_payout_system_raw.payment_request.requester_id
   id_flow:
-    description: FK to flow.
+    description: Identifier for the flow referenced by this financial record.
     lineage:
       - datalake_payout_system_raw.payment_request.flow_id
   id_payee:
-    description: FK to payee.
+    description: Identifier for the payee referenced by this financial record.
     lineage:
       - datalake_payout_system_raw.payment_request.payee_id
   id_account:
@@ -37,7 +37,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.payment_request.external_id
   status:
-    description: Current payment status.
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_payout_system_raw.payment_request.status
   company_use:
@@ -53,7 +53,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.payment_request.attempt_number
   due_amount:
-    description: Amount to be paid.
+    description: Financial attribute representing due amount on the payment_request dataset.
     lineage:
       - datalake_payout_system_raw.payment_request.due_amount
   paid_amount:
@@ -69,7 +69,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.payment_request.paid_currency
   dt_due:
-    description: Payment due date.
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_payout_system_raw.payment_request.due_date
   dt_accrual:

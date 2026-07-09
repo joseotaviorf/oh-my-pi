@@ -1,6 +1,6 @@
 database_name: datalake_wall_street_clean
 table_name: acquire_chargeback
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: This table centralizes chargeback information processed by Simetrik, including transaction details and reason codes.
 columns:

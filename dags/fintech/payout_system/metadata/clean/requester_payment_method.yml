@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: requester_payment_method
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Per-requester payment method enablement and config overrides.
 columns:
@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.requester_payment_method.id
   id_requester:
-    description: FK to requester.
+    description: Identifier for the requester referenced by this financial record.
     lineage:
       - datalake_payout_system_raw.requester_payment_method.requester_id
   id_payment_method:

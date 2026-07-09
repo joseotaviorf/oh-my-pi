@@ -1,67 +1,91 @@
 ---
 database_name: datalake_wall_street_clean
 table_name: chargeback
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per chargeback in the Fintech clean layer, sourced from
+  datalake_wall_street_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 
 columns:
   id:
     lineage:
     - datalake_wall_street_raw.chargeback.id
+    description: Financial attribute representing id on the chargeback dataset.
   id_charge:
     lineage:
     - datalake_wall_street_raw.chargeback.chargeId
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
   id_transaction:
     lineage:
     - datalake_wall_street_raw.chargeback.transactionId
+    description: Identifier for the transaction referenced by this financial record.
   id_external:
     lineage:
     - datalake_wall_street_raw.chargeback.externalId
+    description: Identifier for the external referenced by this financial record.
   id_process:
     lineage:
     - datalake_wall_street_raw.chargeback.processId
+    description: Identifier for the process referenced by this financial record.
   acquirer:
     lineage:
     - datalake_wall_street_raw.chargeback.acquirer
+    description: Financial attribute representing acquirer on the chargeback dataset.
   acquirer_code:
     lineage:
     - datalake_wall_street_raw.chargeback.acquirerCode
+    description: Financial attribute representing acquirer code on the chargeback dataset.
   nsu:
     lineage:
     - datalake_wall_street_raw.chargeback.nsu
+    description: Financial attribute representing nsu on the chargeback dataset.
   card_code:
     lineage:
     - datalake_wall_street_raw.chargeback.cardCode
+    description: Financial attribute representing card code on the chargeback dataset.
   card_first_six_digits:
     lineage:
     - datalake_wall_street_raw.chargeback.cardFirstSixDigits
+    description: Financial attribute representing card first six digits on the chargeback dataset.
   card_last_four_digits:
     lineage:
     - datalake_wall_street_raw.chargeback.cardLastFourDigits
+    description: Financial attribute representing card last four digits on the chargeback dataset.
   authorization_code:
     lineage:
     - datalake_wall_street_raw.chargeback.authorizationCode
+    description: Financial attribute representing authorization code on the chargeback dataset.
   company_document:
     lineage:
     - datalake_wall_street_raw.chargeback.companyDocument
+    description: Financial attribute representing company document on the chargeback dataset.
   metadata:
     lineage:
     - datalake_wall_street_raw.chargeback.metadata
+    description: Structured JSON payload with provider-specific attributes not flattened into columns.
   ts_sent_to_bank:
     lineage:
     - datalake_wall_street_raw.chargeback.sentToBankDate
+    description: Timestamp when sent to bank occurred in the upstream fintech system.
   ts_acquirer_reference:
     lineage:
     - datalake_wall_street_raw.chargeback.acquirerReferenceDate
+    description: Timestamp when acquirer reference occurred in the upstream fintech system.
   ts_adjustment_entry:
     lineage:
     - datalake_wall_street_raw.chargeback.adjustmentEntryDate
+    description: Timestamp when adjustment entry occurred in the upstream fintech system.
   adjustment_amount:
     lineage:
     - datalake_wall_street_raw.chargeback.adjustmentAmount
+    description: Financial attribute representing adjustment amount on the chargeback dataset.
   total_installments:
     lineage:
     - datalake_wall_street_raw.chargeback.totalInstallments
+    description: Financial attribute representing total installments on the chargeback dataset.
   installment:
     lineage:
     - datalake_wall_street_raw.chargeback.installment
+    description: Financial attribute representing installment on the chargeback dataset.

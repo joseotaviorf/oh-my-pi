@@ -1,6 +1,6 @@
 database_name: datalake_wall_street_clean
 table_name: charge_aud
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Audit log of charge records from Wall Street, including revision
   metadata and field-level change tracking."
@@ -20,7 +20,7 @@ columns:
   rev_type:
     lineage:
       - datalake_wall_street_raw.charge_aud.revtype
-    description: "Revision type."
+    description: Financial attribute representing rev type on the charge_aud dataset.
   rev_end:
     lineage:
       - datalake_wall_street_raw.charge_aud.revend
@@ -28,19 +28,19 @@ columns:
   acquire:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquire
-    description: "Acquire name."
+    description: Financial attribute representing acquire on the charge_aud dataset.
   id_acquire:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquireid
-    description: "Acquire ID."
+    description: Identifier for the acquire referenced by this financial record.
   charge_status:
     lineage:
       - datalake_wall_street_raw.charge_aud.chargestatus
-    description: "Charge status."
+    description: Financial attribute representing charge status on the charge_aud dataset.
   acquire_charge_status:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquirechargestatus
-    description: "Acquire charge status."
+    description: Financial attribute representing acquire charge status on the charge_aud dataset.
   acquire_auth_code:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquireauthcode
@@ -48,11 +48,11 @@ columns:
   acquire_nsu:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquirensu
-    description: "Acquire NSU."
+    description: Financial attribute representing acquire nsu on the charge_aud dataset.
   id_acquire_transaction:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquiretid
-    description: "Acquire transaction ID."
+    description: Identifier for the acquire transaction referenced by this financial record.
   ts_paid:
     lineage:
       - datalake_wall_street_raw.charge_aud.paidat

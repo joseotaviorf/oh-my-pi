@@ -1,107 +1,85 @@
 database_name: datalake_wall_street_clean
 table_name: chargeback_notification
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per chargeback notification in the Fintech clean layer, sourced from
+  datalake_wall_street_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.id
-  id_chargeback:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.chargebackId
+    description: Financial attribute representing id on the chargeback_notification dataset.
   id_charge:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.chargeId
-  id_transaction:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.transactionId
-  id_external:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.externalId
-  id_process:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.processId
-  acquirer:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.acquirer
-  acquirer_code:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.acquirerCode
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
   nsu:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.nsu
-  card_code:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.cardCode
+    description: Financial attribute representing nsu on the chargeback_notification dataset.
   card_first_six_digits:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.cardFirstSixDigits
+    description: Financial attribute representing card first six digits on the chargeback_notification dataset.
   card_last_four_digits:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.cardLastFourDigits
+    description: Financial attribute representing card last four digits on the chargeback_notification dataset.
   authorization_code:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.authorizationCode
-  company_document:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.companyDocument
+    description: Financial attribute representing authorization code on the chargeback_notification dataset.
   metadata:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.metadata
-  ts_sent_to_bank:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.sentToBankDate
-  ts_acquirer_reference:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.acquirerReferenceDate
-  ts_adjustment_entry:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.adjustmentEntryDate
-  adjustment_amount:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.adjustmentAmount
-  total_installments:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.totalInstallments
-  installment:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.installment
+    description: Structured JSON payload with provider-specific attributes not flattened into columns.
   reference_number:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.referencenumber
+    description: Financial attribute representing reference number on the chargeback_notification dataset.
   protocol_number:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.protocolnumber
+    description: Financial attribute representing protocol number on the chargeback_notification dataset.
   acquirer_store_code:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.acquirerstorecode
-  sales_summary_number:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.salessummarynumber
+    description: Financial attribute representing acquirer store code on the chargeback_notification dataset.
   reason_code:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.reasoncode
+    description: Financial attribute representing reason code on the chargeback_notification dataset.
   sheet_number:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.sheetnumber
+    description: Financial attribute representing sheet number on the chargeback_notification dataset.
   terminal_code:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.terminalcode
+    description: Financial attribute representing terminal code on the chargeback_notification dataset.
   message:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.message
-  dt_transaction:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.transactiondate
-  dt_request:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.requestdate
-  dt_return:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.returndate
+    description: Financial attribute representing message on the chargeback_notification dataset.
   chargeback_amount:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.chargebackamount
+    description: Financial attribute representing chargeback amount on the chargeback_notification dataset.
   transaction_amount:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.transactionamount
+    description: Financial attribute representing transaction amount on the chargeback_notification dataset.
+  ts_transaction:
+    lineage: []
+    description: Timestamp when transaction occurred in the upstream fintech system.
+  sale_summary_number:
+    lineage: []
+    description: Financial attribute representing sale summary number on the chargeback_notification dataset.
+  ts_return:
+    lineage: []
+    description: Timestamp when return occurred in the upstream fintech system.
+  ts_request:
+    lineage: []
+    description: Timestamp when request occurred in the upstream fintech system.

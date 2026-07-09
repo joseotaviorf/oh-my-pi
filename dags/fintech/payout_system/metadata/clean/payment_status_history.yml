@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: payment_status_history
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Status change history per payment request (previous/new status, date, origin, principal).
 columns:

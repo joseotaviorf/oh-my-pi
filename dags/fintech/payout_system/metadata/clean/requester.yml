@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: requester
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Requester (client/system that creates payment requests; code, name, metadata).
 columns:
@@ -9,11 +9,11 @@ columns:
     lineage:
       - datalake_payout_system_raw.requester.id
   code:
-    description: Unique requester code.
+    description: Financial attribute representing code on the requester dataset.
     lineage:
       - datalake_payout_system_raw.requester.code
   name:
-    description: Requester name.
+    description: Financial attribute representing name on the requester dataset.
     lineage:
       - datalake_payout_system_raw.requester.name
   metadata:

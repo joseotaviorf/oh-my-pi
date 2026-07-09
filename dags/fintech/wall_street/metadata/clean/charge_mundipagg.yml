@@ -1,59 +1,81 @@
 database_name: datalake_wall_street_clean
 table_name: charge_mundipagg
-owner: ae-finance-fintech@quintoandar.com.br
+description:
+  One row per charge mundipagg in the Fintech clean layer, sourced from
+  datalake_wall_street_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.id
+    description: Financial attribute representing id on the charge_mundipagg dataset.
   acquire_message:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.acquireMessage
+    description: Financial attribute representing acquire message on the charge_mundipagg dataset.
   amount:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   id_card:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.cardId
+    description: Identifier for the card referenced by this financial record.
   ts_created:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.createdAt
+    description: Timestamp when created occurred in the upstream fintech system.
   currency:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.currency
+    description: ISO currency code for the monetary amount, typically BRL.
   id_customer:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.customerId
+    description: Identifier for the customer referenced by this financial record.
   ts_due:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.dueAt
+    description: Timestamp when due occurred in the upstream fintech system.
   id_gateway:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.gatewayId
+    description: Identifier for the gateway referenced by this financial record.
   ts_paid:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.paidAt
+    description: Timestamp when paid occurred in the upstream fintech system.
   payment_method:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.paymentMethod
+    description: Financial attribute representing payment method on the charge_mundipagg dataset.
   status:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   ts_updated:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.updatedAt
+    description: Timestamp when updated occurred in the upstream fintech system.
   acquire_return_code:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.acquireReturnCode
+    description: Financial attribute representing acquire return code on the charge_mundipagg dataset.
   acquire_auth_code:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.acquireAuthCode
+    description: Financial attribute representing acquire auth code on the charge_mundipagg dataset.
   acquire_nsu:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.acquireNsu
+    description: Financial attribute representing acquire nsu on the charge_mundipagg dataset.
   acquire_tid:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.acquireTid
+    description: Financial attribute representing acquire tid on the charge_mundipagg dataset.
   acquire_name:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.acquireName
+    description: Financial attribute representing acquire name on the charge_mundipagg dataset.

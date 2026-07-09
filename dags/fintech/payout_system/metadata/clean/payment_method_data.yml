@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: payment_method_data
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Method-specific payload per payment request (e.g. boleto/PIX data as JSON).
 columns:

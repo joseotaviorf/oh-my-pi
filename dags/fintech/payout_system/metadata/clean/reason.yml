@@ -1,6 +1,6 @@
 database_name: datalake_payout_system_clean
 table_name: reason
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Reason codes (provider codes, category, mapped status, terminal/retryable flags).
 columns:
@@ -17,15 +17,15 @@ columns:
     lineage:
       - datalake_payout_system_raw.reason.provider_code
   name:
-    description: Reason name.
+    description: Financial attribute representing name on the reason dataset.
     lineage:
       - datalake_payout_system_raw.reason.name
   description:
-    description: Reason description.
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
       - datalake_payout_system_raw.reason.description
   category_key:
-    description: Semantic category key.
+    description: Financial attribute representing category key on the reason dataset.
     lineage:
       - datalake_payout_system_raw.reason.category_key
   category_label_pt:
@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.reason.sub_category_label_pt
   mapped_status:
-    description: Mapped payment status.
+    description: Financial attribute representing mapped status on the reason dataset.
     lineage:
       - datalake_payout_system_raw.reason.mapped_status
   version:
@@ -61,7 +61,7 @@ columns:
     lineage:
       - datalake_payout_system_raw.reason.retryable
   documentation_url:
-    description: URL to documentation.
+    description: Financial attribute representing documentation url on the reason dataset.
     lineage:
       - datalake_payout_system_raw.reason.documentation_url
   ts_created:
