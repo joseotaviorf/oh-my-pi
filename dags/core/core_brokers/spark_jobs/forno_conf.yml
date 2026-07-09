@@ -1,4 +1,5 @@
 ENTITY_TYPE: "BROKER"
+merge_on_brokers: ["sk_broker"]
 COMPANY_TABLE: "datalake_company_clean.company"
 COMPANY_ADDRESS_TABLE: "datalake_company_clean.company_address"
 COMPANY_DOCUMENT_TABLE: "datalake_company_clean.company_document"

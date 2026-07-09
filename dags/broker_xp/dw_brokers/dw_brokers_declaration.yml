@@ -36,6 +36,7 @@ workflow:
   tables_customization:
     dim_broker:
       partitions: [year, month, day]
+      merge_on: [sk_broker]
       z_order_by: [sk_broker]
       table_privileges:
         3p-readers:

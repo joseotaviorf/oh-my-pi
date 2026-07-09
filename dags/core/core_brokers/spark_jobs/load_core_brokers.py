@@ -270,6 +270,16 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
             current_timestamp().alias("ts_load"),
         )
 
+    def run_pipeline(self, dataframe: DataFrame, args, spark: SparkSession) -> None:
+        """Override to use brokers-specific merge config (merge_on_brokers)."""
+        self._run_pipeline_with_config(
+            dataframe,
+            args,
+            spark,
+            merge_on_key="merge_on_brokers",
+            update_condition_key="when_matched_update_condition_brokers",
+        )
+
 
 if __name__ == "__main__":
     job = CoreBrokersSparkJob()

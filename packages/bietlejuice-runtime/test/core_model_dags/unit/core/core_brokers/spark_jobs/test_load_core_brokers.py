@@ -503,3 +503,28 @@ class TestLoadData:
 
         # assert
         assert result.count() == 2
+
+
+class TestRunPipelineOverride:
+    """Verifies that CoreBrokersSparkJob.run_pipeline delegates to _run_pipeline_with_config."""
+
+    def test_run_pipeline_calls_run_pipeline_with_config(self, core_brokers_job):
+        from unittest.mock import MagicMock, patch
+
+        df = MagicMock()
+        args = MagicMock()
+        spark = MagicMock()
+
+        with patch.object(
+            core_brokers_job,
+            "_run_pipeline_with_config",
+        ) as mock_run:
+            core_brokers_job.run_pipeline(df, args, spark)
+
+        mock_run.assert_called_once_with(
+            df,
+            args,
+            spark,
+            merge_on_key="merge_on_brokers",
+            update_condition_key="when_matched_update_condition_brokers",
+        )
