@@ -1,43 +1,64 @@
 database_name: datalake_iaf_clean
 table_name: return_dialer_mailling
+description:
+  One row per return dialer mailling in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.id
+    description: Financial attribute representing id on the return_dialer_mailling dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_mailling:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.idmailling
+    description: Identifier for the mailling referenced by this financial record.
   id_line:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.fila_id
+    description: Identifier for the line referenced by this financial record.
   id_status_return:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.status_ret_id
+    description: Identifier for the status return referenced by this financial record.
   id_ret:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.id_ret
+    description: Identifier for the ret referenced by this financial record.
   id_ext:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.id_ext
+    description: Identifier for the ext referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.processo
+    description: Financial attribute representing process on the return_dialer_mailling dataset.
   phone:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.fone
+    description: Financial attribute representing phone on the return_dialer_mailling dataset.
   status_ret:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.status_ret
+    description: Financial attribute representing status ret on the return_dialer_mailling dataset.
   external_status_return:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.status_ret_externo
+    description: Financial attribute representing external status return on the return_dialer_mailling dataset.
   hr_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.hora_cad
+    description: Financial attribute representing hr cad on the return_dialer_mailling dataset.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_mailling_discador_retorno.data_cad
+    description: Calendar date associated with cad in the financial workflow.
+  status:
+    lineage: []
+    description: Current lifecycle status of the financial entity in the upstream operational system.

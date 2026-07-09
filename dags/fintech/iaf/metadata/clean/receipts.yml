@@ -1,70 +1,96 @@
 database_name: datalake_iaf_clean
 table_name: receipts
+description: One row per receipts in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.id
+    description: Financial attribute representing id on the receipts dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   id_agreement:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.idparc_acordo
+    description: Identifier for the agreement referenced by this financial record.
   id_account:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.idconta
+    description: Identifier for the account referenced by this financial record.
   id_invoice:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.idboleto
+    description: Invoice identifier in the billing or payments platform.
   id_bank_check:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.idcheque
+    description: Identifier for the bank check referenced by this financial record.
   id_account_plan:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.idplanoconta
+    description: Identifier for the account plan referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.processo
+    description: Financial attribute representing process on the receipts dataset.
   value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.valor
+    description: Financial attribute representing value on the receipts dataset.
   status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   payment_type:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.formapagto
+    description: Financial attribute representing payment type on the receipts dataset.
   payment_local:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.localpagto
+    description: Financial attribute representing payment local on the receipts dataset.
   user_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.usuario_cad
+    description: Financial attribute representing user cad on the receipts dataset.
   code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.codigo
+    description: Financial attribute representing code on the receipts dataset.
   original_code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.codigo_origi
+    description: Financial attribute representing original code on the receipts dataset.
   block:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.bloq
+    description: Financial attribute representing block on the receipts dataset.
   obs_block:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.obs_bloq
+    description: Financial attribute representing obs block on the receipts dataset.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.obs
+    description: Financial attribute representing obs on the receipts dataset.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.data_cad
+    description: Calendar date associated with cad in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_recebimentos.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

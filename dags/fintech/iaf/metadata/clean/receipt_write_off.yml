@@ -1,91 +1,128 @@
 database_name: datalake_iaf_clean
 table_name: receipt_write_off
+description:
+  One row per receipt write off in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.id
+    description: Financial attribute representing id on the receipt_write_off dataset.
   id_write_off_old:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.idbaixa_old
+    description: Identifier for the write off old referenced by this financial record.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   id_receipt:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.idrecebimento
+    description: Identifier for the receipt referenced by this financial record.
   id_title:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.idtitulo
+    description: Identifier for the title referenced by this financial record.
   cad_user:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.usuario_cad
+    description: Financial attribute representing cad user on the receipt_write_off dataset.
   alt_neg_user:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.usuario_alt_neg
+    description: Financial attribute representing alt neg user on the receipt_write_off dataset.
   negotiator:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.negociador
+    description: Financial attribute representing negotiator on the receipt_write_off dataset.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.obs
+    description: Financial attribute representing obs on the receipt_write_off dataset.
   paid_capital:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.capitalpago
+    description: Financial attribute representing paid capital on the receipt_write_off dataset.
   paid_protest:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.protestopago
+    description: Financial attribute representing paid protest on the receipt_write_off dataset.
   paid_fee:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.jurospago
+    description: Financial attribute representing paid fee on the receipt_write_off dataset.
   paid_fine:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.multapago
+    description: Financial attribute representing paid fine on the receipt_write_off dataset.
   paid_honorary:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.honorariospago
+    description: Financial attribute representing paid honorary on the receipt_write_off dataset.
   paid_discount:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.descontopago
+    description: Financial attribute representing paid discount on the receipt_write_off dataset.
   total_paid:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.totalpago
+    description: Financial attribute representing total paid on the receipt_write_off dataset.
   paid_tax:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.taxapago
+    description: Financial attribute representing paid tax on the receipt_write_off dataset.
   paid_pd:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.pdpago
+    description: Financial attribute representing paid pd on the receipt_write_off dataset.
   paid_comi_hon:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.comi_hon_paga
+    description: Financial attribute representing paid comi hon on the receipt_write_off dataset.
   paid_adm_tax:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.taxaadmpago
+    description: Financial attribute representing paid adm tax on the receipt_write_off dataset.
   paid_out_tax:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.taxaoutpago
+    description: Financial attribute representing paid out tax on the receipt_write_off dataset.
   paid_ret_fee:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.jurosretpago
+    description: Financial attribute representing paid ret fee on the receipt_write_off dataset.
   total_discharge:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.quitacaotot
+    description: Financial attribute representing total discharge on the receipt_write_off dataset.
   phase:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.fase
+    description: Financial attribute representing phase on the receipt_write_off dataset.
   origin:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.origem
+    description: Financial attribute representing origin on the receipt_write_off dataset.
   dt_write_off:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.databaixa
+    description: Calendar date associated with write off in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_baixas.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.
+  process:
+    lineage: []
+    description: Financial attribute representing process on the receipt_write_off dataset.

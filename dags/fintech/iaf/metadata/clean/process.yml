@@ -1,64 +1,88 @@
 database_name: datalake_iaf_clean
 table_name: process
+description: One row per process in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.id
+    description: Financial attribute representing id on the process dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.processo
+    description: Financial attribute representing process on the process dataset.
   status_cod:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.status_cod
+    description: Financial attribute representing status cod on the process dataset.
   cod_imp_reopen:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.reaberto_codimp
+    description: Financial attribute representing cod imp reopen on the process dataset.
   status_desc:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.status_desc
+    description: Financial attribute representing status desc on the process dataset.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.obs
+    description: Financial attribute representing obs on the process dataset.
   dt_schedule:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.agenda_data
+    description: Calendar date associated with schedule in the financial workflow.
   hr_schedule:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.agenda_hora
+    description: Financial attribute representing hr schedule on the process dataset.
   obs_schedule:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.agenda_obs
+    description: Financial attribute representing obs schedule on the process dataset.
   last_occurrence:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.ocorrencia_ultima
+    description: Financial attribute representing last occurrence on the process dataset.
   status_negociator:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.status_negociador
+    description: Financial attribute representing status negociator on the process dataset.
   status_cod_bkp:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.status_cod_bkp
+    description: Financial attribute representing status cod bkp on the process dataset.
   status_desc_bkp:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.status_desc_bkp
+    description: Financial attribute representing status desc bkp on the process dataset.
   negociator_schedule:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.agenda_negociador
+    description: Financial attribute representing negociator schedule on the process dataset.
   occurrence_last_status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.ocorrencia_ultimo_status
+    description: Financial attribute representing occurrence last status on the process dataset.
   phase:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.fase
+    description: Financial attribute representing phase on the process dataset.
   dt_reopened:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.reaberto_data
+    description: Calendar date associated with reopened in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_processo.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

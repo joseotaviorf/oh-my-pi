@@ -1,25 +1,37 @@
 database_name: datalake_iaf_clean
 table_name: installment_items
+description:
+  One row per installment items in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao_itens.id
+    description: Financial attribute representing id on the installment_items dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao_itens.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_installment:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao_itens.idprestacao
+    description: Identifier for the installment referenced by this financial record.
   id_write_off:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao_itens.idbaixa
+    description: Identifier for the write off referenced by this financial record.
   number_installment:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao_itens.nprestacao
+    description: Financial attribute representing number installment on the installment_items dataset.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao_itens.obs
+    description: Financial attribute representing obs on the installment_items dataset.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao_itens.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

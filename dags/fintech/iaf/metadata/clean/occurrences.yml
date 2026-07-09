@@ -1,70 +1,96 @@
 database_name: datalake_iaf_clean
 table_name: occurrences
+description: One row per occurrences in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   id_receipt:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.idrecebimento
+    description: Identifier for the receipt referenced by this financial record.
   id_occurrence:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.idocorrencia
+    description: Identifier for the occurrence referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.processo
+    description: Financial attribute representing process on the occurrences dataset.
   operator:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.operador
+    description: Financial attribute representing operator on the occurrences dataset.
   int_note:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.anotaint
+    description: Financial attribute representing int note on the occurrences dataset.
   ext_note:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.anotaext
+    description: Financial attribute representing ext note on the occurrences dataset.
   desc_status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.descstatus
+    description: Financial attribute representing desc status on the occurrences dataset.
   total_seconds:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.segundostotal
+    description: Financial attribute representing total seconds on the occurrences dataset.
   operator_type:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.operadortipo
+    description: Financial attribute representing operator type on the occurrences dataset.
   code_status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.codstatus
+    description: Financial attribute representing code status on the occurrences dataset.
   origin:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.origem
+    description: Financial attribute representing origin on the occurrences dataset.
   hr_begin:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.horainicial
+    description: Financial attribute representing hr begin on the occurrences dataset.
   hr_end:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.horafinal
+    description: Financial attribute representing hr end on the occurrences dataset.
   total_time:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.tempototal
+    description: Financial attribute representing total time on the occurrences dataset.
   tab:
     lineage:
       - datalake_gsheets_clean.quintocred_iaf_occurrences.tab
+    description: Financial attribute representing tab on the occurrences dataset.
   effort:
     lineage:
       - datalake_gsheets_clean.quintocred_iaf_occurrences.effort
+    description: Financial attribute representing effort on the occurrences dataset.
   massive:
     lineage:
       - datalake_gsheets_clean.quintocred_iaf_occurrences.massive
+    description: Financial attribute representing massive on the occurrences dataset.
   channel:
     lineage:
       - datalake_gsheets_clean.quintocred_iaf_occurrences.channel
+    description: Financial attribute representing channel on the occurrences dataset.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.datacad
+    description: Calendar date associated with cad in the financial workflow.

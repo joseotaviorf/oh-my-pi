@@ -1,52 +1,72 @@
 database_name: datalake_iaf_clean
 table_name: return
+description: One row per return in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.id
+    description: Financial attribute representing id on the return dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.codigo
+    description: Financial attribute representing code on the return dataset.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.processo
+    description: Financial attribute representing process on the return dataset.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.data_cad
+    description: Calendar date associated with cad in the financial workflow.
   dt_dev:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.data_dev
+    description: Calendar date associated with dev in the financial workflow.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.obs
+    description: Financial attribute representing obs on the return dataset.
   reason:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.motivo
+    description: Financial attribute representing reason on the return dataset.
   code_reason:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.cod_motivo
+    description: Financial attribute representing code reason on the return dataset.
   status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   user_conc:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.usuario_conc
+    description: Financial attribute representing user conc on the return dataset.
   user_incl:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.usuario_incl
+    description: Financial attribute representing user incl on the return dataset.
   origin:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.origem
+    description: Financial attribute representing origin on the return dataset.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devolucao.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

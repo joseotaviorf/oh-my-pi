@@ -1,88 +1,120 @@
 database_name: datalake_iaf_clean
 table_name: installment
+description: One row per installment in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.id
+    description: Financial attribute representing id on the installment dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_pc_old:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.idpc_old
+    description: Identifier for the pc old referenced by this financial record.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.codigo
+    description: Financial attribute representing code on the installment dataset.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.obs
+    description: Financial attribute representing obs on the installment dataset.
   number_pass_through:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.nrepasse
+    description: Financial attribute representing number pass through on the installment dataset.
   status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   pass_through_type:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.forma_repasse
+    description: Financial attribute representing pass through type on the installment dataset.
   audit_user:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.usuario_auditoria
+    description: Financial attribute representing audit user on the installment dataset.
   payment_local:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.localpagto
+    description: Financial attribute representing payment local on the installment dataset.
   total_tax_adm:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.total_taxa_adm
+    description: Financial attribute representing total tax adm on the installment dataset.
   conf_status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.conf_status
+    description: Financial attribute representing conf status on the installment dataset.
   conf_user:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.conf_usuario
+    description: Financial attribute representing conf user on the installment dataset.
   conf_obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.conf_obs
+    description: Financial attribute representing conf obs on the installment dataset.
   ret_email:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.retemail
+    description: Financial attribute representing ret email on the installment dataset.
   user_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.usuario_cad
+    description: Financial attribute representing user cad on the installment dataset.
   user_alt:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.usuario_alt
+    description: Financial attribute representing user alt on the installment dataset.
   total_credit:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.total_credito
+    description: Financial attribute representing total credit on the installment dataset.
   total_tax_contr:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.total_taxa_contr
+    description: Financial attribute representing total tax contr on the installment dataset.
   total_pass_through:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.total_taxa_contr
+    description: Financial attribute representing total pass through on the installment dataset.
   total_other_debts:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.total_outros_debitos
+    description: Financial attribute representing total other debts on the installment dataset.
   total_honorary:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.total_hon
+    description: Financial attribute representing total honorary on the installment dataset.
   total_pd:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.total_pd
+    description: Financial attribute representing total pd on the installment dataset.
   dt_rec:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.data_rec
+    description: Calendar date associated with rec in the financial workflow.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.data_cad
+    description: Calendar date associated with cad in the financial workflow.
   dt_audit:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.data_auditoria
+    description: Calendar date associated with audit in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_prestacao.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

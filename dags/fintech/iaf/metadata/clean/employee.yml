@@ -1,145 +1,196 @@
 database_name: datalake_iaf_clean
 table_name: employee
+description: One row per employee in the Fintech clean layer, sourced from
+    datalake_iaf_clean for payments, billing, and financial operations
+    reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
     id:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.id
+        description: Financial attribute representing id on the employee dataset.
     id_company:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.idempresa
+        description: Identifier for the company referenced by this financial record.
     id_group:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.idgrupo
+        description: Identifier for the group referenced by this financial record.
     code:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.codigo
+        description: Financial attribute representing code on the employee dataset.
     name:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.nome
+        description: Financial attribute representing name on the employee dataset.
     cpf:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.cpf
+        description: Brazilian individual taxpayer registry number (CPF) used for identity verification (PII).
     rg:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.rg
+        description: Financial attribute representing rg on the employee dataset.
     address:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.endereco
+        description: Financial attribute representing address on the employee dataset.
     address_number:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.end_numero
+        description: Financial attribute representing address number on the employee dataset.
     zip_code:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.end_cep
+        description: Financial attribute representing zip code on the employee dataset.
     city:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.end_cidade
+        description: Financial attribute representing city on the employee dataset.
     uf:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.end_uf
+        description: Financial attribute representing uf on the employee dataset.
     first_phone:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.fone1
+        description: Financial attribute representing first phone on the employee dataset.
     second_phone:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.fone2
+        description: Financial attribute representing second phone on the employee dataset.
     first_email:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.email1
+        description: Financial attribute representing first email on the employee dataset.
     second_email:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.email2
+        description: Financial attribute representing second email on the employee dataset.
     obs:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.obs
+        description: Financial attribute representing obs on the employee dataset.
     login:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.ac_login
+        description: Financial attribute representing login on the employee dataset.
     password:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.ac_senha
+        description: Financial attribute representing password on the employee dataset.
     email:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.ac_email
+        description: Financial attribute representing email on the employee dataset.
     commission:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.comissao
+        description: Financial attribute representing commission on the employee dataset.
     contract_tax:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.taxa_contrato
+        description: Financial attribute representing contract tax on the employee dataset.
     status:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.status
+        description: Current lifecycle status of the financial entity in the upstream operational system.
     phase:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.fase
+        description: Financial attribute representing phase on the employee dataset.
     bank:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.p_banco
+        description: Financial attribute representing bank on the employee dataset.
     agency:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.p_agencia
+        description: Financial attribute representing agency on the employee dataset.
     account:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.p_conta
+        description: Financial attribute representing account on the employee dataset.
     obs_p:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.p_obs
+        description: Financial attribute representing obs p on the employee dataset.
     address_complement:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.end_compl
+        description: Financial attribute representing address complement on the employee dataset.
     profile:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.perfil
+        description: Financial attribute representing profile on the employee dataset.
     last_access:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.ultimo_acesso
+        description: Financial attribute representing last access on the employee dataset.
     pd_tax:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.taxa_pd
+        description: Financial attribute representing pd tax on the employee dataset.
     access_level:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.ac_nivel_acesso
+        description: Financial attribute representing access level on the employee dataset.
     status_pause:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.pausa_status
+        description: Financial attribute representing status pause on the employee dataset.
     reason_pause:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.pausa_motivo
+        description: Financial attribute representing reason pause on the employee dataset.
     leader_function:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.funcao_lider
+        description: Financial attribute representing leader function on the employee dataset.
     com_function:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.funcao_com
+        description: Financial attribute representing com function on the employee dataset.
     neg_function:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.funcao_neg
+        description: Financial attribute representing neg function on the employee dataset.
     commercial_manager:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.ger_comercial
+        description: Financial attribute representing commercial manager on the employee dataset.
     commision_type:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.tp_comissao
+        description: Financial attribute representing commision type on the employee dataset.
     is_fix_ip:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.ipfixo
+        description: Indicates whether fix ip applies to this financial record.
     dt_adm:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.data_adm
+        description: Calendar date associated with adm in the financial workflow.
     dt_dem:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.data_dem
+        description: Calendar date associated with dem in the financial workflow.
     ts_updated:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.last_update
+        description: Timestamp when updated occurred in the upstream fintech system.
     neighborhood:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.end_bairro
+        description: Financial attribute representing neighborhood on the employee dataset.
     extension:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.ramal
+        description: Financial attribute representing extension on the employee dataset.
     manager:
         lineage:
             - datalake_iaf_raw.vi_319_tb_colaborador.permgestor
+        description: Financial attribute representing manager on the employee dataset.

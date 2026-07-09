@@ -1,64 +1,89 @@
 database_name: datalake_iaf_clean
 table_name: qualifies_calls
+description:
+  One row per qualifies calls in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.id
+    description: Financial attribute representing id on the qualifies_calls dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   id_uuid:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.id_uuid
+    description: Identifier for the uuid referenced by this financial record.
   id_occurrence:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.idocorrencia
+    description: Identifier for the occurrence referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.processo
+    description: Financial attribute representing process on the qualifies_calls dataset.
   operator:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.operador
+    description: Financial attribute representing operator on the qualifies_calls dataset.
   qualifies:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.qualifica
+    description: Financial attribute representing qualifies on the qualifies_calls dataset.
   phone:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.fone
+    description: Financial attribute representing phone on the qualifies_calls dataset.
   user_field:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.userfield
+    description: Financial attribute representing user field on the qualifies_calls dataset.
   extension:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.ramal
+    description: Financial attribute representing extension on the qualifies_calls dataset.
   disposition:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.disposition
+    description: Financial attribute representing disposition on the qualifies_calls dataset.
   positive:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.positivo
+    description: Financial attribute representing positive on the qualifies_calls dataset.
   user_field_2:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.userfield2
+    description: Financial attribute representing user field 2 on the qualifies_calls dataset.
   total_seconds:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.segundostotal
+    description: Financial attribute representing total seconds on the qualifies_calls dataset.
   alo:
     lineage:
       - datalake_gsheets_clean.quintocred_iaf_qualifies_calls.alo
+    description: Financial attribute representing alo on the qualifies_calls dataset.
   cpc:
     lineage:
       - datalake_gsheets_clean.quintocred_iaf_qualifies_calls.cpc
+    description: Financial attribute representing cpc on the qualifies_calls dataset.
   hr_cad:
     lineage:
-      - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.hora_cad     
+      - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.hora_cad
+    description: Financial attribute representing hr cad on the qualifies_calls dataset.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.data_cad
+    description: Calendar date associated with cad in the financial workflow.
