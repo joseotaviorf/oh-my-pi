@@ -48,15 +48,13 @@ columns:
   status_history:
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.status_history
-    description: 'Sale status linked to a certain point in time of the listing. Can
-      be one of these: - CCV_CANCELED - CCV_SIGNED - EDITING - OPTED_OUT - PUBLISHED
-      - SALE_COMPLETED - SUSPENDED - UNPUBLISHED'
+    description: Sale status linked to a certain point in time of the listing.
     categories:
       CCV_CANCELED: If the listing is in the process of sales cancellation during
         the change
       CCV_SIGNED: If the listing is in the process of being sold during the change
       EDITING: If the listing is being edited during the change
-      OPTED_OUT: If the listing has not even been published yet (probably bug)
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: If the listing is published during the change
       SALE_COMPLETED: If the listing is already sold during the change
       SUSPENDED: If the listing is suspended during the change
@@ -146,7 +144,7 @@ columns:
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.is_last_price
     description: Flag that signals the most recent publication price of the listing.
-  is_smart_price_change: 
+  is_smart_price_change:
     description: Boolean that tells if the price change is a smart price change. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
   ts_load:
     description: Timestamp of when the table was last processed.

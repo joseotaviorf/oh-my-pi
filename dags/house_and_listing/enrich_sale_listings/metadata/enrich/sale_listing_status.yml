@@ -44,7 +44,7 @@ columns:
     description: The status of the sale listing at the time of the change.
     categories:
       EDITING: If the listing is being edited.
-      OPTED_OUT: If a listing has opted out of the funnel before being published.
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: If the listing is published.
       SUSPENDED: If the listing is suspended.
       UNPUBLISHED: If the listing is unpublished.

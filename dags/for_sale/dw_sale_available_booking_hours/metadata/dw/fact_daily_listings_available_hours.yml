@@ -30,7 +30,7 @@ columns:
         the change
       CCV_SIGNED: If the listing is in the process of being sold during the change
       EDITING: If the listing is being edited during the change
-      OPTED_OUT: If the listing has not even been published yet (probably bug)
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: If the listing is published during the change
       SALE_COMPLETED: If the listing is already sold during the change
       SUSPENDED: If the listing is suspended during the change

@@ -1,7 +1,7 @@
 database_name: dw_sale
 table_name: fact_listing_status
-description: This table keeps track of every status change of For Sale listings. 
-  Therefore, a listing can have multiple rows in this table, one for each status change, with its start and end date (if any). 
+description: This table keeps track of every status change of For Sale listings.
+  Therefore, a listing can have multiple rows in this table, one for each status change, with its start and end date (if any).
   An example would be the first row of a listing where the first status is editing (pre-publication) and the second is published (post-publication).
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
@@ -46,7 +46,7 @@ columns:
     description: Sale status linked to a certain point in time of the listing.
     categories:
       EDITING: If the listing is being edited.
-      OPTED_OUT: If a listing has opted out of the funnel before being published.
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: If the listing is published.
       SUSPENDED: If the listing is suspended.
       UNPUBLISHED: If the listing is unpublished.

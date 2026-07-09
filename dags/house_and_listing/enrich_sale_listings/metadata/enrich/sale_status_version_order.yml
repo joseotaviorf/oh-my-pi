@@ -7,10 +7,10 @@ owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_ebdb_clean.house_aud.id_house 
-    description: Foreign key referring to the house ID. 
+      - datalake_ebdb_clean.house_aud.id_house
+    description: Foreign key referring to the house ID.
   id_user_revision:
-    lineage: 
+    lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
     description: Foreign key referring to the author who made the status change trigger.
   id_region:
@@ -27,7 +27,7 @@ columns:
     description: Sale status linked to a certain point in time of the listing.
     categories:
       EDITING: If the listing is being edited during the change
-      OPTED_OUT: If the listing has not even been published yet (probably bug)
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: If the listing is published during the change
       SUSPENDED: If the listing is suspended during the change
       UNPUBLISHED: If the listing is unpublished during the change
@@ -51,7 +51,7 @@ columns:
     description: Sale status linked to a certain point in time of the listing. However, if the status is null, it will be considered as published.
     categories:
       EDITING: If the listing is being edited during the change
-      OPTED_OUT: If the listing has not even been published yet (probably bug)
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: If the listing is published during the change
       SUSPENDED: If the listing is suspended during the change
       UNPUBLISHED: If the listing is unpublished during the change
@@ -77,8 +77,8 @@ columns:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Timestamp of the next date of the status change for the row.
-  ts_status_changed_new: 
+  ts_status_changed_new:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
       - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Coaleced timestamp with the timestamp of the first publication or the timestamp of the status change. That is, when a listing does not have a defined status, we attach  
+    description: Coaleced timestamp with the timestamp of the first publication or the timestamp of the status change. That is, when a listing does not have a defined status, we attach

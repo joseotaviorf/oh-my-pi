@@ -209,13 +209,11 @@ columns:
       edicao: Editing.
       edicaoSemUsuario: No user editing.
       edicaoUsuarioNaoConfirmado: Unconfirmed user editing.
-      excluido:
-        Excluded - when the house listing has been removed when it was in
-        the "edicao" status (no photos).
+      excluido: Legacy house-level exclusion (House.status). Set only when all LBCs on the house are OPTED_OUT. Not equivalent to OPTED_OUT on one context alone.
       publicado: Published.
       suspenso: Suspended.
       EDITING: Editing.
-      OPTED_OUT: Owner opted out.
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: Published.
       SUSPENDED: Suspended.
       UNPUBLISHED:
@@ -231,7 +229,7 @@ columns:
     description: Latest sale status of this house.
     categories:
       EDITING: Editing.
-      OPTED_OUT: Owner opted out.
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: Published.
       SUSPENDED: Suspended.
       UNPUBLISHED:
@@ -248,7 +246,7 @@ columns:
   house_status:
     lineage:
       - datalake_ebdb_listing.house.status
-    description: Current operational status of the house.
+    description: Legacy house-level status (House.status). Not source of truth for per-context RENT/SALE status — use house_rent_status / house_sale_status from LBC.
     categories:
       aguardando_publicacao: Waiting publication
       alugado: Rented
@@ -258,9 +256,7 @@ columns:
       edicao: Editing
       edicaoSemUsuario: No user editing
       edicaoUsuarioNaoConfirmado: Unconfirmed user editing
-      excluido:
-        Excluded - when the house listing has been removed when it was in
-        the "edicao" status (no photos).
+      excluido: Legacy house-level exclusion (House.status). Set only when all business contexts on the house are OPTED_OUT. Not equivalent to OPTED_OUT on one context alone.
       publicado: Published
       suspenso: Suspended
   house_total_area:
@@ -553,11 +549,18 @@ columns:
   status:
     lineage:
       - datalake_ebdb_listing.house_listing.status
-    description: Current publication lifecycle status of the rent listing (e.g., published, suspended).
+    description: |
+      Current publication lifecycle status at listing-version grain. When is_for_rent = TRUE (rent-only or hybrid), reflects the RENT listing version — on hybrid rows use house_sale_status for sale-side status. When is_for_rent = FALSE and is_for_sale = TRUE (sale-only), reflects the SALE publication lifecycle.
+    categories:
+      EDITING: Under edition; listing not published yet.
+      PUBLISHED: Published and receiving demand.
+      SUSPENDED: Temporarily suspended; not receiving demand.
+      UNPUBLISHED: Unpublished; not receiving demand.
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
   status_reason:
     lineage:
       - datalake_ebdb_listing.house_listing.status_reason
-    description: Reason for the current house listing status.
+    description: Business reason code for status — RENT listing version on rent/hybrid rows (is_for_rent = TRUE); SALE on sale-only rows (is_for_rent = FALSE, is_for_sale = TRUE). On hybrids, use house_rent_status_reason / house_sale_status_reason for per-context LBC reasons.
   ts_administrator_changed:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision

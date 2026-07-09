@@ -116,6 +116,12 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/first_listings_1p.md` — FL 1P: official First Listings metric for 1P supply, counting unique properties/listings first published in the selected period for For Rent and For Sale in Brazil, with channel classification separating 1P from 3P/Rede supply. Builds on `business_entities/supply.md`.
 
+- `metric_entities/listing_to_rental.md` — **L2R** (Listing to Rental / Listing to Contract Signed): monthly corporate rate plus weekly, daily, windowed (4W/8W), and days-to-contract views on `dim_house_listing` + `fact_house_listings`. Builds on `business_entities/house_and_listing.md`.
+
+- `metric_entities/listing_demand_funnel_conversions.md` — L2VB, L2VC, L2OS, L2TP (RENT), L2CCV (SALE): listing cohort demand funnel with separate RENT (`fact_listing_rent_flows`) vs SALE (`fact_visits`, `fact_offers`) patterns. Builds on `business_entities/house_and_listing.md`, `fr_transact.md`, `fs-transact.md`.
+
+- `metric_entities/ongoing_listings.md` — Ongoing Listings (daily volume): RENT (validated `fact_house_listing_status` + `dim_date` query) and SALE (`fact_daily_ongoing_listing`). Builds on `business_entities/house_and_listing.md`.
+
 - `metric_entities/funnel_conversions_supply.md` — Supply Funnel Conversions: cohort-based conversion rates between all stages of the supply acquisition funnel (L2P, P2Q, Q2O, O2L) plus non-adjacent transitions (P2O, P2L, Lead to Listing). Supports both RENT and SALE verticals with week-0 velocity variants. Builds on `business_entities/supply.md`.
 
 - `metric_entities/journey_pc.md` — Journey PC (post-contract journey mix): share of For Rent client slots (contract × role) in each support-interaction category — % Seamless / % Digital / % Human Support clients — by month, journey stage (onboarding/ongoing; offboarding excluded) and IQ/PP, plus interaction-volume metrics (% clientes seamless/digital/human sup. / tamanho do universo por etapa). Population counterpart to the NPS Seamless family in `metric_entities/nps_fr.md`. Builds on `business_entities/ticket.md` and `business_entities/chatbot_sessions.md`.

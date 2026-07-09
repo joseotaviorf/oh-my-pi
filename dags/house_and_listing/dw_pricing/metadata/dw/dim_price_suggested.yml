@@ -14,6 +14,11 @@ columns:
       - datalake_ebdb_pricing.house_suggestion_changes.rule
   suggestion_certainty:
     description: Level of certainty or confidence associated with the suggestion.
+    categories:
+      high: High confidence in the CPS suggestion.
+      medium: Medium confidence.
+      low: Low confidence; analysts may exclude at their discretion — official metrics do not filter this level.
+      none: No confidence; analysts may exclude at their discretion — official metrics do not filter this level.
     lineage:
       - datalake_ebdb_pricing.house_suggestion_changes.suggestion_certainty
   business_context:

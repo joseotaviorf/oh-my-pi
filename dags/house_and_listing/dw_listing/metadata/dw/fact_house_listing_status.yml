@@ -73,11 +73,11 @@ columns:
       edicao: Editing.
       edicaoSemUsuario: No user editing.
       edicaoUsuarioNaoConfirmado: Unconfirmed user editing.
-      excluido: Deleted.
+      excluido: Legacy house-level exclusion (House.status). Set only when all business contexts on the house are OPTED_OUT.
       publicado: Published.
       suspenso: Suspended.
       EDITING: Editing.
-      OPTED_OUT: Owner opted out.
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: Published.
       SUSPENDED: Suspended.
       UNPUBLISHED: Unpublished.

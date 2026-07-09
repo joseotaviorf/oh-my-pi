@@ -23,13 +23,13 @@ columns:
   status:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.status
-    description: Current operational status of the listing, indicating whether it's under edition, published, or in specific workflow states.
+    description: Current operational status of the listing per business context (RENT or SALE).
     categories:
-      EDITING: The listing is under edition, not published yet.
-      PUBLISHED: The listing is published and ready to receive demand.
-      SUSPENDED: The listing is suspended, not receiving demand.
-      UNPUBLISHED: The listing is unpublished, out of our platform.
-      OPTED_OUT: The owner of the listing has opted out of the platform.
+      EDITING: Under edition; listing not published yet.
+      PUBLISHED: Published and receiving demand.
+      SUSPENDED: Temporarily suspended; not receiving demand.
+      UNPUBLISHED: Unpublished; not receiving demand.
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
   status_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.statusreason

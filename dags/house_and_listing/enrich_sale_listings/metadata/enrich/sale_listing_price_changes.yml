@@ -1,25 +1,30 @@
 ---
 database_name: datalake_sale_listings
 table_name: sale_listing_price_changes
-description: Enrich table that handles the price change information and enriches it with some comparison columns and pricing scheme information, as well as calculator and status information. 
-  Where, each row represents a valid price exchange for the listing. By valid, we mean that we only keep the information from the last price change of the day when there was a price change 
-  (if the selling price of this change is different from the first price of the day. If not, it will not count as a price change).
+description: |
+  Legacy enrich table for SALE price changes with end-of-day deduplication, status context, ticket segment, and calculator columns.
+  Not the official source for price changes — use datalake_ebdb_pricing.listing_price_change (→ dw_listing.dim_pricing + fact_price_changes)
+  for new analyses. Each row represents a valid price exchange for the listing. By valid, we mean that we only keep the information from the
+  last price change of the day when there was a price change (if the selling price of this change is different from the first price of the day;
+  if not, it will not count as a price change). Calculator columns (calculator_*_sale_price, calculator_certainty) are joined from legacy
+  house_predicted_price_aud — not from price_prediction or CPS house_suggestion_changes. For Girafales percentiles or suggested price, use
+  datalake_pricing_clean.price_prediction or dw_listing.dim_price_suggested / fact_price_suggested instead.
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
-  id_house: 
+  id_house:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
-    description: Foreign key referring to the house ID. 
-  id_user_revision: 
+    description: Foreign key referring to the house ID.
+  id_user_revision:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
     description: Foreign key referring to the author who made the price change.
-  id_owner: 
+  id_owner:
     lineage:
       - datalake_ebdb_clean.house_aud.id_user
-    description: Foreign key referring to the seller user ID. 
-  id_region: 
+    description: Foreign key referring to the seller user ID.
+  id_region:
     lineage:
       - datalake_ebdb_clean.house_aud.id_region
     description: Foreign key of region where listing is located in.
@@ -30,7 +35,7 @@ columns:
         the change
       CCV_SIGNED: If the listing is in the process of being sold during the change
       EDITING: If the listing is being edited during the change
-      OPTED_OUT: If the listing has not even been published yet (probably bug)
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
       PUBLISHED: If the listing is published during the change
       SALE_COMPLETED: If the listing is already sold during the change
       SUSPENDED: If the listing is suspended during the change
@@ -43,7 +48,7 @@ columns:
     lineage:
       - datalake_region.region.city_group
       - datalake_ebdb_clean.house_aud.sale_price
-  sale_price: 
+  sale_price:
     lineage:
       - datalake_ebdb_clean.house_aud.sale_price
     description: Published price for a listing in a given time period.
@@ -59,11 +64,11 @@ columns:
       first price: If there is no previous price.
       price down: If the sales price is lower than the previous price.
       price up: If the sales price is higher than the previous price.
-  change_number: 
+  change_number:
     description: Tells the number of listing price changes.
   days_with_pricing_scheme:
     description: Count how many days the listing stayed at that publication price. If it is the most recent price, it counts up to D-1.
-  calculator_min_sale_price: 
+  calculator_min_sale_price:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_10
     description: Calculator column. Tells the minimum price estimated by the calculator output. May also be referred to as 'p_10'.
@@ -71,7 +76,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_30
     description: Calculator column. Tells the estimated price related to the 30% percentile of the calculator's output. May also be referred to as just 'p_30'.
-  calculator_sale_price: 
+  calculator_sale_price:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_50
     description: Column for calculator. Tells the most likely estimated price for the listing. Can also be referred to as just 'p_50'.
@@ -79,11 +84,11 @@ columns:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_70
     description: Calculator column. Tells the estimated price related to the 70% percentile of the calculator's output. May also be referred to as just 'p_70'.
-  calculator_max_sale_price: 
+  calculator_max_sale_price:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_90
     description: Calculator column. Tells the maximum price estimated by the calculator output. May also be referred to as 'p_90'.
-  calculator_certainty: 
+  calculator_certainty:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.certainty
     description: 'Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.'
@@ -96,13 +101,13 @@ columns:
     description: Boolean that tells if the price is the first publication price of the listing.
   is_last_price:
     description: Boolean that tells if the price is the most recent publication price of the listing.
-  is_smart_price_change: 
+  is_smart_price_change:
     description: Boolean that tells if the price change is a smart price change. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
   ts_price_started:
-    lineage: 
+    lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: Timestamp of the beginning of the price scheme observed in that row.
   ts_price_ended:
-    lineage: 
+    lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: Timestamp of the end of the price scheme observed in that row, if any. 
+    description: Timestamp of the end of the price scheme observed in that row, if any.

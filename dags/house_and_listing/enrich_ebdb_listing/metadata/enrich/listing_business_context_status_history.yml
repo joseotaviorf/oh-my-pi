@@ -15,11 +15,11 @@ columns:
       - datalake_ebdb_clean.listing_business_context_aud.status
     description: Status of the listing business context at the recorded point in time.
     categories:
-      EDITING: Editing
-      PUBLISHED: Published
-      SUSPENDED: Suspended
-      UNPUBLISHED: Unpublished
-      OPTED_OUT: Opted-out of the business context
+      EDITING: Under edition; listing not published yet.
+      PUBLISHED: Published and receiving demand.
+      SUSPENDED: Temporarily suspended; not receiving demand.
+      UNPUBLISHED: Unpublished; not receiving demand.
+      OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
   status_reason:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.status_reason

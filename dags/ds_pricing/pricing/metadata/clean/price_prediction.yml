@@ -69,6 +69,11 @@ columns:
       - datalake_pricing_raw.price_prediction.p90
   prediction_certainty:
     description: "Certainty level of the prediction, indicating model confidence in the result."
+    categories:
+      high: High confidence in the calculator prediction.
+      medium: Medium confidence.
+      low: Low confidence; analysts may exclude at their discretion — official metrics do not filter this level.
+      none: No confidence; analysts may exclude at their discretion — official metrics do not filter this level.
     lineage:
       - datalake_pricing_raw.price_prediction.prediction_certainty
   house_dejavuid:

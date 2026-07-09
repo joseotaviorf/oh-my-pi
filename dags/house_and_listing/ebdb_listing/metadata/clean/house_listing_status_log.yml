@@ -2,7 +2,7 @@ database_name: datalake_ebdb_clean
 table_name: house_listing_status_log
 owner: camila.stenico@quintoandar.com.br
 domain: House and Listing
-description: 'Table for tracking status change events for house listings, recording status and sub-status transitions, along with the reason and additional context. It can be joined to the `HouseEventLog` table to capture detailed event information (house ID, business context, actor information, etc.).'
+description: 'Table for tracking status change events for house listings, recording status and sub-status transitions, along with the reason and additional context. Available in the datalake from 2026-02-03. Enriched onto house_listing_status / sale_listing_status as deactivation_* columns (1P deactivations only). Join to HouseEventLog for house ID, business context, and actor.'
 columns:
   id:
     lineage:
@@ -11,11 +11,21 @@ columns:
   status_from:
     lineage:
       - datalake_ebdb_raw.HouseListingStatusLog.status_from
-    description: 'Previous status of the listing before the change. Examples: EDITING, PUBLISHED, SUSPENDED, UNPUBLISHED, EXCLUDED.'
+    description: Previous status of the listing before the change.
+    categories:
+      EDITING: Draft — not yet published.
+      PUBLISHED: Was published on the platform.
+      SUSPENDED: Was temporarily suspended.
+      UNPUBLISHED: Was unpublished (deactivated, not excluded).
   status_to:
     lineage:
       - datalake_ebdb_raw.HouseListingStatusLog.status_to
-    description: 'New status of the listing after the change. Examples: EDITING, PUBLISHED, SUSPENDED, UNPUBLISHED, EXCLUDED.'
+    description: New status of the listing after the change.
+    categories:
+      PUBLISHED: Published on the platform.
+      SUSPENDED: Temporarily suspended.
+      UNPUBLISHED: Unpublished (deactivated, not excluded).
+      EXCLUDED: Definitive exclusion (state machine). Standard exclude flow sets the status to OPTED_OUT on listing_business_context; House.status is set to 'excluido' only when all business contexts are OPTED_OUT in the LBC table.
   substatus_from:
     lineage:
       - datalake_ebdb_raw.HouseListingStatusLog.substatus_from
