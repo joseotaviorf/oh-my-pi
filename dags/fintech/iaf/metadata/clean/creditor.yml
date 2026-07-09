@@ -1,241 +1,323 @@
 database_name: datalake_iaf_clean
 table_name: creditor
+description: One row per creditor in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.id
+    description: Financial attribute representing id on the creditor dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_invoice:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.idboleto
+    description: Invoice identifier in the billing or payments platform.
   id_campaign:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.idcampanha
+    description: Identifier for the campaign referenced by this financial record.
   id_monetary_correction:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.id_correcao_mon
+    description: Identifier for the monetary correction referenced by this financial record.
   id_contract:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.idcontrato
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_campaign_2:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.idcampanha2
+    description: Identifier for the campaign 2 referenced by this financial record.
   id_code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_codigoid
+    description: Identifier for the code referenced by this financial record.
   id_campaign_2_ck:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.idcampanha2ck
+    description: Identifier for the campaign 2 ck referenced by this financial record.
   id_invoice_blocked:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.idboleto_bloq
+    description: Identifier for the invoice blocked referenced by this financial record.
   code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.codigo
+    description: Financial attribute representing code on the creditor dataset.
   corporate_name:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.razaosocial
+    description: Financial attribute representing corporate name on the creditor dataset.
   fantasy_name:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.fantasia
+    description: Financial attribute representing fantasy name on the creditor dataset.
   cnpj:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.cnpj
+    description: Brazilian company registry number (CNPJ) for corporate counterparties (PII).
   ie:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.ie
+    description: Financial attribute representing ie on the creditor dataset.
   address:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.endereco
+    description: Financial attribute representing address on the creditor dataset.
   address_number:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.end_numero
+    description: Financial attribute representing address number on the creditor dataset.
   neighborhood:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.end_bairro
+    description: Financial attribute representing neighborhood on the creditor dataset.
   zip_code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.end_cep
+    description: Financial attribute representing zip code on the creditor dataset.
   city:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.end_cidade
+    description: Financial attribute representing city on the creditor dataset.
   uf:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.end_uf
+    description: Financial attribute representing uf on the creditor dataset.
   first_phone:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.fone1
+    description: Financial attribute representing first phone on the creditor dataset.
   second_phone:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.fone2
+    description: Financial attribute representing second phone on the creditor dataset.
   first_email:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.email1
+    description: Financial attribute representing first email on the creditor dataset.
   second_email:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.email2
+    description: Financial attribute representing second email on the creditor dataset.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.obs
+    description: Financial attribute representing obs on the creditor dataset.
   obs_cob:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.obs_cob
+    description: Financial attribute representing obs cob on the creditor dataset.
   login:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.ac_login
+    description: Financial attribute representing login on the creditor dataset.
   password:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.ac_senha
+    description: Financial attribute representing password on the creditor dataset.
   ac_email:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.ac_email
+    description: Financial attribute representing ac email on the creditor dataset.
   p_email:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_email
+    description: Financial attribute representing p email on the creditor dataset.
   consultant:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.consultor
+    description: Financial attribute representing consultant on the creditor dataset.
   activity:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.atividade
+    description: Financial attribute representing activity on the creditor dataset.
   bank:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_banco
+    description: Financial attribute representing bank on the creditor dataset.
   agency:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_agencia
+    description: Financial attribute representing agency on the creditor dataset.
   account:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_conta
+    description: Financial attribute representing account on the creditor dataset.
   obs_p:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_obs
+    description: Financial attribute representing obs p on the creditor dataset.
   frequency:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_frequencia
+    description: Financial attribute representing frequency on the creditor dataset.
   term:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.prazo_perm
+    description: Financial attribute representing term on the creditor dataset.
   group:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.grupo
+    description: Financial attribute representing group on the creditor dataset.
   address_complement:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.end_compl
+    description: Financial attribute representing address complement on the creditor dataset.
   status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   last_access:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.ultimo_acesso
+    description: Financial attribute representing last access on the creditor dataset.
   shipping:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_envionf
+    description: Financial attribute representing shipping on the creditor dataset.
   modality:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_modalidade
+    description: Financial attribute representing modality on the creditor dataset.
   param_status_proc:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.param_status_proc
+    description: Financial attribute representing param status proc on the creditor dataset.
   param_status_oco:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.param_status_oco
+    description: Financial attribute representing param status oco on the creditor dataset.
   consultant_2:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.consultor2
+    description: Financial attribute representing consultant 2 on the creditor dataset.
   account_commissions:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.contabilizar_comissoes
+    description: Financial attribute representing account commissions on the creditor dataset.
   cod_ext:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.cod_ext
+    description: Financial attribute representing cod ext on the creditor dataset.
   model:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.p_modelo
+    description: Financial attribute representing model on the creditor dataset.
   districk:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.districk
+    description: Financial attribute representing districk on the creditor dataset.
   layout_imp:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.layout_imp
+    description: Financial attribute representing layout imp on the creditor dataset.
   assignor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.bol_cedente
+    description: Financial attribute representing assignor on the creditor dataset.
   assignor_cnpj:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.bol_cedente_cnpj
+    description: Financial attribute representing assignor cnpj on the creditor dataset.
   breaks_deal:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.a_quebra_acordo
+    description: Financial attribute representing breaks deal on the creditor dataset.
   breaks_days:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.a_quebra_dias
+    description: Financial attribute representing breaks days on the creditor dataset.
   user_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.usuario_cad
+    description: Financial attribute representing user cad on the creditor dataset.
   user_alt:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.usuario_alt
+    description: Financial attribute representing user alt on the creditor dataset.
   segment:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.segmento
+    description: Financial attribute representing segment on the creditor dataset.
   block_pc:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.bloq_pc
+    description: Financial attribute representing block pc on the creditor dataset.
   installment_amount:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.qtde_parc
+    description: Financial attribute representing installment amount on the creditor dataset.
   conf_div:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.conf_div
+    description: Financial attribute representing conf div on the creditor dataset.
   conf_inov:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.conf_inov
+    description: Financial attribute representing conf inov on the creditor dataset.
   activate_agreement:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.ativa_acordo
+    description: Financial attribute representing activate agreement on the creditor dataset.
   min_discount_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_desconto_min
+    description: Financial attribute representing min discount value on the creditor dataset.
   discount_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_desconto
+    description: Financial attribute representing discount value on the creditor dataset.
   fee_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_juros
+    description: Financial attribute representing fee value on the creditor dataset.
   fine_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_multa
+    description: Financial attribute representing fine value on the creditor dataset.
   honorary_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_honorarios
+    description: Financial attribute representing honorary value on the creditor dataset.
   pd_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_pd
+    description: Financial attribute representing pd value on the creditor dataset.
   contract_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_contrato
+    description: Financial attribute representing contract value on the creditor dataset.
   min_fine_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_multa_min
+    description: Financial attribute representing min fine value on the creditor dataset.
   min_fee_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_juros_min
+    description: Financial attribute representing min fee value on the creditor dataset.
   min_honorary_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_honorarios_min
+    description: Financial attribute representing min honorary value on the creditor dataset.
   charge_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.vl_cobranca
+    description: Financial attribute representing charge value on the creditor dataset.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.data_cad
+    description: Calendar date associated with cad in the financial workflow.
   dt_alt:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.data_alt
+    description: Calendar date associated with alt in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_credor.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

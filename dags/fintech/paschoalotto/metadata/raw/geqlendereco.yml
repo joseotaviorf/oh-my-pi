@@ -1,23 +1,33 @@
 ---
 database_name: datalake_paschoalotto_raw
 table_name: geqlendereco
+description: One row per geqlendereco in the Fintech raw layer, sourced from
+  datalake_paschoalotto_raw for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   endereco_str:
     tags:
       - Restricted
+    description: Financial attribute representing endereco str on the geqlendereco dataset.
   complemento_str:
     tags:
       - Restricted
+    description: Financial attribute representing complemento str on the geqlendereco dataset.
   bairro_str:
     tags:
       - Restricted
+    description: Financial attribute representing bairro str on the geqlendereco dataset.
   cep_str:
     tags:
       - Restricted
+    description: Financial attribute representing cep str on the geqlendereco dataset.
   cidade_str:
     tags:
       - Restricted
+    description: Financial attribute representing cidade str on the geqlendereco dataset.
   estado_str:
     tags:
       - Restricted
+    description: Financial attribute representing estado str on the geqlendereco dataset.

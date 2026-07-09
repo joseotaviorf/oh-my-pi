@@ -1,8 +1,13 @@
 ---
 database_name: datalake_paschoalotto_raw
 table_name: geqlemail
+description: One row per geqlemail in the Fintech raw layer, sourced from
+  datalake_paschoalotto_raw for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   email_str:
     tags:
       - Confidential
+    description: Financial attribute representing email str on the geqlemail dataset.

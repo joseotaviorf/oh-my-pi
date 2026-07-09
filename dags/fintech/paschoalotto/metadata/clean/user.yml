@@ -1,20 +1,20 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: user
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: It contains user system data.
 columns:
   id_user:
-    description: ""
+    description: QuintoAndar user identifier associated with this financial transaction or account.
     lineage:
       - datalake_paschoalotto_raw.geusuario.id_geusuario_int
   login_name:
-    description: "Login code"
+    description: Financial attribute representing login name on the user dataset.
     lineage:
       - datalake_paschoalotto_raw.geusuario.nomelogin_str
   full_name:
-    description: "User's Full Name"
+    description: Financial attribute representing full name on the user dataset.
     lineage:
       - datalake_paschoalotto_raw.geusuario.nomecompleto_str
   email:
@@ -25,3 +25,6 @@ columns:
     description: "Business context of origin table (QuintoCred or QuintoAndar)"
     lineage:
       - datalake_paschoalotto_raw.geusuario.context
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

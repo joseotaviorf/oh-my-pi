@@ -1,49 +1,67 @@
 database_name: datalake_iaf_clean
 table_name: agreement_tit
+description: One row per agreement tit in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.id
+    description: Financial attribute representing id on the agreement_tit dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_agreement:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.idacordo
+    description: Identifier for the agreement referenced by this financial record.
   id_title:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.idtitulo
+    description: Identifier for the title referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.processo
+    description: Financial attribute representing process on the agreement_tit dataset.
   contract_tax_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_tx_contrato
+    description: Financial attribute representing contract tax value on the agreement_tit dataset.
   protest_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_protesto
+    description: Financial attribute representing protest value on the agreement_tit dataset.
   discount_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_desconto
+    description: Financial attribute representing discount value on the agreement_tit dataset.
   fee_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_juros
+    description: Financial attribute representing fee value on the agreement_tit dataset.
   fine_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_multa
+    description: Financial attribute representing fine value on the agreement_tit dataset.
   honorary_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_honorarios
+    description: Financial attribute representing honorary value on the agreement_tit dataset.
   capital_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_capital
+    description: Financial attribute representing capital value on the agreement_tit dataset.
   capital_net_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_capital_liq
+    description: Financial attribute representing capital net value on the agreement_tit dataset.
   capital_adjusted_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.vl_capital_corrig
+    description: Financial attribute representing capital adjusted value on the agreement_tit dataset.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_tit.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

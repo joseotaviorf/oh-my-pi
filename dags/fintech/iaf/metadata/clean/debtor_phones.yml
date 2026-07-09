@@ -1,43 +1,63 @@
 database_name: datalake_iaf_clean
 table_name: debtor_phones
+description: One row per debtor phones in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.id
+    description: Financial attribute representing id on the debtor_phones dataset.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_uuid:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.id_uuid
+    description: Identifier for the uuid referenced by this financial record.
   type:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.tipo
+    description: Financial attribute representing type on the debtor_phones dataset.
   status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   contact:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.contato
+    description: Financial attribute representing contact on the debtor_phones dataset.
   hot_number:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.hot_number
+    description: Financial attribute representing hot number on the debtor_phones dataset.
   origin:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.origem
+    description: Financial attribute representing origin on the debtor_phones dataset.
   qualification:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.qualificacao
+    description: Financial attribute representing qualification on the debtor_phones dataset.
   whatsapp:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.whatsapp
+    description: Financial attribute representing whatsapp on the debtor_phones dataset.
   date:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.data
+    description: Financial attribute representing date on the debtor_phones dataset.
   dt_inactive:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor_fones.data_inativa
+    description: Calendar date associated with inactive in the financial workflow.
+  phone:
+    lineage: []
+    description: Financial attribute representing phone on the debtor_phones dataset.

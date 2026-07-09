@@ -1,41 +1,56 @@
 ---
 database_name: datalake_paschoalotto_raw
 table_name: cbcontrato
+description: One row per cbcontrato in the Fintech raw layer, sourced from
+  datalake_paschoalotto_raw for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   nome_str:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing nome str on the cbcontrato dataset.
   cpf_str:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing cpf str on the cbcontrato dataset.
   endereco_str:
     tags:
       - Restricted
+    description: Financial attribute representing endereco str on the cbcontrato dataset.
   complemento_str:
     tags:
       - Restricted
+    description: Financial attribute representing complemento str on the cbcontrato dataset.
   bairro_str:
     tags:
       - Restricted
+    description: Financial attribute representing bairro str on the cbcontrato dataset.
   cep_str:
     tags:
       - Restricted
+    description: Financial attribute representing cep str on the cbcontrato dataset.
   cidade_str:
     tags:
       - Restricted
+    description: Financial attribute representing cidade str on the cbcontrato dataset.
   estado_str:
     tags:
       - Restricted
+    description: Financial attribute representing estado str on the cbcontrato dataset.
   telefone_str:
     tags:
       - Confidential
+    description: Financial attribute representing telefone str on the cbcontrato dataset.
   estado_civil_str:
     tags:
       - PII
       - Restricted
+    description: Financial attribute representing estado civil str on the cbcontrato dataset.
   email_str:
     tags:
       - Confidential
+    description: Financial attribute representing email str on the cbcontrato dataset.

@@ -1,9 +1,13 @@
 ---
 database_name: datalake_paschoalotto_raw
 table_name: cbitembordero
-owner: bianca.martins@quintoandar.com.br
+description: One row per cbitembordero in the Fintech raw layer, sourced from
+  datalake_paschoalotto_raw for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   destino_str:
     tags:
       - Confidential
+    description: Financial attribute representing destino str on the cbitembordero dataset.

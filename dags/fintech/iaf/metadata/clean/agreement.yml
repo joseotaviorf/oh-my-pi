@@ -1,97 +1,132 @@
 database_name: datalake_iaf_clean
 table_name: agreement
+description: One row per agreement in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.id
+    description: Financial attribute representing id on the agreement dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.idempresa
+    description: Identifier for the company referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.processo
+    description: Financial attribute representing process on the agreement dataset.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   id_monetary_correction:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.id_correcao_mon
+    description: Identifier for the monetary correction referenced by this financial record.
   id_recupera_installment:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.cod_ext
+    description: Identifier for the recupera installment referenced by this financial record.
   negotiator:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.negociador
+    description: Financial attribute representing negotiator on the agreement dataset.
   status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   percent_pd_tax:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.taxa_pd_porcento
+    description: Financial attribute representing percent pd tax on the agreement dataset.
   cancellation_user:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.usuario_cancelamento
+    description: Financial attribute representing cancellation user on the agreement dataset.
   percent_fee:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.juros_porcento
+    description: Financial attribute representing percent fee on the agreement dataset.
   percent_fine:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.multa_porcento
+    description: Financial attribute representing percent fine on the agreement dataset.
   percent_honorary:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.honorarios_porcento
+    description: Financial attribute representing percent honorary on the agreement dataset.
   percent_default:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.mora_porcento
+    description: Financial attribute representing percent default on the agreement dataset.
   percent_capital_discount:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.desc_capital_porcento
+    description: Financial attribute representing percent capital discount on the agreement dataset.
   percent_contract_tax:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.taxa_contrato_porcento
+    description: Financial attribute representing percent contract tax on the agreement dataset.
   total_capital:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_capital
+    description: Financial attribute representing total capital on the agreement dataset.
   total_net_capital:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_capital_liq
+    description: Financial attribute representing total net capital on the agreement dataset.
   total_protest:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_protesto
+    description: Financial attribute representing total protest on the agreement dataset.
   total_tax:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_taxa
+    description: Financial attribute representing total tax on the agreement dataset.
   total_fee:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_juros
+    description: Financial attribute representing total fee on the agreement dataset.
   total_fine:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_multa
+    description: Financial attribute representing total fine on the agreement dataset.
   total__ho:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_ho
+    description: Financial attribute representing total ho on the agreement dataset.
   total_without_default:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_sem_mora
+    description: Financial attribute representing total without default on the agreement dataset.
   total_with_default:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.tot_com_mora
+    description: Financial attribute representing total with default on the agreement dataset.
   balance_net_capital:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.saldo_capital_liq
+    description: Financial attribute representing balance net capital on the agreement dataset.
   dt_agreement:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.data_acordo
+    description: Calendar date associated with agreement in the financial workflow.
   dt_calc:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.data_calc
+    description: Calendar date associated with calc in the financial workflow.
   dt_cancellation:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.data_cancelamento
+    description: Calendar date associated with cancellation in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

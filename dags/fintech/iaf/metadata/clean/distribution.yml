@@ -1,28 +1,40 @@
 database_name: datalake_iaf_clean
 table_name: distribution
+description: One row per distribution in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_distribuicao.id
+    description: Financial attribute representing id on the distribution dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_distribuicao.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_distribuicao.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_distribuicao.processo
+    description: Financial attribute representing process on the distribution dataset.
   user_distribution:
     lineage:
       - datalake_iaf_raw.vi_319_tb_distribuicao.usuario_distri
+    description: Financial attribute representing user distribution on the distribution dataset.
   charger:
     lineage:
       - datalake_iaf_raw.vi_319_tb_distribuicao.cobrador
+    description: Financial attribute representing charger on the distribution dataset.
   dt_distribution:
     lineage:
       - datalake_iaf_raw.vi_319_tb_distribuicao.data_distri
+    description: Calendar date associated with distribution in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_distribuicao.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

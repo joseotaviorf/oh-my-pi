@@ -1,97 +1,132 @@
 database_name: datalake_iaf_clean
 table_name: debtor
+description: One row per debtor in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.id
+    description: Financial attribute representing id on the debtor dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.codigo
+    description: Financial attribute representing code on the debtor dataset.
   corporate_name:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.razaosocial
+    description: Financial attribute representing corporate name on the debtor dataset.
   fantasy_name:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.fantasia
+    description: Financial attribute representing fantasy name on the debtor dataset.
   cnpj:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.cnpj
+    description: Brazilian company registry number (CNPJ) for corporate counterparties (PII).
   ie:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.ie
+    description: Financial attribute representing ie on the debtor dataset.
   address:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.endereco
+    description: Financial attribute representing address on the debtor dataset.
   address_number:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.end_numero
+    description: Financial attribute representing address number on the debtor dataset.
   neighborhood:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.end_bairro
+    description: Financial attribute representing neighborhood on the debtor dataset.
   zip_code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.end_cep
+    description: Financial attribute representing zip code on the debtor dataset.
   city:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.end_cidade
+    description: Financial attribute representing city on the debtor dataset.
   uf:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.end_uf
+    description: Financial attribute representing uf on the debtor dataset.
   first_email:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.email1
+    description: Financial attribute representing first email on the debtor dataset.
   second_email:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.email2
+    description: Financial attribute representing second email on the debtor dataset.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.obs
+    description: Financial attribute representing obs on the debtor dataset.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.processo
+    description: Financial attribute representing process on the debtor dataset.
   contacts:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.contatos
+    description: Financial attribute representing contacts on the debtor dataset.
   field_1:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.campo1
+    description: Financial attribute representing field 1 on the debtor dataset.
   field_2:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.campo2
+    description: Financial attribute representing field 2 on the debtor dataset.
   field_3:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.campo3
+    description: Financial attribute representing field 3 on the debtor dataset.
   field_4:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.campo4
+    description: Financial attribute representing field 4 on the debtor dataset.
   field_5:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.campo5
+    description: Financial attribute representing field 5 on the debtor dataset.
   address_complement:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.end_compl
+    description: Financial attribute representing address complement on the debtor dataset.
   user_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.usuario_cad
+    description: Financial attribute representing user cad on the debtor dataset.
   user_alt:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.usuario_alt
+    description: Financial attribute representing user alt on the debtor dataset.
   cod_ext:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.cod_ext
+    description: Financial attribute representing cod ext on the debtor dataset.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.data_cad
+    description: Calendar date associated with cad in the financial workflow.
   dt_alt:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.data_alt
+    description: Calendar date associated with alt in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_devedor.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.

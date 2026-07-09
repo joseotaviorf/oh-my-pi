@@ -1,49 +1,67 @@
 database_name: datalake_iaf_clean
 table_name: agreement_neg
+description: One row per agreement neg in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.id
+    description: Financial attribute representing id on the agreement_neg dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.idempresa
+    description: Identifier for the company referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.processo
+    description: Financial attribute representing process on the agreement_neg dataset.
   id_agreement:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.idacordo
+    description: Identifier for the agreement referenced by this financial record.
   status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   cancellation_user:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.usuario_cancelamento
+    description: Financial attribute representing cancellation user on the agreement_neg dataset.
   discharge_user:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.usuario_quitacao
+    description: Financial attribute representing discharge user on the agreement_neg dataset.
   backup_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.valorbkp
+    description: Financial attribute representing backup value on the agreement_neg dataset.
   value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.valor
+    description: Financial attribute representing value on the agreement_neg dataset.
   installment:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.parcela
+    description: Financial attribute representing installment on the agreement_neg dataset.
   payment_type:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.forma_pagto
+    description: Financial attribute representing payment type on the agreement_neg dataset.
   dt_cancellation:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.data_cancelamento
+    description: Calendar date associated with cancellation in the financial workflow.
   dt_discharge:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.data_quitacao
+    description: Calendar date associated with discharge in the financial workflow.
   dt_due:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.data_vencto
+    description: Calendar date associated with due in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_acordo_neg.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.
