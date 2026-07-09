@@ -1,28 +1,38 @@
 database_name: datalake_repairs_clean
 table_name: repair_evidence
+description: Photo and document evidence uploaded for individual repair request line items.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_repairs_raw.repair_evidence.id
+    description: Surrogate key identifying this repair evidence record in the repairs pipeline.
   id_repair_request_item:
     lineage:
       - datalake_repairs_raw.repair_evidence.repair_request_item_id
+    description: Repair request line item that this photo or document evidence supports.
   asset_url:
     lineage:
       - datalake_repairs_raw.repair_evidence.asset_url
+    description: Storage URL of the uploaded evidence file attached to the repair item.
   ts_created:
     lineage:
       - datalake_repairs_raw.repair_evidence.created_at
+    description: Timestamp when the evidence file was uploaded to Repairs.
   ts_updated:
     lineage:
       - datalake_repairs_raw.repair_evidence.updated_at
+    description: Timestamp when the evidence metadata was last updated.
   year:
     lineage:
       - datalake_repairs_raw.repair_evidence.year
+    description: Year partition derived from the evidence upload timestamp.
   month:
     lineage:
       - datalake_repairs_raw.repair_evidence.month
+    description: Month partition derived from the evidence upload timestamp.
   day:
     lineage:
       - datalake_repairs_raw.repair_evidence.day
+    description: Day partition derived from the evidence upload timestamp.

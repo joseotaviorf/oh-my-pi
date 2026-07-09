@@ -1,13 +1,13 @@
 database_name: datalake_repairs_clean
 table_name: form_answer
-description: This table contains the questions and options chosen by users during the repair request.
+description: Tenant answers to repair triage questionnaire items linked to specific repair request lines.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_repairs_raw.form_answer.id
-    description: ID of the table, it's the primary key.
+    description: "ID of the table, it's the primary key."
   id_question:
     lineage:
       - datalake_repairs_raw.form_answer.question_id
@@ -15,11 +15,11 @@ columns:
   id_question_option:
     lineage:
       - datalake_repairs_raw.form_answer.question_option_id
-    description: ID of the question option that the form answer is associated with
+    description: Selected questionnaire option that produced this tenant form answer.
   id_repair_request_item:
     lineage:
       - datalake_repairs_raw.form_answer.repair_request_item_id
-    description: ID of the repair request item the form answer is associated with
+    description: Repair request line item that this questionnaire answer helped classify.
   ts_created:
     lineage:
       - datalake_repairs_raw.form_answer.created_at

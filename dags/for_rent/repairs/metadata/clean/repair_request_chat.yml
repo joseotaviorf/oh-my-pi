@@ -1,13 +1,18 @@
 database_name: datalake_repairs_clean
 table_name: repair_request_chat
+description: Records that the contract chat between tenant and landlord was opened while an active repair request negotiation was ongoing.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_repairs_raw.repair_request_chat.id
+    description: Surrogate key identifying this repair request chat record in the repairs pipeline.
   id_repair_request:
     lineage:
       - datalake_repairs_raw.repair_request_chat.repair_request_id
+    description: Repair request identifier for the chat thread between parties.
   ts_started:
     lineage:
       - datalake_repairs_raw.repair_request_chat.started_at
+    description: Timestamp when the repair negotiation chat session was opened.

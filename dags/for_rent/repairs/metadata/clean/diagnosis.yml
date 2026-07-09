@@ -1,17 +1,17 @@
 database_name: datalake_repairs_clean
 table_name: diagnosis
-description: This table contains the possible diagnosis for a repair request triage.
+description: Diagnosis outcomes assigned to repair expense types in the Repairs triage questionnaire.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_repairs_raw.diagnosis.id
-    description: ID of the table, it's the primary key.
+    description: "ID of the table, it's the primary key."
   id_repair_expense:
     lineage:
       - datalake_repairs_raw.diagnosis.repair_expense_id
-    description: ID of the repair expense
+    description: Repair expense catalog entry associated with this triage diagnosis outcome.
   name:
     lineage:
       - datalake_repairs_raw.diagnosis.name

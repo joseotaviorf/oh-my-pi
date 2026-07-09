@@ -2,7 +2,7 @@ database_name: datalake_repairs_clean
 table_name: attachment
 description: Documents attached to the repair request budget
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -15,10 +15,7 @@ columns:
   file_name:
     lineage:
       - datalake_repairs_raw.attachment.file_name
-    description: |
-      This field represents the name of the uploaded file. It is a text and will
-      always be a uuid following the contentType which refers to the image format.
-      Example: 123123-131231-123123-123123.png
+    description: "This field represents the name of the uploaded file. It is a text and will always be a uuid following the contentType which refers to the image format. Example: 123123-131231-123123-123123.png"
   content_type:
     lineage:
       - datalake_repairs_raw.attachment.content_type

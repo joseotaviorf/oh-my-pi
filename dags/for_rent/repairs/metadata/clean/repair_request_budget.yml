@@ -1,10 +1,11 @@
 database_name: datalake_repairs_clean
 table_name: repair_request_budget
-description:
-  Repair budget data, only for requests where the property owner requests a tenant service provider.
-  These requests are created via Zendesk.
+description: |
+  Repair budget quotes submitted by the tenant when the owner requests a tenant-sourced service
+  provider (TENANT_PROVIDER journey with owner approval), with owner approval tracking. Approving
+  one budget automatically denies the others for the same repair request.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -38,9 +39,7 @@ columns:
   service_provider:
     lineage:
       - datalake_repairs_raw.repair_request_budget.service_provider
-    description: |
-      It is a jsonb with the name and phoneNumber values of the indicated service provider within the budget
-      Example: {name: 'so-and-so', phoneNumber: '551299999999'}
+    description: "It is a jsonb with the name and phoneNumber values of the indicated service provider within the budget Example: {name: 'so-and-so', phoneNumber: '551299999999'}"
   is_allowed_service_provider_info_sharing:
     lineage:
       - datalake_repairs_raw.repair_request_budget.allowed_service_provider_info_sharing
@@ -48,8 +47,8 @@ columns:
   ts_created:
     lineage:
       - datalake_repairs_raw.repair_request_budget.created_at
-    description: Budget creation date
+    description: Timestamp when the repair budget quote was registered.
   ts_updated:
     lineage:
       - datalake_repairs_raw.repair_request_budget.updated_at
-    description: Budget update date
+    description: Timestamp when the repair budget quote was last revised.

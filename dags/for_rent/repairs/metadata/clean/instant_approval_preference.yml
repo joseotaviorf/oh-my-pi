@@ -1,28 +1,40 @@
 database_name: datalake_repairs_clean
 table_name: instant_approval_preference
+description: |
+  Deprecated, per-house instant-approval coverage limits from the Repairs service. No JPA entity or
+  active service reads or writes this table today; it is kept only for historical records.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.house_id
+    description: EBDB house identifier for which the landlord configured instant repair approval limits.
   covered_amount:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.covered_amount
+    description: "Maximum repair amount the landlord pre-authorized for automatic approval on this listing."
   is_consenting:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.is_consenting
+    description: Whether the opt-in/opt-out decision for instant approval on this house was made directly by the house owner user, per the source column comment.
   ts_created:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.created_at
+    description: Timestamp when the instant approval preference was saved in Repairs.
   ts_updated:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.updated_at
+    description: Timestamp when the instant approval preference was last changed.
   year:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.year
+    description: Year partition derived from the preference creation timestamp.
   month:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.month
+    description: Month partition derived from the preference creation timestamp.
   day:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.day
+    description: Day partition derived from the preference creation timestamp.

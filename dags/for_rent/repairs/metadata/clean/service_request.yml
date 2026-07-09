@@ -1,38 +1,53 @@
 ---
 database_name: datalake_repairs_clean
 table_name: service_request
+description: |
+  CX support tickets and Taskmaster tasks linked to a repair request, historically synced with the
+  Zendesk CRM. This table is being phased out along with the Zendesk deprecation.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_repairs_raw.service_request.id
+    description: Surrogate key identifying this service request record in the repairs pipeline.
   id_repair_request:
     lineage:
       - datalake_repairs_raw.service_request.repair_request_id
+    description: "Repair request identifier linked to this CX/support ticket."
   id_third_party_crm_ticket_external:
     lineage:
       - datalake_repairs_raw.service_request.third_party_crm_ticket_external_id
+    description: External ticket identifier in the partner CRM handling the service request.
   status:
     lineage:
       - datalake_repairs_raw.service_request.status
+    description: "Current workflow status of the CX/support ticket linked to the repair request."
   type:
     lineage:
       - datalake_repairs_raw.service_request.type
+    description: "Which CX/Taskmaster queue this support ticket belongs to (tenant, landlord, or partners)."
   third_party_crm:
     lineage:
       - datalake_repairs_raw.service_request.third_party_crm
+    description: Name of the external CRM tracking this support ticket; currently only Zendesk, being phased out.
   ts_created:
     lineage:
       - datalake_repairs_raw.service_request.created_at
+    description: Timestamp when the service request was created in Repairs.
   ts_updated:
     lineage:
       - datalake_repairs_raw.service_request.updated_at
+    description: Timestamp when the service request was last updated.
   year:
     lineage:
       - datalake_repairs_raw.service_request.year
+    description: Year partition derived from the service request creation timestamp.
   month:
     lineage:
       - datalake_repairs_raw.service_request.month
+    description: Month partition derived from the service request creation timestamp.
   day:
     lineage:
       - datalake_repairs_raw.service_request.day
+    description: Day partition derived from the service request creation timestamp.

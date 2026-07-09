@@ -1,22 +1,30 @@
 database_name: datalake_repairs_clean
 table_name: repair_expense_group
+description: Hierarchical catalog groups organizing repair expense types in the Repairs service.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_repairs_raw.repair_expense_group.id
+    description: Surrogate key identifying this repair expense group record in the repairs pipeline.
   id_parent:
     lineage:
       - datalake_repairs_raw.repair_expense_group.parent_id
+    description: Parent expense group identifier when this group is nested in the catalog hierarchy.
   repair_group_name:
     lineage:
       - datalake_repairs_raw.repair_expense_group.name
+    description: Display name of the repair expense group shown in product flows.
   repair_group_description:
     lineage:
       - datalake_repairs_raw.repair_expense_group.description
+    description: Longer text explaining the repair expense group scope and usage.
   ts_created:
     lineage:
       - datalake_repairs_raw.repair_expense_group.created_at
+    description: Timestamp when the expense group was created in Repairs.
   ts_updated:
     lineage:
       - datalake_repairs_raw.repair_expense_group.updated_at
+    description: Timestamp when the expense group was last updated in Repairs.

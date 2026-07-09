@@ -1,10 +1,10 @@
 database_name: datalake_repairs_clean
 table_name: repair_expense
-description:
+description: |
   Repair expense catalog from the Repairs service, defining expense types, approval rules,
   and responsibility rules used when defining repairs.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:

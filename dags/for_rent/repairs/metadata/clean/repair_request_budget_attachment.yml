@@ -2,7 +2,7 @@ database_name: datalake_repairs_clean
 table_name: repair_request_budget_attachment
 description: This table links the repair request budget to the request attachments.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_repair_request_budget:
     lineage:

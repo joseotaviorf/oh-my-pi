@@ -3,33 +3,35 @@ database_name: datalake_repairs_clean
 table_name: repair_request_tenant_negotiation_follow_up
 description: This table has information on all follow-ups related to the tenant's negotiation regarding the repair.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
-    description: Unique identifier of table records
+    description: Unique identifier of the tenant negotiation follow-up record.
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.id
   id_repair_request:
-    description: Repair Request unique identifier.
+    description: Repair request identifier linked to this negotiation follow-up entry.
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.repair_request_id
   description:
-    description: Open field where the tenant can send additional data.
+    description: Open text field where the tenant can send additional negotiation details.
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.description
   status:
-    description: The status of the repair negotiation.
+    description: Current status of the repair negotiation follow-up workflow step.
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.status
   help_action:
-    description: It is filled in only when the status is HELP_NEEDED,
-      indicating the reason for requesting help (predefined list of options).
+    description: |
+      Reason selected when status is HELP_NEEDED, indicating why the tenant requested
+      assistance from QuintoAndar during negotiation.
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.help_action
   solving_action:
     description:
-      It is filled in only when the status is SOLVED, indicating the agreement
-      signed between tenant and owner (predefined list of options)
+      Filled in when the status is SOLVED, indicating how the tenant reports the repair was resolved
+      (e.g. owner referred a provider, repair already executed, refund or cost-split intent, or owner
+      asked to postpone) — a predefined list of options, not necessarily a signed agreement.
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.solving_action
   ts_expected_execution:
@@ -46,10 +48,22 @@ columns:
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.reassign_date
   ts_created:
-    description: Creation date and time.
+    description: Timestamp when the negotiation follow-up record was created.
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.created_at
   ts_updated:
-    description: Update date and time.
+    description: Timestamp when the negotiation follow-up record was last updated.
     lineage:
       - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.updated_at
+  year:
+    description: Year partition derived from the follow-up creation timestamp.
+    lineage:
+      - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.year
+  month:
+    description: Month partition derived from the follow-up creation timestamp.
+    lineage:
+      - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.month
+  day:
+    description: Day partition derived from the follow-up creation timestamp.
+    lineage:
+      - datalake_repairs_raw.repair_request_tenant_negotiation_follow_up.day
