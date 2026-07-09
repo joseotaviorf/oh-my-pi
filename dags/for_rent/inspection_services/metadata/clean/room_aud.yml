@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: room_aud
 description: Data about the room being inspected.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_room:
     lineage:
@@ -28,9 +28,7 @@ columns:
   comment:
     lineage:
       - datalake_inspection_services_raw.room_aud.comment
-    description:
-      This column would keep the inspector's comments about the room, but
-      the functionality was not implemented
+    description: This column would keep the inspector's comments about the room, but the functionality was not implemented
   rev:
     lineage:
       - datalake_inspection_services_raw.room_aud.rev

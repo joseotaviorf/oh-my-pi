@@ -3,7 +3,7 @@ database_name: datalake_inspection_services_clean
 table_name: reviewer_aud
 description: Audit data relating to reviewers of the inspection report.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_reviewer:
     lineage:
@@ -44,7 +44,7 @@ columns:
   rev_end:
     lineage:
       - datalake_inspection_services_raw.reviewer_aud.revend
-    description: ""
+    description: Revision identifier when this reviewer audit version was superseded by a later change; null for the current active version of the record.
   reviewer_type:
     lineage:
       - datalake_inspection_services_raw.reviewer_aud.reviewer_type

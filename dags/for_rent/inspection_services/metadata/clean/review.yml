@@ -1,11 +1,11 @@
 ---
 database_name: datalake_inspection_services_clean
 table_name: review
-description:
+description: |
   After the inspection, the tenant and the property owner can review the
   report and contest the result given by the inspector.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_review:
     lineage:
@@ -18,9 +18,7 @@ columns:
   id_user:
     lineage:
       - datalake_inspection_services_raw.review.user_id
-    description: Reviewer user unique identifier (number). This field is legacy,
-      meaning it is no longer updated. The column that currently contains this
-      information is id_reviewer.
+    description: Reviewer user unique identifier (number). This field is legacy, meaning it is no longer updated. The column that currently contains this information is id_reviewer.
 
       Some records can be found with both the id_user and the id_reviewer null.
       This is because some people are still using the old tool (they shouldn't be), but it will
@@ -28,10 +26,7 @@ columns:
   id_reviewer:
     lineage:
       - datalake_inspection_services_raw.review.reviewer_id
-    description: Reviewer unique identifier (number)
-      Some records can be found with both the id_user and the id_reviewer null.
-      This is because some people are still using the old tool (they shouldn't be), but it will
-      be completely deactivated in Q1/2024, so after that, these cases will definitely end.
+    description: Reviewer unique identifier (number) Some records can be found with both the id_user and the id_reviewer null. This is because some people are still using the old tool (they shouldn't be), but it will be completely deactivated in Q1/2024, so after that, these cases will definitely end.
   user_type:
     lineage:
       - datalake_inspection_services_raw.review.user_type
