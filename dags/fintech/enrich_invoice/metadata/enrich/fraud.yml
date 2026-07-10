@@ -1,9 +1,9 @@
 ---
 database_name: datalake_invoice
 table_name: fraud
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Table containing fraudulent invoices data with contamination delay metrics"
+description: "Table containing fraudulent invoices data with contamination delay metrics. The fraud classification is a proxy based on bill items descriptions, offifcial data comes from SAP closing reports"
 columns:
   id_contract:
     description: "External contract identifier from retsuko invoice system"

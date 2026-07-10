@@ -1,259 +1,515 @@
----
 database_name: datalake_losses
 table_name: provision
-description: "Enrich table with the losses model informations for the fact tables"
-owner: felipe.chies@quintoandar.com.br
+description: 'Part of the Losses enrich pipeline. Losses measures the monthly variation of provisioned
+  balance for rental contracts. The mathematical steps are: closing (month-end open wallet snapshot) →
+  delay (contract-level delay contamination) → provision_factor (lookup of factors 0–1) → provision (open
+  invoices at dt_closing with provisioned balance). Summing provisioned balance by closing month yields
+  the Losses KPI. provision joins delay to provision_factor and materializes, for each open invoice at
+  dt_closing, the applicable provision_factor and provisioned balances (factor × due_amount) across delay-rule
+  variants. The operational Losses number is obtained by grouping this table and summing the selected
+  provision_balance for the closing month. Note: provision_factor values in this join follow the pre-2026
+  Accounting methodology (see provision_factor); closing and delay inputs remain valid.'
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_invoice:
     lineage:
-      - datalake_losses.delay.id_invoice
-    description: Id of the invoice.
+    - datalake_losses.delay.id_invoice
+    description: Invoice identifier in the billing or payments platform.
   id_contract:
     lineage:
-      - datalake_losses.delay.id_contract
-    description: Id of the contract.
+    - datalake_losses.delay.id_contract
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   accrual_year_month:
     lineage:
-      - datalake_losses.delay.accrual_year_month
+    - datalake_losses.delay.accrual_year_month
     description: String with Year number and Month number 'yyyymm' related to the sent date.
   deal_delay_rule_a:
     lineage:
-      - datalake_losses.delay.deal_delay_rule_a
+    - datalake_losses.delay.deal_delay_rule_a
     description: Rule A related to the delay of the payment.
   deal_delay_rule_b:
     lineage:
-      - datalake_losses.delay.deal_delay_rule_b
+    - datalake_losses.delay.deal_delay_rule_b
     description: Rule B related to the delay of the payment.
   deal_delay_rule_c:
     lineage:
-      - datalake_losses.delay.deal_delay_rule_c
+    - datalake_losses.delay.deal_delay_rule_c
     description: Rule C related to the delay of the payment.
   deal_delay_rule_d:
     lineage:
-      - datalake_losses.delay.deal_delay_rule_d
+    - datalake_losses.delay.deal_delay_rule_d
     description: Rule D related to the delay of the payment.
   deal_delay_rule_e:
     lineage:
-      - datalake_losses.delay.deal_delay_rule_e
+    - datalake_losses.delay.deal_delay_rule_e
     description: Rule E related to the delay of the payment.
   deal_order:
     lineage:
-      - datalake_losses.delay.deal_order
+    - datalake_losses.delay.deal_order
     description: Information related to the deal position.
   deal_status:
     lineage:
-      - datalake_losses.delay.deal_status
-    description: Status of the deal.
+    - datalake_losses.delay.deal_status
+    description: Financial attribute representing deal status on the provision dataset.
   delay_at_deal_creation:
     lineage:
-      - datalake_losses.delay.delay_at_deal_creation
+    - datalake_losses.delay.delay_at_deal_creation
     description: Date difference between deal_anchor_due_date and dt_created_deal.
   bigger_anchor_deal_at_contract:
     lineage:
-      - datalake_losses.delay.bigger_anchor_deal_at_contract
+    - datalake_losses.delay.bigger_anchor_deal_at_contract
     description: Worst debt in active negotiation for the contract.
   delay_contaminated_range_rule_a:
     lineage:
-      - datalake_losses.delay.delay_contaminated_range_rule_a
+    - datalake_losses.delay.delay_contaminated_range_rule_a
     description: Minimun value for deal_delay_rule_a.
   delay_contaminated_range_rule_b:
     lineage:
-      - datalake_losses.delay.delay_contaminated_range_rule_b
+    - datalake_losses.delay.delay_contaminated_range_rule_b
     description: Minimun value for deal_delay_rule_b.
   delay_contaminated_range_rule_c:
     lineage:
-      - datalake_losses.delay.delay_contaminated_range_rule_c
+    - datalake_losses.delay.delay_contaminated_range_rule_c
     description: Minimun value for deal_delay_rule_c.
   delay_contaminated_range_rule_d:
     lineage:
-      - datalake_losses.delay.delay_contaminated_range_rule_d
+    - datalake_losses.delay.delay_contaminated_range_rule_d
     description: Minimun value for deal_delay_rule_d.
   delay_contaminated_range_rule_e:
     lineage:
-      - datalake_losses.delay.delay_contaminated_range_rule_e
+    - datalake_losses.delay.delay_contaminated_range_rule_e
     description: Minimun value for deal_delay_rule_e.
   delta_days:
     lineage:
-      - datalake_losses.delay.delta_days
+    - datalake_losses.delay.delta_days
     description: Date difference between dt_due_adjs and dt_closing.
   due_amount:
     lineage:
-      - datalake_losses.delay.due_amount
+    - datalake_losses.delay.due_amount
     description: Total value of the invoice.
   frequency:
     lineage:
-      - datalake_losses.delay.frequency
+    - datalake_losses.delay.frequency
     description: Frequency of the payment.
   full_delay_at_deal:
     lineage:
-      - datalake_losses.delay.full_delay_at_deal
+    - datalake_losses.delay.full_delay_at_deal
     description: Date difference between deal_anchor_due_date and dt_closing.
   guarantee_type:
     lineage:
-      - datalake_losses.delay.guarantee_type
+    - datalake_losses.delay.guarantee_type
     description: Guarantee information related to the invoice.
   invoice_account_type:
-    description: Account type information associated with the user information.
+    description: Account type label derived from invoice user (Inquilino/Proprietario).
+    lineage:
+    - datalake_losses.delay.user
   payment_status:
     lineage:
-      - datalake_losses.delay.payment_status
+    - datalake_losses.delay.payment_status
     description: Invoice status of payment i.e if it is open, paid, canceled or was written down
   invoice_status:
-    description: Invoice status information related to the payment status.
+    description: Localized payment status label (Pago, Em aberto, Cancelado, Baixado).
+    lineage:
+    - datalake_losses.delay.payment_status
   pd_range_rule_a:
     lineage:
-      - datalake_losses.delay.pd_range_rule_a
+    - datalake_losses.delay.pd_range_rule_a
     description: Range of the delay in days related to Rule A.
   pd_range_rule_b:
     lineage:
-      - datalake_losses.delay.pd_range_rule_b
+    - datalake_losses.delay.pd_range_rule_b
     description: Range of the delay in days related to Rule B.
   pd_range_rule_c:
     lineage:
-      - datalake_losses.delay.pd_range_rule_c
+    - datalake_losses.delay.pd_range_rule_c
     description: Range of the delay in days related to Rule C.
   pd_range_rule_d:
     lineage:
-      - datalake_losses.delay.pd_range_rule_d
+    - datalake_losses.delay.pd_range_rule_d
     description: Range of the delay in days related to Rule D.
   pd_range_rule_e:
     lineage:
-      - datalake_losses.delay.pd_range_rule_e
+    - datalake_losses.delay.pd_range_rule_e
     description: Range of the delay in days related to Rule E.
   provision_balance_p1_delay_a:
-    description: Provision balance for the rule A during 2022.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant a
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p2_delay_a:
-    description: Provision balance for the rule A on jan/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant a
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p3_delay_a:
-    description: Provision balance for the rule A on fev/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant a
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p4_delay_a:
-    description: Provision balance for the rule A from mar/2023 to nov/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant a
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p5_delay_a:
-    description: Provision balance for the rule A from dez/2023 to jun/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant a
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p6_delay_a:
-    description: Provision balance for the rule A from jul/2024 to nov/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant a
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p7_delay_a:
-    description: Current provision balance for the rule A.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant a
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p1_delay_b:
-    description: Provision balance for the rule B during 2022.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant b
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p2_delay_b:
-    description: Provision balance for the rule B on jan/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant b
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p3_delay_b:
-    description: Provision balance for the rule B on fev/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant b
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p4_delay_b:
-    description: Provision balance for the rule B from mar/2023 to nov/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant b
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p5_delay_b:
-    description: Provision balance for the rule B from dez/2023 to jun/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant b
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p6_delay_b:
-    description: Provision balance for the rule B from jul/2024 to nov/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant b
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p7_delay_b:
-    description: Current provision balance for the rule B.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant b
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p1_delay_c:
-    description: Provision balance for the rule C during 2022.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant c
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p2_delay_c:
-    description: Provision balance for the rule C on jan/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant c
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p3_delay_c:
-    description: Provision balance for the rule C on fev/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant c
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p4_delay_c:
-    description: Provision balance for the rule C from mar/2023 to nov/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant c
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p5_delay_c:
-    description: Provision balance for the rule C from dez/2023 to jun/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant c
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p6_delay_c:
-    description: Provision balance for the rule C from jul/2024 to nov/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant c
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p7_delay_c:
-    description: Current provision balance for the rule C.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant c
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p1_delay_d:
-    description: Provision balance for the rule D during 2022.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant d
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p2_delay_d:
-    description: Provision balance for the rule D on jan/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant d
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p3_delay_d:
-    description: Provision balance for the rule D on fev/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant d
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p4_delay_d:
-    description: Provision balance for the rule D from mar/2023 to nov/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant d
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p5_delay_d:
-    description: Provision balance for the rule D from dez/2023 to jun/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant d
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p6_delay_d:
-    description: Provision balance for the rule D from jul/2024 to nov/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant d
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p7_delay_d:
-    description: Current provision balance for the rule D.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant d
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p1_delay_e:
-    description: Provision balance for the rule E during 2022.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant e
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p2_delay_e:
-    description: Provision balance for the rule E on jan/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant e
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p3_delay_e:
-    description: Provision balance for the rule E on fev/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant e
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p4_delay_e:
-    description: Provision balance for the rule E from mar/2023 to nov/2023.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant e
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p5_delay_e:
-    description: Provision balance for the rule E from dez/2023 to jun/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant e
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p6_delay_e:
-    description: Provision balance for the rule E from jul/2024 to nov/2024.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant e
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance_p7_delay_e:
-    description: Current provision balance for the rule E.
+    description: Provisioned balance scenario = provision_factor × due_amount for delay-rule variant e
+      and factor cohort in the column name.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
   provision_balance:
-    description: Provision balance being applied to the invoice.
+    description: Selected provisioned balance for the closing (factor × due_amount) under the rule active
+      for that closing month; sum this to obtain Losses.
+    lineage:
+    - datalake_losses.delay.due_amount
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
+    - datalake_losses.delay.dt_snapshot
   provision_factor:
-    description: Provision factor being applied to the invoice.
+    description: Selected provision factor (0–1) applied to the invoice open due amount for the closing
+      month methodology window.
+    lineage:
+    - datalake_losses.provision_factor.provision_factor
+    - datalake_losses.delay.delay_contamined_range
+    - datalake_losses.delay.risk_type
+    - datalake_losses.delay.dt_snapshot
   risk_type:
     lineage:
-      - datalake_losses.delay.risk_type
-    description: Risk type of the deal.
+    - datalake_losses.delay.risk_type
+    description: Financial attribute representing risk type on the provision dataset.
   user:
     lineage:
-      - datalake_losses.delay.user
+    - datalake_losses.delay.user
     description: User information related to the invoice.
   is_before_started:
     lineage:
-      - datalake_losses.delay.is_before_started
+    - datalake_losses.delay.is_before_started
     description: Flag to show if the date is before started.
   is_contract_with_deal:
     lineage:
-      - datalake_losses.delay.is_contract_with_deal
+    - datalake_losses.delay.is_contract_with_deal
     description: Flag to show if the contract had deal.
   is_hr:
     lineage:
-      - datalake_losses.delay.is_hr
+    - datalake_losses.delay.is_hr
     description: Flag to identify if the deal is high risk.
   is_invoice_deal:
     lineage:
-      - datalake_losses.delay.is_invoice_deal
+    - datalake_losses.delay.is_invoice_deal
     description: Flag to identify if the invoice has deal.
   is_international:
     lineage:
-      - datalake_losses.delay.is_international
+    - datalake_losses.delay.is_international
     description: Flag to show if the invoice is international.
   is_writtendown_in_dead_time:
     lineage:
-      - datalake_losses.delay.is_writtendown_in_dead_time
+    - datalake_losses.delay.is_writtendown_in_dead_time
     description: Flag to show if the invoice is writtendown in dead time.
   has_repair_offboarding_bill_item:
     description: Flag to indicate the existence of 'repair offboarding' bill item for an invoice
+    lineage:
+    - datalake_losses.delay.has_repair_offboarding_bill_item
   dt_closing:
     lineage:
-      - datalake_losses.delay.dt_closing
+    - datalake_losses.delay.dt_closing
     description: Last day of the month.
   dt_created_deal:
     lineage:
-      - datalake_losses.delay.dt_created_deal
+    - datalake_losses.delay.dt_created_deal
     description: Date of the deal creation.
   dt_due_adjs:
     lineage:
-      - datalake_losses.delay.dt_due_adjs
+    - datalake_losses.delay.dt_due_adjs
     description: Due date of the deal.
   dt_due_deal_anchor:
     lineage:
-      - datalake_losses.delay.dt_due_deal_anchor
+    - datalake_losses.delay.dt_due_deal_anchor
     description: Due date of the deal anchor.
   dt_due_general_accrual:
     lineage:
-      - datalake_losses.delay.dt_due_general_accrual
-    description: Due date accrual.
+    - datalake_losses.delay.dt_due_general_accrual
+    description: Calendar date associated with due general accrual in the financial workflow.
   dt_paid_adjs:
     lineage:
-      - datalake_losses.delay.dt_paid_adjs
+    - datalake_losses.delay.dt_paid_adjs
     description: Payment date of the deal.
   dt_snapshot:
     lineage:
-      - datalake_losses.delay.dt_snapshot
-    description: Date of the snapshot.
+    - datalake_losses.delay.dt_snapshot
+    description: Calendar date associated with snapshot in the financial workflow.
+  is_contract_write_off:
+    lineage:
+    - datalake_losses.delay.is_contract_write_off
+    description: Indicates whether contract write off applies to this financial record.
+  is_write_off:
+    lineage:
+    - datalake_losses.delay.is_write_off
+    description: Indicates whether write off applies to this financial record.
+  dt_write_off:
+    lineage:
+    - datalake_losses.delay.dt_write_off
+    description: Calendar date associated with write off in the financial workflow.
+  delay_contamined_range:
+    lineage:
+    - datalake_losses.delay.delay_contamined_range
+    description: Financial attribute representing delay contamined range on the provision dataset.
+  paid_amount:
+    lineage:
+    - datalake_losses.delay.paid_amount
+    description: Financial attribute representing paid amount on the provision dataset.

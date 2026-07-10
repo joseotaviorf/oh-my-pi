@@ -1,48 +1,48 @@
 ---
 database_name: datalake_invoice
 table_name: invoice_all
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Table containing data from invoice"
+description: "Table containing data from invoice linking with data from its contract"
 columns:
   id_invoice_entry:
-    description: "Invoice entry ID"
+    description: Identifier for the invoice entry referenced by this financial record.
     lineage:
       - datalake_invoice.invoice_entries.id
   id_region:
-    description: "Region ID"
+    description: Identifier for the region referenced by this financial record.
     lineage:
       - datalake_invoice.invoice_entries.id_region
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_ebdb_contract.contract.id
   rent:
-    description: "Rent amount"
+    description: Financial attribute representing rent on the invoice_all dataset.
     lineage:
       - datalake_ebdb_contract.contract.rent
   version:
-    description: "Version number"
+    description: Financial attribute representing version on the invoice_all dataset.
     lineage:
       - datalake_ebdb_contract.contract.contract_version
   guarantee:
-    description: "Guarantee description"
+    description: Financial attribute representing guarantee on the invoice_all dataset.
     lineage:
       - datalake_ebdb_contract.contract.guarantee
   description:
-    description: "Invoice description"
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
       - datalake_retsuko.invoice_entry.description
   bill_item:
-    description: "Bill item description"
+    description: Financial attribute representing bill item on the invoice_all dataset.
     lineage:
       - datalake_retsuko.invoice_entry.entry_type
   frequency:
-    description: "Frequency description"
+    description: Financial attribute representing frequency on the invoice_all dataset.
     lineage:
       - datalake_retsuko.invoice_info.invoice_frequency
   status:
-    description: "Status description"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_retsuko.invoice_info.payment_status
   invoice_account_type:
@@ -50,9 +50,9 @@ columns:
     lineage:
       - datalake_retsuko.invoice_info.user
   sb_value:
-    description: "SB amount"
+    description: Financial attribute representing sb value on the invoice_all dataset.
   sign_value:
-    description: "Sign amount"
+    description: Financial attribute representing sign value on the invoice_all dataset.
   is_b2b:
     description: "Boolean that indicates if it's b2b"
     lineage:
@@ -76,7 +76,7 @@ columns:
     lineage:
       - datalake_invoice.invoice_entries.id_paid_date
   accrual_year_month:
-    description: "Accural year and month"
+    description: Financial attribute representing accrual year month on the invoice_all dataset.
     lineage:
       - datalake_retsuko.invoice_entry.accrual_year_month
   dt_next_accrual:

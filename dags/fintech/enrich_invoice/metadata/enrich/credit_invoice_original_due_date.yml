@@ -1,9 +1,9 @@
 ---
 database_name: datalake_invoice
 table_name: credit_invoice_original_due_date
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Invoices with flags based on its payment behaviour"
+description: "This tables provides a cleaning of open invoices data into delay categories to aid in the calculation of credit default calculations"
 columns:
   id:
     lineage:
@@ -12,7 +12,7 @@ columns:
   id_invoice:
     lineage:
       - datalake_retsuko.invoice.id_external
-    description: "External Invoice ID"
+    description: Invoice identifier in the billing or payments platform.
   id_contract_retsuko:
     lineage:
       - datalake_retsuko.invoice.id_contract
@@ -48,7 +48,7 @@ columns:
   ts_due:
     lineage:
       - datalake_retsuko.invoice.ts_due
-    description: "timestamp of due date"
+    description: Timestamp when due occurred in the upstream fintech system.
   late_days:
     lineage:
       - datalake_retsuko.invoice.accrual_year_month

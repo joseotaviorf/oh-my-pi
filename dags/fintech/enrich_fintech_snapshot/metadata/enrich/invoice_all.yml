@@ -1,7 +1,7 @@
 ---
 database_name: datalake_fintech_snapshot
 table_name: invoice_all
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "datalake_accounting_funnel.invoice_all monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
@@ -24,7 +24,7 @@ columns:
   version:
     lineage:
       - dw_rent.dim_contract.version
-    description: "Contract version"
+    description: Financial attribute representing version on the invoice_all dataset.
   is_contract_b2b:
     lineage:
       - dw_rent.dim_contract.version
@@ -32,11 +32,11 @@ columns:
   locale:
     lineage:
       - dw_public.dim_region.city_name
-    description: "City name"
+    description: City name recorded on the invoice_all dataset.
   localidade:
     lineage:
       - datalake_gsheets_clean.cod_locale.id_locale
-    description: "City ID"
+    description: City ID recorded on the invoice_all dataset.
   guarantee:
     lineage:
       - dw_rent.dim_contract.guarantee
@@ -57,7 +57,7 @@ columns:
   bill_item:
     lineage:
       - dw_payment.dim_invoice_entry.entry_type
-    description: "Bill item"
+    description: Financial attribute representing bill item on the invoice_all dataset.
   description:
     lineage:
       - dw_payment.dim_invoice_entry.description
@@ -137,27 +137,27 @@ columns:
   entry_created_date:
     lineage:
       - dw_public.dim_date.date
-    description: "Entry creation date"
+    description: Financial attribute representing entry created date on the invoice_all dataset.
   invoice_created_date:
     lineage:
       - dw_payment.dim_invoice.ts_created
-    description: "Invoice creation date"
+    description: Financial attribute representing invoice created date on the invoice_all dataset.
   invoice_due_date:
     lineage:
       - dw_payment.dim_invoice.dt_due
-    description: "Invoice due date"
+    description: Financial attribute representing invoice due date on the invoice_all dataset.
   invoice_sent_date:
     lineage:
       - dw_payment.dim_invoice.dt_sent
-    description: "Date when the invoice was sent"
+    description: Financial attribute representing invoice sent date on the invoice_all dataset.
   invoice_paid_date:
     lineage:
       - dw_payment.dim_invoice.dt_paid
-    description: "Date when the invoice was paid"
+    description: Financial attribute representing invoice paid date on the invoice_all dataset.
   invoice_canceled_date:
     lineage:
       - dw_payment.dim_invoice.ts_canceled
-    description: "Date when the invoice was canceled"
+    description: Financial attribute representing invoice canceled date on the invoice_all dataset.
   invoice_paid_date_next_business_day:
     lineage:
       - dw_public.dim_date.date

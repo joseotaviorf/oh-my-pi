@@ -1,47 +1,47 @@
 ---
 database_name: datalake_invoice
 table_name: invoice_entries
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Table containing data from invoice entries"
+description: "Table containing data from invoice entries, also reffered as bill items"
 columns:
   id:
-    description: "Invoice entry ID"
+    description: Financial attribute representing id on the invoice_entries dataset.
     lineage:
       - datalake_retsuko.entry.id_external
   id_external_reversed_entry:
-    description: "External reversed entry ID"
+    description: Identifier for the external reversed entry referenced by this financial record.
     lineage:
       - datalake_retsuko.entry.id_external_reversed_entry
   id_invoice:
-    description: "Invoice ID"
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_retsuko.invoice.id_external
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_retsuko_clean.contract.id_external
   id_contract_user:
-    description: "Contract user ID"
+    description: Identifier for the contract user referenced by this financial record.
     lineage:
       - datalake_ebdb_clean.rent_flow.id_client
       - datalake_ebdb_clean.house.id_user
       - datalake_ebdb_clean.partner_agent.id_user
       - datalake_ebdb_clean.partner_agent.id_partner
   id_region:
-    description: "Region ID"
+    description: Identifier for the region referenced by this financial record.
     lineage:
       - datalake_ebdb_clean.house.id_region
   id_created_date:
-    description: "Creation date ID"
+    description: Identifier for the created date referenced by this financial record.
     lineage:
       - datalake_retsuko.entry.ts_created
   id_due_date:
-    description: "Due date ID"
+    description: Identifier for the due date referenced by this financial record.
     lineage:
       - datalake_retsuko.invoice.ts_due
   id_paid_date:
-    description: "Pay date ID"
+    description: Identifier for the paid date referenced by this financial record.
     lineage:
       - datalake_retsuko.invoice.ts_paid
   accounting_transaction_identifier:
@@ -49,11 +49,11 @@ columns:
     lineage:
       - datalake_retsuko.entry.accounting_transaction_identifier
   brl_entry_due_amount:
-    description: "Entry due amount in BRL"
+    description: Financial attribute representing brl entry due amount on the invoice_entries dataset.
     lineage:
       - datalake_retsuko.entry.amount
   brl_entry_paid_amount:
-    description: "Entry paid amount in BRL"
+    description: Financial attribute representing brl entry paid amount on the invoice_entries dataset.
   ts_created:
     description: "Timestamp of creation"
     lineage:

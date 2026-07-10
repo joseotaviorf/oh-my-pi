@@ -1,83 +1,129 @@
----
 database_name: datalake_losses
 table_name: historical_closing
-description: "Enrich table with the losses model informations for the fact tables"
-owner: felipe.chies@quintoandar.com.br
+description: 'Part of the Losses enrich pipeline. Losses measures the monthly variation of provisioned
+  balance for rental contracts. The mathematical steps are: closing (month-end open wallet snapshot) →
+  delay (contract-level delay contamination) → provision_factor (lookup of factors 0–1) → provision (open
+  invoices at dt_closing with provisioned balance). Summing provisioned balance by closing month yields
+  the Losses KPI. historical_closing is a static historical build calculated on 2023-03-15 (source: datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged)
+  covering closings from about September 2018 through mid-2022. It freezes a past picture that is not
+  perfect under later retroactive system changes. From August 2022 the recurring snapshot process in closing
+  replaces this approach, so retroactive changes no longer distort month-end open-wallet closings the same
+  way. origin_factor = HISTORICAL BUILD.'
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_invoice:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.sk_invoice
-    description: Id of the invoice.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.sk_invoice
+    description: Invoice identifier from the static historical closing extract (calculated 2023-03-15).
   id_contract:
     lineage:
-      - datalake_ebdb_contract.contract.id
-    description: Id of the contract.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.sk_contract
+    - dw_public_snapshot.dim_contract_snapshot.sk_contract
+    description: Contract identifier from the historical closing extract, enriched with contract snapshot
+      attributes.
   accrual_year_month:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.accrual_year_month
-    description: String with Year number and Month number 'yyyymm' related to the sent date.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.accrual_year_month
+    description: Invoice accrual competence as yyyymm from the static historical closing extract
+      (fechamentos_regras_15032023), used to align historical open-wallet rows to accounting months.
   closing_month_status:
-    description: Status of the closing month.
+    description: 'Contract status at historical closing: Ativo/Finalizado based on annulment vs previous
+      month-end.'
+    lineage:
+    - dw_public_snapshot.dim_contract_snapshot.dt_annulment
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.data_corte
   due_amount:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.due_amount
-    description: Total value of the invoice.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.due_amount
+    description: Invoice due amount from the historical closing extract.
   frequency:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.frequency
-    description: Frequency of the payment.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.frequency
+    description: Invoice frequency from the historical closing extract.
   invoice_type:
-    description: Type of the invoice according to the frequency information.
+    description: Business label of invoice frequency derived from historical frequency.
+    lineage:
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.frequency
   contract_guarantee:
-    description: guarantee information related to the contract.
+    description: Normalized contract guarantee from the fixed 2022-10-04 contract snapshot used to enrich
+      historical closings.
+    lineage:
+    - dw_public_snapshot.dim_contract_snapshot.guarantee
   is_guarantee_paid:
-    description: Flag to show if the guarantee is paid.
+    description: Flag for paid/deposit-style guarantee classification from the contract snapshot enrichment.
+    lineage:
+    - dw_public_snapshot.dim_contract_snapshot.guarantee
   is_before_started:
-    description: Flag to show if the date is before started.
+    description: Before-started flag adjusted with annulment input date relative to the historical snapshot.
+    lineage:
+    - dw_public_snapshot.dim_contract_snapshot.dt_annulment
+    - dw_public_snapshot.dim_contract_snapshot.dt_start
+    - dw_public_snapshot.dim_contract_snapshot.ts_analyst_annulment_input
   is_before_started_raw:
-    description: Flag to show if the date is before started.
+    description: Raw before-started flag from contract start vs annulment.
+    lineage:
+    - dw_public_snapshot.dim_contract_snapshot.dt_annulment
+    - dw_public_snapshot.dim_contract_snapshot.dt_start
   is_canceled_in_dead_time:
-    description: Flag to show if the invoice is canceled in dead time.
+    description: Always false in the historical build (dead-time logic not available for the static extract).
+    lineage:
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.sk_invoice
   is_international:
-    description: Flag to show if the invoice is international.
+    description: True when contract country is not BR (from contract snapshot enrichment).
+    lineage:
+    - dw_public_snapshot.dim_contract_snapshot.country_code
   is_paid_in_closing_day:
-    description: Flag to show if the invoice is paid within the closing day.
+    description: True when historical payment date equals the historical closing day (data_corte).
+    lineage:
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.dt_paid_og
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.data_corte
   is_writtendown_in_dead_time:
-    description: Flag to show if the invoice is writtendown in the deadtime.
+    description: Always false in the historical build (dead-time logic not available for the static extract).
+    lineage:
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.sk_invoice
   paid_amount:
-    description: Not available for historical data, union purpose.
+    description: Not available in the historical extract; null for union compatibility with snapshot closing.
+    lineage:
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.sk_invoice
   payment_status:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.payment_status
-    description: Status of the invoice payment.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.payment_status
+    description: Payment status from the historical closing extract.
   user:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.user
-    description: User information related to the invoice.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.user
+    description: Invoice user/persona from the historical extract; defaults to tenant when null.
   origin_factor:
-    description: Origin of the data, currently can come from the historical table or the snapshot.
+    description: Data origin marker; HISTORICAL BUILD for the static 2023-03-15 historical closing file.
+    lineage:
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.data_corte
   dt_annulment:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.dt_annulment
-    description: Contract annulment date.
+    - dw_public_snapshot.dim_contract_snapshot.dt_annulment
+    description: Contract annulment date from the contract snapshot enrichment.
   dt_closing:
     lineage:
-      - dw_public.dim_date.month_end
-    description: Last day of the month.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.data_corte
+    description: Historical closing day (data_corte) from the static extract.
   dt_contract_signature:
-    description: Date of the contract signature.
+    description: Contract signature date from the contract snapshot enrichment.
+    lineage:
+    - dw_public_snapshot.dim_contract_snapshot.ts_signature
+    - dw_public_snapshot.dim_contract_snapshot.dt_start
   dt_due:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.dt_due
-    description: Due date of the invoice.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.dt_due_retsuko
+    description: Invoice due date from the historical extract.
   dt_paid:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.dt_paid
-    description: Payment completed date of the invoice.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.dt_paid_og
+    description: Invoice payment date from the historical extract.
   dt_sent:
-    description: Not available for historical data, union purpose.
+    description: Not available in the historical extract; null for union compatibility with snapshot closing.
+    lineage:
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.sk_invoice
   dt_snapshot:
     lineage:
-      - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.ts_snapshot
-    description: Date of the snapshot.
+    - datalake_ifrs_monthly_wallet_temp.fechamentos_regras_15032023_onboarding_unchanged.data_corte
+    description: Snapshot/as-of date for the historical row; equals data_corte in the static extract.

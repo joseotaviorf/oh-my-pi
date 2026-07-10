@@ -1,23 +1,36 @@
----
 database_name: datalake_losses
 table_name: provision_factor
-description: This is the enrich table to list the provision factor that should be used on the provision formula.
-owner: felipe.chies@quintoandar.com.br
+description: 'Part of the Losses enrich pipeline. Losses measures the monthly variation of provisioned
+  balance for rental contracts. The mathematical steps are: closing (month-end open wallet snapshot) →
+  delay (contract-level delay contamination) → provision_factor (lookup of factors 0–1) → provision (open
+  invoices at dt_closing with provisioned balance). Summing provisioned balance by closing month yields
+  the Losses KPI. provision_factor is a hardcoded lookup of provision factors (0 to 1) by delay PD range,
+  risk type (e.g. FREE/PAID or LR/HR), and application date window. The factor indicates the share of
+  open balance that should be considered lost (provisioned) for a given contract delay and deterministic
+  risk characteristics. Important: since 2026 the Accounting team changed the provision-factor methodology;
+  this table is legacy for historical Losses analysis and should not be treated as the current accounting
+  factors. Upstream closing and delay models remain valid; a clearer successor for the new methodology
+  will be documented when available.'
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   sk_factor_risk:
-    description: Id of the factor risk.
+    description: Surrogate key identifying a unique provision-factor row (risk × PD range × rule version).
   sk_provision_rule:
-    description: Id of the provision rule.
+    description: Identifier of the provision-rule version/cohort that groups factors for an application
+      period.
   pd_range:
-    description: Range of the delay.
+    description: Past-due delay bucket used to select the factor (e.g. TotalCurrent, TotalM +0 (1-30 days),
+      … TotalM +6 (>181 days)).
   risk_type:
-    description: Type of the risk.
+    description: Deterministic risk segment for the factor (e.g. FREE/PAID guarantee segments, or legacy
+      LR/HR).
   provision_factor:
-    description: Provision factor to be applied on the formula.
+    description: Share of open due amount to provision as loss (between 0 and 1) for the PD range and
+      risk type.
   begin_date_application:
-    description: Related begin date.
+    description: Inclusive start date from which this factor version applies to closings.
   end_date_application:
-    description: Related end date.
+    description: Exclusive/end boundary date of the factor application window.
   provision_name:
-    description: Name of the applied provision.
+    description: Name of the provision methodology family (e.g. high-low-risk, guarantee).
