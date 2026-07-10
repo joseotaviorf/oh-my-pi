@@ -16,7 +16,6 @@ workflow:
   tables_customization:
     fact_lead_3p_flows:
       partitions: [year, month, day]
-      merge_on: [sk_lead_3p_flow]
       z_order_by: [sk_lead_3p_flow, sk_lead_3p]
     dim_current_conversion_funnel:
       partitions: [year, month, day]
