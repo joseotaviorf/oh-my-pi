@@ -1,7 +1,7 @@
 ---
 database_name: dw_fintech_snapshot_recon
 table_name: rental_guarantee_snapshot
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Monthly snapshot of rental guarantee microservice guarantee rows joined to clean guarantee for payment recurrence, for finance reconciliation."
 columns:

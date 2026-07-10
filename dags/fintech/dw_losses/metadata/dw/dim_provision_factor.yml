@@ -2,38 +2,38 @@
 database_name: dw_losses
 table_name: dim_provision_factor
 description: This is a junk dimension to list the provision factor that should be used on the formula.
-owner: felipe.chies@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   sk_factor_risk:
     lineage:
-    - datalake_losses.provision_factor.sk_factor_risk
-    description: Id of the factor risk. 
+      - datalake_losses.provision_factor.sk_factor_risk
+    description: Data warehouse surrogate key for factor risk used in fintech dimensional joins.
   sk_provision_rule:
     lineage:
-    - datalake_losses.provision_factor.sk_provision_rule
+      - datalake_losses.provision_factor.sk_provision_rule
     description: Id of the provision rule. 
   pd_range:
     lineage:
-    - datalake_losses.provision_factor.pd_range
-    description: Range of the delay. 
+      - datalake_losses.provision_factor.pd_range
+    description: Financial attribute representing pd range on the dim_provision_factor dataset.
   risk_type:
     lineage:
-    - datalake_losses.provision_factor.risk_type
-    description: Type of the risk. 
+      - datalake_losses.provision_factor.risk_type
+    description: Financial attribute representing risk type on the dim_provision_factor dataset.
   provision_factor:
     lineage:
-    - datalake_losses.provision_factor.provision_factor
+      - datalake_losses.provision_factor.provision_factor
     description: Provision factor to be applied on the formula. 
   begin_date_application:
     lineage:
-    - datalake_losses.provision_factor.begin_date_application
-    description: Related begin date. 
+      - datalake_losses.provision_factor.begin_date_application
+    description: Financial attribute representing begin date application on the dim_provision_factor dataset.
   end_date_application:
     lineage:
-    - datalake_losses.provision_factor.end_date_application
-    description: Related end date.  
+      - datalake_losses.provision_factor.end_date_application
+    description: Financial attribute representing end date application on the dim_provision_factor dataset.
   provision_name:
     lineage:
-    - datalake_losses.provision_factor.provision_name
+      - datalake_losses.provision_factor.provision_name
     description: Name of the applied provision. 

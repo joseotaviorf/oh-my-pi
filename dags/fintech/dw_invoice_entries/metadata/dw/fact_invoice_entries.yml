@@ -3,54 +3,54 @@ table_name: fact_invoice_entries
 description: Fact table referring to invoice entries events. Smaller granularity of
   the invoice
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_invoice_entry:
     lineage:
-    - datalake_invoice.invoice_entries.id
+      - datalake_invoice.invoice_entries.id
     description: Invoice entry (credit or debit) registered in an invoice
   sk_invoice:
     lineage:
-    - datalake_invoice.invoice_entries.id_invoice
+      - datalake_invoice.invoice_entries.id_invoice
     description: Invoice registered in SeuBarriga
   sk_contract:
     lineage:
-    - datalake_invoice.invoice_entries.id_contract
+      - datalake_invoice.invoice_entries.id_contract
     description: Contract related to an invoice
   sk_contract_user:
     lineage:
-    - datalake_invoice.invoice_entries.id_contract_user
+      - datalake_invoice.invoice_entries.id_contract_user
     description: User id related to the invoice rather than contract
   sk_region:
     lineage:
-    - datalake_invoice.invoice_entries.id_region
+      - datalake_invoice.invoice_entries.id_region
     description: House region id from the contract related to an invoice
   sk_created_date:
     lineage:
-    - datalake_invoice.invoice_entries.id_created_date
+      - datalake_invoice.invoice_entries.id_created_date
     description: Key for invoice entry creation date
   sk_due_date:
     lineage:
-    - datalake_invoice.invoice_entries.id_due_date
+      - datalake_invoice.invoice_entries.id_due_date
     description: Key for invoice entry due date
   sk_paid_date:
     lineage:
-    - datalake_invoice.invoice_entries.id_paid_date
+      - datalake_invoice.invoice_entries.id_paid_date
     description: Key for invoice entry paid date
   brl_entry_due_amount:
     lineage:
-    - datalake_invoice.invoice_entries.brl_entry_due_amount
+      - datalake_invoice.invoice_entries.brl_entry_due_amount
     description: Invoice entry due value, considering debit or credit related to the
       contract cash flow
   brl_entry_paid_amount:
     lineage:
-    - datalake_invoice.invoice_entries.brl_entry_paid_amount
+      - datalake_invoice.invoice_entries.brl_entry_paid_amount
     description: Invoice entry paid value, considering debit or credit related to
       the contract cash flow. Be aware that the amount is distributed proportionally
       in cases of invoice delays
   ts_created:
     lineage:
-    - datalake_invoice.invoice_entries.ts_created
+      - datalake_invoice.invoice_entries.ts_created
     description: Timestamp of the creation of the invoice
   ts_load:
     description: Timestamp of the load into datalake

@@ -1,7 +1,7 @@
 ---
 database_name: dw_fintech_snapshot_recon
 table_name: robin_hood_accounting_entry_snapshot
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Monthly snapshot of Robin Hood accounting entries for selected brokerage-related sources, enriched with contract and locale context for reconciliation."
 columns:
@@ -23,11 +23,11 @@ columns:
   due_amount:
     lineage:
       - datalake_robin_hood.accounting_entry.due_amount
-    description: "Due amount on the accounting entry."
+    description: Financial attribute representing due amount on the robin_hood_accounting_entry_snapshot dataset.
   accrual_year_month:
     lineage:
       - datalake_robin_hood.accounting_entry.accrual_year_month
-    description: "Accrual year-month of the accounting entry."
+    description: Financial attribute representing accrual year month on the robin_hood_accounting_entry_snapshot dataset.
   invoice_paid_date:
     lineage:
       - datalake_robin_hood_clean.payment_request.dt_paid

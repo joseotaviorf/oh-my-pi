@@ -2,17 +2,17 @@
 database_name: dw_losses
 table_name: fact_delay
 description: This table is the fact table for the delay information regarding the losses modelation.
-owner: felipe.chies@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   sk_invoice:
     lineage:
       - datalake_losses.delay.id_invoice
-    description: Id of the invoice.
+    description: Data warehouse surrogate key for invoice used in fintech dimensional joins.
   sk_contract:
     lineage:
       - datalake_losses.delay.id_contract
-    description: Id of the contract.
+    description: Data warehouse surrogate key for contract used in fintech dimensional joins.
   deal_delay_rule_a:
     lineage:
       - datalake_losses.delay.deal_delay_rule_a
@@ -128,7 +128,7 @@ columns:
   risk_type:
     lineage:
       - datalake_losses.delay.risk_type
-    description: Risk type of the deal.
+    description: Financial attribute representing risk type on the fact_delay dataset.
   user:
     lineage:
       - datalake_losses.delay.user
@@ -154,4 +154,28 @@ columns:
       - datalake_losses.delay.dt_closing
     description: Last day of the month.
   ts_load:
-    description: Load date.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+  is_write_off:
+    description: Indicates whether write off applies to this financial record.
+  dt_write_off:
+    description: Calendar date associated with write off in the financial workflow.
+  is_contract_write_off:
+    description: Indicates whether contract write off applies to this financial record.
+  guarantee_type:
+    description: Financial attribute representing guarantee type on the fact_delay dataset.
+  dt_contract_signature:
+    description: Calendar date associated with contract signature in the financial workflow.
+  dt_snapshot:
+    description: Calendar date associated with snapshot in the financial workflow.
+  dt_paid:
+    description: Calendar date associated with paid in the financial workflow.
+  closing_month_status:
+    description: Financial attribute representing closing month status on the fact_delay dataset.
+  dt_annulment:
+    description: Calendar date associated with annulment in the financial workflow.
+  invoice_type:
+    description: Financial attribute representing invoice type on the fact_delay dataset.
+  dt_due:
+    description: Calendar date associated with due in the financial workflow.
+  dt_created:
+    description: Calendar date associated with created in the financial workflow.

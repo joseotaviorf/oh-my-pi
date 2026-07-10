@@ -1,276 +1,238 @@
 database_name: dw_payment
 table_name: dim_invoice_entry
-description: dimension with the details from all individual lines (aka entries/bill-items)
-  of an invoice
+description: "dimension with the details from all individual lines (aka entries/bill-items) of an invoice"
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_invoice_entry:
     lineage:
     - datalake_retsuko.invoice_entry.id
-    description: Id of accounting entry (credit or debit) registered in an invoice
+    description: "Id of accounting entry (credit or debit) registered in an invoice"
   sk_invoice_reversed_entry:
     lineage:
     - datalake_retsuko.invoice_entry.id_external_reversed_entry
-    description: When a entry is created to cancel another entry, this field is filled with the Id of the canceled one
+    description: "When a entry is created to cancel another entry, this field is filled with the Id of the canceled one"
   accounting_transaction_identifier:
-    description: "Transactional entries are created in pairs (on the IQ and PP invoice). This hash can identify this pair."
     lineage:
     - datalake_retsuko.invoice_entry.accounting_transaction_identifier
+    description: "Transactional entries are created in pairs (on the IQ and PP invoice). This hash can identify this pair."
   entry_type:
     lineage:
     - datalake_retsuko.invoice_entry.entry_type
-    description: Invoice entry type according to expense details (tag)
+    description: "Invoice entry type according to expense details (tag)"
     categories:
-      adjustment agreement adm fee: ''
-      adjustment agreement adm partner adm fee: ''
-      adjustment agreement rental: ''
-      adm fee: 5A administration fee
-      adm fee adm partner: Administration fee from B2B partners
-      adm fee tax ir: Tag to identify IR withholding in contracts that we do withholding
-      adm fee tax ir adm partner: Tag to identify IR withholding in contracts that
-        we do withholding for B2B
-      adm fee tax ir quinto andar: Tag to identify IR withholding in contracts that
-        we do withholding
-      adm fee tax pcc: Tag to identify tax expense reimbursement in PJ PP contracts
-        where the total tax amount exceeds BRL10.00
-      adm fee tax pcc adm partner: Tag to identify tax expense reimbursement in PJ
-        PP contracts where the total tax amount exceeds BRL10.00 for B2B
-      adm fee tax pcc quinto andar: Tag to identify tax expense reimbursement in PJ
-        PP contracts where the total tax amount exceeds BRL10.00
-      adm fee tax pcc quintoandar: Same as `adm fee tax pcc quinto andar`
-      advance: Application of temporary bandaids on invoices
-      brokerage adm partner: B2B Partner Brokerage % Billing
-      brokerage adm partner postponed: Postponement of B2B Partner Brokerage % collection
-        due to lack of invoice balance
-      brokerage compensation: Adjustment for broker payment when it is above forecast
-      brokerage estate agent: '% Brokerage from the broker'
-      brokerage estate agent postponed: Postponement of the brokers Brokerage % collection
-        due to lack of balance on the invoice
-      brokerage fee tax ir: Tag to identify IR withholding in contracts that we do
-        withholding.
-      brokerage fee tax ir adm partner: Tag to identify IR withholding in contracts
-        that we do withholding for B2B
-      brokerage fee tax ir quinto andar: Tag to identify IR withholding in contracts
-        that we do withholding.
-      brokerage installment: Brokerage payment installment
-      brokerage installment fee: Brokerage installment fee made by the PP
-      brokerage quinto andar: 5A Brokerage % share
-      brokerage quinto andar postponed: Postponement of the 5A Brokerage % collection
-        due to lack of balance on the invoice
-      campaign: Application of amounts on invoices that are related to marketing campaigns
-        (to distinguish from loss bandaid 5A)
-      campaign discount: Transfer of values related to any marketing campaign
-      collections negotiation: Used when the Collections team grants a discount on
-        a charge
-      condominium: Collection/transfer of condominium expenses
-      condominium defaulting: Used in the collection of internalized condominiums
-        (IQ default or internalized cases prior to validity)
-      condominium fine: Collection/transfer of fines for late payment of condominium
-        fees for which QuintoAndar is responsible (expense 5A)
-      condominium usage: Collection/transfer of condominium expenses
-      debit negotiation: Collection of agreements made in Collections, whose original
-        debts were written down
-      early termination fee: Collection and/or transfer of termination fine
-      estate agent adjustment: ''
-      fine and interest: Fines and charges related to collections of agreements made
-        in Collections
-      home insurance: Use for home fire/protection insurance charges
-      igpm adm fee: Additional IGPM in 5A administration fee
-      igpm adm partner adm fee: Additional IGPM in partner administration fee
-      igpm rental: Additional IGPM in collection and transfer of rent
-      improvement work: Amounts posted for repairs carried out on the property in
-        agreement with those involved (IQ and PP)
-      installment lra: Collection of advance rent requested by the PP - LRA Addon
-      insurance guarantee: Originally used to launch surety bonds. It is a wildcard
-        tag for adjustments and releases that will later be adjusted by the controller.
-        Use carefully!
-      ipca adm fee: Additional IPCA in 5A administration fee
-      ipca adm partner adm fee: Additional IPCA in partner administration fee
-      ipca rental: Additional IPCA in collection and transfer of rent
-      iptu: Monthly IPTU collection (Only used manually when it is necessary to launch
-        a against, that is, cancel the amount already posted)
-      iptu adjustment: For any type of adjustment related to IPTU
-      iva brokerage estate agent: ''
-      iva brokerage quinto andar: ''
-      light water or gas: For entry of consumption accounts prior to or during the
-        lease, paid by 5A, inside or outside the protection (consumption accounts
-        of the condominium should not be here, since they are launched as a condominium)
-      lockin: Launches of iRent/oRent
-      loss: Application of 5A loss bandaids on invoices
-      non protection 5a: Charges that are no in protection 5a package
-      others: If not contemplated in others bill-items
-      payment adjustment: ''
-      postponement: 'Deferred expense: It serves to make adjustments to monthly invoices
-        to ensure that billing invoices can be issued only to tenants and transfer
-        invoices only to owners, the amount is deferred to the next competency. Not
-        applied for post rental invoices'
-      property damage fine: Collection of fines to the customer that enter as revenue
-        at 5A
-      rental: Collection and transfer of rent and related discounts/refunds
-      rental anticipation: Rent advance - MRA Addon
-      rental anticipation fee: Collection of the fee for the advance of rent made
-        by the PP - MRA Addon
-      rental guarantee fee: Collections of the new insured contract model (guarantee
-        2.0)
-      rental guarantee fee refund: Reimbursement of the new insured contract model
-        (guarantee 2.0)
-      repair offboarding: Collections of amounts related to repairs (non-protection)
-        carried out in the Offboarding stage
-      repair ongoing: Used in charges for repairs made by partner providers that are
-        deducted from PP (Does not include Protection 5A repairs)
-      repair work: Entries of values referring to improvements to ongoing contracts
-      reservation: Booking amount charged to IQ - Addon Reservation
-      residential protection 5A acquittance: Amounts of repairs - and only repairs
-        - of the protection that will be borne by 5A
-      residential protection 5A fund transfer: Amounts of repairs - and only repairs
-        - of the protection that will be borne by PP
-      service fee: Service fee charged to IQs
-      utilities defaulting: Used in the process of collecting internalized electricity/gas
-        bills
+      "adjustment agreement adm fee": ""
+      "adjustment agreement adm partner adm fee": ""
+      "adjustment agreement rental": ""
+      "adm fee": "5A administration fee"
+      "adm fee adm partner": "Administration fee from B2B partners"
+      "adm fee tax ir": "Tag to identify IR withholding in contracts that we do withholding"
+      "adm fee tax ir adm partner": "Tag to identify IR withholding in contracts that we do withholding for B2B"
+      "adm fee tax ir quinto andar": "Tag to identify IR withholding in contracts that we do withholding"
+      "adm fee tax pcc": "Tag to identify tax expense reimbursement in PJ PP contracts where the total tax amount exceeds BRL10.00"
+      "adm fee tax pcc adm partner": "Tag to identify tax expense reimbursement in PJ PP contracts where the total tax amount exceeds BRL10.00 for B2B"
+      "adm fee tax pcc quinto andar": "Tag to identify tax expense reimbursement in PJ PP contracts where the total tax amount exceeds BRL10.00"
+      "adm fee tax pcc quintoandar": "Same as `adm fee tax pcc quinto andar`"
+      "advance": "Application of temporary bandaids on invoices"
+      "brokerage adm partner": "B2B Partner Brokerage % Billing"
+      "brokerage adm partner postponed": "Postponement of B2B Partner Brokerage % collection due to lack of invoice balance"
+      "brokerage compensation": "Adjustment for broker payment when it is above forecast"
+      "brokerage estate agent": "% Brokerage from the broker"
+      "brokerage estate agent postponed": "Postponement of the brokers Brokerage % collection due to lack of balance on the invoice"
+      "brokerage fee tax ir": "Tag to identify IR withholding in contracts that we do withholding."
+      "brokerage fee tax ir adm partner": "Tag to identify IR withholding in contracts that we do withholding for B2B"
+      "brokerage fee tax ir quinto andar": "Tag to identify IR withholding in contracts that we do withholding."
+      "brokerage installment": "Brokerage payment installment"
+      "brokerage installment fee": "Brokerage installment fee made by the PP"
+      "brokerage quinto andar": "5A Brokerage % share"
+      "brokerage quinto andar postponed": "Postponement of the 5A Brokerage % collection due to lack of balance on the invoice"
+      "campaign": "Application of amounts on invoices that are related to marketing campaigns (to distinguish from loss bandaid 5A)"
+      "campaign discount": "Transfer of values related to any marketing campaign"
+      "collections negotiation": "Used when the Collections team grants a discount on a charge"
+      "condominium": "Collection/transfer of condominium expenses"
+      "condominium defaulting": "Used in the collection of internalized condominiums (IQ default or internalized cases prior to validity)"
+      "condominium fine": "Collection/transfer of fines for late payment of condominium fees for which QuintoAndar is responsible (expense 5A)"
+      "condominium usage": "Collection/transfer of condominium expenses"
+      "debit negotiation": "Collection of agreements made in Collections, whose original debts were written down"
+      "early termination fee": "Collection and/or transfer of termination fine"
+      "estate agent adjustment": ""
+      "fine and interest": "Fines and charges related to collections of agreements made in Collections"
+      "home insurance": "Use for home fire/protection insurance charges"
+      "igpm adm fee": "Additional IGPM in 5A administration fee"
+      "igpm adm partner adm fee": "Additional IGPM in partner administration fee"
+      "igpm rental": "Additional IGPM in collection and transfer of rent"
+      "improvement work": "Amounts posted for repairs carried out on the property in agreement with those involved (IQ and PP)"
+      "installment lra": "Collection of advance rent requested by the PP - LRA Addon"
+      "insurance guarantee": "Originally used to launch surety bonds. It is a wildcard tag for adjustments and releases that will later be adjusted by the controller. Use carefully!"
+      "ipca adm fee": "Additional IPCA in 5A administration fee"
+      "ipca adm partner adm fee": "Additional IPCA in partner administration fee"
+      "ipca rental": "Additional IPCA in collection and transfer of rent"
+      "iptu": "Monthly IPTU collection (Only used manually when it is necessary to launch a against, that is, cancel the amount already posted)"
+      "iptu adjustment": "For any type of adjustment related to IPTU"
+      "iva brokerage estate agent": ""
+      "iva brokerage quinto andar": ""
+      "light water or gas": "For entry of consumption accounts prior to or during the lease, paid by 5A, inside or outside the protection (consumption accounts of the condominium should not be here, since they are launched as a condominium)"
+      "lockin": "Launches of iRent/oRent"
+      "loss": "Application of 5A loss bandaids on invoices"
+      "non protection 5a": "Charges that are no in protection 5a package"
+      "others": "If not contemplated in others bill-items"
+      "payment adjustment": ""
+      "postponement": "Deferred expense: It serves to make adjustments to monthly invoices to ensure that billing invoices can be issued only to tenants and transfer invoices only to owners, the amount is deferred to the next competency. Not applied for post rental invoices"
+      "property damage fine": "Collection of fines to the customer that enter as revenue at 5A"
+      "rental": "Collection and transfer of rent and related discounts/refunds"
+      "rental anticipation": "Rent advance - MRA Addon"
+      "rental anticipation fee": "Collection of the fee for the advance of rent made by the PP - MRA Addon"
+      "rental guarantee fee": "Collections of the new insured contract model (guarantee 2.0)"
+      "rental guarantee fee refund": "Reimbursement of the new insured contract model (guarantee 2.0)"
+      "repair offboarding": "Collections of amounts related to repairs (non-protection) carried out in the Offboarding stage"
+      "repair ongoing": "Used in charges for repairs made by partner providers that are deducted from PP (Does not include Protection 5A repairs)"
+      "repair work": "Entries of values referring to improvements to ongoing contracts"
+      "reservation": "Booking amount charged to IQ - Addon Reservation"
+      "residential protection 5A acquittance": "Amounts of repairs - and only repairs - of the protection that will be borne by 5A"
+      "residential protection 5A fund transfer": "Amounts of repairs - and only repairs - of the protection that will be borne by PP"
+      "service fee": "Service fee charged to IQs"
+      "utilities defaulting": "Used in the process of collecting internalized electricity/gas bills"
   from_account_type:
     lineage:
     - datalake_retsuko.invoice_entry.from_account_type
-    description: From account type in the invoice entry (contract or stakeholder)
+    description: "From account type in the invoice entry (contract or stakeholder)"
     categories:
-      adm partner: ''
-      contract: ''
-      contract estate agent: ''
-      contract expenses: ''
-      contract iptu: ''
-      landlord: ''
-      missing account: ''
-      personal estate agent: ''
-      quinto andar: ''
-      reservation: ''
-      tenant: ''
-      third party partner: ''
+      "adm partner": ""
+      "contract": ""
+      "contract estate agent": ""
+      "contract expenses": ""
+      "contract iptu": ""
+      "landlord": ""
+      "missing account": ""
+      "personal estate agent": ""
+      "quinto andar": ""
+      "reservation": ""
+      "tenant": ""
+      "third party partner": ""
   to_account_type:
     lineage:
     - datalake_retsuko.invoice_entry.to_account_type
-    description: To account type in the invoice entry  (contract or stakeholder)
+    description: "To account type in the invoice entry (contract or stakeholder)"
     categories:
-      adm partner: ''
-      contract: ''
-      contract estate agent: ''
-      contract expenses: ''
-      contract iptu: ''
-      landlord: ''
-      missing account: ''
-      personal estate agent: ''
-      quinto andar: ''
-      reservation: ''
-      tenant: ''
-      third party partner: ''
+      "adm partner": ""
+      "contract": ""
+      "contract estate agent": ""
+      "contract expenses": ""
+      "contract iptu": ""
+      "landlord": ""
+      "missing account": ""
+      "personal estate agent": ""
+      "quinto andar": ""
+      "reservation": ""
+      "tenant": ""
+      "third party partner": ""
   accounting_account:
     lineage:
     - datalake_retsuko.invoice_entry.accounting_account
-    description: Accounting account in SAP in which entry will be destined (as defined
-      in automatic integration)
+    description: "Accounting account in SAP in which entry will be destined (as defined in automatic integration)"
     categories:
-      adjustment agreement adm fee: ''
-      adjustment agreement adm partner adm fee: ''
-      adjustment agreement rental: ''
-      adm fee: ''
-      adm fee tax ir adm partner: ''
-      adm fee tax ir quinto andar: ''
-      adm fee tax pcc quinto andar: ''
-      adm partner adm fee: ''
-      adm-fee-taxes: ''
-      advance: ''
-      brokerage adm partner: ''
-      brokerage estate agent: ''
-      brokerage fee tax ir adm partner: ''
-      brokerage fee tax ir quinto andar: ''
-      brokerage installment: ''
-      brokerage installment fee: ''
-      brokerage quintoandar: ''
-      brokerage quintoandar taxes: ''
-      campaign: ''
-      campaign discount: ''
-      collections negotiation: ''
-      condo: ''
-      condominium defaulting: ''
-      debit negotiation: ''
-      early termination fee: ''
-      estate agent adjustment: ''
-      fine and interest: ''
-      home insurance: ''
-      installment lra: ''
-      insurance guarantee: ''
-      ipca adm fee: ''
-      ipca adm partner adm fee: ''
-      ipca rental: ''
-      iptu: ''
-      iva brokerage estate agent: ''
-      iva brokerage quinto andar: ''
-      light water or gas: ''
-      loss: ''
-      non protection 5a: ''
-      others: ''
-      payment adjustment: ''
-      postponement: ''
-      property-damage-fine: ''
-      protection-5A-acquittance: ''
-      protection-5A-fund-transfer: ''
-      rental: ''
-      rental anticipation: ''
-      rental anticipation fee: ''
-      rental guarantee fee: ''
-      rental guarantee fee refund: ''
-      repair offboarding: ''
-      repair ongoing: ''
-      reservation: ''
-      service fee: ''
-      utilities defaulting: ''
+      "adjustment agreement adm fee": ""
+      "adjustment agreement adm partner adm fee": ""
+      "adjustment agreement rental": ""
+      "adm fee": ""
+      "adm fee tax ir adm partner": ""
+      "adm fee tax ir quinto andar": ""
+      "adm fee tax pcc quinto andar": ""
+      "adm partner adm fee": ""
+      "adm-fee-taxes": ""
+      "advance": ""
+      "brokerage adm partner": ""
+      "brokerage estate agent": ""
+      "brokerage fee tax ir adm partner": ""
+      "brokerage fee tax ir quinto andar": ""
+      "brokerage installment": ""
+      "brokerage installment fee": ""
+      "brokerage quintoandar": ""
+      "brokerage quintoandar taxes": ""
+      "campaign": ""
+      "campaign discount": ""
+      "collections negotiation": ""
+      "condo": ""
+      "condominium defaulting": ""
+      "debit negotiation": ""
+      "early termination fee": ""
+      "estate agent adjustment": ""
+      "fine and interest": ""
+      "home insurance": ""
+      "installment lra": ""
+      "insurance guarantee": ""
+      "ipca adm fee": ""
+      "ipca adm partner adm fee": ""
+      "ipca rental": ""
+      "iptu": ""
+      "iva brokerage estate agent": ""
+      "iva brokerage quinto andar": ""
+      "light water or gas": ""
+      "loss": ""
+      "non protection 5a": ""
+      "others": ""
+      "payment adjustment": ""
+      "postponement": ""
+      "property-damage-fine": ""
+      "protection-5A-acquittance": ""
+      "protection-5A-fund-transfer": ""
+      "rental": ""
+      "rental anticipation": ""
+      "rental anticipation fee": ""
+      "rental guarantee fee": ""
+      "rental guarantee fee refund": ""
+      "repair offboarding": ""
+      "repair ongoing": ""
+      "reservation": ""
+      "service fee": ""
+      "utilities defaulting": ""
   producer:
     lineage:
     - datalake_retsuko.invoice_entry.producer
-    description: Rotine that produces the entry
+    description: "Rotine that produces the entry"
     categories:
-      brokerage-estate-agent-postponed: ''
-      early-termination: ''
-      early-termination-v2: ''
-      estate-agent: ''
-      extra: ''
-      fine-and-interest: ''
-      manual: ''
-      manual-pos-rental: ''
-      monthly-routine: ''
-      non-specified: ''
-      onboarding-routine: ''
-      onboarding-routine-delayed: ''
-      payment-adjustment: ''
-      postponement: ''
-      sporadic-routine: ''
+      "brokerage-estate-agent-postponed": ""
+      "early-termination": ""
+      "early-termination-v2": ""
+      "estate-agent": ""
+      "extra": ""
+      "fine-and-interest": ""
+      "manual": ""
+      "manual-pos-rental": ""
+      "monthly-routine": ""
+      "non-specified": ""
+      "onboarding-routine": ""
+      "onboarding-routine-delayed": ""
+      "payment-adjustment": ""
+      "postponement": ""
+      "sporadic-routine": ""
   description:
     lineage:
     - datalake_retsuko.invoice_entry.description
-    description: Invoice entry title as shown in invoice
+    description: "Invoice entry title as shown in invoice"
   is_rental_paid_in_advance:
     lineage:
     - datalake_retsuko.invoice_entry.is_rental_paid_in_advance
-    description: Some versions of contracts have variation in the payment method (aka
-      mora/paga, paga/mora)
+    description: "Some versions of contracts have variation in the payment method (aka mora/paga, paga/mora)"
   invoice_entry_revenue:
     lineage:
     - datalake_invoice.invoice_revenues.invoice_entry_revenue
-    description: Indicates which revenue line the entry belongs to
+    description: "Indicates which revenue line the entry belongs to"
     categories:
-      brokerage_financing_fee: ''
-      partner_revenue_share_brokerage: ''
-      partner_revenue_share_management: ''
-      rental_CIQ_commission: ''
-      rental_agents_commission: ''
-      rental_brokerage_fee_5A: ''
-      rental_management_fee_5A: ''
+      "brokerage_financing_fee": ""
+      "partner_revenue_share_brokerage": ""
+      "partner_revenue_share_management": ""
+      "rental_CIQ_commission": ""
+      "rental_agents_commission": ""
+      "rental_brokerage_fee_5A": ""
+      "rental_management_fee_5A": ""
   accrual_year_month:
     lineage:
     - datalake_retsuko.invoice_entry.accrual_year_month
-    description: Expense reference month
+    description: "Expense reference month"
   due_year_month:
     lineage:
     - datalake_retsuko.invoice_entry.due_year_month
-    description: Expense due month
+    description: "Financial attribute representing due year month on the dim_invoice_entry dataset."
   ts_load:
-    description: Timestamp which the data was loaded
+    description: "Timestamp which the data was loaded"

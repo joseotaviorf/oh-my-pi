@@ -2,19 +2,19 @@
 database_name: dw_losses
 table_name: fact_closing
 description: This table is the fact table for the closing information regarding the losses modelation.
-owner: felipe.chies@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   sk_invoice:
     lineage:
       - datalake_losses.closing.id_invoice
       - datalake_losses.historical_closing.id_invoice
-    description: Id of the invoice.
+    description: Data warehouse surrogate key for invoice used in fintech dimensional joins.
   sk_contract:
     lineage:
       - datalake_losses.closing.id_contract
       - datalake_losses.historical_closing.id_contract
-    description: Id of the contract.
+    description: Data warehouse surrogate key for contract used in fintech dimensional joins.
   accrual_year_month:
     lineage:
       - datalake_losses.closing.accrual_year_month
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_losses.closing.closing_month_status
       - datalake_losses.historical_closing.closing_month_status
-    description: Status of the closing month.
+    description: Financial attribute representing closing month status on the fact_closing dataset.
   contract_guarantee:
     lineage:
       - datalake_losses.closing.contract_guarantee
@@ -128,6 +128,20 @@ columns:
     lineage:
       - datalake_losses.closing.dt_snapshot
       - datalake_losses.historical_closing.dt_snapshot
-    description: Date of the snapshot.
+    description: Calendar date associated with snapshot in the financial workflow.
   ts_load:
-    description: Load date.
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+  is_write_off:
+    description: Indicates whether write off applies to this financial record.
+  dt_write_off:
+    description: Calendar date associated with write off in the financial workflow.
+  city:
+    description: Financial attribute representing city on the fact_closing dataset.
+  dt_due_adjusted_retsuko:
+    description: Calendar date associated with due adjusted retsuko in the financial workflow.
+  is_contract_write_off:
+    description: Indicates whether contract write off applies to this financial record.
+  dt_canceled:
+    description: Calendar date associated with canceled in the financial workflow.
+  dt_created:
+    description: Calendar date associated with created in the financial workflow.

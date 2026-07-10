@@ -2,13 +2,13 @@
 database_name: dw_losses
 table_name: dim_bill_items
 description: "DW table with the invoice's bill items"
-owner: bianca.martinss@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   sk_invoice:
     lineage:
       - datalake_losses.bill_items.id_invoice
-    description: Invoice ID
+    description: Data warehouse surrogate key for invoice used in fintech dimensional joins.
   bill_item_name:
     lineage:
       - datalake_losses.bill_items.bill_item_name

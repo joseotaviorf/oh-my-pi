@@ -3,7 +3,7 @@ database_name: dw_payment_snapshot
 table_name: fact_overdue_portfolio_timeline_snapshot
 description: Monthly snapshot, taken on the second business day of month, of the table dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline. This table contains information about the portfolio of overdue invoices. The invoice is inserted into the table 1 day after its due date, and it's replicated every day until the day the debt is paid or written down.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_overdue_portfolio_timeline:
     lineage:
@@ -12,19 +12,19 @@ columns:
   sk_contract:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_contract
-    description: Contract ID
+    description: Data warehouse surrogate key for contract used in fintech dimensional joins.
   id_invoice:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.id_invoice
-    description: Invoice ID
+    description: Invoice identifier in the billing or payments platform.
   id_proposal:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.id_proposal
-    description: Proposal ID
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   contract_status:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.contract_status
-    description: Contract status
+    description: Financial attribute representing contract status on the fact_overdue_portfolio_timeline_snapshot dataset.
   invoice_type:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.invoice_type
@@ -47,7 +47,7 @@ columns:
   recovery_method:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.recovery_method
-    description: "Recovery Method"
+    description: Financial attribute representing recovery method on the fact_overdue_portfolio_timeline_snapshot dataset.
     categories:
       Self Service Negotiation - Payment of original debt: ""
       Self Service Negotiation - Negotiation: ""
@@ -80,11 +80,11 @@ columns:
   due_amount:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.due_amount
-    description: Invoice due amount
+    description: Financial attribute representing due amount on the fact_overdue_portfolio_timeline_snapshot dataset.
   paid_amount:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.paid_amount
-    description: Invoice paid amount
+    description: Financial attribute representing paid amount on the fact_overdue_portfolio_timeline_snapshot dataset.
   recovered_amount:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.recovered_amount
@@ -92,7 +92,7 @@ columns:
   contract_debt:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.contract_debt
-    description: Debt of the contract
+    description: Financial attribute representing contract debt on the fact_overdue_portfolio_timeline_snapshot dataset.
   business_day:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.business_day
@@ -120,11 +120,11 @@ columns:
   dt_invoice_paid:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_paid
-    description: Invoice paid date
+    description: Calendar date associated with invoice paid in the financial workflow.
   dt_invoice_due:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_due
-    description: Invoice due date
+    description: Calendar date associated with invoice due in the financial workflow.
   dt_invoice_due_adjust:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_due_adjust
@@ -143,3 +143,11 @@ columns:
     description: Invoice timeline reference date
   ts_load:
     description: "Timestamp of when the data was inserted into the table"
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+  ts_snapshot:
+    description: Timestamp when snapshot occurred in the upstream fintech system.
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
