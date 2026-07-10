@@ -1,194 +1,198 @@
 ---
 database_name: dw_recon_quintocred_snapshot
 table_name: fact_receivable_guarantees
+description:
+  One row per fact receivable guarantees in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   sk_propose:
-    description: ''
+    description: Data warehouse surrogate key for propose used in fintech dimensional joins.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.sk_propose
+      - dw_recon_quintocred.fact_receivable_guarantees.sk_propose
   sk_propose_20:
-    description: ''
+    description: Data warehouse surrogate key for propose 20 used in fintech dimensional joins.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.sk_propose_20
+      - dw_recon_quintocred.fact_receivable_guarantees.sk_propose_20
   sk_delinquency:
-    description: ''
+    description: Data warehouse surrogate key for delinquency used in fintech dimensional joins.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.sk_delinquency
+      - dw_recon_quintocred.fact_receivable_guarantees.sk_delinquency
   sk_transaction:
-    description: ''
+    description: Data warehouse surrogate key for transaction used in fintech dimensional joins.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.sk_transaction
+      - dw_recon_quintocred.fact_receivable_guarantees.sk_transaction
   sk_ticket:
-    description: ''
+    description: Data warehouse surrogate key for ticket used in fintech dimensional joins.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.sk_ticket
+      - dw_recon_quintocred.fact_receivable_guarantees.sk_ticket
   id_payment_request:
-    description: ''
+    description: Identifier for the payment request referenced by this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.id_payment_request
+      - dw_recon_quintocred.fact_receivable_guarantees.id_payment_request
   id_rh_delinquency:
-    description: ''
+    description: Identifier for the rh delinquency referenced by this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.id_rh_delinquency
+      - dw_recon_quintocred.fact_receivable_guarantees.id_rh_delinquency
   origin_table:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing origin table in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.origin_table
+      - dw_recon_quintocred.fact_receivable_guarantees.origin_table
   customer_document:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing customer document in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.customer_document
+      - dw_recon_quintocred.fact_receivable_guarantees.customer_document
   bill_item:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing bill item in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.bill_item
+      - dw_recon_quintocred.fact_receivable_guarantees.bill_item
   provisional_group:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing provisional group in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.provisional_group
+      - dw_recon_quintocred.fact_receivable_guarantees.provisional_group
   status_rh_payment:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing status rh payment in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.status_rh_payment
+      - dw_recon_quintocred.fact_receivable_guarantees.status_rh_payment
   description:
-    description: ''
+    description: Human-readable description of the financial transaction or ledger entry.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.description
+      - dw_recon_quintocred.fact_receivable_guarantees.description
   due_amount:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing due amount in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.due_amount
+      - dw_recon_quintocred.fact_receivable_guarantees.due_amount
   paid_amount:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing paid amount in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.paid_amount
+      - dw_recon_quintocred.fact_receivable_guarantees.paid_amount
   open_amount:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing open amount in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.open_amount
+      - dw_recon_quintocred.fact_receivable_guarantees.open_amount
   discount_amount:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing discount amount in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.discount_amount
+      - dw_recon_quintocred.fact_receivable_guarantees.discount_amount
   due_amount_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing due amount delinquency in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.due_amount_delinquency
+      - dw_recon_quintocred.fact_receivable_guarantees.due_amount_delinquency
   due_amount_adjusted:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing due amount adjusted in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.due_amount_adjusted
+      - dw_recon_quintocred.fact_receivable_guarantees.due_amount_adjusted
   open_amount_adjusted:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing open amount adjusted in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.open_amount_adjusted
+      - dw_recon_quintocred.fact_receivable_guarantees.open_amount_adjusted
   package_amount:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing package amount in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.package_amount
+      - dw_recon_quintocred.fact_receivable_guarantees.package_amount
   paid_amount_real_estate:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing paid amount real estate in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.paid_amount_real_estate
+      - dw_recon_quintocred.fact_receivable_guarantees.paid_amount_real_estate
   check_rh_payment:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing check rh payment in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.check_rh_payment
+      - dw_recon_quintocred.fact_receivable_guarantees.check_rh_payment
   total_amount_guaranteed:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total amount guaranteed in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.total_amount_guaranteed
+      - dw_recon_quintocred.fact_receivable_guarantees.total_amount_guaranteed
   balance_guarantee:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing balance guarantee in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.balance_guarantee
+      - dw_recon_quintocred.fact_receivable_guarantees.balance_guarantee
   is_property_damage:
-    description: ''
+    description: Indicates whether property damage applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.is_property_damage
+      - dw_recon_quintocred.fact_receivable_guarantees.is_property_damage
   is_delinquency_renewal:
-    description: ''
+    description: Indicates whether delinquency renewal applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.is_delinquency_renewal
+      - dw_recon_quintocred.fact_receivable_guarantees.is_delinquency_renewal
   is_debt_forgiveness:
-    description: ''
+    description: Indicates whether debt forgiveness applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.is_debt_forgiveness
+      - dw_recon_quintocred.fact_receivable_guarantees.is_debt_forgiveness
   is_contract_active:
-    description: ''
+    description: Indicates whether contract active applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.is_contract_active
+      - dw_recon_quintocred.fact_receivable_guarantees.is_contract_active
   is_archived_delinquency:
-    description: ''
+    description: Indicates whether archived delinquency applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.is_archived_delinquency
+      - dw_recon_quintocred.fact_receivable_guarantees.is_archived_delinquency
   has_tickets:
-    description: ''
+    description: Indicates whether tickets applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.has_tickets
+      - dw_recon_quintocred.fact_receivable_guarantees.has_tickets
   has_rh_payment:
-    description: ''
+    description: Indicates whether rh payment applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.has_rh_payment
+      - dw_recon_quintocred.fact_receivable_guarantees.has_rh_payment
   days_late:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing days late in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.days_late
+      - dw_recon_quintocred.fact_receivable_guarantees.days_late
   dt_register:
-    description: ''
+    description: Calendar date associated with register in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_register
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_register
   dt_due:
-    description: ''
+    description: Calendar date associated with due in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_due
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_due
   dt_paid:
-    description: ''
+    description: Calendar date associated with paid in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_paid
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_paid
   dt_register_adjusted:
-    description: ''
+    description: Calendar date associated with register adjusted in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_register_adjusted
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_register_adjusted
   dt_contract_started:
-    description: ''
+    description: Calendar date associated with contract started in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_contract_started
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_contract_started
   dt_contract_ended:
-    description: ''
+    description: Calendar date associated with contract ended in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_contract_ended
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_contract_ended
   dt_model_ended:
-    description: ''
+    description: Calendar date associated with model ended in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_model_ended
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_model_ended
   dt_rh_payment:
-    description: ''
+    description: Calendar date associated with rh payment in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_rh_payment
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_rh_payment
   dt_rh_payment_programmed:
-    description: ''
+    description: Calendar date associated with rh payment programmed in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_rh_payment_programmed
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_rh_payment_programmed
   dt_closing:
-    description: ''
+    description: Calendar date associated with closing in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.dt_closing
+      - dw_recon_quintocred.fact_receivable_guarantees.dt_closing
   ts_snapshot:
-    description: ''
+    description: Timestamp when snapshot occurred in the upstream fintech system.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.NOW()
+      - dw_recon_quintocred.fact_receivable_guarantees.NOW()
   year:
-    description: ''
+    description: Year partition derived from the source event timestamp for incremental loading.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.YEAR(CURRENT_DATE)
+      - dw_recon_quintocred.fact_receivable_guarantees.YEAR(CURRENT_DATE)
   month:
-    description: ''
+    description: Month partition derived from the source event timestamp for incremental loading.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.MONTH(CURRENT_DATE)
+      - dw_recon_quintocred.fact_receivable_guarantees.MONTH(CURRENT_DATE)
   day:
-    description: ''
+    description: Day partition derived from the source event timestamp for incremental loading.
     lineage:
-    - dw_recon_quintocred.fact_receivable_guarantees.DAY(CURRENT_DATE)
+      - dw_recon_quintocred.fact_receivable_guarantees.DAY(CURRENT_DATE)

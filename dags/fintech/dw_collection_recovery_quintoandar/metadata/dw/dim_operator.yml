@@ -1,6 +1,6 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: dim_operator
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Dimension table containing standardized information about operators, including metadata from multiple sources like Recupera, Cyber, Paschoalotto, Webhelp, Bulgarelli, and MeetCall. Used for joining operator data in analytical models.
 columns:

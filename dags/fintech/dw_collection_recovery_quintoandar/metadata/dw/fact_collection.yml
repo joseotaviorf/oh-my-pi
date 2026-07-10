@@ -1,8 +1,8 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: fact_collection
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
-description: It contain data about the collection action by customer.
+owner: juliana.hocihara@quintoandar.com.br
+description: "This table contain events of interaction in the collections journey between BPOs and the debtors"
 columns:
   sk_collection:
     lineage:
@@ -140,3 +140,6 @@ columns:
     description: "The day of the collection occurrence."
   ts_load:
     description: "Timestamp indicating when this record was loaded or last updated in the table."
+  creditor:
+    lineage: []
+    description: Debt collection attribute describing creditor for recovery workflow tracking.

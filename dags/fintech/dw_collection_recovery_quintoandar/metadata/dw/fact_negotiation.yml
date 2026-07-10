@@ -1,8 +1,8 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: fact_negotiation
-description: Negotiations of Debt Recovery
+description: "Table containing of negotiation done in collections for TENANTS in For Rent. A negotiation is the process in which an expired or sum of debts is transformed into new installment by negotiation options"
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_negotiation:
     lineage:
@@ -32,7 +32,7 @@ columns:
   id_negotiation_trato_feito:
     lineage:
       - datalake_collections_quintoandar.negotiation.id_negotiation_trato_feito
-    description: "Trato-Feito negotiation ID."
+    description: Identifier for the negotiation trato feito referenced by this financial record.
   id_manager_authorized:
     lineage:
       - datalake_collections_quintoandar.negotiation.id_manager_authorized
@@ -76,7 +76,7 @@ columns:
   origin_agreement:
     lineage:
       - datalake_collections_quintoandar.negotiation.origin_agreement
-    description: "Origin of the agreement."
+    description: Debt collection attribute describing origin agreement for recovery workflow tracking.
     categories:
       Assessoria: "Advisory"
       Carta_Campanha: "These are agreements that are paid in installments through bank slips (boletos)"
@@ -179,7 +179,7 @@ columns:
   credit_card_fee_amount:
     lineage:
       - datalake_collections_quintoandar.negotiation.credit_card_fee_amount
-    description: "The amount of the credit card fee applied to the negotiation."
+    description: Debt collection attribute describing credit card fee amount for recovery workflow tracking.
   installment_eviction_costs:
     lineage:
       - datalake_collections_quintoandar.negotiation.installment_eviction_costs
@@ -252,7 +252,7 @@ columns:
       - datalake_collections_quintoandar.negotiation.original_debt_amount
       - datalake_collections_quintoandar.negotiation.number_of_installments
       - datalake_collections_quintoandar.negotiation.discount_to_original_amount
-    description: "The net amount of the down payment that has actually been paid."
+    description: Debt collection attribute describing down payment net amount paid for recovery workflow tracking.
   net_paid_amount:
     lineage:
       - datalake_collections_quintoandar.negotiation.promisse_payment_method

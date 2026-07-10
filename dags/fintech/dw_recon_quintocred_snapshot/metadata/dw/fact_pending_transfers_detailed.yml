@@ -85,7 +85,7 @@ columns:
       - dw_recon_quintocred.fact_pending_transfers_detailed
 
   type_account:
-    description: "Bank account category of the payment holder used for outbound QuintoCred transfers"
+    description: QuintoCred rental guarantee attribute describing type account in the policy lifecycle.
     lineage:
       - dw_recon_quintocred.fact_pending_transfers_detailed
 
@@ -188,23 +188,18 @@ columns:
     description: "Date payment was confirmed by RH"
     lineage:
       - dw_recon_quintocred.fact_pending_transfers_detailed
-
-  ts_snapshot:
-    description: "Timestamp when the monthly snapshot was captured"
-    lineage:
-      - dw_recon_quintocred.fact_pending_transfers_detailed.NOW()
-
-  year:
-    description: "Partition year from snapshot run date"
-    lineage:
-      - dw_recon_quintocred.fact_pending_transfers_detailed.YEAR(CURRENT_DATE)
-
-  month:
-    description: "Partition month from snapshot run date"
-    lineage:
-      - dw_recon_quintocred.fact_pending_transfers_detailed.MONTH(CURRENT_DATE)
-
   day:
-    description: "Partition day from snapshot run date"
-    lineage:
-      - dw_recon_quintocred.fact_pending_transfers_detailed.DAY(CURRENT_DATE)
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_snapshot:
+    description: Timestamp when snapshot occurred in the upstream fintech system.
+    lineage: []
+  description:
+    description: Human-readable description of the financial transaction or ledger entry.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []

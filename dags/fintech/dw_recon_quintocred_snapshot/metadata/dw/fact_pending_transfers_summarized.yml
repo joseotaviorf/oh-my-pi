@@ -19,11 +19,6 @@ columns:
     lineage:
       - dw_recon_quintocred.fact_pending_transfers_summarized
 
-  due_amount:
-    description: "Total amount due for payment"
-    lineage:
-      - dw_recon_quintocred.fact_pending_transfers_summarized
-
   paid_amount:
     description: "Total amount that has been paid"
     lineage:
@@ -33,3 +28,15 @@ columns:
     description: "Amount still to be paid"
     lineage:
       - dw_recon_quintocred.fact_pending_transfers_summarized
+  ts_snapshot:
+    description: Timestamp when snapshot occurred in the upstream fintech system.
+    lineage: []
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []

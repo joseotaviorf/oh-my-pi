@@ -1,6 +1,6 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: dim_agency
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Dimension table containing agency and agency group information for collection recovery analysis.
 columns:

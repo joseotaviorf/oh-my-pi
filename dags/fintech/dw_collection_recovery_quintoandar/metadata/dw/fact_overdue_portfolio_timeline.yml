@@ -1,10 +1,10 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: fact_overdue_portfolio_timeline
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 description: The table contains information about the portfolio of overdue
   invoices. The invoice is inserted into the table 1 day after its due date, and
-  it's replicated every day until the day the debt is paid or written down.
+  it's replicated every day until last day of the month in which  the debt is paid or written down.
 columns:
   sk_overdue_portfolio_timeline:
     lineage:
@@ -21,7 +21,7 @@ columns:
   sk_contract:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.id_contract
-    description: "Contract ID."
+    description: Data warehouse surrogate key for contract used in fintech dimensional joins.
   sk_negotiation:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.payment_status
@@ -56,11 +56,11 @@ columns:
   id_invoice:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.id_invoice
-    description: "Invoice ID."
+    description: Invoice identifier in the billing or payments platform.
   id_proposal:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.id_proposal
-    description: "Proposal ID."
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   negotiation_installment_number:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.invoice_type
@@ -70,7 +70,7 @@ columns:
   contract_status:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.contract_status
-    description: "Contract status."
+    description: Debt collection attribute describing contract status for recovery workflow tracking.
   invoice_type:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.invoice_type

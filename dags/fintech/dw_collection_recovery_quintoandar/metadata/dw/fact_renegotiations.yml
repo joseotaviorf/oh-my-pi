@@ -1,7 +1,7 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: fact_renegotiations
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 description: This table contains the anchor invoice for each invoice within a contract's renegotiation hierarchy. The anchor represents the earliest or latest invoice in the renegotiation chain depending on the selected mode, used for tracking lineage and depth of renegotiations.
 columns:
   sk_contract:

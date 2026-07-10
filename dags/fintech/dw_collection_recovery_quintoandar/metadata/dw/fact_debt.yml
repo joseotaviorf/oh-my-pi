@@ -1,7 +1,7 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: fact_debt
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 description: |
   It contains information about the debts negotiated, in granularity of invoice per contract, i.e, which invoices have been negotiated, even if the invoice has not yet expired.
   An invoice can have 1 or more negotiations, in case of a broken negotiation (i.e a promisse not paid). 1 negotiation can include 1 or more invoices (from seu barriga).
