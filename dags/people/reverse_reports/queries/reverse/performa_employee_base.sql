@@ -104,7 +104,7 @@ hierarchy_emails AS (
 ),
 employee_access AS (
     SELECT
-        he.*,
+        he.* EXCEPT (access_list),
         CONCAT(
             '-',
             LOWER(he.work_email),
@@ -131,7 +131,7 @@ SELECT
     bu.consolidated_business_unit_name AS empresa,
     es.name AS nome,
     es.person_number AS matricula,
-    LOWER(es.work_email) AS email,
+    LOWER(es.work_email) AS email_pin,
     CASE
         WHEN LOWER(es.status) = 'active' THEN 'ativo'
         WHEN LOWER(es.status) = 'terminated' THEN 'desligado'
@@ -197,7 +197,6 @@ SELECT
     LOWER(es.name_l5) AS l5_gestor,
     LOWER(es.name_l6) AS l6_gestor,
     es.access_list,
-    LOWER(es.work_email) AS email_pin,
     YEAR(DATE('{load_start_date}')) AS year,
     MONTH(DATE('{load_start_date}')) AS month,
     DAY(DATE('{load_start_date}')) AS day
