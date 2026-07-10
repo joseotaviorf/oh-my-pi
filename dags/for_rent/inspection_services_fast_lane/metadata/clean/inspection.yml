@@ -5,7 +5,7 @@ description:
   It handles the entire process of scheduling an inspection, including cancellations and
   rescheduling, until the inspection actually takes place.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_inspection:
     lineage:

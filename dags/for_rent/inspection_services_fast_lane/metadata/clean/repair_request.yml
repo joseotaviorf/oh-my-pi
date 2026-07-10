@@ -5,7 +5,7 @@ description:
   This table provides information on repair requests after the inspection
   process.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_repair_request:
     lineage:

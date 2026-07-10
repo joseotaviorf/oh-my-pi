@@ -1,193 +1,258 @@
 database_name: datalake_ebdb_clean
 table_name: inspection_aud
+description: Audit history of rental property inspections from EBDB, capturing status changes and scheduling updates over time.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_inspection:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.id
+    description: Id inspection from the inspection audit record.
   id_contract:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.contrato_id
+    description: Id contract from the inspection audit record.
   id_house:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.imovel_id
+    description: Id house from the inspection audit record.
   id_ref:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.ref_id
+    description: Id ref from the inspection audit record.
   id_user_inspector:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.vistoriador_id
+    description: Id user inspector from the inspection audit record.
   id_final_report_pdf:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.finalreportpdfid
+    description: Id final report pdf from the inspection audit record.
   id_booking:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.schedule_id
+    description: Id booking from the inspection audit record.
   id_partial_report_pdf:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.partialreportpdfid
+    description: Id partial report pdf from the inspection audit record.
   rev:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.rev
+    description: Rev from the inspection audit record.
   rev_type:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.revtype
+    description: Rev type from the inspection audit record.
   is_tenant_approved:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.aprovadoinquilino
+    description: Is tenant approved from the inspection audit record.
   mod_is_tenant_approved:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.aprovadoinquilino_mod
+    description: Mod is tenant approved from the inspection audit record.
   is_owner_approved:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.aprovadoproprietario
+    description: Is owner approved from the inspection audit record.
   mod_is_owner_approved:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.aprovadoproprietario_mod
+    description: Mod is owner approved from the inspection audit record.
   browser_tenant_approval:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.browseraprovacaoinquilino
+    description: Browser tenant approval from the inspection audit record.
   browser_owner_approval:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.browseraprovacaoproprietario
+    description: Browser owner approval from the inspection audit record.
   tenant_comment:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.comentarioinquilino
+    description: Tenant comment from the inspection audit record.
   owner_comment:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.comentarioproprietario
+    description: Owner comment from the inspection audit record.
   hash:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.hash
+    description: Hash from the inspection audit record.
   ip_tenant_approval:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.ipaprovacaoinquilino
+    description: Ip tenant approval from the inspection audit record.
   ip_owner_approval:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.ipaprovacaoproprietario
+    description: Ip owner approval from the inspection audit record.
   short_review_tenant:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.shortrevisarinq
+    description: Short review tenant from the inspection audit record.
   short_review_owner:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.shortrevisarprop
+    description: Short review owner from the inspection audit record.
   os_tenant_approval:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.soaprovacaoinquilino
+    description: Os tenant approval from the inspection audit record.
   os_owner_approval:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.soaprovacaoproprietario
+    description: Os owner approval from the inspection audit record.
   status:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.status
+    description: Current processing state of the record in the source workflow.
   mod_status:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.status_mod
+    description: Mod status from the inspection audit record.
   type:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.tipo
+    description: Classification code defining the entity role or category.
   mod_tenant_comment:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.comentarioinquilino_mod
+    description: Mod tenant comment from the inspection audit record.
   mod_owner_comment:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.comentarioproprietario_mod
+    description: Mod owner comment from the inspection audit record.
   is_item_commented:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.itencommented
+    description: Is item commented from the inspection audit record.
   is_final_report_created:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.finalreportcreated
+    description: Is final report created from the inspection audit record.
   report_sent_status:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.reportsentstatus
+    description: Report sent status from the inspection audit record.
   mod_report_sent_status:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.reportsentstatus_mod
+    description: Mod report sent status from the inspection audit record.
   last_report_sent:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.lastreportsent
+    description: Last report sent from the inspection audit record.
   mod_last_report_sent:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.lastreportsent_mod
+    description: Mod last report sent from the inspection audit record.
   mod_ts_expired:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.expiraem_mod
+    description: Mod ts expired from the inspection audit record.
   is_report_finished:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.reportfinished
+    description: Is report finished from the inspection audit record.
   mod_is_report_finished:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.reportfinished_mod
+    description: Mod is report finished from the inspection audit record.
   key_location:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.keylocation
+    description: Key location from the inspection audit record.
   mod_key_location:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.keylocation_mod
+    description: Mod key location from the inspection audit record.
   key_location_details:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.keylocationdetails
+    description: Key location details from the inspection audit record.
   has_inspector_got_all_info:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.inspectorgotallinfo
+    description: Has inspector got all info from the inspection audit record.
   version:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.version
+    description: Version from the inspection audit record.
   mod_version:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.version_mod
+    description: Mod version from the inspection audit record.
   mod_id_booking:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.schedule_mod
+    description: Mod id booking from the inspection audit record.
   schedule_observations:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.scheduleobservations
+    description: Schedule observations from the inspection audit record.
   mod_schedule_observations:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.scheduleobservations_mod
+    description: Mod schedule observations from the inspection audit record.
   report_revised:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.reportrevised
+    description: Report revised from the inspection audit record.
   mod_report_revised:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.reportrevised_mod
+    description: Mod report revised from the inspection audit record.
   is_schedule_double_checked:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.scheduledoublechecked
+    description: Is schedule double checked from the inspection audit record.
   mod_is_schedule_double_checked:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.scheduledoublechecked_mod
+    description: Mod is schedule double checked from the inspection audit record.
   mod_ts_last_synced:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.lastsynced_mod
+    description: Mod ts last synced from the inspection audit record.
   mode:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.mode
+    description: Mode from the inspection audit record.
   mod_mode:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.mode_mod
+    description: Mod mode from the inspection audit record.
   ts_tenant_approved:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.dataaprovacaoinquilino
+    description: Ts tenant approved from the inspection audit record.
   ts_owner_approved:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.dataaprovacaoproprietario
+    description: Ts owner approved from the inspection audit record.
   ts_expired:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.expiraem
+    description: Ts expired from the inspection audit record.
   ts_partial_owner_report_sent:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.partialownerreportsentat
+    description: Ts partial owner report sent from the inspection audit record.
   ts_partial_tenant_report_sent:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.partialtenantreportsentat
+    description: Timestamp when the partial inspection report was delivered to the tenant.
   ts_last_synced:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.lastsynced
+    description: Ts last synced from the inspection audit record.
   dt_inspected:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.datavistoria
+    description: Dt inspected from the inspection audit record.
   dt_final_report_sent:
     lineage:
       - datalake_ebdb_raw.vistoria_aud.finalreportsentat
+    description: Dt final report sent from the inspection audit record.

@@ -1,26 +1,36 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: conservation_item
+description: Checklist items recorded during a conservation assessment, grouped by
+  room and item type in the EBDB inspections source.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_conservation_item:
     lineage:
-      - datalake_ebdb_raw.conservationitem.id
+    - datalake_ebdb_raw.conservationitem.id
+    description: Primary key of the conservation checklist item.
   id_room:
     lineage:
-      - datalake_ebdb_raw.conservationitem.roomId
+    - datalake_ebdb_raw.conservationitem.roomId
+    description: Room where this conservation item was evaluated.
   item_type:
     lineage:
-      - datalake_ebdb_raw.conservationitem.itemType
+    - datalake_ebdb_raw.conservationitem.itemType
+    description: Type label of the conservation checklist item.
   item_group:
     lineage:
-      - datalake_ebdb_raw.conservationitem.itemGroup
+    - datalake_ebdb_raw.conservationitem.itemGroup
+    description: Grouping of related items such as floor, paint, or lighting.
   is_present:
     lineage:
-      - datalake_ebdb_raw.conservationitem.present
+    - datalake_ebdb_raw.conservationitem.present
+    description: Whether the item was found present during the assessment.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.conservationitem.criadoEm
+    - datalake_ebdb_raw.conservationitem.criadoEm
+    description: Timestamp when the item record was created in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.conservationitem.atualizadoEm
+    - datalake_ebdb_raw.conservationitem.atualizadoEm
+    description: Timestamp of the last update to the item record.

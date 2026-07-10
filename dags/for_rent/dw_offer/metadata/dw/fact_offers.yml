@@ -1,88 +1,91 @@
 database_name: dw_rent
 table_name: fact_offers
 description: Fact table with offer consolidated data from Rental Transact database.
-            Each line is a unique offer and its current state.
+  Each line is a unique offer and its current state.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   pk_offer:
-    description: Offer's primary key.
+    description: pk offer for the fact offers dataset in dw_offer.
   sk_offer:
     lineage:
-      - datalake_rental_transact.offer.id_offer
+    - datalake_rental_transact.offer.id_offer
     description: Offer identifier from Rental Transact database.
   sk_client:
     lineage:
-      - datalake_rental_transact.offer.id_tenant
-    description: Tenant prospect ID.
+    - datalake_rental_transact.offer.id_tenant
+    description: Surrogate key identifying this fact offers record in the dw_offer
+      pipeline.
   sk_owner:
     lineage:
-      - datalake_rental_transact.offer.id_owner
-    description: House owner ID.
+    - datalake_rental_transact.offer.id_owner
+    description: Surrogate key identifying this fact offers record in the dw_offer
+      pipeline.
   sk_house:
     lineage:
-      - datalake_rental_transact.offer.id_house
+    - datalake_rental_transact.offer.id_house
     description: House identifier from Rental Transact database.
   sk_house_listing:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_house_listing
-    description: House listing ID.
+    - datalake_ebdb_listing.house_listing.id_house_listing
+    description: Surrogate key identifying this fact offers record in the dw_offer
+      pipeline.
   status:
     lineage:
-      - datalake_rental_transact.offer.status
-    description: Offer current status.
+    - datalake_rental_transact.offer.status
+    description: status for the fact offers dataset in dw_offer.
   original_rent_value:
     lineage:
-      - datalake_rental_transact.offer.original_rent
+    - datalake_rental_transact.offer.original_rent
     description: Original rent value proposed by the owner.
   payment_flow_type:
     lineage:
-      - datalake_rental_transact.offer.payment_flow_type
-    description: Payment flow type for the offer.
+    - datalake_rental_transact.offer.payment_flow_type
+    description: Billing workflow variant governing how the payment is processed.
     categories:
       NONE: No payment flow type specified.
       ADVANCE_PAYMENT: Payment flow uses advance payment.
   original_iptu_value:
     lineage:
-      - datalake_rental_transact.offer.original_iptu_value
+    - datalake_rental_transact.offer.original_iptu_value
     description: Original IPTU (property tax) value from the offer.
   original_condominium_value:
     lineage:
-      - datalake_rental_transact.offer.original_condominium_value
+    - datalake_rental_transact.offer.original_condominium_value
     description: Original condominium value from the offer.
   original_home_insurance_value:
     lineage:
-      - datalake_rental_transact.offer.original_home_insurance_value
+    - datalake_rental_transact.offer.original_home_insurance_value
     description: Original home insurance value from the offer.
   original_tenant_service_fee_value:
     lineage:
-      - datalake_rental_transact.offer.original_tenant_service_fee_value
-    description: Original tenant service fee value from the offer.
+    - datalake_rental_transact.offer.original_tenant_service_fee_value
+    description: Tenant service fee percentage before final offer adjustments.
   last_proposed_rent_value:
     lineage:
-      - datalake_rental_transact.offer.last_proposed_rent_value
+    - datalake_rental_transact.offer.last_proposed_rent_value
     description: Last proposed rent value on the negotiation.
   days_of_negotiation:
     lineage:
-      - datalake_rental_transact.offer.ts_last_iteration
-      - datalake_rental_transact.offer.ts_first_iteration
+    - datalake_rental_transact.offer.ts_last_iteration
+    - datalake_rental_transact.offer.ts_first_iteration
     description: Number of days of negotiation.
   qtd_topics_negotiated:
     lineage:
-      - datalake_rental_transact.offer.qtd_topics_negotiated
+    - datalake_rental_transact.offer.qtd_topics_negotiated
     description: Number of topics being negotiated on this offer.
   original_to_final_value_difference:
     lineage:
-      - datalake_rental_transact.offer.original_rent
-      - datalake_rental_transact.offer.last_proposed_rent_value
-    description: Difference between original and final rent value proposed.
+    - datalake_rental_transact.offer.original_rent
+    - datalake_rental_transact.offer.last_proposed_rent_value
+    description: Monetary gap between the initial and final negotiated offer value.
   ts_first_iteration:
     lineage:
-      - datalake_rental_transact.offer.ts_first_iteration
+    - datalake_rental_transact.offer.ts_first_iteration
     description: Timestamp of the first iteration of the negotiation.
   ts_last_iteration:
     lineage:
-      - datalake_rental_transact.offer.ts_last_iteration
+    - datalake_rental_transact.offer.ts_last_iteration
     description: Timestamp of the last iteration of the negotiation.
   ts_load:
     description: Timestamp of when this data was loaded.

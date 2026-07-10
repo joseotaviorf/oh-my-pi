@@ -1,23 +1,24 @@
 database_name: dw_rent
 table_name: dim_offer_topic
 description: Dimension table with offer topic data from Rental Transact database.
-              Each offer topic represents something being negotiated (price or house modifications) 
-              and each line represents a unique offer topic.
+  Each offer topic represents something being negotiated (price or house modifications)
+  and each line represents a unique offer topic.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_offer_topic:
     lineage:
-      - datalake_rental_transact_clean.offer_topic.id
-    description: Offer topic ID.
+    - datalake_rental_transact_clean.offer_topic.id
+    description: Surrogate key identifying this dim offer topic record in the dw_offer
+      pipeline.
   status:
     lineage:
-      - datalake_rental_transact_clean.offer_topic.status
-    description: Offer topic status.
+    - datalake_rental_transact_clean.offer_topic.status
+    description: status for the dim offer topic dataset in dw_offer.
   type:
     lineage:
-      - datalake_rental_transact_clean.offer_topic.type
-    description: Offer topic type.
+    - datalake_rental_transact_clean.offer_topic.type
+    description: type for the dim offer topic dataset in dw_offer.
     categories:
       PRICE: Price negotiation.
       REMOVE: Negotiation regarding the removal of something from the house.
@@ -26,11 +27,11 @@ columns:
       MODIFY: Negotiation regarding some house modification.
   ts_created:
     lineage:
-      - datalake_rental_transact_clean.offer_topic.ts_created
+    - datalake_rental_transact_clean.offer_topic.ts_created
     description: Timestamp of when the topic was created.
   ts_updated:
     lineage:
-      - datalake_rental_transact_clean.offer_topic.ts_updated
+    - datalake_rental_transact_clean.offer_topic.ts_updated
     description: Timestamp of when the topic was updated.
   ts_load:
     description: Timestamp of when this data was loaded.

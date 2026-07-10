@@ -1,55 +1,76 @@
+---
 database_name: datalake_ebdb_clean
 table_name: inspection_item
+description: Line-level inspection checklist items from EBDB, including room context,
+  photos, and comments from tenant and owner.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.id
+    - datalake_ebdb_raw.itemvistoria.id
+    description: Primary key of the inspection checklist item in EBDB.
   id_inspection:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.vistoria_id
+    - datalake_ebdb_raw.itemvistoria.vistoria_id
+    description: Inspection this checklist item belongs to.
   id_room:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.roomid
+    - datalake_ebdb_raw.itemvistoria.roomid
+    description: Room identifier associated with the item.
   id_ref:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.refid
+    - datalake_ebdb_raw.itemvistoria.refid
+    description: Reference identifier for linked inspection entities.
   has_photo:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.temfoto
+    - datalake_ebdb_raw.itemvistoria.temfoto
+    description: Whether a photo was attached to this checklist item.
   name:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.nome
+    - datalake_ebdb_raw.itemvistoria.nome
+    description: Display name of the inspection item as entered by the inspector.
   type:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.tipo
+    - datalake_ebdb_raw.itemvistoria.tipo
+    description: Item type classification in the inspection checklist.
   position:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.posicao
+    - datalake_ebdb_raw.itemvistoria.posicao
+    description: Ordering position of the item within its room or group.
   photo_name:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.nomefoto
+    - datalake_ebdb_raw.itemvistoria.nomefoto
+    description: File name of the photo attached to this item, if any.
   room_name:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.roomname
+    - datalake_ebdb_raw.itemvistoria.roomname
+    description: Human-readable room name for the inspected area.
   finishing:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.acabamento
+    - datalake_ebdb_raw.itemvistoria.acabamento
+    description: Finishing or surface condition noted for the item.
   operation:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.funcionamento
+    - datalake_ebdb_raw.itemvistoria.funcionamento
+    description: Operational status or functioning assessment of the item.
   comment:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.comentario
+    - datalake_ebdb_raw.itemvistoria.comentario
+    description: General inspector comment on the item condition.
   tenant_comment:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.comentarioinquilino
+    - datalake_ebdb_raw.itemvistoria.comentarioinquilino
+    description: Tenant-provided comment on the item during review.
   owner_comment:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.comentarioproprietario
+    - datalake_ebdb_raw.itemvistoria.comentarioproprietario
+    description: Owner-provided comment on the item during review.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.criadoem
+    - datalake_ebdb_raw.itemvistoria.criadoem
+    description: Timestamp when the item record was created in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.itemvistoria.atualizadoem
+    - datalake_ebdb_raw.itemvistoria.atualizadoem
+    description: Timestamp of the last update to the item record.

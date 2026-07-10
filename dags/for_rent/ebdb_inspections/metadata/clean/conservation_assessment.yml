@@ -1,29 +1,40 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: conservation_assessment
+description: Conservation assessments from EBDB tracking property condition evaluations
+  linked to photographer jobs and houses.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_conservation_assessment:
     lineage:
-      - datalake_ebdb_raw.conservationassessment.id
+    - datalake_ebdb_raw.conservationassessment.id
+    description: Primary key of the conservation assessment in EBDB.
   id_house:
     lineage:
-      - datalake_ebdb_raw.conservationassessment.imovelId
+    - datalake_ebdb_raw.conservationassessment.imovelId
+    description: Property being evaluated in the conservation assessment.
   id_user:
     lineage:
-      - datalake_ebdb_raw.conservationassessment.userId
+    - datalake_ebdb_raw.conservationassessment.userId
+    description: User who created or owns the conservation assessment record.
   id_job:
     lineage:
-      - datalake_ebdb_raw.conservationassessment.jobId
+    - datalake_ebdb_raw.conservationassessment.jobId
+    description: Photographer job associated with this conservation assessment.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.conservationassessment.criadoEm
+    - datalake_ebdb_raw.conservationassessment.criadoEm
+    description: Timestamp when the assessment record was created in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.conservationassessment.atualizadoEm
+    - datalake_ebdb_raw.conservationassessment.atualizadoEm
+    description: Timestamp of the last update to the assessment record.
   ts_started:
     lineage:
-      - datalake_ebdb_raw.conservationassessment.startedAt
+    - datalake_ebdb_raw.conservationassessment.startedAt
+    description: When the on-site conservation assessment began.
   ts_ended:
     lineage:
-      - datalake_ebdb_raw.conservationassessment.finishedAt
+    - datalake_ebdb_raw.conservationassessment.finishedAt
+    description: When the on-site conservation assessment was completed.

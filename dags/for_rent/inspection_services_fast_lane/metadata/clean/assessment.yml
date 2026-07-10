@@ -7,7 +7,7 @@ description:
   This bug erroneously created more than one Assessment per inspection. Therefore, for these cases, the Assessment will not be unique per inspection.
   It is observed that the extra Assessments are identical, with no data distinction between them.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_assessment:
     lineage:
