@@ -1,8 +1,9 @@
+---
 database_name: metric_rent
 table_name: ppmulti_demand_events
 description: This table contains the aggregated sum of demand events of PPs Multi (owners with 5 or more ongoing properties on the date), each line has the total volume of events related to the scope within the aggregation.
 domain: For Rent
-owner: mariana.kralco@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   day:
     lineage:
@@ -12,22 +13,22 @@ columns:
   country_code:
     lineage:
       - dw_rent.fact_rent_demand_events.country_code
-    description: Country code of the house.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
-  visits_booked:
+  visit_booked:
     lineage:
     - dw_rent.fact_rent_demand_events.sk_event
-    description: Total volume of visits booked of PPs Multi (owners with 5 or more ongoing properties on the date) within the aggregation.
+    description: Count of tenant visits scheduled during the reporting period.
     metric:
       name: PP Multi Visits Booked
-      description: Total volume of visits booked of PPs Multi (owners with 5 or more ongoing properties on the date) within the aggregation.
+      description: Count of tenant visits scheduled during the reporting period.
       acronym: VB
       is_additive: True
       business_stage: Demand
       hierarchy: Executive
       approved_by: mariana.kralco@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/100001'
-  visits_completed:
+  visit_completed:
     lineage:
     - dw_rent.fact_rent_demand_events.sk_event
     description: Total volume of visits completed of PPs Multi (owners with 5 or more ongoing properties on the date) within the aggregation.
@@ -40,7 +41,7 @@ columns:
       hierarchy: Operations Mgmt
       approved_by: mariana.kralco@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/100001'
-  offers_submitted:
+  offer_submitted:
     lineage:
     - dw_rent.fact_rent_demand_events.sk_event
     description: Total volume of offers submitted of PPs Multi (owners with 5 or more ongoing properties on the date) within the aggregation.
@@ -53,7 +54,7 @@ columns:
       hierarchy: Operations Mgmt
       approved_by: mariana.kralco@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/100001'
-  offers_accepted:
+  offer_accepted:
     lineage:
     - dw_rent.fact_rent_demand_events.sk_event
     description: Total volume of offers accepted of PPs Multi (owners with 5 or more ongoing properties on the date) within the aggregation.
@@ -92,7 +93,7 @@ columns:
       hierarchy: operations mgmt
       approved_by: 'mariana.kralco@quintoandar.com.br'
       link_to_metric: 'https://metabase.quintoandar.com.br/question/100001'
-  documentation_sent:
+  document_sent:
     lineage:
     - dw_rent.fact_rent_demand_events.sk_event
     description: Total volume of documentations sent of PPs Multi (owners with 5 or more ongoing properties on the date) within the aggregation.
@@ -118,7 +119,7 @@ columns:
       hierarchy: Operations Mgmt
       approved_by: mariana.kralco@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/100001'
-  contracts_created:
+  contract_created:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event
     description: Total volume of contracts created of PPs Multi (owners with 5 or more ongoing properties on the date) within the aggregation.
@@ -131,7 +132,7 @@ columns:
       hierarchy: Executive
       approved_by: mariana.kralco@quintoandar.com.br
       link_to_metric: 'https://metabase.quintoandar.com.br/question/100001'
-  contracts_signed:
+  contract_signed:
     lineage:
     - dw_rent.fact_rent_demand_events.sk_event
     description: Total volume of contracts signed of PPs Multi (owners with 5 or more ongoing properties on the date) within the aggregation.

@@ -1,9 +1,9 @@
+---
 database_name: metric_rent
 table_name: cohort_conversions_volumes
-description: This table contains the volume of ForRent Demand events that were converted or not.
-  Each line has the total volume of the cohort related to the scope within the aggregation.
+description: This table contains the volume of ForRent Demand events that were converted or not. Each line has the total volume of the cohort related to the scope within the aggregation.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   halfyear:
     lineage:
@@ -48,8 +48,7 @@ columns:
   weeks_to_conversion:
     lineage:
       - dw_rent_snapshot.rent_cohort_conversions_snapshot.weeks_to_conversion
-    description: Weeks to conversion, which means how many weeks the base event too the be converted.
-      If the week to conversion is -1, it means that the event wasn't converted yet.
+    description: Weeks to conversion, which means how many weeks the base event too the be converted. If the week to conversion is -1, it means that the event wasn't converted yet.
     dimension: True
   vb_unconverted:
     lineage:
@@ -374,7 +373,7 @@ columns:
   dt_event:
     lineage:
       - dw_rent_snapshot.rent_cohort_conversions_snapshot.dt_event
-    description: Date of the base event.
+    description: Date of the base event captured in the source operational system.
     dimension: True
   dt_week_started:
     lineage:
@@ -384,8 +383,5 @@ columns:
   country_code:
     lineage:
       - dw_rent_snapshot.rent_cohort_conversions_snapshot.country_code
-    description: Country code information.
-    dimension: True
-  ts_load:
-    description: Load date.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True

@@ -1,58 +1,62 @@
 database_name: datalake_signatures_clean
 table_name: signature_collector
-description: This table contains the information about the signature collector.
+description: |
+  Clean CDC copy of signature collector batches from the Signatures Postgres service, one row
+  per orchestrated signing workflow that groups related agreement documents and recipients.
+  Tracks batch lifecycle from start through dispatch to completion. Linked to individual
+  signature rows and used to analyze end-to-end electronic signing operations in For Rent.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
-    description: The unique identifier for the signature collector.
+    description: Primary key of the signature collector batch record in the Signatures service.
     lineage:
       - datalake_signatures_raw.signature_collector.id
   id_external_reference:
-    description: The unique identifier for the external reference.
+    description: Identifier of the upstream business process or entity that owns this signing batch.
     lineage:
       - datalake_signatures_raw.signature_collector.external_reference_id
   external_reference_name:
-    description: The name of the external reference.
+    description: Human-readable label of the business object linked through id_external_reference for this collector.
     lineage:
       - datalake_signatures_raw.signature_collector.external_reference_name
   version:
-    description: The version of the signature collector.
+    description: Optimistic-locking revision number incremented whenever the collector row is updated in Signatures.
     lineage:
       - datalake_signatures_raw.signature_collector.version
   status:
-    description: The status of the signature collector.
+    description: Overall workflow state of the collector batch, such as draft, in progress, completed, or cancelled.
     lineage:
       - datalake_signatures_raw.signature_collector.status
   ts_started:
-    description: The timestamp of the started signature collector.
+    description: Timestamp when the collector workflow began processing signature requests (UTC).
     lineage:
       - datalake_signatures_raw.signature_collector.started_at
   ts_completed:
-    description: The timestamp of the completed signature collector.
+    description: Timestamp when all required signatures in the batch were finished; null while the workflow is open (UTC).
     lineage:
       - datalake_signatures_raw.signature_collector.completed_at
   ts_sent:
-    description: The timestamp of the sent signature collector.
+    description: Timestamp when the collector dispatched signature invitations to recipients (UTC).
     lineage:
       - datalake_signatures_raw.signature_collector.sent_at
   ts_created:
-    description: The timestamp of the created signature collector.
+    description: Timestamp when the collector record was first created in the Signatures service (UTC).
     lineage:
       - datalake_signatures_raw.signature_collector.created_at
   ts_updated:
-    description: The timestamp of the updated signature collector.
+    description: Timestamp of the most recent update to the collector record in Signatures (UTC).
     lineage:
       - datalake_signatures_raw.signature_collector.updated_at
   year:
-    description: The year of when the signature collector was ingested.
+    description: Ingestion partition year derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.signature_collector.year
   month:
-    description: The month of when the signature collector was ingested.
+    description: Ingestion partition month derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.signature_collector.month
   day:
-    description: The day of when the signature collector was ingested.
+    description: Ingestion partition day derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.signature_collector.day

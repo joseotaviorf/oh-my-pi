@@ -1,8 +1,9 @@
+---
 database_name: metric_rent
 table_name: demand_events
 description: This table contains the aggregated sum of demand events of For Rent, each line has the total volume of events related to the scope within the aggregation.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   halfyear:
     lineage:
@@ -47,10 +48,10 @@ columns:
   visits_booked:
     lineage:
     - dw_rent_snapshot.rent_demand_events_snapshot.visits_booked
-    description: Total volume of visits booked within the aggregation.
+    description: Count of tenant visits scheduled during the reporting period.
     metric:
       name: Visits Booked
-      description: Total volume of visits booked within the aggregation.
+      description: Count of tenant visits scheduled during the reporting period.
       acronym: VB
       is_additive: True
       business_stage: Demand
@@ -182,18 +183,18 @@ columns:
   dt_event:
     lineage:
     - dw_rent_snapshot.rent_demand_events_snapshot.dt_event
-    description: Date of the event.
+    description: Date of the event captured in the source operational system.
     dimension: True
   dt_week_started:
     lineage:
     - dw_rent_snapshot.rent_demand_events_snapshot.dt_week_started
-    description: Week date of the event.
+    description: Week date of the event captured in the source operational system.
     dimension: True
   country_code:
     lineage:
     - dw_rent_snapshot.rent_demand_events_snapshot.country_code
-    description: Country code information.
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   ts_load:
-    description: Load date.
+    description: Load date captured in the source operational system.
     dimension: True

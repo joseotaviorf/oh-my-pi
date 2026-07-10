@@ -1,26 +1,35 @@
 ---
 database_name: datalake_condominium_payments_clean
 table_name: non_payment_report_invoice
+description: Clean layer table for non payment report invoice from the condominium_payments pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_condominium_payments_raw.non_payment_report_invoice.id
+    description: Surrogate key identifying this non payment report invoice record in the condominium_payments pipeline.
   id_non_payment_report:
     lineage:
       - datalake_condominium_payments_raw.non_payment_report_invoice.non_payment_report_id
+    description: id non payment report captured in the source operational system.
   due_month:
     lineage:
       - datalake_condominium_payments_raw.non_payment_report_invoice.due_month
+    description: due month captured in the source operational system.
   due_year:
     lineage:
       - datalake_condominium_payments_raw.non_payment_report_invoice.due_year
+    description: due year captured in the source operational system.
   dt_due:
     lineage:
       - datalake_condominium_payments_raw.non_payment_report_invoice.invoice_due_date
+    description: Calendar date for the due attribute on this record.
   ts_created:
     lineage:
       - datalake_condominium_payments_raw.non_payment_report_invoice.created_at
+    description: Record creation date
   ts_updated:
     lineage:
       - datalake_condominium_payments_raw.non_payment_report_invoice.updated_at
+    description: Record update date

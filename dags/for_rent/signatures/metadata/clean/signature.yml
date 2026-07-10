@@ -1,58 +1,62 @@
 database_name: datalake_signatures_clean
 table_name: signature
-description: This table contains the information about the signature.
+description: |
+  Clean CDC copy of individual signature requests from the Signatures Postgres service, one row
+  per recipient invited to sign a specific agreement document within a collector batch. Tracks
+  workflow status and sent/signed timestamps. Primary source for per-recipient signing events
+  in For Rent closing analytics when joined to agreement_document and recipient.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
-    description: The unique identifier for the signature.
+    description: Primary key of the signature request record in the Signatures service.
     lineage:
       - datalake_signatures_raw.signature.id
   id_recipient:
-    description: The unique identifier for the recipient.
+    description: Foreign key to the recipient who must sign this agreement document instance.
     lineage:
       - datalake_signatures_raw.signature.recipient_id
   id_agreement_document:
-    description: The unique identifier for the agreement document.
+    description: Foreign key to the agreement document that this signature request belongs to.
     lineage:
       - datalake_signatures_raw.signature.agreement_document_id
   id_signature_collector:
-    description: The unique identifier for the signature collector.
+    description: Foreign key to the collector batch that groups this signature with related requests.
     lineage:
       - datalake_signatures_raw.signature.signature_collector_id
   version:
-    description: The version of the signature.
+    description: Optimistic-locking revision number incremented whenever the signature row is updated in Signatures.
     lineage:
       - datalake_signatures_raw.signature.version
   status:
-    description: The status of the signature.
+    description: Workflow state of this signature request, such as pending dispatch, sent, signed, or refused by the recipient.
     lineage:
       - datalake_signatures_raw.signature.status
   ts_sent:
-    description: The timestamp of the sent signature.
+    description: Timestamp when the signature invitation was dispatched to the recipient (UTC).
     lineage:
       - datalake_signatures_raw.signature.sent_at
   ts_signed:
-    description: The timestamp of the signed signature.
+    description: Timestamp when the recipient completed signing; null while the request remains outstanding (UTC).
     lineage:
       - datalake_signatures_raw.signature.signed_at
   ts_created:
-    description: The timestamp of the created signature.
+    description: Timestamp when the signature request was first created in the Signatures service (UTC).
     lineage:
       - datalake_signatures_raw.signature.created_at
   ts_updated:
-    description: The timestamp of the updated signature.
+    description: Timestamp of the most recent update to the signature request record in Signatures (UTC).
     lineage:
       - datalake_signatures_raw.signature.updated_at
   year:
-    description: The year of when the signature was ingested.
+    description: Ingestion partition year derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.signature.year
   month:
-    description: The month of when the signature was ingested.
+    description: Ingestion partition month derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.signature.month
   day:
-    description: The day of when the signature was ingested.
+    description: Ingestion partition day derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.signature.day

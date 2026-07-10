@@ -3,7 +3,7 @@ database_name: datalake_condominium_payments_clean
 table_name: attachment
 description: Clean table of file attachments for condominium payment invoices from the Condominium Payments API, including MIME type, source URL, and optional file access secret.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:

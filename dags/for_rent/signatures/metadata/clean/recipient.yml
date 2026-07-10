@@ -1,62 +1,66 @@
 database_name: datalake_signatures_clean
 table_name: recipient
-description: This table contains the information about the recipient.
+description: |
+  Clean CDC copy of signatory recipients from the Signatures Postgres service, one row per
+  person invited to sign an agreement. Captures contact details, party role, and cross-system
+  references. Used with signature and agreement_document for per-recipient signing funnel
+  analysis in For Rent closing and partner accreditation workflows.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
-    description: The unique identifier for the recipient.
+    description: Primary key of the recipient record in the Signatures service.
     lineage:
       - datalake_signatures_raw.recipient.id
   id_internal_reference:
-    description: The unique identifier for the internal reference.
+    description: Identifier of the upstream QuintoAndar entity associated with this signatory, such as a user or contract party.
     lineage:
       - datalake_signatures_raw.recipient.internal_reference_id
   id_external_reference:
-    description: The unique identifier for the external reference.
+    description: Identifier of a related person or party record in an external system when applicable.
     lineage:
       - datalake_signatures_raw.recipient.external_reference_id
   internal_reference_name:
-    description: The name of the internal reference.
+    description: Human-readable label describing the upstream entity type tied to id_internal_reference for this recipient.
     lineage:
       - datalake_signatures_raw.recipient.internal_reference_name
   external_reference_name:
-    description: The name of the external reference.
+    description: Descriptor of the external party or object linked through id_external_reference for cross-system signing.
     lineage:
       - datalake_signatures_raw.recipient.external_reference_name
   version:
-    description: The version of the recipient.
+    description: Optimistic-locking revision number incremented whenever the recipient row is updated in Signatures.
     lineage:
       - datalake_signatures_raw.recipient.version
   name:
-    description: The name of the recipient.
+    description: Full legal or display name of the person invited to review and sign the agreement.
     lineage:
       - datalake_signatures_raw.recipient.name
   email:
-    description: The email of the recipient.
+    description: Email address where the Signatures service delivers the signature invitation for this recipient.
     lineage:
       - datalake_signatures_raw.recipient.email
   type:
-    description: The type of the recipient.
+    description: Signatory role or party classification assigned in Signatures (sourced from dtype in the operational database).
     lineage:
       - datalake_signatures_raw.recipient.dtype
   ts_created:
-    description: The timestamp of the created recipient.
+    description: Timestamp when the recipient record was first created in the Signatures service (UTC).
     lineage:
       - datalake_signatures_raw.recipient.created_at
   ts_updated:
-    description: The timestamp of the updated recipient.
+    description: Timestamp of the most recent update to the recipient record in Signatures (UTC).
     lineage:
       - datalake_signatures_raw.recipient.updated_at
   year:
-    description: The year of when the recipient was ingested.
+    description: Ingestion partition year derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.recipient.year
   month:
-    description: The month of when the recipient was ingested.
+    description: Ingestion partition month derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.recipient.month
   day:
-    description: The day of when the recipient was ingested.
+    description: Ingestion partition day derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.recipient.day

@@ -1,74 +1,78 @@
 database_name: datalake_signatures_clean
 table_name: agreement_document
-description: This table contains the information about the agreement document.
+description: |
+  Clean CDC copy of agreement documents from the Signatures Postgres service, one row per
+  legal document prepared for electronic signing. Stores template metadata, email content,
+  and S3 pointers to unsigned and signed PDFs. Consumed by For Rent closing analytics and
+  enrich pipelines that match documents to upstream entities via internal and external references.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
-    description: The unique identifier for the agreement document.
+    description: Primary key of the agreement document record in the Signatures service.
     lineage:
       - datalake_signatures_raw.agreement_document.id
   id_internal_reference:
-    description: The unique identifier for the internal reference.
+    description: Identifier of the upstream QuintoAndar entity that originated this document, such as a contract process UUID.
     lineage:
       - datalake_signatures_raw.agreement_document.internal_reference_id
   id_external_reference:
-    description: The unique identifier for the external reference.
+    description: Identifier of a related record in an external system when the document is tied outside Signatures.
     lineage:
       - datalake_signatures_raw.agreement_document.external_reference_id
   internal_reference_name:
-    description: The name of the internal reference.
+    description: Human-readable label of the upstream entity type linked through id_internal_reference (for example contract or partnership flow).
     lineage:
       - datalake_signatures_raw.agreement_document.internal_reference_name
   external_reference_name:
-    description: The name of the external reference.
+    description: Descriptor of the external business object associated with id_external_reference when signing spans systems.
     lineage:
       - datalake_signatures_raw.agreement_document.external_reference_name
   version:
-    description: The version of the agreement document.
+    description: Optimistic-locking revision number incremented whenever the document row is updated in Signatures.
     lineage:
       - datalake_signatures_raw.agreement_document.version
   type:
-    description: The type of the agreement document.
+    description: Document category or template class that defines which signing workflow and legal template apply.
     lineage:
       - datalake_signatures_raw.agreement_document.type
   document_s3_uid:
-    description: The S3 UID of the document.
+    description: S3 object identifier of the unsigned PDF distributed to recipients before signing completes.
     lineage:
       - datalake_signatures_raw.agreement_document.document_s3_uid
   name:
-    description: The name of the agreement document.
+    description: Display title of the agreement shown to signatories in emails and the Signatures portal.
     lineage:
       - datalake_signatures_raw.agreement_document.name
   email_subject:
-    description: The subject of the email.
+    description: Subject line sent with the signature invitation email for this agreement document.
     lineage:
       - datalake_signatures_raw.agreement_document.email_subject
   email_body:
-    description: The body of the email.
+    description: Message body (HTML or plain text) included in the signature invitation email to recipients.
     lineage:
       - datalake_signatures_raw.agreement_document.email_body
   signed_document_s3_uid:
-    description: The S3 UID of the signed document.
+    description: S3 object identifier of the fully executed PDF after all required signatures are collected.
     lineage:
       - datalake_signatures_raw.agreement_document.signed_document_s3_uid
   ts_created:
-    description: The timestamp of the created document.
+    description: Timestamp when the agreement document was first created in the Signatures service (UTC).
     lineage:
       - datalake_signatures_raw.agreement_document.created_at
   ts_updated:
-    description: The timestamp of the updated document.
+    description: Timestamp of the most recent update to the agreement document record in Signatures (UTC).
     lineage:
       - datalake_signatures_raw.agreement_document.updated_at
   year:
-    description: The year of when the document was ingested.
+    description: Ingestion partition year derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.agreement_document.year
   month:
-    description: The month of when the document was ingested.
+    description: Ingestion partition month derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.agreement_document.month
   day:
-    description: The day of when the document was ingested.
+    description: Ingestion partition day derived from CDC load time; filter on this column for partition pruning.
     lineage:
       - datalake_signatures_raw.agreement_document.day

@@ -5,6 +5,7 @@ description: |
   Clean table of non-payment reports from Condominium Payments API. One row per report
   created for a contract with condominium-related payment issues.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     description: Primary key identifier of the non-payment report in the source system.

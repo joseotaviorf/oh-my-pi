@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: re_rentals_daily
 description: New Rentals in houses which already had a previous contract signed.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   day:
     lineage:
@@ -14,13 +14,13 @@ columns:
   country_code:
     lineage:
       - dw_rent.dim_contract.country_code
-    description: Country code of the house
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   re_rentals:
     description: New Rentals in houses which already had a previous contract signed.
     metric:
       name: Re Rentals Daily
-      description:
+      description: 
         New Rentals in houses which already had a previous contract signed.
         It's the count distinct of sk_contracts that were in status Ativo or Finalizado and the house already was rented before.
       acronym: RR
