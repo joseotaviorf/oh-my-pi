@@ -2,28 +2,28 @@ database_name: datalake_ebdb_country
 table_name: house
 description: Information related to the counrty of origin of a house.
 domain: For Rent
-owner: data-international@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_house:
     lineage:
     - datalake_ebdb_clean.house.id
-    description: Id of the house.
+    description: Primary key of the property in EBDB, used to join country and regional attributes.
   id_country:
     lineage:
     - datalake_ebdb_clean.country.id
-    description: Id of the country of origin of the house.
+    description: Foreign key to the country dimension for geographic reporting.
   id_state:
     lineage:
     - datalake_ebdb_clean.house.id_state
-    description: Id of the state of the house.
+    description: Foreign key to the Brazilian state where the property is registered in EBDB.
   id_region:
     lineage:
     - datalake_ebdb_clean.house.id_region
-    description: Id of the region of the house.
+    description: Foreign key to the QuintoAndar operations region that groups the property.
   country_code:
     lineage:
     - datalake_ebdb_clean.country.code
-    description: Country code of the house. Also, a partition of this table.
+    description: ISO country code for geographic filtering of the analytical metric.
   ts_created:
     lineage:
     - datalake_ebdb_clean.house.dt_creation

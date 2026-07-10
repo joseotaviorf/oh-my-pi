@@ -3,7 +3,7 @@ database_name: datalake_ebdb_clean
 table_name: proposal_aud
 description: Audit history table for rental proposal changes from EBDB Proposta_AUD.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_proposal:
     lineage:

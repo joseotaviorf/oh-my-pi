@@ -3,149 +3,149 @@ database_name: datalake_static_files
 table_name: rental_demand_targets
 description: Table that consolidates rental demand targets from gsheets.
 domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   city_group:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.city_group
       - datalake_gsheets_clean.demand_targets_2020.city_group
       - datalake_gsheets_clean.demand_targets_2021.city_group
-    description: "City group"
+    description: Geographic city grouping used to aggregate rental demand targets from planning spreadsheets.
   demand_channel:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.demand_channel
       - datalake_gsheets_clean.demand_targets_2020.demand_channel
       - datalake_gsheets_clean.demand_targets_2021.demand_channel
-    description: "Demand channel"
+    description: Marketing or acquisition channel attributed to the demand target volume.
   demand_channel_type:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.demand_channel_type
       - datalake_gsheets_clean.demand_targets_2020.demand_channel_type
       - datalake_gsheets_clean.demand_targets_2021.demand_channel_type
-    description: "Demand channel type"
+    description: Subcategory of the demand channel (paid, organic, partner, etc.).
   funnel_origin:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.funnel_origin
       - datalake_gsheets_clean.demand_targets_2020.funnel_origin
       - datalake_gsheets_clean.demand_targets_2021.funnel_origin
-    description: "Funnel origin"
+    description: Origin step in the rental demand funnel for the target metric.
   rental_administrator:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.rental_administrator
       - datalake_gsheets_clean.demand_targets_2020.rental_administrator
       - datalake_gsheets_clean.demand_targets_2021.rental_administrator
-    description: "Rental administrator"
+    description: Property administrator model (QuintoAndar-managed vs owner-managed) for the target row.
   evaluation_positive:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.evaluation_positive
       - datalake_gsheets_clean.demand_targets_2020.evaluation_positive
       - datalake_gsheets_clean.demand_targets_2021.evaluation_positive
-    description: "Evaluation positive" 
+    description: Planned count of tenant evaluations with positive outcome in the demand funnel.
   evaluation_started:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.evaluation_started
       - datalake_gsheets_clean.demand_targets_2020.evaluation_started
       - datalake_gsheets_clean.demand_targets_2021.evaluation_started
-    description: "Evaluation started"
+    description: Planned count of tenant credit evaluations started in the demand funnel.
   new_tenant_prospects:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.new_tenant_prospects
       - datalake_gsheets_clean.demand_targets_2020.new_tenant_prospects
       - datalake_gsheets_clean.demand_targets_2021.new_tenant_prospects
-    description: "New tenant prospects"
+    description: Planned count of new tenant prospects entering the rental demand funnel.
   contracts_signed:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.contracts_signed
       - datalake_gsheets_clean.demand_targets_2020.contracts_signed
       - datalake_gsheets_clean.demand_targets_2021.contracts_signed
-    description: "Contracts signed"
+    description: Planned count of signed rental contracts for the target period.
   credit_approved:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.credit_approved
       - datalake_gsheets_clean.demand_targets_2020.credit_approved
       - datalake_gsheets_clean.demand_targets_2021.credit_approved
-    description: "Credits approved"
+    description: Planned count of tenants with approved credit checks in the funnel.
   doc_completed:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.doc_completed
       - datalake_gsheets_clean.demand_targets_2020.doc_completed
       - datalake_gsheets_clean.demand_targets_2021.doc_completed
-    description: "Docs completed"
+    description: Planned count of rental documentation packages completed by tenants.
   doc_sent:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.doc_sent
       - datalake_gsheets_clean.demand_targets_2020.doc_sent
       - datalake_gsheets_clean.demand_targets_2021.doc_sent
-    description: "Docs sent"
+    description: Planned count of rental documentation packages sent to tenants.
   has_guarantee:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.guarantee
       - datalake_gsheets_clean.demand_targets_2020.guarantee
       - datalake_gsheets_clean.demand_targets_2021.guarantee
-    description: "Has guarantee"
+    description: Planned count of prospects or contracts including a rental guarantee product.
   offer_accepted:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.offer_accepted
       - datalake_gsheets_clean.demand_targets_2020.offer_accepted
       - datalake_gsheets_clean.demand_targets_2021.offer_accepted
-    description: "Offers accepted"
+    description: Planned count of rental offers accepted by owners in the funnel.
   offer_sent:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.offer_sent
       - datalake_gsheets_clean.demand_targets_2020.offer_sent
       - datalake_gsheets_clean.demand_targets_2021.offer_sent
-    description: "Offers sent"
+    description: Planned count of rental offers sent to owners in the funnel.
   visits_booked:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.visits_booked
       - datalake_gsheets_clean.demand_targets_2020.visits_booked
       - datalake_gsheets_clean.demand_targets_2021.visits_booked
-    description: "Visits booked"
+    description: Count of tenant visits scheduled during the reporting period.
   visits_completed:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.visits_completed
       - datalake_gsheets_clean.demand_targets_2020.visits_completed
       - datalake_gsheets_clean.demand_targets_2021.visits_completed
-    description: "Visits completed"
+    description: Planned count of property visits completed by tenant prospects.
   tier:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.tier
       - datalake_gsheets_clean.demand_targets_2020.tier
       - datalake_gsheets_clean.demand_targets_2021.tier
-    description: "Tier" 
+    description: City tier classification used to segment rental demand planning targets.
   halfyear:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.halfyear
       - datalake_gsheets_clean.demand_targets_2020.halfyer
       - datalake_gsheets_clean.demand_targets_2021.halfyer
-    description: "Halfyer"
+    description: Half-year period (H1 or H2) that scopes the demand target.
   quarter:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.quarter
       - datalake_gsheets_clean.demand_targets_2020.quarter
       - datalake_gsheets_clean.demand_targets_2021.quarter
-    description: "Quarter"
+    description: Calendar quarter that scopes the demand target row.
   month:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.month
       - datalake_gsheets_clean.demand_targets_2020.month
       - datalake_gsheets_clean.demand_targets_2021.month
-    description: "Month"
+    description: Calendar month that scopes the demand target row.
   year:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.year
       - datalake_gsheets_clean.demand_targets_2020.year
       - datalake_gsheets_clean.demand_targets_2021.year
-    description: "Year"
+    description: Calendar year that scopes the demand target row.
   dt_week_started:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.dt_week_started
       - datalake_gsheets_clean.demand_targets_2020.week_start
       - datalake_gsheets_clean.demand_targets_2021.week_start
-    description: "Date of the week start"
+    description: Start date of the planning week for the demand target row.
   dt_target:
     lineage:
       - datalake_gsheets_clean.demand_targets_2019.dt_target
       - datalake_gsheets_clean.demand_targets_2020.date
       - datalake_gsheets_clean.demand_targets_2021.date
-    description: "Date of the target"
+    description: Reference date for the demand target metric in the planning spreadsheet.

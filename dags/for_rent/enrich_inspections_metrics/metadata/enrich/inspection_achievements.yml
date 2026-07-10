@@ -3,7 +3,7 @@ database_name: datalake_inspections_metrics
 table_name: inspection_achievements
 description: This table is responsible for calculating the achievement of targets for carrying out the inspection.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_inspection:
     description:
@@ -13,10 +13,7 @@ columns:
     lineage:
       - datalake_inspections.inspection_booking.id_inspection
   id_assessment:
-    description: Unique identifier of an Assessment.
-      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
-      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique.
-      It is observed that the extra Assessments are identical, with no data distinction between them.
+    description: Unique identifier of an Assessment. This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug. This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique. It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspections.inspection_booking.id_assessment
   id_external:
@@ -32,7 +29,7 @@ columns:
     lineage:
       - datalake_inspections.inspection_booking.city_name
   inspection_type:
-    description: The type of inspection.
+    description: Lifecycle stage of the inspection workflow (onboarding before move-in, verification after changes, or offboarding after exit).
     categories:
       onboarding: Inspection carried out before the tenant enters the property, to certify the conditions of the house.
       verification: Inspection carried out when there is any relevant change in the property, such as the creation of rooms, for example.

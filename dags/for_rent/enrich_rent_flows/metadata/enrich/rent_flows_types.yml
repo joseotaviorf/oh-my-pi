@@ -6,16 +6,14 @@ description: This table has information related to rent flow's type information.
   Each line is an unique combination of all the possible characteristics of a rent flow. The id_rent_flow_type it's a mutable id
   and should not be used for analysis purposes.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_rent_flow_type:
-    description: Unique and mutable id related to the combination of characteristics of a rent flow.
-      This id is updated daily and should not be used for analysis, only as a join condition for the
-      rent flow models (dw_rent.fact_rent_flows and the junk dimension dw_rent.dim_rent_flow_type.)
+    description: Unique and mutable id related to the combination of characteristics of a rent flow. This id is updated daily and should not be used for analysis, only as a join condition for the rent flow models (dw_rent.fact_rent_flows and the junk dimension dw_rent.dim_rent_flow_type.)
   country_code:
     lineage:
       - datalake_rent_flows.rent_flows.country_code
-    description: The country code of the rent flow, related to the property.
+    description: ISO country code for geographic filtering of the analytical metric.
   first_touchpoint:
     lineage:
       - datalake_rent_flows.rent_flows.first_touchpoint
@@ -35,11 +33,7 @@ columns:
   is_valid_rent_flow:
     lineage:
       - datalake_rent_flows.rent_flows.is_valid_rent_flow
-    description: "Boolean flag indicating if the rent flow is valid and also its events.
-      A rent flow is only present on the RDE if the property has as context Rent or null and if it has any visit with
-      Rent intent or it could have Sale intent but is related to a rent contract at the end.
-      A rent flow event will only be valid if it follows several rules: for example, to count a visit booked, it has to be type = Visit,
-      otherwise it won't be counted as a valid visit booked."
+    description: "Boolean flag indicating if the rent flow is valid and also its events. A rent flow is only present on the RDE if the property has as context Rent or null and if it has any visit with Rent intent or it could have Sale intent but is related to a rent contract at the end. A rent flow event will only be valid if it follows several rules: for example, to count a visit booked, it has to be type = Visit, otherwise it won't be counted as a valid visit booked."
   has_visit_flow:
     lineage:
       - datalake_rent_flows.rent_flows.has_visit_flow
@@ -49,8 +43,7 @@ columns:
       - datalake_rent_flows.rent_flows.has_offer_flow
     description: Boolean flag indicating if the rent flow had offer event.
   has_direct_offer_flow:
-    description: "Boolean flag indicating if the rent flow had any direct offer (DO) event, which means that the first event
-      of the rent flow was a DO."
+    description: "Boolean flag indicating if the rent flow had any direct offer (DO) event, which means that the first event of the rent flow was a DO."
   has_tta_flow:
     lineage:
       - datalake_rent_flows.rent_flows.country_code

@@ -1,11 +1,11 @@
 database_name: datalake_repairs
 table_name: repair_tickets
-description:
+description: |
   Enrichment table that aims to consolidate information from the repair
   service flow. Each line in this table represents a service ticket for this flow.
   This table contain the ticket that are and were in the repair service flow.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_ticket:
     lineage:
@@ -209,6 +209,14 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.ts_assigned
     description: Local timestamp when the ticket was last assigned.
+  ts_latest_analyst_comment:
+    lineage:
+      - datalake_zendesk_clean.ticket_comments
+    description: Timestamp that identifies when the last public comment was posted by the customer service analyst.
+  ts_latest_customer_comment:
+    lineage:
+      - datalake_zendesk_clean.ticket_comments
+    description: Timestamp that identifies when the last public comment was posted by the client.
   year:
     lineage:
       - datalake_zendesk.tickets_current.ts_updated

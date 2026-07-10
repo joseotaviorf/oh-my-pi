@@ -3,7 +3,7 @@ database_name: datalake_static_files
 table_name: rental_supply_targets
 description: This table unifies the Supply funnel ForRent targets of some years (2019, 2020, 2021).
 domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   city_group:
     description: City group related to the target.
@@ -30,13 +30,13 @@ columns:
       - datalake_gsheets_clean.supply_targets_2020.opportunities
       - datalake_gsheets_clean.supply_targets_2021.opportunities
   prospects:
-    description: Target of prospects.
+    description: Planned volume of supply funnel prospects for the target period and segment.
     lineage:
       - datalake_gsheets_clean.supply_targets_2019.prospects
       - datalake_gsheets_clean.supply_targets_2020.prospects
       - datalake_gsheets_clean.supply_targets_2021.prospects
   qualifieds:
-    description: Target of qualifieds.
+    description: Planned volume of supply prospects qualified for listing conversion.
     lineage:
       - datalake_gsheets_clean.supply_targets_2019.qualifieds
       - datalake_gsheets_clean.supply_targets_2020.qualifieds

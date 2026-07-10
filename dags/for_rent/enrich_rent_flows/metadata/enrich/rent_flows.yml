@@ -10,7 +10,7 @@ description: "This table has information related to a rent flow and its events (
   that was created but has no visits booked and the only offer wasn't sent yet).
   The id_rent_flow must not be unique, since it can have several visits, offers, etc."
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_rent_flow:
     lineage:
@@ -139,18 +139,13 @@ columns:
       - datalake_ebdb_clean.rent_flow.is_step_rejected
     description: "Boolean flag indicating if the present step in which the rent flow is, was rejected."
   is_valid_rent_flow:
-    description: "Boolean flag indicating if the rent flow is valid and also its events.
-      A rent flow is only present on the RDE if the property has as context Rent or null and if it has any visit with
-      Rent intent or it could have Sale intent but is related to a rent contract at the end.
-      A rent flow event will only be valid if it follows several rules: for example, to count a visit booked, it has to be type = Visit,
-      otherwise it won't be counted as a valid visit booked."
+    description: "Boolean flag indicating if the rent flow is valid and also its events. A rent flow is only present on the RDE if the property has as context Rent or null and if it has any visit with Rent intent or it could have Sale intent but is related to a rent contract at the end. A rent flow event will only be valid if it follows several rules: for example, to count a visit booked, it has to be type = Visit, otherwise it won't be counted as a valid visit booked."
   has_visit_flow:
     description: "Boolean flag indicating if the rent flow had any visit event."
   has_offer_flow:
     description: "Boolean flag indicating if the rent flow had any offer event."
   has_direct_offer_flow:
-    description: "Boolean flag indicating if the rent flow had any direct offer (DO) event, which means that the first event
-      of the rent flow was a DO."
+    description: "Boolean flag indicating if the rent flow had any direct offer (DO) event, which means that the first event of the rent flow was a DO."
   has_tta_flow:
     description: "Boolean flag indicating if the rent flow had any Talk to Agent event."
   ts_created:
@@ -238,5 +233,4 @@ columns:
   ts_rent_flow_event:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.ts_event
-    description: "Timestamp of when an event happened on the rent flow. Associated to the id_event_type,
-      it's possible to understand which event it was (visit, offer, proposal, etc.)"
+    description: "Timestamp of when an event happened on the rent flow. Associated to the id_event_type, it's possible to understand which event it was (visit, offer, proposal, etc.)"

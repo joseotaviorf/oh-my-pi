@@ -2,44 +2,44 @@ database_name: datalake_ebdb_country
 table_name: user
 description: Information related to the counrty of origin of a user.
 domain: For Rent
-owner: data-international@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_user:
     lineage:
     - datalake_ebdb_clean.user.id
-    description: Id of the user.
+    description: Primary key of the EBDB user record linked to country and state attributes.
   id_agent:
     lineage:
     - datalake_ebdb_clean.user.id_agent
-    description: Id of the agent user.
+    description: Foreign key to the agent profile when the user acts as a QuintoAndar agent.
   id_sales_rep:
     lineage:
     - datalake_ebdb_clean.user.id_sales_rep
-    description: Id of the sales rep user.
+    description: Foreign key to the sales representative profile associated with the user.
   id_affiliate:
     lineage:
     - datalake_ebdb_clean.user.id_affiliates
-    description: Id of the affiliate user.
+    description: Foreign key to the affiliate program participant linked to this user.
   id_photographer_data:
     lineage:
     - datalake_ebdb_clean.user.id_photographer_data
-    description: Id of the prographer user.
+    description: Foreign key to the photographer profile data when the user is a listing photographer.
   id_partner_agent:
     lineage:
     - datalake_ebdb_clean.partner_agent.id
-    description: Id of the partner agent user.
+    description: Foreign key to the partner agent record when the user is an external partner.
   id_country:
     lineage:
     - datalake_ebdb_clean.user.id_country
-    description: Id of the country of origin of the user.
+    description: Foreign key to the country dimension for geographic reporting.
   id_state:
     lineage:
     - datalake_ebdb_clean.user.id_state
-    description: Id of the state of the user.
+    description: Foreign key to the state of residence or registration for the user in EBDB.
   country_code:
     lineage:
     - datalake_ebdb_clean.country.code
-    description: Country code of the user. Also, a partition of this table.
+    description: ISO country code for geographic filtering of the analytical metric.
   ts_created:
     lineage:
     - datalake_ebdb_clean.user.ts_created

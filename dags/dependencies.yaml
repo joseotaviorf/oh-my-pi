@@ -203,6 +203,7 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination:first-run-of-day
   - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.dw_repairs:load-dw-repairs-dim-ongoing-repairs:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-dim-answer:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer:first-run-of-day
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day

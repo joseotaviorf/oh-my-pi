@@ -1,10 +1,10 @@
 database_name: datalake_repairs
 table_name: ongoing_repair_tickets
-description:
+description: |
   Enrichment table that aims to consolidate information from the repair
   service flow. Each line in this table represents a service ticket for this flow.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_ticket:
     lineage:

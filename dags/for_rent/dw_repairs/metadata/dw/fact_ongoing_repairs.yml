@@ -1,11 +1,11 @@
 database_name: dw_repairs
 table_name: fact_ongoing_repairs
-description:
+description: |
   Table stores data on ongoing repair requests. This data includes information about the customer
   the repair the responsible analyst and the repair status. The table is used to analyze the performance of the repair process
   including response time resolution time, costs, delay reasons, and success factors.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_ticket:
     description: Ticket unique identifier.
@@ -28,7 +28,7 @@ columns:
     lineage:
       - datalake_repairs.repair_tickets.id_contract
   sk_user:
-    description: User unique identifier.
+    description: Surrogate key of the Zendesk user who opened or is linked to the repair ticket.
     lineage:
       - datalake_zendesk.tickets_current.id_user_main
   sk_agent:
@@ -188,12 +188,12 @@ columns:
       - dw_customer_support.fact_ticket_events.ts_event
       - dw_customer_support.fact_ticket_events.tags
   ts_ps_iq:
-    description: Timestamp of the PS IQ.
+    description: Timestamp when the repair ticket entered the post-sale IQ tenant negotiation stage.
     lineage:
       - dw_customer_support.fact_ticket_events.ts_event
       - dw_customer_support.fact_ticket_events.tags
   ts_ps_pp:
-    description: Timestamp of the PS PP.
+    description: Timestamp when the repair ticket entered the post-sale PP owner negotiation stage.
     lineage:
       - dw_customer_support.fact_ticket_events.ts_event
       - dw_customer_support.fact_ticket_events.tags
