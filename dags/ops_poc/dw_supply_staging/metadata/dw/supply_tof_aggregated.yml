@@ -1,4 +1,3 @@
----
   database_name: dw_supply_staging
   table_name: supply_tof_aggregated
   owner: fabio.soeiro@quintoandar.com.br
@@ -12,8 +11,15 @@
   columns:
     aux_reference:
       description:
-        Row source label distinguishing each union branch (e.g. actual volumes, budget, OKR, unique
-        targets, cost targets, allocated costs, or last-year actuals reshaped to the current year).
+        Row source label for each UNION ALL branch in the consolidated TOF table.
+      categories:
+        actual_vol: Actual funnel volumes from obt_supply.
+        act_last_year: Prior-year actuals shifted forward one year for YoY comparison.
+        target_unique: Unique-supply target volumes from supply_unique_targets.
+        act_costs: Allocated media costs from supply_costs_allocation_prospect.
+        bup: Budget (QTS) target rows from supply_targets.
+        okr: OKR target rows from supply_targets.
+        tgt_mkt_costs: Marketing cost targets from daily_target_supply GSheets.
     date:
       description: Calendar date for the metric row; aligned to event or target date depending on the row source.
       lineage:
@@ -24,7 +30,10 @@
       lineage:
         - dw_growth.obt_supply.acquisition_origin
     business_context:
-      description: Business context of the row (RENT or SALE), equivalent to nm_business_context on obt_supply actual rows.
+      description: Business context of the row (RENT or SALE for actuals; nullable on target and cost rows).
+      categories:
+        RENT: Rent-side supply TOF metric row.
+        SALE: Sale-side supply TOF metric row.
       lineage:
         - dw_growth.obt_supply.nm_business_context
         - datalake_supply_staging.supply_targets.business_context
@@ -32,6 +41,10 @@
       description:
         High-level supply channel grouping (1P, 3P, CIQ) derived from planning_operation for target rows;
         from obt_supply for actual rows.
+      categories:
+        1P: First-party supply channel.
+        3P: Third-party supply channel.
+        CIQ: CIQ consultant supply channel.
       lineage:
         - dw_growth.obt_supply.nm_supply_source
         - datalake_supply_staging.supply_targets.planning_operation
@@ -137,6 +150,9 @@
       description:
         Unique-supply classification from supply_unique_rules, literal Unique for Unique-target rows,
         or Cross-listing when no rule matches.
+      categories:
+        Unique: Supply counted as unique under supply_unique_rules or unique-target rows.
+        Cross-listing: Supply that does not match a unique rule and is treated as cross-listing.
       lineage:
         - datalake_supply_staging.supply_unique_rules.fl_unique
     act_leads:
@@ -498,4 +514,3 @@
         - dw_public.dim_date.date
     ts_load:
       description: Timestamp when the row was materialized by the pipeline (load time).
-  

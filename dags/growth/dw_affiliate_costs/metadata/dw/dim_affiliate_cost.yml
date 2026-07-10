@@ -1,40 +1,62 @@
 database_name: dw_quintoandar
 table_name: dim_affiliate_cost
-description: 'Table created to control affiliate costs based on robin hood'
+description: Dimension table describing the attributes of affiliate commission cost entries sourced from the Robin Hood financial system. Each row provides the contextual
+  metadata for an accounting entry — including city group, commission type, cost center, and marketing origin — used to classify and analyze affiliate cost allocation. Joins
+  with fact_affiliate_costs to enable financial reporting on affiliate program expenditure by the Growth team.
 domain: Growth
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_rh_accounting_entry:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
-    description: 'A registration number of information in the database of accounting entry.'
+    description: Surrogate key for the Robin Hood accounting entry that records the affiliate commission transaction.
   sk_payee:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_payee
-    description: 'A registration number of information in the database of payee.'
+    description: Surrogate key identifying the affiliate who is the payee (recipient) of the commission payment.
   city_group:
     lineage:
     - datalake_robin_hood.affiliate_costs.city_group
-    description: 'A grouping of city or clusters of cities and neighborhoods (RMSP - Região Metropolitana de São Paulo).'
+    description: Geographic grouping of cities and neighborhoods (including metro areas such as RMSP) where the affiliate activity generating the cost occurred.
   description:
     lineage:
     - datalake_robin_hood.affiliate_costs.description
-    description: 'A description of house indication.'
+    description: Free-text label describing the nature of the house indication or commission item associated with this accounting entry.
   source_bill_item:
     lineage:
     - datalake_robin_hood.affiliate_costs.source_bill_item
-    description: 'A source bill item.'
+    description: Identifies the billing line item source within the Robin Hood financial system that originated this affiliate cost entry.
   commission_type:
     lineage:
     - datalake_robin_hood.affiliate_costs.commission_type
-    description: 'A type of comission.'
+    description: Classification of the affiliate commission type, differentiating listing, rent, sale, campaign, and correction modalities.
+    categories:
+      Commission Listing: Commission paid for a successful listing indication.
+      Commission Rent: Commission paid for a rent conversion.
+      Commission Sale: Commission paid for a sale conversion.
+      Commission MGM: Member-get-member referral commission.
+      campanha: Promotional campaign commission (lowercase variant).
+      Campanha: Promotional campaign commission.
+      campanhaManual: Manually entered campaign commission.
+      Campanha programa IndicaAí: Standard Indica Aí program campaign commission.
+      Campanha Padrão do Indica Aí: Default Indica Aí campaign commission.
+      Campanha Mensal: Monthly campaign commission.
+      Campanha Doorman: Doorman-specific campaign commission.
+      Doorman: Doorman referral commission.
+      Correção: Commission correction entry (uppercase variant).
+      correção: Commission correction entry (lowercase variant).
+      Correção Porteiros: Doorman commission correction.
   cost_center_code:
     lineage:
     - datalake_robin_hood.affiliate_costs.cost_center_code
-    description: 'A cost center code.'
+    description: Accounting cost center code used to attribute the affiliate commission expense to the correct business unit for financial reporting.
   mkt_origin:
     lineage:
     - datalake_robin_hood.affiliate_costs.mkt_origin
-    description: 'Inputed origin of the marketing campaign that acquired the lead, such as a specific product.'
+    description: Marketing origin of the affiliate program that generated the commission cost.
+    categories:
+      Indica Aí - General: General Indica Aí affiliate program commission.
+      Indica Aí - Agents: Agent-specific Indica Aí program commission.
+      Doorman: Doorman-driven affiliate commission.
   ts_load:
-    description: 'Timestamp indicating the data load into our system. It has nothing related to the rent flow taxonomy itself.'
+    description: Timestamp recording when this row was loaded into the data warehouse by the pipeline; not related to the affiliate transaction itself.

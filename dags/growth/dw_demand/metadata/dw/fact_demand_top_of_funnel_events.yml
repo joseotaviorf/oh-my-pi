@@ -1,155 +1,177 @@
 ---
 database_name: dw_growth
 table_name: fact_demand_top_of_funnel_events
-owner: isabela.matsumoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: 'This table tracks the top of the funnel interactions by users across different platforms and marketing channels. It includes ad hoc rules for media setup identification, user interaction details, and platform categorization.'
-
+description: Fact table capturing top-of-funnel (TOF) demand interactions — the earliest user touchpoints before any prospect conversion — across platforms and marketing
+  channels for both Rent and Sale contexts. Each row represents a distinct TOF event enriched with media setup attribution (including ad hoc overrides and naming convention logic),
+  campaign strategy dimensions, and behavioral classification. Used by the Growth team for awareness, acquisition, and engagement measurement at the top of the demand funnel.
 columns:
   sk_tof_event:
-    description: 'Unique identifier for the top of funnel event.'
+    description: Surrogate key uniquely identifying each top-of-funnel interaction event in this fact table.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.id_top_of_funnel_event
   sk_tof_user:
-    description: 'Unique identifier for the user at the top of the funnel.'
+    description: Surrogate key identifying the user who generated the top-of-funnel interaction, which may be anonymous before login.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.id_tof_user
   sk_house:
-    description: 'Identifier of the property related to the user interaction.'
+    description: Surrogate key of the property the user interacted with at the top of the funnel; may be null for non-property-specific events.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.id_house
   sk_region:
-    description: 'Identifier representing the region of the interaction or property.'
+    description: Surrogate key for the geographic region associated with the property or user interaction.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.sk_region
   naming_convention_sufix:
-    description: 'The final media setup naming convention suffix selected based on a priority order from adhoc, dictionary, exception flow, and naming convention.'
+    description: The final media setup naming convention suffix selected based on a priority order from adhoc, dictionary, exception flow, and naming convention.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.naming_convention_sufix
   business_context:
-    description: 'Context in witch that tof event happened.'
+    description: Business vertical (Rent or Sale) in which this top-of-funnel event occurred, used to segment marketing performance.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.business_context
   utm_medium:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: Marketing parameter that characterizes the campaign responsible for user conversion.
     lineage:
-      - datalake_demand_flows.top_of_funnel_results.utm_medium  
+      - datalake_demand_flows.top_of_funnel_results.utm_medium
   utm_source:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: Marketing parameter that characterizes the campaign responsible for user conversion.
     lineage:
-      - datalake_demand_flows.top_of_funnel_results.utm_source  
+      - datalake_demand_flows.top_of_funnel_results.utm_source
   utm_campaign:
-    description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
+    description: Marketing parameter that characterizes the campaign responsible for user conversion.
     lineage:
-      - datalake_demand_flows.top_of_funnel_results.utm_campaign  
+      - datalake_demand_flows.top_of_funnel_results.utm_campaign
   utm_content:
-    description: 'Marketing parameter providing additional content information for the campaign.'
+    description: Marketing parameter providing additional content information for the campaign.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.utm_content
   utm_term:
-    description: 'Marketing parameter providing term information used in the marketing campaign.'
+    description: Marketing parameter providing term information used in the marketing campaign.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.utm_term
   app_type:
-    description: 'Application from which the user made the conversion event.'
+    description: Application from which the user made the conversion event.
     lineage:
-      - datalake_demand_flows.top_of_funnel_results.app_type 
+      - datalake_demand_flows.top_of_funnel_results.app_type
   operation_channel:
-    description: 'Physical agent, internal or external, who performed the conversion in the funnel stage under analysis'
+    description: Physical agent, internal or external, who performed the conversion in the funnel stage under analysis
     categories:
-      SelfService: 'Conversions that took place without the aid of any operation being carried out by the Prospect itself at the time of conversion.'
+      SelfService: Conversions that took place without the aid of any operation being carried out by the Prospect itself at the time of conversion.
   origin:
-    description: QuintoAndar application where the conversion was carried out in the funnel stage under analysis. 
+    description: QuintoAndar application where the conversion was carried out in the funnel stage under analysis.
   platform:
     description: Platform of the prospect device where the evaluated event took place.
     lineage:
-      - datalake_demand_flows.top_of_funnel_results.app_type 
+      - datalake_demand_flows.top_of_funnel_results.app_type
   content_page:
-    description: Classification of content pages depending on the strategy adopted.  
+    description: Classification of content pages depending on the strategy adopted.
   entrance_uri:
-    description: 'The URI through which the user entered the site or application.'
+    description: The URI through which the user entered the site or application.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.entrance_uri
   referrer:
-    description: 'Referring URL or entity that led the user to the interaction.'
+    description: Referring URL or entity that led the user to the interaction.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.referrer
   branded:
-    description: 'Points if the campaign responsible for the user conversion was a Branded advertising'
+    description: Points if the campaign responsible for the user conversion was a Branded advertising
     lineage:
       - datalake_demand_flows.top_of_funnel_results.branded
   campaign_business_context:
-    description: 'Intention of the actions/campaigns adopted in relation to the business context.'
-    categories: 
-      rent: 'Campaign/Action aims to generate results in Rent'
-      sale: 'Campaign/Action aims to generate results in Sale'
+    description: Intention of the campaign in relation to the business context.
+    categories:
+      rent: Campaign targets rent business results (lowercase variant).
+      sale: Campaign targets sale business results (lowercase variant).
+      Rent: Campaign targets rent business results.
+      Sale: Campaign targets sale business results.
+      Hybrid: Campaign targets both rent and sale contexts.
+      NA: Business context not applicable to the campaign.
+      Other: Campaign business context outside standard rent/sale buckets.
+      Lost Tracking: Campaign with lost attribution tracking.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.campaign_business_context
   campaign_strategy_intent:
-    description: 'Intention of the actions/campaigns adopted in relation to the growth strategy.'
-    categories: 
-      Brand Awareness: 'One of these objectives is to get people to know QuintoAndar and consider the company as an option at some point: Reach people, drive traffic to the website regardless of the page or generate brand recognition.'
-      Acquisition: 'It aims to bring people to QuintoAndar who are already in the consideration phase'
-      Activation: 'Its objective is to make people perform their 1st flow at QuintoAndar.'
-      Engagement: 'Its objective is to keep people engaged through flows on QuintoAndar.'
-      Recovery: 'Its objective is to make people who have become churned users carry out new flows.'
+    description: Intention of the campaign in relation to the growth strategy.
+    categories:
+      Brand Awareness: Campaign aims at reach, traffic, or brand recognition.
+      Acquisition: Campaign targets users already in the consideration phase.
+      Activation: Campaign aims at the user's first QuintoAndar flow.
+      Engagement: Campaign keeps users engaged through repeat flows.
+      Recovery: Campaign reactivates churned users.
+      Other: Campaign strategy outside standard intent buckets.
+      Lost Tracking: Campaign with lost attribution tracking.
+      NA: Strategy intent not applicable.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.campaign_strategy_intent
   behavior_type:
-    description: 'Type of user behavior in relation to their search decision and entry into the QuintoAndar environment.'
-    categories: 
-      Organic: 'Conversions in which the decision to search for and enter the QuintoAndar environment was made by the user.'
-      Non Organic: 'Conversions in which entry into the QuintoAndar environment was forced by QuintoAndar.'    
+    description: Type of user behavior in relation to their search decision and entry into QuintoAndar.
+    categories:
+      organic: User chose to search for and enter QuintoAndar (lowercase, dominant in production).
+      non organic: QuintoAndar pushed the user into the environment (lowercase, dominant in production).
+      Organic: Uppercase variant of organic behavior classification.
+      Non Organic: Uppercase variant of non-organic behavior classification.
+      Other: Behavior type outside standard organic/non-organic buckets.
+      Lost Tracking: Behavior classification lost in attribution tracking.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.behavior_type
   campaign_landing_page:
-    description: 'Landing page/domain of QuintoAndar to which the campaign directs.'
+    description: Landing page/domain of QuintoAndar to which the campaign directs.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.campaign_landing_page
   funnel_side:
-    description: 'Side of the funnel to which that campaign was directed.'
+    description: Side of the funnel to which the campaign was directed.
     categories:
-      demand: 'Campaign made to bring potential buyers or tenants to our platform.'
-      supply: 'Campaign made to bring potential house owners to our platform.'
-      affiliates: 'Campaign made to bring affiliates to our platform.'
-      branding: 'Campaign created by the Branding team.'
+      demand: Demand-side campaign (lowercase variant).
+      supply: Supply-side campaign (lowercase variant).
+      affiliates: Affiliates campaign (lowercase variant).
+      branding: Branding campaign (lowercase variant).
+      Demand: Campaign to bring buyers or tenants to the platform.
+      Supply: Campaign to bring property owners to the platform.
+      Affiliates: Campaign to recruit affiliates.
+      Branding: Campaign created by the Branding team.
+      CIQ: Campaign directed at CIQ supply flows.
+      NA: Funnel side not applicable.
+      Other: Funnel side outside standard buckets.
+      Lost Tracking: Funnel side lost in attribution tracking.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.funnel_side
   medium:
-    description: 'Combination of platform intent, media package, branded and recovery audience status dimensions. Where the average package size is mandatory and the others are applied when convenient. More information in the Doc indicated in the table description.'
+    description: Combination of platform intent, media package, branded and recovery audience status dimensions. Where the average package size is mandatory and the others are applied when convenient. More information in the Doc indicated in the table description.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.medium
   source:
-    description: 'QuintoAndar s external platform/operation responsible for generating the result.'
+    description: QuintoAndar s external platform/operation responsible for generating the result.
     lineage:
-      - datalake_demand_flows.top_of_funnel_results.source    
+      - datalake_demand_flows.top_of_funnel_results.source
   is_rede_demand:
-    description: 'Flag indicating if this house came from a rede partner'
+    description: Flag indicating if this house came from a rede partner
     lineage:
       - datalake_ebdb_clean.house.internal_admin_info
   is_qac:
-    description: 'Flag indicating if the event came from QuintoAndar Classifieds (QAC).'
+    description: Flag indicating if the event came from QuintoAndar Classifieds (QAC).
     lineage:
       - datalake_demand_flows.top_of_funnel_results.is_qac
   dt_event:
-    description: 'Date of the event'
+    description: Calendar date when the user performed the top-of-funnel interaction, used for daily demand acquisition reporting and partition pruning.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.dt_event
   ts_event:
-    description: 'Timestamp of the event.'
+    description: Exact timestamp when the user performed the top-of-funnel interaction, preserving sub-day ordering for media attribution rules.
     lineage:
       - datalake_demand_flows.top_of_funnel_results.ts_event
   year:
-    description: 'Year of the event'
+    description: Year of the event
     lineage:
       - datalake_demand_flows.top_of_funnel_results.year
   month:
-    description: 'Month of the event'
+    description: Month of the event
     lineage:
       - datalake_demand_flows.top_of_funnel_results.month
   day:
-    description: 'Day of the event'
+    description: Day of the event
     lineage:
       - datalake_demand_flows.top_of_funnel_results.day
   ts_load:
-    description: 'Timestamp of when the table was loaded'    
+    description: Timestamp of when the table was loaded

@@ -1,28 +1,30 @@
 database_name: dw_quintoandar
 table_name: fact_affiliate_costs
-description: 'Table created to control affiliate costs based on robin hood'
+description: Fact table recording individual affiliate commission cost transactions sourced from the Robin Hood financial system. Each row represents a single accounting
+  entry with the transaction date, the affiliate payee, and the monetary cost incurred. Used by the Growth team to track affiliate commission expenditure over time and to
+  join with dim_affiliate_cost for full cost classification analysis.
 domain: Growth
-owner: '@data-growth'
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_rh_accounting_entry:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
-    description: 'This is a registration number of information in the database of accounting entry.'
+    description: Surrogate key for the Robin Hood accounting entry; used as the primary key to join with dim_affiliate_cost for cost classification.
   sk_payee:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_payee
-    description: 'This is a registration number of information in the database of payee.'
+    description: Surrogate key identifying the affiliate who received the commission payment for this transaction.
   sk_date:
     lineage:
     - datalake_robin_hood.affiliate_costs.dt_transaction
-    description: 'Date that transaction was executed.'
+    description: Date dimension surrogate key for the day the affiliate commission transaction was executed, used for time-based cost aggregation.
   sk_user:
     lineage:
     - datalake_robin_hood.affiliate_costs.id_external
-    description: 'Unique key that identifies a User.'
+    description: Surrogate key identifying the QuintoAndar user (affiliate) associated with this commission cost record.
   cost:
     lineage:
     - datalake_robin_hood.affiliate_costs.cost
-    description: 'Cost spent on campaign.'
+    description: Monetary amount of the affiliate commission paid for this accounting entry, expressed in the local currency.
   ts_load:
-    description: 'Timestamp indicating when data was loaded.'
+    description: Timestamp recording when this row was loaded into the data warehouse by the pipeline.

@@ -2,81 +2,81 @@
 database_name: dw_datamarts
 table_name: lead_listing_flows
 domain: Growth
-owner: "@data-growth"
-description: This dataset contains information about the lead flow.
+owner: gabriel.salla@quintoandar.com
+description: Consolidated cross-domain view of the lead-to-listing journey, combining Rent and Sale listing flow data via UNION ALL. Each row represents one listing-flow branch (Rent or Sale origin_table) enriched with per-stage business context flags; sk_house_listing_flow is not unique because the same flow can appear in both Rent and Sale branches and join logic can produce duplicate rows.
 columns:
   sk_house_listing_flow:
-    description: Unique id related to the house listing flow, it's the primary key of the table.
+    description: Identifier of the house listing flow shared across Rent and Sale pipelines; not unique in this table because rows are split by origin_table and may duplicate from upstream joins.
     lineage:
       - dw_sale.fact_listing_flows.sk_house_listing_flow
       - dw_public.fact_house_listing_flows.sk_house_listing_flow
   sk_lead:
-    description: Lead identifier
+    description: Surrogate key identifying the lead (potential owner) who entered the funnel for this listing flow.
     lineage:
       - dw_sale.fact_listing_flows.sk_lead
       - dw_public.fact_house_listing_flows.sk_lead
   sk_house:
-    description: House identifier
+    description: Surrogate key identifying the physical property associated with this listing flow.
     lineage:
       - dw_sale.fact_listing_flows.sk_house_listing
       - dw_public.fact_house_listing_flows.sk_house_listing
   sk_house_listing:
-    description: House listing identifier
+    description: Surrogate key identifying the specific listing version of the property within the funnel flow.
     lineage:
       - dw_sale.fact_listing_flows.sk_house_listing
       - dw_public.fact_house_listing_flows.sk_house_listing
   sk_region:
-    description: Region identifier
+    description: Surrogate key for the geographic region of the property, used for regional funnel breakdowns.
     lineage:
       - dw_sale.fact_listing_flows.sk_region
       - dw_public.fact_house_listing_flows.sk_region
   sk_lead_date:
-    description: Lead date identifier
+    description: Date dimension key for when the lead first entered the pipeline, used for cohort and funnel-entry analysis.
     lineage:
       - dw_sale.fact_listing_flows.sk_lead_date
       - dw_public.fact_house_listing_flows.sk_lead_date
   sk_first_contact_date:
-    description: First contact date identifier
+    description: Date dimension key for the first contact event between the lead and the operations team.
     lineage:
       - dw_sale.fact_listing_flows.sk_first_contact_date
       - dw_public.fact_house_listing_flows.sk_first_contact_date
   sk_prospect_date:
-    description: Prospect date identifier
+    description: Date dimension key for when the lead was first classified as a prospect in the supply funnel.
     lineage:
       - dw_sale.fact_listing_flows.sk_prospect_date
       - dw_public.fact_house_listing_flows.sk_prospect_date
   sk_qualified_date:
-    description: Qualified date identifier
+    description: Date dimension key for when the lead reached the qualified stage, indicating a higher intent to list.
     lineage:
       - dw_sale.fact_listing_flows.sk_qualified_date
       - dw_public.fact_house_listing_flows.sk_qualified_date
   sk_available_qualified_date:
-    description: Available qualified date identifier
+    description: Date dimension key for when the listing became available as a qualified opportunity in the funnel.
     lineage:
       - dw_sale.fact_listing_flows.sk_available_qualified_date
       - dw_public.fact_house_listing_flows.sk_available_qualified_date
   sk_opportunity_date:
-    description: Opportunity date identifier
+    description: Date dimension key for when the lead advanced to the opportunity stage, representing a near-signing state.
     lineage:
       - dw_sale.fact_listing_flows.sk_opportunity_date
       - dw_public.fact_house_listing_flows.sk_opportunity_date
   sk_first_listing_date:
-    description: First listing date identifier
+    description: Date dimension key for when the property was first published as an active listing on the platform.
     lineage:
       - dw_sale.fact_listing_flows.sk_first_listing_date
       - dw_public.fact_house_listing_flows.sk_first_listing_date
   sk_conversion_date:
-    description: Conversion date identifier
+    description: Date dimension key for when the lead converted (e.g., signed a rental or sale agreement).
     lineage:
       - dw_sale.fact_listing_flows.sk_conversion_date
       - dw_public.fact_house_listing_flows.sk_conversion_date
   sk_discard_date:
-    description: Discard date identifier
+    description: Date dimension key for when the lead was discarded from the funnel, used to measure funnel drop rates.
     lineage:
       - dw_sale.fact_listing_flows.sk_discard_date
       - dw_public.fact_house_listing_flows.sk_discard_date
   sk_first_photojob_date_fact_photo_job:
-    description: First photojob date identifier
+    description: Date dimension key for when the first photo shoot job was created for this property, indicating readiness-to-list.
     lineage:
       - dw_public.fact_photo_job.sk_date_job_created
   sk_user_lead_affiliate:
@@ -85,9 +85,70 @@ columns:
       - dw_sale.fact_listing_flows.sk_user_lead_affiliate
       - dw_public.fact_house_listing_flows.sk_user_lead_affiliate
   country_code:
-    description: Identifies the country
+    description: ISO country code identifying the country where the property and listing flow originated.
     lineage:
-      - dw_public.fact_house_listing_flows.country_code
+      - dw_public.dim_region.country_code
+  context_lead:
+    description: Business context (Rent, Sale, or Hybrid) in which the lead event occurred for this listing flow row. NULL when no lead date is recorded for the branch.
+    categories:
+      Rent: Lead event belongs to the rent listing flow.
+      Sale: Lead event belongs to the sale listing flow.
+      Hybrid: Lead dates align across rent and sale flows for the same house listing flow.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_lead_date
+      - dw_sale.fact_listing_flows.sk_lead_date
+  context_prospect:
+    description: Business context (Rent, Sale, or Hybrid) in which the prospect event occurred for this listing flow row.
+    categories:
+      Rent: Prospect event belongs to the rent listing flow.
+      Sale: Prospect event belongs to the sale listing flow.
+      Hybrid: Prospect dates align across rent and sale flows for the same house listing flow.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_prospect_date
+      - dw_sale.fact_listing_flows.sk_prospect_date
+  context_qualified:
+    description: Business context (Rent, Sale, or Hybrid) in which the qualified event occurred for this listing flow row.
+    categories:
+      Rent: Qualified event belongs to the rent listing flow.
+      Sale: Qualified event belongs to the sale listing flow.
+      Hybrid: Qualified dates align across rent and sale flows for the same house listing flow.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_qualified_date
+      - dw_sale.fact_listing_flows.sk_qualified_date
+  context_available_qualified:
+    description: Business context (Rent, Sale, or Hybrid) in which the available-qualified event occurred for this listing flow row.
+    categories:
+      Rent: Available-qualified event belongs to the rent listing flow.
+      Sale: Available-qualified event belongs to the sale listing flow.
+      Hybrid: Available-qualified dates align across rent and sale flows for the same house listing flow.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_available_qualified_date
+      - dw_sale.fact_listing_flows.sk_available_qualified_date
+  context_opportunity:
+    description: Business context (Rent, Sale, or Hybrid) in which the opportunity event occurred for this listing flow row.
+    categories:
+      Rent: Opportunity event belongs to the rent listing flow.
+      Sale: Opportunity event belongs to the sale listing flow.
+      Hybrid: Opportunity dates align across rent and sale flows for the same house listing flow.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_opportunity_date
+      - dw_sale.fact_listing_flows.sk_opportunity_date
+  context_first_listing:
+    description: Business context (Rent, Sale, or Hybrid) in which the first-listing event occurred for this listing flow row.
+    categories:
+      Rent: First-listing event belongs to the rent listing flow.
+      Sale: First-listing event belongs to the sale listing flow.
+      Hybrid: First-listing dates align across rent and sale flows for the same house listing flow.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_first_listing_date
+      - dw_sale.fact_listing_flows.sk_first_listing_date
+  mkt_origin:
+    description: Normalized marketing origin of the supply lead after CIQ, B2B, and partner overrides applied in the cross-domain union.
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_origin
+      - dw_sale.fact_listing_flows.mkt_origin
+      - dw_rent.dim_house_listing.consultant_type
+      - dw_sale.dim_listing.consultant_type
   mkt_completion:
     description: The marketing completion value. It comes from a gsheet.
     lineage:
@@ -131,8 +192,25 @@ columns:
       - datalake_olos_dialer.outbound_last_contact
       - dw_public.dim_lead.sales_company
       - dw_quintoandar.dim_user_sales_rep.sales_company
+  sourcing_ops:
+    description: Operations sourcing channel that handled the lead, derived from marketing completion, inside-sales intervention, and sales company rules.
+    categories:
+      B2B: Lead sourced through the B2B partner channel.
+      CIQ: Lead sourced through the CIQ consultant program.
+      FSS: Fully self-service lead without inside-sales photo job intervention.
+      FSS IS PhotoJob: Self-service lead with inside-sales photo job at opportunity stage.
+      MENSAGERIA: Lead handled by the Mensageria outbound team.
+      IS Int: Lead handled by internal inside sales.
+      IS Ext: Lead handled by external inside sales partners.
+      Other: Lead did not match a defined sourcing rule.
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_completion
+      - dw_public.fact_house_listing_flows.has_isales_intervention
+      - dw_sale.fact_listing_flows.mkt_completion
+      - dw_sale.fact_listing_flows.has_isales_intervention
+      - dw_public.dim_lead.sales_company
   lead_origin:
-    description: Origin of the lead.
+    description: Source system or acquisition channel that captured the supply lead, as recorded in EBDB (e.g. App, Inbound, Facebook, OwnerPWA, Reprocessado).
     lineage:
       - dw_sale.fact_listing_flows.lead_origin
       - dw_public.fact_house_listing_flows.lead_origin
@@ -142,34 +220,82 @@ columns:
       - dw_sale.fact_listing_flows.funnel_drop_reason
       - dw_public.fact_house_listing_flows.funnel_drop_reason
   lead_context_origin:
-    description: Business context
+    description: Business context associated with the lead's origin, indicating the product area or initiative that generated the supply lead.
     lineage:
       - dw_sale.fact_listing_flows.lead_context_origin
       - dw_public.fact_house_listing_flows.lead_context_origin
+  origin_table:
+    description: Source listing-flow domain for the row after the Rent and Sale union (Rent or Sale).
+    categories:
+      Rent: Row originated from the rent fact_house_listing_flows pipeline.
+      Sale: Row originated from the sale fact_listing_flows pipeline.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_house_listing_flow
+      - dw_sale.fact_listing_flows.sk_house_listing_flow
   rental_administrator:
-    description: Rental administrator after the change
+    description: Identifier of the rental administrator responsible for managing the property after a handover or reassignment.
     lineage:
       - dw_rent.dim_house_listing.rental_administrator
+  aux_rn_prospect:
+    description: Row number within the house listing flow ordered by prospect date, used to break ties when multiple prospect events share the same date.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_prospect_date
+      - dw_sale.fact_listing_flows.sk_prospect_date
+  aux_order_prospect:
+    description: Dense rank of prospect dates within the house listing flow, grouping rows that reached prospect on the same calendar date.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_prospect_date
+      - dw_sale.fact_listing_flows.sk_prospect_date
+  aux_rn_qualified:
+    description: Row number within the house listing flow ordered by qualified date, used to break ties when multiple qualified events share the same date.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_qualified_date
+      - dw_sale.fact_listing_flows.sk_qualified_date
+  aux_order_qualified:
+    description: Dense rank of qualified dates within the house listing flow, grouping rows that reached qualified on the same calendar date.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_qualified_date
+      - dw_sale.fact_listing_flows.sk_qualified_date
+  aux_rn_available_qualified:
+    description: Row number within the house listing flow ordered by available-qualified date, used to break ties when multiple events share the same date.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_available_qualified_date
+      - dw_sale.fact_listing_flows.sk_available_qualified_date
+  aux_order_available_qualified:
+    description: Dense rank of available-qualified dates within the house listing flow, grouping rows that reached the stage on the same calendar date.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_available_qualified_date
+      - dw_sale.fact_listing_flows.sk_available_qualified_date
   first_prospect_date:
-    description: First Prospect Date
+    description: Earliest calendar date on which the lead reached prospect status across all associated flows.
     lineage:
       - dw_public.fact_house_listing_flows.sk_prospect_date
       - dw_sale.fact_listing_flows.sk_prospect_date
   last_prospect_date:
-    description: Last Prospect Date
+    description: Most recent calendar date on which the lead reached prospect status, relevant for funnel recency analysis.
     lineage:
       - dw_public.fact_house_listing_flows.sk_prospect_date
       - dw_sale.fact_listing_flows.sk_prospect_date
   first_qualified_date:
-    description: First Qualified Date
+    description: Earliest calendar date on which the lead reached qualified status, used to measure conversion speed.
     lineage:
       - dw_public.fact_house_listing_flows.sk_qualified_date
       - dw_sale.fact_listing_flows.sk_qualified_date
   last_qualified_date:
-    description: Last Qualified Date
+    description: Most recent calendar date on which the lead reached qualified status across all associated flows.
     lineage:
       - dw_public.fact_house_listing_flows.sk_qualified_date
       - dw_sale.fact_listing_flows.sk_qualified_date
+  first_available_qualified_date:
+    description: Earliest calendar date on which the lead reached available-qualified status across all associated flows.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_available_qualified_date
+      - dw_sale.fact_listing_flows.sk_available_qualified_date
+  last_available_qualified_date:
+    description: Most recent calendar date on which the lead reached available-qualified status across all associated flows.
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_available_qualified_date
+      - dw_sale.fact_listing_flows.sk_available_qualified_date
   has_isales_intervention:
     description: Flag that identifies if there were inside sales intervention
     lineage:

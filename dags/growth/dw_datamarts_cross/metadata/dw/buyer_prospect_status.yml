@@ -2,56 +2,57 @@
 database_name: dw_datamarts
 table_name: buyer_prospect_status
 domain: Growth
-owner: data-growth@quintoandar.com.br
-description: A buyer prospect is a user who has scheduled at least one visit to a property for sale. This table contains information about the status of the prospect,
-  and each row is a change in the status.
+owner: gabriel.salla@quintoandar.com
+description: Tracks the lifecycle status of buyer prospects — users who have scheduled at least one visit to a property for sale — across the sale funnel. Each row represents
+  a status transition event, capturing when a prospect became active, churned, or signed a sale contract (CCV). Used by the Growth and Sale teams to measure buyer engagement,
+  churn rates, and recovery patterns across city groups.
 columns:
   sk_buyer:
     lineage:
       - datalake_talk_to_agent.talk_to_agent.tenant_id
       - dw_sale.fact_offers.sk_buyer
       - dw_sale.fact_sale_flows.sk_buyer
-    description: ID of the buyer prospect user.
+    description: Surrogate key identifying the buyer prospect user across sale funnel tables.
   city_group:
     lineage:
       - dw_public.dim_region.city_group
-    description: City group of the property.
+    description: Geographic grouping of the property the prospect interacted with, used for regional analysis.
   ts_start:
     lineage:
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_sale.fact_visits.ts_booking_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
-    description: Timestamp of the start of the status.
+    description: Timestamp marking the beginning of the current prospect status period, derived from the triggering funnel event.
   ts_end:
     lineage:
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_sale.fact_visits.ts_booking_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
-    description: Timestamp of the end of the status.
+    description: Timestamp marking the end of the current prospect status period; null when the status is still active.
   sk_start_date:
     lineage:
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_sale.fact_visits.ts_booking_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
-    description: Date key of the start of the status.
+    description: Date dimension surrogate key for the start of the status period, used to join with dim_date for calendar analysis.
   sk_end_date:
     lineage:
       - datalake_talk_to_agent.talk_to_agent.first_message_ts
       - dw_sale.fact_visits.ts_booking_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
-    description: Date key of the end of the status.
+    description: Date dimension surrogate key for the end of the status period, used to join with dim_date for calendar analysis.
   status:
-    description: Status of the prospect.
+    description: Current lifecycle classification of the prospect in the sale funnel.
     categories:
       ACTIVE: The prospect is active (i.e., has had at least one event in the last 90 days).
       CHURNED: The prospect is churned (i.e., has not had any event in the last 90 days, nor signed any contract).
       SIGNED CCV: The prospect has signed a CCV (sale contract).
   status_detail:
-    description: Detail of the status of the prospect.
+    description: Trigger that caused the current status transition in the sale buyer journey, such as first booking/offer, 90-day inactivity, CCV signing, or reactivation after churn.
     categories:
       New BP: New buyer prospect (first event).
       First activation in city_group: First activation of the prospect in the city group.
@@ -65,8 +66,8 @@ columns:
       - dw_sale.fact_visits.ts_booking_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
-    description: Timestamp of the first activation of the prospect.
+    description: Timestamp of the prospect's very first qualifying engagement event, establishing the start of their buyer journey.
   city_group_first_activation:
     lineage:
       - dw_public.dim_region.city_group
-    description: City group of the property at the first activation of the prospect.
+    description: Geographic city group where the prospect first became active, used for regional attribution of buyer acquisition.
