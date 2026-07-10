@@ -1,34 +1,47 @@
+---
 database_name: datalake_ebdb_clean
 table_name: proposal_resident
+description: Residents declared on a rental proposal from EBDB PropostaMorador. One row per resident with identity and contact data linked to a proposal.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.propostamorador.id
+    description: Surrogate key of the record on EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.propostamorador.atualizadoem
+    description: Timestamp for the updated event on this record.
   ts_created:
     lineage:
       - datalake_ebdb_raw.propostamorador.criadoem
+    description: Timestamp for the created event on this record.
   cpf:
     lineage:
       - datalake_ebdb_raw.propostamorador.cpf
+    description: Brazilian individual taxpayer registry number of the person.
   dt_birth:
     lineage:
       - datalake_ebdb_raw.propostamorador.datanascimento
+    description: Date value for the birth attribute.
   email:
     lineage:
       - datalake_ebdb_raw.propostamorador.email
+    description: Email address used to contact this person.
   name:
     lineage:
       - datalake_ebdb_raw.propostamorador.nome
+    description: Full name of the person on the record.
   rg:
     lineage:
       - datalake_ebdb_raw.propostamorador.rg
+    description: Brazilian identity document number of the person.
   phone_number:
     lineage:
       - datalake_ebdb_raw.propostamorador.telefone
+    description: Primary phone number of the proposal participant.
   id_proposal:
     lineage:
       - datalake_ebdb_raw.propostamorador.proposta_id
+    description: Foreign key to the related proposal entity.

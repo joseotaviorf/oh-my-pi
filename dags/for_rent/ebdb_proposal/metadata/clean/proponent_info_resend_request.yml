@@ -1,25 +1,39 @@
+---
 database_name: datalake_ebdb_clean
 table_name: proponent_info_resend_request
+description: Requests to resend missing proponent documentation from EBDB ProponentInfoResendRequest. One row per resend request linked to participant and document.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.proponentinforesendrequest.id
+    description: Surrogate key of the record on EBDB.
   id_proponent_proposal:
     lineage:
       - datalake_ebdb_raw.proponentinforesendrequest.proposalProponentId
+    description: Foreign key to the related proponent proposal entity.
   id_proposal_document:
     lineage:
       - datalake_ebdb_raw.proponentinforesendrequest.proposalDocumentId
+    description: Foreign key to the related proposal document entity.
   proponent_info_type:
     lineage:
       - datalake_ebdb_raw.proponentinforesendrequest.proponentInfoType
+    description: Category of proponent information requested for resend.
+  resend_document_reason:
+    lineage:
+      - datalake_ebdb_raw.proponentinforesendrequest.resendDocumentReason
+    description: Reason why the proponent documentation must be resent.
   description:
     lineage:
       - datalake_ebdb_raw.proponentinforesendrequest.description
+    description: Free-text description or explanation for this record.
   ts_created:
     lineage:
       - datalake_ebdb_raw.proponentinforesendrequest.criadoEm
+    description: Timestamp for the created event on this record.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.proponentinforesendrequest.atualizadoEm
+    description: Timestamp for the updated event on this record.

@@ -1,31 +1,43 @@
+---
 database_name: datalake_ebdb_clean
 table_name: proposal_condition_aud
+description: Hibernate Envers audit history of proposal conditions from EBDB CondicaoProposta_AUD. Each row is one revision with modification flags on agreement and text fields.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_proposal_condition:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.id
+    description: Foreign key to the related proposal condition entity.
   rev:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   has_agreed:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.concordado
+    description: Boolean flag indicating whether agreed applies.
   mod_has_agreed:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.concordado_mod
+    description: Flag indicating whether the has agreed field changed in this revision.
   description:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.descricao
+    description: Free-text description or explanation for this record.
   mod_description:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.descricao_mod
+    description: Flag indicating whether the description field changed in this revision.
   title:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.titulo
+    description: Display title of the condition or document.
   mod_title:
     lineage:
       - datalake_ebdb_raw.condicaoproposta_aud.titulo_mod
+    description: Flag indicating whether the title field changed in this revision.

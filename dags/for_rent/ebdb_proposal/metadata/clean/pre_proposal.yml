@@ -1,82 +1,111 @@
+---
 database_name: datalake_ebdb_clean
 table_name: pre_proposal
+description: Early-stage rental proposal from EBDB PreProposta before full proposal submission. One row per pre-proposal with acceptance flags, rent terms, and listing references. Consumed by FR Transact funnel analytics.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.preproposta.id
+    description: Surrogate key of the record on EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.preproposta.atualizadoem
+    description: Timestamp for the updated event on this record.
   ts_created:
     lineage:
       - datalake_ebdb_raw.preproposta.criadoem
+    description: Timestamp for the created event on this record.
   has_rental_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta.aceitoaluguel
+    description: Boolean flag indicating whether rental accepted applies.
   has_income_proof_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta.aceitocomprovarrenda
+    description: Boolean flag indicating whether income proof accepted applies.
   has_charge_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta.aceitoencargos
+    description: Boolean flag indicating whether charge accepted applies.
   rent:
     lineage:
       - datalake_ebdb_raw.preproposta.aluguel
+    description: Proposed monthly rent value for the pre-proposal.
   ts_approved:
     lineage:
       - datalake_ebdb_raw.preproposta.dataaprovacao
+    description: Timestamp for the approved event on this record.
   edition:
     lineage:
       - datalake_ebdb_raw.preproposta.edicao
+    description: Edition counter tracking pre-proposal revisions by the tenant.
   is_owner_accept_condition:
     lineage:
       - datalake_ebdb_raw.preproposta.proprietarioaceitoucondicoes5a
+    description: Boolean flag indicating whether owner accept condition is true.
   status:
     lineage:
       - datalake_ebdb_raw.preproposta.status
+    description: Current workflow status of the record.
   last_edition_updated:
     lineage:
       - datalake_ebdb_raw.preproposta.ultimoupdateedicao
+    description: Timestamp of the most recent edition update on the pre-proposal.
   id_animals:
     lineage:
       - datalake_ebdb_raw.preproposta.animais_id
+    description: Foreign key to the related animals entity.
   id_user:
     lineage:
       - datalake_ebdb_raw.preproposta.usuario_id
+    description: Foreign key to the related user entity.
   id_house:
     lineage:
       - datalake_ebdb_raw.preproposta.imovel_id
+    description: Foreign key to the related house entity.
   id_when_will_live:
     lineage:
       - datalake_ebdb_raw.preproposta.quandovaimudar_id
+    description: Foreign key to the related when will live entity.
   id_who_will_live:
     lineage:
       - datalake_ebdb_raw.preproposta.quemvaimorar_id
+    description: Foreign key to the related who will live entity.
   original_rent:
     lineage:
       - datalake_ebdb_raw.preproposta.alugueloriginal
+    description: Original listing rent value before negotiation.
   original_condo:
     lineage:
       - datalake_ebdb_raw.preproposta.condominiooriginal
+    description: Original listing condo value before negotiation.
   original_iptu:
     lineage:
       - datalake_ebdb_raw.preproposta.iptuoriginal
+    description: Original listing iptu value before negotiation.
   original_home_insurance:
     lineage:
       - datalake_ebdb_raw.preproposta.homeownerinsuranceoriginalvalue
+    description: Original listing home insurance value before negotiation.
   ts_expired:
     lineage:
       - datalake_ebdb_raw.preproposta.expirationdate
+    description: Timestamp for the expired event on this record.
   ts_last_edition_updated:
     lineage:
       - datalake_ebdb_raw.preproposta.lastedicaoupdatedate
+    description: Timestamp for the last edition updated event on this record.
   rejection_reason:
     lineage:
       - datalake_ebdb_raw.preproposta.rejectionreason
+    description: Reason provided when the pre-proposal was rejected.
   code:
     lineage:
       - datalake_ebdb_raw.preproposta.code
+    description: Human-readable or system code identifying this record.
   ts_visualized:
     lineage:
       - datalake_ebdb_raw.preproposta.visualizeddate
+    description: Timestamp for the visualized event on this record.

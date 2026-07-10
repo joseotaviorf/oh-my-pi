@@ -1,115 +1,155 @@
+---
 database_name: datalake_ebdb_clean
 table_name: pre_proposal_aud
+description: Hibernate Envers audit history of pre-proposals from EBDB PreProposta_AUD. Each row is one revision with modification flags. Used for FR Transact proposal funnel change tracking.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_pre_proposal:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.id
+    description: Foreign key to the related pre proposal entity.
   rev:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   has_rental_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.aceitoaluguel
+    description: Boolean flag indicating whether rental accepted applies.
   mod_has_rental_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.aceitoaluguel_mod
+    description: Flag indicating whether the has rental accepted field changed in this revision.
   has_income_proof_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.aceitocomprovarrenda
+    description: Boolean flag indicating whether income proof accepted applies.
   mod_has_income_proof_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.aceitocomprovarrenda_mod
+    description: Flag indicating whether the has income proof accepted field changed in this revision.
   has_charge_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.aceitoencargos
+    description: Boolean flag indicating whether charge accepted applies.
   mod_has_charge_accepted:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.aceitoencargos_mod
+    description: Flag indicating whether the has charge accepted field changed in this revision.
   rent:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.aluguel
+    description: Proposed monthly rent value for the pre-proposal.
   mod_rent:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.aluguel_mod
+    description: Flag indicating whether the rent field changed in this revision.
   ts_approved:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.dataaprovacao
+    description: Timestamp for the approved event on this record.
   edition:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.edicao
+    description: Edition counter tracking pre-proposal revisions by the tenant.
   mod_edition:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.edicao_mod
+    description: Flag indicating whether the edition field changed in this revision.
   is_owner_accept_condition:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.proprietarioaceitoucondicoes5a
+    description: Boolean flag indicating whether owner accept condition is true.
   status:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.status
+    description: Current workflow status of the record.
   mod_status:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.status_mod
+    description: Flag indicating whether the status field changed in this revision.
   id_animals:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.animais_id
+    description: Foreign key to the related animals entity.
   mod_animals:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.animais_mod
+    description: Flag indicating whether the animals field changed in this revision.
   mod_conditions:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.condicoes_mod
+    description: Flag indicating whether the conditions field changed in this revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.imovel_id
+    description: Foreign key to the related house entity.
   mod_house:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.imovel_mod
+    description: Flag indicating whether the house field changed in this revision.
   id_when_will_schedule:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.quandovaimudar_id
+    description: Foreign key to the related when will schedule entity.
   mod_when_will_schedule:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.quandovaimudar_mod
+    description: Flag indicating whether the when will schedule field changed in this revision.
   id_who_will_live:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.quemvaimorar_id
+    description: Foreign key to the related who will live entity.
   mod_who_will_live:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.quemvaimorar_mod
+    description: Flag indicating whether the who will live field changed in this revision.
   id_user:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.usuario_id
+    description: Foreign key to the related user entity.
   mod_user:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.usuario_mod
+    description: Flag indicating whether the user field changed in this revision.
   original_rent:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.alugueloriginal
+    description: Original listing rent value before negotiation.
   original_condo:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.condominiooriginal
+    description: Original listing condo value before negotiation.
   original_iptu:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.iptuoriginal
+    description: Original listing iptu value before negotiation.
   original_home_insurance:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.homeownerinsuranceoriginalvalue
+    description: Original listing home insurance value before negotiation.
   ts_expired:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.expirationdate
+    description: Timestamp for the expired event on this record.
   rejection_reason:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.rejectionreason
+    description: Reason provided when the pre-proposal was rejected.
   code:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.code
+    description: Human-readable or system code identifying this record.
   ts_visualized:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.visualizeddate
+    description: Timestamp for the visualized event on this record.
   mod_ts_visualized:
     lineage:
       - datalake_ebdb_raw.preproposta_aud.visualizeddate_mod
+    description: Flag indicating whether the ts visualized field changed in this revision.

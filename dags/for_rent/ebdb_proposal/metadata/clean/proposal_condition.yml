@@ -1,22 +1,31 @@
+---
 database_name: datalake_ebdb_clean
 table_name: proposal_condition
+description: Reusable rental proposal condition templates from EBDB CondicaoProposta. One row per condition with title and agreement status. Used in proposal negotiation workflows.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.condicaoproposta.id
+    description: Surrogate key of the record on EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.condicaoproposta.atualizadoem
+    description: Timestamp for the updated event on this record.
   ts_created:
     lineage:
       - datalake_ebdb_raw.condicaoproposta.criadoem
+    description: Timestamp for the created event on this record.
   has_agreed:
     lineage:
       - datalake_ebdb_raw.condicaoproposta.concordado
+    description: Boolean flag indicating whether agreed applies.
   description:
     lineage:
       - datalake_ebdb_raw.condicaoproposta.descricao
+    description: Free-text description or explanation for this record.
   title:
     lineage:
       - datalake_ebdb_raw.condicaoproposta.titulo
+    description: Display title of the condition or document.

@@ -1,172 +1,231 @@
+---
 database_name: datalake_ebdb_clean
 table_name: proponent_proposal_aud
+description: Hibernate Envers audit history of proposal participants from EBDB PropostaProponente_AUD. Each row is one revision capturing profile and documentation changes.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.id
+    description: Surrogate key of the record on EBDB.
   rev:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   neighborhood:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.bairro
+    description: Neighborhood of the participant residential address.
   zip_code:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.cep
+    description: Postal code of the participant residential address.
   city:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.cidade
+    description: City of the participant residential address.
   complement:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.complemento
+    description: Address complement such as apartment or block.
   has_contributed_to_current_house:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.contribuinoimovelatual
+    description: Boolean flag indicating whether contributed to current house applies.
   cpf:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.cpf
+    description: Brazilian individual taxpayer registry number of the person.
   dt_admission_date:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.dataadmissao
+    description: Date value for the admission date attribute.
   dt_rg_created:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.dataexpedicaorg
+    description: Date value for the rg created attribute.
   dt_birth:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.datanascimento
+    description: Date value for the birth attribute.
   ts_document_validity:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.datavalidadedocumento
+    description: Timestamp for the document validity event on this record.
   email:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.email
+    description: Email address used to contact this person.
   company_link:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.empvinculo
+    description: Business attribute capturing company link for rental proposal processing.
   company:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.empresa
+    description: Employer or company name declared by the participant.
   address:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.endereco
+    description: Street address of the participant residence.
   marital_status:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.estadocivil
+    description: Marital status declared by the participant.
   rental_reason:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.motivolocacao
+    description: Business attribute capturing rental reason for rental proposal processing.
   nationality:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.nacionalidade
+    description: Nationality declared by the participant.
   name:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.nome
+    description: Full name of the person on the record.
   name_of_real_estate_company_or_owner:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.nomeimobiliariaouproprietario
+    description: Business attribute capturing name of real estate company or owner for rental proposal processing.
   mothers_name:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.nomemae
+    description: Business attribute capturing mothers name for rental proposal processing.
   number:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.numero
+    description: Street number of the participant residential address.
   number_of_dependents:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.numerodependentes
+    description: Declared count of financial dependents for the participant.
   issuing_body:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.orgaoexpedidor
+    description: Business attribute capturing issuing body for rental proposal processing.
   country_of_origin:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.paisorigem
+    description: Business attribute capturing country of origin for rental proposal processing.
   id_drive_folder:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.pastadriveid
+    description: Foreign key to the related drive folder entity.
   profession:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.profissao
+    description: Profession or occupation declared by the participant.
   branch:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.ramal
+    description: Business attribute capturing branch for rental proposal processing.
   name_reference:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.refnome
+    description: Business attribute capturing name reference for rental proposal processing.
   phone_number_reference:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.reftelefone
+    description: Business attribute capturing phone number reference for rental proposal processing.
   link_reference:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.refvinculo
+    description: Business attribute capturing link reference for rental proposal processing.
   monthly_salary:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.rendamensal
+    description: Monthly income amount declared by the participant.
   rg:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.rg
+    description: Brazilian identity document number of the person.
   gender:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.sexo
+    description: Gender informed by the participant on the proposal.
   current_situation:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.situacaoatual
+    description: Business attribute capturing current situation for rental proposal processing.
   phone_number:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.telefone
+    description: Primary phone number of the proposal participant.
   company_phone_number:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.telefoneempresa
+    description: Business attribute capturing company phone number for rental proposal processing.
   phone_number_of_real_estate_company_or_owner:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.telefoneimobiliariaouproprietario
+    description: Business attribute capturing phone number of real estate company or owner for rental proposal processing.
   residential_phone_number:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.telefoneresidencial
+    description: Business attribute capturing residential phone number for rental proposal processing.
   years_lived_in_residence:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.tempoderesidenciaanos
+    description: Business attribute capturing years lived in residence for rental proposal processing.
   type:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.tipo
+    description: Category or role type for this record.
   person_type:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.tipopessoa
+    description: Business attribute capturing person type for rental proposal processing.
   will_live:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.vaimorar
+    description: Business attribute capturing will live for rental proposal processing.
   id_proposal:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.proposta_id
+    description: Foreign key to the related proposal entity.
   source_of_income:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.origemrenda
+    description: Business attribute capturing source of income for rental proposal processing.
   additional_income:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.rendimentoadicional
+    description: Business attribute capturing additional income for rental proposal processing.
   documentation_extra_comment:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.documentationextracomment
+    description: Business attribute capturing documentation extra comment for rental proposal processing.
   mod_documentation_extra_comment:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.documentationextracomment_mod
+    description: Flag indicating whether the documentation extra comment field changed in this revision.
   id_state:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.estado_id
+    description: Foreign key to the related state entity.
   mod_state:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.estado_mod
+    description: Flag indicating whether the state field changed in this revision.
   flag_agent:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.flagrepresentante
+    description: Business attribute capturing flag agent for rental proposal processing.
   owner_name:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.nomeproprietario
+    description: Business attribute capturing owner name for rental proposal processing.
   owner_cpf:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.cpfproprietario
+    description: Business attribute capturing owner cpf for rental proposal processing.
   id_docx_folder:
     lineage:
       - datalake_ebdb_raw.propostaproponente_aud.docxfolderid
+    description: Foreign key to the related docx folder entity.

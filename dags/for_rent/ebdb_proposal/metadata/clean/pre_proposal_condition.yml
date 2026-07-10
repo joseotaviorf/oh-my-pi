@@ -1,10 +1,15 @@
+---
 database_name: datalake_ebdb_clean
 table_name: pre_proposal_condition
+description: Join table linking pre-proposals to accepted conditions from EBDB PreProposta_CondicaoProposta. One row per pre-proposal and condition pair.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_pre_proposal:
     lineage:
       - datalake_ebdb_raw.preproposta_condicaoproposta.preproposta_id
+    description: Foreign key to the related pre proposal entity.
   id_conditions:
     lineage:
       - datalake_ebdb_raw.preproposta_condicaoproposta.condicoes_id
+    description: Foreign key to the related conditions entity.

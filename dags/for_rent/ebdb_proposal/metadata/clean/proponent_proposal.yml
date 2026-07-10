@@ -1,7 +1,9 @@
+---
 database_name: datalake_ebdb_clean
 table_name: proponent_proposal
 description: Clean mirror of EBDB PropostaProponente with one row per proposal participant and their personal, contact, address, income, documentation, and bank account data used in rental proposal analysis.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -90,7 +92,7 @@ columns:
   number_of_dependents:
     lineage:
       - datalake_ebdb_raw.propostaproponente.numerodependentes
-    description: Number of financial dependents declared by the participant.
+    description: Declared count of financial dependents for the participant.
   neighborhood:
     lineage:
       - datalake_ebdb_raw.propostaproponente.bairro
