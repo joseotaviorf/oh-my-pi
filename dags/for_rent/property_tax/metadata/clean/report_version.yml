@@ -1,19 +1,20 @@
+---
 database_name: datalake_property_tax_clean
 table_name: report_version
 description: Represents each IPTU update submission.
   A tax_report is associated with at least one report_version.
   Up to two (if the updated value is edited).
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_report_version:
     lineage:
       - datalake_property_tax_raw.report_version.id
-    description: Report version ID.
+    description: Primary key of a single IPTU update submission sent by landlord or tenant.
   id_tax_report:
     lineage:
       - datalake_property_tax_raw.report_version.tax_report_id
-    description: Tax report ID.
+    description: Foreign key linking the submission to the annual IPTU report for the house.
   id_author:
     lineage:
       - datalake_property_tax_raw.report_version.author_id
@@ -21,7 +22,7 @@ columns:
   tenant_email_status:
     lineage:
       - datalake_property_tax_raw.report_version.tenant_email_status
-    description: Tenant's report status.
+    description: Delivery and acknowledgment status of the IPTU update email sent to the tenant.
     categories:
       report-version.tenant-email-status/ready-to-send: The report is ready to send.
       report-version.tenant-email-status/manually-sent: The report was sent manually.

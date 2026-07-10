@@ -1,18 +1,19 @@
+---
 database_name: dw_public
 table_name: dim_photo_job
 description: A photo job is when QuintoAndar sends a photographer to take photos of a property for listing. Each line is a photo job
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 
 columns:
   sk_photo_job:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.id
-    description: key of photo job
+    description: Surrogate key identifying the photo job in the warehouse dimension.
   id:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.id
-    description: key of photo job
+    description: Natural key of the photo job from the EBDB photo jobs source.
   imovel_id:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.id_house
@@ -32,7 +33,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.country_code
-    description: Country code of the photo job
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
@@ -178,9 +179,7 @@ columns:
   cancel_reason_detailed:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.cancellation_reason_text
-    description:
-      reason that a job was cancelled, written by the last person (admin,
-      photographer, owner)
+    description: "reason that a job was cancelled, written by the last person (admin, photographer, owner)"
   user_cancel_name:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.user_who_canceled_name
@@ -203,17 +202,15 @@ columns:
   flexible_schedule:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.is_flexible_schedule
-    description:
-      flag to identify if job has a fixed scheduled hour or a flexible
-      one
+    description: flag to identify if job has a fixed scheduled hour or a flexible one
   approved:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.is_approved
-    description: deprecated
+    description: Deprecated flag indicating whether listing photos were approved (no longer populated).
   confirmed:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.is_confirmed
-    description: deprecated
+    description: Deprecated flag indicating whether the photo session was confirmed (no longer populated).
   lockbox:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.has_lockbox

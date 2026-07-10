@@ -1,28 +1,26 @@
+---
 database_name: datalake_property_tax_clean
 table_name: tax_report
 description: The table represents the yearly IPTU update of a house.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_property_tax_raw.tax_report.id
-    description:
-      ID that identifies the record of the table itself. It's duplicated
-      because the ingestion is via incremental load. When there's an update of an
-      ID, we get it and the older data keeps in our datalake, causing a duplication.
+    description: "ID that identifies the record of the table itself. It's duplicated because the ingestion is via incremental load. When there's an update of an ID, we get it and the older data keeps in our datalake, causing a duplication."
   id_contract_ebdb:
     lineage:
       - datalake_property_tax_raw.tax_report.contract_id
-    description: Contract ID of ebdb source.
+    description: Rental contract identifier in EBDB tied to the annual IPTU update cycle.
   id_house_ebdb:
     lineage:
       - datalake_property_tax_raw.tax_report.house_external_id
-    description: House ID of ebdb source.
+    description: Foreign key to the house record in the EBDB operational database.
   status:
     lineage:
       - datalake_property_tax_raw.tax_report.status
-    description: Status of the update
+    description: Current processing state of the record in the source workflow.
     categories:
       tax-report.status/pending: Update status is pending
       tax-report.status/finished: Update status is finished
@@ -33,7 +31,7 @@ columns:
   year_tax_report:
     lineage:
       - datalake_property_tax_raw.tax_report.year_tax_report
-    description: Year of the IPTU.
+    description: Calendar year covered by the property tax update submission.
   ts_created:
     lineage:
       - datalake_property_tax_raw.tax_report.created_at

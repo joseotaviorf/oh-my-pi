@@ -1,29 +1,41 @@
 ---
 database_name: datalake_firestore_clean
 table_name: rent_offer
+description: Clean layer table for rent offer from the firestore pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_firestore_raw.rent_offer.documentid
+    description: Surrogate key identifying this rent offer record in the firestore pipeline.
   original_message:
     lineage:
       - datalake_firestore_raw.rent_offer.before
+    description: original message captured in the source operational system.
   updated_message:
     lineage:
       - datalake_firestore_raw.rent_offer.after
+    description: updated message captured in the source operational system.
   event_type:
     lineage:
       - datalake_firestore_raw.rent_offer.eventtype
+    description: event type captured in the source operational system.
   ts_updated:
     lineage:
       - datalake_firestore_raw.rent_offer.timestamp
+    description: Record update date
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer by the ETL pipeline.
   year:
     lineage:
       - datalake_firestore_raw.rent_offer.year
+    description: Year of update date.
   month:
     lineage:
       - datalake_firestore_raw.rent_offer.month
+    description: Month of update date.
   day:
     lineage:
       - datalake_firestore_raw.rent_offer.day
+    description: Day of update date.

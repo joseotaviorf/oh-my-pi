@@ -1,9 +1,10 @@
+---
 database_name: datalake_rental_transact
 table_name: advance_payment
 description: Enrich table for advance payments with historical audit data.
   This table contains all revision history for advance payments including modification flags and associated offer information.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -12,7 +13,7 @@ columns:
   uuid_advance_payment:
     lineage:
       - datalake_rental_transact_clean.advance_payment_aud.uuid_advance_payment
-    description: UUID of the advance payment.
+    description: Universally unique identifier of the advance payment record in Rental Transact.
   id_house_external:
     lineage:
       - datalake_rental_transact_clean.advance_payment_aud.id_house_external
@@ -52,7 +53,7 @@ columns:
   revtype:
     lineage:
       - datalake_rental_transact_clean.advance_payment_aud.revtype
-    description: Type of revision for advance payment (0=ADD, 1=MOD, 2=DEL).
+    description: "Type of revision for advance payment (0=ADD, 1=MOD, 2=DEL)."
   status:
     lineage:
       - datalake_rental_transact_clean.advance_payment_aud.status
@@ -79,7 +80,7 @@ columns:
   payment_amount:
     lineage:
       - datalake_rental_transact_clean.advance_payment_aud.payment_amount
-    description: Amount of the advance payment.
+    description: Monetary value of the payment transaction in local currency.
   ts_created:
     lineage:
       - datalake_rental_transact_clean.advance_payment_aud.ts_created

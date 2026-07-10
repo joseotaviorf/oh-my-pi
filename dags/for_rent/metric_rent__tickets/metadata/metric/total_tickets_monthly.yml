@@ -10,7 +10,7 @@ columns:
   dt_month:
     lineage:
       - dw_customer_support.fact_tickets.ts_solved
-    description: "Month reference date."
+    description: Month reference date.
     dimension: True
   context:
     lineage:
@@ -24,7 +24,7 @@ columns:
   journey:
     lineage:
       - dw_customer_support.dim_taxonomy.journey
-    description: "Journey of the ticket."
+    description: Customer journey stage label for the tracked business process.
     dimension: True
   sub_journey:
     lineage:
@@ -49,7 +49,7 @@ columns:
   ticket_type:
     lineage:
       - dw_customer_support.dim_department.front_or_back
-    description: "Type of the ticket."
+    description: "Whether the support ticket is handled by frontline or back-office teams."
     categories:
       front: "Front ticket."
       back: "Back ticket."
@@ -57,25 +57,18 @@ columns:
   theme:
     lineage:
       - dw_customer_support.dim_taxonomy.theme
-    description: "Theme of the ticket."
+    description: Macro taxonomy theme classifying the customer contact reason.
     dimension: True
   theme_detail:
     lineage:
       - dw_customer_support.dim_taxonomy.theme_detail
     description: "Theme detail of the ticket."
     dimension: True
-  driver:
-    lineage:
-      - metric_rent.ongoing_rentals_daily
-    description: "Driver of the ticket, which depends on the sub journey type."
-    dimension: True
   total_tickets_pure:
-    description:
-      "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution
-      of missing tickets and abandoned calls."
+    description: "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution of missing tickets and abandoned calls."
     metric:
       name: Total Tickets Pure
-      description:
+      description: 
         "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution
         of missing tickets and abandoned calls."
       acronym: TTP
@@ -85,13 +78,10 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ""
   total_tickets_proportional:
-    description:
-      "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked
-      as Ticket Rate after applying the respective weights and proportional distribution of missing tickets and
-      abandoned calls."
+    description: "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked as Ticket Rate after applying the respective weights and proportional distribution of missing tickets and abandoned calls."
     metric:
       name: Total Tickets Proportional
-      description:
+      description: 
         "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked
         as Ticket Rate after applying the respective weights and proportional distribution of missing tickets and
         abandoned calls."

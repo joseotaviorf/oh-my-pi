@@ -1,8 +1,9 @@
+---
 database_name: datalake_rental_transact
 table_name: offer
 description: Enrich table for the offers from Rental Transact database.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_offer:
     lineage:
@@ -11,11 +12,11 @@ columns:
   id_offer_topic:
     lineage:
       - datalake_rental_transact_clean.offer_topic.id
-    description: Offer topic ID.
+    description: Identifier of the negotiation topic thread linked to this rental offer.
   id_firestore:
     lineage:
       - datalake_rental_transact_clean.offer.id_firestore_offer
-    description: Firestore ID
+    description: Document identifier of the offer in the Firestore operational store.
   id_tenant:
     lineage:
       - datalake_rental_transact_clean.offer.id_tenant_external
@@ -39,15 +40,15 @@ columns:
   original_iptu:
     lineage:
       - datalake_ebdb_clean.house.iptu
-    description: Original IPTU value.
+    description: Monthly property tax (IPTU) amount from the listing before negotiation began.
   original_rent:
     lineage:
       - datalake_rental_transact_clean.offer.original_rent_value
-    description: Original rent value.
+    description: "Monthly rent amount proposed on the listing before counter-offers started."
   payment_flow_type:
     lineage:
       - datalake_rental_transact_clean.offer.payment_flow_type
-    description: Payment flow type for the offer.
+    description: Defines whether the tenant pays via standard billing or advance payment checkout.
     categories:
       NONE: No payment flow type specified.
       ADVANCE_PAYMENT: Payment flow uses advance payment.
@@ -58,15 +59,15 @@ columns:
   original_condominium_value:
     lineage:
       - datalake_rental_transact_clean.offer.original_condominium_value
-    description: Original condominium value from the offer.
+    description: Original condominium fee value before offer negotiation.
   original_home_insurance_value:
     lineage:
       - datalake_rental_transact_clean.offer.original_home_insurance_value
-    description: Original home insurance value from the offer.
+    description: Monthly residential insurance premium from the listing before negotiation began.
   original_tenant_service_fee_value:
     lineage:
       - datalake_rental_transact_clean.offer.original_tenant_service_fee_value
-    description: Original tenant service fee value from the offer.
+    description: Tenant service fee charged on the listing before any offer adjustments.
   rent:
     lineage:
       - datalake_rental_transact_clean.offer_topic_message.proposed_rent_value
@@ -75,7 +76,7 @@ columns:
   status:
     lineage:
       - datalake_rental_transact_clean.offer.status
-    description: Offer status.
+    description: Current processing state of the record in the source workflow.
   turn:
     lineage:
       - datalake_rental_transact_clean.offer.turn
@@ -86,15 +87,15 @@ columns:
   iteration:
     lineage:
       - datalake_rental_transact_clean.offer.iteration
-    description: Negotiation iteration.
+    description: "Current counter-offer round number within the rental negotiation thread."
   rejection_reason:
     lineage:
       - datalake_rental_transact_clean.offer.rejection_reason
-    description: Offer rejection reason.
+    description: Business reason recorded when the landlord or tenant declined the offer.
   type:
     lineage:
       - datalake_rental_transact_clean.offer.type
-    description: Offer type.
+    description: Classification code defining the entity role or category.
   number_of_cohabitants:
     lineage:
       - datalake_rental_transact_clean.resident_info.number_of_cohabitants
@@ -150,8 +151,8 @@ columns:
       - datalake_rental_transact_clean.rev_info.ts_rev
     description: Timestamp of the first time the offer was analyzed by the owner (REJECTED or ACCEPTED).
   year:
-    description: Year of the offer creation. It's also a table partition.
+    description: "Year of the offer creation. It's also a table partition."
   month:
-    description: Month of the offer creation. It's also a table partition.
+    description: "Month of the offer creation. It's also a table partition."
   day:
-    description: Day of the offer creation. It's also a table partition.
+    description: "Day of the offer creation. It's also a table partition."

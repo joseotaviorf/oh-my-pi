@@ -1,28 +1,39 @@
+---
 database_name: datalake_firestore_clean
 table_name: monday
+description: Clean layer table for monday from the firestore pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_firestore_raw.monday.documentid
+    description: id captured in the source operational system.
   original_message:
     lineage:
       - datalake_firestore_raw.monday.before
+    description: original message captured in the source operational system.
   updated_message:
     lineage:
       - datalake_firestore_raw.monday.after
+    description: updated message captured in the source operational system.
   event_type:
     lineage:
       - datalake_firestore_raw.monday.eventtype
+    description: event type captured in the source operational system.
   ts_updated:
     lineage:
       - datalake_firestore_raw.monday.timestamp
+    description: Record update date
   year:
     lineage:
       - datalake_firestore_raw.monday.year
+    description: Year of update date.
   month:
     lineage:
       - datalake_firestore_raw.monday.month
+    description: Month of update date.
   day:
     lineage:
       - datalake_firestore_raw.monday.day
+    description: Day of update date.

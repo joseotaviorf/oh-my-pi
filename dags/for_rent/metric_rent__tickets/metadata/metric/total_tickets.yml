@@ -25,7 +25,7 @@ columns:
   ticket_type:
     lineage:
       - dw_customer_support.dim_department.front_or_back
-    description: Type of the ticket.
+    description: "Whether the support ticket is handled by frontline or back-office teams."
     categories:
       front: Front ticket.
       back: Back ticket.
@@ -33,7 +33,7 @@ columns:
   journey:
     lineage:
       - dw_customer_support.dim_taxonomy.journey
-    description: Journey of the ticket.
+    description: Customer journey stage label for the tracked business process.
     dimension: True
   sub_journey:
     lineage:
@@ -67,8 +67,7 @@ columns:
       approved_by: marcus.pinto@quintoandar.com.br
       link_to_metric: ""
   total_tickets_identified:
-    description: Count of unique CX's tickets by contact_theme_detail.
-      Only considers tickets that had the taxonomy filled in after attendance.
+    description: Count of unique CX's tickets by contact_theme_detail. Only considers tickets that had the taxonomy filled in after attendance.
     metric:
       name: Total Tickets Daily
       description: Count of unique CX's tickets.
@@ -79,8 +78,7 @@ columns:
       approved_by: marcus.pinto@quintoandar.com.br
       link_to_metric: ""
   total_tickets_distributed:
-    description: Count of unique CX's tickets without contact_theme_detail,
-      considering idle cases or in which the attendance was not classified (null taxonomy), and, proportionally distributed to this taxonomy.
+    description: Count of unique CX's tickets without contact_theme_detail, considering idle cases or in which the attendance was not classified (null taxonomy), and, proportionally distributed to this taxonomy.
     metric:
       name: Total Tickets Distributed Daily
       description: Count of unique CX's tickets without contact_theme_detail and proportionally distributed to this taxonomy.

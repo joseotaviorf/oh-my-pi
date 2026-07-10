@@ -1,19 +1,20 @@
+---
 database_name: dw_public
 table_name: fact_photo_job
 description: Fact table that contains each photo job created and keys associated with
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 
 columns:
   id_photo_job:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.id
-    description: Key of photo job
+    description: Natural key of the photo job linked to this fact row.
   sk_house_listing:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.id_house
       - datalake_ebdb_listing.house_listing.version
-    description: Key of house listing
+    description: Surrogate key of the house listing associated with the scheduled photo job.
   sk_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
@@ -164,9 +165,7 @@ columns:
   flexible_schedule:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.is_flexible_schedule
-    description:
-      Flag to identify if job has a fixed scheduled hour or a flexible
-      one
+    description: Flag to identify if job has a fixed scheduled hour or a flexible one
   is_same_day_upload:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.is_same_day_upload
@@ -194,9 +193,7 @@ columns:
   rescheduled:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.id
-    description:
-      Flag that indicates if this job was successfully rescheduled for
-      another date
+    description: Flag that indicates if this job was successfully rescheduled for another date
   sk_date_photographer_accepted:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.ts_photographer_accepted
