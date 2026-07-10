@@ -1,148 +1,175 @@
----
 database_name: metric_fintech
 table_name: daily_recovery_pipe_to_pipe_segmentation_clustered
-description: Daily recovery metrics by clustered theoretical segmentation, measured on a pipe-to-pipe basis — each period runs from the day after one pipeline (pipe) day through the next pipe day, rather than from the first to the last calendar day of the month. Restricted to the last 6 months to keep the pipeline lightweight. Pairs of closely related theoretical segmentations are collapsed into clustered buckets (under-mob3 early + late → under-mob3; early-low + late-low → low) to reduce noise while keeping more granularity than the macro and hyper segmentations. Metrics are T2-delay focused and calculated both at reference date and accumulated from invoice creation until observation date.
+description: 'Daily recovery metrics by clustered theoretical segmentation on a pipe-to-pipe basis. Shows
+  cumulative recovery from one pipe day (the day in the month when rental invoices are due) to the next
+  pipe day (pipe-to-pipe window), rather than from the first to the last calendar day of the month. Grain
+  is clustered theoretical segmentation: closely related segments are collapsed (e.g. under-mob3 early
+  + late → under-mob3; early-low + late-low → low), finer than macro/hyper. Main goal: show the T2 recovery
+  rate (recovered_amount over due_amount) under the T2 delay contamination methodology. Restricted to
+  the last 6 months to keep the pipeline lightweight.'
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
   segment:
     lineage:
-      - dw_collections_segmentation.fact_contract_features_timeline.segmentation
-    description: Clustered theoretical segmentation — the raw segmentation with selected pairs collapsed into shared buckets (active-new-defaulter-under-mob3 from under-mob3 early and late; active-new-defaulter-low from early-low and late-low); all other segmentation values are preserved as-is.
-    dimension: True
+    - dw_collections_segmentation.fact_contract_features_timeline.segmentation
+    description: Clustered theoretical segmentation — the raw segmentation with selected pairs collapsed
+      into shared buckets (active-new-defaulter-under-mob3 from under-mob3 early and late; active-new-defaulter-low
+      from early-low and late-low); all other segmentation values are preserved as-is.
+    dimension: true
   rn_business_day:
-    description: Row number used to deduplicate rows by segment, pipe period and business-day offset since pipe, keeping the most recent reference date first.
-    dimension: True
+    description: Row number used to deduplicate rows by segment, pipe period and business-day offset since
+      pipe, keeping the most recent reference date first.
+    dimension: true
   n_business_days_since_pipe:
-    description: Number of Brazilian fintech business days elapsed since the pipe-period start (the day after the pipe day), within the same segment and pipe period.
-    dimension: True
+    description: Number of Brazilian fintech business days elapsed since the pipe-period start (the day
+      after the pipe day), within the same segment and pipe period.
+    dimension: true
   days_to_pipe:
-    description: Number of calendar days between the reference date and the pipe-period start (day after the pipe day), 1-based.
-    dimension: True
+    description: Number of calendar days between the reference date and the pipe-period start (day after
+      the pipe day), 1-based.
+    dimension: true
   n_contracts_at_reference:
     description: Number of distinct contracts in the clustered segment at the reference date.
     metric:
       name: Contracts at Reference
       description: Number of distinct contracts in the clustered segment at the reference date.
       acronym: CAR
-      is_additive: True
+      is_additive: true
       business_stage: Collections
       hierarchy: Contract analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   n_contracts_acc:
-    description: Accumulated number of distinct contracts in the clustered segment from invoice creation until the observation date.
+    description: Accumulated number of distinct contracts in the clustered segment from invoice creation
+      until the observation date.
     metric:
       name: Accumulated Contracts
-      description: Accumulated number of distinct contracts in the clustered segment from invoice creation until the observation date.
+      description: Accumulated number of distinct contracts in the clustered segment from invoice creation
+        until the observation date.
       acronym: AC
-      is_additive: True
+      is_additive: true
       business_stage: Collections
       hierarchy: Contract analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   n_invoices_DT2_at_reference:
-    description: Number of distinct invoices with delay T2 (overdue) in the clustered segment at the reference date.
+    description: Number of distinct invoices with delay T2 (overdue) in the clustered segment at the reference
+      date.
     metric:
       name: Invoices Delay T2 at Reference
-      description: Number of distinct invoices with delay T2 (overdue) in the clustered segment at the reference date.
+      description: Number of distinct invoices with delay T2 (overdue) in the clustered segment at the
+        reference date.
       acronym: IDT2AR
-      is_additive: True
+      is_additive: true
       business_stage: Collections
       hierarchy: Invoice analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   n_invoices_DT2_acc:
-    description: Accumulated number of distinct invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
+    description: Accumulated number of distinct invoices with delay T2 (overdue) in the clustered segment
+      from invoice creation until the observation date.
     metric:
       name: Accumulated Invoices Delay T2
-      description: Accumulated number of distinct invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
+      description: Accumulated number of distinct invoices with delay T2 (overdue) in the clustered segment
+        from invoice creation until the observation date.
       acronym: AIDT2
-      is_additive: True
+      is_additive: true
       business_stage: Collections
       hierarchy: Invoice analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   recovered_invoices_DT2_acc:
-    description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
+    description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the clustered
+      segment from invoice creation until the observation date.
     metric:
       name: Accumulated Recovered Invoices Delay T2
-      description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
+      description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the clustered
+        segment from invoice creation until the observation date.
       acronym: ARIDT2
-      is_additive: True
+      is_additive: true
       business_stage: Collections
       hierarchy: Invoice analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   due_amount_DT2_at_reference:
-    description: Total due amount for invoices with delay T2 (overdue) in the clustered segment at the reference date.
+    description: Total due amount for invoices with delay T2 (overdue) in the clustered segment at the
+      reference date.
     metric:
       name: Due Amount Delay T2 at Reference
-      description: Total due amount for invoices with delay T2 (overdue) in the clustered segment at the reference date.
+      description: Total due amount for invoices with delay T2 (overdue) in the clustered segment at the
+        reference date.
       acronym: DADT2AR
-      is_additive: True
+      is_additive: true
       business_stage: Collections
       hierarchy: Financial analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   due_amount_DT2_acc:
-    description: Accumulated total due amount for invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
+    description: Accumulated total due amount for invoices with delay T2 (overdue) in the clustered segment
+      from invoice creation until the observation date.
     metric:
       name: Accumulated Due Amount Delay T2
-      description: Accumulated total due amount for invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
+      description: Accumulated total due amount for invoices with delay T2 (overdue) in the clustered
+        segment from invoice creation until the observation date.
       acronym: ADADT2
-      is_additive: True
+      is_additive: true
       business_stage: Collections
       hierarchy: Financial analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   recovered_amount_DT2_acc:
-    description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
+    description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the clustered
+      segment from invoice creation until the observation date.
     metric:
       name: Accumulated Recovered Amount Delay T2
-      description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
+      description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the clustered
+        segment from invoice creation until the observation date.
       acronym: ARADT2
-      is_additive: True
+      is_additive: true
       business_stage: Collections
       hierarchy: Financial analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   recovery_rate_amount_t2:
-    description: Accumulated recovery rate on T2-delayed amount, computed as recovered_amount_DT2_acc divided by due_amount_DT2_acc.
+    description: Accumulated recovery rate on T2-delayed amount, computed as recovered_amount_DT2_acc
+      divided by due_amount_DT2_acc.
     metric:
       name: Recovery Rate Amount T2
-      description: Accumulated recovery rate on T2-delayed amount for the clustered segment, from invoice creation until the observation date.
+      description: Accumulated recovery rate on T2-delayed amount for the clustered segment, from invoice
+        creation until the observation date.
       acronym: RRAT2
-      is_additive: False
+      is_additive: false
       business_stage: Collections
       hierarchy: Financial analysis
-      approved_by: ae-finance-fintech@quintoandar.com.br
-      link_to_metric: ""
+      approved_by: juliana.hocihara@quintoandar.com.br
+      link_to_metric: ''
   is_brz_fintech_business_day:
     lineage:
-      - dw_public.dim_date.is_brz_fintech_business_day
+    - dw_public.dim_date.is_brz_fintech_business_day
     description: Flag indicating whether the reference date is a Brazilian fintech business day.
-    dimension: True
+    dimension: true
   next_brz_fintech_business_day:
     lineage:
-      - dw_public.dim_date.next_brz_fintech_business_day
+    - dw_public.dim_date.next_brz_fintech_business_day
     description: Next Brazilian fintech business day after the reference date.
-    dimension: True
+    dimension: true
   dt_pipe_period_start:
     lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_pipe
-    description: First day of the pipe-to-pipe period (the day after the pipe day) that the reference date belongs to.
-    dimension: True
+    - dw_collections_segmentation.fact_contract_wallet_timeline.dt_pipe
+    description: First day of the pipe-to-pipe period (the day after the pipe day) that the reference
+      date belongs to.
+    dimension: true
   dt_pipe:
     lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_pipe
+    - dw_collections_segmentation.fact_contract_wallet_timeline.dt_pipe
     description: Pipe date indicating when the contract entered the collections pipeline.
-    dimension: True
+    dimension: true
   dt_reference:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
     description: Reference date for the metrics observation.
-    dimension: True
+    dimension: true
   ts_load:
     description: Timestamp when the record was loaded into the table.
-    dimension: True
+    dimension: true

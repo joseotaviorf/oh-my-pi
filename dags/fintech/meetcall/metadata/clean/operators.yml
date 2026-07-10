@@ -1,15 +1,15 @@
 database_name: datalake_meetcall_clean
 table_name: operators
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: This table contains the registration and identification information of Meetcall operators. It includes details such as names, emails, positions, leadership information, admission and termination dates, and PA type. The data is essential for mapping operator profiles, managing access controls, and supporting HR and operational analytics.
 columns:
   id_operator_cyber:
-    description: Cyber operator login
+    description: Identifier for the operator cyber referenced by this financial record.
     lineage:
       - datalake_meetcall_raw.dadosoperadores.id_operador_cyber
   id_operator:
-    description: MeetCall operator login
+    description: Identifier for the operator referenced by this financial record.
     lineage:
       - datalake_meetcall_raw.dadosoperadores.id_operador_assessoria
   name:

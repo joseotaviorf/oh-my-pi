@@ -3,7 +3,7 @@ database_name: metric_fintech
 table_name: average_ongoing_package
 description: Average value of packages for signed VELO contracts per month.
 domain: Fintech
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   month:
     lineage:

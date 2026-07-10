@@ -3,7 +3,7 @@ database_name: metric_fintech
 table_name: active_gmv
 description: Gross Merchandise Value (GMV) of active VELO contracts per month.
 domain: Fintech
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   month_signed:
     lineage:

@@ -1,5 +1,6 @@
 database_name: datalake_ledger_clean
 table_name: transaction
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Data from the transaction table containing transaction details and timing information
 columns:

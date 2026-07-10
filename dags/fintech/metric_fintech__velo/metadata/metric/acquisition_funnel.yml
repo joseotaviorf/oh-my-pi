@@ -3,12 +3,12 @@ database_name: metric_fintech
 table_name: acquisition_funnel
 description: Quantity and percentage of Proposes on each step of the Acquisition Funnel per day.
 domain: Fintech
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   date:
     lineage:
       - dw_public.dim_date.date
-    description: Date base for each metric
+    description: Velo platform attribute describing date for condominium billing reconciliation.
     dimension: True
   propose_created:
     description: (Top of funnel) Quantity of guarantee proposal created.
