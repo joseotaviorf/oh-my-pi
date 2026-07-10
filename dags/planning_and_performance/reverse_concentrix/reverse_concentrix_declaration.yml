@@ -22,7 +22,6 @@ workflow:
     - "('webhelp','concentrix','cnx')"
 
   tables_customization:
-    segments_perspective: {}
     tickets_perspective: {}
     tickets_contract: {}
     cases_perspective: {}
