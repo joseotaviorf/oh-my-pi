@@ -1,18 +1,18 @@
 ---
 database_name: dw_revenue_lines
 table_name: dim_brokerage_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing brokerage fee and payment data by contract"
 columns:
   sk_brokerage_fee:
     description: "Distinct ID for brokerage fee"
   id_contract_ebdb:
-    description: "Contract ID on EBDB"
+    description: Identifier for the contract ebdb referenced by this financial record.
     lineage:
       - datalake_revenue_lines.brokerage_fee.id_contract_ebdb
   brokerage_share:
-    description: "Share of brokerage fee"
+    description: Financial attribute representing brokerage share on the dim_brokerage_fee dataset.
     lineage:
       - datalake_revenue_lines.brokerage_fee.brokerage_share
   invoice_payment_status:
@@ -24,11 +24,11 @@ columns:
     lineage:
       - datalake_revenue_lines.brokerage_fee.first_rental_commission
   agent_brokerage_share:
-    description: "Share of brokerage agent"
+    description: Financial attribute representing agent brokerage share on the dim_brokerage_fee dataset.
     lineage:
       - datalake_revenue_lines.brokerage_fee.agent_brokerage_share
   brokerage_split_percentage:
-    description: "Split Percentage for the brokerage fee"
+    description: Financial attribute representing brokerage split percentage on the dim_brokerage_fee dataset.
     lineage:
       - datalake_revenue_lines.brokerage_fee.brokerage_split_percentage
   prod_theorical_amount:
@@ -40,11 +40,11 @@ columns:
     lineage:
       - datalake_revenue_lines.brokerage_fee.invoice_theorical_amount
   invoice_paid_amount:
-    description: "Paid amount in BRL"
+    description: Financial attribute representing invoice paid amount on the dim_brokerage_fee dataset.
     lineage:
       - datalake_revenue_lines.brokerage_fee.invoice_paid_amount
   accrual_year_month:
-    description: "Reference year-month"
+    description: Financial attribute representing accrual year month on the dim_brokerage_fee dataset.
     lineage:
       - datalake_revenue_lines.brokerage_fee.accrual_year_month
   dt_due:
@@ -56,6 +56,9 @@ columns:
     lineage:
       - datalake_revenue_lines.brokerage_fee.dt_paid
   dt_contract_start:
-    description: "Contract start date"
+    description: Calendar date associated with contract start in the financial workflow.
     lineage:
       - datalake_revenue_lines.brokerage_fee.dt_contract_start
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

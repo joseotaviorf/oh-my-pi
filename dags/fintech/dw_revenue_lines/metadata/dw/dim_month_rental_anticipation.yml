@@ -3,7 +3,7 @@ table_name: dim_month_rental_anticipation
 description: This For Rent addon makes it possible to our client (PP) to anticipate
   one rent - MRA
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_month_rental_anticipation:
     lineage:
@@ -44,7 +44,7 @@ columns:
   accrual_year_month:
     lineage:
     - datalake_revenue_lines.month_rental_anticipation.accrual_year_month
-    description: Reference year-month
+    description: Financial attribute representing accrual year month on the dim_month_rental_anticipation dataset.
   dt_created:
     lineage:
     - datalake_revenue_lines.month_rental_anticipation.dt_created

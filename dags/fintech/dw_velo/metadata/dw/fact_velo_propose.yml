@@ -2,7 +2,7 @@ database_name: dw_velo
 table_name: fact_velo_propose
 description: Fact table focused on the Propose and Contracts of Velo systems
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_propose:
     lineage:

@@ -1,8 +1,8 @@
 database_name: dw_revenue_lines
 table_name: dim_fire_insurance
-description: Fire Insurance
+description: One row per dim fire insurance in the Fintech data warehouse layer, sourced from dw_revenue_lines for payments, billing, and financial operations reporting.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_contract:
     description: "Contract identification number"
@@ -25,11 +25,11 @@ columns:
     lineage:
     - datalake_revenue_lines.fire_insurance.guarantee
   origin_fact:
-    description: "Payment origin"
+    description: Financial attribute representing origin fact on the dim_fire_insurance dataset.
     lineage:
     - datalake_revenue_lines.fire_insurance.origin_fact
   raw_payment_amount:
-    description: "Total amount of payment"
+    description: Financial attribute representing raw payment amount on the dim_fire_insurance dataset.
     lineage:
     - datalake_revenue_lines.fire_insurance.raw_payment_amount
   rent:
@@ -48,3 +48,6 @@ columns:
     description: "Timestamp of the guarantee created date"
     lineage:
     - datalake_revenue_lines.fire_insurance.dt_start
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

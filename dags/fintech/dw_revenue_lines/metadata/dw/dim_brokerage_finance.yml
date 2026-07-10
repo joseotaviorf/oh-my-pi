@@ -3,7 +3,7 @@ table_name: dim_brokerage_finance
 description: This For Rent addon makes it possible to our clients to split brokerage
   fee - BFI
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_brokerage_finance:
     lineage:
@@ -53,7 +53,7 @@ columns:
   accrual_year_month:
     lineage:
     - datalake_revenue_lines.brokerage_finance.accrual_year_month
-    description: Reference year-month
+    description: Financial attribute representing accrual year month on the dim_brokerage_finance dataset.
   dt_bf_created:
     lineage:
     - datalake_revenue_lines.brokerage_finance.dt_bf_created
@@ -61,7 +61,7 @@ columns:
   dt_due_fee:
     lineage:
     - datalake_revenue_lines.brokerage_finance.dt_due_fee
-    description: Fee due date
+    description: Calendar date associated with due fee in the financial workflow.
   dt_paid_fee:
     lineage:
     - datalake_revenue_lines.brokerage_finance.dt_paid_fee

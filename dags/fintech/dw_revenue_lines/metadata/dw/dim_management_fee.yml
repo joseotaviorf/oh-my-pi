@@ -1,18 +1,18 @@
 ---
 database_name: dw_revenue_lines
 table_name: dim_management_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing management fee and payment data by contract"
 columns:
   sk_management_fee:
     description: "Distinct ID for management fee"
   id_contract_ebdb:
-    description: "Contract ID on EBDB"
+    description: Identifier for the contract ebdb referenced by this financial record.
     lineage:
       - datalake_revenue_lines.management_fee.id_contract_ebdb
   management_fee_share:
-    description: "Share of management fee"
+    description: Financial attribute representing management fee share on the dim_management_fee dataset.
     lineage:
       - datalake_revenue_lines.management_fee.management_fee_share
   payment_status:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_revenue_lines.management_fee.monthly_administration_fee
   administration_split_percentage:
-    description: "Split Percentage for the administration fee"
+    description: Financial attribute representing administration split percentage on the dim_management_fee dataset.
     lineage:
       - datalake_revenue_lines.management_fee.administration_split_percentage
   prod_theorical_amount:
@@ -36,11 +36,11 @@ columns:
     lineage:
       - datalake_revenue_lines.management_fee.invoice_theorical_amount
   invoice_paid_amount:
-    description: "Paid amount in BRL"
+    description: Financial attribute representing invoice paid amount on the dim_management_fee dataset.
     lineage:
       - datalake_revenue_lines.management_fee.invoice_paid_amount
   accrual_year_month:
-    description: "Reference year-month"
+    description: Financial attribute representing accrual year month on the dim_management_fee dataset.
     lineage:
       - datalake_revenue_lines.management_fee.accrual_year_month
   dt_due:
@@ -51,3 +51,6 @@ columns:
     description: "Invoice's paid date"
     lineage:
       - datalake_revenue_lines.management_fee.dt_paid
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

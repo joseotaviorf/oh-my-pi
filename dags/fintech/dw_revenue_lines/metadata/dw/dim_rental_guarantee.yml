@@ -1,8 +1,8 @@
 database_name: dw_revenue_lines
 table_name: dim_rental_guarantee
-description: Rental guarantees
+description: One row per dim rental guarantee in the Fintech data warehouse layer, sourced from dw_revenue_lines for payments, billing, and financial operations reporting.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_contract:
     description: "Contract identification number"
@@ -25,19 +25,19 @@ columns:
     lineage:
     - datalake_revenue_lines.rental_guarantee.number_payments
   origin_fact:
-    description: "Payment origin"
+    description: Financial attribute representing origin fact on the dim_rental_guarantee dataset.
     lineage:
     - datalake_revenue_lines.rental_guarantee.origin_fact
   raw_payment_amount:
-    description: "Total amount of payment"
+    description: Financial attribute representing raw payment amount on the dim_rental_guarantee dataset.
     lineage:
     - datalake_revenue_lines.rental_guarantee.raw_payment_amount
   revenue_qa:
-    description: "Revenue total"
+    description: Financial attribute representing revenue qa on the dim_rental_guarantee dataset.
     lineage:
     - datalake_revenue_lines.rental_guarantee.revenue_qa
   guarantee_type:
-    description: "Type of the guarantee"
+    description: Financial attribute representing guarantee type on the dim_rental_guarantee dataset.
     lineage:
     - datalake_revenue_lines.rental_guarantee.guarantee_type
   ts_guarantee_created:

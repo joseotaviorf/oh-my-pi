@@ -1,7 +1,7 @@
 ---
 database_name: dw_velo
 table_name: fact_velo_payment_legacy
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Fact table focused on the Payments context for Velo (Not migrated payments from 2.0 only).
 columns:
@@ -46,7 +46,7 @@ columns:
     lineage:
       - datalake_velo.payment_legacy.id_customer
   id_unicid:
-    description: Business ID for UNICID.
+    description: Identifier for the unicid referenced by this financial record.
     lineage:
       - datalake_velo.payment_legacy.id_unicid
   id_subscription:
@@ -62,7 +62,7 @@ columns:
     lineage:
       - datalake_velo.payment_legacy.payment_type
   status:
-    description: Status description.
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_velo.payment_legacy.status
   payment_gateway:
@@ -74,7 +74,7 @@ columns:
     lineage:
       - datalake_velo.payment_legacy.payment_category
   invoice_url:
-    description: URL of charged invoice.
+    description: Velo platform attribute describing invoice url for condominium billing reconciliation.
     lineage:
       - datalake_velo.payment_legacy.invoice_url
   description:
@@ -82,7 +82,7 @@ columns:
     lineage:
       - datalake_velo.payment_legacy.description
   due_amount:
-    description: Amount that is due.
+    description: Velo platform attribute describing due amount for condominium billing reconciliation.
     lineage:
       - datalake_velo.payment_legacy.due_amount
   net_amount:
@@ -134,4 +134,4 @@ columns:
     lineage:
       - datalake_velo.payment_legacy.ts_updated
   ts_load:
-    description: Load timestamp
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

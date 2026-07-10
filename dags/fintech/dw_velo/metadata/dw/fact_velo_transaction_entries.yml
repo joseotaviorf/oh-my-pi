@@ -3,7 +3,7 @@ table_name: fact_velo_transaction_entries
 description: Fact table focused on the Entries added to transactions from Velo, registered
   on OMIE systems.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_transaction_entry:
     lineage:
@@ -36,11 +36,11 @@ columns:
   due_amount:
     lineage:
     - datalake_velo.transaction_entries.due_amount
-    description: Entry's due amount
+    description: Velo platform attribute describing due amount for condominium billing reconciliation.
   paid_amount:
     lineage:
     - datalake_velo.transaction_entries.paid_amount
-    description: Entry's paid amount
+    description: Velo platform attribute describing paid amount for condominium billing reconciliation.
   is_occurency:
     lineage:
     - datalake_velo.transaction_entries.is_occurency

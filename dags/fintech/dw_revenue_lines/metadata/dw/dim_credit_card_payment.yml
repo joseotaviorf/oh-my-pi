@@ -3,7 +3,7 @@ table_name: dim_credit_card_payment
 description: This For Rent addon opportunizes our clients to pay using credit card
   - CCP
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_credit_card_payment:
     lineage:
@@ -16,11 +16,11 @@ columns:
   status:
     lineage:
     - datalake_revenue_lines.credit_card_payment.status
-    description: Status of the credit card payment
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   brand_name:
     lineage:
     - datalake_revenue_lines.credit_card_payment.brand_name
-    description: Credit card brand
+    description: Financial attribute representing brand name on the dim_credit_card_payment dataset.
   type_paid:
     lineage:
     - datalake_revenue_lines.credit_card_payment.type_paid
@@ -35,7 +35,7 @@ columns:
   invoice_theorical_amount:
     lineage:
     - datalake_revenue_lines.credit_card_payment.invoice_theorical_amount
-    description: Invoice total amount
+    description: Financial attribute representing invoice theorical amount on the dim_credit_card_payment dataset.
   invoice_paid_amount:
     lineage:
     - datalake_revenue_lines.credit_card_payment.invoice_paid_amount
@@ -47,7 +47,7 @@ columns:
   accrual_year_month:
     lineage:
     - datalake_revenue_lines.credit_card_payment.accrual_year_month
-    description: Reference year-month
+    description: Financial attribute representing accrual year month on the dim_credit_card_payment dataset.
   dt_ccp_created:
     lineage:
     - datalake_revenue_lines.credit_card_payment.dt_ccp_created

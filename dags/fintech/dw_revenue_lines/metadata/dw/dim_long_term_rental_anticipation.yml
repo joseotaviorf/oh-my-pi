@@ -3,7 +3,7 @@ table_name: dim_long_term_rental_anticipation
 description: This For Rent addon makes it possible to our client (PP) to anticipate
   more than one rent - LRA
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_long_term_rental_anticipation:
     lineage:
@@ -61,7 +61,7 @@ columns:
   accrual_year_month:
     lineage:
     - datalake_revenue_lines.long_term_rental_anticipation.accrual_year_month
-    description: Reference year-month
+    description: Financial attribute representing accrual year month on the dim_long_term_rental_anticipation dataset.
   dt_due:
     lineage:
     - datalake_revenue_lines.long_term_rental_anticipation.dt_due
