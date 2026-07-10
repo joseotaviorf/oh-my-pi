@@ -1,22 +1,33 @@
 database_name: datalake_vans_clean
 table_name: bank_boleto
+description:
+  One row per bank boleto in the Fintech clean layer, sourced from
+  datalake_vans_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_vans_raw.bankboleto.id
+    description: Financial attribute representing id on the bank_boleto dataset.
   id_bank:
     lineage:
       - datalake_vans_raw.bankboleto.bank_id
+    description: Identifier for the bank referenced by this financial record.
   agency:
     lineage:
       - datalake_vans_raw.bankboleto.agency
+    description: Financial attribute representing agency on the bank_boleto dataset.
   account:
     lineage:
       - datalake_vans_raw.bankboleto.account
+    description: Financial attribute representing account on the bank_boleto dataset.
   is_active:
     lineage:
       - datalake_vans_raw.bankboleto.active
+    description: Indicates whether active applies to this financial record.
   account_digit:
     lineage:
       - datalake_vans_raw.bankboleto.account_digit
+    description: Financial attribute representing account digit on the bank_boleto dataset.

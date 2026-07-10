@@ -1,37 +1,53 @@
 database_name: datalake_robin_hood_clean
 table_name: payee
+description:
+  One row per payee in the Fintech clean layer, sourced from
+  datalake_robin_hood_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_robin_hood_raw.payee.id
+    description: Financial attribute representing id on the payee dataset.
   id_external:
     lineage:
       - datalake_robin_hood_raw.payee.external_id
+    description: Identifier for the external referenced by this financial record.
   id_external_agent:
     lineage:
       - datalake_robin_hood_raw.payee.external_agent_id
+    description: Identifier for the external agent referenced by this financial record.
   id_external_affiliate:
     lineage:
       - datalake_robin_hood_raw.payee.external_affiliate_id
+    description: Identifier for the external affiliate referenced by this financial record.
   id_external_photographer:
     lineage:
       - datalake_robin_hood_raw.payee.external_photographer_id
+    description: Identifier for the external photographer referenced by this financial record.
   id_external_salesman:
     lineage:
       - datalake_robin_hood_raw.payee.external_salesman_id
+    description: Identifier for the external salesman referenced by this financial record.
   name:
     lineage:
       - datalake_robin_hood_raw.payee.name
+    description: Financial attribute representing name on the payee dataset.
   email:
     lineage:
       - datalake_robin_hood_raw.payee.email
+    description: Financial attribute representing email on the payee dataset.
   document_number:
     lineage:
       - datalake_robin_hood_raw.payee.document_number
+    description: Financial attribute representing document number on the payee dataset.
   ts_created:
     lineage:
       - datalake_robin_hood_raw.payee.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_robin_hood_raw.payee.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

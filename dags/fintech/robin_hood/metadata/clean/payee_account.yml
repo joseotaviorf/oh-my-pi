@@ -1,25 +1,37 @@
 database_name: datalake_robin_hood_clean
 table_name: payee_account
+description:
+  One row per payee account in the Fintech clean layer, sourced from
+  datalake_robin_hood_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_robin_hood_raw.payee_account.id
+    description: Financial attribute representing id on the payee_account dataset.
   id_payee:
     lineage:
       - datalake_robin_hood_raw.payee_account.payee_id
+    description: Identifier for the payee referenced by this financial record.
   id_related_account:
     lineage:
       - datalake_robin_hood_raw.payee_account.related_account_id
+    description: Identifier for the related account referenced by this financial record.
   related_account_type:
     lineage:
       - datalake_robin_hood_raw.payee_account.related_account_type
+    description: Financial attribute representing related account type on the payee_account dataset.
   id_source:
     lineage:
       - datalake_robin_hood_raw.payee_account.source_id
+    description: Identifier for the source referenced by this financial record.
   ts_created:
     lineage:
       - datalake_robin_hood_raw.payee_account.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_disabled:
     lineage:
       - datalake_robin_hood_raw.payee_account.disabled_at
+    description: Timestamp when disabled occurred in the upstream fintech system.

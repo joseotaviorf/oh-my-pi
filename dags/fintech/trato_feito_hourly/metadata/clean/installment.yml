@@ -1,75 +1,114 @@
 ---
 database_name: datalake_trato_feito_hourly_clean
 table_name: installment
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Installment table from Trato Feito product"
+description: |
+  Clean-layer hourly CDC of Trato Feito installments — the new financial objects generated from
+  debt negotiations (amounts, fees, due dates, and statuses). Supports near-real-time Collections
+  operations on installment schedules. Updated hourly between 08:00 and 21:00 (Airflow schedule
+  `0 8-21 * * *`). Filter year/month/day for partition pruning on incremental loads.
 columns:
   id:
-    description: "Main ID for installment"
+    description: Unique installment identifier in Trato Feito.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.id
   id_external:
-    description: "External ID"
+    description: External installment identifier used for integration with billing/payment systems.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.external_id
   id_negotiation:
-    description: "ID that connects with negotiation table"
+    description: Foreign key to the parent negotiation that generated this installment.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.negotiation_id
   id_installment_charge:
-    description: Installment Charge ID (FK table installment_charges)
+    description: Foreign key to the installment charge record associated with this installment.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.installment_charge_id
   id_billing:
-    description: Billing ID (FK table billing)
+    description: Foreign key to the billing record associated with this installment.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.billing_id
   status:
-    description: "Status of installment"
+    description: Current lifecycle status of the installment in Trato Feito.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.status
   status_reason:
-    description: ""
+    description: Reason code or text explaining the current installment status.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.status_reason
   external_index:
-    description: ""
+    description: Ordinal index of the installment within the negotiation schedule (e.g. 1st, 2nd).
     lineage:
       - datalake_trato_feito_hourly_raw.installment.external_index
   adm_fee_amount:
-    description: "Amount charged of Administration Fee"
+    description: Administration fee amount charged on this installment.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.adm_fee_amount
   installment_fee_amount:
-    description: "Installment Fee"
+    description: Installment fee amount charged on this installment.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.installment_fee_amount
   debts_fee_amount:
-    description: "Debts Fee"
+    description: Debt-related fee amount included in this installment.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.debts_fee_amount
   discount_amount:
-    description: "Discount Amount"
+    description: Discount amount applied to this installment.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.discount_amount
   total_amount:
-    description: "Total Amount"
+    description: Total amount due for this installment after fees and discounts.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.total_amount
   dt_due:
-    description: "Date Due"
+    description: Due date of the installment payment.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.due_date
   ts_expired:
-    description: "Timestamp of expiration"
+    description: Timestamp when the installment expired or became invalid.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.expired_at
   ts_created:
-    description: "Timestamp of creation"
+    description: Timestamp when the installment was created in Trato Feito.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.created_at
   ts_updated:
-    description: "Timestamp of last update"
+    description: Timestamp when the installment was last updated in Trato Feito.
     lineage:
       - datalake_trato_feito_hourly_raw.installment.updated_at
+  rev:
+    description: Revision number of the installment record in the source system.
+    lineage:
+      - datalake_trato_feito_hourly_raw.installment.rev
+  installment_interest:
+    description: Interest amount charged on this installment.
+    lineage:
+      - datalake_trato_feito_hourly_raw.installment.installment_interest
+  month:
+    description: Month partition for incremental loading; filter with year/day for pruning.
+    lineage:
+      - datalake_trato_feito_hourly_raw.installment.month
+  credit_card_fee:
+    description: Credit-card fee amount charged on this installment when paid by card.
+    lineage:
+      - datalake_trato_feito_hourly_raw.installment.credit_card_fee
+  year:
+    description: Year partition for incremental loading; filter with month/day for pruning.
+    lineage:
+      - datalake_trato_feito_hourly_raw.installment.year
+  ts_load:
+    description: Timestamp when the row was materialized into the lake by the ETL pipeline.
+    lineage: []
+  day:
+    description: Day partition for incremental loading; filter with year/month for pruning.
+    lineage:
+      - datalake_trato_feito_hourly_raw.installment.day
+  installment_costs:
+    description: Additional cost amount included in this installment.
+    lineage:
+      - datalake_trato_feito_hourly_raw.installment.installment_costs
+  installment_lawyers_fee:
+    description: Lawyers fee amount charged on this installment.
+    lineage:
+      - datalake_trato_feito_hourly_raw.installment.installment_lawyers_fee

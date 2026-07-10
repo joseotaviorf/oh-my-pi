@@ -1,64 +1,89 @@
 database_name: datalake_robin_hood_clean
 table_name: payment_request
+description:
+  One row per payment request in the Fintech clean layer, sourced from
+  datalake_robin_hood_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_robin_hood_raw.payment_request.id
+    description: Financial attribute representing id on the payment_request dataset.
   id_parent:
     lineage:
       - datalake_robin_hood_raw.payment_request.parent_id
+    description: Identifier for the parent referenced by this financial record.
   id_lot:
     lineage:
       - datalake_robin_hood_raw.payment_request.lot_id
+    description: Identifier for the lot referenced by this financial record.
   id_source:
     lineage:
       - datalake_robin_hood_raw.payment_request.source_id
+    description: Identifier for the source referenced by this financial record.
   id_payee:
     lineage:
       - datalake_robin_hood_raw.payment_request.payee_id
+    description: Identifier for the payee referenced by this financial record.
   id_payee_account:
     lineage:
       - datalake_robin_hood_raw.payment_request.payee_account_id
+    description: Identifier for the payee account referenced by this financial record.
   id_schedule:
     lineage:
       - datalake_robin_hood_raw.payment_request.schedule_id
+    description: Identifier for the schedule referenced by this financial record.
   id_next_attempt:
     lineage:
       - datalake_robin_hood_raw.payment_request.next_attempt_id
+    description: Identifier for the next attempt referenced by this financial record.
   payment_method:
     lineage:
       - datalake_robin_hood_raw.payment_request.payment_method
+    description: Financial attribute representing payment method on the payment_request dataset.
   due_amount:
     lineage:
       - datalake_robin_hood_raw.payment_request.due_amount
+    description: Financial attribute representing due amount on the payment_request dataset.
   status:
     lineage:
       - datalake_robin_hood_raw.payment_request.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   metadata:
     lineage:
       - datalake_robin_hood_raw.payment_request.metadata
+    description: Structured JSON payload with provider-specific attributes not flattened into columns.
   dt_errored:
     lineage:
       - datalake_robin_hood_raw.payment_request.error_at
+    description: Calendar date associated with errored in the financial workflow.
   dt_scheduled:
     lineage:
       - datalake_robin_hood_raw.payment_request.scheduled_at
+    description: Calendar date associated with scheduled in the financial workflow.
   dt_due:
     lineage:
       - datalake_robin_hood_raw.payment_request.due_date
+    description: Calendar date associated with due in the financial workflow.
   dt_paid:
     lineage:
       - datalake_robin_hood_raw.payment_request.paid_at
+    description: Calendar date associated with paid in the financial workflow.
   dt_chargedback:
     lineage:
       - datalake_robin_hood_raw.payment_request.chargeback_at
+    description: Calendar date associated with chargedback in the financial workflow.
   ts_canceled:
     lineage:
       - datalake_robin_hood_raw.payment_request.canceled_at
+    description: Timestamp when canceled occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_robin_hood_raw.payment_request.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_robin_hood_raw.payment_request.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

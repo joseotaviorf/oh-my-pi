@@ -4,7 +4,10 @@ dag:
   owner: Data Fintech
   documentation:
     dag_purpose: |
-      [Trato Feito](https://github.com/quintoandar/trato-feito) is a microservice that manages the negotiation flows between QuintoAndar and its debtors.
+      [Trato Feito](https://github.com/quintoandar/trato-feito) manages negotiations with defaulting
+      clients — negotiation objects, conditions, statuses, and the installments/payments they generate.
+      This hourly CDC DAG (`0 8-21 * * *`, 08:00–21:00) gives Collections near-real-time data on
+      negotiations made and installment payments.
 workflow:
   type: cdc
   layer: raw

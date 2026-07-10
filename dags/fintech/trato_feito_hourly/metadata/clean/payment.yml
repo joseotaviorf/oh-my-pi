@@ -1,31 +1,71 @@
 ---
 database_name: datalake_trato_feito_hourly_clean
 table_name: payment
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Data about the payment of the negotiation installments"
+description: |
+  Clean-layer hourly CDC of Trato Feito payments against negotiation installments. Tracks payment
+  type, status, paid/credit dates, and processing timestamps so Collections operations can monitor
+  installment payments near real time. Updated hourly between 08:00 and 21:00 (Airflow schedule
+  `0 8-21 * * *`). Filter year/month/day for partition pruning on incremental loads.
 columns:
   id:
     lineage:
       - datalake_trato_feito_hourly_raw.payment.id
+    description: Unique payment identifier in Trato Feito.
   id_installment:
     lineage:
       - datalake_trato_feito_hourly_raw.payment.installment_id
+    description: Foreign key to the installment this payment settles.
   type:
     lineage:
       - datalake_trato_feito_hourly_raw.payment.type
+    description: Payment type or method recorded by Trato Feito.
   metadata:
     lineage:
       - datalake_trato_feito_hourly_raw.payment.metadata
+    description: Structured JSON payload with provider-specific attributes not flattened into columns.
   status:
     lineage:
       - datalake_trato_feito_hourly_raw.payment.status
+    description: Current lifecycle status of the payment in Trato Feito.
   ts_created:
     lineage:
       - datalake_trato_feito_hourly_raw.payment.created_at
+    description: Timestamp when the payment was created in Trato Feito.
   ts_updated:
     lineage:
       - datalake_trato_feito_hourly_raw.payment.updated_at
+    description: Timestamp when the payment was last updated in Trato Feito.
   ts_started_processing:
     lineage:
-      - datalake_trato_feito_raw.payment.started_processing_at
+      - datalake_trato_feito_hourly_raw.payment.started_processing_at
+    description: Timestamp when Trato Feito began async settlement of this installment payment
+      (provider charge or reconciliation kickoff), before status reaches paid/failed.
+  month:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.month
+    description: Month partition for incremental loading; filter with year/day for pruning.
+  year:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.year
+    description: Year partition for incremental loading; filter with month/day for pruning.
+  id_installment_external:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.installment_external_id
+    description: External installment identifier used for integration with billing/payment systems.
+  day:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.day
+    description: Day partition for incremental loading; filter with year/month for pruning.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the lake by the ETL pipeline.
+  dt_paid:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.paid_at
+    description: Date when the installment payment was paid.
+  dt_credit:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.credit_date
+    description: Credit date when the payment was recognized financially.

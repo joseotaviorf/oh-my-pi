@@ -1,40 +1,78 @@
 ---
 database_name: datalake_trato_feito_hourly_clean
 table_name: negotiation
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Data about negotiations of debts"
+description: |
+  Clean-layer hourly CDC of Trato Feito negotiations with defaulting clients. Stores negotiation
+  objects, conditions, and lifecycle statuses from the product database. Feeds near-real-time
+  Collections operations on deals made. Updated hourly between 08:00 and 21:00 (Airflow schedule
+  `0 8-21 * * *`). Filter year/month/day for partition pruning on incremental loads.
 columns:
   id:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.id
+    description: Unique negotiation identifier in Trato Feito.
   id_collector:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.collector_id
+    description: Internal collector (agency/operator) identifier linked to the negotiation.
   id_collector_external:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.collector_external_id
+    description: External collector identifier used for integration with collection systems.
   id_debtor:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.debtor_id
+    description: Internal debtor identifier for the defaulting client in the negotiation.
   id_debtor_external:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.debtor_external_id
+    description: External debtor identifier used to join with other product systems.
   status:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.status
+    description: Current lifecycle status of the negotiation in Trato Feito.
   currency:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.currency
+    description: ISO currency code of the negotiated amounts (typically BRL).
   status_reason:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.status_reason
+    description: Reason code or text explaining the current negotiation status.
   consultancy:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.consultancy
+    description: Consultancy or collection partner associated with the negotiation.
   ts_created:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.created_at
+    description: Timestamp when the negotiation was created in Trato Feito.
   ts_updated:
     lineage:
       - datalake_trato_feito_hourly_raw.negotiation.updated_at
+    description: Timestamp when the negotiation was last updated in Trato Feito.
+  month:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.month
+    description: Month partition for incremental loading; filter with year/day for pruning.
+  year:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.year
+    description: Year partition for incremental loading; filter with month/day for pruning.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the lake by the ETL pipeline.
+  manage_type:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.manage_type
+    description: Management type classifying how the negotiation is handled operationally.
+  day:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.day
+    description: Day partition for incremental loading; filter with year/month for pruning.
+  payload:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.payload
+    description: Structured payload with negotiation conditions and attributes not flattened into columns.

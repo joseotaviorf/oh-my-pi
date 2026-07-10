@@ -1,16 +1,25 @@
 database_name: datalake_vans_clean
 table_name: bank
+description:
+  One row per bank in the Fintech clean layer, sourced from
+  datalake_vans_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_vans_raw.bank.id
+    description: Financial attribute representing id on the bank dataset.
   name:
     lineage:
       - datalake_vans_raw.bank.name
+    description: Financial attribute representing name on the bank dataset.
   acronym:
     lineage:
       - datalake_vans_raw.bank.acronym
+    description: Financial attribute representing acronym on the bank dataset.
   code:
     lineage:
       - datalake_vans_raw.bank.code
+    description: Financial attribute representing code on the bank dataset.

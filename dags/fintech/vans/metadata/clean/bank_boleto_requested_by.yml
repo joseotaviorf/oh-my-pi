@@ -1,19 +1,29 @@
 database_name: datalake_vans_clean
 table_name: bank_boleto_requested_by
+description:
+  One row per bank boleto requested by in the Fintech clean layer, sourced
+  from datalake_vans_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_vans_raw.bankboletorequestedby.id
+    description: Financial attribute representing id on the bank_boleto_requested_by dataset.
   requested_by:
     lineage:
       - datalake_vans_raw.bankboletorequestedby.requested_by
+    description: Financial attribute representing requested by on the bank_boleto_requested_by dataset.
   id_bank_boleto:
     lineage:
       - datalake_vans_raw.bankboletorequestedby.bank_boleto_id
+    description: Identifier for the bank boleto referenced by this financial record.
   is_active:
     lineage:
       - datalake_vans_raw.bankboletorequestedby.active
+    description: Indicates whether active applies to this financial record.
   is_fallback:
     lineage:
       - datalake_vans_raw.bankboletorequestedby.fallback
+    description: Indicates whether fallback applies to this financial record.
