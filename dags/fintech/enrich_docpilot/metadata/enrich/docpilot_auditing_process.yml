@@ -27,11 +27,11 @@ columns:
   proponent_cpf:
     lineage:
       - datalake_quinturk_clean.task.proponent_cpf
-    description: "Proponent CPF number."
+    description: "CPF tax identifier of the rental proponent linked to the audited document."
   proponent_name:
     lineage:
       - datalake_quinturk_clean.task.proponent_name
-    description: "Proponent name"
+    description: "Full name of the rental proponent linked to the audited document."
   lead_time:
     lineage:
       - datalake_quinturk_clean.task_completion.lead_time
@@ -66,7 +66,7 @@ columns:
   payslip_reference_period:
     lineage:
       - datalake_quinturk_clean.task_completion.result
-    description: "The reference period of the payslip."
+    description: "Month and year the payslip income amounts refer to, as marked by the analyst."
   bank_statement_start_date:
     lineage:
       - datalake_quinturk_clean.task_completion.result
@@ -98,6 +98,6 @@ columns:
   ts_updated:
     lineage:
       - datalake_quinturk_clean.task_completion.ts_updated
-    description: "Updated timestamp."
+    description: "When the analyst last saved the review annotation in Label Studio."
   ts_load:
-    description: "Load timestamp."
+    description: "When this row was loaded into the enrich layer by the ETL pipeline."

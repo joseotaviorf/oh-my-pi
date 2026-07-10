@@ -42,7 +42,7 @@ columns:
   number_of_errors:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The number of errors in extraction."
+    description: "Count of validation issues found while DocPilot extracted income from the document."
   file_path:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
@@ -70,7 +70,7 @@ columns:
   statement_type:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "Bank statement type."
+    description: "Category of bank statement format detected when processing the income document."
   llm_normalized_bank_name:
     lineage:
       - datalake_docpilot_clean.income_extraction.errors
@@ -138,13 +138,11 @@ columns:
   reference_period:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The reference period of the extracted income, which corresponds to the period of the document."
+    description: "Month or period the extracted income amount refers to, matching the document reference period."
   reference_date:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data.reference_date
-    description: "The reference date of the extracted income, which corresponds to the date when the document was processed."
-  document_number:
-    description: "Ranking based on the document ID and reference period to indicate the order of the processed documents."
+    description: "Reference date of the extracted income entry within the document period."
   is_suspicious:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
@@ -152,7 +150,7 @@ columns:
   is_dates_divergent:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "Based on the metadata analysis, indicates if there is any divergent date."
+    description: "Whether metadata analysis found inconsistent dates within the document."
   is_main_user:
     lineage:
       - datalake_ebdb_user.user.id
@@ -160,22 +158,22 @@ columns:
   dt_document_date:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The payslip date"
+    description: "Issue or reference date extracted from the payslip or bank statement."
   dt_document_start_date:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The bank statement start date"
+    description: "Start date of the bank statement period covered by the document."
   dt_document_end_date:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The bank statement start date"
+    description: "End date of the bank statement period covered by the document."
   ts_created:
     lineage:
       - datalake_docpilot_clean.income_extraction.ts_created
-    description: "Creation timestamp."
+    description: "When the income extraction record was first created in DocPilot."
   ts_updated:
     lineage:
       - datalake_docpilot_clean.income_extraction.ts_updated
-    description: "Updated timestamp."
+    description: "When the income extraction record was last updated in DocPilot."
   ts_load:
-    description: "Load timestamp."
+    description: "When this row was loaded into the enrich layer by the ETL pipeline."
