@@ -43,6 +43,10 @@ columns:
     lineage:
       - datalake_partner_payment_raw.bills.payment_provider
     description: Name of the external system responsible for processing the payment.
+  errors:
+    lineage:
+      - datalake_partner_payment_raw.bills.errors
+    description: Details of errors encountered while processing the bill, if any (e.g. payment provider rejection or validation failure).
   ts_created:
     lineage:
       - datalake_partner_payment_raw.bills.created_at

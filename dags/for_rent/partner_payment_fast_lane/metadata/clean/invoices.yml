@@ -32,6 +32,10 @@ columns:
     lineage:
       - datalake_partner_payment_raw.invoices.version
     description: Record version used for optimistic concurrency control in the source system.
+  errors:
+    lineage:
+      - datalake_partner_payment_raw.invoices.errors
+    description: Details of errors encountered while processing the invoice, if any (e.g. BlobVault upload failure or payment provider rejection).
   dt_upload:
     lineage:
       - datalake_partner_payment_raw.invoices.upload_date

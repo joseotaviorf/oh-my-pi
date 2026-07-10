@@ -30,3 +30,5 @@ workflow:
       clean_table_name: operation_event
     additionals:
       clean_table_name: additionals
+    invoices:
+      clean_table_name: invoices

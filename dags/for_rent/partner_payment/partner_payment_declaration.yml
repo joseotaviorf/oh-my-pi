@@ -31,8 +31,6 @@ workflow:
       clean_table_name: bill_reviews
     payments_period:
       clean_table_name: payments_period
-    invoices:
-      clean_table_name: invoices
     invoices_aud:
       clean_table_name: invoices_aud
     company_contract_type:

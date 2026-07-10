@@ -5,6 +5,7 @@ SELECT
     status,
     invoice_receipt_number,
     version,
+    errors,
     upload_date AS dt_upload,
     created_at AS ts_created,
     updated_at AS ts_updated
