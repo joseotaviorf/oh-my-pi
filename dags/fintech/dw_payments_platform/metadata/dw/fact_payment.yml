@@ -1,7 +1,7 @@
 ---
 database_name: dw_payments_platform
 table_name: fact_payment
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "This table contains all payment transactions from different sources (checkout, wallstreet, vans) unified in a single view"
 columns:
@@ -36,7 +36,7 @@ columns:
   id_finance_entity:
     lineage:
       - datalake_payments_platform.payment.id_finance_entity
-    description: "ID of the finance entity in the payment"
+    description: Identifier for the finance entity referenced by this financial record.
   id_requester:
     lineage:
       - datalake_payments_platform.payment.id_requester

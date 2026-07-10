@@ -1,16 +1,16 @@
 ---
 database_name: dw_losses
 table_name: fact_losses
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Table that apply all necessary filters and add all necessary columns to calculate losses
 columns:
   sk_contract:
-    description: "Contract ID"
+    description: Data warehouse surrogate key for contract used in fintech dimensional joins.
     lineage:
       - dw_losses.fact_provision.sk_contract
   sk_invoice:
-    description: "Invoice ID"
+    description: Data warehouse surrogate key for invoice used in fintech dimensional joins.
     lineage:
       - dw_losses.fact_provision.sk_invoice
   invoice_account_type:
@@ -21,38 +21,18 @@ columns:
     description: "Invoice status of payment i.e if it is open, paid, canceled or was written down"
     lineage:
       - dw_losses.fact_provision.payment_status
-  invoice_status:
-    description: "Invoice status information related to the payment status."
-    lineage:
-      - dw_losses.fact_provision.invoice_status
   invoice_type:
     description: "Type of the invoice according to the frequency information."
     lineage:
       - dw_losses.fact_closing.invoice_type
   contract_closing_month_status:
-    description: "Contract status of the closing month."
+    description: Financial attribute representing contract closing month status on the fact_losses dataset.
     lineage:
       - dw_losses.fact_closing.closing_month_status
-  is_before_started:
-    description: "Flag to show if the invoice is before started."
-    lineage:
-      - dw_losses.fact_provision.is_before_started
-  is_international:
-    description: "Flag to show if the invoice is international."
-    lineage:
-      - dw_losses.fact_provision.is_international
-  is_writtendown_in_dead_time:
-    description: "Flag to show if the invoice is writtendown in dead time."
-    lineage:
-      - dw_losses.fact_provision.is_writtendown_in_dead_time
   has_repair_offboarding_bill_item:
     description: "Flag to indicate the existence of 'repair offboarding' bill item for an invoice"
     lineage:
       - dw_losses.fact_provision.has_repair_offboarding_bill_item
-  city:
-    description: "City name where the house is located"
-    lineage:
-      - datalake_retsuko_clean.contract.city
   risk_group:
     description: "Group of risk type of the deal (low or high)"
     lineage:
@@ -86,33 +66,59 @@ columns:
     description: "Total value of the invoice"
     lineage:
       - dw_losses.fact_provision.due_amount
-  dt_cohort:
-    description: "First day of the month"
-    lineage:
-      - dw_losses.fact_provision.dt_closing
   dt_closing:
     description: "Last day of the month"
     lineage:
       - dw_losses.fact_provision.dt_closing
   dt_snapshot:
-    description: "Date of the snapshot"
+    description: Calendar date associated with snapshot in the financial workflow.
     lineage:
       - dw_losses.fact_provision.dt_snapshot
   dt_due_invoice_adjusted:
     description: "Due date of the deal"
     lineage:
       - dw_losses.fact_provision.dt_due_adjs
-  dt_paid_invoice_adjusted:
-    description: "Payment date of the deal"
-    lineage:
-      - dw_losses.fact_provision.dt_paid_adjs
   dt_contract_signature:
     description: "Date of the contract signature"
     lineage:
       - dw_losses.fact_closing.dt_contract_signature
   dt_contract_annulment:
-    description: "Contract annulment date"
+    description: Calendar date associated with contract annulment in the financial workflow.
     lineage:
       - dw_losses.fact_closing.dt_annulment
-  ts_load:
-    description: "Timestamp when table was updated"
+  dt_write_off:
+    description: Calendar date associated with write off in the financial workflow.
+    lineage: []
+  previous_provision_balance:
+    description: Financial attribute representing previous provision balance on the fact_losses dataset.
+    lineage: []
+  dt_due:
+    description: Calendar date associated with due in the financial workflow.
+    lineage: []
+  dt_invoice_created:
+    description: Calendar date associated with invoice created in the financial workflow.
+    lineage: []
+  is_contract_write_off:
+    description: Indicates whether contract write off applies to this financial record.
+    lineage: []
+  city_group:
+    description: Financial attribute representing city group on the fact_losses dataset.
+    lineage: []
+  dt_due_general_accrual:
+    description: Calendar date associated with due general accrual in the financial workflow.
+    lineage: []
+  is_write_off:
+    description: Indicates whether write off applies to this financial record.
+    lineage: []
+  deal_status:
+    description: Financial attribute representing deal status on the fact_losses dataset.
+    lineage: []
+  paid_amount:
+    description: Financial attribute representing paid amount on the fact_losses dataset.
+    lineage: []
+  dt_paid_adjs:
+    description: Calendar date associated with paid adjs in the financial workflow.
+    lineage: []
+  city_name:
+    description: Financial attribute representing city name on the fact_losses dataset.
+    lineage: []

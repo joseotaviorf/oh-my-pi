@@ -2,7 +2,7 @@ database_name: dw_velo
 table_name: quintocred_aging_recurring_payment_no_renewal
 description: Table made to measure PDD of non renewed Recurring Payments.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   client_cpf_cnpj:
     description: "For 3.0 cases, it will be the delinquency entry id, for 2.0 cases, it will be the delinquency id."
@@ -26,9 +26,9 @@ columns:
   open_amount:
     description: "Difference between the amount paid and the original invoice amount"
   paid_amount:
-    description: "Delinquency amount paid"
+    description: Velo platform attribute describing paid amount for condominium billing reconciliation.
   pdd:
-    description: "PDD value"
+    description: Velo platform attribute describing pdd for condominium billing reconciliation.
   pdd_percentage:
     description: "PDD percentage, calculated according to the delay range: 'a.Current' = 0.35, 'b.1 a 30' = 0.86 and anything else = 1"
   sk_propose:

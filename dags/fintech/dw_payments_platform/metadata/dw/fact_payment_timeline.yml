@@ -1,7 +1,7 @@
 ---
 database_name: dw_payments_platform
 table_name: fact_payment_timeline
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "This table contains the timeline evolution of payment statuses from different sources (checkout, wallstreet, vans) unified in a single view"
 columns:

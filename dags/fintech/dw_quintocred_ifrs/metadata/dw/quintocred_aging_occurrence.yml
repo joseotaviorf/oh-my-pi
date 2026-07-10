@@ -2,7 +2,7 @@ database_name: dw_velo
 table_name: quintocred_aging_occurrence
 description: Table made to measure PDD of Occurrences.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   client_cpf_cnpj:
     description: "For 3.0 cases, it will be the delinquency entry id, for 2.0 cases, it will be the delinquency id"
@@ -36,9 +36,9 @@ columns:
   open_amount_termination:
     description: "Difference between the amount paid and the original invoice amount on termination delinquencies"
   paid_amount:
-    description: "Delinquency amount paid"
+    description: Velo platform attribute describing paid amount for condominium billing reconciliation.
   paid_amount_2:
-    description: "Paid amount added"
+    description: Velo platform attribute describing paid amount 2 for condominium billing reconciliation.
   sk_propose:
     description: "Proposal ID related to payment information"
   ts_load:

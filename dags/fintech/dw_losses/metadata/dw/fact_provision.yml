@@ -2,17 +2,17 @@
 database_name: dw_losses
 table_name: fact_provision
 description: This table is the fact table for the provision information regarding the losses modelation.
-owner: felipe.chies@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   sk_invoice:
     lineage:
       - datalake_losses.provision.id_invoice
-    description: "Id of the invoice."
+    description: Data warehouse surrogate key for invoice used in fintech dimensional joins.
   sk_contract:
     lineage:
       - datalake_losses.provision.id_contract
-    description: "Id of the contract."
+    description: Data warehouse surrogate key for contract used in fintech dimensional joins.
   due_amount:
     lineage:
       - datalake_losses.provision.due_amount
@@ -202,4 +202,40 @@ columns:
       - datalake_losses.provision.dt_closing
     description: "Last day of the month."
   ts_load:
-    description: "Load date."
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+  dt_write_off:
+    lineage: []
+    description: Calendar date associated with write off in the financial workflow.
+  delay_contamined_range:
+    lineage: []
+    description: Financial attribute representing delay contamined range on the fact_provision dataset.
+  risk_type:
+    lineage: []
+    description: Financial attribute representing risk type on the fact_provision dataset.
+  dt_due_deal_anchor:
+    lineage: []
+    description: Calendar date associated with due deal anchor in the financial workflow.
+  is_contract_write_off:
+    lineage: []
+    description: Indicates whether contract write off applies to this financial record.
+  dt_due_adjs:
+    lineage: []
+    description: Calendar date associated with due adjs in the financial workflow.
+  dt_due_general_accrual:
+    lineage: []
+    description: Calendar date associated with due general accrual in the financial workflow.
+  dt_snapshot:
+    lineage: []
+    description: Calendar date associated with snapshot in the financial workflow.
+  deal_status:
+    lineage: []
+    description: Financial attribute representing deal status on the fact_provision dataset.
+  is_write_off:
+    lineage: []
+    description: Indicates whether write off applies to this financial record.
+  paid_amount:
+    lineage: []
+    description: Financial attribute representing paid amount on the fact_provision dataset.
+  dt_paid_adjs:
+    lineage: []
+    description: Calendar date associated with paid adjs in the financial workflow.

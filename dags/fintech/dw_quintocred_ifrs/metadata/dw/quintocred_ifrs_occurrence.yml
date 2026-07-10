@@ -2,7 +2,7 @@ database_name: dw_velo
 table_name: quintocred_ifrs_occurrence
 description: Table made to measure IFRS delinquency.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   origin_table:
     description: "Source table of payment information for each line. Possible tables : Omie, Payment, Invoice (direct billing information), Delinquency and Sap"
@@ -31,7 +31,7 @@ columns:
   due_amount_ajustado:
     description: "For some cases of 2.0, the original value of the delinquency includes 11% interest. In this column, this was readjusted and interest was removed."
   paid_amount:
-    description: "Delinquency amount paid"
+    description: Velo platform attribute describing paid amount for condominium billing reconciliation.
   open_amount:
     description: "Difference between the amount paid and the original invoice amount"
   open_amount_ajustado:

@@ -97,7 +97,18 @@ base_final AS (
 )
 
 SELECT
-    *,
+    sk_propose,
+    client_cpf_cnpj,
+    delay_range_overdue,
+    max_delay_overdue,
+    months_overdue,
+    value_overdue,
+    due_amount,
+    paid_amount,
+    discount_value,
+    open_amount,
+    dt_due,
+    dt_renewal,
     CASE
         WHEN delay_range_overdue = 'a.Current' THEN 0.35
         WHEN delay_range_overdue = 'b.1 a 30' THEN 0.86
