@@ -1,35 +1,37 @@
 database_name: metric_rent
 table_name: demand_targets
-description: This table contains the ForRent targets of the Demand funnel.
-  Each line has the Demand or Budget target of each demand event.
+description: |
+  For Rent demand funnel planning targets by city group and funnel stage.
+  Each row holds budget or forecast goal volumes for a demand event slice.
 domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   city_group:
-    description: The city group related to the target.
+    description: Geographic city cluster used to group demand planning targets.
     lineage:
-      - datalake_gsheets_clean.rent_demand_budget_2024.city_group
+      - datalake_gsheets.rental_demand_budget.city_group
       - datalake_gsheets.rental_demand_coincident_targets.city_group
     dimension: True
   business_type:
-    description: The business type related to the target.
+    description: Listing business line segment used to filter demand targets.
     lineage:
-      - datalake_gsheets_clean.rent_demand_budget_2024.business_type
+      - datalake_gsheets.rental_demand_budget.business_type
       - datalake_gsheets.rental_demand_coincident_targets.business_type
     dimension: True
   rent_flow_origin:
-    description: The rent flow origin type related to the target.
+    description: First-touch channel of the rent flow for target segmentation.
     lineage:
-      - datalake_gsheets_clean.rent_demand_budget_2024.rent_flow_origin
+      - datalake_gsheets.rental_demand_budget.rent_flow_origin
       - datalake_gsheets.rental_demand_coincident_targets.rent_flow_origin
     dimension: True
   rental_administrator:
-    description: The rental administrator type related to the target.
+    description: Contract administrator segment such as QuintoAndar or third party.
     lineage:
-      - datalake_gsheets_clean.rent_demand_budget_2024.rental_administrator
+      - datalake_gsheets.rental_demand_budget.rental_administrator
       - datalake_gsheets.rental_demand_coincident_targets.rental_administrator
     dimension: True
   visits_booked:
+    description: Planned target count of visits booked in the demand funnel for this slice.
     metric:
       name: Visits Booked Target
       description: Target of visits booked within the aggregation.
@@ -40,6 +42,7 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   visits_completed:
+    description: Planned target count of visits completed in the demand funnel for this slice.
     metric:
       name: Visits Completed Target
       description: Target of visits completed within the aggregation.
@@ -50,6 +53,7 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   offers_submitted:
+    description: Planned target count of offers submitted in the demand funnel for this slice.
     metric:
       name: Offers Submitted Target
       description: Target of offers submitted within the aggregation.
@@ -60,6 +64,7 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   offers_accepted:
+    description: Planned target count of offers accepted in the demand funnel for this slice.
     metric:
       name: Offers Accepted Target
       description: Target of offers accepted within the aggregation.
@@ -70,6 +75,7 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   evaluation_started:
+    description: Planned target count of credit evaluations started for this demand slice.
     metric:
       name: Evaluation Started Target
       description: Target of evaluations started within the aggregation.
@@ -80,6 +86,7 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   evaluation_positive:
+    description: Planned target count of positive credit evaluations for this demand slice.
     metric:
       name: Evaluation Positive Target
       description: Target of evaluations positive within the aggregation.
@@ -90,6 +97,7 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   documentation_sent:
+    description: Planned target count of documentation packages sent for this demand slice.
     metric:
       name: Documentation Sent Target
       description: Target of documentation sent within the aggregation.
@@ -100,6 +108,7 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   credit_approved:
+    description: Planned target count of credit approvals in the demand funnel for this slice.
     metric:
       name: Credit Approved Target
       description: Target of credits approved within the aggregation.
@@ -110,6 +119,7 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   contracts_signed:
+    description: Planned target count of signed contracts in the demand funnel for this slice.
     metric:
       name: Contracts Signed Target
       description: Target of contracts signed within the aggregation.
@@ -120,14 +130,14 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ''
   target_type:
-    description: The type of the target.
+    description: Indicates whether the row is a budget target or a forecast target.
     categories:
       BUDGET: The target is related to a budget target.
       FORECAST: The target is related to a forecast target.
     dimension: True
   dt_target:
-    description: The target date.
+    description: Calendar date the demand or budget target volume applies to.
     lineage:
-      - datalake_gsheets_clean.rent_demand_budget_2024.dt_budget
+      - datalake_gsheets.rental_demand_budget.dt_budget
       - datalake_gsheets.rental_demand_coincident_targets.dt_target
     dimension: True

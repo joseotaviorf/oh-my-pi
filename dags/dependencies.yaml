@@ -4476,8 +4476,8 @@ bietlejuice.metric_rent__demand_events:
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-rent-demand-events-snapshot:first-run-of-day
   - bietlejuice.dw_user:load-dw-rent-dim-owner-category:first-run-of-day
 bietlejuice.metric_rent__demand_targets:
+  - bietlejuice.enrich_gsheets:load-enrich-rental-demand-budget:first-run-of-day
   - bietlejuice.enrich_gsheets:load-enrich-rental-demand-coincident-targets:first-run-of-day
-  - bietlejuice.gsheets_for_rent_targets:done-clean-rent-demand-budget-2024:first-run-of-day
 bietlejuice.metric_rent__gross_profit:
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger:first-run-of-day

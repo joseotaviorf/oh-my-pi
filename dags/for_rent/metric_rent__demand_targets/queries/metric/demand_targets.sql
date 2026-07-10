@@ -34,4 +34,4 @@ SELECT
     'BUDGET' AS target_type,
     dt_budget AS dt_target
 FROM
-    datalake_gsheets_clean.rent_demand_budget_2024
+    datalake_gsheets.rental_demand_budget
