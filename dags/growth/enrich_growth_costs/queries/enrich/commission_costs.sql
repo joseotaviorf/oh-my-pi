@@ -62,7 +62,7 @@ commission_costs AS (
         datalake_robin_hood.accounting_entry AS ae
     WHERE 
         ae.description NOT LIKE '%que não foi enviada%'
-        AND ae.dt_occurrence::DATE BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE
+        AND CAST(ae.dt_occurrence AS DATE) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
         AND LOWER(ae.source_name) IN ('indica aí', 'indica aí agents', 'porteiros')
     GROUP BY ALL
 ),
@@ -107,9 +107,47 @@ manual_tax AS (
         AND t.ts_disabled IS NULL
         AND ts_blocked IS NULL
         AND LOWER(aes.source_name) IN ('porteiros', 'indica aí agents', 'indica aí')
-        AND TO_DATE(CAST(accounting_year_month AS VARCHAR(6)) || '01', 'yyyyMMdd')::DATE BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE
+        AND TO_DATE(CAST(accounting_year_month AS VARCHAR(6)) || '01', 'yyyyMMdd') BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
     GROUP BY ALL
 )
-SELECT * FROM commission_costs
+SELECT
+    source_name,
+    cost_type,
+    id_rh_accounting_entry,
+    id_external,
+    id_payee,
+    city_group,
+    description,
+    source_bill_item,
+    commission_type,
+    vertical,
+    cost_center_code,
+    company_report_origin,
+    business_context,
+    dt_cost,
+    total_costs,
+    year,
+    month,
+    day
+FROM commission_costs
 UNION ALL
-SELECT * FROM manual_tax
+SELECT
+    source_name,
+    cost_type,
+    id_rh_accounting_entry,
+    id_external,
+    id_payee,
+    city_group,
+    description,
+    source_bill_item,
+    commission_type,
+    vertical,
+    cost_center_code,
+    company_report_origin,
+    business_context,
+    dt_cost,
+    total_costs,
+    year,
+    month,
+    day
+FROM manual_tax

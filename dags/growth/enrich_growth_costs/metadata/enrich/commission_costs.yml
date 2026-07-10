@@ -1,5 +1,5 @@
 ---
-database_name: enrich_growth_costs
+database_name: datalake_growth
 table_name: commission_costs
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
