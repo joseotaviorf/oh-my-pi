@@ -1,0 +1,251 @@
+database_name: datalake_debt_recovery
+table_name: billing
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: |
+  Enrich explosion of Trato Feito billing-campaign (boletagem) payloads into invoice × installment
+  × discount grain for Debt Recovery. Parses payload JSON arrays (parcelas, parcelasAgr,
+  camposDesconto) from datalake_trato_feito_clean.billing so Collections can analyze campaign
+  conditions, installment schedules, and with/without-discount amounts before a billing becomes
+  a negotiation.
+columns:
+  id_contract:
+    description: External debtor/contract identifier for the billing campaign (Trato Feito debtor_external_id).
+    lineage:
+      - datalake_trato_feito_clean.billing.id_debtor_external
+  id_negotiation:
+    description: External collector/negotiation identifier for the billing campaign (Trato Feito collector_external_id).
+    lineage:
+      - datalake_trato_feito_clean.billing.id_collector_external
+  id_contract_cyber:
+    description: Cyber contract identifier extracted from payload.contrato.
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  id_client:
+    description: Client CPF/CNPJ extracted from payload.cpfCnpj.
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  id_invoice:
+    description: Invoice/installment identifier from the exploded payload.parcelas array (idParcela).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  contract_group:
+    description: Contract group code extracted from payload.grupo.
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  status:
+    description: Current lifecycle status of the billing campaign in Trato Feito.
+    lineage:
+      - datalake_trato_feito_clean.billing.status
+  status_reason:
+    description: Reason code or text explaining the current billing status.
+    lineage:
+      - datalake_trato_feito_clean.billing.status_reason
+  contact_type:
+    description: Contact channel used to create the billing (payload.tipoContato).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  agency:
+    description: Collection agency/advisory code for the billing (payload.cdAssessoria).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  frequency:
+    description: Payment periodicity of the billing campaign (payload.periodicidade).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  grace_period_days:
+    description: Grace period in days before the billing campaign expires (payload.diasCarencia).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  payment_method:
+    description: Payment method offered in the billing campaign (payload.formaPagamento).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  is_boletagem:
+    description: Flag indicating the record is a boletagem campaign (payload.flgCampanhaBoletagem).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  agreement_type:
+    description: Agreement type code of the billing campaign (payload.cdTipoAcordo).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  fine_rate:
+    description: Fine rate applied in the billing campaign (payload.taxaMulta).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  down_payment:
+    description: Down-payment / entry amount of the billing campaign (payload.vlrEntrada).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  total_installments:
+    description: Number of installments in the billing campaign (payload.qtdParcelas).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  negotiated_amount:
+    description: Total negotiated amount of the billing campaign (payload.vlrNegociado).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_honorarium_amount:
+    description: Honorarium amount charged per installment (payload.vlrHonorariosParc).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  invoice_main_amount:
+    description: Principal amount of the exploded invoice from payload.parcelas.vlrPrincipal.
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  invoice_residual_fine_amount:
+    description: Residual fine amount on the exploded invoice (payload.parcelas.vlrMultaResidual).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  invoice_residual_interest_amount:
+    description: Residual interest amount on the exploded invoice (payload.parcelas.vlrJurosResiduais).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  invoice_residual_costs_amount:
+    description: Residual costs amount on the exploded invoice (payload.parcelas.vlrCustasResiduais).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  invoice_residual_honorarium_amount:
+    description: Residual honorarium amount on the exploded invoice (payload.parcelas.vlrHonorariosResiduais).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_fine_amount:
+    description: Interest/fine amount on the exploded agreement installment (payload.parcelasAgr.vlrJuros).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_balance_amount:
+    description: Remaining balance of the exploded agreement installment (payload.parcelasAgr.vlrSaldo).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_fine_rate:
+    description: Fine rate on the exploded agreement installment (payload.parcelasAgr.taxaMulta).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_amount:
+    description: Installment amount from the exploded agreement schedule (payload.parcelasAgr.vlrParcela).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_number:
+    description: Ordinal number of the exploded agreement installment (payload.parcelasAgr.numeroParcela).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_amortization_amount:
+    description: Amortization amount of the exploded agreement installment (payload.parcelasAgr.vlrAmortizacao).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_credit_card_fee:
+    description: Credit-card fee rate/amount on the exploded installment (payload.parcelasAgr.taxaCartaoCredito).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  overdue_amount_with_discount:
+    description: Overdue principal amount with discount (camposDesconto campo U1VLRPRCAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  overdue_amount_without_discount:
+    description: Overdue principal amount without discount (camposDesconto campo U1VLRPRCAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  to_due_amount_with_discount:
+    description: To-due principal amount with discount (camposDesconto campo U1VLRPRCAVAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  to_due_amount_without_discount:
+    description: To-due principal amount without discount (camposDesconto campo U1VLRPRCAVAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_fine_amount_with_discount:
+    description: Installment fine amount with discount (camposDesconto campo U1VLRPRMUAGR, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  installment_fine_amount_without_discount:
+    description: Installment fine amount without discount (camposDesconto campo U1VLRPRMUAGR, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  residual_fine_amount_with_discount:
+    description: Residual fine amount with discount (camposDesconto campo U1VLRMUREAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  residual_fine_amount_without_discount:
+    description: Residual fine amount without discount (camposDesconto campo U1VLRMUREAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  agreement_fine_amount_with_discount:
+    description: Agreement fine amount with discount (camposDesconto campo U1VLRMUAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  agreement_fine_amountwithout_discount:
+    description: Agreement fine amount without discount (camposDesconto campo U1VLRMUAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  interest_installments_with_discount:
+    description: Installment interest amount with discount (camposDesconto campo U1VLRPRJUAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  interest_installments_without_discount:
+    description: Installment interest amount without discount (camposDesconto campo U1VLRPRJUAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  residual_interest_with_discount:
+    description: Residual interest amount with discount (camposDesconto campo U1VLRJUREAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  residual_interest_without_discount:
+    description: Residual interest amount without discount (camposDesconto campo U1VLRJUREAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  agreement_interest_with_discount:
+    description: Agreement interest amount with discount (camposDesconto campo U1VLRJUAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  agreement_interest_without_discount:
+    description: Agreement interest amount without discount (camposDesconto campo U1VLRJUAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  residual_costs_with_discount:
+    description: Residual costs amount with discount (camposDesconto campo U1VLCUSREAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  residual_costs_without_discount:
+    description: Residual costs amount without discount (camposDesconto campo U1VLCUSREAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  agreement_costs_with_discount:
+    description: Agreement costs amount with discount (camposDesconto campo U1VLCUSTASAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  agreement_costs_without_discount:
+    description: Agreement costs amount without discount (camposDesconto campo U1VLCUSTASAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  residual_fees_with_discount:
+    description: Residual honorarium/fees amount with discount (camposDesconto campo U1VLRHOREAG, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  residual_fees_without_discount:
+    description: Residual honorarium/fees amount without discount (camposDesconto campo U1VLRHOREAG, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  judicial_expenses_with_discount:
+    description: Judicial expenses amount with discount (camposDesconto campo U1VLRDESPJUD, vlrComDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  judicial_expenses_without_discount:
+    description: Judicial expenses amount without discount (camposDesconto campo U1VLRDESPJUD, vlrSemDesconto).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  dt_installment_start:
+    description: Start date of the exploded agreement installment (payload.parcelasAgr.dtInicial).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  dt_due_installment:
+    description: Due date of the exploded agreement installment (payload.parcelasAgr.dtVencimento).
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
+  ts_creation:
+    description: Timestamp when the billing campaign was created in Trato Feito.
+    lineage:
+      - datalake_trato_feito_clean.billing.ts_created
+  ts_due_boletagem:
+    description: Billing-campaign validity/due timestamp from payload.dataValidadeBoletagem.
+    lineage:
+      - datalake_trato_feito_clean.billing.payload
