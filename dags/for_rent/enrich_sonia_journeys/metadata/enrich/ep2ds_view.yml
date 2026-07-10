@@ -1,10 +1,11 @@
+---
 database_name: datalake_sonia_journeys
 table_name: ep2ds_view
 description: |
   Enrich view for Sonia ep2ds journey, returning users with positive rent flow credit
   events that still do not have documentation submitted or documentation canceled.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   pk_event_user:
     lineage:
@@ -57,11 +58,11 @@ columns:
   user_email:
     lineage:
       - datalake_ebdb_clean.user.email
-    description: User email address.
+    description: User email address captured in the source operational system.
   user_phone:
     lineage:
       - datalake_ebdb_clean.user.main_phone
-    description: User phone number.
+    description: User phone number captured in the source operational system.
   user_first_name:
     lineage:
       - datalake_ebdb_clean.user.name

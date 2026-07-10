@@ -1,3 +1,4 @@
+---
 database_name: dw_public
 table_name: dim_user_doorman
 description: >
@@ -12,13 +13,11 @@ columns:
   sk_user_doorman:
     lineage:
     - datalake_ebdb_user.user_doorman.id
-    description: Unique ID of doorman, which is not equal to sk_user. To get sk_user, needs
-      to join with dim_user by using sk_user_affiliate key. It's the primary key of this table.
+    description: Unique ID of doorman, which is not equal to sk_user. To get sk_user, needs to join with dim_user by using sk_user_affiliate key. It's the primary key of this table.
   sk_user_affiliate:
     lineage:
     - datalake_ebdb_user.user_doorman.id_affiliate_data
-    description: Key to join table with dim_user_affiliate. (dim_user_doorman.sk_user_affiliate
-      = dim_user.dados_afiliado_id).
+    description: Key to join table with dim_user_affiliate. (dim_user_doorman.sk_user_affiliate = dim_user.dados_afiliado_id).
   id_user_doorman:
     lineage:
     - datalake_ebdb_user.user_doorman.id
@@ -34,7 +33,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_user.user_doorman.country_code
-    description: Country code of the doorman. It's also a table partition.
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.
@@ -77,8 +76,7 @@ columns:
   subscription_source:
     lineage:
     - datalake_ebdb_user.user_doorman.subscription_source
-    description: Defines if doorman was captured offline, organic or captured by call
-      center.
+    description: Defines if doorman was captured offline, organic or captured by call center.
   occupation_name:
     lineage:
     - datalake_ebdb_user.user_doorman.occupation_name
@@ -94,9 +92,7 @@ columns:
   is_active:
     lineage:
     - datalake_ebdb_user.user_doorman.is_active
-    description: Flag which indicates if user joined doorman program. If ts_joined
-      program is not null, then it is true. It does not indicates whether doorman
-      is still registered in the affiliates program.
+    description: Flag which indicates if user joined doorman program. If ts_joined program is not null, then it is true. It does not indicates whether doorman is still registered in the affiliates program.
   ts_created:
     lineage:
     - datalake_ebdb_user.user_doorman.ts_created

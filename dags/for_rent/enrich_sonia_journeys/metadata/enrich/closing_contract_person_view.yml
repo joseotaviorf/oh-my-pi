@@ -1,3 +1,4 @@
+---
 database_name: datalake_sonia_journeys
 table_name: closing_contract_person_view
 description: |
@@ -5,7 +6,7 @@ description: |
   For each contract person id, contact and name fields are prioritized from Lake contract_person;
   when not found in Lake, event payload values are used as fallback.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_contract_person:
     lineage:
@@ -18,8 +19,7 @@ columns:
   user_phone:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: |
-      Phone prioritized from the transactional event payload, normalized to digits only and prefixed with country code 55 when the captured number has up to 11 digits.
+    description: "Phone prioritized from the transactional event payload, normalized to digits only and prefixed with country code 55 when the captured number has up to 11 digits."
   first_name:
     lineage:
       - datalake_cdp_clean.transactional.event_properties

@@ -1,3 +1,4 @@
+---
 database_name: dw_public
 table_name: dim_partner_agent
 description: >
@@ -6,7 +7,7 @@ description: >
   a partner company (id_partner) and a QuintoAndar user account (id_user). Used alongside
   dim_partner to analyse partner agent activity and status. Partitioned by country_code.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_partner_agent:
     lineage:
@@ -27,7 +28,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
-    description: Country code of the partner agent. It's also a table partition.
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.

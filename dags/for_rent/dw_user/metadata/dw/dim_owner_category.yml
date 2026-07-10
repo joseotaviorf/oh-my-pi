@@ -1,3 +1,4 @@
+---
 database_name: dw_rent
 table_name: dim_owner_category
 description: Table that consolidates the historical category of a owner.
@@ -5,24 +6,20 @@ description: Table that consolidates the historical category of a owner.
   In this table we're not bringing the B2B users.
   Each line of this table is an unique owner category, which is identified by the sk_owner_category column.
 domain: Growth
-owner: isadora.gallerani@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_owner_category:
     lineage:
       - datalake_pro_owners.owner_category.id_owner_category
-    description: Key of the owner (user) with it's category version.
-      This columns is filled by the concatenation of id_owner + 0 + category (number).
-      The category isn't a nominal value, it's a number. Each change on onwer's category results a new category,
-      even if the owner had the same category before.
+    description: Key of the owner (user) with it's category version. This columns is filled by the concatenation of id_owner + 0 + category (number). The category isn't a nominal value, it's a number. Each change on onwer's category results a new category, even if the owner had the same category before.
   sk_owner:
     lineage:
       - datalake_pro_owners.owner_category.id_owner
-    description: Key to identify the landlord/owner of a house. It's the EBDB.Usuario.id. 
-      It can be joined with dim_user using sk_user
+    description: Key to identify the landlord/owner of a house. It's the EBDB.Usuario.id. It can be joined with dim_user using sk_user
   country_code:
     lineage:
       - datalake_ebdb_country.user.country_code
-    description: Country code of the landlord/owner. It's also a table partition.
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil country code.
       MX: Mexico country code.

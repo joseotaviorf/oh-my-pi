@@ -1,3 +1,4 @@
+---
 database_name: dw_public
 table_name: dim_owner
 description: >
@@ -6,17 +7,16 @@ description: >
   used by operations and owner relationship management. Joinable with dim_user via
   sk_owner = sk_user. Partitioned by country_code.
 domain: Growth
-owner: isadora.gallerani@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_owner:
     lineage:
       - datalake_ebdb_listing.house.id_user
-    description: Primary key of the table, ID user of the house owner. It's the EBDB.Usuario.id. 
-      Joins with dim_user.sk_user.
+    description: Primary key of the table, ID user of the house owner. It's the EBDB.Usuario.id. Joins with dim_user.sk_user.
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
-    description: Country code of the house owner. It's also a table partition.
+    description: ISO country code for geographic filtering of the analytical metric.
   contact_email:
     lineage:
       - datalake_ebdb_listing.house.contact_email

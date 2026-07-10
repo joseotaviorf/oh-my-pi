@@ -1,3 +1,4 @@
+---
 database_name: datalake_sonia_journeys
 table_name: ds2ca_reject_view
 description: |
@@ -6,15 +7,13 @@ description: |
   person, including contact fallback fields, address display text, deterministic experiment binning,
   and a flag indicating whether all rejection reasons are eligible for DS2CA communication.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   pk_event_user:
     lineage:
       - datalake_cdp_clean.transactional.id_event
       - datalake_cdp_clean.transactional.id_person
-    description: |
-      Primary key concatenating CDP event id and person UUID, used as the stable event-person
-      identifier by downstream Sonia/SFMC syncs.
+    description: "Primary key concatenating CDP event id and person UUID, used as the stable event-person identifier by downstream Sonia/SFMC syncs."
   id_event:
     lineage:
       - datalake_cdp_clean.transactional.id_event
@@ -46,7 +45,7 @@ columns:
   ts_event:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: Rejection event timestamp formatted as yyyy-MM-dd HH:mm:ss for downstream compatibility.
+    description: "Rejection event timestamp formatted as yyyy-MM-dd HH:mm:ss for downstream compatibility."
   binning_value:
     lineage:
       - datalake_cdp_clean.transactional.id_person
@@ -59,6 +58,4 @@ columns:
   has_only_eligible_rejection_reasons:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: |
-      Integer flag set to 1 when the rejection event has at least one party rejection reason and every
-      reason belongs to the eligible DS2CA rejection-reason allowlist; otherwise set to 0.
+    description: "Integer flag set to 1 when the rejection event has at least one party rejection reason and every reason belongs to the eligible DS2CA rejection-reason allowlist; otherwise set to 0."

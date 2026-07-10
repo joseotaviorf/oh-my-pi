@@ -1,3 +1,4 @@
+---
 database_name: dw_public
 table_name: dim_partner
 description: >
@@ -6,7 +7,7 @@ description: >
   autonomous agents to prime and executive partners. Used by For Rent analytics to track partner
   company attributes, UTM acquisition data, and partnership lifecycle. Partitioned by country_code.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_partner:
     lineage:

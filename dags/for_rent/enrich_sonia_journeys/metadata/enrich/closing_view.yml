@@ -1,3 +1,4 @@
+---
 database_name: datalake_sonia_journeys
 table_name: closing_view
 description: |
@@ -5,14 +6,13 @@ description: |
   with later canceled/signed flags per rent flow, exploded to tenant and owner rows, joined to EBDB user and house.
   One row per (id_event, uuid_person) after split; includes deterministic binning hash for experiments keyed by house and tenant UUID.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   pk_event_user:
     lineage:
       - datalake_cdp_clean.transactional.id_event
       - datalake_cdp_clean.transactional.event_properties
-    description: |
-      Synthetic primary key concatenating CDP event id and person UUID for the row (tenant or owner arm).
+    description: Synthetic primary key concatenating CDP event id and person UUID for the row (tenant or owner arm).
   id_event:
     lineage:
       - datalake_cdp_clean.transactional.id_event
@@ -33,29 +33,25 @@ columns:
   ts_sent:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: Contract sent event time formatted as yyyy-MM-dd HH:mm:ss (timezone as stored in CDP source).
+    description: "Contract sent event time formatted as yyyy-MM-dd HH:mm:ss (timezone as stored in CDP source)."
   ts_canceled:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: |
-      Contract canceled event time formatted as yyyy-MM-dd HH:mm:ss when a later rent_flow_contract_canceled exists for the same rent flow.
+    description: "Contract canceled event time formatted as yyyy-MM-dd HH:mm:ss when a later rent_flow_contract_canceled exists for the same rent flow."
   ts_signed:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: |
-      Contract signed event time formatted as yyyy-MM-dd HH:mm:ss when a later rent_flow_contract_signed exists for the same rent flow.
+    description: "Contract signed event time formatted as yyyy-MM-dd HH:mm:ss when a later rent_flow_contract_signed exists for the same rent flow."
   is_canceled:
     lineage:
       - datalake_cdp_clean.transactional.event_name
       - datalake_cdp_clean.transactional.ts_event
-    description: |
-      True when a rent_flow_contract_canceled event exists for the same rent_flow with timestamp strictly after ts_sent.
+    description: True when a rent_flow_contract_canceled event exists for the same rent_flow with timestamp strictly after ts_sent.
   is_signed:
     lineage:
       - datalake_cdp_clean.transactional.event_name
       - datalake_cdp_clean.transactional.ts_event
-    description: |
-      True when a rent_flow_contract_signed event exists for the same rent_flow with timestamp strictly after ts_sent.
+    description: True when a rent_flow_contract_signed event exists for the same rent_flow with timestamp strictly after ts_sent.
   user_role:
     description: Person arm for the row; either tenant or owner (two rows per event when both UUIDs exist).
   uuid_person:
@@ -85,11 +81,8 @@ columns:
   binning_value:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: |
-      Non-negative 64-bit hash bucket helper; Spark xxhash64 on UTF-8 concat of id_house, hyphen, and tenant UUID from the sent event.
-      Compare experiment specs before relying on parity with other engines.
+    description: "Non-negative 64-bit hash bucket helper; Spark xxhash64 on UTF-8 concat of id_house, hyphen, and tenant UUID from the sent event. Compare experiment specs before relying on parity with other engines."
   binning_value_contract_id:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: |
-      Temporary binning value using modulo 100 of the contract id. This will be a temporary solution which is replicable to know the AB test attribution in the query used by operations team.
+    description: Temporary binning value using modulo 100 of the contract id. This will be a temporary solution which is replicable to know the AB test attribution in the query used by operations team.

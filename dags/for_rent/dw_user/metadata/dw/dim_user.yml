@@ -1,3 +1,4 @@
+---
 database_name: dw_public
 table_name: dim_user
 description: >
@@ -7,7 +8,7 @@ description: >
   Key for user-level analysis across the full rental funnel and for joining role-specific dimension
   tables (dim_user_doorman, dim_partner_agent). Partitioned by country_code.
 domain: Growth
-owner: isadora.gallerani@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_user:
     lineage:
@@ -64,7 +65,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_user.user.country_code
-    description: Country code of the user. It's also a table partition.
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.
@@ -93,8 +94,7 @@ columns:
   dadosafiliado_ativo:
     lineage:
     - datalake_ebdb_user.affiliate_data.is_active
-    description: Boolean flag that indicates if the user is affiliate, flag indicates whether user is still registered
-      in the affiliates program (same field as dim_user_affiliate.is_active).
+    description: Boolean flag that indicates if the user is affiliate, flag indicates whether user is still registered in the affiliates program (same field as dim_user_affiliate.is_active).
   dadosagente_ativo:
     lineage:
     - datalake_ebdb_user.agent_data.is_active
@@ -180,21 +180,19 @@ columns:
   nome:
     lineage:
     - datalake_ebdb_user.user.name
-    description: Full name of user.
+    description: Full name of user captured in the source operational system.
   cpf:
     lineage:
     - datalake_ebdb_user.user.cpf
-    description: CPF (Tax Identification Number) of user or the CNPJ (Brazilian National Registry of Legal Entities) if the user is a legal entity,
-      with dot and hyphen formatting.
+    description: CPF (Tax Identification Number) of user or the CNPJ (Brazilian National Registry of Legal Entities) if the user is a legal entity, with dot and hyphen formatting.
   rg:
     lineage:
     - datalake_ebdb_user.user.rg
-    description: RG (Brazilian national lD) of user.
-      In most cases the RG is linked with a non entity user, but there's no rule that an entity user can't fill the RG field.
+    description: RG (Brazilian national lD) of user. In most cases the RG is linked with a non entity user, but there's no rule that an entity user can't fill the RG field.
   sexo:
     lineage:
     - datalake_ebdb_user.user.gender
-    description: User's gender.
+    description: User's gender captured in the source operational system.
     categories:
       Feminino: Female gender.
       Masculino: Male gender.
@@ -239,7 +237,7 @@ columns:
   cidade:
     lineage:
     - datalake_ebdb_user.user.city
-    description: City of user's address.
+    description: City of user's address captured in the source operational system.
   estado_nome:
     lineage:
     - core_region.region.state_name
@@ -309,12 +307,11 @@ columns:
   dadosagente_numero_creci:
     lineage:
     - datalake_ebdb_user.agent_data.creci_number
-    description: Creci number (Regional Council for Real Estate Brokers) of user,
-      if user is an agent.
+    description: Creci number (Regional Council for Real Estate Brokers) of user, if user is an agent.
   dadosfotografo_tipo_contrato:
     lineage:
     - datalake_ebdb_clean.photographer_data.contract_type
-    description: Type of contract with photographer, if user is photographer.
+    description: "Type of contract with photographer, if user is photographer."
     categories:
       CLT: The contract is CLT (Consolidation of Labor Laws)
       Freelancer: The photographer is a freelancer, which is autonomous.
@@ -332,8 +329,7 @@ columns:
   dadosafiliado_numero_creci:
     lineage:
     - datalake_ebdb_user.affiliate_data.creci_number
-    description: Creci number (Regional Council for Real Estate Brokers) of affiliate,
-      if user is an affiliate.
+    description: Creci number (Regional Council for Real Estate Brokers) of affiliate, if user is an affiliate.
   dadosafiliado_semana_ultima_comunicacao_balanco:
     lineage:
     - datalake_ebdb_user.affiliate_data.last_week_balance_communication
@@ -341,7 +337,7 @@ columns:
   visits_booked:
     lineage:
     - datalake_booking.booking.id_visitor
-    description: Amount of booked visit by user.
+    description: Count of tenant visits scheduled during the reporting period.
   visits_realized:
     lineage:
     - datalake_booking.booking.is_visit_completed
@@ -365,7 +361,7 @@ columns:
   data_nascimento:
     lineage:
     - datalake_ebdb_user.user.dt_birth
-    description: Birth date of user.
+    description: Birth date of user captured in the source operational system.
   first_visit_date:
     lineage:
     - datalake_ebdb_clean.visit.dt_visit
@@ -386,8 +382,7 @@ columns:
   dadosvendedor_inicio_contrato:
     lineage:
     - datalake_ebdb_clean.sales_rep.ts_contract_started
-    description: Start date of contract with Inside Sales Analyst, if user is Inside.
-      Sales Analyst
+    description: Start date of contract with Inside Sales Analyst, if user is Inside. Sales Analyst
   dadosafiliado_inicio_atuacao:
     lineage:
     - datalake_ebdb_user.affiliate_data.ts_first_operation_start

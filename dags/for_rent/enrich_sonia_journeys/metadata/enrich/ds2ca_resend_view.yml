@@ -1,3 +1,4 @@
+---
 database_name: datalake_sonia_journeys
 table_name: ds2ca_resend_view
 description: |
@@ -7,15 +8,13 @@ description: |
   matches the SFMC tb_*_PreContract_DS2CAResend_Sonia primary key, and a deterministic 0-99
   binning bucket for experiment splits.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   pk_event_user:
     lineage:
       - datalake_cdp_clean.transactional.id_event
       - datalake_cdp_clean.transactional.id_person
-    description: |
-      Synthetic primary key concatenating CDP event id and the actor's person UUID, used as the
-      upsert key by the SFMC sync query that populates tb_history_PreContract_DS2CAResend_Sonia.
+    description: "Synthetic primary key concatenating CDP event id and the actor's person UUID, used as the upsert key by the SFMC sync query that populates tb_history_PreContract_DS2CAResend_Sonia."
   id_event:
     lineage:
       - datalake_cdp_clean.transactional.id_event
@@ -43,15 +42,11 @@ columns:
   user_first_name:
     lineage:
       - datalake_ebdb_clean.user.name
-    description: |
-      First token of the user's display name (split on whitespace) used as last-resort fallback
-      in the SFMC identity-resolution chain. Mirrors the master closing view expression.
+    description: "First token of the user's display name (split on whitespace) used as last-resort fallback in the SFMC identity-resolution chain. Mirrors the master closing view expression."
   user_phone:
     lineage:
       - datalake_ebdb_clean.user.main_phone
-    description: |
-      User main phone with leading '+' stripped, used as last-resort fallback in the SFMC
-      identity-resolution chain. Mirrors the master closing view expression.
+    description: "User main phone with leading '+' stripped, used as last-resort fallback in the SFMC identity-resolution chain. Mirrors the master closing view expression."
   address_text:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -64,4 +59,4 @@ columns:
   ts_event:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: Event timestamp formatted as yyyy-MM-dd HH:mm:ss for SFMC compatibility.
+    description: "Event timestamp formatted as yyyy-MM-dd HH:mm:ss for SFMC compatibility."

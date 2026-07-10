@@ -1,3 +1,4 @@
+---
 database_name: datalake_sonia_journeys
 table_name: closing_audience_view
 description: |
@@ -8,14 +9,12 @@ description: |
   the is_participant flag marks those meeting Sonia entry criteria. Feeds SFMC
   for follow-up closing communications.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   pk_rent_flow_person:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: |
-      Synthetic primary key concatenating id_rent_flow and id_contract_person,
-      uniquely identifying one signatory row per rent flow per contract person.
+    description: "Synthetic primary key concatenating id_rent_flow and id_contract_person, uniquely identifying one signatory row per rent flow per contract person."
   id_house:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
@@ -35,10 +34,7 @@ columns:
   uuid_person:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: |
-      Person UUID of the signatory parsed from the uuid_person field of the event payload. Nullable when the
-      signatory has no platform account. Nullability drives contract-level gate evaluation: a contract where
-      every signatory is non-null satisfies Gate 1; a contract with any null satisfies Gate 2.
+    description: "Person UUID of the signatory parsed from the uuid_person field of the event payload. Nullable when the signatory has no platform account. Nullability drives contract-level gate evaluation: a contract where every signatory is non-null satisfies Gate 1; a contract with any null satisfies Gate 2."
   address_text:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -52,9 +48,7 @@ columns:
     lineage:
       - datalake_cdp_clean.transactional.event_name
       - datalake_cdp_clean.transactional.ts_event
-    description: |
-      True when a rent_flow_contract_canceled event exists for the same rent flow.
-      Contract-level cancellation flag applied to all signatories.
+    description: "True when a rent_flow_contract_canceled event exists for the same rent flow. Contract-level cancellation flag applied to all signatories."
   is_signed:
     lineage:
       - datalake_cdp_clean.transactional.event_name
@@ -74,14 +68,7 @@ columns:
   is_participant:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: |
-      True when the signatory meets any of the three independently-expandable Sonia Closing gates
-      (OR logic): Gate 0 (number_of_signatories = 2, independently tunable threshold), Gate 1
-      (all signatories in the contract are registered, i.e. every uuid_person NOT NULL), or Gate 2
-      (the contract has at least one unregistered signatory, i.e. any uuid_person IS NULL). Gates 1
-      and 2 are evaluated at contract level — every signatory row in the contract inherits the same
-      gate result. Thresholds are constants in the SQL (0-100, 0 = blocked, 100 = fully open);
-      raise each independently to expand that audience segment without retroactively changing earlier buckets.
+    description: "True when the signatory meets any of the three independently-expandable Sonia Closing gates (OR logic): Gate 0 (number_of_signatories = 2, independently tunable threshold), Gate 1 (all signatories in the contract are registered, i.e. every uuid_person NOT NULL), or Gate 2 (the contract has at least one unregistered signatory, i.e. any uuid_person IS NULL). Gates 1 and 2 are evaluated at contract level — every signatory row in the contract inherits the same gate result. Thresholds are constants in the SQL (0-100, 0 = blocked, 100 = fully open); raise each independently to expand that audience segment without retroactively changing earlier buckets."
   n_sent:
     lineage:
       - datalake_cdp_clean.transactional.event_name
@@ -89,17 +76,15 @@ columns:
   ts_first_sent:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: Timestamp of the earliest contract-sent event for this signatory, formatted as yyyy-MM-dd HH:mm:ss.
+    description: "Timestamp of the earliest contract-sent event for this signatory, formatted as yyyy-MM-dd HH:mm:ss."
   ts_last_sent:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: Timestamp of the most recent contract-sent event for this signatory, formatted as yyyy-MM-dd HH:mm:ss.
+    description: "Timestamp of the most recent contract-sent event for this signatory, formatted as yyyy-MM-dd HH:mm:ss."
   ts_canceled:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: |
-      Timestamp of the rent_flow_contract_canceled event formatted as yyyy-MM-dd HH:mm:ss.
-      Null when no cancellation occurred after ts_sent.
+    description: "Timestamp of the rent_flow_contract_canceled event formatted as yyyy-MM-dd HH:mm:ss. Null when no cancellation occurred after ts_sent."
   ts_signed:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
