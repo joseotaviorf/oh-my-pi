@@ -1,20 +1,20 @@
 ---
 database_name: datalake_revenue_lines
 table_name: brokerage_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing brokerage fee and payment data by contract"
 columns:
   id_contract_ebdb:
-    description: "Contract ID on EBDB"
+    description: Identifier for the contract ebdb referenced by this financial record.
     lineage:
       - dw_rent.dim_contract.sk_contract
   id_invoice_entry:
-    description: "Invoice entry ID"
+    description: Identifier for the invoice entry referenced by this financial record.
     lineage:
       - ddatalake_retsuko.invoice_entry.id_invoice_entry
   brokerage_share:
-    description: "Share of brokerage fee"
+    description: Financial attribute representing brokerage share on the brokerage_fee dataset.
   contract_guarantee:
     description: "Type of the contract guarantee."
     lineage:
@@ -28,11 +28,11 @@ columns:
     lineage:
       - dw_rent.dim_contract.first_rental_commission
   agent_brokerage_share:
-    description: "Share of brokerage agent"
+    description: Financial attribute representing agent brokerage share on the brokerage_fee dataset.
     lineage:
       - dw_rent.dim_contract.agent_brokerage_share
   brokerage_split_percentage:
-    description: "Split Percentage for the brokerage fee"
+    description: Financial attribute representing brokerage split percentage on the brokerage_fee dataset.
     lineage:
       - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
   select_agent_brokerage_split_percentage:
@@ -44,9 +44,9 @@ columns:
   invoice_theorical_amount:
     description: "Amortization amount that appears on the invoice"
   invoice_paid_amount:
-    description: "Paid amount in BRL"
+    description: Financial attribute representing invoice paid amount on the brokerage_fee dataset.
   accrual_year_month:
-    description: "Accural year-month"
+    description: Financial attribute representing accrual year month on the brokerage_fee dataset.
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
   dt_due:
@@ -58,6 +58,6 @@ columns:
     lineage:
       - datalake_retsuko.invoice_info.ts_paid
   dt_contract_start:
-    description: "Contract start date"
+    description: Calendar date associated with contract start in the financial workflow.
     lineage:
       - dw_rent.dim_contract.dt_start

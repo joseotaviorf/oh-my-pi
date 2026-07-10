@@ -1,7 +1,7 @@
 ---
 database_name: datalake_revenue_lines
 table_name: late_payments
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Fines for late payment of the rent invoice: 10% for late payment, plus 1% a.m. charged daily"
 columns:
@@ -27,11 +27,11 @@ columns:
       - datalake_invoice.invoice_entries.brl_entry_due_amount
       - datalake_invoice.invoice_entries.brl_entry_paid_amount
   accrual_year_month:
-    description: "Reference year-month"
+    description: Financial attribute representing accrual year month on the late_payments dataset.
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
   dt_created:
-    description: "Entry created date"
+    description: Calendar date associated with created in the financial workflow.
     lineage:
       - datalake_invoice.invoice_entries.ts_created
   dt_due:

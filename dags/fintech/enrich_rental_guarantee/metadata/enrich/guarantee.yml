@@ -1,6 +1,6 @@
 database_name: datalake_rental_guarantee
 table_name: guarantee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing data on standalone guarantee (fiança simples) as a guarantee of payment to the owner. Read more about it at: https://drive.google.com/drive/folders/1VTdZtORa_crcT4P20F4lDHFNO7u15HVL"
 columns:

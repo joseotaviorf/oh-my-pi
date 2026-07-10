@@ -69,9 +69,25 @@ condo AS (
         AND ie.to_account_type = 'contract'
     )
 SELECT
-    *
+    id_late_payments,
+    id_contract,
+    type_late,
+    invoice_theorical_amount,
+    invoice_paid_amount,
+    accrual_year_month,
+    dt_created,
+    dt_due,
+    dt_paid
 FROM payment
 UNION
 SELECT
-    *
+    id_late_payments,
+    id_contract,
+    type_late,
+    invoice_theorical_amount,
+    invoice_paid_amount,
+    accrual_year_month,
+    dt_created,
+    dt_due,
+    dt_paid
 FROM condo

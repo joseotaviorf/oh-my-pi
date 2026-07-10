@@ -1,7 +1,7 @@
 ---
 database_name: datalake_revenue_lines
 table_name: brokerage_finance
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "This For Rent addon makes it possible to our clients to split brokeragefee - BFI"
 columns:
@@ -45,7 +45,7 @@ columns:
       - datalake_ebdb_contract.contract.agent_brokerage_share
       - datalake_owner_fees_clean.contract.real_state_agent_share
   accrual_year_month:
-    description: "Reference year-month"
+    description: Financial attribute representing accrual year month on the brokerage_finance dataset.
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
   dt_bf_created:
@@ -53,7 +53,7 @@ columns:
     lineage:
       - datalake_owner_fees_clean.contract_brokerage_fee.ts_created
   dt_due_fee:
-    description: "Fee due date"
+    description: Calendar date associated with due fee in the financial workflow.
     lineage:
       - ddatalake_quintoandar.aux_date.date
   dt_paid_fee:

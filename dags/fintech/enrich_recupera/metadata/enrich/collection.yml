@@ -1,20 +1,20 @@
 ---
 database_name: datalake_recupera
 table_name: collection
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "This table represents the Recupera report called MISOCO. It contains the data about 'acionamentos'. New data based on the date of occurrence will be appended to the table every day"
 columns:
   id_creditor:
-    description: Creditor code
+    description: Identifier for the creditor referenced by this financial record.
     lineage:
       - datalake_recupera_clean.historical_records.id_creditor
   id_customer:
-    description: Customer ID
+    description: Identifier for the customer referenced by this financial record.
     lineage:
       - datalake_recupera_clean.historical_records.id_customer
   operator_name:
-    description: Operator ID
+    description: Financial attribute representing operator name on the collection dataset.
     lineage:
       - datalake_recupera_clean.operational_records.operator_name
   occurrence:
@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_recupera_clean.historical_records.historical_code
   occurrence_description:
-    description: Description in the occurrence
+    description: Financial attribute representing occurrence description on the collection dataset.
     lineage:
       - datalake_recupera_clean.historical_records.occurence_description
   esforco:
@@ -67,3 +67,12 @@ columns:
     description: Day from ts_occurrence
     lineage:
       - datalake_recupera_clean.historical_records.day
+  id_occurrence:
+    description: Identifier for the occurrence referenced by this financial record.
+    lineage: []
+  id_contract:
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
+    lineage: []
+  status_occurrence:
+    description: Financial attribute representing status occurrence on the collection dataset.
+    lineage: []

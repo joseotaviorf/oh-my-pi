@@ -1,12 +1,12 @@
 ---
 database_name: datalake_recupera
 table_name: negotiation
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "This table represents the Recupera report called NEGOCIAC and contains information about the negotiation."
 columns:
   id_creditor:
-    description: Creditor ID
+    description: Identifier for the creditor referenced by this financial record.
     categories:
       "1": QuintoAndar
       "3": QuintoCred, faturas da plataforma 2.0
@@ -150,7 +150,7 @@ columns:
       - datalake_recupera_clean.installment.installment_number
       - datalake_recupera_clean.installment.amount_to_pay
   down_payment_amount_without_fees:
-    description: Indicated the down payment amount without fees.
+    description: Financial attribute representing down payment amount without fees on the negotiation dataset.
     lineage:
       - datalake_recupera_clean.installment.installment_number
       - datalake_recupera_clean.installment.main_amount
@@ -199,3 +199,6 @@ columns:
     description: Month when the data was loaded
   day:
     description: Day when the data was loaded
+  advisory_code:
+    description: Financial attribute representing advisory code on the negotiation dataset.
+    lineage: []

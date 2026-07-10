@@ -1,7 +1,7 @@
 ---
 database_name: datalake_revenue_lines
 table_name: fire_insurance
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing fire insurance details"
 columns:
@@ -22,9 +22,9 @@ columns:
   guarantee:
     description: "Contract guarantee information"
   origin_fact:
-    description: "Payment origin"
+    description: Financial attribute representing origin fact on the fire_insurance dataset.
   raw_payment_amount:
-    description: "Total amount of payment"
+    description: Financial attribute representing raw payment amount on the fire_insurance dataset.
   rent:
     description: "Rent information from the contract"
     lineage:

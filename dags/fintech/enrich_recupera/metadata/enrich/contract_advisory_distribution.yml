@@ -1,29 +1,29 @@
 ---
 database_name: datalake_recupera
 table_name: contract_advisory_distribution
-owner: bianca.martins@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Contract distribution between advisories
 columns:
   id_contract:
-    description: ""
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_recupera_clean.contracts.id_contract
   advisory:
-    description: ""
+    description: Financial attribute representing advisory on the contract_advisory_distribution dataset.
     lineage:
       - datalake_recupera_clean.operational_records.advisory_code
   distributor:
-    description: ""
+    description: Financial attribute representing distributor on the contract_advisory_distribution dataset.
     lineage:
       - datalake_recupera_clean.operational_records.distributor_code
   partner:
-    description: ""
+    description: Financial attribute representing partner on the contract_advisory_distribution dataset.
     lineage:
       - datalake_recupera_clean.operational_records.advisory_code
       - datalake_recupera_clean.operational_records.distributor_code
   dt_snapshot:
-    description: ""
+    description: Calendar date associated with snapshot in the financial workflow.
     lineage:
       - datalake_recupera_clean.operational_records.year
       - datalake_recupera_clean.operational_records.month

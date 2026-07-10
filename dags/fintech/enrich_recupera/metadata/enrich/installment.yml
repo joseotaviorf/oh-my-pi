@@ -1,7 +1,7 @@
 ---
 database_name: datalake_recupera
 table_name: installment
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "This table represents the Recupera report called MISACO. It contains information about the installment of a negotiation. This table is overwritten every day with the most recent data"
 columns:
@@ -97,3 +97,30 @@ columns:
       - datalake_recupera_clean.installment_canceled.ts_canceled_installment
   dt_base:
     description: Base date. It will be CURRENT DATE - 1 day. Original field name = dt_base
+  payment_method:
+    description: Financial attribute representing payment method on the installment dataset.
+    lineage: []
+  adm_fee_amount:
+    description: Financial attribute representing adm fee amount on the installment dataset.
+    lineage: []
+  is_special_installment:
+    description: Indicates whether special installment applies to this financial record.
+    lineage: []
+  discount_amount:
+    description: Financial attribute representing discount amount on the installment dataset.
+    lineage: []
+  default_interest_amount:
+    description: Financial attribute representing default interest amount on the installment dataset.
+    lineage: []
+  amount_to_pay:
+    description: Financial attribute representing amount to pay on the installment dataset.
+    lineage: []
+  id_receipt:
+    description: Identifier for the receipt referenced by this financial record.
+    lineage: []
+  interest_fee_amount:
+    description: Financial attribute representing interest fee amount on the installment dataset.
+    lineage: []
+  amount_fine:
+    description: Financial attribute representing amount fine on the installment dataset.
+    lineage: []

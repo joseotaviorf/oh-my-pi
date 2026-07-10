@@ -1,6 +1,6 @@
 database_name: datalake_rental_guarantee
 table_name: charge
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing information on the amount charged to the tenant related to the standalone guarantee (fiança simples). Read more about it at: https://drive.google.com/drive/folders/1VTdZtORa_crcT4P20F4lDHFNO7u15HVL"
 columns: 
@@ -37,7 +37,7 @@ columns:
     lineage: 
       - datalake_rental_guarantee_clean.charge.qr_code
   charge_status:
-    description: "Current charge status"
+    description: QuintoCred rental guarantee attribute describing charge status in the policy lifecycle.
     lineage: 
       - datalake_rental_guarantee_clean.charge.charge_status
   charge_type:
