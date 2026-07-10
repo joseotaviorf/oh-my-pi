@@ -1,39 +1,52 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_forecast_cohort_demand
+description: Forecasted cohort rental demand from Google Sheets. One row per cohort with projected funnel volumes.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.city_group
+    description: Geographic city cluster used to group demand and budget planning targets.
   acquisition_channel:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.acquisition_channel
+    description: Marketing acquisition channel segment for demand forecasting.
   first_touchpoint:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.first_touchpoint
+    description: First customer touchpoint channel for demand forecasting.
   ca2cs:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.ca2cs
+    description: Conversion rate target from credit approved to contracts signed.
   cs:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.cs
+    description: Target count or rate for contracts signed in the cohort window.
   oa2ca:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.oa2ca
+    description: Conversion rate target from offers accepted to credit approved.
   os2oa:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.os2oa
+    description: Conversion rate target from offers submitted to offers accepted.
   vb2vc:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.vb2vc
+    description: Conversion rate target from visits booked to visits completed.
   vc2os:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.vc2os
+    description: Conversion rate target from visits completed to offers submitted.
   week_origin:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.week_origin
+    description: Origin week used as the cohort anchor for conversion targets.
   dt_week_start:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_demanda.week_start
  
+    description: Monday date marking the start of the forecast week.

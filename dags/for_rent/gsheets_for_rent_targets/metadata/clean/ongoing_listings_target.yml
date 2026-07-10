@@ -1,7 +1,9 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: ongoing_listings_target
+description: Ongoing rental listings volume targets from Google Sheets. One row per planning slice with listing inventory goals.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   business_context:
     description: Business context of the listing.
@@ -56,6 +58,6 @@ columns:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets.new_first_rental
   dt_created:
-    description: Target date.
+    description: Timestamp when the planning record was loaded from Google Sheets.
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets.date

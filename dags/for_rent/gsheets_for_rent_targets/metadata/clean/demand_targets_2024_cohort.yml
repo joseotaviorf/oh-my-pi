@@ -1,14 +1,16 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_2024_cohort
+description: Cohort-based For Rent demand targets for 2024 from Google Sheets. One row per cohort slice with funnel stage goal volumes.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   dt_week_started:
-    description: Week of the target.
+    description: Planning metric capturing dt week started from the For Rent targets spreadsheet.
     lineage:
       - datalake_gsheets_raw.demand_targets_2024_cohort.week_start
   city_group:
-    description: City group.
+    description: Geographic city cluster used to group demand and budget planning targets.
     lineage:
       - datalake_gsheets_raw.demand_targets_2024_cohort.city_group
   rental_administrator:

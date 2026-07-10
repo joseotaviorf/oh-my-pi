@@ -1,16 +1,16 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rent_demand_budget_2024
-owner: gustavo.alencar@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 domain: For Rent
-description: Transformed table created from a Google Sheets file in order to input demand funnel budgets into datalake
+description: For Rent demand budget targets for 2024 from Google Sheets. One row per city group and budget period with planned funnel volumes.
 columns:
   city_group:
-    description: City group.
+    description: Geographic city cluster used to group demand and budget planning targets.
     lineage:
       - datalake_gsheets_raw.rent_demand_budget_2024.city_group
   dt_budget:
-    description: Date of the budget.
+    description: Calendar date or month the budget target volume applies to.
     lineage:
       - datalake_gsheets_raw.rent_demand_budget_2024.date
   business_type:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.rent_demand_budget_2024.rental_administrator
   visits_booked:
-    description: Budget volume of visits booked.
+    description: Count of tenant visits scheduled during the reporting period.
     lineage:
       - datalake_gsheets_raw.rent_demand_budget_2024.visits_booked  
   visits_completed:

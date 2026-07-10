@@ -1,43 +1,58 @@
 database_name: datalake_gsheets_clean
 table_name: demand_targets_2025_cohort
+description: Cohort-based For Rent demand targets for 2025 from Google Sheets. One row per cohort slice with funnel stage goal volumes.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   business_type:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.business_type
+    description: Business type of the listing related to the event (ASP, CIQ, B2B or Core).
   ca2cs:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.ca2cs
+    description: Conversion rate target from credit approved to contracts signed.
   city_group:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.city_group
+    description: Geographic city cluster used to group demand and budget planning targets.
   cs:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.cs
+    description: Target count or rate for contracts signed in the cohort window.
   oa2ca:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.oa2ca
+    description: Conversion rate target from offers accepted to credit approved.
   os2oa:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.os2oa
+    description: Conversion rate target from offers submitted to offers accepted.
   rent_flow_origin:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.rent_flow_origin
+    description: Origin (first touchpoint) of the rent flow related to the event.
   rental_administrator:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.rental_administrator
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
   vb2os:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.vb2os
+    description: Conversion rate target from visits booked to offers submitted.
   vb2vc:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.vb2vc
+    description: Conversion rate target from visits booked to visits completed.
   vc2os:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.vc2os
+    description: Conversion rate target from visits completed to offers submitted.
   week_start:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.week_start
+    description: Monday date marking the start of the cohort conversion week.
   weeks_conversion:
     lineage:
       - datalake_gsheets_raw.demand_targets_2025_cohort.weeks_conversion
+    description: Number of weeks in the cohort conversion window.

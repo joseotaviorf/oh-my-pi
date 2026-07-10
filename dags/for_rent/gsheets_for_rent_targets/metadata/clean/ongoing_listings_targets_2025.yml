@@ -1,46 +1,62 @@
 database_name: datalake_gsheets_clean
 table_name: ongoing_listings_targets_2025
+description: Ongoing rental listings volume targets for 2025 from Google Sheets. One row per planning slice with listing inventory goals.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   business_context:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.business_context
+    description: Business context segment for ongoing listings planning.
   city_group:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.city_group
+    description: Geographic city cluster used to group demand and budget planning targets.
   date:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.date
+    description: Calendar date the planning target volume applies to.
   depublications:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.depublications
+    description: Planned count of listings removed from publication in the period.
   ended_rentals:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.ended_rentals
+    description: Planned count of rental contracts ending in the budget period.
   erc:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.erc
+    description: Planned count of contracts with end confirmation in the budget period.
   new_first_rental:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.new_first_rental
+    description: Planned count of first-time rental listings in the period.
   new_rental:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.new_rental
+    description: Planned count of new rental contracts started in the period.
   ongoing_listings:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.ongoing_listings
+    description: Planned count of published ongoing rental listings.
   ongoing_rentals:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.ongoing_rentals
+    description: Planned count of active ongoing rental contracts.
   recovered:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.recovered
+    description: Planned count of listings recovered from long unpublished status.
   relisting:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.relisting
+    description: Planned count of listings returning to published after a rental.
   rental_administrator:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.rental_administrator
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
   suspensions:
     lineage:
       - datalake_gsheets_raw.ongoing_listings_targets_2025.suspensions
+    description: Planned count of listings suspended during the budget period.

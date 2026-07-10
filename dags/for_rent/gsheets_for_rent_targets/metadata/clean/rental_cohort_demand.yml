@@ -1,52 +1,70 @@
 database_name: datalake_gsheets_clean
 table_name: rental_cohort_demand
+description: Cohort-level rental demand targets from Google Sheets. One row per cohort with funnel stage goal volumes.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.city_group
+    description: Geographic city cluster used to group demand and budget planning targets.
   funnel_flow:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.funnel_flow
+    description: Demand funnel flow variant used for cohort target segmentation.
   guarantee:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.guarantee
+    description: Rental guarantee product segment for cohort demand targets.
   target_ca:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_ca
+    description: Target volume of credit approved in the cohort planning period.
   target_cep:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_cep
+    description: Target volume of evaluations positive in the cohort planning period.
   target_cs:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_cs
+    description: Target volume of contracts signed in the cohort planning period.
   target_ds:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_ds
+    description: Target volume of documentation sent in the cohort planning period.
   target_es:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_es
+    description: Target volume of evaluations started in the cohort planning period.
   target_oa:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_oa
+    description: Target volume of offers accepted in the cohort planning period.
   target_os:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_os
+    description: Target volume of offers submitted in the cohort planning period.
   target_vb:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_vb
+    description: Target volume of visits booked in the cohort planning period.
   target_vc:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.target_vc
+    description: Target volume of visits completed in the cohort planning period.
   visao:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.visao
+    description: Planning view or scenario label for cohort demand targets.
   week:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.week
+    description: ISO week number for cohort demand target segmentation.
   week_origin:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.week_origin
+    description: Origin week used as the cohort anchor for conversion targets.
   rental_administrator:
     lineage:
       - datalake_gsheets_raw.rental_cohort_demand.rental_administrator
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).

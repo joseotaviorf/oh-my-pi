@@ -1,80 +1,107 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_budget_targets
+description: Consolidated For Rent budget targets from Google Sheets. One row per planning dimension with funnel and listings goals.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   contact_onboarding_moving_actual:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.contact_onboarding_moving_actual
+    description: Actual realized value for contact onboarding moving in the budget tracking period.
   contact_onboarding_moving_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.contact_onboarding_moving_target
+    description: Planned budget goal for contact onboarding moving in the tracking period.
   contact_ongoing_repair_actual:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.contact_ongoing_repair_actual
+    description: Actual realized value for contact ongoing repair in the budget tracking period.
   contact_ongoing_repair_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.contact_ongoing_repair_target
+    description: Planned budget goal for contact ongoing repair in the tracking period.
   contact_payments_actual:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.contact_payments_actual
+    description: Actual realized value for contact payments in the budget tracking period.
   contact_payments_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.contact_payments_target
+    description: Planned budget goal for contact payments in the tracking period.
   contract_signed_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.contract_signed_target
+    description: Planned budget goal for contract signed in the tracking period.
   first_listing_pro_owners_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.first_listing_pro_owners_target
+    description: Planned budget goal for first listing pro owners in the tracking period.
   first_listing_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.first_listing_target
+    description: Planned budget goal for first listing in the tracking period.
   net_churn_coincident_actual:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.net_churn_coincident_actual
+    description: Actual realized value for net churn coincident in the budget tracking period.
   net_churn_coincident_first_listing_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.net_churn_coincident_first_listing_target
+    description: Planned budget goal for net churn coincident first listing in the tracking period.
   net_churn_coincident_relisting_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.net_churn_coincident_relisting_target
+    description: Planned budget goal for net churn coincident relisting in the tracking period.
   net_churn_coincident_suspended_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.net_churn_coincident_suspended_target
+    description: Planned budget goal for net churn coincident suspended in the tracking period.
   net_churn_coincident_suspended_unpublished_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.net_churn_coincident_suspended_unpublished_target
+    description: Planned budget goal for net churn coincident suspended unpublished in the tracking period.
   net_churn_coincident_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.net_churn_coincident_target
+    description: Planned budget goal for net churn coincident in the tracking period.
   new_tenant_prospect_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.new_tenant_prospect_target
+    description: Planned budget goal for new tenant prospect in the tracking period.
   offboarding_actual:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.offboarding_actual
+    description: Actual realized value for offboarding in the budget tracking period.
   offboarding_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.offboarding_target
+    description: Planned budget goal for offboarding in the tracking period.
   recovered_listing_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.recovered_listing_target
+    description: Planned budget goal for recovered listing in the tracking period.
   recovered_tenant_prospects_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.recovered_tenant_prospects_target
+    description: Planned budget goal for recovered tenant prospects in the tracking period.
   relisting_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.relisting_target
+    description: Planned budget goal for relisting in the tracking period.
   tenant_prospects_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.tenant_prospects_target
+    description: Planned budget goal for tenant prospects in the tracking period.
   total_listing_target:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.total_listing_target
+    description: Planned budget goal for total listing in the tracking period.
   dt_month_start:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.month_start
+    description: Planning metric capturing dt month start from the For Rent targets spreadsheet.
   ts_load:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.ts_load
+    description: Planning metric capturing ts load from the For Rent targets spreadsheet.

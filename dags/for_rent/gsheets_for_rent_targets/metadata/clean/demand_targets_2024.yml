@@ -1,14 +1,16 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_2024
+description: For Rent demand funnel volume targets for 2024 from Google Sheets. One row per city group, date, and funnel dimension with stage-level goal counts.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   city_group:
-    description: City group.
+    description: Geographic city cluster used to group demand and budget planning targets.
     lineage:
       - datalake_gsheets_raw.demand_targets_2024.city_group
   dt_target:
-    description: Date of the target.
+    description: Calendar date the demand funnel target volume applies to.
     lineage:
       - datalake_gsheets_raw.demand_targets_2024.date
   business_type:
@@ -24,7 +26,7 @@ columns:
     lineage:
       - datalake_gsheets_raw.demand_targets_2024.rental_administrator
   visits_booked:
-    description: Target volume of visits booked.
+    description: Count of tenant visits scheduled during the reporting period.
     lineage:
       - datalake_gsheets_raw.demand_targets_2024.visits_booked  
   visits_completed:

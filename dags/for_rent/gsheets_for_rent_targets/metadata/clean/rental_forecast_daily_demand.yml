@@ -1,51 +1,68 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rental_forecast_daily_demand
+description: Daily rental demand forecast targets from Google Sheets. One row per date with projected funnel stage volumes.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.city_group
+    description: Geographic city cluster used to group demand and budget planning targets.
   acquisition_channel:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.acquisition_channel
+    description: Marketing acquisition channel segment for demand forecasting.
   first_touchpoint:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.first_touchpoint
+    description: First customer touchpoint channel for demand forecasting.
   ca:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.ca
+    description: Target count for credit approved events in the forecast period.
   cs:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.cs
+    description: Target count or rate for contracts signed in the cohort window.
   oa:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.oa
+    description: Target count for offers accepted in the forecast period.
   os:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.os
+    description: Target count for offers submitted in the forecast period.
   vb:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.vb
+    description: Target count for visits booked in the forecast period.
   vc:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.vc
+    description: Target count for visits completed in the forecast period.
   dt_created:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.date
+    description: Timestamp when the planning record was loaded from Google Sheets.
   dt_week_start:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.week_start
+    description: Monday date marking the start of the forecast week.
   year:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.year
+    description: Planning metric capturing year from the For Rent targets spreadsheet.
   semester:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.halfyear
+    description: Semester period label for daily demand forecast segmentation.
   quarter:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.quarter
+    description: Quarter period label for daily demand forecast segmentation.
   month:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.month
   
+    description: Planning metric capturing month from the For Rent targets spreadsheet.

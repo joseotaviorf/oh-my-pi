@@ -1,9 +1,9 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: rent_ongoing_listings_budget_2024
-owner: gustavo.alencar@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 domain: For Rent
-description: Transformed table created from a Google Sheets file in order to input ongoing listings budget into datalake
+description: Ongoing listings budget targets for 2024 from Google Sheets. One row per budget period with listing inventory goals.
 columns:
   business_context:
     description: Business context of the listing.
@@ -46,6 +46,6 @@ columns:
     lineage:
       - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.erc
   dt_budget:
-    description: Budget date.
+    description: Calendar date or month the budget target volume applies to.
     lineage:
       - datalake_gsheets_raw.rent_ongoing_listings_budget_2024.date

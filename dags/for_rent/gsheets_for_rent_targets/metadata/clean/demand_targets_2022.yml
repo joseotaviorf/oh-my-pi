@@ -1,77 +1,103 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_2022
+description: For Rent demand funnel volume targets for 2022 from Google Sheets. One row per city group, date, and funnel dimension with stage-level goal counts.
 domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.city_group
+    description: Geographic city cluster used to group demand and budget planning targets.
   demand_channel:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.demand_channel
+    description: Planning metric capturing demand channel from the For Rent targets spreadsheet.
   demand_channel_type:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.demand_channel_type
+    description: Planning metric capturing demand channel type from the For Rent targets spreadsheet.
   funnel_origin:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.funnel_origin
+    description: Planning metric capturing funnel origin from the For Rent targets spreadsheet.
   rental_administrator:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.rental_administrator
+    description: Who is responsible for administrating the contract (QuintoAndar, Third party or Brokerage Only).
   evaluation_positive:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.evaluation_positive
+    description: Target volume of evaluations positive.
   evaluation_started:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.evaluation_started
+    description: Target volume of evaluations started.
   new_tenant_prospects:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.new_tenant_prospects
+    description: Planning metric capturing new tenant prospects from the For Rent targets spreadsheet.
   contracts_signed:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.contracts_signed
+    description: Target volume of contracts signed.
   credit_approved:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.credit_approved
+    description: Target volume of credit analysis approved.
   doc_completed:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.doc_completed
+    description: Planning metric capturing doc completed from the For Rent targets spreadsheet.
   doc_sent:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.doc_sent
+    description: Planning metric capturing doc sent from the For Rent targets spreadsheet.
   has_guarantee:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.guarantee
+    description: Planning metric capturing has guarantee from the For Rent targets spreadsheet.
   offer_accepted:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.offer_accepted
+    description: Planning metric capturing offer accepted from the For Rent targets spreadsheet.
   offer_sent:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.offer_sent
+    description: Planning metric capturing offer sent from the For Rent targets spreadsheet.
   visits_booked:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.visits_booked
+    description: Count of tenant visits scheduled during the reporting period.
   visits_completed:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.visits_completed
+    description: Target volume of visits completed.
   tier:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.tier
-  halfyer:
+    description: Planning metric capturing tier from the For Rent targets spreadsheet.
+  halfyear:
     lineage:
-      - datalake_gsheets_raw.demand_targets_2022.halfyer
+      - datalake_gsheets_raw.demand_targets_2022.halfyear
+    description: Planning metric capturing halfyer from the For Rent targets spreadsheet.
   quarter:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.quarter
+    description: Quarter period label for daily demand forecast segmentation.
   month:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.month
+    description: Planning metric capturing month from the For Rent targets spreadsheet.
   year:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.year
+    description: Planning metric capturing year from the For Rent targets spreadsheet.
   dt_week_started:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.week_start
+    description: Planning metric capturing dt week started from the For Rent targets spreadsheet.
   dt_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.date
+    description: Calendar date the demand funnel target volume applies to.
