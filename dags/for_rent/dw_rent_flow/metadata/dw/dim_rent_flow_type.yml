@@ -1,3 +1,4 @@
+---
 database_name: dw_rent
 table_name: dim_rent_flow_type
 description: Junk dimension table that contains information related to the rent flow's type.
@@ -6,13 +7,12 @@ description: Junk dimension table that contains information related to the rent 
     This table is partitioned by the country_code and first_touchpoint columns (in this exactly order), so make sure to
     use them as one of the first filters of the query (in the same order) in order to improve its performance.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_rent_flow_type:
     lineage:
       - datalake_rent_flows.rent_flows_types.id_rent_flow_type
-    description: Unique but mutable id that identifies the type of the rent flow and its combinations.
-      Joins with dw_rent.fact_rent_flows and should be used with it to identify the rent flow.
+    description: Unique but mutable id that identifies the type of the rent flow and its combinations. Joins with dw_rent.fact_rent_flows and should be used with it to identify the rent flow.
   country_code:
     lineage:
       - datalake_rent_flows.rent_flows_types.country_code
@@ -21,9 +21,7 @@ columns:
   first_touchpoint:
     lineage:
       - datalake_rent_flows.rent_flows_types.first_touchpoint
-    description: The first touchpoint of the rent flow, related to the first event that happened to it.
-      Also, a partition of this table -- if you're using this column as a filter, make sure to be one of the first filters,
-      it will improve the query's performance.
+    description: The first touchpoint of the rent flow, related to the first event that happened to it. Also, a partition of this table -- if you're using this column as a filter, make sure to be one of the first filters, it will improve the query's performance.
     categories:
       'VISIT': "Touchpoint is a visit."
       'DIRECT': "Touchpoint is a direct offer (DO)."
@@ -46,12 +44,7 @@ columns:
   is_valid_rent_flow:
     lineage:
       - datalake_rent_flows.rent_flows_types.is_valid_rent_flow
-    description: Boolean flag indicating if the rent flow is valid and also its events.
-      A rent flow is only considered as valid if the property has as context Rent or null and if it has any visit with
-      Rent intent or it could have Sale intent but is related to a rent contract at the end. Then, at least one demand event
-      needs to follows several rules -- for example, to count a visit booked, it has to be type = Visit,
-      otherwise it won't be counted as a valid visit booked.
-      In this way, the rent flow is considered as valid (is_valid_rent_flow = true), otherwise it won't.
+    description: Boolean flag indicating if the rent flow is valid and also its events. A rent flow is only considered as valid if the property has as context Rent or null and if it has any visit with Rent intent or it could have Sale intent but is related to a rent contract at the end. Then, at least one demand event needs to follows several rules -- for example, to count a visit booked, it has to be type = Visit, otherwise it won't be counted as a valid visit booked. In this way, the rent flow is considered as valid (is_valid_rent_flow = true), otherwise it won't.
   has_visit_flow:
     lineage:
       - datalake_rent_flows.rent_flows_types.has_visit_flow
@@ -63,8 +56,7 @@ columns:
   has_direct_offer_flow:
     lineage:
       - datalake_rent_flows.rent_flows_types.has_offer_flow
-    description: Boolean flag indicating if the rent flow had any direct offer (DO) event, which means that the first event
-      of the rent flow was a DO.
+    description: Boolean flag indicating if the rent flow had any direct offer (DO) event, which means that the first event of the rent flow was a DO.
   has_tta_flow:
     lineage:
       - datalake_rent_flows.rent_flows_types.country_code

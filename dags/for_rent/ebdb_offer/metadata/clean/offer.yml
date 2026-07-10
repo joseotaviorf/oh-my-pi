@@ -1,73 +1,99 @@
+---
 database_name: datalake_ebdb_clean
 table_name: offer
+description: Clean layer table for offer from the ebdb_offer pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.offer.id
+    description: id captured in the source operational system.
   id_firestore:
     lineage:
       - datalake_ebdb_raw.offer.firestoreid
+    description: id firestore captured in the source operational system.
   id_godfather:
     lineage:
       - datalake_ebdb_raw.offer.godfatherid
+    description: Legacy identifier linking the offer to the historical Godfather negotiation service.
   id_client:
     lineage:
       - datalake_ebdb_raw.offer.client_id
+    description: id client captured in the source operational system.
   id_house:
     lineage:
       - datalake_ebdb_raw.offer.house_id
+    description: id house captured in the source operational system.
   id_rent_flow:
     lineage:
       - datalake_ebdb_raw.offer.rentflow_id
+    description: id rent flow captured in the source operational system.
   original_condo:
     lineage:
       - datalake_ebdb_raw.offer.originalcondo
+    description: original condo captured in the source operational system.
   original_home_insurance:
     lineage:
       - datalake_ebdb_raw.offer.originalhomeinsurance
+    description: original home insurance captured in the source operational system.
   original_iptu:
     lineage:
       - datalake_ebdb_raw.offer.originaliptu
+    description: original iptu captured in the source operational system.
   original_rent:
     lineage:
       - datalake_ebdb_raw.offer.originalrent
+    description: original rent captured in the source operational system.
   rent:
     lineage:
       - datalake_ebdb_raw.offer.rent
+    description: rent captured in the source operational system.
   status:
     lineage:
       - datalake_ebdb_raw.offer.status
+    description: status captured in the source operational system.
   turn:
     lineage:
       - datalake_ebdb_raw.offer.turn
+    description: turn captured in the source operational system.
   rejection_reason:
     lineage:
       - datalake_ebdb_raw.offer.rejectionreason
+    description: rejection reason captured in the source operational system.
   ts_created:
     lineage:
       - datalake_ebdb_raw.offer.criadoem
+    description: Record creation date
   ts_updated:
     lineage:
       - datalake_ebdb_raw.offer.atualizadoem
+    description: Record update date
   iteration:
     lineage:
       - datalake_ebdb_raw.offer.iteration
+    description: iteration captured in the source operational system.
   ts_expired:
     lineage:
       - datalake_ebdb_raw.offer.expirationdate
+    description: ts expired captured in the source operational system.
   type:
     lineage:
       - datalake_ebdb_raw.offer.type
+    description: type captured in the source operational system.
   ts_updated_godfather:
     lineage:
       - datalake_ebdb_raw.offer.godfatherupdatedat
+    description: Record update date
   resident_name:
     lineage:
       - datalake_ebdb_raw.offer.residentname
+    description: resident name captured in the source operational system.
   is_id_firestore_unique:
     lineage:
       - datalake_ebdb_raw.offer.firestoreid_unique
+    description: is id firestore unique captured in the source operational system.
   is_docs_created_sync:
     lineage:
       - datalake_ebdb_raw.offer.docs_created_sync
+    description: is docs created sync captured in the source operational system.

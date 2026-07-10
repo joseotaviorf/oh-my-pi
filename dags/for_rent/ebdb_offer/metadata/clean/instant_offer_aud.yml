@@ -1,22 +1,31 @@
+---
 database_name: datalake_ebdb_clean
 table_name: instant_offer_aud
+description: Clean layer table for instant offer aud from the ebdb_offer pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.instantoffer_aud.id
+    description: Surrogate key identifying this instant offer aud record in the ebdb_offer pipeline.
   id_house:
     lineage:
       - datalake_ebdb_raw.instantoffer_aud.house_id
+    description: id house captured in the source operational system.
   rev:
     lineage:
       - datalake_ebdb_raw.instantoffer_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_ebdb_raw.instantoffer_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   is_enabled:
     lineage:
       - datalake_ebdb_raw.instantoffer_aud.enabled
+    description: is enabled captured in the source operational system.
   mod_is_enabled:
     lineage:
       - datalake_ebdb_raw.instantoffer_aud.enabled_mod
+    description: Flag indicating whether the is enabled field changed in this revision.

@@ -1,73 +1,99 @@
+---
 database_name: datalake_ebdb_clean
 table_name: offer_aud
+description: Clean layer table for offer aud from the ebdb_offer pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_offer:
     lineage:
       - datalake_ebdb_raw.offer_aud.id
+    description: id offer captured in the source operational system.
   rev:
     lineage:
       - datalake_ebdb_raw.offer_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_ebdb_raw.offer_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   id_client:
     lineage:
       - datalake_ebdb_raw.offer_aud.client_id
+    description: id client captured in the source operational system.
   id_house:
     lineage:
       - datalake_ebdb_raw.offer_aud.house_id
+    description: id house captured in the source operational system.
   id_rent_flow:
     lineage:
       - datalake_ebdb_raw.offer_aud.rentflow_id
+    description: id rent flow captured in the source operational system.
   id_firestore:
     lineage:
       - datalake_ebdb_raw.offer_aud.firestoreid
+    description: id firestore captured in the source operational system.
   id_godfather:
     lineage:
       - datalake_ebdb_raw.offer_aud.godfatherid
+    description: Legacy identifier linking the offer to the historical Godfather negotiation service.
   original_condo:
     lineage:
       - datalake_ebdb_raw.offer_aud.originalcondo
+    description: original condo captured in the source operational system.
   original_home_insurance:
     lineage:
       - datalake_ebdb_raw.offer_aud.originalhomeinsurance
+    description: original home insurance captured in the source operational system.
   original_iptu:
     lineage:
       - datalake_ebdb_raw.offer_aud.originaliptu
+    description: original iptu captured in the source operational system.
   original_rent:
     lineage:
       - datalake_ebdb_raw.offer_aud.originalrent
+    description: original rent captured in the source operational system.
   rent:
     lineage:
       - datalake_ebdb_raw.offer_aud.rent
+    description: rent captured in the source operational system.
   status:
     lineage:
       - datalake_ebdb_raw.offer_aud.status
+    description: status captured in the source operational system.
   turn:
     lineage:
       - datalake_ebdb_raw.offer_aud.turn
+    description: turn captured in the source operational system.
   ts_expiration:
     lineage:
       - datalake_ebdb_raw.offer_aud.expirationdate
+    description: ts expiration captured in the source operational system.
   iteration:
     lineage:
       - datalake_ebdb_raw.offer_aud.iteration
+    description: iteration captured in the source operational system.
   rejection_reason:
     lineage:
       - datalake_ebdb_raw.offer_aud.rejectionreason
+    description: rejection reason captured in the source operational system.
   mod_status:
     lineage:
       - datalake_ebdb_raw.offer_aud.status_mod
+    description: Flag indicating whether the status field changed in this revision.
   mod_turn:
     lineage:
       - datalake_ebdb_raw.offer_aud.turn_mod
+    description: Flag indicating whether the turn field changed in this revision.
   type:
     lineage:
       - datalake_ebdb_raw.offer_aud.type
+    description: type captured in the source operational system.
   ts_godfather_updated:
     lineage:
       - datalake_ebdb_raw.offer_aud.godfatherupdatedat
+    description: ts godfather updated captured in the source operational system.
   resident_name:
     lineage:
       - datalake_ebdb_raw.offer_aud.residentname
+    description: resident name captured in the source operational system.

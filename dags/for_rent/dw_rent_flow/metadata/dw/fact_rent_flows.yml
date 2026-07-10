@@ -1,6 +1,7 @@
+---
 database_name: dw_rent
 table_name: fact_rent_flows
-description:
+description: |
   Fact table that contains information related to a rent flow (which is the tuple [property, tenant prospect]),
   mostly related about its metrics. If desired to understand characteristics of the rent flow, it's necessary to join with
   the dw_rent.dim_rent_flow_type using the key sk_rent_flow_type.
@@ -8,22 +9,16 @@ description:
   This table is partitioned by the country_code column, so make sure to use it as one of the first filters of the query
   in order to improve its performance.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_rent_flow:
     lineage:
       - datalake_rent_flows.rent_flows.id_rent_flow
-    description:
-      Id of the rent flow, also the PK of the table. Each line should be an unique rent flow.
-      Joins with dw_rent.fact_listing_rent_flows.
+    description: Id of the rent flow, also the PK of the table. Each line should be an unique rent flow. Joins with dw_rent.fact_listing_rent_flows.
   sk_rent_flow_type:
     lineage:
       - datalake_rent_flows.rent_flows_types.id_rent_flow_type
-    description:
-      Unique but mutable id that makes possible to identify the type of the rent flow and its combinations.
-      To reach this information, it's necessary to use this key to join with the dw_rent.dim_rent_flow_type.
-      This id should be used only to connect with mentioned dim table in order to identify the rent flow type and its
-      characteristics, but never used for analysis (as for example, filtering data by it).
+    description: Unique but mutable id that makes possible to identify the type of the rent flow and its combinations. To reach this information, it's necessary to use this key to join with the dw_rent.dim_rent_flow_type. This id should be used only to connect with mentioned dim table in order to identify the rent flow type and its characteristics, but never used for analysis (as for example, filtering data by it).
   sk_house:
     lineage:
       - datalake_rent_flows.rent_flows.id_house

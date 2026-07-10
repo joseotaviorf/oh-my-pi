@@ -1,3 +1,4 @@
+---
 database_name: dw_rent
 table_name: fact_rent_cohort_conversions
 description: "Transactional fact table that registers a row for each conversion in
@@ -12,16 +13,13 @@ description: "Transactional fact table that registers a row for each conversion 
   weeks_to_conversion will be -1.
   Each line is an unique cohort conversion."
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_cohort_conversion:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event
       - dw_rent.fact_rent_demand_events.sk_event_type
-    description: "Unique key consolidated with the base event id + base event type id +
-      base event coverted id + base event type converted id. Every id is splitted by a single '-'.
-      (e.g sk_base_event - sk_base_event_type - sk_conversion_event - sk_conversion_event_type).
-      If the event hasn't converted, the rule will be sk_base_event - sk_base_event_type - 0 - 0."
+    description: "Unique key consolidated with the base event id + base event type id + base event coverted id + base event type converted id. Every id is splitted by a single '-'. (e.g sk_base_event - sk_base_event_type - sk_conversion_event - sk_conversion_event_type). If the event hasn't converted, the rule will be sk_base_event - sk_base_event_type - 0 - 0."
   sk_cohort_type:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event_type
@@ -37,13 +35,11 @@ columns:
   sk_conversion_event:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event
-    description: "Key of the conversion event. It joins with dw_rent.fact_rent_demand_events.
-      If the event hasn't converted, it will be 0."
+    description: "Key of the conversion event. It joins with dw_rent.fact_rent_demand_events. If the event hasn't converted, it will be 0."
   sk_conversion_event_type:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event_type
-    description: "Key of the conversion event type (indicating if the event is a VC, OS, etc.). It joins with dw_rent.fact_rent_demand_events.
-      If the event hasn't converted, it will be 0."
+    description: "Key of the conversion event type (indicating if the event is a VC, OS, etc.). It joins with dw_rent.fact_rent_demand_events. If the event hasn't converted, it will be 0."
   sk_base_event_date:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event_date
@@ -51,15 +47,14 @@ columns:
   sk_conversion_date:
     lineage:
       - dw_rent.fact_rent_demand_events.sk_event_date
-    description: "Date key of the event's conversion date (e.g. visit's booking to completed date, etc.).
-      If the event hasn't converted, it will be -1."
+    description: "Date key of the event's conversion date (e.g. visit's booking to completed date, etc.). If the event hasn't converted, it will be -1."
   country_code:
     lineage:
       - dw_rent.fact_rent_demand_events.country_code
-    description: "Country code related to the event. It's also a table partitions."
+    description: ISO country code for geographic filtering of the analytical metric.
   days_to_conversion:
     description: "Days between the base event and the conversion event dates. If the event hasn't converted, it will be -1."
   weeks_to_conversion:
     description: "Weeks between the base event and the conversion event dates. If the event hasn't converted, it will be -1."
   ts_load:
-    description: "Load date."
+    description: Load date captured in the source operational system.

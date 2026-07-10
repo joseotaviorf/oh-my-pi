@@ -1,13 +1,14 @@
+---
 database_name: dw_rent
 table_name: fact_rent_demand_events
-description:
+description: |
   This fact table is related to the demand events of For Rent, used to stablish event trackings relations.
   Using the column sk_event_type, is possible to join with the dw_rent.dim_rent_event_type and understand which type of event it is.
   By understanding the event type, it's possible to join with other models (example, if sk_event_type 9 or 10, then it's a contract event
   and it's possible to use the sk_event column to join with the dw_rent.dim_contract).
   Each line is the most recent update of an event related to the scope.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   pk_rent_demand_event:
     lineage:
@@ -18,21 +19,19 @@ columns:
   sk_event:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_event
-    description:
-      Id of the event. It could be a sk_booking, sk_offer, sk_proposal or sk_contract, and it can be used to join with different models
-      based in which type of event it is.
+    description: Id of the event. It could be a sk_booking, sk_offer, sk_proposal or sk_contract, and it can be used to join with different models based in which type of event it is.
   sk_booking:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_booking
-    description: Id of the booking.
+    description: Id of the booking captured in the source operational system.
   sk_visit:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_visit
-    description: Id of the visit.
+    description: Id of the visit captured in the source operational system.
   sk_offer:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_offer
-    description: Id of the offer.
+    description: Id of the offer captured in the source operational system.
   sk_advance_payment:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_advance_payment
@@ -40,15 +39,15 @@ columns:
   sk_proposal:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_proposal
-    description: Id of the proposal.
+    description: Id of the proposal captured in the source operational system.
   sk_contract:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_contract
-    description: Id of the contract.
+    description: Id of the contract captured in the source operational system.
   sk_event_type:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_event_type
-    description: Id of the event type.
+    description: Id of the event type captured in the source operational system.
   sk_tenant_prospect:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
@@ -56,18 +55,15 @@ columns:
   sk_house:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_house
-    description: Id of the house.
+    description: Id of the house captured in the source operational system.
   sk_agent:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_agent
-    description: Id of the user that is the agent. Notice that it's not the id_agent, but the id_user of the agent
-      (which comes from the EBDB's User table, column id), which is still the same person in our database.
-      This was necessary in order to join with the fact_listing_rent_flows model, which already uses the agent's user id on the column sk_user_agent.
-      If joining with dim_user, it's a directly join with the sk_user column.
+    description: Id of the user that is the agent. Notice that it's not the id_agent, but the id_user of the agent (which comes from the EBDB's User table, column id), which is still the same person in our database. This was necessary in order to join with the fact_listing_rent_flows model, which already uses the agent's user id on the column sk_user_agent. If joining with dim_user, it's a directly join with the sk_user column.
   sk_rent_flow:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_rent_flow
-    description: Id of the rent flow.
+    description: Id of the rent flow captured in the source operational system.
   sk_rent_flow_type:
     lineage:
       - datalake_rent_flows.rent_flows_types.id_rent_flow_type
@@ -79,7 +75,7 @@ columns:
   sk_region:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_region
-    description: Id of the region.
+    description: Id of the region captured in the source operational system.
   sk_owner:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_owner
@@ -87,30 +83,23 @@ columns:
   sk_owner_category:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_owner_category
-    description:
-      Id of the property owner's version. We're not versioning the owners that are B2B, so a -1 values can exist.
-      It can be joined with dw_rent.dim_owner_category to check the owner's category.
+    description: Id of the property owner's version. We're not versioning the owners that are B2B, so a -1 values can exist. It can be joined with dw_rent.dim_owner_category to check the owner's category.
   sk_company_supply:
     lineage:
       - datalake_company.company_sks.sk_company
-    description:
-      Foreign key of the Rede company associated with the event. Can be joined with
-      dw_rede.dim_company.
+    description: Foreign key of the Rede company associated with the event. Can be joined with dw_rede.dim_company.
   sk_event_date:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.ts_event
-    description: Id of the event date.
+    description: Id of the event date captured in the source operational system.
   country_code:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.country_code
-    description: Country code information. It's also a table partitions.
+    description: ISO country code for geographic filtering of the analytical metric.
   is_during_termination:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.is_during_termination
-    description:
-      Boolean flag indicating if the event happened between the listing's version start date and the listing's
-      previous version contract end date.
-      This flag may help understanding events during Early Demand, for example.
+    description: Boolean flag indicating if the event happened between the listing's version start date and the listing's previous version contract end date. This flag may help understanding events during Early Demand, for example.
   ts_event:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.ts_event
@@ -128,4 +117,4 @@ columns:
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Day of when the event happened. It's also a table partitions.
   ts_load:
-    description: Load date.
+    description: Load date captured in the source operational system.
