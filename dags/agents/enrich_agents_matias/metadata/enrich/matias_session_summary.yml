@@ -1,0 +1,155 @@
+---
+database_name: datalake_agents_matias
+table_name: matias_session_summary
+description: |
+  One row per Matias (ian) chatbot session, derived from
+  datalake_agents_matias.eval_session_bundle. Every deterministic session-level signal
+  is pre-computed so downstream analytics/reports never parse the nested bundle. Identity,
+  time and partition keys are flat; the metric families are grouped into structs
+  (volume / timing / cost / capability / outcome / evals) to keep the table narrow —
+  access as e.g. cost.total_tokens, evals.resolution, timing.response_latencies.
+  Merge key: id_session. Partitioned by year/month/day of session_start_ts.
+  Note: Sundays are partial captures (is_partial_day) — flag, do not treat as full days.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_session:
+    description: Canonical session identifier and the table's merge key (one row per id_session).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.id_session
+  id_langfuse_session:
+    description: Langfuse external session id — the key to join back to raw LLM traces and eval scores (datalake_langfuse_clean, datalake_chatbot.evals).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.id_langfuse_session
+  id_copilot_session:
+    description: Copilot Service session id for the same session.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.id_copilot_session
+  user_id:
+    description: End-user (broker) id parsed from the Langfuse trace input JSON ($.user_id). NULL when no trace carries it; use for per-user aggregation and repeat-usage analysis.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.conversation
+  bot:
+    description: Bot that handled the session — always "dominic" (the raw name for Matias / ian).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.bot
+  channel:
+    description: Communication channel of the session (e.g. whatsapp, web).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.channel
+  session_start_ts:
+    description: Timestamp of the first message in the session (session start).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_start_ts
+  session_end_ts:
+    description: Timestamp of the last message in the session (session end, across all senders).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.conversation
+  session_date:
+    description: Calendar date of session_start_ts; primary date filter (also mirrored in the year/month/day integer partitions).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_date
+  weekday:
+    description: Three-letter weekday of session_date (Mon..Sun); for day-of-week patterns.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_date
+  is_weekend:
+    description: TRUE when session_date falls on Saturday or Sunday.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_date
+  is_partial_day:
+    description: >
+      TRUE when session_date is a Sunday. Sundays are truncated captures — analyst turns
+      and the is_escalated flag are missing and sessions are much shorter — so exclude
+      them from quality/rate aggregates.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_date
+  hour_brt:
+    description: Hour of day (0-23) of session_start_ts converted to America/Sao_Paulo (BRT); for time-of-day analysis.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.session_start_ts
+  volume:
+    description: |
+      Message-volume and input-size signals (struct). Fields:
+      - n_msgs: total messages in the session across all senders (user + bot + analyst + system).
+      - n_user_msgs: number of end-user (broker) messages.
+      - n_bot_msgs: number of bot (Matias) messages.
+      - n_analyst_msgs: number of human support-agent messages sent after a handoff (0 when no handoff).
+      - first_user_msg_words / first_user_msg_chars: word and character length of the FIRST user message (the initial ask; an input-quality signal).
+      - user_words_total / user_chars_total: total words and characters across all user messages.
+      - bot_words_total / analyst_words_total: total words across all bot / analyst messages.
+      - avg_user_words: mean words per user message (user_words_total / n_user_msgs).
+      - avg_bot_words: mean words per bot message (bot_words_total / n_bot_msgs).
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.conversation
+  timing:
+    description: |
+      Duration and latency signals, all in seconds (struct). Fields:
+      - duration_sec: full session span (first to last message). INCLUDES post-handoff human-agent time and multi-day async gaps, so it can be very large — use bot_duration_sec for bot-conversation length.
+      - bot_duration_sec: span from the first message to the last user/bot turn (excludes the analyst tail) — the bot-conversation duration.
+      - first_response_latency_sec: seconds from the first user message to the first bot reply.
+      - response_latencies: array of per-turn latencies (seconds from each user turn to its first bot reply); explode / UNNEST for the response-time distribution.
+      - avg_response_latency_sec / max_response_latency_sec: mean and maximum of response_latencies.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.conversation
+  cost:
+    description: |
+      LLM effort and token cost (struct). Fields:
+      - n_llm_calls: number of Langfuse traces (LLM calls) in the session.
+      - total_tokens: total tokens, summed from each leaf LLM generation's token_usage (total, else prompt+completion); state-wrapper echoes are not double-counted.
+      - prompt_tokens / completion_tokens: input vs output token totals (prompt-heavy, since context is re-sent each turn).
+      - tokens_per_user_msg: total_tokens / n_user_msgs — a rough cost-per-interaction signal.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.conversation
+  capability:
+    description: |
+      Tool and sub-agent usage (struct). Fields:
+      - n_docsearch_calls: invocations of the search_broker_documents_v2 RAG tool (observation type TOOL). Telemetry only exists from 2026-06-23 — treat as absent before that date.
+      - n_tool_calls: all tool observations (type TOOL) in the session.
+      - n_agent_obs / n_observations: count of AGENT-type observations / of all Langfuse observations.
+      - n_informational_obs / n_knowledgebase_obs / n_escalation_obs: observation counts for the BrokerInformationalAssistantAgent, BrokerKnowledgeBaseTaskAgent and BrokerHumanEscalationAgent sub-agents.
+      - used_informational / used_knowledgebase: whether each sub-agent was invoked at all.
+      - agent_flow: collapsed ordered path of the sub-agents (consecutive repeats merged), e.g. "Info > KB > Info > Esc"; NULL when no agent ran.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.conversation
+  outcome:
+    description: |
+      Session outcome and escalation signals (struct). Fields:
+      - human_handoff: TRUE when a human analyst actually took over (an analyst message exists) — the canonical, name-independent handoff signal; prefer this for escalation rate.
+      - escalation_node_engaged: TRUE when the BrokerHumanEscalationAgent ran (name match). Fires somewhat more often than human_handoff (includes evaluate-and-decline) and is absent on the V1-stack days (2026-06-01/02).
+      - first_msg_escalation: TRUE when the escalation agent fired within the first user turn (immediate escalation, little or no prior interaction).
+      - is_escalated_raw: the raw is_escalated flag from the source; reliable on most days but reads FALSE on partial (Sunday) days — prefer human_handoff.
+      - is_low_value: TRUE when the session has at most 2 user messages AND fewer than 3 average user words — a low-engagement, low-input session (greeting / abandoned), typically neither resolved nor escalated.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.conversation
+      - datalake_agents_matias.eval_session_bundle.is_escalated
+  evals:
+    description: |
+      LLM-as-a-judge evaluator scores (struct). Only a non-random subset of sessions is
+      scored; every field is NULL when unscored — gate on has_evals before computing rates. Fields:
+      - resolution: whether the bot resolved the request (1 = resolved, 0 = not).
+      - naturalness: how natural / human the conversation felt (0-2, higher is better).
+      - frustration: detected user frustration (0-2, 0 = none).
+      - ai_resistance: user resistance to being served by AI instead of a human (0-2, 0 = none).
+      - legal_risk: labor-litigation risk signal (higher = riskier; usually 0).
+      - resolution_quality: graded resolution quality (0-4) when scored.
+      - escalation_reason: coded reason category when an escalation was evaluated.
+      - is_resolved: convenience boolean for resolution = 1.
+      - is_frustrated: convenience boolean for frustration >= 1.
+      - has_evals: whether the session was scored at all — gate before computing any eval rate.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.evals
+  ts_load:
+    description: Timestamp when this row was written to the table (pipeline load time).
+  year:
+    description: Partition year derived from session_start_ts.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.year
+  month:
+    description: Partition month derived from session_start_ts.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.month
+  day:
+    description: Partition day derived from session_start_ts.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.day

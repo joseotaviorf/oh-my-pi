@@ -1,0 +1,24 @@
+---
+table_name: datalake_agents_matias.matias_session_summary
+alert_channel: "#agents-data-alarms"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_session:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_langfuse_session:
+    is_complete:
+      severity_level: Error
+  session_start_ts:
+    is_complete:
+      severity_level: Error
+  session_date:
+    is_complete:
+      severity_level: Error
