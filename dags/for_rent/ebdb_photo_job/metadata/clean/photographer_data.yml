@@ -1,25 +1,37 @@
+---
 database_name: datalake_ebdb_clean
 table_name: photographer_data
+description: |
+  Photographer contractor profile from EBDB with contract type, payment preference,
+  and contract start date. One row per photographer data record.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.dadosfotografo.id
+    description: Primary key of the photographer profile record in EBDB.
   contract_type:
     lineage:
       - datalake_ebdb_raw.dadosfotografo.tipocontrato
+    description: Employment or service contract model for the photographer (e.g. CLT, PJ).
   payment_preference:
     lineage:
       - datalake_ebdb_raw.dadosfotografo.preferenciapagamento
+    description: Preferred payment method for photographer remuneration.
   is_active:
     lineage:
       - datalake_ebdb_raw.dadosfotografo.ativo
+    description: Whether this photographer profile is currently active.
   ts_contract_started:
     lineage:
       - datalake_ebdb_raw.dadosfotografo.iniciocontrato
+    description: Date when the photographer contract became effective.
   ts_created:
     lineage:
       - datalake_ebdb_raw.dadosfotografo.criadoem
+    description: Record creation date
   ts_updated:
     lineage:
       - datalake_ebdb_raw.dadosfotografo.atualizadoem
+    description: Record update date

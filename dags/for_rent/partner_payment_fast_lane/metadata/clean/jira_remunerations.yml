@@ -3,13 +3,13 @@ database_name: datalake_partner_payment_clean
 table_name: jira_remunerations
 description: |
   This table contains the detailed remuneration tickets from Jira.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.jira_remunerations.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_jira_issue:
     lineage:
       - datalake_partner_payment_raw.jira_remunerations.jira_issue_id
@@ -81,7 +81,7 @@ columns:
   version:
     lineage:
       - datalake_partner_payment_raw.jira_remunerations.version
-    description: Record version.
+    description: Optimistic locking revision counter for concurrent update safety.
   dt_reference:
     lineage:
       - datalake_partner_payment_raw.jira_remunerations.reference_date

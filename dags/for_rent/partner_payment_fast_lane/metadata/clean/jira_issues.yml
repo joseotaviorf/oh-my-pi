@@ -3,17 +3,17 @@ database_name: datalake_partner_payment_clean
 table_name: jira_issues
 description: |
   This table contains the jira issues that are read from the Jira projects we integrate with.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.jira_issues.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it's the primary key."
   issue_key:
     lineage:
       - datalake_partner_payment_raw.jira_issues.issue_key
-    description: The key of the issue in Jira.
+    description: Human-readable Jira issue key (e.g. PP-1234) used to reference the ticket.
   agent_type:
     lineage:
       - datalake_partner_payment_raw.jira_issues.agent_type
@@ -21,11 +21,11 @@ columns:
   issue_type:
     lineage:
       - datalake_partner_payment_raw.jira_issues.issue_type
-    description: The type of the issue in Jira.
+    description: Jira issue classification (e.g. bug, task) defining how the ticket is processed.
   version:
     lineage:
       - datalake_partner_payment_raw.jira_issues.version
-    description: Record version.
+    description: Optimistic locking revision counter for concurrent update safety.
   ts_created:
     lineage:
       - datalake_partner_payment_raw.jira_issues.created_at

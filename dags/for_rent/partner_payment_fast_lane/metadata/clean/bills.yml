@@ -4,7 +4,7 @@ table_name: bills
 description: |
   Bills generated for partner companies paid through the Partner Payment service.
   One row per bill. Primary key: id. Related to payments_period via id_payments_period (FK to payments_period).
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
@@ -26,7 +26,7 @@ columns:
   version:
     lineage:
       - datalake_partner_payment_raw.bills.version
-    description: Record version used for optimistic concurrency control.
+    description: Optimistic locking revision counter for concurrent update safety.
   status:
     lineage:
       - datalake_partner_payment_raw.bills.status

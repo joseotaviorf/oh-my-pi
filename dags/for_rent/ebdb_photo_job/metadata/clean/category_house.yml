@@ -1,13 +1,17 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: category_house
+description: |
+  Many-to-many mapping between house listings and photo categories in EBDB.
+  Links which categories apply to photos of a given property.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_category:
     lineage:
       - datalake_ebdb_raw.categoryimovel.categoryId
-    description: Category id.
+    description: Photo category assigned to the listing.
   id_house:
     lineage:
       - datalake_ebdb_raw.categoryimovel.imovelId
-    description: House id.
+    description: Listing (house) the category association belongs to.

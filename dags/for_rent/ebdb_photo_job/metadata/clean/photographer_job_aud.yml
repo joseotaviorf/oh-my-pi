@@ -1,166 +1,225 @@
+---
 database_name: datalake_ebdb_clean
 table_name: photographer_job_aud
+description: |
+  Envers audit history of photographer photo-session jobs (JobFotografo) in EBDB.
+  Each row records a field-level change to a photo job assignment, keyed by job id and revision.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_photographer_job:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.id
+    description: Primary key of the photo session job being audited.
   id_house:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.imovel_id
+    description: Foreign key to the listing (house) scheduled for the photo session.
   id_origin_creation:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.origincreation_id
+    description: User or system entity that originally created the photo job record.
   mod_origin_creation:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.origincreation_mod
+    description: Flag indicating whether the origin creation field changed in this revision.
   id_reserved_for:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.reservadopara_id
+    description: Photographer user reserved to perform this photo session.
   mod_reserved_for:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.reservadopara_mod
+    description: Flag indicating whether the reserved for field changed in this revision.
   id_photographer_data:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.dadosfotografo_id
+    description: Foreign key to photographer contract and payment profile data.
   mod_id_photographer_data:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.dadosfotografo_mod
+    description: Flag indicating whether the id photographer data field changed in this revision.
   id_last_update_origin:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.originlastupdate_id
+    description: User or system that last modified the photo job.
   mod_id_last_update_origin:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.originlastupdate_mod
+    description: Flag indicating whether the id last update origin field changed in this revision.
   rev:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   correctness_score:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.scorecorretude
+    description: Quality score assessing accuracy of uploaded photos for this session.
   photo_session_email:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.emailsessaofotos
+    description: Contact email provided for coordinating the photo session.
   mod_photo_session_email:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.emailsessaofotos_mod
+    description: Flag indicating whether the photo session email field changed in this revision.
   photo_session_phone:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.telefonesessaofotos
+    description: Primary phone number for photo session coordination.
   mod_photo_session_phone:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.telefonesessaofotos_mod
+    description: Flag indicating whether the photo session phone field changed in this revision.
   photo_session_secondary_phone:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.telefonesessaofotossecundario
+    description: Backup phone number for photo session coordination.
   mod_photo_session_secondary_phone:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.telefonesessaofotossecundario_mod
+    description: Flag indicating whether the photo session secondary phone field changed in this revision.
   photo_session_contact_name:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.nomecontatosessaofotos
+    description: Name of the on-site contact for the photo session.
   mod_photo_session_contact_name:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.nomecontatosessaofotos_mod
+    description: Flag indicating whether the photo session contact name field changed in this revision.
   photo_sender_user_type:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.photosender
+    description: Type of user who uploaded photos (e.g. photographer, owner).
   status:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.status
+    description: Current workflow status of the photo job (e.g. scheduled, completed, cancelled).
   mod_status:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.status_mod
+    description: Flag indicating whether the status field changed in this revision.
   rev_type:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   key_pick_up:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.retirarchave
+    description: How keys will be retrieved for property access during the session.
   mod_key_pick_up:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.retirarchave_mod
+    description: Flag indicating whether the key pick up field changed in this revision.
   problem:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.problema
+    description: Reported issue blocking or affecting the photo session.
   mod_problem:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.problema_mod
+    description: Flag indicating whether the problem field changed in this revision.
   cancellation_reason_text:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.textomotivocancelamento
+    description: Free-text explanation when the photo job was cancelled.
   mod_cancellation_reason_text:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.textomotivocancelamento_mod
+    description: Flag indicating whether the cancellation reason text field changed in this revision.
   key_others:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.outroschave
+    description: Additional key-access details not covered by standard options.
   mod_key_others:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.outroschave_mod
+    description: Flag indicating whether the key others field changed in this revision.
   has_written_authorization:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.autorizacaoporescrito
+    description: Whether written owner authorization is on file for property access.
   booking_instructions:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.instrucoesagendamento
+    description: Special scheduling or access instructions for the photographer.
   mod_booking_instructions:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.instrucoesagendamento_mod
+    description: Flag indicating whether the booking instructions field changed in this revision.
   house_revision:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.revisionimovel
+    description: Listing revision snapshot tied to this photo session.
   contract_type:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.tipocontrato
+    description: Photographer contract model applied to this job (e.g. CLT, PJ).
   mod_contract_type:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.tipocontrato_mod
+    description: Flag indicating whether the contract type field changed in this revision.
   completeness_score:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.scorecompletude
+    description: Score measuring how complete the uploaded photo set is.
   has_lockbox:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.lockbox
+    description: Whether a lockbox is available for property access.
   mod_has_lockbox:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.lockbox_mod
+    description: Flag indicating whether the has lockbox field changed in this revision.
   mod_has_written_authorization:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.autorizacaoporescrito_mod
+    description: Flag indicating whether the has written authorization field changed in this revision.
   is_fixed:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.fixed
+    description: Whether the photo job was marked as fixed or corrected after review.
   is_confirmed:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.confirmado
+    description: Whether the photo session appointment is confirmed.
   mod_is_confirmed:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.confirmado_mod
+    description: Flag indicating whether the is confirmed field changed in this revision.
   is_approved:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.aprovado
+    description: Whether uploaded photos were approved for listing publication.
   mod_is_approved:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.aprovado_mod
+    description: Flag indicating whether the is approved field changed in this revision.
   ts_payment:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.datapagamento
+    description: Date when the photographer was paid for this session.
   ts_session_started:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.datainiciosessao
+    description: Timestamp when the photographer started the on-site session.
   ts_photos_uploaded:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.datauploadfotos
+    description: Timestamp when photos were uploaded to the platform.
   ts_photo_job_requested:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.datajobpedido
+    description: Timestamp when the photo job was originally requested.
   ts_scheduled:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.dataagendamento
+    description: Scheduled date and time for the photo session.
   mod_ts_scheduled:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.dataagendamento_mod
+    description: Flag indicating whether the ts scheduled field changed in this revision.
   ts_photographer_accepted:
     lineage:
       - datalake_ebdb_raw.jobfotografo_aud.dataaceitofotografo
+    description: Timestamp when the assigned photographer accepted the job.

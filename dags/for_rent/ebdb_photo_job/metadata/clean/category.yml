@@ -1,20 +1,24 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: category
+description: |
+  Photo category taxonomy from EBDB used to classify listing images (e.g. room or area types).
+  One row per category with its display name and active flag.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_category:
     lineage:
       - datalake_ebdb_raw.category.categoryId
-    description: Category id.
+    description: Surrogate key identifying the photo category in EBDB.
   category_name:
     lineage:
       - datalake_ebdb_raw.category.name
-    description: Category name.
+    description: Human-readable label of the category (e.g. Sala, Cozinha, Fachada).
   version:
     lineage:
       - datalake_ebdb_raw.category.version
-    description: Category version.
+    description: Optimistic locking revision counter for concurrent update safety.
   is_active:
     lineage:
       - datalake_ebdb_raw.category.active

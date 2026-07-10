@@ -20,7 +20,7 @@ description: |
   - Constructing photo URLs for applications and analysis
   - Understanding photo sequence and primary image designation
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_image:
     lineage:

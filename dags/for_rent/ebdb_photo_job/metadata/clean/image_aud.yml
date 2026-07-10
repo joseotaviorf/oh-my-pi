@@ -3,16 +3,16 @@ database_name: datalake_ebdb_clean
 table_name: image_aud
 description: Table with auditory data from house images.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_image:
     lineage:
       - datalake_ebdb_raw.imagem_aud.id
-    description: Id of the image.
+    description: Identifier of the house image row being audited.
   id_house:
     lineage:
       - datalake_ebdb_raw.imagem_aud.imovel_id
-    description: Id of the house.
+    description: Listing (house) the audited image belongs to.
   rev:
     lineage:
       - datalake_ebdb_raw.imagem_aud.rev
@@ -20,15 +20,15 @@ columns:
   rev_type:
     lineage:
       - datalake_ebdb_raw.imagem_aud.revtype
-    description: Type of revision.
+    description: Envers operation type for this revision (insert, update, or delete).
   subtitle:
     lineage:
       - datalake_ebdb_raw.imagem_aud.legenda
-    description: Image's subtitle.
+    description: Caption text shown with the image at the time of this revision.
   name:
     lineage:
       - datalake_ebdb_raw.imagem_aud.nome
-    description: Image file name.
+    description: Image filename at the time of this audit revision.
   image_order:
     lineage:
       - datalake_ebdb_raw.imagem_aud.ordem

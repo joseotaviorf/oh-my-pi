@@ -3,13 +3,13 @@ database_name: datalake_partner_payment_clean
 table_name: availabilities
 description: |
   This table contains the availabilities records that are part of the payment for companies.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.availabilities.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_agent:
     lineage:
       - datalake_partner_payment_raw.availabilities.agent_id
@@ -45,7 +45,7 @@ columns:
   version:
     lineage:
       - datalake_partner_payment_raw.availabilities.version
-    description: Record version.
+    description: Optimistic locking revision counter for concurrent update safety.
   dt_start:
     lineage:
       - datalake_partner_payment_raw.availabilities.start_date

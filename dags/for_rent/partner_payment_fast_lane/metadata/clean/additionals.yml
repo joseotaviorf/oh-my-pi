@@ -3,21 +3,21 @@ database_name: datalake_partner_payment_clean
 table_name: additionals
 description: |
   This table contains the additional charges that are paid for an inspection or a photo session.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.additionals.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_operation_payment:
     lineage:
       - datalake_partner_payment_raw.additionals.operation_payment_id
-    description: ID of the operation payment.
+    description: Foreign key to the parent operation payment record this additional charge belongs to.
   version:
     lineage:
       - datalake_partner_payment_raw.additionals.version
-    description: Additional version.
+    description: Optimistic locking revision counter for concurrent update safety.
   additional_type:
     lineage:
       - datalake_partner_payment_raw.additionals.additional_type

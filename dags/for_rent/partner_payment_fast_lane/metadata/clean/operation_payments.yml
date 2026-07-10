@@ -3,13 +3,13 @@ database_name: datalake_partner_payment_clean
 table_name: operation_payments
 description: |
   This table contains the payment information to be made to the agent.
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 columns:
   id:
     lineage:
       - datalake_partner_payment_raw.operation_payments.id
-    description: ID of the table, it’s the primary key.
+    description: "ID of the table, it’s the primary key."
   id_user:
     lineage:
       - datalake_partner_payment_raw.operation_payments.user_id
@@ -61,7 +61,7 @@ columns:
   agent_type:
     lineage:
       - datalake_partner_payment_raw.operation_payments.agent_type
-    description: Type of agent who performed the operation (e.g. INSPECTOR, PHOTOGRAPHER).
+    description: "Type of agent who performed the operation (e.g. INSPECTOR, PHOTOGRAPHER)."
   agent_status:
     lineage:
       - datalake_partner_payment_raw.operation_payments.agent_status
@@ -77,7 +77,7 @@ columns:
   operation_agent_status:
     lineage:
       - datalake_partner_payment_raw.operation_payments.operation_agent_status
-    description: Status of the agent's participation in this specific operation (e.g. CONFIRMED, CANCELLED).
+    description: "Status of the agent's participation in this specific operation (e.g. CONFIRMED, CANCELLED)."
   house_area:
     lineage:
       - datalake_partner_payment_raw.operation_payments.house_area
