@@ -1,28 +1,28 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
 table_name: d045d
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Cost allocation among ToF Events for the cities of Rio de Janeiro, Belo Horizonte, Porto Alegre and Campinas assigned to UTM d045d.D.RET.Sale.Strategic_Cities.churnedBPs_[RJ_BH_POA_CAM].
 columns:
   id_date:
-    description: Date of applied share
+    description: Calendar date key for the daily marketing cost row; joins to the shared date dimension.
     lineage:
-      - datalake_quintoandar.aux_date.id_date
-  id_rule: 
-    description: Id rule
-    categories: 
+    - datalake_quintoandar.aux_date.id_date
+  id_rule:
+    description: Sharing rule code identifying which allocation logic produced this row (for example a002a, d010d).
+    categories:
       d023d: ''
   city_group:
-    description: city_group segmentation
+    description: Geographic city group assigned to the spend after sharing rules and taxonomy mapping.
     lineage:
-      - datalake_region.region.city_group
-  share: 
-    description: Percentage of cost that will be applied to specific city_group
-  funnel_side: 
-    description: Marketplace side of business
-    categories: 
+    - datalake_region.region.city_group
+  share:
+    description: Fraction or percentage of the source campaign cost allocated to this city group or segment.
+  funnel_side:
+    description: Funnel side from taxonomy indicating demand-side versus supply-side marketing focus.
+    categories:
       demand: ''
       supply: ''
   business_context:
-    description: Business context of the rule.
+    description: Business line (Rent, Sale, Hybrid) associated with the campaign spend after enrichment.

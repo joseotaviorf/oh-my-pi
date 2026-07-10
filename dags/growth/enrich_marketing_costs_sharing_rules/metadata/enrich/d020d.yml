@@ -1,27 +1,25 @@
 ---
 database_name: datalake_marketing_costs_sharing_rules
 table_name: d020d
-owner: '@data-growth'
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Allocation of SEM Branded costs - divides the costs resulting from these campaigns according to the number nTP from SEM Branded among cities from São Paulo State
 columns:
   id_date:
-    description: Date of applied share
+    description: Calendar date key for the daily marketing cost row; joins to the shared date dimension.
     lineage:
-      - datalake_quintoandar.aux_date.id_date
+    - datalake_quintoandar.aux_date.id_date
   id_rule:
-    description: Id rule. Hard coded AS {id_rule}
+    description: Sharing rule code identifying which allocation logic produced this row (for example a002a, d010d).
   city_group:
-    description: city_group segmentation
+    description: Geographic city group assigned to the spend after sharing rules and taxonomy mapping.
     lineage:
-      - datalake_region.region.city_group
+    - datalake_region.region.city_group
   share:
-    description: Fraction of demand marketing cost attributed to this city_group on id_date; count of distinct
-      first-interaction clients in the group divided by the day total, or the fallback share when
-      the validator count for the day is zero.
+    description: Fraction or percentage of the source campaign cost allocated to this city group or segment.
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_client
+    - datalake_ebdb_rent_flow.rent_flow.id_client
   funnel_side:
-    description: Marketplace side of business. Hard coded AS 'demand'
+    description: Funnel side from taxonomy indicating demand-side versus supply-side marketing focus.
   business_context:
-    description: Business context of the rule. Hard coded AS NULL STRING
+    description: Business line (Rent, Sale, Hybrid) associated with the campaign spend after enrichment.
