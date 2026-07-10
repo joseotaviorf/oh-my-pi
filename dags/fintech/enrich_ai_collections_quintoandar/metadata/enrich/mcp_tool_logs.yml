@@ -21,7 +21,8 @@ columns:
     lineage:
       - datalake_langfuse_clean.traces.id_session
     description: Langfuse session identifier resolved from the trace; joins to
-      datalake_ai_collections_quintoandar.mcp_collection_sessions.id_langfuse_session.
+      datalake_ai_collections_quintoandar.sessions.id_external and
+      datalake_ai_collections_quintoandar.observation.id_langfuse_session.
       NULL when no matching trace exists for the request.
   id_user:
     lineage:

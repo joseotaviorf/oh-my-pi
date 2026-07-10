@@ -196,21 +196,20 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_contract_call
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_http_status
-    description: Number of the person's contracts where the agent encountered contracts with distriution error
-      (a systemic error that unables the contract to be negotiated). Technically, count of distinct contracts
-      for which TratoFeito.GetDebtBreakdown returned HTTP 422 (distribution error) in the
-      session.
+    description: Number of the person's contracts where the agent encountered a distribution error
+      (a systemic error that prevents the contract from being negotiated). Technically, count of
+      distinct contracts for which TratoFeito.GetDebtBreakdown returned HTTP 422 (distribution
+      error) in the session.
   n_contracts_active_negotiation:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_contract_call
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_outcome
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
-    description: Number of the person's contracts that already have a ongoing negotiation.
-      Technically, count of distinct contracts with an
-      active ongoing negotiation, detected when TratoFeito.GetOngoingNegotiation returned
-      success with a non-empty response (a NULL response means an active negotiation exists;
-      the "empty" string means none).
+    description: Number of the person's contracts that already have an ongoing negotiation.
+      Technically, count of distinct contracts where TratoFeito.GetOngoingNegotiation returned
+      call_outcome = success and call_response is NULL or not the literal "empty" string
+      (NULL response means an active negotiation exists; "empty" means none).
   n_contracts_negotiation_options_not_found:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_contract_mcp
