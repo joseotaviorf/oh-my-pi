@@ -2,12 +2,12 @@ database_name: dw_public
 table_name: dim_region
 description: Cities and regions where QuintoAndar operates. Each line is either a city or a sub-region (similar to a neighborhood).
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_region:
     lineage:
     - datalake_region.region.id
-    description: Key of the region.
+    description: Surrogate key for the QuintoAndar operations region dimension, equal to region.id.
   id:
     lineage:
     - datalake_region.region.id
@@ -15,15 +15,15 @@ columns:
   id_country:
     lineage:
     - datalake_region.region.id_country
-    description: Country id of the region.
+    description: Foreign key to the country where this QuintoAndar operations region is located.
   macro_id:
     lineage:
     - datalake_region.region.id_macro_region
-    description: Macro region id.
+    description: Foreign key to the macro-region grouping cities or neighborhood clusters.
   city_id:
     lineage:
     - datalake_region.region.id_city
-    description: The ID for the city where this region is in.
+    description: Numeric identifier of the city in the regional hierarchy.
   country_code:
     lineage:
     - datalake_region.region.country_code
@@ -50,7 +50,7 @@ columns:
   city_name:
     lineage:
     - datalake_region.region.city_name
-    description: The name for the city where this region is in.
+    description: Human-readable city name for regional reporting.
   city_group:
     lineage:
     - datalake_region.region.city_group
@@ -130,7 +130,7 @@ columns:
   country_name:
     lineage:
     - datalake_region.region.country_name
-    description: Country name of the region.
+    description: Human-readable country name for geographic reporting.
   has_rent_operation:
     lineage:
     - datalake_region.region.has_rent_operation

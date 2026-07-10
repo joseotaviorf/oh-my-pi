@@ -1,6 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: contract
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 description: Table that contains data related to rent contracts.
 columns:
   id:
@@ -34,19 +35,19 @@ columns:
   id_administration_fee_type:
     lineage:
       - datalake_ebdb_raw.contrato.administrationfeetype_id
-    description: Administration id fee type.
+    description: Foreign key to the administration fee type applied on the contract.
   id_contract_version:
     lineage:
       - datalake_ebdb_raw.contrato.contractversion_id
-    description: Contract version id.
+    description: Version identifier of the contract template used when the rent agreement was created.
   id_mailing_state:
     lineage:
       - datalake_ebdb_raw.contrato.correspondencia_estado_id
-    description: Maligin state id.
+    description: State identifier for the mailing address associated with the contract.
   id_bank_account_validation_bank_data:
     lineage:
       - datalake_ebdb_raw.contrato.dadosBanco_bankAccountValidation_id
-    description: Bank account validation id.
+    description: Foreign key to bank account validation data for payout setup.
   invoice_email:
     lineage:
       - datalake_ebdb_raw.contrato.emailfatura
@@ -54,7 +55,7 @@ columns:
   observation:
     lineage:
       - datalake_ebdb_raw.contrato.observacao
-    description: Observation about the contract.
+    description: Free-text operational notes recorded on the contract.
   rent:
     lineage:
       - datalake_ebdb_raw.contrato.valoraluguel
@@ -62,11 +63,11 @@ columns:
   status:
     lineage:
       - datalake_ebdb_raw.contrato.status
-    description: Currently status of the contract.
+    description: Current processing state of the record in the source workflow.
   contract_rent_model:
     lineage:
       - datalake_ebdb_raw.contrato.contractRentModel
-    description: The contract rent model.
+    description: Rent pricing model applied to the contract such as standard or promotional.
   house_number:
     lineage:
       - datalake_ebdb_raw.contrato.numimovel
@@ -82,11 +83,11 @@ columns:
   type:
     lineage:
       - datalake_ebdb_raw.contrato.tipo
-    description: Type of contract.
+    description: Classification code defining the entity role or category.
   bank_agency:
     lineage:
       - datalake_ebdb_raw.contrato.agenciabanco
-    description: Bank agency.
+    description: Bank branch agency number provided for rent payout transfers.
   owners_comment:
     lineage:
       - datalake_ebdb_raw.contrato.comentarioproprietario
@@ -94,7 +95,7 @@ columns:
   bank_account:
     lineage:
       - datalake_ebdb_raw.contrato.contabanco
-    description: Bank account.
+    description: Bank account number used to receive rent payments on the contract.
   neighborhood_for_mailing:
     lineage:
       - datalake_ebdb_raw.contrato.correspondencia_bairro
@@ -126,11 +127,11 @@ columns:
   iptu:
     lineage:
       - datalake_ebdb_raw.contrato.iptu_valor
-    description: IPTU value.
+    description: Annual property tax (IPTU) amount configured on the rent contract.
   bank_name:
     lineage:
       - datalake_ebdb_raw.contrato.nomebanco
-    description: Bank name.
+    description: Name of the financial institution holding the payout bank account.
   paying_condo:
     lineage:
       - datalake_ebdb_raw.contrato.pagantecondominio
@@ -162,7 +163,7 @@ columns:
   home_insurance_value:
     lineage:
       - datalake_ebdb_raw.contrato.seguroresidencial_valor
-    description: Value of the home insurance.
+    description: Monthly home insurance premium amount configured on the contract.
   fist_rent_comission_fee:
     lineage:
       - datalake_ebdb_raw.contrato.taxacomissaoprimeiroaluguel
@@ -170,15 +171,15 @@ columns:
   account_type:
     lineage:
       - datalake_ebdb_raw.contrato.tipocontabanco
-    description: Type of bank account.
+    description: Checking or savings classification of the payout bank account.
   condo_price:
     lineage:
       - datalake_ebdb_raw.contrato.valorcondominio
-    description: Condo price.
+    description: Monthly condominium fee amount recorded on the rent contract.
   value_iptu:
     lineage:
       - datalake_ebdb_raw.contrato.valoriptu
-    description: IPTU value.
+    description: Annual property tax (IPTU) amount configured on the rent contract.
   neighborhood:
     lineage:
       - datalake_ebdb_raw.contrato.bairro
@@ -190,7 +191,7 @@ columns:
   city:
     lineage:
       - datalake_ebdb_raw.contrato.cidade
-    description: City of the property.
+    description: Municipality where the rented property is located.
   address_details:
     lineage:
       - datalake_ebdb_raw.contrato.complemento
@@ -202,15 +203,15 @@ columns:
   number:
     lineage:
       - datalake_ebdb_raw.contrato.numero
-    description: Number of the property.
+    description: Street number of the rented property address.
   bank_data_agency:
     lineage:
       - datalake_ebdb_raw.contrato.dadosbanco_agencia
-    description: Bank agency.
+    description: Bank branch agency number provided for rent payout transfers.
   bank_data_account:
     lineage:
       - datalake_ebdb_raw.contrato.dadosbanco_contacorrente
-    description: Bank account number.
+    description: Account number from the structured bank data for contract payouts.
   bank_data_cpf_cnpj:
     lineage:
       - datalake_ebdb_raw.contrato.dadosbanco_cpfoucnpj
@@ -226,7 +227,7 @@ columns:
   bank_data_account_type:
     lineage:
       - datalake_ebdb_raw.contrato.dadosbanco_tipoconta
-    description: Type of bank account.
+    description: Checking or savings classification of the payout bank account.
   is_tenant_in_transit:
     lineage:
       - datalake_ebdb_raw.contrato.emtransitoinquilino
@@ -258,11 +259,11 @@ columns:
   signature_type:
     lineage:
       - datalake_ebdb_raw.contrato.tipoassinatura
-    description: Type of signature on the contract.
+    description: Method used to sign the contract such as electronic, physical, or mixed.
   status_closing:
     lineage:
       - datalake_ebdb_raw.contrato.statusclosing
-    description: The closing status of the contract.
+    description: Workflow status of the contract closing process.
   contract_signed:
     lineage:
       - datalake_ebdb_raw.contrato.contratoassinado
@@ -290,7 +291,7 @@ columns:
   policy:
     lineage:
       - datalake_ebdb_raw.contrato.policy
-    description: Contract policy.
+    description: Insurance or guarantee policy reference attached to the rent contract.
   agent_brokerage_share:
     lineage:
       - datalake_ebdb_raw.contrato.estateagentbrokerageshare
@@ -298,7 +299,7 @@ columns:
   tenant_service_fee:
     lineage:
       - datalake_ebdb_raw.contrato.tenantservicefee
-    description: The service fee for the tenant.
+    description: Service fee percentage charged to the tenant on this contract.
   is_exit_inspection_opted_out:
     lineage:
       - datalake_ebdb_raw.contrato.exitInspectionOptOut

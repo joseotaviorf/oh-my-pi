@@ -1,11 +1,11 @@
 database_name: dw_rental_contribution_margin
 table_name: fact_house_listing_revenues
-description:
+description: |
   This table shows the revenues of each contract and competence month.
   Each row represents the revenues of the contract in a month. So we can have repeated
   ID contracs and ID house_listing
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_house_listing_revenue:
     description:
@@ -33,7 +33,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
-    description: Country code of the house. We're filtering just BR houses.
+    description: ISO country code for geographic filtering of the analytical metric.
   contract_lifetime:
     description:
       The difference between the month when the contract started and competence
@@ -67,8 +67,7 @@ columns:
   addons_reserve:
     description: Extra reservation revenue comes from kill_queue service.
   agents_commission:
-    description: Agents commission share value that is passed to agents.
-      It's the sum of 'rental agents' and 'ciq select' from brokerage share column. (Negative value).
+    description: Agents commission share value that is passed to agents. It's the sum of 'rental agents' and 'ciq select' from brokerage share column. (Negative value).
   affiliates_commission:
     description: Affiliates commission share value that is passed to CIQ. (Negative value).
   partner_share_brokerage:
@@ -76,8 +75,7 @@ columns:
       Commission paid to affiliates/B2B partners. We receive this value
       just on the first competence month of the contract. (Negative value).
   partner_share_management:
-    description: Administration fee paid to partners when the contract is linked
-      with affiliates/B2B. (Negative value).
+    description: Administration fee paid to partners when the contract is linked with affiliates/B2B. (Negative value).
   net_revenue_pre_taxes:
     description: The net revenue calculated from all the revenues (gross_revenue + addons_revenue + total_revenue_discounts).
   gross_revenue:

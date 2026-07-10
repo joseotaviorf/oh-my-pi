@@ -1,12 +1,12 @@
 ---
 database_name: datalake_consumption_bill
 table_name: consumption_bill_history
-owner: "kleber.inoue@quintoandar.com.br"
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
-description: This table contains the history of consumption bill of each house.
+description: Enrich layer table for consumption bill history from the enrich_consumption_bill pipeline used in For Rent analytics.
 columns:
   id_house:
-    description: ID of the house.
+    description: EBDB property identifier for the house whose utility bill configuration is tracked.
     lineage:
       - datalake_ebdb_clean.consumption_bill_aud.id_house
   is_water_included_in_condo:

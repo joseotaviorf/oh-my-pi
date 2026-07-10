@@ -1,6 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: inspection
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 description: |
   Table containing comprehensive property inspection data for rental properties. This table tracks the complete
   inspection lifecycle including scheduling, execution, approvals from both tenants and owners, and final reporting.
@@ -165,7 +166,7 @@ columns:
     lineage:
       - datalake_ebdb_raw.vistoria.dataaprovacaoproprietario
   ts_partial_tenant_report_sent:
-    description: Timestamp when a partial inspection report was sent to the tenant
+    description: Timestamp when the partial inspection report was delivered to the tenant.
     lineage:
       - datalake_ebdb_raw.vistoria.partialtenantreportsentat
   ts_partial_owner_report_sent:

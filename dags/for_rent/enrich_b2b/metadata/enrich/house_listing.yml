@@ -1,9 +1,9 @@
 database_name: datalake_b2b
 table_name: house_listing
-description: This table contains the information about all the houses and telling if they're
+description: Enrich layer table for house listing from the enrich_b2b pipeline used in For Rent analytics.
   B2B.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_house:
     lineage:
@@ -12,13 +12,13 @@ columns:
   id_house_listing:
     lineage:
     - datalake_house_listing.house_listing.id_house_listing
-    description: ID house listing of the house.
+    description: Foreign key to the house listing associated with this record.
   id_contract:
     lineage:
     - datalake_house_listing.house_listing.id_contract
     description: ID of the contract created for this house during this listing version.
   b2b_type:
-    description: Type of the B2B.
+    description: B2B partner program classification for the listing such as online, prime, or none.
     categories:
       online: The partner type associated to the house/listing is B2BPartner.
       prime: The partner type associated to the house/listing is PRIME.

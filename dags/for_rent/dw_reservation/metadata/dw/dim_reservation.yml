@@ -4,7 +4,7 @@ description: QuintoAndar allows tenants to reserve properties by making a paymen
   Each line is a reservation attempt. This table contains just rent context.
   The source of the data comes from kill_queue microservice
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_reservation:
     lineage:
@@ -17,7 +17,7 @@ columns:
   version:
     lineage:
     - datalake_kill_queue.reservation.version
-    description: Attempt number of payment.
+    description: Optimistic locking revision counter for concurrent update safety.
   attempt:
     lineage:
     - datalake_kill_queue.reservation.attempt
@@ -25,7 +25,7 @@ columns:
   status:
     lineage:
     - datalake_kill_queue.reservation.status
-    description: Status of the reservation.
+    description: Current lifecycle status of the rental reservation in Kill Queue.
     categories:
       CANCELED: Rent flow was interrupted at some point.
       CHARGED: The value was charged from customer.
@@ -37,8 +37,7 @@ columns:
   cancellation_reason:
     lineage:
     - datalake_kill_queue.reservation.cancellation_reason
-    description: Reason why reservation was cancelled if status is equal to 'CANCELED'
-      or 'RETURNED'.
+    description: Reason why reservation was cancelled if status is equal to 'CANCELED' or 'RETURNED'.
   value:
     lineage:
     - datalake_kill_queue.reservation.value
@@ -50,8 +49,7 @@ columns:
   is_ongoing:
     lineage:
     - datalake_kill_queue.reservation.is_ongoing
-    description: Flag which indicates if reservation is still open (when status is
-      either equal to 'CHARGED' or 'TOKEN_RECEIVED').
+    description: Flag which indicates if reservation is still open (when status is either equal to 'CHARGED' or 'TOKEN_RECEIVED').
   ts_created:
     lineage:
     - datalake_kill_queue.reservation.ts_created

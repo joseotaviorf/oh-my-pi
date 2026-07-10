@@ -1,6 +1,6 @@
 database_name: datalake_amplitude_offboarding
 table_name: offboarding_bill_task
-description: This table contains event data related to offboarding bill task.
+description: Enrich layer table for offboarding bill task from the enrich_amplitude_offboarding pipeline used in For Rent analytics.
   It contains the following events.
   offboarding_bills_task_summary_page_viewed
   offboarding_bills_task_condo_form_submitted
@@ -9,20 +9,20 @@ description: This table contains event data related to offboarding bill task.
   offboarding_bills_task_installation_code_form_submitted
   offboarding_bills_task_success_page_viewed
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_app:
     lineage:
       - datalake_house_listing.house_listing.id_app
-    description: Amplitude's App ID.
+    description: Amplitude application identifier for the offboarding bills mobile or web client.
   id_event:
     lineage:
       - datalake_house_listing.house_listing.id_event
-    description: Event's ID.
+    description: Unique Amplitude event identifier for each offboarding bill task interaction.
   id_user:
     lineage:
       - datalake_amplitude_clean.events.id_user
-    description: User's ID
+    description: QuintoAndar user identifier of the tenant completing offboarding bill tasks.
   uuid:
     lineage:
       - datalake_amplitude_clean.events.uuid
@@ -35,6 +35,10 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.user_properties
     description: Properties of the user who generated the event.
+  amplitude_event_type:
+    lineage:
+      - datalake_amplitude_clean.events.amplitude_event_type
+    description: Descriptive information indicating the type of amplitude event.
   city:
     lineage:
       - datalake_amplitude_clean.events.city
@@ -67,10 +71,30 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.region
     description: Region/State where the event happened.
+  version_name:
+    lineage:
+      - datalake_amplitude_clean.events.version_name
+    description: Descriptive information about the amplitude version.
+  ts_client_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_client_event
+    description: Timestamp type information that indicates when the event was requested in the Amplitude client.
+  ts_client_uploaded:
+    lineage:
+      - datalake_amplitude_clean.events.ts_client_uploaded
+    description: Timestamp type information that indicates when the event was uploaded to the Amplitude client.
+  ts_server_received:
+    lineage:
+      - datalake_amplitude_clean.events.ts_server_received
+    description: Timestamp type information that indicates when the event was received by the amplitude.
   ts_event:
     lineage:
       - datalake_amplitude_clean.events.ts_event
     description: Timestamp when the event happened.
+  ts_server_uploaded:
+    lineage:
+      - datalake_amplitude_clean.events.ts_server_uploaded
+    description: Timestamp type information that indicates when the event was uploaded to the Amplitude server.
   ts_processed:
     lineage:
       - datalake_amplitude_clean.events.ts_processed

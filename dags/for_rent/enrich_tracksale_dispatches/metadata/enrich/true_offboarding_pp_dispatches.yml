@@ -1,10 +1,10 @@
 database_name: datalake_tracksale_dispatches
 table_name: true_offboarding_pp_dispatches
-description: This table contains the information about landlord and it's going to be delivered to reverse_tracksale DAG.
+description: Enrich layer table for true offboarding pp dispatches from the enrich_tracksale_dispatches pipeline used in For Rent analytics.
   Today we're having an issue that the same email is sent in different days to the same person and about the same contract.
   With this table, is going to be possible to filter the email already sent to the person, limiting one email per person and contract.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   customer_name:
     lineage:
@@ -29,9 +29,9 @@ columns:
   id_user:
     lineage:
       - datalake_ebdb_clean.contract_person.id_user
-    description: ID of the user.
+    description: QuintoAndar user identifier of the landlord receiving the offboarding survey dispatch.
   campaign_type:
-    description: Type of the campaign, which is true.
+    description: Tracksale campaign type for true offboarding dispatches; always true for this export.
   driver_type:
     description: Type of the driver, which is contract.
   id_driver:

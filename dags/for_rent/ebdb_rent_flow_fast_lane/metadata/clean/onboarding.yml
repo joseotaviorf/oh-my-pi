@@ -2,6 +2,7 @@ database_name: datalake_ebdb_clean
 table_name: onboarding
 description: "Clean layer table containing comprehensive rental property onboarding process data with 30-minute refresh intervals. Tracks all stages of tenant and landlord onboarding workflow, including policy management, document delivery, utility transfers, key handover, and financial processing. This fast-lane version serves as the test environment for monitoring onboarding completion status and identifying bottlenecks in real-time rental flow processes."
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     description: "Unique identifier for each onboarding record. Primary key that distinguishes individual onboarding processes across all rental contracts."

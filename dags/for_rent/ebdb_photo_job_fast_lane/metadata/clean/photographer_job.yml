@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: photographer_job
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 description: |
   Current state table for photographer job records from EBDB database, containing the most recent snapshot of photo job information.
   This table tracks photo job lifecycle from creation through completion, including scheduling, execution, and status updates.

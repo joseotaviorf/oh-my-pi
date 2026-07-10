@@ -3,7 +3,7 @@ database_name: datalake_amplitude_inspections
 table_name: inspection_stages_access
 description: Creation of access indicators for the inspection report review page, both by the owner and the tenant
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_inspection:
     lineage:
@@ -20,7 +20,7 @@ columns:
   inspection_type:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.type
-    description: The type of inspection.
+    description: Inspection workflow type from inspection services such as entry, exit, or onboarding.
   total_owner_access_review:
     description: Number of times the owner accessed the inspection report review home page
   has_owner_access_review:

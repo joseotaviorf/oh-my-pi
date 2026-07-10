@@ -3,7 +3,7 @@ table_name: contract_b2b
 description: Information related to ForRent contracts B2B. Each line is an unique
   contract
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_contract:
     lineage:
@@ -12,11 +12,11 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.house.country_code
-    description: Country code of the contract.
+    description: ISO country code of the property linked to the B2B rent contract.
   contract_plan:
     lineage:
     - datalake_ebdb_clean.contract_partnership_data.contract_plan
-    description: Type of contract plan.
+    description: Partnership plan tier negotiated with the B2B partner on the contract.
   contract_partner_type:
     lineage:
     - datalake_ebdb_clean.contract_partnership_data.partner_type
@@ -28,7 +28,7 @@ columns:
   brokerage_split_percentage:
     lineage:
     - datalake_ebdb_clean.contract_partnership_data.brokerage_split_percentage
-    description: The brokerage percentage of the contract.
+    description: Percentage of brokerage commission allocated to partners on the contract.
   b2b_type:
     description: Type of the B2B client origin related to the contract.
     categories:

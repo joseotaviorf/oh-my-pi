@@ -1,111 +1,111 @@
 database_name: datalake_ebdb_photo_jobs
 table_name: photo_job
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 domain: For Rent
 description: Information about the photography job carried out on the properties
 columns:
   id:
-    description: ""
+    description: Unique identifier of the photographer job record in EBDB.
     lineage:
       - datalake_ebdb_clean.photographer_job.id
   id_house:
-    description: ""
+    description: Property identifier for the listing scheduled for the photo shoot.
     lineage:
       - datalake_ebdb_clean.photographer_job.id_house
   id_photographer:
-    description: ""
+    description: User identifier of the photographer assigned to carry out the session.
     lineage:
       - datalake_ebdb_clean.photographer_data.id
   id_user_who_canceled:
-    description: ""
+    description: User identifier of whoever canceled the photographer job.
     lineage:
       - datalake_ebdb_clean.user.id
   id_rep:
-    description: ""
+    description: Inside Sales representative user id when the job was created by a rep.
     lineage:
       - datalake_ebdb_clean.user.id_sales_rep
       - datalake_ebdb_clean.user.id
   country_code:
-    description: ""
+    description: ISO country code for geographic filtering of the analytical metric.
     lineage:
       - datalake_ebdb_country.house.country_code
   job_status:
-    description: ""
+    description: Current workflow status of the photographer job such as Cancelado or ComProblema.
     lineage:
       - datalake_ebdb_clean.photographer_job.status
   booking_instructions:
-    description: ""
+    description: Free-text scheduling instructions provided when the photo job was booked.
     lineage:
       - datalake_ebdb_clean.photographer_job.booking_instructions
   photographer_name:
-    description: ""
+    description: Full name of the assigned photographer from the EBDB user profile.
     lineage:
       - datalake_ebdb_clean.user.name
   photographer_email:
-    description: ""
+    description: Email address of the assigned photographer for session coordination.
     lineage:
       - datalake_ebdb_clean.user.email
   photo_session_contact_name:
-    description: ""
+    description: On-site contact name for the photographer during the shoot.
     lineage:
       - datalake_ebdb_clean.photographer_job.photo_session_contact_name
   photo_session_email:
-    description: ""
+    description: Email of the on-site contact for the photo session.
     lineage:
       - datalake_ebdb_clean.photographer_job.photo_session_email
   photo_session_phone:
-    description: ""
+    description: Primary phone number of the on-site contact for the session.
     lineage:
       - datalake_ebdb_clean.photographer_job.photo_session_phone
   photo_session_secondary_phone:
-    description: ""
+    description: Secondary phone number of the on-site contact when a backup is provided.
     lineage:
       - datalake_ebdb_clean.photographer_job.photo_session_secondary_phone
   key_pick_up:
-    description: ""
+    description: Instructions on how the photographer should collect property keys.
     lineage:
       - datalake_ebdb_clean.photographer_job.key_pick_up
   key_others:
-    description: ""
+    description: Additional key-handling notes when standard pickup does not apply.
     lineage:
       - datalake_ebdb_clean.photographer_job.key_others
   contract_type:
-    description: ""
+    description: Rent contract type linked to the listing at the time of the job.
     lineage:
       - datalake_ebdb_clean.photographer_job.contract_type
   problem:
-    description: ""
+    description: Problem description recorded when the job status is ComProblema.
     lineage:
       - datalake_ebdb_clean.photographer_job.problem
   photo_sender_user_type:
-    description: ""
+    description: Role of the user who submitted photos for this job.
     lineage:
       - datalake_ebdb_clean.photographer_job.photo_sender_user_type
   cancellation_reason:
-    description: ""
+    description: Coded reason for cancellation from the job or house registration status.
     lineage:
       - datalake_ebdb_clean.photographer_job.reason_of_change
       - datalake_ebdb_clean.house_registration_status_aud.photo_shoot_schedule_reason
   cancellation_reason_text:
-    description: ""
+    description: Free-text explanation entered when the photographer job was canceled.
     lineage:
       - datalake_ebdb_clean.photographer_job.cancellation_reason_text
   user_who_canceled_name:
-    description: ""
+    description: Full name of the user who canceled the photographer job.
     lineage:
       - datalake_ebdb_clean.user.name
   user_who_canceled_email:
-    description: ""
+    description: Email of the user who canceled the photographer job.
     lineage:
       - datalake_ebdb_clean.user.email
   creation_origin:
-    description: ""
+    description: Actor who created the job such as photographer, Inside Sales, admin, or owner.
     lineage:
       - datalake_ebdb_clean.user.id_photographer_data
       - datalake_ebdb_clean.user.id_sales_rep
       - datalake_ebdb_clean.user.email
   user_cancellation_type:
-    description: ""
+    description: Actor category that canceled the job when status is Cancelado.
     lineage:
       - datalake_ebdb_clean.photographer_job.status
       - datalake_ebdb_clean.user.id
@@ -113,87 +113,87 @@ columns:
       - datalake_ebdb_clean.user.id_sales_rep
       - datalake_ebdb_clean.user.email
   has_lockbox:
-    description: ""
+    description: Whether a lockbox is available for key access at the property.
     lineage:
       - datalake_ebdb_clean.photographer_job.has_lockbox
   is_canceled:
-    description: ""
+    description: True when the photographer job status is Cancelado.
     lineage:
       - datalake_ebdb_clean.photographer_job.status
   is_approved:
-    description: ""
+    description: Whether photo assets for this job were approved after upload.
     lineage:
       - datalake_ebdb_clean.photographer_job.is_approved
   is_confirmed:
-    description: ""
+    description: Whether the photographer confirmed attendance for the scheduled session.
     lineage:
       - datalake_ebdb_clean.photographer_job.is_confirmed
   is_flexible_schedule:
-    description: ""
+    description: True when scheduled outside standard business hours before 6am or after 11pm.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_scheduled
   is_same_day_upload:
-    description: ""
+    description: Photos uploaded by 8am the day after the session started or scheduled.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
       - datalake_ebdb_clean.photographer_job.ts_session_started
       - datalake_ebdb_clean.photographer_job.ts_scheduled
   is_job_on_time:
-    description: ""
+    description: Photos uploaded by 8am the day after the scheduled shoot date.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
       - datalake_ebdb_clean.photographer_job.ts_scheduled
   is_job_anticipated:
-    description: ""
+    description: Photos uploaded before the scheduled shoot calendar date.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
       - datalake_ebdb_clean.photographer_job.ts_scheduled
   creation_to_scheduling_diff_minutes:
-    description: ""
+    description: Minutes between job creation and effective scheduling timestamp.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_scheduled
       - datalake_ebdb_clean.photographer_job.ts_created
   dt_photographer_started:
-    description: ""
+    description: Date when the photographer profile was created in EBDB.
     lineage:
       - datalake_ebdb_clean.photographer_data.ts_created
   ts_photographer_accepted:
-    description: ""
+    description: Timestamp when the photographer accepted the job assignment.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_photographer_accepted
   ts_photo_job_requested:
-    description: ""
+    description: Timestamp when the photo job was requested in the platform.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_photo_job_requested
   ts_session_started:
-    description: ""
+    description: Timestamp when the on-site photo session actually started.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_session_started
   ts_scheduled:
-    description: ""
+    description: UTC timestamp of the scheduled photo session.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_scheduled
   ts_scheduled_local:
-    description: ""
+    description: Scheduled session time converted to America/Sao_Paulo timezone.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_scheduled
   ts_photos_uploaded:
-    description: ""
+    description: Timestamp when the photographer uploaded photos for this job.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
   ts_problem_reported:
-    description: ""
+    description: Revision timestamp when the job was marked with a problem in audit.
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_canceled:
-    description: ""
+    description: Revision timestamp when the job cancellation was recorded in audit.
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
   ts_created:
-    description: ""
+    description: Timestamp when the photographer job record was created in EBDB.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_created
   ts_updated:
-    description: ""
+    description: Timestamp when the photographer job record was last updated in EBDB.
     lineage:
       - datalake_ebdb_clean.photographer_job.ts_updated
