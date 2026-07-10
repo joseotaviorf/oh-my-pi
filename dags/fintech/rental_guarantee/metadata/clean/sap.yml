@@ -1,7 +1,7 @@
 ---
 database_name: datalake_rental_guarantee_clean
 table_name: sap
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "SAP integration records for Rental Guarantee, including transaction details, payment entries, and metadata extracted from JSON requests."
 columns:

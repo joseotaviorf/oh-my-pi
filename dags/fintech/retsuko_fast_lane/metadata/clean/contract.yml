@@ -1,12 +1,12 @@
 ---
 database_name: datalake_retsuko_clean
 table_name: contract
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
-  Retsuko rental contracts table, containing information about contracts between landlords and tenants.
-  Includes data about guarantees, administrative fees, validity periods and contract status.
-  This table is updated every 1 hour, between 7h30 AM to 22h30 AM BRT.
+  Clean-layer CDC ingestion of SeuBarriga rental contracts via Retsuko — near-raw copy of the
+  product-database contract table. Includes guarantees, administrative fees, validity periods,
+  and contract status. Updated every 1 hour between 06:30 and 19:30 (Airflow schedule `30 6-19 * * *`).
 columns:
   id:
     description: "Unique identifier of the contract in the Retsuko system"
@@ -73,7 +73,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.contract.adm_partner_brokerage_fee
   brokerage_estate_agent_share:
-    description: "Estate agent share of brokerage fee for the contract"
+    description: Financial attribute representing brokerage estate agent share on the contract dataset.
     lineage:
       - datalake_retsuko_raw.contract.brokerage_estate_agent_share
   brokerage_fee:

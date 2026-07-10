@@ -1,58 +1,81 @@
 database_name: datalake_rental_guarantee_clean
 table_name: risk_category_aud
+description:
+  One row per risk category aud in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   category_level:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.category_level
+    description: QuintoCred rental guarantee attribute describing category level in the policy lifecycle.
   factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.factor
+    description: QuintoCred rental guarantee attribute describing factor in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   standalone_factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.standalone_factor
+    description: QuintoCred rental guarantee attribute describing standalone factor in the policy lifecycle.
   is_guarantee_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.allow_guarantee
+    description: Indicates whether guarantee allowed applies to this financial record.
   is_standalone_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.allow_standalone
+    description: Indicates whether standalone allowed applies to this financial record.
   mod_category_level:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.category_level_mod
+    description: QuintoCred rental guarantee attribute describing mod category level in the policy lifecycle.
   mod_factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.factor_mod
+    description: QuintoCred rental guarantee attribute describing mod factor in the policy lifecycle.
   mod_standalone_factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.standalone_factor_mod
+    description: QuintoCred rental guarantee attribute describing mod standalone factor in the policy lifecycle.
   mod_is_guarantee_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.allow_guarantee_mod
+    description: QuintoCred rental guarantee attribute describing mod is guarantee allowed in the policy lifecycle.
   mod_is_standalone_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.allow_standalone_mod
+    description: QuintoCred rental guarantee attribute describing mod is standalone allowed in the policy lifecycle.
   mod_ts_created:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.created_at_mod
+    description: QuintoCred rental guarantee attribute describing mod ts created in the policy lifecycle.
   mod_ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.updated_at_mod
+    description: QuintoCred rental guarantee attribute describing mod ts updated in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.risk_category_aud.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

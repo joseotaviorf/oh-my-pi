@@ -1,12 +1,13 @@
 ---
 database_name: datalake_retsuko_clean
 table_name: entry_partitioned
-owner: guilherme.sacramento@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
-  Clean layer table containing accounting entries from Retsuko (partitioned by time).
-  Each record represents a financial movement between accounts, linked to invoices and contracts.
-  Data comes from SeuBarriga and is synced via CDC. Updated every 1 hour, between 7h30 AM to 22h30 AM BRT.
+  Clean-layer CDC ingestion of SeuBarriga accounting entries via Retsuko (partitioned by time) —
+  near-raw copy of the product-database entry table. Each record is a financial movement between
+  accounts, linked to invoices and contracts. Updated every 1 hour between 06:30 and 19:30
+  (Airflow schedule `30 6-19 * * *`).
 columns:
   id:
     description: "Unique identifier of the entry in Retsuko"

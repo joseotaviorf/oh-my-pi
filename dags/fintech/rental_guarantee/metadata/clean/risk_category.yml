@@ -1,49 +1,69 @@
 database_name: datalake_rental_guarantee_clean
 table_name: risk_category
+description:
+  One row per risk category in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   category_description:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.category_description
+    description: QuintoCred rental guarantee attribute describing category description in the policy lifecycle.
   category_level:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.category_level
+    description: QuintoCred rental guarantee attribute describing category level in the policy lifecycle.
   deposit_factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.deposit_factor
+    description: QuintoCred rental guarantee attribute describing deposit factor in the policy lifecycle.
   guarantee_factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.factor
+    description: QuintoCred rental guarantee attribute describing guarantee factor in the policy lifecycle.
   standalone_factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.standalone_factor
+    description: QuintoCred rental guarantee attribute describing standalone factor in the policy lifecycle.
   is_deposit_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.allow_deposit
+    description: Indicates whether deposit allowed applies to this financial record.
   is_guarantee_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.allow_guarantee
+    description: Indicates whether guarantee allowed applies to this financial record.
   is_pro_guarantor_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.allow_pro_guarantor
+    description: Indicates whether pro guarantor allowed applies to this financial record.
   is_standalone_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.allow_standalone
+    description: Indicates whether standalone allowed applies to this financial record.
   is_third_party_guarantee_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.allow_third_party_guarantee
+    description: Indicates whether third party guarantee allowed applies to this financial record.
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_disabled:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.disabled_at
+    description: Timestamp when disabled occurred in the upstream fintech system.
   ts_enabled:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.enabled_at
+    description: Timestamp when enabled occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

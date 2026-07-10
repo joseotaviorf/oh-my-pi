@@ -1,25 +1,37 @@
 database_name: datalake_robin_hood_clean
 table_name: accounting_entry_source
+description:
+  One row per accounting entry source in the Fintech clean layer, sourced from
+  datalake_robin_hood_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   abbr:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.abbr
+    description: Financial attribute representing abbr on the accounting_entry_source dataset.
   code:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.code
+    description: Financial attribute representing code on the accounting_entry_source dataset.
   description:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.description
+    description: Human-readable description of the financial transaction or ledger entry.
   id:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.id
+    description: Financial attribute representing id on the accounting_entry_source dataset.
   is_active:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.active
+    description: Indicates whether active applies to this financial record.
   source_name:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.name
+    description: Financial attribute representing source name on the accounting_entry_source dataset.
   ts_created:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_source.created_at
+    description: Timestamp when created occurred in the upstream fintech system.

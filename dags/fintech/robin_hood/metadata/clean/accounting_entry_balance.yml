@@ -1,14 +1,22 @@
 ---
 database_name: datalake_robin_hood_clean
 table_name: accounting_entry_balance
+description:
+  One row per accounting entry balance in the Fintech clean layer, sourced
+  from datalake_robin_hood_clean for payments, billing, and financial
+  operations reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_balance.id
+    description: Financial attribute representing id on the accounting_entry_balance dataset.
   id_payment_request:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_balance.payment_request_id
+    description: Identifier for the payment request referenced by this financial record.
   id_accounting_entry:
     lineage:
       - datalake_robin_hood_raw.accounting_entry_balance.accounting_entry_id
+    description: Identifier for the accounting entry referenced by this financial record.

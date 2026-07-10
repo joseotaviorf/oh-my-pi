@@ -1,37 +1,53 @@
 database_name: datalake_robin_hood_clean
 table_name: financial_data
+description:
+  One row per financial data in the Fintech clean layer, sourced from
+  datalake_robin_hood_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_robin_hood_raw.financial_data.id
+    description: Financial attribute representing id on the financial_data dataset.
   id_payee:
     lineage:
       - datalake_robin_hood_raw.financial_data.payee_id
+    description: Identifier for the payee referenced by this financial record.
   name:
     lineage:
       - datalake_robin_hood_raw.financial_data.name
+    description: Financial attribute representing name on the financial_data dataset.
   document_number:
     lineage:
       - datalake_robin_hood_raw.financial_data.document_number
+    description: Financial attribute representing document number on the financial_data dataset.
   bank_code:
     lineage:
       - datalake_robin_hood_raw.financial_data.bank_code
+    description: Financial attribute representing bank code on the financial_data dataset.
   bank_name:
     lineage:
       - datalake_robin_hood_raw.financial_data.bank_name
+    description: Financial attribute representing bank name on the financial_data dataset.
   account_type:
     lineage:
       - datalake_robin_hood_raw.financial_data.account_type
+    description: Financial attribute representing account type on the financial_data dataset.
   agency_number:
     lineage:
       - datalake_robin_hood_raw.financial_data.agency_number
+    description: Financial attribute representing agency number on the financial_data dataset.
   account_number:
     lineage:
       - datalake_robin_hood_raw.financial_data.account_number
+    description: Financial attribute representing account number on the financial_data dataset.
   ts_created:
     lineage:
       - datalake_robin_hood_raw.financial_data.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_disabled:
     lineage:
       - datalake_robin_hood_raw.financial_data.disabled_at
+    description: Timestamp when disabled occurred in the upstream fintech system.

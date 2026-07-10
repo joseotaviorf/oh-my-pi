@@ -1,10 +1,13 @@
 ---
 database_name: datalake_retsuko_clean
 table_name: invoice
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Clean layer table containing invoice information from SeuBarriga for renting contracts.
-  This table is updated every 1 hour, between 7h30 AM to 22h30 AM BRT.
+description: |
+  Clean-layer CDC ingestion of SeuBarriga invoices via Retsuko — the closest lake copy of the
+  product-database invoice table (near-raw). Registers all rental invoices and their statuses
+  and is the backbone for downstream Collections models (enrich, DW, and recovery metrics).
+  Updated every 1 hour between 06:30 and 19:30 (Airflow schedule `30 6-19 * * *`).
 columns:
   id:
     description: "Unique invoice identifier"
@@ -59,7 +62,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.payment_status
   negotiation_status:
-    description: "Negotiation status information"
+    description: Financial attribute representing negotiation status on the invoice dataset.
     lineage:
       - datalake_retsuko_raw.invoice.negotiation_status
   paid_via:
@@ -87,7 +90,7 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.reason
   due_amount:
-    description: "Amount due for the invoice"
+    description: Financial attribute representing due amount on the invoice dataset.
     lineage:
       - datalake_retsuko_raw.invoice.due_amount
   paid_amount:
@@ -95,13 +98,13 @@ columns:
     lineage:
       - datalake_retsuko_raw.invoice.paid_amount
   payment_paid_interest_amount:
-    description: "Interest amount paid with the invoice payment"
+    description: Financial attribute representing payment paid interest amount on the invoice dataset.
     lineage:
-      - datalake_retusko_raw.invoice.payment_paid_interest_amount
+      - datalake_retsuko_raw.invoice.payment_paid_interest_amount
   payment_paid_fine_amount:
-    description: "Fine amount paid with the invoice payment"
+    description: Financial attribute representing payment paid fine amount on the invoice dataset.
     lineage:
-      - datalake_retusko_raw.invoice.payment_paid_fine_amount
+      - datalake_retsuko_raw.invoice.payment_paid_fine_amount
   accrual_year_month:
     description: "Year and month reference for the invoice accrual"
     lineage:
@@ -109,7 +112,7 @@ columns:
   should_request_boleto:
     description: "Boolean field that indicates if a bill creation request should be done"
     lineage:
-      - datalake_retusko_raw.invoice.should_request_boleto
+      - datalake_retsuko_raw.invoice.should_request_boleto
   sispag_file:
     description: "File that Seu Barriga created with Vans to communicate with bank"
     lineage:
@@ -117,11 +120,11 @@ columns:
   payment_company_use_number:
     description: "Company_use works as an ID to identifies the bill created in the bank"
     lineage:
-      - datalake_retusko_raw.invoice.payment_company_use_number
+      - datalake_retsuko_raw.invoice.payment_company_use_number
   payment_bank_code:
-    description: "Paying Bank Code"
+    description: Financial attribute representing payment bank code on the invoice dataset.
     lineage:
-      - datalake_retusko_raw.invoice.payment_bank_code
+      - datalake_retsuko_raw.invoice.payment_bank_code
   is_write_off:
     description: "Boolean to indicate an uncollectible overdue credit, applicable under specific conditions related contract age. Read more at: https://docs.google.com/document/d/1mfqO6suQSHPNM-bBcQi0_iR_RC-xjRwlnHTBpQ66FGw/"
     lineage:

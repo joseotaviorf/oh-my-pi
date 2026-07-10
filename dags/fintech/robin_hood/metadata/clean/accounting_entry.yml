@@ -1,61 +1,85 @@
 database_name: datalake_robin_hood_clean
 table_name: accounting_entry
+description:
+  One row per accounting entry in the Fintech clean layer, sourced from
+  datalake_robin_hood_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.id
+    description: Financial attribute representing id on the accounting_entry dataset.
   id_external:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.external_id
+    description: Identifier for the external referenced by this financial record.
   id_source:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.source_id
+    description: Identifier for the source referenced by this financial record.
   id_payee:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.payee_id
+    description: Identifier for the payee referenced by this financial record.
   id_context:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.context_id
+    description: Identifier for the context referenced by this financial record.
   requested_by:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.requested_by
+    description: Financial attribute representing requested by on the accounting_entry dataset.
   description:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.description
+    description: Human-readable description of the financial transaction or ledger entry.
   source_bill_item:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.source_bill_item
+    description: Financial attribute representing source bill item on the accounting_entry dataset.
   due_amount:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.due_amount
+    description: Financial attribute representing due amount on the accounting_entry dataset.
   locale:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.locale
+    description: Financial attribute representing locale on the accounting_entry dataset.
   type:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.type
+    description: Financial attribute representing type on the accounting_entry dataset.
   cost_center_code:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.cost_center_code
+    description: Financial attribute representing cost center code on the accounting_entry dataset.
   accrual_year_month:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.accrual_year_month
+    description: Financial attribute representing accrual year month on the accounting_entry dataset.
   accounting_year_month:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.accounting_year_month
+    description: Financial attribute representing accounting year month on the accounting_entry dataset.
   metadata:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.metadata
+    description: Structured JSON payload with provider-specific attributes not flattened into columns.
   dt_occurrence:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.occurrence_date
+    description: Calendar date associated with occurrence in the financial workflow.
   ts_synced:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.synced_at
+    description: Timestamp when synced occurred in the upstream fintech system.
   ts_blocked:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.blocked_at
+    description: Timestamp when blocked occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_robin_hood_raw.accounting_entry.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
