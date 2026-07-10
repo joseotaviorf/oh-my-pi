@@ -228,9 +228,6 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         default_vacuum_retention_hours = self.dag_execution_context.workflow_args.get(
             "vacuum_retention_hours", 48
         )
-        default_run_optimize = self.dag_execution_context.workflow_args.get(
-            "run_optimize", True
-        )
         default_run_vacuum = self.dag_execution_context.workflow_args.get(
             "run_vacuum", True
         )
@@ -256,14 +253,21 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             else:
                 z_order_by = default_z_order_by
 
+            apply_partition_filter = self._resolve_apply_partition_filter(table)
+
+            run_optimize, optimize_frequency_days = (
+                self._resolve_run_optimize_and_frequency(
+                    table, z_order_by, apply_partition_filter
+                )
+            )
+
             table_config = {
                 "schema": table.schema,
                 "vacuum_retention_hours": table.table_customization.get(
                     "vacuum_retention_hours", default_vacuum_retention_hours
                 ),
-                "run_optimize": table.table_customization.get(
-                    "run_optimize", default_run_optimize
-                ),
+                "run_optimize": run_optimize,
+                "optimize_frequency_days": optimize_frequency_days,
                 "run_vacuum": table.table_customization.get(
                     "run_vacuum", default_run_vacuum
                 ),
@@ -276,22 +280,82 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 "z_order_by": z_order_by,
             }
             if table.layer == LayerEnum.TRANSACTIONAL:
-                table_config["apply_partition_filter"] = table.table_customization.get(
-                    "optimize_partition_filter", True
-                )
-            else:
-                workflow_incremental_optimize = (
-                    self.dag_execution_context.workflow_args.get(
-                        "incremental_optimize", False
-                    )
-                )
-                if table.table_customization.get(
-                    "incremental_optimize", workflow_incremental_optimize
-                ):
-                    table_config["apply_partition_filter"] = True
+                table_config["apply_partition_filter"] = apply_partition_filter
+            elif apply_partition_filter:
+                table_config["apply_partition_filter"] = True
             tables_config[table.table_name] = table_config
 
         return tables_config
+
+    def _resolve_apply_partition_filter(self, table) -> bool:
+        """Resolve whether OPTIMIZE will be scoped to the run's date range.
+
+        ``True`` for TRANSACTIONAL-layer tables by default (``optimize_partition_filter``
+        opts out), and for any other table with ``incremental_optimize`` enabled
+        (table-level, else workflow-level). Mirrors the table-config key of the
+        same purpose consumed by the Spark job (``run_job`` in
+        ``optimize_delta_table.py``), computed here first so the OPTIMIZE cadence
+        default can take it into account.
+        """
+        if table.layer == LayerEnum.TRANSACTIONAL:
+            return table.table_customization.get("optimize_partition_filter", True)
+        workflow_incremental_optimize = self.dag_execution_context.workflow_args.get(
+            "incremental_optimize", False
+        )
+        return bool(
+            table.table_customization.get(
+                "incremental_optimize", workflow_incremental_optimize
+            )
+        )
+
+    def _resolve_run_optimize_and_frequency(
+        self, table, z_order_by: list, apply_partition_filter: bool
+    ) -> Tuple[bool, int]:
+        """Resolve ``run_optimize`` + ``optimize_frequency_days``, engine- and zorder-aware.
+
+        Explicit ``run_optimize``/``optimize_frequency_days`` (table-level, else
+        workflow-level) always win — no behavior change for declarations that
+        already set them.
+
+        Absent any explicit config: Databricks keeps the historical default
+        (optimize on, capped once per day). EMR defaults optimize *off*, since
+        ``OPTIMIZE`` is a full shuffle/compaction and is proportionally far more
+        expensive on Delta OSS/EMR than on Databricks — unless the table has
+        ZORDER columns configured, in which case it defaults *on*.
+
+        The weekly cadence (``optimize_frequency_days=7``) only applies when
+        OPTIMIZE runs full-table (``apply_partition_filter`` is False): OPTIMIZE's
+        ``WHERE`` clause is scoped to the *current run's* date range only (see
+        ``_resolve_partition_predicate`` in ``optimize_delta_table.py``), never to
+        the days elapsed since the last actual OPTIMIZE. So when
+        ``apply_partition_filter`` is True (TRANSACTIONAL tables by default, or any
+        table with ``incremental_optimize``), a weekly cadence would leave 6 of
+        every 7 days' partitions permanently un-optimized — that OPTIMIZE is
+        already cheap (bounded to the run's date range), so it stays daily
+        regardless of ZORDER.
+        """
+        workflow_args = self.dag_execution_context.workflow_args
+        table_customization = table.table_customization
+        use_emr = self.dag_execution_context.use_airflow_emr
+        has_zorder = bool(z_order_by)
+
+        if "run_optimize" in table_customization:
+            run_optimize = table_customization["run_optimize"]
+        elif "run_optimize" in workflow_args:
+            run_optimize = workflow_args["run_optimize"]
+        elif use_emr:
+            run_optimize = has_zorder
+        else:
+            run_optimize = True
+
+        default_frequency_days = (
+            7 if (use_emr and has_zorder and not apply_partition_filter) else 1
+        )
+        optimize_frequency_days = table_customization.get(
+            "optimize_frequency_days",
+            workflow_args.get("optimize_frequency_days", default_frequency_days),
+        )
+        return run_optimize, int(optimize_frequency_days)
 
 
 def _chain_optimize_tasks_sequentially(tasks: List[BaseOperator]) -> None:

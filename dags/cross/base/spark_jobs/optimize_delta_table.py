@@ -1,4 +1,10 @@
-"""VACUUM/OPTIMIZE Delta tables; optional S3 markers cap maintenance to once per day."""
+"""VACUUM/OPTIMIZE Delta tables.
+
+Optional S3 markers cap maintenance to once per day (``maintenance_once_per_day``,
+default true), and a separate per-table cursor lets OPTIMIZE run on a slower,
+configurable cadence (``optimize_frequency_days``, e.g. weekly) independently of
+VACUUM, which always keeps the once-per-day cadence.
+"""
 
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
@@ -14,8 +20,12 @@ from bietlejuice.base.airflow.optimize_delta_tables_cli import (
 from bietlejuice.base.db.metastore_mapping_factory import MetastoreMappingFactory
 from bietlejuice.base.delta.maintenance_state import (
     build_maintenance_payload,
+    build_optimize_cursor_payload,
+    is_optimize_due,
     maintenance_already_completed,
+    read_maintenance_marker,
     resolve_marker_location,
+    resolve_optimize_cursor_location,
     write_maintenance_marker,
 )
 from bietlejuice.base.pipeline import LayerEnum
@@ -71,6 +81,7 @@ def main():
             "All tables already maintained for this execution date; skipping job."
         )
         return
+    tables = _apply_optimize_cadence(tables, args.layer, maintenance_state)
 
     logger.info(
         f"Starting vacuum and optimize for {len(tables)} tables, "
@@ -116,8 +127,8 @@ def parse_arguments() -> Namespace:
         type=str,
         help="JSON object with all tables to vacuum and optimize. Each key is a table name, "
         "and each value is an object with the following attributes: schema (string), vacuum_retention_hours (integer), "
-        "z_order_by(list), run_optimize(boolean), apply_partition_filter(boolean), "
-        "and maintenance_once_per_day(boolean).",
+        "z_order_by(list), run_optimize(boolean), optimize_frequency_days(integer, default 1), "
+        "apply_partition_filter(boolean), and maintenance_once_per_day(boolean).",
     )
     parser.add_argument(
         "parallelism",
@@ -280,6 +291,86 @@ def _filter_tables_already_maintained(
     return remaining
 
 
+def _apply_optimize_cadence(
+    tables: Dict[str, dict],
+    layer: str,
+    maintenance_state: MaintenanceStateConfig,
+) -> Dict[str, dict]:
+    """Suppress OPTIMIZE (only) for tables not yet due per ``optimize_frequency_days``.
+
+    Decoupled from the daily marker cap above: VACUUM (and OPTIMIZE on tables
+    using the historical once-per-day cadence, i.e. ``optimize_frequency_days <= 1``)
+    is untouched here. Tables whose OPTIMIZE cursor shows fewer days elapsed than
+    their configured frequency get a copy of their config with ``run_optimize``
+    forced to ``False`` for this run only; VACUUM still proceeds per its own flag.
+
+    No-op when maintenance state isn't fully configured (no bucket/region to
+    read a cursor from), preserving today's behavior for DAGs without markers set up.
+    """
+    if not maintenance_state.is_enabled:
+        return tables
+
+    today = _parse_iso_date(maintenance_state.maintenance_date)
+    resolved = {}
+    for table_name, table_configs in tables.items():
+        optimize_frequency_days = table_configs.get("optimize_frequency_days", 1)
+        if not table_configs.get("run_optimize", True) or optimize_frequency_days <= 1:
+            resolved[table_name] = table_configs
+            continue
+
+        full_table_name = get_full_table_name(
+            table_configs.get("schema"), LayerEnum(layer), table_name
+        )
+        cursor_payload = _read_optimize_cursor(full_table_name, maintenance_state)
+        if is_optimize_due(cursor_payload, today, optimize_frequency_days):
+            resolved[table_name] = table_configs
+            continue
+
+        logger.info(
+            f"Skipping OPTIMIZE for {full_table_name}: last ran "
+            f"{cursor_payload.get('last_optimize_date') if cursor_payload else 'never'}, "
+            f"due again every {optimize_frequency_days} day(s). VACUUM (if enabled) still runs."
+        )
+        resolved[table_name] = {**table_configs, "run_optimize": False}
+    return resolved
+
+
+def _read_optimize_cursor(
+    full_table_name: str, maintenance_state: MaintenanceStateConfig
+) -> Optional[dict]:
+    bucket, key = resolve_optimize_cursor_location(
+        state_bucket=maintenance_state.state_bucket,
+        environment=maintenance_state.environment,
+        full_table_name=full_table_name,
+        state_prefix=maintenance_state.state_prefix,
+    )
+    return read_maintenance_marker(
+        bucket, key, region_name=maintenance_state.region_name
+    )
+
+
+def _persist_optimize_cursor(
+    full_table_name: str, maintenance_state: MaintenanceStateConfig
+) -> None:
+    """Overwrite the table's OPTIMIZE cursor with today's date after a successful run."""
+    bucket, key = resolve_optimize_cursor_location(
+        state_bucket=maintenance_state.state_bucket,
+        environment=maintenance_state.environment,
+        full_table_name=full_table_name,
+        state_prefix=maintenance_state.state_prefix,
+    )
+    payload = build_optimize_cursor_payload(
+        full_table_name=full_table_name,
+        last_optimize_date=maintenance_state.maintenance_date,
+        environment=maintenance_state.environment,
+        dag_name=maintenance_state.dag_name,
+    )
+    write_maintenance_marker(
+        bucket, key, payload, region_name=maintenance_state.region_name
+    )
+    logger.info(f"Updated OPTIMIZE cursor for {full_table_name} at s3://{bucket}/{key}")
+
+
 def _maintenance_marker_exists(
     full_table_name: str, maintenance_state: MaintenanceStateConfig
 ) -> bool:
@@ -314,6 +405,12 @@ def _await_job_results_and_persist_markers(
             failures.append((table_name, exc))
             continue
         _persist_maintenance_marker(table_configs, full_table_name, maintenance_state)
+        if (
+            full_table_name
+            and table_configs.get("run_optimize", True)
+            and maintenance_state.is_enabled
+        ):
+            _persist_optimize_cursor(full_table_name, maintenance_state)
     return failures
 
 

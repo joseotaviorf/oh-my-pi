@@ -1915,6 +1915,8 @@ emr_cluster_base: &emr_cluster_anchor
         spark.yarn.am.cores: "1"
         spark.sql.adaptive.enabled: "true"
         spark.sql.adaptive.coalescePartitions.enabled: "true"
+        spark.sql.files.maxPartitionBytes: "268435456"
+        spark.sql.adaptive.advisoryPartitionSizeInBytes: "268435456"
         spark.sql.adaptive.skewJoin.enabled: "true"
         spark.sql.adaptive.localShuffleReader.enabled: "true"
         spark.sql.shuffle.partitions: "100"

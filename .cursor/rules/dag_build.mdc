@@ -366,7 +366,8 @@ workflow:
     run_vacuum: true  # Optional, default: true
     vacuum_retention_hours: 48  # Optional, default: 48
     vacuum_lite: false  # Optional, default: false (requires DBR 16.1+)
-    run_optimize: true  # Optional, default: true
+    run_optimize: true  # Optional, default: true on Databricks; on EMR, defaults to
+                         # false unless the table has zorder columns (see below)
     tables_customization:
         table_name:
             merge_on: ["id", "date"]  # Optional, for upsert operations
@@ -374,12 +375,47 @@ workflow:
             when_matched_delete_condition: "source.is_deleted = true"  # Optional
             when_not_matched_insert_condition: "source.is_valid = true"  # Optional
             z_order_by: ["user_id", "date"]  # Optional
+            run_optimize: true  # Optional, explicit override always wins over engine defaults
+            optimize_frequency_days: 7  # Optional, minimum days between OPTIMIZE runs
             table_properties:  # Optional
                 delta.enableChangeDataFeed: "true"
             execution_timeout_hours: 3.0  # Optional
 ```
 
 *`load_delta_table` only:* `tables_customization.<table>.column_mapping_mode: name` if the job fails with `DELTA_INVALID_CHARACTERS_IN_COLUMN_NAMES` (e.g. Oracle flexfield-style column names).
+
+#### `run_optimize` default on EMR
+
+`OPTIMIZE ... ZORDER BY (...)` is a full shuffle/compaction and is proportionally far
+more expensive on EMR (plain Delta OSS) than on Databricks. Unless `run_optimize` is
+explicitly set (table-level `tables_customization.<table>.run_optimize`, or
+workflow-level `run_optimize`), the default differs by engine:
+
+- **Databricks** — unchanged: `run_optimize: true`, capped once per day via the
+  existing `maintenance_once_per_day` marker.
+- **EMR, table has no `z_order_by`/`raw_z_order_by`/`clean_z_order_by`** —
+  `run_optimize` defaults to `false` (OPTIMIZE skipped). Set `run_optimize: true`
+  explicitly if a specific table genuinely needs regular compaction despite no
+  zorder columns.
+- **EMR, table has zorder columns configured, OPTIMIZE runs full-table** —
+  `run_optimize` defaults to `true`, and `optimize_frequency_days` defaults to
+  `7` (weekly) instead of running every time the daily marker allows it.
+  Override `optimize_frequency_days` per table (or at `workflow` level) if a
+  table's read pattern needs tighter clustering.
+- **EMR, table has zorder columns configured, but OPTIMIZE is partition-filtered**
+  (TRANSACTIONAL-layer tables by default — opt out with `optimize_partition_filter: false`
+  — or any table with `incremental_optimize: true` set table- or workflow-level) —
+  `run_optimize` still defaults to `true`, but
+  `optimize_frequency_days` stays `1` (daily) regardless of zorder. This is
+  intentional: OPTIMIZE's `WHERE` clause only ever covers the current run's
+  `load_start_date`..`load_end_date`, never the days elapsed since the last
+  actual OPTIMIZE, so a weekly cadence on a partition-filtered table would
+  leave 6 of every 7 days' partitions permanently un-optimized. Partition-filtered
+  OPTIMIZE is already cheap (bounded to the run's date range), so daily is safe.
+
+`VACUUM` is unaffected by any of the above — it keeps its own cadence/retention
+(`run_vacuum`, `vacuum_retention_hours`, `maintenance_once_per_day`) regardless of
+engine or `optimize_frequency_days`.
 
 ### Raw Database Pull Delta
 

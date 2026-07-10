@@ -1,6 +1,7 @@
 """Unit tests for Delta maintenance S3 markers."""
 
 import json
+from datetime import date
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -9,10 +10,16 @@ from botocore.exceptions import ClientError
 from bietlejuice.base.delta.maintenance_state import (
     build_maintenance_payload,
     build_marker_key,
+    build_optimize_cursor_key,
+    build_optimize_cursor_payload,
+    days_since_last_optimize,
+    is_optimize_due,
     maintenance_already_completed,
     normalize_s3_bucket,
+    parse_iso_date,
     read_maintenance_marker,
     resolve_marker_location,
+    resolve_optimize_cursor_location,
     slugify_full_table_name,
     write_maintenance_marker,
 )
@@ -275,3 +282,117 @@ class TestResolveMarkerLocation:
         assert bucket == "artifacts.example.com"
         assert key.endswith("/2026-05-28.json")
         assert TEST_STATE_PREFIX in key
+
+
+class TestBuildOptimizeCursorKey:
+    def test_builds_non_date_keyed_path(self):
+        # act
+        key = build_optimize_cursor_key(
+            environment="prod",
+            full_table_name="datalake_dw_braze.fact_events",
+            state_prefix=TEST_STATE_PREFIX,
+        )
+
+        # assert
+        assert (
+            key
+            == "bi-etl-ejuice/delta_maintenance/prod/datalake_dw_braze__fact_events/optimize_cursor.json"
+        )
+
+    def test_strips_leading_and_trailing_slashes_from_prefix(self):
+        # act
+        key = build_optimize_cursor_key(
+            environment="prod",
+            full_table_name="db.table",
+            state_prefix="/bi-etl-ejuice/delta_maintenance/",
+        )
+
+        # assert
+        assert key.startswith("bi-etl-ejuice/delta_maintenance/prod/")
+        assert key.endswith("/optimize_cursor.json")
+
+
+class TestResolveOptimizeCursorLocation:
+    def test_returns_bucket_and_key(self):
+        # act
+        bucket, key = resolve_optimize_cursor_location(
+            state_bucket="s3://artifacts.example.com",
+            environment="forno",
+            full_table_name="datalake_clean.house",
+            state_prefix=TEST_STATE_PREFIX,
+        )
+
+        # assert
+        assert bucket == "artifacts.example.com"
+        assert key.endswith("/optimize_cursor.json")
+        assert TEST_STATE_PREFIX in key
+
+
+class TestBuildOptimizeCursorPayload:
+    def test_includes_expected_fields(self):
+        # act
+        payload = build_optimize_cursor_payload(
+            full_table_name="datalake_dw.fact_x",
+            last_optimize_date="2026-05-28",
+            environment="forno",
+            dag_name="my_dag",
+        )
+
+        # assert
+        assert payload["full_table_name"] == "datalake_dw.fact_x"
+        assert payload["last_optimize_date"] == "2026-05-28"
+        assert payload["environment"] == "forno"
+        assert payload["dag_name"] == "my_dag"
+        assert "ts_completed" in payload
+
+
+class TestParseIsoDate:
+    def test_parses_valid_date(self):
+        assert parse_iso_date("2026-05-28") == date(2026, 5, 28)
+
+    def test_raises_on_invalid_format(self):
+        with pytest.raises(ValueError):
+            parse_iso_date("05/28/2026")
+
+
+class TestDaysSinceLastOptimize:
+    def test_none_when_no_cursor_payload(self):
+        assert days_since_last_optimize(None, date(2026, 5, 28)) is None
+
+    def test_none_when_payload_missing_date_field(self):
+        assert days_since_last_optimize({}, date(2026, 5, 28)) is None
+
+    def test_none_when_payload_date_is_malformed(self):
+        payload = {"last_optimize_date": "not-a-date"}
+        assert days_since_last_optimize(payload, date(2026, 5, 28)) is None
+
+    def test_computes_elapsed_days(self):
+        payload = {"last_optimize_date": "2026-05-21"}
+        assert days_since_last_optimize(payload, date(2026, 5, 28)) == 7
+
+    def test_zero_when_same_day(self):
+        payload = {"last_optimize_date": "2026-05-28"}
+        assert days_since_last_optimize(payload, date(2026, 5, 28)) == 0
+
+
+class TestIsOptimizeDue:
+    def test_always_due_when_frequency_is_daily_or_less(self):
+        payload = {"last_optimize_date": "2026-05-28"}
+        assert is_optimize_due(payload, date(2026, 5, 28), 1) is True
+        assert is_optimize_due(payload, date(2026, 5, 28), 0) is True
+
+    def test_due_on_cold_start_with_no_cursor(self):
+        assert is_optimize_due(None, date(2026, 5, 28), 7) is True
+
+    def test_not_due_before_frequency_elapses(self):
+        payload = {"last_optimize_date": "2026-05-25"}
+        assert is_optimize_due(payload, date(2026, 5, 28), 7) is False
+
+    def test_due_once_frequency_elapses(self):
+        payload = {"last_optimize_date": "2026-05-21"}
+        assert is_optimize_due(payload, date(2026, 5, 28), 7) is True
+
+    def test_due_when_frequency_elapsed_exactly(self):
+        payload = {"last_optimize_date": "2026-05-21"}
+        assert is_optimize_due(payload, date(2026, 5, 27), 7) is False
+        assert is_optimize_due(payload, date(2026, 5, 28), 7) is True

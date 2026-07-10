@@ -5,6 +5,9 @@ from airflow.models import DAG
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
+from bietlejuice.base.airflow.optimize_delta_tables_cli import (
+    decode_tables_config_from_cli,
+)
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -548,3 +551,319 @@ class TestMaintenanceStateWiring:
             dag_execution_context.execution_date,
         ]
         assert "--state-bucket" not in parameters
+
+
+def _table_with_zorder(
+    name: str,
+    z_order_by: list,
+    layer: LayerEnum = LayerEnum.ENRICH,
+    zorder_key: str = "z_order_by",
+    extra_customization: dict = None,
+) -> TableAttributes:
+    customization = {zorder_key: z_order_by}
+    if extra_customization:
+        customization.update(extra_customization)
+    return TableAttributes(
+        dag_args={"name": "test_dag"},
+        workflow_args={
+            "custom_schema": "my_schema",
+            "tables_customization": {name: customization},
+        },
+        layer=layer,
+        table_name=name,
+    )
+
+
+class TestEngineAwareOptimizeDefaults:
+    """EMR defaults OPTIMIZE off unless zorder is configured (then weekly); Databricks unchanged."""
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_databricks_no_zorder_defaults_optimize_on_daily(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = False
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-t1", dag=dag_execution_context.dag
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([_table("t1")])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+        assert tables_config["t1"]["optimize_frequency_days"] == 1
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_no_zorder_defaults_optimize_off(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-t1", dag=dag_execution_context.dag
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([_table("t1")])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is False
+        assert tables_config["t1"]["optimize_frequency_days"] == 1
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_with_zorder_defaults_optimize_on_weekly(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-enrich-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder("t1", ["user_id"])
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+        assert tables_config["t1"]["optimize_frequency_days"] == 7
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_with_raw_zorder_defaults_optimize_on_weekly(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder(
+            "t1", ["user_id"], layer=LayerEnum.RAW, zorder_key="raw_z_order_by"
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+        assert tables_config["t1"]["optimize_frequency_days"] == 7
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_no_zorder_explicit_run_optimize_true_keeps_daily_frequency(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-t1", dag=dag_execution_context.dag
+        )
+        table = TableAttributes(
+            dag_args={"name": "test_dag"},
+            workflow_args={
+                "custom_schema": "my_schema",
+                "tables_customization": {"t1": {"run_optimize": True}},
+            },
+            layer=LayerEnum.RAW,
+            table_name="t1",
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+        assert tables_config["t1"]["optimize_frequency_days"] == 1
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_with_zorder_explicit_run_optimize_false_overrides_default(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-enrich-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder(
+            "t1", ["user_id"], extra_customization={"run_optimize": False}
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is False
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_with_zorder_explicit_frequency_override_wins(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-enrich-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder(
+            "t1", ["user_id"], extra_customization={"optimize_frequency_days": 3}
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+        assert tables_config["t1"]["optimize_frequency_days"] == 3
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_workflow_level_run_optimize_override_applies_to_all_tables(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        dag_execution_context.workflow_args["run_optimize"] = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-t1", dag=dag_execution_context.dag
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([_table("t1")])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_workflow_level_optimize_frequency_days_override_applies_to_all_tables(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        dag_execution_context.workflow_args["optimize_frequency_days"] = 14
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-enrich-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder("t1", ["user_id"])
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["optimize_frequency_days"] == 14
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_with_zorder_transactional_layer_keeps_daily_frequency(
+        self, mock_create_spark, dag_execution_context
+    ):
+        """TRANSACTIONAL tables are partition-filtered by default: OPTIMIZE's WHERE
+        clause only ever covers the current run's date range, so a weekly cadence
+        would leave 6 of every 7 days' partitions permanently un-optimized. ZORDER
+        still turns OPTIMIZE on, but frequency must stay daily."""
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-transactional-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder(
+            "t1",
+            ["user_id"],
+            layer=LayerEnum.TRANSACTIONAL,
+            zorder_key="raw_z_order_by",
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+        assert tables_config["t1"]["apply_partition_filter"] is True
+        assert tables_config["t1"]["optimize_frequency_days"] == 1
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_with_zorder_transactional_opt_out_reverts_to_weekly_frequency(
+        self, mock_create_spark, dag_execution_context
+    ):
+        """When a TRANSACTIONAL table opts out of the partition filter
+        (``optimize_partition_filter: False``), OPTIMIZE runs full-table again, so
+        the weekly cadence is safe and applies as usual."""
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-transactional-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder(
+            "t1",
+            ["user_id"],
+            layer=LayerEnum.TRANSACTIONAL,
+            zorder_key="raw_z_order_by",
+            extra_customization={"optimize_partition_filter": False},
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["apply_partition_filter"] is False
+        assert tables_config["t1"]["optimize_frequency_days"] == 7
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_with_zorder_incremental_optimize_table_override_keeps_daily_frequency(
+        self, mock_create_spark, dag_execution_context
+    ):
+        """A non-TRANSACTIONAL table that opts into incremental_optimize is also
+        partition-filtered, so it must keep the daily cadence despite ZORDER."""
+        dag_execution_context.use_airflow_emr = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-clean-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder(
+            "t1",
+            ["user_id"],
+            layer=LayerEnum.CLEAN,
+            zorder_key="clean_z_order_by",
+            extra_customization={"incremental_optimize": True},
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+        assert tables_config["t1"]["apply_partition_filter"] is True
+        assert tables_config["t1"]["optimize_frequency_days"] == 1
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_with_zorder_workflow_incremental_optimize_keeps_daily_frequency(
+        self, mock_create_spark, dag_execution_context
+    ):
+        """Same as above, but incremental_optimize is set at the workflow level
+        rather than per-table."""
+        dag_execution_context.use_airflow_emr = True
+        dag_execution_context.workflow_args["incremental_optimize"] = True
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-clean-t1", dag=dag_execution_context.dag
+        )
+        table = _table_with_zorder(
+            "t1", ["user_id"], layer=LayerEnum.CLEAN, zorder_key="clean_z_order_by"
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+        tables_config = decode_tables_config_from_cli(
+            mock_create_spark.call_args[0][2][1]
+        )
+
+        assert tables_config["t1"]["run_optimize"] is True
+        assert tables_config["t1"]["apply_partition_filter"] is True
+        assert tables_config["t1"]["optimize_frequency_days"] == 1

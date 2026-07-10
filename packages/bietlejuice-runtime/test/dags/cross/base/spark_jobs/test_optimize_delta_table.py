@@ -21,10 +21,13 @@ sys.modules["bietlejuice.loaders.delta_loader"] = MagicMock()
 
 from dags.cross.base.spark_jobs.optimize_delta_table import (  # noqa: E402
     MaintenanceStateConfig,
+    _apply_optimize_cadence,
     _await_job_results_and_persist_markers,
     _build_maintenance_state_config,
     _filter_tables_already_maintained,
     _persist_maintenance_marker,
+    _persist_optimize_cursor,
+    _read_optimize_cursor,
     _resolve_partition_predicate,
     _should_use_daily_maintenance_cap,
     build_year_month_day_predicate,
@@ -280,11 +283,12 @@ class TestDailyMaintenanceCap:
         loader.optimize_table.assert_called_once()
         loader.vacuum_table.assert_called_once()
 
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table._persist_optimize_cursor")
     @patch(
         "dags.cross.base.spark_jobs.optimize_delta_table._persist_maintenance_marker"
     )
     def test_await_results_persists_markers_for_tables_after_failure(
-        self, mock_persist_marker, maintenance_state
+        self, mock_persist_marker, mock_persist_cursor, maintenance_state
     ):
         # arrange
         tables = {
@@ -319,6 +323,9 @@ class TestDailyMaintenanceCap:
             "datalake_dw.fact_ok",
             maintenance_state,
         )
+        mock_persist_cursor.assert_called_once_with(
+            "datalake_dw.fact_ok", maintenance_state
+        )
 
     @patch("dags.cross.base.spark_jobs.optimize_delta_table.write_maintenance_marker")
     def test_persist_maintenance_marker_writes_after_success(
@@ -338,3 +345,198 @@ class TestDailyMaintenanceCap:
 
         # assert
         mock_write_marker.assert_called_once()
+
+
+class TestOptimizeCadence:
+    """OPTIMIZE-only cadence gating, decoupled from the daily VACUUM/OPTIMIZE cap."""
+
+    @pytest.fixture
+    def maintenance_state(self):
+        return MaintenanceStateConfig(
+            state_bucket="s3://artifacts-bucket",
+            environment="forno",
+            maintenance_date="2026-05-28",
+            dag_name="test_dag",
+            state_prefix="bi-etl-ejuice/delta_maintenance",
+            region_name="us-east-1",
+        )
+
+    def test_noop_when_maintenance_state_disabled(self):
+        # arrange
+        disabled_state = MaintenanceStateConfig(
+            state_bucket=None,
+            environment=None,
+            maintenance_date=None,
+            dag_name=None,
+            state_prefix=None,
+            region_name=None,
+        )
+        tables = {"fact_x": {"run_optimize": True, "optimize_frequency_days": 7}}
+
+        # act
+        resolved = _apply_optimize_cadence(tables, "dw", disabled_state)
+
+        # assert
+        assert resolved == tables
+
+    def test_passthrough_when_run_optimize_false(self, maintenance_state):
+        # arrange
+        tables = {"fact_x": {"run_optimize": False, "optimize_frequency_days": 7}}
+
+        # act
+        resolved = _apply_optimize_cadence(tables, "dw", maintenance_state)
+
+        # assert
+        assert resolved == tables
+
+    def test_passthrough_when_frequency_is_daily_or_less(self, maintenance_state):
+        # arrange
+        tables = {"fact_x": {"run_optimize": True, "optimize_frequency_days": 1}}
+
+        # act
+        resolved = _apply_optimize_cadence(tables, "dw", maintenance_state)
+
+        # assert
+        assert resolved == tables
+
+    @patch(
+        "dags.cross.base.spark_jobs.optimize_delta_table._read_optimize_cursor",
+        return_value=None,
+    )
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
+    def test_due_on_cold_start_keeps_run_optimize_true(
+        self, mock_full_name, mock_read_cursor, maintenance_state
+    ):
+        # arrange
+        mock_full_name.return_value = "datalake_dw.fact_x"
+        tables = {
+            "fact_x": {
+                "schema": "dw",
+                "run_optimize": True,
+                "optimize_frequency_days": 7,
+            }
+        }
+
+        # act
+        resolved = _apply_optimize_cadence(tables, "dw", maintenance_state)
+
+        # assert
+        assert resolved["fact_x"]["run_optimize"] is True
+
+    @patch(
+        "dags.cross.base.spark_jobs.optimize_delta_table._read_optimize_cursor",
+        return_value={"last_optimize_date": "2026-05-25"},
+    )
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
+    def test_not_due_forces_run_optimize_false_but_keeps_run_vacuum(
+        self, mock_full_name, mock_read_cursor, maintenance_state
+    ):
+        # arrange: cursor is 3 days old, frequency is 7 days -> not due yet.
+        mock_full_name.return_value = "datalake_dw.fact_x"
+        tables = {
+            "fact_x": {
+                "schema": "dw",
+                "run_optimize": True,
+                "run_vacuum": True,
+                "optimize_frequency_days": 7,
+            }
+        }
+
+        # act
+        resolved = _apply_optimize_cadence(tables, "dw", maintenance_state)
+
+        # assert
+        assert resolved["fact_x"]["run_optimize"] is False
+        assert resolved["fact_x"]["run_vacuum"] is True
+        # original table config dict must not be mutated in place
+        assert tables["fact_x"]["run_optimize"] is True
+
+    @patch(
+        "dags.cross.base.spark_jobs.optimize_delta_table._read_optimize_cursor",
+        return_value={"last_optimize_date": "2026-05-21"},
+    )
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
+    def test_due_once_frequency_elapsed_keeps_run_optimize_true(
+        self, mock_full_name, mock_read_cursor, maintenance_state
+    ):
+        # arrange: cursor is exactly 7 days old, frequency is 7 days -> due.
+        mock_full_name.return_value = "datalake_dw.fact_x"
+        tables = {
+            "fact_x": {
+                "schema": "dw",
+                "run_optimize": True,
+                "optimize_frequency_days": 7,
+            }
+        }
+
+        # act
+        resolved = _apply_optimize_cadence(tables, "dw", maintenance_state)
+
+        # assert
+        assert resolved["fact_x"]["run_optimize"] is True
+
+
+class TestOptimizeCursorPersistence:
+    @pytest.fixture
+    def maintenance_state(self):
+        return MaintenanceStateConfig(
+            state_bucket="s3://artifacts-bucket",
+            environment="forno",
+            maintenance_date="2026-05-28",
+            dag_name="test_dag",
+            state_prefix="bi-etl-ejuice/delta_maintenance",
+            region_name="us-east-1",
+        )
+
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table.read_maintenance_marker")
+    def test_read_optimize_cursor_uses_cursor_location(
+        self, mock_read_marker, maintenance_state
+    ):
+        # arrange
+        mock_read_marker.return_value = {"last_optimize_date": "2026-05-21"}
+
+        # act
+        payload = _read_optimize_cursor("datalake_dw.fact_x", maintenance_state)
+
+        # assert
+        assert payload == {"last_optimize_date": "2026-05-21"}
+        args, kwargs = mock_read_marker.call_args
+        assert args[0] == "artifacts-bucket"
+        assert args[1].endswith("/optimize_cursor.json")
+        assert kwargs["region_name"] == "us-east-1"
+
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table.write_maintenance_marker")
+    def test_persist_optimize_cursor_writes_todays_date(
+        self, mock_write_marker, maintenance_state
+    ):
+        # act
+        _persist_optimize_cursor("datalake_dw.fact_x", maintenance_state)
+
+        # assert
+        mock_write_marker.assert_called_once()
+        args, kwargs = mock_write_marker.call_args
+        assert args[0] == "artifacts-bucket"
+        assert args[1].endswith("/optimize_cursor.json")
+        assert args[2]["last_optimize_date"] == "2026-05-28"
+        assert kwargs["region_name"] == "us-east-1"
+
+    @patch("dags.cross.base.spark_jobs.optimize_delta_table._persist_optimize_cursor")
+    @patch(
+        "dags.cross.base.spark_jobs.optimize_delta_table._persist_maintenance_marker"
+    )
+    def test_cursor_not_persisted_when_optimize_did_not_run(
+        self, mock_persist_marker, mock_persist_cursor, maintenance_state
+    ):
+        # arrange: run_optimize False -> cursor must not be touched even on success.
+        tables = {"fact_x": {"run_optimize": False, "run_vacuum": True}}
+        result = MagicMock()
+        result.get.return_value = "datalake_dw.fact_x"
+
+        # act
+        failures = _await_job_results_and_persist_markers(
+            tables, [result], maintenance_state
+        )
+
+        # assert
+        assert failures == []
+        mock_persist_cursor.assert_not_called()

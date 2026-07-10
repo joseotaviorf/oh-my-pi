@@ -1,0 +1,39 @@
+"""Regression guard: EMR cluster spark_conf anchor keeps the small-file write-side defaults.
+
+Parses the YAML directly (no ConfigurationService/HierarchicalConf) so this stays a
+cheap, environment-independent sanity check rather than a full config-resolution test.
+"""
+
+from pathlib import Path
+
+import pytest
+import yaml
+
+_CONFIG_DIR = Path(__file__).parents[4] / "src" / "bietlejuice" / "config"
+
+_EXPECTED_SPARK_CONF_DEFAULTS = {
+    "spark.sql.adaptive.enabled": "true",
+    "spark.sql.adaptive.coalescePartitions.enabled": "true",
+    "spark.sql.files.maxPartitionBytes": "268435456",
+    "spark.sql.adaptive.advisoryPartitionSizeInBytes": "268435456",
+}
+
+
+def _load_emr_cluster_base_spark_conf(conf_file_name: str) -> dict:
+    path = _CONFIG_DIR / conf_file_name
+    # YAML anchors/aliases (`&x`, `*x`, `<<:`) resolve naturally via safe_load.
+    raw = yaml.safe_load(path.read_text())
+    return raw["emr_cluster_base"]["spark_conf"]
+
+
+@pytest.mark.parametrize("conf_file_name", ["prod_conf.yml", "forno_conf.yml"])
+class TestEmrClusterSparkConfDefaults:
+    def test_write_side_small_file_defaults_present(self, conf_file_name):
+        spark_conf = _load_emr_cluster_base_spark_conf(conf_file_name)
+
+        for key, expected_value in _EXPECTED_SPARK_CONF_DEFAULTS.items():
+            assert key in spark_conf, f"{key} missing from {conf_file_name}"
+            assert str(spark_conf[key]) == expected_value, (
+                f"{key} in {conf_file_name} is {spark_conf[key]!r}, "
+                f"expected {expected_value!r}"
+            )
