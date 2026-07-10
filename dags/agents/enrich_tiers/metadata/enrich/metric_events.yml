@@ -5,10 +5,9 @@ description: |
   Consolidated metric events for agent performance. It unifies OFFER and PROSPECT
   domain events with metric period mapping (simple and compound), including validity,
   invalidation (when applicable), and supporting identifiers. First Listing metrics
-  (FL_FS, FL_FR) map houses to calendar-month periods using
-  ciq_first_listing.dt_compliance_general_rule. FL_FS and FL_FR use the same attribution
-  window: one calendar day after ts_interval_started through one calendar day after
-  ts_interval_ended, so the two-day grace is not inflated by timezone on month-end.
+  (FL_FS, FL_FR) map houses using ciq_first_listing.dt_compliance_general_rule between
+  DATE(ts_interval_started) and DATE(ts_interval_ended), and require
+  DATE_TRUNC('MONTH', ts_original_first_listing) to match the metric period month.
   Other metrics use DATE() on source timestamps.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br

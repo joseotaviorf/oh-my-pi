@@ -27,16 +27,16 @@ columns:
       - datalake_quintoandar.aux_date.month_start
     description: >
       UTC-aligned start timestamp of the metric window (month start plus 3 hours).
-      FL_FS and FL_FR in metric_events attribute houses using
-      DATE(dt_compliance_general_rule) between DATE(ts_interval_started + 1 day)
-      and DATE(ts_interval_ended + 1 day).
+      FL_FS and FL_FR in metric_events join on dt_compliance_general_rule between
+      DATE(ts_interval_started) and DATE(ts_interval_ended), and on the calendar month
+      of ts_original_first_listing matching DATE_TRUNC('MONTH', ts_interval_started).
   ts_interval_ended:
     lineage:
       - datalake_quintoandar.aux_date.month_end
     description: >
       UTC-aligned end timestamp of the metric window (month end at 23:59:59 plus 3 hours).
-      Used with ts_interval_started for FL_FS/FL_FR period joins in metric_events; other
-      metrics typically use dt_init and dt_end.
+      For FL_FS and FL_FR, adds two days after that UTC offset for compliance grace at
+      month boundaries; other metrics use month end plus 3 hours only.
   ts_created:
     lineage:
       - datalake_quintoandar.aux_date.month_start
