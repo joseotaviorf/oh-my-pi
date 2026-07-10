@@ -1,7 +1,7 @@
 ---
 database_name: datalake_retsuko
 table_name: entry
-owner: athos.sampayo@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Information about entries from invoices"
 columns:
@@ -10,11 +10,11 @@ columns:
     lineage:
       - datalake_retsuko_clean.entry.id
   id_external:
-    description: "External ID"
+    description: Identifier for the external referenced by this financial record.
     lineage:
       - datalake_retsuko_clean.entry.id_external
   id_invoice:
-    description: "Invoice ID"
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_retsuko_clean.entry.id_invoice
   id_contract:
@@ -44,7 +44,7 @@ columns:
   accounting_version:
     description: "Identify accounting version in entry creation"
   amount:
-    description: "Entry amount"
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
     lineage:
       - datalake_retsuko_clean.entry.amount
   bill_item:
@@ -84,7 +84,7 @@ columns:
     lineage:
       - datalake_retsuko_clean.entry.accrual_year_month
   due_year_month:
-    description: "Year and month in which the entry is due to"
+    description: Financial attribute representing due year month on the entry dataset.
     lineage:
       - datalake_retsuko_clean.entry.due_year_month
   ts_created:

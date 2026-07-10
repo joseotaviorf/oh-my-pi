@@ -3,7 +3,7 @@ database_name: datalake_nexxera
 table_name: dtw_filter
 description: "Table containing structured data to be ingested by SAP"
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   OK:
     description: "Checks if the receipt matches the data from the bank"
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.BANK_DIFF
   BALANCE_OK:
-    description: "Validation"
+    description: Financial attribute representing BALANCE OK on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.BALANCE_OK
   BALANCE_DIFF:
@@ -30,17 +30,17 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.EC
   STORE_ID:
-    description: "Store ID"
+    description: Financial attribute representing STORE ID on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.STORE_ID
   JdtNum:
-    description: "Header ID"
+    description: Header ID recorded on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.JdtNum
   ReferenceDate:
     description: "Lauch date"
   DueDate:
-    description: "Due date"
+    description: Due date recorded on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.DueDate
   TaxDate:
@@ -48,7 +48,7 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.TaxDate
   Reference:
-    description: "Card flag"
+    description: Card flag recorded on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.Reference
   Reference2:
@@ -60,7 +60,7 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.Reference3
   Memo:
-    description: "Description"
+    description: Financial attribute representing Memo on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.Memo
   U_ExternalPaymentId:
@@ -68,7 +68,7 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.U_ExternalPaymentId
   U_SourceClient:
-    description: "Source system"
+    description: Financial attribute representing U SourceClient on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.U_SourceClient
   U_RSD_UUIDSB:
@@ -76,7 +76,7 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.U_RSD_UUIDSB
   ParentKey:
-    description: "Header ID"
+    description: Header ID recorded on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.ParentKey
   LineNum:
@@ -88,15 +88,15 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.ShortName
   Debit:
-    description: "Debit amount"
+    description: Financial attribute representing Debit on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.Debit
   Credit:
-    description: "Credit amount"
+    description: Financial attribute representing Credit on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.Credit
   BPLID:
-    description: "Branch ID"
+    description: Branch ID recorded on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.BPLID
   Reference1:
@@ -116,7 +116,7 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.U_FinanceEntityEntryId
   CostingCode:
-    description: "Location"
+    description: Financial attribute representing CostingCode on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.CostingCode
   CostingCode2:
@@ -124,7 +124,7 @@ columns:
     lineage:
       - datalake_nexxera.nexxera_final.CostingCode2
   DueDate_:
-    description: "Due date"
+    description: Due date recorded on the dtw_filter dataset.
     lineage:
       - datalake_nexxera.nexxera_final.DueDate_
   ts_ingested:

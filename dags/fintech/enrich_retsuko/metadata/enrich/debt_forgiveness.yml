@@ -1,16 +1,16 @@
 ---
 database_name: datalake_retsuko
 table_name: debt_forgiveness
-owner: felipe.chies@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Debt forgiveness data with forgiveness details"
 columns:
   id_contract:
-    description: "ID of the contract"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_retsuko.bill_items.id_contract
   id_invoice:
-    description: "ID of the invoice"
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_retsuko.bill_items.id_invoice
   amount_forgiven:
@@ -20,16 +20,16 @@ columns:
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
   purpose:
-    description: "Purpose information of the debt forgiveness"
+    description: Financial attribute representing purpose on the debt_forgiveness dataset.
     lineage:
       - datalake_retsuko.invoice.purpose
   origin_factor:
-    description: "Origin of the data"
+    description: Financial attribute representing origin factor on the debt_forgiveness dataset.
   dt_created:
-    description: "Created date"
+    description: Calendar date associated with created in the financial workflow.
     lineage:
       - datalake_retsuko.invoice.dt_created
   dt_due:
-    description: "Due date"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_retsuko.invoice.dt_due

@@ -1,16 +1,16 @@
 ---
 database_name: datalake_retsuko
 table_name: invoice_entry
-owner: athos.sampayo@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: ""
+description: Enriched invoice entry dataset combining upstream clean sources with business rules for fintech operational analytics and reconciliation.
 columns:
   id:
-    description: "Entry external ID"
+    description: Financial attribute representing id on the invoice_entry dataset.
     lineage:
       - datalake_retsuko.entry.id_external
   id_invoice:
-    description: "Invoice ID"
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_retsuko.entry.id_invoice
   id_external_reversed_entry:
@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_retsuko.entry.accounting_transaction_identifier
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_retsuko_clean.contract.id_external
   bill_item:
@@ -74,7 +74,7 @@ columns:
     lineage:
       - datalake_retsuko.entry.bill_item
   is_rental_paid_in_advance:
-    description: ""
+    description: Indicates whether rental paid in advance applies to this financial record.
     lineage:
       - datalake_retsuko_clean.contract.is_rental_paid_in_advance
   producer:
@@ -106,6 +106,6 @@ columns:
     lineage:
       - datalake_retsuko.entry.accrual_year_month
   due_year_month:
-    description: "Expense due month"
+    description: Financial attribute representing due year month on the invoice_entry dataset.
     lineage:
       - datalake_retsuko.entry.due_year_month

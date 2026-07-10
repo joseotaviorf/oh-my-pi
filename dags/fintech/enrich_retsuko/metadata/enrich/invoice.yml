@@ -1,16 +1,16 @@
 ---
 database_name: datalake_retsuko
 table_name: invoice
-owner: athos.sampayo@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Information about invoices issued by SeuBarriga for renting contracts."
 columns:
   id:
-    description: "Invoice ID"
+    description: Financial attribute representing id on the invoice dataset.
     lineage:
       - datalake_retsuko_clean.invoice.id
   id_external:
-    description: "External ID"
+    description: Identifier for the external referenced by this financial record.
     lineage:
       - datalake_retsuko_clean.invoice.id_external
   id_original_invoice_external:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.id_original_invoice_external
   id_account:
-    description: "Account ID"
+    description: Identifier for the account referenced by this financial record.
     lineage:
       - datalake_retsuko_clean.invoice.id_account
   id_contract:
@@ -54,7 +54,7 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.payment_unique_payment_identifier
   status:
-    description: "Invoice's status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_retsuko_clean.invoice.status
     categories:
@@ -110,7 +110,7 @@ columns:
       robin-hood: ""
       unknown: ""
   purpose:
-    description: "Invoice purpose"
+    description: Financial attribute representing purpose on the invoice dataset.
     lineage:
       - datalake_retsuko_clean.invoice.purpose
     categories:
@@ -149,15 +149,15 @@ columns:
     lineage:
       - datalake_retsuko_clean.invoice.due_amount
   paid_amount:
-    description: "Amount paid in the invoice"
+    description: Financial attribute representing paid amount on the invoice dataset.
     lineage:
       - datalake_retsuko_clean.invoice.paid_amount
   payment_paid_interest_amount:
-    description: "Amount of interest after payment"
+    description: Financial attribute representing payment paid interest amount on the invoice dataset.
     lineage:
       - datalake_retusko_clean.invoice.payment_paid_interest_amount
   payment_paid_fine_amount:
-    description: "Amount of fine after payment"
+    description: Financial attribute representing payment paid fine amount on the invoice dataset.
     lineage:
       - datalake_retusko_clean.invoice.payment_paid_fine_amount
   accrual_year_month:
@@ -177,7 +177,7 @@ columns:
     lineage:
       - datalake_retusko_clean.invoice.payment_company_use_number
   payment_bank_code:
-    description: "Paying Bank Code"
+    description: Financial attribute representing payment bank code on the invoice dataset.
     lineage:
       - datalake_retusko_clean.invoice.payment_bank_code
   is_write_off:

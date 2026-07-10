@@ -1,20 +1,20 @@
 ---
 database_name: datalake_retsuko
 table_name: bill
-owner: athos.sampayo@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: ""
+description: Enriched bill dataset combining upstream clean sources with business rules for fintech operational analytics and reconciliation.
 columns:
   id:
-    description: ""
+    description: Financial attribute representing id on the bill dataset.
     lineage:
       - datalake_retsuko_clean.boleto.id
   id_external:
-    description: ""
+    description: Identifier for the external referenced by this financial record.
     lineage:
       - datalake_retsuko_clean.boleto.id_external
   id_invoice:
-    description: ""
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_retsuko_clean.boleto.id_invoice
   id_checkout_boleto:
@@ -22,35 +22,35 @@ columns:
     lineage:
       - datalake_retsuko_clean.boleto.id_checkout_boleto
   identifier:
-    description: ""
+    description: Financial attribute representing identifier on the bill dataset.
     lineage:
       - datalake_retsuko_clean.boleto.identifier
   status:
-    description: ""
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_retsuko_clean.boleto.status
   due_amount:
-    description: ""
+    description: Financial attribute representing due amount on the bill dataset.
     lineage:
       - datalake_retsuko_clean.boleto.due_amount
   our_number:
-    description: ""
+    description: Financial attribute representing our number on the bill dataset.
     lineage:
       - datalake_retsuko_clean.boleto.our_number
   our_number_digit:
-    description: ""
+    description: Financial attribute representing our number digit on the bill dataset.
     lineage:
       - datalake_retsuko_clean.boleto.our_number_digit
   wallet_number:
-    description: ""
+    description: Financial attribute representing wallet number on the bill dataset.
     lineage:
       - datalake_retsuko_clean.boleto.wallet_number
   barcode:
-    description: ""
+    description: Financial attribute representing barcode on the bill dataset.
     lineage:
       - datalake_retsuko_clean.boleto.barcode
   inputtable_line:
-    description: ""
+    description: Financial attribute representing inputtable line on the bill dataset.
     lineage:
       - datalake_retsuko_clean.boleto.inputtable_line
   external_source:
@@ -58,22 +58,22 @@ columns:
     lineage:
       - datalake_retsuko_clean.boleto.external_source
   ts_due:
-    description: ""
+    description: Timestamp when due occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_clean.boleto.ts_due
   ts_issued:
-    description: ""
+    description: Timestamp when issued occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_clean.boleto.ts_issued
   ts_created:
-    description: ""
+    description: Timestamp when created occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_clean.boleto.ts_created
   ts_retsuko_created:
-    description: ""
+    description: Timestamp when retsuko created occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_clean.boleto.ts_retsuko_created
   ts_retsuko_updated:
-    description: ""
+    description: Timestamp when retsuko updated occurred in the upstream fintech system.
     lineage:
       - datalake_retsuko_clean.boleto.ts_retsuko_updated

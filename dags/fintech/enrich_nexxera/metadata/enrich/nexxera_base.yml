@@ -3,7 +3,7 @@ database_name: datalake_nexxera
 table_name: nexxera_base
 description: "Table containing inadvance data from nexxera files (id_registration = 10). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   rn_end:
     description: "Line number"
@@ -18,14 +18,14 @@ columns:
       - datalake_nexxera_clean.financial.id_flag
       - datalake_nexxera_clean.financial_extracts_050e.id_flag
   id_external_payment:
-    description: "External payment ID"
+    description: Identifier for the external payment referenced by this financial record.
   reconciliation_status:
     description: "Reason for manual bank reconciliation (when reconciled)"
     lineage:
       - datalake_nexxera_clean.financial.manual_bank_reconciliation
       - datalake_nexxera_clean.adjustments.manual_bank_reconciliation
   description_memo:
-    description: "Description"
+    description: Financial attribute representing description memo on the nexxera_base dataset.
   rn_credit:
     description: "Credit row number"
     lineage:
@@ -69,7 +69,7 @@ columns:
       - datalake_nexxera.financial.nsu_cv
       - datalake_nexxera.adjustments.nsu_cv
   installment_number:
-    description: "Number of the installment"
+    description: Financial attribute representing installment number on the nexxera_base dataset.
     lineage:
       - datalake_nexxera.financial.installment_number
       - datalake_nexxera.adjustments.installment_number
@@ -111,7 +111,7 @@ columns:
     lineage:
       - datalake_nexxera.adjustments.adjustment_original_reason
   adjustment_gross_value:
-    description: "Gross value of the adjustment"
+    description: Financial attribute representing adjustment gross value on the nexxera_base dataset.
     lineage:
       - datalake_nexxera.adjustments.adjustment_value
   adjustment_sale_value:
@@ -119,7 +119,7 @@ columns:
     lineage:
       - datalake_nexxera.adjustments.net_adjustment_value
   adjustment_tax_value:
-    description: "Tax value of the adjustment"
+    description: Financial attribute representing adjustment tax value on the nexxera_base dataset.
     lineage:
       - datalake_nexxera.adjustments.adjustment_value_tax
   dt_credit_adjustment:

@@ -3,7 +3,7 @@ database_name: datalake_nexxera
 table_name: nexxera_final
 description: "Table containing sales data from nexxera files (id_registration = 11). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   OK:
     description: "Checks if the receipt matches the data from the bank"
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_nexxera_raw.sales.col_3
   BALANCE_OK:
-    description: "Validation"
+    description: Financial attribute representing BALANCE OK on the nexxera_final dataset.
     lineage:
       - datalake_nexxera_raw.sales.col_4
   BALANCE_DIFF:
@@ -30,101 +30,29 @@ columns:
     lineage:
       - datalake_nexxera_raw.sales.col_6
   STORE_ID:
-    description: "Store ID"
+    description: Financial attribute representing STORE ID on the nexxera_final dataset.
     lineage:
       - datalake_nexxera_raw.sales.col_7
   JdtNum:
-    description: "Header ID"
+    description: Header ID recorded on the nexxera_final dataset.
     lineage:
       - datalake_nexxera_raw.sales.col_8
-  dt_due:
-    description: "Due date"
-    lineage:
-      - datalake_nexxera_raw.sales.col_9
-  dt_tax:
-    description: "Document date"
-    lineage:
-      - datalake_nexxera_raw.sales.col_10
   reference:
-    description: "Card flag"
+    description: Card flag recorded on the nexxera_final dataset.
     lineage:
       - datalake_nexxera_raw.sales.col_11
-  reference_2:
-    description: "EC - Commercial establishment"
-    lineage:
-      - datalake_nexxera_raw.sales.col_12
-  reference_3:
-    description: "Accrual date"
-    lineage:
-      - datalake_nexxera_raw.sales.col_13
   memo:
-    description: "Description"
+    description: Financial attribute representing memo on the nexxera_final dataset.
     lineage:
       - datalake_nexxera_raw.sales.col_14
-  id_u_external_payment:
-    description: "External payment ID"
-    lineage:
-      - datalake_nexxera_raw.sales.col_15
-  u_source_client:
-    description: "Origin system"
-    lineage:
-      - datalake_nexxera_raw.sales.col_16
-  uuid_u_rsd_sb:
-    description: "UUID from origin system"
-    lineage:
-      - datalake_nexxera_raw.sales.col_17
-  parent_key:
-    description: "Header ID"
-    lineage:
-      - datalake_nexxera_raw.sales.col_18
-  line_num:
-    description: "Line number"
-    lineage:
-      - datalake_nexxera_raw.sales.col_19
-  short_name:
-    description: "Accounting account"
-    lineage:
-      - datalake_nexxera_raw.sales.col_20
   debit:
-    description: "Debit amount"
+    description: Financial attribute representing debit on the nexxera_final dataset.
     lineage:
       - datalake_nexxera_raw.sales.col_21
   credit:
-    description: "Credit amount"
+    description: Financial attribute representing credit on the nexxera_final dataset.
     lineage:
       - datalake_nexxera_raw.sales.col_22
-  id_pbl:
-    description: "Branch ID"
-    lineage:
-      - datalake_nexxera_raw.sales.col_23
-  additional_reference_1:
-    description: "Business entity ID"
-    lineage:
-      - datalake_nexxera_raw.sales.col_24
-  additional_reference_2:
-    description: "Financial/accounting event ID"
-    lineage:
-      - datalake_nexxera_raw.sales.col_25
-  additional_reference:
-    description: "Accrual date"
-    lineage:
-      - datalake_nexxera_raw.sales.col_26
-  id_u_finance_entity_entry:
-    description: "Financial/accounting event entry ID"
-    lineage:
-      - datalake_nexxera_raw.sales.col_27
-  costing_code:
-    description: "Location"
-    lineage:
-      - datalake_nexxera_raw.sales.col_28
-  costing_code_2:
-    description: "Cost center"
-    lineage:
-      - datalake_nexxera_raw.sales.col_29
-  dt_due_2:
-    description: "Due date"
-    lineage:
-      - datalake_nexxera_raw.sales.col_30
   ts_ingested:
     description: Timestamp of load
     lineage:
@@ -141,3 +69,57 @@ columns:
     description: Day of load
     lineage:
       - datalake_nexxera.nexxera_base.day
+  u_externalpaymentid:
+    description: Financial attribute representing u externalpaymentid on the nexxera_final dataset.
+    lineage: []
+  reference1:
+    description: Financial attribute representing reference1 on the nexxera_final dataset.
+    lineage: []
+  duedate:
+    description: Financial attribute representing duedate on the nexxera_final dataset.
+    lineage: []
+  parentkey:
+    description: Financial attribute representing parentkey on the nexxera_final dataset.
+    lineage: []
+  reference3:
+    description: Financial attribute representing reference3 on the nexxera_final dataset.
+    lineage: []
+  linenum:
+    description: Financial attribute representing linenum on the nexxera_final dataset.
+    lineage: []
+  reference2_:
+    description: Financial attribute representing reference2 on the nexxera_final dataset.
+    lineage: []
+  taxdate:
+    description: Financial attribute representing taxdate on the nexxera_final dataset.
+    lineage: []
+  u_financeentityentryid:
+    description: Financial attribute representing u financeentityentryid on the nexxera_final dataset.
+    lineage: []
+  u_rsd_uuidsb:
+    description: Financial attribute representing u rsd uuidsb on the nexxera_final dataset.
+    lineage: []
+  reference2:
+    description: Financial attribute representing reference2 on the nexxera_final dataset.
+    lineage: []
+  additionalreference:
+    description: Financial attribute representing additionalreference on the nexxera_final dataset.
+    lineage: []
+  duedate_:
+    description: Financial attribute representing duedate on the nexxera_final dataset.
+    lineage: []
+  u_sourceclient:
+    description: Financial attribute representing u sourceclient on the nexxera_final dataset.
+    lineage: []
+  bplid:
+    description: Financial attribute representing bplid on the nexxera_final dataset.
+    lineage: []
+  shortname:
+    description: Financial attribute representing shortname on the nexxera_final dataset.
+    lineage: []
+  costingcode:
+    description: Financial attribute representing costingcode on the nexxera_final dataset.
+    lineage: []
+  costingcode2:
+    description: Financial attribute representing costingcode2 on the nexxera_final dataset.
+    lineage: []

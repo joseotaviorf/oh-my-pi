@@ -1,6 +1,12 @@
 WITH base_cte AS (
   SELECT
-    *,
+    id_contract,
+    id_invoice,
+    value_sign_bill_item,
+    from_account_type,
+    to_account_type,
+    due_amount,
+    bill_item,
     CASE
       WHEN (
         from_account_type = 'contract'
@@ -22,7 +28,9 @@ forgiven_value_table AS (
   GROUP BY 1,2
 )
 SELECT
-  m.*,
+    m.id_contract,
+    m.id_invoice,
+    m.amount_forgiven,
   f.accrual_year_month,
   f.purpose,
   'ONLINE' AS origin_factor,

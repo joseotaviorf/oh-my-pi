@@ -3,7 +3,7 @@ database_name: datalake_nexxera
 table_name: cnab_payments
 description: "Table containing all cnab payments returns and segment 'a', 'o' and 'j'. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id_bank:
     description: Bank identification number from Febraban
@@ -84,7 +84,7 @@ columns:
       - datalake_nexxera_clean.cnab_payments_341_seg_o.due_amount
       - datalake_nexxera_clean.cnab_payments_237_seg_a.due_amount
   paid_amount:
-    description: Amount actually paid
+    description: Financial attribute representing paid amount on the cnab_payments dataset.
     lineage:
       - datalake_nexxera_clean.cnab_payments_341_seg_a.paid_amount
       - datalake_nexxera_clean.cnab_payments_341_seg_j.paid_amount
@@ -139,3 +139,6 @@ columns:
       - datalake_nexxera_clean.cnab_payments_341_seg_j.day
       - datalake_nexxera_clean.cnab_payments_341_seg_o.day
       - datalake_nexxera_clean.cnab_payments_237_seg_a.day
+  segment_type_details:
+    description: Financial attribute representing segment type details on the cnab_payments dataset.
+    lineage: []

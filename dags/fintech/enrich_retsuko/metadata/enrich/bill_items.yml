@@ -1,18 +1,18 @@
 ---
 database_name: datalake_retsuko
 table_name: bill_items
-owner: leticia.silveira@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Granular table by bill items with data from the last 3 years"
 columns:
   id_contract:
-    description: "contract identification"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_retsuko_clean.contract.id_external
       - datalake_retsuko.invoice.id_contract
       - datalake_retsuko_clean.contract.id
   id_invoice:
-    description: "invoice identification"
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_retsuko.invoice.id_external
       - datalake_retsuko.entry.id_invoice
@@ -29,7 +29,7 @@ columns:
     lineage:
       - datalake_retsuko.entry.bill_item
   bill_item_description:
-    description: "bill item description"
+    description: Financial attribute representing bill item description on the bill_items dataset.
     lineage:
       - datalake_retsuko.entry.description
   bill_item_cluster_name:

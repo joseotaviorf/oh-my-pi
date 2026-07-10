@@ -3,7 +3,7 @@ database_name: datalake_nexxera
 table_name: financial
 description: "Table containing financial data from nexxera files (id_registration = 11). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   rn_credit:
     description: Row number to order registers
@@ -28,7 +28,7 @@ columns:
     lineage:
       - datalake_nexxera_clean.financial.acquirer_pos
   flag:
-    description: Flag name
+    description: Financial attribute representing flag on the financial dataset.
     lineage:
       - datalake_nexxera_clean.financial.flag
   id_flag:
@@ -48,7 +48,7 @@ columns:
     lineage:
       - datalake_nexxera_clean.financial.id_authorization
   installment_number:
-    description: Number of the installment
+    description: Financial attribute representing installment number on the financial dataset.
     lineage:
       - datalake_nexxera_clean.financial.installment_number
   total_installments:
@@ -68,15 +68,15 @@ columns:
     lineage:
       - datalake_nexxera_clean.financial.installment_net_amount
   total_sale_gross_amount:
-    description: Total gross amount of the sale
+    description: Financial attribute representing total sale gross amount on the financial dataset.
     lineage:
       - datalake_nexxera_clean.financial.total_sale_gross_amount
   total_sale_discount_amount:
-    description: Total discount amount of the sale
+    description: Financial attribute representing total sale discount amount on the financial dataset.
     lineage:
       - datalake_nexxera_clean.financial.total_sale_discount_amount
   total_sale_net_amount:
-    description: Total net amount of the sale
+    description: Financial attribute representing total sale net amount on the financial dataset.
     lineage:
       - datalake_nexxera_clean.financial.total_sale_net_amount
   discount_charge:
