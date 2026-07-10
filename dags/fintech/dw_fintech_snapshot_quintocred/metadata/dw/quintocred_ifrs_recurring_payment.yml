@@ -17,10 +17,6 @@ columns:
     description: "Proposal ID related to payment information"
     lineage:
       - dw_velo.quintocred_ifrs_occurrence.sk_propose_20
-  sk_delinquency:
-    description: "Delinquency ID from the delinquency table"
-    lineage:
-      - dw_velo.quintocred_ifrs_occurrence.sk_delinquency
   sk_transaction:
     description: "Delinquency ID from the delinquency table"
     lineage:
@@ -41,10 +37,6 @@ columns:
     description: "Delinquency creation date"
     lineage:
       - dw_velo.quintocred_ifrs_occurrence.dt_register
-  dt_register_ajustada:
-    description: "For 3.0 cases, it will be delinquency creation date (dt_register) , for 2.0 cases, it will be the dt_due."
-    lineage:
-      - dw_velo.quintocred_ifrs_occurrence.dt_register_ajustada
   dt_due:
     description: "Due date of the original invoice that became delinquent"
     lineage:
@@ -65,22 +57,14 @@ columns:
     description: "Amount of the original unpaid charge."
     lineage:
       - dw_velo.quintocred_ifrs_occurrence.due_amount
-  due_amount_ajustado:
-    description: "For some cases of 2.0, the original value of the delinquency includes 11% interest. In this column, this was readjusted and interest was removed."
-    lineage:
-      - dw_velo.quintocred_ifrs_occurrence.due_amount_ajustado
   paid_amount:
-    description: "Delinquency amount paid"
+    description: QuintoCred rental guarantee attribute describing paid amount in the policy lifecycle.
     lineage:
       - dw_velo.quintocred_ifrs_occurrence.paid_amount
   open_amount:
     description: "Difference between the amount paid and the original invoice amount"
     lineage:
       - dw_velo.quintocred_ifrs_occurrence.open_amount
-  open_amount_ajustado:
-    description: "Difference between the amount paid and the original invoice amount ( considering the due_amount_ajustado)"
-    lineage:
-      - dw_velo.quintocred_ifrs_occurrence.open_amount_ajustado
   discount_value:
     description: "value of the discount given when paying the delinquency"
     lineage:

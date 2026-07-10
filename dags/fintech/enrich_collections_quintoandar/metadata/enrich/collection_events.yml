@@ -1,59 +1,157 @@
----
 database_name: datalake_collections_quintoandar
 table_name: collection_events
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Table containing logs and events of collection actions for delinquent customers, consolidating data from Cyber and Recupera sources. Records include automated dialer attempts, email campaigns, SMS messages, and other collection activities with their outcomes."
+description: Table containing logs and events of collection actions for delinquent customers, consolidating
+  data from Cyber and Recupera sources. Records include automated dialer attempts, email campaigns, SMS
+  messages, and other collection activities with their outcomes. Recupera was discontinued in September
+  2024; since then all collection events come from Cyber (historical Recupera rows remain in the table).
 columns:
   id_collection:
-    description: "Unique identifier for the collection event generated through MD5 hash based on key event fields (customer, contract, creditor, operator, phone number, action, result, complement, occurrence description, and timestamp)"
+    description: Unique identifier for the collection event generated through MD5 hash based on key event
+      fields (customer, contract, creditor, operator, phone number, action, result, complement, occurrence
+      description, and timestamp)
+    lineage:
+    - datalake_cyber.collection.id_customer
+    - datalake_recupera.collection.id_customer
+    - datalake_cyber.collection.id_contract_external
+    - datalake_recupera.collection.id_contract
+    - datalake_cyber.collection.creditor
+    - datalake_recupera.collection.id_creditor
+    - datalake_cyber.collection.id_operator
+    - datalake_recupera.collection.operator_name
+    - datalake_cyber.collection.phone_number
+    - datalake_cyber.collection.action
+    - datalake_recupera.collection.id_occurrence
+    - datalake_cyber.collection.result
+    - datalake_cyber.collection.complement
+    - datalake_cyber.collection.occurrence_description
+    - datalake_recupera.collection.occurrence_description
+    - datalake_cyber.collection.ts_occurrence
+    - datalake_recupera.collection.ts_occurrence
   id_customer:
-    description: "Unique identifier of the delinquent customer (e.g., '00001735683')"
+    description: Unique identifier of the delinquent customer (e.g., '00001735683')
+    lineage:
+    - datalake_cyber.collection.id_customer
+    - datalake_recupera.collection.id_customer
   id_contract:
-    description: "Identifier of the contract associated with the collection event (e.g., '719450')"
+    description: Identifier of the contract associated with the collection event (e.g., '719450')
+    lineage:
+    - datalake_cyber.collection.id_contract_external
+    - datalake_recupera.collection.id_contract
   creditor:
-    description: "Creditor name associated with the contract ('IQ QuintoAndar' for creditor IDs 1,4,7,8,9 or 'PP QuintoAndar' for creditor IDs 2,6)"
+    description: Creditor name associated with the contract ('IQ QuintoAndar' for creditor IDs 1,4,7,8,9
+      or 'PP QuintoAndar' for creditor IDs 2,6)
+    lineage:
+    - datalake_cyber.collection.creditor
+    - datalake_recupera.collection.id_creditor
   id_operator:
-    description: "Identifier of the collection operator responsible for the action (e.g., 'PSC09999', 'PSC02001')"
+    description: Identifier of the collection operator responsible for the action (e.g., 'PSC09999', 'PSC02001')
+    lineage:
+    - datalake_cyber.collection.id_operator
+    - datalake_recupera.collection.operator_name
   operator_agency:
-    description: "Name of the collection agency/company (e.g., 'PASCHOALOTTO', 'WEBHELP')"
+    description: Name of the collection agency/company (e.g., 'PASCHOALOTTO', 'WEBHELP')
+    lineage:
+    - datalake_cyber.collection.operator_agency
+    - datalake_recupera.collection.operator_name
+    - datalake_collections_quintoandar.operators.company_name
   phone_number:
-    description: "Phone number used for the collection contact attempt (only available from Cyber source)"
+    description: Phone number used for the collection contact attempt (only available from Cyber source)
+    lineage:
+    - datalake_cyber.collection.phone_number
   source:
-    description: "Data source of the event ('Cyber' for automated systems, 'Recupera' for manual collection, 'Cyber (Migração)' for migrated records, or combined sources separated by ' | ')"
+    description: Data source of the event ('Cyber' for automated systems, 'Recupera' for manual collection,
+      'Cyber (Migração)' for migrated records, or combined sources separated by ' | '). Recupera was
+      discontinued in September 2024; events after that date are from Cyber only.
+    lineage:
+    - datalake_cyber.collection.action_description
+    - datalake_recupera.collection.id_creditor
   action:
-    description: "Action code executed in the collection process (e.g., 'DI' for dialer, 'EM' for email, 'HS' for high structured message)"
+    description: Action code executed in the collection process (e.g., 'DI' for dialer, 'EM' for email,
+      'HS' for high structured message)
+    lineage:
+    - datalake_cyber.collection.action
+    - datalake_recupera.collection.id_occurrence
   action_code_type:
-    description: "Type or category of the executed action code (e.g., 'Ação')"
+    description: Type or category of the executed action code (e.g., 'Ação')
+    lineage:
+    - datalake_cyber.collection.action_code_type
   action_description:
-    description: "Textual description of the executed action (e.g., 'Discador', 'Email', 'High Structured Message')"
+    description: Textual description of the executed action (e.g., 'Discador', 'Email', 'High Structured
+      Message')
+    lineage:
+    - datalake_cyber.collection.action_description
+    - datalake_recupera.collection.occurrence
   result:
-    description: "Result code obtained after executing the collection action (e.g., 'DD' for dialer result, 'NN' for no result)"
+    description: Result code obtained after executing the collection action (e.g., 'DD' for dialer result,
+      'NN' for no result)
+    lineage:
+    - datalake_cyber.collection.result
   result_code_type:
-    description: "Type or category of the result code (e.g., 'Resultado')"
+    description: Type or category of the result code (e.g., 'Resultado')
+    lineage:
+    - datalake_cyber.collection.result_code_type
   result_description:
-    description: "Textual description of the result obtained (e.g., 'Ligação Sem Sucesso', 'Enviado')"
+    description: Textual description of the result obtained (e.g., 'Ligação Sem Sucesso', 'Enviado')
+    lineage:
+    - datalake_cyber.collection.result_description
   complement:
-    description: "Complementary information about the executed collection action (e.g., 'DF' for document/letter)"
+    description: Complementary information about the executed collection action (e.g., 'DF' for document/letter)
+    lineage:
+    - datalake_cyber.collection.complement
   complement_code_type:
-    description: "Type or category of the complement code (e.g., 'Carta')"
+    description: Type or category of the complement code (e.g., 'Carta')
+    lineage:
+    - datalake_cyber.collection.complement_code_type
   complement_description:
-    description: "Textual description of the complementary information (e.g., 'Telefone Caixa Postal')"
+    description: Textual description of the complementary information (e.g., 'Telefone Caixa Postal')
+    lineage:
+    - datalake_cyber.collection.complement_description
   occurrence_description:
-    description: "Detailed description of the occurrence/event (e.g., 'DISCADOR ATENDIDO POR MÁQUINA 31987641279', 'EMAIL MASSIVO DIGITAL')"
+    description: Detailed description of the occurrence/event (e.g., 'DISCADOR ATENDIDO POR MÁQUINA 31987641279',
+      'EMAIL MASSIVO DIGITAL')
+    lineage:
+    - datalake_cyber.collection.occurrence_description
+    - datalake_recupera.collection.occurrence_description
   esforco:
-    description: "Effort level indicator applied in the collection process (1 = effort applied, 0 = no effort)"
+    description: Effort (esforço) flag indicating whether a collection contact attempt counted as an
+      operational effort (1 = effort applied, 0 = no effort).
+    lineage:
+    - datalake_cyber.collection.esforco
+    - datalake_recupera.collection.esforco
   alo:
-    description: "ALO (Local Origin Service) indicator related to the event (1 = ALO applied, 0 = not applied)"
+    description: ALO flag indicating the contact was answered (atendeu) during the collection attempt
+      (1 = answered, 0 = not answered).
+    lineage:
+    - datalake_cyber.collection.alo
+    - datalake_recupera.collection.alo
   cpc:
-    description: "CPC (Contact Per Customer) indicator related to the collection event (1 = CPC applied, 0 = not applied)"
+    description: CPC (contato com a pessoa certa) flag indicating the collector spoke with the right
+      person for the debt (1 = right-party contact, 0 = otherwise).
+    lineage:
+    - datalake_cyber.collection.cpc
+    - datalake_recupera.collection.cpc
   promisse:
-    description: "Payment promise indicator made by the customer (1 = promise made, 0 = no promise)"
+    description: Payment promise indicator made by the customer (1 = promise made, 0 = no promise).
+    lineage:
+    - datalake_cyber.collection.promessa
+    - datalake_recupera.collection.promisse
   agreement:
-    description: "Agreement indicator established with the customer for debt settlement (1 = agreement made, 0 = no agreement)"
+    description: Agreement indicator established with the customer for debt settlement (1 = agreement
+      made, 0 = no agreement).
+    lineage:
+    - datalake_cyber.collection.promessa
+    - datalake_recupera.collection.agreement
   failure:
-    description: "Failure or unsuccessful indicator in the collection process (null = no failure, 1 = failure occurred, only available from Recupera source)"
+    description: Failure or unsuccessful indicator in the collection process (null = no failure, 1 = failure
+      occurred). Only populated from Recupera (discontinued September 2024); Cyber events leave this null.
+    lineage:
+    - datalake_recupera.collection.failure
   ts_occurrence:
-    description: "Timestamp of when the collection event occurred (e.g., '2025-09-25T16:21:33.000+00:00')"
+    description: Timestamp of when the collection event occurred (e.g., '2025-09-25T16:21:33.000+00:00')
+    lineage:
+    - datalake_cyber.collection.ts_occurrence
+    - datalake_recupera.collection.ts_occurrence
   ts_load:
-    description: "Timestamp of data loading into the table (e.g., '2025-09-29T20:59:16.729+00:00')"
+    description: Timestamp of data loading into the table (e.g., '2025-09-29T20:59:16.729+00:00')

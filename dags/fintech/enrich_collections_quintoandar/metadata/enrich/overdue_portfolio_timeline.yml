@@ -1,202 +1,205 @@
----
 database_name: datalake_collections_quintoandar
 table_name: overdue_portfolio_timeline
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: |
-  The table contains information about the daily timeline of overdue tenant (IQ) invoices.
+description: 'The table contains information about the daily timeline of overdue tenant (IQ) invoices.
+
   The table does not include canceled invoices and canceled contracts.
-  An invoice is inserted into the table 1 day after its due date, and it's replicated every day until the day the debt is paid or written down.
+
+  An invoice is inserted into the table 1 day after its due date, and it''s replicated every day until
+  the day last day of the month in which the debt is paid or written down.
+
+  '
 columns:
   id_contract:
     lineage:
-      - datalake_retsuko.invoice.id_contract_external
-    description: Contract ID
+    - datalake_retsuko.invoice.id_contract_external
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_proposal:
     lineage:
-      - datalake_proposal.proposal.id
+    - datalake_proposal.proposal.id
     description: Proposal ID. Use it as key to dw_rent.dim_proposal
   id_invoice:
     lineage:
-      - datalake_retsuko.invoice.id_external
-    description: Invoice ID
+    - datalake_retsuko.invoice.id_external
+    description: Invoice identifier in the billing or payments platform.
   id_region:
     lineage:
-      - datalake_ebdb_house.house.id_region
-    description: Region Identification
+    - datalake_ebdb_house.house.id_region
+    description: Identifier for the region referenced by this financial record.
   contract_status:
     lineage:
-      - datalake_ebdb_contract.contract.dt_termination
-      - datalake_ebdb_contract.contract.status
-    description: Contract status
+    - datalake_ebdb_contract.contract.dt_termination
+    - datalake_ebdb_contract.contract.status
+    description: Debt collection attribute describing contract status for recovery workflow tracking.
   user:
     lineage:
-      - datalake_retsuko.invoice_info.invoice_user
+    - datalake_retsuko.invoice_info.invoice_user
     description: User. It will always be 'tenant'
   invoice_type:
     lineage:
-      - datalake_retsuko.invoice.purpose
-    description: Invoice's type frequency - monthly, extra, pos rental, onboarding,
-      early termination...
+    - datalake_retsuko.invoice.purpose
+    description: Invoice's type frequency - monthly, extra, pos rental, onboarding, early termination...
   payment_status:
     lineage:
-      - datalake_retsuko.invoice.status
+    - datalake_retsuko.invoice.status
     description: Payment status on the reference date
   substatus:
     lineage:
-      - datalake_retsuko.invoice.substatus
+    - datalake_retsuko.invoice.substatus
     description: Invoice Substatus - debt, ongoing-negotiation or none.
   reason:
     lineage:
-      - datalake_retsuko.invoice.reason
+    - datalake_retsuko.invoice.reason
     description: Invoice Reason. Example negotiation-recupera, negotiation-5A, agreement ...
   debtor_type:
     lineage:
-      - datalake_retsuko.invoice.ts_due
-      - datalake_quintoandar.aux_date.month_start
-    description: "Debtor type: Flow or Stock"
+    - datalake_retsuko.invoice.ts_due
+    - datalake_quintoandar.aux_date.month_start
+    description: 'Debtor type: Flow or Stock'
     categories:
-      Flow: customers that are new in the Portfolio. The day the flow contracts enters
-        the portfolio is the first day of the overdue (i.e first business day
-        after the due date).
-      Stock: customers that were already in the portfolio in the last month. Important
-        to notice that the cut off date to this reference is the first day of
-        the month.
+      Flow: customers that are new in the Portfolio. The day the flow contracts enters the portfolio is
+        the first day of the overdue (i.e first business day after the due date).
+      Stock: customers that were already in the portfolio in the last month. Important to notice that
+        the cut off date to this reference is the first day of the month.
   due_amount:
     lineage:
-      - datalake_retsuko.invoice.due_amount
-    description: Invoice due amount
+    - datalake_retsuko.invoice.due_amount
+    description: Debt collection attribute describing due amount for recovery workflow tracking.
   paid_amount:
     lineage:
-      - datalake_retsuko.invoice.paid_amount
-    description: Invoice paid amount
+    - datalake_retsuko.invoice.paid_amount
+    description: Debt collection attribute describing paid amount for recovery workflow tracking.
   recovered_amount:
     lineage:
-      - datalake_retsuko.invoice.due_amount
+    - datalake_retsuko.invoice.due_amount
     description: Amount recovered between reference month start and reference date
   contract_overdue_invoices:
     lineage:
-      - datalake_retsuko.invoice.id_external
+    - datalake_retsuko.invoice.id_external
     description: Total number of overdue invoices in a contract on the reference date
   contract_debt:
     lineage:
-      - datalake_retsuko.invoice.due_amount
-    description: The total debt of a contract on the reference date. It is the sum
-      of all overdue invoices due amount (i.e those that have already expired
-      and have not been paid by the reference date)
+    - datalake_retsuko.invoice.due_amount
+    description: The total debt of a contract on the reference date. It is the sum of all overdue invoices
+      due amount (i.e those that have already expired and have not been paid by the reference date)
   delay_invoice_at_reference:
     lineage:
-      - datalake_retsuko.invoice.ts_due
-    description: Delay invoice at reference
+    - datalake_retsuko.invoice.ts_due
+    description: Debt collection attribute describing delay invoice at reference for recovery workflow
+      tracking.
   delay_invoice_at_closure:
     lineage:
-      - datalake_retsuko.invoice.ts_due
-      - datalake_retsuko.invoice.ts_paid
-    description: Delay invoice at closure
+    - datalake_retsuko.invoice.ts_due
+    - datalake_retsuko.invoice.ts_paid
+    description: Debt collection attribute describing delay invoice at closure for recovery workflow tracking.
   delay_contamined_at_closure:
     lineage:
-      - datalake_retsuko.invoice.ts_due
-      - datalake_quintoandar.aux_date.month_start
-    description: Delay contamined at closure
+    - datalake_retsuko.invoice.ts_due
+    - datalake_quintoandar.aux_date.month_start
+    description: Debt collection attribute describing delay contamined at closure for recovery workflow
+      tracking.
   delay_contamined_range:
     lineage:
-      - datalake_retsuko.invoice.ts_due
-      - datalake_quintoandar.aux_date.month_start
-    description: Delay contamined range. We calculate it based on the contract and
-      not the invoice
+    - datalake_retsuko.invoice.ts_due
+    - datalake_quintoandar.aux_date.month_start
+    description: Delay contamined range. We calculate it based on the contract and not the invoice
   delay_contract_range:
     lineage:
-      - datalake_retsuko.invoice.ts_due
-      - datalake_quintoandar.aux_date.month_start
-    description: Same delay contamined range used for pdd. We calculate it based on
-      the contract and not the invoice
+    - datalake_retsuko.invoice.ts_due
+    - datalake_quintoandar.aux_date.month_start
+    description: Same delay contamined range used for pdd. We calculate it based on the contract and not
+      the invoice
   business_day:
     lineage:
-      - datalake_quintoandar.aux_date.working_days_in_month
+    - datalake_quintoandar.aux_date.working_days_in_month
     description: Number of business day on reference months
   is_last_business_days:
     lineage:
-      - datalake_quintoandar.aux_date.working_days_in_month
-    description: Boolean to inform whether it is the most recent date among days
-      with the same business day, same invoice and month. It deduplicates the
-      calculations per business day.
+    - datalake_quintoandar.aux_date.working_days_in_month
+    description: Boolean to inform whether it is the most recent date among days with the same business
+      day, same invoice and month. It deduplicates the calculations per business day.
   dt_contract_due_date_min:
     lineage:
-      - datalake_retsuko.invoice.ts_due
+    - datalake_retsuko.invoice.ts_due
     description: The minimum due date among all invoices in a contract
   dt_contract_annulled:
     lineage:
-      - datalake_ebdb_contract.contract.dt_termination
-    description: Contract annulled date
+    - datalake_ebdb_contract.contract.dt_termination
+    description: Calendar date associated with contract annulled in the financial workflow.
   dt_invoice_due:
     lineage:
-      - datalake_retsuko.invoice.ts_due
-    description: Invoice due date
+    - datalake_retsuko.invoice.ts_due
+    description: Calendar date associated with invoice due in the financial workflow.
   dt_invoice_due_adjust:
     lineage:
-      - datalake_retsuko.invoice.dt_due_adjusted
+    - datalake_retsuko.invoice.dt_due_adjusted
     description: Invoice due date adjust for next business day
   dt_invoice_paid:
     lineage:
-      - datalake_retsuko.invoice.ts_paid
-    description: Invoice paid date
+    - datalake_retsuko.invoice.ts_paid
+    description: Calendar date associated with invoice paid in the financial workflow.
   dt_month_start:
     lineage:
-      - datalake_quintoandar.aux_date.month_start
+    - datalake_quintoandar.aux_date.month_start
     description: The first day of the month of reference date
   dt_month_end:
     lineage:
-      - datalake_quintoandar.aux_date.month_end
+    - datalake_quintoandar.aux_date.month_end
     description: The last day of the month of reference date
   dt_reference:
     lineage:
-      - datalake_quintoandar.aux_date.date
+    - datalake_quintoandar.aux_date.date
     description: Invoice timeline reference date
   has_app_action_event:
-    description: "Boolean to indicate if the invoice has an app action event within
-      5 days before the payment"
+    description: Boolean to indicate if the invoice has an app action event within 5 days before the payment
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.has_app_action_event
+    - datalake_collections_quintoandar.invoice_portfolio.has_app_action_event
   id_negotiation_child:
-    description: "ID of the negotiation generated by this invoice"
+    description: ID of the negotiation generated by this invoice
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.id_negotiation_child
+    - datalake_collections_quintoandar.invoice_portfolio.id_negotiation_child
   id_negotiation_parent:
-    description: "ID of the negotiation that generated this invoice"
+    description: ID of the negotiation that generated this invoice
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.id_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.id_negotiation_parent
   negotiation_installment_number:
-    description: "Installment number of the negotiation that generated this invoice"
+    description: Installment number of the negotiation that generated this invoice
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.negotiation_installment_number
+    - datalake_collections_quintoandar.invoice_portfolio.negotiation_installment_number
   recovery_channel:
-    description: "Recovery channel of the invoice"
+    description: Recovery channel of the invoice
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.recovery_channel
+    - datalake_collections_quintoandar.invoice_portfolio.recovery_channel
   paid_via:
-    description: Payment method used when the invoice was paid in the reference month after the adjusted due date (null otherwise).
+    description: Payment method used when the invoice was paid in the reference month after the adjusted
+      due date (null otherwise).
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.paid_via
+    - datalake_collections_quintoandar.invoice_portfolio.paid_via
   is_write_off:
-    description: Write-off flag from invoice_portfolio; populated only for dates on or after the write-off date on the timeline (null before).
+    description: Write-off flag from invoice_portfolio; populated only for dates on or after the write-off
+      date on the timeline (null before).
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.is_write_off
+    - datalake_collections_quintoandar.invoice_portfolio.is_write_off
   is_contract_write_off:
     description: Whether the contract is in write-off scope (from invoice_portfolio).
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.is_contract_write_off
+    - datalake_collections_quintoandar.invoice_portfolio.is_contract_write_off
   is_first_payment_default:
     description: Whether this invoice is the contract first-payment invoice (alias of invoice_portfolio.is_first_payment).
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.is_first_payment
+    - datalake_collections_quintoandar.invoice_portfolio.is_first_payment
   delay_first_payment_default:
-    description: First-payment-default delay bucket (0, 7, 15, 30, or 60 days) derived from delay at payment or at reference.
+    description: First-payment-default delay bucket (0, 7, 15, 30, or 60 days) derived from delay at payment
+      or at reference.
     lineage:
-      - datalake_retsuko.invoice.ts_due
-      - datalake_quintoandar.aux_date.month_start
+    - datalake_retsuko.invoice.ts_due
+    - datalake_quintoandar.aux_date.month_start
   dt_write_off:
-    description: Invoice write-off date on rows from that date forward on the timeline (null before write-off date).
+    description: Invoice write-off date on rows from that date forward on the timeline (null before write-off
+      date).
     lineage:
-      - datalake_collections_quintoandar.invoice_portfolio.ts_write_off
+    - datalake_collections_quintoandar.invoice_portfolio.ts_write_off
   ts_load:
-    description: Timestamp when the enrich row was loaded (NOW() at query execution); not sourced from upstream transactional systems.
+    description: Timestamp when the enrich row was loaded (NOW() at query execution); not sourced from
+      upstream transactional systems.

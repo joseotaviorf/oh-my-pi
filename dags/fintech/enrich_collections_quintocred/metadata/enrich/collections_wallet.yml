@@ -1,7 +1,7 @@
 ---
 database_name: datalake_collections_quintocred
 table_name: collections_wallet
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Major table that builds a daily timeline of QuintoCred collections on the granularity of client"
 columns:
@@ -29,10 +29,6 @@ columns:
     description: "Sum of all delinquencies original values"
     lineage:
       - datalake_velo.delinquency_timeline.original_value
-  total_amount_paid:
-    description: "Sum of all delinquencies paid amounts"
-    lineage:
-      - datalake_velo.delinquency_timeline.amount_paid
   amount_paid_added:
     description: "How much paid amount was added on this line/date"
     lineage:
@@ -63,10 +59,6 @@ columns:
     description: "The first date of the main invoice until the first day of the current month"
   lead_time_propose:
     description: "The first date of the contract until the first day of the current month"
-  is_active_day_eviction:
-    description: "Daily control of contracts that are active in evictions"
-  is_active_month_eviction:
-    description: "Monthly control of contracts that are active in evictions"
   dt_min_major_type:
     description: "The first date of the major invoice type"
     lineage:
@@ -75,5 +67,18 @@ columns:
     description: "The first date of the propose"
     lineage:
       - datalake_velo.delinquency_timeline.dt_base
-  dt_aging:
-    description: "Reference date for the aging calculation"
+  is_currently_active:
+    description: Indicates whether currently active applies to this financial record.
+    lineage: []
+  id_propose:
+    description: Identifier for the propose referenced by this financial record.
+    lineage: []
+  has_active_month_eviction:
+    description: Indicates whether active month eviction applies to this financial record.
+    lineage: []
+  is_legacy_propose:
+    description: Indicates whether legacy propose applies to this financial record.
+    lineage: []
+  has_active_day_eviction:
+    description: Indicates whether active day eviction applies to this financial record.
+    lineage: []
