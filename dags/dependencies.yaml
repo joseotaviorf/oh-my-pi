@@ -2063,6 +2063,7 @@ bietlejuice.enrich_condo_monitoring:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_rental_management:load-enrich-condo-monitoring-actions-aud:first-run-of-day
   - bietlejuice.enrich_rental_management:load-enrich-condo-monitoring-eligibility-aud:first-run-of-day
+  - bietlejuice.enrich_rental_management:load-enrich-invoice-aud:first-run-of-day
   - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
   - bietlejuice.rental_management:load-clean-condo-monitoring-actions:first-run-of-day
   - bietlejuice.rental_management:load-clean-invoice:first-run-of-day

@@ -1,13 +1,13 @@
 database_name: datalake_condo_monitoring
 table_name: invoice
-description: This table contains all the invoices related to the Condo Monitoring.
+description: Enrich layer table for invoice from the enrich_condo_monitoring pipeline used in For Rent analytics.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_invoice:
     lineage:
       - datalake_rental_management_clean.invoice.id
-    description: ID of the invoice.
+    description: Surrogate key of the condominium invoice record tracked by the Condo Monitoring product for payment follow-up.
   id_contract:
     lineage:
       - datalake_rental_management_clean.invoice.id_contract
@@ -15,19 +15,19 @@ columns:
   issuer_cnpj:
     lineage:
       - datalake_rental_management_clean.invoice.raw_data
-    description: CNPJ of the issuer of the invoice.
+    description: CNPJ tax identifier of the invoice issuing organization.
   status:
     lineage:
       - datalake_condo_monitoring.communication.id_communication
-    description: Status of the invoice.
+    description: Current processing state of the record in the source workflow.
   issuer_name:
     lineage:
       - datalake_rental_management_clean.invoice.raw_data
-    description: Name of the issuer of the invoice.
+    description: Legal name of the condominium administrator or management company that issued the boleto payment slip.
   barcode:
     lineage:
       - datalake_rental_management_clean.invoice.raw_data
-    description: Barcode of the invoice.
+    description: Numeric barcode printed on the boleto, used to identify the payment slip at banks and payment gateways.
   communications_sent:
     lineage:
       - datalake_condo_monitoring.communication.communication_type
@@ -41,7 +41,7 @@ columns:
   value:
     lineage:
       - datalake_rental_management_clean.invoice.id_contract
-    description: Invoice's value.
+    description: Total amount due on the condominium invoice in Brazilian reais, as reported by the rental management source system.
   was_reminder_comm_required:
     description: Boolean flag to indicate if a reminder communication was required.
   was_warning_comm_required:

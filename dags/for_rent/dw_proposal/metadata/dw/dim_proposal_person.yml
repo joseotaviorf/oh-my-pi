@@ -4,7 +4,7 @@ table_name: dim_proposal_person
 description: This table has each person related to a rental proposal.
   Each line is as unique sk_proposal_person.
 domain: For Rent
-owner: conrado.fabri@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_proposal_person:
     lineage:
@@ -13,15 +13,15 @@ columns:
   full_name:
     lineage:
       - datalake_ebdb_proposal.proposal_person.full_name
-    description: Full name of the person.
+    description: Legal full name of the proposal participant.
   phone_number:
     lineage:
       - datalake_ebdb_proposal.proposal_person.phone_number
-    description: Phone number of the person.
+    description: Primary phone number of the proposal participant.
   email:
     lineage:
       - datalake_ebdb_proposal.proposal_person.email
-    description: Email of the person.
+    description: Email address used for communication about this record.
   personal_document:
     lineage:
       - datalake_ebdb_proposal.proposal_person.personal_document
@@ -29,7 +29,7 @@ columns:
   personal_document_type:
     lineage:
       - datalake_ebdb_proposal.proposal_person.personal_document_type
-    description: Type of the personal document.
+    description: Identity document type provided by the participant, such as RG or RNE.
   employment_bond:
     lineage:
       - datalake_ebdb_proposal.proposal_person.employment_bond
@@ -37,7 +37,7 @@ columns:
   number_of_dependents:
     lineage:
       - datalake_ebdb_proposal.proposal_person.number_of_dependents
-    description: Number of dependents of the person.
+    description: Declared count of financial dependents for the participant.
   current_house_situation:
     lineage:
       - datalake_ebdb_proposal.proposal_person.current_house_situation
@@ -49,7 +49,7 @@ columns:
   gender:
     lineage:
       - datalake_ebdb_proposal.proposal_person.gender
-    description: The person's gender.
+    description: Self-reported gender identity captured during the rental proposal application, used for demographic analysis of applicants.
   marital_status:
     lineage:
       - datalake_ebdb_proposal.proposal_person.marital_status
@@ -57,7 +57,7 @@ columns:
   state_code:
     lineage:
       - datalake_ebdb_proposal.proposal_person.state_code
-    description: Code of the state from which the person is.
+    description: Brazilian state abbreviation for the participant address.
   dt_birth:
     lineage:
       - datalake_ebdb_proposal.proposal_person.dt_birth

@@ -1,8 +1,8 @@
 database_name: datalake_rental_management
 table_name: condo_monitoring_eligibility_aud
-description: This table contains the audit information for condo monitoring actions.
+description: Enrich layer table for condo monitoring eligibility aud from the enrich_rental_management pipeline used in For Rent analytics.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_rental_management.condo_monitoring_eligibility_aud.id_contract
       - datalake_rental_management_transactional.condo_monitoring_eligibility.contract_id
-    description: ID of the contract.
+    description: QuintoAndar rental contract identifier evaluated for eligibility to the Condo Monitoring feature.
   eligibility:
     lineage:
       - datalake_rental_management.condo_monitoring_eligibility_aud.id_action_main_user
@@ -30,7 +30,7 @@ columns:
       - datalake_rental_management_transactional.condo_monitoring_eligibility.ts_database_transaction
     description: Timestamp of when the register was updated.
   rev_type:
-    description: Type of revision.
+    description: Hibernate Envers revision operation code indicating whether the eligibility record was inserted, updated, or deleted.
   year:
     lineage:
       - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated

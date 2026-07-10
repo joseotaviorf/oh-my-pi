@@ -1,9 +1,9 @@
 database_name: datalake_condo_monitoring
 table_name: condo_monitoring_events
-description: This table contains all the events related to the Condo Monitoring.
+description: Enrich layer table for condo monitoring events from the enrich_condo_monitoring pipeline used in For Rent analytics.
   When the contracts was eligible, when the feature was activated by the user, status of the invoices and when the communication was sent to the user.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_condo_monitoring_event:
     lineage:
@@ -26,12 +26,12 @@ columns:
       - datalake_rental_management.condo_monitoring_eligibility_aud.id_contract
       - datalake_rental_management.invoice_aud.id_contract
       - datalake_condo_monitoring.communication.id_contract
-    description: ID of the contract.
+    description: QuintoAndar rental contract identifier linking the condo monitoring event to the active lease being monitored.
   id_invoice:
     lineage:
       - datalake_rental_management.invoice_aud.id_invoice
       - datalake_condo_monitoring.communication.id_invoice
-    description: ID of the invoice.
+    description: Internal identifier of the condominium invoice associated with the monitoring event, when payment status triggered the action.
   id_communication:
     lineage:
       - datalake_condo_monitoring.communication.id_communication

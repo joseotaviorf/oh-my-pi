@@ -1,12 +1,12 @@
 ---
 database_name: dw_rent_snapshot
 table_name: rent_demand_events_snapshot
-description:
+description: |
   "This table has the dailies snapshots data based on the fact_rent_demand_events, creating a full historical of the changes, allowing to understand
   data updates through time. The table has aggregated sums of demand events of the rental funnel, which is also the base used to build the rent demand event metric.
   Each line has the total volume of the aggregation by its dimensions on a daily snapshot."
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_snapshot:
     description: "Date of the snapshot transformed into a number."
@@ -18,10 +18,6 @@ columns:
     lineage:
       - dw_public.dim_region.city_group
     description: "Group which the city of the event belongs."
-  guarantee:
-    lineage:
-      - dw_rent.dim_proposal.guarantee
-    description: "Guarantee of the proposal."
   tier:
     lineage:
       - dw_public.dim_region.city_group
@@ -43,7 +39,7 @@ columns:
       - dw_rent.dim_house_listing.rental_administrator
     description: "Rental administrator related to the event."
   visits_booked:
-    description: "Total volume of visits booked within the aggregation."
+    description: Count of tenant visits scheduled during the reporting period.
   visits_completed:
     description: "Total volume of visits completed within the aggregation."
   offers_submitted:
@@ -63,13 +59,11 @@ columns:
   contracts_signed:
     description: "Total volume of contracts signed within the aggregation."
   has_guarantee:
-    description: "Boolean indicating if the event has a guarantee related.
-      It's important to notice that if the event type is from 1 to 4 (VB til OA), the guarantee flag is automatically false.
-      If the event type is equal or bigger than 5 (EA til CS), the flag is related to the proposal's guarantee type if it's RentalGuarantee."
+    description: "Boolean indicating if the event has a guarantee related. It's important to notice that if the event type is from 1 to 4 (VB til OA), the guarantee flag is automatically false. If the event type is equal or bigger than 5 (EA til CS), the flag is related to the proposal's guarantee type if it's RentalGuarantee."
   dt_event:
     lineage:
       - dw_public.dim_date.date
-    description: "Date of the event."
+    description: "Calendar date when the rental demand funnel event was recorded, aligned to the business timezone of the listing market."
   dt_week_started:
     lineage:
       - dw_public.dim_date.date
@@ -79,7 +73,7 @@ columns:
   country_code:
     lineage:
       - dw_rent.fact_rent_demand_events.country_code
-    description: "Country code information, also a partition."
+    description: ISO country code for geographic filtering of the analytical metric.
   year:
     lineage:
       - dw_rent.fact_rent_demand_events.ts_load

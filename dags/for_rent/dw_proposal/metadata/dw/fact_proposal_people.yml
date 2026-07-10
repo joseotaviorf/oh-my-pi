@@ -4,7 +4,7 @@ description: Table with events and metrics about people involved in an offer acc
   also called proposal (users or not). Each line is a register of a person, not necessarily
   unique in database
 domain: For Rent
-owner: matheus.baroni@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_proposal_person:
     lineage:
@@ -14,8 +14,7 @@ columns:
   sk_personal_document:
     lineage:
       - datalake_ebdb_proposal.proposal_person.id_personal_document
-    description: Document (such as CPF and CNPJ) of the person involved
-      in the proposal (offer accepted).
+    description: Document (such as CPF and CNPJ) of the person involved in the proposal (offer accepted).
   sk_proponent:
     lineage:
       - datalake_ebdb_clean.user.id
@@ -31,51 +30,41 @@ columns:
   sk_created_date:
     lineage:
       - datalake_ebdb_proposal.proposal_person.ts_created
-    description: Key for the date in which a proposal person's register was created
-      in database.
+    description: Key for the date in which a proposal person's register was created in database.
   expected_contract_role:
     lineage:
       - datalake_ebdb_proposal.proposal_person.expected_contract_role
-    description: Role that person informs to perform in the contract, such as owner,
-      tenant, dweller, sponsor ("fiador").
+    description: Role that person informs to perform in the contract, such as owner, tenant, dweller, sponsor ("fiador").
   rental_motive:
     lineage:
       - datalake_ebdb_proposal.proposal_person.rental_motive
-    description: Reason that motivated the person to look for a house to rent, such
-      as proximity, family, cost.
+    description: Reason that motivated the person to look for a house to rent, such as proximity, family, cost.
   brl_total_income:
     lineage:
       - datalake_ebdb_proposal.proposal_person.brl_total_income
-    description: Proposal person total income informed, considering both salary and
-      additional sources
+    description: Proposal person total income informed, considering both salary and additional sources
   is_going_to_live:
     lineage:
       - datalake_ebdb_proposal.proposal_person.is_going_to_live
-    description: Flag to indicate if the person will live in the house associated
-      to the contract.
+    description: Flag to indicate if the person will live in the house associated to the contract.
   is_first_proposal:
     lineage:
       - datalake_ebdb_proposal.proposal_person.is_first_proposal
-    description: Flag to indicate whether the proposal is the first of that person.
-      Valid for users only.
+    description: Flag to indicate whether the proposal is the first of that person. Valid for users only.
   is_last_proposal:
     lineage:
       - datalake_ebdb_proposal.proposal_person.is_last_proposal
-    description: Flag to indicate whether the proposal is the last of that person.
-      Valid for users only.
+    description: Flag to indicate whether the proposal is the last of that person. Valid for users only.
   is_valid_cpf:
     lineage:
       - datalake_ebdb_proposal.proposal_person.is_valid_cpf
-    description: Flag to indicate whether the personal document is a valid CPF, according
-      to the last 2 verification digits.
+    description: Flag to indicate whether the personal document is a valid CPF, according to the last 2 verification digits.
   is_valid_cnpj:
     lineage:
       - datalake_ebdb_proposal.proposal_person.is_valid_cnpj
-    description: Flag to indicate whether the personal document is a valid CNPJ, according
-      to the last 2 verification digits.
+    description: Flag to indicate whether the personal document is a valid CNPJ, according to the last 2 verification digits.
   is_user:
-    description: Flag to indicate whether the person is an user in QuintoAndar (uses
-      any app).
+    description: Flag to indicate whether the person is an user in QuintoAndar (uses any app).
     lineage:
       - datalake_ebdb_clean.user.id
   ts_load:

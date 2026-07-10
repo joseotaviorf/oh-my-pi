@@ -80,10 +80,41 @@ general_base AS (
             ON jb.id_house = v.id_external_domain
     WHERE
         jb.dt_uploaded BETWEEN DATE('2023-01-01') AND (CURRENT_DATE - INTERVAL 1 DAY)
+),
+deduped_listing_quality_sla AS (
+    SELECT
+        id_listing_quality_sla,
+        business_key,
+        id_ticket,
+        id_house,
+        agent_organization,
+        has_demand,
+        has_task_done,
+        has_sla_achieved,
+        has_backlog,
+        has_video,
+        dt_uploaded,
+        dt_ticket_created,
+        dt_ticket_solved,
+        ROW_NUMBER() OVER (PARTITION BY id_house, id_ticket ORDER BY dt_uploaded DESC) AS rn
+    FROM
+        general_base
 )
 SELECT
-    *
+    id_listing_quality_sla,
+    business_key,
+    id_ticket,
+    id_house,
+    agent_organization,
+    has_demand,
+    has_task_done,
+    has_sla_achieved,
+    has_backlog,
+    has_video,
+    dt_uploaded,
+    dt_ticket_created,
+    dt_ticket_solved
 FROM
-    general_base
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_house, id_ticket ORDER BY dt_uploaded DESC) = 1
+    deduped_listing_quality_sla
+WHERE
+    rn = 1

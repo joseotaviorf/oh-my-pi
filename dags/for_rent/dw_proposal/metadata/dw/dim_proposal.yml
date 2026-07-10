@@ -4,28 +4,27 @@ description: A proposal is an offer (see dim_offer table) made by a tenant which
   been accepted by the property owner. Proposals are the last step before becoming
   contracts. Each line is a proposal
 domain: For Rent
-owner: conrado.fabri@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   sk_proposal:
     lineage:
     - datalake_proposal.proposal.id
-    description: Key of proposal
+    description: Surrogate key identifying this dim proposal record in the dw_proposal pipeline.
   id_proposal:
     lineage:
     - datalake_proposal.proposal.id
-    description: Key of proposal
+    description: Foreign key referencing the related proposal entity.
   country_code:
     lineage:
     - datalake_proposal.proposal.country_code
-    description: Country code related to the proposal's country of origin
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   guarantee:
     lineage:
     - datalake_proposal.proposal.guarantee
-    description: Guarantee (BrasilCap, Deposito, Fiador, OutroTipoFiador, PortoSeguro,
-      SeguroFairfax, SeguroFiancaCardiff / today only SeguroFairFax)
+    description: Guarantee (BrasilCap, Deposito, Fiador, OutroTipoFiador, PortoSeguro, SeguroFairfax, SeguroFiancaCardiff / today only SeguroFairFax)
     categories:
       BrasilCap: '-'
       Deposito: '-'
@@ -51,8 +50,7 @@ columns:
   status_doc_tenant:
     lineage:
     - datalake_proposal.proposal.tenant_documentation_status
-    description: Tenant document status (Analise5a, AnaliseCredito, Aprovado, NaoEnviado,
-      RecusadoCredito, ReenvioDocumentos, StandBy)
+    description: Tenant document status (Analise5a, AnaliseCredito, Aprovado, NaoEnviado, RecusadoCredito, ReenvioDocumentos, StandBy)
     categories:
       Analise5a: 'QuintoAndar analysis (credit desk / mesa de crédito)'
       AnaliseCredito: 'Credit evaluation'
@@ -96,8 +94,7 @@ columns:
   result_credit_evaluation:
     lineage:
     - datalake_proposal.proposal.last_result
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Status of the last credit evaluation'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Status of the last credit evaluation'
     categories:
       PRE_APPROVED: Pre approved
       PRE_REJECTED: Pre rejected
@@ -127,19 +124,19 @@ columns:
   tenant_document_sent:
     lineage:
     - datalake_proposal.proposal.has_tenant_sent_documentation
-    description: '1: Tenant sent document / 0: Tenant did not send document'
+    description: Flag indicating whether required tenant documents were submitted.
   tenant_contract_accepted:
     lineage:
     - datalake_proposal.proposal.has_tenant_accepted_contract
-    description: '1: Tenant accepted contract / 0: Tenant did not accept contract'
+    description: Flag indicating whether the tenant accepted the rental contract terms.
   owner_contract_accepted:
     lineage:
     - datalake_proposal.proposal.has_owner_accepted_contract
-    description: '1: Owner accepted contract / 0: Owner did not accept contract'
+    description: Flag indicating whether the owner accepted the rental contract terms.
   owner_document_sent:
     lineage:
     - datalake_proposal.proposal.has_owner_sent_documentation
-    description: '1: Owner sent document / 0: Owner did not send document'
+    description: Flag indicating whether required owner documents were submitted.
   flg_doc_reused:
     lineage:
     - datalake_proposal.proposal.is_doc_reused
@@ -163,7 +160,7 @@ columns:
   dt_updated:
     lineage:
     - datalake_proposal.proposal.ts_updated
-    description: Date of proposal update
+    description: Calendar date for the updated attribute on this record.
   dt_tenant_document_sent:
     lineage:
     - datalake_proposal.proposal.ts_documentation_sent
@@ -183,9 +180,7 @@ columns:
   dt_credit_analysis_first_init:
     lineage:
     - datalake_proposal.proposal.ts_credit_analysis_first_init
-    description: '[Deprecated after 2020-06-08. Only use this column to query data
-      from before this date.] Date when the first credit analysis started for the
-      proposal  (Status of ''AnaliseCredito'' or ''Analise5a'' if after ''2020-01-02'')'
+    description: '[Deprecated after 2020-06-08. Only use this column to query data from before this date.] Date when the first credit analysis started for the proposal  (Status of ''AnaliseCredito'' or ''Analise5a'' if after ''2020-01-02'')'
   dt_credit_analysis_init:
     lineage:
     - datalake_proposal.proposal.ts_credit_analysis_last_init
@@ -193,9 +188,7 @@ columns:
   dt_credit_analysis_first_end:
     lineage:
     - datalake_proposal.proposal.ts_credit_analysis_first_end
-    description: '[Deprecated after 2020-06-08. Only use this column to query data
-      from before this date.] Date when the first credit analysis ended for the proposal
-      (Possible Credit Analysis Status: ''Aprovado'', ''RecusadoCredito'', ''StandBy'')'
+    description: '[Deprecated after 2020-06-08. Only use this column to query data from before this date.] Date when the first credit analysis ended for the proposal (Possible Credit Analysis Status: ''Aprovado'', ''RecusadoCredito'', ''StandBy'')'
   dt_credit_analysis_end:
     lineage:
     - datalake_proposal.proposal.ts_credit_analysis_last_end
@@ -203,42 +196,31 @@ columns:
   dt_credit_last_approved:
     lineage:
     - datalake_proposal.proposal.ts_credit_approved_last
-    description: '[Deprecated after 2020-06-08. Only use this column to query data
-      from before this date.] Date when the last credit analysis result = ''Aprovado''
-      for the Tenant Documentation'
+    description: '[Deprecated after 2020-06-08. Only use this column to query data from before this date.] Date when the last credit analysis result = ''Aprovado'' for the Tenant Documentation'
   dt_tenant_first_doc_complete:
     lineage:
     - datalake_proposal.proposal.ts_tenant_first_doc_complete
-    description: '[Deprecated after Credit Evaluation started] Since then this column
-      equals the credit_evaluation_last_init'
+    description: '[Deprecated after Credit Evaluation started] Since then this column equals the credit_evaluation_last_init'
   dt_tenant_last_doc_complete:
     lineage:
     - datalake_proposal.proposal.ts_tenant_last_doc_complete
-    description: '[Deprecated after Credit Evaluation started] Prior to the credit
-      evaluation it represented the last approval of the documentation before the
-      credit analysis. Since then this column equals the credit_evaluation_last_init'
+    description: '[Deprecated after Credit Evaluation started] Prior to the credit evaluation it represented the last approval of the documentation before the credit analysis. Since then this column equals the credit_evaluation_last_init'
   dt_first_credit_evaluation_init:
     lineage:
     - datalake_proposal.proposal.ts_credit_evaluation_first_init
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Date when the first credit evaluation for the proposal started'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Date when the first credit evaluation for the proposal started'
   dt_last_credit_evaluation_init:
     lineage:
     - datalake_proposal.proposal.ts_credit_evaluation_last_init
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Date when the last credit evaluation for the proposal started'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Date when the last credit evaluation for the proposal started'
   dt_first_credit_evaluation_negative:
     lineage:
     - datalake_proposal.proposal.ts_credit_evaluation_first_negative
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Date of the first tenant documentation rejection on the new
-      evaluation process'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Date of the first tenant documentation rejection on the new evaluation process'
   dt_last_credit_evaluation_negative:
     lineage:
     - datalake_proposal.proposal.ts_credit_evaluation_last_negative
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Date of the last tenant document rejection on the new evaluation
-      process'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Date of the last tenant document rejection on the new evaluation process'
   dt_guarantee:
     lineage:
     - datalake_proposal.proposal.ts_guarantee
@@ -246,27 +228,19 @@ columns:
   dt_first_doc_analysis_approved:
     lineage:
     - datalake_proposal.proposal.ts_doc_analysis_first_approved
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Minimun date when the tenant documentation was approved on
-      the new evaluation process'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Minimun date when the tenant documentation was approved on the new evaluation process'
   dt_last_doc_analysis_approved:
     lineage:
     - datalake_proposal.proposal.ts_doc_analysis_last_approved
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Maximun date when the tenant documentation was approved on
-      the new evaluation process'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Maximun date when the tenant documentation was approved on the new evaluation process'
   dt_first_doc_analysis_rejected:
     lineage:
     - datalake_proposal.proposal.ts_doc_analysis_first_rejected
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Minimun date when the tenant documentation was rejected on
-      the new evaluation process'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Minimun date when the tenant documentation was rejected on the new evaluation process'
   dt_last_doc_analysis_rejected:
     lineage:
     - datalake_proposal.proposal.ts_doc_analysis_last_rejected
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Maximun date when the tenant documentation was rejected on
-      the new evaluation process'
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Maximun date when the tenant documentation was rejected on the new evaluation process'
   dt_guarantee_paid:
     lineage:
     - datalake_proposal.proposal.ts_guarantee_paid
@@ -274,37 +248,27 @@ columns:
   dt_first_credit_evaluation_positive:
     lineage:
     - datalake_proposal.proposal.ts_first_credit_evaluation_positive
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Date of the first time tenant documentation was approved
-      for that proposal - status ''Pre Approved'' or ''Regular'''
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Date of the first time tenant documentation was approved for that proposal - status ''Pre Approved'' or ''Regular'''
   dt_last_credit_evaluation_positive:
     lineage:
     - datalake_proposal.proposal.ts_last_credit_evaluation_positive
-    description: '[New column to consider the credit evaluation step which started
-      in ''2020-06-08''] Date of the last time tenant documentation was approved for
-      that proposal - status ''Pre Approved'' or ''Regular'''
+    description: '[New column to consider the credit evaluation step which started in ''2020-06-08''] Date of the last time tenant documentation was approved for that proposal - status ''Pre Approved'' or ''Regular'''
   dt_credit_analysis_last_init:
     lineage:
     - datalake_proposal.proposal.dt_credit_analysis_last_init
-    description: '[Deprecated after 2020-06-08. Only use this column to query data
-      from before this date.] Date when the last credit analysis  started for the
-      proposal  (Status of ''AnaliseCredito'' or ''Analise5a'' if after ''2020-01-02'')'
+    description: '[Deprecated after 2020-06-08. Only use this column to query data from before this date.] Date when the last credit analysis  started for the proposal  (Status of ''AnaliseCredito'' or ''Analise5a'' if after ''2020-01-02'')'
   dt_credit_analysis_last_end:
     lineage:
     - datalake_proposal.proposal.dt_credit_analysis_last_end
-    description: '[Deprecated after 2020-06-08. Only use this column to query data
-      from before this date.] Date when the last credit analysis ended for the proposal
-      (Possible Credit Analysis Status: ''Aprovado'', ''RecusadoCredito'', ''StandBy'')'
+    description: '[Deprecated after 2020-06-08. Only use this column to query data from before this date.] Date when the last credit analysis ended for the proposal (Possible Credit Analysis Status: ''Aprovado'', ''RecusadoCredito'', ''StandBy'')'
   dt_tenant_doc_complete:
     lineage:
     - datalake_proposal.proposal.ts_tenant_last_doc_complete
-    description: '[Deprecated after Credit Evaluation started] Prior to the credit
-      evaluation it represented the firt approval of the documentation before the
-      credit analysis. Since then this column equals the credit_evaluation_first_init'
+    description: '[Deprecated after Credit Evaluation started] Prior to the credit evaluation it represented the firt approval of the documentation before the credit analysis. Since then this column equals the credit_evaluation_first_init'
   ts_entrance:
     lineage:
     - datalake_proposal.proposal.ts_entrance
-    description: Date of entrance
+    description: Timestamp marking the entrance event for this record.
   dt_timestamp:
     description: Timestamp of when the table was last processed.
   ts_load:
@@ -324,7 +288,7 @@ columns:
   country_code:
     lineage:
     - datalake_proposal.proposal.country_code
-    description: Country of origin
+    description: ISO country code for geographic filtering of the analytical metric.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code

@@ -23,7 +23,7 @@ description: This table has the dailies snapshots data based on the rent demand 
   Each line has the total volume of the coincident conversions and its differences groupped by some dimensions (country_code, business_type,
   rent_flow_origin) on a daily snapshot.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   reference_type:
     description: Reference type of the current time visualization.
@@ -34,15 +34,9 @@ columns:
       LQ: Current day load looking to the events that happened on the last quarter.
       LY: Current day load looking to the events that happened on the last year.
   visits_booked:
-    description: The volume of the visits booked within the aggregation.
+    description: Count of tenant visits scheduled during the reporting period.
   diff_vb:
-    description: The volume difference of the visits booked within the aggregation, compared to the present day load of the reference type.
-      Every reference type has a different time window to visualize the differences (e.g. for D-1 it has no difference check (it's always null),
-      but for W1-W5 it checks the data volume load of the end of the week of each week in focus, comparing to the present day load related to
-      these weeks. For LM, it checks the data volume load of the last day of the previous month, comparing to the present day load related to
-      the past month. For LQ, it checks the data volume load of the last day of the previous quarter, comparing to the present day load related to
-      the past quarter. For LY, it checks the data volume load of the last day of the previous year, comparing to the present day load related to
-      the past year. Follows the same rule for all difference check columns).
+    description: The volume difference of the visits booked within the aggregation, compared to the present day load of the reference type. Every reference type has a different time window to visualize the differences (e.g. for D-1 it has no difference check (it's always null), but for W1-W5 it checks the data volume load of the end of the week of each week in focus, comparing to the present day load related to these weeks. For LM, it checks the data volume load of the last day of the previous month, comparing to the present day load related to the past month. For LQ, it checks the data volume load of the last day of the previous quarter, comparing to the present day load related to the past quarter. For LY, it checks the data volume load of the last day of the previous year, comparing to the present day load related to the past year. Follows the same rule for all difference check columns).
   percentage_diff_vb:
     description: The difference amount of VBs in percentage.
   visits_completed:
@@ -117,7 +111,5 @@ columns:
     description: Day of the present data load. Also, a partition of the table and should be used to improve analysis' performance.
     lineage:
       - dw_rent_snapshot.rent_demand_events_snapshot.day
-  dt_load:
-    description: DEPRECATED.
   ts_load:
     description: Timestamp of when the present data was loaded into our systems.

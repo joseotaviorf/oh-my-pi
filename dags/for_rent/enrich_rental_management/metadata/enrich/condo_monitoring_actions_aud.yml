@@ -1,8 +1,8 @@
 database_name: datalake_rental_management
 table_name: condo_monitoring_actions_aud
-description: This table contains the audit information for condo monitoring actions.
+description: Enrich layer table for condo monitoring actions aud from the enrich_rental_management pipeline used in For Rent analytics.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -13,17 +13,17 @@ columns:
     lineage:
       - datalake_rental_management.condo_monitoring_actions_aud.id_contract
       - datalake_rental_management_transactional.condo_monitoring_actions.contract_id
-    description: ID of the contract.
+    description: QuintoAndar rental contract identifier for which the condo monitoring action was performed or recorded.
   id_action_main_user:
     lineage:
       - datalake_rental_management.condo_monitoring_actions_aud.id_action_main_user
       - datalake_rental_management_transactional.condo_monitoring_actions.action_main_user_id
-    description: ID of the main's user.
+    description: Platform user identifier of the tenant or owner who initiated the condo monitoring action in the product.
   action_type:
     lineage:
       - datalake_rental_management.condo_monitoring_actions_aud.action_type
       - datalake_rental_management_transactional.condo_monitoring_actions.action_type
-    description: Type of the action.
+    description: Business category of the condo monitoring action, such as activation, deactivation, or invoice-related workflow steps.
   action_main_user_email:
     lineage:
       - datalake_rental_management.condo_monitoring_actions_aud.action_main_user_email
@@ -65,7 +65,7 @@ columns:
       - datalake_rental_management_transactional.condo_monitoring_actions.ts_database_transaction
     description: Timestamp of when the register was updated.
   rev_type:
-    description: Type of revision.
+    description: Hibernate Envers revision operation code indicating whether the audited row was inserted, updated, or deleted.
   year:
     lineage:
       - datalake_rental_management.condo_monitoring_actions_aud.ts_updated

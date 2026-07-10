@@ -1,14 +1,14 @@
 ---
 database_name: dw_rent_snapshot
 table_name: rent_cohort_conversions_snapshot
-description:
+description: |
   "This table has the dailies snapshots data based on the fact_rent_cohort_conversions, creating a full historical
   of the changes, allowing to understand data updates through time.
   The table has aggregated sums of cohort conversions of the rental funnel, which is also the base used to build the rent
   cohort conversions event metric.
   Each line has the total volume of the cohort conversion by its dimensions on a daily snapshot."
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_snapshot:
     description: "Date of the snapshot transformed into a number."
@@ -47,8 +47,7 @@ columns:
   weeks_to_conversion:
     lineage:
       - dw_rent.fact_rent_cohort_conversions.weeks_to_conversion
-    description: "How many weeks took the event to be converted.
-      Events with 'unnatural conversion' (e.g. event was a VC before being a VB) will be assigned as week zero (0)."
+    description: "How many weeks took the event to be converted. Events with 'unnatural conversion' (e.g. event was a VC before being a VB) will be assigned as week zero (0)."
   vb_unconverted:
     description: "Total volume of visits booked that weren't converted."
   vb_converted_vc:
@@ -144,13 +143,11 @@ columns:
   cc_converted_cs:
     description: "Total volume of the conversion contract created to contract signed."
   has_guarantee:
-    description: "Boolean indicating if the event has a guarantee related.
-      It's important to notice that if the event type is from 1 to 4 (VB til OA), the guarantee flag is automatically false.
-      If the event type is equal or bigger than 5 (EA til CS), the flag is related to the proposal's guarantee type if it's RentalGuarantee."
+    description: "Boolean indicating if the event has a guarantee related. It's important to notice that if the event type is from 1 to 4 (VB til OA), the guarantee flag is automatically false. If the event type is equal or bigger than 5 (EA til CS), the flag is related to the proposal's guarantee type if it's RentalGuarantee."
   dt_event:
     lineage:
       - dw_public.dim_date.date
-    description: "Date of the base event."
+    description: "Calendar date when the underlying rental funnel event occurred, used as the cohort anchor for conversion metrics."
   dt_week_started:
     lineage:
       - dw_public.dim_date.date
@@ -160,7 +157,7 @@ columns:
   country_code:
     lineage:
       - dw_rent.fact_rent_cohort_conversions.country_code
-    description: "Country code information, also a partition."
+    description: ISO country code for geographic filtering of the analytical metric.
   year:
     lineage:
       - dw_rent.fact_rent_cohort_conversions.ts_load

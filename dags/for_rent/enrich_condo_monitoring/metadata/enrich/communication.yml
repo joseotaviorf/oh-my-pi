@@ -1,8 +1,8 @@
 database_name: datalake_condo_monitoring
 table_name: communication
-description: This table contains the information about the communications related to the Condo Monitoring.
+description: Enrich layer table for communication from the enrich_condo_monitoring pipeline used in For Rent analytics.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   uuid_person:
     lineage:
@@ -44,6 +44,8 @@ columns:
     description: Channel of the notification that was sent to the user.
   was_delivered:
     description: Boolean flag to check if the notification was delivered.
+  was_comm_sent_on_time:
+    description: Boolean indicating whether the notification was sent on the expected schedule relative to the invoice due date.
   ts_sent:
     lineage:
       - datalake_jaiminho_clean.user_notifications.ts_sent
