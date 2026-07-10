@@ -1,46 +1,62 @@
 database_name: datalake_ebdb_clean
 table_name: rent_flow
+description: One row per rent flow from EBDB fluxolocacao, representing the rental journey of a tenant prospect on a QuintoAndar listing.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.id
+    description: Surrogate key of the rent flow record in EBDB fluxolocacao.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.atualizadoem
+    description: Last modification timestamp of this rent flow in EBDB.
   ts_created:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.criadoem
+    description: Creation timestamp when the rent flow was opened in EBDB.
   id_client:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.cliente_id
+    description: EBDB user id of the tenant prospect associated with this rent flow.
   id_manager:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.gerente_id
+    description: EBDB user id of the QuintoAndar manager overseeing this rent flow.
   id_house:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.imovel_id
+    description: EBDB property id of the listing tied to this rent flow.
   ts_ignore_before:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.ignorarantesde
+    description: Events before this timestamp are excluded from rent flow analytics.
   status:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.status
+    description: Current pipeline stage of the rent flow in EBDB (visit, offer, contract, etc.).
   is_step_rejected:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.etaparejeitada
+    description: Whether the active rent flow step was rejected by owner or tenant.
   has_no_iptu:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.withoutiptu
+    description: Indicates the property is flagged as exempt from IPTU property tax.
   id_current_offer:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.currentoffer_id
+    description: EBDB offer id currently linked to this rent flow, when one exists.
   id_current_contract:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.currentcontrato_id
+    description: EBDB contract id signed for this rent flow, when applicable.
   id_current_proposal:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.currentproposta_id
+    description: EBDB proposal id in progress for this rent flow, when applicable.
   id_original_rent_flow:
     lineage:
       - datalake_ebdb_raw.fluxolocacao.originalrentflowid
+    description: Source rent flow id when this journey was cloned or restarted.

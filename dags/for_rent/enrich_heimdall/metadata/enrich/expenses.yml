@@ -1,53 +1,75 @@
 ---
 database_name: datalake_heimdall
 table_name: expenses
+description: Individual expense charges attached to a Heimdall refund activity, parsed from activity expenses metadata.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Heimdall expense line id parsed from activity expenses metadata.
   id_activity:
     lineage:
       - datalake_heimdall_clean.activity.id
+    description: Parent Heimdall activity id that groups this expense charge.
   agreement_channel:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Channel used to negotiate the expense (app, email, support ticket).
   agreement_description:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Summary of the agreement reached for reimbursing this expense.
   agreement_evidences_files_urls:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "Comma-separated URLs of documents proving the expense agreement."
   invoice_file_password:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Password to decrypt a protected invoice attachment, when required.
   invoices_files_urls:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: URLs of invoice files submitted as evidence for the expense.
   receipt_file_url:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "URL of the payment receipt documenting the out-of-pocket expense."
   recurrence_class:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Recurrence class describing how the expense repeats over time.
   recurrence_description:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Label explaining the installment or recurrence schedule.
+  recurrence_type:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+    description: Recurrence type code for the expense charge (single, monthly, installment).
   text:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Expense category label such as condominium fee or repair cost.
   is_custom_text:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Whether the expense description was typed manually by the requester.
   recurrence_current:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Current installment index within the expense payment plan.
   recurrence_total:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Total installments expected for this recurring expense charge.
   amount:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Expense amount in BRL attached to the Heimdall refund activity.
   dt_invoice_due:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Invoice due date associated with the submitted expense document.

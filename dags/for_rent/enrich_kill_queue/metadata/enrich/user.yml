@@ -4,7 +4,7 @@ description: The table contains the users of Kill Queue micro-service. It receiv
   last update of a record. We're deduplicating the repeated IDs in this table, because
   our raw/clean DAG makes the ingestion via incremental load.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -25,15 +25,15 @@ columns:
   email:
     lineage:
       - datalake_kill_queue_clean.user.email
-    description: Email of the user.
+    description: Primary email address registered for the Kill Queue user profile.
   name:
     lineage:
       - datalake_kill_queue_clean.user.name
-    description: User name.
+    description: Full name of the tenant or owner stored in Kill Queue.
   version:
     lineage:
       - datalake_kill_queue_clean.user.version
-    description: Version of the user in Kill Queue.
+    description: Optimistic locking revision counter for concurrent update safety.
   ts_created:
     lineage:
       - datalake_kill_queue_clean.user.ts_created

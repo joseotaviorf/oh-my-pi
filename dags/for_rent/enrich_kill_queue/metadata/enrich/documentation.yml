@@ -5,16 +5,16 @@ description: The table contains documentation of Kill Queue micro-service, which
   We're deduplicating the repeated IDs in this table, because
   our raw/clean DAG makes the ingestion via incremental load.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_clean.documentation.id
-    description: ID of the documentation. It's the primary key of this table.
+    description: Primary key of the Kill Queue documentation record after deduplication.
   id_house:
     lineage:
       - datalake_kill_queue_clean.documentation.id_house
-    description: ID of the house, it can be joined with ID house from EBDB.
+    description: Kill Queue house id; join to EBDB house via enrich_kill_queue.house.id_main.
   id_tenant:
     lineage:
       - datalake_kill_queue_clean.documentation.id_tenant
@@ -22,7 +22,7 @@ columns:
   version:
     lineage:
       - datalake_kill_queue_clean.documentation.version
-    description: Version number of the documentation.
+    description: Optimistic locking revision counter for concurrent update safety.
   is_active:
     lineage:
       - datalake_kill_queue_clean.documentation.is_active
@@ -34,7 +34,7 @@ columns:
   ts_event:
     lineage:
       - datalake_kill_queue_clean.documentation.ts_event
-    description: Timestamp of the event.
+    description: Timestamp when the documentation state change event was recorded.
   ts_created:
     lineage:
       - datalake_kill_queue_clean.documentation.ts_created

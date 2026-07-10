@@ -1,98 +1,131 @@
 ---
 database_name: datalake_heimdall
 table_name: auditable_expenses
+description: Expense line items requiring analyst review, exploded from Heimdall activity auditableExpenses metadata.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Heimdall auditable expense line id parsed from activity metadata.
   id_activity:
     lineage:
       - datalake_heimdall_clean.activity.id
+    description: Parent Heimdall activity id that owns this auditable expense.
   id_entity:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Related entity id (contract, invoice, etc.) tied to the expense review.
   agreement_channel:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Channel where the expense agreement was reached (app, email, phone).
   agreement_description:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Text describing the agreement reached for this expense item.
   agreement_evidences_files_urls:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "Comma-separated URLs of files proving the expense agreement."
   entity_type:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Type of business entity referenced by the auditable expense (contract, invoice).
   invoices_files_urls:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: URLs of invoice documents uploaded for expense validation.
   invoice_file_password:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Password required to open a protected invoice file, when provided.
   receipt_file_url:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: URL of the payment receipt supporting the expense reimbursement.
   recurrence_class:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Recurrence model class for installment or recurring expense charges.
   recurrence_description:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "Human-readable label describing the expense recurrence pattern."
   rejection_reason:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Standardized reason code when the expense review was rejected.
   rejection_comment:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "Analyst free-text comment explaining the expense rejection."
   status:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Review status of the auditable expense (pending, approved, rejected).
   text:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Expense category label such as condominium, repair, or utilities.
   type:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Heimdall expense type code distinguishing charge categories.
   is_custom_text:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Whether the expense label was entered manually instead of from a preset list.
   is_full_refund:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Whether the request asks for a full reimbursement of the expense amount.
   is_idempotent_creation:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Whether this expense row was created by an idempotent API call.
   is_validated_by_instant_refund:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "Whether the expense was auto-approved by instant refund rules."
   initial_month:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: First calendar month covered by a retroactive expense adjustment.
   final_month:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Last calendar month covered by a retroactive expense adjustment.
   initial_year:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: First calendar year covered by a retroactive expense adjustment.
   final_year:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Last calendar year covered by a retroactive expense adjustment.
   recurrence_current:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Current installment number within the expense recurrence schedule.
   recurrence_total:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Total number of installments planned for this recurring expense.
   amount:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Expense amount in BRL requested for reimbursement or charge.
   dt_invoice_due:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Due date printed on the invoice supporting the expense.
   dt_invoice_accrual:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Accrual period date associated with the invoiced expense.
   ts_status_changed:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Timestamp when the auditable expense review status last changed.

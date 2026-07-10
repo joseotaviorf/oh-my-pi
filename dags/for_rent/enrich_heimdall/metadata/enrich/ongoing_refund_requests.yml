@@ -1,63 +1,84 @@
 ---
 database_name: datalake_heimdall
 table_name: ongoing_refund_requests
+description: Open tenant refund requests for condominium or repair costs, joining Heimdall activity with expense details.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_request:
     lineage:
       - datalake_heimdall.activity.id
+    description: Heimdall activity id identifying the open tenant refund request.
   id_expense:
     lineage:
       - datalake_heimdall.expenses.id
+    description: Expense line id linked to the refund request under review.
   id_contract:
     lineage:
       - datalake_heimdall.activity.id_external_contract
+    description: EBDB contract id associated with the refund case.
   request_status:
     lineage:
       - datalake_heimdall.activity.status
+    description: Current workflow status of the refund request in Heimdall.
   refund_type:
     lineage:
       - datalake_heimdall.activity.type
+    description: Refund category such as TENANT_REFUND_CONDOMINIUM or TENANT_REFUND_REPAIR.
   expense_type:
     lineage:
       - datalake_heimdall.expenses.text
+    description: Full expense label parsed from the Heimdall expense text field.
   expense_group:
     lineage:
       - datalake_heimdall.expenses.text
+    description: "High-level expense group extracted from the expense label prefix."
   expense_agreement_channel:
     lineage:
       - datalake_heimdall.expenses.agreement_channel
+    description: Channel where the tenant and analyst agreed on the expense terms.
   expense_amount:
     lineage:
       - datalake_heimdall.expenses.amount
+    description: Requested reimbursement amount in BRL for the expense line.
   expense_recurrence_type:
     lineage:
       - datalake_heimdall.expenses.recurrence_type
+    description: Recurrence type of the expense (single, monthly, installment).
   current_installment:
     lineage:
       - datalake_heimdall.expenses.recurrence_current
+    description: Current installment number within the expense payment schedule.
   total_installments:
     lineage:
       - datalake_heimdall.expenses.recurrence_total
+    description: Total installments planned for the recurring expense charge.
   expense_status:
     lineage:
       - datalake_heimdall.auditable_expenses.status
+    description: Review outcome status of the linked auditable expense.
   expense_rejection_reason:
     lineage:
       - datalake_heimdall.auditable_expenses.rejection_reason
+    description: Standardized rejection reason when the expense was denied.
   expense_rejection_comment:
     lineage:
       - datalake_heimdall.auditable_expenses.rejection_comment
+    description: Analyst comment explaining why the expense was rejected.
   is_custom_expense:
     lineage:
       - datalake_heimdall.expenses.is_custom_text
+    description: Whether the expense label was entered as custom text by the tenant.
   days_requested_to_analyzed:
     lineage:
       - datalake_heimdall.activity.ts_transition_created
       - datalake_heimdall.activity.ts_requested
+    description: Calendar days between request submission and analyst review completion.
   ts_requested:
     lineage:
       - datalake_heimdall.activity.ts_requested
+    description: Timestamp when the tenant submitted the refund request.
   ts_analyzed:
     lineage:
       - datalake_heimdall.activity.ts_transition_created
+    description: Timestamp when the refund request transitioned to an analyzed status.

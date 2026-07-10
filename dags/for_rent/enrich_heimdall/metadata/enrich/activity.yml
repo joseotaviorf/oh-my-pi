@@ -1,101 +1,135 @@
 ---
 database_name: datalake_heimdall
 table_name: activity
+description: Heimdall workflow events for tenant refunds and condominium transfers, parsed from activity metadata.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_heimdall_clean.activity.id
+    description: Heimdall activity document id for the refund or transfer workflow event.
   id_external_contract:
     lineage:
       - datalake_heimdall_clean.activity.id_external_contract
+    description: EBDB contract id referenced by the Heimdall activity.
   id_house:
     lineage:
       - datalake_heimdall_clean.activity.id_house
+    description: EBDB property id tied to the refund or condominium transfer request.
   id_user:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  id_state:
+    description: User id of the tenant or owner who initiated the Heimdall activity.
+  id_status:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Brazilian state id (estadoId) from Heimdall activity metadata.
   id_rent_flow:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Rent flow id linked to the Heimdall workflow when available.
   class:
     lineage:
       - datalake_heimdall_clean.activity.class
+    description: Heimdall document class discriminating the activity workflow type.
   previous_status:
     lineage:
       - datalake_heimdall_clean.activity.transition_list
+    description: Workflow status immediately before the latest state transition.
   status:
     lineage:
       - datalake_heimdall_clean.activity.status
+    description: Current workflow status of the Heimdall activity (requested, analyzed, etc.).
   type:
     lineage:
       - datalake_heimdall_clean.activity.type
+    description: Heimdall activity type such as tenant condominium or repair refund.
   user_name:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Display name of the user who submitted the Heimdall request.
   condominium_receipt_url:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: URL of the uploaded condominium payment receipt evidence.
   condominium_invoice_url:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: URL of the condominium invoice file attached to the request.
   description:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "Free-text description provided in the Heimdall activity metadata."
   event_name:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Named workflow event emitted by the Heimdall state machine.
   house_address:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Formatted property address captured in the activity metadata.
   landlords_contact_info:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Contact details for property owners supplied with the request.
   user_email:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Email address of the user associated with the Heimdall activity.
   ticket_number:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Support ticket number linked to the refund or transfer case.
   discount_months:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Number of months the rental discount applies under negotiation.
   discount_percentage:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Percentage discount applied to the monthly rent amount.
   discount_amount:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Absolute discount value in BRL applied to the monthly rent.
   discounted_rental:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Monthly rent amount after applying the negotiated discount.
   rental_amount:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Original monthly rent amount before any discount is applied.
   discount_start_year_month:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "Year-month when the negotiated rent discount period begins (YYYY-MM)."
   discount_end_year_month:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: "Year-month when the negotiated rent discount period ends (YYYY-MM)."
   dt_contract_started:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Contract start date referenced by the Heimdall activity.
   ts_transferred:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Timestamp when condominium billing responsibility was transferred.
   ts_requested:
     lineage:
       - datalake_heimdall_clean.activity.metadata
+    description: Timestamp when the tenant or owner submitted the refund request.
   ts_transition_created:
     lineage:
       - datalake_heimdall_clean.activity.transition_list
+    description: Timestamp when the latest workflow status transition occurred.
   ts_created:
     lineage:
       - datalake_heimdall_clean.activity.ts_created
+    description: Record creation timestamp in the Heimdall activity collection.
   ts_updated:
     lineage:
       - datalake_heimdall_clean.activity.ts_updated
+    description: Last update timestamp of the Heimdall activity document.

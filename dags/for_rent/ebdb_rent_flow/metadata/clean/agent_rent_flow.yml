@@ -1,10 +1,14 @@
 database_name: datalake_ebdb_clean
 table_name: agent_rent_flow
+description: Links QuintoAndar agents to the rent flows they support, sourced from EBDB fluxolocacao_dadosagente.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_ebdb_raw.fluxolocacao_dadosagente.agentes_id
+    description: EBDB user id of the broker or agent assigned to support the rent flow.
   id_rent_flow:
     lineage:
       - datalake_ebdb_raw.fluxolocacao_dadosagente.fluxolocacao_id
+    description: Rent flow id that the agent assignment belongs to in EBDB.

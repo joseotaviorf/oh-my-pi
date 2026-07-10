@@ -4,7 +4,7 @@ description: The table contains the houses of Kill Queue micro-service. It recei
   last update of a record. We're deduplicating the repeated IDs in this table, because
   our raw/clean DAG makes the ingestion via incremental load.
 domain: For Rent
-owner: bruna.prates@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -13,7 +13,7 @@ columns:
   id_main:
     lineage:
       - datalake_kill_queue_clean.house.id_main
-    description: ID of the house from EBDB (Main) source.
+    description: "EBDB main database house id for cross-system joins."
   id_owner:
     lineage:
       - datalake_kill_queue_clean.house.id_owner
@@ -21,43 +21,43 @@ columns:
   id_region:
     lineage:
       - datalake_kill_queue_clean.house.id_region
-    description: ID of the region where the house is located.
+    description: Region id where the Kill Queue property is located.
   city:
     lineage:
       - datalake_kill_queue_clean.house.city
-    description: City of the house address.
+    description: City component of the property address in Kill Queue.
   complement:
     lineage:
       - datalake_kill_queue_clean.house.complement
-    description: Complement of the house address.
+    description: Address complement such as apartment or block identifier.
   house_number:
     lineage:
       - datalake_kill_queue_clean.house.house_number
-    description: Number of the house.
+    description: Street number component of the property address in Kill Queue.
   street_address:
     lineage:
       - datalake_kill_queue_clean.house.street_address
-    description: Street of the house address.
+    description: Street name of the property address registered in Kill Queue.
   state:
     lineage:
       - datalake_kill_queue_clean.house.state
-    description: State of the house address.
+    description: Brazilian state abbreviation for the property address.
   version:
     lineage:
       - datalake_kill_queue_clean.house.version
-    description: Version number of the house in Kill Queue.
+    description: "Optimistic-lock version of the Kill Queue house record."
   floor:
     lineage:
       - datalake_kill_queue_clean.house.floor
-    description: The floor/level number of the house.
+    description: Floor or level number of the unit within the building.
   rent_price:
     lineage:
       - datalake_kill_queue_clean.house.rent_price
-    description: Rent price of the house.
+    description: Listed monthly rent price for the property in Kill Queue.
   reservation_fee:
     lineage:
       - datalake_kill_queue_clean.house.reservation_fee
-    description: Fee (in percentage) to be paid for the reservation.
+    description: Reservation fee percentage charged to secure the listing.
   is_reservation_allowed:
     lineage:
       - datalake_kill_queue_clean.house.is_reservation_allowed
@@ -65,20 +65,20 @@ columns:
   ts_created:
     lineage:
       - datalake_kill_queue_clean.house.ts_created
-    description: Timestamp when the house was created.
+    description: Timestamp when the Kill Queue house record was first created.
   ts_updated:
     lineage:
       - datalake_kill_queue_clean.house.ts_updated
-    description: Timestamp when the house was updated for the last time.
+    description: Timestamp of the latest update received from Kill Queue.
   year:
     lineage:
       - datalake_kill_queue_clean.house.year
-    description: Year value of the timestamp update. It's not a partition!
+    description: Calendar year extracted from ts_updated; not a table partition column.
   month:
     lineage:
       - datalake_kill_queue_clean.house.month
-    description: Month value of the timestamp update. It's not a partition!
+    description: Calendar month extracted from ts_updated; not a table partition column.
   day:
     lineage:
       - datalake_kill_queue_clean.house.day
-    description: Day value of the timestamp update. It's not a partition!
+    description: Calendar day extracted from ts_updated; not a table partition column.
