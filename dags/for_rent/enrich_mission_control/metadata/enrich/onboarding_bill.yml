@@ -1,44 +1,44 @@
 ---
 database_name: datalake_mission_control
 table_name: onboarding_bill
-owner: 'kleber.inoue@quintoandar.com.br'
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: Table that contains the bills (energy, water, etc)
 columns:
   id:
-    description: ID of the bill.
+    description: Primary key identifying a utility bill registered during rental onboarding.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.id
   id_address:
-    description: ID address.
+    description: Service address identifier where this utility bill applies.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.id_address
   id_onboarding:
-    description: ID of the onboarding.
+    description: Onboarding workflow identifier that groups this utility bill transfer step.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.id_onboarding
   id_supplier:
-    description: ID of the supplier, it can be NULL.
+    description: "ID of the supplier, it can be NULL."
     lineage:
     - datalake_mission_control_clean.onboarding_bill.id_supplier
   id_supplier_city:
-    description: ID of the supplier city.
+    description: Municipality identifier of the utility provider serving this address.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.id_supplier_city
   id_google_drive:
-    description: ID of the Google Drive.
+    description: Google Drive folder storing scanned copies of this utility bill.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.id_google_drive
   id_google_drive_file:
-    description: ID of the Google's Drive file. 
+    description: ID of the Google's Drive file.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.id_google_drive_file
   status:
-    description: Status of the bill.
+    description: Processing status of the utility bill handover during onboarding.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.status
   type:
-    description: Type of the bill.
+    description: Utility category such as water, gas, or electricity for this bill record.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.type
   ownership:
@@ -50,7 +50,7 @@ columns:
     lineage:
     - datalake_mission_control_clean.onboarding_bill.ownership_cpf
   installation_code:
-    description: Installation's code.
+    description: Provider installation or consumer unit code printed on the utility bill.
     lineage:
     - datalake_mission_control_clean.onboarding_bill.installation_code
   total_debit:

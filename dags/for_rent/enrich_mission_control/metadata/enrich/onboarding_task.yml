@@ -1,33 +1,33 @@
 ---
 database_name: datalake_mission_control
 table_name: onboarding_task
-owner: 'kleber.inoue@quintoandar.com.br'
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: Tasks that tenants and owners should do when they're in onboarding step.
   These tasks can be an inspection booking, change the bills ownership, etc.
 columns:
   id:
-    description: ID of the task.
+    description: Primary key of an onboarding checklist task in Mission Control.
     lineage:
     - datalake_mission_control_clean.onboarding_task.id
   id_onboarding:
-    description: ID of the onboarding.
+    description: Onboarding workflow identifier that owns this checklist task.
     lineage:
     - datalake_mission_control_clean.onboarding_task.id_onboarding
   id_task_type:
-    description: ID of the task's type.
+    description: Reference to the template defining the task type and responsible party.
     lineage:
     - datalake_mission_control_clean.onboarding_task.id_task_type
   reference_date_field:
-    description: Reference of the date field.
+    description: Source column name used as the reference date for metric aggregation.
     lineage:
     - datalake_mission_control_clean.onboarding_task.reference_date_field
   title:
-    description: Title of the task.
+    description: "Human-readable title displayed for this onboarding checklist task."
     lineage:
     - datalake_mission_control_clean.onboarding_task.title
   status:
-    description: Status of the task.
+    description: Completion status of the onboarding task in the operational workflow.
     lineage:
     - datalake_mission_control_clean.onboarding_task.status
   start_offset:

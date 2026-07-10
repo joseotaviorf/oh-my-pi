@@ -1,10 +1,11 @@
+---
 database_name: datalake_for_rent_entities_views
 table_name: onboarding
 description: >
   Enriched view of FR_ONBOARDING entities with persona expansion (OWNER, TENANT).
   Consumed by enrich_transactional_entities consolidation.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_entity:
     lineage:
@@ -28,7 +29,7 @@ columns:
   persona:
     description: OWNER or TENANT.
   business_context:
-    description: Fixed value 'RENT'.
+    description: "Fixed value 'RENT'."
   properties:
     lineage:
       - datalake_ebdb_clean.onboarding.status

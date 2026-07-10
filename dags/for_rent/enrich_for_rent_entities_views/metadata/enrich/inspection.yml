@@ -1,10 +1,11 @@
+---
 database_name: datalake_for_rent_entities_views
 table_name: inspection
 description: >
   Enriched view of FR_INSPECTION entities with persona expansion (OWNER, TENANT, AGENT_INSPECTOR).
   Consumed by enrich_transactional_entities consolidation.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_entity:
     lineage:
@@ -29,7 +30,7 @@ columns:
   persona:
     description: OWNER, TENANT, or AGENT_INSPECTOR.
   business_context:
-    description: Fixed value 'RENT'.
+    description: "Fixed value 'RENT'."
   properties:
     lineage:
       - datalake_ebdb_clean.inspection.status

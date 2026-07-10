@@ -1,7 +1,7 @@
 ---
 database_name: datalake_mission_control
 table_name: contract_person
-owner: "kleber.inoue@quintoandar.com.br"
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: Information about users who have an associated contract.
   Each line is a user with their personal information (Name, email, CPF) and their user type,
@@ -17,11 +17,11 @@ columns:
     lineage:
       - datalake_mission_control_clean.contract_person.id_contract
   id_address:
-    description: ID of the address.
+    description: "Address record identifier for the contract participant's registered location."
     lineage:
       - datalake_mission_control_clean.contract_person.id_address
   id_user:
-    description: ID of the user.
+    description: EBDB platform user identifier linking this person to their QuintoAndar account.
     lineage:
       - datalake_mission_control_clean.contract_person.id_user
   contract_type:
@@ -33,15 +33,15 @@ columns:
     lineage:
       - datalake_mission_control_clean.contract_person.person_type
   full_name:
-    description: Full name of the person.
+    description: Legal full name of the person participating in the rental contract.
     lineage:
       - datalake_mission_control_clean.contract_person.full_name
   phone_number:
-    description: Phone number of the person.
+    description: Primary phone contact for reaching the contract participant.
     lineage:
       - datalake_mission_control_clean.contract_person.phone_number
   document_number:
-    description: Document number of the person.
+    description: Government-issued identity document number of the contract person.
     lineage:
       - datalake_mission_control_clean.contract_person.document_number
   is_deleted:

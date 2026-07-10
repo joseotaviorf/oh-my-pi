@@ -1,10 +1,11 @@
+---
 database_name: datalake_for_rent_entities_views
 table_name: credit_evaluation
 description: >
   Enriched view of FR_CREDIT_EVALUATION entities with persona expansion (OWNER, TENANT_PROSPECT).
   Consumed by enrich_transactional_entities consolidation.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_entity:
     lineage:
@@ -26,7 +27,7 @@ columns:
   persona:
     description: OWNER or TENANT_PROSPECT.
   business_context:
-    description: Fixed value 'RENT'.
+    description: "Fixed value 'RENT'."
   properties:
     lineage:
       - core_credit_evaluation.credit_evaluation.status

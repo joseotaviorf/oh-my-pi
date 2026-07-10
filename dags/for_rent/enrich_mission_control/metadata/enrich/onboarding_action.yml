@@ -1,24 +1,26 @@
 ---
 database_name: datalake_mission_control
 table_name: onboarding_action
-owner: 'kleber.inoue@quintoandar.com.br'
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
-description: Table that contains the action for each onboarding.
+description: |
+  Onboarding workflow actions tracked in mission control for new rental contracts.
+  One row per action step executed during tenant or owner onboarding.
 columns:
   id:
-    description: ID of the onboarding's action. It's the primary key of the table.
+    description: "ID of the onboarding's action. It's the primary key of the table."
     lineage:
     - datalake_mission_control_clean.onboarding_action.id
   id_onboarding:
-    description: Onboarding ID.
+    description: Parent onboarding workflow identifier this action belongs to.
     lineage:
     - datalake_mission_control_clean.onboarding_action.id_onboarding
   type_identifier:
-    description: Type of the onboarding action.
+    description: Action type code defining which onboarding step was triggered or completed.
     lineage:
     - datalake_mission_control_clean.onboarding_action.type_identifier
   user_role_target_type:
-    description: User's type related to the action.
+    description: "User's type related to the action."
     lineage:
     - datalake_mission_control_clean.onboarding_action.user_role_type_target
   is_deleted:
@@ -26,7 +28,7 @@ columns:
     lineage:
     - datalake_mission_control_clean.onboarding_action.is_deleted
   ts_created:
-    description: Timestamp of the onboarding's action creation. 
+    description: "Timestamp of the onboarding's action creation."
     lineage:
     - datalake_mission_control_clean.onboarding_action.ts_created
   ts_updated:

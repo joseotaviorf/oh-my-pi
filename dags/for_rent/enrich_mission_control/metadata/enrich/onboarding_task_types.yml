@@ -1,7 +1,7 @@
 ---
 database_name: datalake_mission_control
 table_name: onboarding_task_types
-owner: 'kleber.inoue@quintoandar.com.br'
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: Table that stores the types of the onboarding tasks.
 columns:
@@ -17,7 +17,7 @@ columns:
     lineage:
     - datalake_mission_control_clean.onboarding_task_types.user_type
   type:
-    description: Type of the task.
+    description: Task template category such as document upload or utility transfer.
     lineage:
     - datalake_mission_control_clean.onboarding_task_types.type
   is_active:
