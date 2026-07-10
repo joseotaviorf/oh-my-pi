@@ -1,7 +1,7 @@
 ---
 database_name: dw_collections_segmentation
 table_name: fact_contract_features_timeline
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   Essential contract features timeline for machine learning and advanced analytics in QuintoAndar collections context.
@@ -99,7 +99,7 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_monthly_invoices_created
   n_invoices_paid:
-    description: Number of invoices paid
+    description: Numeric measure of invoices paid for financial reporting and KPI tracking.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_paid
   n_invoices_paid_ontime_t2:
@@ -468,7 +468,7 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
   dt_contract_start:
-    description: Contract start date
+    description: Calendar date associated with contract start in the financial workflow.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.dt_contract_start
   lead_23_n_quitacao_t1:

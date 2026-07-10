@@ -3,57 +3,57 @@ database_name: dw_charging_payment_quintocred
 table_name: fact_direct_billing
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: One row per fact direct billing in the QuintoCred rental guarantee product, tracking underwriting, charges, renewals, and collections for landlord protection policies.
 columns:
   id_propose:
-    description: ''
+    description: Identifier for the propose referenced by this financial record.
     lineage:
-    - datalake_rental_guarantee_platform_clean.entry.propose
+      - datalake_rental_guarantee_platform_clean.entry.propose
   id:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.billing_report.id_boleto
+      - datalake_rental_guarantee_platform_clean.billing_report.id_boleto
   id_bill:
-    description: ''
+    description: Identifier for the bill referenced by this financial record.
     lineage:
-    - datalake_rental_guarantee_platform_clean.billing_report.id_boleto
+      - datalake_rental_guarantee_platform_clean.billing_report.id_boleto
   origin_table:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing origin table in the policy lifecycle.
   value:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing value in the policy lifecycle.
     lineage:
-    - datalake_accounting_funnel.ledger.credit
+      - datalake_accounting_funnel.ledger.credit
   value_paid:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing value paid in the policy lifecycle.
     lineage:
-    - datalake_accounting_funnel.ledger.credit
+      - datalake_accounting_funnel.ledger.credit
   status:
-    description: ''
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
-    - datalake_rental_guarantee_platform_clean.bill.status
+      - datalake_rental_guarantee_platform_clean.bill.status
   order_status:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing order status in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.bill.status
+      - datalake_rental_guarantee_platform_clean.bill.status
   gateway:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing gateway in the policy lifecycle.
   billing_type:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing billing type in the policy lifecycle.
   category:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing category in the policy lifecycle.
   is_overdue:
-    description: ''
+    description: Indicates whether overdue applies to this financial record.
     lineage:
-    - .cobranca_billing.DATE(dt_due) < CURRENT_DATE
+      - .cobranca_billing.DATE(dt_due) < CURRENT_DATE
   dt_paid:
-    description: ''
+    description: Calendar date associated with paid in the financial workflow.
     lineage:
-    - datalake_rental_guarantee_platform_clean.bill.dt_due
+      - datalake_rental_guarantee_platform_clean.bill.dt_due
   dt_created:
-    description: ''
+    description: Calendar date associated with created in the financial workflow.
     lineage:
-    - datalake_rental_guarantee_platform_clean.bill.ts_created
+      - datalake_rental_guarantee_platform_clean.bill.ts_created
   dt_due:
-    description: ''
+    description: Calendar date associated with due in the financial workflow.
   ts_load:
     description: Timestamp of the load into datalake

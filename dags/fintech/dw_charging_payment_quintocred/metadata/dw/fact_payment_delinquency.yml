@@ -3,87 +3,87 @@ database_name: dw_charging_payment_quintocred
 table_name: fact_payment_delinquency
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: One row per fact payment delinquency in the QuintoCred rental guarantee product, tracking underwriting, charges, renewals, and collections for landlord protection policies.
 columns:
   sk_propose_payment:
-    description: ''
+    description: Data warehouse surrogate key for propose payment used in fintech dimensional joins.
     lineage:
-    - dw_charging_payment_quintocred.fact_charging_payment.id_propose
+      - dw_charging_payment_quintocred.fact_charging_payment.id_propose
   sk_transaction:
-    description: ''
+    description: Data warehouse surrogate key for transaction used in fintech dimensional joins.
     lineage:
-    - dw_charging_payment_quintocred.fact_direct_billing.id
+      - dw_charging_payment_quintocred.fact_direct_billing.id
   id_bill:
-    description: ''
+    description: Identifier for the bill referenced by this financial record.
     lineage:
-    - dw_charging_payment_quintocred.fact_direct_billing.id_bill
+      - dw_charging_payment_quintocred.fact_direct_billing.id_bill
   sk_propose_charge:
-    description: ''
+    description: Data warehouse surrogate key for propose charge used in fintech dimensional joins.
     lineage:
-    - .base_payment.COALESCE(p.id_propose, d.id_propose)
+      - .base_payment.COALESCE(p.id_propose, d.id_propose)
   sk_delinquency:
-    description: ''
+    description: Data warehouse surrogate key for delinquency used in fintech dimensional joins.
     lineage:
-    - dw_charging_payment_quintocred.fact_delinquency.id
+      - dw_charging_payment_quintocred.fact_delinquency.id
   id_array_delinquency:
-    description: ''
+    description: Identifier for the array delinquency referenced by this financial record.
     lineage:
-    - dw_charging_payment_quintocred.fact_delinquency.id_array_delinquency
+      - dw_charging_payment_quintocred.fact_delinquency.id_array_delinquency
   sk_propose_delinquency:
-    description: ''
+    description: Data warehouse surrogate key for propose delinquency used in fintech dimensional joins.
     lineage:
-    - dw_charging_payment_quintocred.fact_delinquency.id_propose
+      - dw_charging_payment_quintocred.fact_delinquency.id_propose
   origin_table:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing origin table in the policy lifecycle.
   status_payment:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing status payment in the policy lifecycle.
   gateway_payment:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing gateway payment in the policy lifecycle.
   billing_type_payment:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing billing type payment in the policy lifecycle.
   status_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing status delinquency in the policy lifecycle.
   gateway_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing gateway delinquency in the policy lifecycle.
   total_amount_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total amount delinquency in the policy lifecycle.
   delinquency_monthly_value:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing delinquency monthly value in the policy lifecycle.
   delinquency_amount_paid_monthly:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing delinquency amount paid monthly in the policy lifecycle.
   total_paid_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total paid delinquency in the policy lifecycle.
   open_amount_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing open amount delinquency in the policy lifecycle.
   total_open_amount_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total open amount delinquency in the policy lifecycle.
   discount_value_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing discount value delinquency in the policy lifecycle.
   total_discount_value_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total discount value delinquency in the policy lifecycle.
   value:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing value in the policy lifecycle.
   value_paid:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing value paid in the policy lifecycle.
   is_delinquency_charge_related:
-    description: ''
+    description: Indicates whether delinquency charge related applies to this financial record.
   is_delinquency_active:
-    description: ''
+    description: Indicates whether delinquency active applies to this financial record.
   is_overdue:
-    description: ''
+    description: Indicates whether overdue applies to this financial record.
   month_charge:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing month charge in the policy lifecycle.
   month_due_original:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing month due original in the policy lifecycle.
   month_delinquency_due:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing month delinquency due in the policy lifecycle.
   dt_paid_delinquency:
-    description: ''
+    description: Calendar date associated with paid delinquency in the financial workflow.
   dt_created_payment:
-    description: ''
+    description: Calendar date associated with created payment in the financial workflow.
   dt_due_payment:
-    description: ''
+    description: Calendar date associated with due payment in the financial workflow.
   dt_paid_payment:
-    description: ''
+    description: Calendar date associated with paid payment in the financial workflow.
   ts_load:
     description: Timestamp of the load into datalake

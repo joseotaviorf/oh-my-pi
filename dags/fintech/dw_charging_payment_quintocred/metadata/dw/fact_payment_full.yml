@@ -48,7 +48,7 @@ columns:
     lineage:
       - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_delinquency
   id_document:
-    description: "Invoice document id"
+    description: Identifier for the document referenced by this financial record.
     lineage:
       - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
   id_array_document_canceled:
@@ -56,7 +56,7 @@ columns:
     lineage:
       - dw_charging_payment_quintocred.fact_accounting_funnel.id_array_document_canceled
   id_bill:
-    description: "Bill document id"
+    description: Identifier for the bill referenced by this financial record.
     lineage:
       - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.id_bill
   gateway_final:
@@ -110,7 +110,7 @@ columns:
     lineage:
       - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.gateway_delinquency
   hash:
-    description: "Invoice hash"
+    description: QuintoCred rental guarantee attribute describing hash in the policy lifecycle.
     lineage:
       - dw_charging_payment_quintocred.fact_accounting_funnel.hash
   sap_class:
@@ -212,7 +212,7 @@ columns:
     lineage:
       - dw_charging_payment_quintocred.fact_accounting_funnel.sap_amount
   is_corrected_robot:
-    description: "Is corrected by robot"
+    description: Indicates whether corrected robot applies to this financial record.
     lineage:
       - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.is_corrected_robot
   is_nf_canceled:
@@ -240,7 +240,7 @@ columns:
   is_delinquency_charge_related:
     description: "Flag that checks if there is a payment charge for the same month as the delinquency"
   month_reference:
-    description: "Month analyzed"
+    description: QuintoCred rental guarantee attribute describing month reference in the policy lifecycle.
     lineage:
       - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_propose_life
       - dw_charging_payment_quintocred.fact_accounting_funnel.accrual_year_month

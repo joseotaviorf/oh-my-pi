@@ -1,189 +1,424 @@
----
 database_name: dw_collections_segmentation
 table_name: fact_contract_wallet_timeline
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: |
-  Daily timeline of contracts in QuintoAndar collections context with wallet segmentation metrics.
-  Contains comprehensive contract-level information including evictions, collection efforts, negotiations,
-  and aggregated wallet metrics across multiple delay methodologies for collections analysis.
+description: |-
+  Daily timeline of contracts in QuintoAndar collections context with wallet segmentation metrics. Grain is one row per contract and reference date, aggregated from dw_collections_segmentation.fact_invoice_wallet_timeline (invoice-level wallet timeline). Contains contract-level eviction, collection-effort, negotiation, and wallet metrics across delay methodologies used in collections analysis.
+  Delay methodologies: T1 is delay from the nominal due date of invoices — a deal that restructures older debt into future installments can therefore show T1 < 0 (not overdue yet). T2 is delay contamination that anchors ongoing deal installments to the delay of the negotiated debt, so the same deal can show T2 > 0 while T1 < 0. When the contract has no multiple deal installments, T1 equals T2.
 columns:
   sk_contract_wallet_timeline:
     description: Record unique identification (surrogate key)
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_contract
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_contract
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   sk_contract:
     description: Contract identifier (surrogate key)
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_contract
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_contract
   dt_reference:
     description: Reference date for the timeline
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   reference_contract_status:
     description: Contract status at the reference date (Active/Finished)
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   max_delay_contaminated_contract_t1:
-    description: Maximum delay with contamination at contract level using T1 methodology
+    description: 'Maximum invoice delay at contract level using T1 methodology: delay from the nominal
+      due date of each invoice (dt_due). Deal installments due in the future can be T1 < 0 even when they
+      represent older negotiated debt.'
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
   max_delay_contaminated_contract_t2:
-    description: Maximum delay with contamination at contract level using T2 methodology
+    description: 'Maximum invoice delay at contract level using T2 methodology: delay contamination that
+      anchors ongoing deal installments to the delay of the negotiated (parent) debt. A deal can therefore
+      show T2 > 0 while T1 < 0. When the contract has no multi-installment deal structure, T1 equals T2.'
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
   max_delay_original_invoices_t1:
-    description: Maximum delay for original invoices using T1 methodology
+    description: Maximum T1 delay among original (non-deal-child) invoices, using nominal due dates.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
   max_delay_deal_invoices_t1:
-    description: Maximum delay for deal invoices using T1 methodology
+    description: Maximum T1 delay among deal-child invoices, using each installment nominal due date.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
   max_delay_original_invoices_t2:
-    description: Maximum delay for original invoices using T2 methodology
+    description: Maximum T2 delay among original (non-deal-child) invoices, with delay contamination.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
   max_delay_deal_invoices_t2:
-    description: Maximum delay for deal invoices using T2 methodology
+    description: Maximum T2 delay among deal-child invoices, anchored to the negotiated debt delay.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
   max_delay_contaminated_contract_t3_losses:
     description: Maximum delay with contamination for loss calculations using T3 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.contract_delay_t3_losses
   max_open_delay_contaminated_contract_t3_losses:
     description: Maximum open delay with contamination for loss calculations using T3 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.contract_delay_t3_losses
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
   n_overdue_monthlys_t1:
     description: Number of overdue monthly invoices using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_overdue_deals_t1:
     description: Number of overdue deal invoices using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_overdue_others_t1:
     description: Number of overdue other invoices using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_overdue_monthlys_t2:
     description: Number of overdue monthly invoices using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_overdue_deals_t2:
     description: Number of overdue deal invoices using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_overdue_others_t2:
     description: Number of overdue other invoices using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   sum_overdue_monthlys_t2:
     description: Sum of overdue monthly invoice amounts using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   sum_overdue_deals_t2:
     description: Sum of overdue deal invoice amounts using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   sum_overdue_others_t2:
     description: Sum of overdue other invoice amounts using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   has_negotiation_in_contract:
     description: Flag indicating if contract has any negotiation
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_negotiation_in_contract
   sum_monthly_overdue_days_paid_t1:
     description: Sum of days overdue for monthly invoices that were paid using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.overdue_recovered_amount_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
   count_monthly_overdue_invoices_paid_t1:
     description: Count of monthly overdue invoices that were paid using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.overdue_recovered_amount_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   days_since_ending:
     description: Number of days since contract ended
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   days_since_contract_start:
     description: Number of days since contract started
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_start
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   n_reparos_invoices:
     description: Number of invoices with repair bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_reparos
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_condominio_invoices:
     description: Number of invoices with condominium bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_condominio
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_condominio_open_invoices:
     description: Number of open invoices with condominium bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_condominio
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   open_condominio_balance:
     description: Open balance amount for condominium bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_condominio
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.balance_bill_item_condominio
   n_multa_recisoria_invoices:
     description: Number of invoices with termination fine bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_multa_recisoria
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_multa_recisoria_open_invoices:
     description: Number of open invoices with termination fine bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_multa_recisoria
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   open_multa_recisoria_balance:
     description: Open balance amount for termination fine bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_multa_recisoria
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.balance_bill_item_multa_recisoria
   n_acordo_invoices:
     description: Number of invoices with agreement bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_acordo
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_acordo_open_invoices:
     description: Number of open invoices with agreement bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_acordo
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   open_acordo_balance:
     description: Open balance amount for agreement bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_acordo
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.balance_bill_item_acordo
   n_rental_core_invoices:
     description: Number of invoices with rental core bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_rental_core
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_rental_core_open_invoices:
     description: Number of open invoices with rental core bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_rental_core
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   open_rental_core_balance:
     description: Open balance amount for rental core bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_rental_core
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.balance_bill_item_rental_core
   n_reparos_open_invoices:
     description: Number of open invoices with repair bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_reparos
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   open_reparos_balance:
     description: Open balance amount for repair bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_reparos
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.balance_bill_item_reparos
   n_multas_ongoing_invoices:
     description: Number of invoices with ongoing fine bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_multas_ongoing
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_multas_ongoing_open_invoices:
     description: Number of open invoices with ongoing fine bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_multas_ongoing
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   open_multas_ongoing_balance:
     description: Open balance amount for ongoing fine bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_multas_ongoing
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.balance_bill_item_multas_ongoing
   n_utilidades_invoices:
     description: Number of invoices with utilities bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_utilidades
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_utilidades_open_invoices:
     description: Number of open invoices with utilities bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_utilidades
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   open_utilidades_balance:
     description: Open balance amount for utilities bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_utilidades
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.balance_bill_item_utilidades
   n_outros_invoices:
     description: Number of invoices with other bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_outros
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_outros_open_invoices:
     description: Number of open invoices with other bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_outros
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   open_outros_balance:
     description: Open balance amount for other bill items
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_outros
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.balance_bill_item_outros
   cpc:
     description: Total CPC (contact completions) for the contract on reference date
     lineage:
-      - dw_collection_recovery_quintoandar.fact_collection.total_cpc
+    - dw_collection_recovery_quintoandar.fact_collection.total_cpc
   alo:
     description: Total ALO (contact attempts) for the contract on reference date
     lineage:
-      - dw_collection_recovery_quintoandar.fact_collection.total_alo
+    - dw_collection_recovery_quintoandar.fact_collection.total_alo
   has_app_events:
     description: Flag indicating if contract has app events on reference date
     lineage:
-      - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
+    - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
   has_app_events_overdue:
     description: Flag indicating if contract has overdue-related app events on reference date
     lineage:
-      - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
+    - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
   qt_app_events:
     description: Quantity of app events for the contract on reference date
     lineage:
-      - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
+    - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
   qt_app_events_overdue:
     description: Quantity of overdue-related app events for the contract on reference date
     lineage:
-      - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
+    - datalake_collections_quintoandar.delinquency_app_events.id_amplitude
   promessas:
-    description: Quantity of promises (negotiations without the payment of the first installment) for the contract on reference date
+    description: Quantity of promises (negotiations without the payment of the first installment) for
+      the contract on reference date
     lineage:
-      - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
+    - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
   qt_acordo_quebrado:
     description: Quantity of broken agreements for the contract
     lineage:
-      - dw_collection_recovery_quintoandar.fact_negotiation.negotiation_status
+    - dw_collection_recovery_quintoandar.fact_negotiation.negotiation_status
   qt_promessa_quebrada_fp:
     description: Quantity of broken first payment promises for the contract
     lineage:
-      - dw_collection_recovery_quintoandar.fact_negotiation
+    - dw_collection_recovery_quintoandar.fact_negotiation
   qt_aco_desconto:
     description: Quantity of discount agreements for the contract
     lineage:
-      - dw_collection_recovery_quintoandar.fact_negotiation.discount_to_original_amount
+    - dw_collection_recovery_quintoandar.fact_negotiation.discount_to_original_amount
   id_process_evictions:
     description: Eviction process identifier when contract has active eviction
     lineage:
-      - dw_evictions.fact_evictions.sk_process
+    - dw_evictions.fact_evictions.sk_process
   has_overdue_balance_over0_t1_at_ending:
     description: Flag indicating if contract has any overdue balance using T1 methodology at ending
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
   has_overdue_balance_over5_t1_at_ending:
     description: Flag indicating if contract has overdue balance over 5 days using T1 methodology at ending
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
   has_overdue_balance_over0_t2_at_ending:
     description: Flag indicating if contract has any overdue balance using T2 methodology at ending
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
   has_overdue_balance_over5_t2_at_ending:
     description: Flag indicating if contract has overdue balance over 5 days using T2 methodology at ending
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
   has_overdue_balance_over0_t3_at_ending:
     description: Flag indicating if contract has any overdue balance using T3 methodology at ending
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t3
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
   has_overdue_balance_over5_t3_at_ending:
     description: Flag indicating if contract has overdue balance over 5 days using T3 methodology at ending
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t3
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
   is_evictions:
     description: Flag indicating if contract has active eviction process
     lineage:
-      - dw_evictions.fact_evictions
+    - dw_evictions.fact_evictions
   n_anchor_invoices_not_negativable:
     description: Number of anchor invoices that are not eligible for negative operations
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_negative_eligible
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.order_invoice_wallet_risk
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_invoices_negativable:
     description: Number of invoices eligible for negative operations
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_negative_eligible
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_first_invoices_open:
     description: Number of first invoices that are open
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_first_invoice_contract
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   has_fpd_in_wallet:
     description: |
       Flag indicating the contract has a first-payment-default monthly invoice that is still
       open at dt_reference. Excludes contracts whose guarantee is BROKERAGE_ONLY. Kept for
       backward compatibility with downstream systems that consume the open-only definition.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_first_invoice_contract
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+    - dw_rent.dim_contract.guarantee
   has_fpd_in_wallet_general:
     description: |
       Flag indicating the contract has any first-payment-default monthly invoice in its wallet
@@ -191,169 +426,321 @@ columns:
       contracts whose guarantee is BROKERAGE_ONLY. Used by the segmentation analytical model so
       that the FPD label persists on the recovery date itself, allowing correct attribution of
       recovery to the FPD segment.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_first_invoice_contract
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+    - dw_rent.dim_contract.guarantee
   array_open_invoices:
     description: Array of open invoice identifiers for the contract
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   array_paid_invoices:
     description: Array of paid invoice identifiers for the contract
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   array_negotiated_invoices:
     description: Array of negotiated invoice identifiers for the contract
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_monthly_invoices:
     description: Number of monthly invoices for the contract
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_invoices_paid:
     description: Number of invoices paid for the contract
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_invoices_paid_ontime_t2:
     description: Number of invoices paid on time using T2 methodology
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_overdue_invoices_paid_t2:
     description: Number of overdue invoices paid using T2 methodology
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_invoices_paid_ontime_t1:
     description: Number of invoices paid on time using T1 methodology
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_overdue_invoices_paid_t1:
     description: Number of overdue invoices paid using T1 methodology
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_monthly_invoices_paid_ontime_t2:
     description: Number of monthly invoices paid on time using T2 methodology
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_monthly_invoices_paid_ontime_t1:
     description: Number of monthly invoices paid on time using T1 methodology
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_monthly_overdue_invoices_paid_t2:
     description: Number of monthly overdue invoices paid using T2 methodology
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_monthly_overdue_invoices_paid_t1:
     description: Number of monthly overdue invoices paid using T1 methodology
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_monthly_invoices_created:
     description: Number of monthly invoices created for the contract
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_begin
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_begin
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   n_invoices_in_wallet:
     description: Total number of invoices in the contract wallet
     lineage:
-      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
   monthly_income:
     description: Monthly income of the contract proponent
     lineage:
-      - datalake_sorting_hat_clean.proponent.monthly_income
+    - datalake_sorting_hat_clean.proponent.monthly_income
   open_wallet_overdue_t1:
-    description: Open wallet amount overdue using T1 methodology
+    description: Open wallet amount overdue under T1 (nominal due date). Future deal installments are
+      not overdue under T1.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   open_wallet_overdue_t2:
-    description: Open wallet amount overdue using T2 methodology
+    description: Open wallet amount overdue under T2 (delay contamination). Ongoing deals remain overdue
+      when anchored to the negotiated debt.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   open_wallet_overdue_t3:
     description: Open wallet amount overdue using T3 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t3
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   wallet_overdue_t2:
-    description: Wallet amount overdue using T2 methodology
+    description: Wallet amount overdue under T2 methodology (delay contamination with negotiated-debt
+      anchor).
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   debts_in_income_share_t2:
     description: Ratio of overdue wallet amount to monthly income using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    - datalake_sorting_hat_clean.proponent.monthly_income
   overdue_recovered_amount_t2:
     description: Amount recovered from overdue invoices using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.overdue_recovered_amount_t2
   open_wallet:
     description: Total open wallet amount for the contract
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   wallet:
     description: Total wallet amount for the contract
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   recovered_amount:
     description: Total recovered amount for the contract
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.recovered_amount
   wallet_on_time_t1:
     description: Wallet amount paid on time using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   wallet_overdue_t1:
-    description: Wallet amount overdue using T1 methodology
+    description: Wallet amount overdue under T1 methodology (nominal invoice due date).
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   debts_in_income_share_t1:
     description: Ratio of overdue wallet amount to monthly income using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    - datalake_sorting_hat_clean.proponent.monthly_income
   open_wallet_on_time_t1:
     description: Open wallet amount on time using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   overdue_recovered_amount_t1:
     description: Amount recovered from overdue invoices using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.overdue_recovered_amount_t1
   on_time_paid_amount_t1:
     description: Amount paid on time using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.on_time_paid_amount_t1
   wallet_on_time_t2:
     description: Wallet amount paid on time using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   open_wallet_on_time_t2:
     description: Open wallet amount on time using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   on_time_paid_amount_t2:
     description: Amount paid on time using T2 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.on_time_paid_amount_t2
   wallet_on_time_t3:
     description: Wallet amount paid on time using T3 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t3
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   wallet_overdue_t3:
     description: Wallet amount overdue using T3 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t3
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   open_wallet_on_time_t3:
     description: Open wallet amount on time using T3 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_invoice_overdue_t3
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   overdue_recovered_amount_t3:
     description: Amount recovered from overdue invoices using T3 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.overdue_recovered_amount_t3
   on_time_paid_amount_t3:
     description: Amount paid on time using T3 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.on_time_paid_amount_t3
   max_open_delay_contaminated_contract_t1:
-    description: Maximum open delay with contamination at contract level using T1 methodology
+    description: Maximum open-invoice T1 delay at contract level (nominal due date methodology).
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
   max_open_delay_contaminated_contract_t2:
-    description: Maximum open delay with contamination at contract level using T2 methodology
+    description: Maximum open-invoice T2 delay at contract level (delay contamination / negotiated-debt
+      anchor).
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t2
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
   rent:
     description: Rent value of the contract
     lineage:
-      - dw_rent.dim_contract.rent
+    - dw_rent.dim_contract.rent
   condo:
     description: CONDO value of the contract
     lineage:
-      - dw_rent.dim_contract.condo
+    - dw_rent.dim_contract.condo
   iptu:
     description: IPTU value of the contract
     lineage:
-      - dw_rent.dim_contract.iptu
+    - dw_rent.dim_contract.iptu
   contract_guarantee:
     description: Type of guarantee associated with the rental contract
     lineage:
-      - dw_rent.dim_contract.guarantee
+    - dw_rent.dim_contract.guarantee
   package_amount:
     description: Sum of RENT, CONDO and IPTU of contract
     lineage:
-      - dw_rent.dim_contract.condo
-      - dw_rent.dim_contract.rent
-      - dw_rent.dim_contract.iptu
+    - dw_rent.dim_contract.condo
+    - dw_rent.dim_contract.rent
+    - dw_rent.dim_contract.iptu
   open_wallet_to_due_deals:
-    description: Total amount of open deal debt that is not overdue yet considering T1 contamination methodology, i.e it is to-due
+    description: Total amount of open deal debt that is not overdue yet under T1 (nominal due date),
+      i.e. installments still to-due even when T2 delay contamination may already mark the negotiated debt as overdue.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   open_wallet_to_due_deals_at_reference_month:
-    description: Total amount of open deal debt that has due date equivalent or before the reference month of observation
+    description: Total amount of open deal debt that has due date equivalent or before the reference month
+      of observation
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_due
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   open_wallet_to_due_deals_at_future_month:
     description: Total amount of open deal debt that has due date greater than reference month of observation
-  
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_due
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.payment_status
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   sum_overdue_monthlys_t1:
     description: Sum of overdue monthly invoice amounts using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   sum_overdue_deals_t1:
     description: Sum of overdue deal invoice amounts using T1 methodology
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   sum_overdue_others_t1:
     description: Sum of overdue other invoice amounts using T1 methodology
-
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_type
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.is_child_negotiation
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.invoice_delay_t1
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
   dt_contract_end:
-    description: Contract end date
+    description: Calendar date associated with contract end in the financial workflow.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_annulled
   dt_contract_start:
-    description: Contract start date
+    description: Calendar date associated with contract start in the financial workflow.
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_contract_start
   dt_pipe:
     description: Invoice due date (pipeline date) for monthly invoices, used to identify pipeturn day
     lineage:
-      - datalake_retsuko.invoice.ts_due
+    - datalake_retsuko.invoice.ts_due
   year:
     description: Year extracted from reference date
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   month:
     description: Month extracted from reference date
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   day:
     description: Day extracted from reference date
+    lineage:
+    - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_reference
   ts_load:
     description: Timestamp when the record was loaded

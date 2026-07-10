@@ -35,7 +35,7 @@ columns:
   due_amount:
     description: "Amount of the original unpaid charge."
   paid_amount:
-    description: "Delinquency amount paid"
+    description: QuintoCred rental guarantee attribute describing paid amount in the policy lifecycle.
   open_amount:
     description: "Difference between the amount paid and the original invoice amount"
   discount_value:
@@ -44,7 +44,7 @@ columns:
     description: "total value of the package (rent + condo + water+IPTU+etc)"
   perc_considered_base:
     description: "The amount that must be paid proportionally from the issuance of the delinquency until the present time"
-  perc_considered: 
+  perc_considered:
     description: "Adjustment for when the contract is active and the renewal has already passed 12 months. The full delinquency is considered, but it is not considered a new bad debt for the month"
   due_amount_new_bad_debt:
     description: "calculates the new delinquency amount based on the contract status, valid renewal, and due date, considering proportional division or total amount as applicable"

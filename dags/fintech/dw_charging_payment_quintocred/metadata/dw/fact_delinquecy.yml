@@ -3,79 +3,79 @@ database_name: dw_charging_payment_quintocred
 table_name: fact_delinquecy
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: null
+description: One row per fact delinquecy in the QuintoCred rental guarantee product, tracking underwriting, charges, renewals, and collections for landlord protection policies.
 columns:
   id_propose:
-    description: ''
+    description: Identifier for the propose referenced by this financial record.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.id_propose
+      - datalake_rental_guarantee_platform_clean.delinquency.id_propose
   id:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.id
+      - datalake_rental_guarantee_platform_clean.delinquency.id
   origin_table:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing origin table in the policy lifecycle.
   id_array_delinquency:
-    description: ''
+    description: Identifier for the array delinquency referenced by this financial record.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.id
+      - datalake_rental_guarantee_platform_clean.delinquency.id
   status:
-    description: ''
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.id_status
+      - datalake_rental_guarantee_platform_clean.delinquency.id_status
   ordem_status:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing ordem status in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.id_status
+      - datalake_rental_guarantee_platform_clean.delinquency.id_status
   gateway:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing gateway in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.id_type
+      - datalake_rental_guarantee_platform_clean.delinquency.id_type
   billing_type:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing billing type in the policy lifecycle.
   delinquency_monthly_value:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing delinquency monthly value in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.original_value
+      - datalake_rental_guarantee_platform_clean.delinquency.original_value
   delinquency_amount_paid_monthly:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing delinquency amount paid monthly in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.amount_paid
+      - datalake_rental_guarantee_platform_clean.delinquency.amount_paid
   open_amount_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing open amount delinquency in the policy lifecycle.
   discount_value_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing discount value delinquency in the policy lifecycle.
   total_quantity_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total quantity delinquency in the policy lifecycle.
   total_amount_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total amount delinquency in the policy lifecycle.
   total_paid_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total paid delinquency in the policy lifecycle.
   total_discount_value_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total discount value delinquency in the policy lifecycle.
   total_open_amount_delinquency:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total open amount delinquency in the policy lifecycle.
   month_due_original:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing month due original in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.dt_due
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_due
   month_delinquency_due:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing month delinquency due in the policy lifecycle.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.dt_due
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_due
   is_delinquency_active:
-    description: ''
+    description: Indicates whether delinquency active applies to this financial record.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.is_active
+      - datalake_rental_guarantee_platform_clean.delinquency.is_active
   is_overdue:
-    description: ''
+    description: Indicates whether overdue applies to this financial record.
   dt_created:
-    description: ''
+    description: Calendar date associated with created in the financial workflow.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.ts_created
+      - datalake_rental_guarantee_platform_clean.delinquency.ts_created
   dt_paid:
-    description: ''
+    description: Calendar date associated with paid in the financial workflow.
     lineage:
-    - datalake_rental_guarantee_platform_clean.delinquency.dt_paid
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_paid
   ts_load:
     description: Timestamp of the load into datalake
