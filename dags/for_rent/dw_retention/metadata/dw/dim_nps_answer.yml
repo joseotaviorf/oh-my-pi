@@ -1,19 +1,20 @@
+---
 database_name: dw_retention
 table_name: dim_nps_answer
 description: Dimension table with NPS answers collected during the rental's offboarding process. Each row is a unique NPS answer to our offboarding survey.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_nps_answer:
     lineage:
       - datalake_tracksale.answer.id
       - datalake_casa_mineira_tracksale.answer.id
-    description: ID of the NPS answer.
+    description: Surrogate key uniquely identifying each NPS survey answer in the retention warehouse.
   score_category:
     lineage:
       - datalake_tracksale.answer.score_category
       - datalake_casa_mineira_tracksale.answer.score_category
-    description: Category of the NPS score.
+    description: NPS score bucket such as promoter, passive, or detractor.
     categories:
       detractor: Score value beetween 0 and 6.
       passive: Score value beetween 7 and 8.
@@ -45,7 +46,7 @@ columns:
     lineage:
       - datalake_tracksale.campaign.metric_group
       - datalake_casa_mineira_tracksale.campaign.metric_group
-    description: NPS campaign type.
+    description: Tracksale campaign grouping that classifies the offboarding NPS survey wave sent to respondents.
     categories:
       iqoffboarding: NPS responded only by tentants going through the offboarding process.
       ppoffboarding: NPS responded only by owners going through the offboarding process.

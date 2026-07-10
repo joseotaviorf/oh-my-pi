@@ -1,7 +1,7 @@
 ---
 database_name: datalake_mission_control_clean
 table_name: onboarding_action
-owner: "kleber.inoue@quintoandar.com.br"
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: Table that contains the action for each onboarding.
   Due to incremental load, this table contains duplicated IDs.
@@ -11,11 +11,11 @@ columns:
     lineage:
       - datalake_mission_control_raw.onboardingaction.id
   id_onboarding:
-    description: Onboarding ID.
+    description: Parent onboarding workflow identifier this action belongs to.
     lineage:
       - datalake_mission_control_raw.onboardingaction.onboarding_id
   type_identifier:
-    description: Type of the onboarding action.
+    description: Action type code defining which onboarding step was triggered or completed.
     lineage:
       - datalake_mission_control_raw.onboardingaction.type_identifier
   user_role_target_type:

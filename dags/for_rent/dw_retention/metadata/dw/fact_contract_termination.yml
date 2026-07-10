@@ -1,13 +1,14 @@
+---
 database_name: dw_retention
 table_name: fact_contract_termination
 description: Fact table containing information regarding contract termination. Each row corresponds to a unique contract termination process.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_contract:
     lineage:
       - datalake_ebdb_contract.contract.id
-    description: ID of the contract.
+    description: Surrogate key of the rental contract undergoing termination in the retention mart.
   sk_termination:
     lineage:
       - datalake_offboarding.contract_termination.id_termination
@@ -23,6 +24,6 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_contract.contract.country_code
-    description: Country code of the contract.
+    description: ISO country code for geographic filtering of the analytical metric.
   ts_load:
     description: Timestamp of when this data was loaded.

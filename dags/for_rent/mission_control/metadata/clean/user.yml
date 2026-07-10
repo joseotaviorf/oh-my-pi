@@ -1,7 +1,7 @@
 ---
 database_name: datalake_mission_control_clean
 table_name: user
-owner: "allan.melao@quintoandar.com.br"
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: Information about the people who can be associated in a contract.
 columns:
@@ -10,11 +10,11 @@ columns:
     lineage:
       - datalake_mission_control_raw.user.id
   full_name:
-    description: Full name of the person.
+    description: Legal full name of the proposal participant.
     lineage:
       - datalake_mission_control_raw.user.name
   phone_number:
-    description: Phone number of the person.
+    description: Primary phone number of the proposal participant.
     lineage:
       - datalake_mission_control_raw.user.phone
   is_deleted:

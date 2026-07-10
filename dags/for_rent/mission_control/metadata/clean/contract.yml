@@ -1,7 +1,7 @@
 ---
 database_name: datalake_mission_control_clean
 table_name: contract
-owner: "kleber.inoue@quintoandar.com.br"
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: Table that contains the contracts of Mission Control source.
   Due to incremental load, this table contains duplicated IDs.
@@ -15,7 +15,7 @@ columns:
     lineage:
       - datalake_mission_control_raw.contract.imovel_id
   id_google_drive:
-    description: ID of the Google Drive.
+    description: Google Drive folder identifier storing contract documents in Mission Control.
     lineage:
       - datalake_mission_control_raw.contract.google_drive_id
   id_property_address:
@@ -23,7 +23,7 @@ columns:
     lineage:
       - datalake_mission_control_raw.contract.property_address_id
   id_mailing_address:
-    description: ID of the mailing address.
+    description: Address record identifier used for mailing correspondence on this rental contract.
     lineage:
       - datalake_mission_control_raw.contract.mailing_address_id
   id_landlord_account:
@@ -43,15 +43,15 @@ columns:
     lineage:
       - datalake_mission_control_raw.contract.tenant_user_id
   id_condo_manager:
-    description: ID of the condo manager.
+    description: Identifier of the condominium administrator responsible for the rented property.
     lineage:
       - datalake_mission_control_raw.contract.condo_manager_id
   id_payment_info:
-    description: ID of the info payment.
+    description: Payment profile identifier used to collect rent charges for this contract.
     lineage:
       - datalake_mission_control_raw.contract.info_payment_id
   id_partner:
-    description: ID of the partner.
+    description: "Third-party partner identifier when the lease was originated through a channel partner."
     lineage:
       - datalake_mission_control_raw.contract.partner_id
   id_external:
@@ -59,11 +59,11 @@ columns:
     lineage:
       - datalake_mission_control_raw.contract.external_id
   status:
-    description: Status of the contract.
+    description: Current workflow status of the rental contract within Mission Control operations.
     lineage:
       - datalake_mission_control_raw.contract.status
   guarantee:
-    description: Guarantee type.
+    description: Type of financial guarantee backing the rental contract obligations.
     lineage:
       - datalake_mission_control_raw.contract.guarantee
   condominium_from_account_type:
@@ -83,11 +83,11 @@ columns:
     lineage:
       - datalake_mission_control_raw.contract.condominium_payer
   cover_image_url:
-    description: URL of the cover image.
+    description: HTTPS URL of the listing cover photo associated with this rental contract.
     lineage:
       - datalake_mission_control_raw.contract.cover_image_url
   version:
-    description: Contract version.
+    description: Optimistic locking revision counter for concurrent update safety.
     lineage:
       - datalake_mission_control_raw.contract.version
   contract_rent_model:
@@ -103,11 +103,11 @@ columns:
     lineage:
       - datalake_mission_control_raw.contract.tenant_charge_day
   condominium_amount:
-    description: Condominium value.
+    description: Monthly condominium fee amount configured on the rental contract.
     lineage:
       - datalake_mission_control_raw.contract.condominium_amount
   brokerage_fee:
-    description: Brokerage fee value.
+    description: Brokerage commission amount charged when the rental contract was signed.
     lineage:
       - datalake_mission_control_raw.contract.brokerage_fee
   iptu_installments:
@@ -127,11 +127,11 @@ columns:
     lineage:
       - datalake_mission_control_raw.contract.administration_fee
   monthly_discount:
-    description: Monthly discount value.
+    description: Recurring discount subtracted from the monthly rent billing amount.
     lineage:
       - datalake_mission_control_raw.contract.monthly_discount
   home_insurance_amount:
-    description: Home insurance value.
+    description: Monthly residential insurance premium amount included in the contract.
     lineage:
       - datalake_mission_control_raw.contract.home_insurance_amount
   can_chat:

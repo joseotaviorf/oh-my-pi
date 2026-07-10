@@ -1,8 +1,9 @@
+---
 database_name: dw_retention
 table_name: dim_nps_respondent
 description: Dimension table with NPS respondent data collected during the rental's offboarding process. Each row is a unique NPS respondent to our offboarding survey.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_nps_respondent:
     lineage:
@@ -13,26 +14,26 @@ columns:
     lineage:
       - datalake_tracksale.answer.name
       - datalake_casa_mineira_tracksale.answer.name
-    description: NPS respondent name. 
+    description: Full name of the tenant or owner who responded to the offboarding NPS survey.
   email:
     lineage:
       - datalake_tracksale.answer.email
       - datalake_casa_mineira_tracksale.answer.email
-    description: NPS respondent email.
+    description: Email address used for operational communication.
   alternative_email:
     lineage:
       - datalake_tracksale.answer.alternative_email
       - datalake_casa_mineira_tracksale.answer.alternative_email
-    description: NPS respondent alternative email.
+    description: Secondary email provided by the NPS survey respondent.
   phone:
     lineage:
       - datalake_tracksale.answer.phone
       - datalake_casa_mineira_tracksale.answer.phone
-    description: NPS respondent phone.
+    description: Contact phone number provided by the NPS respondent in the offboarding survey.
   alternative_phone:
     lineage:
       - datalake_tracksale.answer.alternative_phone
       - datalake_casa_mineira_tracksale.answer.alternative_phone
-    description: NPS respondent alternative phone.
+    description: Secondary phone number provided by the NPS survey respondent.
   ts_load:
     description: Timestamp of when this data was loaded.

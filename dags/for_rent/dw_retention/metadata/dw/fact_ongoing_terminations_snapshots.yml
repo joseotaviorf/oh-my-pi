@@ -1,8 +1,9 @@
+---
 database_name: dw_retention
 table_name: fact_ongoing_terminations_snapshots
 description: Fact table containing the daily snapshot of ongoing terminations.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_contract:
     lineage:

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_mission_control_clean
 table_name: contract_person
-owner: "allan.melao@quintoandar.com.br"
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: Information about users who have an associated contract.
   Each line is a user with their personal information (Name, email, CPF) and their user type,
@@ -16,11 +16,11 @@ columns:
     lineage:
       - datalake_mission_control_raw.contractperson.contract_id
   id_address:
-    description: ID of the address.
+    description: "Address record identifier for the contract participant's registered location."
     lineage:
       - datalake_mission_control_raw.contractperson.address_id
   id_user:
-    description: ID of the user.
+    description: EBDB platform user identifier linking this person to their QuintoAndar account.
     lineage:
       - datalake_mission_control_raw.contractperson.user_id
   contract_type:
@@ -32,15 +32,15 @@ columns:
     lineage:
       - datalake_mission_control_raw.contractperson.type
   full_name:
-    description: Full name of the person.
+    description: Legal full name of the person participating in the rental contract.
     lineage:
       - datalake_mission_control_raw.contractperson.name
   phone_number:
-    description: Phone number of the person.
+    description: Primary phone contact for reaching the contract participant.
     lineage:
       - datalake_mission_control_raw.contractperson.phone_number
   document_number:
-    description: Document number of the person.
+    description: Government-issued identity document number of the contract person.
     lineage:
       - datalake_mission_control_raw.contractperson.document_number
   is_deleted:
@@ -56,14 +56,14 @@ columns:
     lineage:
       - datalake_mission_control_raw.contractperson.updated_on
   year:
-    description: Year integer value of the record's update. Also it's a partition.
+    description: "Year integer value of the record's update. Also it's a partition."
     lineage:
       - datalake_mission_control_raw.contractperson.year
   month:
-    description: Month integer value of the record's update. Also it's a partition.
+    description: "Month integer value of the record's update. Also it's a partition."
     lineage:
       - datalake_mission_control_raw.contractperson.month
   day:
-    description: Day integer value of the record's update. Also it's a partition.
+    description: "Day integer value of the record's update. Also it's a partition."
     lineage:
       - datalake_mission_control_raw.contractperson.day

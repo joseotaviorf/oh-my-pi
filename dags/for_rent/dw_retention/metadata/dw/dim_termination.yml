@@ -1,8 +1,9 @@
+---
 database_name: dw_retention
 table_name: dim_termination
 description: Dimension table containing contract termination information. Each row corresponds to a unique termination process.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   sk_termination:
     lineage:
@@ -11,7 +12,7 @@ columns:
   repair_cost:
     lineage:
       - datalake_offboarding.contract_termination.repair_cost
-    description: Cost of repairs.
+    description: Total monetary cost of property repairs assessed during the contract termination process.
   repair_resolution:
     lineage:
       - datalake_offboarding.contract_termination.repair_resolution

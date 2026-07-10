@@ -1,8 +1,9 @@
+---
 database_name: dw_retention
 table_name: fact_owner_retention
 description: Fact table containing information regarding the owner's relationship with QuintoAndar. Each row corresponds to a unique house listing.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
     sk_house_listing:
       lineage:
@@ -11,7 +12,7 @@ columns:
     sk_house:
       lineage:
         - datalake_ebdb_listing.house_listing.id_house
-      description: ID of the house.
+      description: Surrogate key linking to the house dimension in the retention warehouse model.
     sk_owner:
       lineage:
         - datalake_ebdb_listing.house.id_user
@@ -19,7 +20,7 @@ columns:
     sk_contract:
       lineage:
         - datalake_ebdb_contract.contract.id
-      description: ID of the contract.
+      description: Surrogate key linking to the contract dimension in the retention warehouse model.
     country_code:
       lineage:
         - datalake_ebdb_listing.house_listing.country_code
