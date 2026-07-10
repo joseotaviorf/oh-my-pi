@@ -1,6 +1,6 @@
 database_name: datalake_credit_evers
 table_name: credit_evers_original_due_date
-owner: ae-finance-fintech@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: Credit Evers (delinquency) contracts with original due date. It reports Ever 'limpo', i.e, contains only monthly and onboarding invoices.
 columns:
@@ -15,7 +15,7 @@ columns:
   id_proposal:
     lineage:
       - datalake_invoice.credit_invoice_original_due_date.id_proposal
-    description: "Proposal ID of contract"
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   months_of_contract:
     description: "Age of contracts in month, if ended, the total age"
   contract_mob_number:
@@ -40,3 +40,9 @@ columns:
     lineage:
       - datalake_invoice.credit_invoice_original_due_date.dt_contract_updated
     description: "Last date that the contract had informations updated in main"
+  dt_reference:
+    lineage: []
+    description: Calendar date associated with reference in the financial workflow.
+  invoice_anchor:
+    lineage: []
+    description: Credit analysis attribute describing invoice anchor in the tenant underwriting workflow.

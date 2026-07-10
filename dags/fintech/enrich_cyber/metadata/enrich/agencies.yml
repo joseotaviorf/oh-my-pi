@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber
 table_name: agencies
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Consolidated view of agencies and agency groups, including main agency indicators and membership details.
 columns:

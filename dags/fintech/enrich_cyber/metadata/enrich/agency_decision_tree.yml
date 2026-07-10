@@ -1,37 +1,33 @@
 ---
 database_name: datalake_cyber
 table_name: agency_decision_tree
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Agency/advisory decision tree
 columns:
   level:
-    description: ""
+    description: Financial attribute representing level on the agency_decision_tree dataset.
     lineage:
       - datalake_cyber_clean.agency_decision_tree.level
   test:
-    description: ""
+    description: Financial attribute representing test on the agency_decision_tree dataset.
     lineage:
       - datalake_cyber_clean.agency_decision_tree.test
-  queue_type:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.agency_decision_tree.queue_type
   level_name:
-    description: ""
+    description: Financial attribute representing level name on the agency_decision_tree dataset.
     lineage:
       - datalake_cyber_clean.agency_decision_tree.level_name
   queue:
-    description: ""
+    description: Financial attribute representing queue on the agency_decision_tree dataset.
     lineage:
       - datalake_cyber_clean.agency_decision_tree.queue
   queue_name:
-    description: ""
+    description: Financial attribute representing queue name on the agency_decision_tree dataset.
     lineage:
       - datalake_cyber_clean.agency_decision_tree.queue_name
   params:
-    description: ""
+    description: Financial attribute representing params on the agency_decision_tree dataset.
     lineage:
       - datalake_cyber_clean.agency_decision_tree.CONCAT_WS(' AND ', COLLECT_LIST(params))
   ts_load:
-    description: ""
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

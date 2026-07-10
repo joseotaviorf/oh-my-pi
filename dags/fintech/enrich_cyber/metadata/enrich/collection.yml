@@ -1,40 +1,40 @@
 ---
 database_name: datalake_cyber
 table_name: collection
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Collection of debts. Table granularity - occurrence/call/action
 columns:
   id_contract:
-    description: ""
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_cyber_clean.logs.id_contract
   id_contract_external:
-    description: ""
+    description: Identifier for the contract external referenced by this financial record.
     lineage:
       - datalake_cyber_clean.logs.id_contract_external
   id_customer:
-    description: ""
+    description: Identifier for the customer referenced by this financial record.
     lineage:
       - datalake_cyber_clean.logs.id_client
   id_operator:
-    description: ""
+    description: Identifier for the operator referenced by this financial record.
     lineage:
       - datalake_cyber_clean.logs.id_user
   creditor:
-    description: ""
+    description: Financial attribute representing creditor on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.contract_group
   operator_email:
-    description: ""
+    description: Financial attribute representing operator email on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.user_email
   operator_type:
-    description: ""
+    description: Financial attribute representing operator type on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.user_type
   operator_agency:
-    description: ""
+    description: Financial attribute representing operator agency on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.agency_name
   phone_number:
@@ -46,36 +46,66 @@ columns:
     lineage:
       - datalake_cyber_clean.logs.phone_extension
   action:
-    description: ""
+    description: Financial attribute representing action on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.action
   action_description:
-    description: ""
+    description: Financial attribute representing action description on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.code_description
   result:
-    description: ""
+    description: Financial attribute representing result on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.result
   result_description:
-    description: ""
+    description: Financial attribute representing result description on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.code_description
   complement:
-    description: ""
+    description: Financial attribute representing complement on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.complement
   complement_description:
-    description: ""
+    description: Financial attribute representing complement description on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.code_description
   occurrence_description:
-    description: ""
+    description: Financial attribute representing occurrence description on the collection dataset.
     lineage:
       - datalake_cyber_clean.logs.comment
   ts_occurrence:
-    description: ""
+    description: Timestamp when occurrence occurred in the upstream fintech system.
     lineage:
       - datalake_cyber_clean.logs.ts_activity
   ts_load:
-    description: ""
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+  contract_group:
+    description: Financial attribute representing contract group on the collection dataset.
+    lineage: []
+  action_code_type:
+    description: Financial attribute representing action code type on the collection dataset.
+    lineage: []
+  action_result_pre_defined_comment:
+    description: Financial attribute representing action result pre defined comment on the collection dataset.
+    lineage: []
+  complement_code_type:
+    description: Financial attribute representing complement code type on the collection dataset.
+    lineage: []
+  result_code_type:
+    description: Financial attribute representing result code type on the collection dataset.
+    lineage: []
+  esforco:
+    description: Financial attribute representing esforco on the collection dataset.
+    lineage: []
+  alo:
+    description: Financial attribute representing alo on the collection dataset.
+    lineage: []
+  agency_name:
+    description: Financial attribute representing agency name on the collection dataset.
+    lineage: []
+  promessa:
+    description: Financial attribute representing promessa on the collection dataset.
+    lineage: []
+  cpc:
+    description: Financial attribute representing cpc on the collection dataset.
+    lineage: []

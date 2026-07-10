@@ -1,16 +1,16 @@
 ---
 database_name: datalake_collections_aud
 table_name: invoice_aud
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Audit trail of invoice transactions with enriched data from related entities. Contains historical changes to invoices with CDC tracking and business day adjustments."
 columns:
   id:
-    description: "Invoice record ID"
+    description: Debt collection attribute describing id for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.id
   id_invoice:
-    description: "Invoice external ID"
+    description: Invoice identifier in the billing or payments platform.
     lineage:
       - datalake_retsuko_transactional.invoice.external_id
   id_original_invoice_external:
@@ -22,25 +22,21 @@ columns:
     lineage:
       - datalake_retsuko_transactional.invoice.account_id
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_retsuko_transactional.invoice.contract_id
   id_checkout_order:
-    description: "Checkout order ID"
+    description: Identifier for the checkout order referenced by this financial record.
     lineage:
       - datalake_retsuko_transactional.invoice.checkout_order_id
   id_checkout_charge:
-    description: "Checkout charge ID"
+    description: Identifier for the checkout charge referenced by this financial record.
     lineage:
       - datalake_retsuko_transactional.invoice.checkout_charge_id
   id_idempotency:
     description: "Idempotency key for duplicate prevention"
     lineage:
       - datalake_retsuko_transactional.invoice.idempotency_id
-  id_contract_external:
-    description: "External contract ID"
-    lineage:
-      - datalake_retsuko_clean.contract.id_external
   log_type:
     description: "Type of CDC operation performed (CREATE, READ, UPDATE, DELETE)"
     lineage:
@@ -54,7 +50,7 @@ columns:
     lineage:
       - datalake_retsuko_transactional.invoice.cdc_binlog_position
   status:
-    description: "Invoice status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_retsuko_transactional.invoice.status
   substatus:
@@ -62,7 +58,7 @@ columns:
     lineage:
       - datalake_retsuko_transactional.invoice.sub_status
   payment_status:
-    description: "Payment status of the invoice"
+    description: Debt collection attribute describing payment status for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.payment_status
   paid_via:
@@ -70,7 +66,7 @@ columns:
     lineage:
       - datalake_retsuko_transactional.invoice.paid_via
   purpose:
-    description: "Purpose of the invoice"
+    description: Debt collection attribute describing purpose for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.purpose
   closing_mode:
@@ -82,23 +78,23 @@ columns:
     lineage:
       - datalake_retsuko_transactional.invoice.reason
   due_amount:
-    description: "Amount due for the invoice"
+    description: Debt collection attribute describing due amount for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.due_amount
   paid_amount:
-    description: "Amount paid for the invoice"
+    description: Debt collection attribute describing paid amount for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.paid_amount
   payment_paid_interest_amount:
-    description: "Interest amount paid"
+    description: Debt collection attribute describing payment paid interest amount for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.payment_paid_interest_amount
   payment_paid_fine_amount:
-    description: "Fine amount paid"
+    description: Debt collection attribute describing payment paid fine amount for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.payment_paid_fine_amount
   accrual_year_month:
-    description: "Year-month of accrual"
+    description: Debt collection attribute describing accrual year month for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.accrual_year_month
   should_request_boleto:
@@ -106,19 +102,19 @@ columns:
     lineage:
       - datalake_retsuko_transactional.invoice.should_request_boleto
   sispag_file:
-    description: "SISPAG file reference"
+    description: Debt collection attribute describing sispag file for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.sispag_file
   payment_company_use_number:
-    description: "Company use number for payment"
+    description: Debt collection attribute describing payment company use number for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.payment_company_use_number
   payment_bank_code:
-    description: "Bank code for payment"
+    description: Debt collection attribute describing payment bank code for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.payment_bank_code
   payment_style_mapped:
-    description: "Mapped payment style"
+    description: Debt collection attribute describing payment style mapped for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.payment_style_mapped
   is_write_off:
@@ -126,7 +122,7 @@ columns:
     lineage:
       - datalake_retsuko_transactional.invoice.write_off
   accrual_year_month_count:
-    description: "Count of accrual year-month entries"
+    description: Debt collection attribute describing accrual year month count for recovery workflow tracking.
     lineage:
       - datalake_retsuko_transactional.invoice.accrual_year_month_count
   dt_due_adjusted:
@@ -223,3 +219,9 @@ columns:
     description: "Day from database transaction"
     lineage:
       - datalake_retsuko_transactional.invoice.day
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  id_contract_internal:
+    description: Identifier for the contract internal referenced by this financial record.
+    lineage: []

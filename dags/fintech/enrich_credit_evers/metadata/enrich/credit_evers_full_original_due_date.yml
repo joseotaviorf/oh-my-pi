@@ -1,6 +1,6 @@
 database_name: datalake_credit_evers
 table_name: credit_evers_full_original_due_date
-owner: ae-finance-fintech@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: Credit Evers (delinquency) contracts with original due date. It reports Ever 'sujo', i.e, contains all kinds of invoices (extra, pos-rental, monthly and onboarding). The granularity of table is contract, mob and ever.
 columns:
@@ -15,7 +15,7 @@ columns:
   id_proposal:
     lineage:
       - datalake_invoice.credit_invoice_original_due_date.id_proposal
-    description: "Proposal ID of contract"
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   months_of_contract:
     description: "Age of contracts in month, if ended, the total age"
   contract_mob_number:
@@ -26,8 +26,6 @@ columns:
     description: "Operation that determines if the delay of invoice is higher than the auxiliary ever classification columns and takes the maximum"
   num_overs_in_mob_window:
     description: "Operation that determines how many times the contract had an invoice positively over in delay by age evolution"
-  total_due_amount_in_mob_window:
-    description: "Operation that determines how much money the contract had over in delay by age evolution"
   num_total_overs:
     description: "Operation that determines how many times the contract had an invoice positively over in delay to maximum age"
   total_due_amount:
@@ -40,3 +38,24 @@ columns:
     lineage:
       - datalake_invoice.credit_invoice_original_due_date.dt_contract_updated
     description: "Last date that the contract had informations updated in main"
+  is_ever_debt_forgiveness:
+    lineage: []
+    description: Indicates whether ever debt forgiveness applies to this financial record.
+  num_total_overs_debt_forgiveness:
+    lineage: []
+    description: Credit analysis attribute describing num total overs debt forgiveness in the tenant underwriting workflow.
+  num_overs_in_mob_window_debt_forgiveness:
+    lineage: []
+    description: Credit analysis attribute describing num overs in mob window debt forgiveness in the tenant underwriting workflow.
+  total_due_amount_debt_forgiveness:
+    lineage: []
+    description: Credit analysis attribute describing total due amount debt forgiveness in the tenant underwriting workflow.
+  dt_reference:
+    lineage: []
+    description: Calendar date associated with reference in the financial workflow.
+  invoice_anchor:
+    lineage: []
+    description: Credit analysis attribute describing invoice anchor in the tenant underwriting workflow.
+  invoice_anchor_debt_forgiveness:
+    lineage: []
+    description: Credit analysis attribute describing invoice anchor debt forgiveness in the tenant underwriting workflow.
