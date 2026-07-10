@@ -2,7 +2,8 @@ database_name: datalake_facebook_insights_impression_device_clean
 table_name: facebook_insights_455006745173996_impression_device
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table of Facebook Insights data with impression device breakdown for account 455006745173996. 
+description: |
+  Facebook Ads insights for a specific ad account broken down by impression device. Partitioned by year, month, and day — use all partition columns in WHERE.
 columns:
   id_ad:
     description: The unique ID of the ad you're viewing in reporting
