@@ -1,3 +1,5 @@
+---
 database_name: datalake_gsheets_raw
 table_name: retention_targets
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br

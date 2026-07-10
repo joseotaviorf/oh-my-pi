@@ -2,6 +2,7 @@
 database_name: datalake_gsheets_raw
 table_name: listings_with_agreed_discounts
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   user_email:
     tags:

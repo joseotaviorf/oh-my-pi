@@ -3,7 +3,7 @@ database_name: datalake_inspections
 table_name: reviewer
 description: Data on inspection reviewers and the history of their approvals/failures in inspection reports
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_reviewer:
     lineage:
@@ -20,10 +20,7 @@ columns:
   id_previous_assessment:
     lineage:
       - datalake_inspection_services_clean.assessment.id_previous_assessment
-    description:
-      If there was any previous assessment for the same contract, it will
-      be indicated in this column. Usually references an assessment from an onboarding
-      or contestation inspection.
+    description: If there was any previous assessment for the same contract, it will be indicated in this column. Usually references an assessment from an onboarding or contestation inspection.
   id_inspection:
     lineage:
       - datalake_inspection_services_clean.assessment.id_inspection
@@ -31,7 +28,7 @@ columns:
   reviewer_type:
     lineage:
       - datalake_inspection_services_clean.reviewer.reviewer_type
-    description: The types of reviewers.
+    description: The types of reviewers captured in the source operational system.
     categories:
       OWNER: Owner of the property.
       TENANT: Tenant of the property.
@@ -60,8 +57,7 @@ columns:
     lineage:
       - datalake_inspection_services_clean.assessment.dt_owner_limit_revision
       - datalake_inspection_services_clean.assessment.dt_tenant_limit_revision
-    description: Deadline for the person to review the inspection report.
-      This column only contains this information for tenants and owners
+    description: Deadline for the person to review the inspection report. This column only contains this information for tenants and owners
   ts_approved:
     lineage:
       - datalake_inspection_services_clean.reviewer.ts_approved
@@ -69,20 +65,20 @@ columns:
   ts_created:
     lineage:
       - datalake_inspection_services_clean.reviewer.ts_created
-    description: Creation date
+    description: Creation date captured in the source operational system.
   ts_updated:
     lineage:
       - datalake_inspection_services_clean.reviewer.ts_updated
-    description: Update date
+    description: Update date captured in the source operational system.
   year:
     lineage:
       - datalake_inspection_services_clean.reviewer.year
-    description: Year of update date.
+    description: Year of update date captured in the source operational system.
   month:
     lineage:
       - datalake_inspection_services_clean.reviewer.month
-    description: Month of update date.
+    description: Month of update date captured in the source operational system.
   day:
     lineage:
       - datalake_inspection_services_clean.reviewer.day
-    description: Day of update date.
+    description: Day of update date captured in the source operational system.

@@ -3,17 +3,14 @@ database_name: datalake_inspections
 table_name: room
 description: Data about the room being inspected.
 domain: For Rent
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_room:
-    description: Room unique identifier.
+    description: Room unique identifier captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.room.id_room
   id_assessment:
-    description: Unique identifier of an Assessment.
-      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
-      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique.
-      It is observed that the extra Assessments are identical, with no data distinction between them.
+    description: Unique identifier of an Assessment. This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug. This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique. It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspection_services_clean.room.id_assessment
   id_room_type:
@@ -29,11 +26,11 @@ columns:
     lineage:
       - datalake_inspection_services_clean.room_type.type
   ts_created:
-    description: Creation date and time.
+    description: Creation date and time captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.room.ts_created
   ts_updated:
-    description: Update date and time.
+    description: Update date and time captured in the source operational system.
     lineage:
       - datalake_inspection_services_clean.room.ts_updated
   year:
