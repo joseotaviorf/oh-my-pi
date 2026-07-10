@@ -1,20 +1,27 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: tenant_service_fee
+description: Regional tenant service fee configuration from EBDB TenantServiceFee. One row per region with the service fee percentage charged to tenants. Consumed by For Rent billing and pricing analytics.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.TenantServiceFee.id
+    description: Surrogate key of the regional tenant service fee record.
   id_region:
     lineage:
       - datalake_ebdb_raw.TenantServiceFee.region_id
+    description: Foreign key to the geographic region where this fee applies.
   fee:
     lineage:
       - datalake_ebdb_raw.TenantServiceFee.fee
+    description: Tenant service fee percentage charged in this region.
   ts_created:
     lineage:
       - datalake_ebdb_raw.TenantServiceFee.criadoEm
+    description: Timestamp when the regional fee record was created.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.TenantServiceFee.atualizadoEm
+    description: Timestamp when the regional fee record was last updated.

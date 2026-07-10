@@ -1,6 +1,7 @@
+---
 database_name: datalake_ebdb_clean
 table_name: pro_owner_fee_aud
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 description: Table that contains the historical changes of the table pro_owner_fee.
   The id_pro_owner column may contain duplicated IDs due to the changes.
 domain: For Rent
@@ -12,8 +13,7 @@ columns:
   id_user_pro_owner:
     lineage:
       - datalake_ebdb_raw.proownerfee_aud.user_pro_owner_id
-    description: ID related to UserProOwner table.
-      It can be joined with the ID table from datalake_ebdb_clean.user_pro_owner
+    description: ID related to UserProOwner table. It can be joined with the ID table from datalake_ebdb_clean.user_pro_owner
   rev:
     lineage:
       - datalake_ebdb_raw.proownerfee_aud.rev

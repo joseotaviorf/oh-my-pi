@@ -1,23 +1,31 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: property_fee_assigned
+description: Assignment of property fee rules to contracts and houses from EBDB PropertyFeeAssigned. One row per fee rule linked to a contract and property. Used by For Rent billing and administration analytics.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned.id
+    description: Surrogate key of the property fee assignment record on EBDB.
   id_contract:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned.contract_id
+    description: Foreign key to the rental contract receiving this fee rule.
   id_house:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned.imovel_id
+    description: Foreign key to the house property linked to this fee assignment.
   id_property_fee:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned.propertyfee_id
+    description: Foreign key to the property fee catalog rule being assigned.
   ts_created:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned.criadoEm
+    description: Timestamp when the fee assignment was created.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned.atualizadoEm
+    description: Timestamp when the fee assignment was last updated.

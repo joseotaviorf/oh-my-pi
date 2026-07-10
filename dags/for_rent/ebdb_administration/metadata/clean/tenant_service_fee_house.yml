@@ -1,20 +1,27 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: tenant_service_fee_house
+description: House-level tenant service fee overrides from EBDB TenantServiceFeeHouse. One row per property with a custom service fee percentage. Used when regional defaults do not apply.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.TenantServiceFeeHouse.id
+    description: Surrogate key of the house-level tenant service fee override.
   id_house:
     lineage:
       - datalake_ebdb_raw.TenantServiceFeeHouse.house_id
+    description: Foreign key to the house property with a custom service fee.
   fee:
     lineage:
       - datalake_ebdb_raw.TenantServiceFeeHouse.fee
+    description: Custom tenant service fee percentage for this specific property.
   ts_created:
     lineage:
       - datalake_ebdb_raw.TenantServiceFeeHouse.criadoEm
+    description: Timestamp when the house fee override was created.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.TenantServiceFeeHouse.atualizadoEm
+    description: Timestamp when the house fee override was last updated.

@@ -1,6 +1,7 @@
+---
 database_name: datalake_ebdb_clean
 table_name: pro_owner_fee
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 description: Table that contains the PP Multi's owners/landlords adminstration fee.
 domain: For Rent
 columns:
@@ -11,8 +12,7 @@ columns:
   id_user_pro_owner:
     lineage:
       - datalake_ebdb_raw.proownerfee.user_pro_owner_id
-    description: ID related to UserProOwner table.
-      It can be joined with the ID table from datalake_ebdb_clean.user_pro_owner
+    description: ID related to UserProOwner table. It can be joined with the ID table from datalake_ebdb_clean.user_pro_owner
   adm_fee:
     lineage:
       - datalake_ebdb_raw.proownerfee.adm_fee

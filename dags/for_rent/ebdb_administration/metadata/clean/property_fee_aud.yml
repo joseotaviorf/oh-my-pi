@@ -1,59 +1,79 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: property_fee_aud
+description: Hibernate Envers audit history of property fee rules from EBDB PropertyFee_AUD. Each row is one revision of a fee catalog entry. Used for administration pricing change tracking.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.id
+    description: Surrogate key of the property fee rule at this audit revision.
   rev:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   contract_type:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.contractType
+    description: Rental contract type this fee rule applied to at this revision.
   category:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.category
+    description: Rental value segment label used to stratify survey and metric results.
   region_type:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.regionType
+    description: Geographic region type where this fee rule was valid at this revision.
   body_observation:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.bodyObservation
+    description: Additional observation text in the fee detail body at this revision.
   body_text:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.bodyText
+    description: Main body text explaining the fee rule at this revision.
   body_title:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.bodyTitle
+    description: Title of the fee detail body section at this revision.
   header_subtitle:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.headerSubTitle
+    description: Subtitle displayed in the fee rule header at this revision.
   header_title:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.headerTitle
+    description: Main title displayed in the fee rule header at this revision.
   promotion_tag:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.promotionTag
+    description: Marketing tag label for promotional campaigns at this revision.
   promotion_url:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.promotionUrl
+    description: URL linking to promotional campaign details at this revision.
   fee:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.fee
+    description: Standard administration fee percentage at this revision.
   promotional_adm_fee:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.promotionalAdmFee
+    description: Reduced promotional administration fee percentage at this revision.
   promotional_period:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.promotionalPeriod
+    description: Duration in months of the promotional fee period at this revision.
   ts_valid_from:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.validFrom
+    description: Timestamp when this fee rule became effective at this revision.
   ts_valid_until:
     lineage:
       - datalake_ebdb_raw.propertyfee_aud.validUntil
+    description: Timestamp when this fee rule expired at this revision.

@@ -1,55 +1,75 @@
+---
 database_name: datalake_ebdb_clean
 table_name: doorman_affiliate_data
+description: Doorman affiliate program enrollment data from EBDB DoormanAffiliateData. One row per doorman with work location, recruiter, and program join details. Used by For Rent administration and affiliate analytics.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.id
+    description: Surrogate key of the doorman affiliate record on EBDB.
   work_address:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.workaddress
+    description: Full work address where the doorman is assigned.
   work_house_number:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.workhousenumber
+    description: Street number of the doorman work location.
   code:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.code
+    description: Unique affiliate referral or enrollment code for the doorman.
   work_neighborhood:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.workneighbourhood
+    description: Neighborhood of the doorman work location.
   work_city:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.workcity
+    description: City where the doorman performs affiliate activities.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.atualizadoem
+    description: Timestamp when the affiliate record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.criadoem
+    description: Timestamp when the affiliate record was created.
   ts_joined:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.joinedprogramat
+    description: Timestamp when the doorman joined the affiliate program.
   lat:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.lat
+    description: Latitude coordinate of the doorman work location.
   lng:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.lng
+    description: Longitude coordinate of the doorman work location.
   id_place:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.placeid
+    description: Google Places identifier for the doorman work location.
   subscription_source:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.subscriptionsource
+    description: Channel through which the doorman enrolled in the program.
   work_state:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.workstate
+    description: State or region of the doorman work location.
   work_street:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.workstreet
+    description: work street captured in the source operational system.
   recrutier:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.recruiter
+    description: recrutier captured in the source operational system.
   id_doorman_occupation:
     lineage:
       - datalake_ebdb_raw.doormanaffiliatedata.doorman_occupation_id
+    description: Foreign key to the doorman occupation type reference.

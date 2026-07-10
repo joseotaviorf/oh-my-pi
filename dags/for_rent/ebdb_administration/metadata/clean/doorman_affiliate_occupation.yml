@@ -1,22 +1,31 @@
+---
 database_name: datalake_ebdb_clean
 table_name: doorman_affiliate_occupation
+description: Doorman occupation type reference from EBDB DoormanAffiliateOccupation. One row per occupation category with display rank. Used to classify doorman affiliates in administration analytics.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.doormanaffiliateoccupation.id
+    description: Surrogate key of the doorman occupation type on EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.doormanaffiliateoccupation.atualizadoem
+    description: Timestamp when the occupation type was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.doormanaffiliateoccupation.criadoem
+    description: Timestamp when the occupation type was created.
   name:
     lineage:
       - datalake_ebdb_raw.doormanaffiliateoccupation.name
+    description: Display name of the doorman occupation category.
   rank:
     lineage:
       - datalake_ebdb_raw.doormanaffiliateoccupation.rank
+    description: Sort order rank for displaying occupation types in the UI.
   is_active:
     lineage:
       - datalake_ebdb_raw.doormanaffiliateoccupation.active
+    description: Flag indicating whether this occupation type is currently available.

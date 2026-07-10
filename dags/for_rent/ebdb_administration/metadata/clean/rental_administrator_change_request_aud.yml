@@ -1,38 +1,51 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: rental_administrator_change_request_aud
+description: Hibernate Envers audit history of rental administrator change requests from EBDB RentalAdministratorChangeRequest_AUD. Each row is one revision of a migration request. Used for administration change tracking.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_rental_administrator_change_request:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.id
+    description: Surrogate key of the administrator change request at this revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.houseId
+    description: Foreign key to the house property at this revision.
   rev:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   old_rental_administrator:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.oldRentalAdministrator
+    description: Previous rental administrator at this revision.
   new_rental_administrator:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.newRentalAdministrator
+    description: Target rental administrator at this revision.
   status:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.status
+    description: Workflow status of the change request at this revision.
   mod_status:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.status_MOD
+    description: Flag indicating whether the status field changed in this revision.
   mod_migrated:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.migratedAt_MOD
+    description: Flag indicating whether the migration timestamp changed in this revision.
   ts_created:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.created_at
+    description: Timestamp when the change request was created at this revision.
   ts_migrated:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest_aud.migratedAt
+    description: Timestamp when the administrator change was completed at this revision.

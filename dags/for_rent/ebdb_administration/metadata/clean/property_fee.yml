@@ -1,59 +1,79 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: property_fee
+description: Property administration fee catalog from EBDB PropertyFee. One row per fee rule with promotional terms and display content. Consumed by billing and For Rent administration pricing analytics.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.propertyfee.id
+    description: Surrogate key of the property fee rule on EBDB.
   contract_type:
     lineage:
       - datalake_ebdb_raw.propertyfee.contractType
+    description: Rental contract type this fee rule applies to.
   category:
     lineage:
       - datalake_ebdb_raw.propertyfee.category
+    description: Rental value segment label used to stratify survey and metric results.
   region_type:
     lineage:
       - datalake_ebdb_raw.propertyfee.regionType
+    description: Geographic region type where this fee rule is valid.
   body_observation:
     lineage:
       - datalake_ebdb_raw.propertyfee.bodyObservation
+    description: Additional observation text shown in the fee detail body.
   body_text:
     lineage:
       - datalake_ebdb_raw.propertyfee.bodyText
+    description: Main body text explaining the fee rule to customers.
   body_title:
     lineage:
       - datalake_ebdb_raw.propertyfee.bodyTitle
+    description: Title of the fee detail body section in the UI.
   header_subtitle:
     lineage:
       - datalake_ebdb_raw.propertyfee.headerSubTitle
+    description: Subtitle displayed in the fee rule header section.
   header_title:
     lineage:
       - datalake_ebdb_raw.propertyfee.headerTitle
+    description: Main title displayed in the fee rule header section.
   promotion_tag:
     lineage:
       - datalake_ebdb_raw.propertyfee.promotionTag
+    description: Marketing tag label for promotional fee campaigns.
   promotion_url:
     lineage:
       - datalake_ebdb_raw.propertyfee.promotionUrl
+    description: URL linking to promotional fee campaign details.
   fee:
     lineage:
       - datalake_ebdb_raw.propertyfee.fee
+    description: Standard administration fee percentage for this rule.
   promotional_adm_fee:
     lineage:
       - datalake_ebdb_raw.propertyfee.promotionalAdmFee
+    description: Reduced promotional administration fee percentage when active.
   promotional_period:
     lineage:
       - datalake_ebdb_raw.propertyfee.promotionalPeriod
+    description: Duration in months of the promotional fee period.
   ts_valid_from:
     lineage:
       - datalake_ebdb_raw.propertyfee.validFrom
+    description: Timestamp when this fee rule becomes effective.
   ts_valid_until:
     lineage:
       - datalake_ebdb_raw.propertyfee.validUntil
+    description: Timestamp when this fee rule expires.
   ts_created:
     lineage:
       - datalake_ebdb_raw.propertyfee.criadoEm
+    description: Timestamp when the fee rule record was created.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.propertyfee.atualizadoEm
+    description: Timestamp when the fee rule record was last updated.

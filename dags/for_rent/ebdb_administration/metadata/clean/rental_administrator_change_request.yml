@@ -1,29 +1,39 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: rental_administrator_change_request
+description: Requests to change the rental administrator of a property from EBDB RentalAdministratorChangeRequest. One row per migration request with old and new administrator. Used by For Rent administration operations analytics.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_rental_administrator_change_request:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest.id
+    description: Surrogate key of the rental administrator change request.
   id_house:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest.houseId
+    description: Foreign key to the house property undergoing administrator change.
   old_rental_administrator:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest.oldRentalAdministrator
+    description: Previous rental administrator before the requested change.
   new_rental_administrator:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest.newRentalAdministrator
+    description: Target rental administrator after the requested change.
   status:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest.status
+    description: Workflow status of the administrator change request.
   ts_migrated:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest.migratedAt
+    description: Timestamp when the administrator change was completed.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest.updated_at
+    description: Timestamp when the change request was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.rentaladministratorchangerequest.created_at
+    description: Timestamp when the change request was created.

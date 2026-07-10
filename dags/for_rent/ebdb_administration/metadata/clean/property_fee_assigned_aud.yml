@@ -1,23 +1,31 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: property_fee_assigned_aud
+description: Hibernate Envers audit history of property fee assignments from EBDB PropertyFeeAssigned_AUD. Each row is one revision of a fee-to-contract link. Used for administration pricing audit trails.
 domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned_aud.id
+    description: Surrogate key of the fee assignment at this audit revision.
   id_contract:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned_aud.contract_id
+    description: Foreign key to the rental contract at this revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned_aud.imovel_id
+    description: Foreign key to the house property at this revision.
   id_property_fee:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned_aud.propertyfee_id
+    description: Foreign key to the property fee catalog rule at this revision.
   rev:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_ebdb_raw.propertyfeeassigned_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).

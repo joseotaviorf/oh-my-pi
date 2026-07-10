@@ -1,9 +1,10 @@
+---
 database_name: datalake_ebdb_clean
 table_name: consumption_bill_aud
 description: AUD Consumptions bill table from EBDB source.
   It registers the consumptions types of the houses with it's and owner's info.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -12,11 +13,11 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud.imovel_id
-    description: ID of the house from EBDB source.
+    description: Foreign key to the rental property linked to this utility account.
   id_supplier:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud.supplier_id
-    description: ID of the bill supplier.
+    description: Foreign key to the utility company or supplier issuing the bill.
   rev:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud_aud.rev
@@ -28,15 +29,15 @@ columns:
   installation_code:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud.codigoinstalacao
-    description: Installation code.
+    description: Utility provider installation code for the meter at the property.
   type:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud.tipo
-    description: Type of the consumption bill.
+    description: Utility category such as water, gas, or electricity for this account.
   type_charging_bill:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud.chargingBillType
-    description: Type of the charging bill.
+    description: Billing model used by the utility provider for this account.
   titularity:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud.titularidade
@@ -49,30 +50,6 @@ columns:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud.cpftitular
     description: CPF (Individal Taxpayer Registration) of the holder.
-  zip_code:
-    lineage:
-      - datalake_ebdb_raw.contaconsumo_aud.endereco_cep
-    description: Zip code of the house.
-  address:
-    lineage:
-      - datalake_ebdb_raw.contaconsumo_aud.endereco_logradouro
-    description: House's address.
-  number:
-    lineage:
-      - datalake_ebdb_raw.contaconsumo_aud.endereco_numero
-    description: House's number.
-  complement:
-    lineage:
-      - datalake_ebdb_raw.contaconsumo_aud.endereco_complemento
-    description: House's complement.
-  neighborhood:
-    lineage:
-      - datalake_ebdb_raw.contaconsumo_aud.endereco_bairro
-    description: House's neighborhood.
-  city:
-    lineage:
-      - datalake_ebdb_raw.contaconsumo_aud.endereco_cidade
-    description: House's city.
   is_condo_included:
     lineage:
       - datalake_ebdb_raw.contaconsumo_aud.isInclusaCondominio
