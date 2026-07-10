@@ -2,7 +2,8 @@ database_name: datalake_gsheets_clean
 table_name: criteo_costs  
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table load Criteo Costs Report by region from gsheets sent by Criteo team.
+description: |
+  Criteo campaign cost reference data synced from Google Sheets for Growth media cost allocation.
 columns:
   id_advertiser:
     description: Advertiser id of the campaign

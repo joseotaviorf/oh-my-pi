@@ -4,13 +4,7 @@ table_name: facebook_insights_region
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
-  Enrich layer consolidating Facebook Ads Insights with geographic region breakdown across seven
-  QuintoAndar ad accounts. Grain is one row per ad, region, and reporting day (dt_start). Metrics
-  include clicks, impressions, inline link clicks, spend, and actions. Built by UNION ALL of
-  per-account clean tables in datalake_facebook_insights_region_clean. Consumed by growth marketing
-  pipelines (e.g. facebook_metrics, campaign_name_history). Physically partitioned by year, month,
-  and day derived from dt_start (default_partitions in enrich_facebook_insights DAG);
-  Always filter year, month, and day together for partition pruning.
+  Enriched Facebook Ads insights with taxonomy and campaign naming for Growth marketing dashboards. Partitioned by year, month, and day.
 columns:
   id_ad:
     description: Unique identifier for the Facebook ad

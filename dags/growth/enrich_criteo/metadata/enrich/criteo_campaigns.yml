@@ -2,9 +2,8 @@ database_name: datalake_criteo
 table_name: criteo_campaigns  
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Criteo paid media campaign performance report broken down by advertiser, campaign, ad set, and geographic region.
-  Data is sourced from a Google Sheets file sent by the Criteo team and loaded incrementally by report date.
-  Partitioned by `year`, `month` and `day`, always use these columns in the WHERE clause to enable partition pruning.
+description: |
+  Enriched Criteo campaign metrics with advertiser and ad set dimensions for Growth performance marketing. Z-ordered by id_advertiser, id_ad_set, advertiser_name, ad_set, and dt_report. Partitioned by year, month, and day.
 columns:
   id_advertiser:
     description: Unique identifier of the Criteo advertiser account.

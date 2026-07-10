@@ -2,8 +2,8 @@ database_name: datalake_facebook_insights_clean
 table_name: facebook_ads_insights_by_region
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table load Facebook Insights Performance Report from Facebook Ads API extraction with Region breakdown/field. 
-  Documentation can be found at https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/insights/
+description: |
+  Facebook Ads insights broken down by geographic region for regional campaign analysis. Filter year, month, and day together for partition pruning.
 columns:
   id_ad:
     description: The unique ID of the ad you're viewing in reporting
