@@ -1,11 +1,11 @@
 ---
 database_name: metric_rent
 table_name: visits_booked_per_ongoing_listings_weekly_by_sk_region
-description:
+description: |
   Weekly table with the amount of Visits Booked divided by the Ongoing Listing segmented by sk_region.
   Metric used to connect the supply and demand funnels.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   week_start:
     lineage:
@@ -15,20 +15,18 @@ columns:
   sk_region:
     lineage:
       - dw_public.dim_region.sk_region
-    description: Region identifier.
+    description: Region identifier captured in the source operational system.
     dimension: True
   country_code:
     lineage:
       - dw_rent.fact_listing_rent_flows.country_code
-    description: Country code of the house
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   visits_booked_per_ongoing_listings:
-    description:
-      Total of Visits Booked divided by the Ongoing Listing on a week segmented by region.
-      Metric used to connect the supply and demand funnels.
+    description: Total of Visits Booked divided by the Ongoing Listing on a week segmented by region. Metric used to connect the supply and demand funnels.
     metric:
       name: Visits Booked per Ongoing Listings Weekly by SK Region
-      description:
+      description: 
         Total of Visits Booked divided by the Ongoing Listing on a week segmented by region.
         Metric used to connect the supply and demand funnels.
       acronym: VB2OL

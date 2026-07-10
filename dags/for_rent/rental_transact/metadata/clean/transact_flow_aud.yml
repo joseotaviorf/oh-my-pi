@@ -1,33 +1,43 @@
+---
 database_name: datalake_rental_transact_clean
 table_name: transact_flow_aud
 description: This table has the all status changes of each transact flow. Each line is a different transact flow update.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.id
+    description: Surrogate key identifying this transact flow aud record in the rental_transact pipeline.
   id_house:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.house_external_id
+    description: id house captured in the source operational system.
   rev:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_end:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.revend
+    description: rev end captured in the source operational system.
   rev_type:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   mod_status:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.status_mod
+    description: Flag indicating whether the status field changed in this revision.
   status:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.status
+    description: status captured in the source operational system.
   ts_created:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.created_at
+    description: Record creation date
   ts_updated:
     lineage:
       - datalake_rental_transact_raw.transact_flow_aud.updated_at
+    description: Record update date

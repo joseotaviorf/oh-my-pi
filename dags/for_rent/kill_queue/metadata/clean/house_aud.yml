@@ -1,61 +1,83 @@
+---
 database_name: datalake_kill_queue_clean
 table_name: house_aud
+description: Clean layer table for house aud from the kill_queue pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_raw.house_aud.id
+    description: Surrogate key identifying this house aud record in the kill_queue pipeline.
   id_main:
     lineage:
       - datalake_kill_queue_raw.house_aud.main_id
+    description: id main captured in the source operational system.
   id_owner:
     lineage:
       - datalake_kill_queue_raw.house_aud.owner_id
+    description: id owner captured in the source operational system.
   id_region:
     lineage:
       - datalake_kill_queue_raw.house_aud.region_id
+    description: id region captured in the source operational system.
   rev:
     lineage:
       - datalake_kill_queue_raw.house_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_kill_queue_raw.house_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   rev_end:
     lineage:
       - datalake_kill_queue_raw.house_aud.revend
+    description: rev end captured in the source operational system.
   city:
     lineage:
       - datalake_kill_queue_raw.house_aud.city
+    description: city captured in the source operational system.
   complement:
     lineage:
       - datalake_kill_queue_raw.house_aud.complement
+    description: complement captured in the source operational system.
   floor:
     lineage:
       - datalake_kill_queue_raw.house_aud.floor
+    description: floor captured in the source operational system.
   house_number:
     lineage:
       - datalake_kill_queue_raw.house_aud.house_number
+    description: house number captured in the source operational system.
   state:
     lineage:
       - datalake_kill_queue_raw.house_aud.state
+    description: state captured in the source operational system.
   street_address:
     lineage:
       - datalake_kill_queue_raw.house_aud.street_address
+    description: street address captured in the source operational system.
   rent_price:
     lineage:
       - datalake_kill_queue_raw.house_aud.rent_price
+    description: rent price captured in the source operational system.
   reservation_fee:
     lineage:
       - datalake_kill_queue_raw.house_aud.reservation_fee
+    description: reservation fee captured in the source operational system.
   is_reservation_allowed:
     lineage:
       - datalake_kill_queue_raw.house_aud.reservation_allowed
+    description: is reservation allowed captured in the source operational system.
   mod_has_rent_price:
     lineage:
       - datalake_kill_queue_raw.house_aud.rent_price_mod
+    description: Flag indicating whether the has rent price field changed in this revision.
   mod_has_reservation_fee:
     lineage:
       - datalake_kill_queue_raw.house_aud.reservation_fee_mod
+    description: Flag indicating whether the has reservation fee field changed in this revision.
   mod_is_reservation_allowed:
     lineage:
       - datalake_kill_queue_raw.house_aud.reservation_allowed_mod
+    description: Flag indicating whether the is reservation allowed field changed in this revision.

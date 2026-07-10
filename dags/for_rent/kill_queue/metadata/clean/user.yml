@@ -1,40 +1,55 @@
+---
 database_name: datalake_kill_queue_clean
 table_name: user
+description: Clean layer table for user from the kill_queue pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_raw.user.id
+    description: id captured in the source operational system.
   id_main:
     lineage:
       - datalake_kill_queue_raw.user.main_id
+    description: id main captured in the source operational system.
   cell_phone:
     lineage:
       - datalake_kill_queue_raw.user.cellphone
+    description: cell phone captured in the source operational system.
   cpf:
     lineage:
       - datalake_kill_queue_raw.user.cpf
+    description: cpf captured in the source operational system.
   email:
     lineage:
       - datalake_kill_queue_raw.user.email
+    description: Email address used for communication about this record.
   name:
     lineage:
       - datalake_kill_queue_raw.user.name
+    description: Display or legal name associated with this record.
   version:
     lineage:
       - datalake_kill_queue_raw.user.version
+    description: Optimistic locking revision counter for concurrent update safety.
   ts_created:
     lineage:
       - datalake_kill_queue_raw.user.created_at
+    description: Record creation date
   ts_updated:
     lineage:
       - datalake_kill_queue_raw.user.updated_at
+    description: Record update date
   year:
     lineage:
       - datalake_kill_queue_raw.user.year
+    description: Year of update date.
   month:
     lineage:
       - datalake_kill_queue_raw.user.month
+    description: Month of update date.
   day:
     lineage:
       - datalake_kill_queue_raw.user.day
+    description: Day of update date.

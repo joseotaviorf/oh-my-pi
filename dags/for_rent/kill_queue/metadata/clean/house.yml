@@ -1,61 +1,83 @@
+---
 database_name: datalake_kill_queue_clean
 table_name: house
+description: Clean layer table for house from the kill_queue pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_raw.house.id
+    description: id captured in the source operational system.
   id_main:
     lineage:
       - datalake_kill_queue_raw.house.main_id
+    description: id main captured in the source operational system.
   id_owner:
     lineage:
       - datalake_kill_queue_raw.house.owner_id
+    description: id owner captured in the source operational system.
   id_region:
     lineage:
       - datalake_kill_queue_raw.house.region_id
+    description: id region captured in the source operational system.
   city:
     lineage:
       - datalake_kill_queue_raw.house.city
+    description: city captured in the source operational system.
   complement:
     lineage:
       - datalake_kill_queue_raw.house.complement
+    description: complement captured in the source operational system.
   house_number:
     lineage:
       - datalake_kill_queue_raw.house.house_number
+    description: house number captured in the source operational system.
   street_address:
     lineage:
       - datalake_kill_queue_raw.house.street_address
+    description: street address captured in the source operational system.
   state:
     lineage:
       - datalake_kill_queue_raw.house.state
+    description: state captured in the source operational system.
   version:
     lineage:
       - datalake_kill_queue_raw.house.version
+    description: Optimistic locking revision counter for concurrent update safety.
   floor:
     lineage:
       - datalake_kill_queue_raw.house.floor
+    description: floor captured in the source operational system.
   rent_price:
     lineage:
       - datalake_kill_queue_raw.house.rent_price
+    description: rent price captured in the source operational system.
   reservation_fee:
     lineage:
       - datalake_kill_queue_raw.house.reservation_fee
+    description: reservation fee captured in the source operational system.
   is_reservation_allowed:
     lineage:
       - datalake_kill_queue_raw.house.reservation_allowed
+    description: is reservation allowed captured in the source operational system.
   ts_created:
     lineage:
       - datalake_kill_queue_raw.house.created_at
+    description: Record creation date
   ts_updated:
     lineage:
       - datalake_kill_queue_raw.house.updated_at
+    description: Record update date
   year:
     lineage:
       - datalake_kill_queue_raw.house.year
+    description: Year of update date.
   month:
     lineage:
       - datalake_kill_queue_raw.house.month
+    description: Month of update date.
   day:
     lineage:
       - datalake_kill_queue_raw.house.day
+    description: Day of update date.

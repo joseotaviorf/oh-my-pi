@@ -1,19 +1,27 @@
+---
 database_name: datalake_kill_queue_clean
 table_name: charge_aud
+description: Clean layer table for charge aud from the kill_queue pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_raw.charge_aud.id
+    description: Surrogate key identifying this charge aud record in the kill_queue pipeline.
   id_reservation:
     lineage:
       - datalake_kill_queue_raw.charge_aud.reservation_id
+    description: id reservation captured in the source operational system.
   rev:
     lineage:
       - datalake_kill_queue_raw.charge_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_kill_queue_raw.charge_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   rev_end:
     lineage:
       - datalake_kill_queue_raw.charge_aud.revend
+    description: rev end captured in the source operational system.

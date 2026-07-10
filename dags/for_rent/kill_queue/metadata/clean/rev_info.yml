@@ -1,19 +1,27 @@
+---
 database_name: datalake_kill_queue_clean
 table_name: rev_info
+description: Clean layer table for rev info from the kill_queue pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   rev:
     lineage:
       - datalake_kill_queue_raw.revinfo.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   ts_rev:
     lineage:
       - datalake_kill_queue_raw.revinfo.revtstmp
+    description: ts rev captured in the source operational system.
   year:
     lineage:
       - datalake_kill_queue_raw.revinfo.year
+    description: Year of update date.
   month:
     lineage:
       - datalake_kill_queue_raw.revinfo.month
+    description: Month of update date.
   day:
     lineage:
       - datalake_kill_queue_raw.revinfo.day
+    description: Day of update date.

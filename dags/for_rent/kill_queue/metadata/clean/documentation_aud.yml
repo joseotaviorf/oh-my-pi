@@ -1,37 +1,51 @@
+---
 database_name: datalake_kill_queue_clean
 table_name: documentation_aud
+description: Clean layer table for documentation aud from the kill_queue pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.id
+    description: Surrogate key identifying this documentation aud record in the kill_queue pipeline.
   id_house:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.house_id
+    description: id house captured in the source operational system.
   id_tenant:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.tenant_id
+    description: id tenant captured in the source operational system.
   rev:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   rev_end:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.revend
+    description: rev end captured in the source operational system.
   is_active:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.active
+    description: is active captured in the source operational system.
   mod_is_active:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.active_mod
+    description: Flag indicating whether the is active field changed in this revision.
   mod_ts_expired:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.expires_at_mod
+    description: Flag indicating whether the ts expired field changed in this revision.
   ts_expired:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.expires_at
+    description: ts expired captured in the source operational system.
   ts_event:
     lineage:
       - datalake_kill_queue_raw.documentation_aud.event_date
+    description: ts event captured in the source operational system.

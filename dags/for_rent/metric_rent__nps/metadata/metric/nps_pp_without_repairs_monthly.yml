@@ -3,17 +3,17 @@ database_name: metric_rent
 table_name: nps_pp_without_repairs_monthly
 description: Monthly NPS of owners with contract termination without repair needed.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   month_answers:
     lineage:
       - dw_retention.dim_nps_answer.ts_answered
-    description: "Month of the answers."
+    description: Month of the answers captured in the source operational system.
     dimension: True
   category:
     lineage:
       - dw_rent.dim_contract.value_segment
-    description: "Category of rent value."
+    description: Rental value segment label used to stratify survey and metric results.
     categories:
       LOW: Rent lower than R$1500,00.
       MEDIUM: Rent between R$1500,01 and R$2499,99.
@@ -24,7 +24,7 @@ columns:
   country_code:
     lineage:
       - dw_rent.dim_contract.country_code
-    description: "Country code of the house"
+    description: ISO country code for geographic filtering of the analytical metric.
     dimension: True
   promoters_no_repairs_need:
     description: "Volume of promoters among owners that answered the NPS survey after a contract termination without the need of repairs."

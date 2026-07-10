@@ -1,55 +1,75 @@
+---
 database_name: datalake_kill_queue_clean
 table_name: reservation_aud
+description: Clean layer table for reservation aud from the kill_queue pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.id
+    description: Surrogate key identifying this reservation aud record in the kill_queue pipeline.
   id_house:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.house_id
+    description: id house captured in the source operational system.
   id_rent_flow:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.rent_flow_id
+    description: id rent flow captured in the source operational system.
   id_tenant:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.tenant_id
+    description: id tenant captured in the source operational system.
   rev:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.rev
+    description: Envers revision number; join to user_revision_entity for change context.
   rev_type:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.revtype
+    description: Envers operation type for this revision (insert, update, or delete).
   rev_end:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.revend
+    description: rev end captured in the source operational system.
   attempt:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.attempt
+    description: attempt captured in the source operational system.
   cancellation_reason:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.cancellation_reason
+    description: cancellation reason captured in the source operational system.
   mundipagg_token:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.mundipagg_token
+    description: mundipagg token captured in the source operational system.
   status:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.status
+    description: status captured in the source operational system.
   value:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.value
+    description: value captured in the source operational system.
   mod_has_attempt:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.attempt_mod
+    description: Flag indicating whether the has attempt field changed in this revision.
   mod_has_cancellation_reason:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.cancellation_reason_mod
+    description: Flag indicating whether the has cancellation reason field changed in this revision.
   mod_has_mundipagg_token:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.mundipagg_token_mod
+    description: Flag indicating whether the has mundipagg token field changed in this revision.
   mod_has_status:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.status_mod
+    description: Flag indicating whether the has status field changed in this revision.
   mod_has_value:
     lineage:
       - datalake_kill_queue_raw.reservation_aud.value_mod
+    description: Flag indicating whether the has value field changed in this revision.
