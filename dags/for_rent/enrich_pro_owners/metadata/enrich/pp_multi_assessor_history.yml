@@ -5,14 +5,14 @@ description: Enrich table with historical informations of all PP Multi users and
   In this context, the assessor is the figure who is associated with the owner's property contract.
   This historical table has records of the last 6 months of each PP Multi and which assessors were associated with it.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_user:
     lineage:
       - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
       - datalake_ebdb_contract.contract_person.id_user_contract_person
       - datalake_ebdb_contract.contract_person.contract_role
-    description: ID of the user.
+    description: EBDB user identifier of the PP Multi landlord receiving assessor support.
   id_owner:
     lineage:
       - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner 
@@ -22,21 +22,21 @@ columns:
       - datalake_ebdb_contract.contract_person.id_user_contract_person
       - datalake_ebdb_contract.contract_person.contract_role
       - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
-    description: ID of the assessor.
+    description: EBDB user identifier of the QuintoAndar assessor assigned to the landlord.
   user_name:
     lineage:
       - datalake_ebdb_user.user.name
-    description: Name of the user.
+    description: Display name of the PP Multi landlord in the assessor relationship.
   user_email:
     lineage:
       - datalake_ebdb_user.user.email
-    description: Email of the user.
+    description: Contact email of the PP Multi landlord used by the assessor team.
   user_role:
     lineage:
       - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
       - datalake_ebdb_contract.contract_person.id_user_contract_person
       - datalake_ebdb_contract.contract_person.contract_role
-    description: Classification of the user.
+    description: Role of the user involved in the workflow, such as tenant or owner.
     categories:
       PP: PP Multi User.
       ASS: Assessor User.

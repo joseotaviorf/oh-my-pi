@@ -6,16 +6,16 @@ description: Enrich table that cointains the weekly amount of houses,
   Each row is the amount of houses for each owner at the end 
   of each week at the time of the snapshot (stored in the [year, month, day] keys).
 domain: For Rent
-owner: ddata-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_owner:
     lineage:
       - datalake_pro_owners.owner_houses_quantity_history.id_owner
-    description: User ID (Owner)
+    description: EBDB user identifier of the landlord whose weekly house count is summarized.
   houses:
     lineage:
       - datalake_pro_owners.owner_houses_quantity_history.houses
-    description: Amount of houses
+    description: Count of distinct published houses owned by the landlord at the end of the week.
   dt_week_end:
     lineage:
       - dw_public.dim_date.week_end

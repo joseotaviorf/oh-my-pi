@@ -1,14 +1,15 @@
+---
 database_name: datalake_pro_owners
 table_name: owner_houses_quantity_history
 description: Historical enriched table for rent context. It contains the changes of
   owner's quantity houses, just considering rent and not b2b houses
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_owner:
     lineage:
     - datalake_pro_owners.house_b2b_history.id_user
-    description: Id user of the owner
+    description: EBDB user identifier of the landlord whose portfolio size changes are tracked.
   rental_administrator:
     lineage:
     - datalake_ebdb_listing.rent_listing.rental_administrator
@@ -20,7 +21,7 @@ columns:
     lineage:
     - datalake_pro_owners.house_b2b_history.ts_ended
     - datalake_ebdb_listing.house_listing_status.ts_status_started
-    description: Timestamp of how long the changes remained
+    description: Timestamp marking the end of the period when the owner had this specific quantity of houses.
   ts_house_number_started:
     lineage:
     - datalake_pro_owners.house_b2b_history.ts_started

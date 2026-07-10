@@ -1,3 +1,4 @@
+---
 database_name: datalake_pro_owners
 table_name: daily_owner_houses_quantity_history
 description: Historical enriched table for rent context (PP Multi - Pro owner). Each
@@ -10,13 +11,13 @@ description: Historical enriched table for rent context (PP Multi - Pro owner). 
   two columns will reflect the current state of pp_multi_user, not the historical
   state on that date.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_owner:
     lineage:
     - datalake_ebdb_user.user_merge.id_user
     - datalake_pro_owners.house_b2b_history.id_user
-    description: Id user of the owner.
+    description: EBDB user identifier of the landlord whose daily published house count is tracked.
   id_account_manager:
     lineage:
     - datalake_rental_management_clean.pp_multi_user.account_manager_id
@@ -24,7 +25,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
-    description: Country code of the user.
+    description: ISO country code for geographic filtering of the analytical metric.
   houses_published:
     description: Quantity of distincts houses that the owner has on a respective day with status 'publicado' or 'PUBLISHED'.
   houses_suspended:
@@ -42,15 +43,11 @@ columns:
   total_houses:
     description: Quantity of distincts houses that the owner has on a respective day independent of the status.
   brokerage_only_houses:
-    description: Quantity of distincts houses that the owner had and that is
-      managed by the owner (rental_administration = OWNER, which
-      means it's a Brokerage Only house).
+    description: Quantity of distincts houses that the owner had and that is managed by the owner (rental_administration = OWNER, which means it's a Brokerage Only house).
   quintoandar_houses:
-    description: Quantity of distincts houses that the owner had and that is
-      managed by QuintoAndar (rental_administration = QUINTOANDAR).
+    description: Quantity of distincts houses that the owner had and that is managed by QuintoAndar (rental_administration = QUINTOANDAR).
   third_party_houses:
-    description: Quantity of distincts houses that the owner had and the house is
-      from a third party supply. (rental_administration = THIRD_PARTY).
+    description: Quantity of distincts houses that the owner had and the house is from a third party supply. (rental_administration = THIRD_PARTY).
   is_merged_user:
     description: Boolean flag to check if the user is merged from another user.
   is_pp_multi_active:

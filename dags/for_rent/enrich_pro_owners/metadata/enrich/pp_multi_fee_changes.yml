@@ -6,7 +6,7 @@ description: Event-sourced changelog of PP Multi administration fee mutations.
   Historical data (before 2026-03-30) comes from ebdb pro_owner_fee_aud; newer data
   comes from rental_management pp_multi_audit_log.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_owner:
     lineage:

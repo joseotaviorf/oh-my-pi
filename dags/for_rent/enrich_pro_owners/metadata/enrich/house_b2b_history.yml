@@ -3,20 +3,20 @@ database_name: datalake_pro_owners
 table_name: house_b2b_history
 description: Table with historical information about all the houses, with it's status, the historical of owner, B2B info like converted lead, partner.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_house:
-    description: ID of the house.
+    description: EBDB house identifier for the listing whose B2B and ownership history is tracked.
     lineage:
       - datalake_ebdb_clean.conversion_lead_aud.id_house
       - datalake_ebdb_clean.house_aud.id_house
       - datalake_ebdb_listing.house_listing.id_house
   id_user:
-    description: ID of the user (owner).
+    description: EBDB user identifier of the landlord who owned the house on the snapshot date.
     lineage:
       - datalake_ebdb_clean.house_aud.id_user
   id_converted_lead:
-    description: ID of the converted lead.
+    description: Conversion lead identifier when the house originated from a B2B partner funnel.
     lineage:
       - datalake_ebdb_clean.conversion_lead_aud.id_converted_lead
   id_house_listing:
@@ -24,15 +24,15 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
   id_partner:
-    description: ID of the partner.
+    description: Partner identifier when the listing was acquired through a B2B channel.
     lineage:
       - datalake_ebdb_clean.partner_agent_aud.id_partner
   affiliate_type:
-    description: Type of affiliate.
+    description: Affiliate classification describing how the B2B partner sourced the listing.
     lineage:
       - datalake_ebdb_clean.lead_aud.affiliate_type
   is_last_status_of_day:
-    description: Flag to indicate of the status is the last one of the day.
+    description: Boolean flag indicating whether this row is the last B2B house status recorded for that house on the day.
   ts_started:
     description: Timestamp of when the status started.
     lineage:
