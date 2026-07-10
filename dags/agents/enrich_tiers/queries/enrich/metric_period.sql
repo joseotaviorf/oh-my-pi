@@ -40,7 +40,11 @@ SELECT
     month_period.month_end AS dt_end,
     -- add 3 hours to the start and end dates to align with the UTC timezone
     month_period.month_start + INTERVAL 3 HOUR AS ts_interval_started,
-    TIMESTAMP(month_period.month_end || ' 23:59:59') + INTERVAL 3 HOUR AS ts_interval_ended,
+    IF(
+        metrics.metric IN ("FL_FR", "FL_FS"),
+        TIMESTAMP(month_period.month_end || ' 23:59:59') + INTERVAL 3 HOUR + INTERVAL 2 DAY,
+        TIMESTAMP(month_period.month_end || ' 23:59:59') + INTERVAL 3 HOUR
+    ) AS ts_interval_ended,
     TIMESTAMP(month_period.month_start) AS ts_created,
     NOW() AS ts_updated,
     month_period.year,

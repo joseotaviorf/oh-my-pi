@@ -127,8 +127,9 @@ columns:
       - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
       - datalake_listing_deduplication.valid_first_listing.ts_first_listing_sale
     description: >
-      Original first listing timestamp converted to America/Sao_Paulo. Used by FL_FS and FL_FR
-      metric_events to attribute first listings to calendar-month periods in local time.
+      Original first listing timestamp converted to America/Sao_Paulo. Exposed for analysis;
+      FL_FS and FL_FR period attribution in metric_events uses dt_compliance_general_rule
+      against ts_interval_started/ts_interval_ended (plus one calendar day at each bound).
   ts_final_first_listing:
     lineage:
       - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent

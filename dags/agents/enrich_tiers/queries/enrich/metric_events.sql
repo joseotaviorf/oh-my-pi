@@ -458,6 +458,7 @@ sale_first_listing_simple_metrics AS (
     JOIN
         metric_period_process AS mp
             ON cfl.dt_compliance_general_rule BETWEEN DATE(mp.ts_interval_started) AND DATE(mp.ts_interval_ended)
+            AND cfl.ts_original_first_listing BETWEEN mp.ts_interval_started AND mp.ts_interval_ended
             AND mp.metric IN ("FL_FS")
     WHERE
         cfl.business_context = "SALE"
@@ -493,7 +494,8 @@ rent_first_listing_simple_metrics AS (
         datalake_tiers.ciq_first_listing AS cfl
     JOIN
         metric_period_process AS mp
-            ON cfl.dt_compliance_general_rule BETWEEN DATE(mp.ts_interval_started) AND DATE(mp.ts_interval_ended + INTERVAL 2 DAY)
+            ON cfl.dt_compliance_general_rule BETWEEN DATE(mp.ts_interval_started) AND DATE(mp.ts_interval_ended)
+            AND cfl.ts_original_first_listing BETWEEN mp.ts_interval_started AND mp.ts_interval_ended
             AND mp.metric IN ("FL_FR")
     WHERE
         cfl.business_context = "RENT"
