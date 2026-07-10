@@ -1,7 +1,7 @@
 ---
 database_name: datalake_offboarding_categorization_clean
 table_name: categorization
-owner: data-ae-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 domain: For Rent
 description: >
   Clean Delta table of Wall-E offboarding session classifier exports, promoted from raw for

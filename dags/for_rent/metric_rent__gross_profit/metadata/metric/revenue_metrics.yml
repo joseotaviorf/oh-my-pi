@@ -1,9 +1,10 @@
 ---
 database_name: metric_rent
 table_name: revenue_metrics
-description: Monthly table that contains the aggregated value about revenue lines of QuintoAndar
+description: |
+  Monthly aggregated QuintoAndar rental revenue metrics by accrual period and product line.
 domain: For Rent
-owner: camila.simoes@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   accrual_year_month:
     lineage:
@@ -88,7 +89,7 @@ columns:
       approved_by: camila.simoes@quintoandar.com.br
       link_to_metric: ''
   addons_service_fee:
-    description: Addons Revenue from Service Fee
+    description: Revenue from add-on service fees on Brazilian listings in the accrual period.
     metric:
       name: Service Fee
       description: Addons Revenue from Service Fee (considers only brazilian listings)
@@ -231,7 +232,7 @@ columns:
       approved_by: camila.simoes@quintoandar.com.br
       link_to_metric: ''
   sales_tax:
-    description: Sales tax discount
+    description: Net sales tax amount after tax credits for Brazilian listings in the period.
     metric:
         name: Sales Tax
         description: Sales tax = Gross Sales Tax - Tax Credit (considers only brazilian listings)

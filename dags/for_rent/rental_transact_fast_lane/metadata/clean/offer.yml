@@ -4,7 +4,7 @@ description: This table consolidates offer information related to the ForRent op
   Each line should be unique and identified by the id column.
   This table is updated every 30 minutes.
 domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -13,7 +13,7 @@ columns:
   id_firestore_offer:
     lineage:
     - datalake_rental_transact_raw.offer.firestore_offer_id
-    description: Firestore's offer id.
+    description: Document identifier for this offer in Google Cloud Firestore, used by the Rental Transact service as its primary external key.
   id_house_external:
     lineage:
     - datalake_rental_transact_raw.offer.house_external_id
@@ -33,19 +33,19 @@ columns:
   uuid_offer:
     lineage:
     - datalake_rental_transact_raw.offer.offer_uuid
-    description: Offer uuid.
+    description: Universally unique identifier assigned to the rental offer for cross-service correlation across the transact workflow.
   status:
     lineage:
     - datalake_rental_transact_raw.offer.status
-    description: Current status of the offer.
+    description: Current processing state of the record in the source workflow.
   type:
     lineage:
     - datalake_rental_transact_raw.offer.type
-    description: Type of the offer.
+    description: Classification code defining the entity role or category.
   iteration:
     lineage:
     - datalake_rental_transact_raw.offer.iteration
-    description: Iteration of the offer.
+    description: Current negotiation round number between tenant and owner on this offer, incremented with each counterproposal.
   turn:
     lineage:
     - datalake_rental_transact_raw.offer.turn
@@ -61,7 +61,7 @@ columns:
   payment_flow_type:
     lineage:
     - datalake_rental_transact_raw.offer.payment_flow_type
-    description: Payment flow type for the offer.
+    description: Billing model selected for the offer, indicating whether checkout uses standard billing or advance payment before contract signing.
     categories:
       NONE: No payment flow type specified.
       ADVANCE_PAYMENT: Payment flow uses advance payment.
@@ -72,15 +72,15 @@ columns:
   original_condominium_value:
     lineage:
     - datalake_rental_transact_raw.offer.original_condominium_value
-    description: Original condominium value.
+    description: Original condominium fee value before offer negotiation.
   original_home_insurance_value:
     lineage:
     - datalake_rental_transact_raw.offer.original_home_insurance_value
-    description: Original home insurance value.
+    description: Monthly residential insurance premium from the listing before negotiation began.
   original_tenant_service_fee_value:
     lineage:
     - datalake_rental_transact_raw.offer.original_tenant_service_fee_value
-    description: Original tenant service fee value.
+    description: Tenant brokerage fee in BRL recorded when the offer was first created, before negotiation updates to pricing components.
   ts_created:
     lineage:
     - datalake_rental_transact_raw.offer.created_at
@@ -93,4 +93,3 @@ columns:
     lineage:
     - datalake_rental_transact_raw.offer.expires_at
     description: Timestamp of when the offer will expire.
-  

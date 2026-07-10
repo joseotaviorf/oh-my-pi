@@ -10,8 +10,7 @@ columns:
   id:
     lineage:
       - datalake_kill_queue_raw.reservation.id
-    description: Unique identifier for the reservation.
-      It's the primary key from the reservation table in the Kill Queue service.
+    description: Unique identifier for the reservation. It's the primary key from the reservation table in the Kill Queue service.
   id_house:
     lineage:
       - datalake_kill_queue_raw.reservation.house_id
@@ -31,8 +30,7 @@ columns:
   cancellation_reason:
     lineage:
       - datalake_kill_queue_raw.reservation.cancellation_reason
-    description: The reason provided when a reservation is cancelled.
-      Used for analytics and understanding cancellation patterns in the reservation process.
+    description: The reason provided when a reservation is cancelled. Used for analytics and understanding cancellation patterns in the reservation process.
   last_charge_status:
     lineage:
       - datalake_kill_queue_raw.reservation.last_charge_status
@@ -41,13 +39,11 @@ columns:
   mundipagg_token:
     lineage:
       - datalake_kill_queue_raw.reservation.mundipagg_token
-    description: Token identifier from Mundipagg payment gateway for this reservation.
-      Used for payment processing and transaction tracking in the financial system.
+    description: Token identifier from Mundipagg payment gateway for this reservation. Used for payment processing and transaction tracking in the financial system.
   status:
     lineage:
       - datalake_kill_queue_raw.reservation.status
-    description: Current status of the reservation in the Kill Queue system.
-      Indicates the lifecycle stage of the reservation (e.g., active, cancelled, completed).
+    description: Current status of the reservation in the Kill Queue system. Indicates the lifecycle stage of the reservation (e.g., active, cancelled, completed).
     categories:
       CANCELLED: The reservation has been cancelled.
       CHARGED: The reservation has been charged.
@@ -65,23 +61,19 @@ columns:
   attempt:
     lineage:
       - datalake_kill_queue_raw.reservation.attempt
-    description: Number of attempts made for processing this reservation.
-      Tracks retry attempts for payment processing or other reservation operations.
+    description: Number of attempts made for processing this reservation. Tracks retry attempts for payment processing or other reservation operations.
   installments:
     lineage:
       - datalake_kill_queue_raw.reservation.installments
-    description: Number of payment installments configured for this reservation.
-      Defines the payment plan structure for the rental transaction.
+    description: Number of payment installments configured for this reservation. Defines the payment plan structure for the rental transaction.
   tenant_refund_percentage:
     lineage:
       - datalake_kill_queue_raw.reservation.tenant_refund_percentage
-    description: Percentage of refund amount that the tenant is eligible to receive.
-      Used for calculating refund amounts in case of reservation cancellation.
+    description: Percentage of refund amount that the tenant is eligible to receive. Used for calculating refund amounts in case of reservation cancellation.
   value:
     lineage:
       - datalake_kill_queue_raw.reservation.value
-    description: Total monetary value of the reservation.
-      Represents the financial amount associated with the reservation transaction.
+    description: Total monetary value of the reservation. Represents the financial amount associated with the reservation transaction.
   is_ongoing:
     lineage:
       - datalake_kill_queue_raw.reservation.is_ongoing
