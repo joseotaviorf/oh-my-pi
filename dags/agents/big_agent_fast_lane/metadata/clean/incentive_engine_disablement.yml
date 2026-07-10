@@ -1,0 +1,38 @@
+---
+database_name: datalake_big_agent_clean
+table_name: incentive_engine_disablement
+description: |
+  Disablement records for incentive engine configurations in Big Agent, one row per
+  disabled incentive engine, including the actor who performed the disablement and
+  creation timestamp.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_disablement.id
+    description: Disablement record unique identifier.
+  id_incentive_engine:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_disablement.incentive_engine_id
+    description: Identifier of the incentive engine that was disabled.
+  author:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_disablement.author
+    description: Actor that disabled the incentive engine.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_disablement.created_at
+    description: Timestamp when the disablement record was created.
+  year:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_disablement.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_disablement.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.incentive_engine_disablement.day
+    description: Partition day.

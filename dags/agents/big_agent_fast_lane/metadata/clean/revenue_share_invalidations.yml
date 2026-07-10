@@ -1,0 +1,46 @@
+---
+database_name: datalake_big_agent_clean
+table_name: revenue_share_invalidations
+description: |
+  Invalidation records for revenue share entries in Big Agent, one row per
+  invalidated revenue share, including replacement linkage, actor, business reason,
+  and creation timestamp for revenue share lifecycle auditing.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.id
+    description: Invalidation record unique identifier.
+  id_revenue_share:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.revenue_share_id
+    description: Identifier of the revenue share entry being invalidated.
+  id_replaced_by:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.replaced_by
+    description: Identifier of the revenue share entry that replaces the invalidated one, if any.
+  author:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.author
+    description: Actor metadata for the user or system that performed the invalidation.
+  reason:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.reason
+    description: Business reason describing why the revenue share was invalidated.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.created_at
+    description: Timestamp when the invalidation record was created.
+  year:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.revenue_share_invalidations.day
+    description: Partition day.

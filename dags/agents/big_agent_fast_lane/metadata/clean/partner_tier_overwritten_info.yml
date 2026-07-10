@@ -1,0 +1,46 @@
+---
+database_name: datalake_big_agent_clean
+table_name: partner_tier_overwritten_info
+description: |
+  Overwrite audit records for partner tier records in Big Agent, capturing the
+  original partner tier, its replacement, the actor, business reason, and creation
+  timestamp.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.id
+    description: Overwrite record unique identifier.
+  id_partner_tier:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.partner_tier_id
+    description: Identifier of the partner tier record that was overwritten.
+  id_replaced_by:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.replaced_by
+    description: Identifier of the partner tier record that replaced the overwritten one.
+  author:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.author
+    description: Actor metadata for the user or system that performed the overwrite.
+  reason:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.reason
+    description: Business reason describing why the partner tier record was overwritten.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.created_at
+    description: Timestamp when the overwrite record was created.
+  year:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.partner_tier_overwritten_info.day
+    description: Partition day.
