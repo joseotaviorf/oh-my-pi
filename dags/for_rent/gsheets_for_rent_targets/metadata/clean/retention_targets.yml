@@ -1,7 +1,7 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: retention_targets
-owner: kleber.inoue@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 domain: For Rent
 description: This gsheet contains the metric's targets of Retention Project.
   The metric's targets are segmented by the granularity column.
@@ -9,7 +9,7 @@ columns:
   metric_name:
     lineage:
       - datalake_gsheets_raw.retention_targets.metric
-    description: Metric's target name.
+    description: Planning metric capturing metric name from the For Rent targets spreadsheet.
   granularity:
     lineage:
       - datalake_gsheets_raw.retention_targets.granularity
@@ -20,7 +20,7 @@ columns:
   target:
     lineage:
       - datalake_gsheets_raw.retention_targets.target
-    description: Target value.
+    description: Numeric planning goal value for the retention or revenue metric.
   dt_target_reference:
     lineage:
       - datalake_gsheets_raw.retention_targets.time_ref
