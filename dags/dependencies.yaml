@@ -4467,8 +4467,8 @@ bietlejuice.metric_rent__contracts:
   - bietlejuice.dw_offer:load-dw-rent-dim-offer:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
-  - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.metric_rent__demand_events:
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events:first-run-of-day
   - bietlejuice.dw_rent_demand_events_snapshot:load-dw-rent-snapshot-coincident-events-volume-changes-snapshot:first-run-of-day

@@ -2,7 +2,7 @@ WITH base AS (
     SELECT
         c.sk_contract,
         h.sk_region,
-        t.id AS id_termination,
+        t.id_termination,
         COALESCE(c.country_code, 'Undefined') AS country_code,
         COALESCE(r.city_group, 'Undefined') AS city_group,
         COALESCE(r.tier, 'Undefined') AS tier,
@@ -26,7 +26,7 @@ WITH base AS (
         dw_public.dim_region AS r
             ON h.sk_region = r.sk_region
     LEFT JOIN
-        datalake_terminator_clean.termination AS t
+        datalake_offboarding.contract_termination AS t
             ON c.sk_contract = t.id_contract
 ),
 -- As we may have different country code, city groups, tiers and dates in each type of event, it's necessary to cross join all options
