@@ -4,28 +4,28 @@ table_name: ticket_rate_classification
 description: Table with snapshot of the data loaded into datalake_gsheet_clean.ticket_rate_classification 
   to keep track of changes and be able to rollback in case of undesired changes on past ticket_rate metrics.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   macro_taxonomy:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.macro_taxonomy
-    description: "Macro taxonomy of the ticket."
+    description: High-level ticket taxonomy grouping for support analytics.
   micro_taxonomy:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.micro_taxonomy
-    description: "Micro taxonomy of the ticket."
+    description: Detailed ticket taxonomy label within the macro category.
   journey:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.journey
-    description: "Journey of the ticket."
+    description: Customer lifecycle stage bucket (e.g. Listing & Search, Ongoing) used to classify support tickets for ticket-rate metrics.
   sub_journey:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.sub_journey
-    description: "Sub journey of the ticket."
+    description: Sub-journey label within the customer support flow.
   line_owner:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.line_owner
-    description: "Line responsible for the ticket."
+    description: Line responsible for the ticket.
   micro_taxonomy_description:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.micro_taxonomy_description
@@ -33,11 +33,11 @@ columns:
   ops_focal_point:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.ops_focal_point
-    description: "Focal point of this ticket on the Operations Team"
+    description: Focal point of this ticket on the Operations Team
   is_active:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.is_active
-    description: "Boolean indicating if this taxonomy is active"
+    description: Boolean indicating if this taxonomy is active
   ts_snapshot:
     description: Timestamp of when the snapshot was made.
   year:

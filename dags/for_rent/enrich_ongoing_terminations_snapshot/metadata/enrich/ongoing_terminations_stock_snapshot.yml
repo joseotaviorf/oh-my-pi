@@ -3,7 +3,7 @@ database_name: datalake_ongoing_terminations_snapshot
 table_name: ongoing_terminations_stock_snapshot
 description: "This table shows the ongoing contract termination stock, each line is a ongoing termination at the snapshot date and is partitioned by the YEAR, MONTH and DAY."
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_contract:
     lineage:
@@ -13,10 +13,6 @@ columns:
     lineage:
       - datalake_offboarding.contract_termination.id_termination
     description: Id of the contract termination.
-  country_code:
-    lineage:
-      - datalake_ebdb_contract.contract.country_code
-    description: Country code of the house.
   dt_termination_request:
     lineage:
       - datalake_offboarding.contract_termination.ts_created

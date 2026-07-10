@@ -1,34 +1,46 @@
 database_name: datalake_heimdall_clean
 table_name: activity
+description: Clean layer table for activity from the heimdall pipeline. Supports For Rent operations reporting and downstream enrich or warehouse models.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_heimdall_raw.activity._id
+    description: Analytical field capturing id for the activity dataset in heimdall.
   id_external_contract:
     lineage:
       - datalake_heimdall_raw.activity.externalcontractid
+    description: Foreign key referencing the related external contract entity.
   id_house:
     lineage:
       - datalake_heimdall_raw.activity.houseid
+    description: Foreign key referencing the related house entity.
   class:
     lineage:
       - datalake_heimdall_raw.activity._class
+    description: Analytical field capturing class for the activity dataset in heimdall.
   status:
     lineage:
       - datalake_heimdall_raw.activity.status
+    description: Analytical field capturing status for the activity dataset in heimdall.
   type:
     lineage:
       - datalake_heimdall_raw.activity.type
+    description: Analytical field capturing type for the activity dataset in heimdall.
   transition_list:
     lineage:
       - datalake_heimdall_raw.activity.transitionlist
+    description: Analytical field capturing transition list for the activity dataset in heimdall.
   metadata:
     lineage:
       - datalake_heimdall_raw.activity.metadata
+    description: Analytical field capturing metadata for the activity dataset in heimdall.
   ts_created:
     lineage:
       - datalake_heimdall_raw.activity.createdat
+    description: Timestamp marking the created event for this record.
   ts_updated:
     lineage:
       - datalake_heimdall_raw.activity.updatedat
+    description: Timestamp marking the updated event for this record.

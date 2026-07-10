@@ -2,7 +2,7 @@ database_name: datalake_terminations_view
 table_name: terminations
 description: View that consolidates main information on the termination request, including status, next published listing and information on whether an inspection is required and/or was opted out.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_termination:
     lineage: 
@@ -31,7 +31,7 @@ columns:
   country_code:
     lineage: 
       - dw_rent.fact_house_listings.country_code
-    description: Country code of the listing.
+    description: ISO country code for geographic filtering of the analytical metric.
   is_3p_supply:
     lineage: 
       - dw_rent.dim_house_listing.is_3p_supply
@@ -53,7 +53,6 @@ columns:
       - dw_rent.dim_contract
     description: Ended rental confirmed date for the contract.
   is_erc_4w_matured:
-    lineage:
     description: Boolean indicating whether 4 weeks have elapsed from the ended rental confirmed (ERC) date for the contract.
   is_inspection_required:
     lineage: 

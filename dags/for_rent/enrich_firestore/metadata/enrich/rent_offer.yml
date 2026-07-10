@@ -1,3 +1,4 @@
+---
 database_name: datalake_firestore
 table_name: rent_offer
 description: Enriched table that consolidates rent offer data from the Firestore source.
@@ -5,7 +6,7 @@ description: Enriched table that consolidates rent offer data from the Firestore
   related to an offer.
   Each line is an unique offer, its most recently update.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_firestore:
     description: Unique offer id that comes from the Firestore.
@@ -72,11 +73,11 @@ columns:
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   rejection_reason:
-    description: Reason of the offer's rejection.
+    description: "Reason of the offer's rejection."
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   rejection_reason_description:
-    description: Description of the rejection reason.
+    description: Human-readable explanation for why the offer was rejected.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   resident:
@@ -84,15 +85,15 @@ columns:
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   status:
-    description: Present status of the offer.
+    description: Current processing state of the record in the source workflow.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   turn:
-    description: Whose turn is it.
+    description: Negotiation turn indicating whether the owner or tenant must respond next on the offer.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   type:
-    description: The offer type.
+    description: Classification code defining the entity role or category.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   tenant_intent:
@@ -100,7 +101,7 @@ columns:
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   tenant_service_fee:
-    description: The tenant's service fee.
+    description: Service fee percentage charged to the tenant on this contract.
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   has_draft_topics:
@@ -108,8 +109,7 @@ columns:
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   is_instant_offer:
-    description: Boolean flag indicating if the offer is an instant offer (offer that is automatically accepted
-      without intervention of the property owner).
+    description: Boolean flag indicating if the offer is an instant offer (offer that is automatically accepted without intervention of the property owner).
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   is_visualized:
@@ -129,7 +129,7 @@ columns:
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_deadline:
-    description: Timestamp of the offer's deadline.
+    description: "Timestamp of the offer's deadline."
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_visualized:
@@ -145,8 +145,7 @@ columns:
     lineage:
       - datalake_firestore_clean.rent_offer.updated_message
   ts_updated_message:
-    description: Timestamp of when the message was updated.
-      Firestore is a messaging solution, so every chunk of data comes in a message format.
+    description: Timestamp of when the message was updated. Firestore is a messaging solution, so every chunk of data comes in a message format.
     lineage:
       - datalake_firestore_clean.rent_offer.ts_updated
   ts_load:

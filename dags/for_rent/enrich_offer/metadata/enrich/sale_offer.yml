@@ -1,8 +1,9 @@
+---
 database_name: datalake_offer
 table_name: sale_offer
-owner: herivelto.junior@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 domain: For Sale
-description:
+description: |
   With this table we have the objective of consolidating the general data
   of the offer process, the idea here is to consolidate data mainly from the sources
   of Sales (main source), Work Contract and others.
@@ -117,11 +118,11 @@ columns:
   sk_broker_supply:
     lineage:
       - datalake_visit.visit_business_model.sk_broker_supply
-    description: Surrogate key of the supply-side broker (core_brokers) when the business model implies 3P supply. Propagated from booking, sourced from visit_business_model.
+    description: "Surrogate key of the supply-side broker (core_brokers) when the business model implies 3P supply. Propagated from booking, sourced from visit_business_model."
   sk_broker_demand:
     lineage:
       - datalake_visit.visit_business_model.sk_broker_demand
-    description: Surrogate key of the demand-side broker (core_brokers) when the business model implies 3P demand or lead gen. Propagated from booking, sourced from visit_business_model.
+    description: "Surrogate key of the demand-side broker (core_brokers) when the business model implies 3P demand or lead gen. Propagated from booking, sourced from visit_business_model."
   id_company_supply:
     lineage:
       - datalake_visit.visit_business_model.id_company_supply
@@ -133,15 +134,11 @@ columns:
   sk_company_supply:
     lineage:
       - datalake_visit.visit_business_model.id_company_supply
-    description:
-      Surrogate Key of the company in Rede QuintoAndar associated with
-      the house. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
+    description: Surrogate Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
   sk_company_demand:
     lineage:
       - datalake_visit.visit_business_model.id_company_demand
-    description:
-      Surrogate Key of the company in Rede QuintoAndar associated with
-      the agent. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
+    description: Surrogate Key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
   id_company_demand:
     lineage:
       - datalake_visit.visit_business_model.id_company_demand
@@ -151,9 +148,7 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.pendency
     description: Human-readable label of the blocking pendency currently assigned to the offer in SalesFlow.
   ccv_type:
-    description:
-      Type of financed sale agreement considering which financial product
-      it has contracted.
+    description: Type of financed sale agreement considering which financial product it has contracted.
   pendency_type:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency_type
@@ -161,11 +156,7 @@ columns:
   opportunities_of_the_week:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.opportunities_of_the_week
-    description:
-      In For Sale it's every lead qualified in the week for the CRI or
-      MA process. In Rent is every listing published, with at least one scheduled
-      in the week. This information is not used by the For Sale operation team, because
-      of the new business model of Closing Assistance.
+    description: "In For Sale it's every lead qualified in the week for the CRI or MA process. In Rent is every listing published, with at least one scheduled in the week. This information is not used by the For Sale operation team, because of the new business model of Closing Assistance."
   team_lead_name:
     lineage:
       - datalake_gsheets.sale_hub_offer.team_lead_name
@@ -245,9 +236,7 @@ columns:
     lineage:
       - datalake_firestore.monday.payment_model
       - datalake_sale_offer_flows.sale_offer_flows.payment_model
-    description:
-      Payment model used in the purchase of the property (CCV_ASSISTANCE,
-      INSTANT_MORTGAGE, etc)
+    description: Payment model used in the purchase of the property (CCV_ASSISTANCE, INSTANT_MORTGAGE, etc)
   credit_status:
     lineage:
       - datalake_firestore.monday.credit_status
@@ -432,13 +421,9 @@ columns:
       - datalake_visit.visit_schedules.ts_schedule_visit
     description: Hours difference between visit event and offer created
   has_credit_pre_analysis:
-    description:
-      Check if the sale agreement had credit pre analysis in the offer
-      negotiation step.
+    description: Check if the sale agreement had credit pre analysis in the offer negotiation step.
   has_payment_in_protocol:
-    description:
-      Check if the sale agreement has contracted the financial product
-      payment in protocol.
+    description: Check if the sale agreement has contracted the financial product payment in protocol.
   days_offer_submitted_to_offer_accepted:
     lineage:
       - datalake_firestore.monday.dt_accepted
@@ -493,9 +478,7 @@ columns:
     lineage:
       - datalake_firestore.monday.days_sale_agreement_created_to_sale_agreement_signed
       - datalake_sale_offer_flows.sale_offer_flows.days_sale_agreement_created_to_sale_agreement_signed
-    description:
-      Date difference between sale agreement created and sale agreement
-      signed
+    description: Date difference between sale agreement created and sale agreement signed
   has_used_negotiation_chat:
     lineage:
       - datalake_firestore.sale_offer.has_used_negotiation_chat
@@ -527,15 +510,11 @@ columns:
   is_a_rescued_ccv:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_ccv
-    description:
-      Boolean to identify if this offer has an rescued ccv (A ccv that
-      was cancelled and opened again)
+    description: Boolean to identify if this offer has an rescued ccv (A ccv that was cancelled and opened again)
   is_a_rescued_offer:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_a_rescued_offer
-    description:
-      Boolean to identify if this offer is a rescued one (An offer that
-      was cancelled and opened again)
+    description: Boolean to identify if this offer is a rescued one (An offer that was cancelled and opened again)
   is_ccv_5a_model:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_5a_model
@@ -590,10 +569,7 @@ columns:
     lineage:
       - datalake_firestore.monday.dt_sale_transacton_paid
       - datalake_sale_offer_flows.sale_offer_flows.dt_sale_transacton_paid
-    description:
-      Date when the seller received the payment from the financing company.
-      In Closing Assistance model, the full closing process is not monitored. After
-      July 2022 there is no date.
+    description: Date when the seller received the payment from the financing company. In Closing Assistance model, the full closing process is not monitored. After July 2022 there is no date.
   ts_offer_submitted:
     lineage:
       - datalake_firestore.sale_offer.ts_created

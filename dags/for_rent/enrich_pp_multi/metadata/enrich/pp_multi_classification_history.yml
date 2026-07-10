@@ -1,9 +1,9 @@
 database_name: datalake_pp_multi
 table_name: pp_multi_classification_history
-description:
+description: |
   Historical daily classification of PP Multi owners. Each partition represents a snapshot of all qualifying owners on that anchor day, with their classification (ACTIVE, POTENTIAL, LIFETIME), house portfolio statistics, visit metrics, key delivery stats, and contract information. Starting from March 2026, the ACTIVE classification is derived from the PP Multi management system (pp_multi_user) instead of the previous >= 5 ongoing houses heuristic. Historical partitions prior to this change retain the original classification criteria.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_owner:
     description: Identifier of the owner persona.

@@ -1,14 +1,15 @@
+---
 database_name: datalake_ebdb_rental_administration
 table_name: rental_administrator_change_history
 description: Information about administrator changes. Each line brings the rental
   administrator of a house and the start and end date of the administration.
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_house:
     lineage:
     - datalake_ebdb_clean.rental_administrator_change_request_aud.id_house
-    description: Id of the house
+    description: Property identifier from EBDB linking the administrator change to the affected listing.
   country_code:
     lineage:
     - datalake_ebdb_country.house.country_code
@@ -16,11 +17,11 @@ columns:
   previous_rental_administrator:
     lineage:
     - datalake_ebdb_clean.rental_administrator_change_request_aud.old_rental_administrator
-    description: Rental administrator before the change
+    description: Rental administrator responsible before the recorded change.
   rental_administrator:
     lineage:
     - datalake_ebdb_clean.rental_administrator_change_request_aud.new_rental_administrator
-    description: Rental administrator after the change
+    description: Current rental administrator responsible for the property.
     categories:
       OWNER: Owner is the rental administrator, which means that the listing is brokerage-only
       QUINTOANDAR: Default rental administrator, which is QuintoAndar
@@ -33,4 +34,4 @@ columns:
     - datalake_ebdb_clean.rental_administrator_change_request_aud.ts_created
     description: End timestamp of the administration
   id_rental_administrator_change_request:
-    description: Id of the rental administrator change request
+    description: EBDB request identifier for the workflow that transferred rental administration responsibility.

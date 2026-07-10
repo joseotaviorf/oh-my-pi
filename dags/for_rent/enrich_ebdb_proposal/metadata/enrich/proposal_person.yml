@@ -4,36 +4,36 @@ table_name: proposal_person
 description: Information related to ForRent proposals and the client/property owner related. Each line is an unique proposal
   with the personal information about the client or owner related to such proposal.
 domain: For Rent
-owner: gustavo.geiger@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_proposal_person:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.id
-    description: Id of the client related to the proposal.
+    description: Unique identifier of the proposal participant record in EBDB.
   id_personal_document:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.cpf
-    description: Id of the personal document.
+    description: CPF or personal document number identifying the proposal participant.
   id_proposal:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.id_proposal
-    description: Proposal ID.
+    description: EBDB proposal identifier linking this person to the rental application.
   country_code:
     lineage:
       - datalake_ebdb_country.user.country_code
-    description: Country code. It's also a table partition.
+    description: ISO country code for geographic filtering of the analytical metric.
   email:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.email
-    description: Client email.
+    description: Email address provided by the proposal participant for contact and notifications.
   full_name:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.name
-    description: Client full name.
+    description: Legal full name of the proposal participant.
   gender:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.gender
-    description: Client gender.
+    description: Gender declared by the proposal participant in the rental application form.
   marital_status:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.marital_status
@@ -41,24 +41,24 @@ columns:
   personal_document:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.cpf
-    description: Id of the personal document.
+    description: Government-issued identity document number for the proposal participant.
   personal_document_type:
-    description: Indicates the document type.
+    description: Identity document type provided by the participant, such as RG or RNE.
     categories:
       CPF: Natural Persons Register.
       CNPJ: National Register of Legal Entities.
   phone_number:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.phone_number
-    description: Client phone number.
+    description: Primary phone number of the proposal participant.
   state_code:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.id_estado
-    description: State code.
+    description: Brazilian state abbreviation for the participant address.
   number_of_dependents:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.number_of_dependents
-    description: The total number of dependents of the client.
+    description: Declared count of financial dependents for the participant.
   is_going_to_live:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.will_live

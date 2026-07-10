@@ -3,7 +3,7 @@ database_name: datalake_rent_demand_events
 table_name: rent_demand_events
 description: "This table shows the demand events of For Rent, each line is an event related to the scope and is partitioned by the country_code."
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_event:
     lineage:
@@ -20,12 +20,12 @@ columns:
       - datalake_booking.booking.id
       - datalake_ebdb_rent_flow.rent_flow.id_booking
       - datalake_ebdb_clean.visit_status_log.id_schedule
-    description: "Id of the booking."
+    description: Booking identifier from EBDB when the demand event relates to a scheduled property visit.
   id_visit:
     lineage:
       - datalake_booking.booking.id_visit
       - datalake_ebdb_clean.visit_status_log.id_visit
-    description: "Id of the visit."
+    description: Visit identifier linking the demand event to the completed or scheduled property showing.
   id_offer:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_offer_context
@@ -36,18 +36,18 @@ columns:
       - datalake_docx_clean.message.payload
       - datalake_ebdb_rent_flow.rent_flow.id_proposal
       - datalake_proposal.proposal.id
-    description: "Id of the proposal."
+    description: Accepted-offer proposal identifier when the demand event relates to tenant documentation or credit.
   id_contract:
     lineage:
       - datalake_ebdb_contract.contract.id
       - datalake_ebdb_rent_flow.rent_flow.id_contract
-    description: "Id of the contract."
+    description: Rental contract identifier when the demand event records signing or creation milestones.
   id_advance_payment:
     lineage:
       - datalake_rental_transact.advance_payment.id
-    description: "Id of the advance payment."
+    description: Advance payment transaction identifier from Rental Transact for reservation fee events.
   id_event_type:
-    description: "Id of the event type."
+    description: Numeric code mapping to the demand funnel milestone (visit booked, offer submitted, contract signed, etc.).
     categories:
       "1": "Id of the visit booked (VB) event."
       "2": "Id of the visit completed (VC) event."
@@ -79,7 +79,7 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.id_client
       - datalake_offer.offer.id_client
       - datalake_ebdb_clean.visit.id_visitor
-    description: "Id of the tenant prospect (TP)."
+    description: Id of the tenant prospect (TP).
   id_house:
     lineage:
       - datalake_booking.booking.id_house
@@ -87,21 +87,18 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.id_house
       - datalake_offer.offer.id_house
       - datalake_ebdb_clean.visit.id_house
-    description: "Id of the property."
+    description: Property identifier for the listing involved in this For Rent demand funnel event.
   id_agent:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_user_agent
       - datalake_ebdb_clean.visit.id_agent
-    description:
-      "Id of the user that is the agent. Notice that it's not the id_agent, but the id_user of the agent
-      (which comes from the EBDB's User table, column id). This was necessary in order to join with the fact_listing_rent_flows model,
-      which already uses the agent's user id."
+    description: "Id of the user that is the agent. Notice that it's not the id_agent, but the id_user of the agent (which comes from the EBDB's User table, column id). This was necessary in order to join with the fact_listing_rent_flows model, which already uses the agent's user id."
   id_rent_flow:
     lineage:
       - datalake_booking.booking.id_rent_flow
       - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
       - datalake_offer.offer.id_rent_flow
-    description: "Id of the rent flow."
+    description: Rent funnel identifier grouping visit, offer, and contract touchpoints for the same prospect.
   id_schedule:
     lineage:
       - datalake_ebdb_clean.visit_status_log.id_schedule
@@ -109,15 +106,15 @@ columns:
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
-    description: "Id of the house listing."
+    description: Versioned listing identifier active when the demand event occurred.
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
-    description: "Id of the region."
+    description: Geographic region identifier of the property, joinable to datalake_region.region.
   id_owner:
     lineage:
       - datalake_ebdb_listing.house.id_user
-    description: "Id of the property owner."
+    description: Id of the property owner.
   id_owner_category:
     lineage:
       - datalake_pro_owners.owner_category.id_owner_category
@@ -135,10 +132,7 @@ columns:
       - datalake_ebdb_listing.house.partner_3p_supply
     description: Short name of the Rede company.
   is_during_termination:
-    description:
-      "Boolean flag indicating if the event happened between the termination request date and the listing's
-      previous version contract end date (dt_termination).
-      This flag may help understanding events during Early Demand, for example."
+    description: "Boolean flag indicating if the event happened between the termination request date and the listing's previous version contract end date (dt_termination). This flag may help understanding events during Early Demand, for example."
   ts_event:
     lineage:
       - datalake_booking.booking.ts_created

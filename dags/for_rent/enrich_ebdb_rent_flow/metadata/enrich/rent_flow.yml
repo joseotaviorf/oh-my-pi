@@ -1,11 +1,12 @@
+---
 database_name: datalake_ebdb_rent_flow
 table_name: rent_flow
 description: Table that contains events (visit(s), offer(s), etc.) of a rent flow, starting the flow on the booking creation or direct offer submitted. It's very important to keep in mind that every line of this table is related to an event of the rent flow and it's possible to occur more than one event per type in the same rent flow, e.g. multiple bookings within the same rent flow. Each line is a rent flow composed by house listing + tenant prospect + event related to the rent flow.
 domain: For Rent
-owner: gustavo.geiger@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_house_rent_flow:
-    description: Surrogate primary key generated at load time for each rent flow event row.
+    description: Surrogate row identifier assigned sequentially to each rent funnel event row in this enriched table.
   id_house:
     lineage:
       - datalake_ebdb_clean.contract.id_house

@@ -1,6 +1,6 @@
 database_name: datalake_proposal
 table_name: proposal
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: gustavo.brunelli@quintoandar.com.br
 domain: Fintech
 description: "Enrich table that brings proposal information from many sources and it is the base for dim_proposal."
 columns:
@@ -15,7 +15,7 @@ columns:
   id_country:
     lineage:
       - datalake_ebdb_country.house.id_country
-    description: "Country identifier on EBDB."
+    description: Foreign key to the country dimension for geographic reporting.
   id_offer:
     lineage:
       - datalake_ebdb_clean.proposal.id_offer
@@ -23,7 +23,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
-    description: "Country code identifier from EBDB."
+    description: ISO country code for geographic filtering of the analytical metric.
   guarantee:
     lineage:
       - datalake_ebdb_clean.proposal.guarantee
@@ -43,7 +43,7 @@ columns:
   rent_proposal:
     lineage:
       - datalake_ebdb_clean.proposal.rent_proposal
-    description: "Rent value on proposal."
+    description: Monthly rent amount proposed by the tenant during the rental offer negotiation.
   status:
     lineage:
       - datalake_ebdb_clean.proposal.status
@@ -197,30 +197,6 @@ columns:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: "Last timestamp when EBDB's tenant_documentation_status = RecusadoCredito and proposal rejection reason is set to CreditEvaluationRejected."
-  ts_automatic_model_evaluation_positive:
-    lineage:
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_credit_analysis.credit_analysis_proposals.ts_last_credit_evaluation_positive
-    description: "Timestamp that indicates if the proposal has received any guarantee option to proceed within the flux."
-  ts_guarantee_chosen:
-    lineage:
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_ebdb_clean.proposal.is_tenant_auto_submission
-    description: " Timestamp that indicates if the proposal has a guarantee chosen, be it Free or Paid."
-  ts_tenant_first_document_sent:
-    lineage:
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_credit_analysis.credit_analysis_proposals.ts_last_credit_evaluation_positive
-    description: "Timestamp that indicates if the tentant's docs were sent, checking the first time doc flow or doc reuse flow. It is the date used to mark Document Sent (DS) step on Credit funnel."
-  ts_docx_first_doc_sent:
-    lineage:
-      - datalake_docx_clean.folder_reference_aud.ts_documentation_sent
-    description: "Timestamp indicating the first time the tenant's documentation was sent on DOCX microsservice."
-  ts_guarantee_validated:
-    lineage:
-      - datalake_credit_analysis.credit_analysis_proposals.ts_guarantee_paid
-      - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: "Timestamp indicating that there is a valid guarantee to proceed to contract step, be it Free or Paid. It is the data used to mark the Guarantee Validated step on Credit funnel."
   ts_guarantee:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
@@ -257,11 +233,3 @@ columns:
     lineage:
       - datalake_ebdb_clean.proposal.ts_entrance
     description: "Expected entrance date, created automatically."
-  is_guarantee_from_crm:
-    lineage:
-      - datalake_credit_analysis.credit_analysis_proposals.guarantee_source
-    description: "Indicates if the paid guarantee was created via CRM or if it was done via the regular client flow."
-  is_retenant:
-    lineage:
-      - datalake_credit_analysis.credit_analysis_proposals.is_retenant
-    description: "Indicates if the proposal has a proponent that once has had a contract here."
