@@ -1,244 +1,326 @@
 database_name: datalake_ebdb_clean
 table_name: contract_aud
+description: Hibernate Envers audit history of rental contracts from EBDB Contrato_AUD. Each row is one revision of a contract; join rev to user_revision_entity for change context. Used by FR Transact analytics and contract lifecycle reporting.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_contract:
     lineage:
       - datalake_ebdb_raw.contrato_aud.id
+    description: Foreign key to the rental contract record being audited at this revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.contrato_aud.imovel_id
+    description: House identifier linked to the contract at this revision.
   id_user:
     lineage:
       - datalake_ebdb_raw.contrato_aud.usuario_id
+    description: Tenant user identifier linked to the contract at this revision.
   id_google_drive:
     lineage:
       - datalake_ebdb_raw.contrato_aud.googledriveid
+    description: Google Drive folder identifier for contract documents at this revision.
   id_administration_fee_type:
     lineage:
       - datalake_ebdb_raw.contrato_aud.administrationfeetype_id
+    description: Foreign key to the administration fee type applied at this revision.
   id_contract_version:
     lineage:
       - datalake_ebdb_raw.contrato_aud.contractversion_id
+    description: Foreign key to the contract version template at this revision.
   rev:
     lineage:
       - datalake_ebdb_raw.contrato_aud.rev
+    description: Envers revision id; join to user_revision_entity for the user and timestamp of the change.
   rev_type:
     lineage:
       - datalake_ebdb_raw.contrato_aud.revtype
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
   observation:
     lineage:
       - datalake_ebdb_raw.contrato_aud.observacao
+    description: Free-text observation notes on the contract at this revision.
   rent:
     lineage:
       - datalake_ebdb_raw.contrato_aud.valoraluguel
+    description: Monthly rent value in local currency at this revision.
   contract_rent_model:
     lineage:
       - datalake_ebdb_raw.contrato_aud.contractRentModel
+    description: Rental administrator model at this revision (e.g. QuintoAndar or owner-managed).
   status:
     lineage:
       - datalake_ebdb_raw.contrato_aud.status
+    description: Contract lifecycle status on EBDB at this revision.
   billing_day_of_month:
     lineage:
       - datalake_ebdb_raw.contrato_aud.diamescobranca
+    description: Day of the month when rental charges are billed at this revision.
   guarantee_type:
     lineage:
       - datalake_ebdb_raw.contrato_aud.garantia
+    description: Rental guarantee product type selected for the contract at this revision.
   type:
     lineage:
       - datalake_ebdb_raw.contrato_aud.tipo
+    description: Contract product type at this revision (e.g. FullService or DealOnly).
   owners_comment:
     lineage:
       - datalake_ebdb_raw.contrato_aud.comentarioproprietario
+    description: Owner comment text captured on the contract at this revision.
   iptu_installment:
     lineage:
       - datalake_ebdb_raw.contrato_aud.iptu_parcelas
+    description: Number of IPTU installments configured at this revision.
   iptu:
     lineage:
       - datalake_ebdb_raw.contrato_aud.iptu_valor
+    description: IPTU payment amount configured at this revision.
   paying_condo:
     lineage:
       - datalake_ebdb_raw.contrato_aud.pagantecondominio
+    description: Party responsible for making condo fee payments at this revision.
   paying_iptu:
     lineage:
       - datalake_ebdb_raw.contrato_aud.paganteiptu
+    description: Party responsible for making IPTU payments at this revision.
   responsible_for_condo:
     lineage:
       - datalake_ebdb_raw.contrato_aud.responsavelcondominio
+    description: Party responsible for the condo fee amount at this revision.
   responsible_for_iptu:
     lineage:
       - datalake_ebdb_raw.contrato_aud.responsaveliptu
+    description: Party responsible for the IPTU amount at this revision.
   home_insurance_installment:
     lineage:
       - datalake_ebdb_raw.contrato_aud.seguroresidencial_parcelas
+    description: Number of home insurance installments at this revision.
   home_insurance_value:
     lineage:
       - datalake_ebdb_raw.contrato_aud.seguroresidencial_valor
+    description: Home insurance premium value at this revision.
   fist_rent_comission_fee:
     lineage:
       - datalake_ebdb_raw.contrato_aud.taxacomissaoprimeiroaluguel
+    description: First rent brokerage commission fee at this revision.
   condo_price:
     lineage:
       - datalake_ebdb_raw.contrato_aud.valorcondominio
+    description: Monthly condominium fee amount at this revision.
   value_iptu:
     lineage:
       - datalake_ebdb_raw.contrato_aud.valoriptu
+    description: Monthly IPTU value amount at this revision.
   bank_data_agency:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dadosbanco_agencia
+    description: Bank branch agency number for owner payouts at this revision.
   bank_data_account:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dadosbanco_contacorrente
+    description: Bank account number for owner payouts at this revision.
   bank_data_cpf_cnpj:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dadosbanco_cpfoucnpj
+    description: CPF or CNPJ of the bank account holder at this revision.
   bank_data_name:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dadosbanco_nome
+    description: Account holder name on the bank account registered for rent payouts in this contract revision.
   bank_data_other_holder:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dadosbanco_outrotitular
+    description: Alternate bank account holder name when payout goes to a third party.
   bank_data_account_type:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dadosbanco_tipoconta
+    description: Bank account type for owner payouts at this revision.
   signature_type:
     lineage:
       - datalake_ebdb_raw.contrato_aud.tipoassinatura
+    description: Contract signature method at this revision (e.g. electronic).
   status_closing:
     lineage:
       - datalake_ebdb_raw.contrato_aud.statusclosing
+    description: Contract closing workflow status at this revision.
   contract_signed:
     lineage:
       - datalake_ebdb_raw.contrato_aud.contratoassinado
+    description: Flag indicating whether the contract was signed at this revision.
   token_esignature_rent:
     lineage:
       - datalake_ebdb_raw.contrato_aud.tokenesignaturelocacao
+    description: E-signature token for the rental contract at this revision.
   token_esignature_adm:
     lineage:
       - datalake_ebdb_raw.contrato_aud.tokenesignatureadm
+    description: E-signature token for the administration contract at this revision.
   management_contract_signed:
     lineage:
       - datalake_ebdb_raw.contrato_aud.contratoadministracaoassinado
+    description: Flag indicating whether the management contract was signed.
   authorization_contract_entry_signed:
     lineage:
       - datalake_ebdb_raw.contrato_aud.contratoautorizacaoentradaassinado
+    description: Flag indicating whether the entry authorization contract was signed.
   rent_contract_signed:
     lineage:
       - datalake_ebdb_raw.contrato_aud.contratolocacaoassinado
+    description: Flag indicating whether the rental lease contract was signed.
   policy:
     lineage:
       - datalake_ebdb_raw.contrato_aud.policy
+    description: Insurance policy reference linked to the contract at this revision.
   agent_brokerage_share:
     lineage:
       - datalake_ebdb_raw.contrato_aud.estateagentbrokerageshare
+    description: Real estate agent brokerage share percentage at this revision.
   tenant_service_fee:
     lineage:
       - datalake_ebdb_raw.contrato_aud.tenantservicefee
+    description: Monthly tenant service fee percentage charged at this revision.
   mod_rent:
     lineage:
       - datalake_ebdb_raw.contrato_aud.valoraluguel_mod
+    description: Envers flag indicating whether rent changed in this revision.
   mod_contract_rent_model:
     lineage:
       - datalake_ebdb_raw.contrato_aud.contractRentModel_MOD
+    description: Envers flag indicating whether contract_rent_model changed in this revision.
   mod_status:
     lineage:
       - datalake_ebdb_raw.contrato_aud.status_mod
+    description: Envers flag indicating whether status changed in this revision.
   mod_guarantee_type:
     lineage:
       - datalake_ebdb_raw.contrato_aud.garantia_mod
+    description: Envers flag indicating whether guarantee_type changed in this revision.
   mod_iptu:
     lineage:
       - datalake_ebdb_raw.contrato_aud.iptu_mod
+    description: Envers flag indicating whether iptu changed in this revision.
   mod_fist_rent_comission_fee:
     lineage:
       - datalake_ebdb_raw.contrato_aud.taxacomissaoprimeiroaluguel_mod
+    description: Envers flag indicating whether fist_rent_comission_fee changed in this revision.
   mod_value_iptu:
     lineage:
       - datalake_ebdb_raw.contrato_aud.valoriptu_mod
+    description: Envers flag indicating whether value_iptu changed in this revision.
   mod_bank_data:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dadosbanco_mod
+    description: Envers flag indicating whether bank payout data changed in this revision.
   mod_signature_type:
     lineage:
       - datalake_ebdb_raw.contrato_aud.tipoassinatura_mod
+    description: Envers flag indicating whether signature_type changed in this revision.
   mod_status_closing:
     lineage:
       - datalake_ebdb_raw.contrato_aud.statusclosing_mod
+    description: Envers flag indicating whether status_closing changed in this revision.
   mod_token_esignature_adm:
     lineage:
       - datalake_ebdb_raw.contrato_aud.tokenesignatureadm_mod
+    description: Envers flag indicating whether token_esignature_adm changed in this revision.
   mod_contract_version:
     lineage:
       - datalake_ebdb_raw.contrato_aud.contractversion_mod
+    description: Envers flag indicating whether id_contract_version changed in this revision.
   mod_agent_brokerage_share:
     lineage:
       - datalake_ebdb_raw.contrato_aud.estateagentbrokerageshare_mod
+    description: Envers flag indicating whether agent_brokerage_share changed in this revision.
   mod_tenant_service_fee:
     lineage:
       - datalake_ebdb_raw.contrato_aud.tenantservicefee_mod
+    description: Envers flag indicating whether tenant_service_fee changed in this revision.
   mod_has_contract_amendment:
     lineage:
       - datalake_ebdb_raw.contrato_aud.termoaditivoadicionado_mod
+    description: Envers flag indicating whether has_contract_amendment changed in this revision.
   mod_dt_entered:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dataentrada_mod
+    description: Envers flag indicating whether dt_entered changed in this revision.
   mod_dt_started:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datainicio_mod
+    description: Envers flag indicating whether dt_started changed in this revision.
   mod_ts_contract_expected_end:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datafimcontratoprevisto_mod
+    description: Envers flag indicating whether ts_contract_expected_end changed in this revision.
   mod_dt_termination:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datarescisao_mod
+    description: Envers flag indicating whether dt_termination changed in this revision.
   mod_ts_signed:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dataassinado_mod
+    description: Envers flag indicating whether ts_signed changed in this revision.
   mod_ts_electronic_contract_sent:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datacontratoeletronicoenviado_mod
+    description: Envers flag indicating whether ts_electronic_contract_sent changed in this revision.
   mod_ts_expected_termination:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datarescisaoprevista_mod
+    description: Envers flag indicating whether ts_expected_termination changed in this revision.
   mod_is_relisting_enabled:
     lineage:
       - datalake_ebdb_raw.contrato_aud.relistingenabled_mod
+    description: Envers flag indicating whether is_relisting_enabled changed in this revision.
   has_home_insurance:
     lineage:
       - datalake_ebdb_raw.contrato_aud.comseguroresidencial
+    description: Flag indicating whether home insurance is included at this revision.
   has_contract_amendment:
     lineage:
       - datalake_ebdb_raw.contrato_aud.termoaditivoadicionado
+    description: Flag indicating whether an additive contract amendment was added.
   is_relisting_enabled:
     lineage:
       - datalake_ebdb_raw.contrato_aud.relistingenabled
+    description: Flag indicating whether early relisting is enabled for this contract.
   dt_entered:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dataentrada
+    description: Date when the tenant is scheduled to enter the property at this revision.
   dt_started:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datainicio
+    description: Contract start date at this revision.
   ts_contract_expected_end:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datafimcontratoprevisto
+    description: Expected contract end timestamp at this revision.
   dt_termination:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datarescisao
+    description: Actual contract termination date at this revision.
   ts_signed:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dataassinado
+    description: Timestamp when the contract was signed at this revision.
   ts_minuta_approved:
     lineage:
       - datalake_ebdb_raw.contrato_aud.dataminutaaprovada
+    description: Timestamp when the contract draft (minuta) was approved.
   ts_electronic_contract_sent:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datacontratoeletronicoenviado
+    description: Timestamp when the electronic contract was sent for signature.
   ts_ownership_swapped:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datatrocatitularidade
+    description: Timestamp when contract ownership was swapped to a new tenant.
   ts_expected_termination:
     lineage:
       - datalake_ebdb_raw.contrato_aud.datarescisaoprevista
+    description: Timestamp when contract termination is expected at this revision.
   ts_fair_fax_start:
     lineage:
       - datalake_ebdb_raw.contrato_aud.fairfaxstartdate
+    description: Timestamp when Fairfax home insurance coverage started for this contract.

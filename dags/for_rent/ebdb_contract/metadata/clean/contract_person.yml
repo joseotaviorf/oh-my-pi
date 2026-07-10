@@ -1,100 +1,134 @@
 database_name: datalake_ebdb_clean
 table_name: contract_person
+description: Clean table with persons linked to rental contracts (tenants, owners, guarantors) from EBDB ContratoPessoa. One row per contract person record. Used for contract signing flows and tenant or owner analytics.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.contratopessoa.id
+    description: Surrogate key of the contract person record on EBDB.
   cpf:
     lineage:
       - datalake_ebdb_raw.contratopessoa.cpf
+    description: Brazilian CPF tax identifier of the person linked to the contract.
   dt_rg_created:
     lineage:
       - datalake_ebdb_raw.contratopessoa.dataexpedicaorg
+    description: Date when the person's identity document (RG) was issued.
   dt_birth:
     lineage:
       - datalake_ebdb_raw.contratopessoa.datanascimento
+    description: Birth date of the person linked to the contract.
   email:
     lineage:
       - datalake_ebdb_raw.contratopessoa.email
+    description: Primary email address of the contract person.
   name:
     lineage:
       - datalake_ebdb_raw.contratopessoa.nome
+    description: Full legal name of the person linked to the contract.
   rg:
     lineage:
       - datalake_ebdb_raw.contratopessoa.rg
+    description: Brazilian identity document (RG) number of the contract person.
   gender:
     lineage:
       - datalake_ebdb_raw.contratopessoa.sexo
+    description: Gender of the contract person as recorded on EBDB.
   phone_number:
     lineage:
       - datalake_ebdb_raw.contratopessoa.telefone
+    description: Primary phone number of the proposal participant.
   secondary_phone:
     lineage:
       - datalake_ebdb_raw.contratopessoa.telefonesecundario
+    description: Secondary contact phone number of the contract person.
   id_contract:
     lineage:
       - datalake_ebdb_raw.contratopessoa.contrato_id
+    description: Foreign key to the rental contract this person belongs to.
   neighborhood:
     lineage:
       - datalake_ebdb_raw.contratopessoa.bairro
+    description: Neighborhood of the person's registered address.
   zip_code:
     lineage:
       - datalake_ebdb_raw.contratopessoa.cep
+    description: Postal code (CEP) of the person's registered address.
   city:
     lineage:
       - datalake_ebdb_raw.contratopessoa.cidade
+    description: City of the person's registered address.
   complement:
     lineage:
       - datalake_ebdb_raw.contratopessoa.complemento
+    description: Address complement (apartment, block) of the registered address.
   address:
     lineage:
       - datalake_ebdb_raw.contratopessoa.endereco
+    description: Mailing address of the person signing or listed on the rental contract.
   marital_status:
     lineage:
       - datalake_ebdb_raw.contratopessoa.estadocivil
+    description: Civil union state declared during contract onboarding (single, married, divorced, etc.).
   number:
     lineage:
       - datalake_ebdb_raw.contratopessoa.numero
+    description: Street number of the person's registered address.
   issuing_body:
     lineage:
       - datalake_ebdb_raw.contratopessoa.orgaoexpedidor
+    description: Government body that issued the person's identity document.
   profession:
     lineage:
       - datalake_ebdb_raw.contratopessoa.profissao
+    description: Profession declared by the contract person.
   state_id:
     lineage:
       - datalake_ebdb_raw.contratopessoa.estado_id
+    description: Foreign key to the Brazilian state of the registered address.
   type:
     lineage:
       - datalake_ebdb_raw.contratopessoa.tipo
+    description: Role of the person on the contract (e.g. tenant, owner, guarantor).
   nationality:
     lineage:
       - datalake_ebdb_raw.contratopessoa.nacionalidade
+    description: Country of citizenship declared by the person for legal contract documentation.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.contratopessoa.atualizadoem
+    description: Timestamp of the last update to this contract person record.
   ts_created:
     lineage:
       - datalake_ebdb_raw.contratopessoa.criadoem
+    description: Timestamp when this contract person record was created on EBDB.
   id_user:
     lineage:
       - datalake_ebdb_raw.contratopessoa.usuario_id
+    description: Foreign key to the QuintoAndar user account linked to this person.
   will_live:
     lineage:
       - datalake_ebdb_raw.contratopessoa.vaimorar
+    description: Flag indicating whether this person will live in the rented property.
   legal_representative_cpf:
     lineage:
       - datalake_ebdb_raw.contratopessoa.legalrepresentative_cpf
+    description: CPF of the legal representative when the person is a minor or entity.
   legal_representative_email:
     lineage:
       - datalake_ebdb_raw.contratopessoa.legalrepresentative_email
+    description: Contact email for the adult guardian or attorney acting on behalf of this person.
   legal_representative_name:
     lineage:
       - datalake_ebdb_raw.contratopessoa.legalrepresentative_nome
+    description: Legal name of the adult guardian or attorney authorized to sign for this person.
   legal_representative_rg:
     lineage:
       - datalake_ebdb_raw.contratopessoa.legalrepresentative_rg
+    description: RG identity document of the legal representative.
   is_with_representative:
     lineage:
       - datalake_ebdb_raw.contratopessoa.withrepresentative
+    description: Flag indicating whether this person acts through a legal representative.

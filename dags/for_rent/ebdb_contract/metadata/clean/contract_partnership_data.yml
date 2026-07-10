@@ -1,34 +1,46 @@
 database_name: datalake_ebdb_clean
 table_name: contract_partnership_data
+description: Partnership revenue split configuration per rental contract from EBDB ContractPartnershipData. One row per partner linked to a contract with brokerage and administration percentages. Used by FR Transact and partner billing analytics.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.id
+    description: Surrogate key of the contract partnership record on EBDB.
   id_contract:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.contract_id
+    description: Foreign key to the rental contract with this partnership split.
   id_partner:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.partner_id
+    description: Foreign key to the partner entity receiving the revenue share.
   administration_split_percentage:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.administrationsplitpercentage
+    description: Percentage of administration fees allocated to the partner.
   brokerage_split_percentage:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.brokeragesplitpercentage
+    description: Percentage of brokerage commission allocated to the partner.
   contract_plan:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.contractplan
+    description: Contract plan type governing the partnership revenue rules.
   partner_type:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.partnertype
+    description: Partner category such as broker or real estate agency.
   trade_name:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.tradename
+    description: Commercial trade name of the partner on the contract.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.atualizadoem
+    description: Timestamp when the partnership record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.criadoem
+    description: Timestamp when the partnership link was created.

@@ -1,22 +1,30 @@
 database_name: datalake_ebdb_clean
 table_name: signature
+description: Digital signatures on rental contracts from EBDB Assinatura. One row per contract person signature event. Used by FR Transact to track contract execution and signing milestones.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.assinatura.id
+    description: Surrogate key of the contract signature record on EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.assinatura.atualizadoem
+    description: Timestamp when the signature record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.assinatura.criadoem
+    description: Timestamp when the signature record was created.
   ts_signature:
     lineage:
       - datalake_ebdb_raw.assinatura.dataassinatura
+    description: Timestamp when the contract person completed the digital signature.
   id_contract:
     lineage:
       - datalake_ebdb_raw.assinatura.contrato_id
+    description: Foreign key to the rental contract being signed.
   id_contract_person:
     lineage:
       - datalake_ebdb_raw.assinatura.contratopessoa_id
+    description: Foreign key to the contract person who provided the signature.

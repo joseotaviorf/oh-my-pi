@@ -1,154 +1,206 @@
 database_name: datalake_ebdb_clean
 table_name: portability_aud
+description: Hibernate Envers audit history of portability requests from EBDB Portability_AUD. Each row is one revision of a portability record; join rev to user_revision_entity.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id_portability:
     lineage:
       - datalake_ebdb_raw.portability_aud.id
+    description: Foreign key to the portability request record being audited at this revision.
   rev:
     lineage:
       - datalake_ebdb_raw.portability_aud.rev
+    description: Envers revision id; join to user_revision_entity for the user and timestamp of the change.
   rev_type:
     lineage:
       - datalake_ebdb_raw.portability_aud.revtype
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
   dt_contract_ended:
     lineage:
       - datalake_ebdb_raw.portability_aud.contractfinaldate
+    description: Existing lease end date at this revision.
   mod_dt_contract_ended:
     lineage:
       - datalake_ebdb_raw.portability_aud.contractfinaldate_mod
+    description: Envers flag indicating whether dt_contract_ended changed in this revision.
   contract_observations:
     lineage:
       - datalake_ebdb_raw.portability_aud.contractobservations
+    description: Lease observation notes at this revision.
   mod_contract_observations:
     lineage:
       - datalake_ebdb_raw.portability_aud.contractobservations_mod
+    description: Envers flag indicating whether contract_observations changed in this revision.
   dt_contract_started:
     lineage:
       - datalake_ebdb_raw.portability_aud.contractstartdate
+    description: Existing lease start date at this revision.
   mod_dt_contract_started:
     lineage:
       - datalake_ebdb_raw.portability_aud.contractstartdate_mod
+    description: Envers flag indicating whether dt_contract_started changed in this revision.
   current_condo_fee:
     lineage:
       - datalake_ebdb_raw.portability_aud.currentcondofee
+    description: Reported condominium fee at this revision.
   mod_current_condo_fee:
     lineage:
       - datalake_ebdb_raw.portability_aud.currentcondofee_mod
+    description: Envers flag indicating whether current_condo_fee changed in this revision.
   current_iptu_twelth:
     lineage:
       - datalake_ebdb_raw.portability_aud.currentiptutwelth
+    description: Reported monthly IPTU equivalent at this revision.
   mod_current_iptu_twelth:
     lineage:
       - datalake_ebdb_raw.portability_aud.currentiptutwelth_mod
+    description: Envers flag indicating whether current_iptu_twelth changed in this revision.
   current_rent:
     lineage:
       - datalake_ebdb_raw.portability_aud.currentrent
+    description: Reported monthly rent at this revision.
   mod_current_rent:
     lineage:
       - datalake_ebdb_raw.portability_aud.currentrent_mod
+    description: Envers flag indicating whether current_rent changed in this revision.
   house_address_neighborhood:
     lineage:
       - datalake_ebdb_raw.portability_aud.houseaddress_bairro
+    description: Property neighborhood at this revision.
   house_address_zipcode:
     lineage:
       - datalake_ebdb_raw.portability_aud.houseaddress_cep
+    description: Property postal code at this revision.
   house_address_city:
     lineage:
       - datalake_ebdb_raw.portability_aud.houseaddress_cidade
+    description: Property city at this revision.
   house_address_complement:
     lineage:
       - datalake_ebdb_raw.portability_aud.houseaddress_complemento
+    description: Property address complement at this revision.
   house_address_street:
     lineage:
       - datalake_ebdb_raw.portability_aud.houseaddress_logradouro
+    description: Property street name at this revision.
   house_address_number:
     lineage:
       - datalake_ebdb_raw.portability_aud.houseaddress_numero
+    description: Property street number at this revision.
   mod_house_address:
     lineage:
       - datalake_ebdb_raw.portability_aud.houseaddress_mod
+    description: Envers flag indicating whether house address fields changed in this revision.
   house_type:
     lineage:
       - datalake_ebdb_raw.portability_aud.housetype
+    description: Property type at this revision.
   mod_house_type:
     lineage:
       - datalake_ebdb_raw.portability_aud.housetype_mod
+    description: Envers flag indicating whether house_type changed in this revision.
   lat:
     lineage:
       - datalake_ebdb_raw.portability_aud.lat
+    description: Property latitude at this revision.
   mod_lat:
     lineage:
       - datalake_ebdb_raw.portability_aud.lat_mod
+    description: Envers flag indicating whether lat changed in this revision.
   lng:
     lineage:
       - datalake_ebdb_raw.portability_aud.lng
+    description: Property longitude at this revision.
   mod_lng:
     lineage:
       - datalake_ebdb_raw.portability_aud.lng_mod
+    description: Envers flag indicating whether lng changed in this revision.
   owner_data_email:
     lineage:
       - datalake_ebdb_raw.portability_aud.ownerdata_email
+    description: Owner email at this revision.
   owner_data_gender:
     lineage:
       - datalake_ebdb_raw.portability_aud.ownerdata_gender
+    description: Owner gender at this revision.
   owner_data_name:
     lineage:
       - datalake_ebdb_raw.portability_aud.ownerdata_name
+    description: Owner name at this revision.
   owner_data_phone_number:
     lineage:
       - datalake_ebdb_raw.portability_aud.ownerdata_phonenumber
+    description: Owner phone number at this revision.
   mod_owner_data:
     lineage:
       - datalake_ebdb_raw.portability_aud.ownerdata_mod
+    description: Envers flag indicating whether owner contact data changed in this revision.
   status:
     lineage:
       - datalake_ebdb_raw.portability_aud.status
+    description: Portability workflow status at this revision.
   mod_status:
     lineage:
       - datalake_ebdb_raw.portability_aud.status_mod
+    description: Envers flag indicating whether status changed in this revision.
   tenant_data_email:
     lineage:
       - datalake_ebdb_raw.portability_aud.tenantdata_email
+    description: Tenant email at this revision.
   tenant_data_gender:
     lineage:
       - datalake_ebdb_raw.portability_aud.tenantdata_gender
+    description: Tenant gender at this revision.
   tenant_data_name:
     lineage:
       - datalake_ebdb_raw.portability_aud.tenantdata_name
+    description: Tenant name at this revision.
   tenant_data_phone_number:
     lineage:
       - datalake_ebdb_raw.portability_aud.tenantdata_phonenumber
+    description: Tenant phone number at this revision.
   mod_tenant_data:
     lineage:
       - datalake_ebdb_raw.portability_aud.tenantdata_mod
+    description: Envers flag indicating whether tenant contact data changed in this revision.
   id_flow:
     lineage:
       - datalake_ebdb_raw.portability_aud.flow_id
+    description: Foreign key to the portability workflow at this revision.
   mod_id_flow:
     lineage:
       - datalake_ebdb_raw.portability_aud.flow_mod
+    description: Envers flag indicating whether id_flow changed in this revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.portability_aud.house_id
+    description: Foreign key to the house record at this revision.
   mod_house:
     lineage:
       - datalake_ebdb_raw.portability_aud.house_mod
+    description: Envers flag indicating whether id_house changed in this revision.
   id_region:
     lineage:
       - datalake_ebdb_raw.portability_aud.region_id
+    description: Foreign key to the operating region at this revision.
   mod_id_region:
     lineage:
       - datalake_ebdb_raw.portability_aud.region_mod
+    description: Envers flag indicating whether id_region changed in this revision.
   id_tenant:
     lineage:
       - datalake_ebdb_raw.portability_aud.tenant_id
+    description: Foreign key to the tenant user at this revision.
   mod_tenant:
     lineage:
       - datalake_ebdb_raw.portability_aud.tenant_mod
+    description: Envers flag indicating whether id_tenant changed in this revision.
   owner_type:
     lineage:
       - datalake_ebdb_raw.portability_aud.ownertype
+    description: Owner classification type at this revision.
   mod_owner_type:
     lineage:
       - datalake_ebdb_raw.portability_aud.ownertype_mod
+    description: Envers flag indicating whether owner_type changed in this revision.

@@ -1,80 +1,106 @@
----
 database_name: datalake_ebdb_clean
 table_name: full_contract_aud
+description: Hibernate Envers audit history of extended contract financial terms from EBDB ContratoFull_AUD. Each row is one revision of a full contract record; join rev to user_revision_entity.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.id
+      - datalake_ebdb_raw.contratofull_aud.id
+    description: Surrogate key of the full contract record being audited at this revision.
   id_last_IGPM_adjustment:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.lastIGPMAdjustment_id
+      - datalake_ebdb_raw.contratofull_aud.lastIGPMAdjustment_id
+    description: Foreign key to the last IGPM adjustment at this revision.
   rev:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.rev
+      - datalake_ebdb_raw.contratofull_aud.rev
+    description: Envers revision id; join to user_revision_entity for the user and timestamp of the change.
   adm_fee_charge_type:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.admFeeChargeType
+      - datalake_ebdb_raw.contratofull_aud.admFeeChargeType
+    description: Administration fee charge model at this revision.
   home_insurance_type:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.homeInsuranceType
+      - datalake_ebdb_raw.contratofull_aud.homeInsuranceType
+    description: Home insurance product type at this revision.
   price_index_type:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.priceindextype
+      - datalake_ebdb_raw.contratofull_aud.priceindextype
+    description: Rent adjustment index type at this revision.
   monthly_administration_fee:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.taxaAdministracaoMensal
+      - datalake_ebdb_raw.contratofull_aud.taxaAdministracaoMensal
+    description: Monthly administration fee percentage at this revision.
   promotional_adm_fee:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.promotionalAdmFee
+      - datalake_ebdb_raw.contratofull_aud.promotionalAdmFee
+    description: Promotional administration fee at this revision.
   promotional_period:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.promotionalPeriod
+      - datalake_ebdb_raw.contratofull_aud.promotionalPeriod
+    description: Promotional period duration in months at this revision.
   reservation_price:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.reservationValue
+      - datalake_ebdb_raw.contratofull_aud.reservationValue
+    description: Reservation deposit value at this revision.
   reservation_refund_value:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.reservationRefundValue
+      - datalake_ebdb_raw.contratofull_aud.reservationRefundValue
+    description: Reservation refund amount at this revision.
   fixed_value_adjustment:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.fixedValueAdjustment
+      - datalake_ebdb_raw.contratofull_aud.fixedValueAdjustment
+    description: Fixed monetary value used for rent adjustment at this revision.
   minimum_fee_value:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.minimumFeeValue
+      - datalake_ebdb_raw.contratofull_aud.minimumFeeValue
+    description: Minimum administration fee value floor at this revision.
   is_auto_igpm:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.autoIgpm
+      - datalake_ebdb_raw.contratofull_aud.autoIgpm
+    description: Flag indicating automatic IGPM adjustment at this revision.
   owner_pay_day_of_month:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.diaMesPagarProprietario
+      - datalake_ebdb_raw.contratofull_aud.diaMesPagarProprietario
+    description: Day of the month for owner payouts at this revision.
   mod_home_insurance_type:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.homeInsuranceType_MOD
+      - datalake_ebdb_raw.contratofull_aud.homeInsuranceType_MOD
+    description: Envers flag indicating whether home_insurance_type changed in this revision.
   mod_last_ipgm_adjusment:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.lastIGPMAdjustment_MOD
+      - datalake_ebdb_raw.contratofull_aud.lastIGPMAdjustment_MOD
+    description: Envers flag indicating whether id_last_IGPM_adjustment changed in this revision.
   mod_dt_vacancy:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.vacancyDate_MOD
+      - datalake_ebdb_raw.contratofull_aud.vacancyDate_MOD
+    description: Envers flag indicating whether dt_vacancy changed in this revision.
   mod_price_index_type:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.priceindextype_MOD
+      - datalake_ebdb_raw.contratofull_aud.priceindextype_MOD
+    description: Envers flag indicating whether price_index_type changed in this revision.
   mod_fixed_value_adjustment:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.fixedValueAdjustment_MOD
+      - datalake_ebdb_raw.contratofull_aud.fixedValueAdjustment_MOD
+    description: Envers flag indicating whether fixed_value_adjustment changed in this revision.
   mod_ts_last_changed:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.lastChangedAt_MOD
+      - datalake_ebdb_raw.contratofull_aud.lastChangedAt_MOD
+    description: Envers flag indicating whether ts_last_changed changed in this revision.
   mod_minimum_fee_value:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.minimumFeeValue_MOD
+      - datalake_ebdb_raw.contratofull_aud.minimumFeeValue_MOD
+    description: Envers flag indicating whether minimum_fee_value changed in this revision.
   dt_vacancy:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.vacancyDate
+      - datalake_ebdb_raw.contratofull_aud.vacancyDate
+    description: Property vacancy date at this revision.
   ts_last_changed:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.lastChangedAt
+      - datalake_ebdb_raw.contratofull_aud.lastChangedAt
+    description: Timestamp of the last change to the full contract record.
   ts_igpm_notice_sent:
     lineage:
-    - datalake_ebdb_raw.contratofull_aud.enviadoAvisoDeIGPMEm
+      - datalake_ebdb_raw.contratofull_aud.enviadoAvisoDeIGPMEm
+    description: Timestamp when the IGPM adjustment notice was sent at this revision.

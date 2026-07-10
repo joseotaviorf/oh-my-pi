@@ -1,37 +1,50 @@
 database_name: datalake_ebdb_clean
 table_name: contract_version
+description: Rental contract template versions from EBDB ContractVersion. One row per version defining billing rules, insurance flags, and display labels. Referenced by contracts and used by FR Transact product analytics.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.contractversion.id
+    description: Surrogate key of the contract version template on EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.contractversion.atualizadoem
+    description: Timestamp when the contract version was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.contractversion.criadoem
+    description: Timestamp when the contract version was created.
   description:
     lineage:
       - datalake_ebdb_raw.contractversion.description
+    description: Internal description of the contract version business rules.
   name:
     lineage:
       - datalake_ebdb_raw.contractversion.name
+    description: Short name identifying the contract version template.
   has_residential_insurance:
     lineage:
       - datalake_ebdb_raw.contractversion.hasresidentialinsurance
+    description: Flag indicating whether this version includes residential insurance.
   internal_display_label:
     lineage:
       - datalake_ebdb_raw.contractversion.internaldisplaylabel
+    description: Label shown to internal operations teams for this version.
   version_display_contract:
     lineage:
       - datalake_ebdb_raw.contractversion.versiondisplaycontract
+    description: Customer-facing label for the contract version on documents.
   is_auth_with_admin_contract:
     lineage:
       - datalake_ebdb_raw.contractversion.isauthwithadmincontract
+    description: Flag indicating whether authorization requires an admin contract.
   should_calculate_first_payment:
     lineage:
       - datalake_ebdb_raw.contractversion.shouldcalculatefirstpayment
+    description: Flag indicating whether the first payment is auto-calculated.
   is_self_condo:
     lineage:
       - datalake_ebdb_raw.contractversion.isselfcondo
+    description: Flag indicating whether the property is a self-managed condominium.

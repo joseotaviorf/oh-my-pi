@@ -1,16 +1,22 @@
 database_name: datalake_ebdb_clean
 table_name: work_contract
+description: Work contract reference records from EBDB WorkContract. One row per named work contract template used in rental operations. Consumed by FR Transact for contract document generation tracking.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.workcontract.id
+    description: Surrogate key of the work contract record on EBDB.
   contract_name:
     lineage:
       - datalake_ebdb_raw.workcontract.contractname
+    description: Display name of the work contract template.
   ts_created:
     lineage:
       - datalake_ebdb_raw.workcontract.criadoem
+    description: Timestamp when the work contract record was created.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.workcontract.atualizadoem
+    description: Timestamp when the work contract record was last updated.

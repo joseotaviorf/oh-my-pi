@@ -1,28 +1,38 @@
 database_name: datalake_ebdb_clean
 table_name: contract_start_date_request
+description: Requests to change the start date of an active rental contract from EBDB ContractStartDateRequest. One row per request with previous and proposed dates. Consumed by FR Transact and contract operations analytics.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.contractStartDateRequest.id
+    description: Surrogate key of the contract start date change request.
   id_contract:
     lineage:
       - datalake_ebdb_raw.contractStartDateRequest.contractId
+    description: Foreign key to the rental contract whose start date is being changed.
   requester_type:
     lineage:
       - datalake_ebdb_raw.contractStartDateRequest.requesterType
+    description: Party type that submitted the start date change request.
   status:
     lineage:
       - datalake_ebdb_raw.contractStartDateRequest.status
+    description: Approval workflow status of the start date change request.
   dt_requested_started:
     lineage:
       - datalake_ebdb_raw.contractStartDateRequest.requestedStartDate
+    description: Proposed new contract start date requested by the party.
   dt_previous_started:
     lineage:
       - datalake_ebdb_raw.contractStartDateRequest.previousStartDate
+    description: Original contract start date before the change request.
   ts_created:
     lineage:
       - datalake_ebdb_raw.contractStartDateRequest.criadoEm
+    description: Timestamp when the start date change request was created.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.contractStartDateRequest.atualizadoEm
+    description: Timestamp when the start date change request was last updated.

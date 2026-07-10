@@ -1,34 +1,46 @@
 database_name: datalake_ebdb_clean
 table_name: contract_negotiation
+description: Rental contract negotiation requests from EBDB ContractNegotiation. One row per negotiation attempt to change contract terms such as rent value or duration. Consumed by FR Transact analytics and contract lifecycle reporting.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.id
+    description: Surrogate key of the contract negotiation record on EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.atualizadoem
+    description: Timestamp when the negotiation record was last updated.
   ts_created:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.criadoem
+    description: Timestamp when the negotiation request was created.
   dt_duration_until:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.durationuntil
+    description: End date of the proposed new contract duration.
   new_value:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.newvalue
+    description: Proposed new monetary value for the negotiated term.
   status:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.status
+    description: Current workflow status of the negotiation request.
   type:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.type
+    description: Negotiation category such as rent adjustment or term change.
   id_contract:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.contract_id
+    description: Foreign key to the rental contract under negotiation.
   id_requester:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.requestedby_id
+    description: User identifier of the party who initiated the negotiation.
   dt_started:
     lineage:
       - datalake_ebdb_raw.contractnegotiation.startson
+    description: Proposed start date for the negotiated contract term.

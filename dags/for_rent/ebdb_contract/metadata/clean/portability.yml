@@ -1,103 +1,138 @@
 database_name: datalake_ebdb_clean
 table_name: portability
+description: Rental portability requests from EBDB Portability where a tenant transfers an existing lease to QuintoAndar. One row per portability request with house, owner, and tenant snapshot data.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.portability.id
+    description: Surrogate key of the portability request on EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.portability.atualizadoem
+    description: Timestamp of the last update to this portability request.
   ts_created:
     lineage:
       - datalake_ebdb_raw.portability.criadoem
+    description: Timestamp when this portability request was created on EBDB.
   current_condo_fee:
     lineage:
       - datalake_ebdb_raw.portability.currentcondofee
+    description: Current monthly condominium fee reported for the portable lease.
   current_iptu_twelth:
     lineage:
       - datalake_ebdb_raw.portability.currentiptutwelth
+    description: Current monthly IPTU equivalent (twelfth of annual) for the portable lease.
   current_rent:
     lineage:
       - datalake_ebdb_raw.portability.currentrent
+    description: Current monthly rent amount of the existing lease being ported.
   house_address_neighborhood:
     lineage:
       - datalake_ebdb_raw.portability.houseaddress_bairro
+    description: Neighborhood of the property address in the portability request.
   house_address_zipcode:
     lineage:
       - datalake_ebdb_raw.portability.houseaddress_cep
+    description: Postal code (CEP) of the property address.
   house_address_city:
     lineage:
       - datalake_ebdb_raw.portability.houseaddress_cidade
+    description: City of the property address in the portability request.
   house_address_complement:
     lineage:
       - datalake_ebdb_raw.portability.houseaddress_complemento
+    description: Address complement for the property in the portability request.
   house_address_street:
     lineage:
       - datalake_ebdb_raw.portability.houseaddress_logradouro
+    description: Street name of the rental property subject to the portability request.
   house_address_number:
     lineage:
       - datalake_ebdb_raw.portability.houseaddress_numero
+    description: Street number of the property address.
   house_type:
     lineage:
       - datalake_ebdb_raw.portability.housetype
+    description: Property type (e.g. apartment, house) in the portability request.
   lat:
     lineage:
       - datalake_ebdb_raw.portability.lat
+    description: Latitude coordinate of the property location.
   lng:
     lineage:
       - datalake_ebdb_raw.portability.lng
+    description: Longitude coordinate of the property location.
   owner_data_email:
     lineage:
       - datalake_ebdb_raw.portability.ownerdata_email
+    description: Email address of the property owner in the portability request.
   owner_data_gender:
     lineage:
       - datalake_ebdb_raw.portability.ownerdata_gender
+    description: Gender of the property owner as recorded in the request.
   owner_data_name:
     lineage:
       - datalake_ebdb_raw.portability.ownerdata_name
+    description: Full name of the property owner in the portability request.
   owner_data_phone_number:
     lineage:
       - datalake_ebdb_raw.portability.ownerdata_phonenumber
+    description: Phone number of the property owner in the portability request.
   status:
     lineage:
       - datalake_ebdb_raw.portability.status
+    description: Current workflow status of the portability request on EBDB.
   tenant_data_email:
     lineage:
       - datalake_ebdb_raw.portability.tenantdata_email
+    description: Email address of the tenant submitting the portability request.
   tenant_data_gender:
     lineage:
       - datalake_ebdb_raw.portability.tenantdata_gender
+    description: Gender of the tenant as recorded in the portability request.
   tenant_data_name:
     lineage:
       - datalake_ebdb_raw.portability.tenantdata_name
+    description: Full name of the tenant in the portability request.
   tenant_data_phone_number:
     lineage:
       - datalake_ebdb_raw.portability.tenantdata_phonenumber
+    description: Phone number of the tenant in the portability request.
   id_flow:
     lineage:
       - datalake_ebdb_raw.portability.flow_id
+    description: Foreign key to the portability workflow instance on EBDB.
   id_house:
     lineage:
       - datalake_ebdb_raw.portability.house_id
+    description: Foreign key to the QuintoAndar house record linked after onboarding.
   id_state:
     lineage:
       - datalake_ebdb_raw.portability.houseaddress_estado_id
+    description: Foreign key to the Brazilian state of the property address.
   id_region:
     lineage:
       - datalake_ebdb_raw.portability.region_id
+    description: Foreign key to the QuintoAndar operating region for the property.
   id_tenant:
     lineage:
       - datalake_ebdb_raw.portability.tenant_id
+    description: Foreign key to the tenant user account on EBDB.
   dt_contract_ended:
     lineage:
       - datalake_ebdb_raw.portability.contractfinaldate
+    description: End date of the existing lease being ported to QuintoAndar.
   contract_observations:
     lineage:
       - datalake_ebdb_raw.portability.contractobservations
+    description: Free-text observations about the existing lease contract.
   dt_contract_started:
     lineage:
       - datalake_ebdb_raw.portability.contractstartdate
+    description: Start date of the existing lease being ported to QuintoAndar.
   owner_type:
     lineage:
       - datalake_ebdb_raw.portability.ownertype
+    description: Owner classification type for the portability request (e.g. individual or company).

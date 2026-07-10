@@ -1,103 +1,138 @@
 database_name: datalake_ebdb_clean
 table_name: contract_person_aud
+description: Hibernate Envers audit history of contract person records from EBDB ContratoPessoa_AUD. Each row is one revision of a person linked to a contract; join rev to user_revision_entity.
 domain: For Rent
+owner: gustavo.brunelli@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.id
+    description: Surrogate key of the contract person record being audited at this revision.
   rev:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.rev
+    description: Envers revision id; join to user_revision_entity for the user and timestamp of the change.
   rev_type:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.revtype
+    description: Envers revision type for this audit row (0 create, 1 update, 2 delete).
   neighborhood:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.bairro
+    description: Neighborhood of the person's address at this revision.
   zip_code:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.cep
+    description: Postal code (CEP) of the person's address at this revision.
   city:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.cidade
+    description: City of the person's address at this revision.
   complement:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.complemento
+    description: Address complement at this revision.
   cpf:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.cpf
+    description: CPF tax identifier of the contract person at this revision.
   dt_rg_created:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.dataexpedicaorg
+    description: Date when the identity document was issued at this revision.
   dt_birth:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.datanascimento
+    description: Birth date of the contract person at this revision.
   email:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.email
+    description: Email address of the contract person at this revision.
   address:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.endereco
+    description: Mailing address of the contract party as recorded in this audit revision.
   marital_status:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.estadocivil
+    description: Marital status of the contract person at this revision.
   legal_representative_cpf:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.legalrepresentative_cpf
+    description: CPF of the legal representative at this revision.
   legal_representative_email:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.legalrepresentative_email
+    description: Email of the legal representative at this revision.
   legal_representative_name:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.legalrepresentative_nome
+    description: Full name of the legal representative when the contract party is a company.
   legal_representative_rg:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.legalrepresentative_rg
+    description: RG of the legal representative at this revision.
   nationality:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.nacionalidade
+    description: Nationality of the contract person at this revision.
   name:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.nome
+    description: Full legal name of the contract person at this revision.
   number:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.numero
+    description: Street number of the person's address at this revision.
   issuing_body:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.orgaoexpedidor
+    description: Issuing body of the identity document at this revision.
   profession:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.profissao
+    description: Profession declared by the contract person at this revision.
   rg:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.rg
+    description: Identity document (RG) number at this revision.
   gender:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.sexo
+    description: Gender of the contract person at this revision.
   phone_number:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.telefone
+    description: Primary phone number of the proposal participant.
   secondary_phone:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.telefonesecundario
+    description: Secondary phone number at this revision.
   type:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.tipo
+    description: Role of the person on the contract at this revision.
   id_user:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.usuario_id
+    description: Foreign key to the QuintoAndar user account at this revision.
   will_live:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.vaimorar
+    description: Flag indicating whether this person will live in the property at this revision.
   is_with_representative:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.withrepresentative
+    description: Flag indicating whether a legal representative is involved at this revision.
   id_contract:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.contrato_id
+    description: Foreign key to the rental contract at this revision.
   id_state:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.estado_id
+    description: Foreign key to the Brazilian state of the address at this revision.
   mod_id_user:
     lineage:
       - datalake_ebdb_raw.contratopessoa_aud.usuarioid_mod
+    description: Envers flag indicating whether id_user changed in this revision.
