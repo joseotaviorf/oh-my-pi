@@ -2,7 +2,7 @@ database_name: dw_collection_recovery_quintocred
 table_name: fact_negotiation_installment
 description: Installments of negotiations
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_negotiation_installment:
     lineage:
@@ -22,7 +22,7 @@ columns:
   id_installment:
     lineage:
       - datalake_debt_recovery.installment.id
-    description: Installment ID
+    description: Identifier for the installment referenced by this financial record.
   id_invoice_extra:
     lineage:
       - datalake_trato_feito_clean.accounting_installment.id_external
@@ -35,7 +35,7 @@ columns:
   installment_number:
     lineage:
       - datalake_recupera.installment.installment_number
-    description: The number of the installment.
+    description: Debt collection attribute describing installment number for recovery workflow tracking.
   creditor:
     lineage:
       - datalake_recupera.installment.creditor
@@ -49,7 +49,7 @@ columns:
     lineage:
       - datalake_recupera.installment.status
       - datalake_debt_recovery.installment.status
-    description: Invoice status
+    description: Debt collection attribute describing installment status for recovery workflow tracking.
     categories:
       expired: "The installment negotiation was broken before the installment was paid."
       paid: "The installment was paid and accounted for."
@@ -65,7 +65,7 @@ columns:
   main_amount:
     lineage:
       - datalake_recupera.installment.main_amount
-    description: Installment Main amount.
+    description: Debt collection attribute describing main amount for recovery workflow tracking.
   amount_to_pay:
     lineage:
       - datalake_recupera.installment.amount_to_pay
@@ -78,11 +78,11 @@ columns:
   amount_fine:
     lineage:
       - datalake_recupera.installment.amount_fine
-    description: Fine Amount
+    description: Debt collection attribute describing amount fine for recovery workflow tracking.
   interest_fee_amount:
     lineage:
       - datalake_recupera.installment.interest_fee_amount
-    description: Interest Value
+    description: Debt collection attribute describing interest fee amount for recovery workflow tracking.
   default_interest_amount:
     lineage:
       - datalake_recupera.installment.default_interest_amount
@@ -96,13 +96,13 @@ columns:
     lineage:
       - datalake_recupera.installment.discount_amount
       - datalake_debt_recovery.installment.discount_amount
-    description: Discount Amount
+    description: Debt collection attribute describing discount amount for recovery workflow tracking.
   paid_amount:
     lineage:
       - datalake_recupera.installment.paid_amount
       - datalake_debt_recovery.installment.total_amount
       - datalake_nexxera.cnab_charges_recupera.net_amount
-    description: Installment Paid Amount.
+    description: Debt collection attribute describing paid amount for recovery workflow tracking.
   dt_creation:
     lineage:
       - datalake_recupera.installment.dt_formalization

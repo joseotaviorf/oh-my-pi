@@ -18,15 +18,15 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.id
   origin_table:
-    description: "Origin table of the contract payment"
+    description: Debt collection attribute describing origin table for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.origin_table
   status:
-    description: "Contract payment status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_velo.payment_contracts.status
   gateway:
-    description: "Contract payment gateway"
+    description: Debt collection attribute describing gateway for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.gateway
   gateway_clean:
@@ -46,11 +46,11 @@ columns:
   status_memory_transaction:
     description: "Transaction status stored in memory"
   billing_type:
-    description: "Contract billing type"
+    description: Debt collection attribute describing billing type for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.billing_type
   category:
-    description: "Contract payment category"
+    description: Debt collection attribute describing category for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.category
   birth_origin:
@@ -78,11 +78,11 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.package_amount
   guarantee_status:
-    description: "Status of the guarantee"
+    description: Debt collection attribute describing guarantee status for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.guarantee_status
   propose_status:
-    description: "Status of the propose"
+    description: Debt collection attribute describing propose status for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.propose_status
   ref_mob_start:
@@ -94,7 +94,7 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.ref_mob_end
   ref_month:
-    description: "Month of reference"
+    description: Debt collection attribute describing ref month for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.ref_month
   number_of_distinct_gateways_at_ref:
@@ -170,11 +170,11 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_valid
   flag_annual_payment_month_limit:
-    description: "Flag indicating the month limit for annual payment"
+    description: Debt collection attribute describing flag annual payment month limit for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_limit
   flag_annual_payment_month_valid_limit:
-    description: "Flag indicating the valid month limit for annual payment"
+    description: Debt collection attribute describing flag annual payment month valid limit for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_valid_limit
   dt_contract_started:
@@ -194,7 +194,7 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.dt_month_ref_creation
   dt_due:
-    description: "Contract due date"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_velo.payment_contracts.dt_due
   dt_month_ref_due:
@@ -202,6 +202,6 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.dt_month_ref_due
   dt_paid:
-    description: "Contract payment date"
+    description: Calendar date associated with paid in the financial workflow.
     lineage:
       - datalake_velo.payment_contracts.dt_paid

@@ -2,7 +2,7 @@ database_name: dw_collection_recovery_quintocred
 table_name: fact_negotiation
 description: Negotiations of Debt Recovery
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_negotiation:
     lineage:
@@ -16,16 +16,16 @@ columns:
   id_negotiation_trato_feito:
     lineage:
       - datalake_debt_recovery.negotiation.id_negotiation
-    description: "Trato-Feito negotiation ID"
+    description: Identifier for the negotiation trato feito referenced by this financial record.
   id_negotiation_recupera:
     lineage:
       - datalake_recupera.negotiation.id_negotiation
-    description: "Recupera negotiation ID"
+    description: Identifier for the negotiation recupera referenced by this financial record.
   id_contract:
     lineage:
       - datalake_debt_recovery.negotiation.id_contract
       - datalake_recupera.negotiation.id_contract
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_operator:
     lineage:
       - datalake_recupera.negotiation.id_operator
@@ -42,7 +42,7 @@ columns:
   invalid_reason:
     lineage:
       - datalake_recupera.negotiation.id_contract
-    description: The reason for the negotiation being invalid
+    description: Debt collection attribute describing invalid reason for recovery workflow tracking.
   agreement_type:
     lineage:
       - datalake_recupera.negotiation.agreement_type
@@ -64,7 +64,7 @@ columns:
   origin_agreement:
     lineage:
       - datalake_recupera.negotiation.origin_agreement
-    description: "Origin of the agreement"
+    description: Debt collection attribute describing origin agreement for recovery workflow tracking.
     categories:
       Assessoria: "Advisory"
       Carta_Campanha: "These are agreements that are paid in installments through bank slips (boletos)"
@@ -114,7 +114,7 @@ columns:
   agreement_in_delay:
     lineage:
       - datalake_recupera.negotiation.agreement_in_delay
-    description: "Delayed agreement"
+    description: Debt collection attribute describing agreement in delay for recovery workflow tracking.
   is_down_payment_paid:
     lineage:
       - datalake_recupera.negotiation.down_payment
@@ -171,7 +171,7 @@ columns:
       - datalake_recupera.negotiation.original_debt_amount
       - datalake_recupera.negotiation.interest_fee_amount
       - datalake_recupera.negotiation.adm_fee_amount
-    description: Fine fee amount (multa)
+    description: Debt collection attribute describing fine fee amount for recovery workflow tracking.
   interest_fee_amount:
     lineage:
       - datalake_debt_recovery.negotiation.interest_fee_amount
@@ -181,7 +181,7 @@ columns:
     lineage:
       - datalake_debt_recovery.negotiation.credit_card_fee_amount
       - datalake_recupera.negotiation.adm_fee_amount
-    description: Credit card fee amount
+    description: Debt collection attribute describing credit card fee amount for recovery workflow tracking.
   total_debt_amount:
     lineage:
       - datalake_recupera.negotiation.expense_amount
@@ -241,7 +241,7 @@ columns:
     lineage:
       - datalake_recupera.negotiation.negotiated_amount
       - datalake_debt_recovery.negotiation.total_expected_amount
-    description: "Negotiation Amount"
+    description: Debt collection attribute describing negotiated amount for recovery workflow tracking.
   negotiated_to_be_due_amount:
     lineage:
       - datalake_recupera.negotiation.negotiated_to_be_due_amount
@@ -253,16 +253,16 @@ columns:
   down_payment_amount:
     lineage:
       - datalake_recupera.negotiation.down_payment_amount
-    description: "Down Payment (Entry) amount"
+    description: Debt collection attribute describing down payment amount for recovery workflow tracking.
   down_payment_amount_without_fees:
     lineage:
       - datalake_recupera.negotiation.down_payment_amount_without_fees
-    description: "Down Payment (Entry) amount without fees"
+    description: Debt collection attribute describing down payment amount without fees for recovery workflow tracking.
   paid_amount:
     lineage:
       - datalake_debt_recovery.negotiation.paid_amount
       - datalake_recupera.negotiation.total_amount_paid
-    description: "Total paid amount"
+    description: Debt collection attribute describing paid amount for recovery workflow tracking.
   total_next_due:
     lineage:
       - datalake_recupera.negotiation.total_next_due
@@ -317,7 +317,7 @@ columns:
   dt_next_due:
     lineage:
       - datalake_recupera.negotiation.dt_next_due
-    description: "Next due date"
+    description: Calendar date associated with next due in the financial workflow.
   dt_paid_all_installments:
     lineage:
       - datalake_debt_recovery.negotiation.ts_paid_all

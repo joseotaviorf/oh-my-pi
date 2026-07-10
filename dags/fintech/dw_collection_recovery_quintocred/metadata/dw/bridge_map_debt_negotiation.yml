@@ -4,7 +4,7 @@ description: |
   This table contains the relationship between two keys from fact_debt and fact_negotiation (sk_debt and sk_negotiation).
   A register will only enter this table when there is a negotiation to them.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_debt:
     lineage:

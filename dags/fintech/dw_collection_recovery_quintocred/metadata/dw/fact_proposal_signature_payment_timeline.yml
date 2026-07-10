@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.origin_table
   status:
-    description: "Contract payment status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_velo.payment_contracts.status
   gateway:
@@ -30,49 +30,49 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.gateway
   gateway_clean:
-    description: "gateway clean"
+    description: Debt collection attribute describing gateway clean for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.gateway
   gateway_memory_transaction:
     description: "Last contract payment gateway"
   gateway_plataform_clean:
-    description: "gateway_plataform_clean"
+    description: Debt collection attribute describing gateway plataform clean for recovery workflow tracking.
   current_plataform:
-    description: "current_plataform"
+    description: Debt collection attribute describing current plataform for recovery workflow tracking.
   current_plataform_ffil:
-    description: "current_plataform_ffil"
+    description: Debt collection attribute describing current plataform ffil for recovery workflow tracking.
   migration_status:
-    description: "migration_status"
+    description: Debt collection attribute describing migration status for recovery workflow tracking.
   migration_status_v2:
-    description: "migration_status_v2"
+    description: Debt collection attribute describing migration status v2 for recovery workflow tracking.
   clean_migration_mechanism_flag:
-    description: "clean_migration_mechanism_flag"
+    description: Debt collection attribute describing clean migration mechanism flag for recovery workflow tracking.
   flag_missing_payment_adjs:
-    description: "flag_missing_payment_adjs"
+    description: Debt collection attribute describing flag missing payment adjs for recovery workflow tracking.
   flag_missing_payment_adjs_v2:
-    description: "flag_missing_payment_adjs_v2"
+    description: Debt collection attribute describing flag missing payment adjs v2 for recovery workflow tracking.
   gateway_estimation:
-    description: "gateway_estimation"
+    description: Debt collection attribute describing gateway estimation for recovery workflow tracking.
   months_since_last_renewal:
-    description: "months_since_last_renewal"
+    description: Debt collection attribute describing months since last renewal for recovery workflow tracking.
   month_of_birth:
-    description: "month_of_birth"
+    description: Debt collection attribute describing month of birth for recovery workflow tracking.
   day_of_birth:
-    description: "day_of_birth"
+    description: Debt collection attribute describing day of birth for recovery workflow tracking.
   months_to_be_renewed:
-    description: "months_to_be_renewed"
+    description: Debt collection attribute describing months to be renewed for recovery workflow tracking.
   n_of_expected_previous_renewals:
-    description: "n_of_expected_previous_renewals"
+    description: Numeric measure of of expected previous renewals for financial reporting and KPI tracking.
   renewal_status:
-    description: "renewal_status"
+    description: Debt collection attribute describing renewal status for recovery workflow tracking.
   id_memory_transaction:
-    description: "id_memory_transaction"
+    description: Identifier for the memory transaction referenced by this financial record.
   value_memory_transaction:
-    description: "value_memory_transaction"
+    description: Debt collection attribute describing value memory transaction for recovery workflow tracking.
   status_memory_transaction:
-    description: "status_memory_transaction"
+    description: Debt collection attribute describing status memory transaction for recovery workflow tracking.
   billing_type:
-    description: "Contract billing type"
+    description: Debt collection attribute describing billing type for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.billing_type
   category:
@@ -104,11 +104,11 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.package_amount
   guarantee_status:
-    description: "Status of the guarantee"
+    description: Debt collection attribute describing guarantee status for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.guarantee_status
   propose_status:
-    description: "Status of the propose"
+    description: Debt collection attribute describing propose status for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.propose_status
   ref_mob_start:
@@ -120,7 +120,7 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.ref_mob_end
   ref_month:
-    description: "Month of reference"
+    description: Debt collection attribute describing ref month for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.ref_month
   number_of_distinct_gateways_at_ref:
@@ -196,15 +196,15 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_valid
   flag_annual_payment_month_limit:
-    description: "Flag indicating the month limit for annual payment"
+    description: Debt collection attribute describing flag annual payment month limit for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_limit
   flag_annual_payment_month_valid_limit:
-    description: "Flag indicating the valid month limit for annual payment"
+    description: Debt collection attribute describing flag annual payment month valid limit for recovery workflow tracking.
     lineage:
       - datalake_velo.payment_contracts.flag_annual_payment_month_valid_limit
   dt_created_memory_transaction:
-    description: "dt_created_memory_transaction"
+    description: Calendar date associated with created memory transaction in the financial workflow.
   dt_contract_started:
     description: "Contract start date"
     lineage:
@@ -234,6 +234,9 @@ columns:
     lineage:
       - datalake_velo.payment_contracts.dt_paid
   dt_expected_month_renewal:
-    description: "dt_expected_month_renewal"
+    description: Calendar date associated with expected month renewal in the financial workflow.
   dt_expected_day_renewal:
-    description: "dt_expected_day_renewal"
+    description: Calendar date associated with expected day renewal in the financial workflow.
+  memory_origin_table:
+    description: Debt collection attribute describing memory origin table for recovery workflow tracking.
+    lineage: []

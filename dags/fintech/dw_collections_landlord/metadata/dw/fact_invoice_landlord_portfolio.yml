@@ -1,7 +1,6 @@
 database_name: dw_collections_landlord
 table_name: fact_invoice_landlord_portfolio
-description: Invoice portfolio data for landlords with bill items breakdown and invoice
-  status information
+description: Invoices from landlords for rent to be collected within collections journey with bill items breakdown and invoice status information
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
@@ -37,24 +36,24 @@ columns:
     description: Invoice type classification (original_invoice or deal_invoice)
   status:
     lineage:
-    - datalake_retsuko.invoice.status
-    description: Operational status of the landlord invoice at the snapshot date.
+      - datalake_retsuko.invoice.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   payment_status:
     lineage:
-    - datalake_retsuko.invoice.payment_status
-    description: Payment settlement status of the landlord invoice record.
+      - datalake_retsuko.invoice.payment_status
+    description: Debt collection attribute describing payment status for recovery workflow tracking.
   purpose:
     lineage:
-    - datalake_retsuko.invoice.purpose
-    description: Business purpose code explaining why the landlord invoice was issued.
+      - datalake_retsuko.invoice.purpose
+    description: Debt collection attribute describing purpose for recovery workflow tracking.
   reason:
     lineage:
-    - datalake_retsuko.invoice.reason
-    description: Reason code describing the landlord invoice billing context.
+      - datalake_retsuko.invoice.reason
+    description: Debt collection attribute describing reason for recovery workflow tracking.
   country_code:
     lineage:
-    - datalake_retsuko.invoice.country_code
-    description: ISO country code of the landlord invoice billing jurisdiction.
+      - datalake_retsuko.invoice.country_code
+    description: Debt collection attribute describing country code for recovery workflow tracking.
   list_bill_items:
     lineage:
     - datalake_retsuko.bill_items.bill_item
@@ -66,12 +65,12 @@ columns:
     description: Adjusted due amount considering between contracts adjustments
   due_amount:
     lineage:
-    - datalake_retsuko.invoice.due_amount
-    description: Monetary amount still outstanding on the landlord invoice.
+      - datalake_retsuko.invoice.due_amount
+    description: Debt collection attribute describing due amount for recovery workflow tracking.
   paid_amount:
     lineage:
-    - datalake_retsuko.invoice.paid_amount
-    description: Monetary amount already paid against the landlord invoice.
+      - datalake_retsuko.invoice.paid_amount
+    description: Debt collection attribute describing paid amount for recovery workflow tracking.
   balance_adm_fee:
     lineage:
     - datalake_retsuko.bill_items.value_sign_bill_item
@@ -207,20 +206,20 @@ columns:
     description: Flag indicating if invoice has unknown bill items
   accrual_year_month:
     lineage:
-    - datalake_retsuko.invoice.accrual_year_month
-    description: Accrual year-month period assigned to the landlord invoice.
+      - datalake_retsuko.invoice.accrual_year_month
+    description: Debt collection attribute describing accrual year month for recovery workflow tracking.
   dt_begin:
     lineage:
-    - datalake_retsuko.invoice.ts_created
-    - datalake_retsuko.invoice.ts_paid
-    - datalake_retsuko.invoice.ts_due
-    description: Start date of the accrual window for the landlord invoice.
+      - datalake_retsuko.invoice.ts_created
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice.ts_due
+    description: Calendar date associated with begin in the financial workflow.
   dt_end:
     lineage:
-    - datalake_retsuko.invoice.ts_paid
-    - datalake_retsuko.invoice.ts_canceled
-    - datalake_retsuko.invoice.ts_retsuko_updated
-    description: End date of the accrual window for the landlord invoice.
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice.ts_canceled
+      - datalake_retsuko.invoice.ts_retsuko_updated
+    description: Calendar date associated with end in the financial workflow.
   dt_paid:
     lineage:
     - datalake_retsuko.invoice.ts_paid
@@ -235,12 +234,12 @@ columns:
     description: Date when invoice was sent
   dt_due:
     lineage:
-    - datalake_retsuko.invoice.ts_due
-    description: Due date when the landlord invoice payment is expected.
+      - datalake_retsuko.invoice.ts_due
+    description: Calendar date associated with due in the financial workflow.
   dt_due_adjusted:
     lineage:
-    - datalake_retsuko.invoice.dt_due_adjusted
-    description: Adjusted due date after payment term changes on the invoice.
+      - datalake_retsuko.invoice.dt_due_adjusted
+    description: Calendar date associated with due adjusted in the financial workflow.
   dt_created:
     lineage:
     - datalake_retsuko.invoice.ts_created

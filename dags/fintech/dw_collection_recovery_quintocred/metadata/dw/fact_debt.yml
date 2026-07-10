@@ -5,7 +5,7 @@ description: |
   An invoice can have 1 or more negotiations, in case of a broken negotiation (i.e a promisse not paid). 1 negotiation can include 1 or more invoices (from seu barriga).
   If an extra invoice (installment of a negotiation) is overdue, it will also be registered in this table.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_debt:
     lineage:
@@ -69,7 +69,7 @@ columns:
     lineage:
       - datalake_retsuko.invoice.due_amount
       - datalake_velo.occurrence.due_amount
-    description: Invoice due amount
+    description: Debt collection attribute describing invoice due amount for recovery workflow tracking.
   invoice_paid_amount:
     lineage:
       - datalake_retsuko.invoice.paid_amount
@@ -82,11 +82,11 @@ columns:
   fine_fee_amount:
     lineage:
       - datalake_trato_feito_clean.debt.fine_fee_amount
-    description: Fine fee amount(multa)
+    description: Debt collection attribute describing fine fee amount for recovery workflow tracking.
   discount_amount:
     lineage:
       - datalake_trato_feito_clean.debt.discount_amount
-    description: Discount amount
+    description: Debt collection attribute describing discount amount for recovery workflow tracking.
   debt_amount:
     lineage:
       - datalake_trato_feito_clean.debt.original_amount
@@ -99,7 +99,7 @@ columns:
       - datalake_retsuko.invoice.ts_due
       - datalake_velo.occurrence.dt_due_legacy
       - datalake_velo.occurrence.dt_due
-    description: Invoice due date
+    description: Calendar date associated with invoice due in the financial workflow.
   dt_invoice_paid:
     lineage:
       - datalake_retsuko.invoice.ts_paid
