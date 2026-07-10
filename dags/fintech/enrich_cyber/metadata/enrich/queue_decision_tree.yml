@@ -1,12 +1,15 @@
 ---
 database_name: datalake_cyber
 table_name: queue_decision_tree
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Queue decision
+description: |
+  Unified reference of Cyber collection decision trees and operational labels.
+  One row per rule node (level and test branch) across segmentation, agreement, digital channel, eviction, credit denial queues and dialer/campaign/eviction/Serasa labels.
+  Rule conditions are decoded from Cyber field codes into readable params; queue_name provides the human label for queue codes consumed by contracts and delinquent_master enrich tables.
 columns:
   level:
-    description: ""
+    description: "Depth of the node in the decision tree hierarchy for the given queue type; higher levels are evaluated after parent conditions match."
     lineage:
       - datalake_cyber_clean.segmentation_decision_tree.level
       - datalake_cyber_clean.agreement_decision_tree.level
@@ -17,7 +20,7 @@ columns:
       - datalake_cyber_clean.campaign_label_decision_tree.level
       - datalake_cyber_clean.pre_legal_label_decision_tree.level
   test:
-    description: ""
+    description: "Branch index within a tree level; multiple tests allow parallel routing paths when several conditions can match at the same depth."
     lineage:
       - datalake_cyber_clean.segmentation_decision_tree.test
       - datalake_cyber_clean.agreement_decision_tree.test
@@ -28,9 +31,9 @@ columns:
       - datalake_cyber_clean.campaign_label_decision_tree.test
       - datalake_cyber_clean.pre_legal_label_decision_tree.test
   queue_type:
-    description: ""
+    description: "Category of the decision tree — Segmentation, Acordo, Canais Digitais, Eviction, Negativação, or operational labels such as Discador Olos, Campaign, Label Evictions and Label Serasa Limpa Nome."
   level_name:
-    description: ""
+    description: "Human-readable label for the decision tree level, taken from the Cyber comment at sequence -1 when test equals zero."
     lineage:
       - datalake_cyber_clean.segmentation_decision_tree.comment
       - datalake_cyber_clean.agreement_decision_tree.comment
@@ -41,7 +44,7 @@ columns:
       - datalake_cyber_clean.campaign_label_decision_tree.comment
       - datalake_cyber_clean.pre_legal_label_decision_tree.comment
   queue:
-    description: ""
+    description: "Numeric queue or label code assigned when the rule path matches; used as foreign key in delinquent_master and contracts (e.g. DMQUE segmentation code)."
     lineage:
       - datalake_cyber_clean.segmentation_decision_tree.queue
       - datalake_cyber_clean.agreement_decision_tree.queue
@@ -52,7 +55,7 @@ columns:
       - datalake_cyber_clean.campaign_label_decision_tree.queue
       - datalake_cyber_clean.pre_legal_label_decision_tree.queue
   queue_name:
-    description: ""
+    description: "Human-readable name of the queue or label from Cyber comments at sequence 0; joined to contracts and delayed_portfolio_base to decode queue codes."
     lineage:
       - datalake_cyber_clean.segmentation_decision_tree.comment
       - datalake_cyber_clean.agreement_decision_tree.comment
@@ -63,7 +66,7 @@ columns:
       - datalake_cyber_clean.campaign_label_decision_tree.comment
       - datalake_cyber_clean.pre_legal_label_decision_tree.comment
   params:
-    description: ""
+    description: "AND-concatenated rule conditions for this node, built by translating Cyber field codes to business names and formatting operators and threshold values."
     lineage:
       - datalake_cyber_clean.segmentation_decision_tree.field_1
       - datalake_cyber_clean.segmentation_decision_tree.field_2
@@ -90,4 +93,7 @@ columns:
       - datalake_cyber_clean.pre_legal_label_decision_tree.field_2
       - datalake_cyber_clean.pre_legal_label_decision_tree.field_3
   ts_load:
-    description: ""
+    description: "Timestamp when the row was materialized into the enrich layer by the ETL pipeline."
+  queue_number:
+    description: "Cyber internal identifier for the queue or label family (e.g. Fila 1 for segmentation, Label 3 for campaigns), assigned when unioning source decision trees."
+    lineage: []

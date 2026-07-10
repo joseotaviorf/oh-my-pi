@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_legal
 table_name: evictions_base
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Comprehensive eviction cases data from the cyber legal system, enriched with case details, agency information, court data, process phases, expenses, and financial information. Includes detailed stage information with dates and expenses for each process stage.
 columns:
@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_cyber_legal.process.id_case
   id_court_case:
-    description: "Court case identifier."
+    description: Identifier for the court case referenced by this financial record.
     lineage:
       - datalake_cyber_legal.process.id_court_case
   contract:
@@ -25,10 +25,6 @@ columns:
     description: "Eviction label classification for the account."
     lineage:
       - datalake_cyber_legal.process.evictions_label
-  contract_category_at_registration:
-    description: "Contract category at the time of registration, classified as: Adimplente, FPD, Acordo Ativo, Mensal, Demais Inadimplentes, or Outros."
-    lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline
   action_type:
     description: "Type of action classification (case subtype)."
     lineage:
@@ -145,18 +141,6 @@ columns:
     description: "Result classification (set to 'not_in_cyber_legal')."
   succumbency_fee:
     description: "Succumbency fee (set to 'not_in_cyber_legal')."
-  total_package:
-    description: "Total package value for the legal case."
-    lineage:
-      - datalake_cyber_legal.process.total_package_amount
-  total_due_amount:
-    description: "Total due amount (overdue amount) for the contract."
-    lineage:
-      - datalake_cyber_legal.process.overdue_amount
-  overdue_days_at_registration:
-    description: "Number of overdue days at registration (maximum delay of original invoices at T1)."
-    lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
   ldt_stock:
     description: "Lead time to stock (number of days)."
     lineage:
@@ -169,48 +153,6 @@ columns:
     description: "Lead time to resolution (number of days)."
     lineage:
       - datalake_cyber_legal.process.ldt_resolution
-  resolution_range:
-    description: "Resolution range classification: <120D, 120-240D, 240-360D, >360D, or NULL."
-    lineage:
-      - datalake_cyber_legal.process.ldt_resolution
-  real_ldt_resolution:
-    description: "Real lead time to resolution calculated as the difference in days between case acceptance date and closure date (only when case is completed)."
-    lineage:
-      - datalake_cyber_legal.process
-  ldt_arbitral_distribution:
-    description: "Lead time to arbitral distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_arbitral_award:
-    description: "Lead time to arbitral award (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_judiciary_distribution:
-    description: "Lead time to judiciary distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_judicial_summons_decision:
-    description: "Lead time to judicial summons decision (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_coercive_decision:
-    description: "Lead time to coercive decision (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_coercive_order_issuance_decision:
-    description: "Lead time to coercive order issuance decision (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_arbitral_citation:
-    description: "Lead time to arbitral citation (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_judicial_summons:
-    description: "Lead time to judicial summons (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_possession_imission_decisions:
-    description: "Lead time to possession imission decisions (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_possession_imission_issuance:
-    description: "Lead time to possession imission issuance (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_judicial_petition:
-    description: "Lead time to judicial petition (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_execution_requirement_decision:
-    description: "Lead time to execution requirement decision (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_prejudgment_attachment:
-    description: "Lead time to prejudgment attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_executed_citation:
-    description: "Lead time to executed citation (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_asset_attachment:
-    description: "Lead time to asset attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_asset_evaluation:
-    description: "Lead time to asset evaluation (number of business days, excluding holidays, weekends, and arbitration recess)."
-  ldt_redit_satisfaction:
-    description: "Lead time to credit satisfaction (number of business days, excluding holidays, weekends, and arbitration recess). Note: column name has a typo (redit instead of credit)."
   ldt_coercive:
     description: "Lead time to coercive action (set to 'not_in_cyber_legal')."
   last_occurrence:
@@ -373,3 +315,12 @@ columns:
     description: "Timestamp when the record was last updated."
     lineage:
       - datalake_cyber_legal.process.ts_updated
+  first_standardized_reason:
+    description: Financial attribute representing first standardized reason on the evictions_base dataset.
+    lineage: []
+  is_reopened:
+    description: Indicates whether reopened applies to this financial record.
+    lineage: []
+  first_consolidated_reason:
+    description: Financial attribute representing first consolidated reason on the evictions_base dataset.
+    lineage: []

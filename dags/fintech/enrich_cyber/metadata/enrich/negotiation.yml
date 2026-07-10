@@ -1,8 +1,11 @@
 database_name: datalake_cyber
 table_name: negotiation
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Table at agreement/negotiation level, containing financial and operational information about debt renegotiation events.
+description: |
+  Enriched agreement and campaign promise grain for debt renegotiations in Cyber.
+  One row per renegotiation (formal agreement or boletagem campaign), unioning agreement and campaign sources with discount breakdowns, installment aggregates, agency attribution and normalized negotiation status.
+  Consumed by Fintech collections for recovery analytics, agreement performance and operational reporting.
 columns:
   id_negotiation:
     description: Unique identifier for the negotiation event.
@@ -51,7 +54,7 @@ columns:
     lineage:
       - datalake_cyber_clean.agreements.agreement_type
   agreement_type_description:
-    description: Description of the agreement type.
+    description: "Human-readable label of the agreement type configuration (e.g. self-service portal, assessoria) from Cyber agreement_type dimension."
     lineage:
       - datalake_cyber_clean.agreements.agreement_type_description
   agreement_type_min_delay_days:

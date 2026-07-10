@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber
 table_name: delayed_portfolio_base
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |
   This report is a list of overdue invoices, whether original, or ongoing or broken agreements. It is basically the active billing portfolio.
@@ -9,110 +9,111 @@ description: |
   The aim is to allow the operation to analyze these bases and create charging and operating strategies and generate new bases for communications.
 columns:
   contract_group:
-    description: ""
+    description: "Product group of the contract (QuintoAndar or QuintoCred), used to scope bills and agreements to the correct creditor line."
     lineage:
       - datalake_cyber_clean.delinquent_master.contract_group
   product:
-    description: ""
+    description: "Creditor product line alias for contract_group (QuintoAndar or QuintoCred) from the latest delinquent master snapshot per contract."
     lineage:
       - datalake_cyber_clean.delinquent_master.creditor
   id_contract:
-    description: ""
+    description: "Cyber contract key linking the overdue invoice to the delinquent account in delinquent master."
     lineage:
       - datalake_cyber_clean.delinquent_master.id_contract
   id_client:
-    description: ""
+    description: "Main tenant CPF/CNPJ associated with the delinquent contract."
     lineage:
       - datalake_cyber_clean.delinquent_master.id_client
   debtor_name:
-    description: ""
+    description: "Debtor name as registered in Cyber delinquent master for operational outreach."
     lineage:
       - datalake_cyber_clean.delinquent_master.debtor_name
   id_invoice:
-    description: ""
+    description: "Open invoice identifier in Cyber billing (bill table) for the overdue charge."
     lineage:
       - datalake_cyber_clean.bill.id_invoice
   id_agreement_invoice:
-    description: ""
+    description: "Invoice identifier from the historical agreement linkage when the overdue charge is part of a renegotiation package."
     lineage:
       - datalake_cyber_clean.historical_agreements.id_invoice
-  ts_installment_due:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.bill.ts_installment_due
   main_amount:
-    description: ""
+    description: "Principal amount of the open invoice in BRL before fees and interest accruals."
     lineage:
       - datalake_cyber_clean.bill.main_amount
   purpose:
-    description: ""
+    description: "Billing purpose or charge type of the invoice (e.g. rent, condominium, IPTU) from Cyber bill metadata."
     lineage:
       - datalake_cyber_clean.bill.purpose
   invoice_status:
-    description: ""
+    description: "Invoice lifecycle status in Cyber billing independent of Retsuko payment platform sync."
     lineage:
       - datalake_cyber_clean.bill.invoice_status
   retsuko_status:
-    description: ""
+    description: "Payment platform status; filtered to open in this table to keep only actively overdue charges."
     lineage:
       - datalake_cyber_clean.bill.retsuko_status
   has_negotiation:
-    description: ""
+    description: "True when the contract has an active or historical agreement linked through contracts_agreements; false for purely original overdue debt."
     lineage:
       - datalake_cyber_clean.agreement.id_agreement
   id_agreement:
-    description: ""
+    description: "Cyber agreement identifier when the invoice is tied to a debt renegotiation; null for non-negotiated overdue invoices."
     lineage:
       - datalake_cyber_clean.agreement.id_agreement
   negotiation_status:
-    description: ""
+    description: "Current status of the linked agreement (e.g. active, finished, canceled) from Cyber agreements."
     lineage:
       - datalake_cyber_clean.agreement.status
   number_of_installments:
-    description: ""
+    description: "Total installments configured in the linked agreement when a renegotiation exists."
     lineage:
       - datalake_cyber_clean.agreement.number_of_installments
   ts_due_agreement_installment:
-    description: ""
+    description: "Due timestamp of the agreement installment aligned to this invoice when under an active payment plan."
     lineage:
       - datalake_cyber_clean.agreement_installments.ts_due_installment
   agreement_installment_status:
-    description: ""
+    description: "Status of the agreement installment tied to the invoice (e.g. pending, paid, broken)."
     lineage:
       - datalake_cyber_clean.agreement_installmentsstatus
   total_negotiated_amount_with_fees:
-    description: ""
+    description: "Total renegotiated amount including fees for the linked agreement, in BRL."
     lineage:
       - datalake_cyber_clean.agreement.total_negotiated_amount_with_fees
   segmentation_queue:
-    description: ""
+    description: "Current segmentation queue code from delinquent master routing the contract to a collection segment."
     lineage:
       - datalake_cyber_clean.delinquent_master.segmentation_queue
   commission_queue:
-    description: ""
+    description: "Commission queue code from delinquent master used for agency remuneration routing."
     lineage:
       - datalake_cyber_clean.delinquent_master.commission_queue
   agreement_queue:
-    description: ""
+    description: "Agreement queue code from delinquent master for renegotiation workflow routing."
     lineage:
       - datalake_cyber_clean.delinquent_master.agreement_queue
   digital_channel_queue:
-    description: ""
+    description: "Digital channel queue code from delinquent master for self-service and automated outreach routing."
     lineage:
       - datalake_cyber_clean.delinquent_master.digital_channel_queue
   eviction_queue:
-    description: ""
+    description: "Eviction queue code from delinquent master for legal eviction workflow routing."
     lineage:
       - datalake_cyber_clean.delinquent_master.eviction_queue
   credit_denial_queue:
-    description: ""
+    description: "Credit bureau negative reporting queue code from delinquent master (negativação)."
     lineage:
       - datalake_cyber_clean.delinquent_master.credit_denial_queue
   olos_dialer_label:
-    description: ""
+    description: "Olos dialer campaign label code from delinquent master for outbound call routing."
     lineage:
       - datalake_cyber_clean.delinquent_master.olos_dialer_label
-  id_agency:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.delinquent_master.id_agency
+  ts_invoice_due:
+    description: "Original due timestamp of the open invoice from Cyber billing (bill.ts_installment_due)."
+    lineage: []
+  installment_number:
+    description: "Installment sequence number within the linked agreement when the invoice is part of a payment plan."
+    lineage: []
+  agency:
+    description: "Collection agency group code currently assigned to the contract in delinquent master (DM agency)."
+    lineage: []

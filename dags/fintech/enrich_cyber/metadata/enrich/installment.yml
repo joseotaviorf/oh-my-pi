@@ -1,105 +1,145 @@
 ---
 database_name: datalake_cyber
 table_name: installment
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Table granularity - installments of agreements/negotiations
+description: |
+  Enriched installment-level view of debt renegotiations and campaign promises in Cyber.
+  One row per agreement or campaign installment, unioning formal agreements with boletagem campaigns and pro-rating agreement-level fees, fines, discounts and eviction costs across installments (remainder on the last installment).
+  Used by Fintech collections to track payment progress, boleto lifecycle and installment composition.
 columns:
   id_agreement_installment:
-    description: ""
+    description: "Surrogate installment key in the enrich layer (Cyber id plus one) for joins across analytical models."
     lineage:
       - datalake_cyber_clean.agreement_installments.id_agreement_installment
   id_negotiation:
-    description: ""
+    description: "Agreement or campaign offer identifier; links to negotiation enrich table at renegotiation grain."
     lineage:
       - datalake_cyber_clean.agreement_installments.id_agreement
   id_contract:
-    description: ""
+    description: "Cyber internal contract key for the delinquent lease linked to the installment."
     lineage:
       - datalake_cyber_clean.agreement_installments.id_contract
   id_contract_external:
-    description: ""
+    description: "QuintoAndar contract code from product systems, coalesced from contracts when the agreement stores only the Cyber key."
     lineage:
       - datalake_cyber_clean.agreement_installments.id_contract_external
   id_debtor:
-    description: ""
+    description: "Main tenant identifier (CPF/CNPJ) responsible for paying the installment."
     lineage:
       - datalake_cyber_clean.agreement_installments.id_client
   id_receipt:
-    description: ""
+    description: "Payment receipt identifier when the installment was settled through Cyber payments."
     lineage:
       - datalake_cyber_clean.agreement_installments.id_payment
   our_number:
-    description: ""
+    description: "Bank slip (boleto) our-number identifier generated for the installment when applicable."
     lineage:
       - datalake_cyber_clean.agreement_installments.our_number
   installment_number:
-    description: ""
+    description: "Sequential installment index within the agreement (1-based in enrich), including down payment as installment zero upstream."
     lineage:
       - datalake_cyber_clean.agreement_installments.installment_number
   creditor:
-    description: ""
+    description: "Product line (QuintoAndar or QuintoCred) owning the renegotiated debt, from contract group on the agreement."
     lineage:
       - datalake_cyber_clean.agreement_installments.contract_group
   status:
-    description: ""
+    description: "Raw installment status from Cyber (e.g. Pendente de Pagamento, Concluído, Quebrado) before enrich normalization."
     lineage:
       - datalake_cyber_clean.agreement_installments.status
   installment_status:
-    description: ""
+    description: "Normalized installment lifecycle status mapped from Cyber values to pending, paid or canceled for analytics."
     lineage:
       - datalake_cyber_clean.agreement_installments.status
   payment_type:
-    description: ""
+    description: "Payment type recorded when the installment was paid (e.g. down payment, regular installment)."
     lineage:
       - datalake_cyber_clean.agreement_installments.payment_type
   payment_method:
-    description: ""
+    description: "Payment method used to settle the installment (e.g. boleto, credit card, PIX)."
     lineage:
       - datalake_cyber_clean.agreement_installments.payment_method
   amortization_amount:
-    description: ""
+    description: "Principal amortization portion of the installment amount in BRL."
     lineage:
       - datalake_cyber_clean.agreement_installments.amortization_amount
-  interest_amount:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.agreement_installments.interest_amount
-  fees_amount:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.agreement_installments.fees_amount
   credit_card_fee_amount:
-    description: ""
+    description: "Credit card processing fee charged on the installment when payment method is card, in BRL."
     lineage:
       - datalake_cyber_clean.agreement_installments.credit_card_fee_amount
   fine_rate:
-    description: ""
+    description: "Fine rate percentage configured for the agreement type applied to overdue components."
     lineage:
       - datalake_cyber_clean.agreement_installments.fine_rate
   amount_to_pay:
-    description: ""
+    description: "Total installment amount due in BRL including fees and interest before discounts."
     lineage:
       - datalake_cyber_clean.agreement_installments.amount_to_pay
   agreement_balance_amount:
-    description: ""
+    description: "Remaining agreement balance after this installment in BRL, as tracked by Cyber."
     lineage:
       - datalake_cyber_clean.agreement_installments.agreement_balance_amount
   paid_amount:
-    description: ""
+    description: "Amount actually paid for the installment in BRL from the linked payment record."
     lineage:
       - datalake_cyber_clean.agreement_installments.payment_amount
   dt_creation:
-    description: ""
+    description: "Calendar date when the agreement or campaign promise that originated the installment was created."
     lineage:
       - datalake_cyber_clean.agreement_installments.ts_agreement_creation
   dt_due:
-    description: ""
+    description: "Calendar due date of the installment for payment."
     lineage:
       - datalake_cyber_clean.agreement_installments.ts_due_installment
   dt_paid:
-    description: ""
+    description: "Calendar date when the installment payment was confirmed in Cyber."
     lineage:
       - datalake_cyber_clean.agreement_installments.ts_payment
   ts_load:
-    description: ""
+    description: "Timestamp when the row was materialized into the enrich layer by the ETL pipeline."
+  discount_amount:
+    description: "Total discount allocated to this installment in BRL, pro-rated from agreement-level discount with rounding remainder on the last installment."
+    lineage: []
+  eviction_costs_amount:
+    description: "Eviction-related legal costs allocated to this installment in BRL, pro-rated across installments."
+    lineage: []
+  honorarium_amount:
+    description: "Legal honorarium fee allocated to this installment in BRL from agreement or campaign terms."
+    lineage: []
+  discount_to_fees_amount:
+    description: "Portion of the discount applied to interest and fee components on this installment in BRL."
+    lineage: []
+  total_interest_amount:
+    description: "Sum of contract-level and installment-level interest allocated to this installment in BRL."
+    lineage: []
+  discount_to_original_amount:
+    description: "Portion of the discount applied to overdue principal (parcelas vencidas) on this installment in BRL."
+    lineage: []
+  id_agreement_installment_cyber:
+    description: "Original Cyber agreement installment identifier as string, preserved for traceability to source system."
+    lineage: []
+  dt_emission_boleto:
+    description: "Calendar date when the boleto for this installment was issued, from agreement invoices or campaign boletagem."
+    lineage: []
+  original_amount:
+    description: "Principal component of the installment in BRL, computed as amount due minus fees plus discounts."
+    lineage: []
+  installment_interest_amount:
+    description: "Installment-specific interest charge in BRL from agreement or campaign installment tables."
+    lineage: []
+  dt_cancelation:
+    description: "Calendar date when the installment or parent agreement was canceled or broken."
+    lineage: []
+  dt_due_boleto:
+    description: "Calendar due date printed on the boleto for this installment."
+    lineage: []
+  contract_interest_amount:
+    description: "Contract residual interest (juros residuais) allocated to this installment in BRL, pro-rated with remainder on the last installment."
+    lineage: []
+  fine_amount:
+    description: "Fine (multa) amount allocated to this installment in BRL, pro-rated from agreement-level fines."
+    lineage: []
+  dt_processing_boleto:
+    description: "Calendar date when boleto processing started in Cyber or campaign boletagem workflow."
+    lineage: []

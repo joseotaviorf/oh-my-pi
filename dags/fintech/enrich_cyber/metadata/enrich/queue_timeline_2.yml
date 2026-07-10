@@ -6,7 +6,7 @@ domain: Fintech
 description: Enhanced timeline table for each contract showing its position in the three existing queues (segmentation, agreement and eviction) with improved date range handling and deduplication
 columns:
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_cyber.contracts.id_contract_external
   dt_reference:
@@ -27,3 +27,12 @@ columns:
     description: "Segmentation queue ID for the contract on the reference date"
     lineage:
       - datalake_cyber.contracts.segmentation_queue
+  segmentation_queue_description:
+    description: Financial attribute representing segmentation queue description on the queue_timeline_2 dataset.
+    lineage: []
+  agreement_queue_description:
+    description: Financial attribute representing agreement queue description on the queue_timeline_2 dataset.
+    lineage: []
+  eviction_queue_description:
+    description: Financial attribute representing eviction queue description on the queue_timeline_2 dataset.
+    lineage: []

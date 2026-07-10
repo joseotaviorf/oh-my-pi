@@ -1,58 +1,61 @@
 ---
 database_name: datalake_cyber
 table_name: contract_agency_distribution
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Get the changes in contract distribution between agencies/advisories
+description: |
+  Enriched history of collection agency (assessoria) assignments per delinquent contract in Cyber.
+  Each row is a contiguous interval during which the contract stayed under the same agency, built from redistribution events in history_contract_distribution and enriched with agency group metadata from datalake_cyber.agencies.
+  Used by Fintech collections to analyze agency handoffs, portfolio distribution, and assessoria performance over time.
 columns:
   id_contract:
-    description: "Unique identifier for the contract."
+    description: "Cyber contract key (external contract id + product group + revision), coalesced to the QuintoAndar external id when available."
     lineage:
       - datalake_cyber_clean.history_contract_distribution.id_contract
   creditor:
-    description: "Creditor associated with the contract."
+    description: "Product line owning the debt (QuintoAndar or QuintoCred), derived from the contract group in the redistribution history."
     lineage:
       - datalake_cyber_clean.history_contract_distribution.creditor
   id_agency:
-    description: "Identifier for the agency."
+    description: "Collection agency group code responsible for the contract during the interval; when redistribution and distribution timestamps match, the new agency is used."
     lineage:
       - datalake_cyber_clean.history_contract_distribution.agency
   id_main_agency:
-    description: "Identifier for the main agency."
+    description: "Identifier of the main agency within the agency group that managed the contract during the interval."
     lineage:
       - datalake_cyber.agencies.id_main_agency
   id_agencies_group:
-    description: "Identifier for the agency group."
+    description: "Identifier of the agency group that contained all assessorias linked to the assigned agency during the interval."
     lineage:
       - datalake_cyber.agencies.id_agencies_group
   juridical_agency:
-    description: "Name of the juridical agency (Assessoria Jurídica) within the agency group."
+    description: "Name of the juridical agency (Assessoria Jurídica) in the group, selected by highest remuneration share when multiple exist."
     lineage:
       - datalake_cyber.agencies.juridical_agency
   conventional_agency:
-    description: "Name of the conventional agency (Assessoria Convencional) within the agency group."
+    description: "Name of the conventional agency (Assessoria Convencional) in the group, selected by highest remuneration share when multiple exist."
     lineage:
       - datalake_cyber.agencies.conventional_agency
   main_agency_name:
-    description: "Name of the main agency."
+    description: "Display name of the main agency in the group responsible for the contract during the interval."
     lineage:
       - datalake_cyber.agencies.main_agency_name
   main_agency_type:
-    description: "Type of the main agency."
+    description: "Type of the main assessoria (e.g. conventional, juridical, portal) during the interval."
     lineage:
       - datalake_cyber.agencies.main_agency_type
   agencies_name_group:
-    description: "Group name of agencies."
+    description: "Human-readable name of the agency group that owned the contract during the interval."
     lineage:
       - datalake_cyber.agencies.agencies_name_group
   dt_start_interval:
-    description: "Start date of the interval during which the agency was responsible for the contract."
+    description: "First calendar day the agency became responsible for the contract, derived from the distribution timestamp of the interval start event."
     lineage:
       - datalake_cyber_clean.history_contract_distribution.ts_distribution
       - datalake_cyber_clean.history_contract_distribution.ts_redistribution
   dt_end_interval:
-    description: "End date of the interval during which the agency was responsible for the contract."
+    description: "Last calendar day the agency remained responsible; ends the day before the next redistribution or current date when still active."
     lineage:
       - datalake_cyber_clean.history_contract_distribution.ts_redistribution
   ts_load:
-    description: "Timestamp when the data was loaded."
+    description: "Timestamp when the row was materialized into the enrich layer by the ETL pipeline."

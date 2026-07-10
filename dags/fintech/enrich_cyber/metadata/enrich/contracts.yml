@@ -1,303 +1,364 @@
 ---
 database_name: datalake_cyber
 table_name: contracts
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Contracts table
+description: |
+  Enriched contract grain for delinquent accounts in Cyber (debt collection platform).
+  One row per contract from a full outer join of contract master (UDA) and delinquent master (DM), enriched with human-readable queue and label names from queue_decision_tree.
+  Supports Fintech collections in portfolio segmentation, agency assignment, eviction and credit-bureau workflows.
 columns:
   id_contract:
-    description: ""
+    description: "Cyber internal contract key (external id + product group + revision), coalesced from contracts and delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.id_contract
   id_contract_external:
-    description: ""
+    description: "QuintoAndar contract code in product systems; parsed from delinquent master key when absent in contract master."
     lineage:
       - datalake_cyber_clean.contracts.id_contract_external
   id_client:
-    description: ""
+    description: "Main tenant CPF/CNPJ linked to the delinquent contract."
     lineage:
       - datalake_cyber_clean.contracts.id_client
   id_contract_property:
-    description: ""
+    description: "Property (imóvel) identifier associated with the lease contract in Cyber."
     lineage:
       - datalake_cyber_clean.contracts.id_contract_property
   id_oldest_negative_invoice:
-    description: ""
+    description: "Bill identifier of the oldest unpaid invoice driving negative credit and rehabilitation rules."
     lineage:
       - datalake_cyber_clean.contracts.id_oldest_negative_invoice
   id_last_negative_installment:
-    description: ""
+    description: "Identifier of the most recent overdue installment recorded on the contract."
     lineage:
       - datalake_cyber_clean.contracts.id_last_negative_installment
   status_agency_declined:
-    description: ""
+    description: "Whether the currently assigned collection agency declined to work the account in delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.status_agency_declined
   delay_contamined_days:
-    description: ""
+    description: "Days delinquent including contagion rules that aggregate delay across related contracts."
     lineage:
       - datalake_cyber_clean.contracts.delay_contamined_days
-  contract_group:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.contracts.contract_group
-  has_boletagem:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.contracts.has_boletagem
-  classification:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.contracts.classification
   has_paused_collection:
-    description: ""
+    description: "Whether collection actions are paused for this contract in Cyber."
     lineage:
       - datalake_cyber_clean.contracts.has_paused_collection
   reason_pause:
-    description: ""
+    description: "Reason code or description for the active collection pause on the contract."
     lineage:
       - datalake_cyber_clean.contracts.reason_pause
   contract_version:
-    description: ""
+    description: "Contract revision or version number tracked in Cyber contract master."
     lineage:
       - datalake_cyber_clean.contracts.contract_version
   contract_guarantee:
-    description: ""
+    description: "Guarantee product or coverage type associated with the lease contract."
     lineage:
       - datalake_cyber_clean.contracts.contract_guarantee
   contract_status:
-    description: ""
+    description: "Lifecycle status of the contract in Cyber (e.g. active, terminated) from contract master."
     lineage:
       - datalake_cyber_clean.contracts.contract_status
   eviction_step:
-    description: ""
+    description: "Current step in the legal eviction workflow for the delinquent contract."
     lineage:
       - datalake_cyber_clean.contracts.eviction_step
   reason_eviction:
-    description: ""
+    description: "Documented reason triggering or sustaining the eviction process."
     lineage:
       - datalake_cyber_clean.contracts.reason_eviction
   eviction_law_firm:
-    description: ""
+    description: "Law firm handling the eviction case when legal action is in progress."
     lineage:
       - datalake_cyber_clean.contracts.eviction_law_firm
   open_invoices:
-    description: ""
+    description: "Count of open unpaid invoices on the contract in Cyber billing."
     lineage:
       - datalake_cyber_clean.contracts.open_invoices
   collection_flow:
-    description: ""
+    description: "Active collection workflow code (fluxo de cobrança) routing operational treatment."
     lineage:
       - datalake_cyber_clean.contracts.collection_flow
   bpo_segmentation:
-    description: "This field represents the segmentation of BPOs (partners). Starting March 11, 2025, a new test was launched to evaluate the impact of delaying the assignment of delinquent accounts to BPOs. The experiment will compare three similarly sized groups, enabling an analysis of how this change affects credit recovery and operational efficiency."
+    description: "BPO partner segmentation for the assignment-delay experiment launched March 2025; groups contracts to measure impact on recovery and operational efficiency."
     lineage:
       - datalake_cyber_clean.contracts.bpo_segmentation
   probability_group:
-    description: "To indicate the probability of recovery of a contract (High/Medium/Low/Very Low), a marking will be uploaded via a spreadsheet, storing key contract indicators in Cyber. These indicators will be used to assign contracts to specific queues for each group."
+    description: "Recovery probability bucket (High, Medium, Low, Very Low) uploaded via spreadsheet to Cyber and used for queue assignment."
     lineage:
       - datalake_cyber_clean.contracts.probability_group
   collection_strategy:
-    description: "Code representing the customer’s collection flow, based on collection_classification + probability_group, activation delay + BPO postponement."
+    description: "Computed collection strategy code combining collection classification, probability group, activation delay and BPO postponement rules."
     lineage:
       - datalake_cyber_clean.contracts.collection_strategy
   agreement_type:
-    description: ""
+    description: "Type of the active or most recent agreement on the account from delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.agreement_type
   agreement_status:
-    description: ""
+    description: "Status of the active or most recent renegotiation on the account from delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.agreement_status
   last_payment_promisse_status:
-    description: ""
+    description: "Status of the latest payment promise registered for the account in delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.last_payment_promisse_status
   flag_promise_payment:
-    description: ""
+    description: "Whether the account currently has a registered payment promise in delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.flag_promise_payment
   flag_account_in_agency_or_court:
-    description: ""
+    description: "Whether the account is under external assessoria management or legal proceedings."
     lineage:
       - datalake_cyber_clean.contracts.flag_account_in_agency_or_court
   last_action:
-    description: ""
+    description: "Most recent collection action code recorded on the account in delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.last_action
   segmentation_queue:
-    description: ""
+    description: "Current segmentation queue code routing the contract to a collection segment in delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.segmentation_queue
   previous_segmentation_queue:
-    description: ""
+    description: "Prior segmentation queue code before the last segmentation update."
     lineage:
       - datalake_cyber_clean.contracts.previous_segmentation_queue
   agreement_queue:
-    description: ""
+    description: "Current agreement queue code for renegotiation workflow routing in delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.agreement_queue
   previous_agreement_queue:
-    description: ""
+    description: "Prior agreement queue code before the last agreement queue update."
     lineage:
       - datalake_cyber_clean.contracts.previous_agreement_queue
   eviction_queue:
-    description: ""
+    description: "Current eviction queue code for legal eviction workflow routing."
     lineage:
       - datalake_cyber_clean.contracts.eviction_queue
   previous_eviction_queue:
-    description: ""
+    description: "Prior eviction queue code before the last eviction queue update."
     lineage:
       - datalake_cyber_clean.contracts.previous_eviction_queue
   credit_denial_queue:
-    description: ""
+    description: "Current credit bureau negative reporting queue code (negativação) for the account."
     lineage:
       - datalake_cyber_clean.contracts.credit_denial_queue
   previous_credit_denial_queue:
-    description: ""
+    description: "Prior credit denial queue code before the last negativação routing change."
     lineage:
       - datalake_cyber_clean.contracts.previous_credit_denial_queue
-  label_3:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.contracts.label_3
-  pre_legal_label:
-    description: ""
-    lineage:
-      - datalake_cyber_clean.contracts.pre_legal_label
   agency:
-    description: ""
+    description: "Collection agency group code currently assigned to the account in delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.dm.id_agency
   agency_automatically_assigned:
-    description: ""
+    description: "Whether the current agency assignment was made automatically by Cyber decision rules."
     lineage:
       - datalake_cyber_clean.contracts.agency_automatically_assigned
   times_account_assigned_agency:
-    description: ""
+    description: "Number of times the account was assigned to a collection agency over its lifecycle."
     lineage:
       - datalake_cyber_clean.contracts.times_account_assigned_agency
   previous_agency:
-    description: ""
+    description: "Agency group code that managed the account immediately before the current assignment."
     lineage:
       - datalake_cyber_clean.contracts.previous_agency
   current_agency_amount:
-    description: ""
+    description: "Outstanding debt amount in BRL when the account was assigned to the current agency."
     lineage:
       - datalake_cyber_clean.contracts.current_agency_amount
   amount_prior_agency:
-    description: ""
+    description: "Outstanding debt amount in BRL recorded at the previous agency assignment."
     lineage:
       - datalake_cyber_clean.contracts.amount_prior_agency
   overdue_amount:
-    description: ""
+    description: "Total overdue balance in BRL on the account from delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.overdue_amount
   debt_amount:
-    description: ""
+    description: "Total debt balance in BRL including overdue principal and accrued charges."
     lineage:
       - datalake_cyber_clean.contracts.debt_amount
   total_package_amount:
-    description: ""
+    description: "Total packaged debt amount in BRL offered or registered for collection treatment."
     lineage:
       - datalake_cyber_clean.contracts.total_package_amount
   oldest_negative_invoice_amount:
-    description: ""
+    description: "Principal amount in BRL of the oldest unpaid invoice used in negative credit rules."
     lineage:
       - datalake_cyber_clean.contracts.oldest_negative_invoice_amount
   contract_rental_amount:
-    description: ""
+    description: "Monthly rent amount in BRL configured on the lease contract."
     lineage:
       - datalake_cyber_clean.contracts.contract_rental_amount
   contract_condominium_amount:
-    description: ""
+    description: "Monthly condominium charge in BRL configured on the lease contract."
     lineage:
       - datalake_cyber_clean.contracts.contract_condominium_amount
   contract_iptu_amount:
-    description: ""
+    description: "Monthly IPTU (property tax) charge in BRL configured on the lease contract."
     lineage:
       - datalake_cyber_clean.contracts.contract_iptu_amount
   ts_start_guarantee:
-    description: ""
+    description: "Timestamp when rental guarantee coverage started for the contract."
     lineage:
       - datalake_cyber_clean.contracts.ts_start_guarantee
   ts_contract_start:
-    description: ""
+    description: "Timestamp when the lease contract became effective."
     lineage:
       - datalake_cyber_clean.contracts.ts_contract_start
   ts_contract_end:
-    description: ""
+    description: "Timestamp when the lease contract ended or is scheduled to end."
     lineage:
       - datalake_cyber_clean.contracts.ts_contract_end
   ts_account_registered:
-    description: ""
+    description: "Timestamp when the account was first registered in Cyber delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.ts_account_registered
   ts_last_update:
-    description: ""
+    description: "Timestamp of the last update to the account in delinquent master (DMHOSTUP)."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_update
   ts_due_oldest_negative_invoice:
-    description: ""
+    description: "Original due timestamp of the oldest unpaid invoice driving negative actions."
     lineage:
       - datalake_cyber_clean.contracts.ts_due_oldest_negative_invoice
   ts_due_oldest_invoice:
-    description: ""
+    description: "Due timestamp of the oldest open invoice on the account from delinquent master."
     lineage:
       - datalake_cyber_clean.contracts.ts_due_oldest_invoice
   ts_first_payment_agreement:
-    description: ""
+    description: "Timestamp of the first payment received under any agreement on the account."
     lineage:
       - datalake_cyber_clean.contracts.ts_first_payment_agreement
   ts_last_payment_agreement:
-    description: ""
+    description: "Timestamp of the most recent payment received under an agreement."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_payment_agreement
   ts_last_payment:
-    description: ""
+    description: "Timestamp of the most recent payment of any kind on the account."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_payment
   ts_next_contact:
-    description: ""
+    description: "Scheduled timestamp for the next planned collection contact on the account."
     lineage:
       - datalake_cyber_clean.contracts.ts_next_contact
   ts_reference_current_agency:
-    description: ""
+    description: "Reference timestamp for metrics tied to the current agency assignment period."
     lineage:
       - datalake_cyber_clean.contracts.ts_reference_current_agency
   ts_last_account_inactive:
-    description: ""
+    description: "Timestamp when the account last became inactive in Cyber."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_account_inactive
   ts_last_account_reactivation:
-    description: ""
+    description: "Timestamp when the account was last reactivated after inactivity."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_account_reactivation
   ts_last_activity:
-    description: ""
+    description: "Timestamp of the most recent collection activity recorded on the account."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_activity
   ts_assignment_previous_agency:
-    description: ""
+    description: "Timestamp when the account was assigned to the previous collection agency."
     lineage:
       - datalake_cyber_clean.contracts.ts_assignment_previous_agency
   ts_last_update_segmentation_queue:
-    description: ""
+    description: "Timestamp when the segmentation queue was last changed on the account."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_update_segmentation_queue
   ts_last_update_agreement_queue:
-    description: ""
+    description: "Timestamp when the agreement queue was last changed on the account."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_update_agreement_queue
   ts_last_update_eviction_queue:
-    description: ""
+    description: "Timestamp when the eviction queue was last changed on the account."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_update_eviction_queue
   ts_last_update_credit_denial_queue:
-    description: ""
+    description: "Timestamp when the credit denial (negativação) queue was last changed."
     lineage:
       - datalake_cyber_clean.contracts.ts_last_update_credit_denial_queue
   ts_load:
-    description: ""
+    description: "Timestamp when the row was materialized into the enrich layer by the ETL pipeline."
     lineage:
       - datalake_cyber_clean.contracts.NOW()
+  campaign_label_description:
+    description: "Human-readable campaign label name decoded from queue_decision_tree for the current campaign_label code."
+    lineage: []
+  serasa_limpa_nome_label_description:
+    description: "Human-readable Serasa Limpa Nome label decoded from queue_decision_tree for serasa_limpa_nome_label."
+    lineage: []
+  previous_credit_denial_queue_description:
+    description: "Human-readable name of the previous credit denial queue from queue_decision_tree."
+    lineage: []
+  creditor:
+    description: "Product line (QuintoAndar or QuintoCred) derived from contract group on the contract master record."
+    lineage: []
+  eviction_queue_description:
+    description: "Human-readable eviction queue name decoded from queue_decision_tree for eviction_queue."
+    lineage: []
+  campaign_label:
+    description: "Campaign label code from delinquent master for promotional or batch collection campaigns."
+    lineage: []
+  contract_segment_strategy:
+    description: "Segment strategy code applied to the contract for collection routing and treatment."
+    lineage: []
+  previous_agreement_queue_description:
+    description: "Human-readable name of the previous agreement queue from queue_decision_tree."
+    lineage: []
+  is_boletagem:
+    description: "Whether the contract is enrolled in boletagem (batch boleto campaign) collection from contract master."
+    lineage: []
+  previous_digital_channel_queue_description:
+    description: "Human-readable name of the previous digital channel queue from queue_decision_tree."
+    lineage: []
+  previous_segementation_queue_description:
+    description: "Human-readable name of the previous segmentation queue from queue_decision_tree (typo matches source column)."
+    lineage: []
+  digital_channel_queue_description:
+    description: "Human-readable digital channel queue name decoded from queue_decision_tree."
+    lineage: []
+  segementation_queue_description:
+    description: "Human-readable segmentation queue name decoded from queue_decision_tree (typo matches source column)."
+    lineage: []
+  evictions_label_description:
+    description: "Human-readable evictions label name decoded from queue_decision_tree for evictions_label."
+    lineage: []
+  previous_eviction_queue_description:
+    description: "Human-readable name of the previous eviction queue from queue_decision_tree."
+    lineage: []
+  has_restrictive_evic_occurrence:
+    description: "Whether the contract has a restrictive eviction-related occurrence flag in contract master."
+    lineage: []
+  evictions_label:
+    description: "Evictions label code from delinquent master for legal eviction campaign routing."
+    lineage: []
+  agreement_queue_description:
+    description: "Human-readable agreement queue name decoded from queue_decision_tree for agreement_queue."
+    lineage: []
+  previous_digital_channel_queue:
+    description: "Prior digital channel queue code before the last digital channel routing update."
+    lineage: []
+  has_serasa_credit_denial:
+    description: "Whether a Serasa credit bureau negative action is active on the contract."
+    lineage: []
+  olos_dialer_label_description:
+    description: "Human-readable Olos dialer label name decoded from queue_decision_tree."
+    lineage: []
+  serasa_limpa_nome_label:
+    description: "Serasa Limpa Nome label code from delinquent master for credit rehabilitation campaigns."
+    lineage: []
+  collection_classification:
+    description: "Internal collection classification of the contract used to derive collection strategy."
+    lineage: []
+  credit_denial_queue_description:
+    description: "Human-readable credit denial queue name decoded from queue_decision_tree for negativação routing."
+    lineage: []
+  olos_dialer_label:
+    description: "Olos dialer campaign label code from delinquent master for outbound call routing."
+    lineage: []
+  digital_channel_queue:
+    description: "Current digital channel queue code for self-service and automated outreach routing."
+    lineage: []

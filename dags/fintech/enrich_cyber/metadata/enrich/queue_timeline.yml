@@ -6,31 +6,31 @@ domain: Fintech
 description: Table responsible for creating a timeline for each contract, showing its position in the three existing queues (segmentation, agreement and eviction)
 columns:
   id_contract_external:
-    description: "Contract ID"
+    description: Identifier for the contract external referenced by this financial record.
     lineage:
       - datalake_cyber.contracts.id_contract_external
   segmentation_queue:
-    description: "Segmentation queue ID"
+    description: Financial attribute representing segmentation queue on the queue_timeline dataset.
     lineage:
       - datalake_cyber.contracts.segmentation_queue
   segmentation_queue_description:
-    description: "Segmentation queue description"
+    description: Financial attribute representing segmentation queue description on the queue_timeline dataset.
     lineage:
       - datalake_cyber.contracts.segementation_queue_description
   agreement_queue:
-    description: "Agreement queue ID"
+    description: Financial attribute representing agreement queue on the queue_timeline dataset.
     lineage:
       - datalake_cyber.contracts.agreement_queue
   agreement_queue_description:
-    description: "Agreement queue description"
+    description: Financial attribute representing agreement queue description on the queue_timeline dataset.
     lineage:
       - datalake_cyber.contracts.agreement_queue_description
   eviction_queue:
-    description: "Eviction queue ID"
+    description: Financial attribute representing eviction queue on the queue_timeline dataset.
     lineage:
       - datalake_cyber.contracts.eviction_queue
   eviction_queue_description:
-    description: "Eviction queue description"
+    description: Financial attribute representing eviction queue description on the queue_timeline dataset.
     lineage:
       - datalake_cyber.contracts.eviction_queue_description
   dt_reference:
