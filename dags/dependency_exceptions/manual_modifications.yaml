@@ -1105,7 +1105,6 @@ bietlejuice.enrich_viva_real_crawler_listings:
 bietlejuice.reverse_aec:
   add:
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-cases-perspective:first-run-of-day
-    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-segments-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metric:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-backlog-metrics-salesforce:first-run-of-day
@@ -1124,13 +1123,11 @@ bietlejuice.reverse_atento:
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-taxonomy:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-transferred:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-contract:first-run-of-day
-    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-segments-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tmr:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-twilio-chat-aht:first-run-of-day
 bietlejuice.reverse_concentrix:
   add:
-    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-segments-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-contract:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-cases-perspective:first-run-of-day
