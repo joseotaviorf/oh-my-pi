@@ -1,12 +1,12 @@
 ---
 database_name: datalake_monopoly
 table_name: sale
-owner: herivelto.junior@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Enriched table with Monopoly and Vendas infos to check an offer total cash flow.
 columns:
   id_offer:
-    description: Offer ID.
+    description: Identifier for the offer referenced by this financial record.
     lineage:
       - datalake_offer.sale_offer.id_offer
   sale_price_agreed:

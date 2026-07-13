@@ -1,6 +1,6 @@
 database_name: datalake_owner_fees
 table_name: contract
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: The table contains information about a contract owner's fees.
 columns:
@@ -27,7 +27,7 @@ columns:
   rent:
     lineage:
       - datalake_owner_fees_clean.contract.rent
-    description: Rent amount
+    description: Financial attribute representing rent on the contract dataset.
   dt_validity:
     lineage:
       - datalake_owner_fees_clean.contract.dt_validity

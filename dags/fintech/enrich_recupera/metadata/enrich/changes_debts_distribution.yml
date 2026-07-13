@@ -1,18 +1,18 @@
 ---
 database_name: datalake_recupera
 table_name: changes_debts_distribution
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "This table captures the debts movements between the distributions and advisories, that can call partners. It is created based on table 'snapshot_daily_debts' (Recupera report called P6)"
 columns:
   creditor:
     lineage:
       - datalake_recupera.snapshot_daily_debts.id_creditor
-    description: Creditor code.
+    description: Financial attribute representing creditor on the changes_debts_distribution dataset.
   id_contract:
     lineage:
       - datalake_recupera.snapshot_daily_debts.id_contract
-    description: Contract ID.
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   partner:
     lineage:
       - datalake_recupera.snapshot_daily_debts.advisory

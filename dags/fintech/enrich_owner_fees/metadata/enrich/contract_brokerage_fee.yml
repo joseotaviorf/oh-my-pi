@@ -3,12 +3,12 @@ table_name: contract_brokerage_fee
 description: This table deduplicates the clean table of our datalake.
   It contains the information about the Brokerage Fee of the Owner Fees contracts.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_owner_fees_clean.contract_brokerage_fee.id
-    description: Unique ID of the table
+    description: Financial attribute representing id on the contract_brokerage_fee dataset.
   id_contract:
     lineage:
       - datalake_owner_fees_clean.contract_brokerage_fee.id_contract
@@ -20,7 +20,7 @@ columns:
   installment_number:
     lineage:
       - datalake_owner_fees_clean.contract_brokerage_fee.installment_number
-    description: Number of the installment.
+    description: Financial attribute representing installment number on the contract_brokerage_fee dataset.
   brokerage_fee:
     lineage:
       - datalake_owner_fees_clean.contract_brokerage_fee.brokerage_fee

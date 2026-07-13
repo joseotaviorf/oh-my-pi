@@ -2,8 +2,8 @@
 database_name: datalake_quintoandar
 table_name: aux_date
 description: Table that prepares base structure for dim_date
-domain: Cross
-owner: fintech-ae@quintoandar.com.br
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id_date:
     description: Date ID (%Y%m%d format)
@@ -22,9 +22,9 @@ columns:
   month:
     description: Number of the month
   month_name:
-    description: Name of the month
+    description: Financial attribute representing month name on the aux_date dataset.
   bimester:
-    description: Number of the bimester.
+    description: Financial attribute representing bimester on the aux_date dataset.
     categories:
       "1": January to February
       "2": March to April
@@ -33,7 +33,7 @@ columns:
       "5": September to October
       "6": November to December
   bimester_name:
-    description: Name of the bimester.
+    description: Financial attribute representing bimester name on the aux_date dataset.
   bimester_months:
     description: Months that make up the bimester.
   quarter:
@@ -46,23 +46,23 @@ columns:
   brz_season:
     description: "The season in Brazil: Summer, Autumn, Winter, Sprint"
   year:
-    description: Year
+    description: Year recorded on the aux_date dataset.
   year_calendar_week:
-    description: Week number/year
+    description: Financial attribute representing year calendar week on the aux_date dataset.
   year_month:
-    description: Year/month
+    description: Financial attribute representing year month on the aux_date dataset.
   year_quarter:
-    description: Year/quarter
+    description: Financial attribute representing year quarter on the aux_date dataset.
   working_days_in_month:
     description: "Cumulative sum of business days in the month counting from the first day to the day in question (field: date)"
   working_days_in_month_fintech:
     description: "Cumulative sum of business days, based on bank calendar (Fintech), in the month counting from the first day to the day in question (field: date)"
   total_working_days_in_month:
-    description: The total of working days in a month
+    description: Financial attribute representing total working days in month on the aux_date dataset.
   total_working_days_in_month_fintech:
     description: The total of working days in a month based on bank calendar (Fintech)
   total_days_in_month:
-    description: The total of days in a month
+    description: Financial attribute representing total days in month on the aux_date dataset.
   is_brz_holiday:
     description: Indicates whether the day is a brazilian holiday or not. The dates listed as holidays are the same dates Google Calendar reports as holidays.
   is_brz_fintech_holiday:

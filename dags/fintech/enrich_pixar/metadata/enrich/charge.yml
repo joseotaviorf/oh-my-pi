@@ -2,7 +2,7 @@ database_name: datalake_pixar
 table_name: charge
 description: Enriched table with charge data, filtered by the most recent update date.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -27,23 +27,23 @@ columns:
   pix_link:
     lineage:
       - datalake_pixar_clean.charge.pix_link
-    description: "PIX URL"
+    description: Financial attribute representing pix link on the charge dataset.
   pix_emv:
     lineage:
       - datalake_pixar_clean.charge.pix_emv
-    description: "PIX EMV code"
+    description: Financial attribute representing pix emv on the charge dataset.
   amount:
     lineage:
       - datalake_pixar_clean.charge.amount
-    description: "Transaction amount"
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   bank_fee:
     lineage:
       - datalake_pixar_clean.charge.bank_fee
-    description: "Bank fee amount"
+    description: Financial attribute representing bank fee on the charge dataset.
   status:
     lineage:
       - datalake_pixar_clean.charge.status
-    description: "Transaction status"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   dt_limit:
     lineage:
       - datalake_pixar_clean.charge.dt_limit

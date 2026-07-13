@@ -2,7 +2,7 @@ database_name: datalake_pixar
 table_name: refund
 description: Enriched table with refund data, filtered by the most recent update date.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -15,11 +15,11 @@ columns:
   amount:
     lineage:
       - datalake_pixar_clean.refund.amount
-    description: "Refund amount"
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   status:
     lineage:
       - datalake_pixar_clean.refund.status
-    description: "Status of the refund"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   ts_created:
     lineage:
       - datalake_pixar_clean.refund.ts_created

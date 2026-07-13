@@ -1,6 +1,6 @@
 database_name: datalake_pixar
 table_name: account
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing account data"
 columns:
@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_pixar_clean.account.id
   pix_key:
-    description: "PIX key"
+    description: Financial attribute representing pix key on the account dataset.
     lineage:
       - datalake_pixar_clean.account.pix_key
   requested_by:
@@ -17,11 +17,11 @@ columns:
     lineage:
       - datalake_pixar_clean.account.requested_by
   bank_name:
-    description: "Bank name"
+    description: Financial attribute representing bank name on the account dataset.
     lineage:
       - datalake_pixar_clean.account.bank_name
   bank_fee:
-    description: "Bank fee amount"
+    description: Financial attribute representing bank fee on the account dataset.
     lineage:
       - datalake_pixar_clean.account.bank_fee
   ts_created:
