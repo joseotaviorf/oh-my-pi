@@ -1,7 +1,7 @@
 dag:
   name: bigfone
   schedule_start_date: 2020, 7, 27
-  schedule_interval: 0 0 * * *
+  schedule_interval: 0 21 * * *
   owner: Data SS
   documentation:
   dag_purpose: Retrieve data from the Bigfone database (PostgreSQL). [Bigfone](https://github.com/quintoandar/big-fone) is a system which is responsible for interacting with Twilio (an external service) to manage calls, peers and store data used to generate some reports. It also acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.
@@ -22,4 +22,3 @@ workflow:
       clean_table_name: call
     Event:
       clean_table_name: event
-

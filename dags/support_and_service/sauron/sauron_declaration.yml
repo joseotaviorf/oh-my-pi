@@ -1,7 +1,7 @@
 dag:
   name: sauron
   schedule_start_date: 2020,7,27
-  schedule_interval: 0 0 * * *
+  schedule_interval: 0 21 * * *
   owner: Data SS
   documentation:
     dag_purpose: |
