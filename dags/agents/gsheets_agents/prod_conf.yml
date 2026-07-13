@@ -1,4 +1,10 @@
 sheets_info:
+  agents_historical_quartile:
+    sheet_id: 172reBsDjSEJp-DnlMXDv-s8tY0W5jr3iutulVcvgfJU
+    sheet_name: dados_quartil_historico
+    clean_table_name: agents_historical_quartile
+    sheet_context: agents
+
   ciq_portfolio:
     sheet_id: 1-1lJbv5430DWWVswf9AHTsi4dzAXvL2VBRqoaSv0j-A
     sheet_name: carteira_ciq
