@@ -27,11 +27,32 @@
 
 **Excluded (by default from all official calculations)**:
 
-- **Interns** (`employee_type = 'INTERN'` or equivalent label in `dim_event_definition`)
-- **Young Apprentices** (`employee_type = 'APPRENTICE'` or equivalent)
+- **Interns** (Estagiários) — `dw_employee_details.dim_job.employment_type = 'intern'`
+- **Young Apprentices** (Jovens Aprendizes / JA) — `dw_employee_details.dim_job.employment_type = 'young apprentice'`
 - **Layoffs** — terminations where `is_reorganization_termination = TRUE`
 
 If the user explicitly asks to include these groups, note that the result will deviate from the official figure.
+
+### Interns / Young Apprentices — Exact Filter
+
+The Intern / Young Apprentice flag lives on **`dw_employee_details.dim_job.employment_type`**, reached with a join, exactly like the versioned job join documented in Nuances:
+
+```sql
+LEFT JOIN dw_employee_details.dim_job AS job
+    ON fact.sk_job_version = job.sk_job_version
+```
+
+- `employment_type` is derived from `job_family` and takes one of three lowercase values — `'clt'`, `'intern'`, `'young apprentice'` — or `NULL` when `job_family` is unmapped (legacy/historical job codes).
+- **Exclude only `'intern'` and `'young apprentice'`, treating `NULL` as regular population (`clt`-equivalent)** — it reflects a data-quality gap on `dim_job.job_family`, not an Intern/JA signal. Use the NULL-safe form, which keeps every `NULL`-`employment_type` employee in the population on both sides of the ratio:
+
+```sql
+AND (job.employment_type IS NULL OR job.employment_type NOT IN ('intern', 'young apprentice'))
+```
+
+- **Apply this filter to every population-defining CTE** — both ends of Average Monthly Headcount, Leavers, and New Hires. Interns/JA are excluded from the whole population, including departures, so the filter appears identically on the numerator and the denominator.
+- The join is point-in-time via `sk_job_version` (same FK as the job-at-departure join in Nuances) — no extra date filter is needed, and it correctly re-includes a person once their job changes from Intern/JA to CLT (effective, dated inclusion/exclusion, not an all-time employee-level flag).
+
+As of the current headcount, `employment_type = 'intern'` covers 54 people and `'young apprentice'` covers 171 people — roughly 3-4% of headcount and, in months with heavier apprentice-program turnover, a much larger share of monthly leavers. The filter has a measurable effect on the reported turnover percentage in those months.
 
 ## Calculation
 
@@ -44,11 +65,12 @@ Average Monthly Headcount = (Active at beginning of month + Active at end of mon
 
 - **Active at end of month**: a snapshot with `is_monthly_snapshot_for_employee = TRUE` and `dt_reference` at the last day of the target month — never `is_current_for_assignment` or `is_current_for_employee`.
 - **Active at beginning of month**: `Active at End of Month + Terminations During the Month − New Hires During the Month`.
-  - **Terminations During the Month**: employees where `is_terminated = TRUE` and `dt_terminated` falls within the target month.
+  - **Terminations During the Month**: employees where `employment_status = 'Terminated'` and `dt_terminated` falls within the target month.
   - **New Hires During the Month**: employees where `dt_hired` falls within the target month.
 - For every side of the ratio, count `COUNT(DISTINCT person_number)` where `is_active = TRUE` and `is_monthly_snapshot_for_employee = TRUE` — this flag already resolves to one row per employee per month, so no separate primary-assignment filter is needed.
 - **Leavers** and **Average Monthly Headcount** must always reference the **same target month**.
-- Count leavers as employees where `is_terminated = TRUE` and `dt_terminated` falls within the target month.
+- Count leavers as employees where `employment_status = 'Terminated'` and `dt_terminated` falls within the target month.
+- `employment_status = 'Terminated'` already excludes `Global Transfer` internal moves — those rows keep `employment_status = 'Active'` on the transfer date — so no additional `is_transfer_termination = FALSE` filter is needed on this table for turnover leavers.
 - **Voluntary / Involuntary segmentation**: apply the Voluntary/Involuntary termination filters already defined in `business_entities/employee_details.md`'s Glossary (via `dim_event_definition.action_name` / `reason_name`) to the leavers side.
 
 ### Aggregated Periods
@@ -72,14 +94,20 @@ Employees with **≤ N months of tenure** (N = 3, 6, or 12) at the moment the in
   
 ### Canonical Filter
 
-Apply on `dw_employee_details.fact_assignment_snapshots`:
+Apply on `dw_employee_details.fact_assignment_snapshots` (aliased `fact` below), joined to `dw_employee_details.dim_job` for the Intern/Young Apprentice exclusion:
 
 ```sql
-is_active = TRUE
-AND is_monthly_snapshot_for_employee = TRUE   -- headcount sides only; not applied to the leavers side
+FROM dw_employee_details.fact_assignment_snapshots AS fact
+LEFT JOIN dw_employee_details.dim_job AS job
+    ON fact.sk_job_version = job.sk_job_version
+WHERE fact.is_active = TRUE
+  AND fact.is_monthly_snapshot_for_employee = TRUE 
+  AND (job.employment_type IS NULL OR job.employment_type NOT IN ('intern', 'young apprentice'))
 ```
 
 **Warning**: substituting `is_current_for_assignment` or `is_current_for_employee` for an explicit `dt_reference` on either side of Average Monthly Headcount silently swaps the target month's headcount for **today's** headcount — every past month in a look-back period would incorrectly return the same current-day number.
+
+Use `employment_status = 'Terminated'` for leavers and `employment_status = 'Active'` (equivalent to `is_active = TRUE`) for headcount, and reach the Intern/Young Apprentice flag exclusively through `dim_job.employment_type` via the `sk_job_version` join above.
 
 ### Nuances
 
@@ -117,6 +145,8 @@ Relevant `dim_job` columns for turnover segmentation: `job_name`, `job_family`, 
 - Apply the RL filter to **both** numerator and denominator when computing Regrettable Turnover.
 - Restrict numerator and denominator to the same tenure group for NH Attrition (3/6/12-month) variants.
 - Exclude Interns, Young Apprentices, and Layoffs from the default calculation unless the user explicitly asks to include them.
+- Join `dim_job` via `sk_job_version` and filter `employment_type NOT IN ('intern', 'young apprentice')` (keeping `NULL`) on **every** population-defining CTE (both headcount ends, leavers, new hires) to exclude Interns/Young Apprentices — see "Interns / Young Apprentices — Exact Filter" above.
+- Use `employment_status = 'Terminated'` for leavers and `employment_status = 'Active'` / `is_active = TRUE` for active population.
 
 **Don't:**
 
@@ -124,42 +154,54 @@ Relevant `dim_job` columns for turnover segmentation: `job_name`, `job_family`, 
 - Count internal transfers as departures — only voluntary and involuntary terminations are leavers.
 - Mix tenure groups between numerator and denominator in NH Attrition.
 - Attempt to compute RL or VRTO without the underlying flag — it isn't available in the TARS pilot; refer to the People Data team instead of approximating.
+- Filter on `employee_type` on the fact or on `dim_event_definition` — neither has such a column. The Intern/JA flag is `dim_job.employment_type`, reached only via `sk_job_version`.
+- Exclude `NULL` `employment_type` rows as if they were Interns/JA — `NULL` means "job_family not mapped" (legacy job codes), not Intern/JA; excluding it silently shrinks the regular population.
+- Apply the Intern/JA exclusion only to the leavers side — it must apply to both sides of every ratio, or the denominator will still include a population the numerator can never count.
 
 ## Golden Queries
 
 ### Query 1 — Monthly Global Turnover
 
-Reuses the headcount pattern already documented in `business_entities/employee_details.md` (`is_active`, `is_monthly_snapshot_for_employee`); what is exclusive to this metric is the beginning/end-of-month derivation and the leavers CTE.
+Reuses the headcount pattern already documented in `business_entities/employee_details.md` (`is_active`, `is_monthly_snapshot_for_employee`); what is exclusive to this metric is the beginning/end-of-month derivation and the leavers CTE. All three population CTEs join `dim_job` and apply the Intern/Young Apprentice exclusion (see "Interns / Young Apprentices — Exact Filter" above).
 
 ```sql
 WITH month_ends AS (
     SELECT
-        date_trunc('month', dt_reference) AS ref_month,
-        COUNT(DISTINCT person_number) AS active_end_of_month
-    FROM dw_employee_details.fact_assignment_snapshots
-    WHERE is_monthly_snapshot_for_employee = TRUE
-      AND dt_reference = last_day_of_month(dt_reference)   -- guards against the "most recent day" / "termination date" is_monthly_snapshot_for_assignment variants for the current, incomplete month
-      AND is_active = TRUE
-      AND dt_reference >= DATE '2024-03-01'   -- system migration date; no reliable history before it
+        date_trunc('month', fas.dt_reference) AS ref_month,
+        COUNT(DISTINCT fas.person_number) AS active_end_of_month
+    FROM dw_employee_details.fact_assignment_snapshots AS fas
+    LEFT JOIN dw_employee_details.dim_job AS job
+        ON fas.sk_job_version = job.sk_job_version
+    WHERE fas.is_monthly_snapshot_for_employee = TRUE
+      AND fas.dt_reference = last_day(fas.dt_reference)
+      AND fas.is_active = TRUE
+      AND fas.dt_reference >= DATE '2024-03-01'   -- system migration date; no reliable history before it
+      AND (job.employment_type IS NULL OR job.employment_type NOT IN ('intern', 'young apprentice'))
     GROUP BY 1
 ),
 terminations AS (
     SELECT
-        date_trunc('month', dt_terminated) AS ref_month,
-        COUNT(DISTINCT person_number) AS leavers
-    FROM dw_employee_details.fact_assignment_snapshots
-    WHERE is_terminated = TRUE
-      AND is_monthly_snapshot_for_employee = TRUE
-      AND dt_terminated >= DATE '2024-03-01'   -- system migration date; keep aligned with month_ends' cutoff (first day of a month) to avoid partial-month leaver counts
+        date_trunc('month', fas.dt_terminated) AS ref_month,
+        COUNT(DISTINCT fas.person_number) AS leavers
+    FROM dw_employee_details.fact_assignment_snapshots AS fas
+    LEFT JOIN dw_employee_details.dim_job AS job
+        ON fas.sk_job_version = job.sk_job_version
+    WHERE fas.employment_status = 'Terminated'
+      AND fas.is_monthly_snapshot_for_employee = TRUE
+      AND fas.dt_terminated >= DATE '2024-03-01' 
+      AND (job.employment_type IS NULL OR job.employment_type NOT IN ('intern', 'young apprentice'))
     GROUP BY 1
 ),
 new_hires AS (
     SELECT
-        date_trunc('month', dt_hired) AS ref_month,
-        COUNT(DISTINCT person_number) AS hires
-    FROM dw_employee_details.fact_assignment_snapshots
-    WHERE is_monthly_snapshot_for_employee = TRUE
-      AND dt_hired >= DATE '2024-03-01'   -- system migration date; same cutoff as the other CTEs, aligned to a month boundary
+        date_trunc('month', fas.dt_hired) AS ref_month,
+        COUNT(DISTINCT fas.person_number) AS hires
+    FROM dw_employee_details.fact_assignment_snapshots AS fas
+    LEFT JOIN dw_employee_details.dim_job AS job
+        ON fas.sk_job_version = job.sk_job_version
+    WHERE fas.is_monthly_snapshot_for_employee = TRUE
+      AND fas.dt_hired >= DATE '2024-03-01'
+      AND (job.employment_type IS NULL OR job.employment_type NOT IN ('intern', 'young apprentice'))
     GROUP BY 1
 ),
 headcount AS (
@@ -184,9 +226,22 @@ LEFT JOIN terminations AS t ON h.ref_month = t.ref_month
 ORDER BY h.ref_month
 ```
 
+**Example output** (validated against production Databricks on 2026-07-08, Jan–Jun 2026):
+
+| ref_month | leavers | avg_monthly_headcount | turnover_pct |
+|---|---|---|---|
+| 2026-01-01 | 137 | 3177.0 | 4.31 |
+| 2026-02-01 | 71 | 2921.5 | 2.43 |
+| 2026-03-01 | 92 | 3087.5 | 2.98 |
+| 2026-04-01 | 86 | 3070.0 | 2.80 |
+| 2026-05-01 | 128 | 3041.5 | 4.21 |
+| 2026-06-01 | 86 | 3019.0 | 2.85 |
+
+The Intern/JA exclusion changes February 2026 from 85 to 71 leavers (14 of 85, 16%, were Interns/JA) — evidence of the filter's measurable effect on the reported percentage.
+
 ### Query 2 — Leavers by job family and band (point-in-time)
 
-Attributes each leaver's job/band **as of their termination snapshot**, using the versioned `dim_job` join documented in Nuances. No date filter needed beyond the snapshot's own `dt_reference` — the FK already resolves to the correct job version.
+Attributes each leaver's job/band **as of their termination snapshot**, using the versioned `dim_job` join documented in Nuances. No date filter needed beyond the snapshot's own `dt_reference` — the FK already resolves to the correct job version. This query already joins `dim_job` for attribution, so the Intern/Young Apprentice exclusion is a single extra predicate.
 
 ```sql
 SELECT
@@ -198,9 +253,10 @@ SELECT
 FROM dw_employee_details.fact_assignment_snapshots AS fas
 INNER JOIN dw_employee_details.dim_job AS job
     ON fas.sk_job_version = job.sk_job_version
-WHERE fas.is_terminated = TRUE
+WHERE fas.employment_status = 'Terminated'
   AND fas.is_primary_assignment_for_snapshot = TRUE
   AND fas.dt_terminated >= DATE '2024-03-01'   -- system migration date; no reliable history before it
+  AND (job.employment_type IS NULL OR job.employment_type NOT IN ('intern', 'young apprentice'))
 GROUP BY 1, 2, 3, 4
 ORDER BY 1, 2, 3
 ```

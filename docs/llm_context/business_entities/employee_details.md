@@ -61,7 +61,8 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Hire date / start date / assignment start / admissão** → `dt_hired` (current assignment only)
 - **Original hire date / company start date / first hire** → `dt_original_hire` (tenure crediting full company history)
 - **Tenure / time in company / time in role** → `days_tenure_in_company`, `months_tenure_in_company`, `days_tenure_in_assignment` on the fact (relative to `dt_reference`)
-- **Termination / separation / offboarding / exit / turnover / demissão** → `is_terminated = TRUE`, `dt_terminated`; join `dim_event_definition` for labels
+- **Termination / separation / offboarding / exit / turnover / demissão** → `employment_status = 'Terminated'`, `dt_terminated`; join `dim_event_definition` for labels
+- **Intern / Estagiário / Young Apprentice / Jovem Aprendiz / JA** → `dw_employee_details.dim_job.employment_type` (`'intern'`, `'young apprentice'`; lowercase), reached via `fact.sk_job_version = dim_job.sk_job_version`. `NULL` reflects an unmapped `job_family` (legacy job codes) and counts as regular population, not Intern/JA.
 - **Voluntary termination / resignation / quit / pedido de demissão** → filter `dim_event_definition` (`action_name`, `reason_name` in EN; `action_name_ptb`, `reason_name_ptb` in PT)
 - **Involuntary termination / dismissal / firing** → `dim_event_definition` labels; recorded only **after** employee communication — cannot predict in advance
 - **Layoff / reorganization exit / restructuring** → `is_reorganization_termination = TRUE` on the fact
@@ -74,8 +75,8 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Span of control / direct reports / team size** → `count_direct_report` on the fact
 - **Indirect reports** → `count_indirect_report`; **total reports** → `count_total_report`
 - **Manager / people manager** → `is_manager = TRUE`
-- **Leadership Team / LT / liderança** → `is_member_lt = TRUE` (band 10+ or EXEC)
-- **Executive Team / ET** → `is_member_et = TRUE` (L0/L1 in hierarchy and band 14+)
+- **Leadership Team / LT / liderança** → `is_leadership_team_member = TRUE` (band 10+ or EXEC)
+- **Executive Team / ET** → `is_executive_team_member = TRUE` (L0/L1 in hierarchy and band 14+)
 - **Internal transfer / mobility / transferência interna** → `is_internal_transfer = TRUE` (flag on the **new** assignment created by the transfer)
 - **Global Transfer / transfer termination event / transferência** → `dim_event_definition.action_name = 'Global Transfer'` on the old assignment's termination event — an internal move, **not** a real exit; must be excluded from dismissals and turnover
 - **Transfer termination / assignment closed by transfer** → `is_transfer_termination = TRUE` (flag on the **old** assignment closed by a Global Transfer) — the simplest way to exclude internal transfers from termination and turnover counts without joining `dim_event_definition`
@@ -114,10 +115,10 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Tenure in company** — `days_tenure_in_company`, `months_tenure_in_company` (relative to `dt_reference`)
 - **Tenure in assignment** — `days_tenure_in_assignment` (current role only)
 - **Span of control** — `count_direct_report`, `count_indirect_report` (pre-computed on the fact)
-- **Voluntary terminations** — `is_terminated = TRUE` + `dim_event_definition` filtered by `action_name` / `reason_name`
-- **Turnover / attrition** — terminations via `is_terminated = TRUE`, always **excluding** internal transfers with `is_transfer_termination = FALSE` (equivalently `dim_event_definition.action_name <> 'Global Transfer'`)
-- **Managers vs ICs** — `is_manager`, `is_member_lt`
-- **Turnover / attrition** — official monthly formula lives in `../metric_entities/turnover.md` (never approximate ad hoc); built from `is_terminated`, `dt_terminated`, and `is_monthly_snapshot_for_employee` headcount snapshots on `fact_assignment_snapshots`
+- **Voluntary terminations** — `employment_status = 'Terminated'` + `dim_event_definition` filtered by `action_name` / `reason_name`
+- **Turnover / attrition** — terminations via `employment_status = 'Terminated'`, which already excludes internal transfers on this table — `is_transfer_termination = TRUE` rows keep `employment_status = 'Active'` on the transfer date (equivalently, filter `dim_event_definition.action_name <> 'Global Transfer'` if joining that dimension)
+- **Managers vs ICs** — `is_manager`, `is_leadership_team_member`
+- **Turnover / attrition** — official monthly formula lives in `../metric_entities/turnover.md` (never approximate ad hoc); built from `employment_status = 'Terminated'`, `dt_terminated`, and `is_monthly_snapshot_for_employee` headcount snapshots on `fact_assignment_snapshots`, with Interns/Young Apprentices excluded via `dim_job.employment_type`
 
 ## Relationships with Other Entities
 
