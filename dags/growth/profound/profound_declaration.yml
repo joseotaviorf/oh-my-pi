@@ -2,7 +2,7 @@ dag:
   name: profound
   owner: Data Growth
   schedule_start_date: 2025, 12, 16
-  schedule_interval: "0 10 * * *"
+  schedule_interval: "0 4 * * *"
   documentation:
     dag_purpose: |
       Profound DAG retrieves Profound data metrics from API.

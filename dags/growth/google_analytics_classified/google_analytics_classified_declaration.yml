@@ -2,7 +2,7 @@ dag:
   name: google_analytics_classified
   owner: Data Growth
   schedule_start_date: 2019, 1, 1
-  schedule_interval: "0 10 * * *"
+  schedule_interval: "0 4 * * *"
   documentation:
     dag_purpose: |
       Google Analytics for Classifieds DAG loads Google Analytics data from BigQuery.

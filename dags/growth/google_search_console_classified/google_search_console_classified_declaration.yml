@@ -2,7 +2,7 @@ dag:
   name: google_search_console_classified
   owner: Data Growth
   schedule_start_date: 2019, 1, 1
-  schedule_interval: "0 10 * * *"
+  schedule_interval: "0 4 * * *"
   documentation:
     dag_purpose: |
       Google Search Console DAG retrieves QuintoAndar's Google Web Search data metrics from Google Search Console platform from Classified Unit.
