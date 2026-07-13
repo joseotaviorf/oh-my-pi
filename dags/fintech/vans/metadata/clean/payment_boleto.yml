@@ -1,70 +1,97 @@
+---
 database_name: datalake_vans_clean
 table_name: payment_boleto
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: |
+  Third-party boleto payment instructions sent through Vans to settle external bank slips.
+  Used when QuintoAndar pays boletos issued by suppliers or partners via CNAB remittance.
 columns:
   id:
+    description: Primary key of the boleto payment instruction in Vans.
     lineage:
       - datalake_vans_raw.paymentboleto.id
-  requested_by:
+  id_bank_payment:
+    description: Foreign key to the QuintoAndar bank account debited for this boleto payment.
     lineage:
-      - datalake_vans_raw.paymentboleto.requested_by
-  related_document_type:
-    lineage:
-      - datalake_vans_raw.paymentboleto.related_document_type
+      - datalake_vans_raw.paymentboleto.bank_payment_id
   id_related_document:
+    description: Identifier of the upstream QuintoAndar document that originated this boleto payment.
     lineage:
       - datalake_vans_raw.paymentboleto.related_document_id
-  related_document_status:
-    lineage:
-      - datalake_vans_raw.paymentboleto.related_document_status
   company_use:
+    description: Free-text company-use field embedded in the CNAB remittance for reconciliation.
     lineage:
       - datalake_vans_raw.paymentboleto.company_use
   our_number:
+    description: Nosso número assigned to this boleto payment in the CNAB remittance batch.
     lineage:
       - datalake_vans_raw.paymentboleto.our_number
+  requested_by:
+    description: Upstream QuintoAndar system that requested settlement of this third-party boleto.
+    lineage:
+      - datalake_vans_raw.paymentboleto.requested_by
+  related_document_type:
+    description: Type of upstream document linked to this boleto payment (e.g. supplier invoice, payout).
+    lineage:
+      - datalake_vans_raw.paymentboleto.related_document_type
+  related_document_status:
+    description: Status of the upstream linked document at the time of payment creation.
+    lineage:
+      - datalake_vans_raw.paymentboleto.related_document_status
   occurrence_code:
+    description: CNAB occurrence code returned by the bank (e.g. accepted, rejected, settled).
     lineage:
       - datalake_vans_raw.paymentboleto.occurrence_code
   occurrence_reason:
+    description: Human-readable reason accompanying the bank occurrence code.
     lineage:
       - datalake_vans_raw.paymentboleto.occurrence_reason
   payee_name:
+    description: Name of the boleto beneficiary or issuing company (PII).
     lineage:
       - datalake_vans_raw.paymentboleto.payee_name
-  ts_created:
-    lineage:
-      - datalake_vans_raw.paymentboleto.created_at
-  ts_updated:
-    lineage:
-      - datalake_vans_raw.paymentboleto.updated_at
   status:
+    description: Current lifecycle status of the boleto payment in Vans (e.g. pending, sent, paid).
     lineage:
       - datalake_vans_raw.paymentboleto.status
-  dt_paid:
-    lineage:
-      - datalake_vans_raw.paymentboleto.paid_at
   original_response:
+    description: Raw JSON or text response returned by the bank during boleto payment processing.
     lineage:
       - datalake_vans_raw.paymentboleto.original_response
   paid_amount:
+    description: Amount actually settled by the bank for this boleto payment.
     lineage:
       - datalake_vans_raw.paymentboleto.paid_amount
   due_amount:
+    description: Nominal amount due on the third-party boleto at payment request time.
     lineage:
       - datalake_vans_raw.paymentboleto.due_amount
   bank_payment_code:
+    description: Bank-specific payment type code in the CNAB remittance layout.
     lineage:
       - datalake_vans_raw.paymentboleto.bank_payment_code
   type:
+    description: Payment modality in Vans for boleto settlement (e.g. boleto payment batch).
     lineage:
       - datalake_vans_raw.paymentboleto.type
   style:
+    description: CNAB layout style or segment variant used for this boleto payment instruction.
     lineage:
       - datalake_vans_raw.paymentboleto.style
-  id_bank_payment:
-    lineage:
-      - datalake_vans_raw.paymentboleto.bank_payment_id
   barcode:
+    description: Barcode (linha digitável) of the third-party boleto being paid.
     lineage:
       - datalake_vans_raw.paymentboleto.barcode
+  ts_created:
+    description: Timestamp when the boleto payment instruction was created in Vans.
+    lineage:
+      - datalake_vans_raw.paymentboleto.created_at
+  ts_updated:
+    description: Timestamp of the last update to the boleto payment instruction in Vans.
+    lineage:
+      - datalake_vans_raw.paymentboleto.updated_at
+  dt_paid:
+    description: Date when the bank confirmed settlement of the boleto payment.
+    lineage:
+      - datalake_vans_raw.paymentboleto.paid_at

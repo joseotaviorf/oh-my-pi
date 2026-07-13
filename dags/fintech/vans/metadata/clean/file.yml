@@ -1,31 +1,45 @@
+---
 database_name: datalake_vans_clean
 table_name: file
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: |
+  CNAB exchange files sent to or received from partner banks through the Vans integration.
+  Tracks remittance batches for boletos, outbound payments, and bank return files.
 columns:
   id:
+    description: Primary key of the CNAB exchange file record in Vans.
     lineage:
       - datalake_vans_raw.file.id
   name:
+    description: File name of the CNAB batch as stored in Vans.
     lineage:
       - datalake_vans_raw.file.name
   path:
+    description: Storage path of the CNAB file in the Vans file repository.
     lineage:
       - datalake_vans_raw.file.path
-  ts_created:
-    lineage:
-      - datalake_vans_raw.file.created_at
   type:
+    description: CNAB file type or layout (e.g. remittance, return, registration batch).
     lineage:
       - datalake_vans_raw.file.type
   origin:
+    description: Direction of the file exchange (sent to bank or received from bank).
     lineage:
       - datalake_vans_raw.file.origin
+  ts_created:
+    description: Timestamp when the CNAB file record was created in Vans.
+    lineage:
+      - datalake_vans_raw.file.created_at
   ts_sent:
+    description: Timestamp when the CNAB file was transmitted to or retrieved from the bank.
     lineage:
       - datalake_vans_raw.file.sent_at
   id_bank_payment:
+    description: Foreign key to the bank payment account used when the file is a payment remittance.
     lineage:
       - datalake_vans_raw.file.bank_payment_id
   id_bank_boleto:
+    description: Foreign key to the bank boleto account used when the file is a boleto batch.
     lineage:
       - datalake_vans_raw.file.bank_boleto_id

@@ -1,25 +1,38 @@
+---
 database_name: datalake_vans_clean
 table_name: bank_payment
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: |
+  QuintoAndar bank accounts registered in Vans for outbound payment remittances (TED/DOC/CNAB).
+  Each row stores the agency, account, and contract number used when sending payment files to
+  partner banks.
 columns:
   id:
+    description: Primary key of the bank payment account configuration in Vans.
     lineage:
       - datalake_vans_raw.bankpayment.id
   id_bank:
+    description: Foreign key to the partner bank that processes payment remittances for this account.
     lineage:
       - datalake_vans_raw.bankpayment.bank_id
   agency:
+    description: Bank branch (agency) number of the QuintoAndar payment account.
     lineage:
       - datalake_vans_raw.bankpayment.agency
   account:
+    description: Checking account number used for outbound payment remittances.
     lineage:
       - datalake_vans_raw.bankpayment.account
-  is_active:
-    lineage:
-      - datalake_vans_raw.bankpayment.active
   account_digit:
+    description: Verification digit of the payment account number.
     lineage:
       - datalake_vans_raw.bankpayment.account_digit
   contract_number:
+    description: Bank contract number authorizing QuintoAndar to send payment CNAB files.
     lineage:
       - datalake_vans_raw.bankpayment.contract_number
+  is_active:
+    description: When true, this bank account is enabled for new payment remittances in Vans.
+    lineage:
+      - datalake_vans_raw.bankpayment.active

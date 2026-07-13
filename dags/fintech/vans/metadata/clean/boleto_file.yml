@@ -1,10 +1,17 @@
+---
 database_name: datalake_vans_clean
 table_name: boleto_file
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: |
+  Junction table linking registered boletos to CNAB exchange files sent or received through Vans.
+  Used to trace which bank file carried each boleto registration or return occurrence.
 columns:
   id_file:
+    description: Foreign key to the CNAB exchange file that includes this boleto.
     lineage:
       - datalake_vans_raw.boleto_file.file_id
   id_boleto:
+    description: Foreign key to the boleto registered or updated in the linked CNAB file.
     lineage:
       - datalake_vans_raw.boleto_file.boleto_id

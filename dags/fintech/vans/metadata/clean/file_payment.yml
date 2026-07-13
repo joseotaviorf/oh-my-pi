@@ -1,10 +1,17 @@
+---
 database_name: datalake_vans_clean
 table_name: file_payment
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: |
+  Junction table linking outbound payment instructions to CNAB remittance files in Vans.
+  Tracks which bank file batch included each payment sent to partner banks.
 columns:
   id_file:
+    description: Foreign key to the CNAB remittance file that contains this payment instruction.
     lineage:
       - datalake_vans_raw.file_payment.file_id
   id_payment:
+    description: Foreign key to the outbound payment instruction included in the remittance file.
     lineage:
       - datalake_vans_raw.file_payment.payment_id

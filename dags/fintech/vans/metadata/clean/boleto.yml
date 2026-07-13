@@ -1,100 +1,138 @@
+---
 database_name: datalake_vans_clean
 table_name: boleto
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: |
+  Registered bank slips (boletos) issued through Vans for QuintoAndar receivables.
+  Tracks registration with partner banks, payer details, due amounts, fines, and settlement
+  status from CNAB return files.
 columns:
   id:
+    description: Primary key of the boleto record in Vans.
     lineage:
       - datalake_vans_raw.boleto.id
   id_related_document:
+    description: Identifier of the upstream QuintoAndar document (invoice, charge) linked to this boleto.
     lineage:
       - datalake_vans_raw.boleto.related_document_id
+  id_bank_boleto:
+    description: Foreign key to the bank boleto account used to register this slip with the partner bank.
+    lineage:
+      - datalake_vans_raw.boleto.bank_boleto_id
   due_amount:
+    description: Nominal amount due on the boleto at issuance.
     lineage:
       - datalake_vans_raw.boleto.due_amount
-  dt_due:
+  paid_amount:
+    description: Amount actually paid when the boleto was settled; null while open.
     lineage:
-      - datalake_vans_raw.boleto.due_date
-  ts_issued:
-    lineage:
-      - datalake_vans_raw.boleto.issue_date_time
+      - datalake_vans_raw.boleto.paid_amount
   company_use:
+    description: Free-text company-use field embedded in the boleto for internal reconciliation.
     lineage:
       - datalake_vans_raw.boleto.company_use
   our_number:
+    description: Nosso número — bank-assigned sequential document number for this boleto.
     lineage:
       - datalake_vans_raw.boleto.our_number
   one_day_interest:
+    description: Daily interest rate applied after the due date, as configured at registration.
     lineage:
       - datalake_vans_raw.boleto.one_day_interest
-  dt_fine_due:
-    lineage:
-      - datalake_vans_raw.boleto.fine_due_date
   fine_amount:
+    description: Fixed fine amount charged when payment occurs after the fine due date.
     lineage:
       - datalake_vans_raw.boleto.fine_amount
   occurrence_code:
+    description: CNAB occurrence code returned by the bank (e.g. registered, rejected, paid).
     lineage:
       - datalake_vans_raw.boleto.occurrence_code
   occurrence_reason:
+    description: Human-readable reason accompanying the bank occurrence code.
     lineage:
       - datalake_vans_raw.boleto.occurrence_reason
   payer_name:
+    description: Full name of the boleto payer printed on the bank slip (PII).
     lineage:
       - datalake_vans_raw.boleto.payer_name
   payer_document:
+    description: CPF or CNPJ of the boleto payer (PII).
     lineage:
       - datalake_vans_raw.boleto.payer_document
   payer_address:
+    description: Street address of the boleto payer (PII).
     lineage:
       - datalake_vans_raw.boleto.payer_address
   payer_neighborhood:
+    description: Neighborhood of the boleto payer address (PII).
     lineage:
       - datalake_vans_raw.boleto.payer_neighborhood
   payer_zipcode:
+    description: Postal code (CEP) of the boleto payer (PII).
     lineage:
       - datalake_vans_raw.boleto.payer_zipcode
   payer_city:
+    description: City of the boleto payer address (PII).
     lineage:
       - datalake_vans_raw.boleto.payer_city
   payer_state:
+    description: State (UF) of the boleto payer address (PII).
     lineage:
       - datalake_vans_raw.boleto.payer_state
-  ts_created:
-    lineage:
-      - datalake_vans_raw.boleto.created_at
-  ts_updated:
-    lineage:
-      - datalake_vans_raw.boleto.updated_at
   status:
+    description: Current lifecycle status of the boleto in Vans (e.g. pending, registered, paid, cancelled).
     lineage:
       - datalake_vans_raw.boleto.status
-  dt_paid:
-    lineage:
-      - datalake_vans_raw.boleto.paid_at
-  paid_amount:
-    lineage:
-      - datalake_vans_raw.boleto.paid_amount
   requested_by:
+    description: Upstream QuintoAndar system that requested boleto registration through Vans.
     lineage:
       - datalake_vans_raw.boleto.requested_by
   related_document_type:
+    description: Type of upstream document linked to this boleto (e.g. invoice, subscription charge).
     lineage:
       - datalake_vans_raw.boleto.related_document_type
   original_response:
+    description: Raw JSON or text response returned by the bank during boleto registration.
     lineage:
       - datalake_vans_raw.boleto.original_response
   interest:
+    description: Interest configuration or amount applied to overdue boleto payments.
     lineage:
       - datalake_vans_raw.boleto.interest
   related_document_status:
+    description: Status of the upstream linked document at the time of boleto registration.
     lineage:
       - datalake_vans_raw.boleto.related_document_status
   document_number:
+    description: Document number printed on the boleto for payer reference.
     lineage:
       - datalake_vans_raw.boleto.document_number
-  id_bank_boleto:
+  dt_due:
+    description: Due date of the boleto payment.
     lineage:
-      - datalake_vans_raw.boleto.bank_boleto_id
+      - datalake_vans_raw.boleto.due_date
+  ts_created:
+    description: Timestamp when the boleto record was created in Vans.
+    lineage:
+      - datalake_vans_raw.boleto.created_at
+  ts_updated:
+    description: Timestamp of the last update to the boleto record in Vans.
+    lineage:
+      - datalake_vans_raw.boleto.updated_at
+  ts_issued:
+    description: Timestamp when the boleto was issued and sent for bank registration.
+    lineage:
+      - datalake_vans_raw.boleto.issue_date_time
+  dt_fine_due:
+    description: Date after which the fine amount applies to late payments.
+    lineage:
+      - datalake_vans_raw.boleto.fine_due_date
+  dt_paid:
+    description: Date when the boleto was settled according to bank return files.
+    lineage:
+      - datalake_vans_raw.boleto.paid_at
   ts_credited:
+    description: Timestamp when the paid amount was credited to QuintoAndar's bank account.
     lineage:
       - datalake_vans_raw.boleto.credit_date

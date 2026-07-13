@@ -1,10 +1,17 @@
+---
 database_name: datalake_vans_clean
 table_name: file_payment_boleto
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: |
+  Junction table linking third-party boleto payment instructions to CNAB remittance files in Vans.
+  Tracks which bank file batch carried each boleto settlement payment.
 columns:
   id_file:
+    description: Foreign key to the CNAB remittance file that includes this boleto payment.
     lineage:
       - datalake_vans_raw.file_paymentboleto.file_id
   id_payment_boleto:
+    description: Foreign key to the boleto payment instruction sent in the remittance file.
     lineage:
       - datalake_vans_raw.file_paymentboleto.payment_boleto_id

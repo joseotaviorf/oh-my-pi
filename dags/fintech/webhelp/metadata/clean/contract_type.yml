@@ -1,21 +1,23 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: contract_type
-owner: bianca.martins@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Contract type data
+description: |
+  Contract type taxonomy in the Webhelp collection CRM. Each type classifies defaulted
+  QuintoAndar contracts by product or portfolio segment and links them to a creditor entity.
 columns:
   id_contract_type:
-    description: "Contract type ID. PK of table"
+    description: Primary key of the contract type in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.tipo_contrato.cod_tipc
   id_creditor:
-    description: "Creditor/portfolio/company ID. FK of table creditors"
+    description: Foreign key to the creditor portfolio that owns contracts of this type.
     lineage:
       - datalake_webhelp_raw.tipo_contrato.cod_cred
   description_contract_type:
-    description: "Description of the contract type"
+    description: Human-readable label of the contract type (e.g. rent, condo, sale product line).
     lineage:
       - datalake_webhelp_raw.tipo_contrato.descricao_tipc
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

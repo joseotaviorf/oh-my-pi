@@ -1,94 +1,130 @@
+---
 database_name: datalake_vans_clean
 table_name: payment
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
+description: |
+  Outbound bank transfer payment instructions sent through Vans to partner banks (TED/DOC/CNAB).
+  Each row represents a payment to a payee account, linked to an upstream QuintoAndar document
+  and tracked through CNAB remittance and return files.
 columns:
   id:
+    description: Primary key of the outbound payment instruction in Vans.
     lineage:
       - datalake_vans_raw.payment.id
   id_related_document:
+    description: Identifier of the upstream QuintoAndar document that originated this payment.
     lineage:
       - datalake_vans_raw.payment.related_document_id
+  id_bank_payment:
+    description: Foreign key to the QuintoAndar bank account used to send this payment remittance.
+    lineage:
+      - datalake_vans_raw.payment.bank_payment_id
   unique_company_use:
+    description: Unique company-use token for idempotent payment identification in CNAB files.
     lineage:
       - datalake_vans_raw.payment.unique_company_use
   unique_payment_identifier:
+    description: Globally unique payment identifier assigned by Vans for reconciliation.
     lineage:
       - datalake_vans_raw.payment.unique_payment_identifier
   due_amount:
+    description: Monetary amount to be transferred to the payee.
     lineage:
       - datalake_vans_raw.payment.due_amount
   dt_dued:
+    description: Scheduled payment date for the bank transfer.
     lineage:
       - datalake_vans_raw.payment.due_date
   ts_issued:
+    description: Timestamp when the payment instruction was issued to the bank.
     lineage:
       - datalake_vans_raw.payment.issue_date_time
   company_use:
+    description: Free-text company-use field embedded in the CNAB remittance for reconciliation.
     lineage:
       - datalake_vans_raw.payment.company_use
   our_number:
+    description: Nosso número assigned to this payment in the CNAB remittance batch.
     lineage:
       - datalake_vans_raw.payment.our_number
   occurrence_code:
+    description: CNAB occurrence code returned by the bank (e.g. accepted, rejected, settled).
     lineage:
       - datalake_vans_raw.payment.occurrence_code
   occurrence_reason:
+    description: Human-readable reason accompanying the bank occurrence code.
     lineage:
       - datalake_vans_raw.payment.occurrence_reason
   payee_name:
+    description: Full name of the payment beneficiary (PII).
     lineage:
       - datalake_vans_raw.payment.payee_name
   payee_document:
+    description: CPF or CNPJ of the payment beneficiary (PII).
     lineage:
       - datalake_vans_raw.payment.payee_document
   payee_agency:
+    description: Bank branch (agency) number of the payee account.
     lineage:
       - datalake_vans_raw.payment.payee_agency
   payee_account:
+    description: Account number of the payment beneficiary.
     lineage:
       - datalake_vans_raw.payment.payee_account
   has_payee_savings_acc:
+    description: When true, the payee account is a savings account (poupança) rather than checking.
     lineage:
       - datalake_vans_raw.payment.payee_savings_acc
   payee_bank_code:
+    description: COMPE bank code of the payee's financial institution.
     lineage:
       - datalake_vans_raw.payment.payee_bank_code
   ts_created:
+    description: Timestamp when the payment instruction was created in Vans.
     lineage:
       - datalake_vans_raw.payment.created_at
   ts_updated:
+    description: Timestamp of the last update to the payment instruction in Vans.
     lineage:
       - datalake_vans_raw.payment.updated_at
   status:
+    description: Current lifecycle status of the payment in Vans (e.g. pending, sent, paid, rejected).
     lineage:
       - datalake_vans_raw.payment.status
   dt_paid:
+    description: Date when the bank confirmed settlement of the payment.
     lineage:
       - datalake_vans_raw.payment.paid_at
   requested_by:
+    description: Upstream QuintoAndar system that requested this outbound payment through Vans.
     lineage:
       - datalake_vans_raw.payment.requested_by
   related_document_type:
+    description: Type of upstream document linked to this payment (e.g. payout, refund, supplier invoice).
     lineage:
       - datalake_vans_raw.payment.related_document_type
   original_response:
+    description: Raw JSON or text response returned by the bank during payment processing.
     lineage:
       - datalake_vans_raw.payment.original_response
   related_document_status:
+    description: Status of the upstream linked document at the time of payment creation.
     lineage:
       - datalake_vans_raw.payment.related_document_status
   paid_amount:
+    description: Amount actually settled by the bank; may differ from due_amount in partial settlements.
     lineage:
       - datalake_vans_raw.payment.paid_amount
   bank_payment_code:
+    description: Bank-specific payment type code in the CNAB remittance layout.
     lineage:
       - datalake_vans_raw.payment.bank_payment_code
   type:
+    description: Payment modality in Vans (e.g. TED, DOC, PIX batch).
     lineage:
       - datalake_vans_raw.payment.type
   style:
+    description: CNAB layout style or segment variant used for this payment instruction.
     lineage:
       - datalake_vans_raw.payment.style
-  id_bank_payment:
-    lineage:
-      - datalake_vans_raw.payment.bank_payment_id
