@@ -1,102 +1,135 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: cnab_payments_341_seg_a
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing Itaú (341) payments data from CNAB files, segment_type = 'A' (Checking Account, Saving Account, Cheque, DOC, TED and PIX). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_bank:
     lineage:
       - datalake_nexxera_raw.cnab_payments.id_bank
+    description: Identifier for the bank referenced by this financial record.
   id_destination_bank:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Identifier for the destination bank referenced by this financial record.
   id_service_batch:
     lineage:
       - datalake_nexxera_raw.cnab_payments.id_service_batch
+    description: Identifier for the service batch referenced by this financial record.
   id_compensation_code:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Identifier for the compensation code referenced by this financial record.
   bank_account:
     lineage:
       - datalake_nexxera_raw.cnab_payments.file_name
+    description: Financial attribute representing bank account on the cnab_payments_341_seg_a dataset.
   record_type:
     lineage:
       - datalake_nexxera_raw.cnab_payments.record_type
+    description: Financial attribute representing record type on the cnab_payments_341_seg_a dataset.
   record_sequence_number:
     lineage:
       - datalake_nexxera_raw.cnab_payments.record_sequence_number
+    description: Financial attribute representing record sequence number on the cnab_payments_341_seg_a dataset.
   segment_type:
     lineage:
       - datalake_nexxera_raw.cnab_payments.segment_type
+    description: Financial attribute representing segment type on the cnab_payments_341_seg_a dataset.
   transaction_type:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing transaction type on the cnab_payments_341_seg_a dataset.
   destination_bank_account:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing destination bank account on the cnab_payments_341_seg_a dataset.
   beneficiarys_name:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing beneficiarys name on the cnab_payments_341_seg_a dataset.
   company_use:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing company use on the cnab_payments_341_seg_a dataset.
   ispb_code:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing ispb code on the cnab_payments_341_seg_a dataset.
   payment_account_pix:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing payment account pix on the cnab_payments_341_seg_a dataset.
   our_number:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing our number on the cnab_payments_341_seg_a dataset.
   purpose_detail:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing purpose detail on the cnab_payments_341_seg_a dataset.
   document_number:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing document number on the cnab_payments_341_seg_a dataset.
   cpf_cnpj:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing cpf cnpj on the cnab_payments_341_seg_a dataset.
   doc_purpose:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing doc purpose on the cnab_payments_341_seg_a dataset.
   ted_purpose:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing ted purpose on the cnab_payments_341_seg_a dataset.
   notice:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing notice on the cnab_payments_341_seg_a dataset.
   occurrence_code:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing occurrence code on the cnab_payments_341_seg_a dataset.
   currency:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: ISO currency code for the monetary amount, typically BRL.
   file_name:
     lineage:
       - datalake_nexxera_raw.cnab_payments.file_name
+    description: Financial attribute representing file name on the cnab_payments_341_seg_a dataset.
   due_amount:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing due amount on the cnab_payments_341_seg_a dataset.
   paid_amount:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Financial attribute representing paid amount on the cnab_payments_341_seg_a dataset.
   dt_due:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Calendar date associated with due in the financial workflow.
   dt_paid:
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
+    description: Calendar date associated with paid in the financial workflow.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.cnab_payments.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_nexxera_raw.cnab_payments.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.cnab_payments.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.cnab_payments.day
+    description: Day partition derived from the source event timestamp for incremental loading.

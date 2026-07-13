@@ -1,36 +1,47 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: file_trailer
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing the file trailers from financial extract files from itaú and bradesco with layout 030 and 050 and segment 'e'. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_bank:
     lineage:
       - datalake_nexxera_raw.ext.col_1
+    description: Identifier for the bank referenced by this financial record.
   id_service_batch:
     lineage:
       - datalake_nexxera_raw.ext.col_2
+    description: Identifier for the service batch referenced by this financial record.
   record_type:
     lineage:
       - datalake_nexxera_raw.ext.col_3
+    description: Financial attribute representing record type on the file_trailer dataset.
   file_batch_amount:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing file batch amount on the file_trailer dataset.
   file_registers_amount:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing file registers amount on the file_trailer dataset.
   file_accounts_amount:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing file accounts amount on the file_trailer dataset.
   year:
     lineage:
       - datalake_nexxera_raw.ext.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.ext.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.ext.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.ext.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.

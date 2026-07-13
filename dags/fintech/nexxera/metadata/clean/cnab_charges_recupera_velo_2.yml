@@ -3,82 +3,26 @@ database_name: datalake_nexxera_clean
 table_name: cnab_charges_recupera_velo_2
 description: "Table containing Recupera's generated charges for Velo 2.0. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id_bank:
     description: Unique identifier for the bank
     lineage:
       - datalake_nexxera_raw.cnab_payments.id_bank
-  id_destination_bank:
-    description: Identifier for the destination bank
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  id_service_batch:
-    description: Unique identifier for the service batch
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.id_service_batch
   bank_account:
-    description: Bank account number
+    description: Financial attribute representing bank account on the cnab_charges_recupera_velo_2 dataset.
     lineage:
       - datalake_nexxera_raw.cnab_payments.file_name
   record_type:
-    description: Type of CNAB record
+    description: Financial attribute representing record type on the cnab_charges_recupera_velo_2 dataset.
     lineage:
       - datalake_nexxera_raw.cnab_payments.record_type
   recupera_creditor_name:
     description: Name of the creditor in Recupera system
     lineage:
       - datalake_nexxera_raw.cnab_payments.file_name
-  record_sequence_number:
-    description: Sequential number of the record
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.record_sequence_number
-  segment_type:
-    description: Type of CNAB segment
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.segment_type
-  transaction_type:
-    description: Type of transaction being processed
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  transaction_instruction_code:
-    description: Code for transaction instructions
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  destination_bank_agency:
-    description: Agency number of the destination bank
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  destination_bank_agency_verification_digit:
-    description: Verification digit for destination bank agency
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  destination_bank_account:
-    description: Account number of the destination bank
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  destination_bank_account_verification_digit:
-    description: Verification digit for destination bank account
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  destination_agency_account_verification_digit:
-    description: Combined verification digit for agency and account
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  beneficiarys_name:
-    description: Name of the beneficiary
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
   company_use:
     description: Field reserved for company use
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  currency:
-    description: Currency code for the transaction
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  currency_amount:
-    description: Amount in the specified currency
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
   our_number:
@@ -89,48 +33,20 @@ columns:
     description: Notice information for the transaction
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
-  doc_purpose:
-    description: Purpose of the document
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  ted_purpose:
-    description: Purpose of the TED transfer
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.file_name
-  additional_purpose:
-    description: Additional purpose information
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  cnab:
-    description: Raw CNAB data
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  beneficiarys_notice:
-    description: Notice information for the beneficiary
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
   occurrence_code:
     description: Code indicating the occurrence type
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
   file_name:
-    description: Name of the source file
+    description: Financial attribute representing file name on the cnab_charges_recupera_velo_2 dataset.
     lineage:
       - datalake_nexxera_raw.cnab_payments.file_name
   due_amount:
-    description: Amount that was due
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  paid_amount:
-    description: Amount that was actually paid
+    description: Financial attribute representing due amount on the cnab_charges_recupera_velo_2 dataset.
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
   dt_due:
     description: Due date for the payment
-    lineage:
-      - datalake_nexxera_raw.cnab_payments.metadata
-  dt_paid:
-    description: Date when the payment was made
     lineage:
       - datalake_nexxera_raw.cnab_payments.metadata
   ts_ingested:
@@ -149,3 +65,84 @@ columns:
     description: Day partition for the data
     lineage:
       - datalake_nexxera_raw.cnab_payments.day
+  billing_fee_amount:
+    description: Financial attribute representing billing fee amount on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  id_cancel_instruction:
+    description: Identifier for the cancel instruction referenced by this financial record.
+    lineage: []
+  id_bank_clearinghouse:
+    description: Identifier for the bank clearinghouse referenced by this financial record.
+    lineage: []
+  agency_liquidated_verification_digit:
+    description: Financial attribute representing agency liquidated verification digit on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  discount_amount:
+    description: Financial attribute representing discount amount on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  charge_type:
+    description: Financial attribute representing charge type on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  interest_amount:
+    description: Financial attribute representing interest amount on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  id_liquidated:
+    description: Identifier for the liquidated referenced by this financial record.
+    lineage: []
+  rebate_amount:
+    description: Financial attribute representing rebate amount on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  others_credit_amount:
+    description: Financial attribute representing others credit amount on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  document_number:
+    description: Financial attribute representing document number on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  id_wallet:
+    description: Identifier for the wallet referenced by this financial record.
+    lineage: []
+  wallet_number:
+    description: Financial attribute representing wallet number on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  cpf_cnpj:
+    description: Financial attribute representing cpf cnpj on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  bank_agency:
+    description: Financial attribute representing bank agency on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  id_document_type:
+    description: Identifier for the document type referenced by this financial record.
+    lineage: []
+  sequential_number:
+    description: Financial attribute representing sequential number on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  our_number_confirmation:
+    description: Financial attribute representing our number confirmation on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  iof_amount:
+    description: Financial attribute representing iof amount on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  is_dda_bill:
+    description: Indicates whether dda bill applies to this financial record.
+    lineage: []
+  account_verification_digit:
+    description: Financial attribute representing account verification digit on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  payers_name:
+    description: Financial attribute representing payers name on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  our_number_verification_digit:
+    description: Financial attribute representing our number verification digit on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  net_amount:
+    description: Financial attribute representing net amount on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  dt_credit:
+    description: Calendar date associated with credit in the financial workflow.
+    lineage: []
+  agency_liquidated:
+    description: Financial attribute representing agency liquidated on the cnab_charges_recupera_velo_2 dataset.
+    lineage: []
+  dt_occurrence_code:
+    description: Calendar date associated with occurrence code in the financial workflow.
+    lineage: []
