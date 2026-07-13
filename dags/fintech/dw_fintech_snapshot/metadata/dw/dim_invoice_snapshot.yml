@@ -1,7 +1,7 @@
 ---
 database_name: dw_payment_snapshot
 table_name: dim_invoice_snapshot
-owner: "@ae-finance-fintech"
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "dw_payment.dim_invoice monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
@@ -14,7 +14,7 @@ columns:
     lineage:
       - dw_payment.dim_invoice.frequency
   payment_status:
-    description: "Invoice payment status."
+    description: Financial attribute representing payment status on the dim_invoice_snapshot dataset.
     lineage:
       - dw_payment.dim_invoice.payment_status
   negotiation_status:
@@ -26,7 +26,7 @@ columns:
     lineage:
       - dw_payment.dim_invoice.closing_mode
   paid_via:
-    description: "How invoice is paid."
+    description: Financial attribute representing paid via on the dim_invoice_snapshot dataset.
     lineage:
       - dw_payment.dim_invoice.paid_via
   user:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - dw_payment.dim_invoice.user
   due_amount:
-    description: "Amount due in invoice."
+    description: Financial attribute representing due amount on the dim_invoice_snapshot dataset.
     lineage:
       - dw_payment.dim_invoice.due_amount
   paid_amount:
@@ -58,11 +58,11 @@ columns:
     lineage:
       - dw_payment.dim_invoice.dt_sent
   dt_due:
-    description: "Invoice due date."
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - dw_payment.dim_invoice.dt_due
   dt_paid:
-    description: "Invoice payment date."
+    description: Calendar date associated with paid in the financial workflow.
     lineage:
       - dw_payment.dim_invoice.dt_paid
   ts_snapshot:
@@ -75,3 +75,15 @@ columns:
     description: "Month from ts_snapshot."
   day:
     description: "Day from ts_snapshot."  
+  dt_write_off:
+    description: Calendar date associated with write off in the financial workflow.
+    lineage: []
+  dt_due_adjusted:
+    description: Calendar date associated with due adjusted in the financial workflow.
+    lineage: []
+  is_write_off:
+    description: Indicates whether write off applies to this financial record.
+    lineage: []
+  reason:
+    description: Financial attribute representing reason on the dim_invoice_snapshot dataset.
+    lineage: []

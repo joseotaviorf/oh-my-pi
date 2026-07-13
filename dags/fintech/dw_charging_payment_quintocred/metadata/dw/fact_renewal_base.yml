@@ -2,7 +2,11 @@ database_name: dw_charging_payment_quintocred
 table_name: fact_renewal_base
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Base table with renewal cycle data per proposal, including delinquency, link status, and reference dates used by collections analytics.
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Base table with renewal cycle data per proposal, including delinquency, link status, and reference dates used by collections analytics.
 columns:
 
   sk_propose_official:
@@ -311,7 +315,7 @@ columns:
       - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
 
   year_of_renewal:
-    description: "Year of the renewal"
+    description: QuintoCred rental guarantee attribute describing year of renewal in the policy lifecycle.
     lineage:
       - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.ref_month
 
@@ -326,7 +330,7 @@ columns:
       - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.ref_month
 
   year_of_renewal_timeline:
-    description: "Year of renewal in the timeline"
+    description: QuintoCred rental guarantee attribute describing year of renewal timeline in the policy lifecycle.
     lineage:
       - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.ref_month
 
@@ -421,7 +425,7 @@ columns:
       - datalake_velo.payment.dt_created
 
   dt_expected_day_renewal:
-    description: "Expected day for renewal payment"
+    description: Calendar date associated with expected day renewal in the financial workflow.
     lineage:
       - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
 

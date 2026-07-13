@@ -1,7 +1,7 @@
 ---
 database_name: dw_payment_snapshot
 table_name: dim_invoice_entry_snapshot
-owner: "@ae-finance-fintech"
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "dw_payment.dim_invoice_entry monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.description
   invoice_entry_revenue:
-    description: "Entry revenue line."
+    description: Financial attribute representing invoice entry revenue on the dim_invoice_entry_snapshot dataset.
     lineage:
       - dw_payment.dim_invoice_entry.invoice_entry_revenue
   accrual_year_month:

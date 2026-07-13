@@ -1,7 +1,7 @@
 ---
 database_name: dw_public_snapshot
 table_name: dim_contract_snapshot
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "dw_rent.dim_contract monthly snapshot. Snapshots are taken the day after the first business day from the month."
 columns:
@@ -250,7 +250,7 @@ columns:
   contract_plan:
     lineage:
       - datalake_ebdb_contract.contract_b2b.contract_plan
-    description: Type of contract plan.
+    description: Financial attribute representing contract plan on the dim_contract_snapshot dataset.
   administration_split_percentage:
     lineage:
       - datalake_ebdb_contract.contract_b2b.administration_split_percentage
@@ -258,7 +258,7 @@ columns:
   brokerage_split_percentage:
     lineage:
       - datalake_ebdb_contract.contract_b2b.brokerage_split_percentage
-    description: The brokerage percentage of the contract.
+    description: Financial attribute representing brokerage split percentage on the dim_contract_snapshot dataset.
   is_ongoing_contract:
     lineage:
       - datalake_ebdb_contract.contract.is_ongoing_contract
