@@ -1,0 +1,36 @@
+database_name: datalake_authx_scim_clean
+table_name: openapis
+description: |
+  Clean snapshot of OpenAPI documents registered by the AuthX SCIM service. One row per stored
+  specification with commit metadata and application ownership for identity platform audits.
+domain: Tech Platform
+owner: luciane.lopes@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_authx_scim_raw.openapis.id
+    description: Surrogate primary key of the registered OpenAPI document in AuthX SCIM.
+  commit_sha:
+    lineage:
+      - datalake_authx_scim_raw.openapis.commit_sha
+    description: Git commit hash of the repository revision when the OpenAPI spec was ingested.
+  raw_json:
+    lineage:
+      - datalake_authx_scim_raw.openapis.raw_json
+    description: Full OpenAPI specification JSON as persisted by AuthX for schema and scope reviews.
+  application:
+    lineage:
+      - datalake_authx_scim_raw.openapis.application
+    description: Internal application name that owns the API surface described by the OpenAPI document.
+  ts_created:
+    lineage:
+      - datalake_authx_scim_raw.openapis.created_at
+    description: UTC timestamp when the OpenAPI record was first registered in AuthX SCIM.
+  ts_updated:
+    lineage:
+      - datalake_authx_scim_raw.openapis.updated_at
+    description: UTC timestamp of the most recent update to the stored OpenAPI metadata or payload.
+  ts_deleted:
+    lineage:
+      - datalake_authx_scim_raw.openapis.deleted_at
+    description: UTC soft-delete timestamp when the OpenAPI registration was retired; null while active.

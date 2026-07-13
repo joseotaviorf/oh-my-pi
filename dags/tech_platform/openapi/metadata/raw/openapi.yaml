@@ -1,24 +1,20 @@
 database_name: datalake_access_logs_raw
 table_name: openapi
-description: Table with openapi definitions.
+description: |
+  Raw OpenAPI operations exploded from YAML specifications stored in S3. One row per path and HTTP
+  method before repository and application names are parsed in the clean layer.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
   file_path:
-    lineage:
-      - s3_openapi_bucket
-    path:
-      lineage:
-        - s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths
-    method:
-      lineage:
-        - s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths.method
-    operationId:
-      lineage:
-        - s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths.method.operationId
-    operation_description:
-      lineage:
-        -s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths.method.description
-    security:
-      lineage:
-        - s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths.method.security
+    description: Full S3 URI of the OpenAPI YAML specification file ingested by the Spark loader.
+  path:
+    description: API route template key from the OpenAPI paths object in the parsed YAML file.
+  method:
+    description: HTTP verb key nested under the path entry in the OpenAPI specification.
+  operationId:
+    description: OpenAPI operationId field identifying the endpoint within the specification.
+  operation_description:
+    description: Description or summary text defined on the OpenAPI operation in the YAML source.
+  security:
+    description: Security requirements array declared on the OpenAPI operation, including OAuth2 scopes.

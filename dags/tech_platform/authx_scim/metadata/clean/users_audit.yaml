@@ -1,26 +1,28 @@
 database_name: datalake_authx_scim_clean
 table_name: users_audit
-description: This table contains the audit of the users operations from the authx-scim database
+description: |
+  Clean change-history audit trail for SCIM user lifecycle operations in AuthX.
+  One row per CREATE, UPDATE, DELETE, or REACTIVATE action with payload snapshot for compliance review.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_authx_scim_raw.users_audit.id
-    description: Unique audit identifier
+    description: Surrogate primary key of the user audit event in the AuthX SCIM store.
   user_id:
     lineage:
       - datalake_authx_scim_raw.users_audit.user_id
-    description: Unique user identifier
+    description: Foreign key to the SCIM user record that was created, updated, or deprovisioned.
   method:
     lineage:
       - datalake_authx_scim_raw.users_audit.method
-    description: "The operation method. Can be one of the following: CREATE, UPDATE, DELETE or REACTIVATE"
+    description: Lifecycle operation performed — CREATE, UPDATE, DELETE, or REACTIVATE on the user.
   data:
     lineage:
       - datalake_authx_scim_raw.users_audit.data
-    description: The payload data of the operation
+    description: JSON snapshot of user attributes captured at the time of the audited operation.
   ts_created:
     lineage:
       - datalake_authx_scim_raw.users_audit.created_at
-    description: The timestamp of when the operation occurred
+    description: UTC timestamp when the audited user lifecycle operation was recorded.

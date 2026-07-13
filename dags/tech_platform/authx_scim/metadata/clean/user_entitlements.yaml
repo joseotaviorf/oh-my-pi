@@ -1,30 +1,32 @@
 database_name: datalake_authx_scim_clean
 table_name: user_entitlements
-description: This table contains the relationship between users and entitlements from the authx-scim database
+description: |
+  Clean many-to-many assignments linking SCIM users to application entitlements in AuthX.
+  One row per user-entitlement membership with soft-delete timestamps for access certification analytics.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
   entitlement_source:
     lineage:
       - datalake_authx_scim_raw.user_entitlements.entitlement_identity_source
-    description: The source of where the entitlement comes from
+    description: Identity source slug of the entitlement side of the membership composite key.
   entitlement_id:
     lineage:
       - datalake_authx_scim_raw.user_entitlements.entitlement_identity_id
-    description: The id of the entitlement
+    description: Entitlement identifier within entitlement_source that is assigned to the user.
   user_source:
     lineage:
       - datalake_authx_scim_raw.user_entitlements.user_identity_source
-    description: The source of where the user comes from
+    description: Identity source slug of the user side of the membership composite key.
   user_id:
     lineage:
       - datalake_authx_scim_raw.user_entitlements.user_identity_id
-    description: The id of the user
+    description: User identifier within user_source that holds the entitlement assignment.
   ts_updated:
     lineage:
       - datalake_authx_scim_raw.user_entitlements.updated_at
-    description: The timestamp of when the relationship was updated
+    description: UTC timestamp when the user-entitlement link was last modified.
   ts_deleted:
     lineage:
       - datalake_authx_scim_raw.user_entitlements.deleted_at
-    description: The timestamp of when the relationship was deleted
+    description: UTC soft-delete timestamp when the assignment was removed; null while active.

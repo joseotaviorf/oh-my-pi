@@ -1,38 +1,40 @@
 database_name: datalake_authx_scim_clean
 table_name: entitlements
-description: This table contains the entitlements from the authx-scim database
+description: |
+  Clean application entitlements registered in AuthX SCIM for role and access catalog synchronization.
+  One row per entitlement definition with display metadata for IdentityNow and internal IAM reviews.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_authx_scim_raw.entitlements.id
-    description: Unique entitlement identifier
+    description: Surrogate primary key of the entitlement record in the AuthX SCIM catalog.
   app_id:
     lineage:
       - datalake_authx_scim_raw.entitlements.app_id
-    description: Application identifier that the entitlement belongs to
+    description: Foreign key to the owning application that exposes this entitlement to end users.
   source:
     lineage:
       - datalake_authx_scim_raw.entitlements.source
-    description: The source of where the entitlement comes from
+    description: Upstream system or connector that authored the entitlement definition.
   display_name:
     lineage:
       - datalake_authx_scim_raw.entitlements.display_name
-    description: The entitlement friendly display name, used in the IdentityNow UI
+    description: Human-readable entitlement title shown in IdentityNow and internal access request UIs.
   description:
     lineage:
       - datalake_authx_scim_raw.entitlements.description
-    description: The entitlement description
+    description: Long-form explanation of the access scope granted when the entitlement is assigned.
   ts_created:
     lineage:
       - datalake_authx_scim_raw.entitlements.created_at
-    description: The timestamp of when the entitlement was created
+    description: UTC timestamp when the entitlement was first registered in AuthX SCIM.
   ts_updated:
     lineage:
       - datalake_authx_scim_raw.entitlements.updated_at
-    description: The timestamp of when the entitlement was updated
+    description: UTC timestamp of the most recent change to entitlement attributes.
   ts_deleted:
     lineage:
       - datalake_authx_scim_raw.entitlements.deleted_at
-    description: The timestamp of when the entitlement was deleted
+    description: UTC soft-delete timestamp when the entitlement was retired from provisioning.

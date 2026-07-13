@@ -1,28 +1,36 @@
 database_name: datalake_access_logs_clean
 table_name: openapi
-description: Table with openapi definitions.
+description: |
+  Normalized OpenAPI operation catalog parsed from repository spec files in S3. One row per HTTP
+  method and path with repository, application, OAuth scopes, and operation metadata for access reviews.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
-  components:
-    repo:
-      lineage:
-        - datalake_access_logs_raw.openapi.file_path
-    app:
-      lineage:
-        - datalake_access_logs_raw.openapi.file_path
-    path:
-      lineage:
-        - datalake_access_logs_raw.openapi.path
-    method:
-      lineage:
-        - datalake_access_logs_raw.openapi.method
-    id_operation:
-      lineage:
-        - datalake_access_logs_raw.openapi.operationId
-    operation_description:
-      lineage:
-        - datalake_access_logs_raw.openapi.operation_description
-    security:
-      lineage:
-        - datalake_access_logs_raw.openapi.auth_column
+  repo:
+    description: Git repository name extracted from the OpenAPI file path in the S3 landing bucket.
+    lineage:
+      - datalake_access_logs_raw.openapi.file_path
+  app:
+    description: Application or service name segment parsed from the OpenAPI file path hierarchy.
+    lineage:
+      - datalake_access_logs_raw.openapi.file_path
+  path:
+    description: API route template defined in the OpenAPI paths section for the operation.
+    lineage:
+      - datalake_access_logs_raw.openapi.path
+  method:
+    description: HTTP verb (GET, POST, PUT, etc.) associated with the OpenAPI operation entry.
+    lineage:
+      - datalake_access_logs_raw.openapi.method
+  id_operation:
+    description: OpenAPI operationId uniquely naming the endpoint within the service specification.
+    lineage:
+      - datalake_access_logs_raw.openapi.operationId
+  operation_description:
+    description: Human-readable summary or description text authored in the OpenAPI operation block.
+    lineage:
+      - datalake_access_logs_raw.openapi.operation_description
+  oauth2_scopes:
+    description: OAuth2 scope list attached to the first security requirement on the OpenAPI operation.
+    lineage:
+      - datalake_access_logs_raw.openapi.security

@@ -1,34 +1,36 @@
 database_name: datalake_authx_scim_clean
 table_name: users
-description: This table contains the users from the authx-scim database
+description: |
+  Clean user identities provisioned through the AuthX SCIM service from upstream identity sources.
+  One row per SCIM user with lifecycle timestamps for identity platform audits and access reviews.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_authx_scim_raw.users.id
-    description: Unique user identifier
+    description: Surrogate primary key of the SCIM user record in the AuthX identity store.
   source:
     lineage:
       - datalake_authx_scim_raw.users.source
-    description: The source of where the user comes from
+    description: Upstream identity provider or connector slug that originated the SCIM user account.
   email:
     lineage:
       - datalake_authx_scim_raw.users.user_name
-    description: The user email
+    description: Canonical login email (SCIM userName) used to match corporate and application accounts.
   active:
     lineage:
       - datalake_authx_scim_raw.users.active
-    description: Whether the user is active or not
+    description: Boolean flag indicating whether the SCIM user is currently active for provisioning flows.
   ts_created:
     lineage:
       - datalake_authx_scim_raw.users.created_at
-    description: The timestamp of when the user was created
+    description: UTC timestamp when the user record was first created in AuthX SCIM.
   ts_updated:
     lineage:
       - datalake_authx_scim_raw.users.updated_at
-    description: The timestamp of when the user was updated
+    description: UTC timestamp of the most recent attribute update on the SCIM user.
   ts_deleted:
     lineage:
       - datalake_authx_scim_raw.users.deleted_at
-    description: The timestamp of when the user was deleted
+    description: UTC soft-delete timestamp when the user was deprovisioned; null while active.
