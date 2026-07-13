@@ -1,77 +1,118 @@
 ---
 database_name: datalake_debt_recovery
 table_name: installment
-owner: athos.sampayo@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Enrich table focused on Installment context for Debt Recovery"
+description:
+  Payment installments of a debt-recovery agreement, including fees, payment
+  method, and contract context.
 columns:
   id:
-    description: "Installment unique ID"
+    description: Internal identifier of the installment.
     lineage:
       - datalake_trato_feito_clean.installment.id
   id_external:
-    description: "External ID"
+    description: Identifier exposed to collectors and billing platforms.
     lineage:
       - datalake_trato_feito_clean.installment.id_external
   id_negotiation:
-    description: "Negotiation unique ID"
+    description: Recovery agreement this installment belongs to.
     lineage:
       - datalake_trato_feito_clean.installment.id_negotiation
   id_invoice_extra:
-    description: "Invoice ID (purpose = extra) created in the agreement."
+    description: Extra-purpose invoice created for this installment when applicable.
     lineage:
-      - datalake_trato_feito_clean.accounting_installment
+      - datalake_trato_feito_clean.accounting_installment.id_external
   installment_number:
-    description: "Installment Number (1,2...), order by due date"
+    description: Position of the installment in the payment schedule.
+    lineage:
+      - datalake_trato_feito_clean.installment.external_index
+      - datalake_trato_feito_clean.installment.ts_created
   our_number:
-    description: "Our number"
+    description: Bank slip number for the installment charge or payment.
+    lineage:
+      - datalake_trato_feito_clean.installment_charges.metadata
+      - datalake_trato_feito_clean.payment.metadata
+      - datalake_trato_feito_clean.installment.id_external
   status:
-    description: "Status of the installment"
+    description: Installment state (e.g. pending, paid, expired, or canceled).
     lineage:
       - datalake_trato_feito_clean.installment.status
   adm_fee_amount:
-    description: "Amount charged of Administration Fee"
+    description: Administration fee charged on the installment.
     lineage:
       - datalake_trato_feito_clean.installment.adm_fee_amount
   installment_fee_amount:
-    description: "Installment Fee"
+    description: Fee charged by the collector for financing the installment.
     lineage:
       - datalake_trato_feito_clean.installment.installment_fee_amount
   debts_fee_amount:
-    description: "Debts Fee"
+    description: Combined debt-related fees, calculated per collector rules.
     lineage:
       - datalake_trato_feito_clean.installment.debts_fee_amount
+      - datalake_trato_feito_clean.installment.installment_interest
+      - datalake_trato_feito_clean.installment.installment_fee_amount
+      - datalake_trato_feito_clean.installment.installment_costs
+      - datalake_trato_feito_clean.installment.installment_lawyers_fee
   discount_amount:
-    description: "Discount Amount"
+    description: Discount applied to this installment.
     lineage:
       - datalake_trato_feito_clean.installment.discount_amount
   total_amount:
-    description: "Total Amount"
+    description: Total amount due for the installment after fees and discounts.
     lineage:
       - datalake_trato_feito_clean.installment.total_amount
   payment_type:
-    description: "How the payment was made"
+    description: Payment method used (e.g. bank slip or credit card).
     lineage:
       - datalake_trato_feito_clean.payment.type
   dt_due:
-    description: "Date Due"
+    description: Due date of the installment.
     lineage:
       - datalake_trato_feito_clean.installment.dt_due
   ts_paid_difference:
-    description: "Difference in days between payment date and due date"
+    description: Days between payment confirmation and due date (positive means late).
+    lineage:
+      - datalake_trato_feito_clean.payment.ts_updated
+      - datalake_trato_feito_clean.installment.dt_due
   ts_expired:
-    description: "Timestamp of expiration"
+    description: When the installment expired without payment.
     lineage:
       - datalake_trato_feito_clean.installment.ts_expired
   ts_created:
-    description: "Timestamp of creation"
+    description: Timestamp marking first registration of the installment in recovery.
     lineage:
       - datalake_trato_feito_clean.installment.ts_created
   ts_updated:
-    description: "Timestamp of last update"
+    description: When the installment was last updated.
     lineage:
       - datalake_trato_feito_clean.installment.ts_updated
   ts_paid:
-    description: "Timestamp of the payment"
+    description: When payment for the installment was confirmed.
     lineage:
       - datalake_trato_feito_clean.payment.ts_updated
+  installment_interest:
+    description: Interest portion of the installment fee breakdown.
+    lineage:
+      - datalake_trato_feito_clean.installment.installment_interest
+  credit_card_fee:
+    description: Additional fee when the installment was paid by credit card.
+    lineage:
+      - datalake_trato_feito_clean.installment.credit_card_fee
+  dt_canceled:
+    description: Date when the installment was canceled or expired.
+    lineage:
+      - datalake_trato_feito_clean.installment.ts_expired
+      - datalake_trato_feito_clean.installment.ts_updated
+  id_contract:
+    description: Rental contract under recovery for this installment.
+    lineage:
+      - datalake_trato_feito_clean.negotiation.id_debtor_external
+  installment_lawyers_fee:
+    description: Legal fees included in the installment breakdown.
+    lineage:
+      - datalake_trato_feito_clean.installment.installment_lawyers_fee
+  installment_costs:
+    description: Other costs included in the installment breakdown.
+    lineage:
+      - datalake_trato_feito_clean.installment.installment_costs

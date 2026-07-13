@@ -1,187 +1,189 @@
 ---
 database_name: datalake_fintech_snapshot
 table_name: accounts_payable
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "datalake_accounting_funnel.accounts_payable monthly snapshot. Snapshots are taken the day after the first business day from the month."
+description:
+  Monthly point-in-time snapshot of accounts-payable lines from the accounting
+  funnel, used by Finance for historical analysis.
 columns:
   id_entry:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.id_entry
-    description: "Unique ID of entry"
+    description: Identifier of the payable line in the accounting funnel.
   id_invoice:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.id_invoice
-    description: "Unique ID of invoice"
+    description: Parent invoice for the payable line.
   sk_invoice_reversed_entry:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.sk_invoice_reversed_entry
-    description: "Surrogate key for the invoice reversed entry"
+    description: Warehouse key of the reversed invoice entry when applicable.
   bill_item:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.bill_item
-    description: "Bill item"
+    description: Code classifying the payable line item.
   description:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.description
-    description: "Invoice entry title as shown in invoice"
+    description: Title shown on the invoice for this line.
   purpose:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.purpose
-    description: "Invoice frequency type to be sent, such as monthly, extra or pos"
+    description: Invoice frequency type (monthly, extra, or post-rental).
   invoice_account_type:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.user
-    description: "Description of invoice account type"
+    description: Account type of the billed party on the invoice.
   from_account_type:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.from_account_type
-    description: "From account type in the invoice entry (contract or stakeholder)"
+    description: Source account type in the invoice entry.
   to_account_type:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.to_account_type
-    description: "To account type in the invoice entry  (contract or stakeholder)"
+    description: Destination account type in the invoice entry.
   account_type:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.account_type
-    description: "Description of account type"
+    description: General account type of the payable line.
   account_classification:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.account_classification
-    description: "Description of account classification"
+    description: Finer accounting classification of the line.
   status:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.payment_status
-    description: "Description of payment status"
+    description: Payment status of the payable line.
   closing_mode:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.closing_mode
-    description: "Description that shows if closing is automatic or manual"
+    description: Whether invoice closing was automatic or manual.
   entry_sort_ascend:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.entry_sort_ascend
-    description: "Sorting column for entries ordering by ascending"
+    description: Sort key for ordering entries chronologically.
   entry_by_accrual_sort_ascend:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.entry_by_accrual_sort_ascend
-    description: "Sorting column for entries by accrual ordering by ascending"
+    description: Sort key for ordering entries by accrual month.
   due_amount:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.due_amount
-    description: "Invoice entry due value, considering debit or credit related to the contract cash flow"
+    description: Amount due on this payable line for the contract cash flow.
   invoice_due_amount:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.invoice_due_amount
-    description: "Invoice due value, considering debit or credit related to the contract cash flow"
+    description: Total amount due on the parent invoice.
   is_cap:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.is_cap
-    description: "Flag indicating if the register is cap"
+    description: Whether this line is subject to payment cap rules.
   has_negotiation:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.has_negotiation
-    description: "Flag indicating if the register has any negociation"
+    description: Whether the underlying invoice has an active recovery agreement.
   has_installments:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.has_installments
-    description: "Flag indicating if the register has installments"
+    description: Whether the underlying invoice is paid in installments.
   pp_pays:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.pp_pays
-    description: "Flag indicating PP pays"
+    description: Whether the landlord pays this charge on behalf of the tenant.
   ended_before_started:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.ended_before_started
-    description: "Flag indicating if the contract has suffered annulment before started"
+    description: Whether the contract was annulled before it effectively started.
   invoice_created_date:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.invoice_created_date
-    description: "Invoice creation date"
+    description: Date the parent invoice was issued.
   invoice_due_date:
     lineage:
-      - datalake_payable_accounts_transactions_clean.invoice_due_date
-    description: "Invoice due date"
+      - datalake_payable_accounts_transactions_clean.accounts_payable.invoice_due_date
+    description: Scheduled due date of the parent invoice.
   invoice_paid_date:
     lineage:
-      - datalake_payable_accounts_transactions_clean.invoice_paid_date
-    description: "Date when the invoice was paid"
+      - datalake_payable_accounts_transactions_clean.accounts_payable.invoice_paid_date
+    description: Date payment was confirmed for the parent invoice.
   invoice_canceled_date:
     lineage:
-      - datalake_payable_accounts_transactions_clean.invoice_canceled_date
-    description: "Date when the invoice was canceled"
+      - datalake_payable_accounts_transactions_clean.accounts_payable.invoice_canceled_date
+    description: Date the parent invoice was canceled.
   invoice_paid_date_next_business_day:
     lineage:
       - datalake_payable_accounts_transactions_clean.invoice_paid_date_next_business_day
-    description: "First business day after the invoice payment"
+    description: First business day after payment confirmation.
   sk_contract:
     lineage:
-      - datalake_payable_accounts_transactions_clean.accounts_payable.supplier_description
-    description: "Contract related to an invoice"
+      - datalake_payable_accounts_transactions_clean.accounts_payable.sk_contract
+    description: Warehouse surrogate key of the rental contract.
   version:
     lineage:
       - dw_rent.dim_contract.version
-    description: "Contract version"
+    description: Contract version in the rental dimension.
   is_contract_b2b:
     lineage:
       - dw_rent.dim_contract.version
-    description: "Flag indicating if the contract is shared with partners"
+    description: Whether the contract is shared with partner brokers.
   locale:
     lineage:
       - dw_public.dim_region.city_name
-    description: "City name"
+    description: City of the contract.
   localidade:
     lineage:
       - datalake_gsheets_clean.cod_locale.id_locale
-    description: "City ID"
+    description: Internal city code for the contract location.
   guarantee:
     lineage:
       - dw_rent.dim_contract.guarantee
-    description: "Type/Insurer hired"
+    description: Rental guarantee product on the contract.
   rental_administrator:
     lineage:
       - dw_rent.dim_contract.rental_administrator
-    description: "Type of administration of the property"
+    description: Who administers the rental (platform or owner).
   is_rental_paid_in_advance:
     lineage:
       - dw_payment.dim_invoice_entry.is_rental_paid_in_advance
-    description: "Some versions of contracts have variation in the payment method (aka mora/paga, paga/mora)"
+    description: Whether rent is paid before or after the accrual month.
   accrual_year_month:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.accrual_year_month
-    description: "Expense reference month"
+    description: Accrual month of the payable expense.
   entry_accrual_year_month:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.accrual_year_month
-    description: "Entry expense reference month"
+    description: Accrual month attributed to the entry line.
   entry_creation_accrual_year_month:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.accrual_year_month
-    description: "Entry creation expense reference month"
+    description: Accrual month when the entry was created.
   entry_created_date:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.dt_paid
-    description: "Entry creation date"
+    description: Date the payable entry line was posted.
   contract_start:
     lineage:
       - dw_rent.dim_contract.dt_start
-    description: "Begining of contract date"
+    description: Date the rental contract started.
   contract_annulment:
     lineage:
       - dw_rent.dim_contract.dt_annulment
-    description: "Annulment of contract date"
+    description: Date the rental contract was annulled.
   ts_snapshot:
     lineage:
       - datalake_accounting_funnel.accounts_payable.ts_load
-    description: "Timestamp when the data was loaded"
+    description: When this monthly snapshot was taken.
   year:
     lineage:
       - datalake_accounting_funnel.accounts_payable.ts_load
-    description: "Year when the data was loaded"
+    description: Year partition of the snapshot.
   month:
     lineage:
       - datalake_accounting_funnel.accounts_payable.ts_load
-    description: "Month when the data was loaded"
+    description: Month partition of the snapshot.
   day:
     lineage:
       - datalake_accounting_funnel.accounts_payable.ts_load
-    description: "Day when the data was loaded"
+    description: Day partition of the snapshot.

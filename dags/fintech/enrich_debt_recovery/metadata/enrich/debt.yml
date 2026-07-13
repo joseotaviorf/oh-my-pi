@@ -1,80 +1,90 @@
 ---
 database_name: datalake_debt_recovery
 table_name: debt
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Debt table
+description:
+  Enriched view of overdue invoice lines included in a debt-recovery negotiation,
+  with bill status and fee breakdown.
 columns:
   id_invoice:
-    description: ""
+    description: Overdue invoice linked to the debt line.
     lineage:
-      - datalake_trato_feito_clean.debt.d.id_external
+      - datalake_trato_feito_clean.debt.id_external
   id_contract:
-    description: ""
+    description: Rental contract associated with the negotiation.
     lineage:
-      - datalake_trato_feito_clean.debt.n.id_debtor_external
+      - datalake_trato_feito_clean.negotiation.id_debtor_external
   debtor:
-    description: ""
+    description:
+      Who owes the debt, combining debtor origin and role (e.g. tenant
+      or landlord).
     lineage:
-      - datalake_trato_feito_clean.debt.CONCAT(dt.origin, "_", dt.type)
+      - datalake_trato_feito_clean.debtor.origin
+      - datalake_trato_feito_clean.debtor.type
   our_number:
-    description: ""
+    description: Bank slip identifier for the linked bill.
     lineage:
-      - datalake_trato_feito_clean.debt.our_number
+      - datalake_trato_feito_clean.bill.our_number
   external_sub_status:
-    description: ""
+    description: Detailed collections status reported by the external agency.
     lineage:
-      - datalake_trato_feito_clean.debt.external_sub_status
+      - datalake_trato_feito_clean.bill.external_sub_status
   external_status:
-    description: ""
+    description: High-level collections status reported by the external agency.
     lineage:
-      - datalake_trato_feito_clean.debt.external_status
+      - datalake_trato_feito_clean.bill.external_status
   purpose:
-    description: ""
+    description: Bill frequency type (e.g. monthly rent or extra charge).
     lineage:
-      - datalake_trato_feito_clean.debt.purpose
+      - datalake_trato_feito_clean.bill.purpose
   due_amount:
-    description: ""
+    description:
+      Amount due on the bill, falling back to the original debt when the
+      bill amount is missing.
     lineage:
-      - datalake_trato_feito_clean.debt.COALESCE(d.original_amount, ABS(b.due_amount))
+      - datalake_trato_feito_clean.debt.original_amount
+      - datalake_trato_feito_clean.bill.due_amount
   interest_fee_amount:
-    description: ""
+    description: Interest applied to the overdue amount.
     lineage:
       - datalake_trato_feito_clean.debt.interest_fee_amount
   fine_fee_amount:
-    description: ""
+    description: Late-payment fine applied to the overdue amount.
     lineage:
       - datalake_trato_feito_clean.debt.fine_fee_amount
   discount_amount:
-    description: ""
+    description: Discount granted on the debt line.
     lineage:
       - datalake_trato_feito_clean.debt.discount_amount
   debt_amount:
-    description: ""
+    description: Total owed after interest and fines, minus discounts.
     lineage:
-      - datalake_trato_feito_clean.debt.d.original_amount + d.interest_fee_amount +
-        d.fine_fee_amount - d.discount_amount
+      - datalake_trato_feito_clean.debt.original_amount
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+      - datalake_trato_feito_clean.debt.fine_fee_amount
+      - datalake_trato_feito_clean.debt.discount_amount
   paid_amount:
-    description: ""
+    description: Amount already paid on the linked bill.
     lineage:
-      - datalake_trato_feito_clean.debt.paid_amount
+      - datalake_trato_feito_clean.bill.paid_amount
   dt_due:
-    description: ""
+    description: Due date of the linked bill.
     lineage:
-      - datalake_trato_feito_clean.debt.dt_due
+      - datalake_trato_feito_clean.bill.dt_due
   dt_paid:
-    description: ""
+    description: Date when the linked bill was paid.
     lineage:
-      - datalake_trato_feito_clean.debt.dt_paid
+      - datalake_trato_feito_clean.bill.dt_paid
   dt_created:
-    description: ""
+    description: Date when the linked bill was created.
     lineage:
-      - datalake_trato_feito_clean.debt.DATE(b.ts_created)
+      - datalake_trato_feito_clean.bill.ts_created
   dt_debt_created:
-    description: ""
+    description: Date when the debt line was registered in recovery.
     lineage:
-      - datalake_trato_feito_clean.debt.DATE(d.ts_created)
+      - datalake_trato_feito_clean.debt.ts_created
   ts_load:
-    description: ""
+    description: When this enriched row was loaded by the pipeline.
     lineage:
       - datalake_trato_feito_clean.debt.NOW()

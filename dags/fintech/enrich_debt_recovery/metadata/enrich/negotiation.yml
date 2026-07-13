@@ -1,105 +1,129 @@
 ---
 database_name: datalake_debt_recovery
 table_name: negotiation
-owner: athos.sampayo@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Enrich table focused on Negotiation context for Debt Recovery"
+description:
+  Summary of a debt-recovery agreement, aggregating installments, balances,
+  collector context, and breach indicators.
 columns:
   id_negotiation:
-    description: "Negotiation unique ID"
+    description: Internal identifier of the recovery agreement.
     lineage:
       - datalake_trato_feito_clean.negotiation.id
   id_negotiation_external:
-    description: "The negotiation ID from Recupera"
+    description: Identifier assigned by the external collector platform.
     lineage:
       - datalake_trato_feito_clean.negotiation.id_collector_external
   id_contract:
-    description: "Contract unique ID"
+    description: Rental contract being renegotiated.
     lineage:
       - datalake_trato_feito_clean.negotiation.id_debtor_external
   debtor:
-    description: "Debtor - 5A or 5C"
+    description: Who owes the debt, by origin and role (landlord, tenant, or QuintoCred).
     categories:
-      "rental_contract_landlord": "PP QuintoAndar"
-      "rental_contract_tenant": "IQ QuintoAndar"
-      "velo_delinquency_tenant": "IQ QuintoCred"
+      rental_contract_landlord: PP QuintoAndar
+      rental_contract_tenant: IQ QuintoAndar
+      velo_delinquency_tenant: IQ QuintoCred
     lineage:
       - datalake_trato_feito_clean.debtor.origin
       - datalake_trato_feito_clean.debtor.type
   status:
-    description: "Status of the negotiation"
+    description: Lifecycle state of the agreement in recovery.
     lineage:
       - datalake_trato_feito_clean.negotiation.status
   qt_installments:
-    description: "Amount of Installments"
+    description: Total installments agreed in the payment plan.
     lineage:
+      - datalake_trato_feito_clean.negotiation.payload
       - datalake_trato_feito_clean.installment.id
   qt_installments_paid:
-    description: "Amount of paid installments"
+    description: Installments already paid.
     lineage:
       - datalake_trato_feito_clean.installment.id
+      - datalake_trato_feito_clean.installment.status
   total_expected_amount:
-    description: "Installment total amount"
+    description: Sum of all installment amounts in the plan.
     lineage:
       - datalake_trato_feito_clean.installment.total_amount
   paid_amount:
-    description: "Installment paid amount"
+    description: Sum of amounts paid across installments.
     lineage:
       - datalake_trato_feito_clean.installment.total_amount
+      - datalake_trato_feito_clean.installment.status
   negotiation_original_amount:
-    description: "Negotiation original amount"
+    description: Sum of original overdue amounts included in the agreement.
     lineage:
       - datalake_trato_feito_clean.debt.original_amount
   negotiation_discount_amount:
-    description: "Negotiation discount amount"
+    description: Total discount granted in the agreement.
     lineage:
       - datalake_trato_feito_clean.debt.discount_amount
+      - datalake_trato_feito_clean.installment.discount_amount
   interest_fee_amount:
-    description: "Negotiation interest fee amount"
+    description: Sum of interest on included debts.
     lineage:
       - datalake_trato_feito_clean.debt.interest_fee_amount
   fine_fee_amount:
-    description: "Negotiation fine fee amount"
+    description: Sum of fines on included debts.
     lineage:
       - datalake_trato_feito_clean.debt.fine_fee_amount
   negotiation_fees_amount:
-    description: "Negotiation fees amount"
+    description: Combined interest, fines, and installment fees in the agreement.
     lineage:
       - datalake_trato_feito_clean.debt.interest_fee_amount
       - datalake_trato_feito_clean.debt.fine_fee_amount
+      - datalake_trato_feito_clean.installment.installment_fee_amount
+      - datalake_trato_feito_clean.installment.installment_interest
   credit_card_fee_amount:
-    description: "Credit card fee amount"
+    description: Total credit card fees in the agreement.
     lineage:
       - datalake_trato_feito_clean.negotiation.payload
+      - datalake_trato_feito_clean.installment.credit_card_fee
+      - datalake_trato_feito_clean.installment.adm_fee_amount
   breached_installment:
-    description: "Breached installment number"
+    description: First installment number that broke the agreement.
+    lineage:
+      - datalake_trato_feito_clean.installment.installment_number
+      - datalake_trato_feito_clean.installment.status
+      - datalake_trato_feito_clean.installment.ts_paid
   total_breached_installments:
-    description: "Total of breached installments"
+    description: Count of installments that broke the agreement.
+    lineage:
+      - datalake_trato_feito_clean.installment.id
+      - datalake_trato_feito_clean.installment.status
+      - datalake_trato_feito_clean.installment.ts_paid
   is_contract_recurrent_debtor:
-    description: "Indicates if it is a recurrent contract debtor"
+    description: Whether the contract had prior recovery agreements.
     lineage:
       - datalake_trato_feito_clean.negotiation.id_debtor_external
   has_renegotiated:
-    description: "Indicates if the negotiation is a renegotiation"
+    description: Whether debts came from a prior broken agreement.
     lineage:
       - datalake_trato_feito_clean.accounting_installment.id
+      - datalake_trato_feito_clean.debt.id_external
   consultancy:
-    description: "Consultancy/advisory ID that created the negotiation"
+    description: Advisory agency code that created the agreement.
     lineage:
       - datalake_trato_feito_clean.negotiation.consultancy
   consultancy_name:
-    description: "Consultancy/advisory name that created the negotiation"
+    description: Human-readable name of the advisory agency.
     lineage:
       - datalake_trato_feito_clean.negotiation.consultancy
+      - datalake_trato_feito_clean.collector.name
   contact_type:
-    description: "Type of contact made by the advisory/agency to create the negotiation"
+    description: Channel used to create the agreement (portal, WhatsApp, dialer, etc.).
     categories:
       BackOfc: Negociação Backoffice
-      AVirtual: Negociação Agente Virtuall, utiliza tecnologia mais limitada com interações pré-programadas e sem IA avançada.
+      AVirtual:
+        Negociação Agente Virtuall, utiliza tecnologia mais limitada com interações
+        pré-programadas e sem IA avançada.
       Chatbot: Negociação Chatbot
       Discador: Negociação Discador
       E-mail: Negociação E-mail
-      IAPortal: Negociação Portal IA, conduzida por uma inteligência artificial que proporciona uma experiência mais fluida e personalizada.
+      IAPortal:
+        Negociação Portal IA, conduzida por uma inteligência artificial que
+        proporciona uma experiência mais fluida e personalizada.
       IAWpp: Negociação WhatsApp IA
       Portal: Negociação Portal
       Manual: Negociação Discador Manual
@@ -107,22 +131,46 @@ columns:
     lineage:
       - datalake_trato_feito_clean.negotiation.contact_type
   dt_expected_end:
-    description: "Installment due date"
+    description: Due date of the last installment in the plan.
     lineage:
       - datalake_trato_feito_clean.installment.dt_due
   ts_first_payment:
-    description: "Timestamp indicating when the first installment was paid"
+    description: When the first installment was paid.
     lineage:
       - datalake_trato_feito_clean.installment.ts_updated
+      - datalake_trato_feito_clean.installment.status
   ts_paid_all:
-    description: "Timestamp indicating when all installments have been paid"
+    description: When the last installment was paid and the plan was fully settled.
     lineage:
       - datalake_trato_feito_clean.installment.ts_updated
+      - datalake_trato_feito_clean.installment.status
   ts_breach:
-    description: "Timestamp indicating when a breach occurred"
+    description: Earliest expiration time among breached installments.
     lineage:
       - datalake_trato_feito_clean.installment.ts_expired
   ts_created_at:
-    description: "Timestamp for when negotiation was created"
+    description: When the agreement was created in recovery.
     lineage:
       - datalake_trato_feito_clean.negotiation.ts_created
+  promisse_payment_method:
+    description: Payment method promised for the first installment.
+    lineage:
+      - datalake_trato_feito_clean.payment.type
+      - datalake_trato_feito_clean.installment.installment_number
+  collector:
+    description: External collection agency handling the agreement.
+    lineage:
+      - datalake_trato_feito_clean.collector.name
+  installment_lawyers_fee:
+    description: Sum of legal fees across installments.
+    lineage:
+      - datalake_trato_feito_clean.installment.installment_lawyers_fee
+  installment_costs:
+    description: Sum of additional costs across installments.
+    lineage:
+      - datalake_trato_feito_clean.installment.installment_costs
+  down_payment_amount:
+    description: Amount of the first installment acting as down payment.
+    lineage:
+      - datalake_trato_feito_clean.installment.total_amount
+      - datalake_trato_feito_clean.installment.installment_number

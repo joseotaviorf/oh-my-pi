@@ -1,47 +1,50 @@
 database_name: datalake_fintech_entities_views
 table_name: invoice
-description: >
-  Enriched view of FR_INVOICE entities with persona derived from account type (TENANT, OWNER).
-  Consumed by enrich_transactional_entities consolidation.
+description: Rental invoice records prepared for the fintech entities catalog, linking
+  bills to contracts, users, and activity status.
 domain: Fintech
-owner: isadora.gallerani@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 columns:
   id_entity:
     lineage:
-      - datalake_retsuko_clean.invoice.id
-    description: Invoice id serving as the entity identifier.
+    - datalake_retsuko_clean.invoice.id
+    description: Invoice used as the entity identifier in the catalog.
   id_house:
     lineage:
-      - core_contract.contract.id_house
-    description: House id derived from the associated contract.
+    - core_contract.contract.id_house
+    description: Property linked to the invoice contract.
   id_contract:
     lineage:
-      - core_contract.contract.id_contract
-    description: Contract id associated with the invoice.
+    - core_contract.contract.id_contract
+    description: Rental contract billed by the invoice.
   id_user:
     lineage:
-      - datalake_retsuko_clean.account.id_main_user
-      - core_contract.contract.id_tenant
-      - core_contract.contract.id_owner
-    description: User id derived from account type (tenant or landlord).
+    - datalake_retsuko_clean.account.id_main_user
+    - core_contract.contract.id_tenant
+    - core_contract.contract.id_owner
+    description: Tenant or landlord user associated with the billed party.
   entity:
-    description: Fixed value 'FR_INVOICE'.
+    description: Fixed catalog label identifying this as a rental invoice entity.
   persona:
-    description: TENANT or OWNER (derived from retsuko account type).
+    description: Whether the billed party is the tenant or the owner.
+    lineage:
+    - datalake_retsuko_clean.account.type
   business_context:
-    description: Fixed value 'RENT'.
+    description: Fixed commercial context for rental invoices.
   properties:
     lineage:
-      - datalake_retsuko_clean.invoice.status
-      - datalake_retsuko_clean.invoice.ts_created
-    description: JSON with invoice status and creation timestamp.
+    - datalake_retsuko_clean.invoice.status
+    - datalake_retsuko_clean.invoice.ts_created
+    description: JSON snapshot of invoice status and creation time for the catalog.
   is_active:
-    description: TRUE for status 'open', FALSE for divergent-payment/not-payable/written-down/canceled/paid.
+    description: Whether the invoice is still open and actionable.
+    lineage:
+    - datalake_retsuko_clean.invoice.status
   ts_created:
     lineage:
-      - datalake_retsuko_clean.invoice.ts_created
-    description: Timestamp when the invoice was created.
+    - datalake_retsuko_clean.invoice.ts_created
+    description: When the invoice was created in the billing pipeline.
   ts_updated:
     lineage:
-      - datalake_retsuko_clean.invoice.ts_retsuko_updated
-    description: Timestamp when the invoice was last updated in Retsuko.
+    - datalake_retsuko_clean.invoice.ts_retsuko_updated
+    description: When the invoice was last updated in the billing pipeline.

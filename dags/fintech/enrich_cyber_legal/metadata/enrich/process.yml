@@ -1,203 +1,206 @@
 ---
 database_name: datalake_cyber_legal
 table_name: process
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Enriched table containing legal process information from CyberLegal including case details, court information, attorney assignments, eviction data, and financial amounts related to legal proceedings"
+description:
+  Enriched legal cases from the Cyber Legal platform, covering court proceedings,
+  eviction context, attorneys, and financial exposure.
 columns:
   id_case:
-    description: "Unique identifier for the legal case in CyberLegal system"
+    description: Identifier of the legal case in Cyber Legal.
     lineage:
       - datalake_cyber_legal_clean.case.id_case
   id_contract_cyber:
-    description: "Contract identifier in CyberCredit system associated with the legal case"
+    description: Contract identifier in the Cyber collections system.
     lineage:
       - datalake_cyber_legal_clean.case_account.id_contract
   id_contract:
-    description: "External contract identifier for the account under legal proceedings"
+    description: QuintoAndar rental contract linked to the case.
     lineage:
       - datalake_cyber_clean.contracts.id_contract_external
   id_process:
-    description: "Legal process dossier identifier number"
+    description: Court dossier or process number.
     lineage:
       - datalake_cyber_legal_clean.case.id_dossier
   id_court:
-    description: "Identifier of the court handling the legal case"
+    description: Court handling the case.
     lineage:
       - datalake_cyber_legal_clean.case.id_court
   court_name:
-    description: "Name of the court where the legal case is being processed"
+    description: Official name of the court where the legal case is filed and processed.
     lineage:
       - datalake_cyber_legal_clean.court.court_name
   process_type:
-    description: "Type of legal process or case classification"
+    description: Normalized case type (eviction, execution, or repossession claim).
     lineage:
       - datalake_cyber_legal_clean.case.case_type
   id_agency:
-    description: "Identifier of the attorney agency handling the case"
+    description: Law firm or agency assigned to the case.
     lineage:
       - datalake_cyber_legal_clean.case.id_attorney_agency
   agency_name:
-    description: "Name of the attorney agency assigned to the legal case"
+    description: Name of the assigned law firm or agency.
     lineage:
       - datalake_cyber_clean.agency.agency_name
   internal_lawyer:
-    description: "Identifier of the internal attorney responsible for the case"
+    description: QuintoAndar attorney responsible for the case.
     lineage:
       - datalake_cyber_legal_clean.case.id_responsible_attorney
   external_lawyer:
-    description: "Identifier of the external attorney working on the case"
+    description: External attorney working on the case.
     lineage:
       - datalake_cyber_legal_clean.case.id_external_attorney
   supervising_lawyer:
-    description: "Identifier of the supervising attorney overseeing the case"
+    description: Supervising attorney overseeing the case.
     lineage:
       - datalake_cyber_legal_clean.case.id_supervisor_attorney
   contract_evictions_status:
-    description: "Status flag indicating if account is with agency or in court for eviction"
+    description: Whether the account is with an agency or already in court for eviction.
     lineage:
       - datalake_cyber_clean.delinquent_master.flag_account_in_agency_or_court
   evictions_label:
-    description: "Eviction label classification for the account"
+    description: Eviction classification label for the contract.
     lineage:
       - datalake_cyber_clean.delinquent_master.evictions_label
   eviction_step:
-    description: "Current step or stage in the eviction process"
+    description: Current step in the eviction workflow.
     lineage:
       - datalake_cyber_clean.contracts.eviction_step
   eviction_law_firm:
-    description: "Law firm assigned to handle the eviction proceedings"
+    description: Law firm handling eviction proceedings.
     lineage:
       - datalake_cyber_clean.contracts.eviction_law_firm
   reason_eviction:
-    description: "Reason or justification for initiating the eviction process"
+    description: Stated reason for initiating eviction.
     lineage:
       - datalake_cyber_clean.contracts.reason_eviction
   process_start_comment:
-    description: "Initial comment or notes when the legal process was started"
+    description: Notes recorded when the legal process was opened.
     lineage:
       - datalake_cyber_legal_clean.case_notification_log.request_comment
   process_end_comment:
-    description: "Final comment or notes when the legal process was closed"
+    description: Notes recorded when the legal process was closed.
     lineage:
       - datalake_cyber_legal_clean.case.close_comment
   case_comment:
-    description: "General comments or notes about the legal case"
+    description: General notes about the case.
     lineage:
       - datalake_cyber_legal_clean.case.case_comment
   case_status:
-    description: "Current status of the legal case (e.g., active, closed, pending)"
+    description: Current status of the legal case.
     lineage:
       - datalake_cyber_legal_clean.case.case_status
   case_subtype:
-    description: "Subtype classification of the legal process"
+    description: Subtype of the legal action.
     lineage:
       - datalake_cyber_legal_clean.case_uda.process_subtype
   court_division:
-    description: "Name of the court division or chamber handling the case"
+    description: Court division or chamber handling the case.
     lineage:
       - datalake_cyber_legal_clean.case_uda.court_division_name
   jurisdiction:
-    description: "Judicial district or comarca where the case is being processed"
+    description: Judicial district where the case is filed.
     lineage:
       - datalake_cyber_legal_clean.case_uda.judicial_district_name
   case_result:
-    description: "Result or outcome code when the case was closed"
+    description: Outcome code when the case was closed.
     lineage:
       - datalake_cyber_legal_clean.case.closure_result
   case_result_description:
-    description: "Descriptive text explaining the case closure result"
+    description: Human-readable description of the case outcome.
     lineage:
       - datalake_cyber_legal_clean.values_list.value_description
   case_final_result:
-    description: "Final reason code for case closure"
+    description: Final closure reason code.
     lineage:
       - datalake_cyber_legal_clean.case.closure_reason
   case_final_description:
-    description: "Descriptive text explaining the final case closure reason"
+    description: Human-readable description of the final closure reason.
     lineage:
       - datalake_cyber_legal_clean.values_list.value_description
   case_amount:
-    description: "Initial lawsuit amount or value of the legal claim"
+    description: Original lawsuit amount claimed.
     lineage:
       - datalake_cyber_legal_clean.case.lawsuit_amount
   provisioned_value:
-    description: "Amount provisioned for potential losses in the case"
+    description: Amount provisioned for potential loss on the case.
     lineage:
       - datalake_cyber_legal_clean.case_uda.provisioned_amount
   updated_case_value:
-    description: "Updated or revised value of the legal cause after adjustments"
+    description: Updated claim value after adjustments.
     lineage:
       - datalake_cyber_legal_clean.case_uda.updated_cause_value_amount
   recovered_amount:
-    description: "Total cash amount recovered through the legal process"
+    description: Cash amount recovered through the legal process.
     lineage:
       - datalake_cyber_legal_clean.case.cash_recovered_amount
   dt_status_changed:
-    description: "Date when the case status was last changed"
+    description: Date of the last status change.
     lineage:
       - datalake_cyber_legal_clean.case.dt_status_changed
   dt_lawsuit:
-    description: "Date when the lawsuit was filed in court"
+    description: Date the lawsuit was filed.
     lineage:
       - datalake_cyber_legal_clean.case.dt_lawsuit_filed
   dt_case_acceptance:
-    description: "Date when the case was accepted for legal proceedings"
+    description: Date the case was accepted for proceedings.
     lineage:
       - datalake_cyber_legal_clean.case.dt_case_accepted
   dt_case_completion:
-    description: "Date when the case was completed or declared unrecoverable"
+    description: Date the case was completed or declared unrecoverable.
     lineage:
       - datalake_cyber_legal_clean.case.dt_unrecoverable_declaration
   dt_agency_assignment:
-    description: "Date when the case was assigned to the attorney agency"
+    description: Date the case was assigned to the law firm.
     lineage:
       - datalake_cyber_legal_clean.case.dt_case_assigned
   city:
-    description: "City where the case is being processed"
+    description: City where the case is processed.
     lineage:
       - datalake_cyber_legal_clean.case.city
   state:
-    description: "State where the case is being processed"
+    description: State where the case is processed.
     lineage:
       - datalake_cyber_legal_clean.case.state
   ts_updated:
-    description: "Timestamp of the last update"
+    description: When the case was last updated in Cyber Legal.
     lineage:
       - datalake_cyber_legal_clean.case.ts_updated
   input_type:
-    description: "Input type of the case"
+    description: Reason the case was opened, resolved to a display label when available.
     lineage:
       - datalake_cyber_legal_clean.case_uda.reason
+      - datalake_cyber_legal_clean.values_list.value_description
   original_process_type:
-    description: "Original process type of the case"
+    description: Original process type before normalization.
     lineage:
       - datalake_cyber_legal_clean.case.process_type
   total_package_amount:
-    description: "Total package amount"
+    description: Total delinquent balance package for the contract.
     lineage:
-      - datalake_cyber_legal_clean.delinquent_master.total_package_amount
+      - datalake_cyber_clean.delinquent_master.total_package_amount
   contract_status:
-    description: "Status of the contract"
+    description: Contract status in the Cyber collections system.
     lineage:
-      - datalake_cyber_legal_clean.contracts.contract_status
+      - datalake_cyber_clean.contracts.contract_status
   overdue_amount:
-    description: "Overdue amount"
+    description: Outstanding overdue balance on the contract.
     lineage:
-      - datalake_cyber_legal_clean.delinquent_master.overdue_amount
+      - datalake_cyber_clean.delinquent_master.overdue_amount
   ts_contract_end:
-    description: "Contract end date"
+    description: When the linked rental contract ended.
     lineage:
-      - datalake_cyber_legal_clean.contracts.ts_contract_end
+      - datalake_cyber_clean.contracts.ts_contract_end
   ldt_resolution:
-    description: "Lead time to resolution"
+    description: Lead time from case opening to resolution.
     lineage:
       - datalake_cyber_legal_clean.case.ldt_resolution
   ldt_stock:
-    description: "Lead time to stock"
+    description: Lead time the case remained in the active portfolio.
     lineage:
       - datalake_cyber_legal_clean.case.ldt_stock
   id_court_case:
-    description: "Court case identifier"
+    description: Court case number from the extended case record.
     lineage:
       - datalake_cyber_legal_clean.case_uda.id_court_case

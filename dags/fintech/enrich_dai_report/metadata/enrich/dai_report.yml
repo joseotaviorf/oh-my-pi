@@ -1,94 +1,95 @@
 ---
 database_name: datalake_dai_report
 table_name: dai_report
-description: DAI (declaração de atividades imobiliárias) contains informations about tributes in the state of São Paulo - SP (Brazil)
+description: Monthly export for São Paulo DAI (Declaração de Atividades Imobiliárias)
+  tax reporting, combining sale and rental transactions in the city.
 domain: Fintech
-owner: marlon.simas@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - dw_house.dim_house.sk_house
-      - datalake_ebdb_clean.house.id
-    description: Unique identifier for the house
+    - dw_house.dim_house.sk_house
+    - datalake_ebdb_clean.house.id
+    description: Property identifier (warehouse key for sales, platform id for rentals).
   trasaction_type:
     lineage: []
-    description: Transaction type indicator (1 = sale, 2 = rent)
+    description: DAI transaction type code (sale or rent).
   transaction_situation:
     lineage: []
-    description: Transaction situation indicator (1 = completed)
+    description: DAI situation code indicating a completed transaction.
   iptu:
     lineage: []
-    description: IPTU tax value (fixed as 0)
+    description: IPTU tax amount reported (placeholder zero in this export).
   transaction_amount:
     lineage:
-      - dw_sale.dim_sale_agreement.sale_price_agreed
-      - datalake_ebdb_clean.contract.rent
-    description: Transaction amount (sale price or rent value)
+    - dw_sale.dim_sale_agreement.sale_price_agreed
+    - datalake_ebdb_clean.contract.rent
+    description: Transaction value (sale price or monthly rent).
   address:
     lineage:
-      - dw_house.dim_house.address
-      - datalake_ebdb_clean.house.address
-    description: Property street address
+    - dw_house.dim_house.address
+    - datalake_ebdb_clean.house.address
+    description: Street name of the property.
   address_number:
     lineage:
-      - dw_house.dim_house.number
-      - datalake_ebdb_clean.house.number
-    description: Property address number
+    - dw_house.dim_house.number
+    - datalake_ebdb_clean.house.number
+    description: Street number of the property.
   address_complement:
     lineage:
-      - dw_house.dim_house.complement
-      - datalake_ebdb_clean.house.complement
-    description: Property address complement (apt, block, etc.)
+    - dw_house.dim_house.complement
+    - datalake_ebdb_clean.house.complement
+    description: Address complement (apartment, block, etc.).
   address_neighborhood:
     lineage:
-      - dw_house.dim_house.neighborhood
-      - datalake_ebdb_clean.house.neighborhood
-    description: Property neighborhood
+    - dw_house.dim_house.neighborhood
+    - datalake_ebdb_clean.house.neighborhood
+    description: Neighborhood of the property.
   address_zipcode:
     lineage:
-      - dw_house.dim_house.zipcode
-      - datalake_ebdb_clean.house.zipcode
-    description: Property ZIP code
+    - dw_house.dim_house.zipcode
+    - datalake_ebdb_clean.house.zipcode
+    description: Postal code of the property.
   house_type:
     lineage:
-      - dw_house.dim_house.type
-      - datalake_ebdb_clean.house.type
-    description: Property type code (2 = house, 3 = apartment/studio, 0 = other)
+    - dw_house.dim_house.type
+    - datalake_ebdb_clean.house.type
+    description: DAI property type code (house, apartment, or other).
   useful_area:
     lineage:
-      - dw_house.dim_house.total_area
-      - datalake_ebdb_clean.house.total_area
-    description: Property useful area in square meters
+    - dw_house.dim_house.total_area
+    - datalake_ebdb_clean.house.total_area
+    description: Usable area of the property in square meters.
   total_area:
     lineage:
-      - dw_house.dim_house.total_area
-      - datalake_ebdb_clean.house.total_area
-    description: Property total area in square meters
+    - dw_house.dim_house.total_area
+    - datalake_ebdb_clean.house.total_area
+    description: Total built area in square meters.
   terrain_area:
     lineage:
-      - dw_house.dim_house.construction_area
-      - datalake_ebdb_clean.house.land_area
-    description: Property terrain/land area in square meters
+    - dw_house.dim_house.construction_area
+    - datalake_ebdb_clean.house.land_area
+    description: Land area in square meters.
   parking_slots:
     lineage:
-      - dw_house.dim_house.parking_slots
-      - datalake_ebdb_clean.house.parking_slots
-    description: Number of parking slots
+    - dw_house.dim_house.parking_slots
+    - datalake_ebdb_clean.house.parking_slots
+    description: Number of parking spaces.
   bedrooms:
     lineage:
       - dw_house.dim_house.bedrooms
       - datalake_ebdb_clean.house.bedrooms
-    description: Number of bedrooms
+    description: Count of bedrooms in the property for DAI reporting.
   bathrooms:
     lineage:
       - dw_house.dim_house.bathrooms
       - datalake_ebdb_clean.house.bathrooms
-    description: Number of bathrooms
+    description: Count of bathrooms in the property for DAI reporting.
   construction_year:
     lineage: []
-    description: Construction year (fixed as 1900 - placeholder value)
+    description: Construction year reported to DAI (placeholder when unknown).
   dt_transaction:
     lineage:
-      - dw_public.dim_date.date
-      - datalake_ebdb_clean.contract.ts_signed
-    description: Transaction date
+    - dw_public.dim_date.date
+    - datalake_ebdb_clean.contract.ts_signed
+    description: Date the transaction was completed (sale signing or lease signing).

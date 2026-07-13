@@ -1,7 +1,6 @@
----
 database_name: datalake_cyber_legal
 table_name: process_stages
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Contém um registro por etapa processual de cada caso legal (juízo) do CyberLegal, armazenando informações sobre o andamento e o controle dos tempos e gastos associados a cada etapa."
 columns:
