@@ -14,12 +14,37 @@ WITH weekends_and_holidays AS (
         sch.category = 'Nacional'
 ),
 
+csat AS (
+    SELECT 
+        sk_case, 
+        fa.ts_submitted,
+        fa.sk_answer,
+        satisfaction_score,
+        respondent_comments, 
+        fa.is_solved,
+        ROW_NUMBER() OVER (PARTITION BY sk_case ORDER BY fa.ts_submitted ASC) as rn 
+    FROM dw_satisfaction_rating.fact_answer as fa
+    LEFT JOIN dw_satisfaction_rating.dim_answer as da on da.sk_answer = fa.sk_answer
+
+    WHERE satisfaction_score IS NOT NULL 
+    AND sk_case is not null 
+),
+
 dirty_cases_sf AS (
     SELECT DISTINCT
         CAST(case_number AS INT) AS case_number,
         id_record
     FROM datalake_salesforce_clean.events_case
     WHERE last_modified_date BETWEEN DATE('{load_start_date}') - INTERVAL 3 DAYS AND DATE('{load_end_date}')
+    UNION ALL
+
+    --- Retorna casos que teve CSAT mas não teve atualização na Events
+    SELECT DISTINCT
+        CAST(c.case_number AS INT) AS case_number,
+        c.id_record AS id_record
+    FROM csat AS csat
+    LEFT JOIN datalake_salesforce_clean.events_case AS c ON c.id_record = csat.sk_case
+    WHERE ts_submitted BETWEEN DATE('{load_start_date}') - INTERVAL 7 DAYS AND DATE('{load_end_date}')
 ),
 
 events_case_dirty AS (
@@ -64,20 +89,7 @@ status_historico AS (
 ),
 
 
-csat AS (
-    SELECT 
-        sk_case, 
-        fa.ts_submitted,
-        fa.sk_answer,
-        satisfaction_score,
-        respondent_comments, 
-        fa.is_solved,
-        ROW_NUMBER() OVER (PARTITION BY sk_case ORDER BY fa.ts_submitted ASC) as rn 
-    FROM dw_satisfaction_rating.fact_answer as fa
-    LEFT JOIN dw_satisfaction_rating.dim_answer as da on da.sk_answer = fa.sk_answer
 
-    WHERE satisfaction_score IS NOT NULL 
-),
 
 spoc AS (
   SELECT 
@@ -278,24 +290,24 @@ GROUP BY 1,2,3,4,5
 
 cases_perspective AS (
     SELECT DISTINCT
-        c.id_record as id_case, -- Ajustado para id_record que veio do Código 2
+        c.id_record as id_case,
         CAST(c.case_number AS INT) as case_number,
-        c.contract_id__c as id_contract, -- Ajustado do Código 2
+        c.contract_id__c as id_contract, 
         du.sk_user,
-        cm.external_id__c, -- Ajustado o alias da tabela cm externa
+        cm.external_id__c, 
         sla.ops as team,
         sla.Front_Or_Back,  
         sla.Pre_Pos,    
         sla.Area,
         sla.ops,
-        c.status as case_status, -- Ajustado do Código 2
-        c.subject as subject, -- Ajustado do Código 2
+        c.status as case_status,
+        c.subject as subject, 
         rt.record_type_name,    
         rt.developer_name as theme,
-        c.type as case_type, -- Ajustado do Código 2
-        to_timestamp(c.created_date) as ts_created, -- Ajustado do Código 2 com conversão de data
+        c.type as case_type, 
+        CAST(c.created_date AS TIMESTAMP) - INTERVAL 3 HOURS as ts_created, 
         sd.ts_solved,
-        to_timestamp(c.closed_date) as ts_closed, -- Ajustado do Código 2 com conversão de data
+        CAST(c.close_date AS TIMESTAMP) - INTERVAL 3 HOURS as ts_closed,
         csat.sk_answer as sk_answer_csat,
         csat.ts_submitted as first_csat_ts_response, 
         csat.satisfaction_score as first_csat_score,
