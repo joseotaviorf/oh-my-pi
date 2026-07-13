@@ -6,7 +6,7 @@ description:
   considering just the FINISHED, CHARGED and CANCELED status, which the money was
   not charge back.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_reservation:
     lineage:
@@ -15,7 +15,7 @@ columns:
   id_contract:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract
-    description: Id of the contract
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   status:
     lineage:
       - datalake_revenue_lines.reservation.status
@@ -54,7 +54,7 @@ columns:
   accrual_month:
     lineage:
       - datalake_revenue_lines.reservation.accrual_month
-    description: Reference month
+    description: Financial attribute representing accrual month on the dim_reservation dataset.
   dt_end_payment:
     lineage:
       - datalake_revenue_lines.reservation.dt_end_payment

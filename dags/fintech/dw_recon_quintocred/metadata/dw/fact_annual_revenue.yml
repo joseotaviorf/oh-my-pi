@@ -2,7 +2,11 @@ database_name: dw_recon_quintocred
 table_name: fact_annual_revenue
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Data from customer revenue in QuintoCred recon context."
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Data from customer revenue in QuintoCred recon context.
 columns:
   sk_propose:
     description: "QuintoCred's propose identification number (ID)"
@@ -15,7 +19,7 @@ columns:
       - dw_velo.fact_velo_propose
 
   client_name:
-    description: "Full name of the client"
+    description: QuintoCred rental guarantee attribute describing client name in the policy lifecycle.
     lineage:
       - dw_velo.dim_velo_propose_person
 

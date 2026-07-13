@@ -1,5 +1,12 @@
 database_name: dw_recon_quintocred_snapshot
 table_name: fact_annual_revenue
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per fact annual revenue in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
@@ -14,7 +21,7 @@ columns:
       - dw_recon_quintocred.fact_annual_revenue
 
   client_name:
-    description: "Full name of the client"
+    description: QuintoCred rental guarantee attribute describing client name in the policy lifecycle.
     lineage:
       - dw_recon_quintocred.fact_annual_revenue
 
@@ -122,3 +129,15 @@ columns:
     description: "Snapshot date when the data was extracted"
     lineage:
       - dw_recon_quintocred.fact_annual_revenue
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_snapshot:
+    description: Timestamp when snapshot occurred in the upstream fintech system.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []

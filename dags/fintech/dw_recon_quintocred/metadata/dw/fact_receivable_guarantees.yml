@@ -2,7 +2,11 @@ database_name: dw_recon_quintocred
 table_name: fact_receivable_guarantees
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Data from receivavle guarantees in QuintoCred recon context."
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Data from receivavle guarantees in QuintoCred recon context.
 columns:
   sk_propose:
     description: "QuintoCred's propose identification number (ID)"
@@ -60,7 +64,7 @@ columns:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.provisional_group
 
   status_rh_payment:
-    description: "Payment status of the RH"
+    description: QuintoCred rental guarantee attribute describing status rh payment in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.rh_status_pagamento
 
@@ -70,12 +74,12 @@ columns:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.f2.description
 
   due_amount:
-    description: "Amount due for payment"
+    description: QuintoCred rental guarantee attribute describing due amount in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.due_amount
 
   paid_amount:
-    description: "Amount that has been paid"
+    description: QuintoCred rental guarantee attribute describing paid amount in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.paid_amount
 
@@ -85,7 +89,7 @@ columns:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.open_amount
 
   discount_amount:
-    description: "Discount amount applied"
+    description: QuintoCred rental guarantee attribute describing discount amount in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.discount
 
@@ -95,12 +99,12 @@ columns:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.delinquency_due_amount
 
   due_amount_adjusted:
-    description: "Adjusted due amount"
+    description: QuintoCred rental guarantee attribute describing due amount adjusted in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.due_amount_ajustado
 
   open_amount_adjusted:
-    description: "Adjusted open amount"
+    description: QuintoCred rental guarantee attribute describing open amount adjusted in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.open_amount_ajustado_2
 
@@ -110,7 +114,7 @@ columns:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.valor_pacote
 
   paid_amount_real_estate:
-    description: "Amount paid to the real estate"
+    description: QuintoCred rental guarantee attribute describing paid amount real estate in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.valor_pago_para_imobiliaria
 
@@ -120,12 +124,12 @@ columns:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.check_rh_payment
 
   total_amount_guaranteed:
-    description: "Total amount guaranteed"
+    description: QuintoCred rental guarantee attribute describing total amount guaranteed in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.valor_total_garantido
 
   balance_guarantee:
-    description: "Balance of the guarantee"
+    description: QuintoCred rental guarantee attribute describing balance guarantee in the policy lifecycle.
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.saldo_garantia
 
@@ -223,3 +227,6 @@ columns:
     description: "Timestamp of the snapshot"
     lineage:
       - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.ts_snapshot
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

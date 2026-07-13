@@ -1,134 +1,141 @@
 ---
 database_name: dw_recon_quintocred_snapshot
 table_name: fact_customer_advance
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per fact customer advance in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   sk_propose:
-    description: ''
+    description: Data warehouse surrogate key for propose used in fintech dimensional joins.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.sk_propose
+      - dw_recon_quintocred.fact_customer_advance.sk_propose
   id_payment_min:
-    description: ''
+    description: Identifier for the payment min referenced by this financial record.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.id_payment_min
+      - dw_recon_quintocred.fact_customer_advance.id_payment_min
   flow_type:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing flow type in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.flow_type
+      - dw_recon_quintocred.fact_customer_advance.flow_type
   gateway:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing gateway in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.gateway
+      - dw_recon_quintocred.fact_customer_advance.gateway
   activator_amount:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing activator amount in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.activator_amount
+      - dw_recon_quintocred.fact_customer_advance.activator_amount
   monthly_guarantee:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing monthly guarantee in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.monthly_guarantee
+      - dw_recon_quintocred.fact_customer_advance.monthly_guarantee
   annual_guarantee:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing annual guarantee in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.annual_guarantee
+      - dw_recon_quintocred.fact_customer_advance.annual_guarantee
   total_charged:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total charged in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.total_charged
+      - dw_recon_quintocred.fact_customer_advance.total_charged
   total_paid:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing total paid in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.total_paid
+      - dw_recon_quintocred.fact_customer_advance.total_paid
   value_upfront_signatures:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing value upfront signatures in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.value_upfront_signatures
+      - dw_recon_quintocred.fact_customer_advance.value_upfront_signatures
   expected_appropriated_months:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing expected appropriated months in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.expected_appropriated_months
+      - dw_recon_quintocred.fact_customer_advance.expected_appropriated_months
   expected_appropriated_amount:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing expected appropriated amount in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.expected_appropriated_amount
+      - dw_recon_quintocred.fact_customer_advance.expected_appropriated_amount
   expected_months_to_be_appropriated:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing expected months to be appropriated in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.expected_months_to_be_appropriated
+      - dw_recon_quintocred.fact_customer_advance.expected_months_to_be_appropriated
   expected_amount_to_be_appropriated:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing expected amount to be appropriated in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.expected_amount_to_be_appropriated
+      - dw_recon_quintocred.fact_customer_advance.expected_amount_to_be_appropriated
   has_activation:
-    description: ''
+    description: Indicates whether activation applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.has_activation
+      - dw_recon_quintocred.fact_customer_advance.has_activation
   has_payment_advance:
-    description: ''
+    description: Indicates whether payment advance applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.has_payment_advance
+      - dw_recon_quintocred.fact_customer_advance.has_payment_advance
   is_direct_billing:
-    description: ''
+    description: Indicates whether direct billing applies to this financial record.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.is_direct_billing
+      - dw_recon_quintocred.fact_customer_advance.is_direct_billing
   mobs_in_between_due_dates:
-    description: ''
+    description: QuintoCred rental guarantee attribute describing mobs in between due dates in the policy lifecycle.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.mobs_in_between_due_dates
+      - dw_recon_quintocred.fact_customer_advance.mobs_in_between_due_dates
   dt_due_min:
-    description: ''
+    description: Calendar date associated with due min in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_due_min
+      - dw_recon_quintocred.fact_customer_advance.dt_due_min
   dt_due_max:
-    description: ''
+    description: Calendar date associated with due max in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_due_max
+      - dw_recon_quintocred.fact_customer_advance.dt_due_max
   dt_month_last_day:
-    description: ''
+    description: Calendar date associated with month last day in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_month_last_day
+      - dw_recon_quintocred.fact_customer_advance.dt_month_last_day
   dt_paid_min:
-    description: ''
+    description: Calendar date associated with paid min in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_paid_min
+      - dw_recon_quintocred.fact_customer_advance.dt_paid_min
   dt_paid_max:
-    description: ''
+    description: Calendar date associated with paid max in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_paid_max
+      - dw_recon_quintocred.fact_customer_advance.dt_paid_max
   dt_month_appropriation_start:
-    description: ''
+    description: Calendar date associated with month appropriation start in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_month_appropriation_start
+      - dw_recon_quintocred.fact_customer_advance.dt_month_appropriation_start
   dt_month_ref_creation:
-    description: ''
+    description: Calendar date associated with month ref creation in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_month_ref_creation
+      - dw_recon_quintocred.fact_customer_advance.dt_month_ref_creation
   dt_contract_started:
-    description: ''
+    description: Calendar date associated with contract started in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_contract_started
+      - dw_recon_quintocred.fact_customer_advance.dt_contract_started
   dt_ended:
-    description: ''
+    description: Calendar date associated with ended in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_ended
+      - dw_recon_quintocred.fact_customer_advance.dt_ended
   dt_created:
-    description: ''
+    description: Calendar date associated with created in the financial workflow.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.dt_created
+      - dw_recon_quintocred.fact_customer_advance.dt_created
   ts_snapshot:
-    description: ''
+    description: Timestamp when snapshot occurred in the upstream fintech system.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.NOW()
+      - dw_recon_quintocred.fact_customer_advance.NOW()
   year:
-    description: ''
+    description: Year partition derived from the source event timestamp for incremental loading.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.YEAR(CURRENT_DATE)
+      - dw_recon_quintocred.fact_customer_advance.YEAR(CURRENT_DATE)
   month:
-    description: ''
+    description: Month partition derived from the source event timestamp for incremental loading.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.MONTH(CURRENT_DATE)
+      - dw_recon_quintocred.fact_customer_advance.MONTH(CURRENT_DATE)
   day:
-    description: ''
+    description: Day partition derived from the source event timestamp for incremental loading.
     lineage:
-    - dw_recon_quintocred.fact_customer_advance.DAY(CURRENT_DATE)
+      - dw_recon_quintocred.fact_customer_advance.DAY(CURRENT_DATE)

@@ -1,14 +1,14 @@
 ---
 database_name: dw_revenue_lines
 table_name: dim_service_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing service fee and payment data by contract"
 columns:
   sk_service_fee:
     description: "Distinct ID for service fee"
   id_contract_ebdb:
-    description: "Contract ID on EBDB"
+    description: Identifier for the contract ebdb referenced by this financial record.
     lineage:
       - datalake_revenue_lines.service_fee.id_contract_ebdb
   invoice_payment_status:
@@ -28,11 +28,11 @@ columns:
     lineage:
       - datalake_revenue_lines.service_fee.invoice_theorical_amount
   invoice_paid_amount:
-    description: "Paid amount in BRL"
+    description: Financial attribute representing invoice paid amount on the dim_service_fee dataset.
     lineage:
       - datalake_revenue_lines.service_fee.invoice_paid_amount
   accrual_year_month:
-    description: "Reference year-month"
+    description: Financial attribute representing accrual year month on the dim_service_fee dataset.
     lineage:
       - datalake_revenue_lines.service_fee.accrual_year_month
   dt_due:
@@ -43,3 +43,6 @@ columns:
     description: "Invoice's paid date"
     lineage:
       - datalake_revenue_lines.service_fee.dt_paid
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

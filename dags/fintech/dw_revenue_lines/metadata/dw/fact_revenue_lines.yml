@@ -2,7 +2,7 @@ database_name: dw_revenue_lines
 table_name: fact_revenue_lines
 description: Fact table for the Revenue lines model with the data related to all the dimensions.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_revenue_lines:
     description: Surrogate key of the table.
@@ -37,3 +37,6 @@ columns:
     description: Source information of the data, can be any dimension of the model.
   dt_month_ref:
     description: Reference month of the data.
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

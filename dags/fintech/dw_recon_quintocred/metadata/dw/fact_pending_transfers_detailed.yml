@@ -2,7 +2,11 @@ database_name: dw_recon_quintocred
 table_name: fact_pending_transfers_detailed
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Data from pending transfers in QuintoCred recon context."
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Data from pending transfers in QuintoCred recon context.
 columns:
   sk_propose:
     description: "QuintoCred's propose identification number (ID)"
@@ -80,7 +84,7 @@ columns:
       - datalake_vans_clean.payment.payee_account
 
   type_account:
-    description: "Type of bank account"
+    description: QuintoCred rental guarantee attribute describing type account in the policy lifecycle.
     lineage:
       - datalake_vans_clean.payment.has_payee_savings_acc
 
@@ -184,3 +188,9 @@ columns:
     description: "Date payment was confirmed by RH"
     lineage:
       - datalake_robin_hood_clean.payment_request.dt_paid
+  payment_activation:
+    description: QuintoCred rental guarantee attribute describing payment activation in the policy lifecycle.
+    lineage: []
+  description:
+    description: Human-readable description of the financial transaction or ledger entry.
+    lineage: []
