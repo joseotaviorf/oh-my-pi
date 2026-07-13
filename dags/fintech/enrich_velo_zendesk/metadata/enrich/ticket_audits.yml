@@ -1,8 +1,12 @@
 database_name: datalake_velo_zendesk
 table_name: ticket_audits
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table containing audits from zendesk tickets"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table containing audits from zendesk tickets
 columns:
   id_ticket_audit:
     description: "Ticket audit identification number (ID)"
@@ -17,7 +21,7 @@ columns:
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.author_id
   event_via:
-    description: "Via of the event"
+    description: Velo platform attribute describing event via for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.via
   sequence_number:
@@ -25,15 +29,15 @@ columns:
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits._sdc_sequence
   table_version:
-    description: "Number of table version"
+    description: Velo platform attribute describing table version for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits._sdc_table_version
   id_event:
-    description: "ID of the event"
+    description: Identifier for the event referenced by this financial record.
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   type:
-    description: "Type of the event"
+    description: Velo platform attribute describing type for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   field_name:
@@ -41,11 +45,11 @@ columns:
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   previous_value:
-    description: "Value before the event"
+    description: Velo platform attribute describing previous value for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   value:
-    description: "Value after the event"
+    description: Velo platform attribute describing value for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   is_public:

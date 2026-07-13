@@ -8,7 +8,7 @@ description: |
   Each row represents a user journey transition with experiment segmentation
   (Test, Control, Out of Experiment) and proposal-level attributes synced via HighTouch.
 domain: Fintech
-owner: luana.silvia@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 columns:
   row_instance_id:
     lineage:
@@ -128,3 +128,5 @@ columns:
     lineage:
       - hightouch_audit.sync_changelog.fields.is_single_tenant
     description: "Boolean flag indicating if the proposal had a single tenant."
+  proposal_active_offer:
+    description: Financial attribute representing proposal active offer on the sonia_journey_log dataset.

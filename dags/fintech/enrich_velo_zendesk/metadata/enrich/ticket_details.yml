@@ -1,8 +1,12 @@
 database_name: datalake_velo_zendesk
 table_name: ticket_details
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table containing zendesk tickets information"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table containing zendesk tickets information
 columns:
   id_ticket:
     description: "Ticket identification number (ID)"
@@ -45,11 +49,11 @@ columns:
     lineage:
       - datalake_velo_zendesk.custom_fields.rejection_reason
   broker_name:
-    description: "Broker name"
+    description: "Velo platform attribute describing broker name for condominium billing reconciliation."
     lineage:
       - datalake_velo_zendesk.custom_fields.broker_name
   contact_reason:
-    description: "Main reason of contact"
+    description: "Velo platform attribute describing contact reason for condominium billing reconciliation."
     lineage:
       - datalake_velo_zendesk.custom_fields.contact_reason
   tenant_name:
@@ -61,15 +65,15 @@ columns:
     lineage:
       - datalake_velo_zendesk.custom_fields.client_request
   name:
-    description: "Ticket group name"
+    description: "Velo platform attribute describing name for condominium billing reconciliation."
     lineage:
       - datalake_velo_zendesk_clean.groups.name
   ticket_type:
-    description: "Ticket type name"
+    description: "Velo platform attribute describing ticket type for condominium billing reconciliation."
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.type
   id_group:
-    description: "Ticket group id"
+    description: "Identifier for the group referenced by this financial record."
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_group
   satisfaction_rating:
@@ -87,7 +91,7 @@ columns:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.priority
   recipient:
-    description: "Recipient description"
+    description: "Velo platform attribute describing recipient for condominium billing reconciliation."
   is_last_register:
     description: "Flag indicating if the current register is the most updated from ticket timeline"
     lineage:
@@ -99,11 +103,11 @@ columns:
   short_request_type:
     description: "Short description of the request type"
   description:
-    description: "Ticket description"
+    description: "Human-readable description of the financial transaction or ledger entry."
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.description
   ticket_url:
-    description: "Ticket URL"
+    description: "Velo platform attribute describing ticket url for condominium billing reconciliation."
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.url_ticket
   tags:
@@ -111,11 +115,11 @@ columns:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.tags
   ticket_status:
-    description: "Ticket status"
+    description: "Velo platform attribute describing ticket status for condominium billing reconciliation."
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.status
   subject:
-    description: "Ticket subject"
+    description: "Velo platform attribute describing subject for condominium billing reconciliation."
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.subject
   has_incidents:
@@ -152,23 +156,23 @@ columns:
     description: "Timestamp when the ticket was loaded"
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.ts_load
-    request_responsible:
-      description: "Name of the responsible for the request"
-      lineage:
-        - datalake_velo_zendesk.custom_fields.request_responsible
-    request_channel:
-      description: "Channel where the request was made"
-      lineage:
-        - datalake_velo_zendesk.custom_fields.request_channel
-    exception_type:
-      description: "Exception type"
-      lineage:
-        - datalake_velo_zendesk.custom_fields.exception_type
-    payment_period:
-      description: "Period the payment has to be made"
-      lineage:
-        - datalake_velo_zendesk.custom_fields.payment_period
-    dt_request:
-      description: "Date when the request was made"
-      lineage:
-        - datalake_velo_zendesk.custom_fields.dt_request
+  request_channel:
+    description: "Channel where the request was made"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.request_channel
+  payment_period:
+    description: "Period the payment has to be made"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.payment_period
+  exception_type:
+    description: "Velo platform attribute describing exception type for condominium billing reconciliation."
+    lineage:
+      - datalake_velo_zendesk.custom_fields.exception_type
+  dt_request:
+    description: "Date when the request was made"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.dt_request
+  request_responsible:
+    description: "Name of the responsible for the request"
+    lineage:
+      - datalake_velo_zendesk.custom_fields.request_responsible

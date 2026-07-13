@@ -1,8 +1,12 @@
 database_name: datalake_velo_zendesk
 table_name: custom_fields
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table containing the most important custom fields from zendesk tickets"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table containing the most important custom fields from zendesk tickets
 columns:
     id_ticket:
         description: "Ticket identification number (ID)"
@@ -69,11 +73,11 @@ columns:
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
     dt_submission:
-        description: "Submission date"
+        description: Calendar date associated with submission in the financial workflow.
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
     dt_due_original:
-        description: "Original due date"
+        description: Calendar date associated with due original in the financial workflow.
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
     dt_started:
@@ -121,7 +125,7 @@ columns:
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
     exception_type:
-        description: "Exception type"
+        description: Velo platform attribute describing exception type for condominium billing reconciliation.
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
     payment_period:
