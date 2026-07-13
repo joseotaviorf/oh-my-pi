@@ -367,6 +367,44 @@ class TestMergeValidationClusterArgs:
             "spark.driver.memoryOverhead": "2g",
         }
 
+    def test_strips_databricks_spark_conf_for_databricks_to_emr_validation(self):
+        prod = {
+            "type": "consolidation_s_general_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "spark_conf": {
+                    "spark.databricks.sql.initial.catalog.namespace": "quintoandar_prod",
+                    "spark.sql.shuffle.partitions": "200",
+                },
+            },
+        }
+        validation = {
+            "type": "emr_7_12_consolidation_s_general_fleet_cluster",
+            "custom_configurations": {
+                "task_nodes": {"target_spot": 1},
+            },
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["custom_configurations"]["spark_conf"] == {
+            "spark.sql.shuffle.partitions": "200",
+        }
+
+    def test_omits_spark_conf_when_prod_only_has_databricks_keys(self):
+        prod = {
+            "type": "consolidation_xs_general_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "spark_conf": {
+                    "spark.databricks.sql.initial.catalog.namespace": "quintoandar_prod",
+                },
+            },
+        }
+        validation = {
+            "type": "emr_7_12_consolidation_xs_general_fleet_cluster",
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert "spark_conf" not in merged.get("custom_configurations", {})
+
     def test_strips_prod_num_workers_for_single_node_validation(self):
         prod = {
             "type": "consolidation_l_memory_cluster",

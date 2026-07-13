@@ -4,3 +4,6 @@ cluster:
   custom_configurations:
     spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     runtime_engine: PHOTON
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_fleet_cluster

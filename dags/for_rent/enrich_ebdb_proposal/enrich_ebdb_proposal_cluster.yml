@@ -6,3 +6,9 @@ cluster:
       spark.sql.sources.partitionOverwriteMode: static
     runtime_engine: PHOTON
     driver_node_type_id: r7g.xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_fleet_cluster
+    custom_configurations:
+      spark_conf:
+        spark.sql.sources.partitionOverwriteMode: static

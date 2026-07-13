@@ -10,3 +10,23 @@ cluster:
       ebs_volume_size: 200
     num_workers: 3
     driver_node_type_id: r7g.2xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_m_general_fleet_cluster
+    custom_configurations:
+      task_nodes:
+        instance_types:
+        - m6g.2xlarge
+        - m7g.2xlarge
+        target_on_demand: 0
+        target_spot: 1
+        allocation_strategy: price-capacity-optimized
+        bid_price_percentage: 100
+      core_nodes:
+        target_on_demand: 2
+        target_spot: 0
+        instance_types:
+        - m6g.2xlarge
+        - m7g.2xlarge
+      aws_attributes:
+        ebs_volume_size: 200

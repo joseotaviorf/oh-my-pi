@@ -9,3 +9,21 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xl_compute_fleet_cluster
+    custom_configurations:
+      task_nodes:
+        instance_types:
+        - c6g.8xlarge
+        - c7g.8xlarge
+        target_on_demand: 0
+        target_spot: 1
+        allocation_strategy: price-capacity-optimized
+        bid_price_percentage: 100
+      core_nodes:
+        target_on_demand: 2
+        target_spot: 0
+        instance_types:
+        - c6g.8xlarge
+        - c7g.8xlarge

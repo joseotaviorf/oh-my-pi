@@ -4,3 +4,6 @@ cluster:
   custom_configurations:
     data_security_mode: USER_ISOLATION
     driver_node_type_id: r7g.2xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_l_memory_fleet_cluster

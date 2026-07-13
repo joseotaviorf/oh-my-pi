@@ -4,3 +4,6 @@ cluster:
   custom_configurations:
     spark_version: 13.3.x-scala2.12
     driver_node_type_id: m7g.large
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_fleet_cluster

@@ -88,6 +88,16 @@ def _strip_databricks_only_custom_config_keys(custom: Dict[str, Any]) -> Dict[st
     }
 
 
+def _strip_databricks_spark_conf_keys(spark_conf: Any) -> Dict[str, Any]:
+    if not isinstance(spark_conf, dict):
+        return {}
+    return {
+        key: value
+        for key, value in spark_conf.items()
+        if not str(key).startswith("spark.databricks.")
+    }
+
+
 def _strip_prod_topology_for_consolidation_validation(
     prod_custom: Dict[str, Any],
     validation_cluster_type: str,
@@ -135,6 +145,17 @@ def merge_validation_cluster_args(prod_cluster: dict, validation_cluster: dict) 
     if _is_databricks_to_emr_validation(prod_cluster_type, validation_cluster_type):
         merged.pop("databricks_conn_id", None)
         prod_custom = _strip_databricks_only_custom_config_keys(prod_custom)
+        prod_spark_conf = prod_custom.get("spark_conf")
+        if isinstance(prod_spark_conf, dict):
+            stripped_spark_conf = _strip_databricks_spark_conf_keys(prod_spark_conf)
+            if stripped_spark_conf:
+                prod_custom = {**prod_custom, "spark_conf": stripped_spark_conf}
+            else:
+                prod_custom = {
+                    key: value
+                    for key, value in prod_custom.items()
+                    if key != "spark_conf"
+                }
     else:
         prod_custom = _strip_prod_topology_for_consolidation_validation(
             prod_custom, validation_cluster_type, prod_cluster_type

@@ -12,3 +12,15 @@ cluster:
       spark.sql.sources.parallelPartitionDiscovery.parallelism: '400'
       spark.sql.files.maxPartitionBytes: '67108864'
       spark.sql.files.openCostInBytes: '1048576'
+validation:
+  cluster:
+    type: emr_7_12_consolidation_s_memory_fleet_cluster
+    custom_configurations:
+      spark_conf:
+        spark.sql.legacy.json.allowEmptyString.enabled: 'true'
+        spark.hadoop.fs.s3a.threads.max: '64'
+        spark.hadoop.fs.s3a.connection.maximum: '200'
+        spark.sql.sources.parallelPartitionDiscovery.parallelism: '400'
+        spark.sql.files.maxPartitionBytes: '67108864'
+        spark.sql.files.openCostInBytes: '1048576'
+  allow_custom_spark_job: true

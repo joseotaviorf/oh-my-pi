@@ -6,3 +6,9 @@ cluster:
       ebs_volume_size: 200
     runtime_engine: PHOTON
     driver_node_type_id: r7g.large
+validation:
+  cluster:
+    type: emr_7_12_consolidation_s_general_fleet_cluster
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
