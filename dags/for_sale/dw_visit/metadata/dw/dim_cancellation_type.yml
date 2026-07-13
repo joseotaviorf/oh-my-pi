@@ -2,33 +2,32 @@ database_name: dw_visit
 table_name: dim_cancellation_type
 description: This dimension table has the cancellation types of the visits and the old value that was consider.
 domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_cancellation_type:
     description: Id of the cancellation type.
   reason:
-    description: Reason of the cancellation.
+    description: Human-readable reason text explaining a status transition or exception.
     categories:
-      PERSON_NOT_INTERESTED_ON_THIS_PROPERTY_OR_ON_THIS_VISIT: 'Prospect is not interested in this property or this specific visit, but continues searching.'
-      PERSON_SCHEDULED_FOR_ANOTHER_TIME: 'Person will not be able to attend this previously scheduled time, but has already scheduled for another time.'
-      PERSON_CANNOT_ATTEND: 'The person was unable to attend the visit, but remains interested in the property or in continuing to sell'
-      PERSON_DOESNT_WANT_5A: 'Person no longer wants to use QuintoAndar'
-      VISIT_OCCURRED_AT_A_DIFFERENT_TIME: 'Person visited at another time. I had this visit scheduled, but ended up visiting at another time (by agent, for example)'
-      PERSON_IDENTIFIED_LISTING_AS_INACCURATE_OR_INCOMPLETE: 'Person no longer wants to visit, because they discovered some information about the ad that means it does not meet their criteria (ad was incomplete or wrong).'
-      PERSON_HAD_ISSUES_WITH_AGENT: 'Client/PP had problems with the agent.'
-      QUINTO_ANDAR_CANNOT_CONTACT_ONE_OF_THE_PARTIES: '5A was unable to contact the demand or supply customer. 5A = agent, secretariat, property etc. Visitor, in this case, could not be the agent, just the customer (demand or supply)'
+      PERSON_NOT_INTERESTED_ON_THIS_PROPERTY_OR_ON_THIS_VISIT: Prospect is not interested in this property or this specific visit, but continues searching.
+      PERSON_SCHEDULED_FOR_ANOTHER_TIME: Person will not be able to attend this previously scheduled time, but has already scheduled for another time.
+      PERSON_CANNOT_ATTEND: The person was unable to attend the visit, but remains interested in the property or in continuing to sell
+      PERSON_DOESNT_WANT_5A: Person no longer wants to use QuintoAndar
+      VISIT_OCCURRED_AT_A_DIFFERENT_TIME: Person visited at another time. I had this visit scheduled, but ended up visiting at another time (by agent, for example)
+      PERSON_IDENTIFIED_LISTING_AS_INACCURATE_OR_INCOMPLETE: Person no longer wants to visit, because they discovered some information about the ad that means it does not meet their criteria (ad was incomplete or wrong).
+      PERSON_HAD_ISSUES_WITH_AGENT: Client/PP had problems with the agent.
+      QUINTO_ANDAR_CANNOT_CONTACT_ONE_OF_THE_PARTIES: 5A was unable to contact the demand or supply customer. 5A = agent, secretariat, property etc. Visitor, in this case, could not be the agent, just the customer (demand or supply)
       PROPERTY_TEMPORARILY_UNAVAILABLE: 'Supply: Property temporarily unavailable (renovation, travel, etc.)'
-      PROPERTY_OR_PERSON_INDEFINITELY_UNAVAILABLE: 'Property or prospect unavailable forever (already rented/sold/gave up renting/selling)'
-      PROPERTY_ON_HOLD_FOR ANOTHER_PROSPECT: 'Client has an advanced proposal / Wants to give preference to another interested party (even if the proposal is from another real estate agency)'
-      PROPERTY_RESERVED: 'In rent, the property can be reserved, this overrides all visits that are already scheduled.'
-      PERSON_DOESNT_WANT_TO_WORK_ON _THIS_LOCATION: 'The agent will not attend the visit, because he does not frequent that region. Either because it is a risk zone or simply because he understands that he is not assigned to visit such a neighborhood.'
-      CONSEQUENCE_MANAGEMENT: 'The visit was canceled because the property or prospect or agent entered GC. If it is the agent, we will always try to reallocate the visit to another agent.'
-      AGENT_TRANSFER_FAILED_TO_FIND_ANOTHER_AGENT: 'When trying to pass a visit from one agent to another agent, the system was unable to find another available agent and the visit was therefore cancelled.'
-      Request_expired: 'Time out. There is an X amount of time for the person to confirm the visit, if they dont confirm, the request automatically expires. This person, in general, will be the owner.'
+      PROPERTY_OR_PERSON_INDEFINITELY_UNAVAILABLE: Property or prospect unavailable forever (already rented/sold/gave up renting/selling)
+      PROPERTY_ON_HOLD_FOR ANOTHER_PROSPECT: Client has an advanced proposal / Wants to give preference to another interested party (even if the proposal is from another real estate agency)
+      PROPERTY_RESERVED: In rent, the property can be reserved, this overrides all visits that are already scheduled.
+      PERSON_DOESNT_WANT_TO_WORK_ON _THIS_LOCATION: The agent will not attend the visit, because he does not frequent that region. Either because it is a risk zone or simply because he understands that he is not assigned to visit such a neighborhood.
+      CONSEQUENCE_MANAGEMENT: The visit was canceled because the property or prospect or agent entered GC. If it is the agent, we will always try to reallocate the visit to another agent.
+      AGENT_TRANSFER_FAILED_TO_FIND_ANOTHER_AGENT: When trying to pass a visit from one agent to another agent, the system was unable to find another available agent and the visit was therefore cancelled.
+      Request_expired: Time out. There is an X amount of time for the person to confirm the visit, if they dont confirm, the request automatically expires. This person, in general, will be the owner.
   old_reason:
     description: Old reason used in the dim_booking.
   on_behalf_of:
-    description:
-      An identification to say the author is present at this event on behalf of those
+    description: An identification to say the author is present at this event on behalf of those
   ts_load:
     description: Timestamp of the ingestion date.

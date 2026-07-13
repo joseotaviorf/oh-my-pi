@@ -2,245 +2,201 @@ database_name: dw_visit
 table_name: fact_visit_schedules
 description: This fact table has all the schedules of the visits with some important keys. Each line is an unique visit schedule identified by the key sk_schedule.
 domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_schedule:
     lineage:
-      - datalake_visits.visit_schedules.id_schedule
-    description:
-      Is the booking key. Joins with booking table.
+    - datalake_visits.visit_schedules.id_schedule
+    description: Is the booking key. Joins with booking table.
   sk_visit:
     lineage:
-      - datalake_visits.visit_schedules.id_visit
-    description:
-      Is the visit unique key. Joins with visit table.
+    - datalake_visits.visit_schedules.id_visit
+    description: Is the visit unique key. Joins with visit table.
   sk_visitor:
     lineage:
-      - datalake_visit.visit_schedules.id_visitor
+    - datalake_visit.visit_schedules.id_visitor
     description: Who is visiting the house.
   sk_owner:
     lineage:
-      - datalake_visit.visit_schedules.id_owner
+    - datalake_visit.visit_schedules.id_owner
     description: House's Owner.
   sk_house:
     lineage:
-      - datalake_visit.visit_schedules.id_house
-    description: Id of house.
+    - datalake_visit.visit_schedules.id_house
+    description: Surrogate key for the property listing visited during the schedule.
   sk_region:
     lineage:
-      - datalake_visits.visit_schedules.id_region
-    description:
-      Is the id of region.
+    - datalake_visits.visit_schedules.id_region
+    description: Surrogate key for the geographic region where the visited property is located.
   sk_business_context:
     lineage:
-      - dw_visit.dim_business_context.sk_business_context
-    description:
-      Is the key of business context of the schedule.
+    - dw_visit.dim_business_context.sk_business_context
+    description: Is the key of business context of the schedule.
   sk_visit_model:
     lineage:
-      - dw_visit.dim_business_context.sk_business_context
-    description:
-      Is the key of the visit model.
+    - dw_visit.dim_business_context.sk_business_context
+    description: Is the key of the visit model.
   sk_business_unit:
     lineage:
-      - datalake_sale_visit_hubs.sale_visit_hubs.id_business_unit
-    description:
-      ID of the business unit associated with the booking. Can be joined with datalake_hub_services_clean.business_unit.
+    - datalake_sale_visit_hubs.sale_visit_hubs.id_business_unit
+    description: ID of the business unit associated with the booking. Can be joined with datalake_hub_services_clean.business_unit.
   sk_company_supply:
     lineage:
-      - datalake_visit.visit_schedules.id_company_supply
-    description:
-      Id of the company in Rede QuintoAndar associated with the house.
+    - datalake_visit.visit_schedules.id_company_supply
+    description: Id of the company in Rede QuintoAndar associated with the house.
   sk_company_demand:
     lineage:
-      - datalake_visit.visit_schedules.id_company_demand
-    description:
-      Id of the company in Rede QuintoAndar associated with the agent.
+    - datalake_visit.visit_schedules.id_company_demand
+    description: Id of the company in Rede QuintoAndar associated with the agent.
   sk_broker_supply:
     lineage:
-      - datalake_visit.visit_schedules.sk_broker_supply
+    - datalake_visit.visit_schedules.sk_broker_supply
     description: Surrogate key of the supply-side broker when the business model implies 3P supply.
   sk_broker_demand:
     lineage:
-      - datalake_visit.visit_schedules.sk_broker_demand
+    - datalake_visit.visit_schedules.sk_broker_demand
     description: Surrogate key of the demand-side broker when the business model implies 3P demand or lead gen.
   sk_agent:
     lineage:
-      - datalake_visit.visit_schedules.id_agent
-    description:
-      Is the last agent of the schedule.
+    - datalake_visit.visit_schedules.id_agent
+    description: Is the last agent of the schedule.
   sk_user_agent:
     lineage:
-      - datalake_visit.visit_schedules.id_user_agent
-    description:
-      Is the last user agent of the schedule.
+    - datalake_visit.visit_schedules.id_user_agent
+    description: Is the last user agent of the schedule.
   sk_first_agent:
     lineage:
-      - datalake_visit.visit_schedules.id_first_agent
-    description:
-      Is the first agent of the schedule.
+    - datalake_visit.visit_schedules.id_first_agent
+    description: Is the first agent of the schedule.
   sk_first_user_agent:
     lineage:
-      - datalake_visit.visit_schedules.id_first_user_agent
-    description:
-      Is the first user agent of the schedule.
+    - datalake_visit.visit_schedules.id_first_user_agent
+    description: Is the first user agent of the schedule.
   sk_user_en:
     lineage:
-      - datalake_sale_visit_hubs.sale_visit_hubs.id_user_en
-    description:
-      ID of the user of the trading executive.
+    - datalake_sale_visit_hubs.sale_visit_hubs.id_user_en
+    description: ID of the user of the trading executive.
   sk_fixed_agent:
     lineage:
-      - datalake_ebdb_agents.preferred_fixed_agent_history.id_agent
-    description:
-      ID of the fixed agent associated with the buyer when the schedule was created.
+    - datalake_ebdb_agents.preferred_fixed_agent_history.id_agent
+    description: ID of the fixed agent associated with the buyer when the schedule was created.
   sk_user_fixed_agent:
     lineage:
-      - datalake_ebdb_agents.preferred_fixed_agent_history.id_user_agent
-    description:
-      User ID of the fixed agent associated with the buyer when the schedule was created.
+    - datalake_ebdb_agents.preferred_fixed_agent_history.id_user_agent
+    description: User ID of the fixed agent associated with the buyer when the schedule was created.
   sk_ppa_relation:
     lineage:
-      - datalake_ebdb_agents.preferred_property_agent_relation_history.id_house_listing_relation
-    description:
-      ID of the preferred property agent relation.
+    - datalake_ebdb_agents.preferred_property_agent_relation_history.id_house_listing_relation
+    description: ID of the preferred property agent relation.
   sk_author_creator:
     lineage:
-      - datalake_visit.visit_schedules.id_user_creation
-    description:
-      Creator of the schedule.
+    - datalake_visit.visit_schedules.id_user_creation
+    description: Creator of the schedule.
   sk_author_cancelation:
     lineage:
-      - datalake_visit.visit_schedules.id_user_cancelation
-    description:
-      Who canceled the schedule.
+    - datalake_visit.visit_schedules.id_user_cancelation
+    description: Who canceled the schedule.
   visit_code:
     lineage:
-      - datalake_visit.visit_schedules.visit_code
-    description:
-      Code of the visit.
+    - datalake_visit.visit_schedules.visit_code
+    description: Human-facing visit code shown in apps and used to join feedback records.
   sk_house_entrance:
     lineage:
-      - dw_house.dim_house_entrance_history.sk_house_entrance
-    description:
-      Foreign key from dw_house.dim_house_entrance_history. Last event before the schedule creation.
+    - dw_house.dim_house_entrance_history.sk_house_entrance
+    description: Foreign key from dw_house.dim_house_entrance_history. Last event before the schedule creation.
   sk_succeed_schedule:
-    description:
-      The next schedule case when this schedule have a reschedule.
+    description: The next schedule case when this schedule have a reschedule.
   days_visit_cancelled_to_visit:
     lineage:
-      - datalake_visit.visit_schedules.days_visit_cancelled_to_visit
-    description:
-      Days between the visit cancelled and the visit.
+    - datalake_visit.visit_schedules.days_visit_cancelled_to_visit
+    description: Business attribute days visit cancelled to visit for fact visit schedules in the data warehouse layer of dw visit.
   days_visit_booked_to_visit:
     lineage:
-      - datalake_visit.visit_schedules.days_visit_booked_to_visit
-    description:
-      Days between the visit booked and the visit.
+    - datalake_visit.visit_schedules.days_visit_booked_to_visit
+    description: Business attribute days visit booked to visit for fact visit schedules in the data warehouse layer of dw visit.
   days_visit_booked_to_cancelled:
     lineage:
-      - datalake_visit.visit_schedules.days_visit_booked_to_cancelled
-    description:
-      Days between the booking creation and the visit cancelled date.
+    - datalake_visit.visit_schedules.days_visit_booked_to_cancelled
+    description: Days between the booking creation and the visit cancelled date.
   days_visit_booked_to_visit_completed:
     lineage:
-      - datalake_visit.visit_schedules.days_visit_booked_to_visit_completed
-    description:
-      Days between the booking creation and the visit completed date.
+    - datalake_visit.visit_schedules.days_visit_booked_to_visit_completed
+    description: Days between the booking creation and the visit completed date.
   has_tenant_living:
     lineage:
-      - datalake_visit.visit_schedules.has_tenant_living
-    description:
-      True if the house has a tenant living in the moment of the visit.
+    - datalake_visit.visit_schedules.has_tenant_living
+    description: True if the house has a tenant living in the moment of the visit.
   is_3p_supply:
     lineage:
-      - datalake_visit.visit_schedules.is_3p_supply
+    - datalake_visit.visit_schedules.is_3p_supply
     description: Boolean flag indicating if the schedule has a 3P supply partner. A 3P supply partner is a company that provides the property to the QuintoAndar platform.
   is_3p_demand:
     lineage:
-      - datalake_visit.visit_schedules.is_3p_demand
+    - datalake_visit.visit_schedules.is_3p_demand
     description: Boolean flag indicating if the schedule has a 3P demand partner. A 3P demand partner is a company that provides the buyer to the QuintoAndar platform.
   is_3p_lead_gen:
     lineage:
-      - datalake_visit.visit_schedules.is_3p_lead_gen
+    - datalake_visit.visit_schedules.is_3p_lead_gen
     description: Boolean flag indicating if the schedule has a 3P lead generation partner. A 3P lead gen partner generates leads that are forwarded to the QuintoAndar platform.
   has_3p_access_control:
     lineage:
-      - datalake_visit.visit_schedules.has_3p_access_control
+    - datalake_visit.visit_schedules.has_3p_access_control
     description: Boolean flag indicating if the schedule has any 3P access control (supply, demand, or lead gen). True if any of the 3P flags are true.
   is_booking:
-    description:
-      If is a booking.
+    description: Boolean flag indicating whether booking applies to this record.
   is_reschedule:
-    description:
-      If is a reschedule.
+    description: Whether this schedule row represents a rescheduled visit attempt.
   is_confirmed:
-    description:
-      If the schedule was confirmed.
+    description: If the schedule was confirmed.
   is_completed:
-    description:
-      If the schedule was completed.
+    description: If the schedule was completed.
   is_canceled:
-    description:
-      If the schedule was canceled.
+    description: If the schedule was canceled.
   is_unsuccessful:
-    description:
-      If the schedule was unsuccessful.
+    description: If the schedule was unsuccessful.
   sk_schedule_created:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_created
-    description:
-      Sk with the creation date.
+    - datalake_visit.visit_schedules.ts_schedule_created
+    description: Sk with the creation date.
   sk_schedule_confirmed:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_confirmed
-    description:
-      Sk with the confirmed date.
+    - datalake_visit.visit_schedules.ts_schedule_confirmed
+    description: Sk with the confirmed date.
   sk_schedule_completed:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_completed
-    description:
-      Sk with the completed date.
+    - datalake_visit.visit_schedules.ts_schedule_completed
+    description: Sk with the completed date.
   sk_schedule_canceled:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_canceled
-    description:
-      Sk with the canceled date.
+    - datalake_visit.visit_schedules.ts_schedule_canceled
+    description: Sk with the canceled date.
   sk_schedule_unsuccessful:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_unsuccessful
-    description:
-      Sk with the unsuccessful date.
+    - datalake_visit.visit_schedules.ts_schedule_unsuccessful
+    description: Sk with the unsuccessful date.
   ts_schedule_created:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_created
-    description:
-      Timestamp of the creation date.
+    - datalake_visit.visit_schedules.ts_schedule_created
+    description: Timestamp of the creation date.
   ts_schedule_confirmed:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_confirmed
-    description:
-      Timestamp of the schedule confirmed.
+    - datalake_visit.visit_schedules.ts_schedule_confirmed
+    description: Timestamp of the schedule confirmed.
   ts_schedule_completed:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_completed
-    description:
-      Timestamp of the schedule completed.
+    - datalake_visit.visit_schedules.ts_schedule_completed
+    description: Timestamp of the schedule completed.
   ts_schedule_canceled:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_canceled
-    description:
-      Timestamp of the schedule canceled.
+    - datalake_visit.visit_schedules.ts_schedule_canceled
+    description: Timestamp of the schedule canceled.
   ts_schedule_unsuccessful:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_unsuccessful
-    description:
-      Timestamp of the unsuccessful schedule.
+    - datalake_visit.visit_schedules.ts_schedule_unsuccessful
+    description: Timestamp of the unsuccessful schedule.
   ts_schedule_rescheduled:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_rescheduled
-    description:
-      Timestamp of the reschedule.
+    - datalake_visit.visit_schedules.ts_schedule_rescheduled
+    description: Timestamp of the reschedule.
   ts_load:
-    description:
-      Timestamp of the load of the table.
+    description: Timestamp of the load of the table.

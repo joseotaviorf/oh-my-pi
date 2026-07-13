@@ -2,15 +2,13 @@ database_name: dw_visit
 table_name: dim_author_type
 description: This dimension table has the author type of the events on visits .
 domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
-  sk_author_type:
-    description: Id of the author type.
   author_type:
     description: Name of the author type. Helps in identifying whether the author id can be found in Main (EBDB) or in Person.
     categories:
-        USUARIO: The user type comes from Main/EBDB. User id joins with dw_public.dim_user
-        PERSON: The user type comes from Person.
+      USUARIO: The user type comes from Main/EBDB. User id joins with dw_public.dim_user
+      PERSON: The user type comes from Person.
   author_user_role:
     description: Name of the author role or 'Undefined'.
   on_behalf_of:

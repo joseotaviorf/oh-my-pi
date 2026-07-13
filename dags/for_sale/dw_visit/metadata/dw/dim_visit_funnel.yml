@@ -1,43 +1,42 @@
 database_name: dw_visit
 table_name: dim_visit_funnel
-description: This dimension table has events of visits funnel (offer submitted, offer accepted, contract signed).
-  Each row is id_visit + event_code + business_context.
+description: This dimension table has events of visits funnel (offer submitted, offer accepted, contract signed). Each row is id_visit + event_code + business_context.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_visit_funnel:
     lineage:
-      - dw_rent.fact_rent_demand_events.sk_visit
-      - dw_sale.fact_sale_demand_event.sk_visit
-      - dw_rent.dim_rent_event_type.abbreviation
-      - dw_sale.dim_sale_event_type.abbreviation
+    - dw_rent.fact_rent_demand_events.sk_visit
+    - dw_sale.fact_sale_demand_event.sk_visit
+    - dw_rent.dim_rent_event_type.abbreviation
+    - dw_sale.dim_sale_event_type.abbreviation
     description: ID of visits funnel dimension.
   sk_visit:
     lineage:
-      - dw_rent.fact_rent_demand_events.sk_visit
-      - dw_sale.fact_sale_demand_event.sk_visit
-    description: ID of visit.
+    - dw_rent.fact_rent_demand_events.sk_visit
+    - dw_sale.fact_sale_demand_event.sk_visit
+    description: Surrogate key identifying the consolidated visit entity in the warehouse model.
   event_code:
     lineage:
-      - dw_rent.dim_rent_event_type.abbreviation
-      - dw_sale.dim_sale_event_type.abbreviation
-    description: Code of event
+    - dw_rent.dim_rent_event_type.abbreviation
+    - dw_sale.dim_sale_event_type.abbreviation
+    description: Business attribute event code for dim visit funnel in the data warehouse layer of dw visit.
     categories:
       os: offer submitted.
       oa: offer accepted.
       cs: contract signed.
   business_context:
-    description: Business context of Visit.
+    description: Business line context distinguishing For Rent and For Sale visit flows.
     categories:
       RENT: When the visit is for rent.
       SALE: When the visit is for sale.
   ts_first_event:
     lineage:
-      - dw_rent.fact_rent_demand_events.ts_event
-      - dw_sale.fact_sale_demand_event.ts_event
+    - dw_rent.fact_rent_demand_events.ts_event
+    - dw_sale.fact_sale_demand_event.ts_event
     description: Timestamp of first event.
   ts_last_event:
     lineage:
-      - dw_rent.fact_rent_demand_events.ts_event
-      - dw_sale.fact_sale_demand_event.ts_event
+    - dw_rent.fact_rent_demand_events.ts_event
+    - dw_sale.fact_sale_demand_event.ts_event
     description: Timestamp of last event.

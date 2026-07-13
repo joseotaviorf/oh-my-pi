@@ -1,47 +1,44 @@
 database_name: dw_visit
 table_name: dim_visit_schedule
-description:
-  Information about Rent and Sale schedules (booking). Each schedule is part of a visit.
-  When an visit intention is rescheduled another id_schedule is generated for the same id_visit.
-  Each line is an unique schedule.
+description: Information about Rent and Sale schedules (booking). Each schedule is part of a visit. When an visit intention is rescheduled another id_schedule is generated for the same id_visit. Each line is an unique schedule.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_schedule:
     lineage:
-      - datalake_visit.visit_schedules.id_schedule
+    - datalake_visit.visit_schedules.id_schedule
     description: ID of schedule. Data since 2015.
   schedule_origin:
     lineage:
-      - datalake_visit.visit_schedules.schedule_origin
+    - datalake_visit.visit_schedules.schedule_origin
     description: If the start of this schedule is from a Request or a Reschedule. Data since 2015.
   channel_creation:
     lineage:
-      - datalake_visit.visit_schedules.channel_creation
+    - datalake_visit.visit_schedules.channel_creation
     description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2024-11.
   application_source_creation:
     lineage:
-      - datalake_visit.visit_schedules.application_source_creation
+    - datalake_visit.visit_schedules.application_source_creation
     description: Application source from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2025-10.
   source_creation_unified:
     lineage:
-      - datalake_visit.visit_schedules.source_creation_unified
+    - datalake_visit.visit_schedules.source_creation_unified
     description: Source of the schedule creation unified from channel and application source. Data since 2024-11.
   schedule_requested_user_role:
     lineage:
-      - datalake_visit.visit_schedules.user_role_creation
+    - datalake_visit.visit_schedules.user_role_creation
     description: Role of user who requested the schedule. Data since 2024-11.
   schedule_first_confirmed_channel:
     lineage:
-      - datalake_visit.visit_schedules.first_confirmed_channel
+    - datalake_visit.visit_schedules.first_confirmed_channel
     description: Channel from first confirmation of schedule. Data since 2024-11.
   schedule_first_confirmed_user_role:
     lineage:
-      - datalake_visit.visit_schedules.first_confirmed_user_role
+    - datalake_visit.visit_schedules.first_confirmed_user_role
     description: Role of user who is related to the first visit confirmation. Data since 2024-11.
   last_confirm_answer_supply:
     lineage:
-      - datalake_visit.visit_schedules.last_answer_supply
+    - datalake_visit.visit_schedules.last_answer_supply
     description: Last answer of confirmation on behalf of supply. Data since 2024-11.
     categories:
       ANSWER_CONFIRMED: Supply's answer is confirmed for scheduling.
@@ -49,7 +46,7 @@ columns:
       ANSWER_REJECTED: Supply's answer is rejected for scheduling.
   last_confirm_answer_demand:
     lineage:
-      - datalake_visit.visit_schedules.last_answer_demand
+    - datalake_visit.visit_schedules.last_answer_demand
     description: Last answer of confirmation on behalf of demand. Data since 2024-11.
     categories:
       ANSWER_CONFIRMED: Demand's answer is confirmed for scheduling.
@@ -57,7 +54,7 @@ columns:
       ANSWER_REJECTED: Demand's answer is rejected for scheduling.
   last_confirm_answer_agent:
     lineage:
-      - datalake_visit.visit_schedules.last_answer_agent
+    - datalake_visit.visit_schedules.last_answer_agent
     description: Last answer of confirmation on behalf of agent. Data since 2024-11.
     categories:
       ANSWER_CONFIRMED: Agent's answer is confirmed for scheduling.
@@ -65,7 +62,7 @@ columns:
       ANSWER_REJECTED: Agent's answer is rejected for scheduling.
   last_confirm_answer_tenant_living:
     lineage:
-      - datalake_visit.visit_schedules.last_answer_tenant_living
+    - datalake_visit.visit_schedules.last_answer_tenant_living
     description: Last answer of confirmation on behalf of tenant living. Data since 2024-11.
     categories:
       ANSWER_CONFIRMED: Tenant's answer is confirmed for scheduling.
@@ -73,97 +70,97 @@ columns:
       ANSWER_REJECTED: Tenant's answer is rejected for scheduling.
   channel_confirmed_supply:
     lineage:
-      - datalake_visit.visit_schedules.channel_confirmed_supply
+    - datalake_visit.visit_schedules.channel_confirmed_supply
     description: Channel from supply's confirmation of schedule. Data since 2024-11.
   channel_confirmed_demand:
     lineage:
-      - datalake_visit.visit_schedules.channel_confirmed_demand
+    - datalake_visit.visit_schedules.channel_confirmed_demand
     description: Channel from demand's confirmation of schedule. Data since 2024-11.
   channel_confirmed_agent:
     lineage:
-      - datalake_visit.visit_schedules.channel_confirmed_agent
+    - datalake_visit.visit_schedules.channel_confirmed_agent
     description: Channel from agent's confirmation of schedule. Data since 2024-11.
   channel_confirmed_tenant_living:
     lineage:
-      - datalake_visit.visit_schedules.channel_confirmed_tenant_living
+    - datalake_visit.visit_schedules.channel_confirmed_tenant_living
     description: Channel from tenant's confirmation of schedule. Data since 2024-11.
   is_schedule_confirmed_by_supply:
     lineage:
-      - datalake_visit.visit_schedules.is_confirmed_by_supply
+    - datalake_visit.visit_schedules.is_confirmed_by_supply
     description: TRUE if the schedule is confirmed by supply. Data since 2024-11.
   is_schedule_confirmed_by_demand:
     lineage:
-      - datalake_visit.visit_schedules.is_confirmed_by_demand
+    - datalake_visit.visit_schedules.is_confirmed_by_demand
     description: TRUE if the schedule is confirmed by demand. Data since 2024-11.
   is_schedule_confirmed_by_agent:
     lineage:
-      - datalake_visit.visit_schedules.is_confirmed_by_agent
+    - datalake_visit.visit_schedules.is_confirmed_by_agent
     description: TRUE if the schedule is confirmed by agent. Data since 2024-11.
   is_schedule_confirmed_by_tenant_living:
     lineage:
-      - datalake_visit.visit_schedules.is_confirmed_by_tenant_living
+    - datalake_visit.visit_schedules.is_confirmed_by_tenant_living
     description: TRUE if the schedule is confirmed by tenant living. Data since 2024-11.
   is_last_schedule:
     lineage:
-      - datalake_visit.visit_schedules.id_succeed_schedule
+    - datalake_visit.visit_schedules.id_succeed_schedule
     description: TRUE when is the last schedule of visit. Data since 2015.
   is_first_schedule:
     lineage:
-      - datalake_visit.visit_schedules.schedule_origin
+    - datalake_visit.visit_schedules.schedule_origin
     description: TRUE when is the first schedule of visit. Data since 2015.
   is_schedule_confirmed:
     lineage:
-      - datalake_visit.visit_schedules.is_confirmed
+    - datalake_visit.visit_schedules.is_confirmed
     description: If the schedule was confirmed by all. Data since 2015.
   is_schedule_completed:
     lineage:
-      - datalake_visit.visit_schedules.is_completed
+    - datalake_visit.visit_schedules.is_completed
     description: If the schedule is completed. Data since 2015.
   is_schedule_rescheduled:
     lineage:
-      - datalake_visit.visit_schedules.is_rescheduled
+    - datalake_visit.visit_schedules.is_rescheduled
     description: If the schedule is a reschedule. Data since 2015.
   is_schedule_canceled:
     lineage:
-      - datalake_visit.visit_schedules.is_canceled
+    - datalake_visit.visit_schedules.is_canceled
     description: If the schedule is canceled. Data since 2015.
   is_schedule_unsuccessful:
     lineage:
-      - datalake_visit.visit_schedules.is_unsuccessful
+    - datalake_visit.visit_schedules.is_unsuccessful
     description: If the schedule return unsuccessful. Data since 2015.
   ts_schedule_created:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_created
+    - datalake_visit.visit_schedules.ts_schedule_created
     description: Timestamp of the creation of the schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2015.
   ts_next_schedule_created:
     lineage:
-      - datalake_visit.visit_schedules.ts_next_schedule_created
+    - datalake_visit.visit_schedules.ts_next_schedule_created
     description: Timestamp of the next schedule creation. Data since 2015.
   ts_schedule_requested:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_requested (VISIT_REQUESTED).
+    - datalake_visit.visit_schedules.ts_schedule_requested (VISIT_REQUESTED).
     description: Timestamp of the request event. Data since 2015.
   ts_schedule_rescheduled:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_rescheduled (VISIT_RESCHEDULED).
+    - datalake_visit.visit_schedules.ts_schedule_rescheduled (VISIT_RESCHEDULED).
     description: Timestamp of the reschedule event. Data since 2015.
   ts_schedule_confirmed:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_confirmed
+    - datalake_visit.visit_schedules.ts_schedule_confirmed
     description: Timestamp of the confirmation event. Data since 2015.
   ts_schedule_completed:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_completed
+    - datalake_visit.visit_schedules.ts_schedule_completed
     description: Timestamp of the completed event (VISIT_DONE). Data since 2015.
   ts_schedule_unsuccessful:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_unsuccessful
+    - datalake_visit.visit_schedules.ts_schedule_unsuccessful
     description: Timestamp with the unsuccessful event (VISIT_UNSUCCESSFUL). Data since 2015.
   ts_schedule_canceled:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_canceled
+    - datalake_visit.visit_schedules.ts_schedule_canceled
     description: Timestamp of the canceled event (VISIT_REQUEST_CANCELED or VISIT_REQUEST_CANCELED). Data since 2015.
   ts_schedule_visit:
     lineage:
-      - datalake_visit.visit_schedules.ts_schedule_visit
+    - datalake_visit.visit_schedules.ts_schedule_visit
     description: Timestamp when the visit was scheduled for each id_schedule (UTC). Data since 2015.
