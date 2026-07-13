@@ -1,13 +1,9 @@
 database_name: datalake_semrush
 table_name: keyword_attributes
-owner: erica.bertan@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
-  Keywords enriched with comprehensive semantic, regional, and structural attributes computed from
-  `keyword_region_attributes`. Includes inferred city and neighborhood matches, URL structure
-  classification, plus extensive boolean indicators for location, product, intent, and content
-  categories. This table provides detailed keyword analysis for SEO strategy and competitive
-  intelligence across real estate platforms.
+  Enriched SEMrush competitive keyword data (keyword_attributes) for Growth SEO intelligence. Partitioned by year and month.
 columns:
   id_region_match_operation_city:
     description: "Identifier for the city-level region match rule that produced the city match."

@@ -1,11 +1,9 @@
 database_name: datalake_semrush
 table_name: keyword_region_attributes
-owner: erica.bertan@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
-  Keywords enriched with regional attributes derived from SEMrush exports and
-  internal region-matching logic. Includes inferred city and neighborhood
-  matches, and boolean indicators for location mentions.
+  Enriched SEMrush competitive keyword data (keyword_region_attributes) for Growth SEO intelligence. Partitioned by year and month.
 columns:
   id_region_match_operation_city:
     description: "Identifier for the city-level region match rule that produced the city match."

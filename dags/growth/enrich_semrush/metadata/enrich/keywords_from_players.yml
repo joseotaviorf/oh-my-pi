@@ -1,12 +1,9 @@
 database_name: datalake_semrush
 table_name: keywords_from_players
-owner: erica.bertan@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: |
-  Table of SEO keywords and SERP features consolidated from multiple real-estate competitors (SEMrush exports).
-  All fields are derived from specific organic_search_kw tables in datalake_semrush_clean for 22 different players. Accents are normalized,
-  intents and SERP features are mapped to human-readable labels in lower case. Includes comprehensive car-related keyword filtering
-  for chavesnamao player (excluding automotive brands, models, and related terms) and golden set keyword identification.
+  Enriched SEMrush competitive keyword data (keywords_from_players) for Growth SEO intelligence. Partitioned by year and month.
 columns:
   player:
     description: "Source competitor/classified site from which the keyword ranking was extracted. Note: chavesnamao player data includes comprehensive car-related keyword filtering to exclude automotive content."
