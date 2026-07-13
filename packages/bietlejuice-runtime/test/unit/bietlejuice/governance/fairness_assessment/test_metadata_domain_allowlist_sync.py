@@ -1,6 +1,14 @@
-"""Interim drift guard: Yamale domain regex must match runtime F2-01 allowlist.
+"""Runtime-side guard for the metadata domain allowlist.
 
-Replaced by SSOT CI once metadata_domain_allowlist.yml lands (follow-up PR).
+Single source of truth is ``bietlejuice/governance/domains.yml`` (bietlejuice-core),
+read via :mod:`bietlejuice.governance.domain_registry`. This test proves, on the
+runtime side, that:
+
+1. F2-01's ``constants.py`` re-exports the loader (no hardcoded pattern drift), and
+2. the generated Yamale schemas match the same loader pattern.
+
+The Yamale drift is also gated in CI by ``make validate-domain-allowlist-sync``;
+this keeps a fast runtime-import check close to the F2-01 consumer.
 """
 
 from __future__ import annotations
@@ -10,6 +18,7 @@ from pathlib import Path
 
 import pytest
 
+from bietlejuice.governance.domain_registry import domain_allowlist_pattern
 from bietlejuice.governance.fairness_assessment.constants import (
     METADATA_DOMAIN_CI_ALLOWLIST_PATTERN,
 )
@@ -36,11 +45,12 @@ def _domain_pattern_from_schema(path: Path) -> str:
     raise AssertionError(f"No domain regex line in {path}")
 
 
+def test_constants_reexport_loader_pattern() -> None:
+    assert METADATA_DOMAIN_CI_ALLOWLIST_PATTERN == domain_allowlist_pattern()
+
+
 @pytest.mark.parametrize("schema_file", _SCHEMA_FILES)
-def test_yamale_domain_regex_matches_runtime_allowlist(schema_file: str) -> None:
-    # Arrange
+def test_yamale_domain_regex_matches_loader(schema_file: str) -> None:
     schema_path = _SCHEMA_DIR / schema_file
-    # Act
     yamale_pattern = _domain_pattern_from_schema(schema_path)
-    # Assert
-    assert yamale_pattern == METADATA_DOMAIN_CI_ALLOWLIST_PATTERN, schema_file
+    assert yamale_pattern == domain_allowlist_pattern(), schema_file

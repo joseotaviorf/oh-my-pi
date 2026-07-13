@@ -866,6 +866,22 @@ validate-metadata-files-content:
 	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_metadata_files_content.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
+.PHONY: sync-domain-allowlist
+sync-domain-allowlist:
+	@echo ""
+	@echo "Syncing the metadata domain allowlist (domains.yml) into the Yamale schemas"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/sync_domain_allowlist.py
+
+.PHONY: validate-domain-allowlist-sync
+validate-domain-allowlist-sync:
+	@echo ""
+	@echo "Checking the Yamale schemas are in sync with the metadata domain allowlist"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/sync_domain_allowlist.py --check
+
 .PHONY: validate-pii-privacy
 validate-pii-privacy:
 	@echo ""

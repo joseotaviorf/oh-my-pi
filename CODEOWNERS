@@ -17,6 +17,11 @@ dags/support_and_service/**                                             @luisaro
 packages/**                                                             @quintoandar/data-ingestion-code-owners @quintoandar/data-ingestion-code-owners
 packages/bietlejuice-runtime/**/governance/**                             @quintoandar/data-ops-governance @quintoandar/data-ingestion-code-owners
 governance/**                                                           @quintoandar/data-ops-governance @quintoandar/data-ingestion-code-owners
+# Domain allowlist single source of truth + its generation chain.
+# Data Governance must approve any change to the authoritative domain list.
+packages/bietlejuice-core/src/bietlejuice/governance/domains.yml        @quintoandar/data-governance
+packages/bietlejuice-core/src/bietlejuice/governance/domain_registry.py @quintoandar/data-governance
+packages/bietlejuice-compiler/scripts/governance_metadata_validation/sync_domain_allowlist.py @quintoandar/data-governance
 packages/bietlejuice-runtime/src/bietlejuice/base/sst/**                @luisarodriguees @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
 packages/bietlejuice-runtime/test/unit/base/sst/**                      @luisarodriguees @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
 packages/bietlejuice-airflow/src/bietlejuice/base/sst/**                @luisarodriguees @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners

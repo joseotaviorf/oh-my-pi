@@ -1,0 +1,34 @@
+# Single source of truth for the metadata `domain:` allowlist (FAIR F2-01 + Yamale CI).
+#
+# Read through bietlejuice.governance.domain_registry — consumers depend on the
+# loader, never on this file's format. Swapping the source later (e.g. to the
+# data-contracts domain files) is contained behind that loader.
+#
+# IMPORTANT: `metadata_domains` order is PRESERVED into the generated Yamale regex
+# and must stay byte-identical to the historical pattern. Do not reorder casually;
+# append new domains at the position the sync expects (see test_domain_registry).
+version: 1
+
+metadata_domains:
+  - Agents
+  - Cross
+  - Data Ops & Governance
+  - Data Life Cycle
+  - Fintech
+  - For Rent
+  - For Sale
+  - Growth
+  - International
+  - Journey Optimizer
+  - MLOps
+  - People
+  - QCX
+  - Rede
+  - Support and Services
+  - Tech Platform
+  - Data Platform
+  - Conversational XP
+  - DS Pricing
+  - Atlas DB
+  - Broker XP
+  - House and Listing

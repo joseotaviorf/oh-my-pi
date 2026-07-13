@@ -170,6 +170,27 @@ steps:
         path: *metadata_files_content_path
     depends_on: [setup]
 
+  validate-domain-allowlist-sync:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make validate-domain-allowlist-sync
+    when:
+      - event: pull_request
+        branch:
+          exclude: [forno, hotfix/*]
+        path: &domain_allowlist_sync_path
+          include:
+            - "packages/bietlejuice-core/src/bietlejuice/governance/domains.yml"
+            - "packages/bietlejuice-core/src/bietlejuice/governance/domain_registry.py"
+            - "packages/bietlejuice-compiler/scripts/services/metadata_file_schemas/**"
+            - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/sync_domain_allowlist.py"
+          on_empty: false
+      - event: push
+        branch: [master, forno]
+        path: *domain_allowlist_sync_path
+    depends_on: [setup]
+
   validate-metadata-files-exist:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true

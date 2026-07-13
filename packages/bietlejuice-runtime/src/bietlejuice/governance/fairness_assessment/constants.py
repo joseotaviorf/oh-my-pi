@@ -5,6 +5,11 @@ from __future__ import annotations
 import re
 from typing import Final, FrozenSet
 
+from bietlejuice.governance.domain_registry import (
+    domain_allowlist_pattern,
+    domain_allowlist_regex,
+)
+
 # ---------------------------------------------------------------------------
 # Spark job: lake table FQNs (driver)
 # ---------------------------------------------------------------------------
@@ -34,17 +39,15 @@ DOCUMENTED_NOT_IN_PHYSICAL_REASON = "documented_not_in_physical"
 # ---------------------------------------------------------------------------
 # Metadata YAML: ``domain`` (CI Yamale + F2-01)
 # ---------------------------------------------------------------------------
-# Must stay identical to the alternation inside ``domain: regex('...')`` in
-# ``packages/bietlejuice-compiler/scripts/services/metadata_file_schemas/*_schema.yml``.
-# Includes ``Data Platform`` (core-layer metadata) in addition to the governance allowlist.
+# Single source of truth: ``bietlejuice/governance/domains.yml`` (bietlejuice-core),
+# read through :mod:`bietlejuice.governance.domain_registry`. The Yamale schemas'
+# ``domain: regex('...')`` line is generated from the same loader (see
+# ``make sync-domain-allowlist``), so both stay in lockstep automatically.
+# These names are kept for backward compatibility with F2-01 and downstream reports.
 # F2-01 uses :func:`re.fullmatch` on the trimmed value; empty domain skips regex (``domain_missing`` only).
 
-METADATA_DOMAIN_CI_ALLOWLIST_PATTERN: Final[str] = (
-    "Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|"
-    "Growth|International|Journey Optimizer|MLOps|People|QCX|Rede|Support and Services|Tech Platform|Data Platform|"
-    "Conversational XP|DS Pricing|Atlas DB|Broker XP|House and Listing"
-)
-METADATA_DOMAIN_CI_ALLOWLIST_RE = re.compile(METADATA_DOMAIN_CI_ALLOWLIST_PATTERN)
+METADATA_DOMAIN_CI_ALLOWLIST_PATTERN: Final[str] = domain_allowlist_pattern()
+METADATA_DOMAIN_CI_ALLOWLIST_RE = domain_allowlist_regex()
 
 # ---------------------------------------------------------------------------
 # Table / column description quality (TDQ) heuristics
