@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: installment_status
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: This table contains information about the installment status.
+description: One row per installment status in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -12,11 +12,11 @@ columns:
   id_installment:
     lineage:
       - datalake_lending_raw.installment_status.installment_id
-    description: ID of the installment.
+    description: Identifier for the installment referenced by this financial record.
   status:
     lineage:
       - datalake_lending_raw.installment_status.status
-    description: Status of the installment.
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   ts_created:
     lineage:
       - datalake_lending_raw.installment_status.created_at

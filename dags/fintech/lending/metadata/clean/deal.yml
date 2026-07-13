@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: deal
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: This table contains information about the deal.
+description: One row per deal in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -12,7 +12,7 @@ columns:
   id_offer_cohort:
     lineage:
       - datalake_lending_raw.deal.offer_cohort_id
-    description: ID of the offer cohort.
+    description: Identifier for the offer cohort referenced by this financial record.
   id_offer_term:
     lineage:
       - datalake_lending_raw.deal.offer_term_id
@@ -20,23 +20,23 @@ columns:
   id_product:
     lineage:
       - datalake_lending_raw.deal.product_id
-    description: ID of the product.
+    description: Identifier for the product referenced by this financial record.
   id_external:
     lineage:
       - datalake_lending_raw.deal.external_id
-    description: External ID of the deal.
+    description: Identifier for the external referenced by this financial record.
   uuid:
     lineage:
       - datalake_lending_raw.deal.uuid
-    description: UUID of the deal.
+    description: Financial attribute representing uuid on the deal dataset.
   uuid_person:
     lineage:
       - datalake_lending_raw.deal.person_uuid
-    description: UUID of the person.
+    description: Financial attribute representing uuid person on the deal dataset.
   value:
     lineage:
       - datalake_lending_raw.deal.value
-    description: Value of the deal.
+    description: Financial attribute representing value on the deal dataset.
   credit_note_number:
     lineage:
       - datalake_lending_raw.deal.credit_note_number

@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: offer_cohort
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: This table contains information about the offer cohort.
+description: One row per offer cohort in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -12,23 +12,23 @@ columns:
   id_product:
     lineage:
       - datalake_lending_raw.offer_cohort.product_id
-    description: ID of the product.
+    description: Identifier for the product referenced by this financial record.
   id_offer_term_sheet:
     lineage:
       - datalake_lending_raw.offer_cohort.offer_term_sheet_id
-    description: ID of the offer term sheet associated to the cohort.
+    description: Identifier for the offer term sheet referenced by this financial record.
   name:
     lineage:
       - datalake_lending_raw.offer_cohort.name
-    description: Name of the offer cohort.
+    description: Financial attribute representing name on the offer_cohort dataset.
   status:
     lineage:
       - datalake_lending_raw.offer_cohort.status
-    description: Status of the offer cohort.
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   customizations:
     lineage:
       - datalake_lending_raw.offer_cohort.customizations
-    description: Customizations of the offer cohort.
+    description: Financial attribute representing customizations on the offer_cohort dataset.
   dt_started:
     lineage:
       - datalake_lending_raw.offer_cohort.start_date

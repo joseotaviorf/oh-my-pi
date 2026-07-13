@@ -1,130 +1,176 @@
 database_name: datalake_iaf_clean
 table_name: titles
+description: One row per titles in the Fintech clean layer, sourced from
+  datalake_iaf_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.id
+    description: Financial attribute representing id on the titles dataset.
   id_company:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.idempresa
+    description: Identifier for the company referenced by this financial record.
   id_creditor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.idcredor
+    description: Identifier for the creditor referenced by this financial record.
   id_debtor:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.iddevedor
+    description: Identifier for the debtor referenced by this financial record.
   process:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.processo
+    description: Financial attribute representing process on the titles dataset.
   value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.valor
+    description: Financial attribute representing value on the titles dataset.
   status:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   obs:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.obs
+    description: Financial attribute representing obs on the titles dataset.
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.data_cad
+    description: Calendar date associated with cad in the financial workflow.
   ts_updated:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.last_update
+    description: Timestamp when updated occurred in the upstream fintech system.
   id_old_title:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.idtitulo_old
+    description: Identifier for the old title referenced by this financial record.
   user_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.usuario_cad
+    description: Financial attribute representing user cad on the titles dataset.
   user_type:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.usuario_tipo
+    description: Financial attribute representing user type on the titles dataset.
   title_number:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.ntitulo
+    description: Financial attribute representing title number on the titles dataset.
   installment:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.parcela
+    description: Financial attribute representing installment on the titles dataset.
   type:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.especie
+    description: Financial attribute representing type on the titles dataset.
   protest:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.protesto
+    description: Financial attribute representing protest on the titles dataset.
   imp_code:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.codimp
+    description: Financial attribute representing imp code on the titles dataset.
   status_bkp:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.status_bkp
+    description: Financial attribute representing status bkp on the titles dataset.
   currency:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.moeda
+    description: ISO currency code for the monetary amount, typically BRL.
   old_value:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.valor_old
+    description: Financial attribute representing old value on the titles dataset.
   info_1:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.info1
+    description: Financial attribute representing info 1 on the titles dataset.
   info_2:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.info2
+    description: Financial attribute representing info 2 on the titles dataset.
   info_3:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.info3
+    description: Financial attribute representing info 3 on the titles dataset.
   cod_dev_get:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.cod_dev_get
+    description: Financial attribute representing cod dev get on the titles dataset.
   field_1:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo1
+    description: Financial attribute representing field 1 on the titles dataset.
   field_2:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo2
+    description: Financial attribute representing field 2 on the titles dataset.
   field_3:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo3
+    description: Financial attribute representing field 3 on the titles dataset.
   field_4:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo4
+    description: Financial attribute representing field 4 on the titles dataset.
   field_5:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo5
+    description: Financial attribute representing field 5 on the titles dataset.
   field_6:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo6
+    description: Financial attribute representing field 6 on the titles dataset.
   field_7:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo7
+    description: Financial attribute representing field 7 on the titles dataset.
   field_8:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo8
+    description: Financial attribute representing field 8 on the titles dataset.
   field_9:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo9
+    description: Financial attribute representing field 9 on the titles dataset.
   field_10:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.campo10
+    description: Financial attribute representing field 10 on the titles dataset.
   dt_write_off:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.data_baixa
+    description: Calendar date associated with write off in the financial workflow.
   dt_rem:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.data_rem
+    description: Calendar date associated with rem in the financial workflow.
   dt_doc:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.data_doc
+    description: Calendar date associated with doc in the financial workflow.
   dt_quit:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.data_quit
+    description: Calendar date associated with quit in the financial workflow.
   dt_dev:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.data_dev
+    description: Calendar date associated with dev in the financial workflow.
   dt_due:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.vencimento
+    description: Calendar date associated with due in the financial workflow.
   dt_update:
     lineage:
       - datalake_iaf_raw.vi_319_tb_titulos.data_atualiza
+    description: Calendar date associated with update in the financial workflow.

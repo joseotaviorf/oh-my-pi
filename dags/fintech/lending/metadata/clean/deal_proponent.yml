@@ -16,7 +16,7 @@ columns:
   uuid_person:
     lineage:
       - datalake_lending_raw.deal_proponent.person_uuid
-    description: UUID of the person (proponent).
+    description: Financial attribute representing uuid person on the deal_proponent dataset.
   id_user:
     lineage:
       - datalake_lending_raw.deal_proponent.user_id
@@ -56,11 +56,11 @@ columns:
   city:
     lineage:
       - datalake_lending_raw.deal_proponent.city
-    description: City of the address.
+    description: Financial attribute representing city on the deal_proponent dataset.
   state:
     lineage:
       - datalake_lending_raw.deal_proponent.state
-    description: State of the address.
+    description: Financial attribute representing state on the deal_proponent dataset.
   cep:
     lineage:
       - datalake_lending_raw.deal_proponent.cep

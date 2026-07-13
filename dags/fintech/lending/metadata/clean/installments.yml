@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: installments
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: This table contains information about the installments.
+description: One row per installments in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -12,31 +12,31 @@ columns:
   id_deal:
     lineage:
       - datalake_lending_raw.installments.deal_id
-    description: ID of the deal.
+    description: Identifier for the deal referenced by this financial record.
   id_installment:
     lineage:
       - datalake_lending_raw.installments.installment_id
-    description: ID of the installment.
+    description: Identifier for the installment referenced by this financial record.
   id_original_installment:
     lineage:
       - datalake_lending_raw.installments.original_installment_id
-    description: Original installment ID of the installment.
+    description: Identifier for the original installment referenced by this financial record.
   installment_number:
     lineage:
       - datalake_lending_raw.installments.installment_number
-    description: Installment number of the installment.
+    description: Financial attribute representing installment number on the installments dataset.
   installment_principal_amount:
     lineage:
       - datalake_lending_raw.installments.installment_principal_amount
-    description: Installment principal amount of the installment.
+    description: Financial attribute representing installment principal amount on the installments dataset.
   installment_interest_amount:
     lineage:
       - datalake_lending_raw.installments.installment_interest_amount
-    description: Installment interest amount of the installment.
+    description: Financial attribute representing installment interest amount on the installments dataset.
   installment_amount:
     lineage:
       - datalake_lending_raw.installments.installment_amount
-    description: Installment amount of the installment.
+    description: Financial attribute representing installment amount on the installments dataset.
   additional_late_fine:
     lineage:
       - datalake_lending_raw.installments.additional_late_fine
@@ -64,15 +64,15 @@ columns:
   installment_negotiated_amount:
     lineage:
       - datalake_lending_raw.installments.installment_negotiated_amount
-    description: Installment negotiated amount of the installment.
+    description: Financial attribute representing installment negotiated amount on the installments dataset.
   installment_paid_amount:
     lineage:
       - datalake_lending_raw.installments.installment_paid_amount
-    description: Installment paid amount of the installment.
+    description: Financial attribute representing installment paid amount on the installments dataset.
   installment_original_principal_amount:
     lineage:
       - datalake_lending_raw.installments.installment_original_principal_amount
-    description: Original installment principal amount of the installment.
+    description: Financial attribute representing installment original principal amount on the installments dataset.
   chargeable_amount:
     lineage:
       - datalake_lending_raw.installments.chargeable_amount

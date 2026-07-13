@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: deal_collateral
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: This table contains information about the deal collateral.
+description: One row per deal collateral in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -12,15 +12,15 @@ columns:
   id_deal:
     lineage:
       - datalake_lending_raw.deal_collateral.deal_id
-    description: ID of the deal.
+    description: Identifier for the deal referenced by this financial record.
   id_external:
     lineage:
       - datalake_lending_raw.deal_collateral.external_id
-    description: External ID of the deal collateral.
+    description: Identifier for the external referenced by this financial record.
   value:
     lineage:
       - datalake_lending_raw.deal_collateral.value
-    description: Value of the deal collateral.
+    description: Financial attribute representing value on the deal_collateral dataset.
   dt_effective:
     lineage:
       - datalake_lending_raw.deal_collateral.effective_date
