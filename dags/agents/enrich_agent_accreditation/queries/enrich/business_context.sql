@@ -1,5 +1,5 @@
 WITH agent_updated AS (
-    SELECT
+    SELECT DISTINCT
         a.id AS id_agent
     FROM
         datalake_ebdb_clean.agent AS a
@@ -7,12 +7,15 @@ WITH agent_updated AS (
         DATE(a.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 agent_data_updated AS (
-    SELECT
-        ad.id_agent_data
+    SELECT DISTINCT
+        aud.id_agent_data
     FROM
-        datalake_ebdb_clean.agent_data_business_contexts_served AS ad
+        datalake_ebdb_user.user_revision_entity AS u
+    JOIN
+        datalake_ebdb_clean.agent_data_business_contexts_served_aud AS aud
+            ON u.id = aud.rev
     WHERE
-        DATE(ad.ts_cdc_transactional) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        DATE(u.ts_revision) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 agent_external_reference AS (
     SELECT
