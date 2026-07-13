@@ -1,7 +1,7 @@
 ---
 database_name: dw_sap_accounting_process
 table_name: fact_sap_accounting_process
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "This table reunite all sap accounting process enrich models to unify accounting analysis"
 columns:

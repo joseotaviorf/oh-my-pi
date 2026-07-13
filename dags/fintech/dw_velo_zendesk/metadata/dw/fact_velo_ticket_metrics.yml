@@ -1,8 +1,12 @@
 database_name: dw_velo
 table_name: fact_velo_ticket_metrics
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table containing zendesk tickets metrics"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table containing zendesk tickets metrics
 columns:
   sk_ticket:
     description: "Ticket identification number (ID)"
@@ -36,18 +40,6 @@ columns:
     description: "Via in which the ticket was opened (web, whatsapp, mobile, etc.)"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.ticket_via
-  ticket_status:
-    description: "Ticket status"
-    categories:
-      new: when the ticket is created.
-      open: when the ticket was assigned to an analyst.
-      pending: when a response from the user is pending.
-      hold: when on hold (rarely used).
-      deleted: when it was deleted by the analyst.
-      solved: when the analyst marks the ticket as resolved (in this status it is possible to reopen it if necessary).
-      closed: when the ticket has been closed (after going through the resolved status), when this happens, it is not possible to reopen it.
-    lineage:
-      - datalake_velo_zendesk.ticket_metrics.status
   group_stations:
     description: "Number of group stations"
     lineage:
@@ -246,3 +238,9 @@ columns:
     description: "Date when the third contact by whatsapp from the claims team was made"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.dt_third_whatsapp
+  ticket_order:
+    description: Velo platform attribute describing ticket order for condominium billing reconciliation.
+    lineage: []
+  status:
+    description: Current lifecycle status of the financial entity in the upstream operational system.
+    lineage: []

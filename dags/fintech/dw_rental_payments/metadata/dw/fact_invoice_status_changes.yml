@@ -1,6 +1,6 @@
 database_name: dw_rental_payments
 table_name: fact_invoice_status_changes
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "This table materializes the temporal monthly evolution of a given status of an invoice and the financial value of that status"
 columns:
@@ -31,7 +31,7 @@ columns:
       - datalake_retsuko.invoice.ts_paid
       - datalake_retsuko.invoice.ts_canceled
   invoice_due_amount:
-    description: Invoice due amount
+    description: Financial attribute representing invoice due amount on the fact_invoice_status_changes dataset.
     lineage:
       - datalake_retsuko.invoice.due_amount
   dt_cohort:

@@ -1,8 +1,12 @@
 database_name: dw_velo
 table_name: fact_velo_ticket_history
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table containing zendesk tickets historical information"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table containing zendesk tickets historical information
 columns:
   sk_ticket:
     description: "Ticket identification number (ID)"
@@ -45,11 +49,11 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.rejection_reason
   broker_name:
-    description: "Broker name"
+    description: Velo platform attribute describing broker name for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk.ticket_details.broker_name
   contact_reason:
-    description: "Main reason of contact"
+    description: Velo platform attribute describing contact reason for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk.ticket_details.contact_reason
   tenant_name:
@@ -115,7 +119,7 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.description
   ticket_url:
-    description: "Ticket URL"
+    description: Velo platform attribute describing ticket url for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk.ticket_details.url_ticket
   tags:
@@ -183,7 +187,7 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.request_channel
   exception_type:
-    description: "Exception type"
+    description: Velo platform attribute describing exception type for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk.ticket_details.exception_type
   payment_period:

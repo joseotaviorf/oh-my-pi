@@ -1,22 +1,18 @@
 ---
 database_name: datalake_agreement_hourly
 table_name: negotiation
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Table updated hourly with Trato Feito negotiation data.
 columns:
   id_negotiation:
-    description: "Negotiation ID"
+    description: Identifier for the negotiation referenced by this financial record.
     lineage:
       - datalake_trato_feito_hourly_clean.installment.id_negotiation
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_trato_feito_hourly_clean.negotiation.id_debtor_external
-  agency:
-    description: "Agency/consultancy/advisory that created the negotiation"
-    lineage:
-      - datalake_trato_feito_hourly_clean.negotiation.consultancy
   down_payment_amount:
     description: "First installment total amount"
     lineage:
@@ -33,15 +29,33 @@ columns:
     description: "Payment date of the first installment."
     lineage:
       - datalake_trato_feito_hourly_clean.installment.dt_paid
-  dt_data_updated:
-    description: "Reference date of the data."
-    lineage:
-      - datalake_trato_feito_hourly_clean.negotiation.year
-      - datalake_trato_feito_hourly_clean.negotiation.month
-      - datalake_trato_feito_hourly_clean.negotiation.day
   ts_negotiation_creation:
-    description: ""
+    description: Timestamp when negotiation creation occurred in the upstream fintech system.
     lineage:
       - datalake_trato_feito_hourly_clean.negotiation.ts_created
   ts_load:
     description: "Timestamp when this table was updated"
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  id_agency:
+    description: Identifier for the agency referenced by this financial record.
+    lineage: []
+  negotiation_status:
+    description: Financial attribute representing negotiation status on the negotiation dataset.
+    lineage: []
+  creditor:
+    description: Financial attribute representing creditor on the negotiation dataset.
+    lineage: []
+  down_payment_paid_amount:
+    description: Financial attribute representing down payment paid amount on the negotiation dataset.
+    lineage: []
+  id_negotiation_external:
+    description: Identifier for the negotiation external referenced by this financial record.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []

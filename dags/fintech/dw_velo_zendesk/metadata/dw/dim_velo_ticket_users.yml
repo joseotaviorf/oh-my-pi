@@ -1,31 +1,27 @@
 database_name: dw_velo
 table_name: dim_velo_ticket_users
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table containing zendesk users data"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table containing zendesk users data
 columns:
   sk_ticket_user:
     description: "Zendesk user identification number (different from rgp users)"
     lineage:
       - datalake_velo_zendesk_clean.users.id_user
-  sk_organization:
-    description: "Zendesk user organization identification number"
-    lineage:
-      - datalake_velo_zendesk_clean.users.id_organization
-  sk_default_group:
-    description: "Zendesk user default group identification number (the group names are described on datalake_velo_zendesk_clean.groups)"
-    lineage:
-      - datalake_velo_zendesk_clean.users.id_default_group
   url_user:
     description: "Zendesk user URL profile"
     lineage:
       - datalake_velo_zendesk_clean.users.url_user
   user_name:
-    description: "Zendesk user name"
+    description: Velo platform attribute describing user name for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_clean.users.name
   user_email:
-    description: "Zendesk user email"
+    description: Velo platform attribute describing user email for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_clean.users.email
   user_phone:
@@ -92,3 +88,9 @@ columns:
     description: "Timestamp when the register was loaded"
     lineage:
       - datalake_velo_zendesk_clean.users.ts_load
+  default_group:
+    description: Velo platform attribute describing default group for condominium billing reconciliation.
+    lineage: []
+  organization:
+    description: Velo platform attribute describing organization for condominium billing reconciliation.
+    lineage: []

@@ -1,6 +1,7 @@
 database_name: datalake_ai_collections_quintoandar
 table_name: matthew_mcp_observations
-description: One row per Langfuse session aggregating all MCP tool activity and derived
+description:
+  One row per Langfuse session aggregating all MCP tool activity and derived
   business signals for Matthew V3 agent conversations. Sourced from
   datalake_ai_collections_quintoandar.mcp_tool_logs joined to datalake_langfuse_clean.traces
   for session linkage. Covers tool invocation counts, financial context signals,
@@ -16,12 +17,14 @@ columns:
   id_user:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_user
-    description: QuintoAndar user legacy identifier from the MCP tool invocations in the
+    description:
+      QuintoAndar user legacy identifier from the MCP tool invocations in the
       session; aggregated as MAX over all rows.
   uuid_person_mcp:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.uuid_person_mcp
-    description: Person UUID from auth on the MCP tool invocation rows in the session;
+    description:
+      Person UUID from auth on the MCP tool invocation rows in the session;
       aggregated as MAX over all rows.
   n_financial_context_calls:
     lineage:
@@ -33,7 +36,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct get_financial_context_v1 MCP requests with a non-2xx
+    description:
+      Count of distinct get_financial_context_v1 MCP requests with a non-2xx
       HTTP status in the session.
   n_debt_breakdown_calls:
     lineage:
@@ -45,7 +49,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct get_debt_breakdown_v1 MCP requests with a non-2xx
+    description:
+      Count of distinct get_debt_breakdown_v1 MCP requests with a non-2xx
       HTTP status in the session.
   n_negotiation_options_calls:
     lineage:
@@ -57,7 +62,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct get_negotiation_options_v1 MCP requests with a non-2xx
+    description:
+      Count of distinct get_negotiation_options_v1 MCP requests with a non-2xx
       HTTP status in the session.
   n_simulate_negotiation_calls:
     lineage:
@@ -69,7 +75,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct simulate_negotiation_v1 MCP requests with a non-2xx
+    description:
+      Count of distinct simulate_negotiation_v1 MCP requests with a non-2xx
       HTTP status in the session.
   n_create_negotiation_calls:
     lineage:
@@ -81,20 +88,23 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct create_negotiation_v1 MCP requests with a non-2xx
+    description:
+      Count of distinct create_negotiation_v1 MCP requests with a non-2xx
       HTTP status in the session.
   n_ongoing_negotiation_calls:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
-    description: Count of distinct get_ongoing_negotiation_information_v1 MCP requests
+    description:
+      Count of distinct get_ongoing_negotiation_information_v1 MCP requests
       in the session.
   n_ongoing_negotiation_errors:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct get_ongoing_negotiation_information_v1 MCP requests
+    description:
+      Count of distinct get_ongoing_negotiation_information_v1 MCP requests
       with a non-2xx HTTP status in the session.
   n_annual_tax_report_calls:
     lineage:
@@ -106,20 +116,23 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct get_annual_tax_report_v1 MCP requests with a non-2xx
+    description:
+      Count of distinct get_annual_tax_report_v1 MCP requests with a non-2xx
       HTTP status in the session.
   n_paid_invoices_report_calls:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
-    description: Count of distinct get_paid_invoices_annual_report_v1 MCP requests in
+    description:
+      Count of distinct get_paid_invoices_annual_report_v1 MCP requests in
       the session.
   n_paid_invoices_report_errors:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct get_paid_invoices_annual_report_v1 MCP requests with
+    description:
+      Count of distinct get_paid_invoices_annual_report_v1 MCP requests with
       a non-2xx HTTP status in the session.
   n_last_paid_invoices_calls:
     lineage:
@@ -131,33 +144,38 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct get_last_paid_invoices_v1 MCP requests with a non-2xx
+    description:
+      Count of distinct get_last_paid_invoices_v1 MCP requests with a non-2xx
       HTTP status in the session.
   n_original_invoices_calls:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
-    description: Count of distinct get_original_invoices_by_status_v1 MCP requests in
+    description:
+      Count of distinct get_original_invoices_by_status_v1 MCP requests in
       the session.
   n_original_invoices_errors:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Count of distinct get_original_invoices_by_status_v1 MCP requests with
+    description:
+      Count of distinct get_original_invoices_by_status_v1 MCP requests with
       a non-2xx HTTP status in the session.
   n_mcp_tool_errors:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Total count of distinct MCP tool requests with a non-2xx HTTP status
+    description:
+      Total count of distinct MCP tool requests with a non-2xx HTTP status
       across all tools in the session.
   n_contracts:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
-    description: How many rental contracts the person has at QuintoAndar (the contracts
+    description:
+      How many rental contracts the person has at QuintoAndar (the contracts
       the collection agent can act on in this conversation). Technically, derived from the
       ContractMobileAPI.GetContracts response in get_financial_context_v1 (array length
       of the JSON-stringified contract ID array); NULL when no successful GetContracts call
@@ -166,7 +184,8 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
-    description: Indicates the person had nothing to be collected — none of their contracts
+    description:
+      Indicates the person had nothing to be collected — none of their contracts
       had any invoices or bills, so there was no outstanding debt to negotiate in this
       session. Technically, 1 when every GetInvoicesForContract and GetDetailedBills
       downstream call in the session returned an empty response; 0 when at least one
@@ -177,7 +196,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
-    description: The collection profile the customer belongs to, which guides how the agent
+    description:
+      The collection profile the customer belongs to, which guides how the agent
       should approach the debt (e.g. EVICTIONS means the case is already in an eviction
       process). Technically, the ChargeHub customer segment from a successful
       GetCustomerSegment call in the session; NULL when no such call exists.
@@ -186,7 +206,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_http_status
-    description: 1 when at least one downstream service call made by get_financial_context_v1
+    description:
+      1 when at least one downstream service call made by get_financial_context_v1
       failed in the session (is_call_success = false), excluding HTTP 404 (a not-found result
       is an absence-of-data signal, not a fetch error); 0 otherwise. Unifies the data/finance
       fetch failure signal and is the V3 source for fact_ai_agents_interaction.flag_fetch_financial_data_error
@@ -226,7 +247,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_contract_mcp
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
-    description: Number of the person's contracts where no negotiation options could be
+    description:
+      Number of the person's contracts where no negotiation options could be
       offered because the customer was not found in the collections system. Technically,
       count of distinct contracts for which ChargeHub.GetNegotiationOptions returned
       empty:NOT_FOUND in the session (person not found in ChargeHub).
@@ -235,7 +257,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_contract_mcp
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
-    description: Number of the person's contracts where no negotiation options could be
+    description:
+      Number of the person's contracts where no negotiation options could be
       offered because there are no eligible proposals for that customer's audience segment.
       Technically, count of distinct contracts for which ChargeHub.GetNegotiationOptions
       returned empty:NO_OPTIONS_FOR_AUDIENCE in the session.
@@ -244,7 +267,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_contract_mcp
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
-    description: Number of the person's contracts where no new negotiation options could be
+    description:
+      Number of the person's contracts where no new negotiation options could be
       offered because the customer already has an active deal in progress. Technically,
       count of distinct contracts for which ChargeHub.GetNegotiationOptions returned
       empty:ONGOING_NEGOTIATION in the session.
@@ -253,7 +277,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
-    description: The list of payment/negotiation deals the agent was able to offer the
+    description:
+      The list of payment/negotiation deals the agent was able to offer the
       customer (for example, pay in one installment via Pix, or pay by credit card).
       Technically, JSON array text of available negotiation option keys from the first
       successful non-empty ChargeHub.GetNegotiationOptions call in the session
@@ -263,7 +288,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_trace
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: How many payment proposals the agent presented to the customer during the
+    description:
+      How many payment proposals the agent presented to the customer during the
       conversation. Technically, count of distinct Langfuse traces in which
       simulate_negotiation_v1 succeeded; used as a proxy for the number of proposals
       presented to the user (distinct-trace deduplication avoids overcounting when the
@@ -272,7 +298,8 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Whether the customer actually closed a deal — a debt negotiation was
+    description:
+      Whether the customer actually closed a deal — a debt negotiation was
       successfully created in this session. This is the main success outcome of a collection
       conversation. Technically, 1 when at least one create_negotiation_v1 call succeeded
       in the session, else 0.
@@ -281,7 +308,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_option_key
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: Which payment/negotiation deal the customer chose when they closed an
+    description:
+      Which payment/negotiation deal the customer chose when they closed an
       agreement. Technically, the negotiation option key selected when the agent
       successfully created a negotiation; sourced from domain_info.option_key in the request
       log. NULL when no successful create_negotiation_v1 call occurred.
@@ -290,7 +318,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_payment_method
       - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
-    description: How the customer agreed to pay when they closed the deal (boleto, Pix, or
+    description:
+      How the customer agreed to pay when they closed the deal (boleto, Pix, or
       credit card). Technically, the payment method used when the agent successfully created
       a negotiation (BOLETO, PIX, or CREDIT_CARD); sourced from domain_info.payment_method
       in the request log. NULL when no successful create_negotiation_v1 call occurred.
@@ -301,7 +330,8 @@ columns:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_outcome
       - datalake_ai_collections_quintoandar.mcp_tool_logs.call_response
-    description: Whether a deal was closed but the customer was likely never shown the final
+    description:
+      Whether a deal was closed but the customer was likely never shown the final
       payment instructions (such as the boleto or Pix to actually pay), so they may not know
       how to complete the payment. Technically, 1 when a negotiation was created but no
       successful TratoFeito.GetOngoingNegotiation call without an empty response was recorded
@@ -318,15 +348,18 @@ columns:
   year:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.ts_request
-    description: Year partition derived from the timestamp of the latest MCP tool request
+    description:
+      Year partition derived from the timestamp of the latest MCP tool request
       in the session.
   month:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.ts_request
-    description: Month partition derived from the timestamp of the latest MCP tool request
+    description:
+      Month partition derived from the timestamp of the latest MCP tool request
       in the session.
   day:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.ts_request
-    description: Day partition derived from the timestamp of the latest MCP tool request
+    description:
+      Day partition derived from the timestamp of the latest MCP tool request
       in the session.
