@@ -1,16 +1,25 @@
 database_name: datalake_fastforward_clean
 table_name: brokerage_fee
+description:
+  One row per brokerage fee in the Fintech clean layer, sourced from
+  datalake_fastforward_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.brokerage_fee.id
+    description: Financial attribute representing id on the brokerage_fee dataset.
   rents:
     lineage:
       - datalake_fastforward_raw.brokerage_fee.number_of_rents
+    description: Financial attribute representing rents on the brokerage_fee dataset.
   ts_created:
     lineage:
       - datalake_fastforward_raw.brokerage_fee.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_fastforward_raw.brokerage_fee.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

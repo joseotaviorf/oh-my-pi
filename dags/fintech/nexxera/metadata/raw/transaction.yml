@@ -1,33 +1,45 @@
 ---
 database_name: datalake_nexxera_raw
 table_name: transaction
+description:
+  One row per transaction from the Nexxera bank file exchange platform,
+  tracking CNAB remittances and return files for rental payment
+  reconciliation.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   col_2:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 2 on the transaction dataset.
   col_3:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 3 on the transaction dataset.
   col_9:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 9 on the transaction dataset.
   col_10:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 10 on the transaction dataset.
   col_28:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 28 on the transaction dataset.
   col_39:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 39 on the transaction dataset.
   col_40:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 40 on the transaction dataset.

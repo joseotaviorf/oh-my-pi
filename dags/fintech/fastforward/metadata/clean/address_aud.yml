@@ -1,31 +1,45 @@
 database_name: datalake_fastforward_clean
 table_name: address_aud
+description:
+  One row per address aud in the Fintech clean layer, sourced from
+  datalake_fastforward_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.address_aud.id
+    description: Financial attribute representing id on the address_aud dataset.
   rev:
     lineage:
       - datalake_fastforward_raw.address_aud.rev
+    description: Financial attribute representing rev on the address_aud dataset.
   rev_type:
     lineage:
       - datalake_fastforward_raw.address_aud.revtype
+    description: Financial attribute representing rev type on the address_aud dataset.
   state:
     lineage:
       - datalake_fastforward_raw.address_aud.uf
+    description: Financial attribute representing state on the address_aud dataset.
   city:
     lineage:
       - datalake_fastforward_raw.address_aud.city
+    description: Financial attribute representing city on the address_aud dataset.
   complement:
     lineage:
       - datalake_fastforward_raw.address_aud.complement
+    description: Financial attribute representing complement on the address_aud dataset.
   neighborhood:
     lineage:
       - datalake_fastforward_raw.address_aud.neighborhood
+    description: Financial attribute representing neighborhood on the address_aud dataset.
   number:
     lineage:
       - datalake_fastforward_raw.address_aud.number
+    description: Financial attribute representing number on the address_aud dataset.
   street:
     lineage:
       - datalake_fastforward_raw.address_aud.street
+    description: Financial attribute representing street on the address_aud dataset.

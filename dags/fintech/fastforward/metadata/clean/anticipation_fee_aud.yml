@@ -1,25 +1,37 @@
 database_name: datalake_fastforward_clean
 table_name: anticipation_fee_aud
+description:
+  One row per anticipation fee aud in the Fintech clean layer, sourced from
+  datalake_fastforward_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.anticipation_fee_aud.id
+    description: Financial attribute representing id on the anticipation_fee_aud dataset.
   rev:
     lineage:
       - datalake_fastforward_raw.anticipation_fee_aud.rev
+    description: Financial attribute representing rev on the anticipation_fee_aud dataset.
   rev_type:
     lineage:
       - datalake_fastforward_raw.anticipation_fee_aud.revtype
+    description: Financial attribute representing rev type on the anticipation_fee_aud dataset.
   rev_end:
     lineage:
       - datalake_fastforward_raw.anticipation_fee_aud.revend
+    description: Financial attribute representing rev end on the anticipation_fee_aud dataset.
   value:
     lineage:
       - datalake_fastforward_raw.anticipation_fee_aud.value
+    description: Financial attribute representing value on the anticipation_fee_aud dataset.
   ts_started:
     lineage:
       - datalake_fastforward_raw.anticipation_fee_aud.started_at
+    description: Timestamp when started occurred in the upstream fintech system.
   ts_finished:
     lineage:
       - datalake_fastforward_raw.anticipation_fee_aud.finished_at
+    description: Timestamp when finished occurred in the upstream fintech system.

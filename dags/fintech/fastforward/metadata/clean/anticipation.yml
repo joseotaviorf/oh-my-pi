@@ -1,43 +1,61 @@
 database_name: datalake_fastforward_clean
 table_name: anticipation
+description:
+  One row per anticipation in the Fintech clean layer, sourced from
+  datalake_fastforward_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.anticipation.id
+    description: Financial attribute representing id on the anticipation dataset.
   id_invoice:
     lineage:
       - datalake_fastforward_raw.anticipation.invoice_id
+    description: Invoice identifier in the billing or payments platform.
   id_contract:
     lineage:
       - datalake_fastforward_raw.anticipation.contract_id
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_promo_fee:
     lineage:
       - datalake_fastforward_raw.anticipation.promo_fee_id
+    description: Identifier for the promo fee referenced by this financial record.
   fee:
     lineage:
       - datalake_fastforward_raw.anticipation.fee
+    description: Financial attribute representing fee on the anticipation dataset.
   amount:
     lineage:
       - datalake_fastforward_raw.anticipation.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   status:
     lineage:
       - datalake_fastforward_raw.anticipation.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   dt_reference:
     lineage:
       - datalake_fastforward_raw.anticipation.reference_month
+    description: Calendar date associated with reference in the financial workflow.
   dt_expiration:
     lineage:
       - datalake_fastforward_raw.anticipation.expires_at
+    description: Calendar date associated with expiration in the financial workflow.
   ts_created:
     lineage:
       - datalake_fastforward_raw.anticipation.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_accepted:
     lineage:
       - datalake_fastforward_raw.anticipation.accepted_at
+    description: Timestamp when accepted occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_fastforward_raw.anticipation.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_paid:
     lineage:
       - datalake_fastforward_raw.anticipation.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
