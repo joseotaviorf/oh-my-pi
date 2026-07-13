@@ -1,51 +1,67 @@
 ---
 database_name: datalake_docx_clean
 table_name: person_document_info
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: This table stores the details of any document submitted by a person. Each row represents a piece of document attached to a person.
+description: Individual data fields or file attachments within a person's submitted document.
 columns:
   id:
     lineage:
     - datalake_docx_raw.person_document_info.id
+    description: Unique identifier of the document field or attachment.
   id_person_document:
     lineage:
     - datalake_docx_raw.person_document_info.person_document_id
+    description: Parent document this field belongs to.
   id_input_source:
     lineage:
     - datalake_docx_raw.person_document_info.input_source_id
+    description: Identifier of the system or record that provided this value.
   input_source_type:
     lineage:
     - datalake_docx_raw.person_document_info.input_source_type
+    description: Type of system that provided the value.
   input_value_type:
     lineage:
     - datalake_docx_raw.person_document_info.input_value_type
+    description: Data type of the stored value.
   validation_type:
     lineage:
     - datalake_docx_raw.person_document_info.validation_type
+    description: Method used to validate this field.
   type:
     lineage:
     - datalake_docx_raw.person_document_info.type
+    description: Whether this entry is a data attribute or a file attachment.
   version:
     lineage:
     - datalake_docx_raw.person_document_info.version
+    description: Version number used to detect concurrent updates.
   status:
     lineage:
     - datalake_docx_raw.person_document_info.status
+    description: Lifecycle status of the field (e.g. informed, validated, approved).
   input_value:
     lineage:
     - datalake_docx_raw.person_document_info.input_value
+    description: Stored value of the field or attachment reference.
   input_type:
     lineage:
     - datalake_docx_raw.person_document_info.input_type
+    description: Kind of input field (e.g. text, date, file).
   validated_by:
     lineage:
     - datalake_docx_raw.person_document_info.validated_by
+    description: Who or what performed the last validation.
   ts_last_validated:
     lineage:
     - datalake_docx_raw.person_document_info.last_validated_at
+    description: Timestamp of the most recent validation review for this document field.
   ts_created:
     lineage:
     - datalake_docx_raw.person_document_info.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
     - datalake_docx_raw.person_document_info.updated_at
+    description: When this record was last modified.

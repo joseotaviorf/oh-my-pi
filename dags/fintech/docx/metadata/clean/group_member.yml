@@ -1,35 +1,35 @@
 ---
 database_name: datalake_docx_clean
 table_name: group_member
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: 'This table stores the data about the members within a group.'
+description: People belonging to a tenant or owner group, with their role in the group.
 columns:
   id:
-    description: ''
+    description: Unique identifier of the group membership.
     lineage:
     - datalake_docx_raw.group_member.id
   id_group:
-    description: ''
+    description: Group this person belongs to.
     lineage:
     - datalake_docx_raw.group_member.group_id
   id_reference:
-    description: ''
+    description: Identifier used to link the member to a person record, typically a tax ID.
     lineage:
     - datalake_docx_raw.group_member.reference_id
   reference_type:
-    description: ''
+    description: Type of identifier used for the member reference.
     lineage:
     - datalake_docx_raw.group_member.reference_type
   role:
-    description: ''
+    description: Role of the member in the group (e.g. primary user or associated person).
     lineage:
     - datalake_docx_raw.group_member.role
   ts_created:
-    description: ''
+    description: When this record was first created.
     lineage:
     - datalake_docx_raw.group_member.created_at
   ts_updated:
-    description: ''
+    description: When this record was last modified.
     lineage:
     - datalake_docx_raw.group_member.updated_at

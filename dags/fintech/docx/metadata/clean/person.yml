@@ -1,38 +1,39 @@
 ---
 database_name: datalake_docx_clean
 table_name: person
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: This table stores the data from users who authenticate in 5A plastform (users) or interact with our products (person).
+description: People registered in the documentation system, linked to platform accounts and tax identifiers.
 columns:
   id:
-    description: ''
+    description: Unique identifier of the person.
     lineage:
     - datalake_docx_raw.person.id
   id_reference:
-    description: ''
+    description: External reference used to identify the person, typically a tax ID.
     lineage:
     - datalake_docx_raw.person.reference_id
   person_uuid:
-    description: ''
+    description: Universal identifier from the person service.
     lineage:
     - datalake_docx_raw.person.person_uuid
   user_person_uuid:
-    description: ''
+    description: Universal identifier linking the person to a platform user.
     lineage:
     - datalake_docx_raw.person.user_person_uuid
   reference_type:
-    description: ''
+    description: Type of external reference used to identify the person.
     lineage:
     - datalake_docx_raw.person.reference_type
   version:
-    description: ''
+    description: Version number used to detect concurrent updates.
     lineage:
     - datalake_docx_raw.person.version
   ts_created:
-    description: ''
+    description: When this record was first created.
     lineage:
     - datalake_docx_raw.person.created_at
   ts_updated:
-    description: ''
+    description: When this record was last modified.
     lineage:
     - datalake_docx_raw.person.updated_at

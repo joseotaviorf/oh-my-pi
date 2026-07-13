@@ -1,67 +1,67 @@
 ---
 database_name: datalake_docx_clean
 table_name: group_authorization
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: 'This table stores all authorization details issued to a group.'
+description: Authorizations issued to tenant groups for rental guarantee and credit workflows.
 columns:
   id:
-    description: ''
+    description: Unique identifier of the authorization.
     lineage:
     - datalake_docx_raw.group_authorization.id
   id_group:
-    description: ''
+    description: Tenant group receiving the authorization.
     lineage:
     - datalake_docx_raw.group_authorization.group_id
   id_requestor:
-    description: ''
+    description: Person or entity that requested the authorization.
     lineage:
     - datalake_docx_raw.group_authorization.requestor_id
   id_house:
-    description: ''
+    description: Property listing the authorization applies to.
     lineage:
     - datalake_docx_raw.group_authorization.properties
   type:
-    description: ''
+    description: Category of authorization (e.g. tenant group).
     lineage:
     - datalake_docx_raw.group_authorization.type
   status:
-    description: ''
+    description: Whether the authorization is active or has been revoked.
     lineage:
     - datalake_docx_raw.group_authorization.status
   requestor_type:
-    description: ''
+    description: Kind of entity that requested the authorization.
     lineage:
     - datalake_docx_raw.group_authorization.requestor_type
   rent_value:
-    description: ''
+    description: Monthly rent amount covered by the authorization.
     lineage:
     - datalake_docx_raw.group_authorization.properties
   package_value:
-    description: ''
+    description: Total rental package value covered by the authorization.
     lineage:
     - datalake_docx_raw.group_authorization.properties
   credit_result:
-    description: ''
+    description: Credit analysis outcome associated with the authorization.
     lineage:
     - datalake_docx_raw.group_authorization.properties
   properties:
-    description: ''
+    description: Input details for the authorization, such as property, city, and rent values.
     lineage:
     - datalake_docx_raw.group_authorization.properties
   result:
-    description: ''
+    description: Full credit analysis result returned for this authorization.
     lineage:
     - datalake_docx_raw.group_authorization.result
   ts_created:
-    description: ''
+    description: When this record was first created.
     lineage:
     - datalake_docx_raw.group_authorization.created_at
   ts_updated:
-    description: ''
+    description: When this record was last modified.
     lineage:
     - datalake_docx_raw.group_authorization.updated_at
   ts_expires:
-    description: ''
+    description: Date and time when the authorization expires.
     lineage:
     - datalake_docx_raw.group_authorization.expires_at

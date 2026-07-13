@@ -1,66 +1,87 @@
 ---
 database_name: datalake_docx_clean
 table_name: group_authorization_aud
-owner: isabella.santos@quintoandar.com.br
+description: Historical record of changes to tenant group authorizations.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_docx_raw.group_authorization_aud.id
+    description: Unique identifier of the authorization.
   id_group:
     lineage:
     - datalake_docx_raw.group_authorization_aud.group_id
+    description: Tenant group receiving the authorization.
   id_requestor:
     lineage:
     - datalake_docx_raw.group_authorization_aud.requestor_id
+    description: Person or entity that requested the authorization.
   id_house:
     lineage:
     - datalake_docx_raw.group_authorization_aud.properties
+    description: Property listing the authorization applies to.
   rev:
     lineage:
     - datalake_docx_raw.group_authorization_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
     - datalake_docx_raw.group_authorization_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
     - datalake_docx_raw.group_authorization_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   type:
     lineage:
     - datalake_docx_raw.group_authorization_aud.type
+    description: Category of authorization.
   status:
     lineage:
     - datalake_docx_raw.group_authorization_aud.status
+    description: Whether the authorization is active or has been revoked.
   requestor_type:
     lineage:
     - datalake_docx_raw.group_authorization_aud.requestor_type
+    description: Kind of entity that requested the authorization.
   rent_value:
     lineage:
     - datalake_docx_raw.group_authorization_aud.properties
+    description: Monthly rent amount covered by the authorization.
   package_value:
     lineage:
     - datalake_docx_raw.group_authorization_aud.properties
+    description: Total rental package value covered by the authorization.
   credit_result:
     lineage:
     - datalake_docx_raw.group_authorization_aud.result
+    description: Credit analysis outcome associated with the authorization.
   properties:
     lineage:
     - datalake_docx_raw.group_authorization_aud.properties
+    description: Input details for the authorization at this revision.
   result:
     lineage:
     - datalake_docx_raw.group_authorization_aud.result
+    description: Full credit analysis result at this revision.
   mod_status:
     lineage:
     - datalake_docx_raw.group_authorization_aud.status_mod
+    description: Whether the authorization status changed in this revision.
   mod_properties:
     lineage:
     - datalake_docx_raw.group_authorization_aud.properties_mod
+    description: Whether the authorization input details changed in this revision.
   mod_result:
     lineage:
     - datalake_docx_raw.group_authorization_aud.result_mod
+    description: Whether the credit analysis result changed in this revision.
   mod_ts_expired:
     lineage:
     - datalake_docx_raw.group_authorization_aud.expires_at_mod
+    description: Whether the expiration date changed in this revision.
   ts_expired:
     lineage:
     - datalake_docx_raw.group_authorization_aud.expires_at
+    description: Date and time when the authorization expires.

@@ -1,51 +1,51 @@
 ---
 database_name: datalake_docx_clean
 table_name: person_document_aud
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: This auditated table stores any document submitted by a person, and any modification related to the document.
+description: Historical record of changes to a person's submitted documents.
 columns:
   id:
-    description: ''
+    description: Unique identifier of the person's document.
     lineage:
     - datalake_docx_raw.person_document_aud.id
   rev:
-    description: ''
+    description: Sequential number identifying this change snapshot in the audit history.
     lineage:
     - datalake_docx_raw.person_document_aud.rev
   id_person:
-    description: ''
+    description: Person who submitted this document.
     lineage:
     - datalake_docx_raw.person_document_aud.person_id
   rev_type:
-    description: ''
+    description: "Type of change recorded (new record, update, or deletion)."
     lineage:
     - datalake_docx_raw.person_document_aud.revtype
   rev_end:
-    description: ''
+    description: Next audit snapshot that replaced this one, if the record was later updated.
     lineage:
     - datalake_docx_raw.person_document_aud.revend
   type:
-    description: ''
+    description: Document category such as identity proof, income proof, or contact information.
     lineage:
     - datalake_docx_raw.person_document_aud.type
   country_code:
-    description: ''
+    description: Country whose document rules apply.
     lineage:
     - datalake_docx_raw.person_document_aud.country_code
   mod_country_code:
-    description: ''
+    description: Whether the country changed in this revision.
     lineage:
     - datalake_docx_raw.person_document_aud.country_code_mod
   mod_type:
-    description: ''
+    description: Whether the document category changed in this revision.
     lineage:
     - datalake_docx_raw.person_document_aud.type_mod
   mod_info_list:
-    description: ''
+    description: Whether the document fields changed in this revision.
     lineage:
     - datalake_docx_raw.person_document_aud.info_list_mod
   mod_person:
-    description: ''
+    description: Whether the linked person changed in this revision.
     lineage:
     - datalake_docx_raw.person_document_aud.person_mod

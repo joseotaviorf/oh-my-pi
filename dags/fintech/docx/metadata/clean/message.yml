@@ -1,25 +1,34 @@
 database_name: datalake_docx_clean
 table_name: message
+description: Outbound messages queued for asynchronous delivery to external systems.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_message:
     lineage:
       - datalake_docx_raw.message.id
+    description: Unique identifier of the queued message.
   id_incremental:
     lineage:
       - datalake_docx_raw.message.incremental_id
+    description: Sequential number assigned to the message for ordering.
   destination:
     lineage:
       - datalake_docx_raw.message.destination
+    description: Target queue or channel where the message will be sent.
   headers:
     lineage:
       - datalake_docx_raw.message.headers
+    description: Metadata attached to the message.
   payload:
     lineage:
       - datalake_docx_raw.message.payload
+    description: Content of the message to be delivered.
   is_published:
     lineage:
       - datalake_docx_raw.message.published
+    description: Whether the message has already been sent.
   ts_created:
     lineage:
       - datalake_docx_raw.message.creation_time
+    description: Epoch timestamp when the outbound message was queued for delivery.

@@ -1,49 +1,96 @@
 database_name: datalake_docx_clean
 table_name: machine_state
+description: Workflow progress records for tenant credit analysis and documentation processes.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_machine_state:
     lineage:
       - datalake_docx_raw.machine_state.id
+    description: Unique identifier of the workflow instance.
   id_input_source:
     lineage:
       - datalake_docx_raw.machine_state.input_source_id
+    description: Identifier of the event or record that triggered this workflow.
   id_context_external:
     lineage:
       - datalake_docx_raw.machine_state.context_external_id
+    description: External business process identifier linked to the workflow.
   id_group:
     lineage:
       - datalake_docx_raw.machine_state.group_id
+    description: Tenant group associated with this workflow.
   id_scope:
     lineage:
       - datalake_docx_raw.machine_state.scope_id
+    description: City or property identifier defining the workflow scope.
   type:
     lineage:
       - datalake_docx_raw.machine_state.type
+    description: Kind of workflow being tracked (e.g. group credit, documentation).
   status:
     lineage:
       - datalake_docx_raw.machine_state.status
+    description: Current step of the workflow.
   input_source_type:
     lineage:
       - datalake_docx_raw.machine_state.input_source_type
+    description: Type of system or event that triggered the workflow.
   input_description:
     lineage:
       - datalake_docx_raw.machine_state.input_description
+    description: Human-readable summary of what triggered the workflow.
   version:
     lineage:
       - datalake_docx_raw.machine_state.version
+    description: Version of the workflow definition in use.
   scope_type:
     lineage:
       - datalake_docx_raw.machine_state.scope_type
+    description: Whether the workflow applies to a city or a specific property.
   is_active:
     lineage:
       - datalake_docx_raw.machine_state.active
+    description: Whether this workflow instance is still active.
   ts_expires:
     lineage:
       - datalake_docx_raw.machine_state.expires_at
+    description: Date and time when this workflow instance expires.
   ts_created:
     lineage:
       - datalake_docx_raw.machine_state.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.machine_state.updated_at
+    description: When this record was last modified.
+  result:
+    lineage: []
+    description: Outcome of the workflow extracted from its stored details.
+  id_house:
+    lineage: []
+    description: Property listing involved in the workflow.
+  informed_limit:
+    lineage: []
+    description: Rent limit informed during the workflow.
+  id_credit_evaluation:
+    lineage: []
+    description: Credit evaluation linked to this workflow.
+  properties:
+    lineage: []
+    description: Workflow-specific details such as limits, guarantee type, and analysis results.
+  guarantee_type:
+    lineage: []
+    description: Type of rental guarantee involved in the workflow.
+  reason:
+    lineage: []
+    description: Reason associated with the workflow outcome.
+  pre_approved_limit:
+    lineage: []
+    description: Limit pre-approved during the workflow.
+  id_city:
+    lineage: []
+    description: City involved in the workflow.
+  id_analysis_request:
+    lineage: []
+    description: Identifier of the credit analysis request.

@@ -1,42 +1,55 @@
 ---
 database_name: datalake_docx_clean
 table_name: machine_state_aud
-owner: isabella.santos@quintoandar.com.br
+description: Historical record of changes to workflow progress records.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_machine_state:
     lineage:
     - datalake_docx_raw.machine_state_aud.id
+    description: Unique identifier of the workflow instance.
   id_input_source:
     lineage:
     - datalake_docx_raw.machine_state_aud.input_source_id
+    description: Identifier of the event or record that triggered this workflow.
   id_context_external:
     lineage:
     - datalake_docx_raw.machine_state_aud.context_external_id
+    description: External business process identifier linked to the workflow.
   rev:
     lineage:
     - datalake_docx_raw.machine_state_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
     - datalake_docx_raw.machine_state_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
     - datalake_docx_raw.machine_state_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   status:
     lineage:
     - datalake_docx_raw.machine_state_aud.status
+    description: Current step of the workflow.
   type:
     lineage:
     - datalake_docx_raw.machine_state_aud.type
+    description: Kind of workflow being tracked.
   input_source_type:
     lineage:
     - datalake_docx_raw.machine_state_aud.input_source_type
+    description: Type of system or event that triggered the workflow.
   input_description:
     lineage:
     - datalake_docx_raw.machine_state_aud.input_description
+    description: Human-readable summary of what triggered the workflow.
   version:
     lineage:
     - datalake_docx_raw.machine_state_aud.version
+    description: Version of the workflow definition in use.
   is_active:
     lineage:
     - datalake_docx_raw.machine_state_aud.active
+    description: Whether this workflow instance is still active.

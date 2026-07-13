@@ -1,40 +1,51 @@
 ---
 database_name: datalake_docx_clean
 table_name: person_aud
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: This table stores the auditated data from users who authenticate in 5A plastform (users) or interact with our products (person).
+description: Historical record of changes to registered people.
 columns:
   id:
     lineage:
     - datalake_docx_raw.person_aud.id
+    description: Unique identifier of the person.
   rev:
     lineage:
     - datalake_docx_raw.person_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   id_reference:
     lineage:
     - datalake_docx_raw.person_aud.reference_id
+    description: External reference used to identify the person.
   person_uuid:
     lineage:
     - datalake_docx_raw.person_aud.person_uuid
+    description: Universal identifier from the person service.
   user_person_uuid:
     lineage:
     - datalake_docx_raw.person_aud.user_person_uuid
+    description: Universal identifier linking the person to a platform user.
   reference_type:
     lineage:
     - datalake_docx_raw.person_aud.reference_type
+    description: Type of external reference used to identify the person.
   rev_type:
     lineage:
     - datalake_docx_raw.person_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
     - datalake_docx_raw.person_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   mod_reference:
     lineage:
     - datalake_docx_raw.person_aud.reference_mod
+    description: Whether the person reference changed in this revision.
   mod_user_person_uuid:
     lineage:
     - datalake_docx_raw.person_aud.user_person_uuid_mod
+    description: Whether the user-person identifier changed in this revision.
   mod_documents:
     lineage:
     - datalake_docx_raw.person_aud.documents_mod
+    description: Whether the linked documents changed in this revision.

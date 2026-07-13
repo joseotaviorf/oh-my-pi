@@ -1,27 +1,35 @@
 ---
 database_name: datalake_docx_clean
 table_name: person_document
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: This table stores any document submitted by a person.
+description: Document categories submitted by a person, such as identity proof or income proof.
 columns:
   id:
     lineage:
     - datalake_docx_raw.person_document.id
+    description: Unique identifier of the person's document.
   id_person:
     lineage:
     - datalake_docx_raw.person_document.person_id
+    description: Person who submitted this document.
   type:
     lineage:
     - datalake_docx_raw.person_document.type
+    description: Category of document (e.g. identity, income, contact information).
   country_code:
     lineage:
     - datalake_docx_raw.person_document.country_code
+    description: Country whose document rules apply.
   version:
     lineage:
     - datalake_docx_raw.person_document.version
+    description: Version number used to detect concurrent updates.
   ts_created:
     lineage:
     - datalake_docx_raw.person_document.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
     - datalake_docx_raw.person_document.updated_at
+    description: When this record was last modified.

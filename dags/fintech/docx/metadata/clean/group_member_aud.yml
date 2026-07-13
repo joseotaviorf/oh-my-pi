@@ -1,36 +1,47 @@
 ---
 database_name: datalake_docx_clean
 table_name: group_member_aud
-owner: isabella.santos@quintoandar.com.br
+description: Historical record of changes to group memberships.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_docx_raw.group_member_aud.id
+    description: Unique identifier of the group membership.
   id_group:
     lineage:
     - datalake_docx_raw.group_member_aud.group_id
+    description: Group this person belongs to.
   id_reference:
     lineage:
     - datalake_docx_raw.group_member_aud.reference_id
+    description: Identifier used to link the member to a person record.
   rev:
     lineage:
     - datalake_docx_raw.group_member_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
     - datalake_docx_raw.group_member_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
     - datalake_docx_raw.group_member_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   reference_type:
     lineage:
     - datalake_docx_raw.group_member_aud.reference_type
+    description: Type of identifier used for the member reference.
   mod_reference:
     lineage:
     - datalake_docx_raw.group_member_aud.reference_mod
+    description: Whether the member reference changed in this revision.
   role:
     lineage:
     - datalake_docx_raw.group_member_aud.role
+    description: Function of this person within the tenant or owner group (e.g. primary user or associated person).
   mod_role:
     lineage:
     - datalake_docx_raw.group_member_aud.role_mod
+    description: Whether the member role changed in this revision.
