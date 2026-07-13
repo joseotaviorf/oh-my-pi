@@ -16,7 +16,7 @@ workflow:
   load_spark_job: load_text2rank_cross_encoder_dataset_raw
   default_partitions: [year, month, day]
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_start_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -7), 'load_start_date') }}"
 
   spark_job_arguments:
     - "{environment}"
