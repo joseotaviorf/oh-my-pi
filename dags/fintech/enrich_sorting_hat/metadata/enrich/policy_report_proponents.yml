@@ -3,37 +3,45 @@ database_name: datalake_sorting_hat
 table_name: policy_report_proponents
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Table with information about the credit policy proponents.
+description: >
+  One row per proponent exploded from policy_report.result.proponents when that
+  array exists (no type filter in enrich SQL — all clean policy_report rows are
+  scanned). Extracted fields are retenant-specific (prior contract ids, retenant_score,
+  is_retenant); in practice only RETENANT reports populate result.proponents with this
+  schema, so other policy types usually contribute no rows. id_user is resolved from
+  ebdb by proponent CPF (null when no matching user).
 columns:
   id_policy_evaluation:
-    description: "Policy report ID"
+    description: Parent policy_report id (Sorting Hat clean policy_report.id).
     lineage:
       - datalake_sorting_hat_clean.policy_report.id
   id_retenant_contract:
-    description: "Retenant contract ID"
+    description: Prior QuintoAndar contract id associated with this proponent as a retenant.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.retenant_contract_id
   id_retenant_contract_proposal:
-    description: "Retenant contract proposal ID"
+    description: Proposal id of the prior contract linked to this proponent.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.retenant_contract_proposal_id
   id_retenant_contract_user:
-    description: "Retenant contract user ID"
+    description: User id on the prior retenant contract for this proponent.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.retenant_contract_user_id
   id_user:
-    description: "Unique identifier of user with the most recent creation date. This value is null for new users."
+    description: >
+      QuintoAndar user id matched by proponent CPF (most recently created ebdb user);
+      null for new users not yet in ebdb.user.
     lineage:
       - datalake_ebdb_user.user.id
   retenant_score:
-    description: "Retenant Score"
+    description: Retenant score assigned to this proponent in the policy result JSON.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.retenant_score
   proponent_document_number:
-    description: "The document number of the proponent (i.e CPF)"
+    description: Proponent CPF from result JSON (personal document number).
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.document_number
   is_retenant:
-    description: "True if user is retenant"
+    description: True when this proponent is classified as a returning tenant in the policy result.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.is_retenant

@@ -3,76 +3,106 @@ database_name: datalake_sorting_hat
 table_name: policy_report
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Table with information about the credit policy.
+description: >
+  Enriched RETENANT policy reports from datalake_sorting_hat_clean.policy_report
+  (type = RETENANT only). One row per retenant evaluation with group classification,
+  elected prior contract, proponent counts, and average retenant score parsed from
+  result JSON. id_external joins to proposal or credit_evaluation via external_source;
+  reports are overwritten in place on re-run (see version and ts_updated).
 columns:
   id_policy_evaluation:
-    description: "Policy report ID"
+    description: Primary key of the RETENANT policy_report row in Sorting Hat clean layer.
     lineage:
       - datalake_sorting_hat_clean.policy_report.id
   id_external:
-    description: "External ID. It can be either the proposal ID when the external source is PROPOSAL or the credit ID when the external source is CREDIT_EVALUATION"
+    description: >
+      Proposal id or credit_evaluation id depending on external_source (same semantics
+      as clean policy_report.id_external).
     lineage:
       - datalake_sorting_hat_clean.policy_report.id_external
   id_retenant_elected_contract:
-    description: "Elected contract ID. It is the contract ID of a retenant. When a tenant had more than one contract, it is considered the latest contract ID in the last six months. In cases of a group of proponents with more than one retenant, the elected contract is the latest one in the last six months with a higher score."
+    description: >
+      Prior QuintoAndar contract id elected for the retenant group — latest contract in
+      the last six months with highest score when multiple retenants or contracts exist.
     lineage:
       - datalake_sorting_hat_clean.policy_report.proponents.retenant_contract_id
   id_retenant_contract_user:
-    description: "Retenant user ID in the contract. It is null for new users, since they did not have any contract with 5A."
+    description: >
+      User id on the elected retenant contract; null for new users with no prior 5A
+      contract.
     lineage:
       - datalake_sorting_hat_clean.policy_report.proponents.retenant_contract_user_id
   policy_name:
-    description: "Type of the credit policy"
+    description: Policy type from clean layer; always RETENANT in this enrich table.
     lineage:
       - datalake_sorting_hat_clean.policy_report.type
   external_source:
-    description: "External source of the credit policy"
+    description: Entity type that id_external refers to (PROPOSAL or CREDIT_EVALUATION).
     lineage:
       - datalake_sorting_hat_clean.policy_report.external_source
   proponent_group_class:
-    description: "Group of the proponent"
+    description: >
+      Retenant group classification from result.type; drives is_retenant on this table.
+    categories:
+      NEW_USER: No proponent in the group is a returning tenant.
+      ANY_PROPONENT: At least one proponent is a retenant (any in group).
+      NEW_GROUP_PROPONENT: Mixed group with new and returning proponents.
+      SAME_GROUP_PROPONENT: All proponents share the same prior contract context.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.type
   proponent_class_detail:
-    description: "Subgroup of the proponent"
+    description: Retenant subgroup code from result.subtype (finer grain than proponent_group_class).
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.subtype
   proponent_group_class_detail:
-    description: "Group and subgroup of the proponent"
+    description: Combined group and subgroup label from result.full_type.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.full_type
   version:
-    description: "Version of the credit policy"
+    description: >
+      Run counter for this (type, external_source, id_external); increments on in-place
+      re-evaluation of the same RETENANT report row.
     lineage:
       - datalake_sorting_hat_clean.policy_report.version
   retenant_classification:
-    description: "Retenants classification based on their score and previous experience with 5A (any pending bills, credit experience, etc). It is null for new users."
+    description: >
+      Retenant quality band from the Sorting Hat RETENANT policy result JSON field
+      classification — not computed in enrich. Derived by the policy engine from
+      retenant_score and prior QuintoAndar contract experience (payment history, credit
+      behavior, pending bills). Null for NEW_USER groups and for historical rows before
+      the retenant classification policy existed.
     categories:
-      GOOD_RETENANT: ""
-      BAD_RETENANT: ""
+      GOOD_RETENANT: >
+        Returning tenant whose prior QuintoAndar experience and retenant score meet
+        policy thresholds (acceptable payment/credit history).
+      BAD_RETENANT: >
+        Returning tenant with adverse prior QuintoAndar experience (e.g. delinquency
+        or credit issues) that fails retenant policy thresholds.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.classification
   number_of_proponents:
-    description: "Number of proponents in the credit policy"
+    description: Count of proponents in the group parsed from result.proponents.
     lineage:
       - datalake_sorting_hat_clean.policy_report.proponents.document_number
   average_retenants_score:
-    description: "Average score of all the proponents in the credit policy"
+    description: Average retenant_score across proponents in the policy result JSON.
     lineage:
       - datalake_sorting_hat_clean.policy_report.proponents.retenant_score
   is_retenant:
-    description: "True for the groups ANY_PROPONENT, NEW_GROUP_PROPONENT, SAME_GROUP_PROPONENT false for the group NEW_USER"
+    description: >
+      True when proponent_group_class is ANY_PROPONENT, NEW_GROUP_PROPONENT, or
+      SAME_GROUP_PROPONENT; false for NEW_USER.
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.type
   are_all_proponents_retenants:
-    description: "True only if all the proponents are retenants"
+    description: True only when every proponent in the group has is_retenant true in result JSON.
     lineage:
       - datalake_sorting_hat_clean.policy_report.proponents.is_retenant
   ts_created:
-    description: "Timestamp creation date of the credit policy"
+    description: Timestamp when this RETENANT report row was first created (version 1).
     lineage:
       - datalake_sorting_hat_clean.policy_report.ts_created
   ts_updated:
-    description: "Timestamp updated date of the credit policy"
+    description: Timestamp of the most recent RETENANT policy run or in-place update.
     lineage:
       - datalake_sorting_hat_clean.policy_report.ts_updated

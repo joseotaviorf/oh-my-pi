@@ -3,81 +3,94 @@ database_name: datalake_sorting_hat
 table_name: early_credit_analysis
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table with the early credit analysis information of the tenant"
+description: >
+  Early Credit outcomes from Sorting Hat — credit analysis performed for a specific
+  listing (id_house), before a formal proposal. One row per early_credit_analysis
+  record after parsing the latest element of the result JSON array. Links user, house,
+  credit evaluation, and the CREDIT_POLICY report that produced the offer (guarantee
+  category, bypass, rejection). Deduped to the latest ts_created per early_credit id;
+  early_credit_number ranks runs per user/house (1 = most recent).
 columns:
   id_early_credit:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id
-    description: "ID of the credit analysis"
+    description: Primary key of the early credit analysis row in Sorting Hat clean layer.
   id_credit_evaluation:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_credit_evaluation
-    description: "ID of the credit evaluation"
+    description: >
+      docx credit_evaluation id for this Early Credit run; join to
+      policy_report_credit_policy and fact_credit_evaluation when external_source is
+      CREDIT_EVALUATION.
   id_user:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_user
-    description: "ID of the user"
+    description: QuintoAndar user id of the tenant who ran early credit for this listing.
   id_house:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_house
-    description: "ID of the house"
+    description: Listing id (house) this early credit analysis was performed for.
   id_variant:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_variant
-    description: "ID of the variant"
-  id_policy_report:
-    lineage:
-      - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "ID of the policy report"
+    description: Policy/model variant id assigned to this early credit evaluation.
   city:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.city
-    description: "City of the tenant" 
+    description: City context passed into the early credit policy evaluation.
   version:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.version
-    description: "Version of the analysis"
+    description: >
+      Version counter on the early credit analysis record; increments when the analysis
+      is re-run for the same underlying early_credit id.
   risk_category_canon:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.risk_category_canon
-    description: "Risk score given by the model result plus the credit policy. Useful, but deprecated in favor to risk_category_canon"
+    description: >
+      Canonical risk band from screening used as a policy input for Early Credit; prefer
+      this field over legacy risk_category variants.
   bypass:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Bypass of the early credit"
+    description: Whether standard policy gates were bypassed for this result element.
   guarantee_offered:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Guarantee offered of the early credit"
+    description: >
+      Guarantee product / analysis category code returned by the policy for this early
+      credit offer (maps to the guarantee mix shown to the user).
   category:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Analysis category"
+    description: Analysis category integer code from the parsed policy result JSON.
   range_start:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Value range start"
+    description: Lower bound of the approved rent or limit range when the policy returns a range offer.
   range_end:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Value range end"
+    description: Upper bound of the approved rent or limit range when the policy returns a range offer.
   early_credit_number:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_user
-    description: "The number of early credits that the user made for each house, 1 refers to the last"
+    description: >
+      Rank of this early credit among all runs for the same user and house ordered by
+      ts_created descending (1 = most recent).
   is_last_early_credit:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_user
-    description: "True olnly if the early credit is the last for that user on that house"
+    description: True when early_credit_number equals 1 for that user/house pair.
   rejection_reason:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Reason of the analysis rejection."
+    description: Policy rejection reason when the early credit is declined; null when approved.
   ts_created:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_created
-    description: "Creation timestamp"
+    description: Timestamp when this early credit analysis row was created.
   ts_expired:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
-    description: "Expiration timestamp"
+    description: Timestamp when this early credit offer expires if not converted to a proposal.

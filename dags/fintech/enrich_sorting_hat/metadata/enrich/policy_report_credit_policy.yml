@@ -4,10 +4,15 @@ table_name: policy_report_credit_policy
 owner: davi.figueiredo@quintoandar.com.br
 domain: Fintech
 description: >
-  Enriched CREDIT_POLICY policy reports from sorting-hat.
+  Enriched CREDIT_POLICY policy reports from Sorting Hat — one row per credit
+  evaluation with scores, policy inputs, guarantee outcome, and experiment_groups.
+  Primary analyst view for what went into a credit decision; rows are overwritten in
+  place on re-run (see version, ts_created, ts_updated).
 columns:
   id_policy_report:
-    description: "Policy report ID"
+    description: >
+      Unique identifier (primary key) of the policy report record. One per
+      credit_evaluation, since the report is overwritten in place across versions.
     lineage:
       - datalake_sorting_hat_clean.policy_report.id
   id_credit_evaluation:
@@ -48,8 +53,13 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.policy_report.external_source
   version:
-    description: "Version of the policy report record (increased whenever a new
-      policy evaluation is run for the same proposal/credit_evaluation)."
+    description: >
+      Version of the policy report for this proposal/credit_evaluation. Starts at 1
+      and increments by 1 each time the credit policy is re-run — the row is
+      OVERWRITTEN in place (not appended), so there is one row per credit_evaluation.
+      ts_created marks version 1; ts_updated marks this (latest) version. Re-runs are
+      common for regular credit (external_source = 'PROPOSAL') but rare for early credit
+      (external_source = 'CREDIT_EVALUATION', which almost always stays at version 1).
     lineage:
       - datalake_sorting_hat_clean.policy_report.version
   variant:
@@ -228,10 +238,10 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.policy_report.raw_data.risk_category_canon
   ts_created:
-    description: "Timestamp when the policy report was created."
+    description: "Timestamp when the policy report was first created (version 1)."
     lineage:
       - datalake_sorting_hat_clean.policy_report.ts_created
   ts_updated:
-    description: "Timestamp when the policy report was last updated."
+    description: "Timestamp when the policy report was last overwritten (current version)."
     lineage:
       - datalake_sorting_hat_clean.policy_report.ts_updated
