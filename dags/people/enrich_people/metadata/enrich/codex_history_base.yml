@@ -30,6 +30,10 @@ columns:
   vertical:
     description: |-
       Derived business vertical based on structure (Ops, Corp, Tech).
+    categories:
+      Ops: Derived from structures Sales, Operations, Marketing, Guarantees, and Support.
+      Corp: Derived from structures Finance, People, Legal, and Administrative.
+      Tech: Derived from structure Product.
     lineage:
       - datalake_gsheets_people_clean.codex_cost_centers.structure
   structure:

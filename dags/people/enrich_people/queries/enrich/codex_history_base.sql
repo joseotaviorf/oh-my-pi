@@ -22,7 +22,7 @@ codex_history_ranked AS (
     codex.product,
     codex.brand,
     CASE
-      WHEN codex.structure IN ('Sales', 'Operations', 'Marketing', 'Guarantees') THEN 'Ops'
+      WHEN codex.structure IN ('Sales', 'Operations', 'Marketing', 'Guarantees', 'Support') THEN 'Ops'
       WHEN codex.structure IN ('Finance', 'People', 'Legal', 'Administrative') THEN 'Corp'
       WHEN codex.structure = 'Product' THEN 'Tech'
     END AS vertical,
