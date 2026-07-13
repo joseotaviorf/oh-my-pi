@@ -1,0 +1,126 @@
+database_name: dw_visit
+table_name: fact_visit_attempt_cycle
+description: |
+  Visit try-cycle fact table. Each row aggregates all visits that share the same
+  id_visit_attempt_cycle (visitor, house, and frustration-aware cycle from enrich visits),
+  including first/last visit keys, status progression, cancellation and unsuccessful
+  reasons, contestation flags, and volume metrics.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  sk_visit_attempt_cycle:
+    description: Surrogate key of the visit attempt cycle. One row per attempt cycle in this table.
+    lineage:
+      - datalake_visit.visits.id_visit_attempt_cycle
+  sk_visit_cycle:
+    description: Surrogate key of the broader visit cycle grouping visitor and house over time.
+    lineage:
+      - datalake_visit.visits.id_visit_cycle
+  sk_visitor:
+    description: User ID of the visitor. Join with dim_user for visitor attributes.
+    lineage:
+      - datalake_visit.visits.id_visitor
+  sk_house:
+    description: House ID of the visited property. Join with dim_house for listing attributes.
+    lineage:
+      - datalake_visit.visits.id_house
+  sk_first_visit:
+    description: Visit ID of the earliest visit in the attempt cycle, by ts_created.
+    lineage:
+      - datalake_visit.visits.id_visit
+  sk_last_visit:
+    description: Visit ID of the latest visit in the attempt cycle, by ts_created.
+    lineage:
+      - datalake_visit.visits.id_visit
+  first_visit_request_channel:
+    description: Channel used when the first visit in the attempt cycle was requested.
+    lineage:
+      - datalake_visit.visits.visit_request_channel
+  last_visit_request_channel:
+    description: Channel used when the last visit in the attempt cycle was requested.
+    lineage:
+      - datalake_visit.visits.visit_request_channel
+  business_context:
+    description: Most frequent business context (RENT or SALE) among visits in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.business_context
+  first_status:
+    description: Computed status of the first visit in the attempt cycle, by ts_created.
+    lineage:
+      - datalake_visit.visits.computed_status
+  mode_frustraded_status:
+    description: Most frequent non-DONE computed status in the attempt cycle, used to summarize frustrated outcomes.
+    lineage:
+      - datalake_visit.visits.computed_status
+  last_status:
+    description: Computed status of the last visit in the attempt cycle, by ts_created.
+    lineage:
+      - datalake_visit.visits.computed_status
+  first_cancellation_on_behalf_of:
+    description: Party on whose behalf the first canceled visit in the attempt cycle was cancelled.
+    lineage:
+      - datalake_visit.visits.cancellation_on_behalf_of
+  first_cancellation_reason:
+    description: Cancellation reason recorded on the first canceled visit in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.cancellation_reason
+  first_unsuccessful_reason:
+    description: Agent-reported motive from post-visit follow-up on the earliest unsuccessful visit in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.unsuccessful_reason
+  last_cancellation_on_behalf_of:
+    description: Party on whose behalf the last canceled visit in the attempt cycle was cancelled.
+    lineage:
+      - datalake_visit.visits.cancellation_on_behalf_of
+  last_cancellation_reason:
+    description: Cancellation reason recorded on the last canceled visit in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.cancellation_reason
+  last_unsuccessful_reason:
+    description: Agent-reported motive from post-visit follow-up on the latest unsuccessful visit in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.unsuccessful_reason
+  has_visits_canceled_contested:
+    description: True when at least one visit in the attempt cycle was contested by demand due to wrong cancellation reason.
+    lineage:
+      - datalake_visit.visits.is_canceled_visit_contested_by_demand
+  has_visits_completed_contested:
+    description: True when at least one visit in the attempt cycle was contested by demand due to wrong visit done status.
+    lineage:
+      - datalake_visit.visits.is_completed_visit_contested_by_demand
+  has_cycle_finished:
+    description: True when the attempt cycle is finished, either because the last visit was completed or the last visit was canceled or unsuccessful more than 2 days ago.
+    lineage:
+      - datalake_visit.visits.is_completed
+      - datalake_visit.visits.ts_visit_canceled
+      - datalake_visit.visits.ts_visit_unsuccessful
+  num_cycles:
+    description: Number of cycles in the attempt cycle.
+  num_visits:
+    description: Count of visits aggregated into the attempt cycle.
+    lineage:
+      - datalake_visit.visits.id_visit_attempt_cycle
+  num_schedules:
+    description: Total number of schedules (sum of nbr_reschedule) across visits in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.nbr_reschedule
+  num_visits_completed:
+    description: Count of completed visits in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.is_completed
+  num_visits_canceled:
+    description: Count of canceled visits in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.is_canceled
+  num_visits_uncuccessful:
+    description: Count of unsuccessful visits in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.is_unsuccessful
+  ts_first_visit_created:
+    description: Earliest ts_created among visits in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.ts_created
+  ts_last_visit_created:
+    description: Latest ts_created among visits in the attempt cycle.
+    lineage:
+      - datalake_visit.visits.ts_created

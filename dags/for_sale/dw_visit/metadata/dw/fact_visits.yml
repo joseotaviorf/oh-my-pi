@@ -12,6 +12,14 @@ columns:
     description: Last schedule ID of the visit.
     lineage:
       - datalake_visit.visits.id_last_schedule
+  sk_visit_cycle:
+    description: Sequential cycle number for a visitor-house pair, incremented after frustration events such as cancellation or unsuccessful completion.
+    lineage:
+      - datalake_visit.visits.id_visit_cycle
+  sk_visit_attempt_cycle:
+    description: Try cycle ID of the visit.
+    lineage:
+      - datalake_visit.visits.id_visit_try_cycle
   sk_visitor:
     description: Visitor's id. (Connect with dim_user)
     lineage:

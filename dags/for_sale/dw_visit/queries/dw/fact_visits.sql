@@ -29,6 +29,8 @@ WITH visit_tenant_living AS (
 SELECT
   v.id_visit AS sk_visit,
   v.id_last_schedule AS sk_last_schedule,
+  v.id_visit_cycle AS sk_visit_cycle,
+  v.id_visit_attempt_cycle AS sk_visit_attempt_cycle,
   v.id_visitor AS sk_visitor,
   v.id_owner AS sk_owner,
   v.id_user_visit_request AS sk_user_visit_request,

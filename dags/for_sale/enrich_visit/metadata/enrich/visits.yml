@@ -14,6 +14,20 @@ columns:
       - datalake_visit.visit_status_events.id_schedule
       - datalake_ebdb_clean.booking.id
     description: Last schedule ID of the visit. Data since 2015.
+  id_visit_cycle:
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+      - datalake_ebdb_clean.visit.id_house
+      - datalake_visit.visit_cancellation_unified.ts_created
+      - datalake_visit.post_visit_agent_unified.ts_post_visit_agent
+    description: Cycle ID of the visit. Data since 2015.
+  id_visit_attempt_cycle:
+    lineage:
+      - datalake_ebdb_clean.visit.id_visitor
+      - datalake_ebdb_clean.visit.id_house
+      - datalake_visit.visit_cancellation_unified.ts_created
+      - datalake_visit.post_visit_agent_unified.ts_post_visit_agent
+    description: Try cycle ID of the visit. Data since 2015.
   id_agent:
     lineage:
       - datalake_ebdb_clean.visit.id_agent
