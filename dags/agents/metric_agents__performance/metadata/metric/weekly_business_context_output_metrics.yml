@@ -6,7 +6,7 @@ description: |
   The data focuses on evaluating agent productivity, engagement, and success in progressing leads through different stages, 
   such as booking, offers, documents sent, and contracts signed, with a weekly granularity.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   business_context:
     lineage:
@@ -190,7 +190,9 @@ columns:
       approved_by: soares.jessica@quintoandar.com.br
       link_to_metric: ""
   total_leads:
-    description: Total number of leads.
+    description: |
+      Weekly count of distinct tenant or buyer leads that interacted with visit agents in the business
+      context, summed from fact_visit_agent_performance over the calendar week.
     metric:
       name: Total Leads
       description: Weekly total of leads.
@@ -255,12 +257,12 @@ columns:
       hierarchy: User analysis
       approved_by: soares.jessica@quintoandar.com.br
       link_to_metric: ""
-  total_lead_to_offer_submitted_by_agent:
-    description: Total number of leads converted to offer submissions by the agent.
+  total_lead_to_document_sent:
+    description: Total number of leads that progressed to document submission in the offer flow.
     metric:
-      name: Total Lead to Offer Submitted by Agent
-      description: Weekly total of leads converted to offer submissions by the agent.
-      acronym: LD2OSBA
+      name: Total Lead to Document Sent
+      description: Weekly total of leads converted to document submissions.
+      acronym: LD2DS
       is_additive: False
       business_stage: Lead Conversion
       hierarchy: User analysis

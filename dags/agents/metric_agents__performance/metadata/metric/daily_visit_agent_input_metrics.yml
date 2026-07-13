@@ -7,22 +7,28 @@ description: |
   Each metric provides insights into the agent's performance, such as engagement with available schedules, booking efficiency, visit cancellations, lead conversion, 
   offer submission, credit approval, and contract signing. These metrics help assess agent productivity, identify potential bottlenecks, and optimize workflow efficiency.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
       - dw_agent.fact_visit_agent_performance.sk_agent
-    description: 
+    description: |
+      Surrogate key of the visit agent from fact_visit_agent_performance; grain key for daily
+      visit-broker ratio metrics on the reference date.
     dimension: True
   business_context:
     lineage:
       - dw_agent.fact_visit_agent_performance.is_rent_agent
-    description: 
+    description: |
+      Commercial line for the agent on the reference day, derived from is_rent_agent and mapped to
+      RENT or SALE to partition visit-performance ratios.
     dimension: True
   major_region_code:
     lineage:
       - dw_agent.fact_visit_agent_performance.major_region_code
-    description: 
+    description: |
+      Primary macro-region code of the visit agent from fact_visit_agent_performance, used to roll up
+      daily KPI ratios by geography.
     dimension: True
   ratio_schedule_engagement:
     description: Proportion of total hours available per contract compared to the total hours allocated available per schedule

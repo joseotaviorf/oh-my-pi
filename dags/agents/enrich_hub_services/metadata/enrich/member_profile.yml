@@ -165,7 +165,9 @@ columns:
   parent_email:
     lineage:
       - datalake_hub_services.users.email
-    description: Parent member email from Hub Services users.
+    description: |
+      Email address of the parent member (e.g. negotiation executive) from Hub Services users,
+      joined via id_parent_member_profile on the latest parent profile row.
   parent_phone_number:
     lineage:
       - datalake_hub_services.users.phone_number
@@ -177,7 +179,9 @@ columns:
   parent_cpf:
     lineage:
       - datalake_hub_services.users.cpf
-    description: Parent member CPF from Hub Services users.
+    description: |
+      CPF of the parent member from Hub Services users, joined via id_parent_member_profile
+      on the latest parent profile row.
   is_member_active_in_period:
     lineage:
       - datalake_hub_services_clean.member_profile_aud.is_active
