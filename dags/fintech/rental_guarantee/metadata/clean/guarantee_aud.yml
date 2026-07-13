@@ -1,136 +1,184 @@
 database_name: datalake_rental_guarantee_clean
 table_name: guarantee_aud
+description:
+  Audit history of rental guarantee policies, with Envers revisions and
+  field-level change flags (mod_* columns).
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.id
+    description: Primary key of the audited rental guarantee.
   id_contract_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.contract_ebdb_id
+    description: EBDB contract id linked to this guarantee.
   id_documentation_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.documentation_ebdb_id
+    description: EBDB documentation id linked to this guarantee.
   id_house_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.house_ebdb_id
+    description: EBDB house or listing id linked to this guarantee.
   id_tenant_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.tenant_ebdb_id
+    description: EBDB tenant id linked to this guarantee.
   rev:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.rev
+    description: Audit revision identifier.
   rev_end:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.revend
+    description: Audit revision end identifier.
   rev_type:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.revtype
+    description: Audit change type for the revision (insert, update, or delete).
   accepted_terms_and_conditions:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.accepted_terms_and_conditions
+    description: Whether the tenant accepted the guarantee terms and conditions.
   cancellation_reason:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.cancellation_reason
+    description: Reason the guarantee was canceled, when applicable.
   score:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.score
+    description: Credit or risk score stored on the guarantee.
   guarantee_source:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.source
+    description: Channel or origin that created the guarantee.
   guarantee_status:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.status
+    description: Current lifecycle status of the guarantee.
   guarantee_type:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.type
+    description: Guarantee product type of the policy.
   base_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.base_value
+    description: Base guarantee amount as stored on the audited guarantee row.
   final_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.final_value
+    description: Final billed guarantee amount as stored on the audited row.
   mod_id_contract_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.contract_ebdb_id_mod
+    description: Flag indicating modification of contract_ebdb_id on this revision.
   mod_id_documentation_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.documentation_ebdb_id_mod
+    description: Flag indicating modification of documentation_ebdb_id on this revision.
   mod_id_house_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.house_ebdb_id_mod
+    description: Flag indicating modification of house_ebdb_id on this revision.
   mod_id_tenant_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.tenant_ebdb_id_mod
+    description: Flag indicating modification of tenant_ebdb_id on this revision.
   mod_accepted_terms_and_conditions:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.accepted_terms_and_conditions_mod
+    description: Flag indicating modification of accepted_terms_and_conditions on this revision.
   mod_cancellation_reason:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.cancellation_reason_mod
+    description: Flag indicating modification of cancellation_reason on this revision.
   mod_score:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.score_mod
+    description: Flag indicating modification of score on this revision.
   mod_guarantee_source:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.source_mod
+    description: Flag indicating modification of source on this revision.
   mod_guarantee_status:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.status_mod
+    description: Flag indicating modification of status on this revision.
   mod_guarantee_type:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.type_mod
+    description: Flag indicating modification of type on this revision.
   mod_base_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.base_value_mod
+    description: Flag indicating modification of base_value on this revision.
   mod_final_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.final_value_mod
+    description: Flag indicating modification of final_value on this revision.
   mod_ts_created:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.created_at_mod
+    description: Flag indicating modification of created_at on this revision.
   mod_ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.updated_at_mod
+    description: Flag indicating modification of updated_at on this revision.
   mod_ts_billed:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.billed_at_mod
+    description: Flag indicating modification of billed_at on this revision.
   mod_ts_cancellation_requested:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.cancellation_requested_at_mod
+    description: Flag indicating modification of cancellation_requested_at on this revision.
   mod_ts_expired:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.expires_at_mod
+    description: Flag indicating modification of expires_at on this revision.
   mod_ts_paid:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.paid_at_mod
+    description: Flag indicating modification of paid_at on this revision.
   mod_ts_payment_expired:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.payment_expires_at_mod
+    description: Flag indicating modification of payment_expires_at on this revision.
   mod_ts_started:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.begins_at_mod
+    description: Flag indicating modification of begins_at on this revision.
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.created_at
+    description: Creation timestamp recorded on the audit row.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.updated_at
+    description: Update timestamp recorded on the audit row.
   ts_billed:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.billed_at
+    description: Timestamp when the guarantee was billed.
   ts_cancellation_requested:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.cancellation_requested_at
+    description: Timestamp when cancellation of the guarantee was requested.
   ts_expired:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.expires_at
+    description: Expiration timestamp of the guarantee coverage.
   ts_paid:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.paid_at
+    description: Timestamp when the guarantee payment was confirmed.
   ts_payment_expired:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.payment_expires_at
+    description: Timestamp when the payment window for the guarantee expires.
   ts_started:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.begins_at
+    description: Timestamp when guarantee coverage begins.

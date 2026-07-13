@@ -1,43 +1,61 @@
 database_name: datalake_pixar_clean
 table_name: charge
+description:
+  One row per charge in the Fintech clean layer, sourced from
+  datalake_pixar_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_pixar_raw.charge.id
+    description: Financial attribute representing id on the charge dataset.
   id_account:
     lineage:
       - datalake_pixar_raw.charge.account_id
+    description: Identifier for the account referenced by this financial record.
   id_external:
     lineage:
       - datalake_pixar_raw.charge.external_id
+    description: Identifier for the external referenced by this financial record.
   id_transaction:
     lineage:
       - datalake_pixar_raw.charge.transaction_id
+    description: Identifier for the transaction referenced by this financial record.
   id_bank_payment:
     lineage:
       - datalake_pixar_raw.charge.bank_payment_id
+    description: Identifier for the bank payment referenced by this financial record.
   pix_link:
     lineage:
       - datalake_pixar_raw.charge.pix_link
+    description: Financial attribute representing pix link on the charge dataset.
   pix_emv:
     lineage:
       - datalake_pixar_raw.charge.emv
+    description: Financial attribute representing pix emv on the charge dataset.
   amount:
     lineage:
       - datalake_pixar_raw.charge.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   bank_fee:
     lineage:
       - datalake_pixar_raw.charge.bank_fee
+    description: Financial attribute representing bank fee on the charge dataset.
   status:
     lineage:
       - datalake_pixar_raw.charge.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   dt_limit:
     lineage:
       - datalake_pixar_raw.charge.date_limit
+    description: Calendar date associated with limit in the financial workflow.
   ts_created:
     lineage:
       - datalake_pixar_raw.charge.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_pixar_raw.charge.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

@@ -1,79 +1,108 @@
 database_name: datalake_rental_guarantee_clean
 table_name: guarantee
+description:
+  One row per rental guarantee policy (QuintoCred), linking contract, house, and
+  tenant with lifecycle amounts and dates.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.id
+    description: Primary key of the rental guarantee.
   id_contract_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.contract_ebdb_id
+    description: EBDB contract id linked to this guarantee.
   id_documentation_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.documentation_ebdb_id
+    description: EBDB documentation id linked to this guarantee.
   id_house_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.house_ebdb_id
+    description: EBDB house or listing id linked to this guarantee.
   id_tenant_ebdb:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.tenant_ebdb_id
+    description: EBDB tenant id linked to this guarantee.
   accepted_terms_and_conditions:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.accepted_terms_and_conditions
+    description: Whether the tenant accepted the guarantee terms and conditions.
   cancellation_reason:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.cancellation_reason
+    description: Reason the guarantee was canceled, when applicable.
   score:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.score
+    description: Credit or risk score stored on the guarantee.
   guarantee_source:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.source
+    description: Channel or origin that created the guarantee.
   guarantee_status:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.status
+    description: Current lifecycle status of the guarantee.
   guarantee_type:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.type
+    description: Guarantee product type of the policy.
   base_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.base_value
+    description: Base guarantee amount in BRL after converting cents in clean.
   final_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.final_value
+    description: Final billed guarantee amount in BRL after converting cents in clean.
   payment_recurrence:
     lineage:
-      - datalake_rental_guarantee_raw.guarantee.type
+      - datalake_rental_guarantee_raw.guarantee.payment_recurrence
+    description: Payment cadence for the guarantee (monthly, one-shot, and similar).
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.created_at
+    description: Creation timestamp of the guarantee record.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.updated_at
+    description: Last update timestamp of the guarantee record.
   ts_billed:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.billed_at
+    description: Timestamp when the guarantee was billed.
   ts_cancellation_requested:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.cancellation_requested_at
+    description: Timestamp when cancellation of the guarantee was requested.
   ts_expired:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.expires_at
+    description: Expiration timestamp of the guarantee coverage.
   ts_paid:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.paid_at
+    description: Timestamp when the guarantee payment was confirmed.
   ts_payment_expired:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.payment_expires_at
+    description: Timestamp when the payment window for the guarantee expires.
   ts_started:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.begins_at
+    description: Timestamp when guarantee coverage begins.
   year:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.year
+    description: Partition year for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.month
+    description: Partition month for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.day
+    description: Partition day for incremental loading.

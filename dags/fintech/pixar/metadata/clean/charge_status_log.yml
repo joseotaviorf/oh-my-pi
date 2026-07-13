@@ -1,5 +1,6 @@
 database_name: datalake_pixar_clean
 table_name: charge_status_log
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Log table tracking status changes and bank responses for PIX payment charges in the Pixar system
 columns:

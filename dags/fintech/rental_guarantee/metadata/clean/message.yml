@@ -1,30 +1,40 @@
 ---
 database_name: datalake_rental_guarantee_clean
 table_name: message
-owner: ae-fintech@quintoandar.com.br
+description:
+  Outbound or staging messages emitted by the rental guarantee service.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_rental_guarantee_raw.message.id
+    description: Primary key of the message.
   id_incremental:
     lineage:
     - datalake_rental_guarantee_raw.message.incremental_id
+    description: Incremental sequence id used when publishing the message.
   destination:
     lineage:
     - datalake_rental_guarantee_raw.message.destination
+    description: Target topic or consumer of the message.
   headers:
     lineage:
     - datalake_rental_guarantee_raw.message.headers
+    description: Message headers payload as JSON.
   payload:
     lineage:
     - datalake_rental_guarantee_raw.message.payload
+    description: Serialized body of the rental guarantee message.
   published:
     lineage:
     - datalake_rental_guarantee_raw.message.published
+    description: Whether the message was published to its destination.
   message_partition:
     lineage:
     - datalake_rental_guarantee_raw.message.message_partition
+    description: Source partition assigned to the message.
   ts_creation_time:
     lineage:
     - datalake_rental_guarantee_raw.message.creation_time
+    description: Creation timestamp of the message.

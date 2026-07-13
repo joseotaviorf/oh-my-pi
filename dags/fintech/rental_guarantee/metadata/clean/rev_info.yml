@@ -1,19 +1,27 @@
 database_name: datalake_rental_guarantee_clean
 table_name: rev_info
+description:
+  Hibernate Envers revision timestamps for rental guarantee audit tables.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   rev:
     lineage:
       - datalake_rental_guarantee_raw.revinfo.rev
+    description: Envers revision identifier.
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.revinfo.revtstmp
+    description: Timestamp of the Envers revision.
   year:
     lineage:
       - datalake_rental_guarantee_raw.revinfo.year
+    description: Partition year for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_raw.revinfo.month
+    description: Partition month for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_raw.revinfo.day
+    description: Partition day for incremental loading.

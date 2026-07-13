@@ -1,15 +1,20 @@
 ---
 database_name: datalake_rental_guarantee_clean
 table_name: processed_message
-owner: ae-fintech@quintoandar.com.br
+description:
+  Messages already handled by a rental guarantee subscriber.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_subscriber:
     lineage:
     - datalake_rental_guarantee_raw.processed_message.subscriber_id
+    description: Identifier of the subscriber that processed the message.
   id_message:
     lineage:
     - datalake_rental_guarantee_raw.processed_message.message_id
+    description: Identifier of the processed message.
   ts_created:
     lineage:
     - datalake_rental_guarantee_raw.processed_message.created_at
+    description: Timestamp when the subscriber marked the message as processed.

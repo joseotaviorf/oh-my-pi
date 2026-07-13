@@ -1,19 +1,27 @@
 database_name: datalake_rental_guarantee_clean
 table_name: renewal
+description:
+  Links a rental guarantee renewal to its guarantee and related charge.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_raw.renewal.id
+    description: Primary key of the renewal.
   id_guarantee:
     lineage:
       - datalake_rental_guarantee_raw.renewal.guarantee_id
+    description: Identifier of the guarantee being renewed.
   id_charge:
     lineage:
       - datalake_rental_guarantee_raw.renewal.charge_id
+    description: Identifier of the charge created for this renewal.
   ts_created:
     lineage:
       - datalake_rental_guarantee_raw.renewal.created_at
+    description: Creation timestamp of the renewal record.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.renewal.updated_at
+    description: Last update timestamp of the renewal record.

@@ -1,5 +1,6 @@
 database_name: datalake_rental_guarantee_clean
 table_name: charge_aud
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Audit log of charge records from Rental Guarantee, including revision metadata and field-level change tracking (mod_* columns)."
 columns:
