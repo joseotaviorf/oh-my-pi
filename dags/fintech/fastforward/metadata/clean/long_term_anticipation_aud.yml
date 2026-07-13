@@ -1,97 +1,133 @@
 database_name: datalake_fastforward_clean
 table_name: long_term_anticipation_aud
+description:
+  One row per long term anticipation aud in the Fintech clean layer, sourced
+  from datalake_fastforward_clean for payments, billing, and financial
+  operations reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.id
+    description: Financial attribute representing id on the long_term_anticipation_aud dataset.
   id_contract:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.contract_id
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_installment_option:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.installment_option_id
+    description: Identifier for the installment option referenced by this financial record.
   mod_id_installment_option:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.installment_option_mod
+    description: Financial attribute representing mod id installment option on the long_term_anticipation_aud dataset.
   id_quota:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.quota_id
+    description: Identifier for the quota referenced by this financial record.
   id_operation:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.operation_id
+    description: Identifier for the operation referenced by this financial record.
   rev:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.rev
+    description: Financial attribute representing rev on the long_term_anticipation_aud dataset.
   rev_type:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.revtype
+    description: Financial attribute representing rev type on the long_term_anticipation_aud dataset.
   investment_source:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.investment_source
+    description: Financial attribute representing investment source on the long_term_anticipation_aud dataset.
   mod_investment_source:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.investment_source_mod
+    description: Financial attribute representing mod investment source on the long_term_anticipation_aud dataset.
   status:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   mod_status:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.status_mod
+    description: Financial attribute representing mod status on the long_term_anticipation_aud dataset.
   months_anticipated:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.months_anticipated_number
+    description: Financial attribute representing months anticipated on the long_term_anticipation_aud dataset.
   mod_months_anticipated:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.months_anticipated_number_mod
+    description: Financial attribute representing mod months anticipated on the long_term_anticipation_aud dataset.
   installment_value:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.installment_value
+    description: Financial attribute representing installment value on the long_term_anticipation_aud dataset.
   mod_installment_value:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.installment_value_mod
+    description: Financial attribute representing mod installment value on the long_term_anticipation_aud dataset.
   partner_commission:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.partner_commission
+    description: Financial attribute representing partner commission on the long_term_anticipation_aud dataset.
   mod_partner_commission:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.partner_commission_mod
+    description: Financial attribute representing mod partner commission on the long_term_anticipation_aud dataset.
   total_amount:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.total_amount
+    description: Financial attribute representing total amount on the long_term_anticipation_aud dataset.
   mod_total_amount:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.total_amount_mod
+    description: Financial attribute representing mod total amount on the long_term_anticipation_aud dataset.
   total_rent:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.total_rent
+    description: Financial attribute representing total rent on the long_term_anticipation_aud dataset.
   mod_total_rent:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.total_rent_mod
+    description: Financial attribute representing mod total rent on the long_term_anticipation_aud dataset.
   ccb_code:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.ccb_code
+    description: Financial attribute representing ccb code on the long_term_anticipation_aud dataset.
   ccb_url:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.ccb_url
+    description: Financial attribute representing ccb url on the long_term_anticipation_aud dataset.
   iof_amount:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.iof_amount
+    description: Financial attribute representing iof amount on the long_term_anticipation_aud dataset.
   mod_iof_amount:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.iof_amount_mod
+    description: Financial attribute representing mod iof amount on the long_term_anticipation_aud dataset.
   mod_ts_paid:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.paid_at_mod
+    description: Financial attribute representing mod ts paid on the long_term_anticipation_aud dataset.
   mod_dt_first_installment:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.first_installment_date_mod
+    description: Financial attribute representing mod dt first installment on the long_term_anticipation_aud dataset.
   ts_paid:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.paid_at
+    description: Timestamp when paid occurred in the upstream fintech system.
   ts_signed:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.signed_at
+    description: Timestamp when signed occurred in the upstream fintech system.
   dt_first_installment:
     lineage:
       - datalake_fastforward_raw.long_term_anticipation_aud.first_installment_date
+    description: Calendar date associated with first installment in the financial workflow.

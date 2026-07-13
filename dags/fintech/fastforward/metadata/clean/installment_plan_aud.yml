@@ -1,25 +1,37 @@
 database_name: datalake_fastforward_clean
 table_name: installment_plan_aud
+description:
+  One row per installment plan aud in the Fintech clean layer, sourced from
+  datalake_fastforward_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_installment_plan:
     lineage:
       - datalake_fastforward_raw.installment_plan_aud.id
+    description: Identifier for the installment plan referenced by this financial record.
   rev:
     lineage:
       - datalake_fastforward_raw.installment_plan_aud.rev
+    description: Financial attribute representing rev on the installment_plan_aud dataset.
   rev_type:
     lineage:
       - datalake_fastforward_raw.installment_plan_aud.revtype
+    description: Financial attribute representing rev type on the installment_plan_aud dataset.
   rev_end:
     lineage:
       - datalake_fastforward_raw.installment_plan_aud.revend
+    description: Financial attribute representing rev end on the installment_plan_aud dataset.
   installments:
     lineage:
       - datalake_fastforward_raw.installment_plan_aud.number_of_installments
+    description: Financial attribute representing installments on the installment_plan_aud dataset.
   interest_rate:
     lineage:
       - datalake_fastforward_raw.installment_plan_aud.interest_rate
+    description: Financial attribute representing interest rate on the installment_plan_aud dataset.
   min_installment_value:
     lineage:
       - datalake_fastforward_raw.installment_plan_aud.min_installment_value
+    description: Financial attribute representing min installment value on the installment_plan_aud dataset.

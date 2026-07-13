@@ -1,76 +1,105 @@
 database_name: datalake_fastforward_clean
 table_name: gateway_loan_aud
+description:
+  One row per gateway loan aud in the Fintech clean layer, sourced from
+  datalake_fastforward_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.id
+    description: Financial attribute representing id on the gateway_loan_aud dataset.
   id_gateway:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.gateway_id
+    description: Identifier for the gateway referenced by this financial record.
   id_source:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.source_id
+    description: Identifier for the source referenced by this financial record.
   id_operation:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.operation_id
+    description: Identifier for the operation referenced by this financial record.
   id_external_contract:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.external_contract_id
+    description: Identifier for the external contract referenced by this financial record.
   rev:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.rev
+    description: Financial attribute representing rev on the gateway_loan_aud dataset.
   revtype:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.revtype
+    description: Financial attribute representing revtype on the gateway_loan_aud dataset.
   gateway:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.gateway
+    description: Financial attribute representing gateway on the gateway_loan_aud dataset.
   source:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.source
+    description: Financial attribute representing source on the gateway_loan_aud dataset.
   product:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.product
+    description: Financial attribute representing product on the gateway_loan_aud dataset.
   status:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   status_reason:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.status_reason
+    description: Financial attribute representing status reason on the gateway_loan_aud dataset.
   gateway_status:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.gateway_status
+    description: Financial attribute representing gateway status on the gateway_loan_aud dataset.
   ccb_url:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.ccb_url
+    description: Financial attribute representing ccb url on the gateway_loan_aud dataset.
   ccb_code:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.ccb_code
+    description: Financial attribute representing ccb code on the gateway_loan_aud dataset.
   investment_source:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.investment_source
+    description: Financial attribute representing investment source on the gateway_loan_aud dataset.
   partner_commission_amount:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.partner_commission_amount
+    description: Financial attribute representing partner commission amount on the gateway_loan_aud dataset.
   iof_amount:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.iof_amount
+    description: Financial attribute representing iof amount on the gateway_loan_aud dataset.
   installment_amount:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.installment_amount
+    description: Financial attribute representing installment amount on the gateway_loan_aud dataset.
   total_loan_cost_amount:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.total_loan_cost_amount
+    description: Financial attribute representing total loan cost amount on the gateway_loan_aud dataset.
   requested_loan_amount:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.requested_loan_amount
+    description: Financial attribute representing requested loan amount on the gateway_loan_aud dataset.
   dt_credit_accrual_year_month:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.credit_accrual_year_month
+    description: Calendar date associated with credit accrual year month in the financial workflow.
   ts_first_installment:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.first_installment_date
+    description: Timestamp when first installment occurred in the upstream fintech system.
   ts_signed:
     lineage:
       - datalake_fastforward_raw.gateway_loan_aud.signed_at
+    description: Timestamp when signed occurred in the upstream fintech system.

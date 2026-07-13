@@ -1,22 +1,33 @@
 database_name: datalake_fastforward_clean
 table_name: house_aud
+description:
+  One row per house aud in the Fintech clean layer, sourced from
+  datalake_fastforward_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_house:
     lineage:
       - datalake_fastforward_raw.house_aud.id
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   id_external:
     lineage:
       - datalake_fastforward_raw.house_aud.external_id
+    description: Identifier for the external referenced by this financial record.
   id_address:
     lineage:
       - datalake_fastforward_raw.house_aud.address_id
+    description: Identifier for the address referenced by this financial record.
   rev:
     lineage:
       - datalake_fastforward_raw.house_aud.rev
+    description: Financial attribute representing rev on the house_aud dataset.
   rev_type:
     lineage:
       - datalake_fastforward_raw.house_aud.revtype
+    description: Financial attribute representing rev type on the house_aud dataset.
   cover_image_url:
     lineage:
       - datalake_fastforward_raw.house_aud.cover_image_url
+    description: Financial attribute representing cover image url on the house_aud dataset.

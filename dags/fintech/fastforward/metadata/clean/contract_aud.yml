@@ -1,43 +1,61 @@
 database_name: datalake_fastforward_clean
 table_name: contract_aud
+description:
+  One row per contract aud in the Fintech clean layer, sourced from
+  datalake_fastforward_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract:
     lineage:
       - datalake_fastforward_raw.contract_aud.id
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_external:
     lineage:
       - datalake_fastforward_raw.contract_aud.external_id
+    description: Identifier for the external referenced by this financial record.
   id_landlord:
     lineage:
       - datalake_fastforward_raw.contract_aud.landlord_id
+    description: Identifier for the landlord referenced by this financial record.
   id_house:
     lineage:
       - datalake_fastforward_raw.contract_aud.house_id
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   id_owner:
     lineage:
       - datalake_fastforward_raw.contract_aud.owner_id
+    description: Identifier for the owner referenced by this financial record.
   id_brokerage_fee:
     lineage:
       - datalake_fastforward_raw.contract_aud.brokerage_fee_id
+    description: Identifier for the brokerage fee referenced by this financial record.
   id_installment_plan:
     lineage:
       - datalake_fastforward_raw.contract_aud.installment_plan_id
+    description: Identifier for the installment plan referenced by this financial record.
   rev:
     lineage:
       - datalake_fastforward_raw.contract_aud.rev
+    description: Financial attribute representing rev on the contract_aud dataset.
   rev_type:
     lineage:
       - datalake_fastforward_raw.contract_aud.revtype
+    description: Financial attribute representing rev type on the contract_aud dataset.
   rev_end:
     lineage:
       - datalake_fastforward_raw.contract_aud.revend
+    description: Financial attribute representing rev end on the contract_aud dataset.
   is_off_limits:
     lineage:
       - datalake_fastforward_raw.contract_aud.off_limits
+    description: Indicates whether off limits applies to this financial record.
   ts_started:
     lineage:
       - datalake_fastforward_raw.contract_aud.start_date
+    description: Timestamp when started occurred in the upstream fintech system.
   ts_ended:
     lineage:
       - datalake_fastforward_raw.contract_aud.end_date
+    description: Timestamp when ended occurred in the upstream fintech system.
