@@ -1,0 +1,120 @@
+database_name: datalake_identitynow_audit_logs_clean
+table_name: account_activities
+description: |
+  IdentityNow account provisioning activities exported as JSON. One row per account lifecycle action
+  with requester, recipient, provisioning payloads, and hourly partitions for IAM audit trails.
+domain: Tech Platform
+owner: matheus.bosa@quintoandar.com.br
+columns:
+  ts_event:
+    description: Activity timestamp parsed from the IdentityNow created field for timeline analysis.
+    lineage:
+      - s3_auditlogs_bucket.created
+  id_account_activity:
+    description: Unique identifier assigned by IdentityNow to the account activity record.
+    lineage:
+      - s3_auditlogs_bucket.id
+  tracking_number:
+    description: Correlation tracking number linking related IdentityNow provisioning activities.
+    lineage:
+      - s3_auditlogs_bucket.trackingNumber
+  type:
+    description: IdentityNow activity type describing the provisioning or governance operation.
+    lineage:
+      - s3_auditlogs_bucket.type
+  sources:
+    description: Source systems or connectors referenced by the IdentityNow account activity.
+    lineage:
+      - s3_auditlogs_bucket.sources
+  action:
+    description: Specific provisioning action requested in the IdentityNow account activity.
+    lineage:
+      - s3_auditlogs_bucket.action
+  status:
+    description: Current processing status of the IdentityNow account activity workflow.
+    lineage:
+      - s3_auditlogs_bucket.status
+  stage:
+    description: Workflow stage reached by the IdentityNow account activity when exported.
+    lineage:
+      - s3_auditlogs_bucket.stage
+  id_requester:
+    description: IdentityNow identifier of the user or system that submitted the activity request.
+    lineage:
+      - s3_auditlogs_bucket.requester.id
+  requester_name:
+    description: Display name of the requester who initiated the IdentityNow account activity.
+    lineage:
+      - s3_auditlogs_bucket.requester.name
+  requester_type:
+    description: IdentityNow entity type of the requester (user, system, service account, etc.).
+    lineage:
+      - s3_auditlogs_bucket.requester.type
+  id_recipient:
+    description: IdentityNow identifier of the identity receiving the provisioning change.
+    lineage:
+      - s3_auditlogs_bucket.recipient.id
+  recipient_name:
+    description: Display name of the identity targeted by the IdentityNow account activity.
+    lineage:
+      - s3_auditlogs_bucket.recipient.name
+  recipient_type:
+    description: IdentityNow entity type of the recipient identity affected by the activity.
+    lineage:
+      - s3_auditlogs_bucket.recipient.type
+  account_requests:
+    description: JSON array of granular account change requests executed within the activity.
+    lineage:
+      - s3_auditlogs_bucket.accountRequests
+  original_requests:
+    description: JSON array preserving the original provisioning requests before transformations.
+    lineage:
+      - s3_auditlogs_bucket.originalRequests
+  expansion_items:
+    description: JSON array of expanded provisioning items generated during IdentityNow evaluation.
+    lineage:
+      - s3_auditlogs_bucket.expansionItems
+  org:
+    description: IdentityNow organization tenant identifier associated with the exported activity.
+    lineage:
+      - s3_auditlogs_bucket.org
+  pod:
+    description: IdentityNow pod or region code hosting the tenant that emitted the activity.
+    lineage:
+      - s3_auditlogs_bucket.pod
+  _type:
+    description: Internal IdentityNow schema type marker preserved from the raw JSON export.
+    lineage:
+      - s3_auditlogs_bucket._type
+  _version:
+    description: Schema version string shipped with the IdentityNow activity JSON payload.
+    lineage:
+      - s3_auditlogs_bucket._version
+  created:
+    description: Raw created timestamp string as emitted by IdentityNow before parsing to ts_event.
+    lineage:
+      - s3_auditlogs_bucket.created
+  modified:
+    description: Last modified timestamp recorded by IdentityNow for the account activity.
+    lineage:
+      - s3_auditlogs_bucket.modified
+  synced:
+    description: Timestamp indicating when IdentityNow synchronized the activity to the export bucket.
+    lineage:
+      - s3_auditlogs_bucket.synced
+  year:
+    description: Partition year derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.created
+  month:
+    description: Partition month derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.created
+  day:
+    description: Partition day derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.created
+  hour:
+    description: Partition hour derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.created

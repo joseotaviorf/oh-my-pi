@@ -1,0 +1,108 @@
+database_name: datalake_identitynow_audit_logs_clean
+table_name: events
+description: |
+  IdentityNow audit events ingested from SaaS JSON exports. One row per IAM governance event with
+  actor, target, operation outcome, and time partitions for security and compliance investigations.
+domain: Tech Platform
+owner: matheus.bosa@quintoandar.com.br
+columns:
+  ts_event:
+    description: Event timestamp parsed from the IdentityNow created field for chronological analysis.
+    lineage:
+      - s3_auditlogs_bucket.created
+  id_event:
+    description: Unique identifier assigned by IdentityNow to the audit event record.
+    lineage:
+      - s3_auditlogs_bucket.id
+  tracking_number:
+    description: Correlation tracking number propagated across related IdentityNow audit payloads.
+    lineage:
+      - s3_auditlogs_bucket.trackingNumber
+  name:
+    description: Human-readable event name displayed in the IdentityNow audit console.
+    lineage:
+      - s3_auditlogs_bucket.name
+  technical_name:
+    description: Internal technical event name used by IdentityNow APIs and automation rules.
+    lineage:
+      - s3_auditlogs_bucket.technicalName
+  operation:
+    description: High-level operation category performed in IdentityNow (create, update, delete, etc.).
+    lineage:
+      - s3_auditlogs_bucket.operation
+  status:
+    description: Processing status of the IdentityNow event at the time it was recorded.
+    lineage:
+      - s3_auditlogs_bucket.status
+  type:
+    description: IdentityNow event type classification used for filtering audit streams.
+    lineage:
+      - s3_auditlogs_bucket.type
+  details:
+    description: Free-text or structured detail payload explaining the context of the audit event.
+    lineage:
+      - s3_auditlogs_bucket.details
+  action:
+    description: Specific action code executed within the IdentityNow governance workflow.
+    lineage:
+      - s3_auditlogs_bucket.action
+  actor_name:
+    description: Display name of the user or system actor that initiated the IdentityNow event.
+    lineage:
+      - s3_auditlogs_bucket.actor.name
+  target_name:
+    description: Display name of the identity or resource affected by the IdentityNow event.
+    lineage:
+      - s3_auditlogs_bucket.target.name
+  attributes:
+    description: Key-value map of supplemental attributes attached to the IdentityNow audit event.
+    lineage:
+      - s3_auditlogs_bucket.attributes
+  objects:
+    description: JSON array listing related objects referenced by the IdentityNow audit event.
+    lineage:
+      - s3_auditlogs_bucket.objects
+  org:
+    description: IdentityNow organization tenant identifier associated with the exported event.
+    lineage:
+      - s3_auditlogs_bucket.org
+  pod:
+    description: IdentityNow pod or region code hosting the tenant that emitted the audit event.
+    lineage:
+      - s3_auditlogs_bucket.pod
+  ip_address:
+    description: Source IP address recorded for the session that triggered the IdentityNow event.
+    lineage:
+      - s3_auditlogs_bucket.ipAddress
+  _type:
+    description: Internal IdentityNow schema type marker preserved from the raw JSON export.
+    lineage:
+      - s3_auditlogs_bucket._type
+  _version:
+    description: Schema version string shipped with the IdentityNow audit JSON payload.
+    lineage:
+      - s3_auditlogs_bucket._version
+  created:
+    description: Raw created timestamp string as emitted by IdentityNow before parsing to ts_event.
+    lineage:
+      - s3_auditlogs_bucket.created
+  synced:
+    description: Timestamp indicating when IdentityNow synchronized the event to the export bucket.
+    lineage:
+      - s3_auditlogs_bucket.synced
+  year:
+    description: Partition year derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.created
+  month:
+    description: Partition month derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.created
+  day:
+    description: Partition day derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.created
+  hour:
+    description: Partition hour derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.created

@@ -1,7 +1,7 @@
 database_name: datalake_idn
 table_name: identities
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: danilo.barbosa@quintoandar.com.br
 description: |
   Current-state SailPoint IdentityNow identities — latest ingest partition within the Airflow batch window and one
   row per identity. Derived from clean by keeping MAX(year, month, day) in scope and deduplicating with QUALIFY.

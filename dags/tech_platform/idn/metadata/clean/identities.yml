@@ -1,7 +1,7 @@
 database_name: datalake_idn_clean
 table_name: identities
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: danilo.barbosa@quintoandar.com.br
 description: |
   Clean IdentityNow identities normalized from raw with typed dates/timestamps; one row per identity per ingest
   partition (year, month, day).
