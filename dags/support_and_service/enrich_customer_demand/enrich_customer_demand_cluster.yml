@@ -7,7 +7,12 @@ cluster:
     runtime_engine: PHOTON
 validation:
   cluster:
-    type: emr_7_12_consolidation_l_memory_single_node_fleet_cluster
+    type: emr_7_12_consolidation_xl_memory_single_node_fleet_cluster
     custom_configurations:
       aws_attributes:
         ebs_volume_size: 300
+      spark_conf:
+        spark.executor.memory: 96g
+        spark.executor.memoryOverhead: 8g
+        spark.driver.memory: 20g
+        spark.driver.memoryOverhead: 4g
