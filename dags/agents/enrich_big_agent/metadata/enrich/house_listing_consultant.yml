@@ -52,8 +52,6 @@ columns:
     categories:
       RENT: Rent listing version from EBDB house_listing.
       SALE: Sale listing from sale_listings enrich layer.
-  enrollment_number:
-    description: Sequential enrollment revision number for the listing, ordered by agency audit revision.
   is_last_ciq_on_listing:
     description: True when the row is the latest consultant revision attributed to the listing.
   dt_consultant_started:

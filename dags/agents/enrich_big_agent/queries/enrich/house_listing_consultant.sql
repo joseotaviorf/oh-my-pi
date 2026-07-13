@@ -6,7 +6,6 @@ WITH sale_historical_consultant AS (
         hch.id_partner,
         hch.id_user,
         hch.consultant_type,
-        ROW_NUMBER() OVER(PARTITION BY sl.id_sale_listing ORDER BY hch.rev) AS enrollment_number,
         FIRST_VALUE(consultant_type) IGNORE NULLS OVER(PARTITION BY sl.id_sale_listing ORDER BY hch.rev) AS first_consultant_type,
         -- If we don't have a consultant related to one listing
         -- we still needing to propagate that there isnt information
@@ -34,7 +33,6 @@ rent_historical_consultant AS (
         hch.id_partner,
         hch.id_user,
         hch.consultant_type,
-        ROW_NUMBER() OVER(PARTITION BY hl.id_house_listing ORDER BY hch.rev) AS enrollment_number,
         FIRST_VALUE(consultant_type) IGNORE NULLS OVER(PARTITION BY hl.id_house_listing ORDER BY hch.rev) AS first_consultant_type,
         -- If we don't have a consultant related to one listing
         -- we still needing to propagate that there isnt information
@@ -93,7 +91,6 @@ SELECT
         ELSE first_consultant_type
     END AS first_consultant_type,
     "RENT" AS business_context,
-    enrollment_number,
     is_last_ciq_on_listing,
     dt_consultant_started,
     ts_consultant_deleted,
@@ -103,7 +100,7 @@ SELECT
     ts_listing_version_end
 FROM
     rent_historical_consultant
-UNION ALL
+UNION
 SELECT 
     id_sale_listing AS id_listing,
     id_house,
@@ -137,7 +134,6 @@ SELECT
         ELSE first_consultant_type
     END AS first_consultant_type,
     "SALE" AS business_context,
-    enrollment_number,
     is_last_ciq_on_listing,
     dt_consultant_started,
     ts_consultant_deleted,
