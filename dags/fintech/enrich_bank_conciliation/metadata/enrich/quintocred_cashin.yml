@@ -1,57 +1,57 @@
 ---
 database_name: datalake_bank_conciliation
 table_name: quintocred_cashin
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: null
+description: Enriched quintocred cashin dataset combining upstream clean sources with business rules for fintech operational analytics and reconciliation.
 columns:
   company_use:
-    description: ''
+    description: Financial attribute representing company use on the quintocred_cashin dataset.
     lineage:
     - .bank_union.company_use
   id_sap_transaction:
-    description: ''
+    description: Identifier for the sap transaction referenced by this financial record.
     lineage:
     - .bank_union.s.id_transaction
   type_transaction:
-    description: ''
+    description: Financial attribute representing type transaction on the quintocred_cashin dataset.
     lineage:
     - .bank_union.type_transaction
   bank_account:
-    description: ''
+    description: Financial attribute representing bank account on the quintocred_cashin dataset.
     lineage:
     - .bank_union.'49458-8'
   bank_paid_amount:
-    description: ''
+    description: Financial attribute representing bank paid amount on the quintocred_cashin dataset.
     lineage:
     - .bank_union.bu.paid_amount
   charge_amount:
-    description: ''
+    description: Financial attribute representing charge amount on the quintocred_cashin dataset.
     lineage:
     - .bank_union.p.paid_amount
   sap_paid_amount:
-    description: ''
+    description: Financial attribute representing sap paid amount on the quintocred_cashin dataset.
     lineage:
     - .bank_union.s.paid_amount
   is_charge_concilied:
-    description: ''
+    description: Indicates whether charge concilied applies to this financial record.
     lineage:
     - .bank_union.CASE WHEN NOT p.our_number IS NULL AND p.paid_amount = bu.paid_amount
       AND p.dt_paid = bu.dt_paid THEN TRUE ELSE FALSE END
   is_sap_concilied:
-    description: ''
+    description: Indicates whether sap concilied applies to this financial record.
     lineage:
     - .bank_union.CASE WHEN NOT s.company_use IS NULL AND s.paid_amount = bu.paid_amount
       AND s.dt_paid = bu.dt_paid THEN TRUE ELSE FALSE END
   dt_bank_paid:
-    description: ''
+    description: Calendar date associated with bank paid in the financial workflow.
     lineage:
     - .bank_union.bu.dt_paid
   dt_charge_paid:
-    description: ''
+    description: Calendar date associated with charge paid in the financial workflow.
     lineage:
     - .bank_union.p.dt_paid
   dt_sap_paid:
-    description: ''
+    description: Calendar date associated with sap paid in the financial workflow.
     lineage:
     - .bank_union.s.dt_paid

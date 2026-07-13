@@ -2,20 +2,20 @@ database_name: datalake_betopera
 table_name: insurance
 description: "Information about the life cycle of insurance policies: creation, cancellation and renewal"
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_betopera_clean.insurance.id
-    description: "Id of the Insurance"
+    description: Financial attribute representing id on the insurance dataset.
   id_idempotency:
     lineage:
       - datalake_betopera_clean.insurance.id_idempotency
-    description: "Id of the Idempotency"
+    description: Identifier for the idempotency referenced by this financial record.
   source_type_code:
     lineage:
       - datalake_betopera_clean.insurance.source_type_code
-    description: "Type of the insurance"
+    description: Financial attribute representing source type code on the insurance dataset.
   status:
     lineage:
       - datalake_betopera_clean.insurance.status
@@ -29,7 +29,7 @@ columns:
   version:
     lineage:
       - datalake_betopera_clean.insurance.version
-    description: "Version of the insurance"
+    description: Financial attribute representing version on the insurance dataset.
   ts_created:
     lineage:
       - datalake_betopera_clean.insurance.ts_created

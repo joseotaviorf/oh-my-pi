@@ -1,7 +1,7 @@
 ---
 database_name: datalake_bank_conciliation
 table_name: for_sale_cashin
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Table containing bank reconciliation data for For Sale and SAP entries.
 columns:
@@ -26,7 +26,7 @@ columns:
     lineage:
     - .final_all.bank_account
   account_number:
-    description: 'account number'
+    description: Financial attribute representing account number on the for_sale_cashin dataset.
     lineage:
     - .final_all.account_number
   company_use:
@@ -38,7 +38,7 @@ columns:
     lineage:
     - .final_all.counterpart_document
   counterpart_name:
-    description: 'Counterparty name'
+    description: Financial attribute representing counterpart name on the for_sale_cashin dataset.
     lineage:
     - .final_all.counterpart_name
   bank_paid_amount:
@@ -50,11 +50,11 @@ columns:
     lineage:
     - .final_all.bank_type_transaction
   monopoly_income_from:
-    description: 'Monopoly income source'
+    description: Financial attribute representing monopoly income from on the for_sale_cashin dataset.
     lineage:
     - .final_all.monopoly_income_from
   monopoly_paid_amount:
-    description: 'Paid amount in Monopoly'
+    description: Financial attribute representing monopoly paid amount on the for_sale_cashin dataset.
     lineage:
     - .final_all.monopoly_paid_amount
   monopoly_is_reconcilied:

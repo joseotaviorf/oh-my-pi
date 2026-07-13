@@ -1,82 +1,85 @@
 database_name: datalake_arquivo_confidencial
 table_name: scr
-owner: felipe.chies@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "Table with SCR data broken by Months on Booking (mob) and version."
+description: >
+  Exploded QI Tech Bacen SCR operations from Arquivo Confidencial aud,
+  one row per CPF/Mob/reference_date/operation item for credit screening.
 columns:
   id:
-    description: "Identification from integration report aud table."
+    description: FK to integration_report_aud.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.id
+      - datalake_arquivo_confidencial_clean.integration_report_aud.id
   cpf:
-    description: "Personal identification from main proponent."
+    description: Brazilian individual taxpayer registry number (CPF) (PII).
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.cpf
+      - datalake_arquivo_confidencial_clean.integration_report_aud.cpf
   rev_end:
-    description: "Represents the end of the validity period for a particular version of a row. If null, it represents the most current version, otherwise, it is filled with the timestamp of the latest revision when inserted."
+    description: Envers end revision; null means current version.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.rev_end
+      - datalake_arquivo_confidencial_clean.integration_report_aud.rev_end
   mob:
-    description: "Months on Booking. Commom name for designating number of months before an event."
+    description: Months-on-book rank of SCR reference_date per CPF load (1 = newest).
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.mob
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.ts_created
   reference_date:
-    description: "Year month of the credit limits data."
+    description: Year-month of the SCR snapshot inside the provider payload.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.reference_date
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   has_scr_attributes:
-    description: "Indicates if the SCR attributes exist in the data."
+    description: 1 if attributes contain SCR data; else 0.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.has_scr_attributes
+      - datalake_arquivo_confidencial_clean.integration_report_aud.attributes
   value:
-    description: "SCR property value."
+    description: Operation balance for domain/modality/submodality (BRL; cents × 0.01).
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   domain:
-    description: "SCR data identification regarding type and time."
+    description: Bacen SCR maturity bucket — a vencer (110–190), vencido (205–290), or credit limit (20/40).
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   modality:
-    description: "SCR data identification of balance operation group."
+    description: Bacen SCR modality code (product/operation group).
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   submodality:
-    description: "SCR data identification of balance operation detail."
+    description: Bacen SCR submodality code (product/operation detail).
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   domain_group:
-    description: "SCR domain grouping based on status."
+    description: Provider grouping of the SCR domain.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   modality_description:
-    description: "SCR data balance operation group."
+    description: Human-readable modality label from the provider.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   submodality_description:
-    description: "SCR data balance operation detail."
+    description: Human-readable submodality label from the provider.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   linked_to_foreign_currency:
-    description: "If data is informed on foreign currency."
+    description: Whether the operation is flagged as foreign-currency linked.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   financial_institution_count:
-    description: "Count of financial institution."
+    description: Number of financial institutions in the SCR report.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   start_relationship_date:
-    description: "Start date of the relationship"
+    description: Start date of the CPF relationship in the Bacen SCR.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
+      - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   ts_created:
-    description: "Date information was created"
+    description: Timestamp when the integration_report_aud row was created.
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.ts_created
+      - datalake_arquivo_confidencial_clean.integration_report_aud.ts_created
   ts_updated:
-    description: "Date information was last updated."
+    description: Revision timestamp from rev_info for this aud row.
     lineage:
-        - datalake_arquivo_confidencial_clean.rev_info.ts_created
+      - datalake_arquivo_confidencial_clean.rev_info.ts_created
   ts_next_updated:
-    description: "Next date the cpf had its data updated"
+    description: Next revision timestamp for the same CPF/Mob (LEAD over ts_updated).
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.ts_updated
+      - datalake_arquivo_confidencial_clean.rev_info.ts_created

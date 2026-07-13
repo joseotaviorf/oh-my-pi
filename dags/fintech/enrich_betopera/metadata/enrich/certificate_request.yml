@@ -2,16 +2,16 @@ database_name: datalake_betopera
 table_name: certificate_request
 description: Information about insurance certificates requests.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_betopera_clean.certificate_request.id
-    description: "ID of the certificate request"
+    description: Financial attribute representing id on the certificate_request dataset.
   id_insurance:
     lineage:
       - datalake_betopera_clean.certificate_request.id_insurance
-    description: "ID of the insurance"
+    description: Identifier for the insurance referenced by this financial record.
   version:
     lineage:
       - datalake_betopera_clean.certificate_request.version

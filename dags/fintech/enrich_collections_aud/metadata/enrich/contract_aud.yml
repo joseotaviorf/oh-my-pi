@@ -1,12 +1,12 @@
 ---
 database_name: datalake_collections_aud
 table_name: contract_aud
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Audit trail of contract transactions with enriched data from related entities. Contains historical changes to contracts with termination tracking and analyst annulment information."
 columns:
   id_contract:
-    description: "Contract ID"
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
     lineage:
       - datalake_ebdb_transactional.contrato.id
   country_code:
@@ -48,10 +48,6 @@ columns:
     description: "Timestamp of database transaction"
     lineage:
       - datalake_ebdb_transactional.contrato.ts_database_transaction
-  ts_snapshot:
-    description: "Timestamp of CDC transaction snapshot"
-    lineage:
-      - datalake_ebdb_transactional.contrato.ts_cdc_transaction
   year:
     description: "Year from database transaction"
     lineage:
@@ -64,3 +60,15 @@ columns:
     description: "Day from database transaction"
     lineage:
       - datalake_ebdb_transactional.contrato.day
+  ts_cdc_transaction:
+    description: Timestamp when cdc transaction occurred in the upstream fintech system.
+    lineage: []
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  log_type:
+    description: Debt collection attribute describing log type for recovery workflow tracking.
+    lineage: []
+  city:
+    description: Debt collection attribute describing city for recovery workflow tracking.
+    lineage: []

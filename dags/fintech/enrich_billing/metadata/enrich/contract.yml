@@ -1,7 +1,7 @@
 ---
 database_name: datalake_billing
 table_name: contract
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Contract data enriched with financial details and timestamps extracted from the latest contract revision."
 columns:

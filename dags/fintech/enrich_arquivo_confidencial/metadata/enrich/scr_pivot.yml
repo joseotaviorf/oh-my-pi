@@ -1,207 +1,178 @@
 database_name: datalake_arquivo_confidencial
 table_name: scr_pivot
-owner: felipe.chies@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "Table with SCR data broken by Months on Booking (mob) and version."
+description: "SCR balances pivoted by months on book (Mob) and credit product buckets."
 columns:
   cpf:
-    description: "Personal identification number"
+    description: "Brazilian individual taxpayer registry number (CPF)."
   rev_end:
-    description: "Represents the end of the validity period for a particular version of a row. If null, it represents the most current version, otherwise, it is filled with the timestamp of the latest revision when inserted."
+    description: "End of validity for this row version. Null means current; otherwise the timestamp of the latest revision when this version ended."
     lineage:
         - datalake_arquivo_confidencial.scr.rev_end
   mob:
-    description: "Months on Booking."
+    description: "Months on book."
   reference_date:
-    description: "Year month indicating to when the data is relevant."
+    description: "Year-month the SCR data refers to."
   financial_institution_count:
     lineage:
         - datalake_arquivo_confidencial.scr.financial_institution_count
-    description: "Count of financial institution."
+    description: "Count of financial institutions in the SCR report."
   start_relationship_date:
     lineage:
         - datalake_arquivo_confidencial.scr.start_relationship_date
-    description: "Start date of the relationship"
+    description: "Start date of the credit relationship."
   balance_due_on_credit_cards_up_to_30_days:
-    description: "Saldo pra vencer até 30 dias considerando
-                  crédito rotativo vinculado a cartão de crédito,
-                  cartão de crédito compra, fatura parcelada ou saque financiado pela instituição emitente do cartão,
-                  cartão de crédito não migrado,
-                  cartão de crédito compra ou fatura parcelada pela instituição financeira emitente do cartão,
-                  cartão de crédito compra à vista e parcelado lojista"
+    description: "Balance due on credit cards up to 30 days, covering revolving credit linked to credit cards, issuer installment purchases or financed cash advances, non-migrated credit cards, issuer purchase or installment bills, and cash or merchant-installment purchases."
   balance_due_on_credit_cards_31_to_180_days:
-    description: "Saldo pra vencer de 31 dias a 180 dias considerando
-                  crédito rotativo vinculado a cartão de crédito,
-                  cartão de crédito compra, fatura parcelada ou saque financiado pela instituição emitente do cartão,
-                  cartão de crédito não migrado,
-                  cartão de crédito compra ou fatura parcelada pela instituição financeira emitente do cartão,
-                  cartão de crédito compra à vista e parcelado lojista"
+    description: "Balance due on credit cards from 31 to 180 days, covering revolving credit linked to credit cards, issuer installment purchases or financed cash advances, non-migrated credit cards, issuer purchase or installment bills, and cash or merchant-installment purchases."
   balance_due_on_credit_cards_over_180_days:
-    description: "Saldo pra vencer acima de 180 dias considerando
-                  crédito rotativo vinculado a cartão de crédito,
-                  cartão de crédito compra, fatura parcelada ou saque financiado pela instituição emitente do cartão,
-                  cartão de crédito não migrado,
-                  cartão de crédito compra ou fatura parcelada pela instituição financeira emitente do cartão,
-                  cartão de crédito compra à vista e parcelado lojista"
+    description: "Balance due on credit cards over 180 days, covering revolving credit linked to credit cards, issuer installment purchases or financed cash advances, non-migrated credit cards, issuer purchase or installment bills, and cash or merchant-installment purchases."
   balance_due_on_real_estate_up_to_30_days:
-    description: "Saldo pra vencer até 30 dias considerando
-                  financiamento habitacional SFH
-                  financiamento habitacional exceto SFH"
+    description: "Balance due on real estate up to 30 days, covering SFH (Housing Finance System) and non-SFH mortgage financing."
   balance_due_on_real_estate_31_to_180_days:
-    description: "Saldo pra vencer de 31 a 180 dias considerando
-                  financiamento habitacional SFH
-                  financiamento habitacional exceto SFH"
+    description: "Balance due on real estate from 31 to 180 days, covering SFH (Housing Finance System) and non-SFH mortgage financing."
   balance_due_on_real_estate_over_180_days:
-    description: "Saldo pra vencer acima de 180 dias considerando
-                  financiamento habitacional SFH
-                  financiamento habitacional exceto SFH"
+    description: "Balance due on real estate over 180 days, covering SFH (Housing Finance System) and non-SFH mortgage financing."
   balance_due_on_payroll_loan_up_to_30_days:
-    description: "Saldo pra vencer até 30 dias considerando crédito pessoal com consignação em folha de pagamentos"
+    description: "Balance due on payroll loan up to 30 days — Bacen registry amount for salary-deducted personal lending."
   balance_due_on_payroll_loan_31_to_180_days:
-    description: "Saldo pra vencer de 31 a 180 dias considerando crédito pessoal com consignação em folha de pagamentos"
+    description: "Balance due on payroll loan from 31 to 180 days — Bacen registry amount for salary-deducted personal lending."
   balance_due_on_payroll_loan_over_180_days:
-    description: "Saldo pra vencer acima de 180 dias considerando crédito pessoal com consignação em folha de pagamentos"
+    description: "Balance due on payroll loan over 180 days — Bacen registry amount for salary-deducted personal lending."
   balance_due_on_vehicles_up_to_30_days:
-    description: "Saldo pra vencer até 30 dias considerando aquisição de bens veículos automotores"
+    description: "Balance due on vehicles up to 30 days — Bacen registry amount for motor acquisition financing."
   balance_due_on_vehicles_31_to_180_days:
-    description: "Saldo pra vencer de 31 a 180 dias considerando aquisição de bens veículos automotores"
+    description: "Balance due on vehicles from 31 to 180 days — Bacen registry amount for motor acquisition financing."
   balance_due_on_vehicles_over_180_days:
-    description: "Saldo pra vencer acima de 180 dias considerando aquisição de bens veículos automotores"
+    description: "Balance due on vehicles over 180 days — Bacen registry amount for motor acquisition financing."
   balance_due_on_home_equity_up_to_30_days:
-    description: "Saldo pra vencer até 30 dias considerando home equity"
+    description: "Balance due on home equity up to 30 days — Bacen registry amount secured by residential property."
   balance_due_on_home_equity_31_to_180_days:
-    description: "Saldo pra vencer de 31 a 180 dias considerando home equity"
+    description: "Balance due on home equity from 31 to 180 days — Bacen registry amount secured by residential property."
   balance_due_on_home_equity_over_180_days:
-    description: "Saldo pra vencer acima de 180 dias considerando home equity"
+    description: "Balance due on home equity over 180 days — Bacen registry amount secured by residential property."
   balance_due_on_personal_credit_up_to_30_days:
-    description: "Saldo pra vencer até 30 dias considerando crédito pessoal, sem consignação em folha de pagamento"
+    description: "Balance due on personal credit up to 30 days — Bacen registry amount for non-payroll consumer lending."
   balance_due_on_personal_credit_31_to_180_days:
-    description: "Saldo pra vencer de 31 a 180 dias considerando crédito pessoal, sem consignação em folha de pagamento"
+    description: "Balance due on personal credit from 31 to 180 days — Bacen registry amount for non-payroll consumer lending."
   balance_due_on_personal_credit_over_180_days:
-    description: "Saldo pra vencer acima de 180 dias considerando crédito pessoal, sem consignação em folha de pagamento"
+    description: "Balance due on personal credit over 180 days — Bacen registry amount for non-payroll consumer lending."
   balance_due_on_overdraft_check_up_to_30_days:
-    description: "Saldo pra vencer até 30 dias considerando adiantamentos a depositantes e cheque especial"
+    description: "Balance due on overdraft check up to 30 days — Bacen registry amount for advances to depositors."
   balance_due_on_overdraft_check_31_to_180_days:
-    description: "Saldo pra vencer de 31 a 180 dias considerando adiantamentos a depositantes e cheque especial"
+    description: "Balance due on overdraft check from 31 to 180 days — Bacen registry amount for advances to depositors."
   balance_due_on_overdraft_check_over_180_days:
-    description: "Saldo pra vencer acima de 180 dias considerando adiantamentos a depositantes e cheque especial"
+    description: "Balance due on overdraft check over 180 days — Bacen registry amount for advances to depositors."
   overdue_balance_of_credit_cards_up_to_30_days:
-    description: "Saldo vencido até 30 dias considerando crédito rotativo vinculado a cartão de crédito,
-                          cartão de crédito compra, fatura parcelada ou saque financiado pela instituição emitente do cartão,
-                          cartão de crédito não migrado,
-                          cartão de crédito compra ou fatura parcelada pela instituição financeira emitente do cartão,
-                          cartão de crédito compra à vista e parcelado lojista"
+    description: "Overdue balance of credit cards up to 30 days, covering revolving credit linked to credit cards, issuer installment purchases or financed cash advances, non-migrated credit cards, issuer purchase or installment bills, and cash or merchant-installment purchases."
   overdue_balance_of_credit_cards_over_30_days:
-    description: "Saldo vencido acima de 30 dias considerando crédito rotativo vinculado a cartão de crédito,
-                          cartão de crédito compra, fatura parcelada ou saque financiado pela instituição emitente do cartão,
-                          cartão de crédito não migrado,
-                          cartão de crédito compra ou fatura parcelada pela instituição financeira emitente do cartão,
-                          cartão de crédito compra à vista e parcelado lojista"
+    description: "Overdue balance of credit cards over 30 days, covering revolving credit linked to credit cards, issuer installment purchases or financed cash advances, non-migrated credit cards, issuer purchase or installment bills, and cash or merchant-installment purchases."
   overdue_balance_of_real_estate_up_to_30_days:
-    description: "Saldo vencido até 30 dias considerando financiamento habitacional com e sem SFH"
+    description: "Overdue balance of real estate up to 30 days, covering SFH (Housing Finance System) and non-SFH mortgage financing."
   overdue_balance_of_real_estate_over_30_days:
-    description: "Saldo vencido acima de 30 dias considerando financiamento habitacional com e sem SFH"
+    description: "Overdue balance of real estate over 30 days, covering SFH (Housing Finance System) and non-SFH mortgage financing."
   overdue_balance_of_payroll_loan_up_to_30_days:
-    description: "Saldo vencido até 30 dias considerando crédito pessoal com consignação em folha de pagamentos"
+    description: "Overdue balance of payroll loan up to 30 days — Bacen registry amount for salary-deducted personal lending."
   overdue_balance_of_payroll_loan_over_30_days:
-    description: "Saldo vencido acima de 30 dias considerando crédito pessoal com consignação em folha de pagamentos"
+    description: "Overdue balance of payroll loan over 30 days — Bacen registry amount for salary-deducted personal lending."
   overdue_balance_of_vehicles_up_to_30_days:
-    description: "Saldo vencido até 30 dias considerando aquisição de bens veículos automotores"
+    description: "Overdue balance of vehicles up to 30 days — Bacen registry amount for motor acquisition financing."
   overdue_balance_of_vehicles_over_30_days:
-    description: "Saldo vencido mais de 30  dias considerando aquisição de bens veículos automotores"
+    description: "Overdue balance of vehicles over 30 days — Bacen registry amount for motor acquisition financing."
   overdue_balance_of_home_equity_up_to_30_days:
-    description: "Saldo vencido até 30 dias considerando home equity."
+    description: "Overdue balance of home equity up to 30 days — Bacen registry amount secured by residential property."
   overdue_balance_of_home_equity_over_30_days:
-    description: "Saldo vencido mais de 30  dias considerando home equity."
+    description: "Overdue balance of home equity over 30 days — Bacen registry amount secured by residential property."
   overdue_balance_of_personal_credit_up_to_30_days:
-    description: "Saldo vencido até 30 dias considerando crédito pessoal sem consignação em folha de pagamento."
+    description: "Overdue balance of personal credit up to 30 days — Bacen registry amount for non-payroll consumer lending."
   overdue_balance_of_personal_credit_over_30_days:
-    description: "Saldo vencido mais de 30  dias considerando crédito pessoal sem consignação em folha de pagamento."
+    description: "Overdue balance of personal credit over 30 days — Bacen registry amount for non-payroll consumer lending."
   overdue_balance_of_overdraft_check_up_to_30_days:
-    description: "Saldo vencido até 30 dias considerando adiantamentos a depositantes e cheque especial"
+    description: "Overdue balance of overdraft check up to 30 days — Bacen registry amount for advances to depositors."
   overdue_balance_of_overdraft_check_over_30_days:
-    description: "Saldo vencido mais de 30  dias considerando adiantamentos a depositantes e cheque especial"
+    description: "Overdue balance of overdraft check over 30 days — Bacen registry amount for advances to depositors."
   global_limit_expiration_up_to_360_days:
-    description: "Limite até 360 dias que é informado quando o banco não reporta o produto específico"
+    description: "Global limit expiration up to 360 days, reported when the bank does not disclose a specific product."
   overdraft_check_limit_expiration_up_to_360_days:
-    description: "Limite de cheque especial disponível no período de até 360 dias"
+    description: "Overdraft check limit expiration up to 360 days — Bacen unused facility ceiling reported by lenders."
   credit_card_limit_expiration_up_to_360_days:
-    description: "Limite para uso de cartão de crédito disponível no período de até 360 dias"
+    description: "Credit card limit expiration up to 360 days — Bacen unused facility ceiling reported by lenders."
   personal_credit_limit_expiration_up_to_360_days:
-    description: "Limite de crédito pessoal disponível no período de até 360 dias"
+    description: "Personal credit limit expiration up to 360 days — Bacen unused facility ceiling reported by lenders."
   global_limit_expiration_over_360_days:
-    description: "Limite para mais de 360 dias que é informado quando o banco não reporta o produto específico"
+    description: "Global limit expiration over 360 days, reported when the bank does not disclose a specific product."
   overdraft_check_limit_expiration_over_360_days:
-    description: "Limite de cheque especial disponível no período acima de 360 dias"
+    description: "Overdraft check limit expiration over 360 days — Bacen unused facility ceiling reported by lenders."
   credit_card_limit_expiration_over_360_days:
-    description: "Limite para uso de cartão de crédito disponível no período de mais de 360 dias"
+    description: "Credit card limit expiration over 360 days — Bacen unused facility ceiling reported by lenders."
   personal_credit_limit_expiration_over_360_days:
-    description: "Limite de crédito pessoal disponível no período acima de 360 dias"
+    description: "Personal credit limit expiration over 360 days — Bacen unused facility ceiling reported by lenders."
   balance_due_on_other_loans_up_to_30_days:
-    description: "Saldo a vencer de Outros Empréstimos (até 30 dias)"
+    description: "Balance due on other loans up to 30 days — Bacen registry amount for miscellaneous lending products."
   balance_due_on_other_loans_31_to_60_days:
-    description: "Saldo a vencer de Outros Empréstimos (31 a 60 dias)"
+    description: "Balance due on other loans from 31 to 60 days — Bacen registry amount for miscellaneous lending products."
   balance_due_on_other_loans_61_to_90_days:
-    description: "Saldo a vencer de Outros Empréstimos (61 a 90 dias)"
+    description: "Balance due on other loans from 61 to 90 days — Bacen registry amount for miscellaneous lending products."
   balance_due_on_other_loans_91_to_180_days:
-    description: "Saldo a vencer de Outros Empréstimos (91 a 180 dias)"
+    description: "Balance due on other loans from 91 to 180 days — Bacen registry amount for miscellaneous lending products."
   balance_due_on_other_loans_over_180_days:
-    description: "Saldo a vencer de Outros Empréstimos (acima de 180 dias)"
+    description: "Balance due on other loans over 180 days — Bacen registry amount for miscellaneous lending products."
   balance_due_on_credit_card_linked_rotating_credit_up_to_30_days:
-    description: "Saldo a vencer de crédito rotativo vinculado a cartão de crédito (até 30 dias)"
+    description: "Balance due on credit card linked rotating credit up to 30 days — Bacen registry amount for revolving card facilities."
   balance_due_on_credit_card_linked_rotating_credit_31_to_60_days:
-    description: "Saldo a vencer de crédito rotativo vinculado a cartão de crédito (31 a 60 dias)"
+    description: "Balance due on credit card linked rotating credit from 31 to 60 days — Bacen registry amount for revolving card facilities."
   balance_due_on_credit_card_linked_rotating_credit_61_to_90_days:
-    description: "Saldo a vencer de crédito rotativo vinculado a cartão de crédito (61 a 90 dias)"
+    description: "Balance due on credit card linked rotating credit from 61 to 90 days — Bacen registry amount for revolving card facilities."
   balance_due_on_credit_card_linked_rotating_credit_91_to_180_days:
-    description: "Saldo a vencer de crédito rotativo vinculado a cartão de crédito (91 a 180 dias)"
+    description: "Balance due on credit card linked rotating credit from 91 to 180 days — Bacen registry amount for revolving card facilities."
   balance_due_on_credit_card_linked_rotating_credit_over_180_days:
-    description: "Saldo a vencer de crédito rotativo vinculado a cartão de crédito (acima de 180 dias)"
+    description: "Balance due on credit card linked rotating credit over 180 days — Bacen registry amount for revolving card facilities."
   balance_due_on_credit_card_in_store_or_installments_up_to_30_days:
-    description: "Saldo a vencer de cartões compra a vista ou parcelado lojista (até 30 dias)"
+    description: "Balance due on credit card in store or installments up to 30 days — Bacen registry amount for merchant purchase facilities."
   balance_due_on_credit_card_in_store_or_installments_31_to_60_days:
-    description: "Saldo a vencer de cartões compra a vista ou parcelado lojista (até 31 a 60 dias)"
+    description: "Balance due on credit card in store or installments from 31 to 60 days — Bacen registry amount for merchant purchase facilities."
   balance_due_on_credit_card_in_store_or_installments_61_to_90_days:
-    description: "Saldo a vencer de cartões compra a vista ou parcelado lojista (até 61 a 90 dias)"
+    description: "Balance due on credit card in store or installments from 61 to 90 days — Bacen registry amount for merchant purchase facilities."
   balance_due_on_credit_card_in_store_or_installments_91_to_180_days:
-    description: "Saldo a vencer de cartões compra a vista ou parcelado lojista (até 91 a 180 dias)"
+    description: "Balance due on credit card in store or installments from 91 to 180 days — Bacen registry amount for merchant purchase facilities."
   balance_due_on_credit_card_in_store_or_installments_over_180_days:
-    description: "Saldo a vencer de cartões compra a vista ou parcelado lojista (acima de 180 dias)"
+    description: "Balance due on credit card in store or installments over 180 days — Bacen registry amount for merchant purchase facilities."
   overdue_balance_of_credit_card_linked_rotating_credit_1_to_14_days:
-    description: "Saldo vencido de crédito rotativo vinculado a cartão (1 a 14 dias)"
+    description: "Overdue balance of credit card linked rotating credit from 1 to 14 days — Bacen registry amount for revolving card facilities."
   overdue_balance_of_credit_card_linked_rotating_credit_15_to_30_days:
-    description: "Saldo vencido de crédito rotativo vinculado a cartão (15 a 30 dias)"
+    description: "Overdue balance of credit card linked rotating credit from 15 to 30 days — Bacen registry amount for revolving card facilities."
   overdue_balance_of_credit_card_linked_rotating_credit_over_30_days:
-    description: "Saldo vencido de crédito rotativo vinculado a cartão (acima de 30 dias)"
+    description: "Overdue balance of credit card linked rotating credit over 30 days — Bacen registry amount for revolving card facilities."
   balance_due_on_credit_card_instalment_purchase_or_issuer_financed_withdrawal_up_to_30_days:
-    description: "Saldo a vencer de cartões compra fatura parcelada ou saque financiado pela instituição emitente do cartão (até 30 dias)"
+    description: "Balance due on credit card instalment purchase or issuer financed withdrawal up to 30 days — Bacen registry amount for issuer-financed card facilities."
   balance_due_on_credit_card_instalment_purchase_or_issuer_financed_withdrawal_31_to_60_days:
-    description: "Saldo a vencer de cartões compra fatura parcelada ou saque financiado pela instituição emitente do cartão (31 a 60 dias)"
+    description: "Balance due on credit card instalment purchase or issuer financed withdrawal from 31 to 60 days — Bacen registry amount for issuer-financed card facilities."
   balance_due_on_credit_card_instalment_purchase_or_issuer_financed_withdrawal_61_to_90_days:
-    description: "Saldo a vencer de cartões compra fatura parcelada ou saque financiado pela instituição emitente do cartão (61 a 90 dias)"
+    description: "Balance due on credit card instalment purchase or issuer financed withdrawal from 61 to 90 days — Bacen registry amount for issuer-financed card facilities."
   balance_due_on_credit_card_instalment_purchase_or_issuer_financed_withdrawal_91_to_180_days:
-    description: "Saldo a vencer de cartões compra fatura parcelada ou saque financiado pela instituição emitente do cartão (91 a 180 dias)"
+    description: "Balance due on credit card instalment purchase or issuer financed withdrawal from 91 to 180 days — Bacen registry amount for issuer-financed card facilities."
   balance_due_on_credit_card_instalment_purchase_or_issuer_financed_withdrawal_over_180_days:
-    description: "Saldo a vencer de cartões compra fatura parcelada ou saque financiado pela instituição emitente do cartão (acima de 180 dias)"
+    description: "Balance due on credit card instalment purchase or issuer financed withdrawal over 180 days — Bacen registry amount for issuer-financed card facilities."
   balance_due_on_personal_credit_31_to_60_days:
-    description: "Saldo a vencer de Crédito Pessoal (31 a 60 dias)"
+    description: "Balance due on personal credit from 31 to 60 days — Bacen registry amount for non-payroll consumer lending."
   balance_due_on_personal_credit_61_to_90_days:
-    description: "Saldo a vencer de Crédito Pessoal (61 a 90 dias)"
+    description: "Balance due on personal credit from 61 to 90 days — Bacen registry amount for non-payroll consumer lending."
   balance_due_on_personal_credit_90_to_180_days:
-    description: "Saldo a vencer de Crédito Pessoal (90 a 180 dias)"
+    description: "Balance due on personal credit from 90 to 180 days — Bacen registry amount for non-payroll consumer lending."
   overdue_balance_of_other_loans_up_to_30_days:
-    description: "Saldo vencido de Outros Empréstimos (até 30 dias)"
+    description: "Overdue balance of other loans up to 30 days — Bacen registry amount for miscellaneous lending products."
   overdue_balance_of_other_loans_over_30_days:
-    description: "Saldo vencido de Outros Empréstimos (acima de 30 dias)"
+    description: "Overdue balance of other loans over 30 days — Bacen registry amount for miscellaneous lending products."
   ts_created:
-    description: "Date information was created"
+    description: "Timestamp when the record was created."
     lineage:
         - datalake_arquivo_confidencial_clean.integration_report.ts_created
   ts_updated:
-    description: "Date information was last updated."
+    description: "Timestamp when the record was last updated."
     lineage:
         - datalake_arquivo_confidencial_clean.integration_report.ts_updated
   ts_next_updated:
-    description: "Next date the cpf had its data updated"
+    description: "Next timestamp when this CPF had SCR data updated."
     lineage:
         - datalake_arquivo_confidencial_clean.integration_report.ts_updated
