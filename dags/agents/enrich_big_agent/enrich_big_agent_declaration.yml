@@ -13,9 +13,9 @@ workflow:
   layer: enrich
   inner_dependencies:
     house_consultant_history:
-    - house
-    - enrollment
-    - program
+      - agent_enrollment
+    house_listing_consultant:
+      - house_consultant_history
     house_rent_listing_consultant:
     - house_consultant_history
     house_sale_listing_consultant:

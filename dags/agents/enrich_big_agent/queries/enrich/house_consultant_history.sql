@@ -51,12 +51,12 @@ last_status_agency AS (
 SELECT
     aeh.id_agency,
     aeh.id_enrollment,
-    e.id_agent AS id_internal_agent,
+    ag.id_agent AS id_internal_agent,
     GET_JSON_OBJECT(h.details, '$.houseExternalId') AS id_house,
-    pa.id_partner,
-    GET_JSON_OBJECT(ag.details, '$.userExternalId') AS id_user,
+    ag.id_partner,
+    ag.id_user,
     aeh.rev,
-    p.name AS consultant_type,
+    ag.consultant_type,
     aeh.is_last_status_of_day,
     lsa.dt_consultant_started,
     lsa.ts_consultant_deleted,
@@ -64,23 +64,14 @@ SELECT
     aeh.ts_enrollment_started,
     aeh.ts_enrollment_ended
 FROM
-    datalake_big_agent.house AS h
+    datalake_big_agent_clean.house AS h
 JOIN
     agency_enrollment_history AS aeh
         ON h.id = aeh.id_house
 JOIN
-    datalake_big_agent.enrollment AS e
-        ON aeh.id_enrollment = e.id
+    datalake_big_agent.agent_enrollment AS ag
+        ON aeh.id_enrollment = ag.id_enrollment
 LEFT JOIN
     last_status_agency AS lsa
         ON lsa.id_agency = aeh.id_agency
         AND lsa.is_last_agency_status = True
-JOIN
-    datalake_big_agent.program AS p
-        ON e.id_program = p.id
-JOIN
-    datalake_big_agent.agent AS ag
-        ON e.id_agent = ag.id
-JOIN
-    datalake_ebdb_clean.partner_agent AS pa
-       ON GET_JSON_OBJECT(ag.details, '$.userExternalId') = pa.id_user

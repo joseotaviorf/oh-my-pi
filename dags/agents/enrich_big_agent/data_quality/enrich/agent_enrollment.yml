@@ -1,23 +1,28 @@
 ---
-table_name: datalake_big_agent.house_consultant_history
+table_name: datalake_big_agent.agent_enrollment
 alert_channel: "#agents-data-alarms"
 table_level_validations:
   has_size:
-    greater_than: 800000
+    greater_than: 1000
     severity_level: Error
 column_level_validations:
-  id_agency:
+  id_agent_enrollment:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_agent:
     is_complete:
       severity_level: Error
   id_enrollment:
     is_complete:
       severity_level: Error
-  id_house:
+  year:
     is_complete:
       severity_level: Error
-  id_user:
+  month:
     is_complete:
       severity_level: Error
-  rev:
+  day:
     is_complete:
       severity_level: Error

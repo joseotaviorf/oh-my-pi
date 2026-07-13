@@ -222,8 +222,9 @@ LEFT JOIN
     house_counts AS hc
         ON hc.id_owner = u.id
 LEFT JOIN
-    datalake_big_agent.agent_current_program AS acpr
+    datalake_big_agent.agent_enrollment AS acpr
         ON u.id = acpr.id_user
+        AND acpr.is_last_enrollment_by_agent = True
 LEFT JOIN
     datalake_ebdb_user.user_merge AS um
         ON u.id = um.id_user

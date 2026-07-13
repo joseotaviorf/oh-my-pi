@@ -91,11 +91,6 @@ bietlejuice.dw_datamarts_cross:
     - bietlejuice.dw_user:load-dw-public-dim-partner:first-run-of-day
     - bietlejuice.dw_user:load-dw-public-dim-partner-agent:first-run-of-day
     - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
-    - bietlejuice.enrich_big_agent:load-enrich-agency:first-run-of-day
-    - bietlejuice.enrich_big_agent:load-enrich-agent:first-run-of-day
-    - bietlejuice.enrich_big_agent:load-enrich-enrollment:first-run-of-day
-    - bietlejuice.enrich_big_agent:load-enrich-house:first-run-of-day
-    - bietlejuice.enrich_big_agent:load-enrich-program:first-run-of-day
     - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
   remove:
     - bietlejuice.dw_lead:load-dw-public-dim-lead:first-run-of-day

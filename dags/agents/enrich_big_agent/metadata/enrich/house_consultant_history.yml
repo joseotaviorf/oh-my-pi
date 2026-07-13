@@ -1,64 +1,67 @@
+---
 database_name: datalake_big_agent
 table_name: house_consultant_history
-description: History information of House and CIQ by Agency
+description: |
+  Daily-grain history of house-to-consultant assignments from Big Agent agency audit revisions,
+  enriched with agent enrollment attributes and current agency status timestamps.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agency:
     lineage:
-    - datalake_big_agent_clean.agency_aud.id
-    description: id from agency coming from datalake_big_agent_clean.agency_aud
+      - datalake_big_agent_clean.agency_aud.id
+    description: Big Agent agency identifier for the house-enrollment association revision.
   id_enrollment:
     lineage:
-    - datalake_big_agent_clean.agency_aud.id_enrollment
-    description: Version of the enrollment also coming from agency_aud
+      - datalake_big_agent_clean.agency_aud.id_enrollment
+    description: Enrollment version linked to the agency revision in agency audit history.
   id_internal_agent:
     lineage:
-    - datalake_big_agent.enrollment.id_agent
-    description: Big-agent internal agent id linked to the enrollment for this agency-house assignment.
+      - datalake_big_agent.agent_enrollment.id_agent
+    description: Internal Big Agent agent id from the enrollment linked to this agency revision.
   id_house:
     lineage:
-    - datalake_big_agent.house.details
-    description: EBDB house identifier for the property linked to this consultant assignment history.
+      - datalake_big_agent_clean.house.details
+    description: EBDB house identifier extracted from Big Agent house JSON for the assignment.
   id_partner:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_partner
-    description: id from the partner assigned to the house
+      - datalake_big_agent.agent_enrollment.id_partner
+    description: Partner company identifier of the consultant responsible during the revision.
   id_user:
     lineage:
-    - datalake_big_agent_clean.agent.details
-    description: id of the user responsible for the house
+      - datalake_big_agent.agent_enrollment.id_user
+    description: QuintoAndar user id of the consultant responsible during the revision.
   rev:
     lineage:
-    - datalake_big_agent_clean.agency_aud.rev
-    description: revision number from the agency_aud
+      - datalake_big_agent_clean.agency_aud.rev
+    description: Audit revision number ordering agency enrollment changes for the agency id.
   consultant_type:
     lineage:
-    - datalake_big_agent.program.name
-    description: Big Agent program tier of the consultant responsible for the house during this revision.
+      - datalake_big_agent.agent_enrollment.consultant_type
+    description: Program tier of the consultant during this agency revision interval.
     categories:
-      ASP: House has an ASP manager assigned(similar to CIQ Manager)
-      CIQ_FULL: House is fully managed by the CIQ
-      CIQ_MANAGER: House has a CIQ manager assigned
+      ASP: House has an ASP manager assigned (similar to CIQ Manager).
+      CIQ_FULL: House is fully managed by the CIQ.
+      CIQ_MANAGER: House has a CIQ manager assigned.
+  is_last_status_of_day:
+    description: True when the revision is the latest agency status recorded for that calendar day.
   dt_consultant_started:
     lineage:
-    - datalake_big_agent_clean.agency.dt_since
-    description: date of the first assignment
+      - datalake_big_agent_clean.agency.dt_since
+    description: Date when the consultant first became associated with the house in Big Agent.
   ts_consultant_deleted:
     lineage:
-    - datalake_big_agent_clean.agency.ts_deleted
-    description: removed date of the consultant
+      - datalake_big_agent_clean.agency.ts_deleted
+    description: Timestamp when the consultant association was removed from the house, if applicable.
   ts_agency_created:
     lineage:
-    - datalake_big_agent_clean.agency_aud.ts_created
-    description: Timestamp when the agency revision row was created in agency_aud.
+      - datalake_big_agent_clean.agency_aud.ts_created
+    description: Timestamp when the agency audit row was created in the source system.
   ts_enrollment_started:
     lineage:
-    - datalake_big_agent_clean.user_revision_entity.ts_revision
-    description: date when the enrollment version started
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
+    description: Timestamp when the enrollment version linked to the agency revision became effective.
   ts_enrollment_ended:
     lineage:
-    - datalake_big_agent_clean.user_revision_entity.ts_revision
-    description: date when the enrollment version ended
-  is_last_status_of_day:
-    description: true if it's the last registry from the history
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
+    description: Timestamp when the enrollment version ended for this agency revision, when known.

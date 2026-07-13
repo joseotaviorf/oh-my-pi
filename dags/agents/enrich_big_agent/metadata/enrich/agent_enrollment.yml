@@ -1,0 +1,92 @@
+---
+database_name: datalake_big_agent
+table_name: agent_enrollment
+description: |
+  Agent enrollment intervals enriched with EBDB user and partner identifiers, accreditation
+  agent-data key, program tier, and active-state flags. One row per agent enrollment version,
+  partitioned by agent update date for incremental loads.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_agent_enrollment:
+    description: Surrogate key combining Big Agent agent id and enrollment id for merge upserts.
+    lineage:
+      - datalake_big_agent_clean.agent.id
+      - datalake_big_agent_clean.enrollment.id
+  id_agent:
+    lineage:
+      - datalake_big_agent_clean.agent.id
+    description: Internal Big Agent identifier of the consultant agent record.
+  id_user:
+    lineage:
+      - datalake_big_agent_clean.agent.details
+      - datalake_ebdb_clean.partner_agent.id_user
+    description: QuintoAndar main user id resolved from agent JSON or partner_agent fallback.
+  id_partner:
+    lineage:
+      - datalake_big_agent_clean.agent.details
+      - datalake_ebdb_clean.partner_agent.id_partner
+    description: EBDB partner company identifier linked to the agent when available.
+  id_agent_data:
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent_data
+    description: Dados Agente identifier from agent accreditation used to join EBDB agent dimensions.
+  id_enrollment:
+    lineage:
+      - datalake_big_agent_clean.enrollment.id
+    description: Big Agent enrollment record identifier for the program assignment interval.
+  id_program:
+    lineage:
+      - datalake_big_agent_clean.enrollment.id_program
+    description: Program identifier assigned to the agent during this enrollment interval.
+  uuid_agent:
+    lineage:
+      - datalake_agent_accreditation.agent.uuid_agent
+    description: Business UUID of the agent in accreditation when the user id matches.
+  uuid_person:
+    lineage:
+      - datalake_agent_accreditation.agent.uuid_person
+    description: Person UUID of the agent in accreditation when the user id matches.
+  consultant_type:
+    lineage:
+      - datalake_big_agent_clean.program.name
+    description: Program tier name (for example ASP, CIQ_FULL, or CIQ_MANAGER) for the enrollment.
+    categories:
+      ASP: Owner advisor program similar to CIQ Manager.
+      CIQ_FULL: Agent fully responsible for property publication and management.
+      CIQ_MANAGER: Property belongs to owner but is managed by a CIQ.
+  is_last_enrollment_by_agent:
+    description: True when the row is the most recently updated enrollment interval for the agent.
+  is_agent_active:
+    lineage:
+      - datalake_big_agent_clean.agent.details
+    description: Whether the agent is marked active in Big Agent operational JSON at load time.
+  ts_enrollment_started:
+    lineage:
+      - datalake_big_agent_clean.enrollment.ts_created
+    description: Timestamp when the enrollment interval started for the agent.
+  ts_enrollment_ended:
+    lineage:
+      - datalake_big_agent_clean.enrollment.ts_updated
+    description: Timestamp when the enrollment interval ended, or current time for open intervals.
+  ts_agent_registered:
+    lineage:
+      - datalake_big_agent_clean.agent.details
+      - datalake_big_agent_clean.agent.ts_created
+    description: Timestamp when the agent was registered in Big Agent.
+  ts_agent_updated:
+    lineage:
+      - datalake_big_agent_clean.agent.ts_updated
+    description: Timestamp of the latest agent update that triggered this incremental row.
+  year:
+    lineage:
+      - datalake_big_agent_clean.agent.year
+    description: Partition year derived from agent ts_updated for incremental extraction.
+  month:
+    lineage:
+      - datalake_big_agent_clean.agent.month
+    description: Partition month derived from agent ts_updated for incremental extraction.
+  day:
+    lineage:
+      - datalake_big_agent_clean.agent.day
+    description: Partition day derived from agent ts_updated for incremental extraction.
