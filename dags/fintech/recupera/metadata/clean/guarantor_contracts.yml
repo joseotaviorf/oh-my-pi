@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_recupera_raw.guarantor_contracts.id_contact
   name:
-    description: "Full name of the guarantor or contract contact person in Recupera."
+    description: Financial attribute representing name on the guarantor_contracts dataset.
     lineage:
       - datalake_recupera_raw.guarantor_contracts.name
   document:
