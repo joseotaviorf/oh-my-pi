@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheet_raw
+database_name: datalake_gsheets_raw
 table_name: fraud_contracts
 description: >
   Raw contracts flagged as fraud by auditors, curated in Google Sheets
