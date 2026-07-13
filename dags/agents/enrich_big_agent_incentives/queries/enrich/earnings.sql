@@ -6,6 +6,8 @@ WITH new_earnings_filtered AS (
         ne.id_external_receiver,
         ne.id_author,
         ne.author_role,
+        ne.author_channel,
+        ne.author_on_behalf_of_role,
         ne.external_receiver_type,
         ne.incentive_system,
         ne.calculated_from,
@@ -28,6 +30,8 @@ SELECT
     IF(es.external_domain_type = 'RENT_CONTRACT', es.id_external_domain, NULL) AS id_contract,
     IF(es.external_domain_type = 'SALES_FLOW', es.id_external_domain, NULL) AS id_sales_flow,
     IF(ne.author_role <> "SYSTEM", ne.id_author, NULL) AS id_author,
+    IF(ne.author_role <> "SYSTEM", author_user.id, NULL) AS id_user_author,
+    IF(ne.author_role <> "SYSTEM", author_user.uuid_person, NULL) AS uuid_person_author,
     es.uuid_external_cart AS uuid_cart,
     tr.id_business_unit,
     IF(ne.external_receiver_type = "COMPANY", ne.id_external_receiver, NULL) AS uuid_company,
@@ -59,6 +63,9 @@ SELECT
     tr.classifier_resume,
     tr.qualifier_min_score,
     tr.qualifier_resume,
+    ne.author_role,
+    ne.author_channel,
+    ne.author_on_behalf_of_role,
     ne.author_role = "SYSTEM" AS is_authored_by_system,
     ne.ts_created,
     ei.ts_invalidated,
@@ -82,3 +89,6 @@ LEFT JOIN
     datalake_big_agent.tier_rule AS tr
         ON tr.id_tier = rs.id_relation
         AND rs.relation_type = 'TIER'
+LEFT JOIN
+    datalake_ebdb_user.user AS author_user
+        ON author_user.uuid_person = ne.id_author

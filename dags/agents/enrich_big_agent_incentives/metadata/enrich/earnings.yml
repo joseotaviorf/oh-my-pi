@@ -2,10 +2,11 @@ database_name: datalake_big_agent
 table_name: earnings
 description: |
   Enriched Big Agent earnings from new_earnings joined to earning sources, revenue share,
-  invalidations, cart, and tier rule configuration. One row per earning updated within the
-  load window, with contract or sales flow context, receiver and author details, monetary
-  amounts rounded to two decimals, and tier classifier or qualifier rules when the revenue
-  share relation type is TIER. Partitioned by earning creation date.
+  invalidations, cart, tier rule configuration, and author context (EBDB user match). One row
+  per earning updated within the load window, with contract or sales flow context, receiver
+  and author details, monetary amounts rounded to two decimals, and tier classifier or
+  qualifier rules when the revenue share relation type is TIER. Partitioned by earning
+  creation date.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -36,6 +37,18 @@ columns:
       - datalake_big_agent_clean.new_earnings.id_author
       - datalake_big_agent_clean.new_earnings.author_role
     description: Author identifier from the earning payload when author_role is not SYSTEM; otherwise null.
+  id_user_author:
+    lineage:
+      - datalake_ebdb_user.user.id
+      - datalake_big_agent_clean.new_earnings.id_author
+      - datalake_big_agent_clean.new_earnings.author_role
+    description: EBDB user id for the author when author_role is not SYSTEM and uuid_person matches id_author; otherwise null.
+  uuid_person_author:
+    lineage:
+      - datalake_ebdb_user.user.uuid_person
+      - datalake_big_agent_clean.new_earnings.id_author
+      - datalake_big_agent_clean.new_earnings.author_role
+    description: Person UUID for the author from EBDB user when author_role is not SYSTEM; otherwise null.
   uuid_cart:
     lineage:
       - datalake_big_agent_clean.earning_sources.uuid_external_cart
@@ -158,6 +171,18 @@ columns:
       - datalake_big_agent.tier_rule.qualifier_resume
       - datalake_big_agent_clean.revenue_share.relation_type
     description: Array summary of qualifier points rules from the linked tier rule when revenue share relation type is TIER; otherwise null.
+  author_role:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.author_role
+    description: Role of the author in the incentive system (for example agent or system roles).
+  author_channel:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.author_channel
+    description: Channel through which the author acted.
+  author_on_behalf_of_role:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.author_on_behalf_of_role
+    description: Role of the actor on whose behalf the earning was authored.
   is_authored_by_system:
     lineage:
       - datalake_big_agent_clean.new_earnings.author_role

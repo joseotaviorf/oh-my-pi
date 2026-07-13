@@ -16,22 +16,15 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   inner_dependencies:
-    agent_tier_validity:
-      - tier_rule
     earnings:
       - tier_rule
   tables_customization:
-    earning_author:
-      merge_on: [id_earning, id_author]
-      z_order_by: [id_earning, ts_updated]
     earnings:
       merge_on: [id_earning, id_earning_source]
       z_order_by: [id_earning_source, id_earning]
     tier_rule:
       merge_on: [id_tier]
       z_order_by: [id_tier, id_business_unit]
-    agent_tier_validity:
-      merge_on: [id_agent_tier]
     brokerage_share_history:
       merge_on: [id_revision, id_contract]
       z_order_by: [id_contract, ts_revision]
