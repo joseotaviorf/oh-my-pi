@@ -22,7 +22,7 @@ validation:
         - r7g.8xlarge
         - r6i.8xlarge
         target_on_demand: 0
-        target_spot: 3
+        target_spot: 6
         allocation_strategy: price-capacity-optimized
         bid_price_percentage: 100
       core_nodes:
@@ -39,7 +39,7 @@ validation:
         spark.executor.memoryOverhead: 8g
         spark.driver.memory: 20g
         spark.driver.memoryOverhead: 4g
-        spark.dynamicAllocation.maxExecutors: '20'
-        spark.sql.shuffle.partitions: '400'
+        spark.dynamicAllocation.maxExecutors: '32'
+        spark.sql.shuffle.partitions: '800'
         spark.memory.fraction: '0.8'
         spark.memory.storageFraction: '0.3'

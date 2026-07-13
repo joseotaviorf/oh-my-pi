@@ -23,3 +23,6 @@ validation:
         - r6g.xlarge
         - r7g.xlarge
         - r6i.xlarge
+      spark_conf:
+        spark.driver.memory: 12g
+        spark.driver.memoryOverhead: 2g

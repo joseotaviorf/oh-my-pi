@@ -30,3 +30,5 @@ validation:
         - r6i.xlarge
       spark_conf:
         spark.sql.sources.partitionOverwriteMode: static
+        spark.driver.memory: 12g
+        spark.driver.memoryOverhead: 2g
