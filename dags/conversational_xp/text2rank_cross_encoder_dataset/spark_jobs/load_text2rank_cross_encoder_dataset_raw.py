@@ -24,27 +24,15 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def cast_df_to_existing_table_schema(
-    df, spark_metastore_service, database_name, table_name
-):
-    """Cast incoming columns to the existing table's types to keep partitions
-    type-consistent across weekly runs. No-op if the table does not exist yet (first run)."""
-    if table_name not in spark_metastore_service.get_table_names(database_name):
-        logger.info(
-            "m=cast_df_to_existing_table_schema, msg=table does not exist yet, skipping cast"
-        )
-        return df
-
-    table_schema = spark_metastore_service.get_table_schema(database_name, table_name)
-    df_types = dict(df.dtypes)
-    for column, target_type in table_schema.items():
-        if column in df_types and df_types[column] != target_type:
-            logger.info(
-                f"m=cast_df_to_existing_table_schema, column={column}, "
-                f"from={df_types[column]}, to={target_type}, msg=casting to existing table type"
-            )
-            df = df.withColumn(column, col(column).cast(target_type))
-    return df
+DOUBLE_COLUMNS = [
+    "area",
+    "bedrooms",
+    "bathrooms",
+    "suites",
+    "parking_slots",
+    "condominium_per_month",
+    "price",
+]
 
 
 def get_source_in_forno(environment, source):
@@ -128,9 +116,8 @@ def main():
         .output()
     )
 
-    df = cast_df_to_existing_table_schema(
-        df, spark_metastore_service, write_database_name, write_table_name
-    )
+    for column_name in DOUBLE_COLUMNS:
+        df = df.withColumn(column_name, col(column_name).cast("double"))
 
     s3_loader.load_df(
         df=df,
