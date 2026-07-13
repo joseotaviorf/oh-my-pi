@@ -2,7 +2,7 @@ database_name: dw_credit
 table_name: fact_offer_early_credit
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table with the early credit analysis information for each offer"
+description: One row per rental offer with the early credit screening outcome (risk category, rejection reason, model version) from Sorting Hat prior to full proposal underwriting.
 columns:
   sk_offer:
     lineage:
@@ -31,11 +31,11 @@ columns:
   version:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.version
-    description: "Version of the early credit analysis."
+    description: Version number of the early credit analysis record matched to this rental offer in Sorting Hat.
   risk_category_canon:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.risk_category_canon
-    description: "Risk score given by the credit model"
+    description: Canonical risk category label assigned by the Sorting Hat credit model for the early screening linked to this offer.
   bypass:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
@@ -59,7 +59,7 @@ columns:
   rejection_reason:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Reason of the analysis rejection."
+    description: Rejection reason extracted from the Sorting Hat early screening result JSON payload when present.
   dt_early_credit_created:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_created

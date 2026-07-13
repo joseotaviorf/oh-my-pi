@@ -1,22 +1,21 @@
 database_name: dw_credit
 table_name: dim_experiment
-description: "This table brings informations about the experiments made with our credit
-  engine variants."
+description: Dimension of Sorting Hat A/B credit policy experiments, including name, description, run status, and active window (start/end dates), used to track and analyze credit engine tests.
 domain: Fintech
 owner: isabella.santos@quintoandar.com.br
 columns:
   id_experiment:
     lineage:
       - datalake_sorting_hat_clean.experiment.id
-    description: "Experiment ID."
+    description: Primary key of the Sorting Hat credit policy experiment; join to dim_variant via id_experiment.
   experiment_name:
     lineage:
       - datalake_sorting_hat_clean.experiment.name
-    description: "Experiment name."
+    description: Short label of the experiment as configured in Sorting Hat A/B test tooling.
   experiment_description:
     lineage:
       - datalake_sorting_hat_clean.experiment.description
-    description: "Experiment description."
+    description: Free-text description of the Sorting Hat credit policy experiment (truncated to 500 characters in the DW).
   is_experiment_running:
     lineage:
       - datalake_sorting_hat_clean.experiment.ts_started

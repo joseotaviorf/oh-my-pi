@@ -1,6 +1,6 @@
 database_name: dw_credit
 table_name: dim_proponent_proposal_informed_incomes
-description: This dimension stores all the informed proponent incomes per proposal. The monthly income is submitted during the credit evaluation process.
+description: One row per proponent per credit evaluation (linked to a rental proposal) with self-declared monthly income, occupation, and income nature submitted during tenant credit evaluation.
 domain: Fintech
 owner: isabella.santos@quintoandar.com.br
 columns:
@@ -15,7 +15,7 @@ columns:
   occupation_area:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.occupation_area
-    description: Proponent informed occupation area.
+    description: Self-declared professional or economic sector of the proponent submitted in DocX during credit evaluation (e.g. HEALTH, EDUCATION, ADMINISTRATION_AND_IT).
   proponent_monthly_income:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.monthly_income
@@ -27,7 +27,7 @@ columns:
   income_nature:
     lineage:
       - datalake_sorting_hat_clean.proponent.income_nature
-    description: Proponent income nature.
+    description: Employment type or income regime of the proponent from Sorting Hat (e.g. CLT, PJ, informal).
   is_resident:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.resident

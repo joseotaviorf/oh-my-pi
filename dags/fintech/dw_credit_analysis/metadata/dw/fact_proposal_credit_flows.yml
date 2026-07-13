@@ -1,9 +1,6 @@
 database_name: dw_credit
 table_name: fact_proposal_credit_flows
-description:
-  This table presents each line as a proposal-credit_analysis with dates
-  from the process and partitions by user, personal document and listings, which facilitate
-  the aggregation by different grains
+description: Multiple rows per rental proposal (one per credit analysis attempt) with funnel milestone dates (offer approval, tenant documentation, credit approval, guarantee acceptance and payment, contract creation and signature); use is_last_credit_evaluation or is_user_version to deduplicate for proposal- or tenant-level conversion analysis.
 domain: Fintech
 owner: isabella.santos@quintoandar.com.br
 columns:
@@ -314,8 +311,9 @@ columns:
     description: "Date when the TP completed the documentation."
   dt_credit_evaluation_approved_date:
     lineage:
+      - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_positive
       - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_negative
-    description: "Calendar date when the automated credit evaluation returned an approved outcome for the proposal."
+    description: "Calendar date parsed from the credit evaluation approval surrogate key (sk_credit_evaluation_approved_date), preferring the positive evaluation date when available."
   dt_credit_analysis_approved_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_credit_analysis_approved_date

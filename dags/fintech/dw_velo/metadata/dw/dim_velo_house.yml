@@ -1,14 +1,18 @@
 database_name: dw_velo
 table_name: dim_velo_house
-description: Dimension with House realted to the contract details
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Dimension of residential properties linked to Velo/QuintoCred condominium proposals, including address and property type.
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_house:
     lineage:
       - datalake_velo.house.id_house
       - datalake_velo.house_legacy.id_house
-    description: ID house
+    description: Surrogate key for the property in Velo; joins to fact_velo_propose and other dw_velo facts.
   type:
     lineage:
       - datalake_velo.house.type
@@ -47,26 +51,26 @@ columns:
     lineage:
       - datalake_velo.house.city
       - datalake_velo.house_legacy.city
-    description: Property city
+    description: City of the property address as registered in Velo for billing and reconciliation.
   state:
     lineage:
       - datalake_velo.house.state
       - datalake_velo.house_legacy.state
-    description: Property state
+    description: State (UF) of the property address as registered in Velo.
   country_code:
     lineage:
       - datalake_velo.house.country_code
       - datalake_velo.house_legacy.country_code
-    description: Property country
+    description: ISO country code of the property address as registered in Velo.
   zipcode:
     lineage:
       - datalake_velo.house.zipcode
       - datalake_velo.house_legacy.zipcode
-    description: Property zipcode
+    description: Postal code (CEP) of the property address as registered in Velo.
   is_legacy:
     lineage:
       - datalake_velo.house.is_legacy
       - datalake_velo.house_legacy.is_legacy
     description: If the propose's comes from Velo 2.0 systems (TRUE = 2.0, FALSE = QuintoCred;3.0)
   ts_load:
-    description: Load timestamp
+    description: Timestamp when the row was loaded into the data warehouse by the ETL pipeline.

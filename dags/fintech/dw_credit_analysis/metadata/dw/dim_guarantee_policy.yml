@@ -1,7 +1,6 @@
 database_name: dw_credit
 table_name: dim_guarantee_policy
-description: "This table brings the guarantee policy details based on what the model
-  and user decide."
+description: Dimension of rental guarantee risk categories and policy parameters (guarantee/deposit factors, allowed guarantee types) used to interpret credit engine category outputs.
 domain: Fintech
 owner: isabella.santos@quintoandar.com.br
 columns:
@@ -14,19 +13,19 @@ columns:
   id_risk_category:
     lineage:
       - datalake_rental_guarantee_clean.risk_category.id
-    description: "Indicates the ID of the guarantee category in Risk Category."
+    description: Internal surrogate key of the risk category row in Rental Guarantee; distinct from category_level used as guarantee category ID.
   guarantee_factor:
     lineage:
       - datalake_rental_guarantee_clean.risk_category.guarantee_factor
-    description: "Indicates the guarantee factor."
+    description: Guarantee premium factor from Rental Guarantee risk category catalog (risk_category.guarantee_factor).
   deposit_factor:
     lineage:
       - datalake_rental_guarantee_clean.risk_category.deposit_factor
-    description: "Indicates the deposit factor."
+    description: Deposit factor from Rental Guarantee risk category catalog (risk_category.deposit_factor).
   category_description:
     lineage:
       - datalake_rental_guarantee_clean.risk_category.category_description
-    description: "Indicates the guarantee description."
+    description: Text label of the guarantee risk category as defined in Rental Guarantee (risk_category.category_description).
   is_guarantee_allowed:
     lineage:
       - datalake_rental_guarantee_clean.risk_category.is_guarantee_allowed

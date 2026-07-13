@@ -1,29 +1,28 @@
 database_name: dw_credit
 table_name: dim_variant
-description: This table presents the details of each credit engine variant we have
-  along with the experiment details and proper date calculation
+description: Dimension of Sorting Hat credit engine experiment variants, one row per variant, linked to parent experiments via id_experiment, with name, description, and traffic allocation share.
 domain: Fintech
 owner: isabella.santos@quintoandar.com.br
 columns:
   id_variant:
     lineage:
       - datalake_sorting_hat_clean.variant.id
-    description: "Credit model+policy Variant ID."
+    description: Primary key of the Sorting Hat A/B experiment variant assigned to credit analyses (early credit and proposal underwriting).
   id_experiment:
     lineage:
       - datalake_sorting_hat_clean.variant.id_experiment
-    description: "Credit experiment ID."
+    description: Foreign key to the parent Sorting Hat experiment that owns this traffic-split variant.
   variant_name:
     lineage:
       - datalake_sorting_hat_clean.variant.name
-    description: "Variant name."
+    description: Human-readable label of the experiment variant (policy branch) shown in Sorting Hat configuration.
   variant_description:
     lineage:
       - datalake_sorting_hat_clean.variant.description
-    description: "Variant description"
+    description: Longer explanation of what this variant changes or tests within the parent experiment.
   variant_percentage_paticipation_on_test:
     lineage:
       - datalake_sorting_hat_clean.variant.percentage
-    description: "Indicates the percentage participation of a variant during tests."
+    description: Percentage of experiment traffic allocated to this variant during the A/B test.
   ts_load:
     description: "Timestamp of data recorded in the table"

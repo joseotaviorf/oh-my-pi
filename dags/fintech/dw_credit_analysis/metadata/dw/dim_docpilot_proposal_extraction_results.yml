@@ -1,6 +1,6 @@
 database_name: dw_credit
 table_name: dim_docpilot_proposal_extraction_results
-description: "Dimension table that summarizes DocPilot income extraction processing results per proposal. This table aggregates document processing outcomes, error metrics, and income extraction statistics from the DocPilot system for credit analysis purposes."
+description: One row per rental proposal summarizing DocPilot income-document extraction outcomes (success, partial success, and failure counts) used in tenant income verification for credit underwriting.
 domain: Fintech
 owner: isabella.santos@quintoandar.com.br
 columns:
@@ -59,7 +59,7 @@ columns:
   proposal_number_of_processing_result_partial_success:
     lineage:
       - datalake_docpilot.income_extraction_processing.processing_result
-    description: "Number of documents that had partial success during processing in the proposal."
+    description: Count of income documents in the proposal where DocPilot extracted partial income data but not a full successful parse.
   proposal_number_of_processing_result_failure:
     lineage:
       - datalake_docpilot.income_extraction_processing.processing_result
