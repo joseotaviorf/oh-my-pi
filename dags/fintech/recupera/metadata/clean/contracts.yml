@@ -8,7 +8,7 @@ description: |
 
   Original table name: TBL_CONTRATOS.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -38,27 +38,27 @@ columns:
     lineage:
       - datalake_recupera_raw.contracts.id_contract
   branch_code:
-    description: "Branch code"
+    description: "Code of the commercial branch associated with the contract in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.branch_code
   branch_name:
-    description: "Branch name"
+    description: "Name of the commercial branch associated with the contract in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.branch_name
   network_code:
-    description: "Network code"
+    description: "Code of the commercial network linked to the contract in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.network_code
   network_name:
-    description: "Network name"
+    description: "Name of the commercial network linked to the contract in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.network_name
   store_code:
-    description: "Store code"
+    description: "Code of the store associated with the contract in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.store_code
   store_name:
-    description: "Store name"
+    description: "Name of the store associated with the contract in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.store_name
   purchase_total_amount:
@@ -90,7 +90,7 @@ columns:
     lineage:
       - datalake_recupera_raw.contracts.contract_fee_amount
   dt_oldest_contract_expiration:
-    description: "Oldest contract expiration"
+    description: "Earliest expiration date among installments linked to this contract."
     lineage:
       - datalake_recupera_raw.contracts.dt_oldest_contract_expiration
   property_description:
@@ -102,7 +102,7 @@ columns:
     lineage:
       - datalake_recupera_raw.contracts.contract_block
   address:
-    description: "Contract address"
+    description: "Street address of the contract property registered in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.address
   neighborhood:
@@ -110,11 +110,11 @@ columns:
     lineage:
       - datalake_recupera_raw.contracts.neighborhood
   city:
-    description: "Contract city"
+    description: "City of the contract property registered in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.city
   state:
-    description: "Contract state"
+    description: "Brazilian state of the contract property registered in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.state
   zip_code:
@@ -122,15 +122,15 @@ columns:
     lineage:
       - datalake_recupera_raw.contracts.zip_code
   phone_number:
-    description: "Contract phone number"
+    description: "Contact phone number associated with the contract in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.phone_number
   contract_number:
-    description: "Contract number"
+    description: "External contract number assigned to the debt in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.contract_number
   address_add_on:
-    description: "Contract address add-on"
+    description: "Address complement or suffix for the contract property location."
     lineage:
       - datalake_recupera_raw.contracts.address_add_on
   address_observation:
@@ -138,6 +138,9 @@ columns:
     lineage:
       - datalake_recupera_raw.contracts.address_observation
   billing_rule_code:
-    description: "Billing rule code"
+    description: "Billing rule code applied to the contract in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.billing_rule_code
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

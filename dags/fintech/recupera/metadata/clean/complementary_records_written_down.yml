@@ -9,7 +9,7 @@ description: |
 
   Original table name: TBL_REGISTROS_COMPL_BAIXAS.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -47,15 +47,15 @@ columns:
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.id_contract
   dt_contract_start:
-    description: "Start date"
+    description: "Calendar date when the written-down contract started in Recupera."
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.dt_contract_start
   dt_debt_due_date:
-    description: "Debt due date"
+    description: "Calendar date when the written-down debt installment was due."
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.dt_debt_due_date
   installment_number:
-    description: "Installment number"
+    description: "Sequential installment number of the written-down contract plan."
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.installment_number
   dt_last_debt_correction:
@@ -79,7 +79,7 @@ columns:
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.minimun_amount
   amount_paid:
-    description: "Amount paid"
+    description: "Monetary amount paid before the debt was written down in Recupera."
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.amount_paid
   installments_amount:
@@ -102,3 +102,15 @@ columns:
     description: "Original Seu Barriga invoice. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.id_installment
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []

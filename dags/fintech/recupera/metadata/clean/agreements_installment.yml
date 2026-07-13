@@ -6,15 +6,15 @@ description: |
 
   Original Table Name: TBL_DEPARA_ACORDOS_PARC_5A.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_installment:
-    description: "Installment ID"
+    description: "Unique identifier of the installment in the Recupera agreement mapping."
     lineage:
       - datalake_recupera_raw.agreements_installment.id_installment
   id_creditor:
-    description: "Creditor code"
+    description: "Creditor portfolio code linked to the agreement installment mapping."
     categories:
       "1": QuintoAndar
       "3": QuintoCred, faturas da plataforma 2.0
@@ -22,15 +22,15 @@ columns:
     lineage:
       - datalake_recupera_raw.agreements_installment.id_creditor
   id_customer:
-    description: "Customer ID"
+    description: "Customer identifier associated with the agreement installment mapping."
     lineage:
       - datalake_recupera_raw.agreements_installment.id_customer
   id_product:
-    description: "Product Code"
+    description: "Recupera product code linked to the agreement installment mapping."
     lineage:
       - datalake_recupera_raw.agreements_installment.id_product
   id_contract:
-    description: "Contract ID"
+    description: "Contract identifier associated with the agreement installment mapping."
     lineage:
       - datalake_recupera_raw.agreements_installment.id_contract
   dt_due:
@@ -45,3 +45,15 @@ columns:
     description: "Unique id of the installment of the agreement. It is the concatenation of fields: id_contract + id_installment + installment_number + dt_due "
     lineage:
       - datalake_recupera_raw.agreements_installment.id_installment_agreement
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []

@@ -7,7 +7,7 @@ description: |
 
   Original table name: TBL_REGISTROS_OPERACIONAL.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -57,10 +57,6 @@ columns:
     description: "Debt Freezing Date - Submitted in the load"
     lineage:
       - datalake_recupera_raw.operational_records.dt_debt_freezing
-  deadline:
-    description: "Deadline expiration date - Date at which records will be exchanged"
-    lineage:
-      - datalake_recupera_raw.operational_records.deadline
   installment_amount:
     description: "Value of the installment"
     lineage:
@@ -86,7 +82,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operational_records.ts_operator_code_update
   ts_last_update:
-    description: "Last update date"
+    description: Timestamp when last update occurred in the upstream fintech system.
     lineage:
       - datalake_recupera_raw.operational_records.ts_last_update
   ts_customer_status_last_update:
@@ -106,7 +102,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operational_records.is_next_customer
   last_customer_history_code:
-    description: "Last customer history code"
+    description: Financial attribute representing last customer history code on the operational_records dataset.
     lineage:
       - datalake_recupera_raw.operational_records.last_customer_history_code
   advisory_code:
@@ -173,3 +169,19 @@ columns:
     description: "Distribution Identifier Code"
     lineage:
       - datalake_recupera_raw.operational_records.id_distribution
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  dt_deadline:
+    description: Calendar date associated with deadline in the financial workflow.
+    lineage:
+      - datalake_recupera_raw.operational_records.deadline

@@ -10,7 +10,7 @@ description: |
 
   Original table name: TBL_PARCELAMENTO_DETALHE.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_installment:
@@ -42,19 +42,19 @@ columns:
     lineage:
       - datalake_recupera_raw.installment_detail.id_contract
   main_amount:
-    description: "Main value"
+    description: "Principal amount allocated to this contract within the installment detail."
     lineage:
       - datalake_recupera_raw.installment_detail.main_amount
   amount_to_pay:
-    description: "Amount to be paid"
+    description: "Total amount to be paid for this contract in the installment detail."
     lineage:
       - datalake_recupera_raw.installment_detail.amount_to_pay
   amount_fine:
-    description: "Fine value"
+    description: "Fine amount allocated to this contract in the installment detail."
     lineage:
       - datalake_recupera_raw.installment_detail.amount_fine
   interest_fee_amount:
-    description: "Interest Value"
+    description: "Interest amount allocated to this contract in the installment detail."
     lineage:
       - datalake_recupera_raw.installment_detail.interest_fee_amount
   adm_fee_amount:
@@ -62,26 +62,38 @@ columns:
     lineage:
       - datalake_recupera_raw.installment_detail.adm_fee_amount
   transfer_amount:
-    description: "Transfer value"
+    description: "Transfer amount allocated to this contract in the installment detail."
     lineage:
       - datalake_recupera_raw.installment_detail.transfer_amount
   revenue_amount:
-    description: "Revenue value"
+    description: "Revenue amount allocated to this contract in the installment detail."
     lineage:
       - datalake_recupera_raw.installment_detail.revenue_amount
   discount_amount:
-    description: "Discount value"
+    description: "Discount amount allocated to this contract in the installment detail."
     lineage:
       - datalake_recupera_raw.installment_detail.discount_amount
   expense_amount:
-    description: "Expense value"
+    description: "Expense amount allocated to this contract in the installment detail."
     lineage:
       - datalake_recupera_raw.installment_detail.expense_amount
   default_interest_amount:
-    description: "Amount of default interest"
+    description: "Late-payment interest amount applied to the installment detail line."
     lineage:
       - datalake_recupera_raw.installment_detail.default_interest_amount
   installment_fee_amount:
     description: "Value of installment interest"
     lineage:
       - datalake_recupera_raw.installment_detail.installment_fee_amount
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []

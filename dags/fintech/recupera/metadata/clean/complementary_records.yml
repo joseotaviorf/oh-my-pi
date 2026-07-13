@@ -8,7 +8,7 @@ description: |
 
   Original table name: TBL_REGISTROS_COMPLEMENTOS.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -46,15 +46,15 @@ columns:
     lineage:
       - datalake_recupera_raw.complementary_records.id_contract
   dt_contract_start:
-    description: "Start date"
+    description: "Calendar date when the defaulted contract started in Recupera."
     lineage:
       - datalake_recupera_raw.complementary_records.dt_contract_start
-  dt_debt_due_date:
-    description: "Debt due date"
+  dt_debt_due:
+    description: "Calendar date when the active debt installment becomes due."
     lineage:
       - datalake_recupera_raw.complementary_records.dt_debt_due_date
   installment_number:
-    description: "Installment number"
+    description: "Sequential installment number of the contract plan in Recupera."
     lineage:
       - datalake_recupera_raw.complementary_records.installment_number
   dt_last_debt_correction:
@@ -78,7 +78,7 @@ columns:
     lineage:
       - datalake_recupera_raw.complementary_records.minimun_amount
   amount_paid:
-    description: "Amount paid"
+    description: "Total monetary amount already paid toward this active debt installment."
     lineage:
       - datalake_recupera_raw.complementary_records.amount_paid
   payment_option:
@@ -105,3 +105,6 @@ columns:
     description: "Original Seu Barriga invoice. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.complementary_records.id_installment
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

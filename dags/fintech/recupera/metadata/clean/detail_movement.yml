@@ -14,7 +14,7 @@ description: |
 
   Original table name: TBL_MOVIMENTO_DETALHE.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_site:
@@ -57,11 +57,11 @@ columns:
     lineage:
       - datalake_recupera_raw.detail_movement.id_contract
   dt_installment_due_date:
-    description: "Installment due date"
+    description: "Calendar date when the paid installment was originally due."
     lineage:
       - datalake_recupera_raw.detail_movement.dt_installment_due_date
   installment_number:
-    description: "Installment number"
+    description: "Sequential installment number associated with the payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.installment_number
   dt_paid:
@@ -69,19 +69,19 @@ columns:
     lineage:
       - datalake_recupera_raw.detail_movement.dt_paid
   main_amount:
-    description: "Main value"
+    description: "Principal debt amount before fines and interest in the payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.main_amount
   amount_paid:
-    description: "Amount paid"
+    description: "Total monetary amount paid in this debt movement line."
     lineage:
       - datalake_recupera_raw.detail_movement.amount_paid
   amount_fine:
-    description: "Fine value"
+    description: "Fine amount included in this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.amount_fine
   interest_fee_amount:
-    description: "Interest Value"
+    description: "Interest amount included in this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.interest_fee_amount
   adm_fee_amount:
@@ -89,19 +89,19 @@ columns:
     lineage:
       - datalake_recupera_raw.detail_movement.adm_fee_amount
   revenue_amount:
-    description: "Revenue value"
+    description: "Revenue portion recorded in this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.revenue_amount
   transfer_amount:
-    description: "Transfer value"
+    description: "Transfer amount recorded in this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.transfer_amount
   discount_amount:
-    description: "Discount value"
+    description: "Discount amount applied in this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.discount_amount
   receipt_code:
-    description: "Receipt code"
+    description: "Receipt identifier associated with this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.receipt_code
   installment_status:
@@ -109,11 +109,11 @@ columns:
     lineage:
       - datalake_recupera_raw.detail_movement.installment_status
   auth_code:
-    description: "Authorization Code"
+    description: "Authorization code associated with this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.auth_code
   customer_name:
-    description: "Client name"
+    description: "Customer name captured on the debt payment receipt."
     lineage:
       - datalake_recupera_raw.detail_movement.customer_name
   customer_document:
@@ -121,7 +121,7 @@ columns:
     lineage:
       - datalake_recupera_raw.detail_movement.customer_document
   receipt_type:
-    description: "Type of receipt"
+    description: "Payment method used for this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.receipt_type
   is_promise_generated:
@@ -166,7 +166,7 @@ columns:
     lineage:
       - datalake_recupera_raw.detail_movement.index_quotation_amount
   expense_amount:
-    description: "Expense value"
+    description: "Expense amount recorded in this debt payment movement."
     lineage:
       - datalake_recupera_raw.detail_movement.expense_amount
   expense_accountability:
@@ -178,7 +178,7 @@ columns:
     lineage:
       - datalake_recupera_raw.detail_movement.dt_expense_accountability
   accountability_status:
-    description: "Accountability status"
+    description: "Accountability status of the payment movement in Recupera."
     lineage:
       - datalake_recupera_raw.detail_movement.accountability_status
   dt_redeposit:
@@ -201,3 +201,6 @@ columns:
     description: "installment unique id. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.detail_movement.id_installment
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

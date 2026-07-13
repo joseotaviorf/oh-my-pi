@@ -8,7 +8,7 @@ description: |
 
   All indicators can be found at the spreadsheet [Cad_Indicadores QuintoAndar_22022023](https://docs.google.com/spreadsheets/d/1LO6aI8Dh3nCWmwQ7vby8rsY6dGb2GHBz/edit#gid=1344425930)
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -46,7 +46,7 @@ columns:
     lineage:
       - datalake_recupera_raw.contracts.indicator_content
   content_description:
-    description: "Content Description"
+    description: "Human-readable description of the contract indicator value in Recupera."
     lineage:
       - datalake_recupera_raw.contracts.content_description
   dt_updated:

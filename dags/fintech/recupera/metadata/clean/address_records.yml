@@ -6,7 +6,7 @@ description: |
 
   Original table name: TBL_REGISTROS_ENDERECOS.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -30,7 +30,7 @@ columns:
     lineage:
       - datalake_recupera_raw.address_records.address_description
   address_number:
-    description: "Customer Address Number"
+    description: "Street number of the customer address registered in Recupera."
     lineage:
       - datalake_recupera_raw.address_records.address_number
   address_add_on:
@@ -42,14 +42,17 @@ columns:
     lineage:
       - datalake_recupera_raw.address_records.neighborhood
   address_city:
-    description: "Customer Address City"
+    description: "City of the customer address used for collection contact in Recupera."
     lineage:
       - datalake_recupera_raw.address_records.address_city
   address_state:
-    description: "Customer address state"
+    description: "Brazilian state code of the customer address in Recupera."
     lineage:
       - datalake_recupera_raw.address_records.address_state
   address_zip_code:
     description: "Customer Address Zip Code"
     lineage:
       - datalake_recupera_raw.address_records.address_zip_code
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

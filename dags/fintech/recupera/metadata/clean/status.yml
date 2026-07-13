@@ -7,7 +7,7 @@ description: |
 
   Original table name: TBL_STATUS.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_status:
@@ -15,7 +15,7 @@ columns:
     lineage:
       - datalake_recupera_raw.status.id_status
   status_description:
-    description: "Status Description"
+    description: Financial attribute representing status description on the status dataset.
     lineage:
       - datalake_recupera_raw.status.status_description
   ts_status_inclusion:
@@ -62,3 +62,6 @@ columns:
     description: "Indicates status expiration date"
     lineage:
       - datalake_recupera_raw.status.dt_expiration
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

@@ -6,7 +6,7 @@ description: |
 
   Original table name: TBL_HISTORICOS.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_historical:
@@ -14,7 +14,7 @@ columns:
     lineage:
       - datalake_recupera_raw.historical.id_historical
   historical_description:
-    description: "History Description"
+    description: "Human-readable label describing the occurrence type in Recupera."
     lineage:
       - datalake_recupera_raw.historical.historical_description
   has_complement:
@@ -92,7 +92,7 @@ columns:
     lineage:
       - datalake_recupera_raw.historical.average_call_time
   historical_type:
-    description: "Type of history"
+    description: "Classification of the occurrence type used in telecollection monitoring."
     lineage:
       - datalake_recupera_raw.historical.historical_type
   is_contract_linked:
@@ -140,10 +140,6 @@ columns:
     description: "Only business days (for days to be added to the scheduled schedule)"
     lineage:
       - datalake_recupera_raw.historical.is_only_business_days
-  to_measure_efficiency:
-    description: "Indicates whether to measure efficiency"
-    lineage:
-      - datalake_recupera_raw.historical.to_measure_efficiency
   is_occurence_exported:
     description: "If the occurrence is exported to advisory"
     lineage:
@@ -168,3 +164,6 @@ columns:
     description: "Indicates if it is contact with the right person"
     lineage:
       - datalake_recupera_raw.historical.is_correct_person_contacted
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

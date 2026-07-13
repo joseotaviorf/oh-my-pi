@@ -6,7 +6,7 @@ description: |
 
   Original table name: TBL_OPERADORES.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_operator:
@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operators.id_operator_superior
   ts_operator_inclusion:
-    description: "Operator inclusion date"
+    description: Timestamp when operator inclusion occurred in the upstream fintech system.
     lineage:
       - datalake_recupera_raw.operators.ts_operator_inclusion
   ts_operator_registration_update:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operators.operator_code_registration_update
   operator_type:
-    description: "Operator Type"
+    description: Financial attribute representing operator type on the operators dataset.
     lineage:
       - datalake_recupera_raw.operators.operator_type
   type_search:
@@ -69,7 +69,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operators.automatic_agendas_triggered
   operator_shift:
-    description: "Operator shift"
+    description: Financial attribute representing operator shift on the operators dataset.
     lineage:
       - datalake_recupera_raw.operators.operator_shift
   success_calls:
@@ -77,7 +77,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operators.success_calls
   ura_parameter:
-    description: "URA parameter"
+    description: Financial attribute representing ura parameter on the operators dataset.
     lineage:
       - datalake_recupera_raw.operators.ura_parameter
   monitoring_type:
@@ -101,7 +101,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operators.id_operator_profile
   ts_password_change:
-    description: "Password change date"
+    description: Timestamp when password change occurred in the upstream fintech system.
     lineage:
       - datalake_recupera_raw.operators.ts_password_change
   is_required_change_password:
@@ -117,7 +117,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operators.attemps_login_incorrect_password
   operator_login_code:
-    description: "Operator login code"
+    description: Financial attribute representing operator login code on the operators dataset.
     lineage:
       - datalake_recupera_raw.operators.operator_login_code
   max_tokens:
@@ -129,7 +129,7 @@ columns:
     lineage:
       - datalake_recupera_raw.operators.ts_last_login
   receipt_printer:
-    description: "Receipt printer - only for receipt"
+    description: Financial attribute representing receipt printer on the operators dataset.
     lineage:
       - datalake_recupera_raw.operators.receipt_printer
   negotiation_level:
@@ -156,3 +156,6 @@ columns:
     description: "Operator CPF/CNPJ number. Field filling is not mandatory."
     lineage:
       - datalake_recupera_raw.operators.operator_document
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

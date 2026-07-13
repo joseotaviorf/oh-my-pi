@@ -1,26 +1,37 @@
 ---
 database_name: datalake_recupera_raw
 table_name: address_records
+description:
+  One row per address records from the Recupera collections agency integration
+  for outsourced debt recovery on overdue tenant and guarantee balances.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   address_description:
     tags:
       - Restricted
+    description: Financial attribute representing address description on the address_records dataset.
   address_number:
     tags:
       - Restricted
+    description: Financial attribute representing address number on the address_records dataset.
   address_add_on:
     tags:
       - Restricted
+    description: Financial attribute representing address add on on the address_records dataset.
   neighborhood:
     tags:
       - Restricted
+    description: Financial attribute representing neighborhood on the address_records dataset.
   address_city:
     tags:
       - Restricted
+    description: Financial attribute representing address city on the address_records dataset.
   address_state:
     tags:
       - Restricted
+    description: Financial attribute representing address state on the address_records dataset.
   address_zip_code:
     tags:
       - Restricted
+    description: Financial attribute representing address zip code on the address_records dataset.

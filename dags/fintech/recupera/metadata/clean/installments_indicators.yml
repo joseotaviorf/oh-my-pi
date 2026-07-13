@@ -7,7 +7,7 @@ description: |
   Original table name: TBL_PRESTACOES_INDICADORES.
   All indicators can be found at the spreadsheet [Cad_Indicadores QuintoAndar_22022023](https://docs.google.com/spreadsheets/d/1LO6aI8Dh3nCWmwQ7vby8rsY6dGb2GHBz/edit#gid=1344425930)
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -52,3 +52,15 @@ columns:
     description: "Description of data indicator content"
     lineage:
       - datalake_recupera_raw.installments_indicators.content_description
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []

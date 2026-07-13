@@ -8,7 +8,7 @@ description: |
 
   Original table name: TBL_REGISTROS_EMAIL.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -34,15 +34,15 @@ columns:
     lineage:
       - datalake_recupera_raw.email_records.customer_email
   type:
-    description: "Email type"
+    description: "Category label of the customer email address in Recupera CRM."
     lineage:
       - datalake_recupera_raw.email_records.type
   is_preferred_email:
-    description: "Email type"
+    description: "Indicates whether this email is marked as preferred for the customer."
     lineage:
       - datalake_recupera_raw.email_records.is_preferred_email
   is_email_inactive:
-    description: "Mark email as inactive"
+    description: "Indicates whether the customer email is marked inactive in Recupera."
     categories:
       S: "Inactive"
       Nulo: "Active"
@@ -52,3 +52,6 @@ columns:
     description: "Customer name in preferred email"
     lineage:
       - datalake_recupera_raw.email_records.customer_name
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

@@ -6,7 +6,7 @@ description: |
 
   Original table name: TBL_REGISTROS.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -32,7 +32,7 @@ columns:
     lineage:
       - datalake_recupera_raw.records.customer_document
   customer_name:
-    description: "Customer name"
+    description: Financial attribute representing customer name on the records dataset.
     lineage:
       - datalake_recupera_raw.records.customer_name
   dt_customer_birth:
@@ -40,15 +40,15 @@ columns:
     lineage:
       - datalake_recupera_raw.records.dt_customer_birth
   spouse_name:
-    description: "Spouse name"
+    description: Financial attribute representing spouse name on the records dataset.
     lineage:
       - datalake_recupera_raw.records.spouse_name
   guarantor_name:
-    description: "Guarantor's name"
+    description: Financial attribute representing guarantor name on the records dataset.
     lineage:
       - datalake_recupera_raw.records.guarantor_name
   guarantor_address:
-    description: "Address of the guarantor"
+    description: Financial attribute representing guarantor address on the records dataset.
     lineage:
       - datalake_recupera_raw.records.guarantor_address
   guarantor_neighborhood:
@@ -56,71 +56,71 @@ columns:
     lineage:
       - datalake_recupera_raw.records.guarantor_neighborhood
   guarantor_city:
-    description: "Guarantor's City"
+    description: Financial attribute representing guarantor city on the records dataset.
     lineage:
       - datalake_recupera_raw.records.guarantor_city
   guarantor_state:
-    description: "State of the guarantor"
+    description: Financial attribute representing guarantor state on the records dataset.
     lineage:
       - datalake_recupera_raw.records.guarantor_state
   guarantor_zip_code:
-    description: "Guarantor zip code"
+    description: Financial attribute representing guarantor zip code on the records dataset.
     lineage:
       - datalake_recupera_raw.records.guarantor_zip_code
   membership_description:
-    description: "Membership Description"
+    description: Financial attribute representing membership description on the records dataset.
     lineage:
       - datalake_recupera_raw.records.membership_description
   residential_address:
-    description: "Home address"
+    description: Financial attribute representing residential address on the records dataset.
     lineage:
       - datalake_recupera_raw.records.residential_address
   residential_district:
-    description: "Residential district"
+    description: Financial attribute representing residential district on the records dataset.
     lineage:
       - datalake_recupera_raw.records.residential_district
   residential_city:
-    description: "Residential city"
+    description: Financial attribute representing residential city on the records dataset.
     lineage:
       - datalake_recupera_raw.records.residential_city
   residential_state:
-    description: "Residential state"
+    description: Financial attribute representing residential state on the records dataset.
     lineage:
       - datalake_recupera_raw.records.residential_state
   residential_zip_code:
-    description: "Residential zip code"
+    description: Financial attribute representing residential zip code on the records dataset.
     lineage:
       - datalake_recupera_raw.records.residential_zip_code
   company_name:
-    description: "Company Name"
+    description: Financial attribute representing company name on the records dataset.
     lineage:
       - datalake_recupera_raw.records.company_name
   company_sector:
-    description: "Company sector"
+    description: Financial attribute representing company sector on the records dataset.
     lineage:
       - datalake_recupera_raw.records.company_sector
   company_position:
-    description: "Position in the company"
+    description: Financial attribute representing company position on the records dataset.
     lineage:
       - datalake_recupera_raw.records.company_position
   commercial_address:
-    description: "Business address"
+    description: Financial attribute representing commercial address on the records dataset.
     lineage:
       - datalake_recupera_raw.records.commercial_address
   commercial_neighborhood:
-    description: "Commercial neighborhood"
+    description: Financial attribute representing commercial neighborhood on the records dataset.
     lineage:
       - datalake_recupera_raw.records.commercial_neighborhood
   commercial_city:
-    description: "Commercial city"
+    description: Financial attribute representing commercial city on the records dataset.
     lineage:
       - datalake_recupera_raw.records.commercial_city
   commercial_state:
-    description: "Commercial state"
+    description: Financial attribute representing commercial state on the records dataset.
     lineage:
       - datalake_recupera_raw.records.commercial_state
   commercial_zip_code:
-    description: "Commercial zip code"
+    description: Financial attribute representing commercial zip code on the records dataset.
     lineage:
       - datalake_recupera_raw.records.commercial_zip_code
   complementary_data:
@@ -132,11 +132,11 @@ columns:
     lineage:
       - datalake_recupera_raw.records.guarantor_observations
   gender:
-    description: "Gender"
+    description: Financial attribute representing gender on the records dataset.
     lineage:
       - datalake_recupera_raw.records.gender
   marital_status:
-    description: "Marital status"
+    description: Financial attribute representing marital status on the records dataset.
     lineage:
       - datalake_recupera_raw.records.marital_status
   brazilian_identity_card:
@@ -148,31 +148,31 @@ columns:
     lineage:
       - datalake_recupera_raw.records.dt_customer_registration
   customer_profession_code:
-    description: "Customer profession code"
+    description: Financial attribute representing customer profession code on the records dataset.
     lineage:
       - datalake_recupera_raw.records.customer_profession_code
   income_amount:
-    description: "Income value"
+    description: Financial attribute representing income amount on the records dataset.
     lineage:
       - datalake_recupera_raw.records.income_amount
   dt_admission:
-    description: "Admission date"
+    description: Calendar date associated with admission in the financial workflow.
     lineage:
       - datalake_recupera_raw.records.dt_admission
   customer_email:
-    description: "Customer email"
+    description: Financial attribute representing customer email on the records dataset.
     lineage:
       - datalake_recupera_raw.records.customer_email
   operations_amount:
-    description: "Amount of operations"
+    description: Financial attribute representing operations amount on the records dataset.
     lineage:
       - datalake_recupera_raw.records.operations_amount
   operations_number:
-    description: "Number of renovations"
+    description: Financial attribute representing operations number on the records dataset.
     lineage:
       - datalake_recupera_raw.records.operations_number
   mailing_address_type:
-    description: "Mailing Address Type"
+    description: Financial attribute representing mailing address type on the records dataset.
     lineage:
       - datalake_recupera_raw.records.mailing_address_type
   address_change:
@@ -184,19 +184,19 @@ columns:
     lineage:
       - datalake_recupera_raw.records.brazilian_identity_card_issuing_federal_unit
   residential_address_number:
-    description: "Residential Address Number"
+    description: Financial attribute representing residential address number on the records dataset.
     lineage:
       - datalake_recupera_raw.records.residential_address_number
   residential_address_complement:
-    description: "Complement of the residential address"
+    description: Financial attribute representing residential address complement on the records dataset.
     lineage:
       - datalake_recupera_raw.records.residential_address_complement
   commercial_address_number:
-    description: "Commercial Address Number"
+    description: Financial attribute representing commercial address number on the records dataset.
     lineage:
       - datalake_recupera_raw.records.commercial_address_number
   commercial_address_complement:
-    description: "Commercial Address Complement"
+    description: Financial attribute representing commercial address complement on the records dataset.
     lineage:
       - datalake_recupera_raw.records.commercial_address_complement
   guarantor_address_number:
@@ -204,10 +204,13 @@ columns:
     lineage:
       - datalake_recupera_raw.records.guarantor_address_number
   guarantor_address_complement:
-    description: "Guarantor Address Complement"
+    description: Financial attribute representing guarantor address complement on the records dataset.
     lineage:
       - datalake_recupera_raw.records.guarantor_address_complement
   type_boleto_delivery:
     description: "Indicates the type of 'Boleto' delivery, i.e, how to send the invoice to the Customer."
     lineage:
       - datalake_recupera_raw.records.type_boleto_delivery
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

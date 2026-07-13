@@ -6,7 +6,7 @@ description: |
 
   Original table name: TBL_REGISTROS_CANAIS_DISTRIB.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -38,10 +38,22 @@ columns:
     lineage:
       - datalake_recupera_raw.records_distributed_channels.distribution_param_code
   relocation_code:
-    description: "Relocation code"
+    description: Financial attribute representing relocation code on the records_distributed_channels dataset.
     lineage:
       - datalake_recupera_raw.records_distributed_channels.relocation_code
   distribution_shipment_number:
     description: "Distribution shipment number to the digital channel"
     lineage:
       - datalake_recupera_raw.records_distributed_channels.distribution_shipment_number
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []

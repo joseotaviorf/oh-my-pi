@@ -1,11 +1,18 @@
 ---
 database_name: datalake_recupera_raw
 table_name: complementary_records_written_down
+description:
+  One row per complementary records written down from the Recupera collections
+  agency integration for outsourced debt recovery on overdue tenant and
+  guarantee balances.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   bank_branch_code:
     tags:
       - Restricted
+    description: Financial attribute representing bank branch code on the complementary_records_written_down dataset.
   bank_account_number:
     tags:
       - Restricted
+    description: Financial attribute representing bank account number on the complementary_records_written_down dataset.

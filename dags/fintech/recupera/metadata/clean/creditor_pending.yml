@@ -4,7 +4,7 @@ table_name: creditor_pending
 description: |
   "It contains the original invoices of each receipt (records found in the 'complementary_records' or 'complementary_records_written_down' tables) and its
   installments.
-  
+
   Receipt originals (without installments): the 'installment_code' field is null and the value of 'is_installment' field is False.
   Installment originals: the installment_code field, when filled in, indicates which installment includes these originals. In this case,
   the 'receipt_code' field remains blank, as there is a possibility that an original installment is
@@ -17,7 +17,7 @@ description: |
 
   Original table name: TBL_CREDOR_PENDENCIA.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   dt_table_insertion:
@@ -49,7 +49,7 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.id_contract
   dt_installment_due_date:
-    description: "Installment due date"
+    description: "Calendar date when the pending installment payment is due."
     lineage:
       - datalake_recupera_raw.creditor_pending.dt_installment_due_date
   sequential_avoid_duplication:
@@ -57,11 +57,11 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.sequential_avoid_duplication
   installment_number:
-    description: "Installment number"
+    description: "Sequential installment number within the creditor pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.installment_number
   dt_correction:
-    description: "Correction date"
+    description: "Calendar date of the last monetary correction applied to the debt."
     lineage:
       - datalake_recupera_raw.creditor_pending.dt_correction
   dt_paid:
@@ -69,15 +69,15 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.dt_paid
   main_amount:
-    description: "Main value"
+    description: "Principal debt amount before fines and interest on the pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.main_amount
   corrected_amount:
-    description: "Corrected value"
+    description: "Debt amount corrected up to the last correction date in Recupera."
     lineage:
       - datalake_recupera_raw.creditor_pending.corrected_amount
   charges_amount:
-    description: "Value charges"
+    description: "Additional charges amount included in the pending receipt calculation."
     lineage:
       - datalake_recupera_raw.creditor_pending.charges_amount
   minimun_amount:
@@ -91,7 +91,7 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.amount_to_pay
   payment_option:
-    description:
+    description: "Payment option number selected when the creditor pending receipt was generated."
     categories:
       "5555": "In case of payment option"
     lineage:
@@ -101,7 +101,7 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.installments_amount
   amount_fine:
-    description: "Amount of the fine"
+    description: "Fine amount included in the creditor pending receipt calculation."
     lineage:
       - datalake_recupera_raw.creditor_pending.amount_fine
   interest_fee_amount:
@@ -113,15 +113,15 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.adm_fee_amount
   revenue_amount:
-    description: "Revenue value"
+    description: "Revenue portion allocated to the creditor pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.revenue_amount
   transfer_amount:
-    description: "Transfer amount"
+    description: "Transfer amount expected from the creditor pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.transfer_amount
   discount_amount:
-    description: "Discount amount"
+    description: "Discount amount applied to the creditor pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.discount_amount
   receipt_code:
@@ -137,15 +137,15 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.is_installment
   installment_code:
-    description: "Installment ID"
+    description: "Installment identifier linked to the creditor pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.installment_code
   interest_fee_discount_amount:
-    description: "Interest discount amount"
+    description: "Discount applied specifically to interest fees on the pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.interest_fee_discount_amount
   auth_code:
-    description: "Authorization code"
+    description: "Authorization code generated for the creditor pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.auth_code
   id_operator:
@@ -170,10 +170,30 @@ columns:
     lineage:
       - datalake_recupera_raw.creditor_pending.index_quotation_amount
   expense_amount:
-    description: "Expense amount"
+    description: "Expense amount associated with the creditor pending receipt."
     lineage:
       - datalake_recupera_raw.creditor_pending.expense_amount
   id_installment:
     description: "Original Seu Barriga invoice. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.creditor_pending.id_installment
+  cod_borde:
+    description: "Borderô batch code associated with the creditor pending receipt."
+    lineage:
+      - datalake_recupera_raw.creditor_pending.cod_borde
+  dat_emiss_notif:
+    description: "Notification emission date for the creditor pending receipt."
+    lineage:
+      - datalake_recupera_raw.creditor_pending.dat_emiss_notif
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
+  year:
+    description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  month:
+    description: Month partition derived from the source event timestamp for incremental loading.
+    lineage: []

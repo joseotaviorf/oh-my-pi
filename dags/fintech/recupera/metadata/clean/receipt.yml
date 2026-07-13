@@ -9,7 +9,7 @@ description: |
 
   Original table name: TBL_RECEBIMENTOS.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_receipt:
@@ -29,7 +29,7 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.amount_paid
   amount_fine:
-    description: "Fine value"
+    description: Financial attribute representing amount fine on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.amount_fine
   interest_fee_amount:
@@ -41,11 +41,11 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.adm_fee_amount
   revenue_amount:
-    description: "Revenue value"
+    description: Financial attribute representing revenue amount on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.revenue_amount
   transfer_amount:
-    description: "Transfer value"
+    description: Financial attribute representing transfer amount on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.transfer_amount
   discount_amount:
@@ -53,7 +53,7 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.discount_amount
   type_receipt:
-    description: Type of receipt made.
+    description: Financial attribute representing type receipt on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.type_receipt
   id_operator:
@@ -61,7 +61,7 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.id_operator
   auth_code:
-    description: "Authorization code"
+    description: Financial attribute representing auth code on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.auth_code
   bank_code:
@@ -85,11 +85,11 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.compensation
   customer_name:
-    description: "Customer name"
+    description: Financial attribute representing customer name on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.customer_name
   customer_document:
-    description: "Customer CPF"
+    description: Financial attribute representing customer document on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.customer_document
   written_down_indicator:
@@ -101,7 +101,7 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.is_receipt_finalized
   cmc7_number:
-    description: "CMC7 number"
+    description: Financial attribute representing cmc7 number on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.cmc7_number
   refund_reason_description:
@@ -121,7 +121,7 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.calculation_index_code
   index_quotation_amount:
-    description: "Index quotation value"
+    description: Financial attribute representing index quotation amount on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.index_quotation_amount
   id_customer:
@@ -129,11 +129,11 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.id_customer
   expense_amount:
-    description: "Expense value"
+    description: Financial attribute representing expense amount on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.expense_amount
   receipt_observation:
-    description: "Observation of Receipt"
+    description: Financial attribute representing receipt observation on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.receipt_observation
   dt_redeposit:
@@ -145,7 +145,7 @@ columns:
     lineage:
       - datalake_recupera_raw.receipt.id_collection_operator
   debt_type_indicator:
-    description: "Debt Type Indicator"
+    description: Financial attribute representing debt type indicator on the receipt dataset.
     lineage:
       - datalake_recupera_raw.receipt.debt_type_indicator
   id_site:
@@ -164,3 +164,6 @@ columns:
     description: "After payment the expected payment date is changed to the date the payment actually occurred, but this field is not changed allowing to consult the original date."
     lineage:
       - datalake_recupera_raw.receipt.dt_paid_original
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

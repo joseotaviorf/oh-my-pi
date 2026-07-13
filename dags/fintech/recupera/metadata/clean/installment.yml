@@ -18,7 +18,7 @@ description: |
 
   Original table name: TBL_PARCELAMENTO.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_installment:
@@ -34,7 +34,7 @@ columns:
     lineage:
       - datalake_recupera_raw.installment.id_sequence_number
   id_creditor:
-    description: "Creditor code"
+    description: "Creditor portfolio code linked to the negotiation installment."
     categories:
       "1": QuintoAndar
       "3": QuintoCred, faturas da plataforma 2.0
@@ -66,11 +66,11 @@ columns:
     lineage:
       - datalake_recupera_raw.installment.amount_to_pay
   amount_fine:
-    description: "Fine Amount"
+    description: "Fine amount charged on the negotiation installment in Recupera."
     lineage:
       - datalake_recupera_raw.installment.amount_fine
   interest_fee_amount:
-    description: "Interest Value"
+    description: "Interest amount charged on the negotiation installment in Recupera."
     lineage:
       - datalake_recupera_raw.installment.interest_fee_amount
   adm_fee_amount:
@@ -78,15 +78,15 @@ columns:
     lineage:
       - datalake_recupera_raw.installment.adm_fee_amount
   transfer_amount:
-    description: "Transfer value"
+    description: "Transfer amount allocated to the negotiation installment."
     lineage:
       - datalake_recupera_raw.installment.transfer_amount
   revenue_amount:
-    description: "Revenue valuea"
+    description: "Revenue portion allocated to the negotiation installment."
     lineage:
       - datalake_recupera_raw.installment.revenue_amount
   discount_amount:
-    description: "Discount amount"
+    description: "Discount amount applied to the negotiation installment."
     lineage:
       - datalake_recupera_raw.installment.discount_amount
   expense_amount:
@@ -153,11 +153,11 @@ columns:
     lineage:
       - datalake_recupera_raw.installment.agreement_type
   installment_rate:
-    description: "Installment fee"
+    description: "Installment fee rate applied to the negotiation agreement."
     lineage:
       - datalake_recupera_raw.installment.installment_rate
   discount_percentage:
-    description: "Discount percentage"
+    description: "Percentage discount applied to the negotiation installment."
     lineage:
       - datalake_recupera_raw.installment.discount_percentage
   installlment_renegotiated:
@@ -165,3 +165,6 @@ columns:
       "Indicates that the installment was renegotiated (identified at the time the agreement is made)"
     lineage:
       - datalake_recupera_raw.installment.installlment_renegotiated
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

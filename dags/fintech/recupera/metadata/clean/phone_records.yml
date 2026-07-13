@@ -9,7 +9,7 @@ description: |
 
   Original table name: TBL_REGISTROS_TELEFONES.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -39,7 +39,7 @@ columns:
     lineage:
       - datalake_recupera_raw.phone_records.phone_type
   branch_line:
-    description: "Branch line"
+    description: Financial attribute representing branch line on the phone_records dataset.
     lineage:
       - datalake_recupera_raw.phone_records.branch_line
   is_phone_preferential:
@@ -55,15 +55,15 @@ columns:
     lineage:
       - datalake_recupera_raw.phone_records.phone_modality
   country_code:
-    description: "Country Code (DDI)"
+    description: Financial attribute representing country code on the phone_records dataset.
     lineage:
       - datalake_recupera_raw.phone_records.country_code
   phone_operator_code:
-    description: "Phone Operator Code"
+    description: Financial attribute representing phone operator code on the phone_records dataset.
     lineage:
       - datalake_recupera_raw.phone_records.phone_operator_code
   ddd_code:
-    description: "DDD code"
+    description: Financial attribute representing ddd code on the phone_records dataset.
     lineage:
       - datalake_recupera_raw.phone_records.ddd_code
   dismembered_phone:
@@ -86,3 +86,6 @@ columns:
     description: "Indicates the customer's name of the phone when it came via cargo as preferred"
     lineage:
       - datalake_recupera_raw.phone_records.customer_name
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []

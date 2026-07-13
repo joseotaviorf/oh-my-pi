@@ -7,7 +7,7 @@ description: |
 
   Original table name: TBL_CONTRATOS_AVALISTA.
   Get the original fields names at [Recupera - Mapeamento de tabelas e campos - Original x Datalake](https://docs.google.com/spreadsheets/d/1yaqkdlfQPrQhW30L46miKKcLD99T4OV6svHJHXIYA6Q/edit?usp=sharing)"
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_creditor:
@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_recupera_raw.guarantor_contracts.id_contact
   name:
-    description: "Contact name"
+    description: "Full name of the guarantor or contract contact person in Recupera."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.name
   document:
@@ -69,35 +69,35 @@ columns:
     lineage:
       - datalake_recupera_raw.guarantor_contracts.mother_name
   address:
-    description: "Contact address"
+    description: "Street address of the guarantor or contract contact in Recupera."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.address
   address_number:
-    description: "Contact address number"
+    description: "Street number of the guarantor or contract contact address."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.address_number
   neighborhood:
-    description: "contact neighborhood"
+    description: "Neighborhood of the guarantor or contract contact address."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.neighborhood
   city:
-    description: "Contact city"
+    description: "City of the guarantor or contract contact address in Recupera."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.city
   state:
-    description: "Contact state"
+    description: "Brazilian state of the guarantor or contract contact address."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.state
   zip_code:
-    description: "Contact zip code"
+    description: "Postal code of the guarantor or contract contact address."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.zip_code
   address_add_on:
-    description: "Contact address add-on"
+    description: "Address complement for the guarantor or contract contact location."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.address_add_on
   comments:
-    description: "Comments"
+    description: "Free-text comments associated with the contract guarantor contact."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.comments
   spouse_name:
@@ -105,10 +105,13 @@ columns:
     lineage:
       - datalake_recupera_raw.guarantor_contracts.spouse_name
   contact_type_code:
-    description: "Contact type code"
+    description: "Code identifying the guarantor contact relationship type."
     lineage:
       - datalake_recupera_raw.guarantor_contracts.contact_type_code
   is_contact_active:
     description: "Indicates whether the contact is active or inactive(has been deleted)"
     lineage:
       - datalake_recupera_raw.guarantor_contracts.is_contact_active
+  ts_load:
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
+    lineage: []
