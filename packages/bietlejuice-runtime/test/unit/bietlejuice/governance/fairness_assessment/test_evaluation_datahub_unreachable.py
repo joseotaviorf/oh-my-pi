@@ -36,6 +36,8 @@ def _row(**overrides):
         "i1_01_failure_reason": None,
         "i3_01_pass": False,
         "i3_02_pass": False,
+        "a1_2_01_pass": False,
+        "a1_2_02_pass": False,
     }
     base.update(overrides)
     return base
@@ -47,7 +49,7 @@ class TestEvaluatorDataHubUnreachableOverride(unittest.TestCase):
             _row(f4_01_failure_reason=DATAHUB_HTTP_ERROR)
         )
 
-        for rid in ("I1-02", "I3-01", "I3-02", "A1.2-03"):
+        for rid in ("I1-02", "I3-01", "I3-02", "A1.2-01", "A1.2-02", "A1.2-03"):
             with self.subTest(requirement_id=rid):
                 self.assertFalse(out[rid].passed)
                 self.assertEqual(out[rid].reason, DATAHUB_UNREACHABLE_REASON)
@@ -60,7 +62,7 @@ class TestEvaluatorDataHubUnreachableOverride(unittest.TestCase):
             _row(f4_01_failure_reason=DATAHUB_FETCH_ERROR)
         )
 
-        for rid in ("I1-02", "I3-01", "I3-02", "A1.2-03"):
+        for rid in ("I1-02", "I3-01", "I3-02", "A1.2-01", "A1.2-02", "A1.2-03"):
             with self.subTest(requirement_id=rid):
                 self.assertEqual(out[rid].reason, DATAHUB_UNREACHABLE_REASON)
         self.assertEqual(out["F4-01"].reason, DATAHUB_FETCH_ERROR)
@@ -70,7 +72,7 @@ class TestEvaluatorDataHubUnreachableOverride(unittest.TestCase):
             _row(f4_01_pass=True, f4_01_failure_reason=None)
         )
 
-        for rid in ("I1-02", "I3-01", "I3-02", "A1.2-03"):
+        for rid in ("I1-02", "I3-01", "I3-02", "A1.2-01", "A1.2-02", "A1.2-03"):
             with self.subTest(requirement_id=rid):
                 self.assertNotEqual(out[rid].reason, DATAHUB_UNREACHABLE_REASON)
         self.assertTrue(out["F4-01"].passed)
@@ -80,7 +82,7 @@ class TestEvaluatorDataHubUnreachableOverride(unittest.TestCase):
             _row(f4_01_failure_reason="ENTITY_NOT_FOUND")
         )
 
-        for rid in ("I1-02", "I3-01", "I3-02", "A1.2-03"):
+        for rid in ("I1-02", "I3-01", "I3-02", "A1.2-01", "A1.2-02", "A1.2-03"):
             with self.subTest(requirement_id=rid):
                 self.assertNotEqual(out[rid].reason, DATAHUB_UNREACHABLE_REASON)
 

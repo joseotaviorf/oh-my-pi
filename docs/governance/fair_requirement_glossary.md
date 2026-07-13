@@ -67,8 +67,10 @@ Still scored in `fairness_assessment`; **escalate to Platform** — no Cursor sk
 | ID | Business name | Owner |
 |----|---------------|--------|
 | **F4-01** | Table visible in DataHub | Platform (indexing / catalog) |
-| **I1-02** | Data contract assigned | Platform (contracts on Databricks entity) |
-| **A1.2-03** | Access policy signal (interim) | Platform |
+| **I1-02** | Data contract assigned | Platform (`Data Contract` structured property on Databricks entity); observability only — not a tier gate yet |
+| **A1.2-01** | How to request access documented | Platform (`How to request access` structured property); observability only — not a tier gate yet |
+| **A1.2-02** | Access approver identified | Platform (`Approvers` ownership type on the entity); observability only — not a tier gate yet |
+| **A1.2-03** | Access policy signal (interim) | Platform; observability only — not a tier gate yet |
 | **I3-01** | Ownership in DataHub UI | Platform (observability; not MVP tier driver alone) |
 | **I3-02** | Lineage in DataHub UI | Platform (same) |
 

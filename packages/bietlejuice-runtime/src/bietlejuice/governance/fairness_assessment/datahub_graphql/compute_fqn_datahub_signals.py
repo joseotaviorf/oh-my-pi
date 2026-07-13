@@ -21,6 +21,7 @@ from bietlejuice.governance.fairness_assessment.constants import (
     DATAHUB_URN_DIAG_OK,
 )
 from bietlejuice.governance.fairness_assessment.datahub_graphql.client import (
+    DatasetFairSignals,
     build_dataset_fair_signals_batch_query,
     datahub_graphql_post,
     parse_batch_fair_signals,
@@ -59,6 +60,8 @@ def _record_batch_failure(
     urn_ownership: dict[str, bool],
     urn_upstream_total: dict[str, int],
     urn_downstream_total: dict[str, int],
+    urn_how_to_request_access: dict[str, bool],
+    urn_approvers: dict[str, bool],
 ) -> None:
     """Apply a batch-level failure (HTTP/timeout/JSON) uniformly to every URN in ``batch``."""
 
@@ -68,12 +71,14 @@ def _record_batch_failure(
         urn_ownership[urn] = False
         urn_upstream_total[urn] = 0
         urn_downstream_total[urn] = 0
+        urn_how_to_request_access[urn] = False
+        urn_approvers[urn] = False
         urn_diagnostic[urn] = outcome
 
 
 def _record_urn_signals(
     urn: str,
-    signals: tuple[bool, bool, bool, int, int, bool],
+    signals: DatasetFairSignals,
     *,
     urn_hit: dict[str, bool],
     urn_contract: dict[str, bool],
@@ -81,24 +86,30 @@ def _record_urn_signals(
     urn_ownership: dict[str, bool],
     urn_upstream_total: dict[str, int],
     urn_downstream_total: dict[str, int],
+    urn_how_to_request_access: dict[str, bool],
+    urn_approvers: dict[str, bool],
 ) -> None:
-    """Translate a per-URN parse tuple into the six output dicts (mirrors legacy serial logic)."""
+    """Translate a per-URN parse tuple into the output dicts (mirrors legacy serial logic)."""
 
-    indexed_ok, has_contract, ownership_nonempty, up_n, down_n, had_ds = signals
-    if not had_ds or not indexed_ok:
+    if not signals.had_dataset or not signals.indexed_ok:
         urn_hit[urn] = False
         urn_contract[urn] = False
         urn_ownership[urn] = False
         urn_upstream_total[urn] = 0
         urn_downstream_total[urn] = 0
+        urn_how_to_request_access[urn] = False
+        urn_approvers[urn] = False
         urn_diagnostic[urn] = DATAHUB_ENTITY_NOT_FOUND
         return
     urn_hit[urn] = True
-    urn_ownership[urn] = ownership_nonempty
-    urn_upstream_total[urn] = up_n
-    urn_downstream_total[urn] = down_n
+    urn_ownership[urn] = signals.ownership_nonempty
+    urn_upstream_total[urn] = signals.upstream_total
+    urn_downstream_total[urn] = signals.downstream_total
+    urn_how_to_request_access[urn] = signals.how_to_request_access
+    urn_approvers[urn] = signals.approvers_ownership
+    # Data contract SP lives on the Databricks entity; keep the platform gate that I1-02 relies on.
     is_databricks_urn = "dataPlatform:databricks" in urn
-    urn_contract[urn] = bool(is_databricks_urn and has_contract)
+    urn_contract[urn] = bool(is_databricks_urn and signals.has_data_contract)
     urn_diagnostic[urn] = DATAHUB_URN_DIAG_OK
 
 
@@ -132,16 +143,22 @@ def resolve_datahub_urn_flags(
     dict[str, bool],
     dict[str, int],
     dict[str, int],
+    dict[str, bool],
+    dict[str, bool],
 ]:
     """Batched GraphQL fetch: ``DATAHUB_GRAPHQL_BATCH_SIZE`` URNs per POST × ``WORKERS`` threads.
 
     Returns (urn_hit, urn_contract, urn_diagnostic, urn_ownership_nonempty, urn_upstream_total,
-    urn_downstream_total).
+    urn_downstream_total, urn_how_to_request_access, urn_approvers).
 
     **F4-01 / urn_hit:** ``dataset.exists`` from GraphQL.
 
-    **I1-02 / urn_contract:** ``institutionalMemory`` labels containing ``urn:prod:datacontract:`` for
+    **I1-02 / urn_contract:** ``Data Contract`` structured property with a non-empty value, for
     Databricks URNs only.
+
+    **A1.2-01 / urn_how_to_request_access:** ``How to request access`` structured property present.
+
+    **A1.2-02 / urn_approvers:** an owner assigned with the ``Approvers`` ownership type.
 
     ``urn_diagnostic`` reuses the same failure tokens for F4-01 reason roll-up per FQN. On batch
     failure (HTTP/timeout/JSON) every URN in that batch inherits the diagnostic — no per-URN retry.
@@ -176,6 +193,8 @@ def resolve_datahub_urn_flags(
     urn_ownership: dict[str, bool] = {}
     urn_upstream_total: dict[str, int] = {}
     urn_downstream_total: dict[str, int] = {}
+    urn_how_to_request_access: dict[str, bool] = {}
+    urn_approvers: dict[str, bool] = {}
 
     if not urns_ordered:
         LOGGER.info(
@@ -189,6 +208,8 @@ def resolve_datahub_urn_flags(
             urn_ownership,
             urn_upstream_total,
             urn_downstream_total,
+            urn_how_to_request_access,
+            urn_approvers,
         )
 
     batch_size = _resolve_positive_int(
@@ -225,6 +246,8 @@ def resolve_datahub_urn_flags(
                     urn_ownership=urn_ownership,
                     urn_upstream_total=urn_upstream_total,
                     urn_downstream_total=urn_downstream_total,
+                    urn_how_to_request_access=urn_how_to_request_access,
+                    urn_approvers=urn_approvers,
                 )
                 continue
             per_urn = parse_batch_fair_signals(root, batch)
@@ -238,6 +261,8 @@ def resolve_datahub_urn_flags(
                     urn_ownership=urn_ownership,
                     urn_upstream_total=urn_upstream_total,
                     urn_downstream_total=urn_downstream_total,
+                    urn_how_to_request_access=urn_how_to_request_access,
+                    urn_approvers=urn_approvers,
                 )
 
     LOGGER.info(
@@ -253,7 +278,66 @@ def resolve_datahub_urn_flags(
         urn_ownership,
         urn_upstream_total,
         urn_downstream_total,
+        urn_how_to_request_access,
+        urn_approvers,
     )
+
+
+def _compute_any_candidate_urn_flag_by_fqn(
+    distinct_fqn_rows: list[Any],
+    urn_flag: dict[str, bool],
+) -> dict[tuple[str, str], bool]:
+    """Roll a per-URN boolean up to the FQN: pass if **any** candidate platform URN is True."""
+
+    result: dict[tuple[str, str], bool] = {}
+    for r in distinct_fqn_rows:
+        db = r["database_name"]
+        tbl = r["table_name"]
+        if db is None or tbl is None:
+            key = (str(db or "").strip(), str(tbl or "").strip())
+            result[key] = False
+            continue
+        db_s, tbl_s = str(db).strip(), str(tbl).strip()
+        key = (db_s, tbl_s)
+        if not db_s or not tbl_s:
+            result[key] = False
+            continue
+        srv_db = bool(r["contract_server_databricks"])
+        srv_tr = bool(r["contract_server_trino"])
+        candidate_urns = [
+            urn
+            for _platform, urn in list_platform_urns_for_fqn(
+                db_s,
+                tbl_s,
+                server_databricks=srv_db,
+                server_trino=srv_tr,
+            )
+        ]
+        if not candidate_urns:
+            result[key] = False
+            continue
+        result[key] = any(bool(urn_flag.get(u, False)) for u in candidate_urns)
+    return result
+
+
+def compute_a1_2_01_how_to_request_access_by_fqn(
+    distinct_fqn_rows: list[Any],
+    urn_how_to_request_access: dict[str, bool],
+) -> dict[tuple[str, str], bool]:
+    """A1.2-01: pass if **any** candidate URN carries the ``How to request access`` structured property."""
+
+    return _compute_any_candidate_urn_flag_by_fqn(
+        distinct_fqn_rows, urn_how_to_request_access
+    )
+
+
+def compute_a1_2_02_approvers_by_fqn(
+    distinct_fqn_rows: list[Any],
+    urn_approvers: dict[str, bool],
+) -> dict[tuple[str, str], bool]:
+    """A1.2-02: pass if **any** candidate URN has an owner with the ``Approvers`` ownership type."""
+
+    return _compute_any_candidate_urn_flag_by_fqn(distinct_fqn_rows, urn_approvers)
 
 
 def compute_has_data_contract_by_fqn(

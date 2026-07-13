@@ -35,6 +35,8 @@ from bietlejuice.governance.fairness_assessment.constants import (
     graphql_url_for_environment,
 )
 from bietlejuice.governance.fairness_assessment.datahub_graphql import (  # noqa: E501
+    compute_a1_2_01_how_to_request_access_by_fqn,
+    compute_a1_2_02_approvers_by_fqn,
     compute_f4_pass_and_reason_by_fqn,
     compute_has_data_contract_by_fqn,
     compute_i3_lineage_pass_and_totals_by_fqn,
@@ -479,6 +481,8 @@ def main() -> None:
     i3_lin_pass_map: dict[tuple[str, str], bool] = {}
     i3_up_tot_map: dict[tuple[str, str], int] = {}
     i3_down_tot_map: dict[tuple[str, str], int] = {}
+    a1_2_01_map: dict[tuple[str, str], bool] = {}
+    a1_2_02_map: dict[tuple[str, str], bool] = {}
     if not datahub_graphql:
         logger.warning(
             "m=datahub_skip,msg=datahub GraphQL URL empty; F4-01 will fail closed"
@@ -497,6 +501,8 @@ def main() -> None:
             urn_ownership,
             urn_upstream_total,
             urn_downstream_total,
+            urn_how_to_request_access,
+            urn_approvers,
         ) = resolve_datahub_urn_flags(datahub_graphql, token, collected)
         f4_map, f4_reason_map = compute_f4_pass_and_reason_by_fqn(
             collected,
@@ -513,6 +519,10 @@ def main() -> None:
                 urn_downstream_total,
             )
         )
+        a1_2_01_map = compute_a1_2_01_how_to_request_access_by_fqn(
+            collected, urn_how_to_request_access
+        )
+        a1_2_02_map = compute_a1_2_02_approvers_by_fqn(collected, urn_approvers)
         if not token:
             logger.info(
                 "m=datahub_token_optional,msg=no Bearer token "
@@ -527,6 +537,8 @@ def main() -> None:
     bc_i3_lin = spark.sparkContext.broadcast(i3_lin_pass_map)
     bc_i3_up = spark.sparkContext.broadcast(i3_up_tot_map)
     bc_i3_down = spark.sparkContext.broadcast(i3_down_tot_map)
+    bc_a1_2_01 = spark.sparkContext.broadcast(a1_2_01_map)
+    bc_a1_2_02 = spark.sparkContext.broadcast(a1_2_02_map)
     use_dh_contract = bool(datahub_graphql)
 
     def _resolve_has_contract(db: Any, tbl: Any) -> bool:
@@ -599,15 +611,39 @@ def main() -> None:
         key = (str(db).strip(), str(tbl).strip())
         return int(bc_i3_down.value.get(key, 0) or 0)
 
+    def _lookup_a1_2_01(db: Any, tbl: Any) -> Any:
+        if not bc_gql_enabled.value:
+            return None
+        if db is None or tbl is None:
+            return False
+        key = (str(db).strip(), str(tbl).strip())
+        return bool(bc_a1_2_01.value.get(key, False))
+
+    def _lookup_a1_2_02(db: Any, tbl: Any) -> Any:
+        if not bc_gql_enabled.value:
+            return None
+        if db is None or tbl is None:
+            return False
+        key = (str(db).strip(), str(tbl).strip())
+        return bool(bc_a1_2_02.value.get(key, False))
+
     i3_01_udf = F.udf(_lookup_i3_01, BooleanType())
     i3_02_udf = F.udf(_lookup_i3_02, BooleanType())
     lineage_up_udf = F.udf(_lookup_lineage_up, LongType())
     lineage_down_udf = F.udf(_lookup_lineage_down, LongType())
+    a1_2_01_udf = F.udf(_lookup_a1_2_01, BooleanType())
+    a1_2_02_udf = F.udf(_lookup_a1_2_02, BooleanType())
     td = td.withColumn(
         "i3_01_pass", i3_01_udf(F.col("database_name"), F.col("table_name"))
     )
     td = td.withColumn(
         "i3_02_pass", i3_02_udf(F.col("database_name"), F.col("table_name"))
+    )
+    td = td.withColumn(
+        "a1_2_01_pass", a1_2_01_udf(F.col("database_name"), F.col("table_name"))
+    )
+    td = td.withColumn(
+        "a1_2_02_pass", a1_2_02_udf(F.col("database_name"), F.col("table_name"))
     )
     td = td.withColumn(
         "datahub_lineage_upstream_total",

@@ -12,6 +12,8 @@ from bietlejuice.governance.fairness_assessment import (
     RequirementResult,
     _parse_dataset_fair_signals,
     build_dataset_urn,
+    check_a1_2_01_access_request_documented,
+    check_a1_2_02_approver_ownership,
     check_a1_2_03_interim_access_policy_via_contract,
     check_f1_03_addressable_fqn,
     check_f4_01_indexed_in_datahub,
@@ -22,14 +24,13 @@ from bietlejuice.governance.fairness_assessment import (
     cumulative_ids_for_tier,
     dataset_id_for_platform,
     evaluate_mvp_checks_from_row,
-    institutional_memory_has_assigned_datacontract,
     list_platform_urns_for_fqn,
     resolve_datahub_gms_base_url,
     resolve_datahub_graphql_url,
     tier_achieved_to_classification,
 )
-from bietlejuice.governance.fairness_assessment.datahub_graphql.client import (
-    entity_json_has_data_contract_resource,
+from bietlejuice.governance.fairness_assessment.constants import (
+    DATAHUB_SP_DATA_CONTRACT_URN,
 )
 
 _SUBSTANTIVE_FACT_CONTRACT_DESC = (
@@ -89,6 +90,18 @@ class TestComputeTierMvp(unittest.TestCase):
         out = compute_tier(results, mode="mvp")
         self.assertEqual(out.tier_achieved, 1)
         self.assertEqual(out.tier_max_possible, 2)
+
+    def test_contract_and_access_fails_do_not_block_mvp_tier_2(self):
+        results = {
+            rid: RequirementResult(rid, True)
+            for rid in MVP_TIER2_SCOPED_REQUIREMENT_IDS
+        }
+        results["I1-02"] = RequirementResult("I1-02", False, reason="no_contract")
+        results["A1.2-03"] = RequirementResult("A1.2-03", False, reason="no_contract")
+        results["A1.2-01"] = RequirementResult("A1.2-01", False, reason="no_access_doc")
+        results["A1.2-02"] = RequirementResult("A1.2-02", False, reason="no_approver")
+        out = compute_tier(results, mode="mvp")
+        self.assertEqual(out.tier_achieved, 2)
 
     def test_missing_key_fails_closed(self):
         results = {
@@ -163,30 +176,6 @@ class TestUrnBuilding(unittest.TestCase):
         self.assertTrue(any(p[0] == "trino" for p in pairs))
 
 
-class TestEntityJsonDataContract(unittest.TestCase):
-    def test_true_when_datacontract_urn_in_nested_string(self):
-        payload = {
-            "aspects": {
-                "x": {
-                    "body": "[Data Contract] urn:prod:datacontract:my.team.dataset@v1",
-                }
-            }
-        }
-        self.assertTrue(entity_json_has_data_contract_resource(payload))
-
-    def test_false_placeholder_no_contract_assigned(self):
-        payload = {"resources": ["[Data Contract] No data contract assigned"]}
-        self.assertFalse(entity_json_has_data_contract_resource(payload))
-
-    def test_false_when_urn_marker_absent(self):
-        self.assertFalse(
-            entity_json_has_data_contract_resource({"a": "no datacontract urn"})
-        )
-
-    def test_false_legacy_suffix_only(self):
-        self.assertFalse(entity_json_has_data_contract_resource("[Data Contract]"))
-
-
 class TestComputeHasDataContractByFqn(unittest.TestCase):
     @staticmethod
     def _row(db, tbl, sd, st):
@@ -216,25 +205,6 @@ class TestComputeHasDataContractByFqn(unittest.TestCase):
         self.assertFalse(m[("a", "b")])
 
 
-class TestInstitutionalMemoryDatacontract(unittest.TestCase):
-    def test_true_when_label_contains_datacontract_urn(self):
-        im = {
-            "elements": [
-                {"label": "[Data Contract] urn:prod:datacontract:my.team.dataset@v1"}
-            ]
-        }
-        self.assertTrue(institutional_memory_has_assigned_datacontract(im))
-
-    def test_false_placeholder_no_contract_assigned(self):
-        im = {"elements": [{"label": "[Data Contract] No data contract assigned"}]}
-        self.assertFalse(institutional_memory_has_assigned_datacontract(im))
-
-    def test_false_when_no_elements(self):
-        self.assertFalse(
-            institutional_memory_has_assigned_datacontract({"elements": []})
-        )
-
-
 class TestParseDatasetFairSignals(unittest.TestCase):
     def test_indexed_and_lineage(self):
         root = {
@@ -244,25 +214,23 @@ class TestParseDatasetFairSignals(unittest.TestCase):
                     "ownership": {"owners": [{"owner": {"urn": "urn:li:corpuser:u"}}]},
                     "upstream": {"total": 2},
                     "downstream": {"total": 0},
-                    "institutionalMemory": {"elements": []},
+                    "structuredProperties": {"properties": []},
                 }
             }
         }
-        indexed_ok, has_contract, own_ok, up_n, down_n, had_ds = (
-            _parse_dataset_fair_signals(root)
-        )
-        self.assertTrue(indexed_ok and had_ds)
-        self.assertFalse(has_contract)
-        self.assertTrue(own_ok)
-        self.assertEqual(up_n, 2)
-        self.assertEqual(down_n, 0)
+        signals = _parse_dataset_fair_signals(root)
+        self.assertTrue(signals.indexed_ok and signals.had_dataset)
+        self.assertFalse(signals.has_data_contract)
+        self.assertTrue(signals.ownership_nonempty)
+        self.assertEqual(signals.upstream_total, 2)
+        self.assertEqual(signals.downstream_total, 0)
 
     def test_dataset_null(self):
         root = {"data": {"dataset": None}}
         t = _parse_dataset_fair_signals(root)
-        self.assertEqual(t, (False, False, False, 0, 0, False))
+        self.assertEqual(t, (False, False, False, 0, 0, False, False, False))
 
-    def test_contract_from_institutional_memory(self):
+    def test_contract_from_structured_property(self):
         root = {
             "data": {
                 "dataset": {
@@ -270,16 +238,47 @@ class TestParseDatasetFairSignals(unittest.TestCase):
                     "ownership": {"owners": []},
                     "upstream": {"total": 0},
                     "downstream": {"total": 1},
-                    "institutionalMemory": {
-                        "elements": [
-                            {"label": "urn:prod:datacontract:foo@v1", "url": None}
+                    "structuredProperties": {
+                        "properties": [
+                            {
+                                "structuredProperty": {
+                                    "urn": DATAHUB_SP_DATA_CONTRACT_URN
+                                },
+                                "values": [
+                                    {"stringValue": "urn:prod:datacontract:foo@v1"}
+                                ],
+                            }
                         ]
                     },
                 }
             }
         }
-        indexed_ok, has_contract, _, _, _, _ = _parse_dataset_fair_signals(root)
-        self.assertTrue(indexed_ok and has_contract)
+        signals = _parse_dataset_fair_signals(root)
+        self.assertTrue(signals.indexed_ok and signals.has_data_contract)
+
+    def test_no_contract_when_structured_property_value_blank(self):
+        root = {
+            "data": {
+                "dataset": {
+                    "exists": True,
+                    "ownership": {"owners": []},
+                    "upstream": {"total": 0},
+                    "downstream": {"total": 0},
+                    "structuredProperties": {
+                        "properties": [
+                            {
+                                "structuredProperty": {
+                                    "urn": DATAHUB_SP_DATA_CONTRACT_URN
+                                },
+                                "values": [{"stringValue": "   "}],
+                            }
+                        ]
+                    },
+                }
+            }
+        }
+        signals = _parse_dataset_fair_signals(root)
+        self.assertFalse(signals.has_data_contract)
 
 
 class TestF4Aggregation(unittest.TestCase):
@@ -432,8 +431,56 @@ class TestMvpChecks(unittest.TestCase):
             "i1_01_pass": True,
         }
         res = evaluate_mvp_checks_from_row(row)
-        self.assertTrue(all(r.passed for r in res.values()))
-        self.assertEqual(set(res.keys()), MVP_TIER2_SCOPED_REQUIREMENT_IDS)
+        self.assertTrue(
+            all(res[rid].passed for rid in MVP_TIER2_SCOPED_REQUIREMENT_IDS)
+        )
+        self.assertTrue(res["I1-02"].passed)
+        self.assertTrue(res["A1.2-03"].passed)
+        self.assertEqual(
+            set(res.keys()),
+            MVP_TIER2_SCOPED_REQUIREMENT_IDS | {"I1-02", "A1.2-03"},
+        )
+
+    def test_a1_2_01_a1_2_02_emitted_when_signals_present(self):
+        row = {
+            "database_name": "dw_rent",
+            "table_name": "fact_contract",
+            "domain": "For Rent",
+            "owner": "Someone@quintoandar.com.br",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
+            "fqn_occurrence_count": 1,
+            "is_active_employee": True,
+            "spark_table_exists": True,
+            "f4_01_pass": True,
+            "has_data_contract": True,
+            "f2_02_pass": True,
+            "i1_01_pass": True,
+            "a1_2_01_pass": True,
+            "a1_2_02_pass": False,
+        }
+        res = evaluate_mvp_checks_from_row(row)
+        self.assertTrue(res["A1.2-01"].passed)
+        self.assertFalse(res["A1.2-02"].passed)
+        self.assertEqual(res["A1.2-02"].reason, "no_approver_owner_in_datahub")
+
+    def test_a1_2_01_a1_2_02_absent_when_signals_missing(self):
+        row = {
+            "database_name": "dw_rent",
+            "table_name": "fact_contract",
+            "domain": "For Rent",
+            "owner": "Someone@quintoandar.com.br",
+            "table_description": _SUBSTANTIVE_FACT_CONTRACT_DESC,
+            "fqn_occurrence_count": 1,
+            "is_active_employee": True,
+            "spark_table_exists": True,
+            "f4_01_pass": True,
+            "has_data_contract": True,
+            "f2_02_pass": True,
+            "i1_01_pass": True,
+        }
+        res = evaluate_mvp_checks_from_row(row)
+        self.assertNotIn("A1.2-01", res)
+        self.assertNotIn("A1.2-02", res)
 
     def test_duplicate_fqn(self):
         row = {
@@ -728,6 +775,18 @@ class TestF4I1Direct(unittest.TestCase):
     def test_a1_2_03_direct_mirrors_contract_boolean(self):
         self.assertTrue(check_a1_2_03_interim_access_policy_via_contract(True).passed)
         self.assertFalse(check_a1_2_03_interim_access_policy_via_contract(False).passed)
+
+    def test_a1_2_01_direct(self):
+        self.assertTrue(check_a1_2_01_access_request_documented(True).passed)
+        fail = check_a1_2_01_access_request_documented(False)
+        self.assertFalse(fail.passed)
+        self.assertEqual(fail.reason, "no_how_to_request_access_structured_property")
+
+    def test_a1_2_02_direct(self):
+        self.assertTrue(check_a1_2_02_approver_ownership(True).passed)
+        fail = check_a1_2_02_approver_ownership(False)
+        self.assertFalse(fail.passed)
+        self.assertEqual(fail.reason, "no_approver_owner_in_datahub")
 
 
 if __name__ == "__main__":

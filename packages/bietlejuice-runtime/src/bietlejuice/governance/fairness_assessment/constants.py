@@ -255,7 +255,9 @@ TDQ_BOILERPLATE_PHRASES: tuple[str, ...] = (
 # Tiering (MVP and full) — also used by I1-01 for partition column names
 # ---------------------------------------------------------------------------
 
-# Tier 1 — Findable and Accessible (explicit list from spike §3.1)
+# Tier 1 — Findable and Accessible (explicit list from spike §3.1). Contract/access IDs
+# (I1-02, A1.2-03, A1.2-01, A1.2-02) are evaluated in ``checks_result_json`` but bypassed
+# from tier gates until platform metadata coverage is ready — see ``TIERING_OBSERVABILITY_ONLY_REQUIREMENT_IDS``.
 TIER_1_IDS: FrozenSet[str] = frozenset(
     {
         "F1-01",
@@ -264,15 +266,16 @@ TIER_1_IDS: FrozenSet[str] = frozenset(
         "F2-01",
         "F4-01",
         "A1-03",
-        "A1.2-03",
-        "I1-02",
         "R1.3-01",
         "R1.3-02",
     }
 )
 
-TIER_2_EXTRA: FrozenSet[str] = frozenset(
-    {"F2-02", "A1.2-02", "I1-01", "I2-01", "I3-01", "I3-02"}
+TIER_2_EXTRA: FrozenSet[str] = frozenset({"F2-02", "I1-01", "I2-01", "I3-01", "I3-02"})
+
+# Emitted in assessment output; not tier gates in the current rollout (same interim pattern as I3-*).
+TIERING_OBSERVABILITY_ONLY_REQUIREMENT_IDS: FrozenSet[str] = frozenset(
+    {"I1-02", "A1.2-03", "A1.2-01", "A1.2-02"}
 )
 TIER_3_EXTRA: FrozenSet[str] = frozenset(
     {"R1-01", "R1-02", "R1-04", "R1-05", "R1.1-01", "R1.2-01"}
@@ -281,8 +284,8 @@ TIER_4_EXTRA: FrozenSet[str] = frozenset(
     {"F3-01", "I2-02", "R1-03", "R1-06", "R1.1-02"}
 )
 
-# Active Tier-1 slice for this rollout: A1-03 still deferred; A1.2-03 scored via interim contract proxy
-# (see check_a1_2_03_interim_access_policy_via_contract); R1.3-* out of scope (naming / CI-CD).
+# Active Tier-1 slice for this rollout: A1-03 still deferred; I1-02 / A1.2-03 bypass tiering
+# (observability only — see ``TIERING_OBSERVABILITY_ONLY_REQUIREMENT_IDS``); R1.3-* out of scope.
 TIER1_ACTIVE_REQUIREMENT_IDS: FrozenSet[str] = frozenset(
     {
         "F1-01",
@@ -290,8 +293,6 @@ TIER1_ACTIVE_REQUIREMENT_IDS: FrozenSet[str] = frozenset(
         "F1-03",
         "F2-01",
         "F4-01",
-        "A1.2-03",
-        "I1-02",
     }
 )
 
@@ -309,7 +310,7 @@ MVP_IMPLEMENTED_REQUIREMENT_IDS: FrozenSet[str] = frozenset(
 PARTITION_COLUMN_NAMES_LOWERCASE: FrozenSet[str] = frozenset({"year", "month", "day"})
 
 # Bump when FAIR tiering requirement ID sets from governance change
-TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v12"
+TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v14"
 
 # ---------------------------------------------------------------------------
 # DataHub GraphQL: default endpoints by environment
@@ -355,7 +356,20 @@ DATAHUB_F4_REASON_NO_CANDIDATE_URNS = "datahub_no_candidate_platform_urns"
 # Per-URN: fetch resolved with non-empty aspects (driver-only; not a consumer-facing failure code).
 DATAHUB_URN_DIAG_OK = "OK"
 
-DATAHUB_DATA_CONTRACT_URN_MARKER = "urn:prod:datacontract:"
+# DataHub structured-property / ownership-type URNs consumed by the fairness signals.
+# ``Data Contract`` SP holds the assigned data-contract URN on the Databricks entity: its presence
+# (non-empty value) is the source of truth for I1-02 / A1.2-03 (replacing the legacy
+# ``institutionalMemory`` label scan). ``How to request access`` SP backs A1.2-01. The ``Approvers``
+# ownership type backs A1.2-02 (an owner assigned with that ownership type on the entity).
+DATAHUB_SP_DATA_CONTRACT_URN = (
+    "urn:li:structuredProperty:c6476d99-291d-4a13-aa0d-a508fd7b8296"
+)
+DATAHUB_SP_HOW_TO_REQUEST_ACCESS_URN = (
+    "urn:li:structuredProperty:ef43e67c-ad15-4ca6-a1f2-276c731ac77d"
+)
+DATAHUB_OWNERSHIP_TYPE_APPROVERS_URN = (
+    "urn:li:ownershipType:9344e0b1-5225-40f3-8e57-c5f829761f3d"
+)
 
 # GraphQL batching defaults: 25 URNs per POST × 4 driver workers = 100 URNs in flight.
 # Both knobs accept env overrides (``DATAHUB_GRAPHQL_BATCH_SIZE`` / ``DATAHUB_GRAPHQL_BATCH_WORKERS``)
@@ -371,6 +385,7 @@ query DatasetFairSignals($urn: String!) {
     exists
     ownership {
       owners {
+        ownershipType { urn }
         owner {
           ... on CorpUser { urn }
           ... on CorpGroup { urn }
@@ -383,10 +398,13 @@ query DatasetFairSignals($urn: String!) {
     downstream: lineage(input: { direction: DOWNSTREAM, start: 0, count: 0 }) {
       total
     }
-    institutionalMemory {
-      elements {
-        label
-        url
+    structuredProperties {
+      properties {
+        structuredProperty { urn }
+        values {
+          ... on StringValue { stringValue }
+          ... on NumberValue { numberValue }
+        }
       }
     }
   }

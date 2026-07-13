@@ -24,7 +24,7 @@ columns:
     description: |
       JSON map of requirement_id to {"passed": bool, "reason": string|null, optional "detail"}. **MVP gate**
       (``MVP_TIER2_SCOPED_REQUIREMENT_IDS``): F1-01, F1-02, F1-03,
-      F2-01, F4-01, A1.2-03, I1-02, **F2-02**, **I1-01**. **F1-02** — detects multiple (dag, task) rows in
+      F2-01, F4-01, **F2-02**, **I1-01**. **F1-02** — detects multiple (dag, task) rows in
       ``datalake_dag_inventory_clean.table`` producing the same FQN on the inventory partition for
       ``load_start_date``; fails with ``duplicate_fqn_in_assessment_universe`` when ``fqn_occurrence_count > 1``.
       **F2-01** — owner email present and valid format,
@@ -43,11 +43,12 @@ columns:
       (documented name absent from physical snapshot), or comma-joined when both; optional detail arrays
       ``undocumented_columns`` and ``documented_not_in_physical``; reason
       ``spark_schema_not_in_columns_metastore_snapshot`` when the FQN is absent from that snapshot.
-      **I3-01** / **I3-02** (DataHub) are emitted
+      **I3-01** / **I3-02** / **A1.2-01** / **A1.2-02** / **I1-02** / **A1.2-03** (DataHub) are emitted
       for observability when GraphQL is configured; they do not affect the MVP tier score. F1-03 uses the same
-      ``columns_metastore`` snapshot (presence of FQN); F4-01 uses DataHub ``dataset.exists``. I1-02 and A1.2-03 use the assigned
-      datacontract URN signal on the Databricks entity. See the historical spike doc for F4-01 and A1-03
-      context.
+      ``columns_metastore`` snapshot (presence of FQN); F4-01 uses DataHub ``dataset.exists``. I1-02 and A1.2-03
+      use the ``Data Contract`` structured property (non-empty value) on the Databricks entity.
+      **A1.2-01** uses the ``How to request access`` structured property; **A1.2-02** uses an owner assigned
+      with the ``Approvers`` ownership type. See the historical spike doc for F4-01 and A1-03 context.
   tier_achieved:
     description: |
       MVP mode: 2 if all checks in ``MVP_TIER2_SCOPED_REQUIREMENT_IDS`` pass, 1 if all Tier-1 active
@@ -69,10 +70,10 @@ columns:
       - datalake_people_public.org_chart.assignment_status_type
   has_data_contract:
     description: |
-      When DataHub GraphQL is configured: True if the Databricks dataset's ``institutionalMemory`` labels
-      contain an assigned data contract URN (``urn:prod:datacontract:``).
-      False when DataHub is not configured, ``dataset.exists`` is false, or only the placeholder
-      "[Data Contract] No data contract assigned" appears (no datacontract URN).
+      When DataHub GraphQL is configured: True if the Databricks dataset carries the ``Data Contract``
+      structured property with a non-empty value (the assigned data-contract URN). Backs I1-02 and A1.2-03.
+      False when DataHub is not configured, ``dataset.exists`` is false, or the structured property is
+      absent / blank.
   table_description_is_substantive:
     description: |
       True when ``assess_table_description_quality`` finds enough non-boilerplate vocabulary beyond

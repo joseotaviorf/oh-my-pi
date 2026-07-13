@@ -6,15 +6,41 @@ import json
 import os
 import urllib.error
 import urllib.request
-from typing import Any, Iterator, Mapping, Optional
+from typing import Any, Mapping, NamedTuple, Optional
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.governance.fairness_assessment.constants import (
-    DATAHUB_DATA_CONTRACT_URN_MARKER,
     DATAHUB_FETCH_ERROR,
     DATAHUB_HTTP_ERROR,
+    DATAHUB_OWNERSHIP_TYPE_APPROVERS_URN,
+    DATAHUB_SP_DATA_CONTRACT_URN,
+    DATAHUB_SP_HOW_TO_REQUEST_ACCESS_URN,
     DATAHUB_URN_DIAG_OK,
+)
+
+
+class DatasetFairSignals(NamedTuple):
+    """Parsed per-dataset DataHub signals (URN-level), rolled up to FQN by the compute layer.
+
+    ``has_data_contract`` / ``how_to_request_access`` come from structured properties; the former
+    replaces the legacy ``institutionalMemory`` label scan. ``approvers_ownership`` is True when the
+    entity has an owner assigned with the ``Approvers`` ownership type. ``had_dataset`` is False when
+    the GraphQL alias resolved to ``null`` (URN unknown to DataHub).
+    """
+
+    indexed_ok: bool
+    has_data_contract: bool
+    ownership_nonempty: bool
+    upstream_total: int
+    downstream_total: int
+    had_dataset: bool
+    how_to_request_access: bool
+    approvers_ownership: bool
+
+
+_EMPTY_DATASET_FAIR_SIGNALS = DatasetFairSignals(
+    False, False, False, 0, 0, False, False, False
 )
 
 LOGGER = QuintoAndarLogger(__name__)
@@ -142,77 +168,77 @@ def datahub_graphql_post(
 # -- GraphQL / entity JSON parsing ----------------------------------------------------------------
 
 
-def _iter_json_strings(obj: Any) -> Iterator[str]:
-    if isinstance(obj, str):
-        yield obj
-    elif isinstance(obj, dict):
-        for v in obj.values():
-            yield from _iter_json_strings(v)
-    elif isinstance(obj, list):
-        for x in obj:
-            yield from _iter_json_strings(x)
+def structured_property_has_nonempty_value(
+    sp_properties: Any, target_sp_urn: str
+) -> bool:
+    """True if ``structuredProperties.properties`` has ``target_sp_urn`` with a non-empty value.
+
+    A value counts as present when it is a non-blank ``stringValue`` or any ``numberValue``.
+    """
+
+    if not isinstance(sp_properties, list):
+        return False
+    for prop in sp_properties:
+        if not isinstance(prop, dict):
+            continue
+        sp_def = prop.get("structuredProperty") or {}
+        if not isinstance(sp_def, dict) or sp_def.get("urn") != target_sp_urn:
+            continue
+        for val in prop.get("values") or []:
+            if not isinstance(val, dict):
+                continue
+            string_value = val.get("stringValue")
+            if isinstance(string_value, str) and string_value.strip():
+                return True
+            if val.get("numberValue") is not None:
+                return True
+    return False
 
 
-def entity_json_has_data_contract_resource(entity_payload: Any) -> bool:
-    """True if the Databricks entity payload contains an **assigned** data contract resource."""
+def ownership_has_type(owners_list: Any, target_ownership_type_urn: str) -> bool:
+    """True if any ``ownership.owners[].ownershipType.urn`` matches ``target_ownership_type_urn``."""
 
-    for s in _iter_json_strings(entity_payload):
-        if isinstance(s, str) and DATAHUB_DATA_CONTRACT_URN_MARKER in s:
+    if not isinstance(owners_list, list):
+        return False
+    for owner in owners_list:
+        if not isinstance(owner, dict):
+            continue
+        ownership_type = owner.get("ownershipType") or {}
+        if (
+            isinstance(ownership_type, dict)
+            and ownership_type.get("urn") == target_ownership_type_urn
+        ):
             return True
     return False
 
 
-def institutional_memory_has_assigned_datacontract(institutional_memory: Any) -> bool:
-    """True if any ``institutionalMemory.elements[].label`` contains a datacontract URN assignment."""
+def _parse_dataset_node(ds: Any) -> DatasetFairSignals:
+    """Parse a single ``dataset`` node payload into :class:`DatasetFairSignals`.
 
-    if not isinstance(institutional_memory, dict):
-        return False
-    elements = institutional_memory.get("elements")
-    if not isinstance(elements, list):
-        return False
-    for el in elements:
-        if not isinstance(el, dict):
-            continue
-        label = el.get("label")
-        if not isinstance(label, str):
-            continue
-        if "No data contract assigned" in label:
-            continue
-        if DATAHUB_DATA_CONTRACT_URN_MARKER in label:
-            return True
-    return False
-
-
-def _parse_dataset_node(
-    ds: Any,
-) -> tuple[
-    bool,
-    bool,
-    bool,
-    int,
-    int,
-    bool,
-]:
-    """Parse a single ``dataset`` node payload into the fair-signals tuple.
-
-    Returns (indexed_ok, has_contract, ownership_nonempty, up_tot, down_tot, had_dataset).
     ``had_dataset`` is False when the alias resolved to ``null`` (URN unknown to DataHub).
     """
 
-    if ds is None:
-        return False, False, False, 0, 0, False
     if not isinstance(ds, dict):
-        return False, False, False, 0, 0, False
+        return _EMPTY_DATASET_FAIR_SIGNALS
 
     exists = ds.get("exists")
     indexed_ok = bool(exists) if exists is not None else False
 
-    inst = ds.get("institutionalMemory")
-    has_contract = institutional_memory_has_assigned_datacontract(inst)
-
     owners_block = ds.get("ownership") if isinstance(ds.get("ownership"), dict) else {}
     owners_list = owners_block.get("owners") if isinstance(owners_block, dict) else None
     ownership_nonempty = bool(isinstance(owners_list, list) and len(owners_list) > 0)
+    approvers_ownership = ownership_has_type(
+        owners_list, DATAHUB_OWNERSHIP_TYPE_APPROVERS_URN
+    )
+
+    sp_block = ds.get("structuredProperties")
+    sp_properties = sp_block.get("properties") if isinstance(sp_block, dict) else None
+    has_data_contract = structured_property_has_nonempty_value(
+        sp_properties, DATAHUB_SP_DATA_CONTRACT_URN
+    )
+    how_to_request_access = structured_property_has_nonempty_value(
+        sp_properties, DATAHUB_SP_HOW_TO_REQUEST_ACCESS_URN
+    )
 
     up_obj = ds.get("upstream") if isinstance(ds.get("upstream"), dict) else {}
     down_obj = ds.get("downstream") if isinstance(ds.get("downstream"), dict) else {}
@@ -227,24 +253,24 @@ def _parse_dataset_node(
     except (TypeError, ValueError):
         down_n = 0
 
-    return indexed_ok, has_contract, ownership_nonempty, up_n, down_n, True
+    return DatasetFairSignals(
+        indexed_ok=indexed_ok,
+        has_data_contract=has_data_contract,
+        ownership_nonempty=ownership_nonempty,
+        upstream_total=up_n,
+        downstream_total=down_n,
+        had_dataset=True,
+        how_to_request_access=how_to_request_access,
+        approvers_ownership=approvers_ownership,
+    )
 
 
-def _parse_dataset_fair_signals(
-    root: Mapping[str, Any],
-) -> tuple[
-    bool,
-    bool,
-    bool,
-    int,
-    int,
-    bool,
-]:
+def _parse_dataset_fair_signals(root: Mapping[str, Any]) -> DatasetFairSignals:
     """From single-dataset GraphQL root, return the fair-signals tuple (see ``_parse_dataset_node``)."""
 
     data = root.get("data")
     if not isinstance(data, dict):
-        return False, False, False, 0, 0, False
+        return _EMPTY_DATASET_FAIR_SIGNALS
     return _parse_dataset_node(data.get("dataset"))
 
 
@@ -255,10 +281,12 @@ def _parse_dataset_fair_signals(
 # complexity budget, so 25 aliases ≈ 250 — well under the default ``complexityLimit`` (2000).
 _DATASET_FAIR_SIGNALS_SELECTION = (
     "exists "
-    "ownership { owners { owner { ... on CorpUser { urn } ... on CorpGroup { urn } } } } "
+    "ownership { owners { ownershipType { urn } "
+    "owner { ... on CorpUser { urn } ... on CorpGroup { urn } } } } "
     "upstream: lineage(input: { direction: UPSTREAM, start: 0, count: 0 }) { total } "
     "downstream: lineage(input: { direction: DOWNSTREAM, start: 0, count: 0 }) { total } "
-    "institutionalMemory { elements { label url } }"
+    "structuredProperties { properties { structuredProperty { urn } "
+    "values { ... on StringValue { stringValue } ... on NumberValue { numberValue } } } }"
 )
 
 
@@ -287,18 +315,18 @@ def build_dataset_fair_signals_batch_query(
 def parse_batch_fair_signals(
     root: Mapping[str, Any],
     urns: list[str],
-) -> dict[str, tuple[bool, bool, bool, int, int, bool]]:
-    """Parse a batched GraphQL root into ``{urn: fair_signals_tuple}``.
+) -> dict[str, DatasetFairSignals]:
+    """Parse a batched GraphQL root into ``{urn: DatasetFairSignals}``.
 
     Missing aliases (``data["d{i}"]`` absent or ``null``) yield ``had_dataset=False``,
     matching the per-URN ``ENTITY_NOT_FOUND`` semantics in ``resolve_datahub_urn_flags``.
     """
 
-    result: dict[str, tuple[bool, bool, bool, int, int, bool]] = {}
+    result: dict[str, DatasetFairSignals] = {}
     data = root.get("data") if isinstance(root, Mapping) else None
     if not isinstance(data, dict):
         for urn in urns:
-            result[urn] = (False, False, False, 0, 0, False)
+            result[urn] = _EMPTY_DATASET_FAIR_SIGNALS
         return result
     for i, urn in enumerate(urns):
         result[urn] = _parse_dataset_node(data.get(f"d{i}"))

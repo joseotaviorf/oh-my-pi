@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import Any, Mapping, Optional
 
 from bietlejuice.governance.fairness_assessment.checks.accessible import (
+    check_a1_2_01_access_request_documented,
+    check_a1_2_02_approver_ownership,
     check_a1_2_03_interim_access_policy_via_contract,
 )
 from bietlejuice.governance.fairness_assessment.checks.findable import (
@@ -32,6 +34,8 @@ _DATAHUB_DEPENDENT_REQUIREMENT_IDS: tuple[str, ...] = (
     "I1-02",
     "I3-01",
     "I3-02",
+    "A1.2-01",
+    "A1.2-02",
     "A1.2-03",
 )
 _DATAHUB_UNREACHABLE_REASONS: frozenset[str] = frozenset(
@@ -106,6 +110,12 @@ def evaluate_mvp_checks_from_row(
         out["I3-01"] = check_i3_01_ownership_in_catalog(bool(row.get("i3_01_pass")))
     if row.get("i3_02_pass") is not None:
         out["I3-02"] = check_i3_02_lineage_in_catalog(bool(row.get("i3_02_pass")))
+    if row.get("a1_2_01_pass") is not None:
+        out["A1.2-01"] = check_a1_2_01_access_request_documented(
+            bool(row.get("a1_2_01_pass"))
+        )
+    if row.get("a1_2_02_pass") is not None:
+        out["A1.2-02"] = check_a1_2_02_approver_ownership(bool(row.get("a1_2_02_pass")))
 
     # When DataHub itself is unreachable for the FQN, F4-01 already exposes the network-level reason
     # (HTTP_ERROR / FETCH_ERROR). Other DataHub-sourced checks only see empty maps and would fall back

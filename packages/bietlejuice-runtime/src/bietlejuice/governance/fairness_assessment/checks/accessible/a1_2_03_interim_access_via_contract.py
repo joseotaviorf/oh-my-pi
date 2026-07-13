@@ -4,7 +4,10 @@ from bietlejuice.governance.fairness_assessment.models import RequirementResult
 def check_a1_2_03_interim_access_policy_via_contract(
     has_data_contract: bool,
 ) -> RequirementResult:
-    """A1.2-03 (Tier 1 — access policy / roles): interim rule aligned with program timing.
+    """A1.2-03 (access policy / roles): interim rule aligned with program timing.
+
+    Evaluated in ``checks_result_json``; not a tier gate in the current rollout (see
+    ``TIERING_OBSERVABILITY_ONLY_REQUIREMENT_IDS``).
 
     **Interim (current):** pass if and only if the asset has an **assigned data contract** on the
     Databricks DataHub entity (same boolean as ``has_data_contract`` / I1-02 — see

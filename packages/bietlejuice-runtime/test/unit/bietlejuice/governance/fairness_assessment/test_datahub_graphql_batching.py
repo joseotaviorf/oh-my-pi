@@ -8,6 +8,9 @@ from unittest import mock
 from bietlejuice.governance.fairness_assessment.constants import (
     DATAHUB_ENTITY_NOT_FOUND,
     DATAHUB_HTTP_ERROR,
+    DATAHUB_OWNERSHIP_TYPE_APPROVERS_URN,
+    DATAHUB_SP_DATA_CONTRACT_URN,
+    DATAHUB_SP_HOW_TO_REQUEST_ACCESS_URN,
     DATAHUB_URN_DIAG_OK,
 )
 from bietlejuice.governance.fairness_assessment.datahub_graphql import (
@@ -34,13 +37,51 @@ def _row(db: str, tbl: str, *, srv_db: bool = True, srv_trino: bool = False) -> 
     }
 
 
-def _ok_dataset_node(*, ownership: bool = True, up: int = 0, down: int = 0) -> dict:
+def _ok_dataset_node(
+    *,
+    ownership: bool = True,
+    up: int = 0,
+    down: int = 0,
+    contract: bool = False,
+    how_to_request: bool = False,
+    approvers: bool = False,
+) -> dict:
+    owners = []
+    if ownership:
+        owners.append(
+            {
+                "ownershipType": {"urn": "urn:li:ownershipType:__technical_owner"},
+                "owner": {"urn": "x"},
+            }
+        )
+    if approvers:
+        owners.append(
+            {
+                "ownershipType": {"urn": DATAHUB_OWNERSHIP_TYPE_APPROVERS_URN},
+                "owner": {"urn": "approver"},
+            }
+        )
+    props = []
+    if contract:
+        props.append(
+            {
+                "structuredProperty": {"urn": DATAHUB_SP_DATA_CONTRACT_URN},
+                "values": [{"stringValue": "urn:prod:datacontract:foo@v1"}],
+            }
+        )
+    if how_to_request:
+        props.append(
+            {
+                "structuredProperty": {"urn": DATAHUB_SP_HOW_TO_REQUEST_ACCESS_URN},
+                "values": [{"stringValue": "https://wiki/how-to-request"}],
+            }
+        )
     return {
         "exists": True,
-        "ownership": {"owners": [{"owner": {"urn": "x"}}] if ownership else []},
+        "ownership": {"owners": owners},
         "upstream": {"total": up},
         "downstream": {"total": down},
-        "institutionalMemory": {"elements": []},
+        "structuredProperties": {"properties": props},
     }
 
 
@@ -60,9 +101,11 @@ class TestBuildBatchQuery(unittest.TestCase):
             self.assertIn(f"$u{i}: String!", query)
         self.assertEqual(variables, {"u0": "urn:a", "u1": "urn:b", "u2": "urn:c"})
         self.assertIn("exists", query)
-        self.assertIn("institutionalMemory", query)
+        self.assertIn("structuredProperties", query)
+        self.assertIn("ownershipType", query)
         self.assertIn("upstream: lineage", query)
         self.assertIn("downstream: lineage", query)
+        self.assertNotIn("institutionalMemory", query)
 
     def test_empty_urns_returns_noop_query(self):
         query, variables = build_dataset_fair_signals_batch_query([])
@@ -83,23 +126,48 @@ class TestParseBatchFairSignals(unittest.TestCase):
                     "ownership": {"owners": []},
                     "upstream": {"total": 0},
                     "downstream": {"total": 0},
-                    "institutionalMemory": {"elements": []},
+                    "structuredProperties": {"properties": []},
                 },
             }
         }
 
         out = parse_batch_fair_signals(root, urns)
 
-        self.assertEqual(out["urn:ok"], (True, False, True, 2, 3, True))
-        self.assertEqual(out["urn:notfound"], (False, False, False, 0, 0, False))
+        # (indexed, contract, ownership, up, down, had_dataset, how_to_request, approvers)
+        self.assertEqual(out["urn:ok"], (True, False, True, 2, 3, True, False, False))
+        self.assertEqual(
+            out["urn:notfound"], (False, False, False, 0, 0, False, False, False)
+        )
         # had_dataset=True but indexed_ok=False (caller treats as ENTITY_NOT_FOUND).
-        self.assertEqual(out["urn:notindexed"], (False, False, False, 0, 0, True))
+        self.assertEqual(
+            out["urn:notindexed"], (False, False, False, 0, 0, True, False, False)
+        )
+
+    def test_structured_properties_and_approvers_are_parsed(self):
+        urns = ["urn:full"]
+        root = {
+            "data": {
+                "d0": _ok_dataset_node(
+                    ownership=True,
+                    contract=True,
+                    how_to_request=True,
+                    approvers=True,
+                )
+            }
+        }
+
+        out = parse_batch_fair_signals(root, urns)
+
+        signals = out["urn:full"]
+        self.assertTrue(signals.has_data_contract)
+        self.assertTrue(signals.how_to_request_access)
+        self.assertTrue(signals.approvers_ownership)
 
     def test_missing_data_block_returns_falses_for_every_urn(self):
         out = parse_batch_fair_signals({}, ["urn:a", "urn:b"])
 
-        self.assertEqual(out["urn:a"], (False, False, False, 0, 0, False))
-        self.assertEqual(out["urn:b"], (False, False, False, 0, 0, False))
+        self.assertEqual(out["urn:a"], (False, False, False, 0, 0, False, False, False))
+        self.assertEqual(out["urn:b"], (False, False, False, 0, 0, False, False, False))
 
 
 class TestResolveDatahubUrnFlagsBatching(unittest.TestCase):
@@ -123,6 +191,8 @@ class TestResolveDatahubUrnFlagsBatching(unittest.TestCase):
                 urn_ownership,
                 urn_upstream_total,
                 urn_downstream_total,
+                urn_how_to_request_access,
+                urn_approvers,
             ) = compute_fqn_datahub_signals.resolve_datahub_urn_flags(
                 _GRAPHQL_URL, "tok", rows
             )
@@ -162,6 +232,8 @@ class TestResolveDatahubUrnFlagsBatching(unittest.TestCase):
                 _urn_ownership,
                 _urn_up,
                 _urn_down,
+                _urn_how,
+                _urn_approvers,
             ) = compute_fqn_datahub_signals.resolve_datahub_urn_flags(
                 _GRAPHQL_URL, "tok", rows
             )
@@ -239,7 +311,69 @@ class TestResolveDatahubUrnFlagsBatching(unittest.TestCase):
             )
 
         post.assert_not_called()
-        self.assertEqual([len(d) for d in out], [0, 0, 0, 0, 0, 0])
+        self.assertEqual([len(d) for d in out], [0, 0, 0, 0, 0, 0, 0, 0])
+
+    def test_new_signals_roll_up_to_fqn(self):
+        rows = [_row("db0", "t0")]
+
+        def fake_post(url, token, query, variables, timeout_sec=60.0):
+            ordered = [variables[f"u{i}"] for i in range(len(variables))]
+            data = {
+                f"d{i}": _ok_dataset_node(
+                    contract=True, how_to_request=True, approvers=True
+                )
+                for i in range(len(ordered))
+            }
+            return {"data": data}, DATAHUB_URN_DIAG_OK
+
+        with mock.patch.object(
+            compute_fqn_datahub_signals, "datahub_graphql_post", side_effect=fake_post
+        ):
+            (
+                _urn_hit,
+                urn_contract,
+                _urn_diagnostic,
+                _urn_ownership,
+                _urn_up,
+                _urn_down,
+                urn_how,
+                urn_approvers,
+            ) = compute_fqn_datahub_signals.resolve_datahub_urn_flags(
+                _GRAPHQL_URL, "tok", rows
+            )
+
+        db_urn = _databricks_urn("db0", "t0")
+        self.assertTrue(urn_contract[db_urn])
+        self.assertTrue(urn_how[db_urn])
+        self.assertTrue(urn_approvers[db_urn])
+
+        contract_map = compute_fqn_datahub_signals.compute_has_data_contract_by_fqn(
+            rows, urn_contract
+        )
+        a1_2_01_map = (
+            compute_fqn_datahub_signals.compute_a1_2_01_how_to_request_access_by_fqn(
+                rows, urn_how
+            )
+        )
+        a1_2_02_map = compute_fqn_datahub_signals.compute_a1_2_02_approvers_by_fqn(
+            rows, urn_approvers
+        )
+        self.assertTrue(contract_map[("db0", "t0")])
+        self.assertTrue(a1_2_01_map[("db0", "t0")])
+        self.assertTrue(a1_2_02_map[("db0", "t0")])
+
+    def test_a1_2_compute_false_when_no_candidate_signal(self):
+        rows = [_row("db0", "t0")]
+        a1_2_01_map = (
+            compute_fqn_datahub_signals.compute_a1_2_01_how_to_request_access_by_fqn(
+                rows, {}
+            )
+        )
+        a1_2_02_map = compute_fqn_datahub_signals.compute_a1_2_02_approvers_by_fqn(
+            rows, {}
+        )
+        self.assertFalse(a1_2_01_map[("db0", "t0")])
+        self.assertFalse(a1_2_02_map[("db0", "t0")])
 
 
 if __name__ == "__main__":
