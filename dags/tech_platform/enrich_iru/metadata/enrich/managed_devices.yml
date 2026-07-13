@@ -1,7 +1,7 @@
 database_name: datalake_iru
 table_name: managed_devices
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: danilo.barbosa@quintoandar.com.br
 description: |
   Current-state IRU/Kandji managed devices: latest ingest partition within the Airflow batch window and one row
   per device (not a historical stack of partitions). Derived from clean by keeping MAX(year, month, day) in
@@ -12,7 +12,7 @@ columns:
     lineage:
       - datalake_iru_clean.managed_devices.id_device
   ds_serial_number:
-    description: Device serial number.
+    description: Hardware serial number reported by IRU/Kandji MDM for endpoint inventory and compliance tracking.
     lineage:
       - datalake_iru_clean.managed_devices.ds_serial_number
   id_udid:
@@ -32,11 +32,11 @@ columns:
     lineage:
       - datalake_iru_clean.managed_devices.ds_platform
   ds_os_version:
-    description: Operating system version.
+    description: Operating system name and version string reported by the Kandji MDM agent on the enrolled endpoint.
     lineage:
       - datalake_iru_clean.managed_devices.ds_os_version
   ds_supplemental_build_version:
-    description: Supplemental build version for the OS.
+    description: Supplemental operating system build version string reported by IRU/Kandji for patch-level identification.
     lineage:
       - datalake_iru_clean.managed_devices.ds_supplemental_build_version
   id_blueprint:
@@ -60,7 +60,7 @@ columns:
     lineage:
       - datalake_iru_clean.managed_devices.nm_user
   ds_user_email:
-    description: User email address associated with the device.
+    description: Corporate email of the primary user assigned to the device in Kandji MDM inventory.
     lineage:
       - datalake_iru_clean.managed_devices.ds_user_email
   is_user_archived:

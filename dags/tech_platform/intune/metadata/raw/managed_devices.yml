@@ -1,5 +1,13 @@
 database_name: datalake_intune_raw
 table_name: managed_devices
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: marcelo.farinaro@quintoandar.com.br
 description: "Raw managed devices from Microsoft Intune (Graph API deviceManagement/managedDevices)"
+columns:
+  year:
+    description: Ingestion partition year derived from the batch load date; filter on this column for partition pruning.
+  month:
+    description: Ingestion partition month derived from the batch load date; filter on this column for partition pruning.
+  day:
+    description: Ingestion partition day derived from the batch load date; filter on this column for partition pruning.
+

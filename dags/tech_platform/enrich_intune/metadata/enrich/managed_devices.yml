@@ -1,7 +1,7 @@
 database_name: datalake_intune
 table_name: managed_devices
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: marcelo.farinaro@quintoandar.com.br
 description: |
   Current-state Intune managed devices: latest ingest partition within the Airflow batch window and one row
   per device (not a historical stack of partitions). Derived from clean by keeping MAX(year, month, day) in
@@ -52,7 +52,7 @@ columns:
     lineage:
       - datalake_intune_clean.managed_devices.nm_model
   ds_serial_number:
-    description: Device serial number.
+    description: Hardware serial number reported by Microsoft Intune for asset tracking and inventory reconciliation.
     lineage:
       - datalake_intune_clean.managed_devices.ds_serial_number
   ds_device_enrollment_type:
@@ -72,7 +72,7 @@ columns:
     lineage:
       - datalake_intune_clean.managed_devices.ds_operating_system
   ds_os_version:
-    description: Operating system version.
+    description: Operating system name and version string reported by the MDM agent on the enrolled endpoint.
     lineage:
       - datalake_intune_clean.managed_devices.ds_os_version
   ds_compliance_state:
