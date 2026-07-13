@@ -1,26 +1,35 @@
 ---
 database_name: datalake_nazare_clean
 table_name: tier_bonus_revision
+description: Revision history for Nazare agent tier bonuses, storing tier name, baseline fee, and bonus fee for each revision used in revenue-share calculations.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_tier_bonus:
     lineage:
       - datalake_nazare_raw.tier_bonus_revision.id
+    description: Identifier of the tier bonus rule this revision belongs to.
   revision:
     lineage:
       - datalake_nazare_raw.tier_bonus_revision.revision
+    description: Sequential revision number of the tier bonus configuration.
   baseline_fee:
     lineage:
       - datalake_nazare_raw.tier_bonus_revision.baseline_fee
+    description: Starting remuneration rate for this agent tier before Nazare adds the incremental bonus amount.
   name:
     lineage:
       - datalake_nazare_raw.tier_bonus_revision.name
+    description: Tier name associated with this revision (e.g. agent tier label).
   bonus_fee:
     lineage:
       - datalake_nazare_raw.tier_bonus_revision.bonus_fee
+    description: Bonus fee applied for this tier revision in revenue-share calculations.
   ts_invalidated:
     lineage:
       - datalake_nazare_raw.tier_bonus_revision.invalidated_at
+    description: Timestamp when this revision was invalidated in Nazare; null means the revision is still valid.
   ts_created:
     lineage:
       - datalake_nazare_raw.tier_bonus_revision.created_at
+    description: Timestamp when this revision was created in Nazare.

@@ -1,31 +1,31 @@
 ---
 database_name: datalake_nazare_clean
 table_name: partner
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Table containing information about partners (related to Company entity).
+description: Partners (companies) registered in Nazare for revenue-share calculations with external participants.
 columns:
   id_partner:
     lineage:
       - datalake_nazare_raw.partner.id
-    description: Primary key (BIGINT). Auto-incrementing unique identifier for internal database operations and foreign key references.
+    description: Internal identifier of the partner in Nazare.
   uuid_company:
     lineage:
       - datalake_nazare_raw.partner.uuid
-    description: Unique identifier for the company in Company entity.
+    description: Unique identifier linking the partner to the Company entity.
   full_name:
     lineage:
       - datalake_nazare_raw.partner.full_name
-    description: Full name of the partner.
+    description: Full legal or display name of the partner.
   short_name:
     lineage:
       - datalake_nazare_raw.partner.short_name
-    description: Short name of the partner.
+    description: Short name of the partner used in Nazare interfaces and exports.
   ts_created:
     lineage:
       - datalake_nazare_raw.partner.created_at
-    description: Timestamp of the creation of the partner.
+    description: Timestamp when the partner was created in Nazare.
   ts_updated:
     lineage:
       - datalake_nazare_raw.partner.updated_at
-    description: Timestamp of the last update of the partner.
+    description: Timestamp when the partner was last updated in Nazare.

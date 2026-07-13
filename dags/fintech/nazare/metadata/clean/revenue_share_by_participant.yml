@@ -1,126 +1,132 @@
 ---
 database_name: datalake_nazare_clean
 table_name: revenue_share_by_participant
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: data from the revenue share by participant table
+description: Participant-level Nazare revenue-share split per offer agent or partner, with brokerage, bonuses (hub, TQC, campaign, advance), and payment eligibility fields parsed from the calculation payload.
 columns:
   id_revenue_share:
-    description: "id of the revenue share"
+    description: Internal identifier of the participant-level revenue-share record.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.id
   id_offer_agent:
-    description: "id of the offer agent"
+    description: Offer–agent association this revenue share belongs to, when the participant is an agent.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.offer_agent_id
   id_offer_partner:
-    description: "id of the offer partner"
+    description: Offer–partner association this revenue share belongs to, when the participant is a partner.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.offer_partner_id
   id_house:
-    description: "house id from revenue share payload (house-id)"
+    description: Property (house) identifier from the revenue-share payload.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   id_participant:
-    description: "participant id from revenue share payload (participant-id)"
+    description: Participant identifier from the revenue-share payload.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   id_business_unit:
-    description: "business unit id from revenue share payload (business-unit-id)"
+    description: Business unit identifier from the revenue-share payload.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   id_offer_external:
-    description: "external offer id from revenue share payload (offer-external-id)"
+    description: External offer identifier from the revenue-share payload.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   offer_category:
-    description: "offer category from revenue share payload (offer-category)"
+    description: Offer category from the revenue-share payload.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   participant_role:
-    description: "participant role from revenue share payload (participant-role)"
+    description: Role of the participant in the revenue-share split (from payload).
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   cancellation_reason:
-    description: "cancellation reason from revenue share payload (cancellation-reason)"
+    description: Offer cancellation reason from the revenue-share payload, when applicable.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   brokerage:
-    description: "brokerage amount from revenue share payload (brokerage)"
+    description: Brokerage amount attributed in the revenue-share calculation.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   hub_bonus:
-    description: "hub bonus from revenue share payload (hub-bonus)"
+    description: Hub bonus amount included in the participant revenue share.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   tqc_bonus:
-    description: "tqc bonus from revenue share payload (tqc-bonus)"
+    description: TQC (demand-acquisition) bonus amount included in the participant revenue share.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   sale_price:
-    description: "sale price from revenue share payload (sale-price)"
+    description: Agreed sale price from the revenue-share payload.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   advance_bonus:
-    description: "advance bonus from revenue share payload (advance-bonus)"
+    description: Advance/gross-advance bonus amount included in the participant revenue share.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   campaign_bonus:
-    description: "campaign bonus from revenue share payload (campaign-bonus)"
+    description: Campaign bonus amount included in the participant revenue share.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   participant_paid_fee:
-    description: "participant paid fee from revenue share payload (participant-paid-fee)"
+    description: Fee amount paid to the participant according to the revenue-share calculation.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   supply_acquisition_share:
-    description: "supply acquisition share from revenue share payload (supply-acquisition-share)"
+    description: Supply-acquisition (CIQ) share amount included in the participant revenue share.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   forbrokers_model_partner_brokerage_fee:
-    description: "forbrokers model partner brokerage fee from revenue share payload (forbrokers-model-partner-brokerage-fee)"
+    description: Amount of partner commission calculated with ForBrokers commercial agreement rules, extracted from the Nazare calculation output.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   quintoandar_model_partner_brokerage_fee:
-    description: "quintoandar model partner brokerage fee from revenue share payload (quintoandar-model-partner-brokerage-fee)"
+    description: Amount of partner commission calculated with QuintoAndar commercial agreement rules, extracted from the Nazare calculation output.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   dt_cancellation_date:
-    description: "cancellation date from revenue share payload (cancellation-date)"
+    description: Offer cancellation date from the revenue-share payload, when applicable.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   dt_offer_signature:
-    description: "offer signature date from revenue share payload (offer-signature-date)"
+    description: Offer signature date from the revenue-share payload.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   dt_payment_allowed:
-    description: "payment allowed date from revenue share payload (payment-allowed-date)"
+    description: Date when payment becomes allowed for this revenue-share record.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   json_output:
-    description: "output of the transaction in JSON format"
+    description: Full revenue-share calculation output payload in JSON format.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.output
   json_errors:
-    description: "errors of the transaction in JSON format"
+    description: Calculation errors for the participant revenue share in JSON format.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.errors
   ts_invalidated:
-    description: "timestamp of the invalidation of the transaction"
+    description: Timestamp when this revenue-share record was invalidated; null means it is still valid.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.invalidated_at
   ts_created:
-    description: "timestamp of the creation of the transaction"
+    description: Timestamp when this revenue-share record was created in Nazare.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.created_at
   op_cdc:
-    description: "CDC operation type (insert, update, delete)"
+    description: CDC operation type (insert, update, delete).
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
   ts_cdc_transaction:
-    description: "timestamp of the CDC transaction"
+    description: Timestamp of the CDC transaction that produced this record.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.ts_cdc_transaction
   ts_database_transaction:
-    description: "timestamp of the database transaction"
+    description: Timestamp of the source database transaction.
     lineage:
       - datalake_nazare_raw.revenue_share_by_participant.ts_database_transaction

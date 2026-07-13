@@ -1,24 +1,31 @@
 ---
 database_name: datalake_nazare_clean
 table_name: tier_partner
-owner: athos.sampayo@quintoandar.com.br
+description: Links Nazare partners to tier bonus categories with validity period and active revision for revenue-share eligibility.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_tier_bonus:
     lineage:
       - datalake_nazare_raw.tier_partner.id
+    description: Tier bonus identifier this partner category assignment is tied to.
   id_partner:
     lineage:
       - datalake_nazare_raw.tier_partner.partner_id
+    description: Nazare partner identifier linked to the tier category.
   current_revision:
     lineage:
       - datalake_nazare_raw.tier_partner.current_revision
+    description: Active revision number of the partner tier category configuration.
   dt_category_start:
     lineage:
       - datalake_nazare_raw.tier_partner.category_start_date
+    description: Start date of the partner tier category validity period.
   dt_category_end:
     lineage:
       - datalake_nazare_raw.tier_partner.category_end_date
+    description: End date of the partner tier category validity period.
   ts_created:
     lineage:
       - datalake_nazare_raw.tier_partner.created_at
+    description: Timestamp when the partner tier category assignment was created in Nazare.

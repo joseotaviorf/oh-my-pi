@@ -1,20 +1,27 @@
 ---
 database_name: datalake_nazare_clean
 table_name: revenue_share_file
+description: Files imported into Nazare for revenue-share processing, including path, target entity, and import timestamps.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_file:
     lineage:
       - datalake_nazare_raw.revenue_share_file.id
+    description: Internal identifier of the imported revenue-share file.
   file_path:
     lineage:
       - datalake_nazare_raw.revenue_share_file.file_path
+    description: Storage path of the imported file.
   entity:
     lineage:
       - datalake_nazare_raw.revenue_share_file.entity
+    description: Nazare entity type the file import targets (e.g. offers, agents, partners).
   ts_created:
     lineage:
       - datalake_nazare_raw.revenue_share_file.created_at
+    description: Timestamp when the file record was created in Nazare.
   ts_imported:
     lineage:
       - datalake_nazare_raw.revenue_share_file.imported_at
+    description: Timestamp when the file was successfully imported into Nazare.

@@ -1,26 +1,35 @@
 ---
 database_name: datalake_nazare_clean
 table_name: tier_bonus
+description: Nazare agent tier bonus rules by agent and role, with active revision and validity period used in revenue-share calculations.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_tier_bonus:
     lineage:
       - datalake_nazare_raw.tier_bonus.id
+    description: Internal identifier of the tier bonus rule in Nazare.
   id_agent:
     lineage:
       - datalake_nazare_raw.tier_bonus.agent_id
+    description: Nazare agent identifier linked to the tier bonus rule.
   agent_role:
     lineage:
       - datalake_nazare_raw.tier_bonus.agent_role
+    description: Role of the agent this tier bonus applies to in the revenue-share split.
   current_revision:
     lineage:
       - datalake_nazare_raw.tier_bonus.current_revision
+    description: Active revision number of the tier bonus configuration, referencing tier_bonus_revision.
   dt_bonus_start:
     lineage:
       - datalake_nazare_raw.tier_bonus.bonus_start_date
+    description: Start date of the tier bonus validity period for revenue-share calculations.
   dt_bonus_end:
     lineage:
       - datalake_nazare_raw.tier_bonus.bonus_end_date
+    description: End date of the tier bonus validity period for revenue-share calculations.
   ts_created:
     lineage:
       - datalake_nazare_raw.tier_bonus.created_at
+    description: Timestamp when the tier bonus rule was created in Nazare.

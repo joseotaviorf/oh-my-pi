@@ -3,7 +3,7 @@ database_name: datalake_nazare_clean
 table_name: offer_agent_importation_error
 description: Errors captured when importing offer agent records from source systems.
 domain: Fintech
-owner: data-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_offer_agent_importation_error:
     lineage:

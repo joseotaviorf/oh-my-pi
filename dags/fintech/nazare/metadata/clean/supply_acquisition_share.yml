@@ -1,9 +1,9 @@
 ---
 database_name: datalake_nazare_clean
 table_name: supply_acquisition_share
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Stores the share configuration for each agent involved in a supply acquisition, including bonus fee details.
+description: Nazare supply-acquisition (CIQ) share configuration per agent and house, including the bonus fee used in revenue-share calculations.
 columns:
   id:
     description: Unique identifier of the supply acquisition share record.

@@ -1,34 +1,35 @@
 ---
 database_name: datalake_nazare_clean
 table_name: revenue_share_by_offer
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: data from the revenue share by offer table
+description: Offer-level Nazare revenue-share calculation results, including JSON output/errors and export/invalidation timestamps.
 columns:
   id:
-    description: "id of the transaction"
+    description: Internal identifier of the revenue-share calculation for the offer.
     lineage:
       - datalake_nazare_raw.revenue_share_by_offer.id
   id_offer:
-    description: "id of the offer"
+    description: Nazare offer identifier this revenue-share calculation belongs to.
     lineage:
       - datalake_nazare_raw.revenue_share_by_offer.offer_id
   output:
-    description: "output of the transaction in JSON format"
+    description: Revenue-share calculation output payload in JSON format.
     lineage:
       - datalake_nazare_raw.revenue_share_by_offer.output
   errors:
-    description: "errors of the transaction in JSON format"
+    description: Calculation errors for the offer-level revenue share in JSON format.
     lineage:
       - datalake_nazare_raw.revenue_share_by_offer.errors
   ts_created:
-    description: "timestamp of the creation of the transaction"
+    description: Timestamp when this revenue-share calculation was created in Nazare.
     lineage:
       - datalake_nazare_raw.revenue_share_by_offer.created_at
   ts_invalidated:
-    description: "timestamp of the invalidation of the transaction"
+    description: Timestamp when this calculation was invalidated; null means it is still valid.
     lineage:
       - datalake_nazare_raw.revenue_share_by_offer.invalidated_at
   ts_exported:
-    description: "timestamp of the export of the transaction"
+    description: Timestamp when this revenue-share result was exported from Nazare.
     lineage:
       - datalake_nazare_raw.revenue_share_by_offer.exported_at

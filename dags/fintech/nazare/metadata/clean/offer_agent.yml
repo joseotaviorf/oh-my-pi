@@ -1,23 +1,31 @@
 ---
 database_name: datalake_nazare_clean
 table_name: offer_agent
+description: Links Nazare agents to offers with their revenue-share role; dissociation marks when the agent was removed from the offer.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_offer_agent:
     lineage:
       - datalake_nazare_raw.offer_agent.id
+    description: Internal identifier of the offer–agent association in Nazare.
   id_agent:
     lineage:
       - datalake_nazare_raw.offer_agent.agent_id
+    description: Nazare agent identifier linked to the offer.
   id_offer:
     lineage:
       - datalake_nazare_raw.offer_agent.offer_id
+    description: Nazare offer identifier this agent participates in.
   agent_role:
     lineage:
       - datalake_nazare_raw.offer_agent.role
+    description: Role of the agent on the offer for revenue-share calculation (e.g. demand vs supply).
   ts_dissociated:
     lineage:
       - datalake_nazare_raw.offer_agent.dissociated_at
+    description: Timestamp when the agent was dissociated from the offer; null means the link is still active.
   ts_created:
     lineage:
       - datalake_nazare_raw.offer_agent.created_at
+    description: Timestamp when the offer–agent association was created in Nazare.
