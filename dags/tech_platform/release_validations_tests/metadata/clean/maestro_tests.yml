@@ -2,7 +2,10 @@
 database_name: datalake_release_validations_tests_clean
 table_name: maestro_tests
 domain: Tech Platform
-description: Granular Maestro test executions with test case metadata expanded to one row per test case.
+owner: gabriel.dantas@quintoandar.com.br
+description: |
+  Clean Maestro mobile release-validation test cases parsed from report.json artifacts in S3.
+  One row per test case with ownership metadata and run-level failure aggregates for quality gate analytics.
 columns:
   file_path:
     description: Full storage path for the Maestro JSON artifact used as source.
@@ -163,11 +166,11 @@ columns:
     lineage:
       - datalake_release_validations_tests_raw.playwright_results.content
   metadata_failed_test_cases_count:
-    description: Count of failed test cases according to metadata.
+    description: Number of Maestro test cases marked as failed in the report.json metadata summary block.
     lineage:
       - datalake_release_validations_tests_raw.playwright_results.content
   metadata_successful_test_cases_count:
-    description: Count of successful test cases according to metadata.
+    description: Number of Maestro test cases marked as successful in the report.json metadata summary block.
     lineage:
       - datalake_release_validations_tests_raw.playwright_results.content
   metadata_teams_with_failures:
@@ -179,26 +182,26 @@ columns:
     lineage:
       - datalake_release_validations_tests_raw.playwright_results.content
   failed_endpoints_count:
-    description: Number of endpoints that failed for this test case.
+    description: Count of API endpoints that failed during this Maestro test case execution in the run.
   ownership_tags_count:
-    description: Number of tags associated with the test case.
+    description: Number of ownership tags attached to the test case for team and tier classification.
   is_passed:
-    description: Boolean flag when the test case status is SUCCESS.
+    description: Boolean flag set when the Maestro test case status equals SUCCESS in the report payload.
   is_failed:
-    description: Boolean flag when the test case failed flag is true.
+    description: Boolean flag set when the Maestro test case failed indicator is true in the report payload.
   is_status_failed:
-    description: Boolean flag when the test case status is FAILED.
+    description: Boolean flag set when the Maestro test case status equals FAILED in the report payload.
   test_case_index:
-    description: Index position of the test case within the testCases array.
+    description: Zero-based position of the test case within the testCases array in the source JSON.
   ts_suite:
-    description: Suite timestamp converted to Spark timestamp type.
+    description: Suite timestamp parsed from the Maestro report and cast to Spark timestamp type.
   ts_test_case:
-    description: Test case timestamp converted to Spark timestamp type.
+    description: Test case timestamp parsed from the Maestro report and cast to Spark timestamp type.
   ts_report_generated:
-    description: Report generation timestamp converted to Spark timestamp type.
+    description: Report generation timestamp parsed from metadata and cast to Spark timestamp type.
   dt_suite:
-    description: Date derived from ts_suite for easier partitioning.
+    description: Calendar date derived from ts_suite for daily aggregation and partition-friendly filtering.
   dt_test_case:
-    description: Date derived from ts_test_case for easier partitioning.
+    description: Calendar date derived from ts_test_case for daily aggregation and partition-friendly filtering.
   dt_report_generated:
-    description: Date derived from ts_report_generated for easier partitioning.
+    description: Calendar date derived from ts_report_generated for daily aggregation and partition-friendly filtering.

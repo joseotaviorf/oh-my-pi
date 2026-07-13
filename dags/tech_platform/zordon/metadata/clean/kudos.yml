@@ -1,37 +1,40 @@
 database_name: datalake_zordon_clean
 table_name: kudos
 domain: Tech Platform
-description: Kudos data from Zordon
+owner: gabriel.dantas@quintoandar.com.br
+description: |
+  Clean peer recognition messages captured by Zordon when employees send kudos to colleagues.
+  One row per kudos event linking sender, receiver, culture principle, and message content for people analytics.
 columns:
   id:
-    description: Unique identifier of the kudos
+    description: Surrogate primary key of the kudos message record in the Zordon recognition store.
     lineage:
       - datalake_zordon_raw.kudos.id
   receiver_email:
-    description: Email of the kudos receiver
+    description: Corporate email address of the employee who received the peer kudos message.
     lineage:
       - datalake_zordon_raw.kudos.receiver_email
   sender_email:
-    description: Email of the kudos sender
+    description: Corporate email address of the employee who sent the peer kudos message.
     lineage:
       - datalake_zordon_raw.kudos.sender_email
   id_principle:
-    description: Identifier of the culture principle associated with the kudos
+    description: Foreign key to the QuintoAndar culture principle that contextualizes the recognition.
     lineage:
       - datalake_zordon_raw.kudos.principle_id
   message:
-    description: Kudos message content
+    description: Free-text kudos message body entered by the sender in the Zordon recognition flow.
     lineage:
       - datalake_zordon_raw.kudos.message
   receiver_info:
-    description: Additional info about the receiver
+    description: Optional structured metadata about the receiver captured by Zordon at submission time.
     lineage:
       - datalake_zordon_raw.kudos.receiver_info
   message_info:
-    description: Additional info about the message
+    description: Optional structured metadata about the message channel or template used for the kudos.
     lineage:
       - datalake_zordon_raw.kudos.message_info
   ts_created:
-    description: Record creation timestamp
+    description: UTC timestamp when the kudos message was created in Zordon.
     lineage:
       - datalake_zordon_raw.kudos.created_at

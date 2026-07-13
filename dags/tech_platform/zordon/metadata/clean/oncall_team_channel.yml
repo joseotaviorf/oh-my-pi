@@ -1,25 +1,28 @@
 database_name: datalake_zordon_clean
 table_name: oncall_team_channel
 domain: Tech Platform
-description: Oncall team channel configuration from Zordon
+owner: gabriel.dantas@quintoandar.com.br
+description: |
+  Clean mapping between Zordon on-call rotations, OpsGenie schedules, and Google Chat notification spaces.
+  One row per team channel configuration used to route paging alerts and shift summaries to engineers.
 columns:
   id:
-    description: Unique identifier of the team channel configuration
+    description: Surrogate primary key of the on-call team channel configuration in Zordon.
     lineage:
       - datalake_zordon_raw.oncall_team_channel.id
   opsgenie_team:
-    description: OpsGenie team name
+    description: OpsGenie team name linked to this on-call rotation and Google Chat notification channel.
     lineage:
       - datalake_zordon_raw.oncall_team_channel.opsgenie_team
   id_opsgenie_schedule:
-    description: OpsGenie schedule identifier
+    description: OpsGenie schedule identifier that defines who is on call for this team channel.
     lineage:
       - datalake_zordon_raw.oncall_team_channel.opsgenie_schedule_id
   is_previous_day:
-    description: Flag indicating if the schedule refers to the previous day
+    description: Flag indicating whether the schedule lookup should use the previous calendar day boundary.
     lineage:
       - datalake_zordon_raw.oncall_team_channel.previous_day
   gchat_space:
-    description: Google Chat space identifier
+    description: Google Chat space identifier where Zordon posts on-call notifications and summaries.
     lineage:
       - datalake_zordon_raw.oncall_team_channel.gchat_space

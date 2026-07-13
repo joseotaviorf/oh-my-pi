@@ -1,6 +1,7 @@
 database_name: datalake_release_validations_tests_raw
 table_name: playwright_results
 domain: Tech Platform
+owner: gabriel.dantas@quintoandar.com.br
 description: Raw Playwright results.json files from release validations with original JSON content and extracted path metadata.
 columns:
   file_path:

@@ -2,6 +2,7 @@
 database_name: datalake_release_validations_tests_clean
 table_name: playwright_results
 domain: Tech Platform
+owner: gabriel.dantas@quintoandar.com.br
 description: One row per Playwright test attempt (retry) with run context, test metadata, and execution results.
 columns:
   file_path:

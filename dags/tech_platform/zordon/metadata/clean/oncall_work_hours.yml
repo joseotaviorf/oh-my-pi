@@ -1,57 +1,60 @@
 database_name: datalake_zordon_clean
 table_name: oncall_work_hours
 domain: Tech Platform
-description: Oncall work hours data from Zordon
+owner: gabriel.dantas@quintoandar.com.br
+description: |
+  Clean on-call shift summaries submitted through Zordon after each engineer rotation.
+  One row per shift with worked hours, alarm counts, and optional incident notes for SRE capacity analytics.
 columns:
   id:
-    description: Unique identifier of the work hours record
+    description: Surrogate primary key of the on-call work hours summary record in Zordon.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.id
   gchat_user:
-    description: Google Chat user identifier
+    description: Google Chat user identifier of the engineer who completed the on-call shift.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.gchat_user
   gchat_user_name:
-    description: Google Chat user name
+    description: Display name of the on-call engineer in Google Chat at the time of submission.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.gchat_user_name
   ts_oncall_start:
-    description: Oncall shift start timestamp
+    description: UTC timestamp when the engineer's on-call rotation window officially started.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.oncall_start_date
   ts_oncall_end:
-    description: Oncall shift end timestamp
+    description: UTC timestamp when the engineer's on-call rotation window officially ended.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.oncall_end_date
   ts_oncall_summary:
-    description: Oncall summary timestamp
+    description: UTC timestamp when the engineer submitted the post-shift summary form in Zordon.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.oncall_summary_date
   hours_oncall:
-    description: Total hours on call
+    description: Total credited on-call hours reported by the engineer for the completed rotation.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.hours_oncall
   nighttime_work_hours:
-    description: Hours worked during nighttime
+    description: Portion of on-call hours that fell inside the configured nighttime window.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.nighttime_work_hours
   daytime_work_hours:
-    description: Hours worked during daytime
+    description: Portion of on-call hours that fell inside the configured daytime window.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.daytime_work_hours
   total_alarms:
-    description: Total number of alarms during the shift
+    description: Count of OpsGenie or monitoring alarms handled during the on-call shift.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.total_alarms
   extra_comments:
-    description: Additional comments about the shift
+    description: Free-text notes added by the engineer about incidents or context during the shift.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.extra_comments
   checkbox_incident:
-    description: Incident checkbox value
+    description: Boolean flag from the on-call summary form indicating whether an incident occurred during the shift.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.checkbox_incident
   id_oncall_team_channel:
-    description: Identifier of the associated team channel
+    description: Foreign key to the Zordon on-call team channel configuration for this rotation.
     lineage:
       - datalake_zordon_raw.oncall_work_hours.oncall_team_channel_id

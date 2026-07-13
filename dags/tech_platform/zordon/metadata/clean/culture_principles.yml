@@ -1,25 +1,27 @@
 database_name: datalake_zordon_clean
 table_name: culture_principles
 domain: Tech Platform
-description: Culture principles data from Zordon
+owner: gabriel.dantas@quintoandar.com.br
+description: |
+  Reference catalog of QuintoAndar culture principles synced from Zordon CDC for people analytics and kudos attribution.
 columns:
   id:
-    description: Unique identifier of the culture principle
+    description: Surrogate primary key of the culture principle in the Zordon reference catalog.
     lineage:
       - datalake_zordon_raw.culture_principles.id
   pt_br:
-    description: Principle name in Portuguese
+    description: Official culture principle label displayed in Portuguese across Zordon and internal tools.
     lineage:
       - datalake_zordon_raw.culture_principles.pt_br
   en_us:
-    description: Principle name in English
+    description: Official culture principle label displayed in English for international reporting contexts.
     lineage:
       - datalake_zordon_raw.culture_principles.en_us
   ts_created:
-    description: Record creation timestamp
+    description: UTC timestamp when the culture principle record was first created in Zordon.
     lineage:
       - datalake_zordon_raw.culture_principles.created_at
   is_deprecated:
-    description: Flag indicating if the principle is deprecated
+    description: Boolean flag indicating the principle is retired and should not appear in new kudos selections.
     lineage:
       - datalake_zordon_raw.culture_principles.deprecated

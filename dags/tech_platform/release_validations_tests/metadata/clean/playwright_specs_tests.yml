@@ -2,7 +2,10 @@
 database_name: datalake_release_validations_tests_clean
 table_name: playwright_specs_tests
 domain: Tech Platform
-description: Granular Playwright executions with suite/spec/test metadata expanded to one row per retry.
+owner: gabriel.dantas@quintoandar.com.br
+description: |
+  Clean Playwright web release-validation retries parsed from results.json artifacts in S3.
+  One row per test retry with suite, spec, project, and outcome metadata for CI quality gate analytics.
 columns:
   file_path:
     description: Full storage path for the Playwright JSON artifact used as source.
@@ -129,7 +132,7 @@ columns:
     lineage:
       - datalake_release_validations_tests_raw.playwright_results.content
   spec_title:
-    description: Title of the Playwright spec.
+    description: Human-readable Playwright spec title extracted from the nested results.json suites hierarchy.
     lineage:
       - datalake_release_validations_tests_raw.playwright_results.content
   id_spec:
@@ -217,42 +220,42 @@ columns:
     lineage:
       - datalake_release_validations_tests_raw.playwright_results.content
   is_flaky_test:
-    description: Boolean indicating the retry passed after at least one previous failure.
+    description: Boolean flag when this retry passed after at least one earlier failure for the same test.
   is_passed:
-    description: Boolean flag when the retry finished with status passed.
+    description: Boolean flag set when the Playwright retry finished with status passed.
   is_failed:
-    description: Boolean flag when the retry finished with status failed.
+    description: Boolean flag set when the Playwright retry finished with status failed.
   is_skipped:
-    description: Boolean flag when the retry was skipped.
+    description: Boolean flag set when the Playwright retry was skipped by the test runner.
   is_timeout:
-    description: Boolean flag when the retry ended due to timeout.
+    description: Boolean flag set when the Playwright retry ended due to configured timeout limits.
   total_attempts_for_this_result:
-    description: Total number of attempts executed for the test up to and including this retry.
+    description: Running count of execution attempts for the test including this retry index.
   first_error_message:
-    description: First error message captured for the retry, when any.
+    description: First error message text captured in the Playwright errors array for this retry.
   first_error_stack:
-    description: Stack trace associated with the first error for the retry.
+    description: Stack trace string associated with the first error captured for this retry.
   error_count:
-    description: Number of errors captured for the retry.
+    description: Total number of error objects recorded by Playwright for this retry attempt.
   attachment_count:
-    description: Number of attachments captured for the retry.
+    description: Total number of attachments such as screenshots or traces saved for this retry.
   stdout_line_count:
-    description: Quantity of stdout entries produced by the retry.
+    description: Number of stdout log lines captured by Playwright during this retry execution.
   stderr_line_count:
-    description: Quantity of stderr entries produced by the retry.
+    description: Number of stderr log lines captured by Playwright during this retry execution.
   ts_result_start:
-    description: Retry start timestamp converted to Spark timestamp type.
+    description: Retry start timestamp parsed from ISO-8601 and cast to Spark timestamp type.
   ts_run_start:
-    description: Run start timestamp converted to Spark timestamp type.
+    description: Playwright run start timestamp parsed from config and cast to Spark timestamp type.
   dt_run_parsed:
-    description: Date derived from ts_run_start for easier partitioning.
+    description: Calendar date derived from ts_run_start for daily aggregation and partition-friendly filtering.
   run_year:
-    description: Year component from ts_run_start.
+    description: Year component extracted from ts_run_start for partition-style filtering on run time.
   run_month:
-    description: Month component from ts_run_start.
+    description: Month component extracted from ts_run_start for partition-style filtering on run time.
   run_day:
-    description: Day component from ts_run_start.
+    description: Day component extracted from ts_run_start for partition-style filtering on run time.
   run_hour:
-    description: Hour component from ts_run_start.
+    description: Hour component extracted from ts_run_start for partition-style filtering on run time.
   id_unique_test_result:
-    description: Concatenated identifier for the retry combining build, spec, project, and retry index.
+    description: Deterministic surrogate key concatenating build, spec, project, and retry index for deduplication.
