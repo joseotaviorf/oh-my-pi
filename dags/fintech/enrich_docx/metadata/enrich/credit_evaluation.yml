@@ -1,6 +1,6 @@
 database_name: datalake_docx
 table_name: credit_evaluation
-owner: felipe.chies@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: "Table with the credit evaluation of the tenant"
 columns:
@@ -11,15 +11,15 @@ columns:
   id_proposal:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_proposal
-    description: "Id of the proposal"
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   id_house:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_house
-    description: "Id of the house"
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   id_user:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_user
-    description: "Id of the user"
+    description: QuintoAndar user identifier associated with this financial transaction or account.
   id_group:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_group
@@ -31,7 +31,7 @@ columns:
   reason:
     lineage:
       - datalake_docx_clean.credit_evaluation.reason
-    description: "Reason of the evaluation"
+    description: Credit analysis attribute describing reason in the tenant underwriting workflow.
   scope:
     lineage:
       - datalake_docx_clean.credit_evaluation.scope
@@ -43,7 +43,7 @@ columns:
   proponent_group_type:
     lineage:
       - datalake_docx_clean.credit_evaluation.proponent_group_type
-    description: "The type of the group."
+    description: Credit analysis attribute describing proponent group type in the tenant underwriting workflow.
     categories:
       MYSELF: "Indicates that the user is interested in renting a property alone"
       MYSELF_WITH_OTHERS: "When the user is interested in renting a property with other proponents."
@@ -51,7 +51,7 @@ columns:
   result:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
-    description: "Result of the credit evaluation"
+    description: Credit analysis attribute describing result in the tenant underwriting workflow.
     categories:
       PRE_APPROVED: ""
       REGULAR: ""
@@ -60,7 +60,7 @@ columns:
   status:
     lineage:
       - datalake_docx_clean.credit_evaluation.status
-    description: "Status of the credit evaluation"
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     categories:
       NOT_SENT: ""
       PROCESSING: ""
@@ -69,7 +69,7 @@ columns:
   proposal_last_result:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
-    description: "Last result of the credit evaluation of the proposal"
+    description: Credit analysis attribute describing proposal last result in the tenant underwriting workflow.
   proposal_number_evaluations:
     lineage:
       - datalake_docx_clean.credit_evaluation.id
@@ -77,7 +77,7 @@ columns:
   group_last_result:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
-    description: "Last result of the credit evaluation of the group"
+    description: Credit analysis attribute describing group last result in the tenant underwriting workflow.
   group_number_evaluations:
     lineage:
       - datalake_docx_clean.credit_evaluation.id
@@ -89,7 +89,7 @@ columns:
   ts_updated:
     lineage:
       - datalake_docx_clean.credit_evaluation.ts_updated
-    description: "Updated timestamp"
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_expires:
     lineage:
       - datalake_docx_clean.credit_evaluation.ts_expires
@@ -98,19 +98,19 @@ columns:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
       - datalake_docx_clean.credit_evaluation.ts_updated
-    description: "Timestamp of the first positive credit evaluation in the proposal"
+    description: Timestamp when proposal first credit evaluation positive occurred in the upstream fintech system.
   ts_proposal_last_credit_evaluation_positive:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
       - datalake_docx_clean.credit_evaluation.ts_updated
-    description: "Timestamp of the last positive credit evaluation in the proposal"
+    description: Timestamp when proposal last credit evaluation positive occurred in the upstream fintech system.
   ts_group_first_credit_evaluation_positive:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
       - datalake_docx_clean.credit_evaluation.ts_updated
-    description: "Timestamp of the first positive credit evaluation in the group"
+    description: Timestamp when group first credit evaluation positive occurred in the upstream fintech system.
   ts_group_last_credit_evaluation_positive:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
       - datalake_docx_clean.credit_evaluation.ts_updated
-    description: "Timestamp of the last positive credit evaluation in the group"
+    description: Timestamp when group last credit evaluation positive occurred in the upstream fintech system.

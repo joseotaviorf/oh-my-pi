@@ -8,56 +8,56 @@ columns:
   id_credit_evaluation:
     description: The unique identifier for the credit evaluation. It can be used in any join with the credit evaluation ID from DocX.
     lineage:
-    -  datalake_docx_clean.credit_evaluation.id
+      -  datalake_docx_clean.credit_evaluation.id
   id_group:
     description: The identifier for the group associated with the credit evaluation (credit passport group). The value can be null if the credit evaluation was submitted to a proposal.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_group
+      - datalake_docx_clean.credit_evaluation.id_group
   id_proposal:
     description: The identifier for the proposal associated with the credit evaluation. The value can be null if the credit evaluation was submitted before the submission of an offer.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_group
+      - datalake_docx_clean.credit_evaluation.id_group
   id_city:
     description: The identifier for the city in which the group submitted the credit evaluation.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_city
+      - datalake_docx_clean.credit_evaluation.id_city
   id_house:
     description: The identifier for the house in which the group submitted the credit evaluation.
     lineage:
-    - datalake_docx_clean.machine_state.id_house
+      - datalake_docx_clean.machine_state.id_house
   id_user:
     description: The unique identifier for the user. This column can be used in any join with the id_user from main.
     lineage:
-    - datalake_docx_clean.credit_evaluation.id_user
+      - datalake_docx_clean.credit_evaluation.id_user
   credit_evaluation_status:
-    description: The status of the credit evaluation.
+    description: Credit analysis attribute describing credit evaluation status in the tenant underwriting workflow.
     lineage:
-    - datalake_docx_clean.credit_evaluation.status
+      - datalake_docx_clean.credit_evaluation.status
   scope:
-    description: The scope of the credit evaluation.
+    description: Credit analysis attribute describing scope in the tenant underwriting workflow.
     categories:
       HOUSE: When the credit model evaluates the credit risk based on the property information.
       CITY: When the credit evaluation is valid for any property within a city.
     lineage:
-    - datalake_docx_clean.credit_evaluation.scope
+      - datalake_docx_clean.credit_evaluation.scope
   credit_result:
-    description: The result of the credit evaluation.
+    description: Credit analysis attribute describing credit result in the tenant underwriting workflow.
     lineage:
-    - datalake_docx_clean.credit_evaluation.result
+      - datalake_docx_clean.credit_evaluation.result
   credit_result_reason:
     description: The rejection reason or pre evaluation reason.
     lineage:
-    - datalake_docx_clean.credit_evaluation.reason
+      - datalake_docx_clean.credit_evaluation.reason
   user_requested_value:
     description: This value is the amount submitted by the user indicating the property limit that the user can afford.
     lineage:
-    - datalake_docx_clean.credit_evaluation.limit_value
+      - datalake_docx_clean.credit_evaluation.limit_value
   user_pre_approved_limit:
     description: This value is the pre approved limit offered to the user.
     lineage:
-    - datalake_docx_clean.credit_evaluation.pre_approved_limit
+      - datalake_docx_clean.credit_evaluation.pre_approved_limit
   event_name:
-    description: The name of the event.
+    description: Credit analysis attribute describing event name in the tenant underwriting workflow.
     categories:
       EVALUATION_POSITIVE: Indicates if the credit evaluation received a positive response and the tenant can move forward to the next step, which if the documentation submission.
       EVALUATION_NEGATIVE: Indicates if the credit evaluation received a negative response and the tenant can not move forward to the next step without redoing the credit evaluation.
@@ -68,8 +68,8 @@ columns:
       STAND_BY: Indicates that the analyst put the proposal in stand by. StandBy status is used when the Tenant has more than one proposal, and the credit desk and closing team need to control which proposal should continue to the contract creation.
       SUFFICIENT_CREDIT_LIMIT: This event indicates when the compatibility between a proposal and the requested user value is verified.
     lineage:
-    - datalake_docx_clean.machine_state.input_source_type
-    - datalake_docx_clean.machine_state.status
+      - datalake_docx_clean.machine_state.input_source_type
+      - datalake_docx_clean.machine_state.status
   credit_evaluation_source:
     description: This column indicates the credit evaluation origin.
     categories:
@@ -79,7 +79,7 @@ columns:
   is_value_within_pre_approved_limit:
     description: Indicates if the value requested by the user is within the pre approved limit.
     lineage:
-    - datalake_docx_clean.credit_evaluation.early_result
+      - datalake_docx_clean.credit_evaluation.early_result
   is_credit_passport:
     description: Indicates if the credit evaluation was submitted within a credit passport.
   is_passport_missing:
@@ -87,44 +87,47 @@ columns:
   ts_bypassed:
     description: The timestamp when the pre-evaluation was bypassed, filtered by input_source_type = 'ANALYSIS_REQUEST' and status = 'BYPASSED'.
     lineage:
-    - datalake_docx_clean.machine_state.ts_created
-    - datalake_docx_clean.machine_state.input_source_type
-    - datalake_docx_clean.machine_state.status
+      - datalake_docx_clean.machine_state.ts_created
+      - datalake_docx_clean.machine_state.input_source_type
+      - datalake_docx_clean.machine_state.status
   ts_credit_evaluation_created:
     description: The timestamp creation of the credit evaluation.
     lineage:
-    - datalake_docx_clean.credit_evaluation.ts_created
+      - datalake_docx_clean.credit_evaluation.ts_created
   ts_evaluation_positive:
     description: The timestamp when the proposal received a positive credit evaluation, which means that the Tenant may move forward to the next step with a free or paid guarantee.
     lineage:
-    - datalake_docx_clean.machine_state.ts_created
-    - datalake_docx_clean.machine_state.input_source_type
-    - datalake_docx_clean.machine_state.status
+      - datalake_docx_clean.machine_state.ts_created
+      - datalake_docx_clean.machine_state.input_source_type
+      - datalake_docx_clean.machine_state.status
   ts_credit_analysis_approved:
     description: The timestamp when the credit analysis was approved before the documentation analysis.
     lineage:
-    - datalake_docx_clean.machine_state.ts_created
-    - datalake_docx_clean.machine_state.input_source_type
-    - datalake_docx_clean.machine_state.status
+      - datalake_docx_clean.machine_state.ts_created
+      - datalake_docx_clean.machine_state.input_source_type
+      - datalake_docx_clean.machine_state.status
   ts_docs_analysis:
     description: The timestamp when the docs analysis started.
     lineage:
-    - datalake_docx_clean.machine_state.ts_created
-    - datalake_docx_clean.machine_state.input_source_type
-    - datalake_docx_clean.machine_state.status
+      - datalake_docx_clean.machine_state.ts_created
+      - datalake_docx_clean.machine_state.input_source_type
+      - datalake_docx_clean.machine_state.status
   ts_docs_resend:
     description: The timestamp when the analyst requested documentation resubmission.
     lineage:
-    - datalake_docx_clean.machine_state.ts_created
-    - datalake_docx_clean.machine_state.input_source_type
-    - datalake_docx_clean.machine_state.status
+      - datalake_docx_clean.machine_state.ts_created
+      - datalake_docx_clean.machine_state.input_source_type
+      - datalake_docx_clean.machine_state.status
   ts_stand_by:
     description: The timestamp when the analyst pur the proposal in StandBy.
     lineage:
-    - datalake_docx_clean.machine_state.ts_created
-    - datalake_docx_clean.machine_state.input_source_type
-    - datalake_docx_clean.machine_state.status
+      - datalake_docx_clean.machine_state.ts_created
+      - datalake_docx_clean.machine_state.input_source_type
+      - datalake_docx_clean.machine_state.status
   ts_expired:
     description: The timestamp when the credit passport will expires.
     lineage:
-    - datalake_docx_clean.credit_evaluation.ts_expires
+      - datalake_docx_clean.credit_evaluation.ts_expires
+  ts_evaluation_negative:
+    description: Timestamp when evaluation negative occurred in the upstream fintech system.
+    lineage: []

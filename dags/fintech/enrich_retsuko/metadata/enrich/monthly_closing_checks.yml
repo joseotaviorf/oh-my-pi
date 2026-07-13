@@ -1,34 +1,34 @@
 database_name: datalake_retsuko
 table_name: monthly_closing_checks
-owner: rodrigo.guedes@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Seu Barriga's checks, alerts and informations about monthly closing"
+description: Checks, alerts, and validation results from Seu Barriga's monthly invoice closing process.
 columns:
   id:
-    description: "Unique ID Internal from the check"
+    description: Internal identifier of the monthly closing check.
     lineage:
       - datalake_retsuko_clean.monthly_closing_checks.id
   id_external:
-    description: "Unique ID External from the check"
+    description: External identifier of the monthly closing check.
     lineage:
       - datalake_retsuko_clean.monthly_closing_checks.id_external
   id_contract:
-    description: "Internal Contract ID from retsuko table"
+    description: Internal contract ID in Retsuko associated with the check.
     lineage:
       - datalake_retsuko_clean.monthly_closing_checks.id_contract
   checks:
-    description: "Checks, alerts and information about monthly closing"
+    description: Structured payload with checks, alerts, and validation details for the monthly closing.
     lineage:
       - datalake_retsuko_clean.monthly_closing_checks.checks
   accrual_year_month:
-    description: "Year/month invoice accrual"
+    description: Reference year-month for invoice accrual (YYYY-MM).
     lineage:
       - datalake_retsuko_clean.monthly_closing_checks.accrual_year_month
   ts_created:
-    description: "Timestamp that refers to when the monthly check was created"
+    description: Timestamp when the monthly closing check was created.
     lineage:
       - datalake_retsuko_clean.monthly_closing_checks.ts_created
   ts_updated:
-    description: "Timestamp from the last update"
+    description: Timestamp of the last update to the monthly closing check.
     lineage:
       - datalake_retsuko_clean.monthly_closing_checks.ts_updated

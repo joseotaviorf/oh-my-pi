@@ -1,43 +1,61 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: documents
+description:
+  One row per documents in the Fintech clean layer, sourced from
+  datalake_arquivo_confidencial_clean for payments, billing, and financial
+  operations reporting.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.id
+    description: Financial attribute representing id on the documents dataset.
   id_documentation_report:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.documentation_report_id
+    description: Identifier for the documentation report referenced by this financial record.
   name:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.name
+    description: Financial attribute representing name on the documents dataset.
   url:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.url
+    description: Financial attribute representing url on the documents dataset.
   type:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.type
+    description: Financial attribute representing type on the documents dataset.
   content_type:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.content_type
+    description: Financial attribute representing content type on the documents dataset.
   sequence:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.sequence
+    description: Financial attribute representing sequence on the documents dataset.
   version:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.version
+    description: Financial attribute representing version on the documents dataset.
   ts_created:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_arquivo_confidencial_raw.documents.day
+    description: Day partition derived from the source event timestamp for incremental loading.

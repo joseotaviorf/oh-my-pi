@@ -1,16 +1,16 @@
 ---
 database_name: datalake_retsuko
 table_name: invoice_info
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: ""
+description: Enriched view of invoice status, payment, and lifecycle attributes from Seu Barriga (Retsuko), with normalized category labels for reporting.
 columns:
   id_invoice:
-    description: "Invoice ID"
+    description: External invoice identifier from Seu Barriga (Retsuko).
     lineage:
       - datalake_retsuko.invoice.id_external
   invoice_frequency:
-    description: "Invoice Frequency (purpose)"
+    description: Invoice billing purpose or frequency (monthly, onboarding, extra, etc.), with normalized labels.
     categories:
       early-termination: ""
       extra: ""
@@ -21,7 +21,7 @@ columns:
     lineage:
       - datalake_retsuko.invoice.purpose
   payment_status:
-    description: "Invoice status"
+    description: Invoice lifecycle status (open, paid, canceled, etc.) derived from the upstream invoice status field.
     categories:
       canceled: The invoice is canceled, and there's no more values to be paid
       divergent-payment:
@@ -42,7 +42,7 @@ columns:
     lineage:
       - datalake_retsuko.invoice.status
   substatus:
-    description: "Invoice subtatus. It's used to set negotiations/debts status"
+    description: Invoice substatus used to track negotiation or debt states.
     categories:
       none: ""
       debt: ""
@@ -50,15 +50,15 @@ columns:
     lineage:
       - datalake_retsuko.invoice.substatus
   negotiation_status:
-    description: "Description of negotiation status"
+    description: Current status of an invoice negotiation, when applicable.
     lineage:
       - datalake_retsuko.invoice.negotiation_status
   closing_mode:
-    description: "Description that shows if closing is automatic or manual"
+    description: Indicates whether the invoice closing was automatic or manual.
     lineage:
       - datalake_retsuko.invoice.closing_mode
   paid_via:
-    description: "Invoice payment method categories"
+    description: Payment method used to settle the invoice.
     categories:
       bank-transfer: ""
       cardif: ""
@@ -77,7 +77,7 @@ columns:
     lineage:
       - datalake_retsuko.invoice.paid_via
   invoice_user:
-    description: "Invoice user"
+    description: Account type associated with the invoice (landlord, tenant, personal estate agent, or QuintoAndar).
     categories:
       landlord: ""
       tenant: ""
@@ -86,18 +86,18 @@ columns:
     lineage:
       - datalake_retsuko_clean.account.type
   ts_sent:
-    description: "Timestamp when the invoice was sent"
+    description: Timestamp when the invoice was sent to the recipient.
     lineage:
       - datalake_retsuko.invoice.ts_sent
   ts_due:
-    description: "Invoice due (timestamp)"
+    description: Invoice due date timestamp.
     lineage:
       - datalake_retsuko.invoice.ts_due
   ts_paid:
-    description: "Timestamp in which invoice was paid"
+    description: Timestamp when the invoice was paid.
     lineage:
       - datalake_retsuko.invoice.ts_paid
   ts_canceled:
-    description: "Invoice cancellation timestamp"
+    description: Timestamp when the invoice was canceled.
     lineage:
       - datalake_retsuko.invoice.ts_canceled

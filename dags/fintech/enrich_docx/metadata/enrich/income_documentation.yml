@@ -1,25 +1,25 @@
 database_name: datalake_docx
 table_name: income_documentation
-owner: felipe.chies@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: "Table with the income documentation of the tenant"
 columns:
   id:
     lineage:
       - datalake_docx_clean.document.id
-    description: "Id of the income documentation"
+    description: Credit analysis attribute describing id in the tenant underwriting workflow.
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
-    description: "Id of the folder"
+    description: Identifier for the folder referenced by this financial record.
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Id of the document type"
+    description: Identifier for the document type referenced by this financial record.
   id_document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
-    description: "Id of the document context"
+    description: Identifier for the document context referenced by this financial record.
   id_context_external:
     lineage:
       - datalake_docx_clean.document.id_context_external
@@ -27,7 +27,7 @@ columns:
   document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Document type"
+    description: Credit analysis attribute describing document type in the tenant underwriting workflow.
     categories:
       RG: ""
       CPF: ""
@@ -39,7 +39,7 @@ columns:
   document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
-    description: "Document context"
+    description: Credit analysis attribute describing document context in the tenant underwriting workflow.
     categories:
       Owner: ""
       Tenant: ""
@@ -53,11 +53,11 @@ columns:
   monthly_salary:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant monthly salary"
+    description: Credit analysis attribute describing monthly salary in the tenant underwriting workflow.
   company_name:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant company name"
+    description: Credit analysis attribute describing company name in the tenant underwriting workflow.
   company_phone_number:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -69,7 +69,7 @@ columns:
   profession:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant profession"
+    description: Credit analysis attribute describing profession in the tenant underwriting workflow.
   additional_income:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -77,11 +77,11 @@ columns:
   source_of_income:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant source of income"
+    description: Credit analysis attribute describing source of income in the tenant underwriting workflow.
   documentation_extra_comment:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Documentation extra comment"
+    description: Credit analysis attribute describing documentation extra comment in the tenant underwriting workflow.
   payslips:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -89,19 +89,19 @@ columns:
   ctps_pages:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant ctps pages"
+    description: Credit analysis attribute describing ctps pages in the tenant underwriting workflow.
   bank_statements:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant bank statements"
+    description: Credit analysis attribute describing bank statements in the tenant underwriting workflow.
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Documentation attributes"
+    description: Credit analysis attribute describing attributes in the tenant underwriting workflow.
   attachments:
     lineage:
       - datalake_docx_clean.document.attachments
-    description: "Documentation attachments"
+    description: Credit analysis attribute describing attachments in the tenant underwriting workflow.
   ts_created:
     lineage:
       - datalake_docx_clean.document.ts_created
@@ -109,4 +109,4 @@ columns:
   ts_updated:
     lineage:
       - datalake_docx_clean.document.ts_updated
-    description: "Updated timestamp"
+    description: Timestamp when updated occurred in the upstream fintech system.

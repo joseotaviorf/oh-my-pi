@@ -1,46 +1,65 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: documentation_report
+description:
+  One row per documentation report in the Fintech clean layer, sourced from
+  datalake_arquivo_confidencial_clean for payments, billing, and financial
+  operations reporting.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.id
+    description: Financial attribute representing id on the documentation_report dataset.
   id_proposal:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.proposal_id
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   id_report:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.report_id
+    description: Identifier for the report referenced by this financial record.
   cpf:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.cpf
+    description: Brazilian individual taxpayer registry number (CPF) used for identity verification (PII).
   status:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   matrix_name:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.matrix_name
+    description: Financial attribute representing matrix name on the documentation_report dataset.
   version:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.version
+    description: Financial attribute representing version on the documentation_report dataset.
   report_result:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.report_result
+    description: Financial attribute representing report result on the documentation_report dataset.
   validations:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.validations
+    description: Financial attribute representing validations on the documentation_report dataset.
   ts_created:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_arquivo_confidencial_raw.documentation_report.day
+    description: Day partition derived from the source event timestamp for incremental loading.

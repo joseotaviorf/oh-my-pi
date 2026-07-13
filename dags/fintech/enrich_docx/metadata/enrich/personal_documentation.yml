@@ -1,25 +1,25 @@
 database_name: datalake_docx
 table_name: personal_documentation
-owner: felipe.chies@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: "Table with the personal documentation of the tenant"
 columns:
   id:
     lineage:
       - datalake_docx_clean.document.id
-    description: "Id of the personal documentation"  
+    description: Credit analysis attribute describing id in the tenant underwriting workflow.
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
-    description: "Id of the folder"  
+    description: Identifier for the folder referenced by this financial record.
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Id of the document type"  
+    description: Identifier for the document type referenced by this financial record.
   id_document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
-    description: "Id of the document context"  
+    description: Identifier for the document context referenced by this financial record.
   id_context_external:
     lineage:
       - datalake_docx_clean.document.id_context_external
@@ -27,11 +27,11 @@ columns:
   cpf:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant CPF"
+    description: Brazilian individual taxpayer registry number (CPF) used for identity verification (PII).
   document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Document type"
+    description: Credit analysis attribute describing document type in the tenant underwriting workflow.
     categories:
       RG: ""
       CPF: ""
@@ -43,7 +43,7 @@ columns:
   document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
-    description: "Document context"
+    description: Credit analysis attribute describing document context in the tenant underwriting workflow.
     categories:
       Owner: ""
       Tenant: ""
@@ -53,15 +53,15 @@ columns:
   full_name:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant full name" 
+    description: Credit analysis attribute describing full name in the tenant underwriting workflow.
   email:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant email" 
+    description: Credit analysis attribute describing email in the tenant underwriting workflow.
   telephone_number:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant telephone number" 
+    description: Credit analysis attribute describing telephone number in the tenant underwriting workflow.
   cell_phone_number:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -69,23 +69,23 @@ columns:
   marital_status:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant marital status" 
+    description: Credit analysis attribute describing marital status in the tenant underwriting workflow.
   rent_reason:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant rent reason" 
+    description: Credit analysis attribute describing rent reason in the tenant underwriting workflow.
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Documentation attributes"
+    description: Credit analysis attribute describing attributes in the tenant underwriting workflow.
   attachments:
     lineage:
       - datalake_docx_clean.document.attachments
-    description: "Documentation attachments"
+    description: Credit analysis attribute describing attachments in the tenant underwriting workflow.
   will_reside:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Will reside information"
+    description: Credit analysis attribute describing will reside in the tenant underwriting workflow.
   ts_created:
     lineage:
       - datalake_docx_clean.document.ts_created
@@ -93,4 +93,4 @@ columns:
   ts_updated:
     lineage:
       - datalake_docx_clean.document.ts_updated
-    description: "Updated timestamp"
+    description: Timestamp when updated occurred in the upstream fintech system.

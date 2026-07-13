@@ -1,6 +1,6 @@
 database_name: datalake_docx
 table_name: address_documentation
-owner: felipe.chies@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: "Table with the address documentation of the tenant"
 columns:
@@ -11,15 +11,15 @@ columns:
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
-    description: "Id of the folder"  
+    description: Identifier for the folder referenced by this financial record.
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Id of the document type"  
+    description: Identifier for the document type referenced by this financial record.
   id_document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
-    description: "Id of the document context"  
+    description: Identifier for the document context referenced by this financial record.
   id_context_external:
     lineage:
       - datalake_docx_clean.document.id_context_external
@@ -27,7 +27,7 @@ columns:
   document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Document type"
+    description: Credit analysis attribute describing document type in the tenant underwriting workflow.
     categories:
       RG: ""
       CPF: ""
@@ -39,7 +39,7 @@ columns:
   document_context:
     lineage:
       - datalake_docx_clean.document.id_document_context
-    description: "Document context"
+    description: Credit analysis attribute describing document context in the tenant underwriting workflow.
     categories:
       Owner: ""
       Tenant: ""
@@ -49,31 +49,31 @@ columns:
   zip_code:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Zip code of the address" 
+    description: Credit analysis attribute describing zip code in the tenant underwriting workflow.
   state:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "State of the address" 
+    description: Credit analysis attribute describing state in the tenant underwriting workflow.
   city:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "City of the address" 
+    description: Credit analysis attribute describing city in the tenant underwriting workflow.
   neighborhood:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Neighborhood of the address" 
+    description: Credit analysis attribute describing neighborhood in the tenant underwriting workflow.
   address:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Address information" 
+    description: Credit analysis attribute describing address in the tenant underwriting workflow.
   address_number:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Number of the address" 
+    description: Credit analysis attribute describing address number in the tenant underwriting workflow.
   address_complement:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Complement of the address" 
+    description: Credit analysis attribute describing address complement in the tenant underwriting workflow.
   years_in_current_residence:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -81,23 +81,23 @@ columns:
   current_living_situation:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Current living situation" 
+    description: Credit analysis attribute describing current living situation in the tenant underwriting workflow.
   real_estate_or_owner_name:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Real estate or owner name" 
+    description: Credit analysis attribute describing real estate or owner name in the tenant underwriting workflow.
   real_estate_or_owner_phone_number:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Real estate or owner phone number"
+    description: Credit analysis attribute describing real estate or owner phone number in the tenant underwriting workflow.
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Documentation attributes"
+    description: Credit analysis attribute describing attributes in the tenant underwriting workflow.
   attachments:
     lineage:
       - datalake_docx_clean.document.attachments
-    description: "Documentation attachments"
+    description: Credit analysis attribute describing attachments in the tenant underwriting workflow.
   ts_created:
     lineage:
       - datalake_docx_clean.document.ts_created
@@ -105,4 +105,4 @@ columns:
   ts_updated:
     lineage:
       - datalake_docx_clean.document.ts_updated
-    description: "Updated timestamp"
+    description: Timestamp when updated occurred in the upstream fintech system.

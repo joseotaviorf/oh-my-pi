@@ -7,23 +7,23 @@ columns:
   id_document:
     lineage:
       - datalake_docx_clean.document.id
-    description: "Id of the identity documentation"
+    description: Identifier for the document referenced by this financial record.
   id_folder:
     lineage:
       - datalake_docx_clean.document.id_folder
-    description: "Id of the folder"
+    description: Identifier for the folder referenced by this financial record.
   id_document_type:
     lineage:
       - datalake_docx_clean.document.id_document_type
-    description: "Id of the document type"
+    description: Identifier for the document type referenced by this financial record.
   id_proposal:
     lineage:
       - datalake_docx_clean.document.id_context_external
-    description: "Id of the proposal"
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   document_number:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant document number"
+    description: Credit analysis attribute describing document number in the tenant underwriting workflow.
   cpf:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -31,7 +31,7 @@ columns:
   document_type:
     lineage:
       - datalake_docx_clean.document_type.name
-    description: "Document type"
+    description: Credit analysis attribute describing document type in the tenant underwriting workflow.
     categories:
       RG: ""
       CPF: ""
@@ -40,7 +40,7 @@ columns:
   document_context:
     lineage:
       - datalake_docx_clean.document_context.name
-    description: "Document context"
+    description: Credit analysis attribute describing document context in the tenant underwriting workflow.
     categories:
       Owner: ""
       Tenant: ""
@@ -50,11 +50,11 @@ columns:
   mother_name:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant mother name"
+    description: Credit analysis attribute describing mother name in the tenant underwriting workflow.
   nationality:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Tenant nationality"
+    description: Credit analysis attribute describing nationality in the tenant underwriting workflow.
   country_of_origin:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -66,11 +66,11 @@ columns:
   attributes:
     lineage:
       - datalake_docx_clean.document.attributes
-    description: "Documentation attributes"
+    description: Credit analysis attribute describing attributes in the tenant underwriting workflow.
   attachments:
     lineage:
       - datalake_docx_clean.document.attachments
-    description: "Documentation attachments"
+    description: Credit analysis attribute describing attachments in the tenant underwriting workflow.
   dt_birth:
     lineage:
       - datalake_docx_clean.document.attributes
@@ -90,4 +90,4 @@ columns:
   ts_updated:
     lineage:
       - datalake_docx_clean.document.ts_updated
-    description: "Updated timestamp"
+    description: Timestamp when updated occurred in the upstream fintech system.
