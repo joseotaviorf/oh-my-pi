@@ -1,36 +1,53 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: payment_event
-owner: data-ae-fintech@quintoandar.com.br
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per payment event in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
     id:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.id
+        description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
     id_payment:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.payment
+        description: Payment transaction identifier in the fintech payments platform.
     fine:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.fine
+        description: QuintoCred rental guarantee attribute describing fine in the policy lifecycle.
     interest:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.interest
+        description: QuintoCred rental guarantee attribute describing interest in the policy lifecycle.
     status:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.status
+        description: Current lifecycle status of the financial entity in the upstream operational system.
     event:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.event
+        description: QuintoCred rental guarantee attribute describing event in the policy lifecycle.
     ts_created:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.created_at
+        description: Timestamp when created occurred in the upstream fintech system.
     year:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.year
+        description: Year partition derived from the source event timestamp for incremental loading.
     month:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.month
+        description: Month partition derived from the source event timestamp for incremental loading.
     day:
         lineage:
             - datalake_rental_guarantee_platform_raw.payment_event.day
+        description: Day partition derived from the source event timestamp for incremental loading.
