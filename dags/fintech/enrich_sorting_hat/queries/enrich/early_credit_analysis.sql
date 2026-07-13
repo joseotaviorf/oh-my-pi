@@ -14,7 +14,7 @@ SELECT
 FROM 
     datalake_sorting_hat_clean.early_credit_analysis
 ),
-base_json AS (
+base_json_ranked AS (
 SELECT 
     id AS id_early_credit,
     id_credit_evaluation,
@@ -33,11 +33,10 @@ SELECT
     GET_JSON_OBJECT(extract_json, '$.rejection_reason') AS rejection_reason,
     ROW_NUMBER() OVER ( PARTITION BY id_user, id_house ORDER BY ts_created DESC ) AS early_credit_number,
     ts_created,
-    ts_expired
+    ts_expired,
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_created DESC) AS rn_dedup
 FROM 
     base
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_created DESC) = 1
 )
 SELECT
     id_early_credit,
@@ -45,7 +44,7 @@ SELECT
     id_user,
     id_house,
     id_variant,
-    id_policy_report
+    id_policy_report,
     city,
     version,
     risk_category_canon,
@@ -60,5 +59,6 @@ SELECT
     ts_created,
     ts_expired
 FROM
-    base_json
-
+    base_json_ranked
+WHERE
+    rn_dedup = 1

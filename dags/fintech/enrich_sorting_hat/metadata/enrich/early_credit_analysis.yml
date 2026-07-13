@@ -34,6 +34,12 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_variant
     description: Policy/model variant id assigned to this early credit evaluation.
+  id_policy_report:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+    description: >
+      Sorting Hat policy_report id (CREDIT_POLICY) parsed from result JSON field
+      policy_report_id for this offer element.
   city:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.city
