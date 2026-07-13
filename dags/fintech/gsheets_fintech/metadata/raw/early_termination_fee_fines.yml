@@ -1,11 +1,17 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: early_termination_fee_fines
+description: >
+  Raw early-termination fee fines curated in Google Sheets by Fintech
+  Operations (sheet MultasCriadas), one row per fine request.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   dados_iq_cpfcnpj:
     tags:
     - PII
+    description: CPF/CNPJ of the IQ titular from the Google Sheets source (PII).
   dados_iq_titular:
     tags:
     - PII
+    description: Name of the IQ titular from the Google Sheets source (PII).

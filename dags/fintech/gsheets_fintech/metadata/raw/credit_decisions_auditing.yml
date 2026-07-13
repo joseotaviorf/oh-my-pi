@@ -1,13 +1,19 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: credit_decisions_auditing
+description: >
+  Raw credit decision auditing notes curated in Google Sheets by Fintech
+  Operations, including auditor comments and leadership feedback.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   comment:
     tags:
       - PII
       - Confidential
+    description: Auditor comment on the credit decision (from Google Sheets, PII).
   feedbacks_to_leadership:
     tags:
       - PII
       - Confidential
+    description: Feedback shared with leadership about the audit (from Google Sheets, PII).

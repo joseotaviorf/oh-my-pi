@@ -1,4 +1,9 @@
 ---
 database_name: datalake_gsheet_raw
 table_name: fraud_contracts_for_rent
+description: >
+  Raw For Rent contracts flagged as fraud by the fraud team, curated in
+  Google Sheets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
+columns: {}

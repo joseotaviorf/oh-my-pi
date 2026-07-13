@@ -1,4 +1,9 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: evictions_base
+description: >
+  Raw E-law eviction process base curated in Google Sheets by Fintech
+  Operations (sheet Base Evictions); replaces evictions_processes_forrent.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
+columns: {}

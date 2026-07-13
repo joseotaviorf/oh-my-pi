@@ -1,14 +1,21 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: imovelweb_customer_portfolio
+description: >
+  Raw Imovelweb customer portfolio curated in Google Sheets by Fintech
+  Operations (sheet carteira_inicial), one row per customer.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   _cpf_cnpj:
     tags:
     - PII
+    description: Customer CPF/CNPJ from the Google Sheets source (PII).
   email:
     tags:
     - PII
+    description: Customer email from the Google Sheets source (PII).
   telefone_1:
     tags:
     - PII
+    description: Primary customer phone from the Google Sheets source (PII).

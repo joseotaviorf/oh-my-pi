@@ -1,21 +1,31 @@
+---
 database_name: datalake_gsheets_raw
 table_name: process_eviction
+description: >
+  Raw eviction process operational data curated in Google Sheets by Fintech
+  Operations (sheet datamart_send), one row per contract in eviction flow.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   landlord_emails:
     tags:
     - Confidential
+    description: Landlord email addresses from the Google Sheets source (Confidential).
   landlord_names:
     tags:
     - PII
     - Confidential
+    description: Landlord names from the Google Sheets source (PII).
   resident_emails:
     tags:
     - Confidential
+    description: Resident email addresses from the Google Sheets source (Confidential).
   tenant_emails:
     tags:
     - Confidential
+    description: Tenant email addresses from the Google Sheets source (Confidential).
   tenant_names:
     tags:
     - PII
     - Confidential
+    description: Tenant names from the Google Sheets source (PII).

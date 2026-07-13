@@ -1,5 +1,9 @@
 ---
 database_name: datalake_gsheets_raw
 table_name: ead_lgd_liability
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Raw EAD and LGD data imported from Google Sheets, containing IFRS liabilities data
+description: >
+  Raw IFRS liability-side EAD and LGD parameters imported from Google Sheets
+  (sheet ifrs_passivo).
+columns: {}

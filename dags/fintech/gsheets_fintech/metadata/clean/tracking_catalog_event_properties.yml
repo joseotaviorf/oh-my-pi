@@ -1,38 +1,53 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: tracking_catalog_event_properties
+description: >
+  Clean tracking catalog of event properties curated in Google Sheets by
+  Fintech Operations (sheet event_properties), one row per event property.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_app:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.id_app
+    description: App identifier for the tracked event property.
   project_name:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.project_name
+    description: Project name owning the event property (from Google Sheets).
   description:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.description
+    description: Human-readable description of the event property.
   owner:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.owner
+    description: Owner of the event property in the tracking catalog.
   event_type:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.event_type
+    description: Event type associated with this property.
   event_property:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.event_property
+    description: Event property name in the tracking catalog.
   platform:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.platform
+    description: Platform where the event property is tracked.
   type:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.type
+    description: Data type or classification of the event property.
   status:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.status
+    description: Current status of the event property in the catalog.
   first_seen:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.first_seen
+    description: First time this event property was observed.
   last_seen:
     lineage:
       - datalake_gsheets_raw.tracking_catalog_event_properties.last_seen
+    description: Most recent time this event property was observed.
