@@ -1,0 +1,9 @@
+cluster:
+  type: emr_7_12_consolidation_s_general_cluster
+  custom_configurations:
+    spark_conf:
+      spark.metrics.namespace: data_products.conversational_xp
+    core_nodes:
+      instance_count: 2
+    task_nodes:
+      instance_count: 1

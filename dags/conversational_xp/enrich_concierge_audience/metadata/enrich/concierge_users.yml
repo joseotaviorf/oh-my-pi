@@ -1,0 +1,109 @@
+---
+database_name: datalake_search
+table_name: concierge_users
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Daily concierge (Julia) WhatsApp audience with intent classification and outreach
+  controls. Port of customer-data-platform cdp_modeled_repo.tb_concierge_users.
+  Grain: one row per user after business-context tie-break; partitioned by snapshot
+  date (year, month, day). Consumed by Concierge campaign orchestration and analytics.
+columns:
+  id_user:
+    description: QuintoAndar internal user identifier eligible for concierge outreach.
+    lineage:
+      - datalake_cdp.users.id_user
+  id_house:
+    description: House identifier attached to high or medium intent when a visit or medium-intent event applies.
+    lineage:
+      - datalake_visit.visits.id_house
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+      - datalake_rent_flows.rent_flows.id_house
+  user_first_name:
+    description: First token of the user's display name used in WhatsApp message personalization.
+    lineage:
+      - datalake_cdp.users.user_name
+  user_phone:
+    description: WhatsApp-capable phone number used to deliver concierge notifications.
+    lineage:
+      - datalake_cdp.users.phone_number
+  business_context:
+    description: Preferred rent or sale business line for concierge to prioritize when contacting the user.
+    lineage:
+      - datalake_cdp.users.id_user
+      - datalake_amplitude_clean.170698_search_page_viewed_events.business_context
+  visit_code:
+    description: Visit code associated with the single confirmed next-day visit when is_confirmed_1_visit is set.
+    lineage:
+      - datalake_visit.visits.code
+  snooze_status:
+    description: Privacy-hub snooze status for concierge outreach (ACTIVE, EXPIRED, or null when never snoozed).
+    lineage:
+      - datalake_privacy_hub_clean.data_subject.purpose_acceptances
+  intent:
+    description: Classified outreach intent tier (HIGH, MEDIUM, LOW, or NOT_CLASSIFIED) for template selection.
+  reason:
+    description: Rule label explaining why the user was included or excluded from a given intent tier.
+  medium_intent_reason:
+    description: |
+      When intent is MEDIUM, the signal that drove classification: DIRECT_OFFER,
+      SCHEDULE_PAGE_VIEWED, FAVORITED_LISTING, or THREE_PLUS_LPV. Null otherwise.
+  searches_since:
+    description: Distinct search sessions performed after the latest snooze expired, used to re-qualify snoozed users.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_session
+  low_notifications:
+    description: Lifetime count of delivered low-intent concierge WhatsApp notifications for the user.
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  notification_count:
+    description: Running count of notifications already sent at the assigned intent tier for message cadence control.
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  is_confirmed_1_visit:
+    description: Flag indicating the user has exactly one visit confirmed for the next calendar day.
+    lineage:
+      - datalake_visit.visits.id_visitor
+  is_received_low_msg_7_days:
+    description: Whether a low-intent concierge WhatsApp template was sent to the user in the last seven days.
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  is_received_med_msg_7_days:
+    description: Whether a medium-intent concierge WhatsApp template was sent to the user in the last seven days.
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  is_received_high_msg_7_days:
+    description: Whether a high-intent concierge WhatsApp template was sent to the user in the last seven days.
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.action
+  is_favourited_scheduled_lpv:
+    description: Whether the user triggered a medium-intent signal yesterday (LPV, favorite, schedule page, or direct offer).
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
+  is_concierge_response:
+    description: Whether the user replied to a concierge WhatsApp conversation in the last 28 days.
+    lineage:
+      - datalake_copilot_service_clean.session.id_user
+  is_concierge_lpv:
+    description: Whether the user viewed a listing page from a concierge WhatsApp recommendation in the last 28 days.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+  has_top_cluster:
+    description: Whether the user has a dominant search-profile cluster for the selected business context.
+    lineage:
+      - datalake_house_listing_search_clean.search_profile.id_profile_holder
+      - datalake_house_listing_search_clean.search_profile_filters.events_count
+  has_qualified_search_cluster:
+    description: Whether the top search cluster has at least ten filter events (qualified cluster threshold).
+    lineage:
+      - datalake_house_listing_search_clean.search_profile_filters.events_count
+  is_first_notification:
+    description: True when the user has never received any concierge low, medium, or high intent notification.
+  ts_created:
+    description: Timestamp when the audience snapshot row was materialized by the enrich pipeline.
+  year:
+    description: Snapshot partition year (calendar date of the audience run).
+  month:
+    description: Snapshot partition month (calendar date of the audience run).
+  day:
+    description: Snapshot partition day (calendar date of the audience run).
