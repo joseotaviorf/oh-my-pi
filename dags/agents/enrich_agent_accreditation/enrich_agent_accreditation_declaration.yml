@@ -24,8 +24,6 @@ workflow:
     agent_registration_actions_log:
       - agent_profile
       - business_context
-    business_context_activity:
-      - agent_registration_actions_log
   tables_customization:
     agent_major_region_code:
       extraction_type: full
@@ -39,9 +37,6 @@ workflow:
     agent_registration_actions_log:
       merge_on: [id_action_log]
       z_order_by: [id_agent, dt_action]
-    business_context_activity:
-      merge_on: [id_business_context_activity]
-      z_order_by: [id_agent, dt_started]
     business_context:
       merge_on: [id_agent_business_context]
       z_order_by: [id_agent, ts_revision_started]

@@ -1,0 +1,74 @@
+---
+database_name: datalake_ebdb_agent_events
+table_name: capability_settings
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Historical event log of Demand Visit Management capability settings changes per agent.
+  Each row captures one CDC revision of a capability settings record, including business context,
+  passive lead receiver flag, and validity interval derived from consecutive updates.
+columns:
+  id_event_log:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.id
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.updated_at
+    description: |
+      Unique identifier for the capability settings revision, generated with XXHASH64
+      from the settings record id and update timestamp.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.capability.id_agent
+    description: Agent identifier linked to the capability through the EBDB capability registry.
+  id_capability:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.capability_id
+    description: Capability identifier to which the settings record belongs.
+  id_capability_settings:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.id
+    description: Identifier of the Demand Visit Management capability settings record in EBDB.
+  rev_type:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.op_cdc
+    description: CDC operation type that produced the revision.
+    categories:
+      CREATE: Insert of a new capability settings record.
+      READ: Snapshot read of an existing capability settings record.
+      UPDATE: Update of an existing capability settings record.
+      DELETE: Deletion of a capability settings record.
+  business_context:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.business_context
+    description: Business context in which the Demand Visit Management capability is configured.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.passive_lead_receiver
+    description: Indicates whether the agent is configured to receive demand visit leads passively.
+  is_current_status:
+    description: True when the row is the latest revision for the capability settings record.
+  is_last_update_by_date:
+    description: True when the row is the latest revision for the capability settings record on that calendar day.
+  ts_created:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.created_at
+    description: Timestamp when the capability settings record was created in EBDB.
+  ts_started:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.updated_at
+    description: Timestamp when this capability settings revision became effective.
+  ts_ended:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.updated_at
+    description: Timestamp when the next revision for the same settings record became effective; null for the latest row.
+  year:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.year
+    description: Partition year derived from the settings update timestamp.
+  month:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.month
+    description: Partition month derived from the settings update timestamp.
+  day:
+    lineage:
+      - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.day
+    description: Partition day derived from the settings update timestamp.

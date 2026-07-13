@@ -1,0 +1,27 @@
+---
+dag:
+  name: enrich_ebdb_agent_events
+  schedule_start_date: 2024, 1, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enriches EBDB agent event streams from transactional CDC sources for the Agents domain.
+      The pipeline materializes revision-level history tables that track how agent capabilities
+      and related settings change over time, enabling downstream accreditation and performance models
+      to reconstruct point-in-time agent behavior.
+
+      Current scope:
+      - Capability settings events: historical revisions of Demand Visit Management capability
+        settings per agent, including business context and passive lead receiver configuration.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  tables_customization:
+    capability_settings:
+      merge_on: [id_event_log]
+      partitions: [year, month, day]
+      z_order_by: [id_agent, ts_started]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

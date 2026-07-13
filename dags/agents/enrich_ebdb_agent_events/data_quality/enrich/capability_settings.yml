@@ -1,28 +1,37 @@
 ---
-table_name: datalake_agent_accreditation.business_context
+table_name: datalake_ebdb_agent_events.capability_settings
 alert_channel: "#agents-data-alarms"
 table_level_validations:
   has_size:
     greater_than: 0
     severity_level: Error
 column_level_validations:
-  id_agent_business_context:
+  id_event_log:
     is_complete:
       severity_level: Error
     is_unique:
       severity_level: Error
-  id_user:
+  id_agent:
     is_complete:
       severity_level: Error
-  business_context:
+  id_capability:
     is_complete:
       severity_level: Error
-  system_name:
+  id_capability_settings:
     is_complete:
       severity_level: Error
-    is_contained_in:
-      values: [AGENT_DOMAIN, LEGACY_SYSTEM]
+  rev_type:
+    is_complete:
       severity_level: Error
-  ts_revision_started:
+  ts_started:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
     is_complete:
       severity_level: Error

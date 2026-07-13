@@ -77,13 +77,17 @@ business_context AS (
         ax.month AS month,
         ax.day AS day
     FROM
-        datalake_ebdb_agents.business_context AS bc
+        datalake_agent_accreditation.business_context AS bc
     JOIN 
         datalake_quintoandar.aux_date AS ax
-            ON ax.date BETWEEN bc.dt_started AND bc.dt_ended
+            ON ax.date BETWEEN DATE(bc.ts_revision_started) AND DATE(bc.ts_revision_ended)
     WHERE 
         ax.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    GROUP BY ALL
+    GROUP BY
+        CAST(bc.id_user AS BIGINT),
+        ax.year,
+        ax.month,
+        ax.day
 )
 SELECT
     e.id_app,

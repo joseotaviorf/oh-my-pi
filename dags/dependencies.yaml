@@ -1534,9 +1534,13 @@ bietlejuice.enrich_agent:
 bietlejuice.enrich_agent_accreditation:
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served-aud:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types-aud:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent-external-reference:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-region-data-aud:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
+  - bietlejuice.enrich_ebdb_agent_events:load-enrich-capability-settings:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_agent_reports:
@@ -1580,7 +1584,7 @@ bietlejuice.enrich_alias:
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day
 bietlejuice.enrich_amplitude_agents_app:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
-  - bietlejuice.enrich_ebdb_agents:load-enrich-business-context:first-run-of-day
+  - bietlejuice.enrich_agent_accreditation:load-enrich-business-context:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
 bietlejuice.enrich_amplitude_inspections:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-inspection-budgetapproval-home-page-viewed-events:first-run-of-day
@@ -2462,9 +2466,11 @@ bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_partner:load-clean-affiliate-data:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
+bietlejuice.enrich_ebdb_agent_events:
+  - bietlejuice.ebdb_agent:load-clean-capability:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-demand-visit-management-capability-settings:first-run-of-day
 bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
-  - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-programs-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-region-data-aud:first-run-of-day
