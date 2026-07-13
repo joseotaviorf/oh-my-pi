@@ -1,63 +1,83 @@
 ---
 database_name: datalake_docx_clean
 table_name: person_document_info_aud
-owner: isabella.santos@quintoandar.com.br
+description: Historical record of changes to individual document fields and attachments.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
     - datalake_docx_raw.person_document_info_aud.id
+    description: Unique identifier of the document field or attachment.
   id_person_document:
     lineage:
     - datalake_docx_raw.person_document_info_aud.person_document_id
+    description: Parent document this field belongs to.
   id_input_source:
     lineage:
     - datalake_docx_raw.person_document_info_aud.input_source_id
+    description: Identifier of the system or record that provided this value.
   rev:
     lineage:
     - datalake_docx_raw.person_document_info_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
     - datalake_docx_raw.person_document_info_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
     - datalake_docx_raw.person_document_info_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   input_source_type:
     lineage:
     - datalake_docx_raw.person_document_info_aud.input_source_type
+    description: Type of system that provided the value.
   input_value_type:
     lineage:
     - datalake_docx_raw.person_document_info_aud.input_value_type
+    description: Data type of the stored value.
   validation_type:
     lineage:
     - datalake_docx_raw.person_document_info_aud.validation_type
+    description: Method used to validate this field.
   type:
     lineage:
     - datalake_docx_raw.person_document_info_aud.type
+    description: Whether this entry is a data attribute or a file attachment.
   status:
     lineage:
     - datalake_docx_raw.person_document_info_aud.status
+    description: Lifecycle status of the field.
   input_value:
     lineage:
     - datalake_docx_raw.person_document_info_aud.input_value
+    description: Stored value at this revision.
   input_type:
     lineage:
     - datalake_docx_raw.person_document_info_aud.input_type
+    description: Format of the stored value such as text, date, or file reference.
   validated_by:
     lineage:
     - datalake_docx_raw.person_document_info_aud.validated_by
+    description: Who or what performed the last validation.
   mod_input:
     lineage:
     - datalake_docx_raw.person_document_info_aud.input_mod
+    description: Whether the input value changed in this revision.
   mod_status:
     lineage:
     - datalake_docx_raw.person_document_info_aud.status_mod
+    description: Whether the field status changed in this revision.
   mod_type:
     lineage:
     - datalake_docx_raw.person_document_info_aud.type_mod
+    description: Whether the entry type changed in this revision.
   mod_person_document:
     lineage:
     - datalake_docx_raw.person_document_info_aud.person_document_mod
+    description: Whether the parent document changed in this revision.
   ts_last_validated:
     lineage:
     - datalake_docx_raw.person_document_info_aud.last_validated_at
+    description: Timestamp of the most recent validation review for this document field.

@@ -1,37 +1,50 @@
 database_name: datalake_docx_clean
 table_name: simulation
+description: Credit simulations run to estimate affordable rental guarantee packages for a user.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.simulation.id
+    description: Unique identifier of the simulation.
   id_simulation_user:
     lineage:
       - datalake_docx_raw.simulation.simulation_user_id
+    description: User who ran the simulation.
   version:
     lineage:
       - datalake_docx_raw.simulation.version
+    description: Version number used to detect concurrent updates.
   simulation_version:
     lineage:
       - datalake_docx_raw.simulation.simulation_version
+    description: Version of the simulation engine used.
   sharing_option:
     lineage:
       - datalake_docx_raw.simulation.sharing_option
+    description: Whether the user plans to rent alone, with others, or only co-tenants.
   result:
     lineage:
       - datalake_docx_raw.simulation.result
+    description: Overall credit simulation outcome (e.g. pre-approved, pre-rejected).
   max_package:
     lineage:
       - datalake_docx_raw.simulation.max_package
+    description: Maximum affordable rental package returned by the simulation.
   ts_calculated:
     lineage:
       - datalake_docx_raw.simulation.calculated_at
+    description: When the simulation result was calculated.
   ts_queried:
     lineage:
       - datalake_docx_raw.simulation.queried_at
+    description: When the external credit query was performed.
   ts_created:
     lineage:
       - datalake_docx_raw.simulation.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.simulation.updated_at
+    description: When this record was last modified.

@@ -108,3 +108,7 @@ columns:
   ts_load:
     description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
     lineage: []
+  dt_debt_due:
+    description: Calendar date associated with debt due in the financial workflow.
+    lineage:
+      - datalake_recupera_raw.complementary_records.dt_debt_due_date

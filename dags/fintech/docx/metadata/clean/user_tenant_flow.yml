@@ -1,19 +1,26 @@
 database_name: datalake_docx_clean
 table_name: user_tenant_flow
+description: Mapping of users to the tenant documentation experience they should see.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.user_tenant_flow.id
+    description: Unique identifier of the flow assignment.
   id_user:
     lineage:
       - datalake_docx_raw.user_tenant_flow.user_id
+    description: QuintoAndar platform user identifier.
   tenant_flow:
     lineage:
       - datalake_docx_raw.user_tenant_flow.tenant_flow
+    description: Documentation experience variant assigned to the user (e.g. legacy or new flow).
   ts_created:
     lineage:
       - datalake_docx_raw.user_tenant_flow.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.user_tenant_flow.updated_at
+    description: When this record was last modified.

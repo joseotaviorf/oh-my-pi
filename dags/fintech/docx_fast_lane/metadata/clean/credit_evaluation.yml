@@ -53,10 +53,6 @@ columns:
     description: Current status of the credit evaluation process
     lineage:
       - datalake_docx_raw.credit_evaluation.status
-  automatic:
-    description: Flag indicating if the evaluation was performed automatically
-    lineage:
-      - datalake_docx_raw.credit_evaluation.automatic
   type:
     description: Type of credit evaluation performed
     lineage:
@@ -77,3 +73,19 @@ columns:
     description: Timestamp when the credit evaluation was last updated
     lineage:
       - datalake_docx_raw.credit_evaluation.updated_at
+  is_automatic:
+    description: Indicates whether automatic applies to this financial record.
+    lineage:
+      - datalake_docx_raw.credit_evaluation.automatic
+  guarantee_factor:
+    description: Credit analysis attribute describing guarantee factor in the tenant underwriting workflow.
+    lineage: []
+  analysis_request_id:
+    description: Credit analysis attribute describing analysis request id in the tenant underwriting workflow.
+    lineage: []
+  pre_approved_limit:
+    description: Credit analysis attribute describing pre approved limit in the tenant underwriting workflow.
+    lineage: []
+  early_result_guarantee_type:
+    description: Credit analysis attribute describing early result guarantee type in the tenant underwriting workflow.
+    lineage: []

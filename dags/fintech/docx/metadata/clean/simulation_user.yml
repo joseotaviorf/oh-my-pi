@@ -1,28 +1,38 @@
 database_name: datalake_docx_clean
 table_name: simulation_user
+description: Contact profile of users who run credit simulations.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.simulation_user.id
+    description: Unique identifier of the simulation user profile.
   id_main:
     lineage:
       - datalake_docx_raw.simulation_user.main_id
+    description: QuintoAndar platform user identifier.
   name:
     lineage:
       - datalake_docx_raw.simulation_user.name
+    description: User's full name (PII).
   email:
     lineage:
       - datalake_docx_raw.simulation_user.email
+    description: User's email address (PII).
   telephone:
     lineage:
       - datalake_docx_raw.simulation_user.telephone
+    description: User's phone number (PII).
   version:
     lineage:
       - datalake_docx_raw.simulation_user.version
+    description: Version number used to detect concurrent updates.
   ts_created:
     lineage:
       - datalake_docx_raw.simulation_user.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.simulation_user.updated_at
+    description: When this record was last modified.

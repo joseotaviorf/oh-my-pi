@@ -102,14 +102,14 @@ columns:
     description: "Original Seu Barriga invoice. It is the PK (Primary Key) of the table."
     lineage:
       - datalake_recupera_raw.complementary_records_written_down.id_installment
-  day:
-    description: Day partition derived from the source event timestamp for incremental loading.
-    lineage: []
   ts_load:
     description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
     lineage: []
   year:
     description: Year partition derived from the source event timestamp for incremental loading.
+    lineage: []
+  day:
+    description: Day partition derived from the source event timestamp for incremental loading.
     lineage: []
   month:
     description: Month partition derived from the source event timestamp for incremental loading.

@@ -1,13 +1,18 @@
 database_name: datalake_docx_clean
 table_name: processed_message
+description: Record of messages already handled by a consumer, used to prevent duplicate processing.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_subscriber:
     lineage:
       - datalake_docx_raw.processed_message.subscriber_id
+    description: Name of the consumer that processed the message.
   id_message:
     lineage:
       - datalake_docx_raw.processed_message.message_id
+    description: Identifier of the message that was processed.
   ts_created:
     lineage:
       - datalake_docx_raw.processed_message.created_at
+    description: When the message was marked as processed.

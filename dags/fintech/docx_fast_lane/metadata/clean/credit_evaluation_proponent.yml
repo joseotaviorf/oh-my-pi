@@ -27,7 +27,7 @@ columns:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent.cpf
   occupation_area:
-    description: Area or field of occupation of the proponent
+    description: Credit analysis attribute describing occupation area in the tenant underwriting workflow.
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent.occupation_area
   status:
@@ -63,7 +63,7 @@ columns:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent.identity_number
   reference_type:
-    description: Type of reference for the proponent
+    description: Credit analysis attribute describing reference type in the tenant underwriting workflow.
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent.reference_type
   ts_created:
