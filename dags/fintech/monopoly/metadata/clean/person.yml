@@ -1,25 +1,37 @@
 database_name: datalake_monopoly_clean
 table_name: person
+description:
+  One row per person in the Fintech clean layer, sourced from
+  datalake_monopoly_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.person.id
+    description: Financial attribute representing id on the person dataset.
   id_external:
     lineage:
       - datalake_monopoly_raw.person.external_id
+    description: Identifier for the external referenced by this financial record.
   person_name:
     lineage:
       - datalake_monopoly_raw.person.name
+    description: Financial attribute representing person name on the person dataset.
   document_number:
     lineage:
       - datalake_monopoly_raw.person.document_number
+    description: Financial attribute representing document number on the person dataset.
   email:
     lineage:
       - datalake_monopoly_raw.person.email
+    description: Financial attribute representing email on the person dataset.
   ts_created:
     lineage:
       - datalake_monopoly_raw.person.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_monopoly_raw.person.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_paschoalotto_clean
 table_name: collection_actions
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: It represents the paschoalotto report 'RETORNO' that contains data about collection
 columns:
@@ -96,18 +96,18 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.tb_arquivo_ret.data_admissao
   ts_load:
-    description: ""
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
     lineage:
       - datalake_paschoalotto_raw.tb_arquivo_ret.ts_load
   year:
-    description: ""
+    description: Year partition derived from the source event timestamp for incremental loading.
     lineage:
       - datalake_paschoalotto_raw.tb_arquivo_ret.year
   month:
-    description: ""
+    description: Month partition derived from the source event timestamp for incremental loading.
     lineage:
       - datalake_paschoalotto_raw.tb_arquivo_ret.month
   day:
-    description: ""
+    description: Day partition derived from the source event timestamp for incremental loading.
     lineage:
       - datalake_paschoalotto_raw.tb_arquivo_ret.day

@@ -1,115 +1,162 @@
 database_name: datalake_monopoly_clean
 table_name: sale_revision
+description:
+  One row per sale revision in the Fintech clean layer, sourced from
+  datalake_monopoly_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.sale_revision.id
+    description: Financial attribute representing id on the sale_revision dataset.
   id_external_offer:
     lineage:
       - datalake_monopoly_raw.sale_revision.external_offer_id
+    description: Identifier for the external offer referenced by this financial record.
   id_state_external:
     lineage:
       - datalake_monopoly_raw.sale_revision.state_external_id
+    description: Identifier for the state external referenced by this financial record.
   id_house:
     lineage:
       - datalake_monopoly_raw.sale_revision.house_id
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   revision:
     lineage:
       - datalake_monopoly_raw.sale_revision.revision
+    description: Financial attribute representing revision on the sale_revision dataset.
   ledger_rule:
     lineage:
       - datalake_monopoly_raw.sale_revision.ledger_rule
+    description: Financial attribute representing ledger rule on the sale_revision dataset.
   category:
     lineage:
       - datalake_monopoly_raw.sale_revision.category
+    description: Financial attribute representing category on the sale_revision dataset.
   payment_method:
     lineage:
       - datalake_monopoly_raw.sale_revision.payment_method
   payment_model:
     lineage:
       - datalake_monopoly_raw.sale_revision.payment_model
+    description: Financial attribute representing payment model on the sale_revision dataset.
   address:
     lineage:
       - datalake_monopoly_raw.sale_revision.address
+    description: Financial attribute representing address on the sale_revision dataset.
   house_number:
     lineage:
       - datalake_monopoly_raw.sale_revision.house_number
+    description: Financial attribute representing house number on the sale_revision dataset.
   complement:
     lineage:
       - datalake_monopoly_raw.sale_revision.complement
+    description: Financial attribute representing complement on the sale_revision dataset.
   postal_code:
     lineage:
       - datalake_monopoly_raw.sale_revision.postal_code
+    description: Financial attribute representing postal code on the sale_revision dataset.
   status:
     lineage:
       - datalake_monopoly_raw.sale_revision.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   drive_folder:
     lineage:
       - datalake_monopoly_raw.sale_revision.drive_folder
+    description: Financial attribute representing drive folder on the sale_revision dataset.
   updated_by:
     lineage:
       - datalake_monopoly_raw.sale_revision.updated_by
+    description: Financial attribute representing updated by on the sale_revision dataset.
   cancellation_reason:
     lineage:
       - datalake_monopoly_raw.sale_revision.cancellation_reason
+    description: Financial attribute representing cancellation reason on the sale_revision dataset.
   errors:
     lineage:
       - datalake_monopoly_raw.sale_revision.errors
+    description: Financial attribute representing errors on the sale_revision dataset.
   down_payment_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.down_payment_amount
+    description: Financial attribute representing down payment amount on the sale_revision dataset.
   entry_payment_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.entry_payment_amount
+    description: Financial attribute representing entry payment amount on the sale_revision dataset.
   financed_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.financed_amount
+    description: Financial attribute representing financed amount on the sale_revision dataset.
   fgts_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.fgts_amount
+    description: Financial attribute representing fgts amount on the sale_revision dataset.
   cash_payment_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.cash_payment_amount
+    description: Financial attribute representing cash payment amount on the sale_revision dataset.
   total_payment_amount:
     lineage:
       - datalake_monopoly_raw.sale_revision.total_payment_amount
+    description: Financial attribute representing total payment amount on the sale_revision dataset.
   payment_method:
     lineage:
       - datalake_monopoly_raw.sale_revision.payment_method
+    description: Financial attribute representing payment method on the sale_revision dataset.
   brokerage_fee:
     lineage:
       - datalake_monopoly_raw.sale_revision.brokerage_fee
+    description: Financial attribute representing brokerage fee on the sale_revision dataset.
   brokerage_quintoandar_fee:
     lineage:
       - datalake_monopoly_raw.sale_revision.brokerage_quintoandar_fee
+    description: Financial attribute representing brokerage quintoandar fee on the sale_revision dataset.
   brokerage_estate_agent_fee:
     lineage:
       - datalake_monopoly_raw.sale_revision.brokerage_estate_agent_fee
+    description: Financial attribute representing brokerage estate agent fee on the sale_revision dataset.
   is_nf_reversion_succeeded:
     lineage:
       - datalake_monopoly_raw.sale_revision.nf_reversion_succeeded
+    description: Indicates whether nf reversion succeeded applies to this financial record.
   ts_event:
     lineage:
       - datalake_monopoly_raw.sale_revision.event_date_time
+    description: Timestamp when event occurred in the upstream fintech system.
   dt_notary_start:
     lineage:
       - datalake_monopoly_raw.sale_revision.notary_start_date
+    description: Calendar date associated with notary start in the financial workflow.
   ts_payment_allowed:
     lineage:
       - datalake_monopoly_raw.sale_revision.payment_allowed_at
+    description: Timestamp when payment allowed occurred in the upstream fintech system.
   dt_revenue_share_calculated:
     lineage:
       - datalake_monopoly_raw.sale_revision.revenue_share_calculated_at
+    description: Calendar date associated with revenue share calculated in the financial workflow.
   dt_nf_scheduled_to:
     lineage:
       - datalake_monopoly_raw.sale_revision.nf_scheduled_to
+    description: Calendar date associated with nf scheduled to in the financial workflow.
   dt_signature:
     lineage:
       - datalake_monopoly_raw.sale_revision.signature_date
+    description: Calendar date associated with signature in the financial workflow.
   ts_created:
     lineage:
       - datalake_monopoly_raw.sale_revision.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_cancelled:
     lineage:
       - datalake_monopoly_raw.sale_revision.cancelled_at
+    description: Timestamp when cancelled occurred in the upstream fintech system.
+  neighbourhood:
+    lineage: []
+    description: Financial attribute representing neighbourhood on the sale_revision dataset.
+  city:
+    lineage: []
+    description: Financial attribute representing city on the sale_revision dataset.

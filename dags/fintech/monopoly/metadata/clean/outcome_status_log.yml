@@ -1,25 +1,36 @@
 database_name: datalake_monopoly_clean
 table_name: outcome_status_log
+description:
+  One row per outcome status log in the Fintech clean layer, sourced from
+  datalake_monopoly_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.outcome_status_log.id
+    description: Financial attribute representing id on the outcome_status_log dataset.
   id_outcome:
     lineage:
       - datalake_monopoly_raw.outcome_status_log.outcome_id
-  id_external_payment_i:
-    lineage:
-      - datalake_monopoly_raw.outcome_status_log.external_payment_id
+    description: Identifier for the outcome referenced by this financial record.
   status:
     lineage:
       - datalake_monopoly_raw.outcome_status_log.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   updated_by:
     lineage:
       - datalake_monopoly_raw.outcome_status_log.updated_by
+    description: Financial attribute representing updated by on the outcome_status_log dataset.
   dt_occurence:
     lineage:
       - datalake_monopoly_raw.outcome_status_log.occurrence_date
+    description: Calendar date associated with occurence in the financial workflow.
   ts_created:
     lineage:
       - datalake_monopoly_raw.outcome_status_log.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
+  id_external_payment:
+    lineage: []
+    description: Identifier for the external payment referenced by this financial record.

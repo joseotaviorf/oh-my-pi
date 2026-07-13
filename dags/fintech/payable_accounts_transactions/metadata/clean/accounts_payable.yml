@@ -1,35 +1,50 @@
 ---
 database_name: datalake_payable_accounts_transactions_clean
 table_name: accounts_payable
+description:
+  One row per accounts payable in the Fintech clean layer, sourced from
+  datalake_payable_accounts_transactions_clean for payments, billing, and
+  financial operations reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   accrual_year_month:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.competencia
+    description: Financial attribute representing accrual year month on the accounts_payable dataset.
   bank_description:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.banco
+    description: Financial attribute representing bank description on the accounts_payable dataset.
   account_number:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.conta
+    description: Financial attribute representing account number on the accounts_payable dataset.
   dt_paid:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.pagamento
+    description: Calendar date associated with paid in the financial workflow.
   nf_file_description:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable._doc_nf
+    description: Financial attribute representing nf file description on the accounts_payable dataset.
   paid_amount:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.valor_bruto
+    description: Financial attribute representing paid amount on the accounts_payable dataset.
   payment_reason:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.revenue_and_cost_elements
+    description: Financial attribute representing payment reason on the accounts_payable dataset.
   payment_source:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.cost_and_profit_center
+    description: Financial attribute representing payment source on the accounts_payable dataset.
   supplier_description:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.fornecedor
+    description: Financial attribute representing supplier description on the accounts_payable dataset.
   ts_load:
     lineage:
       - datalake_payable_accounts_transactions_raw.accounts_payable.ts_load
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

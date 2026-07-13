@@ -1,25 +1,37 @@
 database_name: datalake_pixar_clean
 table_name: account
+description:
+  One row per account in the Fintech clean layer, sourced from
+  datalake_pixar_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_pixar_raw.account.id
+    description: Financial attribute representing id on the account dataset.
   pix_key:
     lineage:
       - datalake_pixar_raw.account.pix_key
+    description: Financial attribute representing pix key on the account dataset.
   requested_by:
     lineage:
       - datalake_pixar_raw.account.requested_by
+    description: Financial attribute representing requested by on the account dataset.
   bank_name:
     lineage:
       - datalake_pixar_raw.account.bank
+    description: Financial attribute representing bank name on the account dataset.
   bank_fee:
     lineage:
       - datalake_pixar_raw.account.bank_fee
+    description: Financial attribute representing bank fee on the account dataset.
   ts_created:
     lineage:
       - datalake_pixar_raw.account.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_pixar_raw.account.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

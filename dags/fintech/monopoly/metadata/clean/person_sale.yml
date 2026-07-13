@@ -1,16 +1,25 @@
 database_name: datalake_monopoly_clean
 table_name: person_sale
+description:
+  One row per person sale in the Fintech clean layer, sourced from
+  datalake_monopoly_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.person_sale.id
+    description: Financial attribute representing id on the person_sale dataset.
   id_person:
     lineage:
       - datalake_monopoly_raw.person_sale.person_id
+    description: Identifier for the person referenced by this financial record.
   id_sale:
     lineage:
       - datalake_monopoly_raw.person_sale.sale_id
+    description: Identifier for the sale referenced by this financial record.
   person_type:
     lineage:
       - datalake_monopoly_raw.person_sale.type
+    description: Financial attribute representing person type on the person_sale dataset.

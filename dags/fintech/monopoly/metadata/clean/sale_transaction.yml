@@ -1,46 +1,65 @@
 database_name: datalake_monopoly_clean
 table_name: sale_transaction
+description:
+  One row per sale transaction in the Fintech clean layer, sourced from
+  datalake_monopoly_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.sale_transaction.id
+    description: Financial attribute representing id on the sale_transaction dataset.
   id_sale:
     lineage:
       - datalake_monopoly_raw.sale_transaction.sale_id
+    description: Identifier for the sale referenced by this financial record.
   id_income_reference:
     lineage:
       - datalake_monopoly_raw.sale_transaction.income_reference_id
+    description: Identifier for the income reference referenced by this financial record.
   id_outcome_reference:
     lineage:
       - datalake_monopoly_raw.sale_transaction.outcome_reference_id
+    description: Identifier for the outcome reference referenced by this financial record.
   id_external_sync:
     lineage:
       - datalake_monopoly_raw.sale_transaction.external_sync_id
+    description: Identifier for the external sync referenced by this financial record.
   event:
     lineage:
       - datalake_monopoly_raw.sale_transaction.event
+    description: Financial attribute representing event on the sale_transaction dataset.
   description:
     lineage:
       - datalake_monopoly_raw.sale_transaction.description
+    description: Human-readable description of the financial transaction or ledger entry.
   status:
     lineage:
       - datalake_monopoly_raw.sale_transaction.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   reversed_by:
     lineage:
       - datalake_monopoly_raw.sale_transaction.reversed_by
+    description: Financial attribute representing reversed by on the sale_transaction dataset.
   dt_accounting:
     lineage:
       - datalake_monopoly_raw.sale_transaction.accounting_date
+    description: Calendar date associated with accounting in the financial workflow.
   ts_synced:
     lineage:
       - datalake_monopoly_raw.sale_transaction.synced_at
+    description: Timestamp when synced occurred in the upstream fintech system.
   ts_reversed:
     lineage:
       - datalake_monopoly_raw.sale_transaction.reversed_at
+    description: Timestamp when reversed occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_monopoly_raw.sale_transaction.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_monopoly_raw.sale_transaction.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

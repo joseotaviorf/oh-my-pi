@@ -1,16 +1,25 @@
 database_name: datalake_monopoly_clean
 table_name: sale
+description:
+  One row per sale in the Fintech clean layer, sourced from
+  datalake_monopoly_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.sale.id
+    description: Financial attribute representing id on the sale dataset.
   id_external_offer:
     lineage:
       - datalake_monopoly_raw.sale.external_offer_id
+    description: Identifier for the external offer referenced by this financial record.
   current_revision:
     lineage:
       - datalake_monopoly_raw.sale.current_revision
+    description: Financial attribute representing current revision on the sale dataset.
   ts_created:
     lineage:
       - datalake_monopoly_raw.sale.created_at
+    description: Timestamp when created occurred in the upstream fintech system.

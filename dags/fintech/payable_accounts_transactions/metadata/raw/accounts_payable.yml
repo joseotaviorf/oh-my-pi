@@ -1,4 +1,8 @@
 ---
-database_name: datalake_cap_clean
+database_name: datalake_payable_accounts_transactions_raw
 table_name: accounts_payable
+description:
+  One row per accounts payable record ingested from CAP (Contas a Pagar) Google
+  Sheets into the payable accounts transactions raw layer.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
