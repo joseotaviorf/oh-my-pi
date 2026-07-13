@@ -1,7 +1,11 @@
 ---
 database_name: metric_fintech
 table_name: active_gmv
-description: Gross Merchandise Value (GMV) of active VELO contracts per month.
+description: |
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Gross Merchandise Value (GMV) of active VELO contracts per month.
 domain: Fintech
 owner: guilherme.sacramento@quintoandar.com.br
 columns:

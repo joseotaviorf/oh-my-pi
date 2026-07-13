@@ -1,27 +1,34 @@
 database_name: datalake_monopoly_clean
 table_name: accounting_entry
-description: Accounting entries
+description: One row per accounting entry in the Fintech clean layer, sourced from datalake_monopoly_clean for payments, billing, and financial operations reporting.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.accounting_entry.id
+    description: Financial attribute representing id on the accounting_entry dataset.
   id_sale_transaction:
     lineage:
       - datalake_monopoly_raw.accounting_entry.sale_transaction_id
+    description: Identifier for the sale transaction referenced by this financial record.
   person_type:
     lineage:
       - datalake_monopoly_raw.accounting_entry.person_type
+    description: Financial attribute representing person type on the accounting_entry dataset.
   entry_type:
     lineage:
       - datalake_monopoly_raw.accounting_entry.type
+    description: Financial attribute representing entry type on the accounting_entry dataset.
   credit:
     lineage:
       - datalake_monopoly_raw.accounting_entry.credit
+    description: Financial attribute representing credit on the accounting_entry dataset.
   debit:
     lineage:
       - datalake_monopoly_raw.accounting_entry.debit
+    description: Financial attribute representing debit on the accounting_entry dataset.
   ts_created:
     lineage:
       - datalake_monopoly_raw.accounting_entry.created_at
+    description: Timestamp when created occurred in the upstream fintech system.

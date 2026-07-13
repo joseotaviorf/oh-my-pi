@@ -1,31 +1,45 @@
 database_name: datalake_monopoly_clean
 table_name: income_status_log
+description:
+  One row per income status log in the Fintech clean layer, sourced from
+  datalake_monopoly_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.income_status_log.id
+    description: Financial attribute representing id on the income_status_log dataset.
   id_income:
     lineage:
       - datalake_monopoly_raw.income_status_log.income_id
+    description: Identifier for the income referenced by this financial record.
   status:
     lineage:
       - datalake_monopoly_raw.income_status_log.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   gateway_response:
     lineage:
       - datalake_monopoly_raw.income_status_log.gateway_response
+    description: Financial attribute representing gateway response on the income_status_log dataset.
   amount:
     lineage:
       - datalake_monopoly_raw.income_status_log.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   dt_expiration:
     lineage:
       - datalake_monopoly_raw.income_status_log.expiration_date
+    description: Calendar date associated with expiration in the financial workflow.
   dt_due:
     lineage:
       - datalake_monopoly_raw.income_status_log.due_date
+    description: Calendar date associated with due in the financial workflow.
   ts_occurrence:
     lineage:
       - datalake_monopoly_raw.income_status_log.occurrence_date
+    description: Timestamp when occurrence occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_monopoly_raw.income_status_log.created_at
+    description: Timestamp when created occurred in the upstream fintech system.

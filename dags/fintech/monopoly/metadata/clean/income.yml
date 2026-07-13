@@ -1,6 +1,6 @@
 database_name: datalake_monopoly_clean
 table_name: income
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Data from the income table containing income information and status details.
 columns:
@@ -25,15 +25,15 @@ columns:
     lineage:
       - datalake_monopoly_raw.income.event
   status:
-    description: Status of the income.
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_monopoly_raw.income.status
   amount:
-    description: Amount of the income.
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
     lineage:
       - datalake_monopoly_raw.income.amount
   payer_info:
-    description: Information about the payer of the income.
+    description: Financial attribute representing payer info on the income dataset.
     lineage:
       - datalake_monopoly_raw.income.payer_info
   invoice_link:

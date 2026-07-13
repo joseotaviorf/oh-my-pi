@@ -1,6 +1,6 @@
 database_name: metric_fintech
 table_name: finance_metrics
-owner: juliana.hocihara@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: |
   QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.

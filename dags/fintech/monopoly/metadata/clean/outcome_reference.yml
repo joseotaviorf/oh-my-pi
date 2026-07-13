@@ -1,25 +1,37 @@
 database_name: datalake_monopoly_clean
 table_name: outcome_reference
+description:
+  One row per outcome reference in the Fintech clean layer, sourced from
+  datalake_monopoly_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_monopoly_raw.outcome_reference.id
+    description: Financial attribute representing id on the outcome_reference dataset.
   id_outcome:
     lineage:
       - datalake_monopoly_raw.outcome_reference.outcome_id
+    description: Identifier for the outcome referenced by this financial record.
   outcome_to:
     lineage:
       - datalake_monopoly_raw.outcome_reference.to
+    description: Financial attribute representing outcome to on the outcome_reference dataset.
   amount:
     lineage:
       - datalake_monopoly_raw.outcome_reference.amount
+    description: Monetary amount in Brazilian Reais for the financial transaction or balance.
   dt_outcome:
     lineage:
       - datalake_monopoly_raw.outcome_reference.outcome_date
+    description: Calendar date associated with outcome in the financial workflow.
   ts_created:
     lineage:
       - datalake_monopoly_raw.outcome_reference.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_monopoly_raw.outcome_reference.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
