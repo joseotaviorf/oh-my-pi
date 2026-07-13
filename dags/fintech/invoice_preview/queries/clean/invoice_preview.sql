@@ -12,6 +12,7 @@ SELECT
     CAST(NULLIF(REPLACE(REPLACE(amount, '.', ''), ',', '.'), '') AS double) AS paid_amount,
     CAST(NULLIF(`blocked`, '') AS BOOLEAN) AS is_blocked,
     CAST(NULLIF(`year-month`, '') AS bigint) AS entry_accrual_year_month,
+    NULLIF(invoice_filename, '') AS invoice_filename,
     ELEMENT_AT(SPLIT(invoice_filename, '(invoice-preview-)|(-\\d{{2}}\\.csv)' ), -2) AS invoice_accrual_year_month,
     TO_DATE(NULLIF(`due-date`, ''), 'y-M-d') AS dt_due,
     TO_DATE(NULLIF(`tenant-due-date`, ''), 'y-M-d') AS dt_tenant_due,

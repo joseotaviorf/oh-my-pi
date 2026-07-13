@@ -75,6 +75,10 @@ columns:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.year-month
     description: Financial attribute representing entry accrual year month on the invoice_preview dataset.
+  invoice_filename:
+    description: Source CSV filename of the SeuBarriga invoice preview export from which the row was loaded.
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.invoice_filename
   invoice_accrual_year_month:
     description: Accrual year-month parsed from the source invoice preview CSV filename.
     lineage:
