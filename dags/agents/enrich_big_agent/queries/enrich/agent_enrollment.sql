@@ -39,7 +39,7 @@ agent AS (
             ON GET_JSON_OBJECT(a.details, '$.partnerExternalId') = pa.id_partner 
     LEFT JOIN
         enrollment AS e
-        ON e.id_agent = a.id
+            ON e.id_agent = a.id
     LEFT JOIN 
         datalake_big_agent_clean.program AS p
             ON e.id_program = p.id
