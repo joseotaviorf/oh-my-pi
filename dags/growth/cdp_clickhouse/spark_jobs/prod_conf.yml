@@ -1,13 +1,19 @@
 ---
 clickhouse_host: g9ppcunt0z.us-east-1.vpce.aws.clickhouse.cloud
-clickhouse_protocol: https
 clickhouse_http_port: 8443
-clickhouse_ssl: true
-clickhouse_ssl_mode: NONE
 clickhouse_database: default
 clickhouse_source_table: events_api
 clickhouse_incremental_column: timestamp_dt
+target_path: https://5a-cdp-processed-data-prod.s3.us-east-1.amazonaws.com/repo/clean/events/{_partition_id}/data.parquet
+source_path: s3://5a-cdp-processed-data-prod/repo/clean/events
+s3_export_role_arn: arn:aws:iam::632540934959:role/event-gateway-clickhouse-s3-access
 partition_columns:
+  - egw_event_type
   - year
   - month
   - day
+  - hour
+event_types:
+  - USER_TRACKING
+  - TRANSACTIONAL
+  - COMMUNICATION

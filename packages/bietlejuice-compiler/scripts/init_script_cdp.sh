@@ -36,6 +36,16 @@ aws s3 cp "${ARTIFACTS_BUCKET}/bi-etl-ejuice/emr_init_script.sh" "${EMR_INIT_SCR
 chmod +x "${EMR_INIT_SCRIPT}"
 "${EMR_INIT_SCRIPT}" "$@"
 
+# Driver-side HTTP client for INSERT INTO FUNCTION s3(...) exports (load_cdp_clickhouse.py).
+# Not in emr_init_script.sh: only CDP ClickHouse DAGs need it; wheels install with --no-deps.
+CLICKHOUSE_CONNECT_VERSION="${CLICKHOUSE_CONNECT_VERSION:-0.7.0}"
+echo "BEGIN: Install clickhouse-connect (>=${CLICKHOUSE_CONNECT_VERSION})"
+if ! sudo pip3 install --no-cache-dir "clickhouse-connect>=${CLICKHOUSE_CONNECT_VERSION}"; then
+    echo "Error: pip install clickhouse-connect failed."
+    exit 1
+fi
+echo "END: Install clickhouse-connect"
+
 echo "BEGIN: Install ClickHouse Spark native connector JARs"
 
 download_clickhouse_jar() {

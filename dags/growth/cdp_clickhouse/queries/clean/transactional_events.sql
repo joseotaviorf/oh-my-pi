@@ -37,3 +37,5 @@ FROM
     datalake_cdp_raw.events_api AS raw
 WHERE
     raw.egw_event_type = 'TRANSACTIONAL'
+    AND MAKE_TIMESTAMP(raw.year, raw.month, raw.day, raw.hour, 0, 0) >= TIMESTAMP('{load_start_date}')
+    AND MAKE_TIMESTAMP(raw.year, raw.month, raw.day, raw.hour, 0, 0) < TIMESTAMP('{load_end_date}')

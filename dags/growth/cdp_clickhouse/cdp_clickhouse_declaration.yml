@@ -3,13 +3,15 @@ dag:
   owner: Data Growth
   schedule_start_date: 2026, 6, 1
   schedule_interval: 0 * * * *
+  max_active_runs: 1
   documentation:
     dag_purpose: |
-      Ingests CDP events from the ClickHouse events_api table into a single raw Delta
-      table, then builds transactional_events, user_tracking_events and comms_events in
-      clean by filtering egw_event_type and applying staging transforms. Loaded
-      incrementally every hour on timestamp_dt; raw deduplicates on event_id using
-      egw_updated_at. Clean schemas mirror customer-data-platform stream_*_clean workflows.
+      Incrementally ingests CDP events from the ClickHouse events_api table every hour
+      (UTC). Each run exports the previous three hours in one-hour windows: ClickHouse
+      writes Parquet directly to the processed-data bucket, Spark loads raw Delta
+      partitions with replaceWhere, then builds transactional_events, user_tracking_events
+      and comms_events in clean by filtering egw_event_type. Overlapping runs are safe
+      because only affected hourly raw partitions are overwritten.
 
 workflow:
   layer: raw
@@ -17,11 +19,11 @@ workflow:
   custom_schema: cdp
   load_spark_job: load_cdp_clickhouse
   default_extraction_type: incremental
-  default_partitions: [year, month, day]
+  default_partitions: [year, month, day, hour]
   execution_timeout_hours: 2
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S'), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end.strftime('%Y-%m-%d %H:%M:%S'), 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
@@ -34,7 +36,7 @@ workflow:
   tables_customization:
     events_api:
       extraction_type: incremental
-      partitions: [year, month, day]
+      partitions: [egw_event_type, year, month, day, hour]
     transactional_events:
       raw_table_dependency: events_api
       clean_extraction_type: incremental
