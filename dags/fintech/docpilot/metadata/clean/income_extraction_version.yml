@@ -1,75 +1,75 @@
 ---
 database_name: datalake_docpilot_clean
 table_name: income_extraction_version
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: "This table stores any modification in the income extraction processed by the DocPilot service. It is an audit table."
+description: Historical record of changes to income reading results, showing how outcomes, document types, extracted values, and errors changed over time.
 columns:
   id_external:
-    description: "The income extraction external source identifier"
+    description: Unique identifier of the income document in the upstream documentation system.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.id_external
   id_transaction:
-    description: "The transaction identifier"
+    description: Identifier of the versioning batch that recorded this change.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.transaction_id
   id_end_transaction:
-    description: "The end transaction identifier"
+    description: Identifier of the versioning batch that superseded this snapshot.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.end_transaction_id
   external_source:
-    description: "External source"
+    description: System that submitted the document for income reading.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.external_source
   processing_result:
-    description: "The processing result of an income extraction"
+    description: Overall outcome of the income reading at this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.processing_result
   documents_type:
-    description: "The type of processed document (ie bank statement or payslip)"
+    description: Kind of income document at this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.documents_type
   extracted_data:
-    description: "The data extracted from the submitted document"
+    description: Parsed income values and metadata at this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.extracted_data
   errors:
-    description: "If any error occured during the extraction process, its type will be recorded in this column"
+    description: Failure details recorded at this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.errors
   operation_type:
-    description: "The operation type"
+    description: Type of change applied (insert, update, or delete).
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.operation_type
   processing_result_mod:
-    description: "Indicates any modification in the processing result of an income extraction"
+    description: Whether the processing outcome changed in this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.processing_result_mod
   documents_type_mod:
-    description: "Indicates any modification in the type of processed documents (ie bank statement or payslip)"
+    description: Whether the document kind changed in this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.documents_type_mod
   extracted_data_mod:
-    description: "Indicates any modification in the data extracted from the submitted document"
+    description: Whether the parsed income data changed in this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.extracted_data_mod
   errors_mod:
-    description: "Indicates any modification in any error occured during the extraction process"
+    description: Whether the failure details changed in this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.errors_mod
   ts_created:
-    description: "The income_extraction creation date"
+    description: When the record was created at this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.ts_created
   ts_updated:
-    description: "The income_extraction update date"
+    description: When the record was last updated at this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.ts_updated
   ts_created_mod:
-    description: "The income_extraction_version creation date"
+    description: Whether the creation timestamp changed in this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.ts_created_mod
   ts_updated_mod:
-    description: "The income_extraction_version update date"
+    description: Whether the last update timestamp changed in this revision.
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.ts_updated_mod

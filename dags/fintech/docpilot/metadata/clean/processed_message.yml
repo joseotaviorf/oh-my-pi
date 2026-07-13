@@ -1,19 +1,19 @@
 ---
 database_name: datalake_docpilot_clean
 table_name: processed_message
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: "This table stores the messages received from the DocPilot worker"
+description: Record of queue messages already handled by the income extraction worker, used to avoid processing the same message twice.
 columns:
   id_subscriber:
-    description: "The subscriber identifier"
+    description: Name of the worker consumer that handled the queue message.
     lineage:
       - datalake_docpilot_raw.processedmessage.subscriber_id
   id_message:
-    description: "The message identifier"
+    description: Unique identifier of the queue message that was handled.
     lineage:
       - datalake_docpilot_raw.processedmessage.message_id
   ts_created:
-    description: "The processed_message creation date"
+    description: When the message was marked as processed.
     lineage:
       - datalake_docpilot_raw.processedmessage.created_at

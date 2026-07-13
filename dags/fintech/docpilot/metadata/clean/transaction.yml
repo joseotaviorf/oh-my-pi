@@ -1,19 +1,19 @@
 ---
 database_name: datalake_docpilot_clean
 table_name: transaction
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: "This table stores all the transactions in the DocPilot service. It can be used to identify the processing timestamp of a record in the audit table (income_extraction_version)"
+description: Versioning metadata for income reading changes, recording when each batch of changes was issued and which source originated it.
 columns:
   id:
-    description: "The transaction identifier"
+    description: Identifier of the versioning batch for income reading changes.
     lineage:
       - datalake_docpilot_raw.transaction.id
   remote_addr:
-    description: "The remote address"
+    description: Network address from which the change batch was recorded.
     lineage:
       - datalake_docpilot_raw.transaction.remote_addr
   ts_issued:
-    description: "The transaction creation date"
+    description: When the change batch was issued.
     lineage:
       - datalake_docpilot_raw.transaction.issued_at
