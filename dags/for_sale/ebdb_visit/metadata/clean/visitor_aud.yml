@@ -4,43 +4,59 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.id
+    - datalake_ebdb_raw.Visitor_AUD.id
+    description: Surrogate primary key of the visitor aud row in EBDB.
   id_booking:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.agendamento_id
+    - datalake_ebdb_raw.Visitor_AUD.agendamento_id
+    description: Foreign key referencing booking in the visit scheduling domain.
   id_user:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.usuario_id
+    - datalake_ebdb_raw.Visitor_AUD.usuario_id
+    description: Foreign key referencing user in the visit scheduling domain.
   id_visit:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.visit_id
+    - datalake_ebdb_raw.Visitor_AUD.visit_id
+    description: Foreign key referencing visit in the visit scheduling domain.
   company_uuid:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.company_uuid
+    - datalake_ebdb_raw.Visitor_AUD.company_uuid
+    description: Attribute company uuid for the visitor aud entity sourced from EBDB visit services.
   company_uuid_MOD:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.company_uuid_MOD
+    - datalake_ebdb_raw.Visitor_AUD.company_uuid_MOD
+    description: Attribute company uuid MOD for the visitor aud entity sourced from EBDB visit services.
   rev:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.rev
+    - datalake_ebdb_raw.Visitor_AUD.rev
+    description: Envers revision number that groups field changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.revtype
+    - datalake_ebdb_raw.Visitor_AUD.revtype
+    description: 'Envers revision type: 0 insert, 1 update, or 2 delete for the audited entity row.'
   absence_reason:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.absenceReason
+    - datalake_ebdb_raw.Visitor_AUD.absenceReason
+    description: Reason recorded when the visitor did not attend the booking.
   has_attended:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.attended
+    - datalake_ebdb_raw.Visitor_AUD.attended
+    description: Whether the visitor physically attended the scheduled visit.
   type:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.type
+    - datalake_ebdb_raw.Visitor_AUD.type
+    description: Classifier for the visitor role or booking subtype in the visit domain.
   current_response:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.current_response
+    - datalake_ebdb_raw.Visitor_AUD.current_response
+    description: Latest RSVP or response state from the visitor for the schedule.
   structured:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.structured
+    - datalake_ebdb_raw.Visitor_AUD.structured
+    description: Flag indicating whether the visit uses structured scheduling metadata in EBDB.
   user_type:
     lineage:
-      - datalake_ebdb_raw.Visitor_AUD.user_type
+    - datalake_ebdb_raw.Visitor_AUD.user_type
+    description: Role of the user linked to the visitor row in the booking context.
+owner: guilherme.rocha@quintoandar.com.br
+description: Envers audit of visitor rows linked to bookings in EBDB. Each row is one revision of attendance, type, and user linkage for a visit participant.

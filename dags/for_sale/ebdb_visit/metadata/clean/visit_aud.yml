@@ -4,49 +4,67 @@ domain: For Sale
 columns:
   id_visit:
     lineage:
-      - datalake_ebdb_raw.visita_aud.id
+    - datalake_ebdb_raw.visita_aud.id
+    description: Foreign key referencing visit in the visit scheduling domain.
   rev:
     lineage:
-      - datalake_ebdb_raw.visita_aud.rev
+    - datalake_ebdb_raw.visita_aud.rev
+    description: Envers revision number that groups field changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.visita_aud.revtype
+    - datalake_ebdb_raw.visita_aud.revtype
+    description: 'Envers revision type: 0 insert, 1 update, or 2 delete for the audited entity row.'
   id_agent:
     lineage:
-      - datalake_ebdb_raw.visita_aud.agente_id
+    - datalake_ebdb_raw.visita_aud.agente_id
+    description: Foreign key referencing agent in the visit scheduling domain.
   id_last_update_origin:
     lineage:
-      - datalake_ebdb_raw.visita_aud.origemultimaatualizacao_id
+    - datalake_ebdb_raw.visita_aud.origemultimaatualizacao_id
+    description: Source system or channel id for the last update to this record.
   is_fixed_agent:
     lineage:
-      - datalake_ebdb_raw.visita_aud.agentefixo
+    - datalake_ebdb_raw.visita_aud.agentefixo
+    description: Whether the booking keeps a fixed agent assignment across reschedules.
   id_real_estate_agent_rating:
     lineage:
-      - datalake_ebdb_raw.visita_aud.realestateagentrating_id
+    - datalake_ebdb_raw.visita_aud.realestateagentrating_id
+    description: Foreign key to agent rating captured for the visit context.
   status:
     lineage:
-      - datalake_ebdb_raw.visita_aud.status
+    - datalake_ebdb_raw.visita_aud.status
+    description: Operational status code of the booking or visit in EBDB at this revision.
   structured:
     lineage:
-      - datalake_ebdb_raw.visita.structured
+    - datalake_ebdb_raw.visita.structured
+    description: Flag indicating whether the visit uses structured scheduling metadata in EBDB.
   computed_status:
     lineage:
-      - datalake_ebdb_raw.visita.computed_status
+    - datalake_ebdb_raw.visita.computed_status
+    description: Derived visit status computed from booking and visit business rules.
   mod_structured:
     lineage:
-      - datalake_ebdb_raw.visita.structured_MOD
+    - datalake_ebdb_raw.visita.structured_MOD
+    description: Envers boolean flag indicating whether structured changed in this audit revision.
   mod_status:
     lineage:
-      - datalake_ebdb_raw.visita_aud.status_mod
+    - datalake_ebdb_raw.visita_aud.status_mod
+    description: Envers boolean flag indicating whether status changed in this audit revision.
   booking_type:
     lineage:
-      - datalake_ebdb_raw.visita_aud.bookingtype
+    - datalake_ebdb_raw.visita_aud.bookingtype
+    description: Scheduling modality or channel used when the visit was booked.
   id_house_rating:
     lineage:
-      - datalake_ebdb_raw.visita_aud.houserating_id
+    - datalake_ebdb_raw.visita_aud.houserating_id
+    description: Foreign key to house rating linked to the visit when collected.
   id_creation_origin:
     lineage:
-      - datalake_ebdb_raw.visita_aud.origemcriacao_id
+    - datalake_ebdb_raw.visita_aud.origemcriacao_id
+    description: Source system or channel id where the visit row was created.
   ts_visit:
     lineage:
-      - datalake_ebdb_raw.visita_aud.visit_datetime
+    - datalake_ebdb_raw.visita_aud.visit_datetime
+    description: Timestamp when the visit is scheduled to occur at the property.
+owner: guilherme.rocha@quintoandar.com.br
+description: Envers audit of consolidated visit (visita) records in EBDB. Each row is one revision of visit status, assigned agent, and structured visit attributes.

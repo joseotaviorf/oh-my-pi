@@ -4,40 +4,55 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.Visitor.id
+    - datalake_ebdb_raw.Visitor.id
+    description: Surrogate primary key of the visitor row in EBDB.
   id_booking:
     lineage:
-      - datalake_ebdb_raw.Visitor.agendamento_id
+    - datalake_ebdb_raw.Visitor.agendamento_id
+    description: Foreign key referencing booking in the visit scheduling domain.
   id_user:
     lineage:
-      - datalake_ebdb_raw.Visitor.usuario_id
+    - datalake_ebdb_raw.Visitor.usuario_id
+    description: Foreign key referencing user in the visit scheduling domain.
   id_visit:
     lineage:
-      - datalake_ebdb_raw.Visitor.visit_id
+    - datalake_ebdb_raw.Visitor.visit_id
+    description: Foreign key referencing visit in the visit scheduling domain.
   uuid_company:
     lineage:
-      - datalake_ebdb_raw.Visitor.company_uuid
+    - datalake_ebdb_raw.Visitor.company_uuid
+    description: UUID identifier for company in the visit access domain.
   absence_reason:
     lineage:
-      - datalake_ebdb_raw.Visitor.absenceReason
+    - datalake_ebdb_raw.Visitor.absenceReason
+    description: Reason recorded when the visitor did not attend the booking.
   has_attended:
     lineage:
-      - datalake_ebdb_raw.Visitor.attended
+    - datalake_ebdb_raw.Visitor.attended
+    description: Whether the visitor physically attended the scheduled visit.
   type:
     lineage:
-      - datalake_ebdb_raw.Visitor.type
+    - datalake_ebdb_raw.Visitor.type
+    description: Classifier for the visitor role or booking subtype in the visit domain.
   structured:
     lineage:
-      - datalake_ebdb_raw.Visitor.structured
+    - datalake_ebdb_raw.Visitor.structured
+    description: Flag indicating whether the visit uses structured scheduling metadata in EBDB.
   user_type:
     lineage:
-      - datalake_ebdb_raw.Visitor.user_type
+    - datalake_ebdb_raw.Visitor.user_type
+    description: Role of the user linked to the visitor row in the booking context.
   current_response:
     lineage:
-      - datalake_ebdb_raw.Visitor.current_response
+    - datalake_ebdb_raw.Visitor.current_response
+    description: Latest RSVP or response state from the visitor for the schedule.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.Visitor.atualizadoEm
+    - datalake_ebdb_raw.Visitor.atualizadoEm
+    description: Timestamp when the row was last updated in the EBDB operational database.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.Visitor.criadoEm
+    - datalake_ebdb_raw.Visitor.criadoEm
+    description: Timestamp when the row was created in the EBDB operational database.
+owner: guilherme.rocha@quintoandar.com.br
+description: Participants on a visit booking in EBDB (demand, supply, or broker roles). One row per visitor with attendance outcome and response state for a schedule.
