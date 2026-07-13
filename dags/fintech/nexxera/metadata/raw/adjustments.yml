@@ -1,25 +1,35 @@
 ---
 database_name: datalake_nexxera_raw
 table_name: adjustments
+description:
+  One row per adjustments from the Nexxera bank file exchange platform,
+  tracking CNAB remittances and return files for rental payment
+  reconciliation.
+owner: juliana.hociharao@quintoandar.com.br
 domain: Fintech
 columns:
   col_2:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 2 on the adjustments dataset.
   col_3:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 3 on the adjustments dataset.
   col_27:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 27 on the adjustments dataset.
   col_28:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 28 on the adjustments dataset.
   col_31:
     tags:
       - PII
       - Confidential
+    description: Financial attribute representing col 31 on the adjustments dataset.

@@ -1,180 +1,239 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: transaction
+owner: juliana.hociharao@quintoandar.com.br
 domain: Fintech
 description: "Table containing transaction data from nexxera files (id_registration = 11). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_registration:
     lineage:
       - datalake_nexxera_raw.transaction.col_1
+    description: Identifier for the registration referenced by this financial record.
   acquirer_name:
     lineage:
       - datalake_nexxera_raw.transaction.col_2
+    description: Financial attribute representing acquirer name on the transaction dataset.
   establishment_cnpj:
     lineage:
       - datalake_nexxera_raw.transaction.col_3
+    description: Financial attribute representing establishment cnpj on the transaction dataset.
   acquirer_pos:
     lineage:
       - datalake_nexxera_raw.transaction.col_4
+    description: Financial attribute representing acquirer pos on the transaction dataset.
   rv_summary_number:
     lineage:
       - datalake_nexxera_raw.transaction.col_5
+    description: Financial attribute representing rv summary number on the transaction dataset.
   nsu_cv:
     lineage:
       - datalake_nexxera_raw.transaction.col_6
+    description: Financial attribute representing nsu cv on the transaction dataset.
   id_authorization:
     lineage:
       - datalake_nexxera_raw.transaction.col_7
+    description: Identifier for the authorization referenced by this financial record.
   id_bank_deposit:
     lineage:
       - datalake_nexxera_raw.transaction.col_8
+    description: Identifier for the bank deposit referenced by this financial record.
   agency_deposit:
     lineage:
       - datalake_nexxera_raw.transaction.col_9
+    description: Financial attribute representing agency deposit on the transaction dataset.
   account_deposit:
     lineage:
       - datalake_nexxera_raw.transaction.col_10
+    description: Financial attribute representing account deposit on the transaction dataset.
   dt_sale:
     lineage:
       - datalake_nexxera_raw.transaction.col_11
+    description: Calendar date associated with sale in the financial workflow.
   installment_number:
     lineage:
       - datalake_nexxera_raw.transaction.col_12
+    description: Financial attribute representing installment number on the transaction dataset.
   total_installments:
     lineage:
       - datalake_nexxera_raw.transaction.col_13
+    description: Financial attribute representing total installments on the transaction dataset.
   installment_net_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_14
+    description: Financial attribute representing installment net amount on the transaction dataset.
   dt_installment_credit:
     lineage:
       - datalake_nexxera_raw.transaction.col_15
+    description: Calendar date associated with installment credit in the financial workflow.
   sale_type:
     lineage:
       - datalake_nexxera_raw.transaction.col_16
+    description: Financial attribute representing sale type on the transaction dataset.
   installment_gross_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_17
+    description: Financial attribute representing installment gross amount on the transaction dataset.
   id_reconciliation:
     lineage:
       - datalake_nexxera_raw.transaction.col_18
+    description: Identifier for the reconciliation referenced by this financial record.
   receipt_number:
     lineage:
       - datalake_nexxera_raw.transaction.col_19
+    description: Financial attribute representing receipt number on the transaction dataset.
   id_transaction:
     lineage:
       - datalake_nexxera_raw.transaction.col_20
+    description: Identifier for the transaction referenced by this financial record.
   id_bpag:
     lineage:
       - datalake_nexxera_raw.transaction.col_21
+    description: Identifier for the bpag referenced by this financial record.
   nsu_tef:
     lineage:
       - datalake_nexxera_raw.transaction.col_22
+    description: Financial attribute representing nsu tef on the transaction dataset.
   payment_status:
     lineage:
       - datalake_nexxera_raw.transaction.col_23
+    description: Financial attribute representing payment status on the transaction dataset.
   dt_sent_to_bank:
     lineage:
       - datalake_nexxera_raw.transaction.col_24
+    description: Calendar date associated with sent to bank in the financial workflow.
   flag:
     lineage:
       - datalake_nexxera_raw.transaction.col_25
+    description: Financial attribute representing flag on the transaction dataset.
   id_bank_grouper:
     lineage:
       - datalake_nexxera_raw.transaction.col_26
+    description: Identifier for the bank grouper referenced by this financial record.
   id_erp:
     lineage:
       - datalake_nexxera_raw.transaction.col_27
+    description: Identifier for the erp referenced by this financial record.
   card_number:
     lineage:
       - datalake_nexxera_raw.transaction.col_28
+    description: Financial attribute representing card number on the transaction dataset.
   installment_discount_value:
     lineage:
       - datalake_nexxera_raw.transaction.col_29
+    description: Financial attribute representing installment discount value on the transaction dataset.
   terminal_number:
     lineage:
       - datalake_nexxera_raw.transaction.col_30
+    description: Financial attribute representing terminal number on the transaction dataset.
   capture_type:
     lineage:
       - datalake_nexxera_raw.transaction.col_31
+    description: Financial attribute representing capture type on the transaction dataset.
   total_sale_gross_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_32
+    description: Financial attribute representing total sale gross amount on the transaction dataset.
   total_sale_discount_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_33
+    description: Financial attribute representing total sale discount amount on the transaction dataset.
   total_sale_net_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_34
+    description: Financial attribute representing total sale net amount on the transaction dataset.
   dt_summary_sale:
     lineage:
       - datalake_nexxera_raw.transaction.col_35
+    description: Calendar date associated with summary sale in the financial workflow.
   hr_summary_sale:
     lineage:
       - datalake_nexxera_raw.transaction.col_36
+    description: Financial attribute representing hr summary sale on the transaction dataset.
   discount_charge:
     lineage:
       - datalake_nexxera_raw.transaction.col_37
+    description: Financial attribute representing discount charge on the transaction dataset.
   id_bank_liquidated:
     lineage:
       - datalake_nexxera_raw.transaction.col_38
+    description: Identifier for the bank liquidated referenced by this financial record.
   agency_liquidated:
     lineage:
       - datalake_nexxera_raw.transaction.col_39
+    description: Financial attribute representing agency liquidated on the transaction dataset.
   account_liquidated:
     lineage:
       - datalake_nexxera_raw.transaction.col_40
+    description: Financial attribute representing account liquidated on the transaction dataset.
   credit_installment_gross_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_41
+    description: Financial attribute representing credit installment gross amount on the transaction dataset.
   credit_installment_discount_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_42
+    description: Financial attribute representing credit installment discount amount on the transaction dataset.
   credit_installment_net_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_43
+    description: Financial attribute representing credit installment net amount on the transaction dataset.
   reconciliation_status:
     lineage:
       - datalake_nexxera_raw.transaction.col_44
+    description: Financial attribute representing reconciliation status on the transaction dataset.
   information_origin:
     lineage:
       - datalake_nexxera_raw.transaction.col_45
+    description: Financial attribute representing information origin on the transaction dataset.
   id_acquirer:
     lineage:
       - datalake_nexxera_raw.transaction.col_46
+    description: Identifier for the acquirer referenced by this financial record.
   id_flag:
     lineage:
       - datalake_nexxera_raw.transaction.col_47
+    description: Identifier for the flag referenced by this financial record.
   tef_pos:
     lineage:
       - datalake_nexxera_raw.transaction.col_48
+    description: Financial attribute representing tef pos on the transaction dataset.
   launch_type:
     lineage:
       - datalake_nexxera_raw.transaction.col_49
+    description: Financial attribute representing launch type on the transaction dataset.
   installment_antecipation_discount_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_50
+    description: Financial attribute representing installment antecipation discount amount on the transaction dataset.
   installment_antecipation_net_amount:
     lineage:
       - datalake_nexxera_raw.transaction.col_51
+    description: Financial attribute representing installment antecipation net amount on the transaction dataset.
   id_hash:
     lineage:
       - datalake_nexxera_raw.transaction.col_52
+    description: Identifier for the hash referenced by this financial record.
   dt_deposit:
     lineage:
       - datalake_nexxera_raw.transaction.col_53
+    description: Calendar date associated with deposit in the financial workflow.
   manual_bank_reconciliation:
     lineage:
       - datalake_nexxera_raw.transaction.col_54
+    description: Financial attribute representing manual bank reconciliation on the transaction dataset.
   year:
     lineage:
       - datalake_nexxera_raw.transaction.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.transaction.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.transaction.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.transaction.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.

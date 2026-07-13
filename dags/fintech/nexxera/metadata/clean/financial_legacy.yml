@@ -1,81 +1,106 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: financial_legacy
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing legacy financial data from nexxera files (id_registration = 13). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_registration:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_1
+    description: Identifier for the registration referenced by this financial record.
   acquirer_name:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_2
+    description: Financial attribute representing acquirer name on the financial_legacy dataset.
   establishment_cnpj:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_3
+    description: Financial attribute representing establishment cnpj on the financial_legacy dataset.
   acquirer_pos:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_4
+    description: Financial attribute representing acquirer pos on the financial_legacy dataset.
   rv_summary_number:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_5
-  rv_summary_date:
-    lineage:
-      - datalake_nexxera_raw.financial_legacy.col_6
+    description: Financial attribute representing rv summary number on the financial_legacy dataset.
   installment_number:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_7
+    description: Financial attribute representing installment number on the financial_legacy dataset.
   dt_installment_credit:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_8
+    description: Calendar date associated with installment credit in the financial workflow.
   id_bank_deposit:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_9
+    description: Identifier for the bank deposit referenced by this financial record.
   agency_deposit:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_10
+    description: Financial attribute representing agency deposit on the financial_legacy dataset.
   account_deposit:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_11
+    description: Financial attribute representing account deposit on the financial_legacy dataset.
   summary_installment_gross_amount:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_12
+    description: Financial attribute representing summary installment gross amount on the financial_legacy dataset.
   summary_installment_discount:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_13
+    description: Financial attribute representing summary installment discount on the financial_legacy dataset.
   summary_installment_net_amount:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_14
+    description: Financial attribute representing summary installment net amount on the financial_legacy dataset.
   summary_installment_antecipation_discount:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_15
+    description: Financial attribute representing summary installment antecipation discount on the financial_legacy dataset.
   summary_installment_paid_amount:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_16
+    description: Financial attribute representing summary installment paid amount on the financial_legacy dataset.
   acquirer_code:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_17
+    description: Financial attribute representing acquirer code on the financial_legacy dataset.
   id_bank_grouper:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_18
+    description: Identifier for the bank grouper referenced by this financial record.
   voucher_flag:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_19
+    description: Financial attribute representing voucher flag on the financial_legacy dataset.
   id_sale_type:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_20
+    description: Identifier for the sale type referenced by this financial record.
   id_flag:
     lineage:
       - datalake_nexxera_raw.financial_legacy.col_21
+    description: Identifier for the flag referenced by this financial record.
   year:
     lineage:
       - datalake_nexxera_raw.financial_legacy.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.financial_legacy.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.financial_legacy.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.financial_legacy.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.
+  dt_rv_summary:
+    lineage: []
+    description: Calendar date associated with rv summary in the financial workflow.

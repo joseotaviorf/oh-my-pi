@@ -1,84 +1,114 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: financial_extracts_030e
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing all financial extract files from itaú and bradesco with layout 030 and segment 'e'. Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_bank:
     lineage:
       - datalake_nexxera_raw.ext.col_1
+    description: Identifier for the bank referenced by this financial record.
   id_service_batch:
     lineage:
       - datalake_nexxera_raw.ext.col_2
+    description: Identifier for the service batch referenced by this financial record.
   record_type:
     lineage:
       - datalake_nexxera_raw.ext.col_3
+    description: Financial attribute representing record type on the financial_extracts_030e dataset.
   sequencial_batch_register:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing sequencial batch register on the financial_extracts_030e dataset.
   segment_code:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing segment code on the financial_extracts_030e dataset.
   company_register_type:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company register type on the financial_extracts_030e dataset.
   company_register_number:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company register number on the financial_extracts_030e dataset.
   bank_insurance_code:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing bank insurance code on the financial_extracts_030e dataset.
   company_agency_number:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company agency number on the financial_extracts_030e dataset.
   company_agency_digit:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company agency digit on the financial_extracts_030e dataset.
   company_account_number:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company account number on the financial_extracts_030e dataset.
   company_account_digit:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company account digit on the financial_extracts_030e dataset.
   agency_account_digit:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing agency account digit on the financial_extracts_030e dataset.
   company_name:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing company name on the financial_extracts_030e dataset.
   cnab_reserved_field:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing cnab reserved field on the financial_extracts_030e dataset.
   dt_launch:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Calendar date associated with launch in the financial workflow.
   launch_value:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing launch value on the financial_extracts_030e dataset.
   launch_type:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing launch type on the financial_extracts_030e dataset.
   launch_category:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing launch category on the financial_extracts_030e dataset.
   bank_code:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing bank code on the financial_extracts_030e dataset.
   history_description:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing history description on the financial_extracts_030e dataset.
   document_number:
     lineage:
       - datalake_nexxera_raw.ext.col_4
+    description: Financial attribute representing document number on the financial_extracts_030e dataset.
   year:
     lineage:
       - datalake_nexxera_raw.ext.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.ext.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.ext.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.ext.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.
+  file_name:
+    lineage: []
+    description: Financial attribute representing file name on the financial_extracts_030e dataset.

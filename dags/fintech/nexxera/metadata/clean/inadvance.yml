@@ -1,87 +1,115 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: inadvance
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing inadvance data from nexxera files (id_registration = 10). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
   id_registration:
     lineage:
       - datalake_nexxera_raw.inadvance.col_1
+    description: Identifier for the registration referenced by this financial record.
   acquirer_name:
     lineage:
       - datalake_nexxera_raw.inadvance.col_2
+    description: Financial attribute representing acquirer name on the inadvance dataset.
   establishment_cnpj:
     lineage:
       - datalake_nexxera_raw.inadvance.col_3
+    description: Financial attribute representing establishment cnpj on the inadvance dataset.
   acquirer_pos:
     lineage:
       - datalake_nexxera_raw.inadvance.col_4
+    description: Financial attribute representing acquirer pos on the inadvance dataset.
   rv_summary_number:
     lineage:
       - datalake_nexxera_raw.inadvance.col_5
+    description: Financial attribute representing rv summary number on the inadvance dataset.
   dt_due:
     lineage:
       - datalake_nexxera_raw.inadvance.col_6
+    description: Calendar date associated with due in the financial workflow.
   summary_installment_number:
     lineage:
       - datalake_nexxera_raw.inadvance.col_7
+    description: Financial attribute representing summary installment number on the inadvance dataset.
   dt_credit_installment:
     lineage:
       - datalake_nexxera_raw.inadvance.col_8
+    description: Calendar date associated with credit installment in the financial workflow.
   id_bank_deposit:
     lineage:
       - datalake_nexxera_raw.inadvance.col_9
+    description: Identifier for the bank deposit referenced by this financial record.
   agency_deposit:
     lineage:
       - datalake_nexxera_raw.inadvance.col_10
+    description: Financial attribute representing agency deposit on the inadvance dataset.
   account_deposit:
     lineage:
       - datalake_nexxera_raw.inadvance.col_11
+    description: Financial attribute representing account deposit on the inadvance dataset.
   inicial_antecipation_value:
     lineage:
       - datalake_nexxera_raw.inadvance.col_12
+    description: Financial attribute representing inicial antecipation value on the inadvance dataset.
   discount_antecipation_value:
     lineage:
       - datalake_nexxera_raw.inadvance.col_13
+    description: Financial attribute representing discount antecipation value on the inadvance dataset.
   credit_net_value:
     lineage:
       - datalake_nexxera_raw.inadvance.col_14
+    description: Financial attribute representing credit net value on the inadvance dataset.
   original_installment_net_value:
     lineage:
       - datalake_nexxera_raw.inadvance.col_15
+    description: Financial attribute representing original installment net value on the inadvance dataset.
   dt_summary_sale:
     lineage:
       - datalake_nexxera_raw.inadvance.col_16
+    description: Calendar date associated with summary sale in the financial workflow.
   original_installment_gross_value:
     lineage:
       - datalake_nexxera_raw.inadvance.col_17
+    description: Financial attribute representing original installment gross value on the inadvance dataset.
   discount_installment_gross_value:
     lineage:
       - datalake_nexxera_raw.inadvance.col_18
+    description: Financial attribute representing discount installment gross value on the inadvance dataset.
   acquirer_code:
     lineage:
       - datalake_nexxera_raw.inadvance.col_19
+    description: Financial attribute representing acquirer code on the inadvance dataset.
   conciliation_status:
     lineage:
       - datalake_nexxera_raw.inadvance.col_20
+    description: Financial attribute representing conciliation status on the inadvance dataset.
   id_flag:
     lineage:
       - datalake_nexxera_raw.inadvance.col_21
+    description: Identifier for the flag referenced by this financial record.
   total_installments:
     lineage:
       - datalake_nexxera_raw.inadvance.col_22
+    description: Financial attribute representing total installments on the inadvance dataset.
   sale_type:
     lineage:
       - datalake_nexxera_raw.inadvance.col_23
+    description: Financial attribute representing sale type on the inadvance dataset.
   year:
     lineage:
       - datalake_nexxera_raw.inadvance.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.inadvance.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.inadvance.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.inadvance.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.

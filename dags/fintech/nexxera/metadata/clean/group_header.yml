@@ -1,6 +1,7 @@
 ---
 database_name: datalake_nexxera_clean
 table_name: group_header
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing all group headers data from nexxera files (id_registration = 00). Link to documentation: https://docs.google.com/document/d/1ZQpHdTUPdi_gxhroiyHkJRYX96XM_8Y1_ggSKte69ds/edit#heading=h.20gk8wb7m9e1"
 columns:
@@ -11,6 +12,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_1
       - datalake_nexxera_raw.sales.col_1
       - datalake_nexxera_raw.transaction.col_1
+    description: Identifier for the registration referenced by this financial record.
   group_name:
     lineage:
       - datalake_nexxera_raw.adjustments.col_2
@@ -18,6 +20,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_2
       - datalake_nexxera_raw.sales.col_2
       - datalake_nexxera_raw.transaction.col_2
+    description: Financial attribute representing group name on the group_header dataset.
   group_cnpj:
     lineage:
       - datalake_nexxera_raw.adjustments.col_3
@@ -25,6 +28,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_3
       - datalake_nexxera_raw.sales.col_3
       - datalake_nexxera_raw.transaction.col_3
+    description: Financial attribute representing group cnpj on the group_header dataset.
   van_name:
     lineage:
       - datalake_nexxera_raw.adjustments.col_4
@@ -32,6 +36,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_4
       - datalake_nexxera_raw.sales.col_4
       - datalake_nexxera_raw.transaction.col_4
+    description: Financial attribute representing van name on the group_header dataset.
   extract_type:
     lineage:
       - datalake_nexxera_raw.adjustments.col_5
@@ -39,6 +44,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_5
       - datalake_nexxera_raw.sales.col_5
       - datalake_nexxera_raw.transaction.col_5
+    description: Financial attribute representing extract type on the group_header dataset.
   layout_version:
     lineage:
       - datalake_nexxera_raw.adjustments.col_6
@@ -46,6 +52,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_6
       - datalake_nexxera_raw.sales.col_6
       - datalake_nexxera_raw.transaction.col_6
+    description: Financial attribute representing layout version on the group_header dataset.
   hr_file_generated:
     lineage:
       - datalake_nexxera_raw.adjustments.col_7
@@ -53,6 +60,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_7
       - datalake_nexxera_raw.sales.col_7
       - datalake_nexxera_raw.transaction.col_7
+    description: Financial attribute representing hr file generated on the group_header dataset.
   dt_file_generated:
     lineage:
       - datalake_nexxera_raw.adjustments.col_8
@@ -60,6 +68,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_8
       - datalake_nexxera_raw.sales.col_8
       - datalake_nexxera_raw.transaction.col_8
+    description: Calendar date associated with file generated in the financial workflow.
   dt_file_reference:
     lineage:
       - datalake_nexxera_raw.adjustments.col_9
@@ -67,6 +76,7 @@ columns:
       - datalake_nexxera_raw.inadvance.col_9
       - datalake_nexxera_raw.sales.col_9
       - datalake_nexxera_raw.transaction.col_9
+    description: Calendar date associated with file reference in the financial workflow.
   year:
     lineage:
       - datalake_nexxera_raw.adjustments.year
@@ -74,6 +84,7 @@ columns:
       - datalake_nexxera_raw.inadvance.year
       - datalake_nexxera_raw.sales.year
       - datalake_nexxera_raw.transaction.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_nexxera_raw.adjustments.month
@@ -81,6 +92,7 @@ columns:
       - datalake_nexxera_raw.inadvance.month
       - datalake_nexxera_raw.sales.month
       - datalake_nexxera_raw.transaction.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_nexxera_raw.adjustments.day
@@ -88,6 +100,7 @@ columns:
       - datalake_nexxera_raw.inadvance.day
       - datalake_nexxera_raw.sales.day
       - datalake_nexxera_raw.transaction.day
+    description: Day partition derived from the source event timestamp for incremental loading.
   ts_ingested:
     lineage:
       - datalake_nexxera_raw.adjustments.ts_ingested
@@ -95,3 +108,7 @@ columns:
       - datalake_nexxera_raw.inadvance.ts_ingested
       - datalake_nexxera_raw.sales.ts_ingested
       - datalake_nexxera_raw.transaction.ts_ingested
+    description: Timestamp when ingested occurred in the upstream fintech system.
+  source_file:
+    lineage: []
+    description: Financial attribute representing source file on the group_header dataset.
