@@ -1,16 +1,22 @@
 database_name: datalake_docx_clean
 table_name: folder_reference_type
+description: Reference list of relationship types between documentation folders.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.folder_reference_type.id
+    description: Unique identifier of the relationship type.
   name:
     lineage:
       - datalake_docx_raw.folder_reference_type.name
+    description: Relationship type name (e.g. tenant proponent, buyer, spouse).
   ts_created:
     lineage:
       - datalake_docx_raw.folder_reference_type.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.folder_reference_type.updated_at
+    description: When this record was last modified.

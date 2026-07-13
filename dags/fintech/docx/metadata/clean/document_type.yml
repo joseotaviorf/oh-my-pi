@@ -1,16 +1,22 @@
 database_name: datalake_docx_clean
 table_name: document_type
+description: Reference list of accepted document kinds for verification.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.document_type.id
+    description: Unique identifier of the document type.
   name:
     lineage:
       - datalake_docx_raw.document_type.name
+    description: Document kind name (e.g. ID card, proof of income, proof of address).
   ts_created:
     lineage:
       - datalake_docx_raw.document_type.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.document_type.updated_at
+    description: When this record was last modified.

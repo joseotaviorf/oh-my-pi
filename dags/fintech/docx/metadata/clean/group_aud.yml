@@ -1,48 +1,63 @@
 ---
 database_name: datalake_docx_clean
 table_name: group_aud
-owner: isabella.santos@quintoandar.com.br
+description: Historical record of changes to tenant or owner groups.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_group:
     lineage:
     - datalake_docx_raw.group_aud.id
+    description: Unique identifier of the group.
   uuid_user_person:
     lineage:
     - datalake_docx_raw.group_aud.user_person_uuid
+    description: Person identifier of the user who created the group.
   mod_uuid_user_person:
     lineage:
     - datalake_docx_raw.group_aud.user_person_uuid_mod
+    description: Whether the creator person identifier changed in this revision.
   rev:
     lineage:
     - datalake_docx_raw.group_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
     - datalake_docx_raw.group_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
     - datalake_docx_raw.group_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   type:
     lineage:
     - datalake_docx_raw.group_aud.type
+    description: Whether the group represents tenants or owners.
   mod_type:
     lineage:
     - datalake_docx_raw.group_aud.type_mod
+    description: Whether the group type changed in this revision.
   sub_type:
     lineage:
     - datalake_docx_raw.group_aud.sub_type
+    description: How the group is composed.
   mod_sub_type:
     lineage:
     - datalake_docx_raw.group_aud.sub_type_mod
+    description: Whether the group composition changed in this revision.
   mod_authorizations:
     lineage:
     - datalake_docx_raw.group_aud.authorizations_mod
+    description: Whether the authorizations changed in this revision.
   mod_members:
     lineage:
     - datalake_docx_raw.group_aud.members_mod
+    description: Whether the members changed in this revision.
   is_active:
     lineage:
     - datalake_docx_raw.group_aud.active
+    description: Whether the group is currently active.
   mod_is_active:
     lineage:
     - datalake_docx_raw.group_aud.active_mod
+    description: Whether the active status changed in this revision.

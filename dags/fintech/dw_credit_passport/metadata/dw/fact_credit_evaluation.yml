@@ -1,9 +1,9 @@
 ---
 database_name: dw_credit_passport
 table_name: fact_credit_evaluation
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: This fact table contains all the information related to a Credit Evaluation.
+description: One row per DocX credit evaluation, with credit and documentation policy outputs, pre-approval limits, and decision reason across Credit Passport, early credit, and proposal underwriting flows.
 columns:
   sk_credit_evaluation:
     description: Unique identifier of a credit evaluation from DocX.

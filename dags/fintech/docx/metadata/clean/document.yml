@@ -1,34 +1,49 @@
 database_name: datalake_docx_clean
 table_name: document
+description: Uploaded documents used for identity and income verification during rental guarantee underwriting.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.document.id
+    description: Unique identifier of the document.
   id_folder:
     lineage:
       - datalake_docx_raw.document.folder_id
+    description: Documentation folder that contains this document.
   id_document_context:
     lineage:
       - datalake_docx_raw.document.document_context_id
+    description: Business role for which the document was submitted (e.g. tenant, owner, buyer).
   id_context_external:
     lineage:
       - datalake_docx_raw.document.context_external_id
+    description: External business process identifier linked to the submission (e.g. proposal).
   id_document_type:
     lineage:
       - datalake_docx_raw.document.document_type_id
+    description: Kind of document submitted (e.g. ID card, proof of income).
   country_code:
     lineage:
       - datalake_docx_raw.document.country_code
+    description: Country whose document rules apply.
   attributes:
     lineage:
       - datalake_docx_raw.document.attributes
+    description: Structured metadata extracted from or associated with the document.
   attachments:
     lineage:
       - datalake_docx_raw.document.attachments
+    description: Files attached to the document, including page references.
   ts_created:
     lineage:
       - datalake_docx_raw.document.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.document.updated_at
+    description: When this record was last modified.
+  cpf:
+    lineage: []
+    description: Brazilian tax ID found in the document attributes (PII).

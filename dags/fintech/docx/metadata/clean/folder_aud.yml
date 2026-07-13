@@ -1,22 +1,30 @@
 database_name: datalake_docx_clean
 table_name: folder_aud
+description: Historical record of changes to documentation folders.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.folder_aud.id
+    description: Unique identifier of the documentation folder.
   id_external:
     lineage:
       - datalake_docx_raw.folder_aud.external_id
+    description: External business identifier the folder represents.
   id_folder_type:
     lineage:
       - datalake_docx_raw.folder_aud.folder_type_id
+    description: Category of entity the folder belongs to.
   rev:
     lineage:
       - datalake_docx_raw.folder_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
       - datalake_docx_raw.folder_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
       - datalake_docx_raw.folder_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.

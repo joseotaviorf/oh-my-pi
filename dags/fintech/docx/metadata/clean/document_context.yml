@@ -1,16 +1,22 @@
 database_name: datalake_docx_clean
 table_name: document_context
+description: Reference list of business roles in which documents can be submitted.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.document_context.id
+    description: Unique identifier of the document context.
   name:
     lineage:
       - datalake_docx_raw.document_context.name
+    description: Role name (e.g. tenant, owner, buyer, seller).
   ts_created:
     lineage:
       - datalake_docx_raw.document_context.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.document_context.updated_at
+    description: When this record was last modified.

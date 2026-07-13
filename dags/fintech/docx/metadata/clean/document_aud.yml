@@ -1,40 +1,54 @@
 database_name: datalake_docx_clean
 table_name: document_aud
+description: Historical record of changes to uploaded verification documents.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.document_aud.id
+    description: Unique identifier of the document.
   id_folder:
     lineage:
       - datalake_docx_raw.document_aud.folder_id
+    description: Documentation folder that contains this document.
   id_document_context:
     lineage:
       - datalake_docx_raw.document_aud.document_context_id
+    description: Business role for which the document was submitted.
   id_context_external:
     lineage:
       - datalake_docx_raw.document_aud.context_external_id
+    description: External business process identifier linked to the submission.
   id_document_type:
     lineage:
       - datalake_docx_raw.document_aud.document_type_id
+    description: Kind of document submitted.
   country_code:
     lineage:
       - datalake_docx_raw.document_aud.country_code
+    description: Country whose document rules apply.
   rev:
     lineage:
       - datalake_docx_raw.document_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
       - datalake_docx_raw.document_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
       - datalake_docx_raw.document_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   attributes:
     lineage:
       - datalake_docx_raw.document_aud.attributes
+    description: Structured metadata associated with the document at this revision.
   attachments:
     lineage:
       - datalake_docx_raw.document_aud.attachments
+    description: Files attached to the document at this revision.
   mod_country_code:
     lineage:
       - datalake_docx_raw.document_aud.country_code_mod
+    description: Whether the country changed in this revision.

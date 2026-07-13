@@ -1,31 +1,45 @@
 database_name: datalake_docx_clean
 table_name: folder_reference_aud
+description: Historical record of changes to folder relationships.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.folder_reference_aud.id
+    description: Unique identifier of the folder relationship.
   rev:
     lineage:
       - datalake_docx_raw.folder_reference_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   id_folder_reference_type:
     lineage:
       - datalake_docx_raw.folder_reference_aud.folder_reference_type_id
+    description: Type of relationship between the folders.
   id_source_folder:
     lineage:
       - datalake_docx_raw.folder_reference_aud.source_folder_id
+    description: Folder where the relationship originates.
   id_target_folder:
     lineage:
       - datalake_docx_raw.folder_reference_aud.target_folder_id
+    description: Folder the relationship points to.
   rev_type:
     lineage:
       - datalake_docx_raw.folder_reference_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
       - datalake_docx_raw.folder_reference_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   mod_ts_documentation_sent:
     lineage:
       - datalake_docx_raw.folder_reference_aud.documentation_send_date_mod
+    description: Whether the documentation send date changed in this revision.
   ts_documentation_sent:
     lineage:
       - datalake_docx_raw.folder_reference_aud.documentation_send_date
+    description: When documentation was sent for this relationship.
+  reference_properties:
+    lineage: []
+    description: Additional details about the relationship at this revision.

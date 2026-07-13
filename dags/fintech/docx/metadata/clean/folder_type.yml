@@ -1,16 +1,22 @@
 database_name: datalake_docx_clean
 table_name: folder_type
+description: Reference list of folder categories used to organize documentation.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.folder_type.id
+    description: Unique identifier of the folder category.
   name:
     lineage:
       - datalake_docx_raw.folder_type.name
+    description: Category name (e.g. user, person, company, house, mortgage).
   ts_created:
     lineage:
       - datalake_docx_raw.folder_type.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.folder_type.updated_at
+    description: When this record was last modified.

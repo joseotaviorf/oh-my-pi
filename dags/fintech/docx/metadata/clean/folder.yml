@@ -1,19 +1,26 @@
 database_name: datalake_docx_clean
 table_name: folder
+description: Containers that organize document submissions by user, person, property, or company.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_docx_raw.folder.id
+    description: Unique identifier of the documentation folder.
   id_external:
     lineage:
       - datalake_docx_raw.folder.external_id
+    description: External business identifier the folder represents (e.g. user or property ID).
   id_folder_type:
     lineage:
       - datalake_docx_raw.folder.folder_type_id
+    description: Category of entity the folder belongs to (e.g. user, person, house).
   ts_created:
     lineage:
       - datalake_docx_raw.folder.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_docx_raw.folder.updated_at
+    description: When this record was last modified.

@@ -1,35 +1,35 @@
 ---
 database_name: datalake_docx_clean
 table_name: group
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: 'This table stores the data about a group (i.e group of tenants, owners, etc) and its activities.'
+description: Groups of related people, such as tenant or owner parties, used in co-tenancy and credit flows.
 columns:
   id_group:
-    description: ''
+    description: Unique identifier of the group.
     lineage:
     - datalake_docx_raw.group.id
   user_person_uuid:
-    description: ''
+    description: Person identifier of the user who created the group.
     lineage:
     - datalake_docx_raw.group.user_person_uuid
   type:
-    description: ''
+    description: Whether the group represents tenants or owners.
     lineage:
     - datalake_docx_raw.group.type
   sub_type:
-    description: ''
+    description: How the group is composed (alone, with others, or only co-tenants).
     lineage:
     - datalake_docx_raw.group.sub_type
   is_active:
-    description: ''
+    description: Whether the group is currently active.
     lineage:
     - datalake_docx_raw.group.active
   ts_created:
-    description: ''
+    description: When this record was first created.
     lineage:
     - datalake_docx_raw.group.created_at
   ts_updated:
-    description: ''
+    description: When this record was last modified.
     lineage:
     - datalake_docx_raw.group.updated_at

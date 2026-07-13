@@ -1,8 +1,8 @@
 database_name: dw_credit_evers
 table_name: fact_ever_clean
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: This table contains all contracts with overdue invoices (delays) and the ever calculation. It reports Ever 'limpo'(only monthly and onboarding invoices), and Ever with agreement (contracts in which there is at least one agreement made to the invoice).
+description: One row per rental contract, MOB window, and days-past-due threshold (15-120), flagging ever delinquency from monthly and onboarding invoices only; excludes debt-forgiveness invoices and tracks broken collection agreements separately.
 columns:
   sk_contract:
     lineage:

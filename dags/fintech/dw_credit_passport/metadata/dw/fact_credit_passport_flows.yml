@@ -1,9 +1,9 @@
 ---
 database_name: dw_credit_passport
 table_name: fact_credit_passport_flows
-description: This fact table contains all the information related to Credit Passport flows, tracking the funnel steps from the start of an evaluation to contract signature.
+description: One row per DocX credit evaluation flagged as Credit Passport (city-scope events since 2025-06-02), with funnel step flags from evaluation start through contract signature; includes proposal-linked evaluations when present.
 domain: Fintech
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 columns:
   sk_credit_evaluation:
     description: Unique identifier of a credit evaluation from DocX.

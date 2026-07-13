@@ -1,8 +1,8 @@
 database_name: dw_credit_evers
 table_name: fact_credit_invoices
-owner: isabella.santos@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: This table contains all invoices from a contract. It can be used as an analytical database to retrieve detailed information about an invoice, such as the purpose, status, due date, payment date and more. The fact_credit_invoices also contains data about any agreement made, and if the agreement was broken.
+description: One row per tenant invoice from Retsuko for a rental contract, with due and payment attributes, collection negotiation flags, debt forgiveness, and fraud indicators; base table for ever delinquency metrics.
 columns:
   sk_invoice:
     lineage:
