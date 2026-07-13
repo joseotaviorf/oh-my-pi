@@ -601,7 +601,10 @@ def _save_to_enrich(
     s3_path = f"{write_location}{write_table_name}"
 
     SparkMetastoreService(spark_client).create_database(write_database_name)
-    DeltaLoader().load_table(
+    # Pass the live job session: DeltaLoader() defaults to the import-time
+    # BaseSparkContext.spark global, whose default catalog on EMR is not Glue —
+    # so the Delta files land in S3 but the table never registers in the catalog.
+    DeltaLoader(spark_client.conn).load_table(
         table_name=full_table_name,
         path=s3_path,
         source_df=result_df,
