@@ -1,37 +1,81 @@
 database_name: datalake_risk_and_mortgage_clean
 table_name: offer_pre_analysis
 domain: For Sale
+description: |
+  Association table linking a SalesFlow sales negotiation, an accepted purchase
+  offer, a buyer, a property, and a credit pre-analysis performed in the external
+  ISolve system. It represents the entry point of the mortgage financing flow: a
+  row is created when a credit pre-analysis is requested for an accepted offer,
+  and it is the anchor to which one or more bank credit proposals are then
+  attached (see `credit_proposal.id_offer_pre_analysis`). The risk-and-mortgage
+  service acts as the anti-corruption layer (ACL) between SalesFlow and banks,
+  either directly or through the intermediary system Atta.
 columns:
   id:
+    description: |
+      Internal unique identifier of the offer pre-analysis record.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.id
   id_buyer:
+    description: |
+      External identifier of the buyer in SalesFlow undergoing the credit
+      pre-analysis for the property purchase.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.buyer_id
   id_external_house:
+    description: |
+      External identifier of the property in SalesFlow's property catalog
+      associated with this pre-analysis.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.external_house_id
   id_offer:
+    description: |
+      Identifier of the accepted purchase offer in SalesFlow associated with
+      this pre-analysis.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.offer_id
   id_pre_analysis:
+    description: |
+      Identifier of the credit pre-analysis generated in the external ISolve
+      system when the pre-analysis request is created. This is the anchor point
+      from which bank credit proposals (see the `credit_proposal` table) are
+      subsequently created.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.pre_analysis_id
   id_sales_flow:
+    description: |
+      Identifier of the overall SalesFlow sales negotiation process (buyer,
+      seller, property, and payment) that this pre-analysis belongs to.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.sales_flow_id
   ts_created:
+    description: |
+      Timestamp when the offer pre-analysis record was created.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.created_at
   ts_updated:
+    description: |
+      Timestamp when the offer pre-analysis record was last updated.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.updated_at
   year:
+    description: |
+      Year partition column. Not part of the risk-and-mortgage application
+      schema; populated by the data ingestion pipeline rather than the
+      application itself.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.year
   month:
+    description: |
+      Month partition column. Not part of the risk-and-mortgage application
+      schema; populated by the data ingestion pipeline rather than the
+      application itself.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.month
   day:
+    description: |
+      Day partition column. Not part of the risk-and-mortgage application
+      schema; populated by the data ingestion pipeline rather than the
+      application itself.
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.day

@@ -1,46 +1,125 @@
 database_name: datalake_risk_and_mortgage_clean
 table_name: credit_proposal
 domain: For Sale
+description: |
+  Mortgage/credit financing proposal submitted to a bank for a buyer's property
+  purchase. The risk-and-mortgage service acts as the anti-corruption layer (ACL)
+  between SalesFlow and banks, either directly or through the intermediary system
+  Atta. One row represents a single bank's credit proposal for a given
+  `offer_pre_analysis` (buyer + property + credit pre-analysis); since financing is
+  typically quoted with more than one bank in parallel, a single pre-analysis can
+  have several concurrent credit_proposal rows (one per bank), and `is_accepted`
+  marks the one ultimately chosen. Used to track credit approval status, turnaround
+  time, and which bank/proposal a buyer ends up financing with.
 columns:
   id:
+    description: |
+      Internal unique identifier of the credit proposal record.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.id
   id_credit_proposal:
+    description: |
+      Identifier of this proposal in the external Atta/ISolve system that
+      originated it. This is not the internal primary key (see `id`); there is no
+      local table for this external entity, it references the proposal record on
+      Atta's side.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.credit_proposal_id
   id_credit_letter_document:
+    description: |
+      Reference to the credit letter document ("carta de crédito") associated with
+      this proposal, the formal document a bank issues after approving credit,
+      stating the approved amount and financing terms, which allows the buyer to
+      proceed with the purchase (contract signing, notary registration). No
+      current producer/consumer of this field was found in the risk-and-mortgage
+      source code, so it may be a legacy or currently unused reference to a
+      document management system.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.credit_letter_document_id
   id_offer_pre_analysis:
+    description: |
+      Foreign key to the `offer_pre_analysis` table. Identifies the buyer,
+      property, and credit pre-analysis pairing this proposal belongs to. A single
+      offer_pre_analysis can have multiple credit_proposal rows, one per bank
+      contacted for financing.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.offer_pre_analysis_id
   bank:
+    description: |
+      Financial institution to which this credit proposal was submitted.
+    categories:
+      ITAU: Itaú Unibanco
+      SANTANDER: Banco Santander
+      CAIXA: Caixa Econômica Federal (source enum stores this constant with the
+        internal value "CAIXA_ECONOMICA")
+      BRADESCO: Banco Bradesco
+      CAIXA_ECONOMICA: Caixa Econômica Federal (secondary constant for the same
+        bank; the source enum `BankSalesFlow` has an apparent naming
+        inconsistency/alias between CAIXA and CAIXA_ECONOMICA)
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.bank
   credit_letter_file_name:
+    description: |
+      File name of the credit letter ("carta de crédito") document referenced by
+      `id_credit_letter_document`. No current producer/consumer of this field was
+      found in the risk-and-mortgage source code, so it may be legacy or currently
+      unused.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.credit_letter_file_name
   status:
+    description: |
+      Current status of the bank's analysis of this credit proposal.
+    categories:
+      APROVADO: Aprovado (credit approved by the bank)
+      REPROVADO: Reprovado (credit rejected by the bank)
+      PROCESSANDO: Processando (analysis in progress; default value while the
+        proposal awaits a decision)
+      NAO_DEFINIDO: Não definido (fallback used when the status value received
+        from the external system does not match any known status)
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.status
   is_accepted:
+    description: |
+      Indicates whether this is the credit proposal chosen among the (potentially
+      several, one per bank) concurrent proposals for the same
+      offer_pre_analysis. Business rule: only one proposal per
+      offer_pre_analysis can be accepted (true) at a time.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.accepted
   dt_credit_started:
+    description: |
+      Start date of the validity/term of the credit approved under this
+      proposal, informed when the proposal is linked to its offer_pre_analysis.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.credit_start_date
   ts_created:
+    description: |
+      Timestamp when the credit proposal record was created.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.created_at
   ts_updated:
+    description: |
+      Timestamp when the credit proposal record was last updated.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.updated_at
   year:
+    description: |
+      Year partition column. Not part of the risk-and-mortgage application
+      schema; populated by the data ingestion pipeline rather than the
+      application itself.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.year
   month:
+    description: |
+      Month partition column. Not part of the risk-and-mortgage application
+      schema; populated by the data ingestion pipeline rather than the
+      application itself.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.month
   day:
+    description: |
+      Day partition column. Not part of the risk-and-mortgage application
+      schema; populated by the data ingestion pipeline rather than the
+      application itself.
     lineage:
       - datalake_risk_and_mortgage_raw.credit_proposal.day
