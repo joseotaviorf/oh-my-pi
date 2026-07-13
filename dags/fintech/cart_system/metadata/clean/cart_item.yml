@@ -1,75 +1,75 @@
 database_name: datalake_cart_system_clean
 table_name: cart_item
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: data from the cart item table
+description: Individual charge lines inside a cart, including amounts, parties, and
+  financial classification.
 columns:
   id:
-    description: Unique identifier of the cart item
+    description: Internal identifier of the cart line.
     lineage:
-      - datalake_cart_system_raw.cart_item.id
+    - datalake_cart_system_raw.cart_item.id
   id_cart:
-    description: Identifier of the related cart
+    description: Cart that contains this line.
     lineage:
-      - datalake_cart_system_raw.cart_item.cart_id
+    - datalake_cart_system_raw.cart_item.cart_id
   id_actor_from:
-    description: Identifier of the sender actor
+    description: Party that pays or sends the amount.
     lineage:
-      - datalake_cart_system_raw.cart_item.from_actor_id
+    - datalake_cart_system_raw.cart_item.from_actor_id
   id_actor_to:
-    description: Identifier of the recipient actor
+    description: Party that receives the amount.
     lineage:
-      - datalake_cart_system_raw.cart_item.to_actor_id
+    - datalake_cart_system_raw.cart_item.to_actor_id
   uuid_cart_item:
-    description: Unique UUID of the cart item
+    description: Stable public identifier of the cart line.
     lineage:
-      - datalake_cart_system_raw.cart_item.cart_item_uuid
+    - datalake_cart_system_raw.cart_item.cart_item_uuid
   description:
-    description: Text description of the cart item
+    description: Human-readable label shown for the charge line.
     lineage:
-      - datalake_cart_system_raw.cart_item.description
+    - datalake_cart_system_raw.cart_item.description
   actor_from_role:
-    description: Role of the sender actor
+    description: Role of the paying or sending party (e.g. tenant or landlord).
     lineage:
-      - datalake_cart_system_raw.cart_item.from_actor_role
+    - datalake_cart_system_raw.cart_item.from_actor_role
   actor_to_role:
-    description: Role of the recipient actor
+    description: Role of the receiving party (e.g. platform or partner).
     lineage:
-      - datalake_cart_system_raw.cart_item.to_actor_role
+    - datalake_cart_system_raw.cart_item.to_actor_role
   metadata:
-    description: Free form metadata
+    description: Additional structured attributes not mapped to dedicated columns.
     lineage:
-      - datalake_cart_system_raw.cart_item.metadata
-      - datalake_cart_system_raw.cart_item.slug
+    - datalake_cart_system_raw.cart_item.metadata
+    - datalake_cart_system_raw.cart_item.slug
   source:
-    description: Source system identifier
-    lineage:
+    description: Originating system or channel that created the line.
+    lineage: null
   slug:
-    description: Slug identifier of the cart item
+    description: Product or fee catalog code for the charge line.
     lineage:
-      - datalake_cart_system_raw.cart_item.source
+    - datalake_cart_system_raw.cart_item.source
   financial_category:
-    description: Financial category of the item
+    description: Accounting category used to classify the charge.
     lineage:
-      - datalake_cart_system_raw.cart_item.financial_category
+    - datalake_cart_system_raw.cart_item.financial_category
   amount:
-    description: Monetary amount of the item
+    description: Monetary value of the charge line.
     lineage:
-      - datalake_cart_system_raw.cart_item.amount
+    - datalake_cart_system_raw.cart_item.amount
   dt_due:
-    description: Due date of the item
+    description: Date when payment for this line is due.
     lineage:
-      - datalake_cart_system_raw.cart_item.due_date
+    - datalake_cart_system_raw.cart_item.due_date
   dt_accrual_year_month:
-    description: Accrual year and month of the item
+    description: Accrual month attributed to this charge.
     lineage:
-      - datalake_cart_system_raw.cart_item.accrual_year_month
+    - datalake_cart_system_raw.cart_item.accrual_year_month
   ts_created:
-    description: Record creation timestamp
+    description: When the cart line was first created.
     lineage:
-      - datalake_cart_system_raw.cart_item.created_at
+    - datalake_cart_system_raw.cart_item.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: When the cart line was last changed.
     lineage:
-      - datalake_cart_system_raw.cart_item.updated_at
-
-
+    - datalake_cart_system_raw.cart_item.updated_at

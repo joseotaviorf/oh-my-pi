@@ -1,49 +1,50 @@
 ---
 database_name: datalake_collections_score_batch_inference_clean
 table_name: collections_score_v3_output
-owner: juliana.hocihara@quintoandar.com.br
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: "Collections score v3 batch inference output with contract, score and payment probability."
+description: Daily batch output of the collections scoring model, predicting payment
+  likelihood per rental contract.
 columns:
   id_contract:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
-    description: "Surrogate key of the contract from inference output (sk_contract in JSON)."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
+    description: Rental contract scored by the model.
   model_name:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.model_name
-    description: "Name of the model that produced the inference."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.model_name
+    description: Name of the scoring model that produced the result.
   model_version:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.model_service
-    description: "Version of the model that produced the inference."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.model_service
+    description: Deployed version of the scoring model.
   payment_probability:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
-    description: "Probability of payment from inference output (payment_probability in JSON)."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
+    description: Estimated probability that the contract will pay overdue amounts.
   score:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
-    description: "Collections score from inference output (score in JSON)."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
+    description: Integer collections risk score derived from model output.
   flag_source:
-    description: "Flag source of the inference."
+    description: Environment label for the inference run (production scoring).
   dt_reference:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
-    description: "Reference date of the inference from output (dt_reference in JSON)."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
+    description: Reference date used as input snapshot for the score.
   ts_inference:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.timestamp
-    description: "Timestamp when the inference was executed."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.timestamp
+    description: When the batch scoring job finished for this contract.
   year:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.year
-    description: "Year partition of the inference data."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.year
+    description: Year partition of the inference batch.
   month:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.month
-    description: "Month partition of the inference data."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.month
+    description: Month partition of the inference batch.
   day:
     lineage:
-      - datalake_collections_score_batch_inference_raw.collections_score_v3_output.day
-    description: "Day partition of the inference data."
+    - datalake_collections_score_batch_inference_raw.collections_score_v3_output.day
+    description: Day partition of the inference batch.

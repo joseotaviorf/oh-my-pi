@@ -1,47 +1,48 @@
 database_name: datalake_cart_system_clean
 table_name: cart
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: data from the new cart table
+description: Shopping carts that group chargeable items before checkout, tied to a
+  business entity and commercial context.
 columns:
   id:
-    description: Unique identifier of the cart
+    description: Internal identifier of the cart.
     lineage:
-      - datalake_cart_system_raw.cart.id
+    - datalake_cart_system_raw.cart.id
   id_business_entity:
-    description: Identifier of the related business entity
+    description: Business entity (e.g. contract or offer) that owns the cart.
     lineage:
-      - datalake_cart_system_raw.cart.business_entity_id
+    - datalake_cart_system_raw.cart.business_entity_id
   uuid_cart:
-    description: Unique UUID of the cart
+    description: Stable public identifier of the cart.
     lineage:
-      - datalake_cart_system_raw.cart.cart_uuid
+    - datalake_cart_system_raw.cart.cart_uuid
   business_context:
-    description: Business context of the cart
+    description: Commercial flow where the cart was created (e.g. rental offer or
+      condominium).
     lineage:
-      - datalake_cart_system_raw.cart.business_context
+    - datalake_cart_system_raw.cart.business_context
   status:
-    description: Current status of the cart
+    description: Cart lifecycle state (open, closed, canceled, or deleted).
     lineage:
-      - datalake_cart_system_raw.cart.status
+    - datalake_cart_system_raw.cart.status
   currency:
-    description: Currency code of the cart
+    description: Currency used for all items in the cart.
     lineage:
-      - datalake_cart_system_raw.cart.currency
+    - datalake_cart_system_raw.cart.currency
   source:
-    description: Source system identifier
+    description: Originating system or channel that created the cart.
     lineage:
-      - datalake_cart_system_raw.cart.source
+    - datalake_cart_system_raw.cart.source
   metadata:
-    description: Free form metadata
+    description: Additional structured attributes not mapped to dedicated columns.
     lineage:
-      - datalake_cart_system_raw.cart.metadata
+    - datalake_cart_system_raw.cart.metadata
   ts_created:
-    description: Record creation timestamp
+    description: When the cart was first created.
     lineage:
-      - datalake_cart_system_raw.cart.created_at
+    - datalake_cart_system_raw.cart.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: When the cart was last changed.
     lineage:
-      - datalake_cart_system_raw.cart.updated_at
-
-
+    - datalake_cart_system_raw.cart.updated_at

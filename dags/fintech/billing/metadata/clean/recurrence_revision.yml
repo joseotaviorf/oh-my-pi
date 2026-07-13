@@ -1,41 +1,43 @@
 database_name: datalake_billing_clean
 table_name: recurrence_revision
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the recurrence revision table containing revision details, currency information, and payment terms
+description: Versioned terms of a recurring charge plan, including currency and payment
+  timing rules.
 columns:
   id:
-    description: Unique identifier of the recurrence revision record
+    description: Internal identifier of the recurrence terms version.
     lineage:
-      - datalake_billing_raw.recurrence_revision.id
+    - datalake_billing_raw.recurrence_revision.id
   id_recurrence:
-    description: Identifier of the related recurrence
+    description: Recurring charge plan these terms belong to.
     lineage:
-      - datalake_billing_raw.recurrence_revision.recurrence_id
+    - datalake_billing_raw.recurrence_revision.recurrence_id
   revision:
-    description: Revision number of the recurrence
+    description: Sequential version number of the recurrence terms.
     lineage:
-      - datalake_billing_raw.recurrence_revision.revision
+    - datalake_billing_raw.recurrence_revision.revision
   currency:
-    description: Currency code for the recurrence
+    description: Currency used for all charges under this version.
     lineage:
-      - datalake_billing_raw.recurrence_revision.currency
+    - datalake_billing_raw.recurrence_revision.currency
   min_number_of_days_to_pay:
-    description: Minimum number of days required for payment
+    description: Minimum number of days allowed for payment after a charge is issued.
     lineage:
-      - datalake_billing_raw.recurrence_revision.min_number_of_days_to_pay
+    - datalake_billing_raw.recurrence_revision.min_number_of_days_to_pay
   type_of_min_number_days_to_pay:
-    description: Type classification for the minimum payment days
+    description: Rule that defines how the minimum payment period is counted.
     lineage:
-      - datalake_billing_raw.recurrence_revision.type_of_min_number_days_to_pay
+    - datalake_billing_raw.recurrence_revision.type_of_min_number_days_to_pay
   metadata:
-    description: Free form metadata associated with the revision
+    description: Additional structured attributes not mapped to dedicated columns.
     lineage:
-      - datalake_billing_raw.recurrence_revision.metadata
+    - datalake_billing_raw.recurrence_revision.metadata
   dt_start_charge:
-    description: Start date for charging the recurrence
+    description: First date from which the recurrence may start generating charges.
     lineage:
-      - datalake_billing_raw.recurrence_revision.start_charge_date
+    - datalake_billing_raw.recurrence_revision.start_charge_date
   ts_createed:
-    description: Record creation timestamp
+    description: When this terms version was first registered.
     lineage:
-      - datalake_billing_raw.recurrence_revision.created_at
+    - datalake_billing_raw.recurrence_revision.created_at

@@ -1,29 +1,31 @@
 database_name: datalake_billing_clean
 table_name: recurrence_phase
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the recurrence phase table containing phase information and revision details
+description: Tracks each billing phase within a recurring charge plan, linking the
+  phase to its parent recurrence and current configuration version.
 columns:
   id:
-    description: Unique identifier of the recurrence phase record
+    description: Internal identifier of the billing phase.
     lineage:
-      - datalake_billing_raw.recurrence_phase.id
+    - datalake_billing_raw.recurrence_phase.id
   id_recurrence:
-    description: Identifier of the related recurrence
+    description: Recurring charge plan this phase belongs to.
     lineage:
-      - datalake_billing_raw.recurrence_phase.recurrence_id
+    - datalake_billing_raw.recurrence_phase.recurrence_id
   uuid_ecurrence_phase:
-    description: UUID identifier of the recurrence phase
+    description: Stable public identifier of the billing phase.
     lineage:
-      - datalake_billing_raw.recurrence_phase.recurrence_phase_uuid
+    - datalake_billing_raw.recurrence_phase.recurrence_phase_uuid
   current_revision:
-    description: Current revision number of the phase
+    description: Active configuration version number for this phase.
     lineage:
-      - datalake_billing_raw.recurrence_phase.current_revision
+    - datalake_billing_raw.recurrence_phase.current_revision
   ts_created:
-    description: Record creation timestamp
+    description: When the billing phase was first registered.
     lineage:
-      - datalake_billing_raw.recurrence_phase.created_at
+    - datalake_billing_raw.recurrence_phase.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: When the billing phase was last changed.
     lineage:
-      - datalake_billing_raw.recurrence_phase.updated_at
+    - datalake_billing_raw.recurrence_phase.updated_at

@@ -1,45 +1,48 @@
 database_name: datalake_billing_clean
 table_name: recurrence_phase_execution
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the recurrence phase execution table containing execution details and status information
+description: Records each execution cycle that bills items for a phase revision, including
+  run status and accrual timing.
 columns:
   id:
-    description: Unique identifier of the phase execution record
+    description: Internal identifier of the phase execution run.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.id
+    - datalake_billing_raw.recurrence_phase_execution.id
   id_external:
-    description: External identifier for the execution
+    description: External reference used to correlate this run with downstream billing
+      systems.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.external_id
+    - datalake_billing_raw.recurrence_phase_execution.external_id
   id_recurrence_phase_revision:
-    description: Identifier of the related recurrence phase revision
+    description: Phase configuration version executed in this run.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.recurrence_phase_revision_id
+    - datalake_billing_raw.recurrence_phase_execution.recurrence_phase_revision_id
   status:
-    description: Current status of the phase execution
+    description: Execution state (e.g. created, open, closed, canceled, or failed).
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.status
+    - datalake_billing_raw.recurrence_phase_execution.status
   status_reason:
-    description: Reason associated with the execution status
+    description: Explanation when the execution did not complete successfully.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.status_reason
+    - datalake_billing_raw.recurrence_phase_execution.status_reason
   dt_accrual:
-    description: Accrual date of the execution
+    description: Accrual month billed by this execution run.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.accrual
+    - datalake_billing_raw.recurrence_phase_execution.accrual
   dt_opened:
-    description: Opening date of the execution
+    description: Calendar date when the execution was opened.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.opened_at
+    - datalake_billing_raw.recurrence_phase_execution.opened_at
   dt_closed:
-    description: Closing date of the execution
+    description: Calendar date when the execution was closed.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.closed_at
+    - datalake_billing_raw.recurrence_phase_execution.closed_at
   ts_created:
-    description: Record creation timestamp
+    description: When the execution run was first registered.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.created_at
+    - datalake_billing_raw.recurrence_phase_execution.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: When the execution run was last changed.
     lineage:
-      - datalake_billing_raw.recurrence_phase_execution.updated_at
+    - datalake_billing_raw.recurrence_phase_execution.updated_at

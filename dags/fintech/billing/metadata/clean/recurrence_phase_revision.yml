@@ -1,59 +1,59 @@
 database_name: datalake_billing_clean
 table_name: recurrence_phase_revision
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: data from the recurrence phase revision table from billing
+description: Versioned configuration of a billing phase, defining charge periodicity,
+  schedule boundaries, and lifecycle status.
 columns:
   id:
-    description: Unique identifier of the phase revision record
+    description: Internal identifier of the phase configuration version.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.id
+    - datalake_billing_raw.recurrence_phase_revision.id
   id_recurrence_phase:
-    description: Identifier of the recurrence phase of the revision
+    description: Billing phase this configuration version applies to.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.recurrence_phase_id
+    - datalake_billing_raw.recurrence_phase_revision.recurrence_phase_id
   revision:
-    description: Revision number of the phase
+    description: Sequential version number within the phase.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.revision
+    - datalake_billing_raw.recurrence_phase_revision.revision
   period:
-    description: Revision period such as monthly quarterly or interval
+    description: Billing periodicity for this version (e.g. monthly or quarterly).
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.period
+    - datalake_billing_raw.recurrence_phase_revision.period
   index:
-    description: Order index of the revision within the phase
+    description: Order of this version among sibling phases in the same recurrence.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.index
+    - datalake_billing_raw.recurrence_phase_revision.index
   status:
-    description: Current status of the revision
+    description: Whether this phase version is still active or has ended.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.status
+    - datalake_billing_raw.recurrence_phase_revision.status
   status_reason:
-    description: Reason associated with the revision status
+    description: Explanation when the phase version was ended or changed.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.status_reason
+    - datalake_billing_raw.recurrence_phase_revision.status_reason
   metadata:
-    description: Free form metadata
+    description: Additional structured attributes not mapped to dedicated columns.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.metadata
+    - datalake_billing_raw.recurrence_phase_revision.metadata
   dt_start_charge:
-    description: Start date of revision charge
+    description: First date from which charges are allowed under this version.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.start_charge
+    - datalake_billing_raw.recurrence_phase_revision.start_charge
   dt_end_charge:
-    description: End date of revision charge
+    description: Last date until which charges are allowed under this version.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.end_charge
+    - datalake_billing_raw.recurrence_phase_revision.end_charge
   dt_open:
-    description: Opening date of the revision
+    description: Calendar day of the month when the billing window opens.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.open_date
+    - datalake_billing_raw.recurrence_phase_revision.open_date
   dt_close:
-    description: Closing date of the revision
+    description: Calendar day of the month when the billing window closes.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.close_date
+    - datalake_billing_raw.recurrence_phase_revision.close_date
   ts_created:
-    description: Record creation timestamp
+    description: When this configuration version was first registered.
     lineage:
-      - datalake_billing_raw.recurrence_phase_revision.created_at
-
-
+    - datalake_billing_raw.recurrence_phase_revision.created_at

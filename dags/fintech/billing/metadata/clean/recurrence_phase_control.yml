@@ -1,39 +1,40 @@
 database_name: datalake_billing_clean
 table_name: recurrence_phase_control
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: data from the recurrence  control table 
+description: Controls the accrual window and lifecycle of a billing phase, indicating
+  whether charges are open, closed, or finished for a given period.
 columns:
   id:
-    description: Unique identifier of the record
+    description: Internal identifier of the phase control record.
     lineage:
-      - datalake_billing_raw.recurrence_phase_control.id
+    - datalake_billing_raw.recurrence_phase_control.id
   id_recurrence_phase:
-    description: Identifier of the related recurrence phase
+    description: Billing phase governed by this control window.
     lineage:
-      - datalake_billing_raw.recurrence_phase_control.recurrence_phase_id
+    - datalake_billing_raw.recurrence_phase_control.recurrence_phase_id
   status:
-    description: Current status of the recurrence phase control
+    description: Lifecycle state of the phase window (e.g. open, ended, outdated,
+      or inactive).
     lineage:
-      - datalake_billing_raw.recurrence_phase_control.status
+    - datalake_billing_raw.recurrence_phase_control.status
   dt_accrual:
-    description: Accrual date of the phase
+    description: Accrual month to which this control window applies.
     lineage:
-      - datalake_billing_raw.recurrence_phase_control.accrual
+    - datalake_billing_raw.recurrence_phase_control.accrual
   dt_open:
-    description: Opening date of the phase
+    description: First calendar date when charges may be opened for this accrual period.
     lineage:
-      - datalake_billing_raw.recurrence_phase_control.open_date
+    - datalake_billing_raw.recurrence_phase_control.open_date
   dt_close:
-    description: Closing date of the phase
+    description: Last calendar date when charges may be closed for this accrual period.
     lineage:
-      - datalake_billing_raw.recurrence_phase_control.close_date
+    - datalake_billing_raw.recurrence_phase_control.close_date
   ts_created:
-    description: Record creation timestamp
+    description: When the control record was first registered.
     lineage:
-      - datalake_billing_raw.recurrence_phase_control.created_at
+    - datalake_billing_raw.recurrence_phase_control.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: When the control record was last changed.
     lineage:
-      - datalake_billing_raw.recurrence_phase_control.updated_at
-
-
+    - datalake_billing_raw.recurrence_phase_control.updated_at
