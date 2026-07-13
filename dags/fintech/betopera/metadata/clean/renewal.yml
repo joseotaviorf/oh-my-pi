@@ -1,5 +1,6 @@
 database_name: datalake_betopera_clean
 table_name: renewal
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Insurance certificate renewal records for Betopera, tracking renewal periods and types for existing certificates
 columns:

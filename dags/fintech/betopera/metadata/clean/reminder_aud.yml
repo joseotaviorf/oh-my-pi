@@ -1,73 +1,101 @@
 database_name: datalake_betopera_clean
 table_name: reminder_aud
+description:
+  One row per reminder aud in the Fintech clean layer, sourced from
+  datalake_betopera_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_betopera_raw.reminder_aud.id
+    description: Financial attribute representing id on the reminder_aud dataset.
   rev:
     lineage:
       - datalake_betopera_raw.reminder_aud.rev
+    description: Financial attribute representing rev on the reminder_aud dataset.
   rev_end:
     lineage:
       - datalake_betopera_raw.reminder_aud.revend
+    description: Financial attribute representing rev end on the reminder_aud dataset.
   rev_type:
     lineage:
       - datalake_betopera_raw.reminder_aud.revtype
+    description: Financial attribute representing rev type on the reminder_aud dataset.
   id_certificate:
     lineage:
       - datalake_betopera_raw.reminder_aud.certificate_id
+    description: Identifier for the certificate referenced by this financial record.
   id_idempotency:
     lineage:
       - datalake_betopera_raw.reminder_aud.idempotency_id
+    description: Identifier for the idempotency referenced by this financial record.
   hash:
     lineage:
       - datalake_betopera_raw.reminder_aud.hash
+    description: Financial attribute representing hash on the reminder_aud dataset.
   status:
     lineage:
       - datalake_betopera_raw.reminder_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   event_type:
     lineage:
       - datalake_betopera_raw.reminder_aud.event_type
+    description: Financial attribute representing event type on the reminder_aud dataset.
   mod_id_certificate:
     lineage:
       - datalake_betopera_raw.reminder_aud.certificate_id_mod
+    description: Financial attribute representing mod id certificate on the reminder_aud dataset.
   mod_id_idempotency:
     lineage:
       - datalake_betopera_raw.reminder_aud.idempotency_id_mod
+    description: Financial attribute representing mod id idempotency on the reminder_aud dataset.
   mod_hash:
     lineage:
       - datalake_betopera_raw.reminder_aud.hash_mod
+    description: Financial attribute representing mod hash on the reminder_aud dataset.
   mod_status:
     lineage:
       - datalake_betopera_raw.reminder_aud.status_mod
+    description: Financial attribute representing mod status on the reminder_aud dataset.
   mod_dt_event:
     lineage:
       - datalake_betopera_raw.reminder_aud.event_date_mod
+    description: Financial attribute representing mod dt event on the reminder_aud dataset.
   mod_event_type:
     lineage:
       - datalake_betopera_raw.reminder_aud.event_type_mod
+    description: Financial attribute representing mod event type on the reminder_aud dataset.
   mod_created_at:
     lineage:
       - datalake_betopera_raw.reminder_aud.created_at_mod
+    description: Financial attribute representing mod created at on the reminder_aud dataset.
   mod_updated_at:
     lineage:
       - datalake_betopera_raw.reminder_aud.updated_at_mod
+    description: Financial attribute representing mod updated at on the reminder_aud dataset.
   dt_event:
     lineage:
       - datalake_betopera_raw.reminder_aud.event_date
+    description: Calendar date associated with event in the financial workflow.
   ts_created:
     lineage:
       - datalake_betopera_raw.reminder_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_betopera_raw.reminder_aud.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_betopera_raw.reminder_aud.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_betopera_raw.reminder_aud.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_betopera_raw.reminder_aud.day
+    description: Day partition derived from the source event timestamp for incremental loading.

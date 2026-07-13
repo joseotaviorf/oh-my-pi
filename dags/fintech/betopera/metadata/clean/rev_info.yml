@@ -1,19 +1,29 @@
 database_name: datalake_betopera_clean
 table_name: rev_info
+description:
+  One row per rev info in the Fintech clean layer, sourced from
+  datalake_betopera_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
     rev:
         lineage:
             - datalake_betopera_raw.revinfo.rev
+        description: Financial attribute representing rev on the rev_info dataset.
     ts_created:
         lineage:
             - datalake_betopera_raw.revinfo.revtstmp
+        description: Timestamp when created occurred in the upstream fintech system.
     year:
         lineage:
             - datalake_betopera_raw.revinfo.year
+        description: Year partition derived from the source event timestamp for incremental loading.
     month:
         lineage:
             - datalake_betopera_raw.revinfo.month
+        description: Month partition derived from the source event timestamp for incremental loading.
     day:
         lineage:
             - datalake_betopera_raw.revinfo.day
+        description: Day partition derived from the source event timestamp for incremental loading.

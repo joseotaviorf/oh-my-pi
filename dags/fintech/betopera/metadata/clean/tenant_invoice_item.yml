@@ -1,5 +1,6 @@
 database_name: datalake_betopera_clean
 table_name: tenant_invoice_item
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Clean tenant invoice item records from Betopera billing flows."
 columns:
@@ -54,7 +55,7 @@ columns:
   reference_year_month:
     lineage:
       - datalake_betopera_raw.tenant_invoice_item.reference_year_month
-    description: "Year-month reference that the tenant invoice item is associated with."
+    description: Financial attribute representing reference year month on the tenant_invoice_item dataset.
   dt_accrued:
     lineage:
       - datalake_betopera_raw.tenant_invoice_item.accrued_date

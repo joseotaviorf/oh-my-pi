@@ -1,40 +1,57 @@
 database_name: datalake_betopera_clean
 table_name: reminder
+description:
+  One row per reminder in the Fintech clean layer, sourced from
+  datalake_betopera_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_betopera_raw.reminder.id
+    description: Financial attribute representing id on the reminder dataset.
   id_certificate:
     lineage:
       - datalake_betopera_raw.reminder.certificate_id
+    description: Identifier for the certificate referenced by this financial record.
   id_idempotency:
     lineage:
       - datalake_betopera_raw.reminder.idempotency_id
+    description: Identifier for the idempotency referenced by this financial record.
   hash:
     lineage:
       - datalake_betopera_raw.reminder.hash
+    description: Financial attribute representing hash on the reminder dataset.
   status:
     lineage:
       - datalake_betopera_raw.reminder.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   event_type:
     lineage:
       - datalake_betopera_raw.reminder.event_type
+    description: Financial attribute representing event type on the reminder dataset.
   dt_event:
     lineage:
       - datalake_betopera_raw.reminder.event_date
+    description: Calendar date associated with event in the financial workflow.
   ts_created:
     lineage:
       - datalake_betopera_raw.reminder.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_betopera_raw.reminder.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_betopera_raw.reminder.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_betopera_raw.reminder.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_betopera_raw.reminder.day
+    description: Day partition derived from the source event timestamp for incremental loading.

@@ -1,40 +1,57 @@
 database_name: datalake_betopera_clean
 table_name: payment
+description:
+  One row per payment in the Fintech clean layer, sourced from
+  datalake_betopera_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
     id:
         lineage:
             - datalake_betopera_raw.payment.id
+        description: Financial attribute representing id on the payment dataset.
     id_certificate:
         lineage:
             - datalake_betopera_raw.payment.certificate_id
+        description: Identifier for the certificate referenced by this financial record.
     process_info:
         lineage:
             - datalake_betopera_raw.payment.process_info
+        description: Financial attribute representing process info on the payment dataset.
     amount:
         lineage:
             - datalake_betopera_raw.payment.amount
+        description: Monetary amount in Brazilian Reais for the financial transaction or balance.
     status:
         lineage:
             - datalake_betopera_raw.payment.status
+        description: Current lifecycle status of the financial entity in the upstream operational system.
     dt_start_installment:
         lineage:
             - datalake_betopera_raw.payment.installment_start_date
+        description: Calendar date associated with start installment in the financial workflow.
     dt_end_installment:
         lineage:
             - datalake_betopera_raw.payment.installment_end_date
+        description: Calendar date associated with end installment in the financial workflow.
     ts_created:
         lineage:
             - datalake_betopera_raw.payment.created_at
+        description: Timestamp when created occurred in the upstream fintech system.
     ts_updated:
         lineage:
             - datalake_betopera_raw.payment.updated_at
+        description: Timestamp when updated occurred in the upstream fintech system.
     year:
         lineage:
             - datalake_betopera_raw.payment.year
+        description: Year partition derived from the source event timestamp for incremental loading.
     month:
         lineage:
             - datalake_betopera_raw.payment.month
+        description: Month partition derived from the source event timestamp for incremental loading.
     day:
         lineage:
             - datalake_betopera_raw.payment.day
+        description: Day partition derived from the source event timestamp for incremental loading.

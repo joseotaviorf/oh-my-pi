@@ -1,5 +1,6 @@
 database_name: datalake_betopera_clean
 table_name: tenant_invoice_item_aud
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Audit history of Betopera tenant invoice items, including revision metadata and field-level modification flags."
 columns:

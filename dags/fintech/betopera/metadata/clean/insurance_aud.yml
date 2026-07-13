@@ -1,52 +1,73 @@
 database_name: datalake_betopera_clean
 table_name: insurance_aud
+description:
+  One row per insurance aud in the Fintech clean layer, sourced from
+  datalake_betopera_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
     id:
         lineage:
             - datalake_betopera_raw.insurance_aud.id
+        description: Financial attribute representing id on the insurance_aud dataset.
     id_idempotency:
         lineage:
             - datalake_betopera_raw.insurance_aud.idempotency_id
+        description: Identifier for the idempotency referenced by this financial record.
     rev:
         lineage:
             - datalake_betopera_raw.insurance_aud.rev
+        description: Financial attribute representing rev on the insurance_aud dataset.
     rev_end:
         lineage:
             - datalake_betopera_raw.insurance_aud.revend
+        description: Financial attribute representing rev end on the insurance_aud dataset.
     rev_type:
         lineage:
             - datalake_betopera_raw.insurance_aud.revtype
+        description: Financial attribute representing rev type on the insurance_aud dataset.
     source_type_code:
         lineage:
             - datalake_betopera_raw.insurance_aud.source_type_code
+        description: Financial attribute representing source type code on the insurance_aud dataset.
     status:
         lineage:
             - datalake_betopera_raw.insurance_aud.status
+        description: Current lifecycle status of the financial entity in the upstream operational system.
     version:
         lineage:
             - datalake_betopera_raw.insurance_aud.version
+        description: Financial attribute representing version on the insurance_aud dataset.
     mod_status:
         lineage:
             - datalake_betopera_raw.insurance_aud.status_mod
+        description: Financial attribute representing mod status on the insurance_aud dataset.
     mod_source_type_code:
         lineage:
             - datalake_betopera_raw.insurance_aud.source_type_code_mod
+        description: Financial attribute representing mod source type code on the insurance_aud dataset.
     mod_id_idempotency:
         lineage:
             - datalake_betopera_raw.insurance_aud.idempotency_id_mod
+        description: Financial attribute representing mod id idempotency on the insurance_aud dataset.
     ts_created:
         lineage:
             - datalake_betopera_raw.insurance_aud.created_at
+        description: Timestamp when created occurred in the upstream fintech system.
     ts_updated:
         lineage:
             - datalake_betopera_raw.insurance_aud.updated_at
+        description: Timestamp when updated occurred in the upstream fintech system.
     year:
         lineage:
             - datalake_betopera_raw.insurance_aud.year
+        description: Year partition derived from the source event timestamp for incremental loading.
     month:
         lineage:
             - datalake_betopera_raw.insurance_aud.month
+        description: Month partition derived from the source event timestamp for incremental loading.
     day:
         lineage:
             - datalake_betopera_raw.insurance_aud.day
+        description: Day partition derived from the source event timestamp for incremental loading.
