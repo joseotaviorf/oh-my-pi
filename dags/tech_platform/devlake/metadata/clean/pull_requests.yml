@@ -1,11 +1,11 @@
 database_name: datalake_devlake_clean
 table_name: pull_requests
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Standardized GitHub pull requests from DevLake. One row per pull request. Columns renamed to follow QuintoAndar naming conventions (id_ prefix for keys, ts_ for timestamps, is_ for booleans). Primary source for PR cycle time and engineering velocity analysis.
 columns:
   id_pr:
-    description: DevLake surrogate PR ID
+    description: Stable DevLake surrogate identifier for the GitHub pull request in the engineering metrics pipeline.
     lineage:
       - datalake_devlake_raw.pull_requests.id
   id_repo:
@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_devlake_raw.pull_requests.pull_request_key
   pr_title:
-    description: Pull request title
+    description: Human-readable GitHub pull request title captured by DevLake for search and velocity reporting.
     lineage:
       - datalake_devlake_raw.pull_requests.title
   pr_status:

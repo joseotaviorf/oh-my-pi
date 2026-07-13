@@ -1,6 +1,6 @@
 database_name: datalake_devlake_clean
 table_name: repos
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Standardized GitHub repositories from DevLake. One row per repository in DevLake scope. Serves as the canonical repository dimension source for all engineering metrics. The repo_url is included to support future natural-key joins from deployment tables (5a_deployments uses repo_url as a string key).
 columns:

@@ -1,6 +1,6 @@
 database_name: datalake_devlake_clean
 table_name: teams
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Standardized organizational hierarchy from DevLake, synced from Backstage. Self-referential table with two entity levels — LINE (department) and TEAM (squad). A TEAM row references its parent LINE via id_parent_team. Used in dw_devlake to build dim_team with a flattened LINE+TEAM structure.
 columns:

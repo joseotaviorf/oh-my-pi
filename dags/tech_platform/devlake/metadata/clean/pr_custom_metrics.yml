@@ -1,6 +1,6 @@
 database_name: datalake_devlake_clean
 table_name: pr_custom_metrics
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Standardized PR lead-time metrics from DevLake. One row per merged PR. Provides release_time (first commit to production, key DORA Lead Time metric) and deploy_time (merge to production). Joins to pull_requests via id_pr.
 columns:

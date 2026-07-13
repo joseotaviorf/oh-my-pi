@@ -1,6 +1,6 @@
 database_name: datalake_devlake_clean
 table_name: pull_request_commits
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: >
   Standardized CDC mirror of DevLake pull_request_commits. One row per

@@ -1,6 +1,6 @@
 database_name: datalake_devlake_clean
 table_name: users
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Standardized catalog user records from DevLake, synced from Backstage. One row per Backstage user in scope. The github_username column enables attribution of GitHub activity (PRs, commits) to organizational identities. user_chapter holds Backstage spec.chapter for functional breakdowns. Used in dw_devlake as the source for dim_user (role-playing for author, merger, and future assignee dimensions).
 columns:
