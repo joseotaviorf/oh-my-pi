@@ -1,37 +1,50 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: unico_check_document
+description: Identity document captured in a Unico biometric check.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.id
+    description: Primary key of the Unico check document.
   id_unico_check_process:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.unico_check_process_id
+    description: FK to the Unico check process.
   version:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.version
+    description: Optimistic-lock version of this Unico identity-document capture row.
   typed:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.typed
+    description: Flag indicating whether Unico treated the capture as a typed identity document.
   type:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.type
+    description: Identity document category returned by Unico (e.g. RG, CNH, passport).
   ocr:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.ocr
+    description: OCR payload extracted from the document.
   ts_created:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.created_at
+    description: Timestamp when the Unico identity-document capture was first stored.
   ts_updated:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.updated_at
+    description: Last updated timestamp.
   year:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.year
+    description: Partition year.
   month:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.month
+    description: Partition month.
   day:
     lineage:
       - datalake_arquivo_confidencial_raw.unico_check_document.day
+    description: Partition day.

@@ -1,28 +1,38 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: presumed_income_report_aud
+description: Audit history of presumed-income reports.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_arquivo_confidencial_raw.presumed_income_report_aud.id
+    description: Primary key of the presumed-income report.
   cpf:
     lineage:
       - datalake_arquivo_confidencial_raw.presumed_income_report_aud.cpf
+    description: Brazilian individual taxpayer registry number (CPF) (PII).
   rev:
     lineage:
       - datalake_arquivo_confidencial_raw.presumed_income_report_aud.rev
+    description: Envers revision id.
   rev_type:
     lineage:
       - datalake_arquivo_confidencial_raw.presumed_income_report_aud.revtype
+    description: Envers revision type.
   rev_end:
     lineage:
       - datalake_arquivo_confidencial_raw.presumed_income_report_aud.revend
+    description: Envers end revision.
   presumed_income:
     lineage:
       - datalake_arquivo_confidencial_raw.presumed_income_report_aud.presumed_income
+    description: Bureau-estimated monthly income.
   source:
     lineage:
       - datalake_arquivo_confidencial_raw.presumed_income_report_aud.source
+    description: Provider of the presumed income (e.g. Crivo, Neoway).
   attributes:
     lineage:
       - datalake_arquivo_confidencial_raw.presumed_income_report_aud.attributes
+    description: Raw provider payload for the presumed-income report.

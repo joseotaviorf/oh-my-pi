@@ -1,40 +1,54 @@
 database_name: datalake_ebdb_clean
 table_name: account_transaction
+description: Clean layer for EBDB checking account operations (OperacaoContaCorrente), one row per ledger transaction posted to a user account.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.id
+    description: Internal identifier of the account transaction in EBDB.
   ts_created:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.datacriacao
+    description: Timestamp when the transaction record was created in EBDB.
   description:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.descricao
+    description: Human-readable description of the ledger operation.
   type:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.tipo
+    description: Transaction type code that classifies the ledger operation (for example, commission or expense).
   value:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.valor
+    description: Monetary amount of the ledger operation in local currency.
   id_account:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.contacorrente_id
+    description: Identifier of the checking account (ContaCorrente) this operation belongs to.
   ts_transaction:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.dataoperacao
+    description: Timestamp when the ledger operation was executed.
   id_house:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.imovel_id
+    description: Property listing identifier associated with the transaction, when applicable.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.atualizadoem
+    description: Timestamp when the transaction record was last updated in EBDB.
   id_expense:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.despesa_id
+    description: Expense identifier linked to the transaction, when applicable.
   ts_payment:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.paymentdate
+    description: Timestamp when the payment related to the transaction was made.
   id_lead_campaign:
     lineage:
       - datalake_ebdb_raw.operacaocontacorrente.leadcampaign_id
+    description: Lead campaign identifier associated with the transaction, when applicable.

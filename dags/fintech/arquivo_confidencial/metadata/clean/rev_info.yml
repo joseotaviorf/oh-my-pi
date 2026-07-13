@@ -1,19 +1,26 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: rev_info
+description: Hibernate Envers revision timestamps for Arquivo Confidencial audits.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   rev:
     lineage:
       - datalake_arquivo_confidencial_raw.revinfo.rev
+    description: Envers revision id.
   ts_created:
     lineage:
       - datalake_arquivo_confidencial_raw.revinfo.revtstmp
+    description: Revision timestamp.
   year:
     lineage:
       - datalake_arquivo_confidencial_raw.revinfo.year
+    description: Partition year.
   month:
     lineage:
       - datalake_arquivo_confidencial_raw.revinfo.month
+    description: Partition month.
   day:
     lineage:
-        - datalake_arquivo_confidencial_raw.revinfo.day
+      - datalake_arquivo_confidencial_raw.revinfo.day
+    description: Partition day.

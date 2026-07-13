@@ -1,6 +1,7 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: request_tracker
-description: "Table containing information about request tracker"
+owner: isabella.santos@quintoandar.com.br
+description: Tracks each Arquivo Confidencial provider request (cache vs fetch).
 domain: Fintech
 columns:
   id:
@@ -18,7 +19,7 @@ columns:
   version:
     lineage:
       - datalake_arquivo_confidencial_raw.request_tracker.version
-    description: "Version of the request tracker"
+    description: Optimistic-lock version of this Arquivo Confidencial provider request row.
   is_cached:
     lineage:
       - datalake_arquivo_confidencial_raw.request_tracker.is_cached
@@ -38,12 +39,12 @@ columns:
   year:
     lineage:
       - datalake_arquivo_confidencial_raw.request_tracker.year
-    description: "Year of the request tracker"
+    description: Partition year.
   month:
     lineage:
       - datalake_arquivo_confidencial_raw.request_tracker.month
-    description: "Month of the request tracker"
+    description: Partition month.
   day:
     lineage:
       - datalake_arquivo_confidencial_raw.request_tracker.day
-    description: "Day of the request tracker"
+    description: Partition day.

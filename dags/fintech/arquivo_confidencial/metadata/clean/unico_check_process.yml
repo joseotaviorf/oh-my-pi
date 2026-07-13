@@ -9,7 +9,7 @@ description: |
   and exposes the full `attributes` JSON, which contains liveness, face match,
   status, score, and other biometric evaluation details.
 domain: Fintech
-owner: luana.silvia@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 
 columns:
   id:
@@ -43,11 +43,11 @@ columns:
     description: |
       JSON payload containing detailed metadata from the biometric check,
       including fields such as:
-        - liveness evaluation
-        - face match score
-        - process status
-        - risk score
-        - additional provider-level diagnostic information.
+      - liveness evaluation
+      - face match score
+      - process status
+      - risk score
+      - additional provider-level diagnostic information.
 
       This is the raw, untransformed structure received from Unico.
 

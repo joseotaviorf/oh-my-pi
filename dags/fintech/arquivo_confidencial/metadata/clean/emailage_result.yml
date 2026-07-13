@@ -1,31 +1,42 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: emailage_result
+description: EmailAge fraud-risk result per email, used by credit screening.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.id
+    description: Primary key of the EmailAge result.
   email:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.email
+    description: Email evaluated by EmailAge (PII).
   score:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.score
+    description: EmailAge fraud-risk score (eaScore).
   version:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.version
+    description: Optimistic-lock version of this EmailAge fraud-risk result row.
   ts_created:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.created_at
+    description: Timestamp when the EmailAge fraud-risk result was first stored.
   ts_updated:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.updated_at
+    description: Last updated timestamp.
   year:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.year
+    description: Partition year.
   month:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.month
+    description: Partition month.
   day:
     lineage:
       - datalake_arquivo_confidencial_raw.emailage_result.day
+    description: Partition day.

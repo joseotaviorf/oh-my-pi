@@ -1,16 +1,22 @@
 database_name: datalake_ebdb_clean
 table_name: account
+description: Clean layer for EBDB checking accounts (ContaCorrente), one row per user account used to track ledger operations.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.contacorrente.id
+    description: Internal identifier of the checking account in EBDB.
   id_user:
     lineage:
       - datalake_ebdb_raw.contacorrente.usuario_id
+    description: QuintoAndar user identifier who owns the checking account.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.contacorrente.atualizadoem
+    description: Timestamp when the account record was last updated in EBDB.
   ts_created:
     lineage:
       - datalake_ebdb_raw.contacorrente.criadoem
+    description: Timestamp when the checking account was created in EBDB.
