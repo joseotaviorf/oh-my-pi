@@ -1,35 +1,25 @@
 WITH house_listing_consultant AS (
-    SELECT 
-        hslc.id_house,
-        hslc.id_user,
-        hslc.consultant_type,
-        "SALE" AS business_context,
-        hslc.is_last_ciq_on_listing,
-        hslc.ts_enrollment_started
-    FROM
-        datalake_big_agent.house_sale_listing_consultant AS hslc
-    WHERE
-        hslc.id_user IS NOT NULL
-        OR hslc.consultant_type = 'Core'
-    UNION
-    SELECT 
-        hrlc.id_house,
-        hrlc.id_user,
-        hrlc.consultant_type,
-        "RENT" AS business_context,
-        hrlc.is_last_ciq_on_listing,
-        COALESCE(
-            hrlc.ts_enrollment_started, 
-            FIRST(hrlc.ts_listing_version_start) OVER (
-                PARTITION BY hrlc.id_house, COALESCE(hrlc.id_user, -1), hrlc.consultant_type 
-                ORDER BY hrlc.ts_listing_version_start ASC
+    SELECT
+        hlc.id_house,
+        hlc.id_user,
+        hlc.consultant_type,
+        hlc.business_context,
+        hlc.is_last_ciq_on_listing,
+        CASE
+            WHEN hlc.business_context = 'RENT' THEN COALESCE(
+                hlc.ts_enrollment_started,
+                FIRST(hlc.ts_listing_version_start) OVER (
+                    PARTITION BY hlc.id_house, hlc.business_context, COALESCE(hlc.id_user, -1), hlc.consultant_type
+                    ORDER BY hlc.ts_listing_version_start ASC
+                )
             )
-        ) AS ts_enrollment_started
+            ELSE hlc.ts_enrollment_started
+        END AS ts_enrollment_started
     FROM
-        datalake_big_agent.house_rent_listing_consultant AS hrlc
+        datalake_big_agent.house_listing_consultant AS hlc
     WHERE
-        hrlc.id_user IS NOT NULL
-        OR hrlc.consultant_type = 'Core'
+        hlc.id_user IS NOT NULL
+        OR hlc.consultant_type = 'Core'
 ),
 unpublished AS (
     SELECT 
@@ -92,13 +82,15 @@ first_contract_signed AS (
         cfl.id_house,
         cfl.id_user,
         cfl.business_context,
-        cfl.ts_contract_signed
+        cfl.ts_contract_signed,
+        ROW_NUMBER() OVER (
+            PARTITION BY cfl.id_house, cfl.id_user, cfl.business_context
+            ORDER BY cfl.ts_contract_signed
+        ) = 1 AS is_first_contract_signed
     FROM
         first_listing AS cfl
     WHERE
         cfl.ts_contract_signed IS NOT NULL
-    QUALIFY
-        1 = ROW_NUMBER() OVER (PARTITION BY cfl.id_house, cfl.id_user, cfl.business_context ORDER BY cfl.ts_contract_signed)
 ),
 house_first_listing AS (
     SELECT
@@ -123,10 +115,34 @@ house_first_listing AS (
             ON fcs.id_house = cfl.id_house
             AND fcs.id_user = cfl.id_user
             AND fcs.business_context = cfl.business_context
+            AND fcs.is_first_contract_signed IS TRUE
     WHERE
         fcs.id_house IS NULL
         OR fcs.ts_contract_signed = cfl.ts_contract_signed
     GROUP BY ALL
+),
+deduped_house_first_listing AS (
+    SELECT
+        hfl.id_house,
+        hfl.id_user,
+        hfl.consultant_type,
+        hfl.business_context,
+        hfl.status,
+        hfl.has_first_listing,
+        hfl.ts_first_listing,
+        hfl.ts_first_unpublished,
+        hfl.ts_contract_signed,
+        hfl.ts_enrollment_started,
+        hfl.ts_updated,
+        hfl.year,
+        hfl.month,
+        hfl.day,
+        ROW_NUMBER() OVER (
+            PARTITION BY hfl.id_house, hfl.business_context, hfl.consultant_type, hfl.ts_first_listing
+            ORDER BY hfl.ts_enrollment_started ASC, hfl.ts_updated DESC
+        ) = 1 AS is_house_first_listing
+    FROM
+        house_first_listing AS hfl
 )
 SELECT 
     hfl.id_house,
@@ -144,9 +160,6 @@ SELECT
     hfl.month,
     hfl.day
 FROM 
-    house_first_listing AS hfl
-QUALIFY
-    1 = ROW_NUMBER() OVER (
-        PARTITION BY hfl.id_house, hfl.business_context, hfl.consultant_type, hfl.ts_first_listing 
-        ORDER BY hfl.ts_enrollment_started ASC, hfl.ts_updated DESC
-    )
+    deduped_house_first_listing AS hfl
+WHERE
+    is_house_first_listing IS TRUE

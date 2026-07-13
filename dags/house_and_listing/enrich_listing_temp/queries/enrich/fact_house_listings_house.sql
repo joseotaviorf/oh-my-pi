@@ -100,8 +100,9 @@ LEFT JOIN datalake_ebdb_clean.partner_agent pa_b2b_online
 LEFT JOIN autonomous_agent_info aa_info
   ON aa_info.id_house = h.id
 LEFT JOIN
-    datalake_big_agent.house_rent_listing_consultant AS hlco
-        ON hlco.id_house_listing = hl.id_house_listing
+    datalake_big_agent.house_listing_consultant AS hlco
+        ON hlco.id_listing = hl.id_house_listing
+        AND hlco.business_context = 'RENT'
         AND hlco.is_last_ciq_on_listing = True
 WHERE
   lbc.id_house IS NULL

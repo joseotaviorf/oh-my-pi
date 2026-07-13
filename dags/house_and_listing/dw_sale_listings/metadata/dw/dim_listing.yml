@@ -23,7 +23,7 @@ columns:
     description: The Id of the current suggestion change record from the pricing model.
   consultant_type:
     lineage:
-    - datalake_big_agent.house_sale_listing_consultant.consultant_type
+    - datalake_big_agent.house_listing_consultant.consultant_type
     description:
       Shows which is the consultant type assigned to the listing.
     categories:
@@ -33,7 +33,7 @@ columns:
       "null": Listing does not have an associated consultant.
   first_consultant_type:
     lineage:
-    - datalake_big_agent.house_sale_listing_consultant.first_consultant_type
+    - datalake_big_agent.house_listing_consultant.first_consultant_type
     description: Shows which is the first consultant type assigned to the listing.
   status:
     lineage:
@@ -298,11 +298,11 @@ columns:
     description: Boolean that tells if the current sale price is determined by the Smart Price feature. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
   dt_consultant_started:
     lineage:
-    - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+    - datalake_big_agent.house_listing_consultant.dt_consultant_started
     description: Date when the listing was assigned to a consultant.
   ts_consultant_deleted:
     lineage:
-    - datalake_big_agent.house_sale_listing_consultant.ts_consultant_deleted
+    - datalake_big_agent.house_listing_consultant.ts_consultant_deleted
     description: Timestamp when the listing was unassigned from a consultant.
   ts_created:
     lineage:

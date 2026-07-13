@@ -3,7 +3,7 @@ SELECT
   sl.id_house AS sk_house,
   h.id_user AS sk_owner,
   h.id_company_hubspot AS sk_company_hubspot,
-  CAST(hslc.id_user AS BIGINT) AS sk_user_consultant,
+  CAST(hlco.id_user AS BIGINT) AS sk_user_consultant,
   h.id_region AS sk_region, 
   COALESCE(
     CASE
@@ -50,9 +50,10 @@ JOIN
   datalake_ebdb_listing.house AS h
     ON sl.id_house = h.id
 LEFT JOIN
-  datalake_big_agent.house_sale_listing_consultant AS hslc
-    ON sl.id_sale_listing = hslc.id_sale_listing
-    AND hslc.is_last_ciq_on_listing = True
+  datalake_big_agent.house_listing_consultant AS hlco
+    ON hlco.id_listing = sl.id_sale_listing
+    AND hlco.business_context = 'SALE'
+    AND hlco.is_last_ciq_on_listing = True
 LEFT JOIN
   datalake_company.company_sks AS cs_supply
     ON (

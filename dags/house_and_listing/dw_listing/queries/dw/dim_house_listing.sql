@@ -302,6 +302,7 @@ LEFT JOIN
     datalake_ebdb_listing.house_listing_fees AS hlf
         ON hl.sk_house_listing = hlf.id_house_listing
 LEFT JOIN
-    datalake_big_agent.house_rent_listing_consultant AS hlco
-        ON hlco.id_house_listing = hl.sk_house_listing
+    datalake_big_agent.house_listing_consultant AS hlco
+        ON hlco.id_listing = hl.sk_house_listing
+        AND hlco.business_context = 'RENT'
         AND hlco.is_last_ciq_on_listing IS TRUE

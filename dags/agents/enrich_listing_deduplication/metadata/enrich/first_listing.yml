@@ -7,18 +7,15 @@ owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.id_house
-      - datalake_big_agent.house_rent_listing_consultant.id_house
+      - datalake_big_agent.house_listing_consultant.id_house
     description: Unique identifier of the house.
   id_user:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.id_user
-      - datalake_big_agent.house_rent_listing_consultant.id_user
+      - datalake_big_agent.house_listing_consultant.id_user
     description: Unique identifier of the CIQ consultant user attached to the listing.
   consultant_type:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.consultant_type
-      - datalake_big_agent.house_rent_listing_consultant.consultant_type
+      - datalake_big_agent.house_listing_consultant.consultant_type
     description: CIQ profile (e.g., CIQ_FULL, CIQ_MANAGER).
   business_context:
     lineage:
@@ -47,38 +44,37 @@ columns:
     description: Timestamp representing the date the contract was signed (SALE agreement or RENT contract signed event), if it exists.
   ts_enrollment_started:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_rent_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_listing_consultant.ts_enrollment_started
     description: Timestamp when the CIQ consultant enrollment started for the listing context.
   ts_updated:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+      - datalake_big_agent.house_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_listing_consultant.dt_consultant_started
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Record update date.
   day:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+      - datalake_big_agent.house_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_listing_consultant.dt_consultant_started
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Day of the record update date.
   month:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+      - datalake_big_agent.house_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_listing_consultant.dt_consultant_started
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Month of the record update date.
   year:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
-      - datalake_big_agent.house_sale_listing_consultant.ts_enrollment_started
-      - datalake_big_agent.house_sale_listing_consultant.dt_consultant_started
+      - datalake_big_agent.house_listing_consultant.ts_enrollment_started
+      - datalake_big_agent.house_listing_consultant.dt_consultant_started
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Year of the record update date.

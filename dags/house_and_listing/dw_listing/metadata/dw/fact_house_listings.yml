@@ -83,7 +83,7 @@ columns:
       table.
   sk_user_consultant:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.id_user
+      - datalake_big_agent.house_listing_consultant.id_user
     description: Surrogate key of the consultant dimension associated with this listing.
   sk_company_supply:
     lineage:

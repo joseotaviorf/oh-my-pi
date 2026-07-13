@@ -49,7 +49,7 @@ columns:
       table.
   sk_user_consultant:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.id_user
+      - datalake_big_agent.house_listing_consultant.id_user
     description: Surrogate key of the consultant user responsible for this listing
       publication.
   sk_stranded_date:

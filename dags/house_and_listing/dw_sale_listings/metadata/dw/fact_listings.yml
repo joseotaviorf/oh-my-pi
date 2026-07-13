@@ -26,7 +26,7 @@ columns:
     description: Foreign key referring to the company ID on Hubspot. Can be joined with dw_quintoandar.dim_company and all other sale modeling tables.
   sk_user_consultant:
     lineage:
-      - datalake_big_agent.house_sale_listing_consultant.id_user
+      - datalake_big_agent.house_listing_consultant.id_user
     description: Foreign key referring to the consultant user ID. Consultant we are referring to the CIQ (Consultor Imobiliário QuintoAndar), which is responsible for capturing
       the owner and registering the property in QuintoAndar's platform. Can be joined with dw_public.dim_user to retrieve CIQ information.
   sk_region:

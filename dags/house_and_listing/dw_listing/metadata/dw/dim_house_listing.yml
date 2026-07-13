@@ -31,7 +31,7 @@ columns:
       prime: Prime type
   consultant_type:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.consultant_type
+      - datalake_big_agent.house_listing_consultant.consultant_type
     description: Type of consultant responsible for this listing.
   country_code:
     lineage:
@@ -43,7 +43,7 @@ columns:
       MX: Mexico's country code
   dt_consultant_started:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.dt_consultant_started
+      - datalake_big_agent.house_listing_consultant.dt_consultant_started
     description: Date when the consultant became responsible for this listing.
   dt_last_exclusive_opted_in:
     lineage:
@@ -75,7 +75,7 @@ columns:
     description: Last optedout date of Special Condition OriginalsReady or OriginalsReno.
   first_consultant_type:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.first_consultant_type
+      - datalake_big_agent.house_listing_consultant.first_consultant_type
     description: First type of consultant ever responsible for this listing.
   first_key_location:
     lineage:
@@ -569,7 +569,7 @@ columns:
       or THIRD_PARTY).
   ts_consultant_deleted:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.ts_consultant_deleted
+      - datalake_big_agent.house_listing_consultant.ts_consultant_deleted
     description: Timestamp when the consultant was deleted.
   ts_early_demand_started:
     lineage:

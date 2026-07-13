@@ -33,11 +33,11 @@ columns:
     description: Sequential version number of the listing lifecycle for this house.
   consultant_type:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.consultant_type
+      - datalake_big_agent.house_listing_consultant.consultant_type
     description: Type of consultant responsible for this listing.
   first_consultant_type:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.first_consultant_type
+      - datalake_big_agent.house_listing_consultant.first_consultant_type
     description: First type of consultant ever responsible for this listing.
   first_key_location:
     lineage:
@@ -452,7 +452,7 @@ columns:
       OriginalsReno: OriginalsReno type.
   dt_consultant_started:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.dt_consultant_started
+      - datalake_big_agent.house_listing_consultant.dt_consultant_started
     description: Date when the consultant became responsible for this listing.
   dt_last_originals_opted_in:
     lineage:
@@ -488,7 +488,7 @@ columns:
     description: Timestamp when this listing was first listed as early demand.
   ts_consultant_deleted:
     lineage:
-      - datalake_big_agent.house_rent_listing_consultant.ts_consultant_deleted
+      - datalake_big_agent.house_listing_consultant.ts_consultant_deleted
     description: Timestamp when the consultant was deleted.
   sale_price:
     lineage:

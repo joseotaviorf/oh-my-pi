@@ -11,8 +11,8 @@ SELECT
   lbc.id_house AS sk_house,
   h.id_company_hubspot AS sk_company_hubspot,
   hsc.id_suggestion_change AS sk_suggestion_change,
-  hslc.consultant_type,
-  hslc.first_consultant_type,
+  hlco.consultant_type,
+  hlco.first_consultant_type,
   lbc.status AS status,
   NULLIF(h.sale_price, 0) AS price,
   hpp.p_30 AS predicted_price_30,
@@ -60,8 +60,8 @@ SELECT
   h.has_sale_great_price_tag AS has_great_price_tag,
   h.has_sale_smart_price_activated AS has_smart_price_activated,
   pc.is_smart_price_change AS has_price_by_smart_price_feature,
-  hslc.dt_consultant_started,
-  hslc.ts_consultant_deleted,
+  hlco.dt_consultant_started,
+  hlco.ts_consultant_deleted,
   lbc.ts_created,
   lbc.ts_first_listing AS ts_first_publication,
   lbc.ts_last_listing AS ts_last_publication,
@@ -93,9 +93,10 @@ LEFT JOIN
   datalake_ebdb_clean.house_registration_status AS hrs
     ON hrs.id_house = lbc.id_house
 LEFT JOIN
-  datalake_big_agent.house_sale_listing_consultant AS hslc
-    ON hslc.id_sale_listing = sl.id_sale_listing
-    AND hslc.is_last_ciq_on_listing = True
+  datalake_big_agent.house_listing_consultant AS hlco
+    ON hlco.id_listing = sl.id_sale_listing
+    AND hlco.business_context = 'SALE'
+    AND hlco.is_last_ciq_on_listing = True
 LEFT JOIN
     datalake_ebdb_clean.house_predicted_price AS hpp
       ON hpp.id_house = lbc.id_house
