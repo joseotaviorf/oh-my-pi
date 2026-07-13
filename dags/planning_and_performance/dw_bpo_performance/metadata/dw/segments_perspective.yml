@@ -347,10 +347,6 @@ columns:
       - dw_customer_support.dim_department.department
       - dw_customer_support.fact_customer_contacts.status
     description: Detailed explanation of the reason for the transfer.
-  analyst_start_date:
-    lineage:
-      - dw_customer_support.fact_tickets.ts_created
-    description: Analyst's initial ticket date.
   first_resolution_analyst:
     lineage:
       - dw_customer_support.fact_customer_contacts.ts_reservation_ended
