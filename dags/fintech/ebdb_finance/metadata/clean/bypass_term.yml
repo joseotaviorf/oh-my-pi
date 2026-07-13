@@ -1,34 +1,38 @@
 database_name: datalake_ebdb_clean
 table_name: bypass_term
-description: This table has the data related to the bypass term signed by the owner on the first VB (visit booked).
-owner: herivelto.junior@quintoandar.com.br
-domain: For Sale
+description: |
+  Owner bypass-term acceptance recorded in EBDB when a property owner signs the legal waiver
+  on their first visit booked (VB), authorizing QuintoAndar to proceed without standard terms.
+  One row per owner acceptance event used by Fintech and compliance workflows to confirm the
+  waiver was signed before enabling restricted product flows.
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
 columns:
   id:
-    description: Unique ID for this record.
+    description: Surrogate key of the bypass-term acceptance record in EBDB.
     lineage:
       - datalake_ebdb_raw.bypass_term.id
   id_user:
-    description: User ID on main tables.
+    description: Identifier of the property owner (EBDB user) who accepted the bypass term.
     lineage:
       - datalake_ebdb_raw.bypass_term.usuario_id
   confirmation_code:
-    description: Unique code generated when the owner signs the term.
+    description: Unique confirmation token generated when the owner completes the waiver signature.
     lineage:
       - datalake_ebdb_raw.bypass_term.confirmation_code
   is_term_signed:
-    description: Boolean indicating if the owner signed the term.
+    description: Boolean flag indicating whether the owner has signed the bypass waiver.
     lineage:
       - datalake_ebdb_raw.bypass_term.signed_term
   ts_term_signed:
-    description: Timestamp inidicating when the code was signed.
+    description: Timestamp when the owner signed the bypass term in EBDB.
     lineage:
       - datalake_ebdb_raw.bypass_term.signed_time
   ts_created:
-    description: Timestamp that indicates when this entry was created.
+    description: Timestamp when the bypass-term acceptance record was created in EBDB.
     lineage:
       - datalake_ebdb_raw.bypass_term.created_at
   ts_updated:
-    description: Timestamp that indicates when this entry was last updated.
+    description: Timestamp of the most recent update to the bypass-term acceptance record.
     lineage:
       - datalake_ebdb_raw.bypass_term.updated_at

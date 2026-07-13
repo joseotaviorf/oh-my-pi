@@ -1,33 +1,37 @@
 database_name: datalake_billing_clean
 table_name: contract_revision
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the contract revision table containing contract revision details and processing information
+description: |
+  Immutable snapshot of a billing contract at a specific revision, storing the full contract
+  payload and idempotency key used during processing. Enables audit and replay of revenue-share
+  agreement changes over time.
 columns:
   id:
-    description: Unique identifier of the contract revision record
+    description: Surrogate key of the contract revision record in the Billing service.
     lineage:
       - datalake_billing_raw.contract_revision.id
   id_contract:
-    description: Identifier of the related contract
+    description: Identifier of the parent billing contract this revision belongs to.
     lineage:
       - datalake_billing_raw.contract_revision.contract_id
   id_idempotency:
-    description: Idempotency identifier for ensuring unique processing
+    description: Idempotency key ensuring the same contract revision is not processed twice.
     lineage:
       - datalake_billing_raw.contract_revision.idempotency_id
   revision:
-    description: Revision number of the contract
+    description: Sequential revision number of the contract within its parent contract entity.
     lineage:
       - datalake_billing_raw.contract_revision.revision
   contract_data:
-    description: Contract data content in JSON format
+    description: JSON payload with the full contract terms and commercial conditions at this revision.
     lineage:
       - datalake_billing_raw.contract_revision.contract_data
   ts_created:
-    description: Record creation timestamp
+    description: Timestamp when the contract revision was submitted to the Billing service.
     lineage:
       - datalake_billing_raw.contract_revision.created_at
   ts_processed:
-    description: Record processing timestamp
+    description: Timestamp when the Billing service finished processing this contract revision.
     lineage:
       - datalake_billing_raw.contract_revision.processed_at

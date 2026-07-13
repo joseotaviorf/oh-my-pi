@@ -1,28 +1,41 @@
 database_name: datalake_ebdb_clean
 table_name: bank
+description: |
+  Reference catalog of Brazilian financial institutions from EBDB, including FEBRABAN codes
+  and display ranking. Used to validate and register bank accounts for rent payouts,
+  partner commissions, and other Fintech transfer flows.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.banco.id
+    description: Surrogate key of the bank in the EBDB catalog.
   id_country:
     lineage:
       - datalake_ebdb_raw.banco.country_id
+    description: Country where the bank operates, referencing the EBDB country dimension.
   name:
     lineage:
       - datalake_ebdb_raw.banco.nome
+    description: Display name of the financial institution shown in product flows.
   code:
     lineage:
       - datalake_ebdb_raw.banco.codigo
+    description: Numeric bank code used in Brazilian TED/DOC and account registration forms.
   febraban_name:
     lineage:
       - datalake_ebdb_raw.banco.nomefebraban
+    description: Official bank name as registered with FEBRABAN for interbank settlement.
   featured_rank:
     lineage:
       - datalake_ebdb_raw.banco.featuredrank
+    description: UI ranking weight used to prioritize commonly selected banks during account registration.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.banco.atualizadoem
+    description: Timestamp of the most recent update to the bank catalog entry in EBDB.
   ts_created:
     lineage:
       - datalake_ebdb_raw.banco.criadoem
+    description: Timestamp when the bank was first registered in the EBDB catalog.

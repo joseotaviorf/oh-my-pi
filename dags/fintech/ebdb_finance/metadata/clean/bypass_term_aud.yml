@@ -1,23 +1,26 @@
 database_name: datalake_ebdb_clean
 table_name: bypass_term_aud
-description: Aud table that has the data related to the bypass term signed by the owner on the first VB (visit booked).
-owner: herivelto.junior@quintoandar.com.br
-domain: For Sale
+description: |
+  Hibernate Envers audit history of bypass-term records, capturing each insert, update, or
+  delete to owner waiver acceptance on the first visit booked (VB). Used to reconstruct when
+  an owner signed or changed the bypass term for compliance and dispute investigations.
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
 columns:
   id:
-    description: Unique ID for this record.
+    description: Surrogate key of the bypass-term record as stored in the audited revision.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.id
   id_user:
-    description: User ID on main tables.
+    description: Identifier of the property owner (EBDB user) associated with the audited bypass term.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.usuario_id
   rev:
-    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    description: Hibernate Envers revision id; join to rev_info for the audit transaction timestamp and actor.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.REV
   rev_type:
-    description: Modification type.
+    description: Hibernate Envers revision type indicating whether the audit row captures an insert, update, or delete.
     categories:
       "0" : Create
       "1" : Update
@@ -25,34 +28,34 @@ columns:
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.REVTYPE
   confirmation_code:
-    description: Unique code generated when the owner signs the term.
+    description: Confirmation token stored on the bypass term at the time of this audit revision.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.confirmation_code
   mod_id_user:
-    description: Flag indicating if the id_user phone has changed.
+    description: Flag indicating whether the owner user identifier changed in this audit revision.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.usuario_id_MOD
   mod_confirmation_code:
-    description: Flag indicating if the confirmation_code phone has changed.
+    description: Flag indicating whether the confirmation code changed in this audit revision.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.confirmation_code_MOD
   mod_is_term_signed:
-    description: Flag indicating if the is_term_signed phone has changed.
+    description: Flag indicating whether the term-signed boolean changed in this audit revision.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.signed_term_MOD
   mod_ts_term_signed:
-    description: Flag indicating if the ts_term_signed phone has changed.
+    description: Flag indicating whether the term-signed timestamp changed in this audit revision.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.signed_time_mod
   is_term_signed:
-    description: Boolean indicating if the owner signed the term.
+    description: Boolean flag stored at this revision indicating whether the owner had signed the waiver.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.signed_term
   ts_term_signed:
-    description: Timestamp inidicating when the code was signed.
+    description: Timestamp of the owner bypass-term signature as recorded in this audit revision.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.signed_time
   ts_created:
-    description: Timestamp that indicates when this entry was created.
+    description: Timestamp when the bypass-term source record was originally created, preserved in this revision.
     lineage:
       - datalake_ebdb_raw.bypass_term_aud.created_at

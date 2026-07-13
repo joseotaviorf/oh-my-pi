@@ -1,25 +1,29 @@
 database_name: datalake_billing_clean
 table_name: account
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the account table containing account information with actor details and role information
+description: |
+  Billing ledger account linking a financial actor (tenant, owner, partner, or executive)
+  to their role in the Billing service. Used as the origin or destination of double-entry
+  movements when calculating revenue share with external partners.
 columns:
   id:
-    description: Unique identifier of the account record
+    description: Surrogate key of the billing account in the Billing service.
     lineage:
       - datalake_billing_raw.account.id
   id_actor:
-    description: Identifier of the actor associated with this account
+    description: Identifier of the business actor (user or entity) that owns this billing account.
     lineage:
       - datalake_billing_raw.account.actor_id
   actor_role:
-    description: Role of the actor associated with this account
+    description: Role of the actor in the billing model (e.g. tenant, owner, partner, executive).
     lineage:
       - datalake_billing_raw.account.actor_role
   ts_created:
-    description: Record creation timestamp
+    description: Timestamp when the billing account was created in the Billing service.
     lineage:
       - datalake_billing_raw.account.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: Timestamp of the most recent update to the billing account record.
     lineage:
       - datalake_billing_raw.account.updated_at

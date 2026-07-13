@@ -1,75 +1,77 @@
 database_name: datalake_billing_clean
 table_name: invoice
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the invoice table containing invoice information and status details
+description: |
+  Billing invoice issued under a contract, aggregating revenue-share amounts owed to partners
+  or executives. Links to legacy Retsuko and Seubarriga invoice identifiers and tracks
+  status, purpose, due amount, and accrual period for settlement.
 columns:
   id:
-    description: Unique identifier of the invoice record
+    description: Surrogate key of the billing invoice in the Billing service.
     lineage:
       - datalake_billing_raw.invoice.id
   id_account:
-    description: Identifier of the related account
+    description: Billing account associated with the invoice recipient or payer.
     lineage:
       - datalake_billing_raw.invoice.account_id
   id_contract:
-    description: Identifier of the related contract
+    description: Identifier of the billing contract that generated this invoice.
     lineage:
       - datalake_billing_raw.invoice.contract_id
   id_source_invoice:
-    description: Identifier of the source invoice
+    description: Identifier of the upstream source invoice when this row was derived or reissued.
     lineage:
       - datalake_billing_raw.invoice.source_invoice_id
   id_original:
-    description: Identifier of the retsuko invoice
+    description: Original Retsuko invoice identifier extracted from the invoice payload.
     lineage:
       - datalake_billing_raw.invoice.payload
   id_seubarriga_invoice:
-    description: Identifier of the Seubarriga invoice
+    description: Corresponding Seubarriga invoice identifier used for rent billing reconciliation.
     lineage:
       - datalake_billing_raw.invoice.seubarriga_invoice_id
   account_type:
-    description: Type of the related account
+    description: Type of billing account tied to the invoice (e.g. partner, executive, tenant).
     lineage:
       - datalake_billing_raw.invoice.account_type
   status:
-    description: Current status of the invoice
+    description: Primary lifecycle status of the invoice (e.g. open, paid, cancelled).
     lineage:
       - datalake_billing_raw.invoice.status
   sub_status:
-    description: Sub-status of the invoice
+    description: Secondary invoice state providing finer granularity beyond the primary status.
     lineage:
       - datalake_billing_raw.invoice.sub_status
   purpose:
-    description: Purpose of the invoice
+    description: Business reason the invoice was issued (e.g. partner commission, executive revenue share).
     lineage:
       - datalake_billing_raw.invoice.purpose
   transaction_type:
-    description: Type of transaction for the invoice
+    description: Direction and nature of the invoice transaction in the billing ledger.
     lineage:
       - datalake_billing_raw.invoice.transaction_type
   payload:
-    description: Raw payload associated with the invoice
+    description: Raw JSON payload with invoice details and cross-system identifiers from upstream billing.
     lineage:
       - datalake_billing_raw.invoice.payload
   due_amount:
-    description: Total amount due for the invoice
+    description: Total monetary amount due on the invoice for settlement or payout.
     lineage:
       - datalake_billing_raw.invoice.due_amount
   dt_accrual_year_month:
-    description: Accrual year-month of the invoice
+    description: Year-month when the invoice revenue should be recognized for accounting accrual.
     lineage:
       - datalake_billing_raw.invoice.accrual_year_month
   dt_due:
-    description: Due date of the invoice
+    description: Calendar due date when the invoice must be paid or settled.
     lineage:
       - datalake_billing_raw.invoice.due_date
   ts_created:
-    description: Record creation timestamp
+    description: Timestamp when the billing invoice was created in the Billing service.
     lineage:
       - datalake_billing_raw.invoice.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: Timestamp of the most recent update to the invoice status or amounts.
     lineage:
       - datalake_billing_raw.invoice.updated_at
-
-

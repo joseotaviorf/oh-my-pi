@@ -1,71 +1,73 @@
 database_name: datalake_billing_clean
 table_name: entry
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the entry table containing billing entry details and accounting information
+description: |
+  Double-entry billing line linked to an invoice, recording monetary movements between
+  ledger accounts with accrual and due periods. Each entry represents a debit/credit pair
+  component used to calculate partner and executive revenue share.
 columns:
   id:
-    description: Unique identifier of the entry record
+    description: Surrogate key of the billing entry in the Billing service.
     lineage:
       - datalake_billing_raw.entry.id
   id_invoice:
-    description: Identifier of the related invoice
+    description: Identifier of the invoice this ledger entry belongs to.
     lineage:
       - datalake_billing_raw.entry.invoice_id
   id_source_entry:
-    description: Identifier of the source entry
+    description: Identifier of the upstream source entry when this row was derived or adjusted.
     lineage:
       - datalake_billing_raw.entry.source_entry_id
   description:
-    description: Description of the entry
+    description: Human-readable label describing the revenue-share movement or adjustment.
     lineage:
       - datalake_billing_raw.entry.description
   status:
-    description: Current status of the entry
+    description: Processing status of the entry (e.g. pending, posted, cancelled).
     lineage:
       - datalake_billing_raw.entry.status
   from_account:
-    description: Origin account of the entry
+    description: Billing account debited in the double-entry movement.
     lineage:
       - datalake_billing_raw.entry.from_account
   to_account:
-    description: Destination account of the entry
+    description: Billing account credited in the double-entry movement.
     lineage:
       - datalake_billing_raw.entry.to_account
   bill_item:
-    description: Billing item associated with the entry
+    description: Bill item or revenue component associated with this entry (e.g. commission type).
     lineage:
       - datalake_billing_raw.entry.bill_item
   producer:
-    description: Producer associated with the entry
+    description: System or service that generated the billing entry (e.g. Billing engine, adjustment job).
     lineage:
       - datalake_billing_raw.entry.producer
   transaction_type:
-    description: Type of transaction for the entry
+    description: Classification of the billing movement (e.g. credit, debit, reversal, adjustment).
     lineage:
       - datalake_billing_raw.entry.transaction_type
   accounting_transaction_identifier:
-    description: Accounting transaction identifier
+    description: External accounting system reference used to reconcile the entry with ERP postings.
     lineage:
       - datalake_billing_raw.entry.accounting_transaction_identifier
   amount:
-    description: Monetary amount of the entry
+    description: Monetary amount transferred between the from and to accounts for this entry.
     lineage:
       - datalake_billing_raw.entry.amount
   dt_accrual_year_month:
-    description: Accrual year-month of the entry
+    description: Year-month when revenue or cost should be recognized for accounting accrual.
     lineage:
       - datalake_billing_raw.entry.accrual_year_month
   dt_due_year_month:
-    description: Due year-month of the entry
+    description: Year-month when the entry amount becomes due for payment or settlement.
     lineage:
       - datalake_billing_raw.entry.due_year_month
   ts_created:
-    description: Record creation timestamp
+    description: Timestamp when the billing entry was created in the Billing service.
     lineage:
       - datalake_billing_raw.entry.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: Timestamp of the most recent update to the billing entry.
     lineage:
       - datalake_billing_raw.entry.updated_at
-
-

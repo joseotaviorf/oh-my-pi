@@ -1,29 +1,33 @@
 database_name: datalake_billing_clean
 table_name: contract
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the contract table containing contract information and status details
+description: |
+  Billing contract instance bound to a recurrence UUID, representing an active revenue-share
+  agreement with an external partner or executive. Tracks lifecycle status and the current
+  contract revision used to generate invoices and ledger entries.
 columns:
   id:
-    description: Unique identifier of the contract record
+    description: Surrogate key of the billing contract in the Billing service.
     lineage:
       - datalake_billing_raw.contract.id
   uuid_recurrence:
-    description: UUID identifier of the related recurrence
+    description: UUID of the parent billing recurrence that defines the agreement terms.
     lineage:
       - datalake_billing_raw.contract.recurrence_uuid
   status:
-    description: Current status of the contract
+    description: Lifecycle status of the contract (e.g. active, suspended, terminated).
     lineage:
       - datalake_billing_raw.contract.status
   current_revision:
-    description: Current revision number of the contract
+    description: Latest processed revision number of the contract terms and payload.
     lineage:
       - datalake_billing_raw.contract.current_revision
   ts_created:
-    description: Record creation timestamp
+    description: Timestamp when the billing contract was created in the Billing service.
     lineage:
       - datalake_billing_raw.contract.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: Timestamp of the most recent update to the contract status or revision pointer.
     lineage:
       - datalake_billing_raw.contract.updated_at

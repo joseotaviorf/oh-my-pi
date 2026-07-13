@@ -1,37 +1,53 @@
 database_name: datalake_ebdb_clean
 table_name: financial_data
+description: |
+  Payout bank account details stored in EBDB for partners, owners, and other payees.
+  Each row links a holder to branch, account number, account type, and tax identifier
+  used to execute rent transfers and partner commission payments.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.financialdata.id
+    description: Surrogate key of the financial data record storing payout bank details in EBDB.
   partner_id:
     lineage:
       - datalake_ebdb_raw.financialdata.partner_id
+    description: Identifier of the partner or user entity whose bank account is registered for payouts.
   id_bank:
     lineage:
       - datalake_ebdb_raw.financialdata.bankdata_banco_id
+    description: Reference to the EBDB bank catalog entry for the registered account.
   bank_agency:
     lineage:
       - datalake_ebdb_raw.financialdata.bankdata_agencia
+    description: Branch agency number of the registered bank account.
   bank_account:
     lineage:
       - datalake_ebdb_raw.financialdata.bankdata_contacorrente
+    description: Checking or savings account number used for outbound transfers.
   bank_account_type:
     lineage:
       - datalake_ebdb_raw.financialdata.bankdata_tipoconta
+    description: Account type classification (e.g. checking, savings) as defined in EBDB.
   bank_cpf_cnpj:
     lineage:
       - datalake_ebdb_raw.financialdata.bankdata_cpfoucnpj
+    description: CPF or CNPJ of the account holder registered for payout compliance (PII).
   bank_account_holder_name:
     lineage:
       - datalake_ebdb_raw.financialdata.bankdata_nome
+    description: Legal name of the primary account holder registered for transfers.
   bank_account_secondary_holder:
     lineage:
       - datalake_ebdb_raw.financialdata.bankdata_outrotitular
+    description: Name of a secondary account holder when the account has joint ownership.
   ts_created:
     lineage:
       - datalake_ebdb_raw.financialdata.criadoem
+    description: Timestamp when the payout bank details were first registered in EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.financialdata.atualizadoem
+    description: Timestamp of the most recent update to the registered bank account details.

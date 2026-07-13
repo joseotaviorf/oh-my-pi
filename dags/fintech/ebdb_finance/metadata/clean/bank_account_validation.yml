@@ -1,19 +1,29 @@
 database_name: datalake_ebdb_clean
 table_name: bank_account_validation
+description: |
+  Bank account validation requests tracked in EBDB, linking each validation attempt to an
+  external verification identifier and its approval outcome. Supports payout onboarding and
+  compliance checks before transfers are enabled.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.bankaccountvalidation.id
+    description: Surrogate key of the bank account validation record in EBDB.
   id_validation:
     lineage:
       - datalake_ebdb_raw.bankaccountvalidation.validationId
+    description: External validation request identifier returned by the bank-account verification service.
   validation_status:
     lineage:
       - datalake_ebdb_raw.bankaccountvalidation.validationStatus
+    description: Outcome of the bank account validation (e.g. pending, approved, rejected).
   ts_created:
     lineage:
       - datalake_ebdb_raw.bankaccountvalidation.criadoEm
+    description: Timestamp when the validation request was created in EBDB.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.bankaccountvalidation.atualizadoEm
+    description: Timestamp of the most recent status change on the validation request.

@@ -1,41 +1,45 @@
 database_name: datalake_billing_clean
 table_name: recurrence
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the recurrence table containing the main recurrence entity with business context, source, and revision details
+description: |
+  Root billing recurrence entity defining the commercial agreement template for partner and
+  executive revenue share. Carries business context, originating source system, and the
+  revision chain from which contracts and invoices are generated.
 columns:
   id:
-    description: Unique identifier of the recurrence record
+    description: Surrogate key of the billing recurrence in the Billing service.
     lineage:
       - datalake_billing_raw.recurrence.id
   uuid_recurrence:
-    description: UUID identifier of the recurrence
+    description: Stable UUID used to link contracts and downstream billing artifacts to this recurrence.
     lineage:
       - datalake_billing_raw.recurrence.recurrence_uuid
   business_entity_id:
-    description: Identifier of the business entity associated with this recurrence
+    description: Identifier of the commercial entity (partner or executive) covered by this recurrence.
     lineage:
       - datalake_billing_raw.recurrence.business_entity_id
   source:
-    description: Source system that originated this recurrence
+    description: Upstream system or channel that created the recurrence (e.g. partner portal, batch import).
     lineage:
       - datalake_billing_raw.recurrence.source
   business_context:
-    description: Business context classification of the recurrence
+    description: Product or business line the recurrence applies to (e.g. rent, sale, partner program).
     lineage:
       - datalake_billing_raw.recurrence.business_context
   current_revision:
-    description: Current revision number of the recurrence
+    description: Latest processed revision number of the recurrence terms and configuration.
     lineage:
       - datalake_billing_raw.recurrence.current_revision
   idempotency_key:
-    description: Key used to guarantee idempotent creation of the recurrence
+    description: Key guaranteeing idempotent creation of the recurrence when retried by upstream systems.
     lineage:
       - datalake_billing_raw.recurrence.idempotency_key
   ts_created:
-    description: Record creation timestamp
+    description: Timestamp when the billing recurrence was created in the Billing service.
     lineage:
       - datalake_billing_raw.recurrence.created_at
   ts_updated:
-    description: Record last update timestamp
+    description: Timestamp of the most recent update to the recurrence record.
     lineage:
       - datalake_billing_raw.recurrence.updated_at

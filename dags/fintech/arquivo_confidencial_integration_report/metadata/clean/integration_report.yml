@@ -1,37 +1,50 @@
 database_name: datalake_arquivo_confidencial_clean
 table_name: integration_report
+description: Bureau/provider integration report per CPF (PII), used by credit screening.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.id
+    description: Primary key of the integration report.
   cpf:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.cpf
+    description: Brazilian individual taxpayer registry number (CPF) (PII).
   version:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.version
+    description: Monotonic version counter of the integration report row from the source system.
   integration_provider:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.integration_provider
+    description: Provider that produced the report (e.g. Serasa, Boa Vista, TransUnion, QI Tech).
   raw_data:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.raw_data
+    description: Unparsed JSON response from the provider.
   attributes:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.attributes
+    description: Parsed fields extracted from the provider response.
   ts_created:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.created_at
+    description: Timestamp indicating when the integration report was created.
   ts_updated:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.updated_at
+    description: Last updated timestamp.
   year:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.year
+    description: Partition year.
   month:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.month
+    description: Partition month.
   day:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report.day
+    description: Partition day.
