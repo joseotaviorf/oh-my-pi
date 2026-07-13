@@ -1,12 +1,26 @@
-WITH conversion_info AS (
+WITH conversion_info_ranked AS (
   SELECT
     id_lead AS id_lead_ebdb,
     id_house,
     business_context,
-    supply_source
+    supply_source,
+    ROW_NUMBER() OVER (
+      PARTITION BY id_lead, business_context, supply_source
+      ORDER BY db_source, ts_conversion
+    ) AS rn
   FROM
     datalake_supply_flows.conversion_lookup
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_lead, business_context, supply_source ORDER BY db_source, ts_conversion) = 1
+),
+conversion_info AS (
+  SELECT
+    id_lead_ebdb,
+    id_house,
+    business_context,
+    supply_source
+  FROM
+    conversion_info_ranked
+  WHERE
+    rn = 1
 ),
 acquisition AS (
   SELECT
@@ -160,7 +174,7 @@ conversion_without_leads AS (
   WHERE
     id_lead_ebdb IS NULL
 ),
-acq_taxonomy AS (
+acq_taxonomy_ranked AS (
   SELECT
     acq.id_lead_ebdb,
     acq.sk_supply_lead,
@@ -188,12 +202,49 @@ acq_taxonomy AS (
     acq.aux_database_tracking_source,
     acq.aux_database_tracking_term,
     acq.aux_database_tracking_content,
-    acq.aux_product_status
+    acq.aux_product_status,
+    ROW_NUMBER() OVER (
+      PARTITION BY acq.id_lead_ebdb, acq.supply_source
+      ORDER BY acq.aux_funnel_level DESC, acq.ts_event_adjusted DESC
+    ) AS rn
   FROM
     acquisition AS acq
   WHERE
     acq.id_lead_ebdb IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY acq.id_lead_ebdb, acq.supply_source ORDER BY acq.aux_funnel_level DESC, acq.ts_event_adjusted DESC) = 1
+),
+acq_taxonomy AS (
+  SELECT
+    id_lead_ebdb,
+    sk_supply_lead,
+    id_lead,
+    id_referred_by,
+    supply_source,
+    affiliate_type,
+    landing_page,
+    lead_type,
+    detailed_route,
+    id_task,
+    id_chat_session,
+    quinto_andar_phone_number,
+    lead_application,
+    medium,
+    source,
+    platform,
+    campaign,
+    term,
+    content,
+    original_lead,
+    ops_assigned,
+    aux_database_tracking_campaign,
+    aux_database_tracking_medium,
+    aux_database_tracking_source,
+    aux_database_tracking_term,
+    aux_database_tracking_content,
+    aux_product_status
+  FROM
+    acq_taxonomy_ranked
+  WHERE
+    rn = 1
 ),
 conversion_with_leads AS (
   SELECT
@@ -274,16 +325,190 @@ conversion_with_leads AS (
     con.id_lead_ebdb IS NOT NULL
 )
 SELECT
-  * EXCEPT (aux_funnel_level)
+    bk_supply,
+    sk_supply_lead,
+    business_context,
+    id_lead_ebdb,
+    id_house,
+    id_lead,
+    id_prospect,
+    id_entity,
+    id_referred_by,
+    id_region,
+    id_user_registrant,
+    id_user_conversion,
+    id_task,
+    id_chat_session,
+    supply_source,
+    business_event,
+    funnel_step,
+    drop_step_reason,
+    affiliate_type,
+    application,
+    landing_page,
+    lead_type,
+    detailed_route,
+    quinto_andar_phone_number,
+    lead_application,
+    medium,
+    source,
+    platform,
+    campaign,
+    term,
+    content,
+    ops_agent,
+    ops_approach,
+    ops_contact_medium,
+    ops_objective,
+    ops_partner,
+    ops_assigned,
+    original_lead,
+    reprocessed,
+    reprocessing_entity_type,
+    reprocessing_table_name,
+    aux_database_tracking_campaign,
+    aux_database_tracking_medium,
+    aux_database_tracking_source,
+    aux_database_tracking_term,
+    aux_database_tracking_content,
+    aux_data_event,
+    aux_group,
+    aux_product_status,
+    aux_origin_table,
+    ts_event_adjusted,
+    ts_event_original,
+    ts_first_discard,
+    ts_last_discard,
+    ts_reprocessing_event,
+    ts_load,
+    year,
+    month,
+    day
 FROM
   acquisition
 UNION ALL
 SELECT
-  *
+    bk_supply,
+    sk_supply_lead,
+    business_context,
+    id_lead_ebdb,
+    id_house,
+    id_lead,
+    id_prospect,
+    id_entity,
+    id_referred_by,
+    id_region,
+    id_user_registrant,
+    id_user_conversion,
+    id_task,
+    id_chat_session,
+    supply_source,
+    business_event,
+    funnel_step,
+    drop_step_reason,
+    affiliate_type,
+    application,
+    landing_page,
+    lead_type,
+    detailed_route,
+    quinto_andar_phone_number,
+    lead_application,
+    medium,
+    source,
+    platform,
+    campaign,
+    term,
+    content,
+    ops_agent,
+    ops_approach,
+    ops_contact_medium,
+    ops_objective,
+    ops_partner,
+    ops_assigned,
+    original_lead,
+    reprocessed,
+    reprocessing_entity_type,
+    reprocessing_table_name,
+    aux_database_tracking_campaign,
+    aux_database_tracking_medium,
+    aux_database_tracking_source,
+    aux_database_tracking_term,
+    aux_database_tracking_content,
+    aux_data_event,
+    aux_group,
+    aux_product_status,
+    aux_origin_table,
+    ts_event_adjusted,
+    ts_event_original,
+    ts_first_discard,
+    ts_last_discard,
+    ts_reprocessing_event,
+    ts_load,
+    year,
+    month,
+    day
 FROM
   conversion_without_leads
 UNION ALL
 SELECT
-  *
+    bk_supply,
+    sk_supply_lead,
+    business_context,
+    id_lead_ebdb,
+    id_house,
+    id_lead,
+    id_prospect,
+    id_entity,
+    id_referred_by,
+    id_region,
+    id_user_registrant,
+    id_user_conversion,
+    id_task,
+    id_chat_session,
+    supply_source,
+    business_event,
+    funnel_step,
+    drop_step_reason,
+    affiliate_type,
+    application,
+    landing_page,
+    lead_type,
+    detailed_route,
+    quinto_andar_phone_number,
+    lead_application,
+    medium,
+    source,
+    platform,
+    campaign,
+    term,
+    content,
+    ops_agent,
+    ops_approach,
+    ops_contact_medium,
+    ops_objective,
+    ops_partner,
+    ops_assigned,
+    original_lead,
+    reprocessed,
+    reprocessing_entity_type,
+    reprocessing_table_name,
+    aux_database_tracking_campaign,
+    aux_database_tracking_medium,
+    aux_database_tracking_source,
+    aux_database_tracking_term,
+    aux_database_tracking_content,
+    aux_data_event,
+    aux_group,
+    aux_product_status,
+    aux_origin_table,
+    ts_event_adjusted,
+    ts_event_original,
+    ts_first_discard,
+    ts_last_discard,
+    ts_reprocessing_event,
+    ts_load,
+    year,
+    month,
+    day
 FROM
   conversion_with_leads

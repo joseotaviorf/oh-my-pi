@@ -3,8 +3,7 @@ table_name: conversion_tracking
 domain: Growth
 owner: gabriel.salla@quintoandar.com
 description: |
-  This table is responsible for storing the taxonomy and conversion events in the supply flows, i.e., 
-  the taxonomy joined with manually reprocessed events and direct flows.
+  Supply conversion events enriched with taxonomy classifications, combining manually reprocessed events and direct conversion flows for attribution reporting. Z-ordered by id_lead_ebdb, id_house, and business_context for query performance.
 columns:
   id_lead_ebdb:
     description: The unique identifier for each lead in the 1P/3P/CIQ tables. Could be repeated between these tables.
@@ -43,8 +42,8 @@ columns:
   business_context:
     description: Business context of the conversion event.
     categories:
-      RENT: 'For rent lead or house'
-      SALE: 'For sale lead or house'
+      RENT: For rent lead or house
+      SALE: For sale lead or house
     lineage:
       - datalake_supply_flows.conversion_events.business_context
   supply_source:
@@ -54,10 +53,27 @@ columns:
       - datalake_ebdb_listing.listing_business_context.ownership
   funnel_step:
     description: The funnel step of the taxonomy, referring to the funnel step in the supply funnel.
+    categories:
+      PROSPECT: Prospect stage in the conversion funnel.
+      QUALIFIED: Qualified stage after prospect conversion.
+      AV_QUALIFIED: Available-qualified stage.
+      OPPORTUNITY: Opportunity stage before first listing.
+      FIRST_LISTING: First listing publication stage.
     lineage:
       - datalake_supply_flows.conversion_events.step
   business_event:
     description: Supply business event type that classifies the conversion tracking row in the funnel.
+    categories:
+      drop_p2q: Prospect dropped before reaching qualified.
+      ongoing_p2q: Prospect still progressing toward qualified.
+      conversion_p2q: Prospect converted to qualified.
+      drop_q2aq: Qualified dropped before available-qualified.
+      conversion_q2aq: Qualified converted to available-qualified.
+      drop_aq2o: Available-qualified dropped before opportunity.
+      ongoing_aq2o: Available-qualified still progressing toward opportunity.
+      conversion_aq2o: Available-qualified converted to opportunity.
+      ongoing_o2fl: Opportunity still progressing toward first listing.
+      conversion_o2fl: Opportunity converted to first listing.
     lineage:
       - datalake_supply_flows.conversion_events.business_event
   application:

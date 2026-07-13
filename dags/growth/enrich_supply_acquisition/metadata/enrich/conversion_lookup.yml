@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: conversion_lookup
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table contains the proxy between id_lead and id_house for all leads that have been converted. | 
+description: |
+  Lookup table mapping id_lead to id_house for all converted leads across business contexts, used as a proxy for conversion attribution in the supply acquisition pipeline. Z-ordered by id_house, business_context, and id_lead for query performance.
   Also contains information about listing and draft for each lead. We have line for each business_context.
 columns:
   id:
@@ -13,21 +14,21 @@ columns:
       - datalake_ebdb_clean.listing_business_context_aud.id
       - datalake_bob.house_draft_business_context.id_draft
   id_lead:
-    description: 'Unique identifier of the lead.'
+    description: Unique identifier of the lead.
     lineage:
       - datalake_rene_descartes_clean.house_lead_conversion.id_lead
       - datalake_ebdb_clean.conversion_lead.id_converted_lead
       - datalake_3p_supply.lead_3p.id_lead_3p
       - datalake_bob.house_draft_business_context.id_draft
   id_house:
-    description: 'Identifier of the house in QuintoAndar, if it has already been created.'
+    description: Identifier of the house in QuintoAndar, if it has already been created.
     lineage:
       - datalake_rene_descartes_clean.house_lead_conversion.id_house
       - datalake_ebdb_clean.conversion_lead.id_house
       - datalake_ebdb_clean.listing_business_context_aud.id_house
       - datalake_bob_clean.submission_progress.id_external
   business_context:
-    description: 'The business context of the lead and house'
+    description: The business context of the lead and house
     categories:
       SALE: When lead and house is for sale.
       RENT: When lead and house is for rent.
@@ -35,29 +36,29 @@ columns:
       - datalake_ebdb_clean.listing_business_context_aud.business_context
       - datalake_bob.house_draft_business_context.business_context
   has_listing:
-    description: 'If the lead has a listing'
+    description: If the lead has a listing
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.business_context
       - datalake_bob.house_draft_business_context.id_draft
   has_draft:
-    description: 'If the lead has a draft in Bob'
+    description: If the lead has a draft in Bob
     lineage:
       - datalake_bob.house_draft_business_context.id_draft
   ts_conversion:
-    description: 'Timestamp of the conversion'
+    description: Timestamp of the conversion
     lineage:
       - datalake_rene_descartes_clean.house_lead_conversion.ts_created
       - datalake_ebdb_clean.conversion_lead.ts_conversion
       - datalake_3p_supply.lead_3p.ts_lead_created
   db_source:
-    description: 'Database source of the event'
+    description: Database source of the event
     categories:
-      1: 1P/Rene Descartes
-      2: 1P/EBDB
-      3: CIQ/Bob
-      4: 3P/Supply Processor
+      '1': 1P/Rene Descartes
+      '2': 1P/EBDB
+      '3': CIQ/Bob
+      '4': 3P/Supply Processor
   supply_source:
-    description: 'Supply source of the lead and house'
+    description: Supply source of the lead and house
     categories:
       1P: When lead and house is from QuintoAndar (first party)
       3P: When lead and house is coming from Supply Processor (third party)

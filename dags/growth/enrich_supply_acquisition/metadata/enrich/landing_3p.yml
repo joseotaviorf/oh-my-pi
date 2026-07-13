@@ -2,22 +2,23 @@ database_name: datalake_supply_flows
 table_name: landing_3p
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table contains transformed data from the 3P tables that will be used to track the status of leads in Supply pipeline. For more information, the Rede models should be consulted.
+description: |
+  Enriched 3P landing page lead data transformed for supply pipeline tracking, sourced from third-party listing platforms. Z-ordered by id_lead_3p, business_context, and id_house for query performance.
 columns:
     id_lead_3p:
-      description: 'Unique identifier of the lead.'
+      description: Unique identifier of the lead.
       lineage: 
         - datalake_3p_supply.lead_3p_status_changes.id_lead_3p
     id_house:
-      description: 'Identifier of the house in QuintoAndar, if it has already been created.'
+      description: Identifier of the house in QuintoAndar, if it has already been created.
       lineage:
         - datalake_ebdb_clean.house.id
     id_region:
-      description: 'Identifier of the lead region.'
+      description: Identifier of the lead region.
       lineage:
         - datalake_3p_supply.lead_3p.region_id
     business_context:
-      description: 'The business context of the lead, referring to the business context where the lead originated.'
+      description: The business context of the lead, referring to the business context where the lead originated.
       categories: 
         SALE: The 3P prospect is for sale.
         RENT: The 3P prospect is for rent.
@@ -26,44 +27,49 @@ columns:
     growth_status:
       lineage:
         - datalake_3p_supply.lead_3p_status_changes.growth_status
-      description: 'Status of the lead in the growth funnel'
+      description: Growth funnel stage of the third-party lead at the status change event.
       categories:
-        LEAD: First stage. The lead was just created, but was not approved in the eligibility analysis. 
-        PROSPECT: Second stage. The lead was approved in the eligibility analysis.
-        QUALIFIED: Third stage. The real estate agency provided information about the owner of the prospect, but it was not approved in analyisis.
-        OPPORTUNITY: Fourth stage. A qualified lead that was sent to image processing.
-        FIRST_LISTING: Fifth and final stage. The opportunity was approved, and registered in Main for publication.
+        LEAD: First stage; lead created but not yet approved in eligibility analysis.
+        PROSPECT: Second stage; lead approved in eligibility analysis.
+        QUALIFIED: Third stage; agency provided owner information pending analysis.
+        AV_QUALIFIED: Available-qualified stage before opportunity.
+        OPPORTUNITY: Fourth stage; qualified lead sent to image processing.
+        FIRST_LISTING: Fifth and final stage; opportunity approved and registered in Main for publication.
     status:
       lineage:
         - datalake_3p_supply.lead_3p_status_changes.status
-      description: 'Status of the lead in Brokers Supply Processor, in the context of 3P.'
+      description: Status of the lead in Brokers Supply Processor for the 3P context.
       categories:
-        REGISTERED: 'Registered in Main for publication'
-        SUSPENDED: 'Lead suspended'
-        WAITING: 'Lead eligible and waiting for owner information'
-        PROCESSING: 'Lead in image processing'
-        QUEUE: 'Lead awaiting in the duplicate queue'
-        NOT_CONVERTED: 'Lead not converted due to ineligibility, enrichment or discard'
+        REGISTERED: Registered in Main for publication.
+        SUSPENDED: Lead suspended.
+        WAITING: Lead eligible and waiting for owner information.
+        PROCESSING: Lead in image processing.
+        QUEUE: Lead awaiting in the duplicate queue.
+        NOT_CONVERTED: Lead not converted due to ineligibility, enrichment, or discard.
+        CONVERTED: Lead successfully converted in Brokers Supply Processor.
+        DISCARDED: Lead discarded from the processing pipeline.
+        RECEIVED: Lead received by Brokers Supply Processor.
+        UNPUBLISHED: Lead unpublished after registration.
     city:
       description: Brazilian municipality where the third-party lead property is located.
       lineage:
         - datalake_3p_supply.lead_3p.city
     reason:
-      description: 'Name of the reason of non-conversion.'
+      description: Name of the reason of non-conversion.
       lineage:
         - datalake_3p_supply.lead_3p_reason_changes.reason
     reason_type:
-      description: 'Type of reason of non-conversion.'
+      description: Type of reason of non-conversion.
       categories:
-        INELIGIBLE_REASON: 'Lead is ineligible, and will not become a prospect'
-        DISCARD_REASON: 'Lead is eligible, but was discarded afterwards'
-        ENRICHMENT_REASON: 'Lead can convert, as long as an information is enriched'
+        INELIGIBLE_REASON: Lead is ineligible, and will not become a prospect.
+        DISCARD_REASON: Lead is eligible, but was discarded afterwards.
+        ENRICHMENT_REASON: Lead can convert, as long as an information is enriched.
       lineage:
         - datalake_3p_supply.lead_3p_reason_changes.reason_type    
     aux_round_number:
-      description: 'Auxiliary column to deduplicate the data.'    
+      description: Auxiliary column to deduplicate the data.
     aux_hash:
-      description: 'Auxiliary column to deduplicate the data. Its a MD5 hash of the columns id_lead_3p, business_context.'
+      description: Auxiliary column to deduplicate the data. Its a MD5 hash of the columns id_lead_3p, business_context.
     ts_event:
       description: Timestamp when the third-party lead status change occurred in Brokers Supply Processor.
       lineage:

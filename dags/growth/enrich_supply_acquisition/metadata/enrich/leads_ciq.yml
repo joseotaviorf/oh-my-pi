@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: leads_ciq
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table contains information about leads extracted from the Bob service that will be used to track our leads in the CIQ source.
+description: |
+  CIQ-sourced lead records extracted from the Bob service for supply acquisition tracking in the classified listings integration pipeline. Z-ordered by sk_supply_lead, business_context, and id_lead for query performance.
 columns:
   sk_supply_lead:
     description: The unique identifier for each lead in the supply tables. Its unique between CIQ, 3P and 1P tables.
@@ -38,7 +39,7 @@ columns:
   business_event:
     description: The business event of the lead, referring which action was taken in the business context.
   funnel_step:
-    description: The funnel step of the lead, referring to the step where the lead is in the funnel.
+    description: The funnel step of the draft lead, referring to the step where the lead is in the funnel. In this table is always LEAD.
   funnel_level:
     description: The funnel level of the lead, referring to the level where the lead is in the funnel. In this table is always 1.
   aux_product_status:

@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: prospects_3p
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table contains transformed data from the 3P landing tables that have a relation with the prospects in the supply pipeline.
+description: |
+  Third-party (3P) prospect records from landing pages enriched for supply acquisition tracking. Z-ordered by sk_supply_lead, business_context, and id_lead for query performance.
 columns:
   sk_supply_lead:
     description: The unique identifier for each lead in the supply tables. Its unique between CIQ, 3P and 1P tables.
@@ -40,9 +41,12 @@ columns:
     lineage:
       - datalake_supply_flows.landing_3p.reason
   funnel_step:
-    description: The funnel step of the lead, referring to the funnel step in supply funnel. In this table is always lead.
+    description: Funnel step mapped from landing_3p growth_status. PROSPECT for converted leads; LEAD for discarded leads at lead stage.
+    categories:
+      PROSPECT: Third-party lead that progressed to prospect (conversion_l2p branch).
+      LEAD: Third-party lead discarded while still at lead stage (discards_l2p branch).
   funnel_level:
-    description: The funnel level of the lead, referring to the funnel level in supply funnel. In this table is always 1.
+    description: The funnel level of the prospect row. Always 2 for both conversion and discard branches.
   aux_product_status:
     description: The product status of the lead, referring to the product status in Broker Processor.
     lineage: 

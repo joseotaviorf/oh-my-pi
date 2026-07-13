@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: leads_3p
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table contains transformed data from the 3P tables that will be used to track the status of leads in Supply pipeline.
+description: |
+  Third-party (3P) lead records enriched for supply acquisition tracking, sourced from external listing platforms in the supply pipeline. Z-ordered by sk_supply_lead, business_context, and id_lead for query performance.
 columns:
   sk_supply_lead:
     description: The unique identifier for each lead in the supply tables. Its unique between CIQ, 3P and 1P tables.
@@ -32,7 +33,7 @@ columns:
   business_event:
     description: The business event of the lead, referring to the business event in supply funnel. In this table is always acquisition_tof2l.
   funnel_step:
-    description: The funnel step of the lead, referring to the funnel step in supply funnel. In this table is always lead.
+    description: The funnel step of the lead, referring to the funnel step in supply funnel. In this table is always LEAD.
   funnel_level:
     description: The funnel level of the lead, referring to the funnel level in supply funnel. In this table is always 1.
   aux_product_status:

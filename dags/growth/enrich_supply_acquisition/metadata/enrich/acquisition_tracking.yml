@@ -1,10 +1,9 @@
 database_name: datalake_supply_flows
 table_name: acquisition_tracking
 domain: Growth
-owner: henrique.paulo@quintoandar.com.br
-description:
-  This table is a union between 1P, 3P and CIQ leads and prospects. Also, contains information about the backfill of leads which doesn't have records in Rene Descartes. |
-  For understading backfill, please check this [notebook](https://dbc-931ee6e0-6803.cloud.databricks.com/?o=4531937035440038#notebook/2308696875379500/command/3611167693023950).
+owner: gabriel.salla@quintoandar.com
+description: |
+  Unified acquisition tracking table combining 1P, 3P, and CIQ leads and prospects, including backfill records for leads missing from René Descartes attribution.
 columns:
   sk_supply_lead:
     lineage:
@@ -26,6 +25,9 @@ columns:
       - datalake_supply_flows.leads_ciq.business_context
       - datalake_supply_flows.prospects_ciq.business_context
     description: The business context of the lead, referring to the business context where the lead originated.
+    categories:
+      RENT: Rent-side supply acquisition event.
+      SALE: Sale-side supply acquisition event.
   id_lead:
     lineage:
       - datalake_supply_flows.acquisition_backfill.id_lead
@@ -56,12 +58,6 @@ columns:
       - datalake_supply_flows.leads_ciq.id_region
       - datalake_supply_flows.prospects_ciq.id_region
     description: The identifier for region in the 1P/3P/CIQ tables.
-  id_user_registrant:
-    lineage:
-      - datalake_supply_flows.acquisition_backfill.id_user_registrant
-      - datalake_supply_flows.leads_1p.id_user_registrant
-      - datalake_supply_flows.prospects_1p.id_user_registrant
-    description: The id_user of the registrant of the lead. It's not implemented in source databases yet.
   id_wololo:
     lineage:
       - datalake_supply_flows.acquisition_backfill.id_wololo
@@ -101,7 +97,10 @@ columns:
       - datalake_supply_flows.prospects_3p.funnel_step
       - datalake_supply_flows.leads_ciq.funnel_step
       - datalake_supply_flows.prospects_ciq.funnel_step
-    description: The funnel step of the lead, referring to the funnel step in supply funnel.
+    description: The funnel step of the lead or prospect in the supply acquisition funnel.
+    categories:
+      LEAD: Acquisition-stage lead event.
+      PROSPECT: Prospect-stage acquisition event.
   supply_source:
     lineage:
       - datalake_supply_flows.acquisition_backfill.supply_source
@@ -113,9 +112,9 @@ columns:
       - datalake_supply_flows.prospects_ciq.supply_source
     description: The source of the lead, referring to the source where the lead originated.
     categories:
-      1P: "The lead is from 1P."
-      3P: "The lead is from 3P."
-      CIQ: "The lead is from CIQ."
+      1P: The lead is from 1P.
+      3P: The lead is from 3P.
+      CIQ: The lead is from CIQ.
   drop_step_reason:
     lineage:
       - datalake_supply_flows.acquisition_backfill.drop_step_reason
@@ -167,7 +166,7 @@ columns:
     lineage:
       - datalake_supply_flows.acquisition_backfill.affiliate_type
       - datalake_supply_flows.lead_origin.affiliate_type
-    description: The type of the affiliate.
+    description: Affiliate program classification for the lead or prospect (e.g. standard affiliate, partner referral).
   campaign:
     lineage:
       - datalake_supply_flows.acquisition_backfill.campaign
@@ -183,6 +182,16 @@ columns:
       - datalake_supply_flows.acquisition_backfill.source
       - datalake_supply_flows.lead_origin.source
     description: The utm_source that brings the lead.
+  term:
+    lineage:
+      - datalake_supply_flows.acquisition_backfill.term
+      - datalake_supply_flows.lead_origin.term
+    description: UTM term parameter identifying paid search keywords or audience segment for the lead.
+  content:
+    lineage:
+      - datalake_supply_flows.acquisition_backfill.content
+      - datalake_supply_flows.lead_origin.content
+    description: UTM content parameter distinguishing ad creative or link variant that generated the lead.
   ops_agent:
     lineage:
       - datalake_supply_flows.acquisition_backfill.ops_agent
@@ -275,3 +284,13 @@ columns:
       - datalake_supply_flows.acquisition_backfill.database_tracking_source
       - datalake_supply_flows.lead_origin.database_tracking_source
     description: The source of utm_source, can be Amplitude or Rene Descartes.
+  database_tracking_term:
+    lineage:
+      - datalake_supply_flows.acquisition_backfill.database_tracking_term
+      - datalake_supply_flows.lead_origin.database_tracking_term
+    description: Provenance system for the UTM term value (e.g. Amplitude, Rene Descartes, backfill).
+  database_tracking_content:
+    lineage:
+      - datalake_supply_flows.acquisition_backfill.database_tracking_content
+      - datalake_supply_flows.lead_origin.database_tracking_content
+    description: Provenance system for the UTM content value (e.g. Amplitude, Rene Descartes, backfill).

@@ -2,7 +2,8 @@ database_name: datalake_supply_flows
 table_name: prospects_1p
 domain: Growth
 owner: gabriel.salla@quintoandar.com
-description: This table contains transformed data from the 1P tables that have a relation with the prospects in the supply pipeline.
+description: |
+  First-party (1P) prospect records enriched for supply acquisition funnel tracking, representing potential landlords before lead qualification. Z-ordered by sk_supply_lead, business_context, and id_lead for query performance.
 columns:
   sk_supply_lead:
     description: The unique identifier for each lead in the supply tables. Its unique between CIQ, 3P and 1P tables.
@@ -12,9 +13,9 @@ columns:
     description: The business context of the lead, referring to the business context where the lead originated.
     lineage: 
       - datalake_supply_flows.leads_1p.business_context
-    category: 
-      - SALE: The 1P lead is for sale.
-      - RENT: The 1P lead is for rent.
+    categories:
+      SALE: The 1P lead is for sale.
+      RENT: The 1P lead is for rent.
   id_lead:
     description: The unique identifier for each lead in the 1P tables.
     lineage: 
@@ -26,7 +27,7 @@ columns:
   id_referred_by:
     description: The identifier of affiliate that referred the lead.
     lineage: 
-      - datalake_supply_flows.leads_1p.id_lead_ebdb
+      - datalake_supply_flows.leads_1p.id_referred_by
   id_region:
     description: The identifier for region in the 1P tables.
     lineage: 
@@ -44,7 +45,10 @@ columns:
   business_event:
     description: The business event of the lead, referring to the business event in supply funnel. In this table is always acquisition_tof2l.
   funnel_step:
-    description: The funnel step of the lead, referring to the funnel step in supply funnel. In this table is always prospect.
+    description: Funnel step for the 1P prospect row. PROSPECT for converted leads; LEAD for discarded leads that never progressed past lead stage.
+    categories:
+      PROSPECT: Lead converted to prospect in the 1P pipeline.
+      LEAD: Discarded lead that remained at lead stage (drop_l2p branch).
   supply_source:
     description: The source of the lead, referring to the source where the lead originated. For this table is always 1P.
   drop_step_reason:

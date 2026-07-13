@@ -1,8 +1,9 @@
 database_name: datalake_supply_flows
 table_name: supply_events_tracking
 domain: Growth
-owner: henrique.paulo@quintoandar.com.br
-description: This table is a result of joined data from acquisition and conversion steps from the supply flows.
+owner: gabriel.salla@quintoandar.com
+description: |
+  Consolidated supply funnel events joining acquisition and conversion steps with taxonomy dimensions for end-to-end supply flow reporting. Z-ordered by sk_supply_lead, id_lead_ebdb, id_house, and business_context for query performance.
 columns:
   bk_supply:
     description: The unique identifier for each supply event.
@@ -27,8 +28,8 @@ columns:
   business_context:
     description: Business context of the conversion event.
     categories:
-      RENT: 'For rent lead or house'
-      SALE: 'For sale lead or house'
+      RENT: For rent lead or house
+      SALE: For sale lead or house
     lineage:
       - datalake_supply_flows.conversion_tracking.business_context
       - datalake_supply_flows.acquisition_tracking.business_context
@@ -48,10 +49,10 @@ columns:
     lineage:
       - datalake_supply_flows.acquisition_tracking.id_lead
   id_prospect:
-    description: The identifier for each prospect.
+    description: Prospect identifier. For acquisition rows, mapped from id_wololo (Wololo prospect id); for conversion rows, sourced from conversion_tracking.
     lineage:
       - datalake_supply_flows.conversion_tracking.id_prospect
-      - datalake_supply_flows.acquisition_tracking.id_prospect
+      - datalake_supply_flows.acquisition_tracking.id_wololo
   id_entity:
     description: The identifier for each entity. Can be a id_prospect or id_house.
     lineage:
@@ -78,16 +79,27 @@ columns:
       - datalake_supply_flows.conversion_tracking.id_user_conversion
   supply_source:
     description: Source of the supply. Can be 1P, 3P, or CIQ.
+    categories:
+      1P: First-party QuintoAndar supply event.
+      3P: Third-party Brokers Supply Processor event.
+      CIQ: CIQ Bob draft supply event.
     lineage:
       - datalake_supply_flows.conversion_tracking.supply_source
       - datalake_supply_flows.acquisition_tracking.supply_source
   business_event:
-    description: Type of business event.
+    description: Business event type classifying the supply funnel step (e.g. prospect, qualified, opportunity, first_listing).
     lineage:
       - datalake_supply_flows.conversion_tracking.business_event
       - datalake_supply_flows.acquisition_tracking.business_event
   funnel_step:
     description: The funnel step of the taxonomy, referring to the funnel step in the supply funnel.
+    categories:
+      LEAD: Lead-stage supply event from acquisition tracking.
+      PROSPECT: Prospect-stage supply event.
+      QUALIFIED: Qualified-stage conversion event.
+      AV_QUALIFIED: Available-qualified conversion event.
+      OPPORTUNITY: Opportunity-stage conversion event.
+      FIRST_LISTING: First-listing conversion event.
     lineage:
       - datalake_supply_flows.conversion_tracking.funnel_step
       - datalake_supply_flows.acquisition_tracking.funnel_step
@@ -97,7 +109,7 @@ columns:
       - datalake_supply_flows.conversion_tracking.drop_step_reason
       - datalake_supply_flows.acquisition_tracking.drop_step_reason
   affiliate_type:
-    description: The type of the affiliate.
+    description: Affiliate program classification for the supply event (e.g. standard affiliate, partner referral).
     lineage:
       - datalake_supply_flows.acquisition_tracking.affiliate_type
   application:
@@ -149,6 +161,14 @@ columns:
     description: The utm_campaign that brings the lead.
     lineage:
       - datalake_supply_flows.acquisition_tracking.campaign
+  term:
+    description: The utm_term that brings the lead.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.term
+  content:
+    description: The utm_content that brings the lead.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.content
   ops_agent:
     description: Agent that reprocessed the lead. For this scenario, it is always the outbound team.
     lineage:
@@ -210,6 +230,14 @@ columns:
     description: The source of utm_source, can be Amplitude or Rene Descartes.
     lineage:
       - datalake_supply_flows.acquisition_tracking.database_tracking_source
+  aux_database_tracking_term:
+    description: The source of utm_term, can be Amplitude or Rene Descartes.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.database_tracking_term
+  aux_database_tracking_content:
+    description: The source of utm_content, can be Amplitude or Rene Descartes.
+    lineage:
+      - datalake_supply_flows.acquisition_tracking.database_tracking_content
   aux_data_event:
     description: Auxiliary data event information.
     lineage:
@@ -224,9 +252,12 @@ columns:
       - datalake_supply_flows.conversion_tracking.aux_product_status
       - datalake_supply_flows.acquisition_tracking.aux_product_status
   aux_origin_table:
-    description: The origin of data, can be acquisition or conversion.
+    description: The origin branch of the unified supply event row.
+    categories:
+      acquisition: Row sourced from acquisition_tracking.
+      conversion: Row sourced from conversion_tracking.
   ts_event_adjusted:
-    description: Timestamp of the event.
+    description: Adjusted timestamp of the supply funnel event after timezone and business rule corrections applied during enrichment.
     lineage:
       - datalake_supply_flows.conversion_tracking.ts_event_adjusted
       - datalake_supply_flows.acquisition_tracking.ts_event
