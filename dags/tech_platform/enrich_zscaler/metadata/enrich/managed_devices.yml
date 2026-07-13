@@ -1,7 +1,7 @@
 database_name: datalake_zscaler
 table_name: managed_devices
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: danilo.barbosa@quintoandar.com.br
 description: |
   Current-state Zscaler Client Connector managed devices: latest ingest partition within the Airflow batch window and one row
   per device (not a historical stack of partitions). Derived from clean by keeping MAX(year, month, day) in
@@ -12,31 +12,31 @@ columns:
     lineage:
       - datalake_zscaler_clean.managed_devices.id_device
   ds_mac_address:
-    description: Device MAC address.
+    description: Media access control address reported by the Zscaler Client Connector agent on the endpoint.
     lineage:
       - datalake_zscaler_clean.managed_devices.ds_mac_address
   nm_hostname:
-    description: Machine hostname.
+    description: Machine hostname registered in Zscaler Client Connector for the managed endpoint.
     lineage:
       - datalake_zscaler_clean.managed_devices.nm_hostname
   ds_user_email:
-    description: User email associated with the device.
+    description: Corporate email of the user last associated with the device in Zscaler Client Connector.
     lineage:
       - datalake_zscaler_clean.managed_devices.ds_user_email
   nm_owner:
-    description: Device owner name.
+    description: Display name of the device owner or assigned user reported by Zscaler inventory.
     lineage:
       - datalake_zscaler_clean.managed_devices.nm_owner
   nm_device_model:
-    description: Device model name.
+    description: Device model name from Zscaler Client Connector inventory for hardware identification.
     lineage:
       - datalake_zscaler_clean.managed_devices.nm_device_model
   nm_manufacturer:
-    description: Device manufacturer.
+    description: Hardware manufacturer name reported by Zscaler Client Connector device inventory.
     lineage:
       - datalake_zscaler_clean.managed_devices.nm_manufacturer
   ds_os_version:
-    description: Operating system version.
+    description: Operating system name and version string reported by the Zscaler agent on the endpoint.
     lineage:
       - datalake_zscaler_clean.managed_devices.ds_os_version
   ds_agent_version:
@@ -48,7 +48,7 @@ columns:
     lineage:
       - datalake_zscaler_clean.managed_devices.nm_policy
   nm_company:
-    description: Company name.
+    description: Company name associated with the device enrollment in Zscaler Client Connector.
     lineage:
       - datalake_zscaler_clean.managed_devices.nm_company
   ds_registration_state:
@@ -56,19 +56,19 @@ columns:
     lineage:
       - datalake_zscaler_clean.managed_devices.ds_registration_state
   cd_device_type:
-    description: Device type code.
+    description: Zscaler device type classification code for the enrolled Client Connector endpoint.
     lineage:
       - datalake_zscaler_clean.managed_devices.cd_device_type
   cd_device_state:
-    description: Device state code.
+    description: Operational state code of the device in Zscaler Client Connector (online/offline/etc.).
     lineage:
       - datalake_zscaler_clean.managed_devices.cd_device_state
   cd_vpn_state:
-    description: VPN state code.
+    description: VPN tunnel state code reported by Zscaler Client Connector for the device session.
     lineage:
       - datalake_zscaler_clean.managed_devices.cd_vpn_state
   ds_tunnel_version:
-    description: Tunnel version.
+    description: Version of the Zscaler tunnel protocol negotiated by the Client Connector agent.
     lineage:
       - datalake_zscaler_clean.managed_devices.ds_tunnel_version
   ds_architecture:

@@ -1,7 +1,7 @@
 database_name: datalake_crowdstrike
 table_name: managed_devices
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: danilo.barbosa@quintoandar.com.br
 description: |
   Current-state CrowdStrike managed devices: latest ingest partition within the Airflow batch window and one row
   per device (not a historical stack of partitions). Derived from clean by keeping MAX(year, month, day) in
@@ -16,7 +16,7 @@ columns:
     lineage:
       - datalake_crowdstrike_clean.managed_devices.id_cid
   nm_hostname:
-    description: Device hostname.
+    description: Device hostname as reported by CrowdStrike Falcon on the managed endpoint.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.nm_hostname
   ds_platform:
@@ -24,11 +24,11 @@ columns:
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_platform
   id_platform:
-    description: Platform identifier.
+    description: Platform identifier code assigned by CrowdStrike for the device operating system.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.id_platform
   ds_os_version:
-    description: Operating system version.
+    description: Operating system product name and version string from CrowdStrike Falcon device inventory.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_os_version
   ds_os_build:
@@ -36,11 +36,11 @@ columns:
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_os_build
   ds_major_version:
-    description: OS major version.
+    description: Major version number of the operating system reported by CrowdStrike.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_major_version
   ds_minor_version:
-    description: OS minor version.
+    description: Minor version number of the operating system reported by CrowdStrike.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_minor_version
   ds_agent_version:
@@ -56,11 +56,11 @@ columns:
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_local_ip
   ds_mac_address:
-    description: Device MAC address.
+    description: Media access control address observed by CrowdStrike Falcon on the endpoint.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_mac_address
   ds_machine_domain:
-    description: Machine domain.
+    description: Active Directory or local domain name associated with the managed device.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_machine_domain
   nm_last_login_user:
@@ -76,11 +76,11 @@ columns:
     lineage:
       - datalake_crowdstrike_clean.managed_devices.id_last_login_user_sid
   id_config_base:
-    description: Configuration ID base.
+    description: Base configuration identifier for the CrowdStrike agent policy set on the device.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.id_config_base
   id_config_build:
-    description: Configuration ID build.
+    description: Build configuration identifier for the CrowdStrike agent policy set on the device.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.id_config_build
   id_config_platform:
@@ -104,7 +104,7 @@ columns:
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_rtr_state
   ds_safe_mode:
-    description: Safe mode status.
+    description: Indicates whether CrowdStrike reports the endpoint as running in Windows safe mode.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ds_safe_mode
   ts_first_seen:
@@ -120,7 +120,7 @@ columns:
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ts_last_login
   ts_agent_local_time:
-    description: Agent local time.
+    description: Local timestamp reported by the CrowdStrike Falcon agent on the managed device.
     lineage:
       - datalake_crowdstrike_clean.managed_devices.ts_agent_local_time
   year:

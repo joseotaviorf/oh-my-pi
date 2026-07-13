@@ -1,5 +1,13 @@
 database_name: datalake_crowdstrike_raw
 table_name: managed_devices
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: danilo.barbosa@quintoandar.com.br
 description: "Raw managed devices from CrowdStrike Falcon EDR platform via REST API."
+columns:
+  year:
+    description: Ingestion partition year derived from the batch load date; filter on this column for partition pruning.
+  month:
+    description: Ingestion partition month derived from the batch load date; filter on this column for partition pruning.
+  day:
+    description: Ingestion partition day derived from the batch load date; filter on this column for partition pruning.
+

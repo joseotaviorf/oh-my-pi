@@ -1,7 +1,7 @@
 database_name: datalake_crowdstrike_clean
 table_name: managed_devices
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: danilo.barbosa@quintoandar.com.br
 description: Clean snapshot of managed devices from CrowdStrike Falcon EDR platform, with normalized identifiers and timestamps.
 columns:
   id_device:
@@ -25,7 +25,7 @@ columns:
     lineage:
       - datalake_crowdstrike_raw.managed_devices.platform_id
   ds_os_version:
-    description: Operating system version name.
+    description: Operating system product name and version string from CrowdStrike Falcon device inventory.
     lineage:
       - datalake_crowdstrike_raw.managed_devices.os_version
   ds_os_build:
