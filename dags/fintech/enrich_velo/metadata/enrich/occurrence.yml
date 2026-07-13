@@ -1,9 +1,13 @@
 ---
 database_name: datalake_velo
 table_name: occurrence
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Enriched table responsible for the occurrence context of Velo
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Enriched table responsible for the occurrence context of Velo
 columns:
   id_occurrence:
     description: Table's unique ID.
@@ -25,7 +29,7 @@ columns:
     lineage:
       - datalake_velo.junk.id_junk
   id_unicid:
-    description: Business ID for UNICID.
+    description: Identifier for the unicid referenced by this financial record.
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.id_unicid
   ids_accounting_entry:
@@ -33,40 +37,40 @@ columns:
     lineage:
       - datalake_robin_hood.accounting_entry.id
   type:
-      description: Describes the category of the delinquency.
-      categories:
-        SIGNATURE: Related to the signature.
-        GUARANTEE: Involves a guarantee.
-        TERMINATION: Tied to termination.
-        BILLING: Related to billing.
-        RENEWAL: Concerns a renewal.
-        RENEWAL_MONTH: A monthly renewal.
-        ACTIVATION_PARTIAL_LINK: Activation with partial linking.
-      lineage:
+    description: Describes the category of the delinquency.
+    categories:
+      SIGNATURE: Related to the signature.
+      GUARANTEE: Involves a guarantee.
+      TERMINATION: Tied to termination.
+      BILLING: Related to billing.
+      RENEWAL: Concerns a renewal.
+      RENEWAL_MONTH: A monthly renewal.
+      ACTIVATION_PARTIAL_LINK: Activation with partial linking.
+    lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.type
   status:
-      description: Represents the current state of the delinquency.
-      categories:
-        REGISTERED: The delinquency is recorded.
-        RECOVERING: The process of recovering is underway.
-        PROGRESS: The delinquency is in progress.
-        FINISHED: The process has been completed.
-        UNDER_AGREEMENT: There is an agreement in place.
-        REQUESTED_AGREEMENT: An agreement is requested but not yet confirmed.
-        ACTIVE_FALSE: The delinquency is inactive.
-        FORGIVEN: The delinquency has been forgiven.
-      lineage:
+    description: Represents the current state of the delinquency.
+    categories:
+      REGISTERED: The delinquency is recorded.
+      RECOVERING: The process of recovering is underway.
+      PROGRESS: The delinquency is in progress.
+      FINISHED: The process has been completed.
+      UNDER_AGREEMENT: There is an agreement in place.
+      REQUESTED_AGREEMENT: An agreement is requested but not yet confirmed.
+      ACTIVE_FALSE: The delinquency is inactive.
+      FORGIVEN: The delinquency has been forgiven.
+    lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.status
   description:
     description: Description comments for this occurrence.
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.description
   invoice_url:
-    description: URL of charged invoice.
+    description: Velo platform attribute describing invoice url for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.invoice_url
   due_amount:
-    description: Amount that is due.
+    description: Velo platform attribute describing due amount for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.value
   due_amount_original:
@@ -74,7 +78,7 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.original_value
   paid_amount:
-    description: Amount that was paid.
+    description: Velo platform attribute describing paid amount for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency.amount_paid
   discount_amount:

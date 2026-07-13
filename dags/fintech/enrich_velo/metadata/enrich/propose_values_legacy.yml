@@ -1,8 +1,12 @@
 database_name: datalake_velo
 table_name: propose_values_legacy
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table containing Velo's proposes detailed info (only 2.0 not migrated proposes)"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table containing Velo's proposes detailed info (only 2.0 not migrated proposes)
 columns:
   id_propose_values:
     description: ProposeValues's identification number (ID)
@@ -37,35 +41,35 @@ columns:
   annual_guarantee:
     description: Annual total amount of the guarantee
   rent_amount:
-    description: Rent amount
+    description: Velo platform attribute describing rent amount for condominium billing reconciliation.
   condo_amount:
-    description: Condo amount
+    description: Velo platform attribute describing condo amount for condominium billing reconciliation.
   light_amount:
-    description: Light amount
+    description: Velo platform attribute describing light amount for condominium billing reconciliation.
   water_amount:
-    description: Water amount
+    description: Velo platform attribute describing water amount for condominium billing reconciliation.
   phone_amount:
-    description: Phone amount
+    description: Velo platform attribute describing phone amount for condominium billing reconciliation.
   iptu_amount:
-    description: IPTU amount
+    description: Velo platform attribute describing iptu amount for condominium billing reconciliation.
   other_amount:
-    description: Other amount
+    description: Velo platform attribute describing other amount for condominium billing reconciliation.
   total_package_amount:
-    description: Total package amount
+    description: Velo platform attribute describing total package amount for condominium billing reconciliation.
   plan_percent:
     description: Percentage of the plan in comparison to the package
     lineage:
       - datalake_rental_guarantee_platform_clean.plan.pricing
   plan_coverage:
-    description: Propose plan coverage.
+    description: Velo platform attribute describing plan coverage for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.plan.coverage
   plan_damage:
-    description: Propose plan damage.
+    description: Velo platform attribute describing plan damage for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.plan.damage
   plan_commission:
-    description: Propose plan comission.
+    description: Velo platform attribute describing plan commission for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.plan.comission
   is_legacy:

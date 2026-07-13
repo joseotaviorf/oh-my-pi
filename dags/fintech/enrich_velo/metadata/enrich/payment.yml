@@ -1,9 +1,13 @@
 ---
 database_name: datalake_velo
 table_name: payment
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Enriched table focused on the Payments context for Velo.
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Enriched table focused on the Payments context for Velo.
 columns:
   id_payment:
     description: Table's unique ID.
@@ -51,7 +55,7 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.customer
   id_unicid:
-    description: Business ID for UNICID.
+    description: Identifier for the unicid referenced by this financial record.
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.unicid
   id_subscription:
@@ -68,7 +72,7 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.billing_type
   status:
-    description: Status description.
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.status
       - datalake_rental_guarantee_platform_clean.agreement_payment.status
@@ -81,7 +85,7 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.product_type
   invoice_url:
-    description: URL of charged invoice.
+    description: Velo platform attribute describing invoice url for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.invoice_url
   description:
@@ -89,7 +93,7 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.description
   due_amount:
-    description: Amount that is due.
+    description: Velo platform attribute describing due amount for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.value
       - datalake_rental_guarantee_platform_clean.agreement_payment.value

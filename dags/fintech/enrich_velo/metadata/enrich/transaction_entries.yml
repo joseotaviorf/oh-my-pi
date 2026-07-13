@@ -1,15 +1,15 @@
 database_name: datalake_velo
 table_name: transaction_entries
-owner: athos.sampayo@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Enriched table responsible for the transaction entries (itens in a transaction) for the Velo context.
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Enriched table responsible for the transaction entries (itens in a transaction) for the Velo context.
 columns:
   id_transaction_entry:
     description: Transaction entry's identification number (ID)
-  id_trasaction:
-    description: Transaction's identification number (ID).
-    lineage:
-      - datalake_velo_omie.cash_flows.id_securities
   id_category:
     description: Category's identification number (ID). This key connects to the table datalake_velo.transaction_category
     lineage:
@@ -32,7 +32,7 @@ columns:
     lineage:
       - datalake_velo_omie_clean.projects.project_name
   status:
-    description: Status of the transaction
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     categories:
       A VENCER: transaction to be due
       ATRASADO: overdue transaction
@@ -42,14 +42,14 @@ columns:
     lineage:
       - datalake_velo_omie.cash_flows.status
   transaction_type:
-    description: Transaction type
+    description: Velo platform attribute describing transaction type for condominium billing reconciliation.
     categories:
       CONTA_A_PAGAR: Payable account
       CONTA_A_RECEBER: Receivable account
     lineage:
       - datalake_velo_omie.cash_flows.id_group
   transaction_purpose:
-    description: Purpose of transaction
+    description: Velo platform attribute describing transaction purpose for condominium billing reconciliation.
     categories:
       ongoing: transaction from an unfinished account
       rescisão: transaction from an finished account
@@ -66,17 +66,17 @@ columns:
     lineage:
       - datalake_velo_omie.cash_flows_categories.category_percentage
   due_amount:
-    description: Entry's due amount
+    description: Velo platform attribute describing due amount for condominium billing reconciliation.
     lineage:
       - datalake_velo_omie.cash_flows.due_amount
   paid_amount:
-    description: Entry's paid amount
+    description: Velo platform attribute describing paid amount for condominium billing reconciliation.
     lineage:
       - datalake_velo_omie.cash_flows.paid_amount
   is_occurency:
     description: If this entry is related to an ocurrency. Basically checks if the destination account is tagged as 'Garantia Locaticia'.
   is_project_receivable_created:
-    description: Has a transaction receivable created
+    description: Indicates whether project receivable created applies to this financial record.
   is_project_receivable_greater_than_payable:
     description: Transaction has the received amount greater than the amount payable
   dt_issue:
@@ -103,3 +103,6 @@ columns:
     description: Moment (timestamp) when the transaction was modified last
     lineage:
       - datalake_velo_omie.cash_flows.ts_modified
+  id_transaction:
+    description: Identifier for the transaction referenced by this financial record.
+    lineage: []

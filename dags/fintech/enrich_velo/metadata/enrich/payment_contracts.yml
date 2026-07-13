@@ -1,9 +1,13 @@
 ---
 database_name: datalake_velo
 table_name: payment_contracts
-owner: juliana.hocihara@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Enriched table focused on the contract payments context for Velo.
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Enriched table focused on the contract payments context for Velo.
 columns:
   id_propose:
     description: Unique identification number of the propose
@@ -20,7 +24,7 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.id
   status:
-    description: Contract payment status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.id
   gateway:
@@ -28,7 +32,7 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.id
   billing_type:
-    description: Contract billing type
+    description: Velo platform attribute describing billing type for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.id
   category:

@@ -1,8 +1,12 @@
 database_name: datalake_velo
 table_name: propose_person_legacy
-description: Details of persons related to the contract (only 2.0 ids)
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Details of persons related to the contract (only 2.0 ids)
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_person:
     description: Person's identification number (ID)
@@ -13,15 +17,15 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy.id_propose
   name:
-    description: Person's name
+    description: Velo platform attribute describing name for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_proposeperson_legacy.name
   email:
-    description: Person's email
+    description: Velo platform attribute describing email for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.clientes_person_legacy.email
   phone:
-    description: Person's phone
+    description: Velo platform attribute describing phone for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.clientes_person_legacy.phone
   bureau_name:

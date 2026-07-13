@@ -1,7 +1,7 @@
 ---
 database_name: datalake_accounting_funnel
 table_name: accounts_payable
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table containing accounts payable data"
 columns:
@@ -18,7 +18,7 @@ columns:
   version:
     lineage:
       - dw_rent.dim_contract.version
-    description: "Contract version"
+    description: Financial attribute representing version on the accounts_payable dataset.
   accounting_version:
     description: "Not visible on CAP, it's used to match the number of columns in Invoice_all table"
   is_contract_b2b:
@@ -28,11 +28,11 @@ columns:
   locale:
     lineage:
       - dw_public.dim_region.city_name
-    description: "City name"
+    description: City name recorded on the accounts_payable dataset.
   localidade:
     lineage:
       - datalake_gsheets_clean.cod_locale.id_locale
-    description: "City ID"
+    description: City ID recorded on the accounts_payable dataset.
   guarantee:
     lineage:
       - dw_rent.dim_contract.guarantee
@@ -94,17 +94,17 @@ columns:
   entry_created_date:
     lineage:
       - datalake_payable_accounts_transactions_clean.accounts_payable.dt_paid
-    description: "Entry creation date"
+    description: Financial attribute representing entry created date on the accounts_payable dataset.
   invoice_created_date:
-    description: "Invoice creation date"
+    description: Financial attribute representing invoice created date on the accounts_payable dataset.
   invoice_due_date:
-    description: "Invoice due date"
+    description: Financial attribute representing invoice due date on the accounts_payable dataset.
   invoice_paid_date:
-    description: "Date when the invoice was paid"
+    description: Financial attribute representing invoice paid date on the accounts_payable dataset.
   invoice_paid_date_next_business_day:
     description: "First business day after the invoice payment"
   invoice_canceled_date:
-    description: "Date when the invoice was canceled"
+    description: Financial attribute representing invoice canceled date on the accounts_payable dataset.
   contract_start:
     lineage:
       - dw_rent.dim_contract.dt_start
