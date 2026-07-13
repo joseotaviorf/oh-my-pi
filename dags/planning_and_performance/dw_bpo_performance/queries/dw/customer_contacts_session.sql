@@ -138,7 +138,7 @@ LEFT JOIN dw_satisfaction_rating.dim_answer da
 WHERE 
     fa.ts_submitted >= DATE '2026-06-25'
     AND (
-        (sa.service_context IN ('call','call inapp') AND sa.score_description = 'resolution survey') OR 
+        (sa.service_context IN ('call','call inapp') AND sa.score_description = 'satisfaction evaluation') OR 
         (sa.service_context NOT IN ('call','call inapp') OR sa.service_context IS NULL)
     )
 ),
