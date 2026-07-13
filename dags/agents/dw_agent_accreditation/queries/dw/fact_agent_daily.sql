@@ -108,6 +108,30 @@ visit_demand_history AS (
         visit_demand_history_ranked
     WHERE
         rn = 1
+),
+old_agent_history AS (
+    WITH old_agent_history_ranked AS (
+        SELECT
+            daily_status.id_agent_daily,
+            ad.is_passive_lead_receiver,
+            ROW_NUMBER() OVER(PARTITION BY daily_status.id_agent_daily ORDER BY ure.ts_revision DESC) AS rn
+        FROM
+            datalake_ebdb_clean.agent_data_aud AS ad
+        JOIN
+            datalake_ebdb_user.user_revision_entity AS ure
+                ON ad.rev = ure.id
+        JOIN
+            daily_status
+                ON ad.id = daily_status.id_agent_data
+                AND daily_status.dt_ref >= DATE(ure.ts_revision)
+    )
+    SELECT
+        id_agent_daily,
+        is_passive_lead_receiver
+    FROM
+        old_agent_history_ranked
+    WHERE
+        rn = 1
 )
 SELECT
     ds.id_agent_daily AS sk_agent_daily,
@@ -130,7 +154,7 @@ SELECT
     IF(ds.cap_negotiation_status IS NULL, NULL, ds.cap_negotiation_status IN ('AGENT_CAPABILITY_ENABLED', 'AGENT_CAPABILITY_REENABLED')) AS is_allow_negotiation,
     vdh.is_allow_demand_sale,
     vdh.is_allow_demand_rent,
-    vdh.is_passive_lead_receiver,
+    COALESCE(oah.is_passive_lead_receiver, vdh.is_passive_lead_receiver) AS is_passive_lead_receiver,
     COALESCE(ad.is_1p_partnership, ds.is_1p_partnership) AS is_1p_partnership,
     COALESCE(ad.is_3p_partnership, ds.is_3p_partnership) AS is_3p_partnership,
     TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) AS days_in_current_status,
@@ -148,6 +172,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_agent_accreditation.agent_daily AS ad
         ON ad.id_agent_daily = ds.id_agent_daily
+LEFT JOIN
+    old_agent_history AS oah
+        ON oah.id_agent_daily = ds.id_agent_daily
 WHERE
     ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')
     OR (ds.agent_status = 'AGENT_INACTIVATED' AND TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) < 1)

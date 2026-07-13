@@ -151,6 +151,19 @@ agent_log AS (
     WHERE
         rn = 1
 ),
+old_agent_data AS (
+    SELECT
+        id,
+        CASE --when the last two characters are a state code, we need to extract the first part of the creci number
+            WHEN REGEXP_LIKE(creci_number, '-[ ]*[A-Za-z]{2}$')
+            THEN TRIM(REGEXP_EXTRACT(creci_number, '^(.*)-[^-]+$', 1))
+            ELSE creci_number
+        END AS creci,
+        NULLIF(REGEXP_EXTRACT(creci_number, '-[ ]*([A-Za-z]{2})$', 1), '') AS creci_uf, --when the last two characters are a state code, we need to extract the last part of the creci number
+        is_passive_lead_receiver
+    FROM
+        datalake_ebdb_clean.agent_data
+),
 agent_capability AS (
     SELECT
         c.id_agent,
@@ -189,8 +202,8 @@ SELECT
     a.uuid_company,
     a.uuid_agent,
     a.uuid_person,
-    pa.creci,
-    pa.creci_uf,
+    COALESCE(oad.creci, pa.creci) AS creci,
+    COALESCE(oad.creci_uf, pa.creci_uf) AS creci_uf,
     a.affiliation_type,
     a.status,
     ap.company_product_name,
@@ -201,7 +214,7 @@ SELECT
     ca.is_allow_visit,
     ca.is_allow_demand_sale,
     ca.is_allow_demand_rent,
-    ca.is_passive_lead_receiver,
+    COALESCE(oad.is_passive_lead_receiver, ca.is_passive_lead_receiver) AS is_passive_lead_receiver,
     a.is_1p_partnership,
     a.is_3p_partnership,
     al.days_in_current_status,
@@ -226,3 +239,6 @@ LEFT JOIN
 LEFT JOIN
     agent_log AS al
         ON al.id_agent = a.id_agent
+LEFT JOIN
+    old_agent_data AS oad
+        ON oad.id = a.id_agent_data

@@ -46,10 +46,12 @@ columns:
   creci:
     lineage:
       - datalake_agent_accreditation.prospect_agent.creci
+      - datalake_ebdb_clean.agent_data.creci_number
     description: CRECI license number from the last prospect person converted.
   creci_uf:
     lineage:
       - datalake_agent_accreditation.prospect_agent.creci_uf
+      - datalake_ebdb_clean.agent_data.creci_number
     description: State (UF) of the CRECI license from the last prospect person converted.
   affiliation_type:
     lineage:
@@ -100,6 +102,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.demand_visit_management_capability_settings.is_passive_lead_receiver
       - datalake_ebdb_clean.capability.type
+      - datalake_ebdb_clean.agent_data.is_passive_lead_receiver
     description: True when the agent is configured to receive passive leads.
   is_1p_partnership:
     lineage:
