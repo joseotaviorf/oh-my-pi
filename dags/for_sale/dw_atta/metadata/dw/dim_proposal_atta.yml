@@ -2,86 +2,86 @@ database_name: dw_atta
 table_name: dim_proposal_atta
 description: dimension with the details from atta proposals
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
-    sk_proposal:
-        lineage:
-            - datalake_atta_clean.proposal.id_proposal
-        description: "Proposal identification number"
-    sk_product:
-        lineage:
-            - datalake_atta_clean.product_info.id_product
-        description: "Product identification number"
-    sk_proposal_status:
-        lineage:
-            - datalake_atta_clean.proposal.id_proposal_status
-        description: "Proposal status identification number"
-    sk_proposal_situation:
-        lineage:
-            - datalake_atta_clean.proposal.id_proposal_situation
-        description: "Proposal situation identification number"
-    sk_proprosal_bank:
-        lineage:
-            - datalake_atta_clean.financing_proposal.id_itau
-        description: "Proposal ID in related bank"
-    sk_credit_analyst:
-        lineage:
-            - datalake_atta_clean.proposal.id_credit_analyst
-        description: "Identification number for the credit analyst who followed the proposal"
-    sk_juridical_analyst:
-        lineage:
-            - datalake_atta_clean.proposal.id_juridical_analyst
-        description: "Identification number for the juridical analyst who followed the proposal"
-    product_name:
-        lineage:
-            - datalake_atta_clean.product_info.product_name
-        description: "Product name"
-    financing_bank:
-        lineage:
-            - datalake_atta_clean.providers_info.provider_name
-        description: "Product name"
-    credit_application_status:
-        description: "Credit application status"
-    proposal_status:
-        lineage:
-            - datalake_atta_clean.track_step_detail.proposal_status
-        description: "Description of proposal status"
-    proposal_situation:
-        description: "Description of proposal situation"
-    channel:
-        description: "Proposal channel grouping"
-    house_value:
-        lineage:
-            - datalake_atta_clean.financing_proposal_check.house_sale_value
-            - datalake_atta_clean.pre_analysis.house_value
-        description: "House value"
-    house_value_bank_evaluation:
-        lineage:
-            - datalake_atta_clean.financing_proposal_check.bank_valuation_value
-            - datalake_atta_clean.financing_proposal.estimated_house_value
-        description: "House value according to bank evaluation"
-    down_payment_amount:
-        description: "Down payment amount in BRL"
-    financing_value:
-        lineage:
-            - datalake_atta_clean.financing_proposal_check.financing_value
-            - datalake_atta_clean.financing_proposal.finance_value
-            - datalake_atta_clean.proposal.financing_value
-            - datalake_atta_clean.pre_analysis.financing_value
-        description: "Financing amouint in BRL"
-    total_financing_value:
-        description: "Total financing amount in BRL (Sum of financing value, itbi and bank evaluation fee)"
-    itbi_value:
-        lineage:
-            - datalake_atta_clean.financing_proposal_check.itbi_value
-        description: "ITBI value in BRL"
-    bank_valuation_fee_value:
-        lineage:
-            - datalake_atta_clean.financing_proposal_check.bank_valuation_fee_value
-        description: "Bank evaluation fee in BRL"
-    is_automatic_proposal:
-        description: "Flag to identify automatic or manual proposals"
-    is_offer_canceled:
-        description: "Flag to identify canceled offers"
-    ts_load:
-        description: "Load date"
+  sk_proposal:
+    lineage:
+    - datalake_atta_clean.proposal.id_proposal
+    description: Proposal identification number
+  sk_product:
+    lineage:
+    - datalake_atta_clean.product_info.id_product
+    description: Product identification number
+  sk_proposal_status:
+    lineage:
+    - datalake_atta_clean.proposal.id_proposal_status
+    description: Proposal status identification number
+  sk_proposal_situation:
+    lineage:
+    - datalake_atta_clean.proposal.id_proposal_situation
+    description: Proposal situation identification number
+  sk_proprosal_bank:
+    lineage:
+    - datalake_atta_clean.financing_proposal.id_itau
+    description: Proposal ID in related bank
+  sk_credit_analyst:
+    lineage:
+    - datalake_atta_clean.proposal.id_credit_analyst
+    description: Identification number for the credit analyst who followed the proposal
+  sk_juridical_analyst:
+    lineage:
+    - datalake_atta_clean.proposal.id_juridical_analyst
+    description: Identification number for the juridical analyst who followed the proposal
+  product_name:
+    lineage:
+    - datalake_atta_clean.product_info.product_name
+    description: Name of the financing product associated with the proposal.
+  financing_bank:
+    lineage:
+    - datalake_atta_clean.providers_info.provider_name
+    description: Name of the bank providing the financing for the proposal.
+  credit_application_status:
+    description: Status of the credit application tied to the financing proposal.
+  proposal_status:
+    lineage:
+    - datalake_atta_clean.track_step_detail.proposal_status
+    description: Description of proposal status
+  proposal_situation:
+    description: Description of proposal situation
+  channel:
+    description: Proposal channel grouping
+  house_value:
+    lineage:
+    - datalake_atta_clean.financing_proposal_check.house_sale_value
+    - datalake_atta_clean.pre_analysis.house_value
+    description: Declared property value in BRL on the financing proposal.
+  house_value_bank_evaluation:
+    lineage:
+    - datalake_atta_clean.financing_proposal_check.bank_valuation_value
+    - datalake_atta_clean.financing_proposal.estimated_house_value
+    description: House value according to bank evaluation
+  down_payment_amount:
+    description: Down payment amount in BRL
+  financing_value:
+    lineage:
+    - datalake_atta_clean.financing_proposal_check.financing_value
+    - datalake_atta_clean.financing_proposal.finance_value
+    - datalake_atta_clean.proposal.financing_value
+    - datalake_atta_clean.pre_analysis.financing_value
+    description: Financing amouint in BRL
+  total_financing_value:
+    description: Total financing amount in BRL (Sum of financing value, itbi and bank evaluation fee)
+  itbi_value:
+    lineage:
+    - datalake_atta_clean.financing_proposal_check.itbi_value
+    description: Property transfer tax (ITBI) amount included or excluded from financing.
+  bank_valuation_fee_value:
+    lineage:
+    - datalake_atta_clean.financing_proposal_check.bank_valuation_fee_value
+    description: Bank evaluation fee in BRL
+  is_automatic_proposal:
+    description: Flag to identify automatic or manual proposals
+  is_offer_canceled:
+    description: Flag to identify canceled offers
+  ts_load:
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

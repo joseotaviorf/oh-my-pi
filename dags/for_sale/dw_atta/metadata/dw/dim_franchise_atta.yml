@@ -2,61 +2,61 @@ database_name: dw_atta
 table_name: dim_franchise_atta
 description: dimension with the details from atta franchises
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_franchise:
     lineage:
-      - datalake_atta_clean.franchise_info.id_franchise
-    description: "Franchise's identification number"
+    - datalake_atta_clean.franchise_info.id_franchise
+    description: Franchise's identification number
   sk_registration_user:
     lineage:
-      - datalake_atta_clean.franchise_info.id_registration_user
-    description: "User's identification number"
+    - datalake_atta_clean.franchise_info.id_registration_user
+    description: User's identification number
   sk_franchise_status:
     lineage:
-      - datalake_atta_clean.franchise_info.id_franchise_status
-    description: "Identification number for franchise status"
+    - datalake_atta_clean.franchise_info.id_franchise_status
+    description: Identification number for franchise status
   franchise_name:
     lineage:
-      - datalake_atta_clean.franchise_info.franchise_name
-    description: "Franchise's name"
+    - datalake_atta_clean.franchise_info.franchise_name
+    description: Commercial name of the Casa Mineira franchise partner organization.
   sk_franchise_category:
     lineage:
-      - datalake_atta_clean.franchise_info.franchise_category
-    description: "Franchise's category identification number"
+    - datalake_atta_clean.franchise_info.franchise_category
+    description: Franchise's category identification number
   sk_franchise_type:
     lineage:
-      - datalake_atta_clean.franchise_info.franchise_type
-    description: "Identification number for franchise type"
+    - datalake_atta_clean.franchise_info.franchise_type
+    description: Identification number for franchise type
   franchise_category:
-    description: "Franchise's category description"
+    description: Franchise's category description
   royalties_percentage_value:
     lineage:
-      - datalake_atta_clean.franchise_info.royalties_percentage_value
-    description: "Percentage value for royalties"
+    - datalake_atta_clean.franchise_info.royalties_percentage_value
+    description: Percentage of revenue owed as franchise royalties under contract.
   martketing_fund_percentage:
     lineage:
-      - datalake_atta_clean.franchise_info.martketing_fund_percentage
-    description: "Percentagem value for marketing fund"
+    - datalake_atta_clean.franchise_info.martketing_fund_percentage
+    description: Percentagem value for marketing fund
   grace_period_royalties:
     lineage:
-      - datalake_atta_clean.franchise_info.grace_period_royalties
-    description: "Grace period royalties"
+    - datalake_atta_clean.franchise_info.grace_period_royalties
+    description: Contractual grace period before royalty payments begin for the franchise.
   grace_period_tec:
     lineage:
-      - datalake_atta_clean.franchise_info.grace_period_tec
-    description: "Grace period tec"
+    - datalake_atta_clean.franchise_info.grace_period_tec
+    description: Grace period before technical fee payments apply for the franchise unit.
   ts_contract_deadline:
     lineage:
-      - datalake_atta_clean.franchise_info.ts_contract_deadline
-    description: "Contract deadline timestamp"
+    - datalake_atta_clean.franchise_info.ts_contract_deadline
+    description: Contract deadline timestamp
   ts_registration:
     lineage:
-      - datalake_atta_clean.franchise_info.ts_registration
-    description: "Registration timestamp"
+    - datalake_atta_clean.franchise_info.ts_registration
+    description: Timestamp when the franchise was registered in the atta platform.
   ts_franchise_signature:
     lineage:
-      - datalake_atta_clean.franchise_info.ts_franchise_signature
-    description: "Franchise signature timestamp"
+    - datalake_atta_clean.franchise_info.ts_franchise_signature
+    description: Franchise signature timestamp
   ts_load:
-    description: "Load date"
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

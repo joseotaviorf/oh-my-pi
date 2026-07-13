@@ -1,9 +1,8 @@
 database_name: dw_public
 table_name: dim_tenant_booking_review
-description: After a visit, tenants review the agent accompanying the visit and the
-  property they visited. Each line is a tenant review for a specific visit.
-domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+description: After a visit, tenants review the agent accompanying the visit and the property they visited. Each line is a tenant review for a specific visit.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_tenant_booking_review:
     lineage:
@@ -16,7 +15,7 @@ columns:
   review_status:
     lineage:
     - datalake_booking.booking_review.review_status
-    description: Status of the tenant booking review
+    description: Status of the tenant's post-visit review (pending, done or dismissed).
     categories:
       DISMISSED: ''
       DONE: ''
@@ -24,57 +23,47 @@ columns:
   visit_not_happened_reason:
     lineage:
     - datalake_booking.booking_review.visit_not_happened_reason
-    description: Reason for visit not happened.
+    description: Reason reported by the tenant for why the visit did not take place.
   wrong_listing_info:
     lineage:
     - datalake_booking.booking_review.wrong_listing_info
-    description: Wrong listing info reported by the tenant if he thinks listing is
-      not accurate to the actual house.
+    description: Wrong listing info reported by the tenant if he thinks listing is not accurate to the actual house.
   no_offer_intent_reason:
     lineage:
     - datalake_booking.booking_review.no_offer_intent_reason
-    description: The reason why the tenant does not want to make an offer for the
-      house visited.
+    description: The reason why the tenant does not want to make an offer for the house visited.
   painting:
     lineage:
     - datalake_booking.booking_review.painting
-    description: The score given by the tenant about the paiting of the house visited
-      (range 1-5).
+    description: The score given by the tenant about the paiting of the house visited (range 1-5).
   cost_benefit:
     lineage:
     - datalake_booking.booking_review.cost_benefit
-    description: The score given by the tenant about the cost benefit of the house
-      visited (range 1-5).
+    description: The score given by the tenant about the cost benefit of the house visited (range 1-5).
   conservation:
     lineage:
     - datalake_booking.booking_review.conservation
-    description: The score given by the tenant about the conservation of the house
-      visited (range 1-5).
+    description: The score given by the tenant about the conservation of the house visited (range 1-5).
   cleaning:
     lineage:
     - datalake_booking.booking_review.cleaning
-    description: The score given by the tenant about the cleanliness of the house
-      visited (range 1-5).
+    description: The score given by the tenant about the cleanliness of the house visited (range 1-5).
   furniture:
     lineage:
     - datalake_booking.booking_review.furniture
-    description: The score given by the tenant about the furniture of the house visited,
-      if the house has furniture (range 1-5).
+    description: The score given by the tenant about the furniture of the house visited, if the house has furniture (range 1-5).
   natural_light:
     lineage:
     - datalake_booking.booking_review.natural_light
-    description: The score given by the tenant about the natural light of the house
-      visited (range 1-5).
+    description: The score given by the tenant about the natural light of the house visited (range 1-5).
   indoor_silence:
     lineage:
     - datalake_booking.booking_review.indoor_silence
-    description: The score given by the tenant about the indoor silence of the house
-      visited (range 1-5).
+    description: The score given by the tenant about the indoor silence of the house visited (range 1-5).
   agent_performance:
     lineage:
     - datalake_booking.booking_review.agent_performance
-    description: The score given by the tenant about the performance of the agent
-      (range 1-5).
+    description: The score given by the tenant about the performance of the agent (range 1-5).
   visit_type:
     lineage:
     - datalake_booking.booking_review.visit_type

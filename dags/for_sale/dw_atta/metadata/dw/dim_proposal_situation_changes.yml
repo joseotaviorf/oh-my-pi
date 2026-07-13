@@ -2,59 +2,59 @@ database_name: dw_atta
 table_name: dim_proposal_situation_changes
 description: dimension bringing all leadtimes for each situation on the proposal
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_proposal:
     lineage:
-      - datalake_atta.proposal_situation_changes.id_proposal
-    description: "Proposal identification number"
+    - datalake_atta.proposal_situation_changes.id_proposal
+    description: Proposal identification number
   sk_partner:
     lineage:
-      - datalake_atta.proposal_situation_changes.id_partner
-    description: "Partner's identification number"
+    - datalake_atta.proposal_situation_changes.id_partner
+    description: Partner's identification number
   proposal_order:
     lineage:
-      - datalake_atta.proposal_situation_changes.proposal_order
-    description: "Number to identify the order of situation"
+    - datalake_atta.proposal_situation_changes.proposal_order
+    description: Number to identify the order of situation
   proposal_status:
     lineage:
-      - datalake_atta.proposal_situation_changes.proposal_status
-    description: "Status description"
+    - datalake_atta.proposal_situation_changes.proposal_status
+    description: Current status of the financing or sale proposal in the partner workflow.
   situation_history:
     lineage:
-      - datalake_atta.proposal_situation_changes.situation_history
-    description: "Situation description"
+    - datalake_atta.proposal_situation_changes.situation_history
+    description: Proposal situation recorded at this step of the situation-change history.
   next_situation:
     lineage:
-      - datalake_atta.proposal_situation_changes.next_situation
-    description: "Next situation description"
+    - datalake_atta.proposal_situation_changes.next_situation
+    description: Next situation description
   lead_time_situation_in_minutes:
     lineage:
-      - datalake_atta.proposal_situation_changes.lead_time_situation_in_minutes
-    description: "Situation leadtime in minutes"
+    - datalake_atta.proposal_situation_changes.lead_time_situation_in_minutes
+    description: Situation leadtime in minutes
   lead_time_situation_in_hour:
     lineage:
-      - datalake_atta.proposal_situation_changes.lead_time_situation_in_hour
-    description: "Situation leadtime in hours"
+    - datalake_atta.proposal_situation_changes.lead_time_situation_in_hour
+    description: Situation leadtime in hours
   lead_time_situation_in_day:
     lineage:
-      - datalake_atta.proposal_situation_changes.lead_time_situation_in_day
-    description: "Situation leadtime in days"
+    - datalake_atta.proposal_situation_changes.lead_time_situation_in_day
+    description: Situation leadtime in days
   lead_time_status_in_day:
     lineage:
-      - datalake_atta.proposal_situation_changes.lead_time_status_in_day
-    description: "Status leadtime in days"
+    - datalake_atta.proposal_situation_changes.lead_time_status_in_day
+    description: Status leadtime in days
   ts_proposal_registration:
     lineage:
-      - datalake_atta.proposal_situation_changes.ts_proposal_registration
-    description: "Proposal registration timestamp"
+    - datalake_atta.proposal_situation_changes.ts_proposal_registration
+    description: Proposal registration timestamp
   ts_start_situation:
     lineage:
-      - datalake_atta.proposal_situation_changes.ts_start_situation
-    description: "Start current situation timestamp"
+    - datalake_atta.proposal_situation_changes.ts_start_situation
+    description: Start current situation timestamp
   ts_end_situation:
     lineage:
-      - datalake_atta.proposal_situation_changes.ts_end_situation
-    description: "End current situation timestamp"
+    - datalake_atta.proposal_situation_changes.ts_end_situation
+    description: End current situation timestamp
   ts_load:
-    description: "Load date"
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

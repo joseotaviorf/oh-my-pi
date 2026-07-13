@@ -2,236 +2,236 @@ database_name: dw_atta
 table_name: fact_pre_analysis_proposal_flow
 description: Fact table containing data from pre analysis and proposal flows
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
-    sk_pre_analysis_proposal_flow:
-        description: "Table primary key, union of proposal and pre analysis IDs"
-    sk_pre_analysis:
-        lineage:
-            - datalake_atta_clean.pre_analysis.id_pre_analysis
-            - datalake_atta_clean.proposal.id_pre_analysis
-        description: "Pre analysis identification number"
-    sk_proposal:
-        lineage:
-            - datalake_atta_clean.proposal.id_product
-        description: "Proposal identification number"
-    sk_proposal_product:
-        lineage:
-            - datalake_atta_clean.proposal.id_proposal_status
-        description: "Product identification number"
-    sk_offer:
-        lineage:
-            - datalake_atta_clean.proposal.id_offer
-            - datalake_atta_clean.pre_analysis.id_offer
-        description: "Offer identification number"
-    sk_client:
-        lineage:
-            - datalake_atta_clean.proposal.id_client
-            - datalake_atta_clean.pre_analysis.id_client
-        description: "Client's identification number"
-    sk_buyer:
-        lineage:
-            - datalake_atta_clean.fact_offers.sk_buyer
-        description: "Buyer's identification number"
-    sk_multibank_typist_user:
-        lineage:
-            - datalake_atta_clean.proposal.id_multibank_typist_user
-        description: "Multibank typist user's identification number"
-    sk_proposal_created_by:
-        lineage:
-            - datalake_atta_clean.proposal.created_by
-        description: "Proposal creator's identification number"
-    sk_bank:
-        lineage:
-            - datalake_atta_clean.providers_info.id_provider
-        description: "Bank identification number"
-    sk_product:
-        lineage:
-            - datalake_atta_clean.product_info.id_product
-        description: "Product identification number"
-    sk_proposal_status:
-        lineage:
-            - datalake_atta_clean.proposal.id_proposal_status
-        description: "Proposal status identification number"
-    sk_proposal_situation:
-        lineage:
-            - datalake_atta_clean.proposal.id_proposal_situation
-        description: "Proposal situation identification number"
-    sk_franchise:
-        lineage:
-            - datalake_atta_clean.franchise_info.id_franchise
-        description: "Franchise identification number"
-    sk_partner:
-        lineage:
-            - datalake_atta_clean.partner_info.id_partner
-        description: "Partner's identification number"
-    sk_registration_user:
-        lineage:
-            - datalake_atta_clean.pre_analysis.id_registration_user
-        description: "Pre analysis registration user's identification number"
-    sk_consultant:
-        lineage:
-            - datalake_atta_clean.proposal.id_consultant
-            - datalake_atta_clean.pre_analysis.id_consultant
-        description: "Consultant's identification number"
-    registration_user_name:
-        description: "Pre analysis registration user's full name"
-    is_offer_canceled:
-        description: "Flag to identify if proposal is canceled"
-    is_most_advanced_canc:
-        description: "Flag to identify the pre analysis' most advanced proposal with the canceled/reproved status"
-    is_most_advanced_og:
-        description: "Flag to identify the pre analysis' most advanced proposal with the ongoing status"
-    is_most_advanced:
-        description: "Flag to identify the pre analysis' most advanced proposal. If there is any ongoing proposal related to the pre analysis, it will select the most advanced ongoing, if there is only canceled/reproved proposals, it will select the most advanced overall"
-    dt_offer_submitted:
-        lineage:
-            - dw_sale.fact_offers.sk_offer_submitted_date
-        description: "Date in which the offer was submitted"
-    dt_offer_accepted:
-        lineage:
-            - dw_sale.fact_offers.sk_offer_accepted_date
-        description: "Date in which the offer was accepted"
-    dt_sale_agreement_signed:
-        lineage:
-            - dw_sale.fact_offers.sk_sale_agreement_signed_date
-        description: "Date in which the sale agreement was signed"
-    dt_offer_canceled:
-        lineage:
-            - dw_sale.fact_offers.sk_offer_dismissed_date
-            - dw_sale.fact_closing_flows.sk_sale_agreement_cancelled_date
-        description: "Date in which the offer was canceled"
-    ts_registration:
-        description: "Registration timestamp"
-    ts_proposal_cancelation:
-        lineage:
-            - datalake_atta.proposal_dates.ts_first_cancelation
-        description: "Timestamp in which proposal cancelation happened"
-    ts_min_credit_application:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_credit_application
-        description: "Timestamp in which first credit application happened"
-    ts_max_credit_application:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_credit_application
-        description: "Timestamp in which last credit application happened"
-    ts_min_pre_analysis:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_pre_analysis
-        description: "Timestamp in which first pre analysis happened"
-    ts_max_pre_analysis:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_pre_analysis
-        description: "Timestamp in which last pre analysis happened"
-    ts_min_credit_application_approval:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_credit_application_approval
-        description: "Timestamp in which first approval of credit application happened"
-    ts_max_credit_application_approval:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_credit_application_approval
-        description: "Timestamp in which last approval of credit application happened"
-    ts_min_credit_application_reproval:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_credit_application_reproval
-        description: "Timestamp in which first reproval of credit application happened"
-    ts_max_credit_application_reproval:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_credit_application_reproval
-        description: "Timestamp in which last reproval of credit application happened"
-    ts_min_inspection:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_inspection
-        description: "Timestamp in which first inspection happened"
-    ts_max_inspection:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_inspection
-        description: "Timestamp in which last inspection happened"
-    ts_min_checklist:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_checklist
-        description: "Timestamp in which first checklist happened"
-    ts_max_checklist:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_checklist
-        description: "Timestamp in which last checklist happened"
-    ts_min_bank_application:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_bank_application
-        description: "Timestamp in which first bank application happened"
-    ts_max_bank_application:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_bank_application
-        description: "Timestamp in which last bank application happened"
-    ts_min_financing_contract:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_financing_contract
-        description: "Timestamp of first financing contract"
-    ts_max_financing_contract:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_financing_contract
-        description: "Timestamp of last financing contract"
-    ts_min_contracted:
-        lineage:
-            - datalake_atta.proposal_dates.ts_min_contracted
-        description: "Timestamp in which first contract signing happened"
-    ts_max_contracted:
-        lineage:
-            - datalake_atta.proposal_dates.ts_max_contracted
-        description: "Timestamp in which last contract signing happened"
-    ts_credit_started:
-        lineage:
-            - datalake_atta.proposal_dates.ts_credit_started
-        description: "Timestamp in which credit started"
-    ts_credit_ended:
-        lineage:
-            - datalake_atta.proposal_dates.ts_credit_ended
-        description: "Timestamp in which credit ended"
-    ts_financing_started:
-        lineage:
-            - datalake_atta.proposal_dates.ts_financing_started
-        description: "Timestamp in which financing started"
-    ts_bank_legal_analysis_started:
-        lineage:
-            - datalake_atta.proposal_dates.ts_bank_legal_analysis_started
-        description: "Timestamp in which legal analysis started"
-    ts_bank_legal_analysis_ended:
-        lineage:
-            - datalake_atta.proposal_dates.ts_bank_legal_analysis_ended
-        description: "Timestamp in which legal analysis ended"
-    ts_financing_ended:
-        lineage:
-            - datalake_atta.proposal.ts_financing_ended
-        description: "Timestamp in which financing ended"
-    ts_last_approved_log:
-        lineage:
-            - datalake_atta.proposal_dates.ts_last_approved_log
-        description: "Timestamp of last approval"
-    ts_filled_credit_form:
-        lineage:
-            - datalake_sales_flow_clean.negotiation.ts_buyer_credit_submitted
-        description: "Timestamp in which the credit form was filled"
-    days_pre_analysis_registration_to_credit_application_started:
-        description: "Number of days the proposal took to turn from pre analysis registration to start credit application"
-    days_pre_analysis_registration_to_credit_application_ended:
-        description: "Number of days the proposal took to turn from pre analysis registration to end credit application"
-    days_credit_application_started_to_credit_application_ended:
-        description: "Number of days the proposal took to start credit application to end credit application"
-    days_credit_application_ended_to_inspection_ended:
-        description: "Number of days the proposal took to turn from credit application end to inspection end"
-    days_inspection_ended_to_checklist_ended:
-        description: "Number of days the proposal took to turn from inspection end to checklist end"
-    days_checklist_ended_to_bank_application_ended:
-        description: "Number of days the proposal took to turn from checklist end to application end"
-    days_bank_application_ended_to_financing_ended:
-        description: "Number of days the proposal took to turn from application end to financing end"
-    days_ongoing_proposal_status:
-        description: "Number of days the proposal was on ongoing proposal status"
-    days_credit_application_started_to_financing_ended:
-        description: "Number of days the proposal took to turn from credit application start from financing end"
-    ts_last_updated:
-        lineage:
-            - datalake_atta_clean.proposal.ts_last_updated
-        description: "Timestamp in which data was updated"
-    ts_load:
-        description: "Load date"
+  sk_pre_analysis_proposal_flow:
+    description: Table primary key, union of proposal and pre analysis IDs
+  sk_pre_analysis:
+    lineage:
+    - datalake_atta_clean.pre_analysis.id_pre_analysis
+    - datalake_atta_clean.proposal.id_pre_analysis
+    description: Pre analysis identification number
+  sk_proposal:
+    lineage:
+    - datalake_atta_clean.proposal.id_product
+    description: Proposal identification number
+  sk_proposal_product:
+    lineage:
+    - datalake_atta_clean.proposal.id_proposal_status
+    description: Product identification number
+  sk_offer:
+    lineage:
+    - datalake_atta_clean.proposal.id_offer
+    - datalake_atta_clean.pre_analysis.id_offer
+    description: Offer identification number
+  sk_client:
+    lineage:
+    - datalake_atta_clean.proposal.id_client
+    - datalake_atta_clean.pre_analysis.id_client
+    description: Client's identification number
+  sk_buyer:
+    lineage:
+    - datalake_atta_clean.fact_offers.sk_buyer
+    description: Buyer's identification number
+  sk_multibank_typist_user:
+    lineage:
+    - datalake_atta_clean.proposal.id_multibank_typist_user
+    description: Multibank typist user's identification number
+  sk_proposal_created_by:
+    lineage:
+    - datalake_atta_clean.proposal.created_by
+    description: Proposal creator's identification number
+  sk_bank:
+    lineage:
+    - datalake_atta_clean.providers_info.id_provider
+    description: Bank identification number
+  sk_product:
+    lineage:
+    - datalake_atta_clean.product_info.id_product
+    description: Product identification number
+  sk_proposal_status:
+    lineage:
+    - datalake_atta_clean.proposal.id_proposal_status
+    description: Proposal status identification number
+  sk_proposal_situation:
+    lineage:
+    - datalake_atta_clean.proposal.id_proposal_situation
+    description: Proposal situation identification number
+  sk_franchise:
+    lineage:
+    - datalake_atta_clean.franchise_info.id_franchise
+    description: Franchise identification number
+  sk_partner:
+    lineage:
+    - datalake_atta_clean.partner_info.id_partner
+    description: Partner's identification number
+  sk_registration_user:
+    lineage:
+    - datalake_atta_clean.pre_analysis.id_registration_user
+    description: Pre analysis registration user's identification number
+  sk_consultant:
+    lineage:
+    - datalake_atta_clean.proposal.id_consultant
+    - datalake_atta_clean.pre_analysis.id_consultant
+    description: Consultant's identification number
+  registration_user_name:
+    description: Pre analysis registration user's full name
+  is_offer_canceled:
+    description: Flag to identify if proposal is canceled
+  is_most_advanced_canc:
+    description: Flag to identify the pre analysis' most advanced proposal with the canceled/reproved status
+  is_most_advanced_og:
+    description: Flag to identify the pre analysis' most advanced proposal with the ongoing status
+  is_most_advanced:
+    description: Flag to identify the pre analysis' most advanced proposal. If there is any ongoing proposal related to the pre analysis, it will select the most advanced ongoing, if there is only canceled/reproved proposals, it will select the most advanced overall
+  dt_offer_submitted:
+    lineage:
+    - dw_sale.fact_offers.sk_offer_submitted_date
+    description: Date in which the offer was submitted
+  dt_offer_accepted:
+    lineage:
+    - dw_sale.fact_offers.sk_offer_accepted_date
+    description: Date in which the offer was accepted
+  dt_sale_agreement_signed:
+    lineage:
+    - dw_sale.fact_offers.sk_sale_agreement_signed_date
+    description: Date in which the sale agreement was signed
+  dt_offer_canceled:
+    lineage:
+    - dw_sale.fact_offers.sk_offer_dismissed_date
+    - dw_sale.fact_closing_flows.sk_sale_agreement_cancelled_date
+    description: Date in which the offer was canceled
+  ts_registration:
+    description: Timestamp when the pre-analysis or proposal flow record was registered.
+  ts_proposal_cancelation:
+    lineage:
+    - datalake_atta.proposal_dates.ts_first_cancelation
+    description: Timestamp in which proposal cancelation happened
+  ts_min_credit_application:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_credit_application
+    description: Timestamp in which first credit application happened
+  ts_max_credit_application:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_credit_application
+    description: Timestamp in which last credit application happened
+  ts_min_pre_analysis:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_pre_analysis
+    description: Timestamp in which first pre analysis happened
+  ts_max_pre_analysis:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_pre_analysis
+    description: Timestamp in which last pre analysis happened
+  ts_min_credit_application_approval:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_credit_application_approval
+    description: Timestamp in which first approval of credit application happened
+  ts_max_credit_application_approval:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_credit_application_approval
+    description: Timestamp in which last approval of credit application happened
+  ts_min_credit_application_reproval:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_credit_application_reproval
+    description: Timestamp in which first reproval of credit application happened
+  ts_max_credit_application_reproval:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_credit_application_reproval
+    description: Timestamp in which last reproval of credit application happened
+  ts_min_inspection:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_inspection
+    description: Timestamp in which first inspection happened
+  ts_max_inspection:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_inspection
+    description: Timestamp in which last inspection happened
+  ts_min_checklist:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_checklist
+    description: Timestamp in which first checklist happened
+  ts_max_checklist:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_checklist
+    description: Timestamp in which last checklist happened
+  ts_min_bank_application:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_bank_application
+    description: Timestamp in which first bank application happened
+  ts_max_bank_application:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_bank_application
+    description: Timestamp in which last bank application happened
+  ts_min_financing_contract:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_financing_contract
+    description: Timestamp of first financing contract
+  ts_max_financing_contract:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_financing_contract
+    description: Timestamp of last financing contract
+  ts_min_contracted:
+    lineage:
+    - datalake_atta.proposal_dates.ts_min_contracted
+    description: Timestamp in which first contract signing happened
+  ts_max_contracted:
+    lineage:
+    - datalake_atta.proposal_dates.ts_max_contracted
+    description: Timestamp in which last contract signing happened
+  ts_credit_started:
+    lineage:
+    - datalake_atta.proposal_dates.ts_credit_started
+    description: Timestamp in which credit started
+  ts_credit_ended:
+    lineage:
+    - datalake_atta.proposal_dates.ts_credit_ended
+    description: Timestamp in which credit ended
+  ts_financing_started:
+    lineage:
+    - datalake_atta.proposal_dates.ts_financing_started
+    description: Timestamp in which financing started
+  ts_bank_legal_analysis_started:
+    lineage:
+    - datalake_atta.proposal_dates.ts_bank_legal_analysis_started
+    description: Timestamp in which legal analysis started
+  ts_bank_legal_analysis_ended:
+    lineage:
+    - datalake_atta.proposal_dates.ts_bank_legal_analysis_ended
+    description: Timestamp in which legal analysis ended
+  ts_financing_ended:
+    lineage:
+    - datalake_atta.proposal.ts_financing_ended
+    description: Timestamp in which financing ended
+  ts_last_approved_log:
+    lineage:
+    - datalake_atta.proposal_dates.ts_last_approved_log
+    description: Timestamp of last approval
+  ts_filled_credit_form:
+    lineage:
+    - datalake_sales_flow_clean.negotiation.ts_buyer_credit_submitted
+    description: Timestamp in which the credit form was filled
+  days_pre_analysis_registration_to_credit_application_started:
+    description: Number of days the proposal took to turn from pre analysis registration to start credit application
+  days_pre_analysis_registration_to_credit_application_ended:
+    description: Number of days the proposal took to turn from pre analysis registration to end credit application
+  days_credit_application_started_to_credit_application_ended:
+    description: Number of days the proposal took to start credit application to end credit application
+  days_credit_application_ended_to_inspection_ended:
+    description: Number of days the proposal took to turn from credit application end to inspection end
+  days_inspection_ended_to_checklist_ended:
+    description: Number of days the proposal took to turn from inspection end to checklist end
+  days_checklist_ended_to_bank_application_ended:
+    description: Number of days the proposal took to turn from checklist end to application end
+  days_bank_application_ended_to_financing_ended:
+    description: Number of days the proposal took to turn from application end to financing end
+  days_ongoing_proposal_status:
+    description: Number of days the proposal has remained in its ongoing status.
+  days_credit_application_started_to_financing_ended:
+    description: Number of days the proposal took to turn from credit application start from financing end
+  ts_last_updated:
+    lineage:
+    - datalake_atta_clean.proposal.ts_last_updated
+    description: Timestamp in which data was updated
+  ts_load:
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

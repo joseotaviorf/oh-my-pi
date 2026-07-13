@@ -2,20 +2,20 @@ database_name: dw_atta
 table_name: dim_consultant_atta
 description: dimension with the details from atta consultants
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
-    sk_consultant:
-        lineage:
-            - datalake_atta_clean.users_info.id_user
-        description: "Consultant's identification number"
-    consultant_name:
-        lineage:
-            - datalake_atta_clean.users_info.user_name
-            - datalake_atta_clean.users_info.user_last_name
-        description: "Consultant's name"
-    consultant_email:
-        lineage:
-            - datalake_atta_clean.users_info.user_email
-        description: "Consultant's email"
-    ts_load:
-        description: "Load date"
+  sk_consultant:
+    lineage:
+    - datalake_atta_clean.users_info.id_user
+    description: Consultant's identification number
+  consultant_name:
+    lineage:
+    - datalake_atta_clean.users_info.user_name
+    - datalake_atta_clean.users_info.user_last_name
+    description: Full name of the atta financing consultant (first and last name concatenated).
+  consultant_email:
+    lineage:
+    - datalake_atta_clean.users_info.user_email
+    description: Email address of the atta financing consultant.
+  ts_load:
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

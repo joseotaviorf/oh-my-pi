@@ -2,41 +2,41 @@ database_name: dw_atta
 table_name: dim_partner_atta
 description: dimension with the details from atta partners
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_partner:
     lineage:
-      - datalake_atta.partner_info.id_partner
-    description: "Partner's identification number"
+    - datalake_atta.partner_info.id_partner
+    description: Partner's identification number
   sk_admin_user:
     lineage:
-      - datalake_atta.partner_info.id_admin_user
-    description: "Admin user's identification number"
+    - datalake_atta.partner_info.id_admin_user
+    description: Admin user's identification number
   sk_franchise:
     lineage:
-      - datalake_atta.partner_info.id_franchise
-    description: "Franchise's identification number"
+    - datalake_atta.partner_info.id_franchise
+    description: Franchise's identification number
   sk_registration_user:
     lineage:
-      - datalake_atta.partner_info.id_registration_user
-    description: "User's identification number"
+    - datalake_atta.partner_info.id_registration_user
+    description: User's identification number
   partner_name:
     lineage:
-      - datalake_atta.partner_info.partner_name
-    description: "Partner's name"
+    - datalake_atta.partner_info.partner_name
+    description: Legal or commercial name of the financing or brokerage partner entity.
   partner_type:
-    description: "Partner's type"
+    description: Category of the financing or brokerage partner entity.
   wallet:
     lineage:
-      - datalake_atta.partner_info.wallet
-    description: "Partnerships description"
+    - datalake_atta.partner_info.wallet
+    description: Partnerships description
   ts_registration:
     lineage:
-      - datalake_atta.partner_info.ts_registration
-    description: "Registration timestamp"
+    - datalake_atta.partner_info.ts_registration
+    description: Timestamp when the partner was registered in the atta platform.
   ts_inactive_user:
     lineage:
-      - datalake_atta.partner_info.ts_inactive_user
-    description: "Timestamp when user became inactive"
+    - datalake_atta.partner_info.ts_inactive_user
+    description: Timestamp when user became inactive
   ts_load:
-    description: "Load date"
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

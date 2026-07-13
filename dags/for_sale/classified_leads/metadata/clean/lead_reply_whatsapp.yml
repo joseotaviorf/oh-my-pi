@@ -1,23 +1,24 @@
 database_name: datalake_classified_leads_clean
 table_name: lead_reply_whatsapp
 domain: For Sale
-description: This table contains lead reply from whatsapp information.
+description: Cleaned snapshot of lead reply whatsapp sourced from operational systems backing Classified leads ingestion for For Sale demand acquisition channels. One row per lead reply whatsapp record with standardized names and types in datalake_classified_leads_clean.
 columns:
   id_pk:
     lineage:
-      - datalake_classified_leads_raw.lead_reply_whatsapp.pk_id
+    - datalake_classified_leads_raw.lead_reply_whatsapp.pk_id
     description: Sequential key of the table.
   id:
     lineage:
-      - datalake_classified_leads_raw.lead_reply_whatsapp.id
+    - datalake_classified_leads_raw.lead_reply_whatsapp.id
     description: Original PK of table (doesn't work as PK).
   id_lead:
     lineage:
-      - datalake_classified_leads_raw.lead_reply_whatsapp.lead_id
-    description: ID of lead.
+    - datalake_classified_leads_raw.lead_reply_whatsapp.lead_id
+    description: Foreign key to the demand lead captured before visit or offer stages.
   user_phone_number:
     lineage:
-      - datalake_classified_leads_raw.lead_reply_whatsapp.user_phone_number
-    description: Phone number of user.
+    - datalake_classified_leads_raw.lead_reply_whatsapp.user_phone_number
+    description: Recipient WhatsApp contact number that received the lead reply message.
   ts_load:
     description: Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.
+owner: guilherme.rocha@quintoandar.com.br

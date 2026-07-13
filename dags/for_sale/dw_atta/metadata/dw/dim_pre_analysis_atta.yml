@@ -2,63 +2,63 @@ database_name: dw_atta
 table_name: dim_pre_analysis_atta
 description: dimension with the details from atta partners
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_pre_analysis:
     lineage:
-      - datalake_atta_clean.pre_analysis.id_pre_analysis
-    description: "Pre analysis identification number"
+    - datalake_atta_clean.pre_analysis.id_pre_analysis
+    description: Pre analysis identification number
   sk_offer:
     lineage:
-      - datalake_atta_clean.pre_analysis.id_offer
-    description: "Offer identification number"
+    - datalake_atta_clean.pre_analysis.id_offer
+    description: Offer identification number
   sk_pre_analysis_status:
     lineage:
-      - datalake_atta_clean.pre_analysis.status
-    description: "Pre analysis status identification number"
+    - datalake_atta_clean.pre_analysis.status
+    description: Pre analysis status identification number
   sk_pre_analysis_situation:
     lineage:
-      - datalake_atta_clean.pre_analysis.situation
-    description: "Pre analysis situation identification number"
+    - datalake_atta_clean.pre_analysis.situation
+    description: Pre analysis situation identification number
   sk_priority_status:
     lineage:
-      - datalake_atta_clean.pre_analysis.priority_status
-    description: "Priority status identification number"
+    - datalake_atta_clean.pre_analysis.priority_status
+    description: Priority status identification number
   archive_reason:
     lineage:
-      - datalake_atta_clean.pre_analysis.archive_reason
-    description: "Description of archivement reason"
+    - datalake_atta_clean.pre_analysis.archive_reason
+    description: Description of archivement reason
   archive_complement:
     lineage:
-      - datalake_atta_clean.pre_analysis.archive_complement
-    description: "Complementar observations about archivement"
+    - datalake_atta_clean.pre_analysis.archive_complement
+    description: Complementar observations about archivement
   created_source_description:
     lineage:
-      - datalake_atta_clean.pre_analysis.created_source
-    description: "Description of the origin of the created source"
+    - datalake_atta_clean.pre_analysis.created_source
+    description: Description of the origin of the created source
   down_payment_amount:
     lineage:
-      - datalake_atta_clean.pre_analysis.down_payment_amount
-    description: "Down payment amount in BRL"
+    - datalake_atta_clean.pre_analysis.down_payment_amount
+    description: Down payment amount in BRL
   financing_value:
     lineage:
-      - datalake_atta_clean.pre_analysis.financing_value
-    description: "Financing amount in BRL"
+    - datalake_atta_clean.pre_analysis.financing_value
+    description: Financing amount in BRL
   house_value:
     lineage:
-      - datalake_atta_clean.pre_analysis.house_value
-    description: "House value"
+    - datalake_atta_clean.pre_analysis.house_value
+    description: Declared property value in BRL used in the financing pre-analysis.
   is_archived:
     lineage:
-      - datalake_atta_clean.pre_analysis.is_archived
-    description: "Flag indicating if the pre analysis is archived"
+    - datalake_atta_clean.pre_analysis.is_archived
+    description: Flag indicating if the pre analysis is archived
   ts_archived:
     lineage:
-      - datalake_atta_clean.pre_analysis.ts_archived
-    description: "Pre analysis archivement timestamp"
+    - datalake_atta_clean.pre_analysis.ts_archived
+    description: Pre analysis archivement timestamp
   ts_registration:
     lineage:
-      - datalake_atta_clean.pre_analysis.ts_registration
-    description: "Timestamp when the pre analysis was registered in the system"
+    - datalake_atta_clean.pre_analysis.ts_registration
+    description: Timestamp when the pre analysis was registered in the system
   ts_load:
-    description: "Load date"
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

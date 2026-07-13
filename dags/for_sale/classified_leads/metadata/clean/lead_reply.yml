@@ -1,15 +1,16 @@
 database_name: datalake_classified_leads_clean
 table_name: lead_reply
 domain: For Sale
-description: This table contains lead reply information.
+description: Cleaned snapshot of lead reply sourced from operational systems backing Classified leads ingestion for For Sale demand acquisition channels. One row per lead reply record with standardized names and types in datalake_classified_leads_clean.
 columns:
   id:
     lineage:
-      - datalake_classified_leads_raw.lead_reply.id
-    description: Primary key of table.
+    - datalake_classified_leads_raw.lead_reply.id
+    description: Unique identifier of the lead reply record sent to a classified-portal lead.
   ts_sent_at:
     lineage:
-      - datalake_classified_leads_raw.lead_reply.sent_at
+    - datalake_classified_leads_raw.lead_reply.sent_at
     description: Timestamp of when record was sent.
   ts_load:
     description: Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.
+owner: guilherme.rocha@quintoandar.com.br

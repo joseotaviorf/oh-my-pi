@@ -1,63 +1,64 @@
 database_name: datalake_classified_leads_clean
 table_name: lead_contact
 domain: For Sale
-description: This table contains lead contact information.
+description: Cleaned snapshot of lead contact sourced from operational systems backing Classified leads ingestion for For Sale demand acquisition channels. One row per lead contact record with standardized names and types in datalake_classified_leads_clean.
 columns:
   id:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.id
-    description: Primary key of table.
+    - datalake_classified_leads_raw.lead_contact.id
+    description: Unique identifier of the lead contact record captured from a classified portal.
   id_property:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.property_id
-    description: ID of property.
+    - datalake_classified_leads_raw.lead_contact.property_id
+    description: Identifier of the advertised property the lead contact refers to.
   id_lead_reply_email:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.lead_reply_email_id
-    description: FK from id_lead_reply_email table.
+    - datalake_classified_leads_raw.lead_contact.lead_reply_email_id
+    description: Reference to the email reply (lead_reply_email) associated with this contact.
   id_lead_reply_whatsapp:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.lead_reply_whatsapp_id
-    description: FK from id_lead_reply_whatsapp table.
+    - datalake_classified_leads_raw.lead_contact.lead_reply_whatsapp_id
+    description: Reference to the WhatsApp reply (lead_reply_whatsapp) associated with this contact.
   id_external_lead:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.external_lead_id
-    description: ID of external lead.
+    - datalake_classified_leads_raw.lead_contact.external_lead_id
+    description: Identifier assigned to the lead by the external classified portal that originated it.
   origin_partner:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.origin_partner
-    description: Origin partner of lead.
+    - datalake_classified_leads_raw.lead_contact.origin_partner
+    description: Name of the classified portal or partner that originated the lead contact.
   user_ddd:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.userddd
-    description: DDD of user.
+    - datalake_classified_leads_raw.lead_contact.userddd
+    description: Brazilian area code (DDD) of the contacting user's phone number.
   user_email:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.user_email
-    description: Email of user.
+    - datalake_classified_leads_raw.lead_contact.user_email
+    description: Email address provided by the user when contacting about the property.
   user_message:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.user_message
-    description: Message of user.
+    - datalake_classified_leads_raw.lead_contact.user_message
+    description: Free-text message the user sent when contacting about the property.
   user_name:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.user_name
-    description: Name of user.
+    - datalake_classified_leads_raw.lead_contact.user_name
+    description: Name provided by the user contacting about the property.
   user_phone_number:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.user_phone_number
-    description: Phone number of user.
+    - datalake_classified_leads_raw.lead_contact.user_phone_number
+    description: Phone number provided by the user contacting about the property.
   business_context:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.business_context
-    description: Which is the context of lead.
+    - datalake_classified_leads_raw.lead_contact.business_context
+    description: Business line context distinguishing For Rent and For Sale visit flows.
   publication_type:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.publication_type
-    description: Type of publication.
+    - datalake_classified_leads_raw.lead_contact.publication_type
+    description: Type of the property publication (listing) the lead contact refers to.
   ts_received:
     lineage:
-      - datalake_classified_leads_raw.lead_contact.received_at
-    description: Timestamp of received.
+    - datalake_classified_leads_raw.lead_contact.received_at
+    description: Timestamp when the lead contact was received from the classified portal.
   ts_load:
     description: Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.
+owner: guilherme.rocha@quintoandar.com.br

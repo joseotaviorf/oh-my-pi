@@ -1,23 +1,24 @@
 database_name: datalake_classified_leads_clean
 table_name: lead_reply_email
 domain: For Sale
-description: This table contains lead reply from email information.
+description: Cleaned snapshot of lead reply email sourced from operational systems backing Classified leads ingestion for For Sale demand acquisition channels. One row per lead reply email record with standardized names and types in datalake_classified_leads_clean.
 columns:
   id_pk:
     lineage:
-      - datalake_classified_leads_raw.lead_reply_email.pk_id
+    - datalake_classified_leads_raw.lead_reply_email.pk_id
     description: Sequential key of table (Primary Key).
   id:
     lineage:
-      - datalake_classified_leads_raw.lead_reply_email.id
+    - datalake_classified_leads_raw.lead_reply_email.id
     description: Original PK of table (doesn't work as PK).
   id_lead:
     lineage:
-      - datalake_classified_leads_raw.lead_reply_email.lead_id
-    description: ID of lead.
+    - datalake_classified_leads_raw.lead_reply_email.lead_id
+    description: Foreign key to the demand lead captured before visit or offer stages.
   user_email:
     lineage:
-      - datalake_classified_leads_raw.lead_reply_email.user_email
-    description: Email of user.
+    - datalake_classified_leads_raw.lead_reply_email.user_email
+    description: Email address to which the lead reply was sent.
   ts_load:
     description: Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.
+owner: guilherme.rocha@quintoandar.com.br

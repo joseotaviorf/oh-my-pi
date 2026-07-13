@@ -2,31 +2,31 @@ database_name: dw_atta
 table_name: dim_client_atta
 description: dimension with the details from atta clients
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
-    sk_client:
-        lineage:
-            - datalake_atta_clean.client.id_client
-        description: "Client's identification number"
-    client_cpf:
-        lineage:
-            - datalake_atta_clean.client.client_cpf
-        description: "Client's name"
-    client_financing_name:
-        lineage:
-            - datalake_atta_clean.client.client_name
-        description: "Client's full name"
-    client_email:
-        lineage:
-            - datalake_atta_clean.client.client_email
-        description: "Client's email"
-    client_cellphone:
-        lineage:
-            - datalake_atta_clean.client.client_cellphone
-        description: "Client's cellphone number"
-    client_phone:
-        lineage:
-            - datalake_atta_clean.client.client_phone
-        description: "Client's telephone number"
-    ts_load:
-        description: "Load date"
+  sk_client:
+    lineage:
+    - datalake_atta_clean.client.id_client
+    description: Client's identification number
+  client_cpf:
+    lineage:
+    - datalake_atta_clean.client.client_cpf
+    description: Client's name
+  client_financing_name:
+    lineage:
+    - datalake_atta_clean.client.client_name
+    description: Client's full name
+  client_email:
+    lineage:
+    - datalake_atta_clean.client.client_email
+    description: Email address used to contact the client about financing status updates.
+  client_cellphone:
+    lineage:
+    - datalake_atta_clean.client.client_cellphone
+    description: Client's cellphone number
+  client_phone:
+    lineage:
+    - datalake_atta_clean.client.client_phone
+    description: Client's telephone number
+  ts_load:
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.
