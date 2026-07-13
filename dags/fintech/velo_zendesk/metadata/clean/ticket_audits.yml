@@ -1,5 +1,13 @@
 database_name: datalake_velo_zendesk_clean
 table_name: ticket_audits
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per ticket audits from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_ticket_audit:
@@ -15,7 +23,7 @@ columns:
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.author_id
   event_via:
-    description: "Via of the event"
+    description: Velo platform attribute describing event via for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.via
   events:
@@ -27,7 +35,7 @@ columns:
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits._sdc_sequence
   table_version:
-    description: "Number of table version"
+    description: Velo platform attribute describing table version for condominium billing reconciliation.
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits._sdc_table_version
   dt_extracted:
@@ -53,9 +61,12 @@ columns:
   year:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.day
+    description: Day partition derived from the source event timestamp for incremental loading.

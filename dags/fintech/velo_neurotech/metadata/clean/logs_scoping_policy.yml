@@ -1,188 +1,249 @@
 ---
 database_name: datalake_velo_neurotech_clean
 table_name: logs_scoping_policy
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per logs scoping policy from the Velo property management and
+  condominium billing platform, ingested for QuintoAndar fintech
+  reconciliation and accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_proposal:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.codigo_proposta
+    description: Credit or rental guarantee proposal identifier from the underwriting flow.
   id_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.codigo_operacao
+    description: Identifier for the operation referenced by this financial record.
   id_proposal_log:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.log_id_proposta
-  log_id_proposta:
-    lineage:
-      - datalake_velo_neurotech_raw.logs_scoping_policy.log_id_proposta
+    description: Identifier for the proposal log referenced by this financial record.
   prop_dom_competence_user:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_dom_alcada_usuario
+    description: Velo platform attribute describing prop dom competence user for condominium billing reconciliation.
   calc_status:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_status
+    description: Velo platform attribute describing calc status for condominium billing reconciliation.
   calc_person_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_tipo_pessoa
+    description: Velo platform attribute describing calc person type for condominium billing reconciliation.
   proposal_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_ffp_campo12
+    description: Velo platform attribute describing proposal type for condominium billing reconciliation.
   ret_rf_street:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.ret_rf_rua
+    description: Velo platform attribute describing ret rf street for condominium billing reconciliation.
   log_result:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.log_resultado
+    description: Velo platform attribute describing log result for condominium billing reconciliation.
   policy_name:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.nome_politica
+    description: Velo platform attribute describing policy name for condominium billing reconciliation.
   proposal_business_unit_uid:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_business_unit_uid
+    description: Velo platform attribute describing proposal business unit uid for condominium billing reconciliation.
   status_approved_value:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_valor_aprovado
+    description: Velo platform attribute describing status approved value for condominium billing reconciliation.
   status_motives:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos
+    description: Velo platform attribute describing status motives for condominium billing reconciliation.
   proposal_rating:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_ffp_campo11
+    description: Velo platform attribute describing proposal rating for condominium billing reconciliation.
   status_decision:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_status_decisao
+    description: Velo platform attribute describing status decision for condominium billing reconciliation.
   status_error:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_erro
+    description: Velo platform attribute describing status error for condominium billing reconciliation.
   status_id_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_id_operacao
+    description: Velo platform attribute describing status id operation for condominium billing reconciliation.
   status_rfpj_state:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_rfpj_municipio
+    description: Velo platform attribute describing status rfpj state for condominium billing reconciliation.
   vi_upload_user:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.vi_upload_usuario
+    description: Velo platform attribute describing vi upload user for condominium billing reconciliation.
   policy_version:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.versao_politica
+    description: Velo platform attribute describing policy version for condominium billing reconciliation.
   status_motive:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivo
+    description: Velo platform attribute describing status motive for condominium billing reconciliation.
   status_exception_callback:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_exception_callback
+    description: Velo platform attribute describing status exception callback for condominium billing reconciliation.
   status_process_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_tipo_processo
+    description: Velo platform attribute describing status process type for condominium billing reconciliation.
   status_credit_team_queue:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_mesa_fila
+    description: Velo platform attribute describing status credit team queue for condominium billing reconciliation.
   status_note:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_note
+    description: Velo platform attribute describing status note for condominium billing reconciliation.
   log_user:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.log_usuario
+    description: Velo platform attribute describing log user for condominium billing reconciliation.
   status_doc_approval:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_doc_aprov
+    description: Velo platform attribute describing status doc approval for condominium billing reconciliation.
   status_comp_pending:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_comp_pend
+    description: Velo platform attribute describing status comp pending for condominium billing reconciliation.
   status_observation:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_observacao
+    description: Velo platform attribute describing status observation for condominium billing reconciliation.
   cod_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_cod_operacao
+    description: Velo platform attribute describing cod operation for condominium billing reconciliation.
   proposal_number:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_ffp_campo6
+    description: Velo platform attribute describing proposal number for condominium billing reconciliation.
   status:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_stat
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   status_request_test:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_request_test
+    description: Velo platform attribute describing status request test for condominium billing reconciliation.
   proposal_document_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_tipo_documento
+    description: Velo platform attribute describing proposal document type for condominium billing reconciliation.
   calc_doc_reproof:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_doc_reprov
+    description: Velo platform attribute describing calc doc reproof for condominium billing reconciliation.
   proposal_realestate:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_ffp_campo13
+    description: Velo platform attribute describing proposal realestate for condominium billing reconciliation.
   proposal_name:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_ffp_nome
+    description: Velo platform attribute describing proposal name for condominium billing reconciliation.
   status_motive_receipt_denied:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivo_comprov_negado
+    description: Velo platform attribute describing status motive receipt denied for condominium billing reconciliation.
   proposal_contributor_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_ffp_tipo_contribuinte
+    description: Velo platform attribute describing proposal contributor type for condominium billing reconciliation.
   flx_principal:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.flx_principal
+    description: Velo platform attribute describing flx principal for condominium billing reconciliation.
   policy:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.politica
-  calc_parecer:
-    lineage:
-      - datalake_velo_neurotech_raw.logs_scoping_policy.calc_parecer
+    description: Velo platform attribute describing policy for condominium billing reconciliation.
   proposal_fma_decision_document:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_fma_parecer_documento
+    description: Velo platform attribute describing proposal fma decision document for condominium billing reconciliation.
   proposal_fma_motives:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_fma_motivos
+    description: Velo platform attribute describing proposal fma motives for condominium billing reconciliation.
   case_competence_decision:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.case_alcada_decisao
+    description: Velo platform attribute describing case competence decision for condominium billing reconciliation.
   status_docs:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_docs
+    description: Velo platform attribute describing status docs for condominium billing reconciliation.
   calc_denied_reason_first_proponent:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos_recusa_proponente1
+    description: Velo platform attribute describing calc denied reason first proponent for condominium billing reconciliation.
   calc_denied_reason_second_proponent:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos_recusa_proponente2
+    description: Velo platform attribute describing calc denied reason second proponent for condominium billing reconciliation.
   calc_denied_reason_third_proponent:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos_recusa_proponente3
+    description: Velo platform attribute describing calc denied reason third proponent for condominium billing reconciliation.
   calc_denied_reason_fourth_proponent:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos_recusa_proponente4
+    description: Velo platform attribute describing calc denied reason fourth proponent for condominium billing reconciliation.
   status_dti_max_percentage:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_dti_maximo
+    description: Velo platform attribute describing status dti max percentage for condominium billing reconciliation.
   is_resubmission:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_resubmissao
+    description: Indicates whether resubmission applies to this financial record.
   ts_proposal_dh_registration:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.prop_ffp_dh_cadastro
+    description: Timestamp when proposal dh registration occurred in the upstream fintech system.
   ts_dh_start:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.log_dh_inicio
+    description: Timestamp when dh start occurred in the upstream fintech system.
   ts_dh_processing:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.log_dh_processamento
+    description: Timestamp when dh processing occurred in the upstream fintech system.
   ts_dh_end:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.log_dh_fim
+    description: Timestamp when dh end occurred in the upstream fintech system.
   ts_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.instante
+    description: Timestamp when operation occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.day
+    description: Day partition derived from the source event timestamp for incremental loading.

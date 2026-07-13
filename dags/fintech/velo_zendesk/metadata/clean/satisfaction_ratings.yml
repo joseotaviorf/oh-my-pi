@@ -1,46 +1,71 @@
 database_name: datalake_velo_zendesk_clean
 table_name: satisfaction_ratings
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per satisfaction ratings from the Velo property management and
+  condominium billing platform, ingested for QuintoAndar fintech
+  reconciliation and accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.id
+    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_ticket:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.ticket_id
+    description: Identifier for the ticket referenced by this financial record.
   id_reason:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.reason_id
+    description: Identifier for the reason referenced by this financial record.
   id_group:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.group_id
+    description: Identifier for the group referenced by this financial record.
   id_assignee:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.assignee_id
+    description: Identifier for the assignee referenced by this financial record.
   id_requester:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.requester_id
+    description: Identifier for the requester referenced by this financial record.
   score:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.score
+    description: Velo platform attribute describing score for condominium billing reconciliation.
   satisfaction_rating_url:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.url
+    description: Velo platform attribute describing satisfaction rating url for condominium billing reconciliation.
   reason:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.reason
+    description: Velo platform attribute describing reason for condominium billing reconciliation.
   ts_created:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.updated_at
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.updated_at
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_zendesk_raw.satisfaction_ratings.updated_at
+    description: Day partition derived from the source event timestamp for incremental loading.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

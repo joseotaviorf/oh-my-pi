@@ -1,100 +1,143 @@
 database_name: datalake_velo_zendesk_clean
 table_name: ticket_metrics
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per ticket metrics from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_ticket_metrics:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.id
+    description: Identifier for the ticket metrics referenced by this financial record.
   url_ticket_metrics:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.url
+    description: Velo platform attribute describing url ticket metrics for condominium billing reconciliation.
   assignee_stations:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.assignee_stations
+    description: Velo platform attribute describing assignee stations for condominium billing reconciliation.
   reopens:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.reopens
+    description: Velo platform attribute describing reopens for condominium billing reconciliation.
   id_ticket:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.ticket_id
+    description: Identifier for the ticket referenced by this financial record.
   replies:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.replies
+    description: Velo platform attribute describing replies for condominium billing reconciliation.
   group_stations:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.group_stations
+    description: Velo platform attribute describing group stations for condominium billing reconciliation.
   minutes_reply_calendar:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.reply_time_in_minutes
+    description: Velo platform attribute describing minutes reply calendar for condominium billing reconciliation.
   minutes_reply_business:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.reply_time_in_minutes
+    description: Velo platform attribute describing minutes reply business for condominium billing reconciliation.
   minutes_first_resolution_calendar:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.first_resolution_time_in_minutes
+    description: Velo platform attribute describing minutes first resolution calendar for condominium billing reconciliation.
   minutes_first_resolution_business:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.first_resolution_time_in_minutes
+    description: Velo platform attribute describing minutes first resolution business for condominium billing reconciliation.
   minutes_full_resolution_calendar:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.full_resolution_time_in_minutes
+    description: Velo platform attribute describing minutes full resolution calendar for condominium billing reconciliation.
   minutes_full_resolution_business:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.full_resolution_time_in_minutes
+    description: Velo platform attribute describing minutes full resolution business for condominium billing reconciliation.
   minutes_requester_wait_calendar:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.requester_wait_time_in_minutes
+    description: Velo platform attribute describing minutes requester wait calendar for condominium billing reconciliation.
   minutes_requester_wait_business:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.requester_wait_time_in_minutes
+    description: Velo platform attribute describing minutes requester wait business for condominium billing reconciliation.
   minutes_agent_wait_calendar:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.agent_wait_time_in_minutes
+    description: Velo platform attribute describing minutes agent wait calendar for condominium billing reconciliation.
   minutes_agent_wait_business:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.agent_wait_time_in_minutes
+    description: Velo platform attribute describing minutes agent wait business for condominium billing reconciliation.
   minutes_on_hold_calendar:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.on_hold_time_in_minutes
+    description: Velo platform attribute describing minutes on hold calendar for condominium billing reconciliation.
   minutes_on_hold_business:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.on_hold_time_in_minutes
+    description: Velo platform attribute describing minutes on hold business for condominium billing reconciliation.
   dt_extracted:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.dt
+    description: Calendar date associated with extracted in the financial workflow.
   ts_requester_updated:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.requester_updated_at
+    description: Timestamp when requester updated occurred in the upstream fintech system.
   ts_solved:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.solved_at
+    description: Timestamp when solved occurred in the upstream fintech system.
   ts_latest_comment_added:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.latest_comment_added_at
+    description: Timestamp when latest comment added occurred in the upstream fintech system.
   ts_initially_assigned:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.initially_assigned_at
+    description: Timestamp when initially assigned occurred in the upstream fintech system.
   ts_assignee_updated:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.assignee_updated_at
+    description: Timestamp when assignee updated occurred in the upstream fintech system.
   ts_assigned:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.assigned_at
+    description: Timestamp when assigned occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_created_local:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.created_at
+    description: Timestamp when created local occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.updated_at
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.updated_at
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_zendesk_raw.ticket_metrics.updated_at
+    description: Day partition derived from the source event timestamp for incremental loading.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

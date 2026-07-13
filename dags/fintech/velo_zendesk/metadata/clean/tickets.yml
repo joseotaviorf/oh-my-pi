@@ -1,97 +1,139 @@
 database_name: datalake_velo_zendesk_clean
 table_name: tickets
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per tickets from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_ticket:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_ticket
+    description: Identifier for the ticket referenced by this financial record.
   satisfaction_rating:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.satisfaction_rating
+    description: Velo platform attribute describing satisfaction rating for condominium billing reconciliation.
   url_ticket:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.url_ticket
+    description: Velo platform attribute describing url ticket for condominium billing reconciliation.
   priority:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.priority
+    description: Velo platform attribute describing priority for condominium billing reconciliation.
   raw_subject:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.raw_subject
+    description: Velo platform attribute describing raw subject for condominium billing reconciliation.
   subject:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.subject
+    description: Velo platform attribute describing subject for condominium billing reconciliation.
   ticket_via:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.via
+    description: Velo platform attribute describing ticket via for condominium billing reconciliation.
   via:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.via
+    description: Velo platform attribute describing via for condominium billing reconciliation.
   tags:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.tags
+    description: Velo platform attribute describing tags for condominium billing reconciliation.
   id_group:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_group
+    description: Identifier for the group referenced by this financial record.
   id_ticket_form:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_ticket_form
+    description: Identifier for the ticket form referenced by this financial record.
   id_requester:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_requester
+    description: Identifier for the requester referenced by this financial record.
   id_assignee:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_assignee
+    description: Identifier for the assignee referenced by this financial record.
   ids_collaborator:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.ids_collaborator
+    description: Velo platform attribute describing ids collaborator for condominium billing reconciliation.
   id_brand:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_brand
+    description: Identifier for the brand referenced by this financial record.
   id_submitter:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.id_submitter
+    description: Identifier for the submitter referenced by this financial record.
   status:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   custom_fields:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.custom_fields
+    description: Velo platform attribute describing custom fields for condominium billing reconciliation.
   has_incidents:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.has_incidents
+    description: Indicates whether incidents applies to this financial record.
   type:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.type
+    description: Velo platform attribute describing type for condominium billing reconciliation.
   allow_channelback:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.allow_channelback
+    description: Velo platform attribute describing allow channelback for condominium billing reconciliation.
   description:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.description
+    description: Human-readable description of the financial transaction or ledger entry.
   recipient:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.recipient
+    description: Velo platform attribute describing recipient for condominium billing reconciliation.
   is_public:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.is_public
+    description: Indicates whether public applies to this financial record.
   dt_extracted:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.dt_extracted
+    description: Calendar date associated with extracted in the financial workflow.
   ts_created:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.ts_created
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_created_local:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.ts_created
+    description: Timestamp when created local occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.ts_updated
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.ts_created
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.ts_created
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_zendesk_clean.tickets_history.ts_created
+    description: Day partition derived from the source event timestamp for incremental loading.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

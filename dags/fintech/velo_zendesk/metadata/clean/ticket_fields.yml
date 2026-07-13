@@ -1,82 +1,119 @@
 database_name: datalake_velo_zendesk_clean
 table_name: ticket_fields
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per ticket fields from the Velo property management and condominium
+  billing platform, ingested for QuintoAndar fintech reconciliation and
+  accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_ticket_fields:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.id
+    description: Identifier for the ticket fields referenced by this financial record.
   title:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.title
+    description: Velo platform attribute describing title for condominium billing reconciliation.
   description:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.description
+    description: Human-readable description of the financial transaction or ledger entry.
   agent_description:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.agent_description
+    description: Velo platform attribute describing agent description for condominium billing reconciliation.
   url_ticket_fields:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.url
+    description: Velo platform attribute describing url ticket fields for condominium billing reconciliation.
   raw_title:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.raw_title
+    description: Velo platform attribute describing raw title for condominium billing reconciliation.
   raw_title_in_portal:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.raw_title_in_portal
+    description: Velo platform attribute describing raw title in portal for condominium billing reconciliation.
   raw_description:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.raw_description
+    description: Velo platform attribute describing raw description for condominium billing reconciliation.
   custom_field_options:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.custom_field_options
+    description: Velo platform attribute describing custom field options for condominium billing reconciliation.
   is_removable:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.removable
+    description: Indicates whether removable applies to this financial record.
   is_position:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.position
+    description: Indicates whether position applies to this financial record.
   is_required:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.required
+    description: Indicates whether required applies to this financial record.
   type:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.type
+    description: Velo platform attribute describing type for condominium billing reconciliation.
   is_active:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.active
+    description: Indicates whether active applies to this financial record.
   is_collapsed_for_agents:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.collapsed_for_agents
+    description: Indicates whether collapsed for agents applies to this financial record.
   is_visible_in_portal:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.visible_in_portal
+    description: Indicates whether visible in portal applies to this financial record.
   is_required_in_portal:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.required_in_portal
+    description: Indicates whether required in portal applies to this financial record.
   is_editable_in_portal:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.editable_in_portal
+    description: Indicates whether editable in portal applies to this financial record.
   is_title_in_portal:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.title_in_portal
+    description: Indicates whether title in portal applies to this financial record.
   dt_extracted:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.dt
+    description: Calendar date associated with extracted in the financial workflow.
   ts_created_local:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.created_at
+    description: Timestamp when created local occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.updated_at
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.updated_at
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_zendesk_raw.ticket_fields.updated_at
+    description: Day partition derived from the source event timestamp for incremental loading.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

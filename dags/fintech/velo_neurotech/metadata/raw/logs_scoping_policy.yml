@@ -1,17 +1,28 @@
 ---
 database_name: datalake_velo_neurotech_raw
 table_name: logs_scoping_policy
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per logs scoping policy from the Velo property management and
+  condominium billing platform, ingested for QuintoAndar fintech
+  reconciliation and accounts payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   log_user:
     tags:
     - PII
     - Confidential
+    description: Velo platform attribute describing log user for condominium billing reconciliation.
   prop_ffp_nome:
     tags:
     - PII
     - Confidential
+    description: Velo platform attribute describing prop ffp nome for condominium billing reconciliation.
   ret_rf_rua:
-   tags:
-   - Restricted
+    tags:
+    - Restricted
    
+    description: Velo platform attribute describing ret rf rua for condominium billing reconciliation.

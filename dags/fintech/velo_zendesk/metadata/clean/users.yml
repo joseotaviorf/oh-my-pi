@@ -1,130 +1,183 @@
 database_name: datalake_velo_zendesk_clean
 table_name: users
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per users from the Velo property management and condominium billing
+  platform, ingested for QuintoAndar fintech reconciliation and accounts
+  payable analytics.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_user:
     lineage:
       - datalake_velo_zendesk_raw.users.id
+    description: QuintoAndar user identifier associated with this financial transaction or account.
   is_active:
     lineage:
       - datalake_velo_zendesk_raw.users.active
+    description: Indicates whether active applies to this financial record.
   alias:
     lineage:
       - datalake_velo_zendesk_raw.users.alias
+    description: Velo platform attribute describing alias for condominium billing reconciliation.
   details:
     lineage:
       - datalake_velo_zendesk_raw.users.details
+    description: Velo platform attribute describing details for condominium billing reconciliation.
   email:
     lineage:
       - datalake_velo_zendesk_raw.users.email
+    description: Velo platform attribute describing email for condominium billing reconciliation.
   phone:
     lineage:
       - datalake_velo_zendesk_raw.users.phone
+    description: Velo platform attribute describing phone for condominium billing reconciliation.
   name:
     lineage:
       - datalake_velo_zendesk_raw.users.name
+    description: Velo platform attribute describing name for condominium billing reconciliation.
   notes:
     lineage:
       - datalake_velo_zendesk_raw.users.notes
+    description: Velo platform attribute describing notes for condominium billing reconciliation.
   url_user:
     lineage:
       - datalake_velo_zendesk_raw.users.url
+    description: Velo platform attribute describing url user for condominium billing reconciliation.
   chat_only:
     lineage:
       - datalake_velo_zendesk_raw.users.chat_only
+    description: Velo platform attribute describing chat only for condominium billing reconciliation.
   id_custom_role:
     lineage:
       - datalake_velo_zendesk_raw.users.custom_role_id
+    description: Identifier for the custom role referenced by this financial record.
   id_default_group:
     lineage:
       - datalake_velo_zendesk_raw.users.default_group_id
+    description: Identifier for the default group referenced by this financial record.
   id_external:
     lineage:
       - datalake_velo_zendesk_raw.users.external_id
+    description: Identifier for the external referenced by this financial record.
   locale:
     lineage:
       - datalake_velo_zendesk_raw.users.locale
+    description: Velo platform attribute describing locale for condominium billing reconciliation.
   id_locale:
     lineage:
       - datalake_velo_zendesk_raw.users.locale_id
+    description: Identifier for the locale referenced by this financial record.
   is_moderator:
     lineage:
       - datalake_velo_zendesk_raw.users.moderator
+    description: Indicates whether moderator applies to this financial record.
   is_only_private_comments:
     lineage:
       - datalake_velo_zendesk_raw.users.only_private_comments
+    description: Indicates whether only private comments applies to this financial record.
   id_organization:
     lineage:
       - datalake_velo_zendesk_raw.users.organization_id
+    description: Identifier for the organization referenced by this financial record.
   is_permanently_deleted:
     lineage:
       - datalake_velo_zendesk_raw.users.permanently_deleted
+    description: Indicates whether permanently deleted applies to this financial record.
   is_report_csv:
     lineage:
       - datalake_velo_zendesk_raw.users.report_csv
+    description: Indicates whether report csv applies to this financial record.
   is_restricted_agent:
     lineage:
       - datalake_velo_zendesk_raw.users.restricted_agent
+    description: Indicates whether restricted agent applies to this financial record.
   role:
     lineage:
       - datalake_velo_zendesk_raw.users.role
+    description: Velo platform attribute describing role for condominium billing reconciliation.
   role_type:
     lineage:
       - datalake_velo_zendesk_raw.users.role_type
+    description: Velo platform attribute describing role type for condominium billing reconciliation.
   is_shared:
     lineage:
       - datalake_velo_zendesk_raw.users.shared
+    description: Indicates whether shared applies to this financial record.
   is_shared_agent:
     lineage:
       - datalake_velo_zendesk_raw.users.shared_agent
+    description: Indicates whether shared agent applies to this financial record.
   is_shared_phone_number:
     lineage:
       - datalake_velo_zendesk_raw.users.shared_phone_number
+    description: Indicates whether shared phone number applies to this financial record.
   signature:
     lineage:
       - datalake_velo_zendesk_raw.users.signature
+    description: Velo platform attribute describing signature for condominium billing reconciliation.
   is_suspended:
     lineage:
       - datalake_velo_zendesk_raw.users.suspended
+    description: Indicates whether suspended applies to this financial record.
   tags:
     lineage:
       - datalake_velo_zendesk_raw.users.tags
+    description: Velo platform attribute describing tags for condominium billing reconciliation.
   ticket_restriction:
     lineage:
       - datalake_velo_zendesk_raw.users.ticket_restriction
+    description: Velo platform attribute describing ticket restriction for condominium billing reconciliation.
   time_zone:
     lineage:
       - datalake_velo_zendesk_raw.users.time_zone
+    description: Velo platform attribute describing time zone for condominium billing reconciliation.
   is_two_factor_auth_enabled:
     lineage:
       - datalake_velo_zendesk_raw.users.two_factor_auth_enabled
+    description: Indicates whether two factor auth enabled applies to this financial record.
   user_fields:
     lineage:
       - datalake_velo_zendesk_raw.users.user_fields
+    description: Velo platform attribute describing user fields for condominium billing reconciliation.
   is_verified:
     lineage:
       - datalake_velo_zendesk_raw.users.verified
+    description: Indicates whether verified applies to this financial record.
   dt_extracted:
     lineage:
       - datalake_velo_zendesk_raw.users.dt
+    description: Calendar date associated with extracted in the financial workflow.
   ts_last_login:
     lineage:
       - datalake_velo_zendesk_raw.users.last_login_at
+    description: Timestamp when last login occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_velo_zendesk_raw.users.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_created_local:
     lineage:
       - datalake_velo_zendesk_raw.users.created_at
+    description: Timestamp when created local occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_velo_zendesk_raw.users.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_velo_zendesk_raw.users.updated_at
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_velo_zendesk_raw.users.updated_at
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_velo_zendesk_raw.users.updated_at
+    description: Day partition derived from the source event timestamp for incremental loading.
+  ts_load:
+    lineage: []
+    description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.
