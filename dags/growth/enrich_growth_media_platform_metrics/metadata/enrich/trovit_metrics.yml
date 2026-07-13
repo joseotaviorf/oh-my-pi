@@ -3,7 +3,8 @@ database_name: datalake_growth_media_platform
 table_name: trovit_metrics
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains metrics like clicks and cost from Trovit campaigns.
+description: |
+  Growth media platform metrics for trovit metrics used in marketing cost allocation. Partitioned by origin, year, month, and day — filter all partition columns in WHERE.
 columns:
   id_account:
     lineage:
@@ -52,7 +53,7 @@ columns:
   total_cost:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.total_cost
-    description: Total cost of the ads in Trovit campaigns.
+    description: Total paid media cost aggregated across device platforms for the marketing channel. of the ads in Trovit campaigns.
   dt_cost:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.dt_attribution

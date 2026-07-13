@@ -3,7 +3,8 @@ database_name: datalake_growth_media_platform
 table_name: facebook_metrics
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains metrics like clicks, impressions, and spend from Facebook Ads Insights by region.
+description: |
+  Growth media platform metrics for facebook metrics used in marketing cost allocation. Partitioned by origin, year, month, and day — filter all partition columns in WHERE.
 columns:
   id_account:
     lineage:
@@ -64,11 +65,11 @@ columns:
   total_cost:
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_region.spend
-    description: Total cost of the ads in Facebook Ads.
+    description: Total paid media cost aggregated across device platforms for the marketing channel. of the ads in Facebook Ads.
   dt_cost:
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_region.dt_start
-    description: Date of the cost.
+    description: Calendar date when the media platform cost was incurred and attributed.
   year:
     lineage:
       - datalake_growth_facebook_insights.facebook_insights_region.dt_start

@@ -3,10 +3,7 @@ table_name: keywords_from_players
 owner: caio.francisco@quintoandar.com.br
 domain: Growth
 description: |
-  Table of SEO keywords and SERP features consolidated from multiple real-estate competitors (Semrush exports),
-  in the countries where classifieds portals operate (Argentina, Ecuador, Mexico, Panama and Peru), except Brazil.
-  All fields are derived from specif organic_search_kw tables in datalake_semrush_classified_clean for 26 different players. Accents are normalized,
-  intents and SERP features are mapped to human_readable labels in lower case.
+  Enriched SEMrush classified-listings competitor keywords (keywords_from_players) for LATAM SEO reporting. Partitioned by year and month.
 columns:
   keyword:
     description: "Original search keyword as provided by Semrush for the given player and URL."

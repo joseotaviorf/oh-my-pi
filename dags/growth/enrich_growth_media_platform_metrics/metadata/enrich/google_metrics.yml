@@ -3,7 +3,8 @@ database_name: datalake_growth_media_platform
 table_name: google_metrics
 domain: Growth
 owner: henrique.paulo@quintoandar.com.br
-description: This table contains metrics like clicks, impressions, and cost from Google Ads with geo-level granularity.
+description: |
+  Growth media platform metrics for google metrics used in marketing cost allocation. Partitioned by origin, year, month, and day — filter all partition columns in WHERE.
 columns:
   id_account:
     lineage:
@@ -70,7 +71,7 @@ columns:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.cost
       - datalake_google_ads_clean.campaigns_geo_performance.cost
-    description: Total cost of the ads in Google Ads, converted to standard currency units.
+    description: Total paid media cost aggregated across device platforms for the marketing channel. of the ads in Google Ads, converted to standard currency units.
   dt_cost:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.dt_loaded

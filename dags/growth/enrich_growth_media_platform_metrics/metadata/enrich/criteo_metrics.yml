@@ -3,7 +3,8 @@ database_name: datalake_growth_media_platform
 table_name: criteo_metrics
 owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: This table contains consolidated metrics like clicks, impressions and cost from Media Platforms from Criteo.
+description: |
+  Growth media platform metrics for criteo metrics used in marketing cost allocation. Partitioned by origin, year, month, and day — filter all partition columns in WHERE.
 columns:
   id_account:
     lineage:
@@ -58,7 +59,7 @@ columns:
   total_cost:
     lineage:
       - datalake_criteo.criteo_campaigns.cost
-    description: Total cost of the media on ads.
+    description: Total paid media cost aggregated across device platforms for the marketing channel. of the media on ads.
   dt_cost:
     lineage:
       - datalake_criteo.criteo_campaigns.dt_report

@@ -3,8 +3,7 @@ table_name: keyword_region_attributes_mex
 owner: caio.francisco@quintoandar.com.br
 domain: Growth
 description: |
-  Keyword-level regional enrichment for Semrush data for Mexican players.
-  Adds inferred matches for city and zone, while preserving keyword performance metrics.
+  Enriched SEMrush classified-listings competitor keywords (keyword_region_attributes_mex) for LATAM SEO reporting. Partitioned by year and month.
 columns:
   keyword:
     description: "Original search keyword as provided by Semrush for the given player and URL."
@@ -80,10 +79,6 @@ columns:
     description: "Estimated share of traffic captured by the URL for this keyword."
     lineage:
       - datalake_semrush_classified.keywords_from_players.share_of_traffic
-  traffic_cost_percentage:
-    description: "Estimated share of traffic cost attributable to this keyword and URL."
-    lineage:
-      - datalake_semrush_classified.keywords_from_players.traffic_cost_percentage
   competition:
     description: "SEMrush competition score for the keyword in paid search."
     lineage:
