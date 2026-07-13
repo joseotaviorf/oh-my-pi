@@ -21,11 +21,8 @@ All four are computed from the pre-joined offboarding table `dw_offboarding.obt_
 
 ## **MBR**
 
-Post Contract
-
-## MBR
-
-- Post Contract
+*   Post contract
+    
 
 ## **Glossary and Synonyms**
 
