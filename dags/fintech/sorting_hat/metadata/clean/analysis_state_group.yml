@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_state_group
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Groups of analysis states belonging to a machine run in the Sorting Hat analysis workflow.
 columns:

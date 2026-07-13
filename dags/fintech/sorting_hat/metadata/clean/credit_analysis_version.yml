@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: credit_analysis_version
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Versioned credit analysis rows including analyst decisions, reasons, and modification tracking in Sorting Hat.
 columns:

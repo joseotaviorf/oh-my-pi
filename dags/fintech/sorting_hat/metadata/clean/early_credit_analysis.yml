@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: early_credit_analysis
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Early-stage credit evaluation outcomes before the full proposal flow (house, variant, risk category).
 columns:

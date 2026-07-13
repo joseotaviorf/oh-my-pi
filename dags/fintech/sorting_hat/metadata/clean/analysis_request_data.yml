@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_request_data
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Raw payload and attributes for an analysis request state machine execution in Sorting Hat.
 columns:

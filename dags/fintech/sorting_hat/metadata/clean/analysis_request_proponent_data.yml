@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_request_proponent_data
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Proponent-scoped request data (documents and raw payload) for a Sorting Hat analysis request.
 columns:

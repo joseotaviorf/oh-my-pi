@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: experiment
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Credit policy experiment metadata (name, description, and active window) in Sorting Hat.
 columns:
