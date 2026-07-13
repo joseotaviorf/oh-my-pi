@@ -1,22 +1,30 @@
 database_name: datalake_fastforward_clean
 table_name: promo_fee
+description: Promotional fees offered for rent anticipation, with amount and marketing description.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.promo_fee.id
+    description: Unique identifier of the promotional fee.
   fee:
     lineage:
       - datalake_fastforward_raw.promo_fee.fee
+    description: Promotional fee amount in Brazilian reais.
   title:
     lineage:
       - datalake_fastforward_raw.promo_fee.title
+    description: Short label describing the promotion.
   description:
     lineage:
       - datalake_fastforward_raw.promo_fee.description
+    description: Detailed explanation of the promotional fee offer.
   ts_created:
     lineage:
       - datalake_fastforward_raw.promo_fee.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_fastforward_raw.promo_fee.updated_at
+    description: When this record was last modified.

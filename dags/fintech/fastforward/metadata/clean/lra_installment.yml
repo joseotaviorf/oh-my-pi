@@ -1,37 +1,50 @@
 database_name: datalake_fastforward_clean
 table_name: lra_installment
+description: Individual payment installments of a long-term rent anticipation contract, including amounts, due dates, and payment status.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.lra_installment.id
+    description: Unique identifier of the installment.
   id_long_term_anticipation:
     lineage:
       - datalake_fastforward_raw.lra_installment.long_term_anticipation_id
+    description: Rent anticipation contract this installment belongs to.
   id_partner_reference:
     lineage:
       - datalake_fastforward_raw.lra_installment.partner_reference_id
+    description: External reference used for reconciliation with the billing partner.
   installment_number:
     lineage:
       - datalake_fastforward_raw.lra_installment.installment_number
+    description: Position of this installment in the payment schedule.
   status:
     lineage:
       - datalake_fastforward_raw.lra_installment.status
+    description: Payment status of the installment (e.g. created, paid).
   amount:
     lineage:
       - datalake_fastforward_raw.lra_installment.amount
+    description: Principal amount due for this installment, in Brazilian reais.
   interest_value:
     lineage:
       - datalake_fastforward_raw.lra_installment.interest_value
+    description: Interest portion of this installment, in Brazilian reais.
   ts_due:
     lineage:
       - datalake_fastforward_raw.lra_installment.due_at
+    description: Actual due date for this installment.
   ts_expected_due:
     lineage:
       - datalake_fastforward_raw.lra_installment.expected_due_date
+    description: Originally expected due date before any adjustments.
   ts_created:
     lineage:
       - datalake_fastforward_raw.lra_installment.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_fastforward_raw.lra_installment.updated_at
+    description: When this record was last modified.

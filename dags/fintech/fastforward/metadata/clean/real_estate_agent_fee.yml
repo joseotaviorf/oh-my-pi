@@ -1,28 +1,38 @@
 database_name: datalake_fastforward_clean
 table_name: real_estate_agent_fee
+description: Monthly brokerage fees owed to real estate agents for a rental contract.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.real_estate_agent_fee.id
+    description: Unique identifier of the agent fee record.
   id_agent:
     lineage:
       - datalake_fastforward_raw.real_estate_agent_fee.agent_id
+    description: Real estate agent receiving the fee.
   id_contract:
     lineage:
       - datalake_fastforward_raw.real_estate_agent_fee.contract_id
+    description: Rental contract the fee is associated with.
   fee:
     lineage:
       - datalake_fastforward_raw.real_estate_agent_fee.fee
+    description: Brokerage fee amount in Brazilian reais.
   month:
     lineage:
       - datalake_fastforward_raw.real_estate_agent_fee.month
+    description: Month the fee refers to.
   year:
     lineage:
       - datalake_fastforward_raw.real_estate_agent_fee.year
+    description: Year the fee refers to.
   ts_created:
     lineage:
       - datalake_fastforward_raw.real_estate_agent_fee.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_fastforward_raw.real_estate_agent_fee.updated_at
+    description: When this record was last modified.

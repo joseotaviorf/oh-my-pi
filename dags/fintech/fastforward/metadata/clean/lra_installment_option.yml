@@ -1,31 +1,42 @@
 database_name: datalake_fastforward_clean
 table_name: lra_installment_option
+description: Available payment plan options for rent anticipation, with installment count, interest rate, and validity period.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.id
+    description: Unique identifier of the payment plan option.
   installments:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.installments_number
+    description: Number of installments in this plan.
   monthly_interest_rate:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.monthly_interest
+    description: Monthly interest rate applied to this plan.
   option_bucket:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.option_bucket
+    description: Pricing group used to categorize this plan option.
   months_anticipated:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.months_anticipated
+    description: Number of rent months covered by the anticipation.
   ts_valid_from:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.valid_from
+    description: Date when this plan option becomes available.
   ts_valid_until:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.valid_until
+    description: Date when this plan option expires.
   ts_created:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_fastforward_raw.lra_installment_option.updated_at
+    description: When this record was last modified.

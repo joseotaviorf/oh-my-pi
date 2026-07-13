@@ -1,19 +1,26 @@
 database_name: datalake_fastforward_clean
 table_name: users
+description: Users registered in the rent anticipation system, linked to their QuintoAndar account.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_fastforward_raw.users.id
+    description: Unique identifier of the user in the anticipation system.
   id_external:
     lineage:
       - datalake_fastforward_raw.users.external_id
+    description: QuintoAndar platform user identifier.
   name:
     lineage:
       - datalake_fastforward_raw.users.name
+    description: Display name of the user (PII).
   ts_created:
     lineage:
       - datalake_fastforward_raw.users.created_at
+    description: When this record was first created.
   ts_updated:
     lineage:
       - datalake_fastforward_raw.users.updated_at
+    description: When this record was last modified.

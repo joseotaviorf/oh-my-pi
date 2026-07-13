@@ -1,52 +1,124 @@
 database_name: datalake_docx_clean
 table_name: credit_evaluation_aud
+description: Historical record of changes to tenant credit evaluations, capturing how status, outcome, limits, and preliminary analysis evolved over time.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_credit_evaluation:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.id
+    description: Unique identifier of the credit evaluation being tracked.
   id_proposal:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.proposal_id
+    description: Rental proposal linked to this credit evaluation.
   id_house:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.house_id
+    description: Property listing associated with the evaluation.
   id_user:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.user_id
+    description: QuintoAndar user who requested or owns the evaluation.
   rev:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   status:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.status
+    description: Current step of the evaluation in the credit analysis process (e.g. pending, in progress, completed, cancelled).
   result:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.result
+    description: Final credit decision (e.g. approved, pre-approved, rejected).
   reason:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.reason
+    description: Explanation for the credit decision (e.g. insufficient income, bad score).
   early_result:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.early_result
+    description: Preliminary credit analysis returned before the final decision, stored as structured data.
   rev_end:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   mod_id_user:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.user_id_mod
+    description: Whether the linked user changed in this revision.
   mod_status:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.status_mod
+    description: Whether the evaluation status changed in this revision.
   mod_result:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.result_mod
+    description: Whether the credit outcome changed in this revision.
   mod_reason:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.reason_mod
+    description: Whether the decision reason changed in this revision.
   mod_early_result:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.early_result_mod
+    description: Whether the preliminary analysis changed in this revision.
+  is_automatic:
+    lineage: []
+    description: Whether the evaluation was triggered automatically rather than manually.
+  guarantee_factor:
+    lineage: []
+    description: Multiplier applied to the guarantee amount in the preliminary analysis.
+  scope:
+    lineage: []
+    description: Whether the evaluation applies to a specific city or a specific property.
+  type:
+    lineage: []
+    description: Level of credit analysis performed (e.g. light approval, regular, full).
+  mod_type:
+    lineage: []
+    description: Whether the analysis type changed in this revision.
+  mod_limit_value:
+    lineage: []
+    description: Whether the approved limit changed in this revision.
+  limit_value:
+    lineage: []
+    description: Maximum rent package amount approved for this evaluation.
+  mod_ts_expires:
+    lineage: []
+    description: Whether the expiration date changed in this revision.
+  analysis_request_id:
+    lineage: []
+    description: Identifier of the preliminary credit analysis request.
+  pre_approved_limit:
+    lineage: []
+    description: Guarantee limit pre-approved before the final decision.
+  mod_city_id:
+    lineage: []
+    description: Whether the city changed in this revision.
+  proponent_group_type:
+    lineage: []
+    description: How tenants are grouped for this evaluation (alone, with others, or only co-tenants).
+  mod_proponent_group_type:
+    lineage: []
+    description: Whether the tenant group composition changed in this revision.
+  mod_is_automatic:
+    lineage: []
+    description: Whether the automatic-processing flag changed in this revision.
+  id_city:
+    lineage: []
+    description: City where the property is located, used in early-phase evaluations.
+  early_result_guarantee_type:
+    lineage: []
+    description: Type of rental guarantee suggested in the preliminary analysis.
+  ts_expires:
+    lineage: []
+    description: Date and time when this evaluation stops being valid.
+  id_group:
+    lineage: []
+    description: Group of tenants linked to this evaluation.

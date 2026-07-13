@@ -1,22 +1,30 @@
 database_name: datalake_fastforward_clean
 table_name: promo_fee_aud
+description: Historical record of changes to promotional fee definitions.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_promo_fee:
     lineage:
       - datalake_fastforward_raw.promo_fee_aud.id
+    description: Unique identifier of the promotional fee.
   rev:
     lineage:
       - datalake_fastforward_raw.promo_fee_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   fee:
     lineage:
       - datalake_fastforward_raw.promo_fee_aud.fee
+    description: Promotional fee amount in Brazilian reais.
   title:
     lineage:
       - datalake_fastforward_raw.promo_fee_aud.title
+    description: Short label describing the promotion.
   description:
     lineage:
       - datalake_fastforward_raw.promo_fee_aud.description
+    description: Detailed explanation of the promotional fee offer.
   rev_type:
     lineage:
       - datalake_fastforward_raw.promo_fee_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."

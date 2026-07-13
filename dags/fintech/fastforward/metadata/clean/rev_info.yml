@@ -1,10 +1,14 @@
 database_name: datalake_fastforward_clean
 table_name: rev_info
+description: Index of audit revisions, recording when each change snapshot was created.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   rev:
     lineage:
       - datalake_fastforward_raw.revinfo.rev
+    description: Sequential revision number.
   ts_created:
     lineage:
       - datalake_fastforward_raw.revinfo.revtstmp
+    description: Date and time when the revision was recorded.

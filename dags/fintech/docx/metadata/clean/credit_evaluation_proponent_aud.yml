@@ -1,40 +1,54 @@
 database_name: datalake_docx_clean
 table_name: credit_evaluation_proponent_aud
+description: Historical record of changes to people included in a credit evaluation, such as name, income, and residency status.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_credit_evaluation_proponent:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.id
+    description: Unique identifier of the person included in the evaluation.
   id_credit_evaluation:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.credit_evaluation_id
+    description: Credit evaluation this person belongs to.
   rev:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   name:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.name
+    description: Full name of the person being evaluated (PII).
   cpf:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.cpf
+    description: Brazilian tax ID used to identify the person (PII).
   occupation_area:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.occupation_area
+    description: Professional field or industry of the person.
   status:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.status
+    description: Current status of this person's credit analysis.
   rev_end:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   resident:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.resident
+    description: Whether the person will live at the rented property.
   income_nature:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.income_nature
+    description: Source or category of the person's declared income.
   monthly_income:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent_aud.monthly_income
+    description: Monthly income amount declared by the person.

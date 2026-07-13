@@ -1,22 +1,30 @@
 database_name: datalake_fastforward_clean
 table_name: users_aud
+description: Historical record of changes to user registrations.
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 columns:
   id_user:
     lineage:
       - datalake_fastforward_raw.users_aud.id
+    description: Unique identifier of the user in the anticipation system.
   id_external:
     lineage:
       - datalake_fastforward_raw.users_aud.external_id
+    description: QuintoAndar platform user identifier.
   rev:
     lineage:
       - datalake_fastforward_raw.users_aud.rev
+    description: Sequential number identifying this change snapshot in the audit history.
   rev_type:
     lineage:
       - datalake_fastforward_raw.users_aud.revtype
+    description: "Type of change recorded (new record, update, or deletion)."
   rev_end:
     lineage:
       - datalake_fastforward_raw.users_aud.revend
+    description: Next audit snapshot that replaced this one, if the record was later updated.
   name:
     lineage:
       - datalake_fastforward_raw.users_aud.name
+    description: Display name of the user (PII).
