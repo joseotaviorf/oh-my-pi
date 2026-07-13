@@ -1,20 +1,30 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: advance_base
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for advance
+  base. One row per planning or control record used in financial reporting and
+  SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_offer:
     lineage:
       - datalake_gsheets_raw.advance_base.id_offer
+    description: Identifier for the offer referenced by this financial record.
   id_agent:
     lineage:
       - datalake_gsheets_raw.advance_base.id_agent
+    description: Identifier for the agent referenced by this financial record.
   agent_full_name:
     lineage:
       - datalake_gsheets_raw.advance_base.agent_full_name
+    description: Value from the Google Sheets source column mapped to agent_full_name for advance_base planning.
   partner_type:
     lineage:
       - datalake_gsheets_raw.advance_base.partner_type
+    description: Value from the Google Sheets source column mapped to partner_type for advance_base planning.
   gross_advance:
     lineage:
       - datalake_gsheets_raw.advance_base.gross_advance
+    description: Value from the Google Sheets source column mapped to gross_advance for advance_base planning.

@@ -1,35 +1,53 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: sap
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per sap in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_business_entity:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.business_entity_id
+    description: Identifier for the business entity referenced by this financial record.
   id_finance_entity:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.finance_entity_id
+    description: Identifier for the finance entity referenced by this financial record.
   id_feature:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.feature_id
+    description: Identifier for the feature referenced by this financial record.
   request:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.request
+    description: QuintoCred rental guarantee attribute describing request in the policy lifecycle.
   response:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.response
+    description: QuintoCred rental guarantee attribute describing response in the policy lifecycle.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   trigger:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.trigger
+    description: QuintoCred rental guarantee attribute describing trigger in the policy lifecycle.
   transaction_name:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.transaction_name
+    description: QuintoCred rental guarantee attribute describing transaction name in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.sap.created_at
+    description: Timestamp when created occurred in the upstream fintech system.

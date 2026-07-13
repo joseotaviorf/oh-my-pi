@@ -1,50 +1,61 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: user_account_aud
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per user account aud in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   uuid_person:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.personuuid
+    description: QuintoCred rental guarantee attribute describing uuid person in the policy lifecycle.
   email:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.email
+    description: QuintoCred rental guarantee attribute describing email in the policy lifecycle.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.revend
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.revtype
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   mod_email:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.email_mod
+    description: QuintoCred rental guarantee attribute describing mod email in the policy lifecycle.
   mod_uuid_person:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.personuuid_mod
+    description: QuintoCred rental guarantee attribute describing mod uuid person in the policy lifecycle.
   mod_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.status_mod
+    description: QuintoCred rental guarantee attribute describing mod status in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.user_account_aud.created_at
-  year:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.user_account_aud.year
-  month:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.user_account_aud.month
-  day:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.user_account_aud.day
+    description: Timestamp when created occurred in the upstream fintech system.

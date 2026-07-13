@@ -1,26 +1,38 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: associate_executive_bonus
+description:
+  Reference dataset curated in Google Sheets by Fintech Operations for
+  associate executive bonus. One row per planning or control record used in
+  financial reporting and SLA targets.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_associate_executive:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.id_associate_executive
+    description: Identifier for the associate executive referenced by this financial record.
   id_hub:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.id_hub
+    description: Identifier for the hub referenced by this financial record.
   hub:
     lineage:
       - datalake_gsheets_raw.associate_executive_bonus.hub
+    description: Value from the Google Sheets source column mapped to hub for associate_executive_bonus planning.
   associate_executive:
     lineage:
       - datalake_gsheets_raw.associate_executive_bonus.associate_executive
+    description: Value from the Google Sheets source column mapped to associate_executive for associate_executive_bonus planning.
   bonus_value:
     lineage:
       - datalake_gsheets_raw.associate_executive_bonus.bonus_value
+    description: Value from the Google Sheets source column mapped to bonus_value for associate_executive_bonus planning.
   dt_bonus:
     lineage:
       - datalake_gsheets_raw.associate_executive_bonus.dt_bonus
+    description: Calendar date associated with bonus in the financial workflow.
   dt_bonus_end:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.dt_bonus_end
+    description: Calendar date associated with bonus end in the financial workflow.
