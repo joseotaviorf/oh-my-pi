@@ -1,7 +1,7 @@
 ---
 database_name: datalake_pas
 table_name: ledger_new_template
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table ledger from SAP B1 with the 4HANA template"
 columns:
@@ -22,7 +22,7 @@ columns:
     lineage:
       - datalake_pas.ledger.id_finance_entity_entry
   id_external_payment:
-    description: "External ID of the payment"
+    description: Identifier for the external payment referenced by this financial record.
     lineage:
       - datalake_pas.ledger.id_external_payment
   id_document:
@@ -33,6 +33,10 @@ columns:
     description: "ID that indicates which company from 5A group"
     lineage:
       - datalake_pas.ledger.id_branch
+  id_line:
+    description: Line identifier of the journal entry within the SAP B1 document.
+    lineage:
+      - datalake_pas.ledger.id_line
   4hana_id_company:
     description: "ID that indicates which company from 5A group updated to 4HANA format"
     lineage:
@@ -42,7 +46,7 @@ columns:
     lineage:
       - datalake_pas.ledger.account_type
   account_number:
-    description: "Account number"
+    description: Financial attribute representing account number on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.account_number
   4hana_account_number:
@@ -54,25 +58,29 @@ columns:
     lineage:
       - datalake_pas.ledger.account_name
   series:
-    description: "Series description"
+    description: Financial attribute representing series on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.series
+  contra_act:
+    description: Contra account associated with the ledger entry in SAP B1.
+    lineage:
+      - datalake_pas.ledger.contra_act
+  sap_document_number:
+    description: SAP B1 document number associated with the ledger entry.
+    lineage:
+      - datalake_pas.ledger.sap_document_number
   document_number:
     description: "Transaction type and document number"
     lineage:
       - datalake_pas.ledger.document_number
   accounting_rule:
-    description: "Accounting rule applied"
+    description: Financial attribute representing accounting rule on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.accounting_rule
   accounting_type:
     description: "Accounting type: bill or transfer"
     lineage:
       - datalake_pas.ledger.accounting_type
-  4hana_transaction_type:
-    description: "Transaction Type in 4HANA format"
-    lineage:
-      - datalake_pas.ledger.document_number
   user_type:
     description: "Type of user involved in the referred transactions"
     lineage:
@@ -86,15 +94,15 @@ columns:
     lineage:
       - datalake_pas.ledger.comments
   debit_credit:
-    description: "Debit - Credit value"
+    description: Financial attribute representing debit credit on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.debit_credit
   debit:
-    description: "Debit value"
+    description: Financial attribute representing debit on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.debit
   credit:
-    description: "Credit value"
+    description: Financial attribute representing credit on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.credit
   created_by:
@@ -102,7 +110,7 @@ columns:
     lineage:
       - datalake_pas.ledger.created_by
   location_profit_code:
-    description: "Location profit code"
+    description: Financial attribute representing location profit code on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.location_profit_code
   cost_center_code:
@@ -114,30 +122,34 @@ columns:
     lineage:
       - datalake_pas.ledger.cost_center_code
   uuid:
-    description: "Unic ID"
+    description: Unic ID recorded on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.uuid
   dt_reference:
-    description: "Reference date"
+    description: Calendar date associated with reference in the financial workflow.
     lineage:
       - datalake_pas.ledger.dt_reference
   dt_due:
-    description: "Due date"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_pas.ledger.dt_due
   dt_tax:
-    description: "Tax date"
+    description: Calendar date associated with tax in the financial workflow.
     lineage:
       - datalake_pas.ledger.dt_tax
   dt_created:
-    description: "Created date"
+    description: Calendar date associated with created in the financial workflow.
     lineage:
       - datalake_pas.ledger.dt_created
   dt_updated:
-    description: "Updated date"
+    description: Calendar date associated with updated in the financial workflow.
     lineage:
       - datalake_pas.ledger.dt_updated
   accrual_year_month:
-    description: "Accrual date"
+    description: Financial attribute representing accrual year month on the ledger_new_template dataset.
     lineage:
       - datalake_pas.ledger.accrual_year_month
+  transaction_type:
+    description: Transaction type remapped to the 4HANA document type codes from the SAP B1 document_number prefix.
+    lineage:
+      - datalake_pas.ledger.document_number

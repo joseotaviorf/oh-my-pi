@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sap_gateway
 table_name: sap_payload_journal_entry_lines
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table containing SAP payload journal entry lines information"
 columns:
@@ -38,42 +38,42 @@ columns:
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.BPLID
   costing_code:
-    description: "Costing code"
+    description: Financial attribute representing costing code on the sap_payload_journal_entry_lines dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.CostingCode
   costing_code_2:
-    description: "Secondary costing code"
+    description: Financial attribute representing costing code 2 on the sap_payload_journal_entry_lines dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.CostingCode2
   shortname:
     description: "Short name identifier"
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.ShortName
-  s4hana_shortname:
+  4hana_shortname:
     description: "S4HANA short name mapping"
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.ShortName
   accounting_rule:
-    description: "Accounting rule"
+    description: Financial attribute representing accounting rule on the sap_payload_journal_entry_lines dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.U_AccountingRule
   accounting_type:
-    description: "Accounting type"
+    description: Financial attribute representing accounting type on the sap_payload_journal_entry_lines dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.U_AccountingType
   user_type:
-    description: "User type"
+    description: Financial attribute representing user type on the sap_payload_journal_entry_lines dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.U_UserType
   credit:
-    description: "Credit amount"
+    description: Financial attribute representing credit on the sap_payload_journal_entry_lines dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.Credit
   debit:
-    description: "Debit amount"
+    description: Financial attribute representing debit on the sap_payload_journal_entry_lines dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.Debit
   accrual_year_month:
-    description: "Accrual year and month"
+    description: Financial attribute representing accrual year month on the sap_payload_journal_entry_lines dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.AdditionalReference 

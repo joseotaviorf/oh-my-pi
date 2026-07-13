@@ -5,7 +5,7 @@ description:
   of a certain property. This property has all the visits e offers canceled. And also
   we're not filtering the status or cancellation_reason in this table
 domain: Fintech
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id_reservation:
     lineage:
@@ -18,7 +18,7 @@ columns:
   id_house:
     lineage:
       - datalake_kill_queue.reservation.id_house
-    description: Id house of the reservation
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   status:
     lineage:
       - datalake_kill_queue.reservation.status
@@ -82,7 +82,7 @@ columns:
   accrual_month:
     lineage:
       - datalake_quintoandar.aux_date.month_start
-    description: Reference month
+    description: Financial attribute representing accrual month on the reservation dataset.
   dt_end_payment:
     lineage:
       - datalake_kill_queue.reservation.ts_created

@@ -1,9 +1,9 @@
 ---
 database_name: datalake_pas
 table_name: ledger
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table ledger from SAP"
+description: One row per ledger synced from SAP S/4HANA or the SAP gateway, supporting accounting postings, journal entries, and financial close processes.
 columns:
   id_transaction:
     description: "Identification number of the transaction"
@@ -30,7 +30,7 @@ columns:
       - datalake_pas.invoice_lines.id_finance_entity_entry
       - datalake_pas.incoming_payments_lines.id_finance_entity_entry
   id_external_payment:
-    description: "External ID of the payment"
+    description: Identifier for the external payment referenced by this financial record.
     lineage:
       - datalake_pas.journal_entries.id_external_payment
       - datalake_pas.invoices.id_external_payment
@@ -48,7 +48,7 @@ columns:
   account_type:
     description: "Account type description"
   account_number:
-    description: "Account number"
+    description: Financial attribute representing account number on the ledger dataset.
     lineage:
       - datalake_pas.journal_entry_lines.account
       - datalake_pas.invoice_lines.account
@@ -58,7 +58,7 @@ columns:
     lineage:
       - datalake_pas_clean.chart_of_accounts
   series:
-    description: "Series description"
+    description: Financial attribute representing series on the ledger dataset.
     lineage:
       - datalake_pas.journal_entries.series
       - datalake_pas.invoices.series
@@ -73,7 +73,7 @@ columns:
       - datalake_pas.invoices.source_document_number
       - datalake_pas.incoming_payments.source_document_number
   accounting_rule:
-    description: "Accounting rule applied"
+    description: Financial attribute representing accounting rule on the ledger dataset.
     lineage:
       - datalake_pas.journal_entry_lines.accounting_rule
       - datalake_pas.invoice_lines.accounting_rule
@@ -106,7 +106,7 @@ columns:
       - datalake_pas.invoice.memo
       - datalake_pas.incoming_payments.memo
   debit_credit:
-    description: "Debit - Credit value"
+    description: Financial attribute representing debit credit on the ledger dataset.
     lineage:
       - datalake_pas.journal_entry_lines.debit
       - datalake_pas.invoice_lines.debit
@@ -115,13 +115,13 @@ columns:
       - datalake_pas.invoice_lines.credit
       - datalake_pas.incoming_payments_lines.credit
   debit:
-    description: "Debit value"
+    description: Financial attribute representing debit on the ledger dataset.
     lineage:
       - datalake_pas.journal_entry_lines.debit
       - datalake_pas.invoice_lines.debit
       - datalake_pas.incoming_payments.debit
   credit:
-    description: "Credit value"
+    description: Financial attribute representing credit on the ledger dataset.
     lineage:
       - datalake_pas.journal_entry_lines.credit
       - datalake_pas.invoice_lines.credit
@@ -131,7 +131,7 @@ columns:
     lineage:
       - datalake_pas_clean.users
   location_profit_code:
-    description: "Location profit code"
+    description: Financial attribute representing location profit code on the ledger dataset.
     lineage:
       - datalake_pas.journal_entry_lines.location_profit_code
       - datalake_pas.invoice_lines.location_profit_code
@@ -142,45 +142,43 @@ columns:
       - datalake_pas.journal_entry_lines.cost_center_code
       - datalake_pas.invoice_lines.cost_center_code
       - datalake_pas.incoming_payments_lines.cost_center_code
-  uuid:
-    description: "Unic ID"
-    lineage:
-      - datalake_pas.journal_entries.uuid
-      - datalake_pas.invoices.uuid
-      - datalake_pas.incoming_payments.uuid
   dt_reference:
-    description: "Reference date"
+    description: Calendar date associated with reference in the financial workflow.
     lineage:
       - datalake_pas.journal_entries.dt_reference
       - datalake_pas.invoices.dt_reference
       - datalake_pas.incoming_payments.dt_reference
   dt_due:
-    description: "Due date"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_pas.journal_entries.dt_due
       - datalake_pas.invoices.dt_due
       - datalake_pas.incoming_payments.dt_due
   dt_tax:
-    description: "Tax date"
+    description: Calendar date associated with tax in the financial workflow.
     lineage:
       - datalake_pas.journal_entries.dt_tax
       - datalake_pas.invoices.dt_tax
       - datalake_pas.incoming_payments.dt_tax
   dt_created:
-    description: "Created date"
+    description: Calendar date associated with created in the financial workflow.
     lineage:
       - datalake_pas.journal_entries.dt_created
       - datalake_pas.invoices.dt_created
       - datalake_pas.incoming_payments.dt_created
-  dt_updated:
-    description: "Updated date"
-    lineage:
-      - datalake_pas.journal_entries.dt_updated
-      - datalake_pas.invoices.dt_updated
-      - datalake_pas.incoming_payments.dt_updated
   accrual_year_month:
-    description: "Accrual date"
+    description: Financial attribute representing accrual year month on the ledger dataset.
     lineage:
       - datalake_pas.journal_entries.accrual_year_month
       - datalake_pas.invoices.accrual_year_month
       - datalake_pas.incoming_payments.accrual_year_month
+  contra_act:
+    description: Financial attribute representing contra act on the ledger dataset.
+  id_line:
+    description: Identifier for the line referenced by this financial record.
+  hash:
+    description: Financial attribute representing hash on the ledger dataset.
+  transaction_type:
+    description: Financial attribute representing transaction type on the ledger dataset.
+  sap_document_number:
+    description: Financial attribute representing sap document number on the ledger dataset.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_revenue_lines
 table_name: rental_guarantee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing rental guarantee details"
 columns:
@@ -24,13 +24,13 @@ columns:
   number_payments:
     description: "Total amount of payments"
   origin_fact:
-    description: "Payment origin"
+    description: Financial attribute representing origin fact on the rental_guarantee dataset.
   raw_payment_amount:
-    description: "Total amount of payment"
+    description: Financial attribute representing raw payment amount on the rental_guarantee dataset.
   revenue_qa:
-    description: "Revenue total"
+    description: Financial attribute representing revenue qa on the rental_guarantee dataset.
   guarantee_type:
-    description: "Type of the guarantee"
+    description: Financial attribute representing guarantee type on the rental_guarantee dataset.
     lineage:
       - datalake_rental_guarantee.guarantee.guarantee_type
   ts_guarantee_created:

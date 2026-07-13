@@ -1,14 +1,14 @@
 ---
 database_name: datalake_robin_hood
 table_name: accounting_entry
-owner: ae-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: Accounting entry enriched data from Robin Hood.
 columns:
   id:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id
-    description: Accounting entry id.
+    description: Financial attribute representing id on the accounting_entry dataset.
   id_external:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_external
@@ -24,7 +24,7 @@ columns:
   id_payee_external:
     lineage:
       - datalake_robin_hood_clean.payee.id_payee.id_external
-    description: Payee external id.
+    description: Identifier for the payee external referenced by this financial record.
   id_lead:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
@@ -44,11 +44,11 @@ columns:
   cost_center_code:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.cost_center_code
-    description: Cost center code.
+    description: Financial attribute representing cost center code on the accounting_entry dataset.
   source_bill_item:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.source_bill_item
-    description: Source bill item.
+    description: Financial attribute representing source bill item on the accounting_entry dataset.
   source_code:
     lineage:
       - datalake_robin_hood_clean.accounting_entry_source.code
@@ -64,7 +64,7 @@ columns:
   type:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.type
-    description: Accounting entry type classification from Robin Hood.
+    description: Financial attribute representing type on the accounting_entry dataset.
   locale:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.locale
@@ -76,19 +76,19 @@ columns:
   accrual_year_month:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.accrual_year_month
-    description: Accrual year month.
+    description: Financial attribute representing accrual year month on the accounting_entry dataset.
   accounting_year_month:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.accounting_year_month
-    description: Accounting year month.
+    description: Financial attribute representing accounting year month on the accounting_entry dataset.
   dt_occurrence:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.dt_occurrence
-    description: Occurrence date.
+    description: Calendar date associated with occurrence in the financial workflow.
   ts_blocked:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.ts_blocked
-    description: Blocked timestamp.
+    description: Timestamp when blocked occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.ts_created

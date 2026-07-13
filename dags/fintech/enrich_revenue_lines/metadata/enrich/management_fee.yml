@@ -1,18 +1,18 @@
 ---
 database_name: datalake_revenue_lines
 table_name: management_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing management fee and payment data by contract"
 columns:
   id_contract_ebdb:
-    description: "Contract ID on EBDB"
+    description: Identifier for the contract ebdb referenced by this financial record.
     lineage:
       - dw_rent.dim_contract.sk_contract
   management_fee_share:
-    description: "Share of management fee"
+    description: Financial attribute representing management fee share on the management_fee dataset.
   payment_status:
-    description: "Payment status"
+    description: Financial attribute representing payment status on the management_fee dataset.
     lineage:
       - datalake_retsuko.invoice.id
   monthly_administration_fee:
@@ -20,7 +20,7 @@ columns:
     lineage:
       - dw_rent.dim_contract.monthly_administration_fee
   administration_split_percentage:
-    description: "Split Percentage for the administration fee"
+    description: Financial attribute representing administration split percentage on the management_fee dataset.
     lineage:
       - datalake_ebdb_clean.administration_Split_Percentage
   prod_theorical_amount:
@@ -28,9 +28,9 @@ columns:
   invoice_theorical_amount:
     description: "Due amount in BRL"
   invoice_paid_amount:
-    description: "Paid amount in BRL"
+    description: Financial attribute representing invoice paid amount on the management_fee dataset.
   accrual_year_month:
-    description: "Reference year-month"
+    description: Financial attribute representing accrual year month on the management_fee dataset.
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
   dt_due:

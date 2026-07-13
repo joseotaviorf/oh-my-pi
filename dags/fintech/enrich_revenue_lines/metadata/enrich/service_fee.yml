@@ -1,12 +1,12 @@
 ---
 database_name: datalake_revenue_lines
 table_name: service_fee
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Table containing service fee and payment data by contract"
 columns:
   id_contract_ebdb:
-    description: "Contract ID on EBDB"
+    description: Identifier for the contract ebdb referenced by this financial record.
     lineage:
       - dw_rent.dim_contract.sk_contract
   invoice_payment_status:
@@ -22,11 +22,11 @@ columns:
   invoice_theorical_amount:
     description: "Due amount in BRL"
   invoice_paid_amount:
-    description: "Paid amount in BRL"
+    description: Financial attribute representing invoice paid amount on the service_fee dataset.
   accrual_year_month:
-    description: "Reference year-month"
+    description: Financial attribute representing accrual year month on the service_fee dataset.
   dt_due:
-    description: "Due date"
+    description: Calendar date associated with due in the financial workflow.
     lineage:
       - datalake_retsuko.invoice_info.ts_due
   dt_paid:

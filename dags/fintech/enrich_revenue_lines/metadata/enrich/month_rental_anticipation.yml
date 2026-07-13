@@ -3,10 +3,10 @@ database_name: datalake_revenue_lines
 table_name: month_rental_anticipation
 description: "This For Rent addon makes it possible to our client (PP) to anticipate one rent - MRA"
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 columns:
   id_mra:
-    description: "MRA ID"
+    description: Identifier for the mra referenced by this financial record.
     lineage:
       - datalake_fastforward_clean.anticipation.id
   id_contract_ebdb:
@@ -32,7 +32,7 @@ columns:
   invoice_paid_fee:
     description: Interest amount that whas paid
   accrual_year_month:
-    description: "Reference year-month"
+    description: Financial attribute representing accrual year month on the month_rental_anticipation dataset.
     lineage:
       - datalake_retsuko.invoice.accrual_year_month
   dt_created:

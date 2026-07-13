@@ -1,7 +1,7 @@
 ---
 database_name: datalake_sap_gateway
 table_name: sap_payload
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: "Table containing SAP payload information from sync jobs"
 columns:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.id_consolidated
   hash:
-    description: "Hash of the record"
+    description: Financial attribute representing hash on the sap_payload dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.hash
   id_business_entity:
@@ -30,11 +30,11 @@ columns:
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload.Reference2
   id_external_payment:
-    description: "External ID of the payment"
+    description: Identifier for the external payment referenced by this financial record.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload.U_ExternalPaymentId
   memo:
-    description: "Memo description"
+    description: Financial attribute representing memo on the sap_payload dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload.Memo
   source_client:
@@ -42,18 +42,18 @@ columns:
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload.U_SourceClient
   accrual_year_month:
-    description: "Accrual year and month"
+    description: Financial attribute representing accrual year month on the sap_payload dataset.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload.Reference3
   ts_due:
-    description: "Due timestamp"
+    description: Timestamp when due occurred in the upstream fintech system.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload.DueDate
   ts_tax:
-    description: "Tax timestamp"
+    description: Timestamp when tax occurred in the upstream fintech system.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload.TaxDate
   ts_reference:
-    description: "Reference timestamp"
+    description: Timestamp when reference occurred in the upstream fintech system.
     lineage:
       - datalake_sap_gateway_clean.sync_sap_job.sap_payload.ReferenceDate

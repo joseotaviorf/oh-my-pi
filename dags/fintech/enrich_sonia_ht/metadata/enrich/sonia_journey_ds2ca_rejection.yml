@@ -5,7 +5,7 @@ description: |
   rejection experiment per user from the HighTouch audit journey.
   One row per user is kept, preferring Test over Control when both exist.
 domain: For Rent
-owner: alan.barzilay@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 columns:
   id_row_instance:
     lineage:
