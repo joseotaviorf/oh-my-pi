@@ -1,40 +1,57 @@
 database_name: datalake_owner_fees_clean
 table_name: installment_option
+description:
+  One row per installment option in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_owner_fees_raw.installment_option.id
+    description: Financial attribute representing id on the installment_option dataset.
   id_charge_delay:
     lineage:
       - datalake_owner_fees_raw.installment_option.charge_delay_id
+    description: Identifier for the charge delay referenced by this financial record.
   installment_number:
     lineage:
       - datalake_owner_fees_raw.installment_option.installment_number
+    description: Financial attribute representing installment number on the installment_option dataset.
   percentage_of_entry:
     lineage:
       - datalake_owner_fees_raw.installment_option.percentage_of_entry
+    description: Financial attribute representing percentage of entry on the installment_option dataset.
   premium_fee:
     lineage:
       - datalake_owner_fees_raw.installment_option.premium_fee
+    description: Financial attribute representing premium fee on the installment_option dataset.
   dt_valid_from:
     lineage:
       - datalake_owner_fees_raw.installment_option.valid_from
+    description: Calendar date associated with valid from in the financial workflow.
   dt_valid_until:
     lineage:
       - datalake_owner_fees_raw.installment_option.valid_until
+    description: Calendar date associated with valid until in the financial workflow.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.installment_option.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.installment_option.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_owner_fees_raw.installment_option.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_owner_fees_raw.installment_option.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_owner_fees_raw.installment_option.day
+    description: Day partition derived from the source event timestamp for incremental loading.

@@ -1,40 +1,57 @@
 database_name: datalake_owner_fees_clean
 table_name: contract_brokerage_fee_aud
+description:
+  One row per contract brokerage fee aud in the Fintech clean layer, sourced
+  from datalake_owner_fees_clean for payments, billing, and financial
+  operations reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract_brokeragee_fee:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.id
+    description: Identifier for the contract brokeragee fee referenced by this financial record.
   contract_id:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.contract_id
+    description: Financial attribute representing contract id on the contract_brokerage_fee_aud dataset.
   charge_delay_in_days:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.charge_delay_in_days
+    description: Financial attribute representing charge delay in days on the contract_brokerage_fee_aud dataset.
   installment_number:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.installment_number
+    description: Financial attribute representing installment number on the contract_brokerage_fee_aud dataset.
   rev:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.rev
+    description: Financial attribute representing rev on the contract_brokerage_fee_aud dataset.
   rev_type:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.revtype
+    description: Financial attribute representing rev type on the contract_brokerage_fee_aud dataset.
   rev_end:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.revend
+    description: Financial attribute representing rev end on the contract_brokerage_fee_aud dataset.
   brokerage_fee:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.fee
+    description: Financial attribute representing brokerage fee on the contract_brokerage_fee_aud dataset.
   premium_fee:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.premium_fee
+    description: Financial attribute representing premium fee on the contract_brokerage_fee_aud dataset.
   down_payment:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.down_payment
+    description: Financial attribute representing down payment on the contract_brokerage_fee_aud dataset.
   mod_installment_number:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.installment_number_mod
+    description: Financial attribute representing mod installment number on the contract_brokerage_fee_aud dataset.
   mod_premium_fee:
     lineage:
       - datalake_owner_fees_raw.contract_brokerage_fee_aud.premium_fee_mod
+    description: Financial attribute representing mod premium fee on the contract_brokerage_fee_aud dataset.

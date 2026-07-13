@@ -1,40 +1,57 @@
 database_name: datalake_owner_fees_clean
 table_name: contract_aud
+description:
+  One row per contract aud in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract:
     lineage:
       - datalake_owner_fees_raw.contract_aud.id
+    description: Rental or sale contract identifier linking this financial record to the lease agreement.
   id_house:
     lineage:
       - datalake_owner_fees_raw.contract_aud.house_id
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   id_external:
     lineage:
       - datalake_owner_fees_raw.contract_aud.external_id
+    description: Identifier for the external referenced by this financial record.
   id_admin_fee_option:
     lineage:
       - datalake_owner_fees_raw.contract_aud.admin_fee_option_id
+    description: Identifier for the admin fee option referenced by this financial record.
   rev:
     lineage:
       - datalake_owner_fees_raw.contract_aud.rev
+    description: Financial attribute representing rev on the contract_aud dataset.
   rev_type:
     lineage:
       - datalake_owner_fees_raw.contract_aud.revtype
+    description: Financial attribute representing rev type on the contract_aud dataset.
   rev_end:
     lineage:
       - datalake_owner_fees_raw.contract_aud.revend
+    description: Financial attribute representing rev end on the contract_aud dataset.
   real_state_agent_share:
     lineage:
       - datalake_owner_fees_raw.contract_aud.real_state_agent_share
+    description: Financial attribute representing real state agent share on the contract_aud dataset.
   rent:
     lineage:
       - datalake_owner_fees_raw.contract_aud.rent
+    description: Financial attribute representing rent on the contract_aud dataset.
   dt_validity:
     lineage:
       - datalake_owner_fees_raw.contract_aud.validity_date
+    description: Calendar date associated with validity in the financial workflow.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.contract_aud.created_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.contract_aud.updated_at
+    description: Timestamp when created occurred in the upstream fintech system.

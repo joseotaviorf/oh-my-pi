@@ -1,28 +1,41 @@
 database_name: datalake_owner_fees_clean
 table_name: admin_fee_option_aud
+description:
+  One row per admin fee option aud in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_admin_fee_option:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option_aud.id
+    description: Identifier for the admin fee option referenced by this financial record.
   rev:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option_aud.rev
+    description: Financial attribute representing rev on the admin_fee_option_aud dataset.
   rev_type:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option_aud.revtype
+    description: Financial attribute representing rev type on the admin_fee_option_aud dataset.
   rev_end:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option_aud.revend
+    description: Financial attribute representing rev end on the admin_fee_option_aud dataset.
   admin_fee:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option_aud.admin_fee
+    description: Financial attribute representing admin fee on the admin_fee_option_aud dataset.
   dt_start:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option_aud.starts_at
+    description: Calendar date associated with start in the financial workflow.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option_aud.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

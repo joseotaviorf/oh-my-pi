@@ -1,34 +1,49 @@
 database_name: datalake_owner_fees_clean
 table_name: house
+description:
+  One row per house in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_owner_fees_raw.house.id
+    description: Financial attribute representing id on the house dataset.
   id_user:
     lineage:
       - datalake_owner_fees_raw.house.user_id
+    description: QuintoAndar user identifier associated with this financial transaction or account.
   id_external:
     lineage:
       - datalake_owner_fees_raw.house.external_id
+    description: Identifier for the external referenced by this financial record.
   status:
     lineage:
       - datalake_owner_fees_raw.house.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   rent:
     lineage:
       - datalake_owner_fees_raw.house.rent
+    description: Financial attribute representing rent on the house dataset.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.house.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.house.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_owner_fees_raw.house.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_owner_fees_raw.house.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_owner_fees_raw.house.day
+    description: Day partition derived from the source event timestamp for incremental loading.

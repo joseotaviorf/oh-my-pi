@@ -1,40 +1,57 @@
 database_name: datalake_owner_fees_clean
 table_name: contract
+description:
+  One row per contract in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_owner_fees_raw.contract.id
+    description: Financial attribute representing id on the contract dataset.
   id_house:
     lineage:
       - datalake_owner_fees_raw.contract.house_id
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   id_external:
     lineage:
       - datalake_owner_fees_raw.contract.external_id
+    description: Identifier for the external referenced by this financial record.
   id_admin_fee_option:
     lineage:
       - datalake_owner_fees_raw.contract.admin_fee_option_id
+    description: Identifier for the admin fee option referenced by this financial record.
   real_state_agent_share:
     lineage:
       - datalake_owner_fees_raw.contract.real_state_agent_share
+    description: Financial attribute representing real state agent share on the contract dataset.
   rent:
     lineage:
       - datalake_owner_fees_raw.contract.rent
+    description: Financial attribute representing rent on the contract dataset.
   dt_validity:
     lineage:
       - datalake_owner_fees_raw.contract.validity_date
+    description: Calendar date associated with validity in the financial workflow.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.contract.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.contract.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_owner_fees_raw.contract.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_owner_fees_raw.contract.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_owner_fees_raw.contract.day
+    description: Day partition derived from the source event timestamp for incremental loading.

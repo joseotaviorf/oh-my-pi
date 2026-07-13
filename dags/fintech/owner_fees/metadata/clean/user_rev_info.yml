@@ -1,13 +1,21 @@
 database_name: datalake_owner_fees_clean
 table_name: user_rev_info
+description:
+  One row per user rev info in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_user:
     lineage:
       - datalake_owner_fees_raw.user_rev_info.user_id
+    description: QuintoAndar user identifier associated with this financial transaction or account.
   rev:
     lineage:
       - datalake_owner_fees_raw.user_rev_info.rev
+    description: Financial attribute representing rev on the user_rev_info dataset.
   ts_rev:
     lineage:
       - datalake_owner_fees_raw.user_rev_info.revtstmp
+    description: Timestamp when rev occurred in the upstream fintech system.

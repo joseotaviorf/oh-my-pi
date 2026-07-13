@@ -1,34 +1,49 @@
 database_name: datalake_owner_fees_clean
 table_name: charge_delay_aud
+description:
+  One row per charge delay aud in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_charge_delay:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.id
+    description: Identifier for the charge delay referenced by this financial record.
   rev:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.rev
+    description: Financial attribute representing rev on the charge_delay_aud dataset.
   rev_type:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.revtype
+    description: Financial attribute representing rev type on the charge_delay_aud dataset.
   rev_end:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.revend
+    description: Financial attribute representing rev end on the charge_delay_aud dataset.
   waiting_period:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.waiting_period
+    description: Financial attribute representing waiting period on the charge_delay_aud dataset.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_owner_fees_raw.charge_delay_aud.day
+    description: Day partition derived from the source event timestamp for incremental loading.

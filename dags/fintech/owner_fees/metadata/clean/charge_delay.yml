@@ -1,25 +1,37 @@
 database_name: datalake_owner_fees_clean
 table_name: charge_delay
+description:
+  One row per charge delay in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_owner_fees_raw.charge_delay.id
+    description: Financial attribute representing id on the charge_delay dataset.
   waiting_period:
     lineage:
       - datalake_owner_fees_raw.charge_delay.waiting_period
+    description: Financial attribute representing waiting period on the charge_delay dataset.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.charge_delay.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.charge_delay.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_owner_fees_raw.charge_delay.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_owner_fees_raw.charge_delay.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_owner_fees_raw.charge_delay.day
+    description: Day partition derived from the source event timestamp for incremental loading.

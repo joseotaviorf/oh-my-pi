@@ -1,34 +1,49 @@
 database_name: datalake_owner_fees_clean
 table_name: house_aud
+description:
+  One row per house aud in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id_house:
     lineage:
       - datalake_owner_fees_raw.house_aud.id
+    description: Property listing identifier linking the financial event to the rented or sold unit.
   id_user:
     lineage:
       - datalake_owner_fees_raw.house_aud.user_id
+    description: QuintoAndar user identifier associated with this financial transaction or account.
   id_external:
     lineage:
       - datalake_owner_fees_raw.house_aud.external_id
+    description: Identifier for the external referenced by this financial record.
   status:
     lineage:
       - datalake_owner_fees_raw.house_aud.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   rev:
     lineage:
       - datalake_owner_fees_raw.house_aud.rev
+    description: Financial attribute representing rev on the house_aud dataset.
   rev_type:
     lineage:
       - datalake_owner_fees_raw.house_aud.revtype
+    description: Financial attribute representing rev type on the house_aud dataset.
   rev_end:
     lineage:
       - datalake_owner_fees_raw.house_aud.revend
+    description: Financial attribute representing rev end on the house_aud dataset.
   rent:
     lineage:
       - datalake_owner_fees_raw.house_aud.rent
+    description: Financial attribute representing rent on the house_aud dataset.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.house_aud.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.house_aud.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.

@@ -1,28 +1,41 @@
 database_name: datalake_owner_fees_clean
 table_name: admin_fee_option
+description:
+  One row per admin fee option in the Fintech clean layer, sourced from
+  datalake_owner_fees_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option.id
+    description: Financial attribute representing id on the admin_fee_option dataset.
   admin_fee:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option.admin_fee
+    description: Financial attribute representing admin fee on the admin_fee_option dataset.
   dt_start:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option.starts_at
+    description: Calendar date associated with start in the financial workflow.
   ts_created:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_owner_fees_raw.admin_fee_option.day
+    description: Day partition derived from the source event timestamp for incremental loading.
