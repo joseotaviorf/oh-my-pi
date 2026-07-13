@@ -1,5 +1,6 @@
 database_name: datalake_betopera_clean
 table_name: billing_fee_type_aud
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Clean audit history records for billing fee types from Betopera."
 columns:
@@ -71,4 +72,3 @@ columns:
     lineage:
       - datalake_betopera_raw.billing_fee_type_aud.day
     description: "Partition day of the source record."
-

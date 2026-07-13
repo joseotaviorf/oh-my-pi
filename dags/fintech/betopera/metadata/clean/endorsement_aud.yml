@@ -1,61 +1,85 @@
 database_name: datalake_betopera_clean
 table_name: endorsement_aud
+description:
+  One row per endorsement aud in the Fintech clean layer, sourced from
+  datalake_betopera_clean for payments, billing, and financial operations
+  reporting.
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 columns:
     id:
         lineage:
             - datalake_betopera_raw.endorsement_aud.id
+        description: Financial attribute representing id on the endorsement_aud dataset.
     id_certificate:
         lineage:
             - datalake_betopera_raw.endorsement_aud.certificate_id
+        description: Identifier for the certificate referenced by this financial record.
     rev:
         lineage:
             - datalake_betopera_raw.endorsement_aud.rev
+        description: Financial attribute representing rev on the endorsement_aud dataset.
     rev_end:
         lineage:
             - datalake_betopera_raw.endorsement_aud.revend
+        description: Financial attribute representing rev end on the endorsement_aud dataset.
     rev_type:
         lineage:
             - datalake_betopera_raw.endorsement_aud.revtype
+        description: Financial attribute representing rev type on the endorsement_aud dataset.
     process_info:
         lineage:
             - datalake_betopera_raw.endorsement_aud.process_info
+        description: Financial attribute representing process info on the endorsement_aud dataset.
     type:
         lineage:
             - datalake_betopera_raw.endorsement_aud.type
+        description: Financial attribute representing type on the endorsement_aud dataset.
     status:
         lineage:
             - datalake_betopera_raw.endorsement_aud.status
+        description: Current lifecycle status of the financial entity in the upstream operational system.
     mod_created_at:
         lineage:
             - datalake_betopera_raw.endorsement_aud.created_at_mod
+        description: Financial attribute representing mod created at on the endorsement_aud dataset.
     mod_id_certificate:
         lineage:
             - datalake_betopera_raw.endorsement_aud.certificate_id_mod
+        description: Financial attribute representing mod id certificate on the endorsement_aud dataset.
     mod_updated_at:
         lineage:
             - datalake_betopera_raw.endorsement_aud.updated_at_mod
+        description: Financial attribute representing mod updated at on the endorsement_aud dataset.
     mod_status:
         lineage:
             - datalake_betopera_raw.endorsement_aud.status_mod
+        description: Financial attribute representing mod status on the endorsement_aud dataset.
     mod_type:
         lineage:
             - datalake_betopera_raw.endorsement_aud.type_mod
+        description: Financial attribute representing mod type on the endorsement_aud dataset.
     mod_process_info:
         lineage:
             - datalake_betopera_raw.endorsement_aud.process_info_mod
+        description: Financial attribute representing mod process info on the endorsement_aud dataset.
     ts_created:
         lineage:
             - datalake_betopera_raw.endorsement_aud.created_at
+        description: Timestamp when created occurred in the upstream fintech system.
     ts_updated:
         lineage:
             - datalake_betopera_raw.endorsement_aud.updated_at
+        description: Timestamp when updated occurred in the upstream fintech system.
     year:
         lineage:
             - datalake_betopera_raw.endorsement_aud.year
+        description: Year partition derived from the source event timestamp for incremental loading.
     month:
         lineage:
             - datalake_betopera_raw.endorsement_aud.month
+        description: Month partition derived from the source event timestamp for incremental loading.
     day:
         lineage:
             - datalake_betopera_raw.endorsement_aud.day
+        description: Day partition derived from the source event timestamp for incremental loading.

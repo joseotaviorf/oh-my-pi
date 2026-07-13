@@ -1,5 +1,6 @@
 database_name: datalake_betopera_clean
 table_name: billing
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: "Clean billing records from Betopera with amounts and status information."
 columns:
@@ -43,4 +44,3 @@ columns:
     lineage:
       - datalake_betopera_raw.billing.day
     description: "Partition day of the source record."
-

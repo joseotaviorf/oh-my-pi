@@ -1,7 +1,8 @@
 database_name: datalake_betopera_clean
 table_name: billing_fee_type
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: "Clean billing fee type records from Betopera."
+description: One row per billing fee type in the Fintech clean layer, sourced from datalake_betopera_clean for payments, billing, and financial operations reporting.
 columns:
   id:
     lineage:
@@ -14,7 +15,7 @@ columns:
   name:
     lineage:
       - datalake_betopera_raw.billing_fee_type.name
-    description: "Name of the billing fee type."
+    description: Financial attribute representing name on the billing_fee_type dataset.
   version:
     lineage:
       - datalake_betopera_raw.billing_fee_type.version
@@ -39,4 +40,3 @@ columns:
     lineage:
       - datalake_betopera_raw.billing_fee_type.day
     description: "Partition day of the source record."
-
