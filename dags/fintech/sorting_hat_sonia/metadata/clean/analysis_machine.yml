@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_machine
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: State machine instance for a credit analysis request; context JSON may include proposal_id and risk_category.
 columns:
@@ -59,6 +60,11 @@ columns:
     lineage:
       - datalake_sorting_hat_raw.analysismachine.op_cdc
     description: CDC operation type for this row (insert, update, or delete).
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
   ts_cdc_transaction:
     lineage:
       - datalake_sorting_hat_raw.analysismachine.ts_cdc_transaction

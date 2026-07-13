@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: proposal_error
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Errors captured when Sorting Hat processes a tenant rental credit proposal.
 columns:

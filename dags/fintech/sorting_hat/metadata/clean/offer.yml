@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: offer
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Offers associated with rental credit proposals (type, approval time, external ids) in Sorting Hat.
 columns:

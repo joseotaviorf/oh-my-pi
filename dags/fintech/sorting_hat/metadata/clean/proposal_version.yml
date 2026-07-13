@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: proposal_version
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Versioned proposal snapshots with home attributes, rent values, and analyst workflow fields for tenant credit.
 columns:
@@ -122,7 +123,7 @@ columns:
   is_home_exclusive_5A:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_exclusive_5A
-    description: Flag indicating the listing is in the exclusive 5A inventory segment.
+    description: Whether the listed property was in QuintoAndar's exclusive (5A) inventory segment at proposal time.
   mod_id_drive:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.drive_id_mod
@@ -226,7 +227,7 @@ columns:
   mod_is_home_exclusive_5A:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_exclusive_5A_mod
-    description: CDC flag indicating exclusive 5A flag changed in this changelog event.
+    description: CDC flag indicating is_home_exclusive_5A changed in this changelog event.
   mod_ts_analyzed:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.analysis_date_mod

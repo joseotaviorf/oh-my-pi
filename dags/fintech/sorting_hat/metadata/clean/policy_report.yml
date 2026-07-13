@@ -1,41 +1,70 @@
 database_name: datalake_sorting_hat_clean
 table_name: policy_report
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
-description: Table with information about the credit policy.
+description: |
+  Sorting Hat policy evaluation reports. Mixes several report types (credit,
+  documentation, income, retenant) in a single table; downstream enrich tables
+  (policy_report_credit_policy, policy_report [RETENANT only], policy_report_tenant_income, and
+  others) filter by type. Business grain is one current report per
+  (type, external_source, id_external) — on re-evaluation (e.g. a new run for the
+  same proposal), Sorting Hat updates the same row in place (version increments,
+  result/raw_data replaced, ts_updated refreshes; ts_created is unchanged). Lake
+  grain is one row keyed by id, linked to a proposal, credit evaluation, or
+  proponent CPF via id_external and external_source.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.policyreport.id
-    description: Policy report ID
+    description: Primary key of this policy report row in Sorting Hat.
   id_external:
     lineage:
       - datalake_sorting_hat_raw.policyreport.external_id
-    description: External ID. It can be either the proposal ID when the external source is PROPOSAL or the credit ID when the external source is CREDIT_EVALUATION
+    description: |
+      Foreign key to the entity that triggered this policy run. Semantics depend on
+      external_source — proposal id (PROPOSAL), credit evaluation id (CREDIT_EVALUATION),
+      or proponent CPF (DOCUMENT_NUMBER for RETENANT_CLASSIFICATION). CPF values are
+      stored with punctuation (###.###.###-##), not digits-only; normalize before
+      joining to other CPF columns. CPF rows carry personal document numbers — Superset
+      may hash this column.
   type:
     lineage:
       - datalake_sorting_hat_raw.policyreport.type
-    description: Type of the credit policy
+    description: Policy engine that produced this report; filter on this before joining enrich views.
+    categories:
+      CREDIT_POLICY: Credit underwriting policy output (risk category, DTI, variant). Enriched in policy_report_credit_policy.
+      DOCUMENTATION_POLICY: Documentation validation policy for a proposal credit evaluation.
+      INCOME_EXTRACTION: Income extraction from bureau and document sources for a proposal.
+      RETENANT: Returning-tenant evaluation for a proposal or credit evaluation. Enriched in enrich policy_report (type filter).
+      RETENANT_CLASSIFICATION: Per-proponent retenant classification; paired with external_source DOCUMENT_NUMBER (CPF in id_external).
+      TENANT_INCOME: Tenant income calculation from bureau scores and elected income. Enriched in policy_report_tenant_income.
   external_source:
     lineage:
       - datalake_sorting_hat_raw.policyreport.external_source
-    description: External source of the credit policy
+    description: Entity type that id_external refers to; always interpret both fields together.
+    categories:
+      PROPOSAL: id_external is a Sorting Hat proposal id (CREDIT_POLICY, DOCUMENTATION_POLICY, INCOME_EXTRACTION, RETENANT, TENANT_INCOME).
+      CREDIT_EVALUATION: id_external is a docx credit_evaluation id (Early Credit CREDIT_POLICY and RETENANT runs).
+      DOCUMENT_NUMBER: id_external is the proponent CPF with separators (###.###.###-##); RETENANT_CLASSIFICATION rows only.
   result:
     lineage:
       - datalake_sorting_hat_raw.policyreport.result
-    description: JSON with the result of the credit policy applied
+    description: JSON policy output; schema varies by type (e.g. risk category and DTI for CREDIT_POLICY, classification for RETENANT).
   raw_data:
     lineage:
       - datalake_sorting_hat_raw.policyreport.raw_data
-    description: JSON with the raw data input of the credit policy
+    description: JSON policy input and context (variant, bureau payloads, tenant structs); schema varies by type.
   version:
     lineage:
       - datalake_sorting_hat_raw.policyreport.version
-    description: Version of the credit policy
+    description: |
+      Run counter for this (type, external_source, id_external) key; incremented on
+      each in-place re-evaluation (same id row, updated result and ts_updated).
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.policyreport.created_at
-    description: Timestamp creation date of the credit policy
+    description: Timestamp when this report row was first created; unchanged on re-evaluation.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.policyreport.updated_at
-    description: Timestamp updated date of the credit policy
+    description: Timestamp of the most recent policy run or in-place update for this report row.

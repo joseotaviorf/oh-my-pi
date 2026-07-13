@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: screening_result_version
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Historical versions of screening results linked to proposals and financial transactions in Sorting Hat.
 columns:

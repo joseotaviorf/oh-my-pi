@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: external_score
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: External credit bureau scores and sources keyed by CPF for Sorting Hat rental credit analysis.
 columns:

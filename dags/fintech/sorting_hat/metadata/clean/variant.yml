@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: variant
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Experiment variant definitions (model version and traffic allocation) for Sorting Hat A/B tests.
 columns:

@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_request
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Credit analysis request header (external ids, business context, enterprise group, outcome) from Sorting Hat.
 columns:

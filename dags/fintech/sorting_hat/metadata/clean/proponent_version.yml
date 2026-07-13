@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: proponent_version
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Versioned proponent profile and PII (contact, income, scores) for rental credit proposals in Sorting Hat.
 columns:

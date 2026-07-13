@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: screening_result
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Screening scores, liquidity, and risk categories for a rental credit proposal in Sorting Hat.
 columns:

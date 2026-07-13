@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: user
+owner: marcus.silva@quintoandar.com.br
 domain: Fintech
 description: Sorting Hat application users (analyst and service accounts) used in credit workflows.
 columns:
