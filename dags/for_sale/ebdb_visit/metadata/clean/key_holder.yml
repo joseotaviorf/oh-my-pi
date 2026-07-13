@@ -1,47 +1,46 @@
----
 database_name: datalake_ebdb_clean
 table_name: key_holder
-owner: leonardo.soares@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: null
+description: People or roles responsible for property keys tied to an entry-access configuration in EBDB. One row per key holder contact used during visit access coordination.
 columns:
   id:
-    description: ''
+    description: Surrogate primary key of the key holder row in EBDB.
     lineage:
     - datalake_ebdb_raw.KeyHolder.id
   id_entry_access:
-    description: ''
+    description: Foreign key referencing entry access in the visit scheduling domain.
     lineage:
     - datalake_ebdb_raw.KeyHolder.entry_access_id
   holder_type:
-    description: ''
+    description: Category of key holder such as owner, tenant, or building staff.
     lineage:
     - datalake_ebdb_raw.KeyHolder.holder_type
   holder_name:
-    description: ''
+    description: Display name of the person or entity holding property access keys.
     lineage:
     - datalake_ebdb_raw.KeyHolder.holder_name
   holder_role:
-    description: ''
+    description: Role of the key holder in the access workflow for visits.
     lineage:
     - datalake_ebdb_raw.KeyHolder.holder_role
   holder_contact:
-    description: ''
+    description: Phone or message contact for coordinating key handoff.
     lineage:
     - datalake_ebdb_raw.KeyHolder.holder_contact
   holder_identifier:
-    description: ''
+    description: External or internal identifier for the key holder record.
     lineage:
     - datalake_ebdb_raw.KeyHolder.holder_identifier
   holder_location:
-    description: ''
+    description: Where keys are stored or handed off before the visit.
     lineage:
     - datalake_ebdb_raw.KeyHolder.holder_location
   ts_updated:
-    description: ''
+    description: Timestamp when the row was last updated in the EBDB operational database.
     lineage:
     - datalake_ebdb_raw.KeyHolder.updated_at
   ts_created:
-    description: ''
+    description: Timestamp when the row was created in the EBDB operational database.
     lineage:
     - datalake_ebdb_raw.KeyHolder.created_at

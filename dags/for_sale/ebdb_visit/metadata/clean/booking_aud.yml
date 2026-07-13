@@ -4,103 +4,139 @@ domain: For Sale
 columns:
   rev_type:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.revtype
+    - datalake_ebdb_raw.agendamento_aud.revtype
+    description: 'Envers revision type: 0 insert, 1 update, or 2 delete for the audited entity row.'
   business_context:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.businesscontext
+    - datalake_ebdb_raw.agendamento_aud.businesscontext
+    description: Business line of the booking, distinguishing For Rent versus For Sale flows.
   checkin_status:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.checkinstatus
+    - datalake_ebdb_raw.agendamento_aud.checkinstatus
+    description: Latest check-in state for the booking or visit check-in record.
   status:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.status
+    - datalake_ebdb_raw.agendamento_aud.status
+    description: Operational status code of the booking or visit in EBDB at this revision.
   mod_id_agent:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.agente_mod
+    - datalake_ebdb_raw.agendamento_aud.agente_mod
+    description: Envers boolean flag indicating whether id agent changed in this audit revision.
   id_house:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.imovel_id
+    - datalake_ebdb_raw.agendamento_aud.imovel_id
+    description: Foreign key referencing house in the visit scheduling domain.
   mod_id_house:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.imovel_mod
+    - datalake_ebdb_raw.agendamento_aud.imovel_mod
+    description: Envers boolean flag indicating whether id house changed in this audit revision.
   mod_dt_booking:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.data_mod
+    - datalake_ebdb_raw.agendamento_aud.data_mod
+    description: Envers boolean flag indicating whether dt booking changed in this audit revision.
   ts_visit_fup:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.datafupvisita
+    - datalake_ebdb_raw.agendamento_aud.datafupvisita
+    description: Timestamp when visit follow-up was recorded on the booking.
   id_rent_flow:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.fluxolocacao_id
+    - datalake_ebdb_raw.agendamento_aud.fluxolocacao_id
+    description: Optional link to the rental transaction flow when visit is For Rent.
   dt_booking:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.data
+    - datalake_ebdb_raw.agendamento_aud.data
+    description: Calendar date of the scheduled visit booking.
   slot_day:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.slotdia
+    - datalake_ebdb_raw.agendamento_aud.slotdia
+    description: Calendar day slot associated with the booking in the scheduling grid.
   is_agent_fixed:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.agentefixo
+    - datalake_ebdb_raw.agendamento_aud.agentefixo
+    description: Whether agent assignment is locked for this booking instance.
   id:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.id
+    - datalake_ebdb_raw.agendamento_aud.id
+    description: Surrogate primary key of the booking aud row in EBDB.
   id_visitor:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.visitante_id
+    - datalake_ebdb_raw.agendamento_aud.visitante_id
+    description: Foreign key referencing visitor in the visit scheduling domain.
   mod_id_visitor:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.visitante_mod
+    - datalake_ebdb_raw.agendamento_aud.visitante_mod
+    description: Envers boolean flag indicating whether id visitor changed in this audit revision.
   id_agent:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.agente_id
+    - datalake_ebdb_raw.agendamento_aud.agente_id
+    description: Foreign key referencing agent in the visit scheduling domain.
   visit_fup:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.fupvisita
+    - datalake_ebdb_raw.agendamento_aud.fupvisita
+    description: Follow-up flag or note captured on the booking after the visit.
   id_rescheduled_booking:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.reagendadode_id
+    - datalake_ebdb_raw.agendamento_aud.reagendadode_id
+    description: Pointer to the previous booking row when this schedule is a reschedule.
   mod_is_tenant_notification_pending:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.informeinquilinopendente_mod
+    - datalake_ebdb_raw.agendamento_aud.informeinquilinopendente_mod
+    description: Envers boolean flag indicating whether is tenant notification pending changed in this audit revision.
   mod_slot_day:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.slotdia_mod
+    - datalake_ebdb_raw.agendamento_aud.slotdia_mod
+    description: Envers boolean flag indicating whether slot day changed in this audit revision.
   rev:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.rev
+    - datalake_ebdb_raw.agendamento_aud.rev
+    description: Envers revision number that groups field changes in this audit snapshot.
   mod_is_fixed_agent:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.agentefixo_mod
+    - datalake_ebdb_raw.agendamento_aud.agentefixo_mod
+    description: Envers boolean flag indicating whether is fixed agent changed in this audit revision.
   is_tenant_notification_pending:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.informeinquilinopendente
+    - datalake_ebdb_raw.agendamento_aud.informeinquilinopendente
+    description: Whether an in-tenant notification is still pending for this booking.
   mod_status:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.status_mod
+    - datalake_ebdb_raw.agendamento_aud.status_mod
+    description: Envers boolean flag indicating whether status changed in this audit revision.
   visit_fup_comment:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.comentariofupvisita
+    - datalake_ebdb_raw.agendamento_aud.comentariofupvisita
+    description: Free-text follow-up comment stored on the booking record.
   mod_id_attendant:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.atendente_mod
+    - datalake_ebdb_raw.agendamento_aud.atendente_mod
+    description: Envers boolean flag indicating whether id attendant changed in this audit revision.
   mod_id_rescheduled_booking:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.reagendadode_mod
+    - datalake_ebdb_raw.agendamento_aud.reagendadode_mod
+    description: Envers boolean flag indicating whether id rescheduled booking changed in this audit revision.
   mod_checkin_status:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.checkinstatus_mod
+    - datalake_ebdb_raw.agendamento_aud.checkinstatus_mod
+    description: Envers boolean flag indicating whether checkin status changed in this audit revision.
   id_attendant:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.atendente_id
+    - datalake_ebdb_raw.agendamento_aud.atendente_id
+    description: User id of the attendant or coordinator handling the booking.
   id_last_update_origin:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.origemultimaatualizacao_id
+    - datalake_ebdb_raw.agendamento_aud.origemultimaatualizacao_id
+    description: Source system or channel id for the last update to this record.
   type:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.tipo
+    - datalake_ebdb_raw.agendamento_aud.tipo
+    description: Classifier for the visitor role or booking subtype in the visit domain.
   structured:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.structured
+    - datalake_ebdb_raw.agendamento_aud.structured
+    description: Flag indicating whether the visit uses structured scheduling metadata in EBDB.
   mod_structured:
     lineage:
-      - datalake_ebdb_raw.agendamento_aud.structured_MOD
+    - datalake_ebdb_raw.agendamento_aud.structured_MOD
+    description: Envers boolean flag indicating whether structured changed in this audit revision.
+owner: guilherme.rocha@quintoandar.com.br
+description: Hibernate Envers audit trail of visit booking (agendamento) rows from EBDB. Each row is one revision capturing field-level changes to schedule status, participants, and timestamps for a single booking.

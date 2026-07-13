@@ -4,31 +4,43 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.id
+    - datalake_ebdb_raw.mudancastatusagendamento.id
+    description: Surrogate primary key of the booking status change row in EBDB.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.data
+    - datalake_ebdb_raw.mudancastatusagendamento.data
+    description: Timestamp when the row was created in the EBDB operational database.
   reason:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.motivo
+    - datalake_ebdb_raw.mudancastatusagendamento.motivo
+    description: Human-readable reason text recorded for a booking status transition.
   status:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.status
+    - datalake_ebdb_raw.mudancastatusagendamento.status
+    description: Operational status code of the booking or visit in EBDB at this revision.
   id_booking:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.agendamento_id
+    - datalake_ebdb_raw.mudancastatusagendamento.agendamento_id
+    description: Foreign key referencing booking in the visit scheduling domain.
   id_user:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.usuario_id
+    - datalake_ebdb_raw.mudancastatusagendamento.usuario_id
+    description: Foreign key referencing user in the visit scheduling domain.
   can_visitor_see:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.visitantepodever
+    - datalake_ebdb_raw.mudancastatusagendamento.visitantepodever
+    description: Whether the demand-side visitor can view this status change in the app.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.atualizadoem
+    - datalake_ebdb_raw.mudancastatusagendamento.atualizadoem
+    description: Timestamp when the row was last updated in the EBDB operational database.
   id_reason_category:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.reasoncategory_id
+    - datalake_ebdb_raw.mudancastatusagendamento.reasoncategory_id
+    description: Foreign key to appointment_change_reason_category for the change.
   reason_enum:
     lineage:
-      - datalake_ebdb_raw.mudancastatusagendamento.reasonenum
+    - datalake_ebdb_raw.mudancastatusagendamento.reasonenum
+    description: Machine-readable enum code paired with the booking change reason.
+owner: guilherme.rocha@quintoandar.com.br
+description: Event log of booking status transitions in EBDB. One row per status change on a visit schedule, including reason text and visibility flags for demand-side users.

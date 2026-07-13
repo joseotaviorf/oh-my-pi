@@ -4,19 +4,27 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.entrance.id
+    - datalake_ebdb_raw.entrance.id
+    description: Surrogate primary key of the entrance row in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.entrance.atualizadoem
+    - datalake_ebdb_raw.entrance.atualizadoem
+    description: Timestamp when the row was last updated in the EBDB operational database.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.entrance.criadoem
+    - datalake_ebdb_raw.entrance.criadoem
+    description: Timestamp when the row was created in the EBDB operational database.
   details:
     lineage:
-      - datalake_ebdb_raw.entrance.details
+    - datalake_ebdb_raw.entrance.details
+    description: Structured details captured about how entrance was attempted or completed.
   problem:
     lineage:
-      - datalake_ebdb_raw.entrance.problem
+    - datalake_ebdb_raw.entrance.problem
+    description: Reported issue that blocked or complicated entrance during the visit.
   is_successful:
     lineage:
-      - datalake_ebdb_raw.entrance.successful
+    - datalake_ebdb_raw.entrance.successful
+    description: Whether an entrance attempt ended with successful property access.
+owner: guilherme.rocha@quintoandar.com.br
+description: Property entrance attempts recorded during the visit journey in EBDB. Each row describes whether access succeeded and any reported problem when entering the house.

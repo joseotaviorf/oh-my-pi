@@ -1,43 +1,42 @@
----
 database_name: datalake_ebdb_clean
 table_name: entry_access
-owner: leonardo.soares@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: null
+description: Configured entry-access rules per house in EBDB (lockbox, keys, concierge, etc.). One row per access setup used by scheduling and check-in flows for property visits.
 columns:
   id:
-    description: ''
+    description: Surrogate primary key of the entry access row in EBDB.
     lineage:
     - datalake_ebdb_raw.EntryAccess.id
   id_house:
-    description: ''
+    description: Foreign key referencing house in the visit scheduling domain.
     lineage:
     - datalake_ebdb_raw.EntryAccess.house_id
   access_model:
-    description: ''
+    description: High-level entry model such as owner present, lockbox, or front desk.
     lineage:
     - datalake_ebdb_raw.EntryAccess.access_model
   access_type:
-    description: ''
+    description: Specific access mechanism configured for the property entry.
     lineage:
     - datalake_ebdb_raw.EntryAccess.access_type
   access_code:
-    description: ''
+    description: Code or credential reference used to unlock the property when applicable.
     lineage:
     - datalake_ebdb_raw.EntryAccess.access_code
   access_details:
-    description: ''
+    description: Additional structured instructions for completing property entry.
     lineage:
     - datalake_ebdb_raw.EntryAccess.access_details
   location:
-    description: ''
+    description: Physical location hint for keys, lockbox, or concierge contact.
     lineage:
     - datalake_ebdb_raw.EntryAccess.location
   ts_created:
-    description: ''
+    description: Timestamp when the row was created in the EBDB operational database.
     lineage:
     - datalake_ebdb_raw.EntryAccess.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the row was last updated in the EBDB operational database.
     lineage:
     - datalake_ebdb_raw.EntryAccess.updated_at

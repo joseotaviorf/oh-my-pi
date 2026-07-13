@@ -4,11 +4,13 @@ domain: For Sale
 columns:
   id_house:
     lineage:
-      - datalake_ebdb_raw.imovel_informacoesvisita.imovel_id
-    description: "ID of house"
+    - datalake_ebdb_raw.imovel_informacoesvisita.imovel_id
+    description: Foreign key to the house listing these visit instructions belong to.
   visit_information:
     lineage:
-      - datalake_ebdb_raw.imovel_informacoesvisita.informacoesvisita
-    description: "Information about visiting the house"
+    - datalake_ebdb_raw.imovel_informacoesvisita.informacoesvisita
+    description: Owner- or operations-provided text with directions, restrictions, and access hints for brokers and demand during visits.
   ts_load:
-    descrition: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."
+    description: ETL ingestion timestamp when this snapshot was loaded into the clean layer using the pipeline clock at processing time.
+owner: guilherme.rocha@quintoandar.com.br
+description: Visit instructions and access notes configured per property in EBDB. One row per house with text shown to brokers and demand during scheduling and check-in.

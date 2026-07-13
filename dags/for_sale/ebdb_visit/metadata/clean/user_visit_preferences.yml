@@ -4,16 +4,23 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences.id
+    - datalake_ebdb_raw.uservisitpreferences.id
+    description: Surrogate primary key of the user visit preferences row in EBDB.
   id_user:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences.user_id
+    - datalake_ebdb_raw.uservisitpreferences.user_id
+    description: Foreign key referencing user in the visit scheduling domain.
   is_preferred_fixed_agent_enabled:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences.preferredfixedagentenabled
+    - datalake_ebdb_raw.uservisitpreferences.preferredfixedagentenabled
+    description: Whether the user asked to keep the same agent across future visit bookings.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences.criadoem
+    - datalake_ebdb_raw.uservisitpreferences.criadoem
+    description: Timestamp when the row was created in the EBDB operational database.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences.atualizadoem
+    - datalake_ebdb_raw.uservisitpreferences.atualizadoem
+    description: Timestamp when the row was last updated in the EBDB operational database.
+owner: guilherme.rocha@quintoandar.com.br
+description: Per-user visit scheduling preferences in EBDB, such as fixed-agent assignment. One row per user influencing how future bookings are routed to brokers.

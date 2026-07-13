@@ -1,87 +1,86 @@
----
 database_name: datalake_ebdb_clean
 table_name: entry_access_tracking
-owner: leonardo.soares@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: null
+description: Change history of entry-access configuration per house in EBDB. Each row logs who changed access settings and the before/after payload for audit and support analysis.
 columns:
   id:
-    description: ''
+    description: Surrogate primary key of the entry access tracking row in EBDB.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.id
   id_house:
-    description: ''
+    description: Foreign key referencing house in the visit scheduling domain.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.house_id
   id_actor_user:
-    description: ''
+    description: Foreign key referencing actor user in the visit scheduling domain.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.actor_user_id
   id_entry_access:
-    description: ''
+    description: Foreign key referencing entry access in the visit scheduling domain.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.entry_access_id
   channel:
-    description: ''
+    description: Attribute channel for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.channel
   actor_role:
-    description: ''
+    description: Attribute actor role for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.actor_role
   event_type:
-    description: ''
+    description: Attribute event type for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.event_type
   entry_access_type:
-    description: ''
+    description: Attribute entry access type for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.entry_access_type
   entry_access_model:
-    description: ''
+    description: Attribute entry access model for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.entry_access_model
   entry_access_details:
-    description: ''
+    description: Attribute entry access details for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.entry_access_details
   key_holder_role:
-    description: ''
+    description: Attribute key holder role for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.key_holder_role
   key_holder_type:
-    description: ''
+    description: Attribute key holder type for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.key_holder_type
   key_holder_identifier:
-    description: ''
+    description: Attribute key holder identifier for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.key_holder_identifier
   key_holder_name:
-    description: ''
+    description: Attribute key holder name for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.key_holder_name
   key_holder_contact:
-    description: ''
+    description: Attribute key holder contact for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.key_holder_contact
   key_holder_location:
-    description: ''
+    description: Attribute key holder location for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.key_holder_location
   actor_user_type:
-    description: ''
+    description: Attribute actor user type for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.actor_user_type
   key_holder_business_context:
-    description: ''
+    description: Attribute key holder business context for the entry access tracking entity sourced from EBDB visit services.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.key_holder_business_context
   ts_created:
-    description: ''
+    description: Timestamp when the row was created in the EBDB operational database.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.created_at
   ts_updated:
-    description: ''
+    description: Timestamp when the row was last updated in the EBDB operational database.
     lineage:
     - datalake_ebdb_raw.EntryAccessTracking.updated_at

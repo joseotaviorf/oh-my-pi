@@ -4,19 +4,21 @@ domain: For Sale
 columns:
   id_house:
     lineage:
-      - datalake_ebdb_raw.imovel_informacoesvisita_aud.imovel_id
-    description: "ID of house"
+    - datalake_ebdb_raw.imovel_informacoesvisita_aud.imovel_id
+    description: Foreign key referencing house in the visit scheduling domain.
   visit_information:
     lineage:
-      - datalake_ebdb_raw.imovel_informacoesvisita_aud.informacoesvisita
-    description: "Information about visiting the house"
+    - datalake_ebdb_raw.imovel_informacoesvisita_aud.informacoesvisita
+    description: Attribute visit information for the house visit information aud entity sourced from EBDB visit services.
   rev:
     lineage:
-      - datalake_ebdb_raw.imovel_informacoesvisita_aud.rev
-    description: "Revision number"
+    - datalake_ebdb_raw.imovel_informacoesvisita_aud.rev
+    description: Envers revision number that groups field changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.imovel_informacoesvisita_aud.revtype
-    description: "Revision type"
+    - datalake_ebdb_raw.imovel_informacoesvisita_aud.revtype
+    description: 'Envers revision type: 0 insert, 1 update, or 2 delete for the audited entity row.'
   ts_load:
-    descrition: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."
+    description: ETL load timestamp when this row was written to the clean layer.
+owner: guilherme.rocha@quintoandar.com.br
+description: Envers audit of house visit information in EBDB. Each row is one revision of the visit instructions text and house key for a property listing.

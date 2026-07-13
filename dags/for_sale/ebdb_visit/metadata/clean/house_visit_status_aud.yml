@@ -4,28 +4,39 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.id
+    - datalake_ebdb_raw.housevisitstatus_aud.id
+    description: Surrogate primary key of the house visit status aud row in EBDB.
   rev:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.rev
+    - datalake_ebdb_raw.housevisitstatus_aud.rev
+    description: Envers revision number that groups field changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.revtype
+    - datalake_ebdb_raw.housevisitstatus_aud.revtype
+    description: 'Envers revision type: 0 insert, 1 update, or 2 delete for the audited entity row.'
   id_house:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.imovel_id
+    - datalake_ebdb_raw.housevisitstatus_aud.imovel_id
+    description: Foreign key referencing house in the visit scheduling domain.
   mod_house:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.imovel_mod
+    - datalake_ebdb_raw.housevisitstatus_aud.imovel_mod
+    description: Envers boolean flag indicating whether house changed in this audit revision.
   status:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.status
+    - datalake_ebdb_raw.housevisitstatus_aud.status
+    description: Operational status code of the booking or visit in EBDB at this revision.
   mod_status:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.status_mod
+    - datalake_ebdb_raw.housevisitstatus_aud.status_mod
+    description: Envers boolean flag indicating whether status changed in this audit revision.
   reason:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.reason
+    - datalake_ebdb_raw.housevisitstatus_aud.reason
+    description: Human-readable reason text recorded for a booking status transition.
   mod_reason:
     lineage:
-      - datalake_ebdb_raw.housevisitstatus_aud.reason_mod
+    - datalake_ebdb_raw.housevisitstatus_aud.reason_mod
+    description: Envers boolean flag indicating whether reason changed in this audit revision.
+owner: guilherme.rocha@quintoandar.com.br
+description: Envers audit of per-house visit availability status in EBDB. Each row captures revision-level changes to whether and how a listing accepts visits.

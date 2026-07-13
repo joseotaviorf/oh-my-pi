@@ -4,16 +4,23 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.appointmentchangereasoncategory.id
+    - datalake_ebdb_raw.appointmentchangereasoncategory.id
+    description: Surrogate primary key of the appointment change reason category row in EBDB.
   name:
     lineage:
-      - datalake_ebdb_raw.appointmentchangereasoncategory.name
+    - datalake_ebdb_raw.appointmentchangereasoncategory.name
+    description: Attribute name for the appointment change reason category entity sourced from EBDB visit services.
   description:
     lineage:
-      - datalake_ebdb_raw.appointmentchangereasoncategory.description
+    - datalake_ebdb_raw.appointmentchangereasoncategory.description
+    description: Attribute description for the appointment change reason category entity sourced from EBDB visit services.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.appointmentchangereasoncategory.criadoem
+    - datalake_ebdb_raw.appointmentchangereasoncategory.criadoem
+    description: Timestamp when the row was created in the EBDB operational database.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.appointmentchangereasoncategory.atualizadoem
+    - datalake_ebdb_raw.appointmentchangereasoncategory.atualizadoem
+    description: Timestamp when the row was last updated in the EBDB operational database.
+owner: guilherme.rocha@quintoandar.com.br
+description: Reference categories from EBDB explaining why a visit booking (agendamento) was rescheduled or changed. One row per reason code used in visit scheduling workflows for For Rent and For Sale business contexts.

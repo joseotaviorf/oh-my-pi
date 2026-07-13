@@ -4,22 +4,31 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences_aud.id
+    - datalake_ebdb_raw.uservisitpreferences_aud.id
+    description: Surrogate primary key of the user visit preferences aud row in EBDB.
   is_preferred_fixed_agent_enabled:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences_aud.preferredfixedagentenabled
+    - datalake_ebdb_raw.uservisitpreferences_aud.preferredfixedagentenabled
+    description: Whether the user asked to keep the same agent across future visit bookings.
   mod_is_preferred_fixed_agent_enabled:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences_aud.preferredfixedagentenabled_mod
+    - datalake_ebdb_raw.uservisitpreferences_aud.preferredfixedagentenabled_mod
+    description: Envers flag showing preferred fixed agent preference changed in this revision.
   rev:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences_aud.rev
+    - datalake_ebdb_raw.uservisitpreferences_aud.rev
+    description: Envers revision number that groups field changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences_aud.revtype
+    - datalake_ebdb_raw.uservisitpreferences_aud.revtype
+    description: 'Envers revision type: 0 insert, 1 update, or 2 delete for the audited entity row.'
   ts_created:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences_aud.criadoem
+    - datalake_ebdb_raw.uservisitpreferences_aud.criadoem
+    description: Timestamp when the row was created in the EBDB operational database.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.uservisitpreferences_aud.atualizadoem
+    - datalake_ebdb_raw.uservisitpreferences_aud.atualizadoem
+    description: Timestamp when the row was last updated in the EBDB operational database.
+owner: guilherme.rocha@quintoandar.com.br
+description: Envers audit of user visit preferences in EBDB. Each row records revision-level changes to fixed-agent and related preference flags.

@@ -4,52 +4,71 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.id
+    - datalake_ebdb_raw.horariosemanalimovel.id
+    description: Surrogate primary key of the house weekly schedule row in EBDB.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.atualizadoem
+    - datalake_ebdb_raw.horariosemanalimovel.atualizadoem
+    description: Timestamp when the row was last updated in the EBDB operational database.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.criadoem
+    - datalake_ebdb_raw.horariosemanalimovel.criadoem
+    description: Timestamp when the row was created in the EBDB operational database.
   weekday:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.diadasemana
+    - datalake_ebdb_raw.horariosemanalimovel.diadasemana
+    description: Day of week index for the recurring visit availability window.
   is_available_between_08_and_09:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel08as09
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel08as09
+    description: Boolean indicator whether available between 08 and 09 applies to this visit-domain record.
   is_available_between_09_and_10:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel09as10
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel09as10
+    description: Boolean indicator whether available between 09 and 10 applies to this visit-domain record.
   is_available_between_10_and_11:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel10as11
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel10as11
+    description: Boolean indicator whether available between 10 and 11 applies to this visit-domain record.
   is_available_between_11_and_12:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel11as12
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel11as12
+    description: Boolean indicator whether available between 11 and 12 applies to this visit-domain record.
   is_available_between_12_and_13:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel12as13
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel12as13
+    description: Boolean indicator whether available between 12 and 13 applies to this visit-domain record.
   is_available_between_13_and_14:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel13as14
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel13as14
+    description: Boolean indicator whether available between 13 and 14 applies to this visit-domain record.
   is_available_between_14_and_15:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel14as15
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel14as15
+    description: Boolean indicator whether available between 14 and 15 applies to this visit-domain record.
   is_available_between_15_and_16:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel15as16
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel15as16
+    description: Boolean indicator whether available between 15 and 16 applies to this visit-domain record.
   is_available_between_16_and_17:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel16as17
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel16as17
+    description: Boolean indicator whether available between 16 and 17 applies to this visit-domain record.
   is_available_between_17_and_18:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel17as18
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel17as18
+    description: Boolean indicator whether available between 17 and 18 applies to this visit-domain record.
   is_available_between_18_and_19:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel18as19
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel18as19
+    description: Boolean indicator whether available between 18 and 19 applies to this visit-domain record.
   is_available_between_19_and_20:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel19as20
+    - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel19as20
+    description: Boolean indicator whether available between 19 and 20 applies to this visit-domain record.
   id_house:
     lineage:
-      - datalake_ebdb_raw.horariosemanalimovel.imovel_id
+    - datalake_ebdb_raw.horariosemanalimovel.imovel_id
+    description: Foreign key referencing house in the visit scheduling domain.
+owner: guilherme.rocha@quintoandar.com.br
+description: Weekly recurring visit availability windows per house in EBDB. One row per schedule slot pattern used when demand books property visits.

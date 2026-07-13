@@ -4,22 +4,31 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.followupdetails.id
+    - datalake_ebdb_raw.followupdetails.id
+    description: Surrogate primary key of the follow up details row in EBDB.
   id_entrance:
     lineage:
-      - datalake_ebdb_raw.followupdetails.entrance_id
+    - datalake_ebdb_raw.followupdetails.entrance_id
+    description: Foreign key referencing entrance in the visit scheduling domain.
   comment:
     lineage:
-      - datalake_ebdb_raw.followupdetails.comment
+    - datalake_ebdb_raw.followupdetails.comment
+    description: Free-text comment captured in follow-up or check-in failure flows.
   is_submitted:
     lineage:
-      - datalake_ebdb_raw.followupdetails.submitted
+    - datalake_ebdb_raw.followupdetails.submitted
+    description: Whether a follow-up or form was submitted versus left as draft.
   visit_type:
     lineage:
-      - datalake_ebdb_raw.followupdetails.visittype
+    - datalake_ebdb_raw.followupdetails.visittype
+    description: Visit business context for the follow-up, such as rent or sale.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.followupdetails.criadoem
+    - datalake_ebdb_raw.followupdetails.criadoem
+    description: Timestamp when the row was created in the EBDB operational database.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.followupdetails.atualizadoem
+    - datalake_ebdb_raw.followupdetails.atualizadoem
+    description: Timestamp when the row was last updated in the EBDB operational database.
+owner: guilherme.rocha@quintoandar.com.br
+description: Follow-up responses linked to an entrance event after a visit attempt. One row per submission with comments and visit type, used in post-visit quality analytics.
