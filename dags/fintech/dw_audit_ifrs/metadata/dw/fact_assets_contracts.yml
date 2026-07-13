@@ -5,7 +5,7 @@ description: >-
   Monthly fact of active portfolio contracts for IFRS / ECL audit: delay bucket, invoice account
   type, guarantee, closing status, and applicable LGD from lookup table ead_lgd_asset (clean),
   built from loss facts without bureau data.
-owner: ae-fintech@quintoandar.com.br
+owner: marcos.mota@quintoandar.com.br
 domain: Fintech
 columns:
   sk_contract:

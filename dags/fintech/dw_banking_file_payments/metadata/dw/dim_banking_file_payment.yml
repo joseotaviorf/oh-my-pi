@@ -2,27 +2,27 @@ database_name: dw_payment
 table_name: dim_banking_file_payment
 description: Gathers information about vans communications - bank compensation.
 domain: Fintech
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   sk_banking_file_payment:
     lineage:
-    - datalake_vans_clean.boleto.id
-    - datalake_vans_clean.payment.id
-    - datalake_vans_clean.payment_boleto.id
-    - datalake_vans_clean.boleto.company_use
-    - datalake_vans_clean.payment.company_use
-    - datalake_vans_clean.payment_boleto.company_use
+      - datalake_vans_clean.boleto.id
+      - datalake_vans_clean.payment.id
+      - datalake_vans_clean.payment_boleto.id
+      - datalake_vans_clean.boleto.company_use
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.payment_boleto.company_use
     description: Banking file payment id from three transaction types recorded in
       Vans DB
   bank_name:
     lineage:
-    - datalake_vans_clean.bank.name
-    description: Name of the bank
+      - datalake_vans_clean.bank.name
+    description: Financial attribute representing bank name on the dim_banking_file_payment dataset.
   related_document_type:
     lineage:
-    - datalake_vans_clean.boleto.related_document_type
-    - datalake_vans_clean.payment.related_document_type
-    - datalake_vans_clean.payment_boleto.related_document_type
+      - datalake_vans_clean.boleto.related_document_type
+      - datalake_vans_clean.payment.related_document_type
+      - datalake_vans_clean.payment_boleto.related_document_type
     description: Type of the document related to the banking file payment, such as
       invoice or payment request from SeuBarriga
     categories:
@@ -32,9 +32,9 @@ columns:
       teste: ''
   invoice_status:
     lineage:
-    - datalake_vans_clean.boleto.related_document_type
-    - datalake_vans_clean.payment.related_document_type
-    - datalake_vans_clean.payment_boleto.related_document_type
+      - datalake_vans_clean.boleto.related_document_type
+      - datalake_vans_clean.payment.related_document_type
+      - datalake_vans_clean.payment_boleto.related_document_type
     description: Invoice paid status when the document related to the payment is from
       type invoice
     categories:
@@ -51,19 +51,19 @@ columns:
       payment_has_error: ''
   payment_request_status:
     lineage:
-    - datalake_vans_clean.boleto.related_document_type
-    - datalake_vans_clean.payment.related_document_type
-    - datalake_vans_clean.payment_boleto.related_document_type
+      - datalake_vans_clean.boleto.related_document_type
+      - datalake_vans_clean.payment.related_document_type
+      - datalake_vans_clean.payment_boleto.related_document_type
     description: Payment request status when the document related to the payment is
       from type payment request
     categories:
       not applicable: ''
   status:
     lineage:
-    - datalake_vans_clean.boleto.status
-    - datalake_vans_clean.payment.status
-    - datalake_vans_clean.payment_boleto.status
-    description: Bill status.
+      - datalake_vans_clean.boleto.status
+      - datalake_vans_clean.payment.status
+      - datalake_vans_clean.payment_boleto.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
     categories:
       changed: ''
       chargeback: ''
@@ -77,41 +77,41 @@ columns:
       written: ''
   accrual_year_month:
     lineage:
-    - datalake_vans_clean.boleto.company_use
-    - datalake_vans_clean.payment.company_use
-    - datalake_vans_clean.payment_boleto.company_use
+      - datalake_vans_clean.boleto.company_use
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.payment_boleto.company_use
     description: Expense reference month
   ts_created:
     lineage:
-    - datalake_vans_clean.boleto.ts_created
-    - datalake_vans_clean.payment.ts_created
-    - datalake_vans_clean.payment_boleto.ts_created
+      - datalake_vans_clean.boleto.ts_created
+      - datalake_vans_clean.payment.ts_created
+      - datalake_vans_clean.payment_boleto.ts_created
     description: File payment creation date.
   ts_issued:
     lineage:
-    - datalake_vans_clean.boleto.ts_issued
-    - datalake_vans_clean.payment.ts_issued
+      - datalake_vans_clean.boleto.ts_issued
+      - datalake_vans_clean.payment.ts_issued
     description: Date in which the banking file will was issued
   ts_updated:
     lineage:
-    - datalake_vans_clean.boleto.ts_updated
-    - datalake_vans_clean.payment.ts_updated
-    - datalake_vans_clean.payment_boleto.ts_updated
+      - datalake_vans_clean.boleto.ts_updated
+      - datalake_vans_clean.payment.ts_updated
+      - datalake_vans_clean.payment_boleto.ts_updated
     description: Date the last status was updated.
   dt_due:
     lineage:
-    - datalake_vans_clean.boleto.dt_due
-    - datalake_vans_clean.payment.dt_dued
+      - datalake_vans_clean.boleto.dt_due
+      - datalake_vans_clean.payment.dt_dued
     description: Expiration date of the invoice sent to the tenant.
   dt_fine_due:
     lineage:
-    - datalake_vans_clean.boleto.dt_fine_due
+      - datalake_vans_clean.boleto.dt_fine_due
     description: Cut-off date for applying the fine after expiration.
   dt_paid:
     lineage:
-    - datalake_vans_clean.boleto.dt_paid
-    - datalake_vans_clean.payment.dt_paid
-    - datalake_vans_clean.payment_boleto.dt_paid
+      - datalake_vans_clean.boleto.dt_paid
+      - datalake_vans_clean.payment.dt_paid
+      - datalake_vans_clean.payment_boleto.dt_paid
     description: Date of payment of the invoice.
   format:
     description: Name format of id according to company use syntax (default or custom)

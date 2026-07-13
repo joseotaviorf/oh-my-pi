@@ -4,7 +4,7 @@ table_name: fact_liability_contracts
 description: >-
   Monthly IFRS / ECL liability-side fact from closing × contract snapshot × liability EAD/LGD
   lookup (ead_lgd_liability clean sheet). Passivos-style pipeline without bureau joins.
-owner: ae-fintech@quintoandar.com.br
+owner: marcos.mota@quintoandar.com.br
 domain: Fintech
 columns:
   sk_contract:

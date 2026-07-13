@@ -1,6 +1,6 @@
 database_name: dw_losses
 table_name: fact_accounts_receivable
-owner: bianca.martins@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Analytical table used to create the AR90 (accounts receivables) metric.
 columns:
