@@ -175,6 +175,12 @@ workflow:
       extra_spark_job_arguments:
         - "1UgZVV5FDuFTvmJ-Pc3ejzCTcyr94g8w4M29nuTDjy8s"
         - "license_to_hire_list"
+    # Former notebook view: access_list_talent
+    # Governance: docs/talent_access_list.md
+    talent_access_list:
+      extra_spark_job_arguments:
+        - "1smsqH7R_-xjxZm5Ca2eVSTKzN9OQqPOUF74uVtO2ZYE"
+        - "access_list_talent"
 
     # --- reports_dw.py notebook migration (DBP-1333) ---
     # Former notebook view: base_de_para
