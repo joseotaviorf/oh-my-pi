@@ -3,20 +3,24 @@ dag:
   name: enrich_big_agent
   schedule_start_date: 2020, 7, 1
   owner: Data Agents
-  documentation: 
+  documentation:
     dag_purpose: |
-      Creates enriched tables for Big Agent.
-      Some tables are deduplicated versions from the clean layer, but there are some table enriching the data.
-      This DAG is triggered by Mediator and loads the table via full load.
+      Enriched Big Agent layer consolidating agent enrollments and linking houses to consultants
+      through agency audit history and listing-level consultant attribution for rent and sale.
+      Triggered by Mediator; most tables are full load, with incremental load on agent_enrollment.
 workflow:
   type: query_delta
   layer: enrich
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   inner_dependencies:
     house_consultant_history:
       - agent_enrollment
     house_listing_consultant:
       - house_consultant_history
-    house_rent_listing_consultant:
-    - house_consultant_history
-    house_sale_listing_consultant:
-    - house_consultant_history
+  tables_customization:
+    agent_enrollment:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [id_agent_enrollment]
