@@ -1,0 +1,42 @@
+database_name: datalake_terminator_clean
+table_name: inspection_opted_out
+description: Clean table that aims to store inspection opt out information.
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
+columns:
+  id_inspection_opted_out:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.id
+    description: Unique identification key of the inspection opted out
+  id_termination:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.termination_id
+    description: Identification key of termination.
+  is_exit_inspection_opt_out:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.exit_inspection_opt_out
+    description: Boolean information indicating whether it was exit inspection opt out.
+  reason:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.reason
+    description: Business reason code explaining why the telephony event or task transition occurred.
+  reason_details:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.reason_details
+    description: Attribute of the termination workflow describing reason details.
+  dt_opt_out:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.date_opt_out
+    description: Inspection opted out date.
+  year:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.year
+    description: Year when the data was loaded.
+  month:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.month
+    description: Month when the data was loaded.
+  day:
+    lineage:
+      - datalake_terminator_raw.inspection_opted_out.day
+    description: Day when the data was loaded.

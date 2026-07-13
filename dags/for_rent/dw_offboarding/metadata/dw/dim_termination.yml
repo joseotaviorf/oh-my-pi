@@ -1,0 +1,141 @@
+---
+database_name: dw_offboarding
+table_name: dim_termination
+description: This table aims to store termination information, each line must contain the termination record in its most current state.
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
+columns:
+  sk_termination:
+    description: Unique termination identification key.
+    lineage:
+      - datalake_terminator.termination.id_termination
+  sk_mediation_ticket:
+    lineage:
+      - datalake_offboarding.mediations.id_mediation_ticket
+    description: Mediation ticket linked to the termination, if it exists.
+  team:
+    description: Name of the team responsible for the termination.
+    lineage:
+      - datalake_terminator.termination.team
+  cancellation_info:
+    description: Data with json structure that indicates detailed information about canceling termination.
+    lineage:
+      - datalake_terminator.termination.cancellation_info
+  category:
+    description: Descriptive information about the termination category.
+    lineage:
+      - datalake_terminator.termination.category
+  requested_by:
+    description: Descriptive information that indicates the type of user who made the termination request.
+    lineage:
+      - datalake_terminator.termination.requested_by
+  source:
+    description: Descriptive information that indicates the source of the termination request.
+    lineage:
+      - datalake_terminator.termination.source
+  status:
+    description: Current termination status.
+    lineage:
+      - datalake_terminator.termination.status
+  feedback:
+    description: Information in json format that indicates the home's output feedback.
+    lineage:
+      - datalake_terminator.termination.feedback
+  task_type:
+    description: Descriptive information that indicates the type of task related to the termination.
+    lineage:
+      - datalake_terminator.termination.task_type
+  reason:
+    description: |
+      Business reason the tenant gave for ending the rental contract (e.g. moving to own house,
+      problems with the house, owner moving in), as recorded by the terminator system.
+    lineage:
+      - datalake_terminator.termination.reason
+  rescheduling_history:
+    description: Json type data that indicates the termination rescheduling history.
+    lineage:
+      - datalake_terminator.termination.rescheduling_history
+  mediation_squad:
+    lineage:
+      - datalake_offboarding.mediations.squad
+    description: Based on ticket tags indicating agreement or disagreement.
+  workflow_current_step:
+    description: |
+      Current step of the termination in the terminator workflow, indicating where it sits in
+      its lifecycle (e.g. request, inspection, report review, mediation, closure).
+    lineage:
+      - datalake_terminator.termination.workflow_current_step
+  fee_negotiation_status:
+    description: |
+      Status of the early-termination-fee negotiation with the tenant, indicating whether the
+      fee is still pending, under negotiation, agreed, or waived.
+    lineage:
+      - datalake_terminator.termination.fee_negotiation_status
+  fee_payment_option:
+    description: Option to pay the termination fee.
+    lineage:
+      - datalake_terminator.termination.fee_payment_option
+  checklist_item:
+    description: Descriptive information that indicates which checklist item the record is in the termination process.
+    lineage:
+      - datalake_terminator.termination.checklist_item
+  decline_person:
+    description: Column indicating who opted-out/declined the relisting.
+    lineage:
+      - datalake_terminator.termination.decline_person
+    categories:
+      "DECLINED_BY_PP": The person who declined the relisting was the owner.
+      "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
+      "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
+  responsible_off_manager_email:
+    lineage:
+      - datalake_terminator.termination.responsible_off_manager_email
+    description: Email of SPOC responsible analyst.
+  repair_resolution:
+    description: Classifies the type of repair when there is one in the Offboarding process.
+    lineage:
+      - datalake_terminator.termination.repair_resolution
+  has_mediation_ticket:
+    lineage:
+      - datalake_offboarding.mediations.has_mediation_ticket
+    description: |
+      Flag indicating the presence of a mediation ticket. The flag is only populated for
+      terminations that have already reached the DONE status (the upstream mediations source
+      restricts to finished terminations); it is not marked while the termination is still in
+      progress. Metrics that use this flag must scope the denominator to finished terminations
+      so numerator and denominator stay coherent — e.g. "% of terminations without mediation
+      and with repairs" should consider only terminations that already reached DONE.
+  has_ac_repairs:
+    lineage:
+      - datalake_terminator.termination.total_tentant_repair_ac
+    description: Flag indicating if tenant had repairs in contestation analysis (total_tentant_repair_ac > 0).
+  is_ticket_opened_via_terminator:
+    lineage:
+      - datalake_offboarding.mediations.is_ticket_opened_via_terminator
+    description: Indicator if the mediation ticket was initiated via the terminator system.
+  has_landlord_comment:
+    description: Flag indicating if the landlord has commented on the termination.
+    lineage:
+      - datalake_terminator.termination.has_landlord_comment
+  has_repair_by_tenant_needed:
+    description: Flag indicating if the tenant needs to repair the property.
+    lineage:
+      - datalake_terminator.termination.has_repair_by_tenant_needed
+  dt_inspection:
+    lineage:
+      - datalake_offboarding.mediations.dt_inspection
+    description: Date when the inspection for the termination occurred.
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_offboarding.
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.year
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.month
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - datalake_terminator.termination.day

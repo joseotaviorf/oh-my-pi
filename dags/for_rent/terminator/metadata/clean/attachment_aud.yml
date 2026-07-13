@@ -1,0 +1,61 @@
+database_name: datalake_terminator_clean
+table_name: attachment_aud
+description:
+  One row per attachment aud in the contract termination (offboarding)
+  workflow managed by the Terminator service. Tracks step progression, fees,
+  and inspection outcomes.
+owner: gustavo.silva@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.id
+    description: Primary surrogate identifier for the entity row in this support and service dataset.
+  id_termination:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.termination_id
+    description: Identifier for the termination referenced by this record.
+  rev:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.rev
+    description: Attribute of the termination workflow describing rev.
+  rev_type:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.revtype
+    description: Attribute of the termination workflow describing rev type.
+  rev_end:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.revend
+    description: Attribute of the termination workflow describing rev end.
+  filename:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.filename
+    description: Attribute of the termination workflow describing filename.
+  path:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.path
+    description: Attribute of the termination workflow describing path.
+  type:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.type
+    description: Classification type assigned by the source platform for routing or reporting.
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.created_at
+    description: Timestamp when the record was first created in the upstream source system.
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.updated_at
+    description: Timestamp of the most recent update to the record in the upstream source system.
+  year:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.year
+    description: Year partition derived from the source event timestamp for incremental loading.
+  month:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.month
+    description: Month partition derived from the source event timestamp for incremental loading.
+  day:
+    lineage:
+      - datalake_terminator_raw.attachment_aud.day
+    description: Day partition derived from the source event timestamp for incremental loading.
