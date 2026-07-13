@@ -1,55 +1,80 @@
+---
 database_name: datalake_gsheets_clean
 table_name: imovelweb_customer_portfolio
+description:
+  Imovelweb partner real-estate customer portfolio curated in Google Sheets
+  by Fintech/Commercial Ops. One row per SAP customer (brokerage / CRECI
+  partner) with location, contacts, monthly fee, listing stock, and average
+  ticket metrics. Used to track Imovelweb channel performance and partner
+  revenue contribution.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   sk_sap:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._id_sap
+    description: SAP customer identifier for the Imovelweb partner; joins to SAP master data.
   document_number:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._cpf_cnpj
+    description: Partner CPF or CNPJ with punctuation removed, stored as a numeric document id.
   legal_entity:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._pf_pj
+    description: Legal-entity type of the partner — PF (individual) or PJ (company).
   realestate_name:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._razao_social
+    description: Partner legal / trading name (razão social) as registered for Imovelweb.
   city_group:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._regiao
+    description: Commercial region or metro grouping used to roll up partners for Imovelweb reporting.
   city:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._cidade
+    description: City where the partner real-estate office operates.
   neighborhood:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._bairro
+    description: Neighborhood of the partner office, when captured in the sheet.
   email:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio.email
+    description: Primary commercial contact email for the Imovelweb partner.
   phone_number:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio.telefone_1
+    description: Primary contact phone with punctuation stripped, stored as a numeric phone id.
   realestate_segmentation:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio.equipe
+    description: Internal commercial team / segmentation label assigned to the partner account.
   integrator:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio.integrador
+    description: Listing-integration vendor that syncs the partner stock into Imovelweb (when applicable).
   amount:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._valor_mensal
+    description: Monthly fee charged to the partner in BRL (Brazilian decimal format cleaned in SQL).
   competitiors_listings:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._estoque_concorrencia
+    description: Count of competitor portals' listings attributed to this partner in the commercial snapshot.
   rent_listings:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio._listings_aluguel
+    description: Count of active for-rent listings in the partner stock at snapshot time.
   sale_listings:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio.listings_venda
+    description: Count of active for-sale listings in the partner stock at snapshot time.
   average_rent:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio.ticket_medio_rent
+    description: Average rent ticket (BRL) across the partner's for-rent listings in the snapshot.
   average_sale:
     lineage:
       - datalake_gsheets_raw.imovelweb_customer_portfolio.ticket_medio_sale
+    description: Average sale ticket (BRL) across the partner's for-sale listings in the snapshot.

@@ -1,61 +1,88 @@
+---
 database_name: datalake_gsheets_clean
 table_name: payments_deals_and_discounts
+description:
+  Operational requests for payment deals, discounts, and charge adjustments
+  curated in Google Sheets by Fintech Ops. One row per request linking
+  contract/house, requester, recipient, charge type, installment plan, SLA,
+  amounts, and due dates. Consumed to track agreement approvals and execution
+  of non-standard payment conditions.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   sk_request:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.sk_request
+    description: Surrogate key of the deal/discount request in the payments intake sheet.
   sk_contract:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.sk_contract
+    description: Contract surrogate key the deal or discount applies to.
   sk_house:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.sk_house
+    description: House / listing surrogate key related to the deal or discount request.
   agent_email:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.agent_email
+    description: Email of the agent associated with the deal/discount request.
   origin_form:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.origin_form
+    description: Form or intake channel that originated the deal/discount request.
   charge:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.charge
+    description: Charge type or billing line the deal/discount targets (e.g. rent, fee, fine).
   requester:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.requester
+    description: Person or team that submitted the deal/discount request.
   recipient:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.recipient
+    description: Party that benefits from the deal or discount (tenant, owner, or internal area).
   installment_type:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.installment_type
+    description: Installment modality agreed for the adjusted charge (e.g. unique, parcelado).
   installments:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.installments
+    description: Number of installments planned for the deal/discount settlement.
   origin_request:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.origin_request
+    description: Business origin / reason category of the request (why the deal was asked).
   comment:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.comment
+    description: Free-text notes explaining context or conditions of the deal/discount.
   is_canceled:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.is_canceled
+    description: True when the deal/discount request was canceled and should not be executed.
   sla:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.sla
+    description: SLA classification or target status recorded for handling this request.
   value:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.value
+    description: Monetary value of the deal or discount in BRL.
   reference_month:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.reference_month
+    description: Competency / reference month the deal or discount should hit financials.
   due_date:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.due_date
+    description: Due date agreed for the adjusted payment or first installment.
   ts_request:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.ts_request
+    description: Timestamp when the deal/discount request was opened.
   ts_request_execution:
     lineage:
       - datalake_gsheets_raw.payments_deals_and_discounts.ts_request_execution
+    description: Timestamp when Fintech executed the approved deal/discount request.

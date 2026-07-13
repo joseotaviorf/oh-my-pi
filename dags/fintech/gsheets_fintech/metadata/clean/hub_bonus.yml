@@ -1,23 +1,35 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: hub_bonus
+description:
+  Hub-level bonus fee schedule maintained in Google Sheets by Fintech Ops.
+  One row per customer-relation (CR) and hub pair with the agreed bonus fee
+  and the opening/cutoff dates that govern when the fee applies. Consumed by
+  Fintech reporting that reconciles hub incentives against contract openings.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_cr:
     lineage:
       - datalake_gsheets_raw.hub_bonus.id_cr
+    description: Customer-relation (CR) identifier that owns the hub bonus agreement.
   id_hub:
     lineage:
       - datalake_gsheets_raw.hub_bonus.id_hub
+    description: Numeric hub identifier used to join this bonus schedule to the agent hub allocation.
   hub:
     lineage:
       - datalake_gsheets_raw.hub_bonus.hub
+    description: Human-readable hub name associated with the bonus fee (e.g. city or regional hub label).
   bonus_fee:
     lineage:
       - datalake_gsheets_raw.hub_bonus.bonus_fee
+    description: Bonus fee amount (BRL) paid or accrued for the hub under the CR agreement.
   dt_opening:
     lineage:
       - datalake_gsheets_raw.hub_bonus.dt_opening
+    description: Date when the hub bonus agreement becomes effective (contract or period opening).
   dt_bonus_cutoff:
     lineage:
       - datalake_gsheets_raw.hub_bonus.dt_bonus_cutoff
+    description: Last date included in the bonus accrual window; openings after this cutoff are out of scope.

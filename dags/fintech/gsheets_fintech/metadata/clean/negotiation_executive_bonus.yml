@@ -1,23 +1,35 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: negotiation_executive_bonus
+description:
+  Negotiation Executive (EN) bonus schedule maintained in Google Sheets by
+  Fintech Ops. One row per EN and hub with the bonus amount and the date
+  window when the bonus is valid. Feeds incentive accrual and EN compensation
+  reporting in Fintech.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_negotiation_executive:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.id_negotiation_executive
+    description: Negotiation Executive (EN) user identifier that receives the bonus.
   id_hub:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.id_hub
+    description: Numeric hub identifier tied to the EN bonus assignment.
   hub:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.hub
+    description: Human-readable hub name for the EN bonus assignment.
   bonus_value:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.bonus_value
+    description: Bonus amount in BRL owed to the Negotiation Executive for the hub period.
   dt_bonus:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.dt_bonus
+    description: Start date of the EN bonus eligibility window.
   dt_bonus_end:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.dt_bonus_end
+    description: End date of the EN bonus eligibility window (inclusive cutoff).

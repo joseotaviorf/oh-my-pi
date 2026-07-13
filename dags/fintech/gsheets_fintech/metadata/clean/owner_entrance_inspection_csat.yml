@@ -1,22 +1,36 @@
+---
 database_name: datalake_gsheets_clean
 table_name: owner_entrance_inspection_csat
+description:
+  Owner CSAT responses for the entrance property inspection (vistoria de
+  entrada / PP entrada), ingested from Google Sheets
+  (csat_vistoria_pp_entrada). One row per survey submission with overall
+  score, improvement tags, free-text comments, and submit timestamp. Used by
+  Ops and Fintech to monitor owner satisfaction at move-in inspection.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_entrada.id_do_contrato
+    description: Rental contract id the entrance-inspection CSAT response refers to.
   email:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_entrada.email
+    description: Owner email address provided on the CSAT survey submission.
   improvement_tags:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_entrada.pontos_de_melhoria
+    description: Structured improvement themes the owner selected (pontos de melhoria).
   comments:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_entrada.campo_aberto
+    description: Free-text owner feedback about the entrance inspection experience.
   general_satisfaction_evaluation:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_entrada.avaliacao_csat
+    description: Overall CSAT score the owner gave for the entrance inspection service.
   ts_submitted:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_entrada.submitted_at
+    description: Timestamp when the owner submitted the entrance-inspection CSAT survey.

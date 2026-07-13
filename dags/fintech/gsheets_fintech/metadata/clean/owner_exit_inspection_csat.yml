@@ -1,25 +1,40 @@
+---
 database_name: datalake_gsheets_clean
 table_name: owner_exit_inspection_csat
+description:
+  Owner CSAT responses for the exit property inspection (vistoria de saída /
+  PP saída), ingested from Google Sheets (csat_vistoria_pp_saida). One row
+  per survey submission with overall service score, house condition score,
+  improvement tags, comments, and submit timestamp. Used by Ops and Fintech
+  to monitor owner satisfaction at move-out inspection.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.id_do_contrato
+    description: Rental contract id the exit-inspection CSAT response refers to.
   email:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.email
+    description: Owner email address provided on the CSAT survey submission.
   improvement_tags:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.pontos_de_melhoria
+    description: Structured improvement themes the owner selected (pontos de melhoria).
   comments:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.campo_aberto
+    description: Free-text owner feedback about the exit inspection experience.
   general_satisfaction_evaluation:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.avaliacao_csat
+    description: Overall CSAT score the owner gave for the exit inspection service.
   general_satisfaction_house:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.nota_pp_imovel
+    description: Owner score for the property / house condition at exit inspection (nota PP imóvel).
   ts_submitted:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.submitted_at
+    description: Timestamp when the owner submitted the exit-inspection CSAT survey.

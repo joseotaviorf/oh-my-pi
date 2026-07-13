@@ -1,65 +1,91 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: offboarding_payments_expenses
+description:
+  Line-item expenses for the offboarding payments workflow, curated in
+  Google Sheets by Fintech Ops. One row per expense on a contract — amount,
+  payer/payee, collection mode, exception flags, and lease dates — used to
+  settle charges when a rental contract exits.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.contrato
+    description: Rental contract id the offboarding expense belongs to.
   expense_description:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.despesa
+    description: Expense label / name as classified in the offboarding payments sheet.
   expense_value:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.valor
+    description: Charge amount in BRL actually applied in the offboarding settlement.
   original_value:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.valor_original
+    description: Original expense amount in BRL before any adjustment or exemption.
   item:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.item
+    description: Line-item code or category identifying the expense within the offboarding package.
   payer:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.de
+    description: Party that should pay this expense (from / "de" in the sheet).
   payee:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.para
+    description: Party that should receive this expense (to / "para" in the sheet).
   original_expense_reason:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.despesa_original
+    description: Original business reason for the expense before exception handling.
   collection_mode:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.cobranca
+    description: How the expense is billed or collected (e.g. invoice, withhold, pass-through).
   contract_version:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.versao
+    description: Contract product/version tag used when the offboarding expense rule was applied.
   status:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.status
+    description: Processing status of the expense line in the offboarding payments workflow.
   exception_type:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.tipo_excecao
+    description: Exception classification when the standard offboarding charge was overridden.
   spent_time:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.tempo_decorrido
+    description: Elapsed handling time (as recorded in the sheet) for processing this expense line.
   is_condo_adjusted:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.condominio_ajustado
+    description: True when the condo amount on this expense was manually adjusted.
   is_new_guarantee:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.nova_garantia
+    description: True when the offboarding expense relates to issuing a new rental guarantee.
   is_exception:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.excecao
+    description: True when this expense line is treated as an exception to the standard rule set.
   dt_start:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.vigencia
+    description: Contract start / vigencia date associated with this expense line.
   dt_termination:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.rescisao
+    description: Contract termination (rescisão) date associated with this expense line (yyyyMMdd in source).
   ts_created:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.created_at
+    description: Timestamp when the expense row was created in the upstream Google Sheet form/export.
   ts_load:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_expenses.ts_load
+    description: Timestamp when the Google Sheets row was ingested into the raw gsheets table.

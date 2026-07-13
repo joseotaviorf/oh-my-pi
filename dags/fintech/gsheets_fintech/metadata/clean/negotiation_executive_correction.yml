@@ -1,29 +1,44 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: negotiation_executive_correction
+description:
+  Manual corrections to Negotiation Executive (EN) and Associate Executive
+  attributions, curated in Google Sheets by Fintech Ops. One row per
+  remapping for a reference month — incorrect EN replaced by the correct EN,
+  with associate executive, role, and hub context. Used to fix incentive and
+  hierarchy attribution before closing the monthly accrual.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_negotiation_executive:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_correction.id_negotiation_executive
+    description: Correct Negotiation Executive (EN) user id after the attribution fix.
   id_associate_executive:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_correction.id_associate_executive
+    description: Associate Executive user id linked to the corrected EN attribution.
   incorrect_negociation_executive:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_correction.incorrect_negociation_executive
+    description: Name of the wrongly assigned Negotiation Executive before the correction.
   negotiation_executive:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_correction.negotiation_executive
+    description: Name of the correct Negotiation Executive after the correction.
   executive_position:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_correction.executive_position
+    description: Role / position title of the executive in the attribution hierarchy for that month.
   associate_executive:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_correction.associate_executive
+    description: Display name of the Associate Executive related to this correction.
   hub:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_correction.hub
+    description: Hub name under which the incorrect EN attribution was recorded.
   dt_month_ref:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_correction.dt_month_ref
+    description: Reference month (date) of the accrual period this attribution correction applies to.

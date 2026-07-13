@@ -1,22 +1,36 @@
+---
 database_name: datalake_gsheets_clean
 table_name: inspection_bugs_v2
+description:
+  Manual log of inspection (vistoria) defects curated in Google Sheets
+  (raw sheet vistoria_bugs_v2). One row per reported bug linking the
+  inspection, house, and inspector, with defect type and free-text notes.
+  Used by Ops and Fintech to track inspection quality issues that may trigger
+  rework or financial adjustments.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_inspection:
     lineage:
       - datalake_gsheets_raw.vistoria_bugs_v2.id_inspection
+    description: Inspection (vistoria) identifier where the defect was found.
   id_house:
     lineage:
       - datalake_gsheets_raw.vistoria_bugs_v2.id_house
+    description: House / listing identifier for the property under inspection.
   id_inspector:
     lineage:
       - datalake_gsheets_raw.vistoria_bugs_v2.id_inspector
+    description: Inspector user id responsible for the visit that reported the defect.
   type:
     lineage:
       - datalake_gsheets_raw.vistoria_bugs_v2.type
+    description: Defect category or bug type classified by Ops in the sheet (e.g. photo, checklist, report).
   description:
     lineage:
       - datalake_gsheets_raw.vistoria_bugs_v2.description
+    description: Free-text description of the inspection defect as logged by Ops.
   inspector_name:
     lineage:
       - datalake_gsheets_raw.vistoria_bugs_v2.inspector_name
+    description: Display name of the inspector who performed the visit.

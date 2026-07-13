@@ -1,41 +1,60 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: offboarding_payments_contracts
+description:
+  Contract-level payment baselines for the offboarding (contract exit)
+  payments workflow, curated in Google Sheets by Fintech Ops. One row per
+  contract with rent, condo, IPTU, fire insurance, and service fee amounts,
+  plus who pays/manages condo and the lease start/termination dates. Consumed
+  when reconciling exit settlements and advance payments.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_contract:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.contrato
+    description: Rental contract id whose offboarding payment baseline is defined in this row.
   condo_payer:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.pagante_condominio
+    description: Party responsible for paying the condo fee during or after offboarding (e.g. tenant, owner, QuintoAndar).
   rent:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.aluguel
+    description: Monthly rent amount in BRL used as the offboarding settlement baseline.
   condo:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.cota_condominial
+    description: Condo fee (cota condominial) amount in BRL for the contract at offboarding.
   iptu:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.iptu
+    description: IPTU (property tax) amount in BRL allocated to the offboarding settlement.
   fire_insurance_fee_value:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.seguro_contra_incendio
+    description: Fire insurance fee in BRL charged on the contract for the offboarding period.
   service_fee_value:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.taxa_de_servico
+    description: QuintoAndar service fee in BRL applied on the contract during offboarding.
   condo_responsible:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.responsavel_condominio
+    description: Operational owner for condo coordination (who manages condo communication / docs).
   is_paid_in_advance:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.adiantado
+    description: True when the relevant offboarding charges were already paid in advance.
   dt_start:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.vigencia
+    description: Contract start / vigencia date used as the lease window for the offboarding baseline.
   dt_termination:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.rescisao
+    description: Contract termination (rescisão) date that triggers the offboarding payment flow.
   ts_load:
     lineage:
       - datalake_gsheets_raw.offboarding_payments_contracts.ts_load
+    description: Timestamp when the Google Sheets row was ingested into the raw gsheets table.

@@ -1,119 +1,168 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: mova_lra_owners
+description:
+  Owner installment ledger for the MOVA LRA (antecipação / rent-advance loan)
+  product, curated in Google Sheets by Fintech Ops. One row per installment
+  with CCB identifiers, banking details, principal/interest/IOF/fee breakdown,
+  payment and settlement dates, and house/contract keys. Used to reconcile
+  MOVA disbursements and collections against QuintoAndar owner contracts.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   ccb_number:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.numero_ccb
+    description: Cédula de Crédito Bancário (CCB) number identifying the MOVA loan instrument.
   cccb_number:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.numero_cccb
+    description: Complementary CCB reference (CCCB) used by MOVA for the same loan when present.
   bank_account_number:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.conta
+    description: Owner bank account number used for MOVA disbursement or installment debit.
   bank_branch_number:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.agencia
+    description: Owner bank branch (agência) for the MOVA payment account.
   compensatory_interest:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.juros_remuneratorios
+    description: Compensatory interest (juros remuneratórios) amount in BRL on the installment.
   contract_installment_interest:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.juros_parcela_contrato
+    description: Contractual installment interest amount in BRL as priced in the MOVA loan.
   contract_main_installment_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.principal_parcela_contrato
+    description: Principal portion of the contractual installment in BRL.
   delay_interest:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.juros_mora
+    description: Late-payment (mora) interest amount in BRL accrued on overdue installments.
   dt_expiration:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.data_vencimento
+    description: Installment due date (vencimento) for the MOVA payment.
   dt_generated_contract:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.data_contrato_gerado
+    description: Date the MOVA loan contract document was generated.
   dt_payment:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.data_pagamento
+    description: Date the overall loan payment / disbursement event was recorded.
   dt_settle:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.data_liquidacao
+    description: Settlement (liquidação) date when the installment was financially cleared.
   dt_signed_contract:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.data_contrato_assinado
+    description: Date the owner signed the MOVA loan contract.
   fine_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.multa
+    description: Fine (multa) amount in BRL charged on the installment when applicable.
   installment_number:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.numero_parcela
+    description: Sequence number of this installment within the MOVA loan schedule.
   installment_status:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.status
+    description: Lifecycle status of the installment (e.g. open, paid, overdue) as tracked by MOVA Ops.
   installment_total_count:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.qtde_parcelas
+    description: Total number of installments contracted for this MOVA loan.
   installment_total_sum:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.soma_parcelas
+    description: Sum of all installment amounts in BRL for the loan schedule.
   installment_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.valor_parcela
+    description: Full installment amount in BRL due for this schedule position.
   interest_rate:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.taxa_juros
+    description: Contractual interest rate applied to the MOVA loan (as recorded in the sheet).
   interest_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.valor_juros
+    description: Interest component in BRL for this installment.
   investor_cnpj:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.cnpj_investidor
+    description: CNPJ of the MOVA investor funding the owner loan.
   main_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.valor_principal
+    description: Principal (valor principal) amount in BRL of the loan or installment.
   owner_cpf_cnpj:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.cpf_cnpj
+    description: Owner CPF or CNPJ registered as the borrower on the MOVA LRA loan.
   owner_full_name:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.nome
+    description: Full legal name of the owner borrowing through MOVA LRA.
   paid_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.valor_pago
+    description: Amount in BRL actually paid on this installment.
   gross_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.Valor_Bruto
+    description: Gross disbursement or installment value in BRL before fees and taxes.
   net_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.Valor_Liquido
+    description: Net value in BRL after MOVA fee and IOF deductions.
   iof_tax_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.IOF
+    description: IOF tax amount in BRL charged on the credit operation.
   mova_fee_value:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.Fee_MOVA
+    description: MOVA platform fee in BRL charged on the loan or installment.
   request_status:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.status_solicitacao
+    description: Status of the owner's loan / anticipation request in the MOVA workflow.
   sk_base_proposal:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.id_proposta_base
+    description: Base proposal id linking this installment to the originating MOVA credit proposal.
   sk_contract:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.contrato_id
+    description: QuintoAndar rental contract id backing the MOVA LRA owner loan.
   sk_house:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.imovel_id
+    description: House / listing id of the property collateralizing or linked to the MOVA loan.
   sk_installment:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.id_parcela
+    description: MOVA installment identifier for this payment schedule row.
   sk_product:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.produto_id
+    description: MOVA product id classifying the LRA loan variant contracted by the owner.
   id_bank:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.banco
+    description: Brazilian bank code (COMPE) of the owner's payment account.
   ts_created_at:
     lineage:
       - datalake_gsheets_raw.mova_lra_owners.created_at
+    description: Timestamp when the installment/loan row was created in the MOVA export.
+  dt_installment_payment:
+    lineage:
+      - datalake_gsheets_raw.mova_lra_owners.data_pagamento_parcela
+    description: Date the specific installment was paid (data pagamento parcela).
