@@ -1,29 +1,33 @@
 database_name: datalake_ledger_clean
 table_name: entry
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the entry table containing ledger entry details and transaction information
+description: |
+  Debit or credit line within a ledger transaction, linking a monetary amount to a named
+  account in the QuintoAndar Ledger. Each transaction contains one or more entries that
+  must balance to zero across accounts.
 columns:
   id_entry:
-    description: id column stores the unique identifier of the entry inside a transaction using integer format
+    description: Integer identifier of the entry within its parent ledger transaction.
     lineage:
       - datalake_ledger_raw.entry.id
   id_transaction:
-    description: transaction_id column stores the identifier of the transaction using UUID (V7) format
+    description: UUID (v7) of the parent ledger transaction grouping this entry with others.
     lineage:
       - datalake_ledger_raw.entry.transaction_id
   account_name:
-    description: account_name column stores the name of the account in a text format, it is a foreign key to the account table
+    description: Name of the ledger account affected by this entry; foreign key to the account table.
     lineage:
       - datalake_ledger_raw.entry.account_name
   amount:
-    description: amount column stores the amount of the entry, it is a NUMERIC(40, 10) to store large values
+    description: Monetary amount of the entry stored as NUMERIC(40,10) in the account currency.
     lineage:
       - datalake_ledger_raw.entry.amount
   type:
-    description: type column stores the type of the entry using entry_type enum
+    description: Entry direction/type enum (debit or credit) within the double-entry movement.
     lineage:
       - datalake_ledger_raw.entry.type
   metadata:
-    description: metadata column stores additional information about the entry in JSONB format
+    description: JSONB payload with additional context about the entry (source system, references, tags).
     lineage:
       - datalake_ledger_raw.entry.metadata

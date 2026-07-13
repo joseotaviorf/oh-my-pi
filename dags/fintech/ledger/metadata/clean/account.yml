@@ -1,49 +1,53 @@
 database_name: datalake_ledger_clean
 table_name: account
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the account table containing account information and balance details
+description: |
+  Ledger chart-of-accounts entry in the QuintoAndar Ledger service. Each account has a
+  hierarchical name tree, currency, optional balance tracking, and overdraft rules used
+  to record double-entry financial movements across Fintech products.
 columns:
   id_account:
-    description: id column stores the unique identifier of the account using UUID (V7) format
+    description: UUID (v7) primary key identifying the ledger account.
     lineage:
       - datalake_ledger_raw.account.id
   name:
-    description: id column stores the unique identifier of the account using UUID (V7) format
+    description: Human-readable account name in the ledger chart of accounts.
     lineage:
       - datalake_ledger_raw.account.name
   name_tree:
-    description: name_tree column stores the name of the account in ltree format, which allows the creation of a hierarchical structure. It should be used for complex searching
+    description: Account path in ltree format enabling hierarchical searches across nested ledger accounts.
     lineage:
       - datalake_ledger_raw.account.name_tree
   type:
-    description: name_tree column stores the name of the account in ltree format, which allows the creation of a hierarchical structure. It should be used for complex searching
+    description: Ledger account type enum defining whether the account is asset, liability, revenue, or expense.
     lineage:
       - datalake_ledger_raw.account.type
   currency:
-    description: currency column stores the currency of the account using currency_type enum
+    description: Currency in which the account balance is denominated (currency_type enum).
     lineage:
       - datalake_ledger_raw.account.currency
   track_balance:
-    description: track_balance column stores whether the account should track its balance or not. When false, the account will not update its balance after every new transaction. It is a performance enhancer to avoid locks on frequently used accounts that we do not need to track the balance. For internal (engineering team) use only
+    description: When true, the account balance is updated on every transaction; when false, balance updates are skipped for performance on high-volume internal accounts.
     lineage:
       - datalake_ledger_raw.account.track_balance
   balance:
-    description: balance column stores the current balance of the account, it is a NUMERIC(40, 10)
+    description: Current account balance stored as NUMERIC(40,10) when balance tracking is enabled.
     lineage:
       - datalake_ledger_raw.account.balance
   allows_overdraft:
-    description: allows_overdraft column stores whether the account allows overdraft or not, if it is true, the account can have a negative balance
+    description: When true, the account may hold a negative balance up to configured overdraft limits.
     lineage:
       - datalake_ledger_raw.account.allows_overdraft
   metadata:
-    description: metadata column stores additional information about the account in JSONB format
+    description: JSONB payload with additional account configuration and integration metadata.
     lineage:
       - datalake_ledger_raw.account.metadata
   ts_created:
-    description: column stores the date and time when the account was created
+    description: Timestamp when the ledger account was created in the Ledger service.
     lineage:
       - datalake_ledger_raw.account.created_at
   ts_updated:
-    description: column stores the date and time when the account was last updated
+    description: Timestamp of the most recent update to the ledger account record.
     lineage:
       - datalake_ledger_raw.account.updated_at

@@ -1,41 +1,44 @@
 database_name: datalake_ledger_clean
 table_name: message
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Data from the message table containing message details and publishing information
+description: |
+  Outbox messages produced by the QuintoAndar Ledger after transactions are committed,
+  queued for asynchronous publishing to downstream consumers (Kafka topics or webhooks).
 columns:
   id_message:
-    description: Unique identifier of the message
+    description: UUID primary key of the outbox message in the Ledger service.
     lineage:
       - datalake_ledger_raw.message.id
   id_incremental:
-    description: Incremental identifier of the message
+    description: Monotonic incremental identifier used to order message delivery within a partition.
     lineage:
       - datalake_ledger_raw.message.incremental_id
   destination:
-    description: Destination of the message
+    description: Target topic or endpoint where the ledger event should be published.
     lineage:
       - datalake_ledger_raw.message.destination
   headers:
-    description: Headers associated with the message
+    description: Message headers propagated to the downstream consumer (content-type, trace IDs, etc.).
     lineage:
       - datalake_ledger_raw.message.headers
   payload:
-    description: Payload content of the message
+    description: Serialized ledger event body published to the destination consumer.
     lineage:
       - datalake_ledger_raw.message.payload
   published:
-    description: Flag indicating if the message was published
+    description: Flag indicating whether the outbox relay successfully published the message.
     lineage:
       - datalake_ledger_raw.message.published
   message_partition:
-    description: Partition information for the message
+    description: Kafka partition (or shard) assigned to the message for ordered delivery.
     lineage:
       - datalake_ledger_raw.message.message_partition
   creation_time:
-    description: Creation time of the message
+    description: Epoch timestamp when the message was enqueued in the ledger outbox.
     lineage:
       - datalake_ledger_raw.message.creation_time
   ts_creation_datetime:
-    description: Creation datetime timestamp of the message
+    description: Datetime when the outbox message was created, derived from creation_time.
     lineage:
       - datalake_ledger_raw.message.creation_datetime
