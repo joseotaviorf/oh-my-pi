@@ -1,110 +1,153 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: lannister_payment_register_aud
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per lannister payment register aud in the QuintoCred rental
+  guarantee product, tracking underwriting, charges, renewals, and collections
+  for landlord protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
     id:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.id
+        description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
     rev:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.rev
+        description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
     rev_end:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.revend
+        description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
     rev_type:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.revtype
+        description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
     id_user:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.user_id
+        description: QuintoAndar user identifier associated with this financial transaction or account.
     mod_id_user:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.user_id_mod
+        description: QuintoCred rental guarantee attribute describing mod id user in the policy lifecycle.
     id_external:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.external_id
+        description: Identifier for the external referenced by this financial record.
     mod_id_external:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.external_id_mod
+        description: QuintoCred rental guarantee attribute describing mod id external in the policy lifecycle.
     id_source:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.source_id
+        description: Identifier for the source referenced by this financial record.
     mod_id_source:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.source_id_mod
+        description: QuintoCred rental guarantee attribute describing mod id source in the policy lifecycle.
     payment_type:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_type
+        description: QuintoCred rental guarantee attribute describing payment type in the policy lifecycle.
     mod_payment_type:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_type_mod
+        description: QuintoCred rental guarantee attribute describing mod payment type in the policy lifecycle.
     paid_value:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.paid_value
+        description: QuintoCred rental guarantee attribute describing paid value in the policy lifecycle.
     mod_paid_value:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.paid_value_mod
+        description: QuintoCred rental guarantee attribute describing mod paid value in the policy lifecycle.
     id_payment_request:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_request_id
+        description: Identifier for the payment request referenced by this financial record.
     mod_id_payment_request:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_request_id_mod
+        description: QuintoCred rental guarantee attribute describing mod id payment request in the policy lifecycle.
     status:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.status
+        description: Current lifecycle status of the financial entity in the upstream operational system.
     mod_status:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.status_mod
+        description: QuintoCred rental guarantee attribute describing mod status in the policy lifecycle.
     raw_request:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.raw_request
+        description: QuintoCred rental guarantee attribute describing raw request in the policy lifecycle.
     mod_raw_request:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.raw_request_mod
+        description: QuintoCred rental guarantee attribute describing mod raw request in the policy lifecycle.
     raw_response:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.raw_response
+        description: QuintoCred rental guarantee attribute describing raw response in the policy lifecycle.
     mod_raw_response:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.raw_response_mod
+        description: QuintoCred rental guarantee attribute describing mod raw response in the policy lifecycle.
     id_next_attempt:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.next_attempt_id
+        description: Identifier for the next attempt referenced by this financial record.
     mod_id_next_attempt:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.next_attempt_id_mod
+        description: QuintoCred rental guarantee attribute describing mod id next attempt in the policy lifecycle.
     id_propose:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.propose_id
+        description: Identifier for the propose referenced by this financial record.
     mod_id_propose:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.propose_id_mod
+        description: QuintoCred rental guarantee attribute describing mod id propose in the policy lifecycle.
     dt_event:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.event_date
+        description: Calendar date associated with event in the financial workflow.
     mod_dt_event:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.event_date_mod
+        description: QuintoCred rental guarantee attribute describing mod dt event in the policy lifecycle.
     dt_payment_scheduled:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_schedule_date
+        description: Calendar date associated with payment scheduled in the financial workflow.
     mod_dt_payment_scheduled:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.payment_schedule_date_mod
+        description: QuintoCred rental guarantee attribute describing mod dt payment scheduled in the policy lifecycle.
     ts_created:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.created_at
+        description: Timestamp when created occurred in the upstream fintech system.
     ts_updated:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.updated_at
+        description: Timestamp when updated occurred in the upstream fintech system.
     year:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.year
+        description: Year partition derived from the source event timestamp for incremental loading.
     month:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.month
+        description: Month partition derived from the source event timestamp for incremental loading.
     day:
         lineage:
             - datalake_rental_guarantee_platform_raw.lannister_payment_register_aud.day
+        description: Day partition derived from the source event timestamp for incremental loading.

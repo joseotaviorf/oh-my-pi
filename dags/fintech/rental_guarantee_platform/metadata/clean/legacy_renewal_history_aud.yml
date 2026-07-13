@@ -1,79 +1,112 @@
 database_name: datalake_rental_guarantee_platform_clean
 table_name: legacy_renewal_history_aud
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per legacy renewal history aud in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_renewal:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.id_renewal
+    description: Identifier for the renewal referenced by this financial record.
   id_renewal_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.id_renewal_mod
+    description: Identifier for the renewal mod referenced by this financial record.
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.id_propose
+    description: Identifier for the propose referenced by this financial record.
   id_propose_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.id_propose_mod
+    description: Identifier for the propose mod referenced by this financial record.
   previous_monthly_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.previous_monthly_amount
+    description: QuintoCred rental guarantee attribute describing previous monthly amount in the policy lifecycle.
   previous_monthly_amount_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.previous_monthly_amount_mod
+    description: QuintoCred rental guarantee attribute describing previous monthly amount mod in the policy lifecycle.
   updated_monthly_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.updated_monthly_amount
+    description: QuintoCred rental guarantee attribute describing updated monthly amount in the policy lifecycle.
   updated_monthly_amount_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.updated_monthly_amount_mod
+    description: QuintoCred rental guarantee attribute describing updated monthly amount mod in the policy lifecycle.
   rev:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.rev
+    description: QuintoCred rental guarantee attribute describing rev in the policy lifecycle.
   rev_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.rev_type
+    description: QuintoCred rental guarantee attribute describing rev type in the policy lifecycle.
   rev_end:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.rev_end
+    description: QuintoCred rental guarantee attribute describing rev end in the policy lifecycle.
   price_index:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.price_index
+    description: QuintoCred rental guarantee attribute describing price index in the policy lifecycle.
   price_index_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.price_index_mod
+    description: QuintoCred rental guarantee attribute describing price index mod in the policy lifecycle.
   price_index_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.price_index_type
+    description: QuintoCred rental guarantee attribute describing price index type in the policy lifecycle.
   price_index_type_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.price_index_type_mod
+    description: QuintoCred rental guarantee attribute describing price index type mod in the policy lifecycle.
   dt_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.dt_due
+    description: Calendar date associated with due in the financial workflow.
   dt_due_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.dt_due_mod
+    description: Calendar date associated with due mod in the financial workflow.
   ts_created_renewal:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_created_renewal
+    description: Timestamp when created renewal occurred in the upstream fintech system.
   ts_created_renewal_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_created_renewal_mod
+    description: Timestamp when created renewal mod occurred in the upstream fintech system.
   ts_updated_renewal:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_updated_renewal
+    description: Timestamp when updated renewal occurred in the upstream fintech system.
   ts_updated_renewal_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_updated_renewal_mod
+    description: Timestamp when updated renewal mod occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_created
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_created_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_created_mod
+    description: Timestamp when created mod occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_updated
+    description: Timestamp when updated occurred in the upstream fintech system.
   ts_updated_mod:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_updated_mod
+    description: Timestamp when updated mod occurred in the upstream fintech system.

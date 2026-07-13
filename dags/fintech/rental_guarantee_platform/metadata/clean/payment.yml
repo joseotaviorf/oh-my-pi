@@ -1,99 +1,137 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: payment
-owner: athos.sampayo@quintoandar.com.br
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per payment in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.propose
+    description: Identifier for the propose referenced by this financial record.
   id_subscription:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.subscription
+    description: Identifier for the subscription referenced by this financial record.
   id_order:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.order_id
+    description: Identifier for the order referenced by this financial record.
   id_charge:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.charge_id
+    description: Charge identifier for a billed amount owed by tenant, owner, or QuintoCred.
   customer:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.customer
+    description: QuintoCred rental guarantee attribute describing customer in the policy lifecycle.
   card_token:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.card_token
+    description: QuintoCred rental guarantee attribute describing card token in the policy lifecycle.
   code:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.code
+    description: QuintoCred rental guarantee attribute describing code in the policy lifecycle.
   payment_link:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.payment_link
+    description: QuintoCred rental guarantee attribute describing payment link in the policy lifecycle.
   invoice_url:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.invoice_url
+    description: QuintoCred rental guarantee attribute describing invoice url in the policy lifecycle.
   unicid:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.unicid
+    description: QuintoCred rental guarantee attribute describing unicid in the policy lifecycle.
   description:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.description
+    description: Human-readable description of the financial transaction or ledger entry.
   gateway:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.gateway
+    description: QuintoCred rental guarantee attribute describing gateway in the policy lifecycle.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   billing_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.billing_type
+    description: QuintoCred rental guarantee attribute describing billing type in the policy lifecycle.
   product_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.product_type
+    description: QuintoCred rental guarantee attribute describing product type in the policy lifecycle.
   installments:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.installments
+    description: QuintoCred rental guarantee attribute describing installments in the policy lifecycle.
   refund_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.refund_amount
+    description: QuintoCred rental guarantee attribute describing refund amount in the policy lifecycle.
   ts_refunded:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.refunded_at
+    description: Timestamp when refunded occurred in the upstream fintech system.
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.value
+    description: QuintoCred rental guarantee attribute describing value in the policy lifecycle.
   tax:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.tax
+    description: QuintoCred rental guarantee attribute describing tax in the policy lifecycle.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.active
+    description: Indicates whether active applies to this financial record.
   ts_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.due_date
+    description: Timestamp when due occurred in the upstream fintech system.
   ts_due_original:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.original_due_date
+    description: Timestamp when due original occurred in the upstream fintech system.
   ts_client_payment:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.client_payment_date
+    description: Timestamp when client payment occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.day
+    description: Day partition derived from the source event timestamp for incremental loading.

@@ -1,56 +1,61 @@
+---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: fiancavelo_proposeperson_legacy
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per fiancavelo proposeperson legacy from the Velo property
+  management and condominium billing platform, ingested for QuintoAndar
+  fintech reconciliation and accounts payable analytics.
 domain: Fintech
-owner: juliana.hocihara@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.id
-    description: Primary key of the legacy Velo record ingested from raw FiancaVelo
-      tables.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.id
+    description: Velo platform attribute describing id for condominium billing reconciliation.
   id_propose:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.propose
-    description: Foreign key referencing the legacy Velo rental guarantee proposal.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.propose
+    description: Identifier for the propose referenced by this financial record.
   id_person:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.person
-    description: Foreign key referencing the legacy Velo person participating in the
-      proposal.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.person
+    description: Identifier for the person referenced by this financial record.
   id_type:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.type
-    description: Role type code of the person linked to the legacy Velo proposal.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.type
+    description: Identifier for the type referenced by this financial record.
   is_active:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.active
-    description: Boolean flag indicating whether the legacy Velo record remains active.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.active
+    description: Indicates whether active applies to this financial record.
   id_user_insert:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.userinsert
-    description: User identifier that originally inserted the legacy Velo record.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.userupdate
-    description: User identifier that last updated the legacy Velo record.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.userupdate
+    description: Identifier for the user update referenced by this financial record.
   ts_inserted:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.dateinsert
-    description: Timestamp when the legacy Velo record was first inserted in source.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.dateinsert
+    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.dateupdate
-    description: Timestamp when the legacy Velo record was last updated in source.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.dateupdate
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.year
-    description: Column year on fiancavelo_proposeperson_legacy.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.month
-    description: Column month on fiancavelo_proposeperson_legacy.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
-    - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.day
-    description: Column day on fiancavelo_proposeperson_legacy.
-description: Legacy Velo proposal-to-person links migrated from FiancaVelo raw ingestion.
+      - datalake_rental_guarantee_platform_raw.fiancavelo_proposeperson_legacy.day
+    description: Day partition derived from the source event timestamp for incremental loading.

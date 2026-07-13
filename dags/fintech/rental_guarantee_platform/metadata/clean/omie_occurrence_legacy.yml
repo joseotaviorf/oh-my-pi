@@ -1,26 +1,41 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: omie_occurrence_legacy
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per omie occurrence legacy in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.propose
+    description: QuintoCred rental guarantee attribute describing propose in the policy lifecycle.
   document:
     lineage:
       - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.document
+    description: QuintoCred rental guarantee attribute describing document in the policy lifecycle.
   type:
     lineage:
       - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.type
+    description: QuintoCred rental guarantee attribute describing type in the policy lifecycle.
   ts_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.due_date
+    description: Timestamp when due occurred in the upstream fintech system.
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.value
+    description: QuintoCred rental guarantee attribute describing value in the policy lifecycle.
   paid_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.omie_occurrence_legacy.paid_value
+    description: QuintoCred rental guarantee attribute describing paid value in the policy lifecycle.

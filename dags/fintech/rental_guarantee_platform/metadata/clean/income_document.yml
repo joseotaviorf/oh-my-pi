@@ -1,53 +1,77 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: income_document
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per income document in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_person:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.person_id
+    description: Identifier for the person referenced by this financial record.
   uuid_document:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.documentuuid
+    description: QuintoCred rental guarantee attribute describing uuid document in the policy lifecycle.
   document_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.document_type
+    description: QuintoCred rental guarantee attribute describing document type in the policy lifecycle.
   income_nature:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.income_nature
+    description: QuintoCred rental guarantee attribute describing income nature in the policy lifecycle.
   extra_info:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.extra_info
+    description: QuintoCred rental guarantee attribute describing extra info in the policy lifecycle.
   attachment_path:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.attachment_path
+    description: QuintoCred rental guarantee attribute describing attachment path in the policy lifecycle.
   document_name:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.document_name
+    description: QuintoCred rental guarantee attribute describing document name in the policy lifecycle.
   validation_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.validation_status
+    description: QuintoCred rental guarantee attribute describing validation status in the policy lifecycle.
   status:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.status
+    description: Current lifecycle status of the financial entity in the upstream operational system.
   version:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.version
+    description: QuintoCred rental guarantee attribute describing version in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.updated_at
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.income_document.day
+    description: Day partition derived from the source event timestamp for incremental loading.

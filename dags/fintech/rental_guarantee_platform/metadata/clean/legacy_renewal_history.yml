@@ -1,37 +1,56 @@
 database_name: datalake_rental_guarantee_platform_clean
 table_name: legacy_renewal_history
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per legacy renewal history in the QuintoCred rental guarantee
+  product, tracking underwriting, charges, renewals, and collections for
+  landlord protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_renewal:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.id_renewal
+    description: Identifier for the renewal referenced by this financial record.
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.id_propose
+    description: Identifier for the propose referenced by this financial record.
   previous_monthly_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.previous_monthly_amount
+    description: QuintoCred rental guarantee attribute describing previous monthly amount in the policy lifecycle.
   updated_monthly_amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.updated_monthly_amount
+    description: QuintoCred rental guarantee attribute describing updated monthly amount in the policy lifecycle.
   price_index:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.price_index
+    description: QuintoCred rental guarantee attribute describing price index in the policy lifecycle.
   price_index_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.price_index_type
+    description: QuintoCred rental guarantee attribute describing price index type in the policy lifecycle.
   dt_due:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.dt_due
+    description: Calendar date associated with due in the financial workflow.
   ts_renewal_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.ts_renewal_created
+    description: Timestamp when renewal created occurred in the upstream fintech system.
   ts_renewal_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.ts_renewal_updated
+    description: Timestamp when renewal updated occurred in the upstream fintech system.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.ts_created
+    description: Timestamp when created occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.legacy_renewal_history.ts_updated
+    description: Timestamp when updated occurred in the upstream fintech system.
