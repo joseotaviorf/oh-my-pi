@@ -1,7 +1,7 @@
 ---
 database_name: dw_devlake
 table_name: dim_repo
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: |
   Repository dimension. Grain: one row per GitHub repository in DevLake scope.

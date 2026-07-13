@@ -1,6 +1,6 @@
 database_name: datalake_devlake_raw
 table_name: pull_request_team
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Factless bridge table associating pull requests with teams. Populated daily by the devlake-automations associate-prs-with-teams cronjob. A PR is associated with a team based on the author's team membership at ingestion time. Supports many-to-many PR-to-team relationships.
 columns:

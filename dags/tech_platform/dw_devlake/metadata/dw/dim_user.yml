@@ -1,7 +1,7 @@
 ---
 database_name: dw_devlake
 table_name: dim_user
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: |
   Person dimension sourced from DevLake users (Backstage catalog). Grain: one row per

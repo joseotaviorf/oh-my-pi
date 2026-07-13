@@ -1,7 +1,7 @@
 ---
 database_name: dw_devlake
 table_name: fact_pull_requests
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: |
   Pull request fact table. Grain: one row per pull request.
@@ -74,7 +74,7 @@ columns:
     lineage:
       - datalake_devlake_clean.pull_requests.pr_key
   pr_title:
-    description: Pull request title
+    description: Human-readable GitHub pull request title captured by DevLake for search and velocity reporting.
     lineage:
       - datalake_devlake_clean.pull_requests.pr_title
   pr_status:

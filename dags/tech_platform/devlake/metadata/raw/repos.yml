@@ -1,6 +1,6 @@
 database_name: datalake_devlake_raw
 table_name: repos
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Raw snapshot of GitHub repositories within DevLake's collection scope. Synced via GitHub App integration. Serves as the canonical repository identity for all DevLake engineering metrics.
 columns:

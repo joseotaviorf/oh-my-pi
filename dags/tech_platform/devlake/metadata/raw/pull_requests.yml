@@ -1,6 +1,6 @@
 database_name: datalake_devlake_raw
 table_name: pull_requests
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Raw snapshot of GitHub pull requests from DevLake. Includes custom enrichment columns (x_type, x_title_hash) added by the devlake-automations cronjobs.
 columns:

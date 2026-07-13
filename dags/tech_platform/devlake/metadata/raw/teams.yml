@@ -1,6 +1,6 @@
 database_name: datalake_devlake_raw
 table_name: teams
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Raw snapshot of the organizational hierarchy synced daily from Backstage by the devlake-automations sync-users-and-teams cronjob. Contains two entity types (LINE and TEAM) in a self-referential hierarchy where TEAM rows reference their parent LINE via parent_id.
 columns:

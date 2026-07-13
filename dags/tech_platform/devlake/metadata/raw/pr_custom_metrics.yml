@@ -1,6 +1,6 @@
 database_name: datalake_devlake_raw
 table_name: pr_custom_metrics
-owner: tech-platform-engprod@quintoandar.com.br
+owner: luciano.holanda@quintoandar.com.br
 domain: Tech Platform
 description: Raw snapshot of custom PR lead-time metrics computed by the devlake-automations calculate-pr-release-time cronjob. One row per merged PR. Contains release time (first commit to production) and deploy time (merge to production).
 columns:
