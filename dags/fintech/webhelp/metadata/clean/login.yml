@@ -1,37 +1,39 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: login
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Login data
+description: |
+  Webhelp collection agents and supervisors registered in the CRM, with organizational
+  hierarchy and access context (collection vs customer service operations).
 columns:
   id_login:
-    description: "User ID. PK of table"
+    description: Primary key of the Webhelp user account in the CRM.
     lineage:
       - datalake_webhelp_raw.login.cod_login
   id_person:
-    description: "Person ID"
+    description: Person identifier linking the user account to identity data in Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.login.cod_pes
   id_supervisor:
-    description: "Supervisor ID (relates to the id_user of the same table)"
+    description: User identifier of the supervisor responsible for this agent (self-referencing login table).
     lineage:
       - datalake_webhelp_raw.login.cod_superv
   user_level:
-    description: "User level"
+    description: Hierarchy level of the user in Webhelp (e.g. operator, supervisor, administrator).
     lineage:
       - datalake_webhelp_raw.login.niv_cod
   person_name:
-    description: "Person Name"
+    description: Full name of the Webhelp collection agent or supervisor.
     lineage:
       - datalake_webhelp_raw.login.nome_pes
   email:
-    description: "Email"
+    description: Email address of the Webhelp user used for CRM access and notifications (PII).
     lineage:
       - datalake_webhelp_raw.login.email
   context:
-    description: "Context (COBRANCA or ATENDIMENTO)"
+    description: Operational context of the user account (COBRANCA for collection or ATENDIMENTO for service).
     lineage:
       - datalake_webhelp_raw.login.subfolder
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

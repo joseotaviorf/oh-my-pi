@@ -1,17 +1,19 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: stages
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Stages data
+description: |
+  Collection funnel stages assigned to customer occurrence types in the Webhelp CRM.
+  Stages track how far a defaulted contract progressed in the recovery workflow.
 columns:
   id_occurrence_stage:
-    description: "Occurrence stage ID. PK of table"
+    description: Primary key of the collection stage in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.estagios.cod_est
   name_occurrence_stage:
-    description: "Name of the occurrence stage"
+    description: Human-readable name of the collection stage linked to occurrence definitions.
     lineage:
       - datalake_webhelp_raw.estagios.nom_est
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

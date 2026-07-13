@@ -1,17 +1,19 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: group_occurrences
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Group occurrences data
+description: |
+  Groups that classify collection occurrence types in the Webhelp CRM tabulation model.
+  Used to organize agent disposition codes into higher-level categories for reporting.
 columns:
   id_group_occurrence:
-    description: "Occurrence group code"
+    description: Primary key of the occurrence group in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.grupo_ocorrencias.cod_gru
   name_group_occurrence:
-    description: "Name of the occurrence group"
+    description: Human-readable label for the occurrence group in Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.grupo_ocorrencias.des_gru
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

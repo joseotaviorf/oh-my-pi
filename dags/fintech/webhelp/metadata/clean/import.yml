@@ -1,21 +1,23 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: import
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Import data
+description: |
+  Batch import jobs that loaded debtor, title, and installment files from QuintoAndar
+  into the Webhelp collection CRM via SFTP parquet drops.
 columns:
   id_import:
-    description: "Import ID"
+    description: Primary key of the import batch in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.importacao.cod_imp
   file_name:
-    description: "Import file name"
+    description: Name of the parquet file imported into Webhelp for this batch load.
     lineage:
       - datalake_webhelp_raw.importacao.nome_arq
   ts_import:
-    description: "Import date and time"
+    description: Timestamp when the import batch was processed in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.importacao.data_imp
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

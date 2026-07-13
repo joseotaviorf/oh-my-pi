@@ -1,17 +1,20 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: creditors
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Creditors data
+description: |
+  Reference catalog of creditor portfolios (companies) managed in the Webhelp collection CRM.
+  Each creditor represents a QuintoAndar business line or portfolio outsourced to Webhelp
+  for defaulting-customer recovery.
 columns:
   id_creditor:
-    description: "Creditor/portfolio/company ID. PK of table"
+    description: Primary key of the creditor portfolio in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.credores.cod_cred
   creditor_name:
-    description: "Creditor/portfolio/company name"
+    description: Display name of the creditor company or portfolio in Webhelp.
     lineage:
       - datalake_webhelp_raw.credores.nome_cred
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

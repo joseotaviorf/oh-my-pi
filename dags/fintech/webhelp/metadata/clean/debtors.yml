@@ -1,17 +1,20 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: debtors
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Debtors data
+description: |
+  Defaulting customers (debtors) registered in the Webhelp collection CRM. Each debtor
+  links a CRM customer code to a person record and may have multiple contracts under
+  active collection recovery.
 columns:
   id_debtor:
-    description: "Debtor/customer code in CRM. PK of table"
+    description: Primary key of the debtor/customer in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.devedores.cod_dev
   id_person:
-    description: "Person code"
+    description: Person identifier in Webhelp CRM linking the debtor to contact and identity data.
     lineage:
       - datalake_webhelp_raw.devedores.cod_pes
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

@@ -1,41 +1,60 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: historical_customers
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Historical Customers
+description: |
+  Agent tabulation history per debtor in the Webhelp collection CRM. Each row records
+  a collection occurrence registered by an operator, including scheduling follow-ups
+  and free-text notes about the contact attempt.
 columns:
   id_historical_customers:
-    description: "Tabulation/service code in CRM. PK of table"
+    description: Primary key of the customer history/tabulation record in Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.historicos_clientes.cod_hist_cli
-  id_contract:
-    description: "Contract code"
-    lineage:
-      - datalake_webhelp_raw.historicos_clientes.cod_tit
   id_debtor:
-    description: "CRM debtor/customer code. FK of table debtors"
+    description: Foreign key to the debtor contacted in this tabulation event.
     lineage:
       - datalake_webhelp_raw.historicos_clientes.cod_dev
   id_occurrence:
-    description: "Occurrence ID. FK of table customer_occurrences"
+    description: Foreign key to the occurrence disposition code registered by the agent.
     lineage:
       - datalake_webhelp_raw.historicos_clientes.cod_ocor
   id_login:
-    description: "Code of the user/agent who registered the occurrence"
+    description: Foreign key to the Webhelp agent who registered this tabulation.
     lineage:
       - datalake_webhelp_raw.historicos_clientes.usuario_cad
   extra_information_occurrence:
-    description: "Additional information about the occurrence"
+    description: Free-text complement added by the agent when tabulating the occurrence.
     lineage:
       - datalake_webhelp_raw.historicos_clientes.complemento_hist_cli
   ts_service:
-    description: "Date and time the tabulation/service was recorded in the CRM"
+    description: Timestamp when the agent registered the tabulation in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.historicos_clientes.data_cad
   ts_scheduling:
-    description: "Return scheduling date and time"
+    description: Scheduled callback datetime set by the agent during the contact attempt.
     lineage:
       - datalake_webhelp_raw.historicos_clientes.dt_agen_hist
+  id_title:
+    description: Foreign key to the defaulted contract (title) associated with this tabulation.
+    lineage:
+      - datalake_webhelp_raw.historicos_clientes.cod_tit
+  occurrence:
+    description: Occurrence title copied into the history record for reporting readability.
+    lineage:
+      - datalake_webhelp_raw.historicos_clientes.titulo_ocor
+  year:
+    description: Calendar year of the tabulation event; Hive partition for incremental Webhelp loads.
+    lineage:
+      - datalake_webhelp_raw.historicos_clientes.year
+  month:
+    description: Calendar month of the tabulation event; Hive partition alongside year and day.
+    lineage:
+      - datalake_webhelp_raw.historicos_clientes.month
+  day:
+    description: Calendar day of the tabulation event; Hive partition alongside year and month.
+    lineage:
+      - datalake_webhelp_raw.historicos_clientes.day
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

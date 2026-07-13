@@ -1,69 +1,84 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: operator_analysis
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Login/logout webhelp operators
+description: |
+  Daily productivity metrics for Webhelp collection agents, including login duration,
+  talk time, tabulations, agreements, and distinct contracts contacted. Used by Portfolio
+  Management to monitor outsourced recovery performance.
 columns:
   actuation_cell:
-    description: "Actuation cell (pt: célula de atuação)"
+    description: Collection actuation cell (célula de atuação) the operator belongs to.
     lineage:
       - datalake_webhelp_raw.analise_operadores.celula
   pa_hiring_type:
-    description: "PA Hiring Type (pt: Tipo de contratação da PA)"
+    description: Employment contract type of the collection agent (tipo de contratação da PA).
     lineage:
       - datalake_webhelp_raw.analise_operadores.tipo_pa
   operator_name:
-    description: "Agent/operator name (pt: nome do agente)"
+    description: Full name of the Webhelp collection agent for the reporting day.
     lineage:
       - datalake_webhelp_raw.analise_operadores.nome_operador
   max_login:
-    description: "First login to the tool (pt:Primeiro logon na ferramenta)"
+    description: Timestamp of the agent's first login to the Webhelp dialer on the reporting day.
     lineage:
       - datalake_webhelp_raw.analise_operadores.max_login
   max_logout:
-    description: "Last logon to the tool (pt: último logon na ferramenta)"
+    description: Timestamp of the agent's last logout from the Webhelp dialer on the reporting day.
     lineage:
       - datalake_webhelp_raw.analise_operadores.max_logout
   total_logged_in_time:
-    description: "Total time logged into the tool (pt: Tempo total logado na ferramenta)"
+    description: Total duration the agent remained logged into the Webhelp dialer.
     lineage:
       - datalake_webhelp_raw.analise_operadores.tempo_logado
   total_idle_time:
-    description: "Total time in IDLE state (pt: Total time in IDLE state)"
+    description: Total duration the agent spent in idle state without active calls.
     lineage:
       - datalake_webhelp_raw.analise_operadores.tempo_idle
   total_talk_time:
-    description: "Total talk time (pt: Tempo total em conversacao)"
+    description: Total duration the agent spent in live conversation with debtors.
     lineage:
       - datalake_webhelp_raw.analise_operadores.tempo_conversacao
   total_pause_time:
-    description: "Total time paused (pt: Tempo total em pausa)"
+    description: Total duration the agent spent on scheduled or unscheduled pauses.
     lineage:
       - datalake_webhelp_raw.analise_operadores.tempo_pausa
   total_tabulations:
-    description: "Number of tabulations performed by the agent (pt: Quantidade de tabulações realizadas pelo agente)"
+    description: Count of occurrence tabulations registered by the agent during the day.
     lineage:
       - datalake_webhelp_raw.analise_operadores.tabulacoes
   tma:
-    description: "Average agent service time (pt: Tempo médio atendimento do agente)"
+    description: Average handle time (tempo médio de atendimento) per contact for the agent.
     lineage:
       - datalake_webhelp_raw.analise_operadores.tma
   total_agreements:
-    description: "Number of agent agreements (pt: Quantidade de acordos do agente)"
+    description: Count of payment agreements closed by the agent on the reporting day.
     lineage:
       - datalake_webhelp_raw.analise_operadores.acordos
   total_transfers:
-    description: "Number of transfers made by the agent (pt: Quantidade de tranferências realizadas pelo agente)"
+    description: Count of calls transferred by the agent to another queue or supervisor.
     lineage:
       - datalake_webhelp_raw.analise_operadores.transferencias
   distinct_contracts_contacted:
-    description: "Number of different contracts contacted by the agent (pt: Quantidade de contratos distintos acionados pelo agente)"
+    description: Count of unique contracts the agent contacted during the reporting day.
     lineage:
       - datalake_webhelp_raw.analise_operadores.clientes_distintos_acionados
   dt_operation:
-    description: ""
+    description: Calendar date of the operator productivity report in Webhelp.
     lineage:
       - datalake_webhelp_raw.analise_operadores.data
+  year:
+    description: Calendar year of the report date; Hive partition for incremental Webhelp loads.
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.year
+  month:
+    description: Calendar month of the report date; Hive partition alongside year and day.
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.month
+  day:
+    description: Calendar day of the report date; Hive partition alongside year and month.
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.day
   ts_load:
-    description: "Timestamp when table was updated"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

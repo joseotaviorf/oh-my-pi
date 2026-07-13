@@ -1,21 +1,56 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: customer_occurrences
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Customer occurrences data
+description: |
+  Collection occurrence definitions in the Webhelp CRM, including stage and contact-outcome
+  flags used when agents tabulate calls. Each row describes a disposition code agents
+  can register during defaulting-customer recovery.
 columns:
   id_occurrence:
-    description: "Occurrence ID"
+    description: Primary key of the collection occurrence type in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.ocorrencias_clientes.cod_ocor
   id_group_occurrence:
-    description: "Occurrence group ID. FK of table group_occurrences"
+    description: Foreign key to the occurrence group that classifies this disposition code.
     lineage:
       - datalake_webhelp_raw.ocorrencias_clientes.cod_gru
   occurrence_name:
-    description: "Occurrence name"
+    description: Display title of the collection occurrence shown during agent tabulation.
     lineage:
       - datalake_webhelp_raw.ocorrencias_clientes.titulo_ocor
+  stage:
+    description: Collection funnel stage code associated with this occurrence type.
+    lineage:
+      - datalake_webhelp_raw.ocorrencias_clientes.estagio
+  alo:
+    description: Flag or category indicating a live contact attempt ('alô') for this occurrence.
+    lineage:
+      - datalake_webhelp_raw.ocorrencias_clientes.alo
+  cpc:
+    description: Flag or category for Right Party Contact (Contato com Pessoa Certa) outcome.
+    lineage:
+      - datalake_webhelp_raw.ocorrencias_clientes.cpc
+  cpca:
+    description: Flag or category for contact with the authorized account holder person.
+    lineage:
+      - datalake_webhelp_raw.ocorrencias_clientes.cpca
+  promessa:
+    description: Flag or category indicating a payment promise disposition type.
+    lineage:
+      - datalake_webhelp_raw.ocorrencias_clientes.promessa
+  year:
+    description: Calendar year of the occurrence snapshot; Hive partition for incremental Webhelp loads.
+    lineage:
+      - datalake_webhelp_raw.ocorrencias_clientes.year
+  month:
+    description: Calendar month of the occurrence snapshot; Hive partition alongside year and day.
+    lineage:
+      - datalake_webhelp_raw.ocorrencias_clientes.month
+  day:
+    description: Calendar day of the occurrence snapshot; Hive partition alongside year and month.
+    lineage:
+      - datalake_webhelp_raw.ocorrencias_clientes.day
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.

@@ -1,41 +1,43 @@
 ---
 database_name: datalake_webhelp_clean
 table_name: titles
-owner: bianca.martins@quintoandar.com.br
+owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
-description: Title data
+description: |
+  Defaulted contracts (titles) placed with Webhelp for collection recovery. Each title
+  links a QuintoAndar contract to a debtor, creditor portfolio, and contract type.
 columns:
   id_title:
-    description: "Contract code. PK of table"
+    description: Primary key of the contract (title) in the Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.titulos.cod_tit
   id_contract_type:
-    description: "Contract type ID. FK of table contract_type"
+    description: Foreign key to the contract type dimension in Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.titulos.cod_tipc
   id_creditor:
-    description: "Creditor/portfolio/company ID. FK of table creditors"
+    description: Foreign key to the creditor portfolio responsible for this contract.
     lineage:
       - datalake_webhelp_raw.titulos.cod_cred
   contract_number:
-    description: "Contract number"
+    description: QuintoAndar contract number under collection in Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.titulos.contrato_tit
   complement:
-    description: "Contract complement"
+    description: Additional contract identifier or suffix complementing the main contract number.
     lineage:
       - datalake_webhelp_raw.titulos.compl_contrato_tit
   id_debtor:
-    description: "Debtor/customer ID in CRM"
+    description: Foreign key to the debtor (customer) associated with this contract.
     lineage:
       - datalake_webhelp_raw.titulos.cod_dev
   ts_inclusion:
-    description: "Date and time of inclusion of the contract in the CRM"
+    description: Timestamp when the contract was included in the Webhelp collection portfolio.
     lineage:
       - datalake_webhelp_raw.titulos.dt_bord_tit
   ts_expiration:
-    description: "Contract expiration date and time in CRM"
+    description: Expiration timestamp of the contract assignment in Webhelp CRM.
     lineage:
       - datalake_webhelp_raw.titulos.dt_expir_tit
   ts_load:
-    description: "Timestamp when data was loaded"
+    description: Timestamp when this row was loaded into the clean Webhelp layer.
