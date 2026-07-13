@@ -1,63 +1,74 @@
 database_name: datalake_legaut_clean
 table_name: meusite_operation
+description: For Sale transaction/operation record tracking a property purchase from initial registration through documentation, purchase-and-sale agreement (CCV), deed, and property registration, including financing terms, property attributes, and legal encumbrances. One row per operation, linked to the client project it was created under (id_project) and, when applicable, to the underlying Sales Flow / EBDB offer (id_offer, id_sales_flow) from the broader FS Transact funnel (see business_entities/fs-transact.md).
 domain: For Sale
 columns:
   id:
     lineage:
     - datalake_legaut_raw.meusite_operation.id
-    description: Surrogate primary key of the meusite operation row in the source system.
+    description: Surrogate primary key uniquely identifying the operation. Referenced by datalake_legaut_clean.meusite_unit and datalake_legaut_clean.meusite_document.
   id_project:
     lineage:
     - datalake_legaut_raw.meusite_operation.project_id
-    description: Foreign key to the project in datalake_legaut_clean.meusite_project this operation belongs to.
+    description: Legalization project this operation belongs to. Foreign key to datalake_legaut_clean.meusite_project.
   id_google_docs_ccv:
     lineage:
     - datalake_legaut_raw.meusite_operation.google_docs_ccv_id
-    description: Foreign key to the Google Docs file holding the purchase-and-sale contract (CCV) for this operation.
+    description: Identifier of the Google Docs file holding the purchase-and-sale contract (CCV) drafted for this operation.
   id_notary:
     lineage:
     - datalake_legaut_raw.meusite_operation.notary_id
-    description: Foreign key to the notary office in datalake_legaut_clean.meusite_notary handling this operation.
+    description: Notary office (cartorio) handling this operation's registration/deed. Foreign key to datalake_legaut_clean.meusite_notary.
   id_place:
     lineage:
     - datalake_legaut_raw.meusite_operation.place_id
-    description: Foreign key to the place record describing the property location for this operation.
+    description: Google Places identifier of the property location for this operation, used to derive formatted_address, geometry, and address_components.
   id_created_by:
     lineage:
     - datalake_legaut_raw.meusite_operation.created_by_id
-    description: Foreign key to the user who created this operation.
+    description: Internal Legaut user who created this operation record.
   id_house:
     lineage:
     - datalake_legaut_raw.meusite_operation.house_id
-    description: Foreign key to the property listing involved in the visit or transaction.
+    description: External identifier of the property listing this operation transacts, cross-referencing the House and Listing domain (dim_house_listing); not a database-enforced foreign key within Legaut.
   id_offer:
     lineage:
     - datalake_legaut_raw.meusite_operation.offer_id
-    description: Natural key of the For Sale offer in Sales Flow or EBDB services.
+    description: External identifier of the For Sale offer in Sales Flow / EBDB that originated this operation, linking it back to the OS-to-CCV stages of the FS Transact funnel (see business_entities/fs-transact.md); not a database-enforced foreign key within Legaut.
   id_sales_flow:
     lineage:
     - datalake_legaut_raw.meusite_operation.salesflow_id
-    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
+    description: External identifier of the parent Sales Flow transaction in the End-of-Funnel domain that this operation supports with legal due diligence; not a database-enforced foreign key within Legaut.
   id_financing_type:
     lineage:
     - datalake_legaut_raw.meusite_operation.financing_type
-    description: Coded financing type chosen for this operation (e.g. cash, bank financing, FGTS).
+    description: How the buyer is financing the purchase, relevant for which documents (e.g. bank financing letters) legal due diligence must collect.
+    categories:
+      "0": "Banco - bank/mortgage financing; the buyer is financing the purchase through a bank."
+      "1": "Vendedor - seller financing; the seller is financing the purchase directly."
   id_status:
     lineage:
     - datalake_legaut_raw.meusite_operation.status
-    description: Coded status identifier of this operation in the diligence workflow.
+    description: Current stage of the operation within the property purchase lifecycle, from initial registration through concluded.
+    categories:
+      "0": "Cadastro - operation has just been registered."
+      "1": "Documentacao - required documents are being collected."
+      "2": "CCV - purchase-and-sale agreement (contrato de compra e venda) stage."
+      "3": "Escritura - property deed being prepared."
+      "4": "Registro do imovel - property registration at the notary office."
+      "5": "Concluido - operation finished."
   name:
     lineage:
     - datalake_legaut_raw.meusite_operation.name
-    description: Display name identifying this diligence operation.
+    description: Display name identifying this operation.
   financing_bank:
     lineage:
     - datalake_legaut_raw.meusite_operation.financing_bank
-    description: Bank providing the mortgage financing for this operation.
+    description: Bank providing the mortgage financing for this operation, when is_financed is true.
   formatted_address:
     lineage:
     - datalake_legaut_raw.meusite_operation.formatted_address
-    description: Full formatted street address of the property in this operation.
+    description: Full formatted street address of the property in this operation, as returned by the geocoding service for id_place.
   cep:
     lineage:
     - datalake_legaut_raw.meusite_operation.cep
@@ -65,7 +76,7 @@ columns:
   disposal_bank:
     lineage:
     - datalake_legaut_raw.meusite_operation.banco_alienacao
-    description: Bank holding the fiduciary alienation (alienacao) on the property.
+    description: Bank holding the fiduciary alienation (alienacao fiduciaria) on the property - i.e. the lender that retains legal ownership as collateral until an existing loan on the property is paid off. Related to has_fiduciary_alienation and disposal_amount.
   payment_obs:
     lineage:
     - datalake_legaut_raw.meusite_operation.payment_obs
@@ -73,39 +84,39 @@ columns:
   geometry:
     lineage:
     - datalake_legaut_raw.meusite_operation.geometry
-    description: Geographic coordinates of the property location.
+    description: Geographic coordinates of the property location, derived from id_place.
   address_components:
     lineage:
     - datalake_legaut_raw.meusite_operation.address_components
-    description: Structured address components parsed from the property address.
+    description: Structured address components (street, number, neighborhood, city, state, postal code) parsed from the property address.
   fgts_amount:
     lineage:
     - datalake_legaut_raw.meusite_operation.fgts_amount
-    description: Amount of FGTS funds applied toward the purchase.
+    description: Amount, in BRL, of FGTS (Brazilian severance-indemnity fund) funds applied toward the purchase, when is_fgts is true.
   signal_down_payment:
     lineage:
     - datalake_legaut_raw.meusite_operation.signal_down_payment
-    description: Initial signal (sinal) amount paid to reserve the purchase.
+    description: Initial signal (sinal) amount, in BRL, paid by the buyer to reserve the purchase before the full agreement is signed.
   down_payment:
     lineage:
     - datalake_legaut_raw.meusite_operation.down_payment
-    description: Down payment amount paid by the buyer.
+    description: Down payment amount, in BRL, paid by the buyer at signing, separate from any financed amount.
   financing_amount:
     lineage:
     - datalake_legaut_raw.meusite_operation.financing_amount
-    description: Amount financed through a mortgage loan.
+    description: Amount, in BRL, financed through a mortgage loan for this operation.
   total_amount:
     lineage:
     - datalake_legaut_raw.meusite_operation.total_amount
-    description: Total transaction amount for this property operation.
+    description: Total transaction amount, in BRL, agreed for this property operation.
   disposal_amount:
     lineage:
     - datalake_legaut_raw.meusite_operation.valor_alienacao
-    description: Outstanding amount of the fiduciary alienation (alienacao) on the property.
+    description: Outstanding amount, in BRL, of the fiduciary alienation (alienacao fiduciaria) encumbering the property, i.e. the balance still owed to disposal_bank.
   bathrooms:
     lineage:
     - datalake_legaut_raw.meusite_operation.num_banheiros_sem_emp
-    description: Number of bathrooms in the property, excluding maid bathrooms.
+    description: Number of bathrooms in the property, excluding any maid's bathroom (see has_maid_bathroom).
   bedrooms:
     lineage:
     - datalake_legaut_raw.meusite_operation.num_quartos
@@ -113,7 +124,7 @@ columns:
   parking_slots_deed:
     lineage:
     - datalake_legaut_raw.meusite_operation.num_vagas_garagem_escritura
-    description: Number of parking spaces registered on the property deed.
+    description: Number of parking spaces registered on the property deed (escritura), which may differ from the number of spaces actually in use.
   floor:
     lineage:
     - datalake_legaut_raw.meusite_operation.pos_pavimento
@@ -125,58 +136,57 @@ columns:
   is_disabled:
     lineage:
     - datalake_legaut_raw.meusite_operation.disable
-    description: Boolean flag indicating whether disabled applies to this record.
+    description: Flag indicating the operation has been disabled/deactivated and excluded from active legal-analysis workflows.
   is_favorite:
     lineage:
     - datalake_legaut_raw.meusite_operation.favorite
-    description: Boolean flag indicating whether favorite applies to this record.
+    description: Flag indicating an analyst marked this operation as a favorite for quick access in the Legaut UI.
   is_closing:
     lineage:
     - datalake_legaut_raw.meusite_operation.is_closing
-    description: Boolean flag indicating whether closing applies to this record.
+    description: Flag indicating this operation is being tracked through the closing (fechamento) stage of the sale transaction.
   is_fgts:
     lineage:
     - datalake_legaut_raw.meusite_operation.fgts
-    description: Boolean flag indicating whether fgts applies to this record.
+    description: Flag indicating the buyer is using FGTS (Brazilian severance-indemnity fund) funds toward the purchase; when true, fgts_amount records the amount.
   is_financed:
     lineage:
     - datalake_legaut_raw.meusite_operation.financing
-    description: Boolean flag indicating whether financed applies to this record.
+    description: Flag indicating the purchase is being financed through a mortgage loan; when true, financing_amount, financing_bank, and id_financing_type describe the financing.
   has_leasure_area:
     lineage:
     - datalake_legaut_raw.meusite_operation.area_lazer
-    description: Boolean flag indicating whether leasure area applies to this record.
+    description: Flag indicating the property/building includes a leisure or common area (area de lazer).
   has_maid_bathroom:
     lineage:
     - datalake_legaut_raw.meusite_operation.banheiro_emp
-    description: Boolean flag indicating whether maid bathroom applies to this record.
+    description: Flag indicating the property includes a maid's bathroom (banheiro de empregada), tracked separately from the main bathroom count.
   has_elevator:
     lineage:
     - datalake_legaut_raw.meusite_operation.elevador
-    description: Boolean flag indicating whether elevator applies to this record.
+    description: Flag indicating the building has an elevator.
   is_foreiro:
     lineage:
     - datalake_legaut_raw.meusite_operation.imovel_foreiro
-    description: Boolean flag indicating whether foreiro applies to this record.
+    description: Flag indicating the property is subject to ground rent/leasehold (foreiro/enfiteuse), meaning the owner does not hold full title to the underlying land - a legal caveat that due diligence must flag.
   has_maid_bedroom:
     lineage:
     - datalake_legaut_raw.meusite_operation.quarto_emp
-    description: Boolean flag indicating whether maid bedroom applies to this record.
+    description: Flag indicating the property includes a maid's bedroom (quarto de empregada).
   has_balcony:
     lineage:
     - datalake_legaut_raw.meusite_operation.varanda
-    description: Boolean flag indicating whether balcony applies to this record.
+    description: Indicator recorded for the property's balcony (varanda); stored as a numeric field in the source system though commonly used as a presence flag.
   has_fiduciary_alienation:
     lineage:
     - datalake_legaut_raw.meusite_operation.alienacao_fiduciaria
-    description: Boolean flag indicating whether fiduciary alienation applies to this record.
+    description: Flag indicating the property is encumbered by fiduciary alienation (alienacao fiduciaria) - a lender-held guarantee from an existing loan that must be settled or transferred as part of the sale. See disposal_bank and disposal_amount for the encumbrance details.
   is_credit_approved:
     lineage:
     - datalake_legaut_raw.meusite_operation.credit_approved
-    description: Boolean flag indicating whether credit approved applies to this record.
+    description: Flag indicating the buyer's credit/financing application has been approved.
   ts_created:
     lineage:
     - datalake_legaut_raw.meusite_operation.created_at
     description: Timestamp when the row was first created in the source operational system.
 owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of meusite operation sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite operation record with standardized names and types in datalake_legaut_clean.

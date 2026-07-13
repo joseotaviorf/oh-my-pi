@@ -1,35 +1,37 @@
 database_name: datalake_legaut_clean
 table_name: crawlers_crawler
+description: Execution record of a single automated document-crawler run performed for a property, owner, or company under legal due diligence (e.g. fetching a tax certificate or registry document from an external government/notary source). One row per crawler execution attempt, tracking its lifecycle status, retries, and the resulting document.
 domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   id:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.id
-    description: Surrogate primary key of the crawlers crawler row in the source system.
+    description: Surrogate primary key uniquely identifying a crawler execution.
   id_crawler:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.crawler_id
-    description: Self-referencing foreign key to the parent crawler in datalake_legaut_clean.crawlers_crawler.
+    description: Parent crawler execution that triggered this run (e.g. a manual retry launched from a prior failed attempt). Self-referencing foreign key to datalake_legaut_clean.crawlers_crawler.
   id_crawler_group:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.crawlergroup_id
-    description: Foreign key to the crawler group in datalake_legaut_clean.crawlers_crawlergroup that this crawler run belongs to.
+    description: Crawler group (participant being investigated - property, owner, company, etc.) that this run belongs to. Foreign key to datalake_legaut_clean.crawlers_crawlergroup.
   id_unit:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.unit_id
-    description: Foreign key to the property unit under legal diligence for this crawler run.
+    description: Property unit under legal due diligence for which this crawler is fetching documents. Foreign key to datalake_legaut_clean.meusite_unit.
   id_document:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.document_id
-    description: Foreign key to the document type registry for closing paperwork.
+    description: Document produced by this crawler run once it completes (e.g. the certificate or registry result that was fetched and stored). Foreign key to datalake_legaut_clean.meusite_document; null while the run is still pending or failed.
   error_code:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.error_code
-    description: Error code returned when the crawler run failed to fetch a document.
+    description: Error code returned when the crawler run failed to fetch a document from its source. Codes are documented in the team's internal crawler error-code reference (external to this table).
   manual_reason:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.manual_reason
-    description: Reason recorded when the crawler run required manual intervention by an analyst.
+    description: Reason recorded when the document had to be submitted manually by an analyst instead of being fetched automatically (see `status` values 3 and 4).
   storages_path:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.storages_path
@@ -37,19 +39,27 @@ columns:
   status:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.status
-    description: Current operational status code governing workflow progression for this record.
+    description: Current stage of the crawler execution lifecycle, from running through completion, manual submission, or failure.
+    categories:
+      "0": "Failed - the crawler could not fetch the document from its source."
+      "1": "Running - the crawler is currently executing."
+      "2": "Completed - the crawler finished and returned a result."
+      "3": "Manual - the document was submitted manually by an analyst instead of by the crawler."
+      "4": "Manual by other crawler - the document was submitted manually via a different crawler run."
+      "5": "Waiting for info - the crawler is waiting on additional information before it can proceed."
+      "6": "Killed - the crawler execution was forcibly terminated."
   rerun_tries:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.rerun_tries
-    description: Number of times the crawler run was retried after a failure.
+    description: Number of times this crawler run was retried after a failure.
   type:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.type
-    description: Classifier distinguishing record subtype or participant role in the workflow.
+    description: Crawler type executed in this run (e.g. IPTU, CND, matrícula lookup), which determines the external source queried and the input keys required. Foreign key to datalake_legaut_clean.crawlers_crawlertype.value.
   result:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.result
-    description: Payload or outcome data produced by the crawler run.
+    description: Payload or outcome data produced by the crawler run (JSON structure with the fetched value, an optional label/flag classifying it, and an analyst observation field).
   ts_run_start:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.run_start
@@ -57,10 +67,8 @@ columns:
   ts_run_deleted:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.deleted
-    description: Timestamp when the crawler run was soft-deleted.
+    description: Timestamp when the crawler run was soft-deleted (the source system uses soft-delete rather than removing rows outright).
   ts_run_end:
     lineage:
     - datalake_legaut_raw.crawlers_crawler.run_end
     description: Timestamp when the crawler run finished executing.
-owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of crawlers crawler sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per crawlers crawler record with standardized names and types in datalake_legaut_clean.

@@ -1,87 +1,107 @@
 database_name: datalake_legaut_clean
 table_name: meusite_unit
+description: Property unit undergoing legal due diligence for a For Sale transaction on Legaut. One row per unit, tracking its registration-certificate (matricula) analysis lifecycle, due-diligence report generation status, and links to the related project, operation, and notary office.
 domain: For Sale
 columns:
   id:
     lineage:
     - datalake_legaut_raw.meusite_unit.id
-    description: Surrogate primary key of the meusite unit row in the source system.
+    description: Surrogate primary key uniquely identifying the unit. Referenced by datalake_legaut_clean.crawlers_crawler, crawlers_crawlergroup, meusite_document, and meusite_analysisqueue.
   id_project:
     lineage:
     - datalake_legaut_raw.meusite_unit.project_id
-    description: Foreign key to the legalization project this unit belongs to, in datalake_legaut_clean.meusite_project.
+    description: Legalization project this unit belongs to. Foreign key to datalake_legaut_clean.meusite_project.
   id_notary:
     lineage:
     - datalake_legaut_raw.meusite_unit.notary_id
-    description: Foreign key to the notary office handling this unit, in datalake_legaut_clean.meusite_notary.
+    description: Notary office handling this unit's registration. Foreign key to datalake_legaut_clean.meusite_notary.
   id_matricula:
     lineage:
     - datalake_legaut_raw.meusite_unit.matricula_id
-    description: Foreign key to the property registration record (matricula de imovel) tied to this unit.
+    description: Identifier of the property registration record (matricula de imovel) tied to this unit.
   id_place:
     lineage:
     - datalake_legaut_raw.meusite_unit.place_id
-    description: Foreign key to the geographic place (Google Places identifier) located for this unit address.
+    description: Google Places identifier located for this unit's address, used to derive formatted_address, geometry, and address_components.
   id_operation:
     lineage:
     - datalake_legaut_raw.meusite_unit.operation_id
-    description: Foreign key to the legal operation processing this unit, in datalake_legaut_clean.meusite_operation.
+    description: For Sale operation this unit is part of. Foreign key to datalake_legaut_clean.meusite_operation.
   id_google_docs:
     lineage:
     - datalake_legaut_raw.meusite_unit.google_docs_id
-    description: Identifier of the Google Docs file holding this unit due diligence report.
+    description: Identifier of the Google Docs file holding this unit's due-diligence report.
   id_google_drive_folder:
     lineage:
     - datalake_legaut_raw.meusite_unit.google_drive_folder_id
-    description: Identifier of the Google Drive folder storing this unit documents and attachments.
+    description: Identifier of the Google Drive folder storing this unit's documents and attachments.
   id_google_spreedsheets:
     lineage:
     - datalake_legaut_raw.meusite_unit.google_spreedsheets_id
-    description: Identifier of the Google Sheets spreadsheet tracking this unit data (source spelling kept).
+    description: Identifier of the Google Sheets spreadsheet tracking this unit's data (source spelling kept).
   id_google_docs_backup:
     lineage:
     - datalake_legaut_raw.meusite_unit.google_docs_id_backup
-    description: Identifier of the backup Google Docs file copy of this unit full report.
+    description: Identifier of the backup Google Docs file copy of this unit's full report.
   id_google_docs_backup_partial:
     lineage:
     - datalake_legaut_raw.meusite_unit.google_docs_id_backup_partial
-    description: Identifier of the backup Google Docs file copy of this unit partial report.
+    description: Identifier of the backup Google Docs file copy of this unit's partial report.
   id_google_docs_partial:
     lineage:
     - datalake_legaut_raw.meusite_unit.google_docs_id_partial
-    description: Identifier of the Google Docs file holding this unit partial due diligence report.
+    description: Identifier of the Google Docs file holding this unit's partial due-diligence report.
   favorite:
     lineage:
     - datalake_legaut_raw.meusite_unit.favorite
-    description: Flag indicating whether the unit was marked as a favorite by an operator.
+    description: Flag indicating an analyst marked this unit as a favorite for quick access.
   disable:
     lineage:
     - datalake_legaut_raw.meusite_unit.disable
-    description: Flag indicating whether the unit has been disabled and excluded from active processing.
+    description: Flag indicating the unit has been disabled and excluded from active processing.
   report_status:
     lineage:
     - datalake_legaut_raw.meusite_unit.report_status
-    description: Current processing status of the unit due diligence report.
+    description: Stage of the unit's registration-certificate (matricula) review and reporting workflow, which drives which action is expected next from the analyst or client.
+    categories:
+      "0": "no_matricula - unit has no registration certificate yet; the client must acquire and upload it."
+      "1": "matricula_to_analysis - registration certificate available for analysis; an analyst must analyze it."
+      "2": "matricula_analyzed - registration certificate analyzed; an analyst must review it."
+      "3": "matricula_revised - registration certificate revised; an analyst must trigger the crawlers."
+      "4": "crawlers_requested - crawlers have been triggered; an analyst must review the resulting report."
+      "5": "partially_available - partially available; the analyst must collect the remaining missing certificates."
+      "6": "unit_available_to_client - fully available to the client."
+      "7": "canceled - cancelled by the client."
   type:
     lineage:
     - datalake_legaut_raw.meusite_unit.type
-    description: Classifier distinguishing record subtype or participant role in the workflow.
+    description: Kind of analysis performed on this unit.
+    categories:
+      "0": "rent - For Rent analysis (Locacao)."
+      "1": "complete - complete analysis (Completa)."
+      "2": "matricula - registration-certificate-only analysis (Matricula)."
+      "3": "closing - closing analysis (Closing)."
   approved:
     lineage:
     - datalake_legaut_raw.meusite_unit.approved
-    description: Flag indicating whether the unit legal analysis was approved.
+    description: Flag indicating the unit's legal due-diligence analysis has been approved.
   queue:
     lineage:
     - datalake_legaut_raw.meusite_unit.queue
-    description: Work queue the unit is assigned to within the legalization workflow.
+    description: Flag indicating whether this unit is currently queued for analyst processing (a boolean marker, not a queue name or identifier).
   report_google_docs_status:
     lineage:
     - datalake_legaut_raw.meusite_unit.report_google_docs_status
-    description: Generation status of the unit report Google Docs file (e.g. pending, generated, failed).
+    description: Generation status of the unit's report Google Docs file.
+    categories:
+      "0": "not_requested - report document generation has not been requested yet."
+      "1": "running - report document generation is in progress."
+      "2": "with_problem - report document generation failed."
+      "3": "finished - report document generation completed successfully."
   complement:
     lineage:
     - datalake_legaut_raw.meusite_unit.complement
-    description: Address complement of the unit, such as apartment, block or suite number.
+    description: Address complement of the unit, such as apartment, block, or suite number.
   formatted_address:
     lineage:
     - datalake_legaut_raw.meusite_unit.formatted_address
@@ -93,7 +113,7 @@ columns:
   name:
     lineage:
     - datalake_legaut_raw.meusite_unit.name
-    description: Human-readable display name associated with the person or entity in this row.
+    description: Human-readable display name of the unit.
   obs:
     lineage:
     - datalake_legaut_raw.meusite_unit.obs
@@ -101,19 +121,19 @@ columns:
   address_components:
     lineage:
     - datalake_legaut_raw.meusite_unit.address_components
-    description: Structured breakdown of the unit address into components (street, number, city, state, postal code).
+    description: Structured breakdown of the unit's address into components (street, number, city, state, postal code).
   notary_office:
     lineage:
     - datalake_legaut_raw.meusite_unit.notary_office
-    description: Name or label of the notary office (cartorio) responsible for the unit registration.
+    description: Name or label of the notary office (cartorio) responsible for the unit's registration, kept as free text alongside the structured id_notary foreign key.
   folders:
     lineage:
     - datalake_legaut_raw.meusite_unit.folders
-    description: References to the document folders associated with the unit legalization process.
+    description: References (JSON) to the Google Drive document folders associated with the unit's legalization process (properties, owners, companies, partners).
   slug:
     lineage:
     - datalake_legaut_raw.meusite_unit.slug
-    description: URL-friendly identifier used to reference the unit page in the meusite application.
+    description: URL-friendly unique identifier used to reference the unit's page in the Legaut application.
   contributor:
     lineage:
     - datalake_legaut_raw.meusite_unit.contributor
@@ -121,10 +141,9 @@ columns:
   ts_delivered:
     lineage:
     - datalake_legaut_raw.meusite_unit.delivered_at
-    description: Timestamp when the unit due diligence report was delivered to the client.
+    description: Timestamp when the unit's due-diligence report was delivered to the client.
   ts_created:
     lineage:
     - datalake_legaut_raw.meusite_unit.created_at
     description: Timestamp when the row was first created in the source operational system.
 owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of meusite unit sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite unit record with standardized names and types in datalake_legaut_clean.

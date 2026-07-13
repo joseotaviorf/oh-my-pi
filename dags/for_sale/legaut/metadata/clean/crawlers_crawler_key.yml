@@ -2,31 +2,54 @@ database_name: datalake_legaut_clean
 table_name: crawlers_crawler_key
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: Table with the keys used by the crawlers
+description: Input key/value used to parameterize an automated document-crawler execution on Legaut (e.g. a CPF, address, or date required to query an external registry). One row per key supplied to a crawler run, a crawler group, or a suggestion group.
 columns:
   id:
-    description: Surrogate primary key of the crawlers crawler key row in the source system.
+    description: Surrogate primary key uniquely identifying a crawler key entry.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.id
   id_crawler:
-    description: Foreign key to the crawler in datalake_legaut_clean.crawlers_crawler that uses this key.
+    description: Crawler execution that consumes this key as an input parameter. Foreign key to datalake_legaut_clean.crawlers_crawler.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.crawler_id
   id_crawler_group:
-    description: Foreign key to the crawler group in datalake_legaut_clean.crawlers_crawlergroup associated with this key.
+    description: Crawler group this key was provided for (shared across all crawlers in the group). Foreign key to datalake_legaut_clean.crawlers_crawlergroup.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.crawlergroup_id
   id_suggestion_group:
-    description: Foreign key to the suggestion group that proposed this crawler key value.
+    description: Suggestion group that proposed this key value as a candidate before it was confirmed (part of the analyst-suggestion workflow, not covered by another table in this DAG).
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.suggestiongroup_id
   value:
-    description: Value of the crawler key used to query or authenticate the document source.
+    description: Value of the crawler key used to query or authenticate against the external document source (e.g. the actual CPF, CNPJ, or address string).
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.value
   type:
-    description: Type classifier of the crawler key, indicating which key kind it represents.
+    description: Business meaning of the key value, i.e. which kind of input this row provides to the crawler (identity document, address component, date, etc.). See datalake_legaut_clean.crawlers_crawler_key_type for the same catalog surfaced as its own reference table.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkey.type
+    categories:
+      "0": "numero_contribuinte - Taxpayer registration number used to query municipal tax records."
+      "1": "date - Generic date value."
+      "2": "year - Year value."
+      "3": "cpf - Brazilian individual taxpayer number."
+      "4": "cnpj - Brazilian company taxpayer number."
+      "5": "rg - Brazilian identity document number."
+      "6": "rne - Foreign national identity document number."
+      "7": "gender - Gender of the individual, used to disambiguate document search."
+      "8": "name - Full name."
+      "9": "razao_social - Registered company legal name."
+      "10": "email - Email address."
+      "11": "name_mother - Mother's full name, used for identity verification."
+      "12": "birthday - Date of birth."
+      "13": "address - Street address."
+      "14": "zip_code - Postal code (CEP)."
+      "15": "neighborhood - Neighborhood name."
+      "16": "city - City name."
+      "17": "uf - Brazilian state abbreviation."
+      "18": "inscricao_estadual - State tax registration number."
+      "19": "complement - Address complement."
+      "20": "number - Street number."
+      "21": "owner - Reference to the property owner."
   ts_load:
-    description: Timestamp when the data was loaded
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

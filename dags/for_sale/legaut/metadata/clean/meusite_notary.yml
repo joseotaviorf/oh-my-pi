@@ -1,18 +1,18 @@
 database_name: datalake_legaut_clean
 table_name: meusite_notary
+description: Reference table of notary offices (cartorios) handling property registration and closing transactions for units under legal due diligence on Legaut. One row per notary office.
 domain: For Sale
 columns:
   id:
     lineage:
     - datalake_legaut_raw.meusite_notary.id
-    description: Surrogate primary key of the meusite notary row in the source system.
+    description: Surrogate primary key uniquely identifying the notary office. Referenced by datalake_legaut_clean.meusite_unit and datalake_legaut_clean.meusite_operation.
   id_city:
     lineage:
     - datalake_legaut_raw.meusite_notary.city_id
-    description: Foreign key to the city in datalake_legaut_clean.meusite_city where this notary office is located.
+    description: City where this notary office is located. Foreign key to datalake_legaut_clean.meusite_city.
   name:
     lineage:
     - datalake_legaut_raw.meusite_notary.name
-    description: Name of the notary office (cartorio) handling the transaction.
+    description: Name of the notary office (cartorio) handling the property registration or transaction.
 owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of meusite notary sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite notary record with standardized names and types in datalake_legaut_clean.

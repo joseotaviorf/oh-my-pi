@@ -2,23 +2,23 @@ database_name: datalake_legaut_clean
 table_name: crawlers_crawler_key_type
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: Table with the types of keys used by the crawlers
+description: Reference catalog of the input-key types (e.g. CPF, CNPJ, birthday, address) that Legaut crawlers can consume, used to label and validate the values recorded in datalake_legaut_clean.crawlers_crawler_key. One row per key type.
 columns:
   id:
-    description: Surrogate primary key of the crawlers crawler key type row in the source system.
+    description: Surrogate primary key uniquely identifying the crawler key type row.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkeytype.id
   type:
-    description: Code identifying this crawler key type within the document-crawler app.
+    description: Numeric code identifying this key type within the document-crawler app. Follows the same catalog of key kinds referenced by datalake_legaut_clean.crawlers_crawler_key.type (e.g. CPF, CNPJ, address, birthday).
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkeytype.type
   name:
-    description: Human-readable name of the crawler key type.
+    description: Human-readable name of the crawler key type (e.g. "CPF", "Data de Nascimento").
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkeytype.name
   variable:
-    description: Template variable name used to bind this key type into crawler requests.
+    description: Template variable name used to bind this key type into the crawler's request payload when building the query to the external document source.
     lineage:
     - datalake_legaut_raw.crawlers_crawlerkeytype.variable
   ts_load:
-    description: Timestamp when the data was loaded
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.

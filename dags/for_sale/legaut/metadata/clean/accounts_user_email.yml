@@ -1,20 +1,20 @@
 database_name: datalake_legaut_clean
 table_name: accounts_user_email
-description: Users and emails of users from diligence cases of legaut
+description: Registry of QuintoAndar analysts and reviewers who operate within Legaut, the internal legal due-diligence and document-crawling platform for For Sale property analysis. One row per analyst email, used to attribute actions such as analysis-queue assignments (see meusite_analysisqueue.id_user) to a specific analyst.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
   id:
     lineage:
     - datalake_legaut_raw.accounts_useremail.id
-    description: ID of QuintoAndar analysts
+    description: Surrogate primary key uniquely identifying a QuintoAndar analyst. Referenced by other Legaut tables (e.g. meusite_analysisqueue.id_user) whenever an analyst action needs to be attributed.
   email:
     lineage:
     - datalake_legaut_raw.accounts_useremail.email
-    description: Email of QuintoAndar analysts
+    description: Email address of the QuintoAndar analyst or reviewer, used for identification and communication about assigned due-diligence work.
   name:
     lineage:
     - datalake_legaut_raw.accounts_useremail.name
-    description: Name of QuintoAndar analysts
+    description: Full name of the QuintoAndar analyst or reviewer.
   ts_load:
     description: ETL ingestion timestamp when this snapshot was written to the lake layer.

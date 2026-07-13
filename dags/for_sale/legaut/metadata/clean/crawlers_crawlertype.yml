@@ -1,58 +1,58 @@
 database_name: datalake_legaut_clean
 table_name: crawlers_crawlertype
+description: Catalog of crawler types available on the Legaut platform, each representing a specific external document source or registry (e.g. IPTU, CND, matrícula) that can be queried automatically during legal due diligence. One row per crawler type, defining its execution behavior, required input keys, and the messaging topics used to dispatch and collect its results.
 domain: For Sale
 columns:
   id:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.id
-    description: Surrogate primary key of the crawlers crawlertype row in the source system.
+    description: Surrogate primary key uniquely identifying the crawler type row.
   default:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.default
-    description: Flag marking whether this crawler type runs by default.
+    description: Flag marking whether this is the default result option to use when a crawler run of this type doesn't yet have an explicit result (matches one of the entries in `results`).
   value:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.value
-    description: Identifier value of the crawler type used by the crawling engine.
+    description: Business identifier of the crawler type used by the crawling engine and by other Legaut tables to reference it (e.g. datalake_legaut_clean.crawlers_crawler.type points to this column).
   repeat:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.repeat
-    description: Flag indicating whether this crawler type may be executed repeatedly.
+    description: Flag indicating whether this crawler type must be executed once per city/municipality rather than a single time (relevant for property types that span multiple jurisdictions).
   monitor:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.monitor
-    description: Flag indicating whether runs of this crawler type are monitored for changes.
+    description: Flag indicating whether runs of this crawler type are monitored by a background task for changes after completion.
   results:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.results
-    description: Expected result schema or output configuration for this crawler type.
+    description: Expected set of possible result options for this crawler type (JSON list), each with a key, label, and flag used to classify what the crawler found.
   classifier:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.classifier
-    description: Classifier name applied to interpret documents returned by this crawler type.
+    description: Configuration of the automatic classifier applied to interpret documents returned by this crawler type.
   keys:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.keys
-    description: Set of input keys required to execute this crawler type.
+    description: Set of input keys required to execute this crawler type (JSON), referencing the key kinds catalogued in datalake_legaut_clean.crawlers_crawler_key_type (e.g. CPF, address).
   label:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.label
-    description: Short UI or workflow label describing the task, tag, or category shown to operators.
+    description: Short label describing this crawler type shown to analysts in the Legaut UI (e.g. "IPTU", "CND Federal").
   link:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.link
-    description: URL or link to the document source targeted by this crawler type.
+    description: URL of the external government/notary source targeted by this crawler type.
   topic:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.topic
-    description: Messaging topic where requests for this crawler type are published.
+    description: Messaging topic where execution requests for this crawler type are published for the crawling workers to pick up.
   return_topic:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.return_topic
-    description: Messaging topic where results from this crawler type are returned.
+    description: Messaging topic where results from this crawler type are returned once the external fetch completes.
   description:
     lineage:
     - datalake_legaut_raw.crawlers_crawlertype.description
-    description: Free-text description of what this crawler type collects.
+    description: Free-text description of what this crawler type collects (e.g. which certificate or registry it fetches).
 owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of crawlers crawlertype sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per crawlers crawlertype record with standardized names and types in datalake_legaut_clean.

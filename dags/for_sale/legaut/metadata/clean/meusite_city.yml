@@ -1,26 +1,26 @@
 database_name: datalake_legaut_clean
 table_name: meusite_city
+description: Reference table of Brazilian cities used across the Legaut due-diligence workflow, for example to locate notary offices (meusite_notary) and to route city-specific crawlers within a crawler group (crawlers_crawlergroup.id_city). One row per city.
 domain: For Sale
 columns:
   id:
     lineage:
     - datalake_legaut_raw.meusite_city.id
-    description: Surrogate primary key of the meusite city row in the source system.
+    description: Surrogate primary key uniquely identifying the city. Referenced by datalake_legaut_clean.meusite_notary and datalake_legaut_clean.crawlers_crawlergroup.
   id_state:
     lineage:
     - datalake_legaut_raw.meusite_city.state_id
-    description: Foreign key to the state in datalake_legaut_clean.meusite_state this city belongs to.
+    description: Brazilian state this city belongs to. Foreign key to datalake_legaut_clean.meusite_state.
   ibge:
     lineage:
     - datalake_legaut_raw.meusite_city.ibge
-    description: IBGE municipality code uniquely identifying this Brazilian city.
+    description: IBGE municipality code uniquely identifying this Brazilian city in the official government registry.
   display:
     lineage:
     - datalake_legaut_raw.meusite_city.display
-    description: Formatted city name shown to users in the interface.
+    description: Flag indicating whether this city is shown as a selectable option in the Legaut interface (e.g. city pickers), rather than the city's display name.
   name:
     lineage:
     - datalake_legaut_raw.meusite_city.name
     description: Official name of the city.
 owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of meusite city sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite city record with standardized names and types in datalake_legaut_clean.

@@ -14,6 +14,7 @@ workflow:
   source_schema: legaut
   custom_schema: legaut
   dbutils_secret_key: LEGAUT_DB
+  max_tables_per_cluster: 17
   tables_customization:
     accounts_useremail:
       clean_table_name: accounts_user_email

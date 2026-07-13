@@ -1,19 +1,20 @@
 database_name: datalake_legaut_clean
 table_name: meusite_state
+description: Reference table of Brazilian states used across the Legaut due-diligence workflow, mainly to classify cities (meusite_city) and, indirectly, notary offices. One row per state.
 domain: For Sale
 columns:
   id:
     lineage:
     - datalake_legaut_raw.meusite_state.id
-    description: Surrogate primary key of the meusite state row in the source system.
+    description: Surrogate primary key uniquely identifying the state. Referenced by datalake_legaut_clean.meusite_city.
   ibge:
     lineage:
     - datalake_legaut_raw.meusite_state.ibge
-    description: IBGE code uniquely identifying this Brazilian state.
+    description: IBGE code uniquely identifying this Brazilian state in the official government registry.
   pais:
     lineage:
     - datalake_legaut_raw.meusite_state.pais
-    description: Country to which this state belongs.
+    description: Country code to which this state belongs; Legaut operates only in Brazil, so this value is expected to be constant across rows.
   name:
     lineage:
     - datalake_legaut_raw.meusite_state.name
@@ -21,10 +22,9 @@ columns:
   uf:
     lineage:
     - datalake_legaut_raw.meusite_state.uf
-    description: Two-letter Brazilian state abbreviation (UF).
+    description: Two-letter Brazilian state abbreviation (UF), commonly used to build formatted addresses.
   ddd:
     lineage:
     - datalake_legaut_raw.meusite_state.ddd
     description: Telephone area code (DDD) associated with the state.
 owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of meusite state sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite state record with standardized names and types in datalake_legaut_clean.

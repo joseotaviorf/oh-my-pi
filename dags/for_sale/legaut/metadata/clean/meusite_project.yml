@@ -1,31 +1,35 @@
 database_name: datalake_legaut_clean
 table_name: meusite_project
+description: Legalization project representing a client engagement (e.g. a real estate firm, bank, or tech partner) for which Legaut runs due-diligence analyses. One row per project, grouping the units and operations processed for that client.
 domain: For Sale
 columns:
   id:
     lineage:
     - datalake_legaut_raw.meusite_project.id
-    description: Surrogate primary key of the meusite project row in the source system.
+    description: Surrogate primary key uniquely identifying the project. Referenced by datalake_legaut_clean.meusite_unit and datalake_legaut_clean.meusite_operation.
   id_google_drive_folder:
     lineage:
     - datalake_legaut_raw.meusite_project.google_drive_folder_id
-    description: Foreign key to the Google Drive folder storing this project's documents.
+    description: Identifier of the Google Drive folder storing this project's documents.
   id_google_spreadsheet:
     lineage:
     - datalake_legaut_raw.meusite_project.google_spreadsheet_id
-    description: Foreign key to the Google Spreadsheet tracking this project.
+    description: Identifier of the Google Spreadsheet tracking this project's data.
   id_company:
     lineage:
     - datalake_legaut_raw.meusite_project.company_id
-    description: Foreign key to the company in datalake_legaut_clean.crawlers_company that owns this project.
+    description: Client/platform company that owns this project (e.g. a real estate firm, bank, or tech partner) - distinct from the crawlers_company entity that represents a company under legal due diligence. This client-company table is not modeled as a separate table in this DAG.
   activated:
     lineage:
     - datalake_legaut_raw.meusite_project.activated
-    description: Flag indicating whether the project is currently activated.
+    description: Flag indicating whether the legalization project is currently activated and in active use.
   type:
     lineage:
     - datalake_legaut_raw.meusite_project.type
-    description: Classifier distinguishing record subtype or participant role in the workflow.
+    description: Scope of analysis this project performs on its units.
+    categories:
+      "0": "pricing - extraction limited to the property description and sale value from the registration certificate, for pricing purposes only."
+      "1": "legal - full due-diligence analysis comparing the registration certificate against other documents."
   name:
     lineage:
     - datalake_legaut_raw.meusite_project.name
@@ -33,10 +37,9 @@ columns:
   slug:
     lineage:
     - datalake_legaut_raw.meusite_project.slug
-    description: URL-friendly slug identifying this project.
+    description: URL-friendly unique identifier of this project, used in Legaut application URLs and storage paths.
   ts_created:
     lineage:
     - datalake_legaut_raw.meusite_project.created_at
     description: Timestamp when the row was first created in the source operational system.
 owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of meusite project sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per meusite project record with standardized names and types in datalake_legaut_clean.

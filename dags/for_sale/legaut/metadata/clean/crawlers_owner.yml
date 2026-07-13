@@ -1,23 +1,24 @@
 database_name: datalake_legaut_clean
 table_name: crawlers_owner
+description: Property owner identified during legal due diligence of a real estate unit for a For Sale operation on Legaut. One row per owner record within a crawler group, capturing the identity data (CPF/CNPJ, RG, name) used to run background and document checks against external registries.
 domain: For Sale
 columns:
   id:
     lineage:
     - datalake_legaut_raw.crawlers_owner.id
-    description: Surrogate primary key of the crawlers owner row in the source system.
+    description: Surrogate primary key uniquely identifying the owner record.
   id_crawler_group:
     lineage:
     - datalake_legaut_raw.crawlers_owner.crawlergroup_id
-    description: Foreign key to the crawler group in datalake_legaut_clean.crawlers_crawlergroup this owner relates to.
+    description: Crawler group running document checks for this owner. Foreign key to datalake_legaut_clean.crawlers_crawlergroup.
   id_matricula_owner:
     lineage:
     - datalake_legaut_raw.crawlers_owner.matricula_owner_id
-    description: Foreign key to the property registration (matricula) owner record this person is linked to.
+    description: Owner record extracted from the property registration certificate (matrícula) analysis that this crawler-tracked owner corresponds to. External reference to the matrícula-analysis domain (not modeled in this DAG).
   id_user:
     lineage:
     - datalake_legaut_raw.crawlers_owner.user_id
-    description: Foreign key to the QuintoAndar user who performed the action.
+    description: QuintoAndar/Legaut internal user who registered or is handling this owner record.
   name:
     lineage:
     - datalake_legaut_raw.crawlers_owner.name
@@ -25,42 +26,41 @@ columns:
   rg:
     lineage:
     - datalake_legaut_raw.crawlers_owner.rg
-    description: Brazilian RG identity document number of the property owner.
+    description: Brazilian RG identity document number of the property owner, used as a crawler input key to query notary and registry sources.
   cpf:
     lineage:
     - datalake_legaut_raw.crawlers_owner.cpf
-    description: Brazilian CPF individual taxpayer number of the property owner.
+    description: Brazilian CPF individual taxpayer number of the property owner, the primary key used to query tax-clearance and background-check crawlers when the owner is an individual (see is_individual).
   gender:
     lineage:
     - datalake_legaut_raw.crawlers_owner.gender
-    description: Gender of the property owner as recorded in legal documents.
+    description: Gender of the property owner as recorded in legal documents; some certificate sources require it to disambiguate the correct registry record.
   name_mother:
     lineage:
     - datalake_legaut_raw.crawlers_owner.name_mother
-    description: Mother's full name of the property owner used for identity verification.
+    description: Mother's full name of the property owner, commonly required by Brazilian registries and background-check services to verify identity.
   cnpj:
     lineage:
     - datalake_legaut_raw.crawlers_owner.cnpj
-    description: Brazilian CNPJ company number when the owner is a legal entity.
+    description: Brazilian CNPJ company number used instead of cpf/rg when the owner is a legal entity rather than an individual (see is_individual).
   extra:
     lineage:
     - datalake_legaut_raw.crawlers_owner.extra
-    description: Additional unstructured owner attributes captured during diligence.
+    description: Additional unstructured owner attributes captured during diligence that don't fit the standard identity fields.
   is_current:
     lineage:
     - datalake_legaut_raw.crawlers_owner.current
-    description: Boolean flag indicating whether current applies to this record.
+    description: Flag indicating this is the current/active owner of the property, as opposed to a past owner kept for historical record.
   is_individual:
     lineage:
     - datalake_legaut_raw.crawlers_owner.individual
-    description: Boolean flag indicating whether individual applies to this record.
+    description: Flag indicating the owner is a natural person (pessoa física) rather than a company; when true, cpf/rg identify the owner, when false, cnpj is used instead.
   has_spouse:
     lineage:
     - datalake_legaut_raw.crawlers_owner.spouse
-    description: Boolean flag indicating whether spouse applies to this record.
+    description: Flag indicating the owner is legally married with a registered spouse, which is relevant because Brazilian property transactions commonly require spousal consent (outorga uxória).
   dt_birth:
     lineage:
     - datalake_legaut_raw.crawlers_owner.birthday
-    description: Calendar date of birth for this crawlers owner record.
+    description: Calendar date of birth of the property owner.
 owner: helder.rodrigues@quintoandar.com.br
-description: Cleaned snapshot of crawlers owner sourced from operational systems backing Legaut legal automation service data for For Sale contract and document workflows. One row per crawlers owner record with standardized names and types in datalake_legaut_clean.
