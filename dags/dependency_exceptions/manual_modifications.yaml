@@ -731,10 +731,6 @@ bietlejuice.enrich_databricks_usage_costs:
     - bietlejuice.gsheets_platform:done-clean-databricks-contract-details:first-run-of-day
   remove:
     - bietlejuice.gsheets_platform:load-clean-databricks-contract-details:first-run-of-day
-bietlejuice.enrich_data_quality:
-  remove:
-    - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
-    - bietlejuice.inmetro:load-clean-data-validations:first-run-of-day
 bietlejuice.enrich_demand_score_report:
   add:
     - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score:first-run-of-day
