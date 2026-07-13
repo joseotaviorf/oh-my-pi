@@ -155,11 +155,11 @@ old_agent_data AS (
     SELECT
         id,
         CASE --when the last two characters are a state code, we need to extract the first part of the creci number
-            WHEN REGEXP_LIKE(creci_number, '-[ ]*[A-Za-z]{2}$')
+            WHEN REGEXP_LIKE(creci_number, '-[ ]*[A-Za-z][A-Za-z]$')
             THEN TRIM(REGEXP_EXTRACT(creci_number, '^(.*)-[^-]+$', 1))
             ELSE creci_number
         END AS creci,
-        NULLIF(REGEXP_EXTRACT(creci_number, '-[ ]*([A-Za-z]{2})$', 1), '') AS creci_uf, --when the last two characters are a state code, we need to extract the last part of the creci number
+        NULLIF(REGEXP_EXTRACT(creci_number, '-[ ]*([A-Za-z][A-Za-z])$', 1), '') AS creci_uf, --when the last two characters are a state code, we need to extract the last part of the creci number
         is_passive_lead_receiver
     FROM
         datalake_ebdb_clean.agent_data
