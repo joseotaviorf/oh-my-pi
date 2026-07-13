@@ -1,20 +1,27 @@
 ---
 database_name: datalake_nazare_clean
 table_name: brokerage_fee_baseline_revision
+description: Revision history for Nazare brokerage fee baselines, storing the bonus fee (gross advance) applied in each revision of the baseline rule.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_brokerage_fee_baseline:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline_revision.id
+    description: Identifier of the brokerage fee baseline rule this revision belongs to.
   revision:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline_revision.revision
+    description: Sequential revision number of the baseline configuration.
   gross_advance:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline_revision.bonus_fee
+    description: Bonus fee (gross advance) applied in this revision of the brokerage fee baseline.
   ts_invalidated:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline_revision.invalidated_at
+    description: Timestamp when this revision was invalidated in Nazare; null means the revision is still valid.
   ts_created:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline_revision.created_at
+    description: Timestamp when this revision was created in Nazare.

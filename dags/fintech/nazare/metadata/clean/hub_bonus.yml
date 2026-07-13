@@ -1,26 +1,35 @@
 ---
 database_name: datalake_nazare_clean
 table_name: hub_bonus
+description: Nazare hub bonus rules linking business units and agent roles to revenue-share bonus periods and the active revision.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_hub_bonus:
     lineage:
       - datalake_nazare_raw.hub_bonus.id
+    description: Internal identifier of the hub bonus rule in Nazare.
   id_business_unit:
     lineage:
       - datalake_nazare_raw.hub_bonus.business_unit_id
+    description: Business unit identifier where the hub bonus rule applies.
   current_revision:
     lineage:
       - datalake_nazare_raw.hub_bonus.current_revision
+    description: Active revision number of the hub bonus configuration, referencing hub_bonus_revision.
   agent_role:
     lineage:
       - datalake_nazare_raw.hub_bonus.agent_role
+    description: Role of the agent this hub bonus applies to in the revenue-share split.
   dt_bonus_start:
     lineage:
       - datalake_nazare_raw.hub_bonus.bonus_start_date
+    description: Start date of the hub bonus validity period for revenue-share calculations.
   dt_bonus_end:
     lineage:
       - datalake_nazare_raw.hub_bonus.bonus_end_date
+    description: End date of the hub bonus validity period for revenue-share calculations.
   ts_created:
     lineage:
       - datalake_nazare_raw.hub_bonus.created_at
+    description: Timestamp when the hub bonus rule was created in Nazare.

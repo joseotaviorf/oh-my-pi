@@ -3,7 +3,7 @@ database_name: datalake_nazare_clean
 table_name: job
 description: Jobs executed by the Nazare service with references to offers and execution timestamps.
 domain: Fintech
-owner: data-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_job:
     lineage:

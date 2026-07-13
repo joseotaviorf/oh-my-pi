@@ -3,7 +3,7 @@ database_name: datalake_nazare_clean
 table_name: offer
 description: Offers with property details, agreed price, brokerage and lifecycle dates produced by the Nazare service.
 domain: Fintech
-owner: data-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_offer:
     lineage:
@@ -24,15 +24,15 @@ columns:
   category:
     lineage:
       - datalake_nazare_raw.offer.category
-    description: Offer category.
+    description: Offer category used by Nazare in revenue-share calculations.
   house_address:
     lineage:
       - datalake_nazare_raw.offer.house_address
-    description: Property address.
+    description: Street address of the property associated with the offer.
   house_city:
     lineage:
       - datalake_nazare_raw.offer.house_city
-    description: Property city.
+    description: City where the property associated with the offer is located.
   house_complement:
     lineage:
       - datalake_nazare_raw.offer.house_complement
@@ -40,7 +40,7 @@ columns:
   house_neighborhood:
     lineage:
       - datalake_nazare_raw.offer.house_neighborhood
-    description: Property neighborhood.
+    description: Neighborhood of the property associated with the offer.
   house_number:
     lineage:
       - datalake_nazare_raw.offer.house_number
@@ -52,11 +52,11 @@ columns:
   price_agreed:
     lineage:
       - datalake_nazare_raw.offer.price_agreed
-    description: Price agreed for the offer.
+    description: Agreed sale price for the offer used in revenue-share calculations.
   cancellation_reason:
     lineage:
       - datalake_nazare_raw.offer.cancellation_reason
-    description: Reason for offer cancellation.
+    description: Reason why the offer was cancelled, when applicable in Nazare.
   brokerage:
     lineage:
       - datalake_nazare_raw.offer.brokerage
@@ -68,7 +68,7 @@ columns:
   dt_signature:
     lineage:
       - datalake_nazare_raw.offer.signature_date
-    description: Offer signature date.
+    description: Date when the offer was signed in the Nazare offer lifecycle.
   dt_payment_allowed:
     lineage:
       - datalake_nazare_raw.offer.payment_allowed_date

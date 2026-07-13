@@ -3,7 +3,7 @@ database_name: datalake_nazare_clean
 table_name: calculation_error
 description: Errors captured when calculating revenue share and related values for offers, agents, and partners.
 domain: Fintech
-owner: data-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_calculation_error:
     lineage:

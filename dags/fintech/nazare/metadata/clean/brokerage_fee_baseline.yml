@@ -1,26 +1,35 @@
 ---
 database_name: datalake_nazare_clean
 table_name: brokerage_fee_baseline
+description: Nazare brokerage fee baseline rules by negotiation type and agent role, with active revision and validity period used in revenue-share calculations.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_brokerage_fee_baseline:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline.id
+    description: Internal identifier of the brokerage fee baseline rule in Nazare.
   negotiation_type:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline.negotiation_type
+    description: Negotiation type the baseline applies to (e.g. sale context used by Nazare revenue share).
   agent_role:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline.agent_role
+    description: Role of the agent this baseline fee applies to in the revenue-share split.
   current_revision:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline.current_revision
+    description: Active revision number of the baseline configuration, referencing brokerage_fee_baseline_revision.
   dt_bonus_start:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline.bonus_start_date
+    description: Start date of the baseline fee validity period for revenue-share calculations.
   dt_bonus_end:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline.bonus_end_date
+    description: End date of the baseline fee validity period for revenue-share calculations.
   ts_created:
     lineage:
       - datalake_nazare_raw.brokerage_fee_baseline.created_at
+    description: Timestamp when the baseline rule was created in Nazare.

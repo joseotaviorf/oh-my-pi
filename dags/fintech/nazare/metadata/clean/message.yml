@@ -3,7 +3,7 @@ database_name: datalake_nazare_clean
 table_name: message
 description: Event messages produced by the Nazare service with delivery and processing metadata.
 domain: Fintech
-owner: data-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_message:
     lineage:
@@ -32,7 +32,8 @@ columns:
   event_type:
     lineage:
       - datalake_nazare_raw.message.event_type
-    description: Type/name of the event.
+    description: Name or type of the Nazare domain event carried by this message.
+
   payload:
     lineage:
       - datalake_nazare_raw.message.payload

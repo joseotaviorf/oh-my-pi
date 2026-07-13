@@ -3,7 +3,7 @@ database_name: datalake_nazare_clean
 table_name: campaign
 description: Revenue share campaigns linking offers, agents and partners with roles, bonus fees, cumulative flag and active period.
 domain: Fintech
-owner: data-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_campaign:
     lineage:
@@ -28,11 +28,11 @@ columns:
   agent_role:
     lineage:
       - datalake_nazare_raw.campaign.agent_role
-    description: Role of the agent in the campaign.
+    description: Role of the agent participating in this revenue-share campaign.
   partner_role:
     lineage:
       - datalake_nazare_raw.campaign.partner_role
-    description: Role of the partner in the campaign
+    description: Role of the partner participating in this revenue-share campaign.
   updated_by:
     lineage:
       - datalake_nazare_raw.campaign.updated_by
@@ -48,11 +48,11 @@ columns:
   dt_campaign_start:
     lineage:
       - datalake_nazare_raw.campaign.start_date
-    description: Campaign start date.
+    description: Start date of the campaign active period for revenue-share bonus.
   dt_campaign_end:
     lineage:
       - datalake_nazare_raw.campaign.end_date
-    description: Campaign end date.
+    description: End date of the campaign active period for revenue-share bonus.
   ts_deleted:
     lineage:
       - datalake_nazare_raw.campaign.deleted_at

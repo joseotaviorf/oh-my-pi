@@ -1,17 +1,23 @@
 ---
 database_name: datalake_nazare_clean
 table_name: business_unit
+description: Business units configured in Nazare for revenue-share calculations with partners and executives, including negotiation type.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id_business_unit:
     lineage:
       - datalake_nazare_raw.business_unit.id
+    description: Internal identifier of the business unit in Nazare.
   name:
     lineage:
       - datalake_nazare_raw.business_unit.name
+    description: Display name of the business unit.
   negotiation_type:
     lineage:
       - datalake_nazare_raw.business_unit.negotiation_type
+    description: Negotiation type associated with the business unit in Nazare revenue-share rules.
   ts_created:
     lineage:
       - datalake_nazare_raw.business_unit.created_at
+    description: Timestamp when the business unit was created in Nazare.

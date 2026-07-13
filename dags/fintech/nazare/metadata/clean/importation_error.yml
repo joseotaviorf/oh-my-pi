@@ -3,7 +3,7 @@ database_name: datalake_nazare_clean
 table_name: importation_error
 description: Errors captured when importing various revenue share entities from source systems.
 domain: Fintech
-owner: data-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 columns:
   id_importation_error:
     lineage:
