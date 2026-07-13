@@ -1,74 +1,108 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: propose
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per propose in the QuintoCred rental guarantee product, tracking
+  underwriting, charges, renewals, and collections for landlord protection
+  policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.userupdate
+    description: Identifier for the user update referenced by this financial record.
   id_business_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.type
+    description: Identifier for the business type referenced by this financial record.
   id_propose_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.status
+    description: Identifier for the propose status referenced by this financial record.
   id_real_estate:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.realestate
+    description: Identifier for the real estate referenced by this financial record.
   id_company_plan:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.company_plan
+    description: Identifier for the company plan referenced by this financial record.
   id_tenant_company:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.tenant_company
+    description: Identifier for the tenant company referenced by this financial record.
   activator_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.activator
+    description: QuintoCred rental guarantee attribute describing activator value in the policy lifecycle.
   realtor:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.realtor
+    description: QuintoCred rental guarantee attribute describing realtor in the policy lifecycle.
   hash:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.hash
+    description: QuintoCred rental guarantee attribute describing hash in the policy lifecycle.
   billing_model:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.billing_model
+    description: QuintoCred rental guarantee attribute describing billing model in the policy lifecycle.
   external_ref:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.externalref
+    description: QuintoCred rental guarantee attribute describing external ref in the policy lifecycle.
   agent_split_fee:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.agent_split_fee
+    description: QuintoCred rental guarantee attribute describing agent split fee in the policy lifecycle.
   annual_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.annual_value
+    description: QuintoCred rental guarantee attribute describing annual value in the policy lifecycle.
   monthly_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.monthly_value
+    description: QuintoCred rental guarantee attribute describing monthly value in the policy lifecycle.
   total_coverage:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.total_coverage
+    description: QuintoCred rental guarantee attribute describing total coverage in the policy lifecycle.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.active
+    description: Indicates whether active applies to this financial record.
   ts_inserted:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.dateinsert
+    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.dateupdate
+    description: Timestamp when updated occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose.day
+    description: Day partition derived from the source event timestamp for incremental loading.
+  ts_broker_begin:
+    lineage: []
+    description: Timestamp when broker begin occurred in the upstream fintech system.

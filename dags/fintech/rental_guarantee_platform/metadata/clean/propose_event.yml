@@ -1,29 +1,45 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: propose_event
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per propose event in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_event.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_entity:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_event.entity_id
+    description: Identifier for the entity referenced by this financial record.
   event_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_event.event_type
+    description: QuintoCred rental guarantee attribute describing event type in the policy lifecycle.
   payload:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_event.payload
+    description: QuintoCred rental guarantee attribute describing payload in the policy lifecycle.
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_event.created_at
+    description: Timestamp when created occurred in the upstream fintech system.
   year:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_event.year
+    description: Year partition derived from the source event timestamp for incremental loading.
   month:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_event.month
+    description: Month partition derived from the source event timestamp for incremental loading.
   day:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_event.day
+    description: Day partition derived from the source event timestamp for incremental loading.

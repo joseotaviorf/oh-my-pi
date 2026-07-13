@@ -1,56 +1,69 @@
 ---
 database_name: datalake_rental_guarantee_platform_clean
 table_name: propose_person
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  One row per propose person in the QuintoCred rental guarantee product,
+  tracking underwriting, charges, renewals, and collections for landlord
+  protection policies.
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 columns:
   id:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.id
+    description: QuintoCred rental guarantee attribute describing id in the policy lifecycle.
   id_user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.userinsert
+    description: Identifier for the user insert referenced by this financial record.
   id_user_update:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.userupdate
+    description: Identifier for the user update referenced by this financial record.
   id_propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.propose
+    description: Identifier for the propose referenced by this financial record.
   id_propose_person_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.type
+    description: Identifier for the propose person type referenced by this financial record.
   uuid_person:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.person
+    description: QuintoCred rental guarantee attribute describing uuid person in the policy lifecycle.
   address:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.address
+    description: QuintoCred rental guarantee attribute describing address in the policy lifecycle.
   name:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.name
+    description: QuintoCred rental guarantee attribute describing name in the policy lifecycle.
   declared_income:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.declared_income
+    description: QuintoCred rental guarantee attribute describing declared income in the policy lifecycle.
   is_foreign:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.is_foreign
+    description: Indicates whether foreign applies to this financial record.
   has_sign:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.sign
+    description: Indicates whether sign applies to this financial record.
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.active
+    description: Indicates whether active applies to this financial record.
   ts_inserted:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.dateinsert
+    description: Timestamp when inserted occurred in the upstream fintech system.
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.propose_person.dateupdate
-  year:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.propose_person.year
-  month:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.propose_person.month
-  day:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.propose_person.day
+    description: Timestamp when updated occurred in the upstream fintech system.
