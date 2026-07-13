@@ -2,32 +2,32 @@ database_name: datalake_credit_analysis
 table_name: credit_engine_checklist
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "This table unifies all the data related to the checklist from a credit analysis request processed by the credit engine. The checklist can be filled manually by the analyst or automatically by the credit engine. The checklist is composed by checklist groups, which are composed by checklist items. The checklist item is the smallest unit of the checklist."
+description: One row per checklist item from the Sorting Hat credit engine, flattening checklist, group, and item with manual or automatic input and final approval decision.
 columns:
   id_checklist:
     lineage:
       - datalake_sorting_hat_clean.checklist.id
-    description: "Incremental column identifier of the checklist"
+    description: Primary key of the checklist record in Sorting Hat.
   id_analysis_request:
     lineage:
       - datalake_sorting_hat_clean.checklist.id_analysis_request
-    description: "Foreign key which associates the checklist to an analysis request. It is the analysis request ID"
+    description: Foreign key to the parent analysis request processed by the credit engine.
   id_checklist_group:
     lineage:
       - datalake_sorting_hat_clean.checklist_group.id
-    description: "Checklist group ID"
+    description: Primary key of the checklist group within the Sorting Hat checklist.
   id_checklist_item:
     lineage:
       - datalake_sorting_hat_clean.checklist_item.id
-    description: "Checklist item ID"
+    description: Primary key of the individual checklist item being verified.
   id_input_source:
     lineage:
       - datalake_sorting_hat_clean.checklist_item.id_input_source
-    description: "Input source ID. It can be the analyst ID when the cheklist was answered by the analyst (manual input source) or the analysis state ID when the checklist was answered by the credit engine (automatic input source)."
+    description: Identifier of the analyst or automated analysis state that supplied the checklist item answer.
   id_subject:
     lineage:
       - datalake_sorting_hat_clean.checklist_group.id_subject
-    description: "Subject ID. If the subject type is PROPOSAL, the subject id could be the id of the proposal, and if the subject type is TENANT, the subject id could be the document number of the tenant (CPF)"
+    description: Subject identifier for the checklist group — proposal ID when subject is PROPOSAL, or tenant CPF when subject is TENANT.
   checklist_type:
     lineage:
       - datalake_sorting_hat_clean.checklist.type
@@ -69,7 +69,7 @@ columns:
   input_description:
     lineage:
       - datalake_sorting_hat_clean.checklist_item.input_description
-    description: "Description of the input"
+    description: Human-readable label describing what the checklist item verifies (e.g. selfie validity, blocklist check).
   input_type:
     lineage:
       - datalake_sorting_hat_clean.checklist_item.input_type
@@ -80,7 +80,7 @@ columns:
   input_value:
     lineage:
       - datalake_sorting_hat_clean.checklist_item.input_value
-    description: "This column represents the input given to the check. It is the choice to the given input. Ex: blocklist check could have IN_BLOCKLIST and NOT_IN_BLOCKLIST inputs"
+    description: Answer selected for this checklist item (e.g. IN_BLOCKLIST, NOT_IN_BLOCKLIST for a blocklist check).
   checklist_item_type:
     lineage:
       - datalake_sorting_hat_clean.checklist_item.type
@@ -88,7 +88,7 @@ columns:
   is_current_checklist:
     lineage:
       - datalake_sorting_hat_clean.checklist.is_current_checklist
-    description: "This flag is a boolean which identifies if the checklist is the current one"
+    description: True when this is the active checklist version for the analysis request.
   is_checklist_group_compliant:
     lineage:
       - datalake_sorting_hat_clean.checklist_group.is_compliant

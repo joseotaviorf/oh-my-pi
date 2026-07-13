@@ -1,89 +1,89 @@
 database_name: datalake_credit_analysis
 table_name: credit_analysis
-description: "Enrich table with the credit analysis information"
-owner: felipe.chies@quintoandar.com.br
+description: One row per credit analysis attempt from Sorting Hat for a rental proposal, with guarantee category, risk score, and policy outcomes joined from proposal aggregates.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   id_credit_analysis:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
-    description: "Credit analysis id coming from credit analysis clean table(sorting hat)"
+    description: Primary key of the credit analysis record in Sorting Hat.
   id_proposal:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_proposal
-    description: "proposal id from sorting hat microsservice, the same on EBDB and Rental Guarantee."
+    description: Rental proposal identifier (same key in EBDB and Rental Guarantee).
   id_analyst:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_analyst
-    description: "Analyst id coming from credit analysis clean table(sorting hat)"
+    description: Credit desk analyst assigned when the analysis was handled manually.
   bypass:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.bypass
-    description: "Bypass reason"
+    description: Bypass flag indicating standard policy checks were skipped for this credit analysis (is_bypass when category is null).
   category:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.category
-    description: "Category information coming from credit analysis clean table(sorting hat)"
+    description: Guarantee category ID returned by the credit model; join dw_credit.dim_guarantee_policy for labels.
   category_within_ca:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis_version.category
-    description: "Same as the category but with the max_ca_category information when the category is null"
+    description: Guarantee category filled from credit analysis versions when the primary category is null.
   category_within_proposal:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis_version.category
-    description: "Same as the category_within_ca but with the last category available on credit_analysis_proposals when the category_within_ca is null"
+    description: Guarantee category with proposal-level fallback when category and version-level values are null.
   documentation_policy:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.type
-    description: "Type information coming from credit analysis clean table(sorting hat)"
+    description: Documentation rigor required for tenant income verification (LIGHT_APPROVAL, FLEX, FULL).
   guarantee_category:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.guarantee_category
-    description: "Category information coming from credit analysis proposals."
+    description: Paid guarantee category from proposal-level aggregates in Rental Guarantee.
   level:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.level
-    description: "level information of the guarantee"
+    description: Guarantee tier level assigned by the Sorting Hat credit policy for this analysis.
   liquidity:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.liquidity
-    description: "Liquidity information of the proposal."
+    description: Liquidity indicator from the latest Sorting Hat screening result for the proposal.
   paid_guarantee_type:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.paid_guarantee_type
-    description: "Type of the paid guarantee"
+    description: Paid guarantee type from proposal-level Rental Guarantee data, when a paid guarantee exists for the proposal.
   standalone_factor:
     lineage:
       - datalake_rental_guarantee_clean.risk_category.category_level
-    description: "Standalone factor of the proposal"
+    description: Standalone guarantee tier label derived from Rental Guarantee risk category (Standalone Low or Standalone High).
   reason:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.reason
-    description: "Reason of the analysis"
+    description: Rejection or decision reason text returned by Sorting Hat for this credit analysis.
   risk_category:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.risk_category
-    description: "Risk score given by the model result plus the credit policy. Useful, but deprecated in favor to risk_category_canon."
+    description: Legacy risk score from model plus policy; deprecated in favor of risk_category_canon.
   risk_category_canon:
     lineage:
       - datalake_sorting_hat_clean.screening_result.risk_category_canon
-    description: "New risk score given by the credit model."
+    description: Canonical risk category label from the latest Sorting Hat screening result for the proposal.
   internal_score:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.internal_score
-    description: "Old credit model (internal-score) deprecated."
+    description: Deprecated internal credit model score; prefer risk_category_canon for new analyses.
   max_bypass:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.max_bypass
-    description: "Bypass reason, if there is one, aggregated by proposal."
+    description: Bypass value aggregated with MAX across all credit analysis attempts for the proposal.
   max_ca_category:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis_version.category
-    description: "Max ca_category information of the guarantee"
+    description: Highest guarantee category reached across credit analysis versions for this attempt.
   result:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.result
-    description: "Result of the analysis"
+    description: Raw result payload from Sorting Hat credit analysis (guarantee, category, rejection details).
   guarantee_offered:
     description: "If the tenant prospect is not a clear no by income reasons, 5A offers one or more type of guarantee.  The offered guarantee can be paid or free. This column indicates which guarantee was offered to the TP after the evaluation process. The guarantee offered might be null if the credit analysis was transfered or had a later approval to free."
     categories:
@@ -111,11 +111,11 @@ columns:
       CLEAR_NO: "When no guarantee was accepted, as it was denied by some reason (such as income reasons)"
       NOT_ACCEPTED: "When 5A has offered a paid guarantee to the TP, but the person has not accepted it."
   is_manual_analysis:
-    description: "True if the analysis is manual"
+    description: True when a credit desk analyst performed this analysis manually.
   is_bypass:
     description: "True if the analysis was bypassed."
   is_reprocessed:
-    description: "True if the analysis is reprocessed"
+    description: True when the proposal guarantee was created via CRM documentation analysis (guarantee_source = CRM_DOCUMENTATION_ANALYSIS).
   ts_guarantee_accepted:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.ts_guarantee_accepted
@@ -123,4 +123,7 @@ columns:
   ts_credit_analysis_created:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.ts_created
-    description: "Credit analysdis creation timestamp."
+    description: Timestamp when this credit analysis record was created in Sorting Hat.
+  last_category:
+    lineage: []
+    description: Last guarantee category across all credit analysis attempts for the proposal; join dw_credit.dim_guarantee_policy.

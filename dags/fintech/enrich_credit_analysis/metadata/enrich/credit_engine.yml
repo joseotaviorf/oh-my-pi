@@ -2,7 +2,7 @@ database_name: datalake_credit_analysis
 table_name: credit_engine
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "Enrich table with credit engine analysis state data. The analysis machine is composed by state groups, which are composed by analysis sates. The analysis state is the smallest unit of the analysis machine. The data in this table refers to any rule applied to a checklist, tenant, proposal or credit evaluation (subject). The credit engine lives in Sorting Hat micro service."
+description: One row per analysis state from the Sorting Hat credit engine state machine, flattening machine, state group, and rule-level inputs and outcomes for tenant documentation and credit evaluation flows.
 columns:
   id_analysis_state:
     lineage:
@@ -27,11 +27,11 @@ columns:
   id_state_group:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.id
-    description: "State group ID"
+    description: Primary key of the analysis state group within the credit engine state machine.
   subject_type:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.subject_type
-    description: "This column represents the type of the subject the machine is related to. In this table only records with subject type CHECKLIST_ITEM_TYPE, PROPOSAL or TENANT are considered."
+    description: "This column represents the type of the subject the machine is related to. In this table only records with subject type CHECKLIST_ITEM_TYPE, PROPOSAL, TENANT or CREDIT_EVALUATION are considered."
   policy_type:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.id_subject
@@ -43,11 +43,11 @@ columns:
   machine_version:
     lineage:
       - datalake_sorting_hat_clean.analysis_machine.machine_version
-    description: "Version of the machine."
+    description: Version identifier of the credit engine machine configuration.
   machine_status:
     lineage:
       - datalake_sorting_hat_clean.analysis_machine.status
-    description: "Machine status"
+    description: Status of the credit engine machine run (CREATED, FINISHED, RETRY).
     categories:
       CREATED: "When the machine is created"
       FINISHED: "When the machine analysis is finished"
@@ -119,7 +119,7 @@ columns:
   score:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
-    description: "Credit score."
+    description: Score extracted from analysis state input for bureau, blocklist, lawsuit, or selfie verification rules.
   income_value_verified_state_result:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
@@ -127,7 +127,7 @@ columns:
   analysis_state_status:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.status
-    description: "Analysis state status"
+    description: Execution status of the individual analysis state (FINISHED or RETRY).
     categories:
       FINISHED: "When the analysis state has been run with success the status is finished"
       RETRY: "When the analysis state has been run with error the status is retry"
@@ -145,7 +145,7 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
       - datalake_sorting_hat_clean.analysis_state_group.group_name
-    description: "The risk category canon calculated by the credit engine."
+    description: Canonical risk category label computed in this analysis state.
   dti:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input

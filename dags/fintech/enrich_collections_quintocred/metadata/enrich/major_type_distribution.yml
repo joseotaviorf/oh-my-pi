@@ -1,9 +1,13 @@
 ---
 database_name: datalake_collections_quintocred
 table_name: major_type_distribution
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Intermediate table to create collections_wallet"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Intermediate table to create collections_wallet
 columns:
     name:
         description: "Client name related to debts"
@@ -14,22 +18,20 @@ columns:
         lineage:
             - datalake_collections_quintocred.delinquency_timeline.document
     id_propose:
-        description: "ID of related propose"
+        description: Identifier for the propose referenced by this financial record.
         lineage:
             - datalake_quintocred_collections.delinquency_timeline.id_propose
     mob:
         description: "MOB based on the oldest active delinquency"
         lineage:
             - datalake_quintocred_collections.delinquency_timeline.mob_delinquency
-    type_description:
-        description: "Array with all descriptions of this delinquency`s type"
-        lineage:
-            - datalake_quintocred_collections.delinquency_timeline.type_description
     major_type:
         description: "Type of the main propose of the client, aggregated by day"
     monthly_major_type:
         description: "Type of the main propose of the client, aggregated by month"
-    dt_base:
-        description: "Reference date for the timeline"
-        lineage:
-            - datalake_quintocred_collections.delinquency_timeline.dt_base
+    type_description_array:
+        description: Debt collection attribute describing type description array for recovery workflow tracking.
+        lineage: []
+    date:
+        description: Debt collection attribute describing date for recovery workflow tracking.
+        lineage: []

@@ -1,8 +1,12 @@
 database_name: datalake_velo
 table_name: house_legacy
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: "Table with House realted to the contract details (2.0 only)"
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Table with House realted to the contract details (2.0 only)
 columns:
   id_house:
     description: "House identification number (ID)"
@@ -40,11 +44,11 @@ columns:
     lineage:
       - datalake_ebdb_clean.country.code
   zipcode:
-    description: "ZIPCODE"
+    description: Velo platform attribute describing zipcode for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.zip_code
   geolocation:
-    description: "Geolocation"
+    description: Velo platform attribute describing geolocation for condominium billing reconciliation.
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_property_legacy.geolocation
   is_legacy:

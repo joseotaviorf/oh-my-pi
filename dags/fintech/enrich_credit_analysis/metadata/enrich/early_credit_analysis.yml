@@ -1,63 +1,63 @@
 ---
 database_name: datalake_credit_analysis
 table_name: early_credit_analysis
-description: "Enrich table with the early credit analysis information"
-owner: felipe.chies@quintoandar.com.br
+description: One row per early credit screening from Sorting Hat, enriched with rent-flow context (visit, booking, offer) and lag metrics for funnel analysis before formal proposal submission.
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 columns:
   id_house:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_house 
-    description: "House id coming from early credit analysis table(sorting hat)"
+    description: EBDB house/listing identifier for the property screened in the early credit check.
   id_visit:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_visit
-    description: "Visit id coming from rent flow ebdb table"
+    description: Visit identifier from the rent flow linked to this early credit evaluation window.
   id_offer:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_offer
-    description: "Offer id coming from rent flow ebdb table"
+    description: Rental offer identifier when an offer was submitted within one month after the early credit screening.
   id_user:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_user
-    description: "User id coming from early credit analysis table(sorting hat)"
+    description: Tenant prospect (EBDB user) who received the early credit screening from Sorting Hat.
   id_rent_flow:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
-    description: "Rent flow id coming from rent flow ebdb table"
+    description: Rent flow identifier (client + house journey) from EBDB linked to the early credit window.
   id_credit_evaluation:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_credit_evaluation
-    description: "Credit evaluation id coming from early credit analysis table(sorting hat)"
+    description: Sorting Hat early credit analysis identifier; external credit evaluation ID linked to this screening when present.
   result:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Result of the analysis"
+    description: Outcome payload or status from the Sorting Hat early credit screening.
   days_offer_after_early_credit_evaluation:
-    description: "Number of days of the offer after early credit evaluation"
+    description: Calendar days between early credit creation and linked offer submission, when an offer exists in the rent flow.
   days_booking_after_early_credit_evaluation:
-    description: "Number of days of the booking after early credit evaluation"
-  days_visit_after_early_credit_evaluation: 
-    description: "Number of days of the visit after early credit evaluation"
+    description: Calendar days between early credit creation and visit booking, when a booking exists in the rent flow.
+  days_visit_after_early_credit_evaluation:
+    description: Calendar days between early credit creation and visit date, when a visit exists in the rent flow.
   is_most_recent_evaluation:
-    description: "True if the evaluation is the most recent"
+    description: True for the latest early credit screening per tenant-house pair in Sorting Hat.
   dt_visit:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_visit
-    description: "Date of the visit"
+    description: Date of the property visit linked to the rent flow, when available.
   ts_booking_created:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
-    description: "Booking creation timestamp"
+    description: Timestamp when the visit booking was created in the EBDB rent flow.
   ts_offer_created:
     lineage:
       - datalake_ebdb_clean.offer.ts_created
-    description: "Offer creation timestamp"
+    description: Timestamp when the rental offer linked to this rent flow was submitted.
   ts_early_credit_analysis_created:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_created
-    description: "Early credit analysis creation timestamp"
+    description: Timestamp when Sorting Hat created the early credit screening record.
   ts_early_credit_analysis_expired:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
-    description: "Early credit analysis expiration timestamp"
+    description: Timestamp when the early credit screening expires (typically 30 days after creation).

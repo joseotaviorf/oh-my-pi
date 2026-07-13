@@ -1,71 +1,71 @@
 database_name: datalake_credit_analysis
 table_name: credit_analysis_proposals
-owner: felipe.chies@quintoandar.com.br
+owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "Table that aggregates data from credit analysis to a proposal levels"
+description: One row per rental proposal aggregating first/last credit analyses, guarantee choices, risk scores, and DocX evaluation milestones from Sorting Hat and Rental Guarantee.
 columns:
   id_proposal:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_proposal
-    description: "proposal id from sorting hat microsservice, the same on EBDB and Rental Guarantee."
+    - datalake_sorting_hat_clean.credit_analysis.id_proposal
+    description: Rental proposal identifier from Sorting Hat (same key in EBDB and Rental Guarantee).
   id_proposal_from_rg:
     lineage:
-      - datalake_rental_guarantee.guarantee.id_documentation_ebdb
-    description: "proposal id from rental guarantee microsservice, the same on EBDB and Sorting Hat."
+    - datalake_rental_guarantee.guarantee.id_documentation_ebdb
+    description: Proposal identifier as stored in Rental Guarantee (same EBDB proposal ID, sourced from guarantee.id_documentation_ebdb).
   id_first_credit_analysis:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
+    - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
     description: "First credit analysis identifier from Sorting Hat."
   id_last_credit_analysis:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
+    - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
     description: "Last credit analysis identifier from Sorting Hat."
   id_first_variant:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_variant
-    description: "First credit model+policy variant identifier that evaluated the proposal."
+    - datalake_sorting_hat_clean.credit_analysis.id_variant
+    description: Sorting Hat experiment variant used on the first credit analysis attempt for this proposal.
   id_last_variant_not_null:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.id_variant
-    description: "Last credit model+policy variant identifier that evaluated the proposal."
+    - datalake_sorting_hat_clean.credit_analysis.id_variant
+    description: Sorting Hat experiment variant from the most recent credit analysis with a non-null variant.
   income:
     lineage:
-      - datalake_sorting_hat_clean.proponent.monthly_income
-    description: "Monthly income of the proponent."
+    - datalake_sorting_hat_clean.proponent.monthly_income
+    description: Aggregated monthly income declared by proponents on the proposal.
   first_category:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.category
-    description: "First guarantee offer identifier given to a proposal. Join with dw_credit.dim_variant for more details."
+    - datalake_sorting_hat_clean.credit_analysis.category
+    description: Guarantee category offered on the first credit analysis attempt; join dw_credit.dim_guarantee_policy.
   guarantee_category:
     lineage:
-      - datalake_rental_guarantee.guarantee.score
-    description: "Guarantee offer identifier on rental guarantee microservice given to a proposal. Here should only have paid options. Join with dw_credit.dim_variant for more details."
+    - datalake_rental_guarantee.guarantee.score
+    description: Paid guarantee category recorded in Rental Guarantee for this proposal.
   paid_guarantee_type:
     lineage:
-      - datalake_rental_guarantee.guarantee.guarantee_type
+    - datalake_rental_guarantee.guarantee.guarantee_type
     description: "Paid guarantee name, such as deposit, pro_guarantor,etc."
     categories:
-        DEPOSIT: "Deposit calculated from 3 to 9 times the monthly rent value and its returned to tenant at the end if everything went alright. Restricted to the proposals on Core Quinto Andar business."
-        INSURANCE: "Former external guarantee, which is a fraction of the monthly rent value, paid in order to secure the contract. Restricted to the proposals on Core Quinto Andar business."
-        PRO_GUARANTOR: "Guarantee, which is a fraction of the monthly rent value, paid in order to secure the contract. Restricted to the proposals on Core Quinto Andar business."
-        STANDALONE: "Guarantee, which is a fraction of the monthly rent value, paid in order to secure the contract."
-        "null": "It happens if the paid guarantee options are not chosem or the proposal has the Free guarantee option."
+      DEPOSIT: "Deposit calculated from 3 to 9 times the monthly rent value and its returned to tenant at the end if everything went alright. Restricted to the proposals on Core Quinto Andar business."
+      INSURANCE: "Former external guarantee, which is a fraction of the monthly rent value, paid in order to secure the contract. Restricted to the proposals on Core Quinto Andar business."
+      PRO_GUARANTOR: "Guarantee, which is a fraction of the monthly rent value, paid in order to secure the contract. Restricted to the proposals on Core Quinto Andar business."
+      STANDALONE: "Guarantee, which is a fraction of the monthly rent value, paid in order to secure the contract."
+      "null": "It happens if the paid guarantee options are not chosem or the proposal has the Free guarantee option."
   guarantee_source:
     lineage:
-      - datalake_rental_guarantee.guarantee.guarantee_source
+    - datalake_rental_guarantee.guarantee.guarantee_source
     description: "From rental guarantee microservice, indicates from which path the paid guarantee was created."
   guarantee_type:
     lineage:
-      - datalake_ebdb_clean.contract.guarantee_type
+    - datalake_ebdb_clean.contract.guarantee_type
     description: "Guarantee name as given on the contract."
   liquidity:
     lineage:
-      - datalake_sorting_hat_clean.screening_result.liquidity
+    - datalake_sorting_hat_clean.screening_result.liquidity
     description: "Liquidity information of the proposal."
   last_result:
     lineage:
-      - datalake_docx.credit_evaluation.proposal_last_result
-    description: "Docx last cret credit evaluation result for a given proposal, such as pre approved, pre rejected,etc."
+    - datalake_docx.credit_evaluation.proposal_last_result
+    description: DocX outcome of the most recent credit evaluation (REGULAR, PRE_APPROVED, PRE_REJECTED).
     categories:
       REGULAR: "Normal new credit evaluation, status given if goes to the credit decision table."
       PRE_APPROVED: "Eligible credit evaluation to light approval or a approved credit analysis on Sorting Hat."
@@ -73,82 +73,70 @@ columns:
       "null": "Means that the credit evaluation has not reached end."
   package:
     lineage:
-      - datalake_sorting_hat_clean.proposal
-    description: "Package information, which can be calculated as: rent_value + condo_value + home_insurance_value"
+    - datalake_sorting_hat_clean.proposal
+    description: Total rental package value (rent + condo + insurance + IPTU components from Sorting Hat proposal).
   risk_category:
     lineage:
-      - datalake_sorting_hat_clean.screening_result.risk_category
-    description: "Risk score given by the model result plus the credit policy. Useful, but deprecated in favor to risk_category_canon."
+    - datalake_sorting_hat_clean.screening_result.risk_category
+    description: Legacy risk score from model plus policy; deprecated in favor of risk_category_canon.
   status:
     lineage:
-      - datalake_sorting_hat_clean.proposal.status
-    description: "Proposal status on Sorting Hat microsservice."
+    - datalake_sorting_hat_clean.proposal.status
+    description: Proposal processing status in Sorting Hat (e.g. pending, analyzed, rejected).
   dti:
     lineage:
-      - datalake_sorting_hat_clean.proposal.rent_value
-      - datalake_sorting_hat_clean.proposal.condo_value
-      - datalake_sorting_hat_clean.proposal.iptu_value
-      - datalake_sorting_hat_clean.proposal.home_insurance_value
-      - datalake_sorting_hat_clean.proponent.monthly_income
-    description: "Debt-to-income. It evaluates ratio from the total declared revenue which the rent will be representative."
-  risk_category_canon:
-    lineage:
-      - datalake_sorting_hat_clean.screening_result.risk_category_canon
-    description: "New risk grouping that is more granular and allows for a more flexible way to test and build credit policies. Check details with the Credit team."
-  risk_category_canon_past_filler:
-    lineage:
-      - datalake_sorting_hat_clean.screening_result.risk_category_canon
-    description: "Because risk category canon was created quite recetly (Q4/22), this column brings what would be the canon value if it was implemented before, it is used as back up for the main column."
-  is_retenant:
-    lineage:
-      - datalake_ebdb_clean.contract_person.cpf
-    description: "Verification if the proposal has a proponent that once has had a contract here."
+    - datalake_sorting_hat_clean.proposal.rent_value
+    - datalake_sorting_hat_clean.proposal.condo_value
+    - datalake_sorting_hat_clean.proposal.iptu_value
+    - datalake_sorting_hat_clean.proposal.home_insurance_value
+    - datalake_sorting_hat_clean.proponent.monthly_income
+    description: Debt-to-income ratio — total package value divided by declared monthly income of proponents.
   last_category:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.category
-    description: "Last guarantee offer identifier given to a proposal. Join with dw_credit.variant for more details."
+    - datalake_sorting_hat_clean.credit_analysis.category
+    description: Guarantee category from the most recent credit analysis attempt; join dw_credit.dim_guarantee_policy.
   last_category_not_null:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.category
-    description: "Last guarantee offer identifier, exlcuiding the possibility of a Clear No, given to a proposal. Join with dw_credit.dim_variant for more details."
+    - datalake_sorting_hat_clean.credit_analysis.category
+    description: Last non-null guarantee category across credit analysis attempts for the proposal; join dw_credit.dim_guarantee_policy.
   max_bypass:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.bypass
+    - datalake_sorting_hat_clean.credit_analysis.bypass
     description: "Bypass reason, if there is one, aggregated by proposal."
   internal_score:
     lineage:
-      - datalake_sorting_hat_clean.screening_result.score
+    - datalake_sorting_hat_clean.screening_result.score
     description: "Old credit model (internal-score) deprecated."
   number_evaluations:
     lineage:
-     - datalake_docx.credit_evaluation.proposal_number_evaluations
-    description: "Number of credit evaluations created at docx for a proposal."
+    - datalake_docx.credit_evaluation.proposal_number_evaluations
+    description: Count of DocX credit evaluations created for this proposal.
   ts_analyzed:
     lineage:
-      - datalake_sorting_hat_clean.proposal.ts_analyzed
-    description: "Last timestamp on which the proposal was manually analyzed."
+    - datalake_sorting_hat_clean.proposal.ts_analyzed
+    description: Timestamp of the most recent manual analyst review on the proposal in Sorting Hat.
   ts_first_analyzed:
     lineage:
-      - datalake_sorting_hat_clean.proposal.ts_analyzed
-      - datalake_sorting_hat_clean.proposal_version.ts_analyzed 
-    description: "First timestamp on which the proposal was manually analyzed."
+    - datalake_sorting_hat_clean.proposal.ts_analyzed
+    - datalake_sorting_hat_clean.proposal_version.ts_analyzed 
+    description: Timestamp of the first manual analyst review on the proposal in Sorting Hat.
   ts_first_credit_evaluation_positive:
     lineage:
-      - datalake_docx.credit_evaluation.ts_proposal_first_credit_evaluation_positive
+    - datalake_docx.credit_evaluation.ts_proposal_first_credit_evaluation_positive
     description: "First timestamp in which a proposal was given a status of evaluated positively by the model, meaning if the proposal is fit for a Free guarantee."
   ts_guarantee_paid:
     lineage:
-      - datalake_rental_guarantee.guarantee.ts_paid
+    - datalake_rental_guarantee.guarantee.ts_paid
     description: "If the proposal has a paid guarantee, when it was paid."
   ts_last_credit_evaluation_positive:
     lineage:
-      - datalake_docx.credit_evaluation.ts_last_credit_evaluation_positive
-    description: "First timestamp in which a proposal was given a status of evaluated positively by the model, meaning if the proposal is fit for a Free guarantee."
+    - datalake_docx.credit_evaluation.ts_last_credit_evaluation_positive
+    description: Last timestamp in which a proposal was given a positive model evaluation status, meaning if the proposal is fit for a Free guarantee.
   ts_guarantee_accepted:
     lineage:
-      - datalake_rental_guarantee.guarantee.ts_created
+    - datalake_rental_guarantee.guarantee.ts_created
     description: "Timestamp of the date in which the guarantee was accepted by the tenant prospect."
   ts_processed:
     lineage:
-      - datalake_sorting_hat_clean.proposal.ts_processed
-    description: "Proposal's timestamp when it had an update."
+    - datalake_sorting_hat_clean.proposal.ts_processed
+    description: Timestamp when the proposal last received an update processed by Sorting Hat.

@@ -1,19 +1,23 @@
 ---
 database_name: datalake_velo
 table_name: neurotech_rating
-owner: ae-finance-fintech@quintoandar.com.br
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
-description: Base table to process neurotech rating analysis for proposes
+description:
+  QuintoCred is the name given to Velo after its acquisition by QuintoAndar in 2021. As of 2023, the Velo brand was replaced by QuintoCred.
+  In June 2025, QuintoCred's core operations were shut down, leaving only the debt collection services active. In the first quarter of 2026, the decision was made to terminate the collection operations by July 31, 2026.
+  Therefore, it is important to understand that all Velo and QuintoCred systems are considered legacy, and consequently, the involved tables are as well.
+  Base table to process neurotech rating analysis for proposes
 columns:
   id_propose:
-    description: 'Id of the propose'
+    description: Identifier for the propose referenced by this financial record.
     lineage:
-    - datalake_velo_neurotech_clean.logs_credit_granting.proposal_number
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_number
   rating:
     description: 'Level of risk assessed in credit approval'
     lineage:
-    - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
   ts_operation:
     description: 'Timestamp of the operation'
     lineage:
-    - datalake_velo_neurotech_clean.logs_credit_granting.ts_operation
+      - datalake_velo_neurotech_clean.logs_credit_granting.ts_operation

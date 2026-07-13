@@ -2,20 +2,20 @@ database_name: datalake_credit_analysis
 table_name: credit_engine_analysis_request
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "This table unifies all the data submitted to the credit engine for analysis. The data is related to an external source, info about this external source is retrieved in order to decide if the request could be approved or rejected. Possible external sources are PROPOSAL for tenant documentation analysis flow or CREDIT_EVALUATION for credit analysis flow."
+description: One row per analysis request data snapshot submitted to the Sorting Hat credit engine, with external source context (proposal or credit evaluation) and attributes used for automated approval or rejection.
 columns:
   id_analysis_request:
     lineage:
       - datalake_sorting_hat_clean.analysis_request.id
-    description: "Incremental column identifier of the analysis request."
+    description: Primary key of the analysis request submitted to the Sorting Hat credit engine.
   id_external:
     lineage:
       - datalake_sorting_hat_clean.analysis_request.id_external
-    description: "External entity id related to external source. For external source CREDIT_EVALUATION the external id would be credit_evaluation’s id stored in docx, and for external source PROPOSAL the external id would be proposal id stored in main."
+    description: Identifier of the external entity driving the request — DocX credit evaluation ID or EBDB proposal ID depending on source type.
   id_proposal:
     lineage:
       - datalake_sorting_hat_clean.analysis_request.id_external
-    description: "Proposal ID. The proposal_id is equal to the external_id when the source is of type PROPOSAL. It is the same ID from Proposal table."
+    description: Rental proposal ID when the external source is PROPOSAL (same as id_external in that case).
   id_state_machine:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.id_state_machine
@@ -27,27 +27,27 @@ columns:
   id_credit_analysis:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "Credit analysis ID"
+    description: Sorting Hat credit analysis ID extracted from request attributes when available.
   id_house:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "House ID"
+    description: EBDB house/listing identifier extracted from request attributes.
   id_offer_firestore:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "Offer firestore ID. It is the same ID from an offer from Firestore"
+    description: Firestore offer document identifier extracted from request attributes.
   bypass:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "Bypass reason"
+    description: Bypass flag from request attributes indicating policy checks were skipped for this request.
   internal_score:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "Internal 5A score"
+    description: Legacy internal QuintoAndar credit score from request attributes.
   risk_category:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "Risk score given by the model result plus the credit policy"
+    description: Legacy risk score from model plus policy in request attributes; prefer risk_category_canon in downstream tables.
   documentation_policy:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
@@ -60,11 +60,11 @@ columns:
   category:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "Category information"
+    description: Guarantee category ID from request attributes; join dw_credit.dim_guarantee_policy.
   guarantee_type:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "Type of the guarantee"
+    description: Guarantee type extracted from request attributes (DEPOSIT, PRO_GUARANTOR, INSURANCE, etc.).
     categories:
       INSURANCE: ""
       DEPOSIT: ""
@@ -74,7 +74,7 @@ columns:
   package_value:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.attributes
-    description: "Total rent value, which includes the rent fee, IPTU, 5A fees and other fees"
+    description: Total monthly rental package (rent + fees + IPTU) submitted for credit evaluation.
   analysis_request_result:
     lineage:
       - datalake_sorting_hat_clean.analysis_request.result
@@ -85,7 +85,7 @@ columns:
   business_context:
     lineage:
       - datalake_sorting_hat_clean.analysis_request.business_context
-    description: "Business context of the analysis request"
+    description: Business context identifier for the analysis request (from Sorting Hat analysis_request.business_context).
   version:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.version
@@ -93,7 +93,7 @@ columns:
   source_entity:
     lineage:
       - datalake_sorting_hat_clean.analysis_request_data.source_entity
-    description: "Source entity of the analysis request"
+    description: Upstream entity type that supplied data for this request attribute snapshot.
     categories:
       PROPOSAL_DOCUMENTATION: ""
       CONTRACT: ""
