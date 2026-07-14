@@ -310,6 +310,28 @@ class MetricYamlPostProcessTest(unittest.TestCase):
         md_path.unlink()
         md_path.parent.rmdir()
 
+    def test_extract_metric_rows_chart_and_dashboard_urns(self) -> None:
+        chart_urn = "urn:li:chart:(superset,chart.56400)"
+        dashboard_urn = "urn:li:dashboard:(superset,dashboard.123)"
+        md_path = self._metric_md(
+            "## Superset Golden Assets\n\n"
+            f"- **Dataset** — `sandbox.nps_fr` — URN: `{self._SUPERSET_URN}`\n"
+            f"- **Chart** — URN: `{chart_urn}`\n"
+            f"- **Dashboard** — URN: `{dashboard_urn}`\n"
+        )
+        rows = g._extract_metric_dataset_rows(md_path)
+        self.assertEqual(
+            rows,
+            [
+                {"schema": "sandbox", "table": "nps_fr"},
+                {"urn": self._SUPERSET_URN},
+                {"urn": chart_urn},
+                {"urn": dashboard_urn},
+            ],
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
     def test_extract_metric_rows_legacy_superset_section(self) -> None:
         md_path = self._metric_md(
             "## Superset Golden Assets\n\n"
@@ -485,6 +507,51 @@ class OwnersTest(unittest.TestCase):
         md_path.unlink()
         md_path.parent.rmdir()
 
+    def test_extract_owners_unwraps_mailto_links(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Ownership\n\n"
+            "**Data Owner:**\n"
+            "- [owner@quintoandar.com.br](mailto:owner@quintoandar.com.br)\n\n"
+            "**Data Steward:**\n"
+            "- [steward@quintoandar.com.br](mailto:steward@quintoandar.com.br)\n"
+        )
+        owners = g._extract_owners(md_path)
+        self.assertEqual(owners["data_owner"], ["owner@quintoandar.com.br"])
+        self.assertEqual(owners["data_steward"], ["steward@quintoandar.com.br"])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_owners_accepts_quintoandar_com_and_com_br(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Ownership\n\n"
+            "**Data Owner:**\n"
+            "- owner@quintoandar.com\n\n"
+            "**Data Steward:**\n"
+            "- steward@quintoandar.com.br\n"
+        )
+        owners = g._extract_owners(md_path)
+        self.assertEqual(owners["data_owner"], ["owner@quintoandar.com"])
+        self.assertEqual(owners["data_steward"], ["steward@quintoandar.com.br"])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_owners_ignores_pre_ownership_heading(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Pre-ownership\n\n"
+            "**Data Owner:**\n"
+            "- decoy@quintoandar.com.br\n\n"
+            "## **Ownership**\n\n"
+            "**Data Owner:**\n"
+            "- owner@quintoandar.com.br\n\n"
+            "**Data Steward:**\n"
+            "- steward@quintoandar.com.br\n"
+        )
+        owners = g._extract_owners(md_path)
+        self.assertEqual(owners["data_owner"], ["owner@quintoandar.com.br"])
+        self.assertEqual(owners["data_steward"], ["steward@quintoandar.com.br"])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
     def test_inject_owners_emits_parseable_block(self) -> None:
         out = g._inject_owners(
             "data_product_type: domain\n",
@@ -545,6 +612,12 @@ class MbrTest(unittest.TestCase):
     def test_extract_mbrs_absent_section_returns_empty(self) -> None:
         md_path = self._md("# Demo\n\n## Overview\n\nNo MBR here.\n")
         self.assertEqual(g._extract_mbrs(md_path), [])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_mbrs_plain_line_without_bullet(self) -> None:
+        md_path = self._md("# Demo\n\n## **MBR**\n\nPost Contract\n")
+        self.assertEqual(g._extract_mbrs(md_path), ["Post Contract"])
         md_path.unlink()
         md_path.parent.rmdir()
 

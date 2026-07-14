@@ -272,6 +272,9 @@ def open_sync_pull_request(
         f"### Review checklist\n\n"
         f"- [ ] Golden query SQL is valid Trino\n"
         f"- [ ] All `schema.table` pairs exist in DataHub\n"
+        f"- [ ] Text reads correctly in the diff — no glued words or stray "
+        f"HTML (DataHub's editor can drop whitespace at paragraph wraps; "
+        f"compare against the source Context Document if unsure)\n"
         f"- [ ] Woodpecker `sync-tars-entities` passes after merge\n"
     )
     pr = _api_request(

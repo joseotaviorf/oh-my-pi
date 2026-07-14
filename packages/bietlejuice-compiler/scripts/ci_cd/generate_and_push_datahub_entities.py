@@ -154,16 +154,19 @@ _RELATED_DATA_PRODUCTS_BLOCK_RE = re.compile(
 _DOCUMENTATION_LINK_BLOCK_RE = re.compile(r"(?ms)^documentation_link:.*?\n(?=\S|\Z)")
 _GITHUB_REPO = "quintoandar/bi-etl-ejuice"
 _GITHUB_BRANCH = "master"
-_SUPERSET_DATASET_URN_RE = re.compile(
-    r"urn:li:dataset:\(urn:li:dataPlatform:superset,[^)]+\)",
+_SUPERSET_ASSET_URN_RE = re.compile(
+    r"urn:li:dataset:\(urn:li:dataPlatform:superset,[^)]+\)"
+    r"|urn:li:chart:\(superset,[^)]+\)"
+    r"|urn:li:dashboard:\(superset,[^)]+\)",
     re.I,
 )
 _TRINO_TABLE_REF_RE = re.compile(r"`([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)`")
 
 # Ownership parsing (## Ownership section → owners: block in the YAML).
-# Only real @quintoandar.com.br addresses match — template placeholders such as
-# ``{data_owner_email@quintoandar.com.br}`` are ignored (the leading ``{`` breaks the match).
-_OWNER_EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+-]+@quintoandar\.com\.br$")
+# Only real @quintoandar.com / @quintoandar.com.br addresses match — template
+# placeholders such as ``{data_owner_email@quintoandar.com.br}`` are ignored
+# (the leading ``{`` breaks the match).
+_OWNER_EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+-]+@quintoandar\.com(?:\.br)?$")
 # The two bold sub-groups inside ``## Ownership``; each maps to a DataHub ownership type.
 _OWNER_ROLE_HEADINGS = {
     "data owner": "data_owner",
@@ -171,6 +174,7 @@ _OWNER_ROLE_HEADINGS = {
 }
 _OWNER_ROLE_HEADING_RE = re.compile(r"^\*\*\s*(.+?)\s*:\s*\*\*$")
 _OWNERS_BLOCK_RE = re.compile(r"(?ms)^owners:.*?\n(?=\S|\Z)")
+_MAILTO_LINK_RE = re.compile(r"^\[([^\]]+)\]\(mailto:[^)]+\)$", re.IGNORECASE)
 
 # MBR parsing (## MBR section → mbr: list block in the YAML, metric entities only).
 # Template placeholders such as ``{MBR Name}`` are ignored (the braces break the match).
@@ -198,21 +202,50 @@ def _display_name_to_product_id(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
 
 
+def _normalize_heading(text: str) -> str:
+    """Strip Markdown emphasis and collapse whitespace for heading comparisons."""
+    cleaned = re.sub(r"[*_`]+", "", text)
+    return re.sub(r"\s+", " ", cleaned).strip().lower()
+
+
 def _extract_section_body(md_text: str, *heading_substrings: str) -> str:
-    """Return the body of the first ``##`` section whose title contains any substring."""
+    """Return the body of the best-matching ``##`` section.
+
+    Exact heading matches (after stripping emphasis) win over substring matches so
+    ``## Pre-ownership`` cannot steal an ``ownership`` lookup from ``## Ownership``.
+    """
     lines = md_text.splitlines()
-    body: list[str] = []
-    in_section = False
+    exact_body: list[str] | None = None
+    substring_body: list[str] | None = None
+    mode: str | None = None  # "exact" | "substring" | None
+    current: list[str] = []
+
+    def _flush() -> None:
+        nonlocal exact_body, substring_body, mode, current
+        if mode == "exact" and exact_body is None:
+            exact_body = current
+        elif mode == "substring" and substring_body is None:
+            substring_body = current
+        mode = None
+        current = []
+
     for line in lines:
         if line.startswith("## "):
-            title = line[3:].strip().lower()
-            in_section = any(sub.lower() in title for sub in heading_substrings)
-            if in_section:
-                body = []
+            _flush()
+            title = _normalize_heading(line[3:])
+            for sub in heading_substrings:
+                cand = sub.strip().lower()
+                if title == cand:
+                    mode = "exact"
+                    break
+                if cand in title and mode is None:
+                    mode = "substring"
             continue
-        if in_section:
-            body.append(line)
-    return "\n".join(body).strip()
+        if mode is not None:
+            current.append(line)
+    _flush()
+    chosen = exact_body if exact_body is not None else substring_body
+    return "\n".join(chosen or []).strip()
 
 
 def _extract_related_data_products(md_path: Path) -> list[str]:
@@ -235,7 +268,8 @@ def _extract_owners(md_path: Path) -> dict[str, list[str]]:
     """Parse ``## Ownership`` into ``{"data_owner": [...], "data_steward": [...]}``.
 
     Reads the two bold sub-groups (``**Data Owner:**`` / ``**Data Steward:**``) and the
-    ``@quintoandar.com.br`` email bullets under each. Template placeholders (wrapped in
+    ``@quintoandar.com`` / ``@quintoandar.com.br`` email bullets under each.
+    Template placeholders (wrapped in
     ``{...}``) never match and are silently dropped, so an unfilled template yields empty
     lists. Emails are de-duplicated per role, preserving document order.
     """
@@ -251,6 +285,9 @@ def _extract_owners(md_path: Path) -> dict[str, list[str]]:
         if current_role is None or not stripped.startswith("- "):
             continue
         email = stripped[2:].strip()
+        link_match = _MAILTO_LINK_RE.match(email)
+        if link_match:
+            email = link_match.group(1).strip()
         if _OWNER_EMAIL_RE.match(email) and email not in owners[current_role]:
             owners[current_role].append(email)
     return owners
@@ -297,9 +334,12 @@ def _extract_mbrs(md_path: Path) -> list[str]:
     seen: set[str] = set()
     for line in section.splitlines():
         stripped = line.strip()
-        if not stripped.startswith("- "):
+        if stripped.startswith("- "):
+            name = stripped[2:].strip().strip("*").strip()
+        elif stripped and not stripped.startswith("#"):
+            name = stripped.strip("*").strip()
+        else:
             continue
-        name = stripped[2:].strip().strip("*").strip()
         if not name or "{" in name or "}" in name:
             continue
         if name.lower() not in seen:
@@ -368,16 +408,16 @@ def _inject_related_data_products(yaml_content: str, product_ids: list[str]) -> 
 
 
 def _metric_asset_section_bodies(md_text: str) -> list[str]:
-    """Body of ``## Superset Golden Assets`` — Trino tables + Superset URNs for DataHub assets."""
+    """Body of ``## Superset Golden Assets`` — Trino tables + Superset assets for DataHub."""
     body = _extract_section_body(md_text, "superset golden")
     return [body] if body else []
 
 
 def _extract_metric_dataset_rows(md_path: Path) -> list[dict[str, str]]:
-    """Extract Trino ``schema.table`` refs and Superset URNs for metric Data Product assets.
+    """Extract Trino ``schema.table`` refs and Superset assets for metric Data Product assets.
 
     Both are linked on the product Summary in DataHub (e.g. nps-fr: sandbox tables + Superset
-    virtual datasets). Parsed from ``## Superset Golden Assets``.
+    virtual datasets / charts / dashboards). Parsed from ``## Superset Golden Assets``.
     """
     rows: list[dict[str, str]] = []
     seen_tables: set[tuple[str, str]] = set()
@@ -388,7 +428,7 @@ def _extract_metric_dataset_rows(md_path: Path) -> list[dict[str, str]]:
             if key not in seen_tables:
                 seen_tables.add(key)
                 rows.append({"schema": schema, "table": table})
-        for urn in _SUPERSET_DATASET_URN_RE.findall(body):
+        for urn in _SUPERSET_ASSET_URN_RE.findall(body):
             urn = urn.strip()
             if urn not in seen_urns:
                 seen_urns.add(urn)

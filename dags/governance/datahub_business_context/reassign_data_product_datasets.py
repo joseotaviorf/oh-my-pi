@@ -37,7 +37,7 @@ from load_collections_context import (  # noqa: E402
     _SET_DATA_PRODUCT_ASSETS,
     _data_product_urn,
     _entity_exists,
-    _get_dataset_current_product_urn,
+    _get_asset_current_product_urn,
     _post,
 )
 
@@ -87,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
             skipped += 1
             continue
 
-        current = _get_dataset_current_product_urn(urn)
+        current = _get_asset_current_product_urn(urn)
         if current is _OWNER_UNKNOWN:
             print(f"  ! SKIP {label}: ownership lookup failed — retry when reachable")
             skipped += 1

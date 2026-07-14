@@ -1684,11 +1684,11 @@ def _filter_registered_dataset_urns(urns: list[str]) -> list[str]:
     return registered
 
 
-# batchSetDataProduct is EXCLUSIVE (one dataset → one product). This reverse-relationship
-# query lets us refuse to steal a dataset already owned by a *different* product.
-_GET_DATASET_OWNER_PRODUCT = """
-query GetDatasetOwnerProduct($urn: String!) {
-  dataset(urn: $urn) {
+# batchSetDataProduct is EXCLUSIVE (one asset → one product). This reverse-relationship
+# query lets us refuse to steal an asset already owned by a *different* product.
+_GET_ASSET_OWNER_PRODUCT = """
+query GetAssetOwnerProduct($urn: String!) {
+  entity(urn: $urn) {
     relationships(input: {
       types: ["DataProductContains"], direction: INCOMING, start: 0, count: 1
     }) {
@@ -1702,25 +1702,25 @@ query GetDatasetOwnerProduct($urn: String!) {
 _OWNER_UNKNOWN = object()  # sentinel: lookup failed, cannot determine ownership
 
 
-def _get_dataset_current_product_urn(dataset_urn: str) -> Any:
-    """Return the Data Product URN that currently owns ``dataset_urn``, or None.
+def _get_asset_current_product_urn(asset_urn: str) -> Any:
+    """Return the Data Product URN that currently owns ``asset_urn``, or None.
 
     Returns the ``_OWNER_UNKNOWN`` sentinel when the GraphQL call fails or returns no
     data — callers must distinguish "unowned" (None) from "lookup error" (sentinel) so
     that transient API errors don't silently allow reassignment.
 
-    Uses the INCOMING ``DataProductContains`` relationship (the ``dataset.dataProduct``
-    GraphQL field does not exist in this DataHub version).
+    Uses the INCOMING ``DataProductContains`` relationship via the generic ``entity``
+    root query so datasets, charts, and dashboards are all supported.
     """
     try:
-        data = _post(_GET_DATASET_OWNER_PRODUCT, {"urn": dataset_urn})
+        data = _post(_GET_ASSET_OWNER_PRODUCT, {"urn": asset_urn})
     except Exception:
         return _OWNER_UNKNOWN
-    dataset_node = _graphql_field(data, "dataset")
-    if not dataset_node:
+    entity_node = _graphql_field(data, "entity")
+    if not entity_node:
         # GraphQL returned no data — cannot confirm unowned; treat as unknown.
         return _OWNER_UNKNOWN
-    rels = (dataset_node.get("relationships") or {}).get("relationships") or []
+    rels = (entity_node.get("relationships") or {}).get("relationships") or []
     for rel in rels:
         owner = ((rel or {}).get("entity") or {}).get("urn")
         if owner:
@@ -1729,9 +1729,9 @@ def _get_dataset_current_product_urn(dataset_urn: str) -> Any:
 
 
 def _filter_assignable_urns(urns: list[str], this_product_urn: str) -> list[str]:
-    """Drop datasets already owned by a *different* product (prevents ownership theft).
+    """Drop assets already owned by a *different* product (prevents ownership theft).
 
-    Keep a dataset when it is unowned or already owned by this product (idempotent).
+    Keep an asset when it is unowned or already owned by this product (idempotent).
     Skip (fail-closed) when ownership cannot be determined — a transient API error must
     not silently permit reassignment.
     A conflict is logged loudly (naming both products) so it surfaces in CI and can be
@@ -1740,7 +1740,7 @@ def _filter_assignable_urns(urns: list[str], this_product_urn: str) -> list[str]
     """
     assignable: list[str] = []
     for urn in urns:
-        owner = _get_dataset_current_product_urn(urn)
+        owner = _get_asset_current_product_urn(urn)
         if owner is _OWNER_UNKNOWN:
             print(
                 f"  ! ownership lookup failed for {urn} — skipping (fail-closed). "

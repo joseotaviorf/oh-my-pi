@@ -246,3 +246,65 @@ class TestPruneStaleAssets:
         loader._prune_stale_assets("urn:li:dataProduct:x", ["urn:a"])
         # Never detach on incomplete information (fail-open) — no mutation attempted.
         assert all("FetchDataProductAssets" in q for q, _ in calls)
+
+
+class TestGetAssetCurrentProductUrn:
+    """Ownership lookup must work for datasets, charts, and dashboards."""
+
+    _OWNER_URN = "urn:li:dataProduct:metric-entity-property-integrity"
+
+    @staticmethod
+    def _entity_owner_response(owner_urn: str | None) -> dict | None:
+        if owner_urn is None:
+            return {
+                "entity": {
+                    "relationships": {"relationships": []},
+                }
+            }
+        return {
+            "entity": {
+                "relationships": {
+                    "relationships": [{"entity": {"urn": owner_urn}}]
+                }
+            }
+        }
+
+    @pytest.mark.parametrize(
+        "asset_urn",
+        [
+            "urn:li:dataset:(urn:li:dataPlatform:superset,16266,PROD)",
+            "urn:li:chart:(superset,chart.56400)",
+            "urn:li:dashboard:(superset,dashboard.123)",
+        ],
+    )
+    def test_resolves_owner_for_any_asset_type(
+        self, monkeypatch, asset_urn: str
+    ) -> None:
+        monkeypatch.setattr(
+            loader,
+            "_post",
+            lambda q, v: self._entity_owner_response(self._OWNER_URN),
+        )
+        assert loader._get_asset_current_product_urn(asset_urn) == self._OWNER_URN
+
+    def test_unowned_asset_returns_none(self, monkeypatch) -> None:
+        monkeypatch.setattr(
+            loader,
+            "_post",
+            lambda q, v: self._entity_owner_response(None),
+        )
+        assert (
+            loader._get_asset_current_product_urn(
+                "urn:li:chart:(superset,chart.56400)"
+            )
+            is None
+        )
+
+    def test_lookup_failure_returns_sentinel(self, monkeypatch) -> None:
+        monkeypatch.setattr(loader, "_post", lambda q, v: None)
+        assert (
+            loader._get_asset_current_product_urn(
+                "urn:li:chart:(superset,chart.56400)"
+            )
+            is loader._OWNER_UNKNOWN
+        )

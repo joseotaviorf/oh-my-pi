@@ -73,6 +73,36 @@ def _gq_stable_urn(product_id: str, index: int, base_urn: Optional[str] = None) 
     return f"urn:li:query:{uuid.uuid5(_URN_NAMESPACE, key)}"
 
 
+def _resolve_datasets(
+    parsed: ParsedEntityDocument,
+    *,
+    data_product_type: str,
+    primary_datasets: Optional[list[tuple[str, str]]],
+    all_gq_subjects: list[tuple[str, str]],
+) -> list[dict[str, str]]:
+    """Build the ``datasets`` list for the YAML spec (Trino rows and/or Superset URNs)."""
+    if data_product_type == DATA_PRODUCT_TYPE_METRIC and parsed.metric_dataset_rows:
+        return list(parsed.metric_dataset_rows)
+    if primary_datasets:
+        return [{"schema": s, "table": t} for s, t in primary_datasets]
+    if parsed.datasets:
+        return [{"schema": s, "table": t} for s, t in parsed.datasets]
+    return [{"schema": s, "table": t} for s, t in all_gq_subjects]
+
+
+def _gq_subject_rows(
+    datasets: list[dict[str, str]],
+) -> list[tuple[str, str]]:
+    """Return schema/table pairs from dataset rows for golden-query subjects."""
+    subjects: list[tuple[str, str]] = []
+    for row in datasets:
+        schema = row.get("schema")
+        table = row.get("table")
+        if schema and table:
+            subjects.append((schema, table))
+    return subjects
+
+
 def build_datahub_yaml(
     parsed: ParsedEntityDocument,
     *,
@@ -96,7 +126,13 @@ def build_datahub_yaml(
         for pair in extract_subjects_from_sql(gq.sql):
             if pair not in all_gq_subjects:
                 all_gq_subjects.append(pair)
-    datasets = primary_datasets or parsed.datasets or all_gq_subjects
+    dataset_rows = _resolve_datasets(
+        parsed,
+        data_product_type=data_product_type,
+        primary_datasets=primary_datasets,
+        all_gq_subjects=all_gq_subjects,
+    )
+    gq_subject_fallback = _gq_subject_rows(dataset_rows) or all_gq_subjects
     md_output_dir = (
         MD_OUTPUT_DIR_METRICS
         if data_product_type == DATA_PRODUCT_TYPE_METRIC
@@ -121,7 +157,7 @@ def build_datahub_yaml(
                 f"br.com.quintoandar.datahub.{product_id}.golden_query_url",
             ],
         },
-        "datasets": [{"schema": s, "table": t} for s, t in datasets],
+        "datasets": dataset_rows,
         "documentation_link": {
             "label": f"Business entity documentation ({entity_slug}.md)",
             "url": (
@@ -138,7 +174,7 @@ def build_datahub_yaml(
     if parsed.golden_queries:
         gq_list = []
         for i, gq in enumerate(parsed.golden_queries):
-            gq_subjects = extract_subjects_from_sql(gq.sql) or datasets[:3]
+            gq_subjects = extract_subjects_from_sql(gq.sql) or gq_subject_fallback[:3]
             gq_list.append(
                 {
                     "stable_urn": _gq_stable_urn(
@@ -172,7 +208,7 @@ def build_datahub_yaml(
         }
 
     # Ownership (## Ownership) — applies to both domain and metric products. Only emit
-    # roles that actually have resolved @quintoandar.com.br emails.
+    # roles that actually have resolved @quintoandar.com / @quintoandar.com.br emails.
     owners_block = {
         role: emails for role, emails in (parsed.owners or {}).items() if emails
     }
@@ -182,6 +218,9 @@ def build_datahub_yaml(
     # MBR (## MBR) — metric products only; the loader clears membership when absent.
     if data_product_type == DATA_PRODUCT_TYPE_METRIC and parsed.mbr:
         spec["mbr"] = list(parsed.mbr)
+
+    if data_product_type == DATA_PRODUCT_TYPE_METRIC and parsed.related_data_products:
+        spec["related_data_products"] = list(parsed.related_data_products)
 
     if source_document_urn:
         spec["source_context_document_urn"] = source_document_urn

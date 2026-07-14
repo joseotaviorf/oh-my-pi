@@ -67,14 +67,16 @@ def test_parse_entity_markdown_extracts_sections():
 
 def test_validate_parsed_document_passes_for_complete_doc():
     parsed = parse_entity_markdown(SAMPLE_MD)
-    assert validate_parsed_document(parsed) == []
+    errors, warnings = validate_parsed_document(parsed)
+    assert errors == []
+    assert warnings == []
 
 
 def test_validate_parsed_document_fails_without_golden_query():
     parsed = parse_entity_markdown(
         "# Foo\n\n## Overview\n\nBar\n\n## Tables\n\n`dw_a.fact_b`\n"
     )
-    errors = validate_parsed_document(parsed)
+    errors, _warnings = validate_parsed_document(parsed)
     assert any("Golden Queries" in e for e in errors)
 
 
@@ -100,7 +102,9 @@ def test_parse_inline_datahub_fence_extracts_golden_query():
     sql = parsed.golden_queries[0].sql
     assert sql.startswith("WITH j AS")
     assert "```" not in sql and "`" not in sql  # no fence remnants leak into the SQL
-    assert validate_parsed_document(parsed) == []
+    errors, warnings = validate_parsed_document(parsed)
+    assert errors == []
+    assert warnings == []
 
 
 def test_metric_document_skips_tables_and_golden_query_checks():
@@ -113,7 +117,9 @@ def test_metric_document_skips_tables_and_golden_query_checks():
         "### Canonical Filter\n\n```sql\nbusiness_context = 'forRent'\n```\n"
     )
     parsed = parse_entity_markdown(metric_md)
-    assert validate_parsed_document(parsed, data_product_type="metric") == []
+    errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
+    assert errors == []
+    assert warnings == []
 
 
 def test_domain_document_still_requires_tables_and_golden_query():
@@ -121,7 +127,7 @@ def test_domain_document_still_requires_tables_and_golden_query():
     # teach a canonical query.
     metric_md = "# NPS FR\n\n## Overview\n\nNPS overview.\n"
     parsed = parse_entity_markdown(metric_md)
-    errors = validate_parsed_document(parsed, data_product_type="domain")
+    errors, _warnings = validate_parsed_document(parsed, data_product_type="domain")
     assert any("Golden Queries" in e for e in errors)
     assert any("schema.table" in e for e in errors)
 
