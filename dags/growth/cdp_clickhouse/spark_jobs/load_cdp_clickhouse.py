@@ -5,6 +5,8 @@ from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
 import clickhouse_connect
+from pyspark.sql import Window
+from pyspark.sql.functions import col, desc, row_number
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -208,6 +210,17 @@ if __name__ == "__main__":
 
     df = spark.read.parquet(*source_paths)
     logger.info("data loaded successfully!")
+
+    """
+    Deduplicate raw events by event_id (latest egw_timestamp).
+    """
+    dedup_window = Window.partitionBy("event_id").orderBy(desc("egw_timestamp"))
+    df = (
+        df.withColumn("_rn", row_number().over(dedup_window))
+        .filter(col("_rn") == 1)
+        .drop("_rn")
+    )
+    logger.info("raw events deduplicated by event_id (latest egw_timestamp)")
 
     """
     Load data to datalake.
