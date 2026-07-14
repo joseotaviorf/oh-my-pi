@@ -40,6 +40,28 @@ def test_owners_are_recovered_from_glued_datahub_export():
     assert parsed.mbr == ["Post Contract"]
 
 
+def test_sanitizes_bold_italic_underscore_when_underscores_are_backslash_escaped():
+    """Regression: DataHub backslash-escapes underscores but not the bold
+    asterisks around them (``**\\_Data Owner:\\_**``), producing a heading the
+    markdown_sanitizer's emphasis regexes can't match until the escaping
+    backslash is stripped. Sanitizing before unescaping left this artifact in
+    the committed markdown (``raw_markdown`` / ``build_markdown_file`` output)
+    even though owners still parsed correctly from the same text — see the
+    'Cases Perspective' Context Document sync that surfaced this.
+    """
+    doc = (
+        "# Metric Entity: Cases Perspective\n\n"
+        "## Ownership\n\n"
+        "**\\_Data Owner:\\_**\n\n"
+        "- [joao.mariani@quintoandar.com.br](mailto:joao.mariani@quintoandar.com.br)\n\n"
+        "## Overview\n\nBody.\n"
+    )
+    parsed = parse_entity_markdown(doc)
+    assert parsed.owners["data_owner"] == ["joao.mariani@quintoandar.com.br"]
+    assert "**Data Owner:**" in parsed.raw_markdown
+    assert "**_Data Owner:_**" not in parsed.raw_markdown
+
+
 def test_mbr_parsed_from_bold_wrapped_heading():
     doc = """\
 # Metric

@@ -379,8 +379,14 @@ def parse_entity_markdown(
     markdown: str, *, fallback_title: str = ""
 ) -> ParsedEntityDocument:
     """Parse a TARS entity Context Document body into structured fields."""
-    markdown = sanitize_datahub_markdown(markdown)
+    # Unescape BEFORE sanitizing: DataHub backslash-escapes markdown special
+    # chars (see _MD_ESCAPE_RE below), and the sanitizer's emphasis/heading
+    # regexes only match literal `*`/`_` runs. Sanitizing first left escaped
+    # artifacts (e.g. ``**\_Data Owner:\_**``) untouched, since the escaping
+    # backslash breaks the regex; unescaping afterward then revealed the
+    # un-sanitized ``**_Data Owner:_**`` in the final output.
     markdown = _MD_ESCAPE_RE.sub(r"\1", markdown)
+    markdown = sanitize_datahub_markdown(markdown)
     title = _extract_title(markdown)
     _stripped_fallback = fallback_title.strip()
     if (
