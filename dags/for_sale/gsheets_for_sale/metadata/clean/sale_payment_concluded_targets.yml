@@ -4,73 +4,99 @@ domain: For Sale
 columns:
   city_group:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.city_group
+    - datalake_gsheets_raw.sale_payment_concluded_targets.city_group
+    description: City group the sale-closing payment target applies to, used to slice targets by commercial region.
   operacao:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.operacao
+    - datalake_gsheets_raw.sale_payment_concluded_targets.operacao
+    description: Sales operation segment the target refers to, used to break down payment-conclusion goals by operation.
   model:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.model
+    - datalake_gsheets_raw.sale_payment_concluded_targets.model
+    description: Business model the target applies to, distinguishing the sale operating model behind the payment goal.
   forma_pagamento:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.forma_pagamento
+    - datalake_gsheets_raw.sale_payment_concluded_targets.forma_pagamento
+    description: Payment method the target refers to, such as financing, cash or FGTS-backed payment.
   payment_concluded:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.payment_concluded
+    - datalake_gsheets_raw.sale_payment_concluded_targets.payment_concluded
+    description: Target number of sales reaching concluded payment for the given segment and period.
   credito_fim:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.credito_fim
+    - datalake_gsheets_raw.sale_payment_concluded_targets.credito_fim
+    description: SLA target for the end of the credit-approval stage of the sale-closing process.
   credito_inicio:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.credito_inicio
+    - datalake_gsheets_raw.sale_payment_concluded_targets.credito_inicio
+    description: SLA target for the start of the credit-approval stage of the sale-closing process.
   cri_fim:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.cri_fim
+    - datalake_gsheets_raw.sale_payment_concluded_targets.cri_fim
+    description: SLA target for the end of the CRI property-registry stage of the sale-closing process.
   cri_inicio:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.cri_inicio
+    - datalake_gsheets_raw.sale_payment_concluded_targets.cri_inicio
+    description: SLA target for the start of the CRI property-registry stage of the sale-closing process.
   crn_fim:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.crn_fim
+    - datalake_gsheets_raw.sale_payment_concluded_targets.crn_fim
+    description: SLA target for the end of the CRN notary-registry stage of the sale-closing process.
   crn_inicio:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.crn_inicio
+    - datalake_gsheets_raw.sale_payment_concluded_targets.crn_inicio
+    description: SLA target for the start of the CRN notary-registry stage of the sale-closing process.
   dd_fim_legal:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.dd_fim_legal
+    - datalake_gsheets_raw.sale_payment_concluded_targets.dd_fim_legal
+    description: SLA target for the end of the legal due-diligence stage of the sale-closing process.
   dd_fim_legaut:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.dd_fim_legaut
+    - datalake_gsheets_raw.sale_payment_concluded_targets.dd_fim_legaut
+    description: SLA target for the end of the legal-authorization due-diligence stage of the sale-closing process.
   dd_inicio_legal:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.dd_inicio_legal
+    - datalake_gsheets_raw.sale_payment_concluded_targets.dd_inicio_legal
+    description: SLA target for the start of the legal due-diligence stage of the sale-closing process.
   diligencia_fim:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.diligencia_fim
+    - datalake_gsheets_raw.sale_payment_concluded_targets.diligencia_fim
+    description: SLA target for the end of the overall diligence stage of the sale-closing process.
   diligencia_inicio:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.diligencia_inicio
+    - datalake_gsheets_raw.sale_payment_concluded_targets.diligencia_inicio
+    description: SLA target for the start of the overall diligence stage of the sale-closing process.
   financiamento_fim:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.financiamento_fim
+    - datalake_gsheets_raw.sale_payment_concluded_targets.financiamento_fim
+    description: SLA target for the end of the mortgage-financing stage of the sale-closing process.
   financiamento_inicio:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.financiamento_inicio
+    - datalake_gsheets_raw.sale_payment_concluded_targets.financiamento_inicio
+    description: SLA target for the start of the mortgage-financing stage of the sale-closing process.
   halfyear:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.halfyear
+    - datalake_gsheets_raw.sale_payment_concluded_targets.halfyear
+    description: Half-year period the payment-conclusion target refers to, used for semester-level planning.
   quarter:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.quarter
+    - datalake_gsheets_raw.sale_payment_concluded_targets.quarter
+    description: Calendar quarter the payment-conclusion target refers to, used for quarterly planning.
   week:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.week
+    - datalake_gsheets_raw.sale_payment_concluded_targets.week
+    description: Week the payment-conclusion target refers to, used for weekly tracking of closing goals.
   month:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.month
+    - datalake_gsheets_raw.sale_payment_concluded_targets.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   year:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.year
+    - datalake_gsheets_raw.sale_payment_concluded_targets.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   date:
     lineage:
-      - datalake_gsheets_raw.sale_payment_concluded_targets.date
+    - datalake_gsheets_raw.sale_payment_concluded_targets.date
+    description: Reference date the payment-conclusion target applies to in the planning calendar.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale payment concluded targets sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale payment concluded targets record with standardized names and types in datalake_gsheets_clean.

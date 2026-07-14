@@ -3,58 +3,60 @@ table_name: sale_supply_targets_2024
 domain: For Sale
 columns:
   city_group:
-    description: City group.
+    description: City group the supply target applies to, used to slice acquisition goals by commercial region.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.city_group
+    - datalake_gsheets_raw.sale_supply_targets_2024.city_group
   lead_processing_operation:
     description: Operation that processed the listing lead.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.lead_processing_operation
+    - datalake_gsheets_raw.sale_supply_targets_2024.lead_processing_operation
   supply_mkt_origin_detailed:
     description: Market origin of the lead.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.supply_mkt_origin_detailed
+    - datalake_gsheets_raw.sale_supply_targets_2024.supply_mkt_origin_detailed
   planning_taxonomy:
     description: Planning team taxonomy. Combination of supply mkt origin and Medium channel.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.planning_taxonomy
+    - datalake_gsheets_raw.sale_supply_targets_2024.planning_taxonomy
   planning_conversion:
     description: Field that identifies what kind of conversion detailed. Distinguishing the Inside Sales Operation with Inbound, Outbound and IS Expert.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.planning_conversion
+    - datalake_gsheets_raw.sale_supply_targets_2024.planning_conversion
   planning_operation:
     description: Identifies the conversion operation type.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.planning_operation
+    - datalake_gsheets_raw.sale_supply_targets_2024.planning_operation
   planning_cluster:
     description: Field used to segmenting the channel in the Cluster for affiliates and Medium for Owners PWA and Price Calculator FR/FS.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.planning_cluster
+    - datalake_gsheets_raw.sale_supply_targets_2024.planning_cluster
   company_report_origin:
     description: Identifies the acquisition channel for operation (IS and FSS) and the conversion fonts for every else, like CIQ, Rede, PP Multi and Captaí.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.company_report_origin
+    - datalake_gsheets_raw.sale_supply_targets_2024.company_report_origin
   prospects:
     description: Target volume of prospects.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.prospects
+    - datalake_gsheets_raw.sale_supply_targets_2024.prospects
   qualifieds:
     description: Target volume of qualifieds.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.qualifieds
+    - datalake_gsheets_raw.sale_supply_targets_2024.qualifieds
   opportunities:
     description: Target volume of opportunities.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.opportunities
+    - datalake_gsheets_raw.sale_supply_targets_2024.opportunities
   available_qualifieds:
     description: Target volume of available qualifieds.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.available_qualifieds
+    - datalake_gsheets_raw.sale_supply_targets_2024.available_qualifieds
   first_listings:
     description: Target volume of first listings.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.first_listings
+    - datalake_gsheets_raw.sale_supply_targets_2024.first_listings
   dt_target:
-    description: Date of the target.
+    description: Calendar date of target for this sale supply targets 2024 record.
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets_2024.date
+    - datalake_gsheets_raw.sale_supply_targets_2024.date
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale supply targets 2024 sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale supply targets 2024 record with standardized names and types in datalake_gsheets_clean.

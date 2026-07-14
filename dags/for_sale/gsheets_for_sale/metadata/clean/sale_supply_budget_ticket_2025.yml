@@ -4,34 +4,47 @@ domain: For Sale
 columns:
   city_group:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.city_group
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.city_group
+    description: City group the supply budget applies to, used to slice acquisition goals by commercial region.
   company_report_origin:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.company_report_origin
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.company_report_origin
+    description: Company report origin classification used to group supply records in standardized reporting.
   date:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.date
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.date
+    description: Reference date the supply budget applies to in the planning calendar.
   planning_cluster:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.planning_cluster
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.planning_cluster
+    description: Planning cluster grouping from the supply planning taxonomy used to organize the budget.
   planning_conversion:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.planning_conversion
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.planning_conversion
+    description: Planning conversion grouping from the supply planning taxonomy used to organize the budget.
   planning_operation:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.planning_operation
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.planning_operation
+    description: Planning operation grouping from the supply planning taxonomy used to organize the budget.
   range_tkt_adj:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.range_tkt_adj
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.range_tkt_adj
+    description: Adjusted ticket price range used to group supply budgets by adjusted listing price band.
   tkt_range:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.tkt_range
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.tkt_range
+    description: Ticket price range band used to group supply budgets by listing price.
   volume_first_listings:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.volume_first_listings
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.volume_first_listings
+    description: Budgeted volume of first listings expected for the ticket price band and period.
   week:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.week
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.week
+    description: Week the supply budget applies to, used for weekly tracking of acquisition goals.
   year_month:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_ticket_2025.year_month
+    - datalake_gsheets_raw.sale_supply_budget_ticket_2025.year_month
+    description: Reference month the supply budget applies to, used for monthly planning.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale supply budget ticket 2025 sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale supply budget ticket 2025 record with standardized names and types in datalake_gsheets_clean.

@@ -4,55 +4,75 @@ domain: For Sale
 columns:
   campaign:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.campaign
+    - datalake_gsheets_raw.sale_supply_targets.campaign
+    description: Marketing campaign associated with the supply-acquisition target, used to attribute goals to campaigns.
   city_group:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.city_group
+    - datalake_gsheets_raw.sale_supply_targets.city_group
+    description: City group the supply target applies to, used to slice acquisition goals by commercial region.
   first_listings:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.first_listings
+    - datalake_gsheets_raw.sale_supply_targets.first_listings
+    description: Target number of first listings, the final stage of the sale supply-acquisition funnel.
   mkt_channel:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.mkt_channel
+    - datalake_gsheets_raw.sale_supply_targets.mkt_channel
+    description: Marketing channel the supply target is attributed to, such as paid media or organic.
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.mkt_origin
+    - datalake_gsheets_raw.sale_supply_targets.mkt_origin
+    description: Marketing origin (lead source) the supply target is attributed to.
   mkt_type:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.mkt_type
+    - datalake_gsheets_raw.sale_supply_targets.mkt_type
+    description: Marketing type classification used to group supply-acquisition targets by acquisition strategy.
   operacao:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.operacao
+    - datalake_gsheets_raw.sale_supply_targets.operacao
+    description: Sales operation segment the supply target refers to, used to break down goals by operation.
   canal_planning:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.canal_planning
+    - datalake_gsheets_raw.sale_supply_targets.canal_planning
+    description: Planning channel grouping used to organize supply-acquisition targets in the planning model.
   opportunities:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.opportunities
+    - datalake_gsheets_raw.sale_supply_targets.opportunities
+    description: Target number of supply opportunities, the funnel stage between qualified leads and first listings.
   prospects:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.prospects
+    - datalake_gsheets_raw.sale_supply_targets.prospects
+    description: Target number of supply prospects, the top stage of the sale supply-acquisition funnel.
   qualifieds:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.qualifieds
+    - datalake_gsheets_raw.sale_supply_targets.qualifieds
+    description: Target number of qualified supply leads, the stage after prospects in the supply funnel.
   available_qualifieds:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.available_qualifieds
+    - datalake_gsheets_raw.sale_supply_targets.available_qualifieds
+    description: Target number of qualified leads still available to work, after excluding already-handled qualifieds.
   halfyear:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.halfyear
+    - datalake_gsheets_raw.sale_supply_targets.halfyear
+    description: Half-year period the supply target refers to, used for semester-level planning.
   quarter:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.quarter
+    - datalake_gsheets_raw.sale_supply_targets.quarter
+    description: Calendar quarter the supply target refers to, used for quarterly planning.
   week:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.week
+    - datalake_gsheets_raw.sale_supply_targets.week
+    description: Week the supply target refers to, used for weekly tracking of acquisition goals.
   year:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.year
+    - datalake_gsheets_raw.sale_supply_targets.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.month
+    - datalake_gsheets_raw.sale_supply_targets.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   date:
     lineage:
-      - datalake_gsheets_raw.sale_supply_targets.date
+    - datalake_gsheets_raw.sale_supply_targets.date
+    description: Reference date the supply target applies to in the planning calendar.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale supply targets sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale supply targets record with standardized names and types in datalake_gsheets_clean.

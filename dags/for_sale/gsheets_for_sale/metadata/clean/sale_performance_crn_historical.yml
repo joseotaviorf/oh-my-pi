@@ -1,68 +1,67 @@
----
 database_name: datalake_gsheets_clean
 table_name: sale_performance_crn_historical
-owner: hyran.teixeira@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: 'Historical data of notary office (cartório) processes for sale transactions, tracking lead times, contacts, and documentation steps from sale agreement to registry completion.'
+description: Historical data of notary office (cartório) processes for sale transactions, tracking lead times, contacts, and documentation steps from sale agreement to registry completion.
 columns:
   id_offer:
-    description: 'Unique identifier for the sale offer associated with the notary process.'
+    description: Unique identifier for the sale offer associated with the notary process.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.id_offer
   id_house:
-    description: 'Unique identifier for the property/house involved in the sale transaction.'
+    description: Unique identifier for the property/house involved in the sale transaction.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.id_house
   crn_partner:
-    description: 'Name or identifier of the notary office (cartório) partner handling the registration process.'
+    description: Name or identifier of the notary office (cartório) partner handling the registration process.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.crn_partner
   crn_agent:
-    description: 'Name or identifier of the specific agent at the notary office responsible for the case.'
+    description: Name or identifier of the specific agent at the notary office responsible for the case.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.crn_agent
   due_lead_time_bookkeeping_reason:
-    description: 'Reason or explanation for delays in the bookkeeping/accounting phase of the notary process.'
+    description: Reason or explanation for delays in the bookkeeping/accounting phase of the notary process.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.due_lead_time_bookkeeping_reason
   due_lead_time_cri_reason:
-    description: 'Reason or explanation for delays in the CRI (Certificate of Real Estate Registry) request or completion phase.'
+    description: Reason or explanation for delays in the CRI (Certificate of Real Estate Registry) request or completion phase.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.due_lead_time_cri_reason
   observations:
-    description: 'Additional notes, comments, or observations about the notary process or transaction.'
+    description: Additional notes, comments, or observations about the notary process or transaction.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.observations
   status:
-    description: 'Current status of the notary registration process (e.g., "in_progress", "completed", "pending").'
+    description: Current status of the notary registration process (e.g., "in_progress", "completed", "pending").
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.status
   has_house_chattel_mortgage:
-    description: 'Boolean flag indicating whether the property has a chattel mortgage or similar encumbrance.'
+    description: Boolean flag indicating whether the property has a chattel mortgage or similar encumbrance.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.has_house_chattel_mortgage
   is_continue_with_crn_partner:
-    description: 'Boolean flag indicating whether the transaction will continue with the current notary office partner.'
+    description: Boolean flag indicating whether the transaction will continue with the current notary office partner.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.is_continue_with_crn_partner
   lt_first_contact:
-    description: 'Lead time (in days) from sale agreement signing to first contact with the notary office.'
+    description: Lead time (in days) from sale agreement signing to first contact with the notary office.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.lt_first_contact
   lt_bookkeeping:
-    description: 'Lead time (in days) for the bookkeeping/accounting phase of the notary process.'
+    description: Lead time (in days) for the bookkeeping/accounting phase of the notary process.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.lt_bookkeeping
   lt_cri_request:
-    description: 'Lead time (in days) from first contact to CRI (Certificate of Real Estate Registry) request submission.'
+    description: Lead time (in days) from first contact to CRI (Certificate of Real Estate Registry) request submission.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.lt_cri_request
   lt_cri:
-    description: 'Lead time (in days) for the CRI completion phase, from request to issuance.'
+    description: Lead time (in days) for the CRI completion phase, from request to issuance.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.lt_cri
   lt_total:
-    description: 'Total lead time (in days) for the entire notary registration process, from sale agreement signing to completion.'
+    description: Total lead time (in days) for the entire notary registration process, from sale agreement signing to completion.
     lineage:
     - datalake_gsheets_raw.sale_performance_crn_historical.lt_total
   dt_sale_agreement_signed:

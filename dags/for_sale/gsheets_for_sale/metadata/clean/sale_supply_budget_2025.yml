@@ -4,34 +4,47 @@ domain: For Sale
 columns:
   available_qualifieds:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.available_qualifieds
+    - datalake_gsheets_raw.sale_supply_budget_2025.available_qualifieds
+    description: Budgeted number of qualified leads still available to work, after excluding already-handled qualifieds.
   city_group:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.city_group
+    - datalake_gsheets_raw.sale_supply_budget_2025.city_group
+    description: City group the supply budget applies to, used to slice acquisition goals by commercial region.
   company_report_origin:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.company_report_origin
+    - datalake_gsheets_raw.sale_supply_budget_2025.company_report_origin
+    description: Company report origin classification used to group supply records in standardized reporting.
   date:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.date
+    - datalake_gsheets_raw.sale_supply_budget_2025.date
+    description: Reference date the supply budget applies to in the planning calendar.
   first_listings:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.first_listings
+    - datalake_gsheets_raw.sale_supply_budget_2025.first_listings
+    description: Budgeted number of first listings, the final stage of the sale supply-acquisition funnel.
   opportunities:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.opportunities
+    - datalake_gsheets_raw.sale_supply_budget_2025.opportunities
+    description: Budgeted number of supply opportunities, the funnel stage between qualified leads and first listings.
   planning_cluster:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.planning_cluster
+    - datalake_gsheets_raw.sale_supply_budget_2025.planning_cluster
+    description: Planning cluster grouping from the supply planning taxonomy used to organize the budget.
   planning_conversion:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.planning_conversion
+    - datalake_gsheets_raw.sale_supply_budget_2025.planning_conversion
+    description: Planning conversion grouping from the supply planning taxonomy used to organize the budget.
   planning_operation:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.planning_operation
+    - datalake_gsheets_raw.sale_supply_budget_2025.planning_operation
+    description: Planning operation grouping from the supply planning taxonomy used to organize the budget.
   prospects:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.prospects
+    - datalake_gsheets_raw.sale_supply_budget_2025.prospects
+    description: Budgeted number of supply prospects, the top stage of the sale supply-acquisition funnel.
   qualifieds:
     lineage:
-      - datalake_gsheets_raw.sale_supply_budget_2025.qualifieds
+    - datalake_gsheets_raw.sale_supply_budget_2025.qualifieds
+    description: Budgeted number of qualified supply leads, the stage after prospects in the supply funnel.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale supply budget 2025 sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale supply budget 2025 record with standardized names and types in datalake_gsheets_clean.

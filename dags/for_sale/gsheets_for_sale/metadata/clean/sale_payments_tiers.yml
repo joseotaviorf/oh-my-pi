@@ -1,29 +1,35 @@
----
 database_name: datalake_gsheets_clean
 table_name: sale_payments_tiers
 domain: For Sale
 columns:
-  sk_user:
+  bigint:
     lineage:
-      - datalake_gsheets_raw.sale_payments_tiers.sk_user
-  sk_agent:
-    lineage:
-      - datalake_gsheets_raw.sale_payments_tiers.sk_agent
+    - datalake_gsheets_raw.sale_payments_tiers.sk_user
+    - datalake_gsheets_raw.sale_payments_tiers.sk_agent
+    description: Cast BIGINT values for user and agent surrogate keys from the source sheet.
   comission_percentage:
     lineage:
-      - datalake_gsheets_raw.sale_payments_tiers.comission
+    - datalake_gsheets_raw.sale_payments_tiers.comission
+    description: Commission rate paid to the agent for this tier, as a percentage of the brokerage value.
   additional_comission_percentage:
     lineage:
-      - datalake_gsheets_raw.sale_payments_tiers.additional_comission
+    - datalake_gsheets_raw.sale_payments_tiers.additional_comission
+    description: Additional commission rate paid on top of the base rate for this tier, as a percentage.
   tier:
     lineage:
-      - datalake_gsheets_raw.sale_payments_tiers.tier
+    - datalake_gsheets_raw.sale_payments_tiers.tier
+    description: Commission tier label that determines the agent payout rate for the period.
   kind:
     lineage:
-      - datalake_gsheets_raw.sale_payments_tiers.kind
+    - datalake_gsheets_raw.sale_payments_tiers.kind
+    description: Specialist or party kind distinguishing broker, lawyer, or coordinator roles.
   dt_tier_start:
     lineage:
-      - datalake_gsheets_raw.sale_payments_tiers.tier_start_date
+    - datalake_gsheets_raw.sale_payments_tiers.tier_start_date
+    description: Calendar date of tier start for this sale payments tiers record.
   dt_tier_end:
     lineage:
-      - datalake_gsheets_raw.sale_payments_tiers.tier_end_date
+    - datalake_gsheets_raw.sale_payments_tiers.tier_end_date
+    description: Calendar date of tier end for this sale payments tiers record.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale payments tiers sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale payments tiers record with standardized names and types in datalake_gsheets_clean.

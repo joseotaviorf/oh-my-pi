@@ -4,31 +4,43 @@ domain: For Sale
 columns:
   city:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.city
+    - datalake_gsheets_raw.sale_tof_daily_targets.city
+    description: City the top-of-funnel users target applies to, used to slice acquisition goals by city.
   context:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.context
+    - datalake_gsheets_raw.sale_tof_daily_targets.context
+    description: Business context grouping the top-of-funnel users target by acquisition scenario.
   mkt_channel:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.mkt_channel
+    - datalake_gsheets_raw.sale_tof_daily_targets.mkt_channel
+    description: Marketing channel the top-of-funnel users target is attributed to.
   mkt_medium:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.mkt_medium
+    - datalake_gsheets_raw.sale_tof_daily_targets.mkt_medium
+    description: Marketing medium the top-of-funnel users target is attributed to.
   mkt_source:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.mkt_source
+    - datalake_gsheets_raw.sale_tof_daily_targets.mkt_source
+    description: Marketing source the top-of-funnel users target is attributed to.
   tof_users_target:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.tof_users_target
+    - datalake_gsheets_raw.sale_tof_daily_targets.tof_users_target
+    description: Target number of top-of-funnel users to reach for the segment and period.
   week_start:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.week_start
+    - datalake_gsheets_raw.sale_tof_daily_targets.week_start
+    description: Start date of the week the top-of-funnel users target applies to.
   month:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.month
+    - datalake_gsheets_raw.sale_tof_daily_targets.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   year:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.year
+    - datalake_gsheets_raw.sale_tof_daily_targets.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   date:
     lineage:
-      - datalake_gsheets_raw.sale_tof_daily_targets.date
+    - datalake_gsheets_raw.sale_tof_daily_targets.date
+    description: Reference date the supply target applies to in the planning calendar.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale tof daily targets sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale tof daily targets record with standardized names and types in datalake_gsheets_clean.
