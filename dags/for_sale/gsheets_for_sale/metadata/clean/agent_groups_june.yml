@@ -4,25 +4,35 @@ domain: For Sale
 columns:
   sk_agent:
     lineage:
-      - datalake_gsheets_raw.agent_groups_june.sk_agent
+    - datalake_gsheets_raw.agent_groups_june.sk_agent
+    description: Warehouse surrogate key referencing agent in the dimensional model for Google Sheets curated reference data maintained by the For Sale analytics team.
   id_business_unit:
     lineage:
-      - datalake_gsheets_raw.agent_groups_june.sk_agent
+    - datalake_gsheets_raw.agent_groups_june.sk_agent
+    description: Foreign key to the business unit in datalake_gsheets_clean.business_unit_region the agent belongs to.
   hub_name:
     lineage:
-      - datalake_gsheets_raw.agent_groups_june.hub_name
+    - datalake_gsheets_raw.agent_groups_june.hub_name
+    description: Name of the sales hub the agent group belongs to.
   agent_group:
     lineage:
-      - datalake_gsheets_raw.agent_groups_june.agent_group
+    - datalake_gsheets_raw.agent_groups_june.agent_group
+    description: Agent group (cluster) used to segment sale agents for performance analysis.
   total_buyers_window:
     lineage:
-      - datalake_gsheets_raw.agent_groups_june.total_buyers_window
+    - datalake_gsheets_raw.agent_groups_june.total_buyers_window
+    description: Number of buyers assigned to the agent during the analysis window.
   nb_ccvs_window:
     lineage:
-      - datalake_gsheets_raw.agent_groups_june.nb_ccvs_window
+    - datalake_gsheets_raw.agent_groups_june.nb_ccvs_window
+    description: Number of CCVs (purchase-and-sale contracts) the agent closed during the analysis window.
   bp2ccv_window:
     lineage:
-      - datalake_gsheets_raw.agent_groups_june.bp2ccv_window
+    - datalake_gsheets_raw.agent_groups_june.bp2ccv_window
+    description: Buyer-prospect-to-CCV conversion rate for the agent during the analysis window.
   ts_load:
     lineage:
-      - datalake_gsheets_raw.agent_groups_june.ts_load
+    - datalake_gsheets_raw.agent_groups_june.ts_load
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of agent groups june sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per agent groups june record with standardized names and types in datalake_gsheets_clean.

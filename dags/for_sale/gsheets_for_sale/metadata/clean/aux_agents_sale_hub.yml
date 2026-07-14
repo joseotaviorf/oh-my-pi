@@ -4,40 +4,55 @@ domain: For Sale
 columns:
   id_user_agent:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.id
+    - datalake_gsheets_raw.aux_agents_sale_hub.id
+    description: Foreign key to the agent user id in the sale-hub source system.
   status:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.status
+    - datalake_gsheets_raw.aux_agents_sale_hub.status
+    description: Current operational status code governing workflow progression for this record.
   agent_type:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.tipo_agent
+    - datalake_gsheets_raw.aux_agents_sale_hub.tipo_agent
+    description: Type/category of the agent (source column tipo_agent).
   days_since_activation:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.dias_desde_ativacao
+    - datalake_gsheets_raw.aux_agents_sale_hub.dias_desde_ativacao
+    description: Number of days elapsed since the agent was activated.
   permanently_deactivated:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.descred_permanente
+    - datalake_gsheets_raw.aux_agents_sale_hub.descred_permanente
+    description: Flag indicating the agent was permanently deactivated (source descred_permanente).
   suspension_reason:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.motivo_suspensao
+    - datalake_gsheets_raw.aux_agents_sale_hub.motivo_suspensao
+    description: Reason the agent was suspended (source motivo_suspensao).
   deactivation_reason:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.motivo_descredenciamento
+    - datalake_gsheets_raw.aux_agents_sale_hub.motivo_descredenciamento
+    description: Reason the agent was deactivated/unaccredited (source motivo_descredenciamento).
   dt_registration:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.semana_credenciamento
+    - datalake_gsheets_raw.aux_agents_sale_hub.semana_credenciamento
+    description: Calendar date of registration for this aux agents sale hub record.
   dt_activation:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.data_ativacao
+    - datalake_gsheets_raw.aux_agents_sale_hub.data_ativacao
+    description: Calendar date of activation for this aux agents sale hub record.
   dt_last_suspension:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.data_last_suspensao
+    - datalake_gsheets_raw.aux_agents_sale_hub.data_last_suspensao
+    description: Calendar date of last suspension for this aux agents sale hub record.
   dt_last_suspension_return:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.data_last_retorno_suspensao
+    - datalake_gsheets_raw.aux_agents_sale_hub.data_last_retorno_suspensao
+    description: Calendar date of last suspension return for this aux agents sale hub record.
   dt_last_deactivation:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.data_last_descredenciamento
+    - datalake_gsheets_raw.aux_agents_sale_hub.data_last_descredenciamento
+    description: Calendar date of last deactivation for this aux agents sale hub record.
   dt_last_deactivation_return:
     lineage:
-      - datalake_gsheets_raw.aux_agents_sale_hub.data_last_retorno_descredenciamento
+    - datalake_gsheets_raw.aux_agents_sale_hub.data_last_retorno_descredenciamento
+    description: Calendar date of last deactivation return for this aux agents sale hub record.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of aux agents sale hub sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per aux agents sale hub record with standardized names and types in datalake_gsheets_clean.

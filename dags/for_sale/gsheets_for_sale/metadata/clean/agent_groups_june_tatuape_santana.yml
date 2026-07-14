@@ -1,28 +1,38 @@
 database_name: datalake_gsheets_clean
-table_name: agent_groups_june_tatuape_santana_tatuape_santana
+table_name: agent_groups_june_tatuape_santana
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Cleaned snapshot of the June agent-group assignment restricted to the Tatuape and Santana sales hubs, sourced from a curated Google Sheet maintained by the For Sale analytics team. One row per agent with its group and window conversion metrics in datalake_gsheets_clean.
 columns:
   sk_agent:
+    description: Surrogate key identifying the sale agent in the dimensional model.
     lineage:
       - datalake_gsheets_raw.agent_groups_june_tatuape_santana.sk_agent
   id_business_unit:
+    description: Foreign key to the business unit in datalake_gsheets_clean.business_unit_region the agent belongs to.
     lineage:
       - datalake_gsheets_raw.agent_groups_june_tatuape_santana.sk_agent
   hub_name:
+    description: Name of the sales hub the agent group belongs to.
     lineage:
       - datalake_gsheets_raw.agent_groups_june_tatuape_santana.hub_name
   agent_group:
+    description: Agent group (cluster) used to segment sale agents for performance analysis.
     lineage:
       - datalake_gsheets_raw.agent_groups_june_tatuape_santana.agent_group
   total_buyers_window:
+    description: Number of buyers assigned to the agent during the analysis window.
     lineage:
       - datalake_gsheets_raw.agent_groups_june_tatuape_santana.total_buyers_window
   nb_ccvs_window:
+    description: Number of CCVs (purchase-and-sale contracts) the agent closed during the analysis window.
     lineage:
       - datalake_gsheets_raw.agent_groups_june_tatuape_santana.nb_ccvs_window
   bp2ccv_window:
+    description: Buyer-prospect-to-CCV conversion rate for the agent during the analysis window.
     lineage:
       - datalake_gsheets_raw.agent_groups_june_tatuape_santana.bp2ccv_window
   ts_load:
+    description: ETL ingestion timestamp when this snapshot was written to the lake layer.
     lineage:
       - datalake_gsheets_raw.agent_groups_june_tatuape_santana.ts_load

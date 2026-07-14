@@ -1,32 +1,31 @@
----
 database_name: datalake_gsheets_clean
 table_name: notary_office_nps
-owner: leonardo.soares@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Table with data about NPS from Notary Office
+description: Cleaned snapshot of notary office nps sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per notary office nps record with standardized names and types in datalake_gsheets_clean.
 columns:
   sk_offer:
-    description: 'Surrogate key for the offer'
+    description: Surrogate key for the offer
     lineage:
     - datalake_gsheets_raw.notary_office_nps.sk_offer
   metric_group:
-    description: 'Metric group of the NPS'
+    description: Grouping of the NPS metric for the notary-office survey.
     lineage:
     - datalake_gsheets_raw.notary_office_nps.metric_group
   payment_method:
-    description: 'Payment method used in the offer'
+    description: Payment method used in the offer
     lineage:
     - datalake_gsheets_raw.notary_office_nps.payment_method
   score_category:
-    description: 'Score category of the NPS'
+    description: NPS score category derived from the survey score (e.g. detractor, passive, promoter).
     lineage:
     - datalake_gsheets_raw.notary_office_nps.score_category
   comment:
-    description: 'Comment from the notary office'
+    description: Free-text comment captured during review, follow-up, or exception handling.
     lineage:
     - datalake_gsheets_raw.notary_office_nps.comment
   support_partners_notary:
-    description: 'Support partners notary office'
+    description: Whether partners supported the notary-office process (source apoio_parceiros_cartorio).
     lineage:
     - datalake_gsheets_raw.notary_office_nps.apoio_parceiros_cartorio
   support_name:
@@ -34,24 +33,24 @@ columns:
     lineage:
     - datalake_gsheets_raw.notary_office_nps.apoio_name
   support_followed_with_partner:
-    description: ''
+    description: Boolean indicating whether support continued with the partner (derived from Apoio_seguiu_com_parceiro Sim/Nao).
     lineage:
-    - "datalake_gsheets_raw.notary_office_nps.apoio_seguiu_com_parceiro"
+    - datalake_gsheets_raw.notary_office_nps.apoio_seguiu_com_parceiro
   score:
-    description: 'Score of the NPS'
+    description: NPS score given in the survey (integer).
     lineage:
     - datalake_gsheets_raw.notary_office_nps.score
   dt_offer_shared:
-    description: 'Date of the offer shared'
+    description: Date of the offer shared
     lineage:
     - datalake_gsheets_raw.notary_office_nps.dt_offer_compartilhada
   ts_answered:
-    description: 'Timestamp when the NPS was answered'
+    description: Timestamp when the NPS was answered
     lineage:
     - datalake_gsheets_raw.notary_office_nps.ts_answered
   ts_sale_agreement_signed:
-    description: 'Timestamp when the sale agreement was signed'
+    description: Timestamp when the sale agreement was signed
     lineage:
     - datalake_gsheets_raw.notary_office_nps.ts_sale_agreement_signed
   ts_load:
-    description: 'Timestamp when the data was loaded'
+    description: Timestamp when the data was loaded

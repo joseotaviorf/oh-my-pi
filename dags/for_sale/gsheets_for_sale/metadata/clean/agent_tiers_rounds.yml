@@ -4,10 +4,15 @@ domain: For Sale
 columns:
   round:
     lineage:
-      - datalake_gsheets_raw.agent_tiers_rounds.round
+    - datalake_gsheets_raw.agent_tiers_rounds.round
+    description: Tiering round identifier, with its start and end dates, referenced by agent_tiers.round.
   ts_start:
     lineage:
-      - datalake_gsheets_raw.agent_tiers_rounds.start_date
+    - datalake_gsheets_raw.agent_tiers_rounds.start_date
+    description: Timestamp when start occurred in the operational or warehouse pipeline.
   ts_end:
     lineage:
-      - datalake_gsheets_raw.agent_tiers_rounds.end_date
+    - datalake_gsheets_raw.agent_tiers_rounds.end_date
+    description: Timestamp when end occurred in the operational or warehouse pipeline.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of agent tiers rounds sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per agent tiers rounds record with standardized names and types in datalake_gsheets_clean.

@@ -4,16 +4,23 @@ domain: For Sale
 columns:
   id_agent:
     lineage:
-      - datalake_gsheets_raw.agent_tiers.sk_agent
+    - datalake_gsheets_raw.agent_tiers.sk_agent
+    description: Foreign key to the broker or agent user coordinating the visit or sale.
   id_business_unit:
     lineage:
-      - datalake_gsheets_raw.agent_tiers.id_business_unit
+    - datalake_gsheets_raw.agent_tiers.id_business_unit
+    description: Foreign key to the business unit in datalake_gsheets_clean.business_unit_region the agent belongs to.
   agent_group:
     lineage:
-      - datalake_gsheets_raw.agent_tiers.agent_group
+    - datalake_gsheets_raw.agent_tiers.agent_group
+    description: Agent group (cluster) used to segment sale agents for tiering.
   hub_name:
     lineage:
-      - datalake_gsheets_raw.agent_tiers.hub_name
+    - datalake_gsheets_raw.agent_tiers.hub_name
+    description: Name of the sales hub the agent belongs to.
   round:
     lineage:
-      - datalake_gsheets_raw.agent_tiers.round
+    - datalake_gsheets_raw.agent_tiers.round
+    description: Tiering round number the agent assignment refers to, joining to agent_tiers_rounds.round.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of agent tiers sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per agent tiers record with standardized names and types in datalake_gsheets_clean.

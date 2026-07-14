@@ -4,32 +4,44 @@ domain: For Sale
 columns:
   id_house_partner:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.id_house_partner
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.id_house_partner
+    description: Foreign key to the partner listing (house) identifier.
   partner:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.partner
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.partner
+    description: Name of the partner that provided the listing.
   address:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.address
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.address
+    description: Street address of the listing.
   number:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.number
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.number
+    description: Street number of the listing address (numeric, extracted from the raw value).
   complement:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.complement
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.complement
+    description: Address complement of the listing (e.g. apartment or block).
   complement_number:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.complement
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.complement
+    description: Numeric portion extracted from the address complement.
   lat:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lat
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lat
+    description: Latitude of the listing location in decimal degrees.
   lng:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lng
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lng
+    description: Longitude of the listing location in decimal degrees.
   lat_lng:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lat
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lng
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lat
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lng
+    description: Concatenation of latitude and longitude used as a location key for deduplication.
   zip_code:
     lineage:
-      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.cep
+    - datalake_gsheets_raw.deduplicate_batch_listings_forsale.cep
+    description: Postal code (CEP) of the listing address.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of deduplicate batch listings forsale sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per deduplicate batch listings forsale record with standardized names and types in datalake_gsheets_clean.

@@ -1,42 +1,42 @@
 database_name: datalake_gsheets_clean
 table_name: asp_opportunities_distribution
-owner: vitor.locatelli@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description: Table containing the allocation of First Listings to ASP For Rent Analysts.
 columns:
   id_house:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.id_house
-    description: ID of the house.
+    - datalake_gsheets_raw.asp_opportunities_distribution.id_house
+    description: Foreign key to the property listing involved in the visit or transaction.
   rent:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.rent
+    - datalake_gsheets_raw.asp_opportunities_distribution.rent
     description: Monthly rental value of the property in Brazilian Reais.
   price_suggestion:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.sugestao_preco
+    - datalake_gsheets_raw.asp_opportunities_distribution.sugestao_preco
     description: Price suggestion for the listing, calculated as the 90th percentile (P90) value in Brazilian Reais.
   right_price:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.preco_certo_asp
+    - datalake_gsheets_raw.asp_opportunities_distribution.preco_certo_asp
     description: Eligibility for right price adjustment program (Preço Certo ASP). Indicates whether the listing qualifies for price optimization adjustments.
   eligibility:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.elegibilidade
+    - datalake_gsheets_raw.asp_opportunities_distribution.elegibilidade
     description: Type of eligibility classification for Easy Entry program. Categorizes the listing's eligibility status for the Easy Entry initiative.
   rental_assistant:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.aux_alocacao
+    - datalake_gsheets_raw.asp_opportunities_distribution.aux_alocacao
     description: Name of the ASP Operational Analyst responsible for managing and allocating the listing.
   dt_publication:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.dt_publicacao
+    - datalake_gsheets_raw.asp_opportunities_distribution.dt_publicacao
     description: Date when the listing was published.
   dt_distribution:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.data_de_distribuicao
+    - datalake_gsheets_raw.asp_opportunities_distribution.data_de_distribuicao
     description: Date when the listing was distributed to the ASP operation team.
   dt_expiration:
     lineage:
-      - datalake_gsheets_raw.asp_opportunities_distribution.data_exp
+    - datalake_gsheets_raw.asp_opportunities_distribution.data_exp
     description: Date when the listing expired.

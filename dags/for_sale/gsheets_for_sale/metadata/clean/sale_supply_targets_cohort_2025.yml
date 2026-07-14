@@ -1,43 +1,58 @@
 database_name: datalake_gsheets_clean
-table_name: sale_demand_buyer_targets_cohort_2025
+table_name: sale_supply_targets_cohort_2025
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Cleaned snapshot of 2025 sale-supply funnel targets by cohort and region, sourced from a curated Google Sheet. One row per planning cohort with weekly conversion-rate and first-listing targets in datalake_gsheets_clean.
 columns:
-  avq2opp:
+  region:
+    description: Region the supply targets apply to.
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.avq2opp
-  city_group:
-    lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.city_group
-  company_report_origin:
-    lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.company_report_origin
-  fl:
-    lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.fl
-  op2q:
-    lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.op2q
-  opp2fl:
-    lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.opp2fl
-  planning_cluster:
-    lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.planning_cluster
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.region
   planning_conversion:
+    description: Planning conversion scenario label the target row belongs to.
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.planning_conversion
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.planning_conversion
   planning_operation:
+    description: Planning operation label the target row belongs to.
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.planning_operation
-  q2avq:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.planning_operation
+  planning_cluster:
+    description: Planning cluster grouping the target row belongs to.
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.q2avq
-  q2opp:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.planning_cluster
+  company_report_origin:
+    description: Origin of the company report the targets were derived from.
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.q2opp
-  week_start:
-    lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.week_start
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.company_report_origin
   weeks_conversion:
+    description: Number of weeks in the conversion window assumed for the targets.
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.weeks_conversion
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.weeks_conversion
+  op2q:
+    description: Target conversion-rate metric (op2q) for the sale supply funnel, by cohort and region.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.op2q
+  q2avq:
+    description: Target conversion-rate metric (q2avq) for the sale supply funnel, by cohort and region.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.q2avq
+  avq2opp:
+    description: Target conversion-rate metric (avq2opp) for the sale supply funnel, by cohort and region.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.avq2opp
+  opp2fl:
+    description: Target conversion-rate metric (opp2fl) for the sale supply funnel, by cohort and region.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.opp2fl
+  fl:
+    description: Target value for the first-listing (fl) stage of the sale supply funnel.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.fl
+  q2opp:
+    description: Target conversion-rate metric (q2opp) for the sale supply funnel, by cohort and region.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.q2opp
+  week_start:
+    description: Week start date the target row applies to.
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_cohort_2025.week_start

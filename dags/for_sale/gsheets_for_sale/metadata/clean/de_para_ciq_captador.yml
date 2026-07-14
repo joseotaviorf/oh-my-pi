@@ -4,16 +4,23 @@ domain: For Sale
 columns:
   id_ciq_5a:
     lineage:
-      - datalake_gsheets_raw.de_para_ciq_captador.id_ciq_5a
+    - datalake_gsheets_raw.de_para_ciq_captador.id_ciq_5a
+    description: Foreign key to the agent id in the CIQ 5A system.
   id_captador_cm:
     lineage:
-      - datalake_gsheets_raw.de_para_ciq_captador.id_captador_cm
+    - datalake_gsheets_raw.de_para_ciq_captador.id_captador_cm
+    description: Foreign key to the listing agent (captador) id in the Casa Mineira (CM) system.
   name:
     lineage:
-      - datalake_gsheets_raw.de_para_ciq_captador.name
+    - datalake_gsheets_raw.de_para_ciq_captador.name
+    description: Human-readable display name associated with the person or entity in this row.
   email:
     lineage:
-      - datalake_gsheets_raw.de_para_ciq_captador.email
+    - datalake_gsheets_raw.de_para_ciq_captador.email
+    description: Contact email address used for notifications and identity matching.
   cpf:
     lineage:
-      - datalake_gsheets_raw.de_para_ciq_captador.cpf
+    - datalake_gsheets_raw.de_para_ciq_captador.cpf
+    description: Agent CPF (Brazilian taxpayer id) used to match records across the CIQ and CM systems.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of de para ciq captador sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per de para ciq captador record with standardized names and types in datalake_gsheets_clean.

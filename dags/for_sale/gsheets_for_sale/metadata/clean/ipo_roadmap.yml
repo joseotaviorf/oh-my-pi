@@ -1,23 +1,23 @@
 ---
-database_name: datalake_gsheets_for_sale_clean
+database_name: datalake_gsheets_clean
 table_name: ipo_roadmap
-owner: leonardo.soares@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Roadmap of the ipo team
+description: Roadmap of the IPO workstream, sourced from a curated Google Sheet, with one row per planned task and its delivery status.
 columns:
   id:
-    description: ''
+    description: Unique identifier of the roadmap task.
     lineage:
     - datalake_gsheets_raw.ipo_roadmap.id
   task:
-    description: ''
+    description: Description of the roadmap task or initiative to be delivered.
     lineage:
     - datalake_gsheets_raw.ipo_roadmap.task
   status:
-    description: ''
+    description: Current delivery status of the roadmap task.
     lineage:
     - datalake_gsheets_raw.ipo_roadmap.status
   category:
-    description: ''
+    description: Category the roadmap task belongs to.
     lineage:
     - datalake_gsheets_raw.ipo_roadmap.category

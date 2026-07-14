@@ -2835,6 +2835,7 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-2024:first-run-of-day
   - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-2025:first-run-of-day
   - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-cohort-2024:first-run-of-day
+  - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-cohort-2025:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-budget-2024:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-budget-2025:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-targets-cohort-2025:first-run-of-day

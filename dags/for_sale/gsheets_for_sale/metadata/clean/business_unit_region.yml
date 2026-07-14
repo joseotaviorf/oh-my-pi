@@ -4,16 +4,23 @@ domain: For Sale
 columns:
   id_region:
     lineage:
-      - datalake_gsheets_raw.business_unit_region.id_region
+    - datalake_gsheets_raw.business_unit_region.id_region
+    description: Foreign key to the region identifier mapped to the business unit.
   business_model:
     lineage:
-      - datalake_gsheets_raw.business_unit_region.business_model
+    - datalake_gsheets_raw.business_unit_region.business_model
+    description: Business model classification of the business unit.
   business_unit:
     lineage:
-      - datalake_gsheets_raw.business_unit_region.business_unit
+    - datalake_gsheets_raw.business_unit_region.business_unit
+    description: Name of the business unit mapped to the region.
   dt_start:
     lineage:
-      - datalake_gsheets_raw.business_unit_region.start_date
+    - datalake_gsheets_raw.business_unit_region.start_date
+    description: Calendar date of start for this business unit region record.
   dt_end:
     lineage:
-      - datalake_gsheets_raw.business_unit_region.end_date
+    - datalake_gsheets_raw.business_unit_region.end_date
+    description: Calendar date of end for this business unit region record.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of business unit region sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per business unit region record with standardized names and types in datalake_gsheets_clean.

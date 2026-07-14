@@ -4,31 +4,43 @@ domain: For Sale
 columns:
   id_agent:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.id_agent
+    - datalake_gsheets_raw.hub_agents_hierarchy.id_agent
+    description: Foreign key to the broker or agent user coordinating the visit or sale.
   cpf:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.cpf
+    - datalake_gsheets_raw.hub_agents_hierarchy.cpf
+    description: Agent CPF (Brazilian taxpayer id).
   creci:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.creci
+    - datalake_gsheets_raw.hub_agents_hierarchy.creci
+    description: Agent CRECI (real-estate broker license) number.
   full_name:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.full_name
+    - datalake_gsheets_raw.hub_agents_hierarchy.full_name
+    description: Full legal name of the sale agent in the hub hierarchy registry.
   quintoandar_email:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.quintoandar_email
+    - datalake_gsheets_raw.hub_agents_hierarchy.quintoandar_email
+    description: Agent corporate QuintoAndar email address.
   personal_number:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.personal_number
+    - datalake_gsheets_raw.hub_agents_hierarchy.personal_number
+    description: Agent personal phone number.
   status:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.status
+    - datalake_gsheets_raw.hub_agents_hierarchy.status
+    description: Current operational status code governing workflow progression for this record.
   function_type:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.function_type
+    - datalake_gsheets_raw.hub_agents_hierarchy.function_type
+    description: Agent function/role type in the hub hierarchy.
   hub_region:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.hub_region
+    - datalake_gsheets_raw.hub_agents_hierarchy.hub_region
+    description: Region of the hub the agent belongs to.
   manager:
     lineage:
-      - datalake_gsheets_raw.hub_agents_hierarchy.manager
+    - datalake_gsheets_raw.hub_agents_hierarchy.manager
+    description: Name of the agent's manager in the hub hierarchy.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of hub agents hierarchy sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per hub agents hierarchy record with standardized names and types in datalake_gsheets_clean.

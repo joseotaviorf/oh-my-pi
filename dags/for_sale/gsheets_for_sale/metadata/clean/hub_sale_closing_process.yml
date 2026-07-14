@@ -1,46 +1,62 @@
 database_name: datalake_gsheets_clean
 table_name: hub_sale_closing_process
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
+description: Cleaned snapshot of hub sale closing process sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per hub sale closing process record with standardized names and types in datalake_gsheets_clean.
 columns:
   id_house:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.sk_house
+    - datalake_gsheets_raw.hub_sale_closing_process.sk_house
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_owner:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.sk_owner
+    - datalake_gsheets_raw.hub_sale_closing_process.sk_owner
+    description: Foreign key to the property owner on the supply side of the transaction.
   hub_offer:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.hub
+    - datalake_gsheets_raw.hub_sale_closing_process.hub
+    description: Sales hub that owns the offer (source column hub).
   city_group:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.city
+    - datalake_gsheets_raw.hub_sale_closing_process.city
+    description: City group of the offer (source column city).
   state_name:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.state
+    - datalake_gsheets_raw.hub_sale_closing_process.state
+    description: State of the offer (source column state).
   seller_name:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.seller_name
+    - datalake_gsheets_raw.hub_sale_closing_process.seller_name
+    description: Name of the property seller.
   seller_cpf_cnpj:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.seller_cpf_cnpj
+    - datalake_gsheets_raw.hub_sale_closing_process.seller_cpf_cnpj
+    description: Seller CPF or CNPJ (Brazilian taxpayer id).
   sale_price_agreed:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.sale_price_agreed
+    - datalake_gsheets_raw.hub_sale_closing_process.sale_price_agreed
+    description: Agreed sale price of the property in Brazilian Reais (R$).
   brokerage_fee_quintoandar:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.brokerage_fee_quintoandar
+    - datalake_gsheets_raw.hub_sale_closing_process.brokerage_fee_quintoandar
+    description: Brokerage fee amount owed to QuintoAndar in Brazilian Reais (R$).
   brokerage_fee_partner:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.brokerage_fee_partner
+    - datalake_gsheets_raw.hub_sale_closing_process.brokerage_fee_partner
+    description: Brokerage fee amount owed to the partner in Brazilian Reais (R$).
   brokerage_fee:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.brokerage_fee
+    - datalake_gsheets_raw.hub_sale_closing_process.brokerage_fee
+    description: Total brokerage fee on the sale in Brazilian Reais (R$).
   dt_process_started:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.dt_process_start
+    - datalake_gsheets_raw.hub_sale_closing_process.dt_process_start
+    description: Calendar date of process started for this hub sale closing process record.
   dt_sale:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.dt_sale
+    - datalake_gsheets_raw.hub_sale_closing_process.dt_sale
+    description: Calendar date of sale for this hub sale closing process record.
   dt_ccv_signed:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.dt_ccv_signed
+    - datalake_gsheets_raw.hub_sale_closing_process.dt_ccv_signed
+    description: Calendar date of ccv signed for this hub sale closing process record.

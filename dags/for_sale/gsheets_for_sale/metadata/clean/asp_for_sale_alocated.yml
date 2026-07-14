@@ -1,30 +1,30 @@
 database_name: datalake_gsheets_clean
 table_name: asp_for_sale_alocated
-owner: vitor.locatelli@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description: Table containing the allocation of Listings to ASP For Sale Analysts.
 columns:
   id_house:
     lineage:
-      - datalake_gsheets_raw.asp_for_sale_alocated.sk_house
-    description: ID of the house.
+    - datalake_gsheets_raw.asp_for_sale_alocated.sk_house
+    description: Foreign key to the property listing involved in the visit or transaction.
   score:
     lineage:
-      - datalake_gsheets_raw.asp_for_sale_alocated.score
+    - datalake_gsheets_raw.asp_for_sale_alocated.score
     description: Score assigned to the listing.
   rental_assistant:
     lineage:
-      - datalake_gsheets_raw.asp_for_sale_alocated.aux_alocacao
+    - datalake_gsheets_raw.asp_for_sale_alocated.aux_alocacao
     description: Name of the ASP Operational Analyst responsible for managing and allocating the listing.
   dt_first_publication:
     lineage:
-      - datalake_gsheets_raw.asp_for_sale_alocated.dt_first_publication
+    - datalake_gsheets_raw.asp_for_sale_alocated.dt_first_publication
     description: Date when the listing was published for the first time.
   dt_distribution:
     lineage:
-      - datalake_gsheets_raw.asp_for_sale_alocated.data_de_distribuicao
+    - datalake_gsheets_raw.asp_for_sale_alocated.data_de_distribuicao
     description: Date when the listing was distributed to the ASP operation team.
   dt_expiration:
     lineage:
-      - datalake_gsheets_raw.asp_for_sale_alocated.data_exp
+    - datalake_gsheets_raw.asp_for_sale_alocated.data_exp
     description: Date when the listing expired.

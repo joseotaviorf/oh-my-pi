@@ -1,43 +1,43 @@
 ---
-database_name: datalake_gsheets_for_sale_clean
+database_name: datalake_gsheets_clean
 table_name: magellan_roadmap
-owner: leonardo.soares@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Table with the roadmap of the magellan project
+description: Table with the roadmap of the Magellan project, sourced from a curated Google Sheet, with one row per planned task and its schedule.
 columns:
   task:
-    description: ''
+    description: Description of the roadmap task or initiative to be delivered.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.task
   owner:
-    description: ''
+    description: Person or team responsible for delivering the roadmap task.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.owner
   status:
-    description: ''
+    description: Current delivery status of the roadmap task.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.status
   type:
-    description: ''
+    description: Type or category of the roadmap task.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.type
   duration:
-    description: ''
+    description: Planned duration of the task in days.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.INT(duration)
   affected_service:
-    description: ''
+    description: Service or system affected by the roadmap task.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.affected_service
   dt_start:
-    description: ''
+    description: Planned start date of the roadmap task.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.DATE(start_date)
   dt_end:
-    description: ''
+    description: Planned end date of the roadmap task.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.DATE(end_date)
   notes:
-    description: ''
+    description: Free-text notes or comments about the roadmap task.
     lineage:
     - datalake_gsheets_raw.magellan_roadmap.notes
