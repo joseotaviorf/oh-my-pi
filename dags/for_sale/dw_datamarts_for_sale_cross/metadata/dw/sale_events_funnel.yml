@@ -1,124 +1,123 @@
----
 database_name: dw_datamarts
 table_name: sale_events_funnel
 description: Aggregated funnel table for sale events tracking supply and demand metrics across the sales journey.
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   week_start:
     lineage:
-      - dw_public.dim_date.week_start
+    - dw_public.dim_date.week_start
     description: Start date of the week for the event.
   date:
     lineage:
-      - dw_public.dim_date.date
+    - dw_public.dim_date.date
     description: Calendar reference date used to aggregate supply and demand funnel metrics at daily grain in this table.
   month:
     lineage:
-      - dw_public.dim_date.month
-    description: Month of the event.
+    - dw_public.dim_date.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   quarter:
     lineage:
-      - dw_public.dim_date.quarter
+    - dw_public.dim_date.quarter
     description: Calendar quarter derived from the reference date, used to roll up funnel volumes for quarterly performance reporting.
   city_group:
     lineage:
-      - dw_public.dim_region.city_group
+    - dw_public.dim_region.city_group
     description: City group classification (RMSP, Rio de Janeiro, Belo Horizonte, Porto Alegre, Campinas, or Out of coverage area).
   lead_context:
     lineage:
-      - dw_datamarts.lead_listing_flows.mkt_origin
-      - dw_datamarts.lead_listing_flows.mkt_completion
+    - dw_datamarts.lead_listing_flows.mkt_origin
+    - dw_datamarts.lead_listing_flows.mkt_completion
     description: Lead context classification (B2B, CIQ, FSS, or IS) based on marketing origin and completion type.
   mkt_campaign_context:
     lineage:
-      - dw_datamarts.lead_listing_flows.lead_context_origin
+    - dw_datamarts.lead_listing_flows.lead_context_origin
     description: Marketing campaign context (Branded for Organic, otherwise original value).
   mkt_origin:
     lineage:
-      - dw_datamarts.lead_listing_flows.mkt_origin
+    - dw_datamarts.lead_listing_flows.mkt_origin
     description: Marketing origin of the lead.
   mkt_channel:
     lineage:
-      - dw_datamarts.lead_listing_flows.mkt_channel
+    - dw_datamarts.lead_listing_flows.mkt_channel
     description: Marketing channel of the lead.
   mkt_medium:
     lineage:
-      - dw_datamarts.lead_listing_flows.mkt_medium
+    - dw_datamarts.lead_listing_flows.mkt_medium
     description: Marketing medium of the lead.
   mkt_type:
     lineage:
-      - dw_datamarts.lead_listing_flows.mkt_origin
-      - dw_datamarts.lead_listing_flows.mkt_channel
+    - dw_datamarts.lead_listing_flows.mkt_origin
+    - dw_datamarts.lead_listing_flows.mkt_channel
     description: Marketing type classification (Paid or Non Paid) based on origin and channel.
   sales_company:
     lineage:
-      - dw_datamarts.lead_listing_flows.sales_company
+    - dw_datamarts.lead_listing_flows.sales_company
     description: Sales company associated with the lead.
   lead_processing_operation:
     lineage:
-      - dw_datamarts.lead_listing_flows.sourcing_ops
+    - dw_datamarts.lead_listing_flows.sourcing_ops
     description: Lead processing operation classification.
   affiliate_volumetry:
     lineage:
-      - dw_datamarts.affiliates_clusters.affiliate_volumetry
+    - dw_datamarts.affiliates_clusters.affiliate_volumetry
     description: Affiliate volumetry classification.
   first_origin_demand:
     lineage:
-      - dw_sale.fact_sale_flows.first_event
+    - dw_sale.fact_sale_flows.first_event
     description: First touchpoint of the demand flow.
   origin_before_offer:
     lineage:
-      - dw_sale.fact_sale_flows.higher_intent_before_offer
+    - dw_sale.fact_sale_flows.higher_intent_before_offer
     description: Higher intent event before offer submission.
   origin_after_offer:
     lineage:
-      - dw_sale.fact_sale_flows.higher_intent_after_offer
+    - dw_sale.fact_sale_flows.higher_intent_after_offer
     description: Higher intent event after offer submission.
   form_of_payment:
     lineage:
-      - datalake_sale_offer.sale_offer.current_payment_method
-      - datalake_sale_offer.sale_offer.has_used_fgts_in_payment
+    - datalake_sale_offer.sale_offer.current_payment_method
+    - datalake_sale_offer.sale_offer.has_used_fgts_in_payment
     description: Form of payment classification (Financiado, À Vista, À Vista + FGTS, Financiado + FGTS, or Other).
   hub_visit:
     lineage:
-      - datalake_hub_services_clean.business_unit.hub_name
+    - datalake_hub_services_clean.business_unit.hub_name
     description: Hub name where the visit occurred.
   hub_offer:
     lineage:
-      - dw_sale.dim_offer.business_unit
+    - dw_sale.dim_offer.business_unit
     description: Business unit/hub associated with the offer.
   supply_3p_partner:
     lineage:
-      - dw_brokers.dim_broker.broker_name
-      - dw_rent.dim_house_listing.partner_3p_supply
-      - dw_sale.fact_visits.partner_3p_supply
-      - dw_sale.dim_offer.partner_3p_supply
+    - dw_brokers.dim_broker.broker_name
+    - dw_rent.dim_house_listing.partner_3p_supply
+    - dw_sale.fact_visits.partner_3p_supply
+    - dw_sale.dim_offer.partner_3p_supply
     description: Name of the 3P supply partner.
   demand_3p_partner:
     lineage:
-      - dw_brokers.dim_broker.broker_name
-      - dw_sale.fact_visits.partner_3p_demand
-      - dw_sale.dim_offer.partner_3p_demand
+    - dw_brokers.dim_broker.broker_name
+    - dw_sale.fact_visits.partner_3p_demand
+    - dw_sale.dim_offer.partner_3p_demand
     description: Name of the 3P demand partner.
   supply_3pbh_partner:
     lineage:
-      - datalake_ebdb_listing.house.partner_3p_supply
+    - datalake_ebdb_listing.house.partner_3p_supply
     description: Name of the 3P BH supply partner.
   is_3p_supply:
     lineage:
-      - dw_rent.dim_house_listing.is_3p_supply
-      - dw_sale.fact_visits.is_3p_supply
-      - dw_sale.dim_offer.is_3p_supply
+    - dw_rent.dim_house_listing.is_3p_supply
+    - dw_sale.fact_visits.is_3p_supply
+    - dw_sale.dim_offer.is_3p_supply
     description: Flag indicating if the transaction has a 3P supply partner.
   is_3p_demand:
     lineage:
-      - dw_sale.fact_visits.is_3p_demand
-      - dw_sale.dim_offer.is_3p_demand
+    - dw_sale.fact_visits.is_3p_demand
+    - dw_sale.dim_offer.is_3p_demand
     description: Flag indicating if the transaction has a 3P demand partner.
   is_3pbh_supply:
     lineage:
-      - datalake_ebdb_listing.house.is_3p_supply_bh
+    - datalake_ebdb_listing.house.is_3p_supply_bh
     description: Flag indicating if the transaction has a 3P BH supply partner.
   leads:
     description: Count of leads generated.

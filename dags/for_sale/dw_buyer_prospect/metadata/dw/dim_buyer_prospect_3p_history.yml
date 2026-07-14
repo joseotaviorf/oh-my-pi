@@ -1,116 +1,79 @@
----
 database_name: dw_sale
 table_name: dim_buyer_prospect_3p_history
-description: SCD2-style dimension that tracks the buyer prospect classification
-  (NBP / RBP) timeline for the 3P funnel. Each row is one prospect window per
-  (sk_buyer, demand_type) with version, is_current, ts_started and ts_ended.
-  NBP marks the first episode for that buyer x demand_type pair; RBP marks the
-  next episode after a >=90-day idle period. Events whose computed classification
-  is null (continuations within an open window) are filtered out and do not open
-  or close a window.
+description: SCD2-style dimension that tracks the buyer prospect classification (NBP / RBP) timeline for the 3P funnel. Each row is one prospect window per (sk_buyer, demand_type) with version, is_current, ts_started and ts_ended. NBP marks the first episode for that buyer x demand_type pair; RBP marks the next episode after a >=90-day idle period. Events whose computed classification is null (continuations within an open window) are filtered out and do not open or close a window.
 domain: For Sale
-owner: vitor.musachio@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_buyer_prospect:
     lineage:
-      - datalake_visit.visits.id_visitor
-      - datalake_ebdb_clean.user.id
-    description: Surrogate key of the buyer prospect window. Defined as
-      CONCAT(id_buyer, 0, version); because version restarts per demand_type,
-      this column is NOT unique on its own. Uniqueness grain of the table is
-      (sk_buyer, demand_type, version) — mirrors the dw_agent.dim_agent_3p_history
-      pattern.
+    - datalake_visit.visits.id_visitor
+    - datalake_ebdb_clean.user.id
+    description: Surrogate key of the buyer prospect window. Defined as CONCAT(id_buyer, 0, version); because version restarts per demand_type, this column is NOT unique on its own. Uniqueness grain of the table is (sk_buyer, demand_type, version) — mirrors the dw_agent.dim_agent_3p_history pattern.
   sk_buyer:
     lineage:
-      - datalake_visit.visits.id_visitor
-      - datalake_ebdb_clean.user.id
-    description: Foreign key referring to the buyer prospect ID. Sourced from
-      visits.id_visitor on the visit branch and from ebdb_clean.user.id (joined
-      via buyer_company.uuid_person) on the buyer_company_relation branch.
+    - datalake_visit.visits.id_visitor
+    - datalake_ebdb_clean.user.id
+    description: Foreign key referring to the buyer prospect ID. Sourced from visits.id_visitor on the visit branch and from ebdb_clean.user.id (joined via buyer_company.uuid_person) on the buyer_company_relation branch.
   sk_visit:
     lineage:
-      - datalake_visit.visits.id_visit
-      - datalake_rede_platform_clean.buyer_company_event.id_event_entity
-    description: Foreign key referring to the visit that originated the prospect
-      event. Sourced from visits.id_visit on the visit branch and from
-      buyer_company_event.id_event_entity when event_entity_name = 'VISIT' on
-      the buyer_company_relation branch. -1 when no visit is linked.
+    - datalake_visit.visits.id_visit
+    - datalake_rede_platform_clean.buyer_company_event.id_event_entity
+    description: Foreign key referring to the visit that originated the prospect event. Sourced from visits.id_visit on the visit branch and from buyer_company_event.id_event_entity when event_entity_name = 'VISIT' on the buyer_company_relation branch. -1 when no visit is linked.
   sk_broker:
     lineage:
-      - datalake_visit.visits.sk_broker_demand
-      - core_brokers.brokers.sk_broker
-    description: Foreign key referring to the 3P broker linked to the prospect
-      event. Sourced from visits.sk_broker_demand on the visit branch and from
-      core_brokers.brokers.sk_broker (matched by uuid_company) on the
-      buyer_company_relation branch.
+    - datalake_visit.visits.sk_broker_demand
+    - core_brokers.brokers.sk_broker
+    description: Foreign key referring to the 3P broker linked to the prospect event. Sourced from visits.sk_broker_demand on the visit branch and from core_brokers.brokers.sk_broker (matched by uuid_company) on the buyer_company_relation branch.
   demand_type:
     lineage:
-      - datalake_visit.visits.business_model
-      - datalake_rede_platform_clean.buyer_company.type
-    description: Demand type of the prospect window. Derived from
-      visits.business_model on the visit branch and from buyer_company.type
-      on the buyer_company_relation branch.
+    - datalake_visit.visits.business_model
+    - datalake_rede_platform_clean.buyer_company.type
+    description: Demand type of the prospect window. Derived from visits.business_model on the visit branch and from buyer_company.type on the buyer_company_relation branch.
     categories:
-      '3P_DEMAND': 3P agent-led demand (3P type / business_model contains 3P_DEMAND).
-      '3P_LEAD_GEN': 3P lead-generation (1P type / business_model contains 3P_LEAD_GEN).
+      3P_DEMAND: 3P agent-led demand (3P type / business_model contains 3P_DEMAND).
+      3P_LEAD_GEN: 3P lead-generation (1P type / business_model contains 3P_LEAD_GEN).
   buyer_prospect_type:
     lineage:
-      - datalake_visit.visits.ts_created
-      - datalake_rede_platform_clean.buyer_company.ts_started
-    description: Buyer prospect classification of the window. NBP for the first
-      episode per (sk_buyer, demand_type); RBP when the previous event happened
-      at least 90 days before the current one.
+    - datalake_visit.visits.ts_created
+    - datalake_rede_platform_clean.buyer_company.ts_started
+    description: Buyer prospect classification of the window. NBP for the first episode per (sk_buyer, demand_type); RBP when the previous event happened at least 90 days before the current one.
     categories:
-      'NBP': New Buyer Prospect.
-      'RBP': Recovery Buyer Prospect.
+      NBP: New Buyer Prospect.
+      RBP: Recovery Buyer Prospect.
   buyer_prospect_type_long:
     lineage:
-      - datalake_visit.visits.ts_created
-      - datalake_rede_platform_clean.buyer_company.ts_started
+    - datalake_visit.visits.ts_created
+    - datalake_rede_platform_clean.buyer_company.ts_started
     description: Long description of buyer_prospect_type.
     categories:
-      'New Buyer Prospect': First-ever prospect episode of the buyer for this
-        demand_type — opens the buyer's funnel in the 3P demand context.
-      'Recovery Buyer Prospect': Reactivation episode — the buyer already had
-        a previous prospect event in this demand_type but became idle for at
-        least 90 days before the current event, opening a new window.
+      New Buyer Prospect: First-ever prospect episode of the buyer for this demand_type — opens the buyer's funnel in the 3P demand context.
+      Recovery Buyer Prospect: Reactivation episode — the buyer already had a previous prospect event in this demand_type but became idle for at least 90 days before the current event, opening a new window.
   event_source:
-    description: Origin of the prospect event. Hardcoded literal value indicating
-      which upstream stream produced the row.
+    description: Origin of the prospect event. Hardcoded literal value indicating which upstream stream produced the row.
     categories:
-      'VISIT': Event sourced from datalake_visit.visits.
-      'BUYER_COMPANY_RELATION': Event sourced from datalake_rede_platform_clean.buyer_company.
+      VISIT: Event sourced from datalake_visit.visits.
+      BUYER_COMPANY_RELATION: Event sourced from datalake_rede_platform_clean.buyer_company.
   event_type:
     lineage:
-      - datalake_rede_platform_clean.buyer_company_event.event_type
-    description: Type of event that produced the prospect window. Hardcoded as
-      'VISIT_REQUESTED' on the visit branch and sourced from
-      buyer_company_event.event_type on the buyer_company_relation branch.
+    - datalake_rede_platform_clean.buyer_company_event.event_type
+    description: Type of event that produced the prospect window. Hardcoded as 'VISIT_REQUESTED' on the visit branch and sourced from buyer_company_event.event_type on the buyer_company_relation branch.
   trigger_actor:
     lineage:
-      - datalake_rede_platform_clean.buyer_company_event.trigger_actor
-    description: Actor that triggered the event. Hardcoded as 'AGENT' on the
-      visit branch and sourced from buyer_company_event.trigger_actor on the
-      buyer_company_relation branch.
+    - datalake_rede_platform_clean.buyer_company_event.trigger_actor
+    description: Actor that triggered the event. Hardcoded as 'AGENT' on the visit branch and sourced from buyer_company_event.trigger_actor on the buyer_company_relation branch.
   version:
-    description: Sequential revision number per (sk_buyer, demand_type), ordered
-      by ts_started (1 = oldest window). Derived from a ROW_NUMBER window
-      function over the classified base.
+    description: Sequential revision number per (sk_buyer, demand_type), ordered by ts_started (1 = oldest window). Derived from a ROW_NUMBER window function over the classified base.
   is_current:
-    description: Flag identifying the most recent window per (sk_buyer,
-      demand_type). True when ts_ended is null.
+    description: Flag identifying the most recent window per (sk_buyer, demand_type). True when ts_ended is null.
   ts_started:
     lineage:
-      - datalake_visit.visits.ts_created
-      - datalake_rede_platform_clean.buyer_company.ts_started
-    description: Timestamp when this prospect window became effective. Sourced
-      from visits.ts_created on the visit branch and from buyer_company.ts_started
-      on the buyer_company_relation branch.
+    - datalake_visit.visits.ts_created
+    - datalake_rede_platform_clean.buyer_company.ts_started
+    description: Timestamp when this prospect window became effective. Sourced from visits.ts_created on the visit branch and from buyer_company.ts_started on the buyer_company_relation branch.
   ts_ended:
     lineage:
-      - datalake_visit.visits.ts_created
-      - datalake_rede_platform_clean.buyer_company.ts_started
-    description: Timestamp when this window was superseded by the next NBP/RBP
-      event for the same (sk_buyer, demand_type). Null for the current window.
+    - datalake_visit.visits.ts_created
+    - datalake_rede_platform_clean.buyer_company.ts_started
+    description: Timestamp when this window was superseded by the next NBP/RBP event for the same (sk_buyer, demand_type). Null for the current window.
   ts_load:
     description: Timestamp of when the table was last processed.

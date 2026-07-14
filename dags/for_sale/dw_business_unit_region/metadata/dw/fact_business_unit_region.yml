@@ -2,7 +2,7 @@ database_name: dw_sale
 table_name: fact_business_unit_region
 description: Table indicating BUs coverage on each region over the time.
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_region:
     lineage:
@@ -23,8 +23,7 @@ columns:
   business_unit:
     lineage:
     - datalake_sale_visit_hubs.business_unit_region_history.hub_name
-    description: Last BU name. So if this BU had a different name in the past it won't
-      be considered.
+    description: Last BU name. So if this BU had a different name in the past it won't be considered.
   dt_coverage_started:
     lineage:
     - datalake_sale_visit_hubs.business_unit_region_history.ts_start_coverage

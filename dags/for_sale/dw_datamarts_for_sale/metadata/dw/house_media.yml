@@ -1,4 +1,3 @@
----
 database_name: dw_datamarts
 table_name: house_media
 owner: helder.rodrigues@quintoandar.com

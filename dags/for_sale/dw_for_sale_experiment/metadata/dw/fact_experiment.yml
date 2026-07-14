@@ -1,41 +1,38 @@
----
 database_name: dw_for_sale_experiment
 table_name: fact_experiment
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Fact table containing individual experiment participants and their assignments for For Sale line experiments.
-  This fact table can be joined with dim_experiment table to get the experiment metadata and dimensions about the participants (e.g. dim_house, dim_agent, dim_user)
-  Each record represents a unique participant in a specific experiment, enabling detailed analysis of experiment performance and participant behavior across different test groups.
+description: Fact table containing individual experiment participants and their assignments for For Sale line experiments. This fact table can be joined with dim_experiment table to get the experiment metadata and dimensions about the participants (e.g. dim_house, dim_agent, dim_user) Each record represents a unique participant in a specific experiment, enabling detailed analysis of experiment performance and participant behavior across different test groups.
 columns:
   sk_element_exp:
     lineage:
-      - datalake_for_sale_experiment.exp_identifier_unified.id_element_exp
+    - datalake_for_sale_experiment.exp_identifier_unified.id_element_exp
     description: Unique key combining neotribe, experiment, business_context and participant identifier for granular tracking.
   sk_neotribe_exp:
     lineage:
-      - datalake_for_sale_experiment.exp_identifier_unified.id_neotribe
-      - datalake_for_sale_experiment.exp_identifier_unified.id_experiment
-      - datalake_for_sale_experiment.exp_identifier_unified.business_context
+    - datalake_for_sale_experiment.exp_identifier_unified.id_neotribe
+    - datalake_for_sale_experiment.exp_identifier_unified.id_experiment
+    - datalake_for_sale_experiment.exp_identifier_unified.business_context
     description: Foreign key to dim_experiment table for experiment metadata lookup.
   sk_neotribe:
     lineage:
-      - datalake_for_sale_experiment.exp_identifier_unified.id_neotribe
+    - datalake_for_sale_experiment.exp_identifier_unified.id_neotribe
     description: Key for the neotribe conducting the experiment.
   sk_experiment:
     lineage:
-      - datalake_for_sale_experiment.exp_identifier_unified.id_experiment
+    - datalake_for_sale_experiment.exp_identifier_unified.id_experiment
     description: Key for the specific experiment within the neotribe.
   sk_identifier:
     lineage:
-      - datalake_for_sale_experiment.exp_identifier_unified.identifier
+    - datalake_for_sale_experiment.exp_identifier_unified.identifier
     description: Key for the experiment participant (e.g. id_visitor, id_house, id_visit).
   identifier_type:
     lineage:
-      - datalake_for_sale_experiment.exp_identifier_unified.identifier_type
+    - datalake_for_sale_experiment.exp_identifier_unified.identifier_type
     description: Type of identifier used for experiment participants (e.g. VISITOR, AGENT, HOUSE).
   test_group:
     lineage:
-      - datalake_for_sale_experiment.exp_identifier_unified.test_group
+    - datalake_for_sale_experiment.exp_identifier_unified.test_group
     description: Assignment of the participant to a test group (CONTROL, TREATMENT, or ERROR for invalid assignments).
     categories:
       CONTROL: Participant assigned to the control group.
@@ -43,5 +40,5 @@ columns:
       ERROR: Invalid or unmapped participant assignment.
   dt_identifier_started:
     lineage:
-      - datalake_for_sale_experiment.exp_identifier_unified.dt_identifier_started
+    - datalake_for_sale_experiment.exp_identifier_unified.dt_identifier_started
     description: Date when this specific participant first started participating in the experiment based on their activity.

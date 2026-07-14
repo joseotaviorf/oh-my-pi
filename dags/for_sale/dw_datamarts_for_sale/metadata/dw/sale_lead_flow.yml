@@ -1,278 +1,372 @@
----
 database_name: dw_datamarts
 table_name: sale_lead_flow
 domain: For Sale
 columns:
   sk_lead:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_lead
+    - datalake_sale_lead_flows.lead_flow.id_lead
+    description: Surrogate key of the lead, defining the grain of this table (one row per lead).
   sk_user:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_user
+    - datalake_sale_lead_flows.lead_flow.id_user
+    description: Surrogate key of the user associated with the lead.
   sk_visitor_hub_service:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_visitor_hub_service
+    - datalake_sale_lead_flows.lead_flow.id_visitor_hub_service
+    description: Surrogate key of the visitor hub service linked to the lead.
   sk_secretariat_client:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_secretariat_client
+    - datalake_sale_lead_flows.lead_flow.id_secretariat_client
+    description: Surrogate key of the secretariat (SDR) client record linked to the lead.
   sk_classified_lead:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_classified_lead
+    - datalake_sale_lead_flows.lead_flow.id_classified_lead
+    description: Surrogate key of the classified-listing lead record linked to this lead.
   sk_region_classified:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_region_classified
+    - datalake_sale_lead_flows.lead_flow.id_region_classified
+    description: Surrogate key of the region where the lead was sourced from a classified listing.
   sk_region_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_region_contact_prospect
+    - datalake_sale_lead_flows.lead_flow.id_region_contact_prospect
+    description: Surrogate key of the region at the lead's contact-prospect stage.
   sk_region_booking_cm:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_region_booking_cm
+    - datalake_sale_lead_flows.lead_flow.id_region_booking_cm
+    description: Surrogate key of the region of the lead's Casa Mineira (CM) booking.
   sk_region_booking_5a:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_region_booking_5a
+    - datalake_sale_lead_flows.lead_flow.id_region_booking_5a
+    description: Surrogate key of the region of the lead's QuintoAndar (5A) booking.
   sk_region_visit_intent:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_region_visit_intent
+    - datalake_sale_lead_flows.lead_flow.id_region_visit_intent
+    description: Surrogate key of the region tied to the lead's visit intent.
   sk_first_region:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_first_region
+    - datalake_sale_lead_flows.lead_flow.id_first_region
+    description: Surrogate key of the first region the lead interacted with.
   sk_first_house:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_first_house
+    - datalake_sale_lead_flows.lead_flow.id_first_house
+    description: Surrogate key of the first house the lead interacted with.
   sk_first_house_sale_agreement:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.id_first_house_sale_agreement
+    - datalake_sale_lead_flows.lead_flow.id_first_house_sale_agreement
+    description: Surrogate key of the first house on which the lead reached a signed sale agreement (CCV).
   first_touch:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_touch
+    - datalake_sale_lead_flows.lead_flow.first_touch
+    description: First touchpoint through which the lead entered the For Sale funnel.
   first_classified_partner:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_classified_partner
+    - datalake_sale_lead_flows.lead_flow.first_classified_partner
+    description: Name of the classified-listing partner that originated the lead's first classified contact.
   first_business_unit_region_intent_lead:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_business_unit_region_intent_lead
+    - datalake_sale_lead_flows.lead_flow.first_business_unit_region_intent_lead
+    description: Business unit region at the lead's first visit-intent event.
   last_business_unit_region_intent_lead:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.last_business_unit_region_intent_lead
+    - datalake_sale_lead_flows.lead_flow.last_business_unit_region_intent_lead
+    description: Business unit region at the lead's most recent visit-intent event.
   first_business_unit_region_new_buyer_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_business_unit_region_new_buyer_prospect
+    - datalake_sale_lead_flows.lead_flow.first_business_unit_region_new_buyer_prospect
+    description: Sales territory recorded when this lead first converted into a New Buyer Prospect.
   first_city_booking_cm:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_city_booking_cm
+    - datalake_sale_lead_flows.lead_flow.first_city_booking_cm
+    description: City of the lead's first Casa Mineira (CM) booking.
   first_city_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_city_contact_prospect
+    - datalake_sale_lead_flows.lead_flow.first_city_contact_prospect
+    description: City at the lead's first contact-prospect event.
   first_contact_prospect_origin:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_contact_prospect_origin
+    - datalake_sale_lead_flows.lead_flow.first_contact_prospect_origin
+    description: Acquisition origin of the lead's first contact-prospect event.
   last_contact_prospect_origin:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.last_contact_prospect_origin
+    - datalake_sale_lead_flows.lead_flow.last_contact_prospect_origin
+    description: Acquisition origin of the lead's most recent contact-prospect event.
   first_contact_prospect_media:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_contact_prospect_media
+    - datalake_sale_lead_flows.lead_flow.first_contact_prospect_media
+    description: Media channel of the lead's first contact-prospect event.
   last_contact_prospect_media:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.last_contact_prospect_media
+    - datalake_sale_lead_flows.lead_flow.last_contact_prospect_media
+    description: Media channel of the lead's most recent contact-prospect event.
   first_offer_flow:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_offer_flow
+    - datalake_sale_lead_flows.lead_flow.first_offer_flow
+    description: Identifier of the lead's first offer flow.
   first_ccv_flow:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_ccv_flow
+    - datalake_sale_lead_flows.lead_flow.first_ccv_flow
+    description: Identifier of the lead's first sale agreement (CCV) flow.
   first_offer_business_unit:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_offer_business_unit
+    - datalake_sale_lead_flows.lead_flow.first_offer_business_unit
+    description: Sales territory tied to the first purchase offer the lead submitted.
   first_ccv_business_unit:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_ccv_business_unit
+    - datalake_sale_lead_flows.lead_flow.first_ccv_business_unit
+    description: Business unit of the lead's first sale agreement (CCV).
   first_booking_creator_5a:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.first_booking_creator_5a
+    - datalake_sale_lead_flows.lead_flow.first_booking_creator_5a
+    description: Actor who created the lead's first QuintoAndar (5A) booking.
   further_funnel_step:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.further_funnel_step
+    - datalake_sale_lead_flows.lead_flow.further_funnel_step
+    description: Furthest funnel step the lead reached in the For Sale journey.
   has_first_booking:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.has_first_booking
+    - datalake_sale_lead_flows.lead_flow.has_first_booking
+    description: Boolean flag indicating whether first booking applies to this record.
   has_secretariat_contact_created:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.has_secretariat_contact_created
+    - datalake_sale_lead_flows.lead_flow.has_secretariat_contact_created
+    description: Boolean flag indicating whether secretariat contact created applies to this record.
   has_booking_before_secretariat_contact:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.has_booking_before_secretariat_contact
+    - datalake_sale_lead_flows.lead_flow.has_booking_before_secretariat_contact
+    description: Boolean flag indicating whether booking before secretariat contact applies to this record.
   has_tenant_rental_contract:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.has_tenant_rental_contract
+    - datalake_sale_lead_flows.lead_flow.has_tenant_rental_contract
+    description: Boolean flag indicating whether tenant rental contract applies to this record.
   is_ongoing_tenant_rental_contract:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.is_ongoing_tenant_rental_contract
+    - datalake_sale_lead_flows.lead_flow.is_ongoing_tenant_rental_contract
+    description: Boolean flag indicating whether ongoing tenant rental contract applies to this record.
   has_owner_rental_contract:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.has_owner_rental_contract
+    - datalake_sale_lead_flows.lead_flow.has_owner_rental_contract
+    description: Boolean flag indicating whether owner rental contract applies to this record.
   has_rental_visit_intent:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.has_rental_visit_intent
+    - datalake_sale_lead_flows.lead_flow.has_rental_visit_intent
+    description: Boolean flag indicating whether rental visit intent applies to this record.
   total_bookings_created_by_secretariat:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.total_bookings_created_by_secretariat
+    - datalake_sale_lead_flows.lead_flow.total_bookings_created_by_secretariat
+    description: Total number of bookings created by the secretariat (SDR) for this lead.
   total_bookings_created:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.total_bookings_created
+    - datalake_sale_lead_flows.lead_flow.total_bookings_created
+    description: Total number of bookings created for this lead.
   total_bookings_canceled:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.total_bookings_canceled
+    - datalake_sale_lead_flows.lead_flow.total_bookings_canceled
+    description: Total number of bookings canceled for this lead.
   total_visits_completed_by_secretariat:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.total_visits_completed_by_secretariat
+    - datalake_sale_lead_flows.lead_flow.total_visits_completed_by_secretariat
+    description: Total number of visits completed for this lead from bookings created by the secretariat (SDR).
   total_visits_completed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.total_visits_completed
+    - datalake_sale_lead_flows.lead_flow.total_visits_completed
+    description: Total number of visits completed for this lead.
   total_offer_submitted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.total_offer_submitted
+    - datalake_sale_lead_flows.lead_flow.total_offer_submitted
+    description: Total number of offers submitted for this lead.
   total_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.total_sale_agreement_signed
+    - datalake_sale_lead_flows.lead_flow.total_sale_agreement_signed
+    description: Total number of sale agreements (CCV) signed for this lead.
   days_first_visit_intent_to_first_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_contact_prospect
+    - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_contact_prospect
+    description: Number of days elapsed between the lead's first visit intent and their first contact-prospect event.
   days_first_visit_intent_to_new_buyer_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_new_buyer_prospect
+    - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_new_buyer_prospect
+    description: Number of days elapsed between the lead's first visit intent and becoming a New Buyer Prospect.
   days_first_visit_intent_to_first_booking_created:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_booking_created
+    - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_booking_created
+    description: Number of days elapsed between the lead's first visit intent and their first booking created.
   days_first_visit_intent_to_first_visit_completed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_visit_completed
+    - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_visit_completed
+    description: Number of days elapsed between the lead's first visit intent and their first completed visit.
   days_first_booking_created_to_first_visit_completed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_visit_completed
+    - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_visit_completed
+    description: Number of days elapsed between the lead's first booking created and their first completed visit.
   days_first_booking_created_to_first_offer_submitted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_offer_submitted
+    - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_offer_submitted
+    description: Number of days elapsed between the lead's first booking created and their first submitted offer.
   days_first_booking_created_to_first_offer_accepted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_offer_accepted
+    - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_offer_accepted
+    description: Number of days elapsed between the lead's first booking created and their first accepted offer.
   days_first_booking_created_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_sale_agreement_signed
+    - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_sale_agreement_signed
+    description: Number of days elapsed between the lead's first booking created and their first signed sale agreement (CCV).
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_offer_submitted
+    - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_offer_submitted
+    description: Number of days elapsed between the lead's first completed visit and their first submitted offer.
   days_first_visit_completed_to_first_offer_accepted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_offer_accepted
+    - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_offer_accepted
+    description: Number of days elapsed between the lead's first completed visit and their first accepted offer.
   days_first_visit_completed_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_sale_agreement_signed
+    - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_sale_agreement_signed
+    description: Number of days elapsed between the lead's first completed visit and their first signed sale agreement (CCV).
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_offer_submitted_to_first_offer_accepted
+    - datalake_sale_lead_flows.lead_flow.days_first_offer_submitted_to_first_offer_accepted
+    description: Number of days elapsed between the lead's first submitted offer and their first accepted offer.
   days_first_offer_submitted_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_offer_submitted_to_first_sale_agreement_signed
+    - datalake_sale_lead_flows.lead_flow.days_first_offer_submitted_to_first_sale_agreement_signed
+    description: Number of days elapsed between the lead's first submitted offer and their first signed sale agreement (CCV).
   days_first_offer_accepted_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.days_first_offer_accepted_to_first_sale_agreement_signed
+    - datalake_sale_lead_flows.lead_flow.days_first_offer_accepted_to_first_sale_agreement_signed
+    description: Number of days elapsed between the lead's first accepted offer and their first signed sale agreement (CCV).
   ts_first_talk_to_secretariat:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_talk_to_secretariat
+    - datalake_sale_lead_flows.lead_flow.ts_first_talk_to_secretariat
+    description: Timestamp of the lead's first talk-to-secretariat (SDR) interaction.
   ts_last_talk_to_secretariat:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_talk_to_secretariat
+    - datalake_sale_lead_flows.lead_flow.ts_last_talk_to_secretariat
+    description: Timestamp of the lead's most recent talk-to-secretariat (SDR) interaction.
   ts_first_visit_lead_intent:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_visit_lead_intent
+    - datalake_sale_lead_flows.lead_flow.ts_first_visit_lead_intent
+    description: Timestamp of the lead's first visit-intent event.
   ts_last_visit_lead_intent:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_visit_lead_intent
+    - datalake_sale_lead_flows.lead_flow.ts_last_visit_lead_intent
+    description: Timestamp of the lead's most recent visit-intent event.
   ts_first_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_contact_prospect
+    - datalake_sale_lead_flows.lead_flow.ts_first_contact_prospect
+    description: Timestamp of the lead's first contact-prospect event.
   ts_last_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_contact_prospect
+    - datalake_sale_lead_flows.lead_flow.ts_last_contact_prospect
+    description: Timestamp of the lead's most recent contact-prospect event.
   ts_first_classified_intent:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_classified_intent
+    - datalake_sale_lead_flows.lead_flow.ts_first_classified_intent
+    description: Timestamp of the lead's first classified-listing intent event.
   ts_last_classified_intent:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_classified_intent
+    - datalake_sale_lead_flows.lead_flow.ts_last_classified_intent
+    description: Timestamp of the lead's most recent classified-listing intent event.
   ts_first_visit_scheduling_event:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_visit_scheduling_event
+    - datalake_sale_lead_flows.lead_flow.ts_first_visit_scheduling_event
+    description: Timestamp of the lead's first visit-scheduling event.
   ts_last_visit_scheduling_event:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_visit_scheduling_event
+    - datalake_sale_lead_flows.lead_flow.ts_last_visit_scheduling_event
+    description: Timestamp of the lead's most recent visit-scheduling event.
   ts_first_tta_message_sent:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_tta_message_sent
+    - datalake_sale_lead_flows.lead_flow.ts_first_tta_message_sent
+    description: Timestamp of the first Talk-to-Agent (TTA) message sent for the lead.
   ts_last_tta_message_sent:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_tta_message_sent
+    - datalake_sale_lead_flows.lead_flow.ts_last_tta_message_sent
+    description: Timestamp of the most recent Talk-to-Agent (TTA) message sent for the lead.
   ts_first_booking_created_5a:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_booking_created_5a
+    - datalake_sale_lead_flows.lead_flow.ts_first_booking_created_5a
+    description: Timestamp of the lead's first booking created on QuintoAndar (5A).
   ts_last_booking_created_5a:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_booking_created_5a
+    - datalake_sale_lead_flows.lead_flow.ts_last_booking_created_5a
+    description: Timestamp of the lead's most recent booking created on QuintoAndar (5A).
   ts_first_visit_completed_5a:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed_5a
+    - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed_5a
+    description: Timestamp of the lead's first completed visit on QuintoAndar (5A).
   ts_last_visit_completed_5a:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed_5a
+    - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed_5a
+    description: Timestamp of the lead's most recent completed visit on QuintoAndar (5A).
   ts_first_booking_created_cm:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_booking_created_cm
+    - datalake_sale_lead_flows.lead_flow.ts_first_booking_created_cm
+    description: Timestamp of the lead's first booking created on Casa Mineira (CM).
   ts_last_booking_created_cm:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_booking_created_cm
+    - datalake_sale_lead_flows.lead_flow.ts_last_booking_created_cm
+    description: Timestamp of the lead's most recent booking created on Casa Mineira (CM).
   ts_first_visit_completed_cm:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed_cm
+    - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed_cm
+    description: Timestamp of the lead's first completed visit on Casa Mineira (CM).
   ts_last_visit_completed_cm:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed_cm
+    - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed_cm
+    description: Timestamp of the lead's most recent completed visit on Casa Mineira (CM).
   ts_new_buyer_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_new_buyer_prospect
+    - datalake_sale_lead_flows.lead_flow.ts_new_buyer_prospect
+    description: Timestamp when the lead became a New Buyer Prospect.
   ts_first_booking_created:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_booking_created
+    - datalake_sale_lead_flows.lead_flow.ts_first_booking_created
+    description: Timestamp of the lead's first booking created (any channel).
   ts_last_booking_created:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_booking_created
+    - datalake_sale_lead_flows.lead_flow.ts_last_booking_created
+    description: Timestamp of the lead's most recent booking created (any channel).
   ts_first_visit_completed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed
+    - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed
+    description: Timestamp of the lead's first completed visit (any channel).
   ts_last_visit_completed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed
+    - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed
+    description: Timestamp of the lead's most recent completed visit (any channel).
   ts_first_offer_submitted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_offer_submitted
+    - datalake_sale_lead_flows.lead_flow.ts_first_offer_submitted
+    description: Timestamp of the lead's first submitted offer.
   ts_last_offer_submitted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_offer_submitted
+    - datalake_sale_lead_flows.lead_flow.ts_last_offer_submitted
+    description: Timestamp of the lead's most recent submitted offer.
   ts_first_offer_accepted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_offer_accepted
+    - datalake_sale_lead_flows.lead_flow.ts_first_offer_accepted
+    description: Timestamp of the lead's first accepted offer.
   ts_last_offer_accepted:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_offer_accepted
+    - datalake_sale_lead_flows.lead_flow.ts_last_offer_accepted
+    description: Timestamp of the lead's most recent accepted offer.
   ts_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_sale_agreement_signed
+    - datalake_sale_lead_flows.lead_flow.ts_first_sale_agreement_signed
+    description: Timestamp of the lead's first signed sale agreement (CCV).
   ts_last_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_sale_agreement_signed
+    - datalake_sale_lead_flows.lead_flow.ts_last_sale_agreement_signed
+    description: Timestamp of the lead's most recent signed sale agreement (CCV).
   ts_first_combo_event_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_first_combo_event_contact_prospect
+    - datalake_sale_lead_flows.lead_flow.ts_first_combo_event_contact_prospect
+    description: Timestamp of the lead's first combined (cross-channel) contact-prospect event.
   ts_last_combo_event_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.lead_flow.ts_last_combo_event_contact_prospect
+    - datalake_sale_lead_flows.lead_flow.ts_last_combo_event_contact_prospect
+    description: Timestamp of the lead's most recent combined (cross-channel) contact-prospect event.
+  ts_load:
+    description: Timestamp when the table was last processed.
+owner: guilherme.rocha@quintoandar.com.br
+description: Data warehouse sale lead flow table supporting reporting on For Sale datamart tables for executive and product analytics. Grain and keys follow the dimensional model consumed by BI and metrics.

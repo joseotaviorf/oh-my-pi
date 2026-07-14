@@ -1,404 +1,362 @@
 database_name: dw_sale
 table_name: fact_buyer_prospects
-description: Fact table that describes the events of buyer prospects in the demand
-  sale funnel. Each line is a user that at least made a booking or an offer
+description: Fact table that describes the events of buyer prospects in the demand sale funnel. Each line is a user that at least made a booking or an offer
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_buyer:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.id_buyer
-    description: >
+    description: |
       Foreign key referring to the buyer prospect ID.
   sk_first_region:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.id_first_region
-    description: >
-      Foreign key of first region where a buyer prospect made contact with us. In other words, the first region he visited.
-      Can be joined with dw_public.dim_region.
+    description: |
+      Foreign key of first region where a buyer prospect made contact with us. In other words, the first region he visited. Can be joined with dw_public.dim_region.
   sk_last_region:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.id_last_region
-    description: >
-      Foreign key of last region where a buyer prospect made contact with us. In other words, the last region he visited.
-      Can be joined with dw_public.dim_region.
+    description: |
+      Foreign key of last region where a buyer prospect made contact with us. In other words, the last region he visited. Can be joined with dw_public.dim_region.
   sk_first_sale_flow_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_first_sale_flow
-    description: > 
+    description: |
       Foreign key referring to the first sale flow. Can be joined with dw_public.dim_date.
   sk_first_booking_created_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_first_booking_created
-    description: > 
+    description: |
       Foreign key referring to the first booking created. Can be joined with dw_public.dim_date.
   sk_first_visit_completed_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_first_visit_completed
-    description: >
+    description: |
       Foreign key referring to the first visit completed. Can be joined with dw_public.dim_date.
   sk_first_offer_submitted_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_first_offer_submitted
-    description: >
+    description: |
       Foreign key referring to the first offer submitted. Can be joined with dw_public.dim_date.
   sk_first_offer_accepted_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.dt_first_offer_accepted
-    description: > 
+    description: |
       Foreign key referring to the first offer accepted. Can be joined with dw_public.dim_date.
   sk_first_sale_agreement_signed_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.dt_first_sale_agreement_signed
-    description: >
+    description: |
       Foreign key referring to the first sale agreement signed. Can be joined with dw_public.dim_date.
   sk_last_sale_flow_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_last_sale_flow
-    description: >
+    description: |
       Foreign key referring to the last sale flow. Can be joined with dw_public.dim_date.
   sk_last_booking_created_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_last_booking_created
-    description: >
+    description: |
       Foreign key referring to the last booking created. Can be joined with dw_public.dim_date.
   sk_last_visit_completed_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_last_visit_completed
-    description: >
+    description: |
       Foreign key referring to the last visit completed. Can be joined with dw_public.dim_date.
   sk_last_offer_submitted_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_last_offer_submitted
-    description: > 
+    description: |
       Foreign key referring to the last offer submitted. Can be joined with dw_public.dim_date.
   sk_last_offer_accepted_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.dt_last_offer_accepted
-    description: >
+    description: |
       Foreign key referring to the last offer accepted. Can be joined with dw_public.dim_date.
   sk_last_sale_agreement_signed_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.dt_last_sale_agreement_signed
-    description: >
+    description: |
       Foreign key referring to the last sale agreement signed. Can be joined with dw_public.dim_date.
   sk_last_event_date:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.ts_last_event
-    description: >
-      Foreign key referring to the last event in demand funnel the buyer had. Can be joined with dw_public.dim_date.    
+    description: |
+      Foreign key referring to the last event in demand funnel the buyer had. Can be joined with dw_public.dim_date.
   first_event:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.first_event
-    description: >
+    description: |
       The first event in the funnel made by the buyer prospect. It could be: booking, offer or talk_to_agent.
   last_event:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.last_event
-    description: >
+    description: |
       The last event in the funnel made by the buyer prospect.
   further_funnel_step:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.further_funnel_step
-    description: >
-      The further event the Buyer had in the funnel. 
-      The order is: visit booked (VB) > visit completed (VC) > offer sent (OS) > offer accepted (OA) > sale agreement signet (CCV)
+    description: |
+      The further event the Buyer had in the funnel.  The order is: visit booked (VB) > visit completed (VC) > offer sent (OS) > offer accepted (OA) > sale agreement signet (CCV)
   first_buyer_intention:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.first_buyer_intention
-    description: >
+    description: |
       The first intention category for buying the house that the buyer indicate in the booking schedule.
   is_tenant:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.is_tenant
-    description: >
+    description: |
       Boolean column indicating if buyer had/have rental contracts in QuintoAndar as tenant.
   is_current_tenant:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.is_current_tenant
-    description: >
+    description: |
       Boolean column indicating if buyer is a current tenant in QuintoAndar.
   is_contract_owner:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.is_contract_owner
-    description: >
+    description: |
       Boolean column indicating if buyer had/have rental contracts in QuintoAndar as owner.
   is_tenant_prospect:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.is_tenant_prospect
-    description: >
+    description: |
       Boolean column indicating  if buyer if buyer had rent flows in QuintoAndar.
   sale_flows:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.sale_flows
-    description: >
+    description: |
       Number of sale flows, in other words, number of houses interacted with bookings or offers.
   regions_with_sale_flows:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.regions_with_sale_flows
-    description: >
+    description: |
       Count of regions where the buyer had sale flows, in other words, number of different regions in which the user has interacted with listings, with bookings or offers.
   weeks_with_sale_flows:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.weeks_with_sale_flows
-    description: >
+    description: |
       Count of weeks that the buyer had sale flows.
   bookings_created:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.bookings_created
-    description: >
+    description: |
       Number of booking created including visits, inspections and photo sessions.
   bookings_created_by_agent:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.bookings_created_by_agent
-    description: >
+    description: |
       Number of booking created by agent including visits, inspections and photo sessions.
   bookings_canceled:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.bookings_canceled
-    description: >
+    description: |
       Number of booking canceled including visits, inspections and photo sessions.
   visits_completed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.visits_completed
-    description: >
+    description: |
       Number of visits completed by buyer.
   offers_submitted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.offers_submitted
-    description: >
+    description: |
       Number of offers submitted by buyer.
   offers_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.offers_accepted
-    description: >
+    description: |
       Number of offers submitted by buyer and accepted by owner.
   offers_dismissed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.offers_dismissed
-    description: >
+    description: |
       Number of offers dismissed by buyer.
   sale_agreements_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.sale_agreements_signed
-    description: >
+    description: |
       Number of sale agreements signed by buyer.
   avg_sale_price:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.avg_sale_price
-    description: >
+    description: |
       Average sale price of the houses that the buyer had sale flows.
   avg_offer_price:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.avg_offer_price
-    description: >
+    description: |
       Average offer price of the offers submitted by the buyer.
   avg_offer_discount:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.avg_offer_discount
-    description: >
-      Average offer discount of the offers submitted by the buyer. 
-      In other words, given the listing's published price, the average difference between that price and the offer value.
+    description: |
+      Average offer discount of the offers submitted by the buyer.  In other words, given the listing's published price, the average difference between that price and the offer value.
   houses_owned:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.houses_owned
-    description: >
+    description: |
       Count of house owned by the buyer that are registrered in QuintoAndar.
   listings_for_sale:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.listings_for_sale
-    description: >
+    description: |
       Count of house owned by the buyer that are listed for sale business context in QuintoAndar.
   listings_for_rent:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.listings_for_rent
-    description: >
+    description: |
       Count of house owned by the buyer that are listed for rent business context in QuintoAndar.
   days_first_sale_flow_to_first_booking_created:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_booking_created
-    description: > 
-      Number of days between the first sale flow and the first booking created by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their first booking created.
   days_first_sale_flow_to_first_visit_completed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_visit_completed
-    description: >
-      Number of days between the first sale flow and the first visit completed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their first completed visit.
   days_first_sale_flow_to_first_offer_submitted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_offer_submitted
-    description: >
-      Number of days between the first sale flow and the first offer submitted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their first submitted offer.
   days_first_sale_flow_to_first_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_offer_accepted
-    description: > 
-      Number of days between the first sale flow and the first offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their first accepted offer.
   days_first_sale_flow_to_first_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_sale_agreement_signed
-    description: > 
-      Number of days between the first sale flow and the first sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their first signed sale agreement (CCV).
   days_first_booking_created_to_first_visit_completed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_first_visit_completed
-    description: >
-      Number of days between the first booking created and the first visit completed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their first completed visit.
   days_first_booking_created_to_first_offer_submitted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_first_offer_submitted
-    description: > 
-      Number of days between the first booking created and the first offer submitted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their first submitted offer.
   days_first_booking_created_to_first_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_first_offer_accepted
-    description: >
-      Number of days between the first booking created and the first offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their first accepted offer.
   days_first_booking_created_to_first_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_first_sale_agreement_signed
-    description: >
-      Number of days between the first booking created and the first sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their first signed sale agreement (CCV).
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_first_offer_submitted
-    description: >
-      Number of days between the first visit completed and the first offer submitted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first completed visit and their first submitted offer.
   days_first_visit_completed_to_first_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_first_offer_accepted
-    description: >
-      Number of days between the first visit completed and the first offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first completed visit and their first accepted offer.
   days_first_visit_completed_to_first_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_first_sale_agreement_signed
-    description: >
-      Number of days between the first visit completed and the first sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first completed visit and their first signed sale agreement (CCV).
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_first_offer_accepted
-    description: >
-      Number of days between the first offer submitted and the first offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first submitted offer and their first accepted offer.
   days_first_offer_submitted_to_first_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_first_sale_agreement_signed
-    description: >
-      Number of days between the first offer submitted and the first sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first submitted offer and their first signed sale agreement (CCV).
   days_first_offer_accepted_to_first_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_offer_accepted_to_first_sale_agreement_signed
-    description: >
-      Number of days between the first offer accepted and the first sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first accepted offer and their first signed sale agreement (CCV).
   days_first_sale_flow_to_last_sale_flow:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_sale_flow
-    description: >
-      Number of days between the first sale flow and the last sale flow of the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their last sale flow.
   days_first_sale_flow_to_last_booking_created:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_booking_created
-    description: > 
-      Number of days between the first sale flow and the last booking created by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their last booking created.
   days_first_sale_flow_to_last_visit_completed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_visit_completed
-    description: > 
-      Number of days between the first sale flow and the last visit completed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their last completed visit.
   days_first_sale_flow_to_last_offer_submitted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_offer_submitted
-    description: >
-      Number of days between the first sale flow and the last offer submitted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their last submitted offer.
   days_first_sale_flow_to_last_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_offer_accepted
-    description: >
-      Number of days between the first sale flow and the last offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their last accepted offer.
   days_first_sale_flow_to_last_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_sale_agreement_signed
-    description: > 
-      Number of days between the first sale flow and the last sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their last signed sale agreement (CCV).
   days_first_sale_flow_to_last_event:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_event
-    description: >
-      Number of days between the first sale flow and the last event of the buyer.
+    description: Number of days elapsed between the buyer prospect's first sale flow and their last funnel event.
   days_first_booking_created_to_last_booking_created:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_booking_created
-    description: > 
-      Number of days between the first booking created and the last booking created by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their last booking created.
   days_first_booking_created_to_last_visit_completed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_visit_completed
-    description: >
-      Number of days between the first booking created and the last visit completed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their last completed visit.
   days_first_booking_created_to_last_offer_submitted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_offer_submitted
-    description: > 
-      Number of days between the first booking created and the last offer submitted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their last submitted offer.
   days_first_booking_created_to_last_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_offer_accepted
-    description: >
-      Number of days between the first booking created and the last offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their last accepted offer.
   days_first_booking_created_to_last_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_sale_agreement_signed
-    description: >
-      Number of days between the first booking created and the last sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first booking created and their last signed sale agreement (CCV).
   days_first_visit_completed_to_last_visit_completed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_last_visit_completed
-    description: >
-      Number of days between the first visit completed and the last visit completed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first completed visit and their last completed visit.
   days_first_visit_completed_to_last_offer_submitted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_last_offer_submitted
-    description: >
-      Number of days between the first visit completed and the last offer submitted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first completed visit and their last submitted offer.
   days_first_visit_completed_to_last_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_last_offer_accepted
-    description: >
-      Number of days between the first visit completed and the last offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first completed visit and their last accepted offer.
   days_first_visit_completed_to_last_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_last_sale_agreement_signed
-    description: >
-      Number of days between the first visit completed and the last sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first completed visit and their last signed sale agreement (CCV).
   days_first_offer_submitted_to_last_offer_submitted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_last_offer_submitted
-    description: >
-      Number of days between the first offer submitted and the last offer submitted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first submitted offer and their last submitted offer.
   days_first_offer_submitted_to_last_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_last_offer_accepted
-    description: >
-      Number of days between the first offer submitted and the last offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first submitted offer and their last accepted offer.
   days_first_offer_submitted_to_last_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_last_sale_agreement_signed
-    description: >
-      Number of days between the first offer submitted and the last sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first submitted offer and their last signed sale agreement (CCV).
   days_first_offer_accepted_to_last_offer_accepted:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_offer_accepted_to_last_offer_accepted
-    description: >
-      Number of days between the first offer accepted and the last offer accepted by the buyer.
+    description: Number of days elapsed between the buyer prospect's first accepted offer and their last accepted offer.
   days_first_offer_accepted_to_last_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_offer_accepted_to_last_sale_agreement_signed
-    description: >
-      Number of days between the first offer accepted and the last sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first accepted offer and their last signed sale agreement (CCV).
   days_first_sale_agreement_signed_to_last_sale_agreement_signed:
     lineage:
     - datalake_buyer_prospect.buyer_prospect.days_first_sale_agreement_signed_to_last_sale_agreement_signed
-    description: >
-      Number of days between the first sale agreement signed and the last sale agreement signed by the buyer.
+    description: Number of days elapsed between the buyer prospect's first signed sale agreement (CCV) and their last signed sale agreement.
   ts_load:
-    description: >
+    description: |
       Timestamp when the table was loaded.

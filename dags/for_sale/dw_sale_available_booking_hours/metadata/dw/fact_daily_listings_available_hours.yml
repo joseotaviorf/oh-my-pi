@@ -1,18 +1,13 @@
 database_name: dw_sale
 table_name: fact_daily_listings_available_hours
-description: This table shows the weekly schedule information available for ForSale
-  property tours. It is assembled in a technique called periodic snapshot, that is,
-  daily we save the schedule snapshot of all Sale listings. Then we can filter for
-  any listing, any day we want, and view the weekly schedule. Each line represents
-  a house in a day
+description: This table shows the weekly schedule information available for ForSale property tours. It is assembled in a technique called periodic snapshot, that is, daily we save the schedule snapshot of all Sale listings. Then we can filter for any listing, any day we want, and view the weekly schedule. Each line represents a house in a day
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_date:
     lineage:
     - dw_public.dim_date.sk_date
-    description: Key associated with the day of the snapshot. Can be associated with
-      dw_public.dim_date.
+    description: Key associated with the day of the snapshot. Can be associated with dw_public.dim_date.
   sk_house:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.id_house
@@ -26,8 +21,7 @@ columns:
     - dw_sale.fact_listing_status.status_history
     description: Sale status linked to a certain point in time of the listing.
     categories:
-      CCV_CANCELED: If the listing is in the process of sales cancellation during
-        the change
+      CCV_CANCELED: If the listing is in the process of sales cancellation during the change
       CCV_SIGNED: If the listing is in the process of being sold during the change
       EDITING: If the listing is being edited during the change
       OPTED_OUT: Permanent logical exclusion from this business context. Not UNPUBLISHED or SUSPENDED. Use status_reason.
@@ -38,66 +32,48 @@ columns:
   week_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.week_available_hours
-    description: It tells us the snapshot of the sum of the amount of hours available
-      for the visit of the property for every day of the week, that is, on the day
-      that is linked to the snapshot, it has x hours available for the visit.
+    description: It tells us the snapshot of the sum of the amount of hours available for the visit of the property for every day of the week, that is, on the day that is linked to the snapshot, it has x hours available for the visit.
   workdays_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.workdays_available_hours
-    description: It tells us the snapshot of the sum of the number of hours available
-      for the visit of the property on business days, that is, on the day that the
-      snapshot is linked to, it has x hours available for the visit.
+    description: It tells us the snapshot of the sum of the number of hours available for the visit of the property on business days, that is, on the day that the snapshot is linked to, it has x hours available for the visit.
   monday_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.monday_available_hours
-    description: It tells us the snapshot of the amount of hours available to visit
-      the property on Monday, that is, on the day that tied to the snapshot, it has
-      X hours available for the visit.
+    description: It tells us the snapshot of the amount of hours available to visit the property on Monday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   tuesday_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.tuesday_available_hours
-    description: It tells us the snapshot of the amount of hours available to visit
-      the property on Tuesday, that is, on the day that tied to the snapshot, it has
-      X hours available for the visit.
+    description: It tells us the snapshot of the amount of hours available to visit the property on Tuesday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   wednesday_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.wednesday_available_hours
-    description: It tells us the snapshot of the amount of hours available to visit
-      the property on Wednesday, that is, on the day that tied to the snapshot, it
-      has X hours available for the visit.
+    description: It tells us the snapshot of the amount of hours available to visit the property on Wednesday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   thursday_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.thursday_available_hours
-    description: It tells us the snapshot of the amount of hours available to visit
-      the property on Thursday, that is, on the day that tied to the snapshot, it
-      has X hours available for the visit.
+    description: It tells us the snapshot of the amount of hours available to visit the property on Thursday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   friday_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.friday_available_hours
-    description: It tells us the snapshot of the amount of hours available to visit
-      the property on Friday, that is, on the day that tied to the snapshot, it has
-      X hours available for the visit.
+    description: It tells us the snapshot of the amount of hours available to visit the property on Friday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   saturday_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.saturday_available_hours
-    description: It tells us the snapshot of the amount of hours available to visit
-      the property on Saturday, that is, on the day that tied to the snapshot, it
-      has X hours available for the visit.
+    description: It tells us the snapshot of the amount of hours available to visit the property on Saturday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   sunday_available_hours:
     lineage:
     - datalake_sale_available_booking_hours.weekly_available_booking_hours.sunday_available_hours
-    description: It tells us the snapshot of the amount of hours available to visit
-      the property on Sunday, that is, on the day that tied to the snapshot, it has
-      X hours available for the visit.
+    description: It tells us the snapshot of the amount of hours available to visit the property on Sunday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   year:
     lineage:
     - dw_public.dim_date.year
-    description: Year of the snapshot.
+    description: Partition year when the ETL run loaded this row into the lake table.
   month:
     lineage:
     - dw_public.dim_date.month
-    description: Month of the snapshot.
+    description: Partition month when the ETL run loaded this row into the lake table.
   day:
     lineage:
     - dw_public.dim_date.day
-    description: Day of the snapshot.
+    description: Partition day when the ETL run loaded this row into the lake table.
