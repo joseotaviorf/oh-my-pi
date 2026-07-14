@@ -23,11 +23,15 @@ artifacts its own markdown export can't express cleanly:
 - A whole GFM table flattened onto one physical line, with row breaks
   collapsed to ``||`` (the closing pipe of one row meeting the opening pipe
   of the next, newline eaten) — this renders as raw text instead of a table.
+- The opposite table shape: each row already on its own physical line, but
+  with a blank line between every row (DataHub exports each table row as its
+  own paragraph). GFM requires header/separator/data rows on immediately
+  consecutive lines, so this also renders as isolated text, not a table.
 - Code-fence delimiters glued to content (``` ```sqlSELECT … ORDER BY 1``` ```)
   instead of sitting on their own lines: the closing fence never matches, so
   the block never closes and swallows every section below it.
 
-This module fixes exactly those six, structurally: every rule is a no-op on
+This module fixes exactly those seven, structurally: every rule is a no-op on
 markdown that doesn't contain the pattern, so it's safe to run on
 hand-authored files too.
 
@@ -88,6 +92,14 @@ _MID_LINE_BULLET_RE = re.compile(r"(?<=\S)-\s+(?=\S)")
 # heading. Requires a space after the hashes (like a real ATX heading) so a
 # literal bold "**#1 priority**" is never touched.
 _BOLD_WRAPPED_HEADING_RE = re.compile(r"^\*\*(#{1,6}\s+\S.*?)\*\*[ \t]*$", re.MULTILINE)
+
+# A table row DataHub exported as its own paragraph: each row already sits on
+# its own physical line (unlike the single-line-glued-with-"||" shape below),
+# but a blank line between every row breaks GFM table parsing — a table
+# requires its header/separator/data rows on immediately consecutive lines,
+# so each row here would render as isolated, useless pipe-delimited text
+# instead of a table. Matches a full row line (starts and ends with "|").
+_TABLE_ROW_LINE_RE = re.compile(r"^\s*\|.*\|\s*$")
 
 # A GFM table row boundary flattened to "||": the closing pipe of one row and
 # the opening pipe of the next, with the newline between them eaten. Two pipes
@@ -230,6 +242,43 @@ def _reflow_collapsed_tables(markdown: str) -> str:
     return "\n".join(out_lines)
 
 
+def _join_blank_line_separated_table_rows(markdown: str) -> str:
+    """Rejoin table rows DataHub exported as separate, blank-line-divided paragraphs.
+
+    A run of two or more ``_TABLE_ROW_LINE_RE`` lines, each separated from the
+    next by exactly one blank line, is a table whose rows survived as
+    individual paragraphs instead of a contiguous block. Only a *run* (2+
+    rows) is rejoined, so an isolated line that merely starts/ends with "|"
+    (not actually part of a table) is left untouched — a single row can never
+    render as a table anyway, so nothing is lost by ignoring it here. The
+    blank line before the first row and after the last row is preserved
+    (still the correct separator from surrounding prose); only the blank
+    lines *between* rows are dropped.
+    """
+    lines = markdown.split("\n")
+    out: list[str] = []
+    i, n = 0, len(lines)
+    while i < n:
+        line = lines[i]
+        if _TABLE_ROW_LINE_RE.match(line):
+            block = [line]
+            j = i + 1
+            while (
+                j + 1 < n
+                and lines[j].strip() == ""
+                and _TABLE_ROW_LINE_RE.match(lines[j + 1])
+            ):
+                block.append(lines[j + 1])
+                j += 2
+            if len(block) > 1:
+                out.extend(block)
+                i = j
+                continue
+        out.append(line)
+        i += 1
+    return "\n".join(out)
+
+
 def sanitize_datahub_markdown(markdown: str) -> str:
     """Normalize known DataHub rich-text-editor export artifacts.
 
@@ -253,6 +302,7 @@ def sanitize_datahub_markdown(markdown: str) -> str:
     protected = _BOLD_ITALIC_TRIPLE_RE.sub(r"**\1**", protected)
     protected = _SINGLE_ITALIC_ASTERISK_RE.sub(r"**\1**", protected)
     protected = _reflow_collapsed_tables(protected)
+    protected = _join_blank_line_separated_table_rows(protected)
     protected = _reflow_inline_bullets(protected)
 
     return _unshield_code(protected, code_blocks)

@@ -137,6 +137,38 @@ def test_reflows_collapsed_table_into_rows():
     ]
 
 
+def test_joins_table_rows_datahub_exported_as_separate_paragraphs():
+    # Regression: DataHub exported each row of the "Cases Perspective" Context
+    # Document's last_team exclusion table as its own blank-line-separated
+    # paragraph — the opposite shape from the single-line-glued-with-"||"
+    # case above. GFM requires contiguous rows, so this rendered as isolated
+    # text instead of a table.
+    md = (
+        "regardless of which department they were logged under:\n\n"
+        "| `last_team` | Why it is excluded |\n\n"
+        "| :---- | :---- |\n\n"
+        "| `CX Expert` | Pre-Contract |\n\n"
+        "| `Propostas` | Pre-Contract |\n\n"
+        "One additional `last_team` is excluded for a different reason\n"
+    )
+    result = sanitize_datahub_markdown(md)
+    assert result == (
+        "regardless of which department they were logged under:\n\n"
+        "| `last_team` | Why it is excluded |\n"
+        "| :---- | :---- |\n"
+        "| `CX Expert` | Pre-Contract |\n"
+        "| `Propostas` | Pre-Contract |\n\n"
+        "One additional `last_team` is excluded for a different reason\n"
+    )
+
+
+def test_does_not_join_a_single_isolated_pipe_line():
+    # A lone line that starts/ends with "|" but has no adjacent row is left
+    # alone — never part of a table, so nothing to join.
+    md = "Some prose.\n\n| not really a table row |\n\nMore prose.\n"
+    assert sanitize_datahub_markdown(md) == md
+
+
 def test_leaves_well_formed_multiline_table_untouched():
     md = "| A | B |\n| :-- | :-- |\n| 1 | 2 |"
     assert sanitize_datahub_markdown(md) == md
