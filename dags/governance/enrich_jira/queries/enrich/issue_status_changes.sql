@@ -5,8 +5,6 @@ WITH issue_change AS (
         EXPLODE(FROM_JSON(GET_JSON_OBJECT(histories,'$.items'), 'array<string>')) AS items
     FROM
         datalake_jira_clean.issues
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ), issue_status_change AS (
     SELECT 
         key AS id_issue, 
@@ -70,4 +68,7 @@ FROM
 JOIN issue_status_change AS isc
     ON isc.id_issue = iod.id_issue
         AND isc.id_change = iod.id_change
+WHERE
+    isc.ts_updated >= '{load_start_date}'
+    AND isc.ts_updated < '{load_end_date}'
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11
