@@ -111,6 +111,7 @@ never query it unbounded (data starts 2025-01).
 - Never restrict the **denominator** to a single category — the total must include all categories so the shares are comparable and sum to ~100%.
 - Never compute the client shares from `SUM(count_*)` — those are interaction **volumes**, not client-slot counts (see Nuances).
 - Never remove the `type_replicated NOT IN ('offboarding')` filter from either numerator or denominator — doing so changes the official definition and will not match the reference spreadsheet.
+- **Warning**: `month_replicated` is `TIMESTAMP WITH TIME ZONE` — always do `CAST(month_replicated AS DATE)` (or equivalent) before comparing with `DATE` / `date_trunc` / `current_date`; comparing without the cast shifts the window by one month depending on the session timezone.
 
 ### Nuances
 
@@ -198,8 +199,8 @@ WITH contract_category AS (
         COUNT(DISTINCT sk_contract) AS contracts
     FROM sandbox.journey_post_contract
     WHERE type_replicated NOT IN ('offboarding')    -- offboarding excluded from the official definition
-      AND month_replicated >= date_trunc('month', date_add('month', -24, current_date))  -- date/partition bound: last 24 months
-      AND month_replicated <= date_trunc('month', current_date)
+      AND CAST(month_replicated AS DATE) >= date_trunc('month', date_add('month', -24, current_date))  -- date/partition bound: last 24 months (CAST: month_replicated is TIMESTAMP WITH TIME ZONE)
+      AND CAST(month_replicated AS DATE) <= date_trunc('month', current_date)
     GROUP BY 1, 2, 3
 )
 SELECT
@@ -237,8 +238,8 @@ WITH contract_category AS (
         COUNT(DISTINCT sk_contract) AS contracts
     FROM sandbox.journey_post_contract
     WHERE type_replicated NOT IN ('offboarding')
-      AND month_replicated >= date_trunc('month', date_add('month', -24, current_date))  -- date/partition bound: last 24 months
-      AND month_replicated <= date_trunc('month', current_date)
+      AND CAST(month_replicated AS DATE) >= date_trunc('month', date_add('month', -24, current_date))  -- date/partition bound: last 24 months (CAST: month_replicated is TIMESTAMP WITH TIME ZONE)
+      AND CAST(month_replicated AS DATE) <= date_trunc('month', current_date)
     GROUP BY 1, 2, 3, 4
 )
 SELECT
@@ -272,8 +273,8 @@ SELECT
     SUM(count_human_back)  AS total_ticket_back
 FROM sandbox.journey_post_contract
 WHERE type_replicated NOT IN ('offboarding')
-  AND month_replicated >= date_trunc('month', date_add('month', -24, current_date))  -- date/partition bound: last 24 months
-  AND month_replicated <= date_trunc('month', current_date)
+  AND CAST(month_replicated AS DATE) >= date_trunc('month', date_add('month', -24, current_date))  -- date/partition bound: last 24 months (CAST: month_replicated is TIMESTAMP WITH TIME ZONE)
+  AND CAST(month_replicated AS DATE) <= date_trunc('month', current_date)
 GROUP BY 1, 2, 3
 ORDER BY 1, 2, 3
 ```
