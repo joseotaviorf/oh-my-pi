@@ -2,7 +2,7 @@ from argparse import ArgumentParser, Namespace
 from typing import Dict, List, Tuple
 
 import ftfy
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import coalesce, col, lit, lower, udf, when
 from pyspark.sql.types import BooleanType
 
@@ -22,8 +22,9 @@ JOB_NAME = "load_description_features"
 
 def main():
     args = parse_args()
+    spark = SparkClient(app_name=JOB_NAME).conn
     patterns_by_country_code, fields = read_configs(args)
-    descriptions_df = prepare_descriptions_dataframe(fields)
+    descriptions_df = prepare_descriptions_dataframe(spark, fields)
     descriptions_df = infer_features_from_description(
         descriptions_df, patterns_by_country_code
     )
@@ -61,16 +62,16 @@ def read_configs(args: Namespace) -> Tuple[Dict[str, List], List[str]]:
     return patterns_by_country_code, fields
 
 
-def prepare_descriptions_dataframe(fields: List[str]) -> DataFrame:
+def prepare_descriptions_dataframe(spark: SparkSession, fields: List[str]) -> DataFrame:
     """Returns a dataframe with all descriptions and fields to be inferred, with null values"""
 
-    descriptions_df = get_raw_descriptions_dataframe()
+    descriptions_df = get_raw_descriptions_dataframe(spark)
     clean_descriptions_df = clean_description(descriptions_df)
     clean_descriptions_with_fields_df = add_all_fields(clean_descriptions_df, fields)
     return clean_descriptions_with_fields_df
 
 
-def get_raw_descriptions_dataframe() -> DataFrame:
+def get_raw_descriptions_dataframe(spark: SparkSession) -> DataFrame:
     """Returns a dataframe with all descriptions from house, or from lead_3p if it is a third party house"""
 
     return spark.sql("""
