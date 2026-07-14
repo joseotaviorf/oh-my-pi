@@ -1,0 +1,31 @@
+alerts:
+  registry_template_pipeline_ok:
+    description: |
+      [TEMPLATE] Prod pipeline healthcheck — fires once per entity/day (deduped). Delete this
+      entire alert after the first successful GChat in prod.
+    channel: "#agents-data-alarms"
+    ignore_cron: true
+    cron: "*/30 * * * *"
+    threshold: 0
+    severity: Warning
+    id_column: id_healthcheck
+    value_column: check_label
+    criteria_sql: |
+      SELECT
+        'agents_alerts_template_v3_forno_smoke' AS id_healthcheck,
+        'pipeline_ok_forno_smoke' AS check_label
+  prospect_waiting_conversion_6h:
+    description: Prospect agents stuck in WAITING_CONVERSION for more than 6 hours.
+    channel: "#alerts_agent_accreditation"
+    cron: "0 */2 * * *"
+    threshold: 0
+    severity: Error
+    id_column: id_prospect_agent
+    value_column: hours_over_threshold
+    criteria_sql: |
+      SELECT
+        pa.id_prospect_agent,
+        (UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP(pa.ts_updated)) / 3600.0 - 6 AS hours_over_threshold
+      FROM datalake_agent_accreditation.prospect_agent AS pa
+      WHERE pa.status = 'WAITING_CONVERSION'
+        AND pa.ts_updated <= CURRENT_TIMESTAMP() - INTERVAL 6 HOURS

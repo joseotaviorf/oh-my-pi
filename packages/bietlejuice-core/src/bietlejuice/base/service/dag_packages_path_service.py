@@ -388,6 +388,41 @@ class DAGPackagesPathService:
         return query_content
 
     @staticmethod
+    def get_config_file_content_in_spark_jobs(
+        dag_name: str,
+        file_name: str,
+        engine: str = "databricks_volume",
+    ) -> str:
+        """
+        Opens a co-located configuration file shipped under ``spark_jobs/{dag_name}/``.
+
+        Used from Spark driver jobs (Databricks or EMR) that read an in-repo config
+        (e.g. an alert registry YAML) living next to the custom job ``.py``. When
+        ``SPARK_RUNTIME=emr``, S3 reads always use ``boto3`` regardless of ``engine``.
+
+        :param dag_name: the DAG name
+        :param file_name: the config file name co-located under spark_jobs/{dag_name}/
+        :param engine: engine on Databricks: "spark", "boto3" or "databricks_volume". On EMR, boto3 is always used.
+        :return: config file content
+        """
+        from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+
+        if RuntimeDetector.is_emr():
+            engine = "boto3"
+
+        config_file_relative_path = path.join("spark_jobs", dag_name, file_name)
+        config_content = DAGPackagesPathService._read_dag_package_file_from_s3(
+            sql_file_relative_path=config_file_relative_path, engine=engine
+        )
+
+        if not config_content:
+            raise FileNotFoundError(
+                f"Config file was not found or is empty, dag_name={dag_name}, config_file_relative_path={config_file_relative_path}"
+            )
+
+        return config_content
+
+    @staticmethod
     def list_queries_files_in_composer(
         dag_name: str, layer: str, intermediate_path: str = ""
     ) -> list:

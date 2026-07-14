@@ -1,0 +1,2 @@
+# Notification Hub Internal — inmetro route (per-alert ?space= from registry channel).
+notification_hub_inmetro_webhook_base: "https://notification-hub-internal-api.quintoandar.com.br/webhook/inmetro"

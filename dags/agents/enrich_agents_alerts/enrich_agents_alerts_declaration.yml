@@ -1,0 +1,25 @@
+dag:
+  name: enrich_agents_alerts
+  owner: Data Agents
+  schedule_start_date: 2026, 7, 7
+  schedule_interval: "*/30 * * * *"
+  documentation:
+    dag_purpose: |
+      Config-driven Agents alert framework. Every 30 minutes evaluates an in-repo
+      registry of alerts whose cron is due, writes one metric row per violating entity to
+      datalake_agents_validation.agent_alert_results, and notifies via Notification
+      Hub (inmetro route) on breach.
+workflow:
+  type: query_delta
+  layer: enrich
+  load_spark_job: load_agent_alerts
+  custom_schema: agents_validation
+  default_partitions: [alert_name, year, month, day]
+  spark_job_arguments:
+  - '{environment}'
+  - '{bucket}'
+  - '{dag_name}'
+  - '{schema}'
+  - '{{ data_interval_start }}'
+  tables_customization:
+    agent_alert_results: {}

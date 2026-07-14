@@ -1,0 +1,65 @@
+---
+database_name: datalake_agents_validation
+table_name: agent_alert_results
+description: |
+  Result log of the config-driven Agents alert framework (enrich_agents_alerts DAG). Grain is
+  one row per id_alert: a deterministic per-entity key combining the alert, the violating entity
+  id, and the check day. Rows are written only for entities flagged while an alert is breaching
+  (violation_count > threshold), upserted (insert-only Delta MERGE on id_alert) so overlapping or
+  retried runs never duplicate and ts_check stays the first time the entity was alerted. This
+  grain deduplicates notifications: the same entity on the same day is alerted once, but a
+  still-breaching entity re-alerts on a new day. The alert-level violation_count is carried on
+  every row, so the metric survives as an aggregate. The source of the evaluated alerts is the
+  in-repo, PR-reviewed alert registry (spark_jobs/alerts_registry.yml; see ALERTS_REGISTRY.md);
+  consumers are the Agents data on-call, who receive a GChat message listing the new breaching
+  ids and can audit history here. Partitioned by alert_name, year, month, and day — always filter
+  on year, month, and day for partition pruning and add alert_name when inspecting a single alert.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_alert:
+    description: |
+      Deterministic per-entity dedup key: first 16 hex chars of the sha256 of
+      alert_name|id_entity|dt_check. Merge key of the table; guarantees the same entity is
+      recorded and notified once per alert per day, even across DAG re-runs.
+  alert_name:
+    description: Registry key of the evaluated alert (e.g. prospect_waiting_conversion_6h).
+  criteria_version:
+    description: |
+      First 12 hex chars of the sha256 of the normalized criteria SQL, computed by the job for
+      auditability of which query definition produced this result.
+  id_column:
+    description: |
+      Name of the entity id column selected by the alert's criteria SQL (e.g. id_prospect_agent);
+      identifies what kind of entity id_entity holds.
+  id_entity:
+    description: |
+      The violating entity id value (stringified) returned by the alert's criteria SQL; the entity
+      that triggered this alert row.
+  entity_value:
+    description: |
+      Optional per-entity metric value (string) from the alert's criteria SQL when it declares a
+      value_column; numbers and other types are stringified by the job. Null when the alert has no
+      value_column or the SQL value is null.
+  violation_count:
+    description: |
+      Alert-level number of violating entities returned by the criteria SQL on the run that first
+      recorded this row; identical across all rows of the same alert and run.
+  threshold:
+    description: |
+      Breach threshold for the alert (string in Delta; registry may use a number or string). A breach
+      occurs when violation_count is greater than the numeric interpretation of this value.
+  is_breach:
+    description: Boolean flag, true when violation_count is greater than threshold.
+  dt_check:
+    description: Date derived from ts_check (the DAG data_interval_start); the dedup day.
+  ts_check:
+    description: |
+      Deterministic check timestamp equal to the DAG data_interval_start at the moment the entity
+      was first alerted; preserved by the insert-only merge across retried or overlapping runs.
+  year:
+    description: Partition column, year of dt_check.
+  month:
+    description: Partition column, month of dt_check.
+  day:
+    description: Partition column, day of dt_check.
