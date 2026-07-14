@@ -15,6 +15,8 @@ dags/platform/**                                                        @quintoa
 dags/primitives/**                                                      @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives @quintoandar/data-ingestion-code-owners
 dags/support_and_service/**                                             @gbrunelli @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
 packages/**                                                             @quintoandar/data-ingestion-code-owners @quintoandar/data-ingestion-code-owners
+# DAG spark-job tests mirror dags/ — either platform or DE team can approve.
+packages/bietlejuice-runtime/test/dags/**                               @quintoandar/bi-etl-ejuice-code-owners @quintoandar/data-ingestion-code-owners
 packages/bietlejuice-runtime/**/governance/**                           @quintoandar/data-ops-governance @quintoandar/data-ingestion-code-owners
 governance/**                                                           @quintoandar/data-ops-governance @quintoandar/data-ingestion-code-owners
 # Domain allowlist single source of truth + its generation chain.
