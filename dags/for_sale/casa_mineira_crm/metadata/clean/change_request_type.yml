@@ -1,17 +1,22 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: change_request_type
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.id
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.id
+    description: Surrogate primary key of the change request type row in the source system.
   change_request_type_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.nome
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.nome
+    description: Display name of the change request type category.
   priority:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.prioridade
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.prioridade
+    description: Priority level assigned to change requests of this type.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.criado_em
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of change request type sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per change request type record with standardized names and types in datalake_casa_mineira_crm_clean.

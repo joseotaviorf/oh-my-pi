@@ -1,20 +1,26 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: city
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.cidade.id
+    - datalake_casa_mineira_crm_raw.cidade.id
+    description: Surrogate primary key of the city row in the source system.
   id_uf:
     lineage:
-      - datalake_casa_mineira_crm_raw.cidade.uf_id
+    - datalake_casa_mineira_crm_raw.cidade.uf_id
+    description: Foreign key to the state (UF) in datalake_casa_mineira_crm_clean.uf where the city is located.
   city_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.cidade.nome
+    - datalake_casa_mineira_crm_raw.cidade.nome
+    description: Name of the city where the listing or condo is located.
   city_slug_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.cidade.slug
+    - datalake_casa_mineira_crm_raw.cidade.slug
+    description: URL-friendly slug identifier derived from the city name.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.cidade.criado_em
+    - datalake_casa_mineira_crm_raw.cidade.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of city sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per city record with standardized names and types in datalake_casa_mineira_crm_clean.

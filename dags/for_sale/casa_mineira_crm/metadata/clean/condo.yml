@@ -1,44 +1,58 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: condo
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.id
+    - datalake_casa_mineira_crm_raw.condominio.id
+    description: Surrogate primary key of the condo row in the source system.
   id_builder:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.construtora_id
+    - datalake_casa_mineira_crm_raw.condominio.construtora_id
+    description: Foreign key to the builder in datalake_casa_mineira_crm_clean.builder that constructed the condo.
   id_neighborhood:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.bairro_id
+    - datalake_casa_mineira_crm_raw.condominio.bairro_id
+    description: Foreign key to the neighborhood in datalake_casa_mineira_crm_clean.neighborhood where the condo is located.
   condo_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.nome
+    - datalake_casa_mineira_crm_raw.condominio.nome
+    description: Short name of the condominium.
   condo_full_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.nome_completo
+    - datalake_casa_mineira_crm_raw.condominio.nome_completo
+    description: Full descriptive name of the condominium.
   condo_slug_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.slug
+    - datalake_casa_mineira_crm_raw.condominio.slug
+    description: URL-friendly slug identifier derived from the condo name.
   condo_slug_full_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.slug_completo
+    - datalake_casa_mineira_crm_raw.condominio.slug_completo
+    description: URL-friendly slug identifier derived from the condo full name.
   address:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.logradouro
+    - datalake_casa_mineira_crm_raw.condominio.logradouro
+    description: Street address (logradouro) of the condominium.
   address_number:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.numero
+    - datalake_casa_mineira_crm_raw.condominio.numero
+    description: Street number of the condominium address.
   zip_code:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.cep
+    - datalake_casa_mineira_crm_raw.condominio.cep
+    description: Postal code (CEP) of the condominium address.
   lat:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.latitude
+    - datalake_casa_mineira_crm_raw.condominio.latitude
+    description: Geographic latitude coordinate of the condominium.
   lng:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.longitude
+    - datalake_casa_mineira_crm_raw.condominio.longitude
+    description: Geographic longitude coordinate of the condominium.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.condominio.criado_em
+    - datalake_casa_mineira_crm_raw.condominio.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of condo sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per condo record with standardized names and types in datalake_casa_mineira_crm_clean.

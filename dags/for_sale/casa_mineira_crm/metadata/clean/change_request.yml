@@ -1,32 +1,42 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: change_request
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.id
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.id
+    description: Surrogate primary key of the change request row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.imovel_id
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_user_attendance:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.usuario_atendimento_id
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.usuario_atendimento_id
+    description: Foreign key to the user in datalake_casa_mineira_crm_clean.user who handled the change request.
   id_user_confirmation:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.usuario_confirmacao_id
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.usuario_confirmacao_id
+    description: Foreign key to the user in datalake_casa_mineira_crm_clean.user who confirmed the change request.
   id_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.tipo_id
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.tipo_id
+    description: Foreign key to the change request type in datalake_casa_mineira_crm_clean.change_request_type.
   change_request_status:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.status
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.status
+    description: Current status of the change request workflow (e.g. pending, accepted, rejected).
   ts_accepted:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.aceito_em
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.aceito_em
+    description: Timestamp when the change request was accepted.
   ts_rejected:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.recusado_em
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.recusado_em
+    description: Timestamp when the change request was rejected.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.criado_em
+    - datalake_casa_mineira_crm_raw.solicitacao_alteracao.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of change request sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per change request record with standardized names and types in datalake_casa_mineira_crm_clean.

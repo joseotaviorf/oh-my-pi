@@ -1,26 +1,34 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: client
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente.id
+    - datalake_casa_mineira_crm_raw.cliente.id
+    description: Surrogate primary key of the client row in the source system.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente.criado_por
+    - datalake_casa_mineira_crm_raw.cliente.criado_por
+    description: Identifier of the user who created the client record in the source system.
   email:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente.email
+    - datalake_casa_mineira_crm_raw.cliente.email
+    description: Contact email address used for notifications and identity matching.
   name:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente.nome
+    - datalake_casa_mineira_crm_raw.cliente.nome
+    description: Human-readable display name associated with the person or entity in this row.
   phone_number:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente.telefone
+    - datalake_casa_mineira_crm_raw.cliente.telefone
+    description: Primary contact phone number of the client.
   second_phone_number:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente.telefone_secundario
+    - datalake_casa_mineira_crm_raw.cliente.telefone_secundario
+    description: Secondary contact phone number of the client.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente.criado_em
+    - datalake_casa_mineira_crm_raw.cliente.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of client sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per client record with standardized names and types in datalake_casa_mineira_crm_clean.

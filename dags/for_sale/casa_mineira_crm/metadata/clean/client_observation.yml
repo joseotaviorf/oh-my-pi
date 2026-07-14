@@ -1,20 +1,26 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: client_observation
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_observacao.id
+    - datalake_casa_mineira_crm_raw.cliente_observacao.id
+    description: Surrogate primary key of the client observation row in the source system.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_observacao.cliente_id
+    - datalake_casa_mineira_crm_raw.cliente_observacao.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_observacao.criado_por
+    - datalake_casa_mineira_crm_raw.cliente_observacao.criado_por
+    description: Identifier of the user who recorded the client observation.
   observation:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_observacao.observacao
+    - datalake_casa_mineira_crm_raw.cliente_observacao.observacao
+    description: Free-text observation note recorded about the client.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_observacao.criado_em
+    - datalake_casa_mineira_crm_raw.cliente_observacao.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of client observation sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per client observation record with standardized names and types in datalake_casa_mineira_crm_clean.

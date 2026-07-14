@@ -1,20 +1,26 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: access_register
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_acesso.id
+    - datalake_casa_mineira_crm_raw.registro_acesso.id
+    description: Surrogate primary key of the access register row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_acesso.imovel_id
+    - datalake_casa_mineira_crm_raw.registro_acesso.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_acesso.usuario_id
+    - datalake_casa_mineira_crm_raw.registro_acesso.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   action:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_acesso.acao
+    - datalake_casa_mineira_crm_raw.registro_acesso.acao
+    description: Action performed during the access event recorded against the property listing.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_acesso.criado_em
+    - datalake_casa_mineira_crm_raw.registro_acesso.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of access register sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per access register record with standardized names and types in datalake_casa_mineira_crm_clean.

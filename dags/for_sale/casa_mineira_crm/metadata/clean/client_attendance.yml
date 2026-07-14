@@ -1,26 +1,34 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: client_attendance
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_atendimento.id
+    - datalake_casa_mineira_crm_raw.cliente_atendimento.id
+    description: Surrogate primary key of the client attendance row in the source system.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_atendimento.cliente_id
+    - datalake_casa_mineira_crm_raw.cliente_atendimento.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_atendimento.criado_por
+    - datalake_casa_mineira_crm_raw.cliente_atendimento.criado_por
+    description: Identifier of the user who created the client attendance record.
   attendance_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_atendimento.tipo
+    - datalake_casa_mineira_crm_raw.cliente_atendimento.tipo
+    description: Type or channel of the client attendance interaction.
   description:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_atendimento.descricao
+    - datalake_casa_mineira_crm_raw.cliente_atendimento.descricao
+    description: Free-text notes describing the client attendance interaction.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_atendimento.criado_em
+    - datalake_casa_mineira_crm_raw.cliente_atendimento.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_attended:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_atendimento.atendimento_em
+    - datalake_casa_mineira_crm_raw.cliente_atendimento.atendimento_em
+    description: Timestamp when the client attendance took place.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of client attendance sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per client attendance record with standardized names and types in datalake_casa_mineira_crm_clean.

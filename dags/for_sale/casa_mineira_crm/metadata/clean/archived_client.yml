@@ -1,17 +1,22 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: archived_client
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_arquivado.id
+    - datalake_casa_mineira_crm_raw.cliente_arquivado.id
+    description: Surrogate primary key of the archived client row in the source system.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_arquivado.cliente_id
+    - datalake_casa_mineira_crm_raw.cliente_arquivado.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_arquivado.usuario_id
+    - datalake_casa_mineira_crm_raw.cliente_arquivado.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_arquivado.criado_em
+    - datalake_casa_mineira_crm_raw.cliente_arquivado.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of archived client sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per archived client record with standardized names and types in datalake_casa_mineira_crm_clean.

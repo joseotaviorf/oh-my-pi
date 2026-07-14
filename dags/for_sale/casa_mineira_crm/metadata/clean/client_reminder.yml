@@ -1,29 +1,38 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: client_reminder
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_lembrete.id
+    - datalake_casa_mineira_crm_raw.cliente_lembrete.id
+    description: Surrogate primary key of the client reminder row in the source system.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_lembrete.cliente_id
+    - datalake_casa_mineira_crm_raw.cliente_lembrete.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_lembrete.criado_por
+    - datalake_casa_mineira_crm_raw.cliente_lembrete.criado_por
+    description: Identifier of the user who created the client reminder.
   is_priority:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_lembrete.prioridade
+    - datalake_casa_mineira_crm_raw.cliente_lembrete.prioridade
+    description: Boolean flag indicating whether priority applies to this record.
   ts_reminded:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_lembrete.lembrete_em
+    - datalake_casa_mineira_crm_raw.cliente_lembrete.lembrete_em
+    description: Scheduled timestamp at which the client reminder should fire.
   ts_notified:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_lembrete.notificado_em
+    - datalake_casa_mineira_crm_raw.cliente_lembrete.notificado_em
+    description: Timestamp when the reminder notification was sent.
   ts_completed:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_lembrete.concluido_em
+    - datalake_casa_mineira_crm_raw.cliente_lembrete.concluido_em
+    description: Timestamp when the client reminder was marked as completed.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_lembrete.criado_em
+    - datalake_casa_mineira_crm_raw.cliente_lembrete.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of client reminder sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per client reminder record with standardized names and types in datalake_casa_mineira_crm_clean.

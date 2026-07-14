@@ -1,26 +1,34 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: client_permission
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_permissao.id
+    - datalake_casa_mineira_crm_raw.cliente_permissao.id
+    description: Surrogate primary key of the client permission row in the source system.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_permissao.cliente_id
+    - datalake_casa_mineira_crm_raw.cliente_permissao.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   id_user_revogation:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_permissao.usuario_revogacao_id
+    - datalake_casa_mineira_crm_raw.cliente_permissao.usuario_revogacao_id
+    description: Foreign key to the user in datalake_casa_mineira_crm_clean.user who revoked the permission.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_permissao.usuario_id
+    - datalake_casa_mineira_crm_raw.cliente_permissao.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_permissao.criado_por
+    - datalake_casa_mineira_crm_raw.cliente_permissao.criado_por
+    description: Identifier of the user who granted the client permission.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_permissao.criado_em
+    - datalake_casa_mineira_crm_raw.cliente_permissao.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_revoked:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_permissao.revogado_em
+    - datalake_casa_mineira_crm_raw.cliente_permissao.revogado_em
+    description: Timestamp when the client permission was revoked.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of client permission sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per client permission record with standardized names and types in datalake_casa_mineira_crm_clean.

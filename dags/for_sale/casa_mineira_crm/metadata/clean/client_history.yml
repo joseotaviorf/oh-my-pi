@@ -1,26 +1,34 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: client_history
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_historico.id
+    - datalake_casa_mineira_crm_raw.cliente_historico.id
+    description: Surrogate primary key of the client history row in the source system.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_historico.cliente_id
+    - datalake_casa_mineira_crm_raw.cliente_historico.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_historico.criado_por
+    - datalake_casa_mineira_crm_raw.cliente_historico.criado_por
+    description: Identifier of the user who triggered the client field change.
   modified_column:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_historico.campo
+    - datalake_casa_mineira_crm_raw.cliente_historico.campo
+    description: Name of the client field that was modified in this history entry.
   new_value:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_historico.novo
+    - datalake_casa_mineira_crm_raw.cliente_historico.novo
+    description: Value of the field after the change was applied.
   last_value:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_historico.anterior
+    - datalake_casa_mineira_crm_raw.cliente_historico.anterior
+    description: Value of the field before the change was applied.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.cliente_historico.criado_em
+    - datalake_casa_mineira_crm_raw.cliente_historico.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of client history sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per client history record with standardized names and types in datalake_casa_mineira_crm_clean.
