@@ -4,8 +4,8 @@ table_name: ongoing
 description:
   Enriched ongoing dataset combining upstream clean sources with business
   rules for support journey analytics and SLA monitoring.
-owner: gabriel.firmino@quintoandar.com.br
-domain: Support and Services
+owner: gustavo.silva@quintoandar.com.br
+domain: For Rent
 columns:
   id:
     lineage:

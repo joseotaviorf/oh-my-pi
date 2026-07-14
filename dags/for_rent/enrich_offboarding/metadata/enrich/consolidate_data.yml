@@ -1,8 +1,8 @@
 database_name: datalake_offboarding
 table_name: consolidate_data
 description: Table that consolidates offboarding information.
-domain: Support and Services
-owner: gabriel.firmino@quintoandar.com.br
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id:
     lineage:

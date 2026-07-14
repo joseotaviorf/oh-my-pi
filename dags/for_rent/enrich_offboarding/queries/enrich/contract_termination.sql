@@ -322,8 +322,8 @@ last_negotiation AS (
         nr.discount_percentage AS fee_discount_percentage,
         nr.discount_value AS fee_discount_value,
         nr.final_amount AS fee_final_amount,
-        tf.tenant_payment_method:['installments'] AS fee_number_of_installments,
-        tf.tenant_payment_method:['paymentOption'] AS fee_payment_option,
+        GET_JSON_OBJECT(tf.tenant_payment_method, '$.installments') AS fee_number_of_installments,
+        GET_JSON_OBJECT(tf.tenant_payment_method, '$.paymentOption') AS fee_payment_option,
         nr.status AS fee_negotiation_status,
         nr.ts_created AS ts_fee_negotiation_created,
         nr.ts_updated AS ts_fee_negotiation_updated

@@ -4,8 +4,8 @@ table_name: contract_termination
 description:
   It consolidates each step that occurs during the termination of a contract, including
   termination data, output inspection, repairs, related customer support and NPS metrics.
-domain: Support and Services
-owner: gabriel.firmino@quintoandar.com.br
+domain: For Rent
+owner: gustavo.silva@quintoandar.com.br
 columns:
   id_termination:
     description: Termination request identification code
