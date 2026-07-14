@@ -4,34 +4,47 @@ domain: For Sale
 columns:
   bp2bp_w_vc:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp2bp_w_vc
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp2bp_w_vc
+    description: Target conversion rate from buyer prospect to visit-completed for the cohort, by region and model.
   bp_w_ccv:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp_w_ccv
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp_w_ccv
+    description: Target volume of buyer prospects that reached the signed-contract (CCV) stage in the cohort.
   bp_w_oa2bp_w_ccv:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp_w_oa2bp_w_ccv
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp_w_oa2bp_w_ccv
+    description: Target conversion rate from offer-accepted to signed-contract (CCV) for the cohort.
   bp_w_os2bp_w_oa:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp_w_os2bp_w_oa
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp_w_os2bp_w_oa
+    description: Target conversion rate from offer-submitted to offer-accepted for the cohort.
   bp_w_vc2bp_w_os:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp_w_vc2bp_w_os
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.bp_w_vc2bp_w_os
+    description: Target conversion rate from visit-completed to offer-submitted for the cohort.
   is_tqc:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.is_tqc
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.is_tqc
+    description: Boolean flag indicating whether tqc applies to this record.
   modelo:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.modelo
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.modelo
+    description: Sale product model the cohort conversion targets apply to.
   price_range:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.price_range
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.price_range
+    description: Property price band the cohort conversion targets are segmented by.
   region:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.region
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.region
+    description: Region the cohort conversion targets are planned for.
   week_origin:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.week_origin
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.week_origin
+    description: Origin week label identifying the buyer-prospect cohort being tracked.
   week_start:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.week_start
+    - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.week_start
+    description: Calendar date of the first day of the cohort origin week.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale demand buyer targets cohort 2025 sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale demand buyer targets cohort 2025 record with standardized names and types in datalake_gsheets_clean.

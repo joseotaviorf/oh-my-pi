@@ -4,58 +4,79 @@ domain: For Sale
 columns:
   city_group:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.city_group
+    - datalake_gsheets_raw.sale_closing_ops_targets.city_group
+    description: City group the closing-operations SLA target applies to.
   payment_method:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.payment_method
+    - datalake_gsheets_raw.sale_closing_ops_targets.payment_method
+    description: Buyer payment method the closing-operations SLA target is segmented by.
   metric_name:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.metric_name
+    - datalake_gsheets_raw.sale_closing_ops_targets.metric_name
+    description: Name of the closing-process metric whose SLA target is tracked in this row.
   metric_flux:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.metric_flux
+    - datalake_gsheets_raw.sale_closing_ops_targets.metric_flux
+    description: Closing-process step or flow stage that the SLA metric is measured against.
   sla_target_backlog:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_backlog
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_backlog
+    description: SLA target in days applied to the accumulated backlog of closing cases before the tracked months.
   sla_target_202201:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202201
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202201
+    description: SLA target in days for closing the sales process in the January 2022 cohort (202201).
   sla_target_202202:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202202
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202202
+    description: SLA target in days for closing the sales process in the February 2022 cohort (202202).
   sla_target_202203:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202203
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202203
+    description: SLA target in days for closing the sales process in the March 2022 cohort (202203).
   sla_target_202204:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202204
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202204
+    description: SLA target in days for closing the sales process in the April 2022 cohort (202204).
   sla_target_202205:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202205
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202205
+    description: SLA target in days for closing the sales process in the May 2022 cohort (202205).
   sla_target_202206:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202206
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202206
+    description: SLA target in days for closing the sales process in the June 2022 cohort (202206).
   sla_target_202207:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202207
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202207
+    description: SLA target in days for closing the sales process in the July 2022 cohort (202207).
   sla_target_202208:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202208
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202208
+    description: SLA target in days for closing the sales process in the August 2022 cohort (202208).
   sla_target_202209:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202209
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202209
+    description: SLA target in days for closing the sales process in the September 2022 cohort (202209).
   sla_target_202210:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202210
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202210
+    description: SLA target in days for closing the sales process in the October 2022 cohort (202210).
   sla_target_202211:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202211
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202211
+    description: SLA target in days for closing the sales process in the November 2022 cohort (202211).
   sla_target_202212:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202212
+    - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202212
+    description: SLA target in days for closing the sales process in the December 2022 cohort (202212).
   has_used_fgts_in_payment:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.has_used_fgts_in_payment
+    - datalake_gsheets_raw.sale_closing_ops_targets.has_used_fgts_in_payment
+    description: Boolean flag indicating whether used fgts in payment applies to this record.
   has_seller_debt_payments:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets.has_seller_debt_payments
+    - datalake_gsheets_raw.sale_closing_ops_targets.has_seller_debt_payments
+    description: Boolean flag indicating whether seller debt payments applies to this record.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale closing ops targets sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale closing ops targets record with standardized names and types in datalake_gsheets_clean.

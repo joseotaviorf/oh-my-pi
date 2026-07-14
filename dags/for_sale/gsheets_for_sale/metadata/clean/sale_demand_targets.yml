@@ -4,58 +4,79 @@ domain: For Sale
 columns:
   ccv:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.ccv
+    - datalake_gsheets_raw.sale_demand_targets.ccv
+    description: Target volume of signed sale contracts (CCV) in the demand funnel.
   cidade:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.cidade
+    - datalake_gsheets_raw.sale_demand_targets.cidade
+    description: City the demand funnel target applies to (cidade in Portuguese).
   deal_quali:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.deal_quali
+    - datalake_gsheets_raw.sale_demand_targets.deal_quali
+    description: Deal qualification segment used to break down the demand funnel target.
   dm_central:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.dm_central
+    - datalake_gsheets_raw.sale_demand_targets.dm_central
+    description: Demand-management central segment (dm_central) used to group the demand funnel target.
   operacao:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.operacao
+    - datalake_gsheets_raw.sale_demand_targets.operacao
+    description: Operation type the demand funnel target applies to (operacao in Portuguese).
   fb:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.fb
+    - datalake_gsheets_raw.sale_demand_targets.fb
+    description: Demand-funnel breakdown attribute (fb) used to segment the targets by cohort.
   new_buyer_prospect:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.new_buyer_prospect
+    - datalake_gsheets_raw.sale_demand_targets.new_buyer_prospect
+    description: Target volume of new buyer prospects entering the demand funnel.
   recovered_buyer_prospect:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.recovered_buyer_prospect
+    - datalake_gsheets_raw.sale_demand_targets.recovered_buyer_prospect
+    description: Target volume of recovered (reactivated) buyer prospects in the demand funnel.
   origin:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.origin
+    - datalake_gsheets_raw.sale_demand_targets.origin
+    description: Acquisition origin channel the demand funnel target is attributed to.
   offer_accepted:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.offer_accepted
+    - datalake_gsheets_raw.sale_demand_targets.offer_accepted
+    description: Target volume of purchase offers accepted in the demand funnel.
   offer_sent:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.offer_sent
+    - datalake_gsheets_raw.sale_demand_targets.offer_sent
+    description: Target volume of purchase offers sent (submitted) in the demand funnel.
   visit_booked:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.visit_booked
+    - datalake_gsheets_raw.sale_demand_targets.visit_booked
+    description: Target volume of property visits booked in the demand funnel.
   visit_completed:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.visit_completed
+    - datalake_gsheets_raw.sale_demand_targets.visit_completed
+    description: Target volume of property visits completed in the demand funnel.
   halfyear:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.halfyear
+    - datalake_gsheets_raw.sale_demand_targets.halfyear
+    description: Half-year period the demand funnel target refers to.
   quarter:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.quarter
+    - datalake_gsheets_raw.sale_demand_targets.quarter
+    description: Calendar quarter the demand funnel target refers to.
   week:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.week
+    - datalake_gsheets_raw.sale_demand_targets.week
+    description: Calendar week the demand funnel target refers to.
   month:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.month
+    - datalake_gsheets_raw.sale_demand_targets.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   year:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.year
+    - datalake_gsheets_raw.sale_demand_targets.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   date:
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets.date
+    - datalake_gsheets_raw.sale_demand_targets.date
+    description: Reference date of the demand funnel target entry.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale demand targets sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale demand targets record with standardized names and types in datalake_gsheets_clean.

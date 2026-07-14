@@ -4,46 +4,63 @@ domain: For Sale
 columns:
   bp:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.bp
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.bp
+    description: Budgeted volume of buyer prospects in the demand funnel, segmented by region, price range and sale model.
   bp_w_ccv:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.first_listings
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.bp_w_ccv
+    description: Budgeted buyer prospects that reached the signed-contract (CCV) stage of the demand funnel.
   bp_w_oa:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.opportunities
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.bp_w_oa
+    description: Budgeted buyer prospects that reached the offer-accepted stage of the demand funnel.
   bp_w_os:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.bp_w_os
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.bp_w_os
+    description: Budgeted buyer prospects that reached the offer-submitted stage of the demand funnel.
   bp_w_vc:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.bp_w_vc
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.bp_w_vc
+    description: Budgeted buyer prospects that reached the visit-completed stage of the demand funnel.
   ccv:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.ccv
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.ccv
+    description: Budgeted volume of signed sale contracts (CCV) in the demand funnel.
   date:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.date
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.date
+    description: Reference date of the demand budget entry.
   is_tqc:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.is_tqc
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.is_tqc
+    description: Boolean flag indicating whether tqc applies to this record.
   modelo:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.modelo
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.modelo
+    description: Sale product model the demand budget applies to.
   oa:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.oa
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.oa
+    description: Budgeted volume of purchase offers accepted in the demand funnel.
   os:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.os
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.os
+    description: Budgeted volume of purchase offers submitted by buyers in the demand funnel.
   price_range:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.price_range
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.price_range
+    description: Property price band the demand budget is segmented by.
   region:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.region
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.region
+    description: Region the demand budget is planned for.
   vb:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.vb
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.vb
+    description: Budgeted volume of visits booked by buyers in the demand funnel.
   vc:
     lineage:
-      - datalake_gsheets_raw.sale_demand_buyer_budget_2025.vc
+    - datalake_gsheets_raw.sale_demand_buyer_budget_2025.vc
+    description: Budgeted volume of visits completed by buyers in the demand funnel.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale demand buyer budget 2025 sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale demand buyer budget 2025 record with standardized names and types in datalake_gsheets_clean.

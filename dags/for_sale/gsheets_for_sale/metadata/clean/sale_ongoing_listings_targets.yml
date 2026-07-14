@@ -4,28 +4,39 @@ domain: For Sale
 columns:
   cidade:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.cidade
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.cidade
+    description: City the ongoing-listings target applies to (cidade in Portuguese).
   ongoing_listing:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.ongoing_listing
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.ongoing_listing
+    description: Target volume of ongoing (active) sale listings for the period.
   sale_model:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.FB
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.FB
+    description: Sale product model the ongoing-listings target applies to, derived from the source FB column.
   halfyear:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.halfyear
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.halfyear
+    description: Half-year period the ongoing-listings target refers to.
   quarter:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.quarter
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.quarter
+    description: Calendar quarter the ongoing-listings target refers to.
   week:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.week
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.week
+    description: Calendar week the ongoing-listings target refers to.
   month:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.month
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.month
+    description: Partition month when the ETL run loaded this row into the lake table.
   year:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.year
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.year
+    description: Partition year when the ETL run loaded this row into the lake table.
   date:
     lineage:
-      - datalake_gsheets_raw.sale_ongoing_listings_targets.date
+    - datalake_gsheets_raw.sale_ongoing_listings_targets.date
+    description: Reference date of the ongoing-listings target entry.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale ongoing listings targets sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale ongoing listings targets record with standardized names and types in datalake_gsheets_clean.

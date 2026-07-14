@@ -1,29 +1,30 @@
----
 database_name: datalake_gsheets_clean
 table_name: sale_demand_targets_bps_2024
 domain: For Sale
 columns:
   city_group:
-    description: City group.
+    description: City group the demand funnel target is planned for.
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets_bps_retro.city_group
+    - datalake_gsheets_raw.sale_demand_targets_bps_retro.city_group
   hub_offer:
     description: Informs which associated hub the offer came from.
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets_bps_retro.hub_offer
+    - datalake_gsheets_raw.sale_demand_targets_bps_retro.hub_offer
   new_buyer_prospect:
     description: Target volume of new buyers prospects.
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets_bps_retro.new_buyer_prospect
+    - datalake_gsheets_raw.sale_demand_targets_bps_retro.new_buyer_prospect
   recovered_buyer_prospect:
     description: Target volume of recovered buyers prospect.
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets_bps_retro.recovered_buyer_prospect
+    - datalake_gsheets_raw.sale_demand_targets_bps_retro.recovered_buyer_prospect
   is_rede:
-    description: If it comes from rede.
+    description: Flag indicating whether the demand comes from the partner agency network (Rede).
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets_bps_retro.is_rede
+    - datalake_gsheets_raw.sale_demand_targets_bps_retro.is_rede
   dt_target:
-    description: Date of the target.
+    description: Calendar date of target for this sale demand targets bps 2024 record.
     lineage:
-      - datalake_gsheets_raw.sale_demand_targets_bps_retro.date
+    - datalake_gsheets_raw.sale_demand_targets_bps_retro.date
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale demand targets bps 2024 sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale demand targets bps 2024 record with standardized names and types in datalake_gsheets_clean.

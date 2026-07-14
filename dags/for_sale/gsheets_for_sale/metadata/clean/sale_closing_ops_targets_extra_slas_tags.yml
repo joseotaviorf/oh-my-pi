@@ -2,12 +2,17 @@ database_name: datalake_gsheets_clean
 table_name: sale_closing_ops_targets_extra_slas_tags
 domain: For Sale
 columns:
-  tag_salesflow:
+  salesflow_tag:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.tag_salesflow
-  sla_extra:
+    - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.tag_salesflow
+    description: Sales Flow tag that triggers additional SLA days on top of the base closing target.
+  extra_sla_days:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.sla_extra
+    - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.sla_extra
+    description: Number of extra SLA days added to the base closing target for the associated sales flow tag.
   metric_name:
     lineage:
-      - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.metric_name
+    - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.metric_name
+    description: Name of the closing-process metric the extra SLA days apply to.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale closing ops targets extra slas tags sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale closing ops targets extra slas tags record with standardized names and types in datalake_gsheets_clean.

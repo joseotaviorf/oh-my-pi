@@ -4,52 +4,71 @@ domain: For Sale
 columns:
   id_offer:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.id_offer
+    - datalake_gsheets_raw.offers_hub_central.id_offer
+    description: Natural key of the For Sale offer in Sales Flow or EBDB services.
   id_client_cm:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.id_client_cm
+    - datalake_gsheets_raw.offers_hub_central.id_client_cm
+    description: Identifier of the buyer client as registered in the Sales Flow (CM) system for this offer.
   id_user_5a:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.id_user_5a
+    - datalake_gsheets_raw.offers_hub_central.id_user_5a
+    description: Identifier of the buyer user as registered in the QuintoAndar (5A) platform for this offer.
   id_house_cm:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.id_house_cm
+    - datalake_gsheets_raw.offers_hub_central.id_house_cm
+    description: Identifier of the listed property as registered in the Sales Flow (CM) system for this offer.
   id_house_5a:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.id_house_5a
+    - datalake_gsheets_raw.offers_hub_central.id_house_5a
+    description: Identifier of the listed property as registered in the QuintoAndar (5A) platform for this offer.
   offer_flow:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.offer_flow
+    - datalake_gsheets_raw.offers_hub_central.offer_flow
+    description: Sales funnel flow the offer was originated through, used to segment offers by acquisition path.
   offer_model:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.offer_model
+    - datalake_gsheets_raw.offers_hub_central.offer_model
+    description: Sale product model under which the offer was made (for example financed or cash purchase).
   status:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.status
+    - datalake_gsheets_raw.offers_hub_central.status
+    description: Current operational status code governing workflow progression for this record.
   agent:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.agent
+    - datalake_gsheets_raw.offers_hub_central.agent
+    description: Name of the real-estate agent responsible for negotiating this offer.
   executive:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.executive
+    - datalake_gsheets_raw.offers_hub_central.executive
+    description: Name of the sales executive accountable for the offer in the hub.
   executive_lead:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.executive_lead
+    - datalake_gsheets_raw.offers_hub_central.executive_lead
+    description: Name of the lead executive supervising the sales executive on this offer.
   sale_price_agreed:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.sale_price_agreed
+    - datalake_gsheets_raw.offers_hub_central.sale_price_agreed
+    description: Agreed sale price negotiated for the offer, in brazilian Reais (R$).
   dt_offer_submitted:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.dt_offer_submitted
+    - datalake_gsheets_raw.offers_hub_central.dt_offer_submitted
+    description: Calendar date of offer submitted for this offers hub central record.
   dt_offer_ended:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.dt_offer_ended
+    - datalake_gsheets_raw.offers_hub_central.dt_offer_ended
+    description: Calendar date of offer ended for this offers hub central record.
   dt_offer_accepted:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.dt_offer_accepted
+    - datalake_gsheets_raw.offers_hub_central.dt_offer_accepted
+    description: Calendar date of offer accepted for this offers hub central record.
   dt_offer_dismissed:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.dt_offer_dismissed
+    - datalake_gsheets_raw.offers_hub_central.dt_offer_dismissed
+    description: Calendar date of offer dismissed for this offers hub central record.
   dt_sale_agreement_signed:
     lineage:
-      - datalake_gsheets_raw.offers_hub_central.dt_sale_agreement_signed
+    - datalake_gsheets_raw.offers_hub_central.dt_sale_agreement_signed
+    description: Calendar date of sale agreement signed for this offers hub central record.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of offers hub central sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per offers hub central record with standardized names and types in datalake_gsheets_clean.

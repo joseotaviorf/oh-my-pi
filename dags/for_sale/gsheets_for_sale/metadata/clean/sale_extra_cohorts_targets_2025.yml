@@ -4,28 +4,39 @@ domain: For Sale
 columns:
   bp2bp_w_ccv:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp2bp_w_ccv
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp2bp_w_ccv
+    description: Targeted overall conversion rate from buyer prospect to signed-contract (CCV) for the extra cohort.
   bp2bp_w_os:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp2bp_w_os
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp2bp_w_os
+    description: Targeted conversion rate from buyer prospect to offer-submitted for the extra cohort.
   bp_w_os2bp_w_ccv:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp_w_os2bp_w_ccv
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp_w_os2bp_w_ccv
+    description: Targeted conversion rate from offer-submitted to signed-contract (CCV) for the extra cohort.
   city_group:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.city_group
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.city_group
+    description: City group the extra-cohort target applies to.
   is_ht:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.is_ht
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.is_ht
+    description: Boolean flag indicating whether ht applies to this record.
   is_tqc:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.is_tqc
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.is_tqc
+    description: Boolean flag indicating whether tqc applies to this record.
   modelo:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.modelo
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.modelo
+    description: Sale product model the extra-cohort target is segmented by.
   month_conversion:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.month_conversion
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.month_conversion
+    description: Month in which the conversion is expected to occur for the extra cohort target.
   month_start:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.month_start
+    - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.month_start
+    description: Calendar date of the first day of the extra-cohort origin month.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale extra cohorts targets 2025 sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per sale extra cohorts targets 2025 record with standardized names and types in datalake_gsheets_clean.
