@@ -1,26 +1,34 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: visit_request
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita_solicitacao.id
+    - datalake_casa_mineira_crm_raw.visita_solicitacao.id
+    description: Surrogate primary key of the visit request row in the source system.
   id_contact:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita_solicitacao.contato_id
+    - datalake_casa_mineira_crm_raw.visita_solicitacao.contato_id
+    description: Foreign key to the contact in datalake_casa_mineira_crm_clean.contact that opened this visit request.
   id_user_validation:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita_solicitacao.usuario_validacao_id
+    - datalake_casa_mineira_crm_raw.visita_solicitacao.usuario_validacao_id
+    description: Foreign key to the user who validated the visit request.
   validation_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita_solicitacao.validacao
+    - datalake_casa_mineira_crm_raw.visita_solicitacao.validacao
+    description: Validation status recorded for the visit request in the source CRM.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita_solicitacao.criado_em
+    - datalake_casa_mineira_crm_raw.visita_solicitacao.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_visited:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita_solicitacao.visita_em
+    - datalake_casa_mineira_crm_raw.visita_solicitacao.visita_em
+    description: Timestamp when the requested visit actually took place.
   ts_validated:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita_solicitacao.validado_em
+    - datalake_casa_mineira_crm_raw.visita_solicitacao.validado_em
+    description: Timestamp when the visit request was validated.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of visit request sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per visit request record with standardized names and types in datalake_casa_mineira_crm_clean.
