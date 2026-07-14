@@ -11,8 +11,6 @@ workflow:
   layer: enrich
   custom_schema: agent_reports
   inner_dependencies:
-    agent_support_tickets_by_month:
-      - agent_status_by_month
     agent_independent_campinas_metrics:
       - agent_status_by_month
     agent_new_agent_activation_metrics:
@@ -32,10 +30,6 @@ workflow:
   tables_customization:
     agent_status_by_month:
       load_spark_job: load_agent_status_by_month
-    agent_support_tickets_by_month:
-      load_spark_job: load_agent_support_tickets_by_month
-      extra_spark_job_arguments:
-        - "2"
     agent_independent_campinas_metrics:
       load_spark_job: load_agent_independent_campinas_metrics
       extra_spark_job_arguments:

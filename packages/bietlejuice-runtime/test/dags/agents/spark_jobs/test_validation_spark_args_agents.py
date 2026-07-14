@@ -9,7 +9,6 @@ _REPO_ROOT = Path(__file__).resolve().parents[6]
 _JOB_PATHS = [
     "dags/agents/airtable/spark_jobs/load_airtable_raw.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_status_by_month.py",
-    "dags/agents/enrich_agent_reports/spark_jobs/load_agent_support_tickets_by_month.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_independent_campinas_metrics.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_new_agent_activation_metrics.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_new_agent_activation_daily.py",
@@ -22,7 +21,6 @@ _JOB_PATHS = [
 _JOBS_WITH_RESOLVE = {
     "dags/agents/airtable/spark_jobs/load_airtable_raw.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_status_by_month.py",
-    "dags/agents/enrich_agent_reports/spark_jobs/load_agent_support_tickets_by_month.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_independent_campinas_metrics.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_new_agent_activation_metrics.py",
     "dags/agents/enrich_agent_reports/spark_jobs/load_agent_new_agent_activation_daily.py",

@@ -681,8 +681,8 @@ class TestBuildValidationClusterSpec:
                 "type": "query_delta",
                 "layer": "enrich",
                 "tables_customization": {
-                    "agent_support_tickets_by_month": {
-                        "load_spark_job": "load_agent_support_tickets_by_month",
+                    "agent_status_by_month": {
+                        "load_spark_job": "load_agent_status_by_month",
                     },
                 },
             },
