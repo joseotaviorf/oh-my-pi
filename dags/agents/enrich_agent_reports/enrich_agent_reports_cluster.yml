@@ -1,27 +1,25 @@
 cluster:
-  type: consolidation_xs_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
     spark_conf:
-      spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    num_workers: 3
-    driver_node_type_id: m7g.xlarge
-validation:
-  cluster:
-    type: emr_7_12_consolidation_xs_memory_cluster
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      core_nodes:
-        instance_count: 2
-      task_nodes:
-        instance_count: 1
-      master_node_type_id: r6g.2xlarge
-      spark_conf:
-        spark.driver.memory: 12g
-        spark.driver.memoryOverhead: 4g
-        spark.yarn.am.memory: 2g
-  allow_custom_spark_job: true
+      spark.driver.memory: 12g
+      spark.driver.memoryOverhead: 4g
+      spark.yarn.am.memory: 2g
+    aws_attributes:
+      ebs_volume_size: 200
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - r6g.xlarge
+      - r7g.xlarge
+      - r6i.xlarge
+    task_nodes:
+      instance_types:
+      - r6g.xlarge
+      - r7g.xlarge
+      - r6i.xlarge
+      target_on_demand: 0
+      target_spot: 1
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
