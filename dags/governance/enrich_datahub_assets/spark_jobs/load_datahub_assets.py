@@ -7,17 +7,18 @@ from typing import Optional
 
 from datahub.ingestion.graph.client import DatahubClientConfig, DataHubGraph
 from datahub.metadata.schema_classes import DatasetKeyClass, SchemaMetadataClass
-from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
 )
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 JOB_NAME = "load_datahub_datasets"
@@ -141,12 +142,13 @@ def main() -> None:
     partition_cols = ast.literal_eval(args.partitions)
     load_date = datetime.strptime(args.load_end_date, "%Y-%m-%d")
 
+    dbutils = BaseDBUtils().get_dbutils()
     token = dbutils.secrets.get(scope="quintoandar", key="DATAHUB_API_KEY")
     datahub_client = build_datahub_client(args.environment, token)
 
     records = fetch_dataset_records(datahub_client)
 
-    spark = SparkSession.builder.getOrCreate()
+    spark = SparkClient(app_name=JOB_NAME).conn
 
     df = (
         spark.createDataFrame(records)
