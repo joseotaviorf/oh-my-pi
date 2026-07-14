@@ -17,6 +17,10 @@ columns:
     description: Foreign key linking back to the Supply customer record in lead_contact_info (lead_contact_info.id_contact). Z-ordered — filter on this column for efficient data skipping when querying by customer.
     lineage:
       - datalake_rene_descartes_raw.lead_intent.contact_id
+  id_house_lead:
+    description: Foreign key linking back to the House Lead record.
+    lineage:
+      - datalake_rene_descartes_raw.lead_intent.house_lead_id
   origin:
     description: The specific product through which the customer demonstrated intent.
     lineage:
