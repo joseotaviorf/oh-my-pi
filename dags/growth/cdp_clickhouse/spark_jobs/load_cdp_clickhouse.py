@@ -253,10 +253,3 @@ if __name__ == "__main__":
         partition_columns,
         force_recreate=False,
     )
-
-    spark_metastore_service.create_new_partitions_from_df(
-        database_name=write_database_name,
-        table_name=write_table_name,
-        df=df,
-        partition_cols=partition_columns,
-    )
