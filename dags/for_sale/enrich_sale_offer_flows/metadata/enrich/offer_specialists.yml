@@ -1,173 +1,230 @@
----
 database_name: datalake_sale_offer_flows
 table_name: offer_specialists
 domain: For Sale
 columns:
   id_offer:
     lineage:
-      - datalake_sales_flow_clean.offer.id_firestore
+    - datalake_sales_flow_clean.offer.id_firestore
+    description: Natural key of the For Sale offer in Sales Flow or EBDB services.
   id_user_consultant:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the Deal Maker (consultant) assigned to the offer's sales flow.
   id_consultant:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the Deal Maker (consultant) assigned to the offer.
   id_user_team_lead:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the team lead overseeing the offer's sales flow.
   id_team_lead:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the team lead overseeing the offer.
   id_user_pre_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the pre-sale specialist (PRE kind) handling the offer.
   id_pre_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the pre-sale specialist (PRE kind) handling the offer.
   id_user_post_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the post-sale specialist (POST kind) handling the offer.
   id_post_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the post-sale specialist (POST kind) handling the offer.
   id_user_credit_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the credit specialist (CREDIT kind) handling the offer's financing.
   id_credit_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the credit specialist (CREDIT kind) handling the offer's financing.
   id_user_start_financing_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the specialist who started the mortgage process (MORTGAGE_START kind).
   id_start_financing_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the specialist who started the mortgage process (MORTGAGE_START kind).
   id_user_follow_up_financing_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the specialist following up on the mortgage process (MORTGAGE_FUP kind).
   id_follow_up_financing_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the specialist following up on the mortgage process (MORTGAGE_FUP kind).
   id_user_end_financing_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the specialist who concluded the mortgage process (MORTGAGE_END kind).
   id_end_financing_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the specialist who concluded the mortgage process (MORTGAGE_END kind).
   id_user_notes_registry_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the notes registry specialist (CRN kind) handling the offer's deed registration.
   id_notes_registry_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the notes registry specialist (CRN kind) handling the offer's deed registration.
   id_user_real_estate_register_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the real estate register specialist (CRI kind) handling the offer's property registry.
   id_real_estate_register_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the real estate register specialist (CRI kind) handling the offer's property registry.
   id_user_legal_risk_analyst:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the legal risk analyst (LEGAL_RISK kind) assigned to the offer.
   id_legal_risk_analyst:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the legal risk analyst (LEGAL_RISK kind) assigned to the offer.
   id_user_agent:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the agent (AGENT kind) coordinating the offer's visit or sale.
   id_agent:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: Foreign key to the broker or agent user coordinating the visit or sale.
   id_user_post_dd_specialist:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the post due-diligence specialist (POST_DD kind) handling the offer.
   id_post_dd_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the post due-diligence specialist (POST_DD kind) handling the offer.
   id_user_agent_lead_referral:
     lineage:
-      - datalake_ebdb_clean.user.id
+    - datalake_ebdb_clean.user.id
+    description: EBDB user id of the agent who referred the lead (AGENT_LEAD_REFERRAL kind) for the offer.
   id_agent_lead_referral:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_specialist
+    - datalake_sales_flow_clean.specialist.id_specialist
+    description: SalesFlow specialist id of the agent who referred the lead (AGENT_LEAD_REFERRAL kind) for the offer.
   consultant_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the Deal Maker (consultant) assigned to the offer.
   consultant_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the Deal Maker (consultant) assigned to the offer.
   team_lead_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the team lead overseeing the offer.
   team_lead_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the team lead overseeing the offer.
   pre_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the pre-sale specialist (PRE kind) handling the offer.
   pre_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the pre-sale specialist (PRE kind) handling the offer.
   post_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the post-sale specialist (POST kind) handling the offer.
   post_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the post-sale specialist (POST kind) handling the offer.
   credit_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the credit specialist (CREDIT kind) handling the offer's financing.
   credit_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the credit specialist (CREDIT kind) handling the offer's financing.
   start_financing_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the specialist who started the mortgage process (MORTGAGE_START kind).
   start_financing_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the specialist who started the mortgage process (MORTGAGE_START kind).
   follow_up_financing_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the specialist following up on the mortgage process (MORTGAGE_FUP kind).
   follow_up_financing_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the specialist following up on the mortgage process (MORTGAGE_FUP kind).
   end_financing_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the specialist who concluded the mortgage process (MORTGAGE_END kind).
   end_financing_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the specialist who concluded the mortgage process (MORTGAGE_END kind).
   notes_registry_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the notes registry specialist (CRN kind) handling the offer's deed registration.
   notes_registry_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the notes registry specialist (CRN kind) handling the offer's deed registration.
   real_estate_register_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the real estate register specialist (CRI kind) handling the offer's property registry.
   real_estate_register_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the real estate register specialist (CRI kind) handling the offer's property registry.
   legal_risk_analyst_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the legal risk analyst (LEGAL_RISK kind) assigned to the offer.
   legal_risk_analyst_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the legal risk analyst (LEGAL_RISK kind) assigned to the offer.
   agent_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the agent (AGENT kind) coordinating the offer's visit or sale.
   agent_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the agent (AGENT kind) coordinating the offer's visit or sale.
   post_dd_specialist_name:
     lineage:
-      - datalake_sales_flow_clean.users.name
+    - datalake_sales_flow_clean.users.name
+    description: Full name of the post due-diligence specialist (POST_DD kind) handling the offer.
   post_dd_specialist_email:
     lineage:
-      - datalake_sales_flow_clean.users.email
+    - datalake_sales_flow_clean.users.email
+    description: Email of the post due-diligence specialist (POST_DD kind) handling the offer.
   ts_agent_lead_referral_updated:
     lineage:
-      - datalake_sales_flow_clean.specialist.ts_updated
+    - datalake_sales_flow_clean.specialist.ts_updated
+    description: Timestamp when the agent lead referral specialist record was last updated.
+owner: helder.rodrigues@quintoandar.com.br
+description: Enriched offer specialists table combining upstream clean and warehouse sources for Enriched offer-flow event tables tracking negotiation milestones. Rows are shaped for analytics with derived attributes and business keys.

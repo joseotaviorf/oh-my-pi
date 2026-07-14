@@ -1,10 +1,8 @@
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_users
-description: Enriched table for sales flow users. This table contains info for each
-  users involved in the offer flow after it gets accepted and before the sale agreement
-  flow get started.
+description: Enriched table for sales flow users. This table contains info for each users involved in the offer flow after it gets accepted and before the sale agreement flow get started.
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_user:
     lineage:
@@ -29,13 +27,11 @@ columns:
   id_inviter:
     lineage:
     - datalake_sales_flow_clean.users.id_external
-    description: Inviter User ID on QuintoAndar's main databases. Only exists if it's
-      an invited user.
+    description: Inviter User ID on QuintoAndar's main databases. Only exists if it's an invited user.
   id_invitee:
     lineage:
     - datalake_sales_flow_clean.sales_flow_invite_aud.id_invitee
-    description: User ID on Sales Flow databases. This user id_external can be found
-      on table sales_flow_clean.users
+    description: User ID on Sales Flow databases. This user id_external can be found on table sales_flow_clean.users
   id_house_docx_folder:
     lineage:
     - datalake_docx_clean.folder_reference.id_target_folder
@@ -45,7 +41,7 @@ columns:
     - datalake_sales_flow_clean.buyer_data.id_docx_folder
     - datalake_sales_flow_clean.seller_data.id_docx_folder
     - datalake_docx_clean.folder_reference.id_source_folder
-    description: User ID on Docx folder database.
+    description: Docx folder id holding this user's documents for the offer.
   type:
     lineage:
     - datalake_sales_flow_clean.sales_flow_users.type
@@ -73,8 +69,7 @@ columns:
   buyer_signer_status:
     lineage:
     - datalake_sales_flow_clean.buyer_data.signer_status
-    description: For buyers this column indicates if this user is a ccv signer or
-      not.
+    description: For buyers this column indicates if this user is a ccv signer or not.
   buyer_holding_value:
     lineage:
     - datalake_sales_flow_clean.buyer_data.holding_value
@@ -90,14 +85,11 @@ columns:
   is_original_user:
     lineage:
     - datalake_sales_flow_clean.sales_flow_users.is_original_user
-    description: Indicates if this user is the one that made the offer in case of
-      buyer and for seller indicates if it's the one that accepted. It can only exists
-      1 for each user type for each offer
+    description: Indicates if this user is the one that made the offer in case of buyer and for seller indicates if it's the one that accepted. It can only exists 1 for each user type for each offer
   is_ccv_buyer:
     lineage:
     - datalake_docx_clean.folder_reference.reference_properties
-    description: Flag from docx databases that indicates if this user will be on the
-      sale agreement document.
+    description: Flag from docx databases that indicates if this user will be on the sale agreement document.
   is_seller_ccv_signer:
     lineage:
     - datalake_sales_flow_clean.seller_data.is_ccv_signer
@@ -105,8 +97,7 @@ columns:
   is_income_partner:
     lineage:
     - datalake_docx_clean.folder_reference.reference_properties
-    description: Indicates if this user is participating on this offer as an income
-      partner.
+    description: Indicates if this user is participating on this offer as an income partner.
   is_pj:
     lineage:
     - datalake_sales_flow_clean.seller_data.is_pj
@@ -137,5 +128,5 @@ columns:
     description: Timestamp indicating the moment that this user accepted the invite.
   ts_updated:
     lineage:
-      - datalake_sales_flow_clean.sales_flow_users.ts_updated
+    - datalake_sales_flow_clean.sales_flow_users.ts_updated
     description: Timestamp indicating the last user update.

@@ -4,33 +4,48 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+    description: Surrogate primary key of the potential listing lead tasks row in the source system.
   id_user_sales_rep:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_rep
-      - datalake_crm_lead.lead_tasks.id_rep
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_rep
+    - datalake_crm_lead.lead_tasks.id_rep
+    description: User id of the sales rep handling the lead conversion; -1 when none is assigned.
   id_user_first_task_assignee:
     lineage:
-      - datalake_crm_lead.lead_tasks.id_rep
+    - datalake_crm_lead.lead_tasks.id_rep
+    description: User id of the rep assigned to the first conversion task for the lead; -1 when none.
   id_user_last_task_assignee:
     lineage:
-      - datalake_crm_lead.lead_tasks.id_rep
+    - datalake_crm_lead.lead_tasks.id_rep
+    description: User id of the rep assigned to the last conversion task for the lead; -1 when none.
   dt_first_task_created_date:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
-      - datalake_crm_lead.lead_tasks.ts_created
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
+    - datalake_crm_lead.lead_tasks.ts_created
+    description: Date the first lead conversion task was created (floored to the lead date when earlier).
   dt_first_task_closed_date:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
-      - datalake_crm_lead.lead_tasks.ts_created
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
+    - datalake_crm_lead.lead_tasks.ts_created
+    description: Date the first lead conversion task was closed (floored to the lead date when earlier).
   dt_last_task_created_date:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
-      - datalake_crm_lead.lead_tasks.ts_created
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
+    - datalake_crm_lead.lead_tasks.ts_created
+    description: Date the last lead conversion task was created (floored to the lead date when earlier).
   dt_last_task_closed_date:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
-      - datalake_crm_lead.lead_tasks.ts_created
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
+    - datalake_crm_lead.lead_tasks.ts_created
+    description: Date the last lead conversion task was closed (floored to the lead date when earlier).
   has_fup_photo_task:
     lineage:
-      - datalake_listing_jobs.house_photo_job_tasks.has_fup_photo
+    - datalake_listing_jobs.house_photo_job_tasks.has_fup_photo
+    description: Boolean flag indicating whether a follow-up photo task exists for the house listing.
+  first_isales_intervention:
+    description: First iSales intervention type for the lead task workflow.
+  has_isales_intervention:
+    description: Boolean flag indicating whether an iSales intervention occurred for the lead.
+owner: guilherme.rocha@quintoandar.com.br
+description: Enriched potential listing lead tasks table combining upstream clean and warehouse sources for Enriched potential listing tables for For Sale supply forecasting. Rows are shaped for analytics with derived attributes and business keys.

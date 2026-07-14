@@ -4,19 +4,35 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+    description: Surrogate primary key of the potential listing reprocessed leads row in the source system.
   lead_type:
     lineage:
-      - datalake_lead.lead.type
+    - datalake_lead.lead.type
+    description: Type of the lead, carried over from the original lead when the lead was reprocessed.
   lead_origin:
     lineage:
-      - datalake_lead.lead.source
+    - datalake_lead.lead.source
+    description: Source/origin of the lead, carried over from the original lead when reprocessed.
   utm_source:
     lineage:
-      - datalake_lead.lead.utm_source
+    - datalake_lead.lead.utm_source
+    description: UTM source of the lead's acquisition channel, carried over from the original lead when reprocessed.
   utm_medium:
     lineage:
-      - datalake_lead.lead.utm_medium
+    - datalake_lead.lead.utm_medium
+    description: UTM medium of the lead's acquisition channel, carried over from the original lead when reprocessed.
   is_b2b:
     lineage:
-      - datalake_lead.lead.is_b2b
+    - datalake_lead.lead.is_b2b
+    description: Boolean flag indicating whether the lead is a B2B lead (has a real estate agency code or is flagged as B2B).
+  is_lead_branded:
+    lineage:
+    - datalake_lead.lead.branded_lead
+    description: Boolean flag indicating whether the lead is branded.
+  is_reprocessed:
+    lineage:
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.lead_origin
+    description: Boolean flag indicating whether the lead was reprocessed.
+owner: guilherme.rocha@quintoandar.com.br
+description: Enriched potential listing reprocessed leads table combining upstream clean and warehouse sources for Enriched potential listing tables for For Sale supply forecasting. Rows are shaped for analytics with derived attributes and business keys.

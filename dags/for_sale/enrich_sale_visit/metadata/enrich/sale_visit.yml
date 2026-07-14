@@ -1,8 +1,8 @@
 database_name: datalake_sale_visit
 table_name: sale_visit
-description: 'Every row in this enrich is a ForSale visit booking.'
+description: Every row in this enrich is a ForSale visit booking.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_booking:
     lineage:
@@ -15,7 +15,7 @@ columns:
   id_house:
     lineage:
     - datalake_booking.booking.id_house
-    description: Identifier of the house associated with the sale visit booking.
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_region:
     lineage:
     - datalake_ebdb_clean.house.id_region
@@ -67,11 +67,11 @@ columns:
   id_agent:
     lineage:
     - datalake_booking.booking.id_agent
-    description: 'ID of the agent associated with the booking. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id'
+    description: ID of the agent associated with the booking. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id
   id_user_agent:
     lineage:
     - datalake_ebdb_clean.user.id
-    description: 'ID of the agent''s user associated with the booking. Can be joined with dw_public.dim_agent.id_user or dw_public.dim_user.sk_user'
+    description: ID of the agent's user associated with the booking. Can be joined with dw_public.dim_agent.id_user or dw_public.dim_user.sk_user
   id_user_en:
     lineage:
     - datalake_sale_visit_hubs.sale_visit_hubs.id_user_en
@@ -79,7 +79,7 @@ columns:
   id_fixed_agent:
     lineage:
     - datalake_booking.booking.id_sale_fixed_agent
-    description: 'ID of the fixed agent associated with the buyer when the booking was created. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id'
+    description: ID of the fixed agent associated with the buyer when the booking was created. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id
   id_buyer:
     lineage:
     - datalake_booking.booking.id_visitor
@@ -111,11 +111,11 @@ columns:
   id_visit:
     lineage:
     - datalake_booking.booking.id_visit
-    description: Identifier visit entity linked to the sale booking in EBDB.
+    description: Natural key of the consolidated visit in the operational visit service.
   visit_code:
     lineage:
     - datalake_booking.booking.code
-    description: Human-readable visit code from booking used to match buyer reviews and marketing attribution events.
+    description: Human-facing visit code shown in apps and used to join feedback records.
   id_buyer_booking_review:
     lineage:
     - datalake_booking.booking.id
@@ -131,8 +131,7 @@ columns:
   is_house_rented:
     lineage:
     - datalake_booking.booking.is_house_rented
-    description: True if the house booked had an active rental contract at 5A at the
-      booking date
+    description: True if the house booked had an active rental contract at 5A at the booking date
   is_virtual_visit:
     lineage:
     - datalake_booking.booking.is_virtual_visit
@@ -140,11 +139,11 @@ columns:
   days_visit_cancelled_to_visit:
     lineage:
     - datalake_booking.booking.days_visit_cancelled_to_visit
-    description: Number of days between the booking cancellation timestamp and the scheduled visit date in local timezone.
+    description: Days between the visit cancellation and the originally scheduled visit date.
   days_visit_booked_to_visit:
     lineage:
     - datalake_booking.booking.days_visit_booked_to_visit
-    description: Number of days between booking creation and the scheduled visit date in local timezone.
+    description: Days between the booking creation and the scheduled visit date.
   days_visit_booked_to_visit_cancelled:
     lineage:
     - datalake_booking.booking.days_visit_booked_to_visit_cancelled
@@ -178,4 +177,4 @@ columns:
     - datalake_insider_clean.review.dt_creation
     description: Timestamp of the buyer booking review.
   ts_load:
-    description: 'Timestamp of when the data was last loaded in this table.'
+    description: Timestamp of when the data was last loaded in this table.

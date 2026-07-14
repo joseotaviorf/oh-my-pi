@@ -1,34 +1,33 @@
----
 database_name: datalake_sale_visit_hubs
 table_name: sale_visit_hubs
-owner: gabriel.firmino@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description: This enrich was created with the aim of providing us with a view of which hub the broker was associated with at the time of a visit. It uses teams data as its main source, followed by work contract data and finally by business unit region data.
 columns:
-    id_booking:
-        description: An unique booking identifier. Currently, it is a PK for this table.
-        lineage:
-            - datalake_ebdb_clean.booking.id
-    id_business_unit:
-        description: A business unit identifier (only for sale hubs) has a direct relationship with teams, since a from/to of all sources was made for this standardization.
-        lineage:
-            - datalake_hub_services.business_unit_region.id_business_unit
-            - datalake_hub_services_clean.member_profile.id_business_unit
-            - datalake_hub_services_clean.business_unit.id
-    id_user_agent:
-        description: An identifier for the brokers.
-        lineage:
-            - datalake_ebdb_clean.user.id
-    id_user_en:
-        description: An identifier for trading executives.
-        lineage:
-            - datalake_hub_services_clean.users.id_external
-    business_unit:
-        description: Business unit name, already standardized with Teams data.
-        lineage:
-            - datalake_hub_services_clean.member_profile.business_unit
-            - datalake_hub_services_clean.business_unit.hub_name
-    ts_visit_intent:
-        description: Date when the booking was generated.
-        lineage:
-            - datalake_ebdb_clean.booking.ts_created
+  id_booking:
+    description: An unique booking identifier. Currently, it is a PK for this table.
+    lineage:
+    - datalake_ebdb_clean.booking.id
+  id_business_unit:
+    description: A business unit identifier (only for sale hubs) has a direct relationship with teams, since a from/to of all sources was made for this standardization.
+    lineage:
+    - datalake_hub_services.sale_business_unit_region.id_business_unit
+    - datalake_hub_services_clean.member_profile.id_business_unit
+    - datalake_hub_services_clean.business_unit.id
+  id_user_agent:
+    description: An identifier for the brokers.
+    lineage:
+    - datalake_ebdb_clean.user.id
+  id_user_en:
+    description: An identifier for trading executives.
+    lineage:
+    - datalake_hub_services_clean.users.id_external
+  business_unit:
+    description: Business unit name, already standardized with Teams data.
+    lineage:
+    - datalake_hub_services_clean.member_profile.business_unit
+    - datalake_hub_services_clean.business_unit.hub_name
+  ts_visit_intent:
+    description: Date when the booking was generated.
+    lineage:
+    - datalake_ebdb_clean.booking.ts_created

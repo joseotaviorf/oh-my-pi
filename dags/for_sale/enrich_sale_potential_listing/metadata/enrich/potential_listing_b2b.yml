@@ -4,24 +4,37 @@ domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+    description: Surrogate primary key of the potential listing b2b row in the source system.
   id_condo:
     lineage:
-      - datalake_ebdb_listing.house.id_condo_parent
+    - datalake_ebdb_listing.house.id_condo_parent
+    description: Parent condominium id of the house being listed; defaults to -1 when not part of a condo.
   id_house_listing:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_house
-      - datalake_ebdb_listing.house_listing.version
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_house
+    - datalake_ebdb_listing.house_listing.version
+    description: House listing id built from the house id and listing version for the potential listing.
   id_partner:
     lineage:
-      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_partner
-      - datalake_ebdb_clean.partner_agent.id_partner
+    - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_partner
+    - datalake_ebdb_clean.partner_agent.id_partner
+    description: Foreign key to the financing or brokerage partner organization.
   id_autonomous_agent:
     lineage:
-      - datalake_ebdb_clean.partner_agent.id_user
+    - datalake_ebdb_clean.partner_agent.id_user
+    description: User id of the autonomous agent (partner of type AUTONOMOUS_AGENT) who registered the listing; -1 when none.
   id_user_registrant:
     lineage:
-      - datalake_ebdb_listing.house.id_user_registrant
+    - datalake_ebdb_listing.house.id_user_registrant
+    description: User id of the person who registered the house listing.
   is_exclusive:
     lineage:
-      - datalake_ebdb_listing.house.is_exclusive
+    - datalake_ebdb_listing.house.is_exclusive
+    description: Boolean flag indicating whether the house is listed under an exclusive contract with QuintoAndar.
+  is_autonomous_agent:
+    lineage:
+    - datalake_ebdb_clean.partner_agent.id_user
+    description: Boolean flag indicating whether the listing partner is an autonomous agent.
+owner: guilherme.rocha@quintoandar.com.br
+description: Enriched potential listing b2b table combining upstream clean and warehouse sources for Enriched potential listing tables for For Sale supply forecasting. Rows are shaped for analytics with derived attributes and business keys.

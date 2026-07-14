@@ -1,32 +1,46 @@
----
 database_name: datalake_sale_offer_flows
 table_name: sale_offer_status
 domain: For Sale
 columns:
   id_sales_flow:
     lineage:
-      - datalake_sales_flow_clean.status_record.id_sales_flow
+    - datalake_sales_flow_clean.status_record.id_sales_flow
+    description: Foreign key to the parent sales flow transaction in the end-of-funnel domain.
   id_firestore:
     lineage:
-      - datalake_sales_flow_clean.offer.id_firestore
+    - datalake_sales_flow_clean.offer.id_firestore
+    description: Firestore offer id linked to the sales flow status record.
   primary_closing_type_label:
     lineage:
-      - datalake_sales_flow_clean.closing_type.key
+    - datalake_sales_flow_clean.closing_type.key
+    description: Label of the primary (macro) closing type set on the offer's sales flow.
   secundary_closing_type_label:
     lineage:
-      - datalake_sales_flow_clean.closing_type.key
+    - datalake_sales_flow_clean.closing_type.key
+    description: Label of the secondary (micro) closing type set on the offer's sales flow.
   macro_status_name:
     lineage:
-      - datalake_sales_flow_clean.status.key
+    - datalake_sales_flow_clean.status.key
+    description: Name of the current macro (parent) status of the offer in the sales flow.
   ordering:
     lineage:
-      - datalake_sales_flow_clean.status_order.ordering
+    - datalake_sales_flow_clean.status_order.ordering
+    description: Sequence position of the status within the closing type funnel, used to order statuses.
   last_micro_status_name:
     lineage:
-      - datalake_sales_flow_clean.status.key
+    - datalake_sales_flow_clean.status.key
+    description: Name of the most recent micro (child) status reached under the current macro status.
   ts_macro_status_start:
     lineage:
-      - datalake_sales_flow_clean.status_record.ts_status_start
+    - datalake_sales_flow_clean.status_record.ts_status_start
+    description: Timestamp when the offer entered the current macro status.
   ts_macro_status_end:
     lineage:
-      - datalake_sales_flow_clean.status_record.ts_status_end
+    - datalake_sales_flow_clean.status_record.ts_status_end
+    description: Timestamp when the offer left the current macro status.
+  ts_micro_status_last_update:
+    lineage:
+    - datalake_sales_flow_clean.status_record.ts_updated
+    description: Timestamp of the last micro status update for the offer status record.
+owner: helder.rodrigues@quintoandar.com.br
+description: Enriched sale offer status table combining upstream clean and warehouse sources for Enriched offer-flow event tables tracking negotiation milestones. Rows are shaped for analytics with derived attributes and business keys.

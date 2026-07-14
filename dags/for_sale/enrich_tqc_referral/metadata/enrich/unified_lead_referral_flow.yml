@@ -6,65 +6,65 @@ description: |
   (agent + referral date = dt_reference). Hub and region attributes on that allocation already reflect
   the enrich business_unit grain (latest region per unit upstream).
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_referral_flow:
     lineage:
-      - datalake_ebdb_agents.agent_unified_contract_changes.id_agent
-      - datalake_ebdb_clean.agent_lead_referral.id_agent
-      - datalake_ebdb_clean.agent_lead_referral.id_lead
-      - datalake_ebdb_clean.agent_lead_referral.phone
-      - datalake_ebdb_user.user.id
+    - datalake_ebdb_agents.agent_unified_contract_changes.id_agent
+    - datalake_ebdb_clean.agent_lead_referral.id_agent
+    - datalake_ebdb_clean.agent_lead_referral.id_lead
+    - datalake_ebdb_clean.agent_lead_referral.phone
+    - datalake_ebdb_user.user.id
     description: Id used to identify a lead indication for TQC (concatenates id_agent + id_lead);
   id_agent:
     lineage:
-      - datalake_ebdb_agents.agent_unified_contract_changes.id_agent
-      - datalake_ebdb_clean.agent_lead_referral.id_agent
-      - datalake_ebdb_user.user.id_agent
-    description: Id of the agent.
+    - datalake_ebdb_agents.agent_unified_contract_changes.id_agent
+    - datalake_ebdb_clean.agent_lead_referral.id_agent
+    - datalake_ebdb_user.user.id_agent
+    description: Foreign key to the broker or agent user coordinating the visit or sale.
   id_user_agent:
     lineage:
-      - datalake_ebdb_user.user.id
-    description: ID user of the agent.
+    - datalake_ebdb_user.user.id
+    description: EBDB account of the broker who submitted the lead indication for TQC.
   id_user_lead:
     lineage:
-      - datalake_ebdb_clean.agent_lead_referral.id_lead
-      - datalake_ebdb_user.user.id   
-    description: ID user of the lead. 
+    - datalake_ebdb_clean.agent_lead_referral.id_lead
+    - datalake_ebdb_user.user.id
+    description: User id of the referred lead, resolved from the agent_lead_referral lead.
   lead_phone:
     lineage:
-      - datalake_ebdb_clean.agent_lead_referral.phone
-      - datalake_gsheets_clean.tqc_leads.lead_phone
-    description: Lead phone number.
+    - datalake_ebdb_clean.agent_lead_referral.phone
+    - datalake_gsheets_clean.tqc_leads.lead_phone
+    description: Phone number of the referred lead, used to match referrals across sources.
   hub_name:
     lineage:
-      - datalake_hub_services.member_hub_allocation.hub_name
+    - datalake_hub_services.member_hub_allocation.hub_name
     description: |
       Hub name from member_hub_allocation for the agent on the referral calendar day (same dt_reference
       as the appointment or agent_lead_referral ts_created date).
   city_group:
     lineage:
-      - datalake_hub_services.member_hub_allocation.city_group
+    - datalake_hub_services.member_hub_allocation.city_group
     description: City group of the hub’s region from member_hub_allocation.
   macro_region:
     lineage:
-      - datalake_hub_services.member_hub_allocation.short_region_name
+    - datalake_hub_services.member_hub_allocation.short_region_name
     description: |
       OPS-facing bucket derived from short_region_name on member_hub_allocation: 'BH' when MG,
       'SP-RJ-POA' when RJ/SP/RS, otherwise 'OTHER'. Same CASE logic in both union branches.
   status:
     lineage:
-      - datalake_ebdb_clean.agent_lead_referral.status
-      - datalake_gsheets_clean.tqc_leads.is_valid_lead
+    - datalake_ebdb_clean.agent_lead_referral.status
+    - datalake_gsheets_clean.tqc_leads.is_valid_lead
     description: Referral status. It can be TRUE/FALSE, CONFIRMED, EXPIRED, INVALID.
   tqc_flow:
     description: Indicates the stream where a referral was made. Whether it was old ('Old') or new ('New')
   origin:
     lineage:
-      - datalake_ebdb_clean.agent_lead_referral.origin
+    - datalake_ebdb_clean.agent_lead_referral.origin
     description: Related to the origin of the indication. It can be in the traditional model (form/product) or via an invitation link (new sources can be included).
   ts_created:
     lineage:
-      - datalake_ebdb_clean.agent_lead_referral.ts_created
-      - datalake_gsheets_clean.tqc_leads.ts_appointment
+    - datalake_ebdb_clean.agent_lead_referral.ts_created
+    - datalake_gsheets_clean.tqc_leads.ts_appointment
     description: Timestamp at which the indication was registered.

@@ -6,20 +6,20 @@ owner: data-for-sale@quintoandar.com.br
 columns:
   id_visit:
     lineage:
-      - datalake_ebdb_visit.visit.id_visit
-    description: Primary key of the sale visit in the TQC funnel.
+      - datalake_ebdb_clean.booking.id_visit
+    description: Foreign key to the visit (booking.id_visit) tied to this funnel event.
   id_house:
     lineage:
       - datalake_ebdb_visit.visit.id_house
     description: Key of property/house.
   id_buyer:
     lineage:
-      - datalake_ebdb_visit.visit.id_visitor
-    description: User identifier of the buyer (visitor) tied to the sale visit or offer.
+      - datalake_ebdb_clean.booking.id_visitor
+    description: Identifier of the buyer (booking visitor) on this funnel event.
   id_agent:
     lineage:
-      - datalake_ebdb_user.user.id_agent
-    description: Agent user identifier associated with the visit or offer.
+      - datalake_ebdb_clean.booking.id_agent
+    description: Identifier of the real-estate agent assigned to the booking.
   id_sales_flow:
     lineage:
       - datalake_ebdb_visit.visit.id_visitor

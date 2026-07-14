@@ -1,402 +1,402 @@
 database_name: datalake_sale_salesforce
 table_name: purchase_sale_contract
-owner: thiago.bueno@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description: Table with enriched data about purchase sale contracts from Salesforce, consolidated for the For Sale domain. This table contains comprehensive information about contract stages, payments, dates, and process status throughout the sales transaction lifecycle.
 columns:
   id:
     description: Identifier of the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.id
+    - datalake_salesforce_clean.purchase_sale_contract.id
   id_owner:
     description: Identifier of the seller of the house
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.id_owner
+    - datalake_salesforce_clean.purchase_sale_contract.id_owner
   id_created_by:
     description: Identifier of the user who created the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.id_created_by
+    - datalake_salesforce_clean.purchase_sale_contract.id_created_by
   id_last_modified_by:
     description: Identifier of the user who last modified the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.id_last_modified_by
+    - datalake_salesforce_clean.purchase_sale_contract.id_last_modified_by
   id_external:
     description: External identifier of the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.id_external
+    - datalake_salesforce_clean.purchase_sale_contract.id_external
   id_offer:
     description: Identifier of the offer associated with the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.id_offer
+    - datalake_salesforce_clean.purchase_sale_contract.id_offer
   name:
-    description: Name of the purchase sale contract
+    description: Human-readable display name associated with the person or entity in this row.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.name
+    - datalake_salesforce_clean.purchase_sale_contract.name
   diligence_classification:
-    description: Diligence classification
+    description: Diligence classification assigned to the contract in Salesforce.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.diligence_classification
+    - datalake_salesforce_clean.purchase_sale_contract.diligence_classification
   diligence_status:
-    description: Status of the diligence
+    description: Current status of the diligence process for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.diligence_status
+    - datalake_salesforce_clean.purchase_sale_contract.diligence_status
   payment_method:
-    description: The payment method used in the purchase sale contract
+    description: How the buyer settles the purchase (e.g. cash, bank financing, or QuintoAndar credit).
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.payment_method
+    - datalake_salesforce_clean.purchase_sale_contract.payment_method
   stage:
-    description: Stage of the purchase sale contract
+    description: Current pipeline stage of the purchase sale contract in Salesforce.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.stage
+    - datalake_salesforce_clean.purchase_sale_contract.stage
   buyer:
     description: Identifier of the buyer of the house
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.buyer
+    - datalake_salesforce_clean.purchase_sale_contract.buyer
   clause_identifiers:
     description: Specifies the clauses that are part of the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.clause_identifiers
+    - datalake_salesforce_clean.purchase_sale_contract.clause_identifiers
   sales_flow_url:
-    description: URL of the sales flow
+    description: URL linking the contract to its SalesFlow record.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.sales_flow_url
+    - datalake_salesforce_clean.purchase_sale_contract.sales_flow_url
   seller:
-    description: Seller of the house
+    description: Seller name or identifier recorded on the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.seller
+    - datalake_salesforce_clean.purchase_sale_contract.seller
   zendesk_url:
-    description: Zendesk URL of the case
+    description: URL linking the contract to its related Zendesk support ticket.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.zendesk_url
+    - datalake_salesforce_clean.purchase_sale_contract.zendesk_url
   agent_email:
-    description: Email of the agent responsible for the purchase sale contract
+    description: Email of the agent responsible for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.agent_email
+    - datalake_salesforce_clean.purchase_sale_contract.agent_email
   crn_status:
     description: Notary office (CRN) status
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.crn_status
+    - datalake_salesforce_clean.purchase_sale_contract.crn_status
   ccv_status:
-    description: CCV status of the contract
+    description: Status of the sale agreement (CCV) for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ccv_status
+    - datalake_salesforce_clean.purchase_sale_contract.ccv_status
   house_chattel_mortgage:
-    description: House chattel mortgage information
+    description: Chattel mortgage (alienacao fiduciaria) information on the house for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.house_chattel_mortgage
+    - datalake_salesforce_clean.purchase_sale_contract.house_chattel_mortgage
   house_state:
-    description: State of the house
+    description: State (UF) where the contracted house is located.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.house_state
+    - datalake_salesforce_clean.purchase_sale_contract.house_state
   itbi_status:
-    description: ITBI status
+    description: Status of the ITBI (real estate transfer tax) payment for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.itbi_status
+    - datalake_salesforce_clean.purchase_sale_contract.itbi_status
   simplified_stage:
-    description: Simplified stage of the contract
+    description: Simplified, grouped version of the contract stage for reporting.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.simplified_stage
+    - datalake_salesforce_clean.purchase_sale_contract.simplified_stage
   subscription_model_buyer:
-    description: Subscription model of the buyer
+    description: Subscription (signing) model used by the buyer on the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.subscription_model_buyer
+    - datalake_salesforce_clean.purchase_sale_contract.subscription_model_buyer
   subscription_model_seller:
-    description: Subscription model of the seller
+    description: Subscription (signing) model used by the seller on the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.subscription_model_seller
+    - datalake_salesforce_clean.purchase_sale_contract.subscription_model_seller
   cri_protocol:
-    description: CRI protocol number
+    description: Protocol number of the real estate registry (CRI) filing for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.cri_protocol
+    - datalake_salesforce_clean.purchase_sale_contract.cri_protocol
   crn_name:
     description: Notary office (CRN) name
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.crn_name
+    - datalake_salesforce_clean.purchase_sale_contract.crn_name
   alienation_status:
-    description: Alienation status
+    description: Status of the property alienation (chattel mortgage release) for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.alienation_status
+    - datalake_salesforce_clean.purchase_sale_contract.alienation_status
   bypass_rescission_validation:
     description: Indicates if rescission validation was bypassed
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.bypass_rescission_validation
+    - datalake_salesforce_clean.purchase_sale_contract.bypass_rescission_validation
   cri_have_demand_note:
     description: Indicates if CRI has a demand note
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.cri_have_demand_note
+    - datalake_salesforce_clean.purchase_sale_contract.cri_have_demand_note
   crn_partner:
     description: Notary office (CRN) partner
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.crn_partner
+    - datalake_salesforce_clean.purchase_sale_contract.crn_partner
   crn_complexity:
     description: Complexity of the notary office (CRN)
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.crn_complexity
+    - datalake_salesforce_clean.purchase_sale_contract.crn_complexity
   escrivao:
     description: Name of the clerk (escrivao)
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.escrivao
+    - datalake_salesforce_clean.purchase_sale_contract.escrivao
   have_unpaid_alienation:
     description: Indicates if there is an unpaid alienation
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.have_unpaid_alienation
+    - datalake_salesforce_clean.purchase_sale_contract.have_unpaid_alienation
   house_occupant:
-    description: Occupant of the house
+    description: Current occupant of the house under contract (e.g. owner, tenant, vacant).
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.house_occupant
+    - datalake_salesforce_clean.purchase_sale_contract.house_occupant
   preemptive_right:
-    description: Preemptive right information
+    description: Preemptive right (direito de preferencia) information applicable to the sale.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.preemptive_right
+    - datalake_salesforce_clean.purchase_sale_contract.preemptive_right
   proof_payment_received:
     description: Indicates if proof of payment was received
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.proof_payment_received
+    - datalake_salesforce_clean.purchase_sale_contract.proof_payment_received
   request_type:
-    description: Type of request
+    description: Type of request that originated or modified the contract record.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.request_type
+    - datalake_salesforce_clean.purchase_sale_contract.request_type
   requested_by:
     description: Who requested the action
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.requested_by
+    - datalake_salesforce_clean.purchase_sale_contract.requested_by
   rescission_status:
-    description: Status of the rescission
+    description: Status of the contract rescission (cancellation) process.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.rescission_status
+    - datalake_salesforce_clean.purchase_sale_contract.rescission_status
   fs_ave_protocol_ccv:
-    description: FS AVE protocol for CCV
+    description: AVE protocol number for the CCV registry filing.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_ave_protocol_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.fs_ave_protocol_ccv
   fs_cri_name_ccv:
-    description: FS CRI name for CCV
+    description: Name of the real estate registry office (CRI) handling the CCV.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_cri_name_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.fs_cri_name_ccv
   fs_cri_status:
-    description: FS CRI status for CCV
+    description: Status of the real estate registry (CRI) step for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_cri_status
+    - datalake_salesforce_clean.purchase_sale_contract.fs_cri_status
   fs_endorsement_status_ccv:
-    description: FS endorsement status for CCV
+    description: Status of the CCV endorsement (averbacao) step.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_endorsement_status_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.fs_endorsement_status_ccv
   fs_cartorio_ccv_id:
-    description: FS notary ID for CCV
+    description: Identifier of the registry office (cartorio) handling the CCV.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_cartorio_ccv_id
+    - datalake_salesforce_clean.purchase_sale_contract.fs_cartorio_ccv_id
   fs_reason_non_conversion_ccv:
-    description: FS reason for non-conversion of CCV
+    description: Reason the CCV was not converted (completed) when applicable.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_reason_non_conversion_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.fs_reason_non_conversion_ccv
   address:
     description: Address associated with the contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.address
+    - datalake_salesforce_clean.purchase_sale_contract.address
   addendum_status:
-    description: Status of the addendum
+    description: Status of any addendum (aditivo) attached to the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.addendum_status
+    - datalake_salesforce_clean.purchase_sale_contract.addendum_status
   fs_responsible_assistant_ccv:
-    description: FS responsible assistant for CCV
+    description: Assistant responsible for the CCV registry step.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_responsible_assistant_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.fs_responsible_assistant_ccv
   lt_bookkeeping_done_form:
     description: LT bookkeeping done form status
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.lt_bookkeeping_done_form
+    - datalake_salesforce_clean.purchase_sale_contract.lt_bookkeeping_done_form
   fs_reasons_lt_overrun_register_ccv:
-    description: FS reasons for LT overrun on register for CCV
+    description: Reasons the lead time was exceeded during the CCV registry step.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_reasons_lt_overrun_register_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.fs_reasons_lt_overrun_register_ccv
   fs_reasons_lt_overrun_ccv:
-    description: FS reasons for LT overrun for CCV
+    description: Reasons the overall lead time was exceeded for the CCV process.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.fs_reasons_lt_overrun_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.fs_reasons_lt_overrun_ccv
   deal_maker_name:
-    description: Name of the deal maker
+    description: Name of the Deal Maker responsible for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.deal_maker_name
+    - datalake_salesforce_clean.purchase_sale_contract.deal_maker_name
   hub_name:
-    description: Name of the hub
+    description: Name of the hub (business unit) responsible for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.hub_name
+    - datalake_salesforce_clean.purchase_sale_contract.hub_name
   long_term_payment:
     description: Indicates if it is a long-term payment
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.long_term_payment
+    - datalake_salesforce_clean.purchase_sale_contract.long_term_payment
   range_of_days_since_ccv:
     description: Range of days since CCV signing
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.range_of_days_since_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.range_of_days_since_ccv
   thread_id:
-    description: Thread ID for the contract
+    description: Identifier of the communication thread linked to the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.thread_id
+    - datalake_salesforce_clean.purchase_sale_contract.thread_id
   have_demand_note_reason:
     description: Reason for having a demand note
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.have_demand_note_reason
+    - datalake_salesforce_clean.purchase_sale_contract.have_demand_note_reason
   is_deleted:
     description: Flag indicating if the purchase sale contract is deleted
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_deleted
+    - datalake_salesforce_clean.purchase_sale_contract.is_deleted
   is_down_payment_paid:
     description: Flag indicating if the down payment is paid
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_down_payment_paid
+    - datalake_salesforce_clean.purchase_sale_contract.is_down_payment_paid
   is_buyer_pays_entire_deposit:
     description: Flag indicating if the buyer pays the entire deposit
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_buyer_pays_entire_deposit
+    - datalake_salesforce_clean.purchase_sale_contract.is_buyer_pays_entire_deposit
   is_diligence_accepted:
     description: Flag indicating if the diligence is accepted
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_diligence_accepted
+    - datalake_salesforce_clean.purchase_sale_contract.is_diligence_accepted
   has_down_payment_extension:
     description: Flag indicating if there is a down payment extension
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.has_down_payment_extension
+    - datalake_salesforce_clean.purchase_sale_contract.has_down_payment_extension
   is_paid_via_ted:
     description: Flag indicating if the payment is made via TED
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_paid_via_ted
+    - datalake_salesforce_clean.purchase_sale_contract.is_paid_via_ted
   is_seller_pays_part_deposit:
     description: Flag indicating if the seller pays part of the deposit
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_seller_pays_part_deposit
+    - datalake_salesforce_clean.purchase_sale_contract.is_seller_pays_part_deposit
   is_key_received:
     description: Flag indicating if the key is received
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_key_received
+    - datalake_salesforce_clean.purchase_sale_contract.is_key_received
   is_continue_with_partner_registry:
     description: Flag indicating if the process should continue with the partner registry
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_continue_with_partner_registry
+    - datalake_salesforce_clean.purchase_sale_contract.is_continue_with_partner_registry
   is_house_registry_must_be_updated:
     description: Flag indicating if the house registry must be updated
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_house_registry_must_be_updated
+    - datalake_salesforce_clean.purchase_sale_contract.is_house_registry_must_be_updated
   is_suspended:
     description: Flag indicating if the contract is suspended
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_suspended
+    - datalake_salesforce_clean.purchase_sale_contract.is_suspended
   is_assigned:
     description: Flag indicating if the contract is assigned
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_assigned
+    - datalake_salesforce_clean.purchase_sale_contract.is_assigned
   is_balance_payment_made:
     description: Flag indicating if the balance payment was made
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_balance_payment_made
+    - datalake_salesforce_clean.purchase_sale_contract.is_balance_payment_made
   is_share_community_portal:
     description: Flag indicating if it is shared on the community portal
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_share_community_portal
+    - datalake_salesforce_clean.purchase_sale_contract.is_share_community_portal
   is_list_view_user:
-    description: Flag for list view user
+    description: Salesforce flag indicating whether the record is visible to list-view users.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_list_view_user
+    - datalake_salesforce_clean.purchase_sale_contract.is_list_view_user
   is_house_registry_must_be_updated_form:
     description: Flag from form indicating if the house registry must be updated
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_house_registry_must_be_updated_form
+    - datalake_salesforce_clean.purchase_sale_contract.is_house_registry_must_be_updated_form
   is_concomitant_registration:
     description: Flag indicating if the registration is concomitant
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_concomitant_registration
+    - datalake_salesforce_clean.purchase_sale_contract.is_concomitant_registration
   is_lease_complaint_sent:
     description: Flag indicating if a lease complaint was sent
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.is_lease_complaint_sent
+    - datalake_salesforce_clean.purchase_sale_contract.is_lease_complaint_sent
   dt_down_payment_deadline:
     description: Date of the down payment deadline
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_down_payment_deadline
+    - datalake_salesforce_clean.purchase_sale_contract.dt_down_payment_deadline
   dt_key_delivery_buyer:
     description: Date of key delivery to the buyer
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_key_delivery_buyer
+    - datalake_salesforce_clean.purchase_sale_contract.dt_key_delivery_buyer
   dt_key_delivery_seller:
     description: Date of key delivery from the seller
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_key_delivery_seller
+    - datalake_salesforce_clean.purchase_sale_contract.dt_key_delivery_seller
   dt_key_delivery:
-    description: Date of key delivery
+    description: Date the property keys were delivered for the contract.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_key_delivery
+    - datalake_salesforce_clean.purchase_sale_contract.dt_key_delivery
   dt_updated:
     description: Date when the purchase sale contract was last updated
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_updated
+    - datalake_salesforce_clean.purchase_sale_contract.dt_updated
   dt_subscription_scheduling:
     description: Date of the subscription scheduling
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_subscription_scheduling
+    - datalake_salesforce_clean.purchase_sale_contract.dt_subscription_scheduling
   dt_bookkeeping_done_ccv:
     description: Date when the bookkeeping was done for the CCV
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_bookkeeping_done_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.dt_bookkeeping_done_ccv
   dt_cri_done_ccv:
     description: Date when the CRI was done for the CCV
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_cri_done_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.dt_cri_done_ccv
   dt_fs_endorsement_request_ccv:
     description: Date of the FS endorsement request for the CCV
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_fs_endorsement_request_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.dt_fs_endorsement_request_ccv
   dt_fs_cri_request_ccv:
     description: Date of the FS CRI request for the CCV
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_fs_cri_request_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.dt_fs_cri_request_ccv
   dt_completion_ccv:
     description: Date of the CCV completion
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.dt_completion_ccv
+    - datalake_salesforce_clean.purchase_sale_contract.dt_completion_ccv
   ts_created:
     description: Timestamp of when the purchase sale contract was created
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_created
+    - datalake_salesforce_clean.purchase_sale_contract.ts_created
   ts_last_modified:
-    description: Timestamp of when the purchase sale contract was last modified
+    description: Timestamp when the contract record was last modified in Salesforce.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_last_modified
+    - datalake_salesforce_clean.purchase_sale_contract.ts_last_modified
   ts_system_mod:
     description: Timestamp of when the purchase sale contract was last modified in the system
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_system_mod
+    - datalake_salesforce_clean.purchase_sale_contract.ts_system_mod
   ts_last_activity:
-    description: Timestamp of the last activity on the purchase sale contract
+    description: Timestamp of the last activity logged against the contract in Salesforce.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_last_activity
+    - datalake_salesforce_clean.purchase_sale_contract.ts_last_activity
   ts_last_viewed:
-    description: Timestamp of when the purchase sale contract was last viewed
+    description: Timestamp when the contract record was last viewed in Salesforce.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_last_viewed
+    - datalake_salesforce_clean.purchase_sale_contract.ts_last_viewed
   ts_last_referenced:
-    description: Timestamp of when the purchase sale contract was last referenced
+    description: Timestamp when the contract record was last referenced in Salesforce.
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_last_referenced
+    - datalake_salesforce_clean.purchase_sale_contract.ts_last_referenced
   ts_ccv_signed:
     description: Timestamp of when the CCV was signed
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_ccv_signed
+    - datalake_salesforce_clean.purchase_sale_contract.ts_ccv_signed
   ts_ccv_termination:
     description: Timestamp of when the CCV termination was created
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_ccv_termination
+    - datalake_salesforce_clean.purchase_sale_contract.ts_ccv_termination
   ts_dd_accepted:
     description: Timestamp of when the DD was accepted
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.ts_dd_accepted
+    - datalake_salesforce_clean.purchase_sale_contract.ts_dd_accepted
   year:
     description: Year of the last modification of the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.year
+    - datalake_salesforce_clean.purchase_sale_contract.year
   month:
     description: Month of the last modification of the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.month
+    - datalake_salesforce_clean.purchase_sale_contract.month
   day:
     description: Day of the last modification of the purchase sale contract
     lineage:
-      - datalake_salesforce_clean.purchase_sale_contract.day
+    - datalake_salesforce_clean.purchase_sale_contract.day
