@@ -468,6 +468,29 @@ FROM VALUES
                                 ),
            'running', True
         )
+    ),
+
+        -- Pclick Sale Agents
+    (
+        "ab_beakman_search_services_p_click_experiment_sale_v8",
+        named_struct(
+            'begin_date', DATE('2026-07-15'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
     )
 
 AS experiment_config(experiment_name, config)
