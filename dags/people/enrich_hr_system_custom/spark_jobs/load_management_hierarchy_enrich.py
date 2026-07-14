@@ -39,18 +39,31 @@ if __name__ == "__main__":
     table_name = "management_hierarchy"
 
     managers_query = """
+        WITH latest_managers AS (
+            SELECT
+                id_period_of_service,
+                id_manager_period_of_service,
+                id_assignment,
+                id_manager_assignment,
+                ROW_NUMBER() OVER (
+                    PARTITION BY assignment_number
+                    ORDER BY dt_effective_started DESC
+                ) AS rn
+            FROM
+                datalake_pin.managers_history
+            WHERE
+                dt_effective_started <= CURRENT_DATE
+                AND id_manager_assignment <> '300000008488092'
+        )
         SELECT
             id_period_of_service,
             id_manager_period_of_service,
             id_assignment,
             id_manager_assignment
         FROM
-            datalake_pin.managers_history
+            latest_managers
         WHERE
-            dt_effective_started <= CURRENT_DATE
-            AND id_manager_assignment <> '300000008488092'
-        QUALIFY
-            ROW_NUMBER() OVER (PARTITION BY assignment_number ORDER BY dt_effective_started DESC) = 1
+            rn = 1
     """
 
     logger.info(
