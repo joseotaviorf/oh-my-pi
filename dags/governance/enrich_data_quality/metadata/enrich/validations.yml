@@ -2,7 +2,7 @@
 database_name: datalake_data_quality
 table_name: validations
 description: This table consolidates the data quality validations applied to bietlejuice DAGs. Partitioned by id_dag, year, month, day. Always filter on id_dag, year, month, day in WHERE clauses to enable partition pruning and avoid full table scans.
-domain: Cross
+domain: Data Ops & Governance
 owner: bruna.prates@quintoandar.com.br
 columns:
   id_data_quality:
