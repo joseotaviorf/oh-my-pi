@@ -1,17 +1,10 @@
 cluster:
-  type: consolidation_xs_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  custom_configurations:
+    spark_conf:
+      spark.driver.memory: 3g
+      spark.driver.memoryOverhead: 1g
+      spark.yarn.am.memory: 512m
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
-  custom_configurations:
-    driver_node_type_id: m7g.xlarge
-validation:
-  cluster:
-    type: emr_7_12_consolidation_xs_memory_cluster
-    custom_configurations:
-      master_node_type_id: m6g.xlarge
-      spark_conf:
-        spark.driver.memory: 3g
-        spark.driver.memoryOverhead: 1g
-        spark.yarn.am.memory: 512m

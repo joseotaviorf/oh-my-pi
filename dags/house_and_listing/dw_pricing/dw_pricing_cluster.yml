@@ -1,20 +1,7 @@
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
-    driver_node_type_id: r7g.2xlarge
-    spark_version: 16.4.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: emr_7_12_consolidation_s_memory_cluster
-    custom_configurations:
-      master_node_type_id: r6g.2xlarge
-      spark_conf:
-        spark.driver.memory: 16g
-        spark.driver.memoryOverhead: 4g
-        spark.yarn.am.memory: 4g
-  allow_custom_spark_job: true
+      spark.driver.memory: 16g
+      spark.driver.memoryOverhead: 4g
+      spark.yarn.am.memory: 4g

@@ -1,19 +1,24 @@
 cluster:
-  type: consolidation_xs_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_m_memory_fleet_cluster
+  custom_configurations:
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+    task_nodes:
+      instance_types:
+      - r6g.2xlarge
+      - r7g.2xlarge
+      - r6i.2xlarge
+      target_on_demand: 0
+      target_spot: 1
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    aws_attributes:
+      ebs_volume_size: 200
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
-  custom_configurations:
-    data_security_mode: USER_ISOLATION
-    num_workers: 3
-validation:
-  cluster:
-    type: emr_7_12_consolidation_m_memory_cluster
-    custom_configurations:
-      core_nodes:
-        instance_count: 2
-      task_nodes:
-        instance_count: 1
-      aws_attributes:
-        ebs_volume_size: 200
