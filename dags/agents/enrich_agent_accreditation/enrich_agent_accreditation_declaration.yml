@@ -5,32 +5,22 @@ dag:
   owner: Data Agents
   documentation:
     dag_purpose: |
-      O pipeline process tracks and enriches data related to agent operations, covering business context assignments, regional coverage, and registration actions.
-      It integrates multiple data sources to generate insights into an agent’s predominant region, active periods within a business context, and key changes to their registration over time.
+      Tracks and enriches agent operations for accreditation: business context assignments,
+      profile type history, and the registration actions log of key changes over time.
 
-      This workflow consists of three main stages:
-
-      - Business Context Tracking: Records the historical assignment of business contexts to agents and enriches it with activity periods.
-      - Regional Coverage Analysis: Determines the agent’s predominant region code over time based on the number of associated regions.
-      - Registration Actions Log: Captures and stores key modifications in an agent’s profile, such as accreditation, de-accreditation, and business context changes.
-      This pipeline ensures accurate historical tracking of agent operations, enabling data-driven decisions regarding their performance and coverage.
+      Current scope:
+      - Business Context Tracking: historical assignment of business contexts to visit agents.
+      - Agent Profile History: revision intervals for agent performance profiles (visit, inspection, etc.).
+      - Registration Actions Log: accreditation, de-accreditation, context/profile updates, and related actions.
 workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
   inner_dependencies:
-    agent_profile_activity:
-      - agent_registration_actions_log
     agent_registration_actions_log:
       - agent_profile
       - business_context
   tables_customization:
-    agent_major_region_code:
-      extraction_type: full
-      z_order_by: [id_agent, ts_started]
-    agent_profile_activity:
-      merge_on: [id_agent_profile_activity]
-      z_order_by: [id_agent, dt_started]
     agent_profile:
       merge_on: [id_agent_profile]
       z_order_by: [id_agent, ts_revision_started]
