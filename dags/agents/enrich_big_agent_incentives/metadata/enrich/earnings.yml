@@ -116,10 +116,6 @@ columns:
     lineage:
       - datalake_big_agent_clean.revenue_share.relation_type
     description: Relation type of the revenue share linked to the earning (for example TIER).
-  revenue_share_type:
-    lineage:
-      - datalake_big_agent_clean.revenue_share.type
-    description: Type of the revenue share linked to the earning.
   base_amount:
     lineage:
       - datalake_big_agent_clean.earning_sources.base_amount
