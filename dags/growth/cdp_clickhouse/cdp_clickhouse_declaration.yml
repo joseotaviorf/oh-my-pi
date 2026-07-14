@@ -2,16 +2,17 @@ dag:
   name: cdp_clickhouse
   owner: Data Growth
   schedule_start_date: 2026, 6, 1
-  schedule_interval: 0 * * * *
+  schedule_interval: "*/30 * * * *"
   max_active_runs: 1
   documentation:
     dag_purpose: |
-      Incrementally ingests CDP events from the ClickHouse events_api table every hour
-      (UTC). Each run exports the previous three hours in one-hour windows: ClickHouse
-      writes Parquet directly to the processed-data bucket, Spark loads raw Delta
-      partitions with replaceWhere, then builds transactional_events, user_tracking_events
-      and comms_events in clean by filtering egw_event_type. Overlapping runs are safe
-      because only affected hourly raw partitions are overwritten.
+      Incrementally ingests CDP events from the ClickHouse events_api table every 30
+      minutes (UTC). Each run exports the previous three hours in one-hour windows:
+      ClickHouse writes Parquet directly to the processed-data bucket, Spark loads raw
+      Delta partitions with replaceWhere, then builds transactional_events,
+      user_tracking_events and comms_events in clean by filtering egw_event_type.
+      Overlapping runs are safe because only affected hourly raw partitions are
+      overwritten.
 
 workflow:
   layer: raw

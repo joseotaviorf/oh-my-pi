@@ -1,5 +1,6 @@
 DAG:
   equals:
+    - bietlejuice.cdp_clickhouse
     - bietlejuice.check_dags_dataset_queue
     - bietlejuice.clustering_image_model
     - bietlejuice.consorcio
