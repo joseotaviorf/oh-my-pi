@@ -28,3 +28,7 @@ workflow:
     brokerage_share_history:
       merge_on: [id_revision, id_contract]
       z_order_by: [id_contract, ts_revision]
+    partner_tier:
+      merge_on: [id_partner_tier]
+      partitions: [year, month, day]
+      z_order_by: [id_partner_tier, ts_updated]

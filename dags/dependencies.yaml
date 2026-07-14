@@ -1758,6 +1758,8 @@ bietlejuice.enrich_big_agent_incentives:
   - bietlejuice.big_agent_fast_lane:load-clean-new-earnings-aud:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-new-earnings:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-new-points-rule:first-run-of-day
+  - bietlejuice.big_agent_fast_lane:load-clean-partner-tier-overwritten-info:first-run-of-day
+  - bietlejuice.big_agent_fast_lane:load-clean-partner-tier:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-revenue-share:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-score-rule:first-run-of-day
   - bietlejuice.big_agent_fast_lane:load-clean-tier:first-run-of-day

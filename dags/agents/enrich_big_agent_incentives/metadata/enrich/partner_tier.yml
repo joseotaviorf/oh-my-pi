@@ -1,0 +1,90 @@
+---
+database_name: datalake_big_agent
+table_name: partner_tier
+description: |
+  Enriched partner-to-tier assignments from Big Agent incentives, including validity
+  windows and overwrite metadata when a mapping was invalidated and replaced.
+  Incremental load covers partners updated in the window or with new overwrite records.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_partner_tier:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.id
+    description: Unique identifier of the partner tier assignment record in Big Agent.
+  id_new_partner_tier:
+    lineage:
+      - datalake_big_agent_clean.partner_tier_overwritten_info.id_replaced_by
+    description: Identifier of the partner tier assignment that replaced this record when it was overwritten; null when not replaced.
+  id_tier:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.id_tier
+    description: Tier configuration identifier linked to this partner assignment.
+  uuid_person:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.id_partner_external
+      - datalake_big_agent_clean.partner_tier.partner_external_type
+    description: Person UUID of the partner when the external partner type is PERSON; otherwise null.
+  uuid_company:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.id_partner_external
+      - datalake_big_agent_clean.partner_tier.partner_external_type
+    description: Company UUID of the partner when the external partner type is COMPANY; otherwise null.
+  uuid_overwritten_by:
+    lineage:
+      - datalake_big_agent_clean.partner_tier_overwritten_info.author
+    description: Person identifier extracted from the overwrite author JSON when the actor type is PERSON; otherwise null.
+  incentive_system:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.incentive_system
+    description: Incentive system label applied to this partner tier assignment.
+  overwritten_reason:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.overwritten_reason
+      - datalake_big_agent_clean.partner_tier_overwritten_info.reason
+    description: Business reason for overwrite, preferring the partner_tier value and falling back to overwrite-info reason.
+  is_valid:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.status
+    description: True when the partner tier assignment status is ACTIVE.
+  is_overwritten:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.status
+      - datalake_big_agent_clean.partner_tier_overwritten_info.id_replaced_by
+    description: True when the assignment was invalidated and a replacement partner tier id is present.
+  is_overwritten_by_ops:
+    lineage:
+      - datalake_big_agent_clean.partner_tier_overwritten_info.author
+    description: True when the overwrite actor role is OPS; false when missing or a different role.
+  dt_validity_started:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.dt_validity_started
+    description: First date when this partner tier assignment is valid.
+  dt_validity_ended:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.dt_validity_ended
+    description: Last date when this partner tier assignment is valid.
+  ts_overwritten:
+    lineage:
+      - datalake_big_agent_clean.partner_tier_overwritten_info.ts_created
+    description: Timestamp when the overwrite record was created for this partner tier assignment.
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.ts_created
+    description: Timestamp when the partner tier assignment was created in Big Agent.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.ts_updated
+    description: Timestamp when the partner tier assignment was last updated in Big Agent.
+  year:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.year
+    description: Partition year derived from the partner tier update timestamp.
+  month:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.month
+    description: Partition month derived from the partner tier update timestamp.
+  day:
+    lineage:
+      - datalake_big_agent_clean.partner_tier.day
+    description: Partition day derived from the partner tier update timestamp.
