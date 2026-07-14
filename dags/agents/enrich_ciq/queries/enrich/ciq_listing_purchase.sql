@@ -154,7 +154,7 @@ SELECT
         hch.consultant_type
     ) AS id_listing_purchase,
     h.id_house,
-    hch.id_partner,
+    TRY_CAST(hch.id_partner AS BIGINT) AS id_partner,
     hl.id_house_listing,
     hl.id_contract,
     h.id_owner,

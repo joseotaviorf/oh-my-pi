@@ -31,7 +31,7 @@ last_ciq_of_day AS (
     one status per day. To do so, we are assuming that only the last status/agency
     of this house in a day will be considered. We aligned with SWE
     and the rule is programs are excludent, so there is only
-    one program:house per time.
+    one program per house per time.
     For the SELECT program, we are not sure yet, but for CIQ/ASP this is valid.
 
     In addition, there are periods around June - 2021 (In our auds) when two programs exists at
@@ -230,7 +230,7 @@ listings_states_per_day AS (
         h.id_user AS id_owner,
         heh.id_occupant,
         hbh.id_partner,
-        lcod.id_partner AS id_partner_big_agent,
+        TRY_CAST(lcod.id_partner AS BIGINT) AS id_partner_big_agent,
         h.id_region,
         hs.id_house_status,
         lpc.id_price_change,
@@ -270,7 +270,7 @@ listings_states_per_day AS (
         vnm.visits_confirmed,
         vnm.visits_done,
         offers.offers_sent,
-        DATEDIFF(DAY, DATE(lbcsh.ts_last_publication), dbase.dt_day) + 1 AS days_published,
+        TRY_CAST(DATEDIFF(dbase.dt_day, DATE(lbcsh.ts_last_publication)) + 1 AS BIGINT) AS days_published,
         hls.status_history,
         hls.status_change_reason,
         hl.listing_category,
