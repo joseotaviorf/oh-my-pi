@@ -39,10 +39,6 @@ columns:
     lineage:
       - datalake_big_agent_raw.revenue_share_aud.relation_type
     description: Type discriminator for the relation.
-  type:
-    lineage:
-      - datalake_big_agent_raw.revenue_share_aud.type
-    description: Type of condition applied to compute revenue share.
   value:
     lineage:
       - datalake_big_agent_raw.revenue_share_aud.value
