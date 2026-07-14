@@ -12,11 +12,11 @@ columns:
   id_sheet:
     lineage:
       - datalake_lending_raw.offer_term.sheet_id
-    description: Identifier for the sheet referenced by this financial record.
+    description: Foreign key to the offer term sheet that groups this term.
   uuid:
     lineage:
       - datalake_lending_raw.offer_term.uuid
-    description: Financial attribute representing uuid on the offer_term dataset.
+    description: Universally unique identifier of the offer term in the lending platform.
   base_value_multiplier:
     lineage:
       - datalake_lending_raw.offer_term.base_value_multiplier
@@ -28,7 +28,11 @@ columns:
   installments_number:
     lineage:
       - datalake_lending_raw.offer_term.installments_number
-    description: Financial attribute representing installments number on the offer_term dataset.
+    description: Quantity of monthly installments the offer term splits the deal into.
+  recovery_grace_period_days:
+    lineage:
+      - datalake_lending_raw.offer_term.recovery_grace_period_days
+    description: Grace period in days for recovery before a new deal is generated.
   ts_created:
     lineage:
       - datalake_lending_raw.offer_term.created_at

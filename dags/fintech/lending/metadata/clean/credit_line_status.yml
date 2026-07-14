@@ -1,0 +1,23 @@
+---
+database_name: datalake_lending_clean
+table_name: credit_line_status
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains the status history of credit lines.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.credit_line_status.id
+    description: Primary key of the credit line status.
+  id_credit_line:
+    lineage:
+      - datalake_lending_raw.credit_line_status.credit_line_id
+    description: Foreign key to the credit line whose status transition this row records.
+  status:
+    lineage:
+      - datalake_lending_raw.credit_line_status.status
+    description: Status value the credit line transitioned to at this point in time.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.credit_line_status.created_at
+    description: Timestamp when the credit line status was created.

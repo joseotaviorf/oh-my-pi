@@ -9,6 +9,8 @@ SELECT
     value,
     credit_note_number,
     credit_note_type,
+    kind,
+    credit_line_id AS id_credit_line,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

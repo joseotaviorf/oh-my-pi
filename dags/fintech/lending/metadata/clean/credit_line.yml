@@ -1,0 +1,35 @@
+---
+database_name: datalake_lending_clean
+table_name: credit_line
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains credit lines granted to people, including approved limit and maximum number of draws.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.credit_line.id
+    description: Primary key of the credit line.
+  uuid:
+    lineage:
+      - datalake_lending_raw.credit_line.uuid
+    description: Universally unique identifier of the credit line in the lending platform.
+  uuid_person:
+    lineage:
+      - datalake_lending_raw.credit_line.person_uuid
+    description: UUID of the person who owns the credit line.
+  approved_limit:
+    lineage:
+      - datalake_lending_raw.credit_line.approved_limit
+    description: Total credit amount approved for this line that the person can draw against, in BRL.
+  max_draws:
+    lineage:
+      - datalake_lending_raw.credit_line.max_draws
+    description: Maximum number of draws allowed for the credit line.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.credit_line.created_at
+    description: Timestamp when the credit line was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.credit_line.updated_at
+    description: Timestamp when the credit line was last updated.

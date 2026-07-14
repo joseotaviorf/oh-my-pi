@@ -3,7 +3,7 @@ database_name: datalake_lending_clean
 table_name: deal
 owner: nilton.nakate@quintoandar.com.br
 domain: Fintech
-description: One row per deal in the Fintech clean layer, sourced from datalake_lending_clean for payments, billing, and financial operations reporting.
+description: Lending deals (loan contracts) taken out by a person, one row per deal sourced from datalake_lending_raw.deal, holding the deal value, product, offer terms and credit note references.
 columns:
   id:
     lineage:
@@ -12,7 +12,7 @@ columns:
   id_offer_cohort:
     lineage:
       - datalake_lending_raw.deal.offer_cohort_id
-    description: Identifier for the offer cohort referenced by this financial record.
+    description: Foreign key to the offer cohort the deal originated from.
   id_offer_term:
     lineage:
       - datalake_lending_raw.deal.offer_term_id
@@ -20,23 +20,23 @@ columns:
   id_product:
     lineage:
       - datalake_lending_raw.deal.product_id
-    description: Identifier for the product referenced by this financial record.
+    description: Foreign key to the lending product under which the deal was contracted.
   id_external:
     lineage:
       - datalake_lending_raw.deal.external_id
-    description: Identifier for the external referenced by this financial record.
+    description: Identifier of the deal in the external partner system that originated it.
   uuid:
     lineage:
       - datalake_lending_raw.deal.uuid
-    description: Financial attribute representing uuid on the deal dataset.
+    description: Universally unique identifier of the deal in the lending platform.
   uuid_person:
     lineage:
       - datalake_lending_raw.deal.person_uuid
-    description: Financial attribute representing uuid person on the deal dataset.
+    description: Universally unique identifier of the person who contracted the deal.
   value:
     lineage:
       - datalake_lending_raw.deal.value
-    description: Financial attribute representing value on the deal dataset.
+    description: Total contracted amount of the deal, in BRL.
   credit_note_number:
     lineage:
       - datalake_lending_raw.deal.credit_note_number
@@ -45,6 +45,14 @@ columns:
     lineage:
       - datalake_lending_raw.deal.credit_note_type
     description: Type of the credit note associated to the deal.
+  kind:
+    lineage:
+      - datalake_lending_raw.deal.kind
+    description: Kind classification of the deal.
+  id_credit_line:
+    lineage:
+      - datalake_lending_raw.deal.credit_line_id
+    description: ID of the credit line associated to the deal.
   ts_created:
     lineage:
       - datalake_lending_raw.deal.created_at

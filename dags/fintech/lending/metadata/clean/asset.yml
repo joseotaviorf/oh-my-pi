@@ -1,0 +1,35 @@
+---
+database_name: datalake_lending_clean
+table_name: asset
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains assets linked to lending deals, with a snapshot of their state.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.asset.id
+    description: Primary key of the asset.
+  id_deal:
+    lineage:
+      - datalake_lending_raw.asset.deal_id
+    description: ID of the deal associated with the asset.
+  id_external:
+    lineage:
+      - datalake_lending_raw.asset.external_id
+    description: Identifier of the asset in the external partner system that originated it.
+  asset_type:
+    lineage:
+      - datalake_lending_raw.asset.asset_type
+    description: Business category of the asset pledged as collateral (e.g. property, vehicle).
+  snapshot_payload:
+    lineage:
+      - datalake_lending_raw.asset.snapshot_payload
+    description: JSON payload with a snapshot of the asset state.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.asset.created_at
+    description: Timestamp when the asset was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.asset.updated_at
+    description: Timestamp when the asset was last updated.

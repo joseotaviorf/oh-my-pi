@@ -1,0 +1,47 @@
+---
+database_name: datalake_lending_clean
+table_name: credit_line_draw
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains individual draws made against a credit line.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.id
+    description: Primary key of the credit line draw.
+  id_credit_line:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.credit_line_id
+    description: ID of the credit line the draw belongs to.
+  id_deal:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.deal_id
+    description: ID of the deal generated for the draw, null until disbursed.
+  uuid:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.uuid
+    description: Universally unique identifier of the credit line draw in the lending platform.
+  draw_number:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.draw_number
+    description: Sequential number of the draw within the credit line.
+  amount:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.amount
+    description: Amount requested in the draw.
+  dt_processing:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.processing_date
+    description: Date when the draw is processed.
+  dt_target_disbursement:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.target_disbursement_date
+    description: Target disbursement date of the draw.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.created_at
+    description: Timestamp when the credit line draw was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.credit_line_draw.updated_at
+    description: Timestamp when the credit line draw was last updated.
