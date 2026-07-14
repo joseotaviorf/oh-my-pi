@@ -42,6 +42,8 @@ from pathlib import Path
 import yaml
 from sqlglot import exp, parse_one
 
+from bietlejuice.governance.domain_registry import folder_to_domain
+
 
 class LineageResolver:
     """
@@ -288,7 +290,10 @@ def create_yml_for_table(
         path_parts = Path(sql_file_path).parts
         dag_root_index = path_parts.index("dags")
         if dag_root_index + 1 < len(path_parts):
-            dag_domain = path_parts[dag_root_index + 1].capitalize()
+            # Resolve the repo folder to its allowlisted metadata domain. Returns
+            # None for mixed / per-DAG folders (platform, core, ...) so the author
+            # fills `domain:` by hand instead of getting an invalid guess.
+            dag_domain = folder_to_domain(path_parts[dag_root_index + 1])
     except ValueError:
         print("Warning: Could not determine domain from path.")
 

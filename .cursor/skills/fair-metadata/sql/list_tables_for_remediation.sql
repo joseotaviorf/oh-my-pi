@@ -24,7 +24,7 @@ WHERE fa.tier_achieved < 2
 -- INNER JOIN (
 --     SELECT DISTINCT database_name, table_name
 --     FROM datalake_documentation_metrics_clean.tables_documentation
---     WHERE domain = 'Data Ops & Governance'  -- example; use fairness_metadata.mdc allowlist
+--     WHERE domain = 'Data Ops & Governance'  -- example; allowlist SSOT: packages/bietlejuice-core/src/bietlejuice/governance/domains.yml
 --       AND DATE(CAST(year AS VARCHAR) || '-' || LPAD(CAST(month AS VARCHAR), 2, '0') || '-' || LPAD(CAST(day AS VARCHAR), 2, '0')) = (SELECT MAX(DATE(CAST(year AS VARCHAR) || '-' || LPAD(CAST(month AS VARCHAR), 2, '0') || '-' || LPAD(CAST(day AS VARCHAR), 2, '0'))) FROM datalake_documentation_metrics_clean.tables_documentation)
 -- ) td ON fa.database_name = td.database_name AND fa.table_name = td.table_name
 -- (2) Or restrict to FQNs extracted from dags/{domain}/**/metadata/*/*.yml:

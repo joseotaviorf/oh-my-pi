@@ -101,3 +101,25 @@ def test_runtime_constants_reexports_loader():
         "(a call), not hardcode a string literal."
     )
     assert getattr(value_node.func, "id", None) == "domain_allowlist_pattern"
+
+
+def test_folder_to_domain_resolves_known_folders():
+    assert domain_registry.folder_to_domain("for_rent") == "For Rent"
+    assert domain_registry.folder_to_domain("governance") == "Data Ops & Governance"
+    assert (
+        domain_registry.folder_to_domain("support_and_service")
+        == "Support and Services"
+    )
+
+
+def test_folder_to_domain_none_for_unmapped_or_ambiguous():
+    # Mixed / per-DAG / non-domain folders and unknown folders must return None so
+    # generate_metadata leaves `domain:` for a human instead of guessing.
+    for folder in ("platform", "core", "ops_poc", "planning_and_performance", "nope"):
+        assert domain_registry.folder_to_domain(folder) is None, folder
+
+
+def test_folder_mappings_only_target_allowlisted_domains():
+    allowed = set(domain_registry.active_domains())
+    for folder, domain in domain_registry._load()["repo_folder_mappings"].items():
+        assert domain in allowed, f"{folder} -> {domain!r} is not in the allowlist"

@@ -74,6 +74,6 @@ If the user is performing a rename, generate the concrete steps:
 
 ## Notes
 
-- The repo has 871 Airflow DAGs (834 DAG Builder + 37 legacy Python) across 25 domain folders. Always use parallel subagents — sequential search takes too long.
+- The repo has many Airflow DAGs across the domain folders under `dags/`. Always use parallel subagents — sequential search takes too long.
 - `dags/dependencies.yaml` (auto-generated) is the canonical dependency graph; cross-reference it for DAG-level dependencies.
 - Column renames in clean/enrich tables cascade to all downstream dw/metric SQL and metadata.

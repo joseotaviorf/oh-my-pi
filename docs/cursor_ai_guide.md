@@ -639,7 +639,7 @@ Does this metadata YAML for my new DW table pass CI?
 ```
 
 The Governance Officer checks:
-- Valid `domain` from the 15-item list (e.g. `For Rent`, `Platform`, `Growth`, `People`)
+- Valid `domain` from the allowlist SSOT `packages/bietlejuice-core/src/bietlejuice/governance/domains.yml` (e.g. `For Rent`, `Growth`, `People`)
 - `owner` is a `@quintoandar.com.br` email
 - All enrich/DW columns have `lineage: database.table.column`
 - No raw PII stored in enrich/DW columns (join `dim_person` instead)

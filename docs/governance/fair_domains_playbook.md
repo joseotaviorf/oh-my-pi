@@ -49,6 +49,7 @@ Use **`fix-ci-failure`** (SQL/declaration only) or fix manually. Bulk remediatio
 
 ## References
 
+- Domain allowlist SSOT: `packages/bietlejuice-core/src/bietlejuice/governance/domains.yml` (read via `bietlejuice.governance.domain_registry`)
 - Authoring rules: `.cursor/rules/fairness_metadata.mdc`
 - Glossary: `fair_requirement_glossary.md`
 - Lake detail: `fair_metadata_remediation.md`

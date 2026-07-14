@@ -13,6 +13,7 @@ from __future__ import annotations
 import re
 from functools import lru_cache
 from pathlib import Path
+from typing import Optional
 
 import yaml
 
@@ -51,3 +52,13 @@ def domain_allowlist_pattern() -> str:
 def domain_allowlist_regex() -> re.Pattern[str]:
     """Compiled allowlist regex (used with ``fullmatch`` by FAIR F2-01)."""
     return re.compile(domain_allowlist_pattern())
+
+
+def folder_to_domain(folder: str) -> Optional[str]:
+    """Resolve a ``dags/`` repo folder to its metadata ``domain:`` value.
+
+    Returns the mapped allowlist value for folders with a reliable 1:1 domain, or
+    ``None`` for folders that are mixed / per-DAG (or unknown) — callers should then
+    leave ``domain:`` for a human to fill rather than guess.
+    """
+    return _load().get("repo_folder_mappings", {}).get(folder)

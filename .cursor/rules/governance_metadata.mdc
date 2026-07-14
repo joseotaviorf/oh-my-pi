@@ -30,9 +30,7 @@ columns:
 
 > Optional `privacy` section — see [PII privacy section](#pii-privacy-section-preferred) below.
 
-**Valid domains:** must **full-match** one value below (same list as F2-01 / CI Yamale — canonical source: [`fairness_metadata.mdc`](fairness_metadata.mdc) and `METADATA_DOMAIN_CI_ALLOWLIST_PATTERN` in `fairness_assessment/constants.py`):
-
-`Agents`, `Atlas DB`, `Broker XP`, `Conversational XP`, `Cross`, `Data Life Cycle`, `Data Ops & Governance`, `Data Platform`, `DS Pricing`, `Fintech`, `For Rent`, `For Sale`, `Growth`, `House and Listing`, `International`, `Journey Optimizer`, `MLOps`, `People`, `QCX`, `Rede`, `Support and Services`, `Tech Platform`
+**Valid domains:** must **full-match** one allowlist value. The authoritative list lives in `packages/bietlejuice-core/src/bietlejuice/governance/domains.yml` (read via `bietlejuice.governance.domain_registry`) — do not hardcode it here. `METADATA_DOMAIN_CI_ALLOWLIST_PATTERN` in `fairness_assessment/constants.py` re-exports from that loader, and CI Yamale `*_schema.yml` is generated from it. Examples: `For Rent`, `Data Ops & Governance`, `Tech Platform`.
 
 **Deprecated labels (do not use in new metadata):** `Governance` → `Data Ops & Governance`; `Platform` → `Data Platform` or `Tech Platform`; `Data Science` → `DS Pricing` or `MLOps`; `Support and Service` → `Support and Services`.
 

@@ -32,3 +32,28 @@ metadata_domains:
   - Atlas DB
   - Broker XP
   - House and Listing
+
+# Reliable 1:1 mapping from a dags/ repo folder to its metadata `domain:` value.
+# Used to scaffold `domain:` in generate_metadata. Only folders with a single,
+# unambiguous domain are listed — folders that are mixed or per-DAG (platform, core,
+# planning_and_performance, publisher_xp, ops_poc) are intentionally omitted so the
+# author fills `domain:` in by hand instead of getting a wrong guess.
+repo_folder_mappings:
+  agents: Agents
+  atlas_db: Atlas DB
+  broker_xp: Broker XP
+  conversational_xp: Conversational XP
+  cross: Cross
+  ds_pricing: DS Pricing
+  fintech: Fintech
+  for_rent: For Rent
+  for_sale: For Sale
+  governance: Data Ops & Governance
+  growth: Growth
+  house_and_listing: House and Listing
+  journey_optimizer: Journey Optimizer
+  mlops: MLOps
+  people: People
+  qcx: QCX
+  support_and_service: Support and Services
+  tech_platform: Tech Platform

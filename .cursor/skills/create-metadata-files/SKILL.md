@@ -57,7 +57,7 @@ For each SQL listed, create `dags/{domain}/{dag_name}/metadata/{layer}/{table}.y
 Infer values from the path and DAG declaration:
 - `table_name` = SQL filename without `.sql`
 - `database_name` = from [naming_conventions.mdc](.cursor/rules/naming_conventions.mdc): `datalake_{source}_{context}` (enrich), `dw_{schema}` (dw), `metric_{context}` (metric)
-- `domain` = map `dag.owner` from `{dag_name}_declaration.yml` to a valid domain (e.g. "Data SS" → "Support and Services")
+- `domain` = derive from the `dags/` folder or map `dag.owner` from `{dag_name}_declaration.yml` to a valid domain (e.g. "Data SS" → "Support and Services"). For 1:1 folder→domain scaffolding, `generate_metadata` resolves it via `domain_registry.folder_to_domain()` (SSOT: `repo_folder_mappings` in `domains.yml`)
 - `owner` = email from `{dag_name}_declaration.yml`
 
 **Raw/Clean skeleton (with placeholder):**
@@ -226,9 +226,7 @@ Bad column description examples:
 
 ### 3.1 Domain values by layer (must match exactly)
 
-Use one exact value from the FAIR/CI allowlist ([`fairness_metadata.mdc`](../../rules/fairness_metadata.mdc), mirrored in [`governance_metadata.mdc`](../../rules/governance_metadata.mdc)):
-
-`Agents`, `Atlas DB`, `Broker XP`, `Conversational XP`, `Cross`, `Data Life Cycle`, `Data Ops & Governance`, `Data Platform`, `DS Pricing`, `Fintech`, `For Rent`, `For Sale`, `Growth`, `House and Listing`, `International`, `Journey Optimizer`, `MLOps`, `People`, `QCX`, `Rede`, `Support and Services`, `Tech Platform`
+Use one exact value from the allowlist. The authoritative list lives in `packages/bietlejuice-core/src/bietlejuice/governance/domains.yml` (read via `bietlejuice.governance.domain_registry`); see [`fairness_metadata.mdc`](../../rules/fairness_metadata.mdc) and [`governance_metadata.mdc`](../../rules/governance_metadata.mdc) for guidance. Do not hardcode it here. Examples: `For Rent`, `Data Ops & Governance`, `Tech Platform`.
 
 ### 3.2 Raw
 

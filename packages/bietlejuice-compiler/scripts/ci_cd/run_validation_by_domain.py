@@ -29,33 +29,22 @@ from typing import List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from scripts.services.git_service import GitService
 
-ALL_DOMAINS: List[str] = [
-    "agents",
-    "atlas_db",
-    "broker_xp",
-    "conversational_xp",
-    "core",
-    "cross",
-    "ds_pricing",
-    "fintech",
-    "for_rent",
-    "for_sale",
-    "governance",
-    "growth",
-    "luigijr",
-    "mlops",
-    "ops_poc",
-    "people",
-    "planning_and_performance",
-    "platform",
-    "qcx",
-    "qube",
-    "support_and_service",
-    "tech_platform",
-]
+# Folders under dags/ that are not validation domains and must not be sharded.
+# (get_dag_domain_names already skips "_"-prefixed entries such as __pycache__.)
+_NON_DOMAIN_FOLDERS = frozenset({"dependency_exceptions"})
+
+# Derived from the filesystem so new dags/<domain>/ folders are picked up
+# automatically — no hardcoded list to drift out of sync (previously missed
+# house_and_listing, journey_optimizer and publisher_xp).
+ALL_DOMAINS: List[str] = sorted(
+    d
+    for d in DAGPackagesPathService.get_dag_domain_names()
+    if d not in _NON_DOMAIN_FOLDERS
+)
 
 _DOMAIN_PREFIXES = {d: f"dags/{d}/" for d in ALL_DOMAINS}
 

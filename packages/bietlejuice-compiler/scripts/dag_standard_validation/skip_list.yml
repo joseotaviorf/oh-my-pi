@@ -30,6 +30,8 @@ dags_not_using_builder:
   - atlas_db/vespucio_pipeline_plugins/vespucio_pipeline_plugins.py
   - publisher_xp/alias_classifieds/alias_classifieds.py
   - publisher_xp/alias_classifieds_on_demand/alias_classifieds_on_demand.py
+  # Shared constants/params module for the publisher_xp classifieds DAGs — not a DAG file.
+  - publisher_xp/alias_classifieds_common.py
   - atlas_db/vespucio_pipeline_table_names.py
   - growth/lifull_campaigns/lifull_campaigns.py
   - growth/olos_dialer/olos_dialer.py

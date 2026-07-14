@@ -397,7 +397,7 @@ columns:
     description: "Column description (min 10 chars)."
 ```
 
-**Domain mapping** — Map the business domain (from Step 1) to the valid domain value:
+**Domain mapping** — Map the business domain (from Step 1) to the valid domain value. This table mirrors `repo_folder_mappings` in the SSOT `packages/bietlejuice-core/src/bietlejuice/governance/domains.yml` (resolved in code via `domain_registry.folder_to_domain()`):
 
 | Business Domain (folder name) | Domain Value |
 |-------------------------------|--------------|
@@ -421,7 +421,7 @@ columns:
 | `international` | `International` |
 | `rede` | `Rede` |
 
-**Valid domains (FAIR / CI allowlist):** see [`fairness_metadata.mdc`](../../rules/fairness_metadata.mdc) — `Agents`, `Atlas DB`, `Broker XP`, `Conversational XP`, `Cross`, `Data Life Cycle`, `Data Ops & Governance`, `Data Platform`, `DS Pricing`, `Fintech`, `For Rent`, `For Sale`, `Growth`, `House and Listing`, `International`, `Journey Optimizer`, `MLOps`, `People`, `QCX`, `Rede`, `Support and Services`, `Tech Platform`.
+**Valid domains (FAIR / CI allowlist):** the authoritative list lives in `packages/bietlejuice-core/src/bietlejuice/governance/domains.yml` (read via `bietlejuice.governance.domain_registry`); see [`fairness_metadata.mdc`](../../rules/fairness_metadata.mdc). Do not hardcode it here. Examples: `For Rent`, `Data Ops & Governance`, `Tech Platform`.
 
 ---
 

@@ -14,13 +14,13 @@ Whenever the user asks to audit or remediate FAIR metadata **by domain**, resolv
 
 Inventories **overlap but differ** whenever tables in other folders use the same YAML `domain:` (common for `Data Ops & Governance`, `Data Platform`, `Cross`).
 
-Full allowlist: `.cursor/rules/fairness_metadata.mdc` (synced with `METADATA_DOMAIN_CI_ALLOWLIST_PATTERN`).
+Full allowlist SSOT: `packages/bietlejuice-core/src/bietlejuice/governance/domains.yml` (read via `bietlejuice.governance.domain_registry`); see `.cursor/rules/fairness_metadata.mdc` for guidance.
 
 ---
 
 ## Repo folder → YAML `domain:` mapping
 
-CLI `--domain` uses the **folder basename** (snake_case). Metadata `domain:` must be an **allowlist** value (often Title Case, spaces, `&`).
+CLI `--domain` uses the **folder basename** (snake_case). Metadata `domain:` must be an **allowlist** value (often Title Case, spaces, `&`). The 1:1 rows below mirror `repo_folder_mappings` in the SSOT `packages/bietlejuice-core/src/bietlejuice/governance/domains.yml` — `generate_metadata` resolves them via `domain_registry.folder_to_domain()`.
 
 | Repo folder (`--domain`) | Typical YAML `domain:` | Notes |
 |--------------------------|------------------------|-------|
