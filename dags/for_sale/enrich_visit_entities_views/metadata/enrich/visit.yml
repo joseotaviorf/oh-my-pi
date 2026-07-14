@@ -1,26 +1,25 @@
 database_name: datalake_visit_entities_views
 table_name: visit
-description: >
-  Enriched view of VISIT entities with persona expansion (OWNER, TENANT_PROSPECT/BUYER_PROSPECT, AGENT_BROKER).
-  Covers both RENT and SALE business contexts. Consumed by enrich_transactional_entities consolidation.
+description: |
+  Enriched view of VISIT entities with persona expansion (OWNER, TENANT_PROSPECT/BUYER_PROSPECT, AGENT_BROKER). Covers both RENT and SALE business contexts. Consumed by enrich_transactional_entities consolidation.
 domain: For Sale
-owner: isadora.gallerani@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_entity:
     lineage:
-      - core_visit.visit.code
+    - core_visit.visit.code
     description: Visit code serving as the entity identifier.
   id_house:
     lineage:
-      - core_visit.visit.id_house
+    - core_visit.visit.id_house
     description: House id related to the visit.
   id_contract:
     description: Always NULL for visit entities (no contract association).
   id_user:
     lineage:
-      - core_visit.visit.id_owner
-      - core_visit.visit.id_visitor
-      - core_visit.visit.id_agent
+    - core_visit.visit.id_owner
+    - core_visit.visit.id_visitor
+    - core_visit.visit.id_agent
     description: User id associated with the visit, varying by persona (owner, visitor, or agent).
   entity:
     description: Fixed value 'VISIT'.
@@ -28,20 +27,20 @@ columns:
     description: Role of the user in the visit (OWNER, TENANT_PROSPECT, BUYER_PROSPECT, or AGENT_BROKER).
   business_context:
     lineage:
-      - core_visit.visit.business_context
+    - core_visit.visit.business_context
     description: Business context of the visit (RENT or SALE).
   properties:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.event_type
-      - core_visit.visit.ts_visit
+    - datalake_ebdb_clean.visit_status_log.event_type
+    - core_visit.visit.ts_visit
     description: JSON with visit status event (what) and scheduled time (when).
   is_active:
     description: TRUE for CONFIRMED/REQUESTED visits, FALSE for CANCELED/DONE/UNSUCCESSFUL/STALLED.
   ts_created:
     lineage:
-      - core_visit.visit.ts_created
+    - core_visit.visit.ts_created
     description: Timestamp when the visit was created.
   ts_updated:
     lineage:
-      - core_visit.visit.ts_updated
+    - core_visit.visit.ts_updated
     description: Timestamp when the visit was last updated.

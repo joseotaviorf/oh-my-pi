@@ -1,45 +1,44 @@
 database_name: datalake_visit
 table_name: visit_status_events
-description: Information about Rent and Sale visits status log events.
-  Each row is an unique visit status.
+description: Information about Rent and Sale visits status log events. Each row is an unique visit status.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_visit_status_events:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.id_visit_status_log
+    - datalake_ebdb_clean.visit_status_log.id_visit_status_log
     description: A concat with visit status log Id + Ranking. Used to be the unique key table.
   id_visit_status_log:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.id_visit_status_log
+    - datalake_ebdb_clean.visit_status_log.id_visit_status_log
     description: Id of each visit status log event.
   id_visit:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.id_visit
+    - datalake_ebdb_clean.visit_status_log.id_visit
     description: Visit ID for connection to the Visit table
   id_schedule:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.id_schedule
+    - datalake_ebdb_clean.visit_status_log.id_schedule
     description: Field that can be used as booking ID
   id_visitor:
     lineage:
-      - datalake_ebdb_clean.visit.id_visitor
+    - datalake_ebdb_clean.visit.id_visitor
     description: User id of the user is visiting the house
   id_owner:
     lineage:
-      - datalake_ebdb_clean.house.id_user
+    - datalake_ebdb_clean.house.id_user
     description: User ID of the property owner
   id_agent:
     lineage:
-      - datalake_ebdb_clean.visit.id_agent
+    - datalake_ebdb_clean.visit.id_agent
     description: Agent user who is following the visit
   id_author_user:
     lineage:
-      - datalake_ebdb_clean.visits_status_log
+    - datalake_ebdb_clean.visits_status_log
     description: User who made the last update.
   id_house:
     lineage:
-      - datalake_ebdb_clean.visit.id_house
+    - datalake_ebdb_clean.visit.id_house
     description: Id of the house of interest
   id_house_listing:
     lineage:
@@ -57,55 +56,55 @@ columns:
     description: Id of the trace in the request logging
   sk_broker_supply:
     lineage:
-      - datalake_visit.visit_business_model.sk_broker_supply
+    - datalake_visit.visit_business_model.sk_broker_supply
     description: Surrogate key of the supply-side broker (core_brokers) when the business model implies 3P supply. From visit_business_model.
   sk_broker_demand:
     lineage:
-      - datalake_visit.visit_business_model.sk_broker_demand
+    - datalake_visit.visit_business_model.sk_broker_demand
     description: Surrogate key of the demand-side broker (core_brokers) when the business model implies 3P demand or lead gen. From visit_business_model.
   id_company_supply:
     lineage:
-      - datalake_visit.visit_business_model.id_company_supply
+    - datalake_visit.visit_business_model.id_company_supply
     description: ID of the supply partner from the company domain. Obtained from visit_business_model which consolidates supply partner data.
   uuid_company_supply:
     lineage:
-      - datalake_ebdb_listing.house_listing.uuid_company
+    - datalake_ebdb_listing.house_listing.uuid_company
     description: UUID of the supply partner in the company domain
   id_company_demand:
     lineage:
-      - datalake_visit.visit_business_model.id_company_demand
+    - datalake_visit.visit_business_model.id_company_demand
     description: ID of the demand partner from Hubspot. Obtained from visit_business_model which consolidates demand partner data.
   partner_3p_supply:
     lineage:
-      - datalake_visit.visit_business_model.partner_3p_supply
+    - datalake_visit.visit_business_model.partner_3p_supply
     description: Supply partner name. Obtained from visit_business_model which consolidates supply partner data.
   partner_3p_demand:
     lineage:
-      - datalake_visit.visit_business_model.partner_3p_demand
+    - datalake_visit.visit_business_model.partner_3p_demand
     description: Demand partner name. Obtained from visit_business_model which consolidates demand partner data.
   is_3p_supply:
     lineage:
-      - datalake_visit.visit_business_model.is_3p_supply
+    - datalake_visit.visit_business_model.is_3p_supply
     description: Boolean flag indicating if the visit has 3P supply partner. Obtained from visit_business_model.
   is_3p_demand:
     lineage:
-      - datalake_visit.visit_business_model.is_3p_demand
+    - datalake_visit.visit_business_model.is_3p_demand
     description: Boolean flag indicating if the visit has 3P demand partner. Obtained from visit_business_model.
   is_3p_lead_gen:
     lineage:
-      - datalake_visit.visit_business_model.is_3p_lead_gen
+    - datalake_visit.visit_business_model.is_3p_lead_gen
     description: Boolean flag indicating if the visit has 3P lead generation partner. Obtained from visit_business_model.
   has_3p_access_control:
     lineage:
-      - datalake_visit.visit_business_model.has_3p_access_control
+    - datalake_visit.visit_business_model.has_3p_access_control
     description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). Obtained from visit_business_model.
   event_type:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.event_type
+    - datalake_ebdb_clean.visit_status_log.event_type
     description: Type of event that occurred in the visit status log.
   country_code:
     lineage:
-      - datalake_ebdb_listing.house_listing.country_code
+    - datalake_ebdb_listing.house_listing.country_code
     description: Country code of the property.
   visit_code:
     lineage:
@@ -115,22 +114,22 @@ columns:
     description: The context of the visit, which can be RENT or SALE
   ranking:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.ranking
+    - datalake_ebdb_clean.visit_status_log.ranking
     description: Status numbering of the same visit
   author_user_type:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.author_user_type
+    - datalake_ebdb_clean.visit_status_log.author_user_type
     description: Person source type in our internal products related to the event
     categories:
-          PERSON: The user id comes from the Person internal product and can be joined with it.
-          USUARIO: The user id comes from the Main (EBDB) and can be joined with it.
+      PERSON: The user id comes from the Person internal product and can be joined with it.
+      USUARIO: The user id comes from the Main (EBDB) and can be joined with it.
   author_user_role:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.author_user_role
+    - datalake_ebdb_clean.visit_status_log.author_user_role
     description: Role of the person responsible for that update line
   on_behalf_of:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.on_behalf_of
+    - datalake_ebdb_clean.visit_status_log.on_behalf_of
     description: In whose name that status
   channel:
     lineage:
@@ -140,7 +139,7 @@ columns:
     description: Unified visit channel. The channel is enriched with the host from the request logging in the conversational case.
   application_source:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.application_source
+    - datalake_ebdb_clean.visit_status_log.application_source
     description: Application source of the event
   reason:
     lineage:
@@ -150,9 +149,9 @@ columns:
     description: If it is the last event of that visit in the database
   ts_created:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.ts_created
+    - datalake_ebdb_clean.visit_status_log.ts_created
     description: When the event was created
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.ts_updated
+    - datalake_ebdb_clean.visit_status_log.ts_updated
     description: When the event was updated

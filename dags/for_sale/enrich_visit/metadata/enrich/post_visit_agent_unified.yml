@@ -24,8 +24,8 @@ columns:
     description: Reason of unsuccessful visit finalization by agent.
   event_type:
     lineage:
-      - datalake_ebdb_clean.booking.visit_fup
-      - datalake_visit.visit_status_events.event_type
+    - datalake_ebdb_clean.booking.visit_fup
+    - datalake_visit.visit_status_events.event_type
     description: If the visit was done or unsuccessful.
     categories:
       VISIT_DONE: The visit was done by agent.
@@ -52,6 +52,6 @@ columns:
     description: True if supply (owner) did not attend the unsuccessful visit.
   ts_post_visit_agent:
     lineage:
-      - datalake_ebdb_clean.booking.ts_visit_fup
-      - datalake_visit.visit_status_events.ts_created
+    - datalake_ebdb_clean.booking.ts_visit_fup
+    - datalake_visit.visit_status_events.ts_created
     description: Timestamp when the follow up was collected.

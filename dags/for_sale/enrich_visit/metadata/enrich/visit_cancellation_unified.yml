@@ -1,34 +1,33 @@
 database_name: datalake_visit
 table_name: visit_cancellation_unified
-description: This data model unifies visit cancellation data. Until 2024 coming from booking (last status by visit) and visit_cancellation_details and after 2024 coming from visit_status_log.
-  Each row is an unique visit.
+description: This data model unifies visit cancellation data. Until 2024 coming from booking (last status by visit) and visit_cancellation_details and after 2024 coming from visit_status_log. Each row is an unique visit.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_visit:
     lineage:
-      - datalake_visit.visit_status_events.id_visit
-      - datalake_ebdb_clean.visit_cancellation_details.id_visit
+    - datalake_visit.visit_status_events.id_visit
+    - datalake_ebdb_clean.visit_cancellation_details.id_visit
     description: Primary key of this table. The cancellation information is at visit granularity. Data since 2015.
   id_schedule:
     lineage:
-      - datalake_visit.visit_status_events.id_schedule
-      - datalake_ebdb_clean.booking.id
+    - datalake_visit.visit_status_events.id_schedule
+    - datalake_ebdb_clean.booking.id
     description: ID of schedule (booking) that was cancelled. Data since 2015.
   id_user:
     lineage:
-      - datalake_visit.visit_status_events.id_author_user
-      - datalake_ebdb_clean.booking_status_change.id_user
+    - datalake_visit.visit_status_events.id_author_user
+    - datalake_ebdb_clean.booking_status_change.id_user
     description: ID of user who cancelled the visit. Data since 2015.
   channel:
     lineage:
-      - datalake_visit.visit_status_events.channel
-      - datalake_ebdb_clean.visit_cancellation_details.channel
+    - datalake_visit.visit_status_events.channel
+    - datalake_ebdb_clean.visit_cancellation_details.channel
     description: The channel through which the visit was cancelled. Data since 2024-05.
   on_behalf_of:
     lineage:
-      - datalake_visit.visit_status_events.on_behalf_of
-      - datalake_ebdb_clean.visit_cancellation_details.on_behalf_of
+    - datalake_visit.visit_status_events.on_behalf_of
+    - datalake_ebdb_clean.visit_cancellation_details.on_behalf_of
     description: On whose behalf the visit was cancelled. Data since 2024-05.
     categories:
       SUPPLY: Visit canceled on behalf of the owner.
@@ -37,16 +36,16 @@ columns:
       DEMAND: Visit canceled on behalf of the prospect.
   reason:
     lineage:
-      - datalake_visit.visit_status_events.reason
-      - datalake_ebdb_clean.visit_cancellation_details.reason
+    - datalake_visit.visit_status_events.reason
+    - datalake_ebdb_clean.visit_cancellation_details.reason
     description: Reason why the visit was cancelled. Data since 2024-05.
   author_user_role:
     lineage:
-      - datalake_visit.visit_status_events.author_user_role
+    - datalake_visit.visit_status_events.author_user_role
     description: Role of user who cancelled the visit. Data since 2024-11.
   type:
     lineage:
-      - datalake_visit.visit_status_events.event_type
+    - datalake_visit.visit_status_events.event_type
     description: Type of cancellation. It can be before or after the confirmation. Data since 2024-11.
     categories:
       VISIT_REQUEST_CANCELED: Visit cancelled before the confirmation.
@@ -55,11 +54,11 @@ columns:
     description: True if the visit was cancelled due to expired time. Data since 2024-05.
   ts_created:
     lineage:
-      - datalake_visit.visit_status_events.ts_created
-      - datalake_ebdb_clean.visit_cancellation_details.ts_created
+    - datalake_visit.visit_status_events.ts_created
+    - datalake_ebdb_clean.visit_cancellation_details.ts_created
     description: Timestamp of when the cancelled visits were created. Data since 2015.
   ts_updated:
     lineage:
-      - datalake_visit.visit_status_events.ts_updated
-      - datalake_ebdb_clean.visit_cancellation_details.ts_updated
+    - datalake_visit.visit_status_events.ts_updated
+    - datalake_ebdb_clean.visit_cancellation_details.ts_updated
     description: Timestamp of when the cancelled visits were updated. Data since 2015.

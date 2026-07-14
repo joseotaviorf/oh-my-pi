@@ -1,112 +1,110 @@
----
 database_name: datalake_visit
 table_name: visit_fitting
-description: Information about Rent and Sale visit fitting.
-  Each row is an unique visit fitting solicitation.
+description: Information about Rent and Sale visit fitting. Each row is an unique visit fitting solicitation.
 domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.id
+    - datalake_ebdb_clean.visit_fitting.id
     description: Visit fitting unique ID.
   id_visit:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.id_visit
+    - datalake_ebdb_clean.visit_fitting.id_visit
     description: ID of visit, when the visit was fitted.
   id_visitor:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.id_visitor
-    description:  ID of the Visitor.
+    - datalake_ebdb_clean.visit_fitting.id_visitor
+    description: ID of the visitor (demand user) who requested this visit fitting.
   id_owner:
     lineage:
-      - datalake_ebdb_listing.house.id_user
-    description:  House's Owner ID.
+    - datalake_ebdb_listing.house.id_user
+    description: House's Owner ID.
   id_house:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.id_house
-    description: House's ID.
+    - datalake_ebdb_clean.visit_fitting.id_house
+    description: ID of the house the visitor requested to visit.
   id_house_listing:
     lineage:
-      - datalake_ebdb_listing.house_listing.id_house_listing
-    description: House Listing's ID.
+    - datalake_ebdb_listing.house_listing.id_house_listing
+    description: ID of the house listing version active when the visit fitting was created.
   id_next_visit_fitting_after_discard:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.id_next_visit_fitting_after_discard
+    - datalake_ebdb_clean.visit_fitting.id_next_visit_fitting_after_discard
     description: ID of the new visit request responsible for discarding the current visit request
   country_code:
     lineage:
-      - datalake_ebdb_listing.house_listing.country_code
-    description: Country code.
+    - datalake_ebdb_listing.house_listing.country_code
+    description: Country code of the house listing where the visit was requested.
   business_context:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.business_context
+    - datalake_ebdb_clean.visit_fitting.business_context
     description: If the visit is a Sale context or Rent context.
   intention:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.intention
-    description: Intention of the visit.
+    - datalake_ebdb_clean.visit_fitting.intention
+    description: Declared intention behind the visit fitting request.
   status:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.status
+    - datalake_ebdb_clean.visit_fitting.status
     description: Status about this solicitation.
   channel:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.channel
+    - datalake_ebdb_clean.visit_fitting.channel
     description: What the channel of this solicitation
   request_context:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.request_context
-    description: The context about the request.
+    - datalake_ebdb_clean.visit_fitting.request_context
+    description: Context in which the visit fitting request was made.
   has_fitted_visit_after_expired:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.has_fitted_visit_after_expired
+    - datalake_ebdb_clean.visit_fitting.has_fitted_visit_after_expired
     description: Indicates whether there was a scheduled visit for the Visitor after the visit request expired.
   has_fitted_visit_after_expired_in_same_house:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.has_fitted_visit_after_expired_in_same_house
+    - datalake_ebdb_clean.visit_fitting.has_fitted_visit_after_expired_in_same_house
     description: Indicates whether a visit was scheduled for the Visitor after the visit request expired, however, the house with the scheduled visit is the same as the one in the expired request.
   has_fitted_visit_all_5a_journey:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.has_fitted_visit_all_5a_journey
+    - datalake_ebdb_clean.visit_fitting.has_fitted_visit_all_5a_journey
     description: Indicates whether there was a scheduled visit (originating from a visit request) throughout the user's 5A journey
   dt_visit_desired:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.dt_visit
+    - datalake_ebdb_clean.visit_fitting.dt_visit
     description: Desired date of the visit.
   ts_visit_desired_begin_local_tz:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.dt_visit
-      - datalake_ebdb_clean.visit_fitting.begin_slot
-      - datalake_ebdb_clean.country.default_timezone
+    - datalake_ebdb_clean.visit_fitting.dt_visit
+    - datalake_ebdb_clean.visit_fitting.begin_slot
+    - datalake_ebdb_clean.country.default_timezone
     description: Desired begin date of this visit.
   ts_visit_desired_end_local_tz:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.dt_visit
-      - datalake_ebdb_clean.visit_fitting.end_slot
-      - datalake_ebdb_clean.country.default_timezone
+    - datalake_ebdb_clean.visit_fitting.dt_visit
+    - datalake_ebdb_clean.visit_fitting.end_slot
+    - datalake_ebdb_clean.country.default_timezone
     description: Desired end date of this visit.
   ts_expiration:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.ts_expiration
+    - datalake_ebdb_clean.visit_fitting.ts_expiration
     description: Expiration of the solicitation.
   ts_created:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.ts_created
+    - datalake_ebdb_clean.visit_fitting.ts_created
     description: When was created the solicitation.
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.ts_updated
+    - datalake_ebdb_clean.visit_fitting.ts_updated
     description: When was updated the solicitation.
   year:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.ts_updated
+    - datalake_ebdb_clean.visit_fitting.ts_updated
     description: Year of updated date.
   month:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.ts_updated
+    - datalake_ebdb_clean.visit_fitting.ts_updated
     description: Month of updated date.
   day:
     lineage:
-      - datalake_ebdb_clean.visit_fitting.ts_updated
+    - datalake_ebdb_clean.visit_fitting.ts_updated
     description: Day of updated date.

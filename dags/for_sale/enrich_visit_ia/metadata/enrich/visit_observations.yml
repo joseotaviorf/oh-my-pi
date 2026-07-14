@@ -9,45 +9,45 @@ owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_observation:
     lineage:
-      - datalake_langfuse_clean.observations.id_observation
+    - datalake_langfuse_clean.observations.id_observation
     description: Primary identifier of the Langfuse observation record for the visits tool call.
   id_trace:
     lineage:
-      - datalake_langfuse_clean.observations.id_trace
+    - datalake_langfuse_clean.observations.id_trace
     description: Langfuse trace identifier grouping the conversational session that triggered the tool.
   name:
     lineage:
-      - datalake_langfuse_clean.observations.name
+    - datalake_langfuse_clean.observations.name
     description: Tool observation name in Langfuse, filtered to visits TOOL spans at DEFAULT level.
   visit_code:
     lineage:
-      - datalake_langfuse_clean.observations.input
+    - datalake_langfuse_clean.observations.input
     description: Visit code extracted from the visits tool input JSON payload.
   user_role:
     lineage:
-      - datalake_langfuse_clean.observations.input
+    - datalake_langfuse_clean.observations.input
     description: User role extracted from the visits tool input JSON payload (for example agent or demand).
   event_type:
     lineage:
-      - datalake_langfuse_clean.observations.input
+    - datalake_langfuse_clean.observations.input
     description: Visit event type extracted from the visits tool input JSON payload.
   reason:
     lineage:
-      - datalake_langfuse_clean.observations.input
+    - datalake_langfuse_clean.observations.input
     description: Reason or outcome text extracted from the visits tool input JSON payload.
   ts_started:
     lineage:
-      - datalake_langfuse_clean.observations.ts_started
+    - datalake_langfuse_clean.observations.ts_started
     description: Timestamp when the Langfuse observation started, used as the incremental load watermark.
   year:
     lineage:
-      - datalake_langfuse_clean.observations.ts_started
+    - datalake_langfuse_clean.observations.ts_started
     description: Year extracted from the Langfuse observation start timestamp.
   month:
     lineage:
-      - datalake_langfuse_clean.observations.ts_started
+    - datalake_langfuse_clean.observations.ts_started
     description: Month extracted from the Langfuse observation start timestamp.
   day:
     lineage:
-      - datalake_langfuse_clean.observations.ts_started
+    - datalake_langfuse_clean.observations.ts_started
     description: Day extracted from the Langfuse observation start timestamp.
