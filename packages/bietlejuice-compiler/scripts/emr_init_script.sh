@@ -16,6 +16,161 @@ MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"
 QUINTOANDAR_LOGGER_WHEEL="${QUINTOANDAR_LOGGER_WHEEL:-quintoandar_logger-0.8.0-py3-none-any.whl}"
 REQUESTS_VERSION="${REQUESTS_VERSION:-2.32.5}"
 DATABRICKS_SDK_VERSION="${DATABRICKS_SDK_VERSION:-0.102.0}"
+CLUSTER_YAML_LOCAL="${TMP_DIR}/emr_dag_cluster.yml"
+DAGS_S3_PREFIX="astronomer/dags/dags/"
+
+# Normalize Airflow dag_id → DAG package folder name.
+# bietlejuice.enrich_lost_listings → enrich_lost_listings
+# bietlejuice.enrich_lost_listings__validation → enrich_lost_listings
+_emr_normalize_dag_folder() {
+    local dag_id="$1"
+    local folder="${dag_id#bietlejuice.}"
+    folder="${folder%__validation}"
+    printf '%s' "${folder}"
+}
+
+# Download {dag}_cluster.yml (or _declaration.yml) from the Astronomer DAG bundle on S3.
+# Runs early while EMR awscli is still reliable (later pip installs can break dateutil).
+_emr_download_cluster_yaml() {
+    local dag_folder="$1"
+    local dest="$2"
+    local bucket_name="${ARTIFACTS_BUCKET#s3://}"
+    local domains
+    local domain_prefix
+    local suffix
+    local key
+
+    if [ -z "${dag_folder}" ]; then
+        echo "  WARN: empty dag folder; skipping custom_libraries discovery"
+        return 1
+    fi
+
+    echo "Discovering cluster YAML for dag_folder=${dag_folder} under s3://${bucket_name}/${DAGS_S3_PREFIX}"
+    domains="$(
+        aws s3api list-objects-v2 \
+            --bucket "${bucket_name}" \
+            --prefix "${DAGS_S3_PREFIX}" \
+            --delimiter "/" \
+            --query 'CommonPrefixes[].Prefix' \
+            --output text 2>/dev/null || true
+    )"
+    if [ -z "${domains}" ]; then
+        echo "  WARN: no domain prefixes under ${DAGS_S3_PREFIX}; skipping custom_libraries"
+        return 1
+    fi
+
+    for suffix in "_cluster.yml" "_declaration.yml"; do
+        for domain_prefix in ${domains}; do
+            key="${domain_prefix}${dag_folder}/${dag_folder}${suffix}"
+            if aws s3api head-object --bucket "${bucket_name}" --key "${key}" >/dev/null 2>&1; then
+                echo "  Found s3://${bucket_name}/${key}"
+                if aws s3 cp "s3://${bucket_name}/${key}" "${dest}"; then
+                    return 0
+                fi
+                echo "  WARN: failed to download s3://${bucket_name}/${key}"
+                return 1
+            fi
+        done
+    done
+
+    echo "  WARN: no ${dag_folder}_cluster.yml / _declaration.yml under ${DAGS_S3_PREFIX}; skipping custom_libraries"
+    return 1
+}
+
+# Parse custom_libraries pypi.package entries from a cluster/declaration YAML.
+# Prints one package string per line. Always reads cluster.custom_libraries;
+# when IS_VALIDATION=1 also unions validation.cluster.custom_libraries.
+_emr_extract_pypi_packages() {
+    local cluster_yaml="$1"
+    local is_validation="${2:-0}"
+    IS_VALIDATION="${is_validation}" python3 - "${cluster_yaml}" <<'PY'
+import os
+import sys
+
+import yaml
+
+path = sys.argv[1]
+is_validation = os.environ.get("IS_VALIDATION") == "1"
+with open(path, encoding="utf-8") as fh:
+    data = yaml.safe_load(fh) or {}
+
+packages = []
+
+
+def extract(libs):
+    if not isinstance(libs, list):
+        return
+    for item in libs:
+        if not isinstance(item, dict):
+            continue
+        pypi = item.get("pypi")
+        if isinstance(pypi, dict):
+            package = pypi.get("package")
+            if package:
+                packages.append(str(package).strip())
+
+
+cluster = data.get("cluster") or {}
+extract(cluster.get("custom_libraries"))
+if is_validation:
+    validation_cluster = (data.get("validation") or {}).get("cluster") or {}
+    extract(validation_cluster.get("custom_libraries"))
+
+seen = set()
+for pkg in packages:
+    if pkg and pkg not in seen:
+        seen.add(pkg)
+        print(pkg)
+PY
+}
+
+# Install DAG-level custom_libraries PyPI packages (Databricks parity on EMR).
+_emr_install_custom_pypi_libraries() {
+    local cluster_yaml="$1"
+    local is_validation="${2:-0}"
+    local packages
+    local pkg
+
+    echo "BEGIN: Install custom_libraries PyPI packages from cluster YAML"
+
+    if [ ! -f "${cluster_yaml}" ]; then
+        echo "  WARN: cluster YAML not present at ${cluster_yaml}; skipping"
+        echo "END: Install custom_libraries PyPI packages (skipped)"
+        return 0
+    fi
+
+    if ! packages="$(_emr_extract_pypi_packages "${cluster_yaml}" "${is_validation}")"; then
+        echo "Error: failed to parse custom_libraries from ${cluster_yaml}"
+        exit 1
+    fi
+
+    if [ -z "${packages}" ]; then
+        echo "  No pypi entries in custom_libraries; nothing to install"
+        echo "END: Install custom_libraries PyPI packages (none)"
+        return 0
+    fi
+
+    echo "  Packages to install:"
+    while IFS= read -r pkg; do
+        [ -z "${pkg}" ] && continue
+        echo "    ${pkg}"
+    done <<EOF
+${packages}
+EOF
+
+    while IFS= read -r pkg; do
+        [ -z "${pkg}" ] && continue
+        echo "  Installing ${pkg}..."
+        if ! $PIP_EXEC install --no-cache-dir -c "${EMR_CONSTRAINTS}" "${pkg}"; then
+            echo "Error: pip install of custom_libraries package '${pkg}' failed."
+            exit 1
+        fi
+    done <<EOF
+${packages}
+EOF
+
+    echo "END: Install custom_libraries PyPI packages"
+}
 
 echo "BEGIN: Install QuintoAndar internal libs"
 
@@ -46,6 +201,25 @@ else
             --key "spark-event-logs-emr/${AIRFLOW_DAG_ID}/" \
             || echo "  WARN: failed to create Spark event-log prefix"
         echo "END: Create Spark event-log directory"
+    fi
+
+    # Fetch cluster YAML early (awscli still intact) for later custom_libraries install.
+    EMR_IS_VALIDATION=0
+    case "${AIRFLOW_DAG_ID}" in
+        *__validation) EMR_IS_VALIDATION=1 ;;
+    esac
+    if [ -n "${AIRFLOW_DAG_ID}" ]; then
+        echo "BEGIN: Download DAG cluster YAML for custom_libraries"
+        EMR_DAG_FOLDER="$(_emr_normalize_dag_folder "${AIRFLOW_DAG_ID}")"
+        echo "  airflow_dag_id=${AIRFLOW_DAG_ID} dag_folder=${EMR_DAG_FOLDER} is_validation=${EMR_IS_VALIDATION}"
+        _emr_download_cluster_yaml "${EMR_DAG_FOLDER}" "${CLUSTER_YAML_LOCAL}" \
+            || rm -f "${CLUSTER_YAML_LOCAL}"
+        echo "END: Download DAG cluster YAML for custom_libraries"
+    else
+        # Drop any leftover from a prior bootstrap on this host so install cannot
+        # pick up another DAG's custom_libraries via the fixed CLUSTER_YAML_LOCAL path.
+        echo "WARN: AIRFLOW_DAG_ID not set; skipping custom_libraries discovery"
+        rm -f "${CLUSTER_YAML_LOCAL}"
     fi
 fi
 
@@ -179,6 +353,14 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
     if ! python3 -c 'import pandas; major, minor, *_ = (int(x) for x in pandas.__version__.split(".")[:2]); raise SystemExit(0 if (major, minor) >= (2, 0) else 1)' 2>/dev/null; then
         echo "Installing pandas>=2.0.0,<3 for inmetro ${INMETRO_VERSION}..."
         $PIP_EXEC install --no-cache-dir 'pandas>=2.0.0,<3'
+    fi
+
+    # Databricks custom_libraries (pypi) parity — after all aws s3 cp (JARs/wheels).
+    # Extra pip resolver work can break python-dateutil / awscli; cluster YAML was
+    # fetched early for that reason. Only install when this bootstrap discovered YAML
+    # for AIRFLOW_DAG_ID (file was cleared when discovery was skipped).
+    if [ -n "${AIRFLOW_DAG_ID:-}" ]; then
+        _emr_install_custom_pypi_libraries "${CLUSTER_YAML_LOCAL}" "${EMR_IS_VALIDATION:-0}"
     fi
 
     echo "Restoring python-dateutil for awscli compatibility..."
