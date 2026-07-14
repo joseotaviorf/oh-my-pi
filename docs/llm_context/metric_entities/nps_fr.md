@@ -199,8 +199,14 @@ hardcode**. The **same weights** serve NPS True and PP Multi.
 
 - **Join key**: `campaign_group` ↔ journey derived from `metric_group`.
 - **Date join**: `CAST(ref_month AS DATE) BETWEEN dt_start AND dt_end`.
-- **Fallback**: a month without a registered quarter uses the most recent weight per journey
-  (`ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end DESC)`).
+- **Fallback (expected behavior, not a data issue)**: a month without a registered quarter uses
+  the most recent weight per journey (`ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end
+  DESC)`). This is a **designed fallback**, not a data quality problem —
+  `weight_source = 'fallback'` on Query 1 / Query 3 is expected by itself and is not grounds to
+  flag the number as incomplete or at risk. It is only worth escalating when it fires for a
+  quarter that has **already closed** (the CX team should have registered a weight for it by
+  now, but didn't) — a fallback on the **current, still-open** quarter, before the CX team
+  registers the new weight, is the normal, expected state.
 
 **`is_spoc_test` flag** (SPOC / AS IS) — **already available in `sandbox.nps_fr`** (alongside
 `spoc_team` = `'BAU'`/`'LAB'`); consume the column directly. For reference, the derivation from
