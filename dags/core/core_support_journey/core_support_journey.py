@@ -188,7 +188,7 @@ with DAG(
     end = SStPlaceholderOperator(task_id="end")
     execute_job_cluster = create_execute_job_cluster_task(dag_execution_context)
 
-    external_sensors = external_sensors()
+    # external_sensors = external_sensors()
 
     load_tasks = []
     for stem, _spec in list_table_specs_from_dir(TABLES_DIR):
@@ -209,7 +209,7 @@ with DAG(
 
     (
         start
-        >> external_sensors
+        # >> external_sensors
         >> execute_job_cluster
         >> load_tasks
         >> cluster_completion_sink
