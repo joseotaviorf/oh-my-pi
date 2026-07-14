@@ -5,11 +5,15 @@ cluster:
     num_workers: 3
     runtime_engine: PHOTON
     driver_node_type_id: r7g.xlarge
-# events_exploded is memory-bound (FROM_JSON on Amplitude props); general L OOM'd (exit 137) on m6g.4xlarge / 24g executors.
+# events_exploded is memory-bound (FROM_JSON on Amplitude props). L-memory preset (48g/4 cores)
+# still OOM'd (exit 137) on j-3HXJINPZEQK2S — pack ~1 fat executor per r6g.4xlarge instead of ~2.
 validation:
   cluster:
     type: emr_7_12_consolidation_l_memory_fleet_cluster
     custom_configurations:
       spark_conf:
-        spark.sql.shuffle.partitions: "200"
+        spark.executor.memory: "96g"
+        spark.executor.memoryOverhead: "8g"
+        spark.executor.cores: "8"
+        spark.sql.shuffle.partitions: "400"
         spark.sql.execution.arrow.maxRecordsPerBatch: "10000"
