@@ -66,7 +66,7 @@ Return duplicate list to caller
 
 ## Entity-relationship diagram
 
-The diagram shows **all tables in the production `propertydedup` database**. Ingested tables (`similar_property`, `duplicity_output`) use **clean layer** naming (`datalake_property_dedup_clean`); non-ingested tables use their OLTP column names. Only `duplicity_output → similar_property` is a real DB foreign key; audit/`rev` links and cross-system IDs are logical references.
+The diagram shows **all tables in the production `propertydedup` database**. Ingested tables (`similar_property`, `duplicity_output`, `dedup_complement_parse_audit`) use **clean layer** naming (`datalake_property_dedup_clean`); non-ingested tables use their OLTP column names. Only `duplicity_output → similar_property` is a real DB foreign key; audit/`rev` links and cross-system IDs are logical references.
 
 ```mermaid
 erDiagram
@@ -137,6 +137,30 @@ erDiagram
         timestamptz ts_decision
         timestamptz created_at
         timestamptz updated_at
+    }
+
+    dedup_complement_parse_audit {
+        bigint id PK
+        varchar id_external
+        bigint id_property
+        varchar id_trace
+        text complement_raw
+        varchar mode_requested
+        varchar strategy_used
+        text primary_hit_ids_pre_cep
+        text shadow_hit_ids_pre_cep
+        text primary_hit_ids_post_cep
+        text shadow_hit_ids_post_cep
+        boolean search_diverged
+        boolean cep_filtered_diverged
+        varchar action_primary
+        varchar action_shadow
+        boolean actions_match
+        boolean async_evaluated
+        timestamptz ts_async_completed
+        timestamptz ts_decision
+        timestamptz ts_created
+        timestamptz ts_updated
     }
 
     similar_property_aud {
@@ -449,11 +473,49 @@ Rules-engine outcome for a single `similar_property` candidate. Persisted 1:1 wi
 
 ---
 
+### `dedup_complement_parse_audit`
+
+Complement parser shadow audit — one row per dedup request when audit is enabled. Compares legacy regex vs Atlas address-parser outputs, vespucio search divergence, and (after async enrichment) full duplicity pipeline actions. Grain: one row per audited request. **PK:** `id` (`BIGSERIAL`). Indexed on `external_id`, `property_id`, `created_at`.
+
+| Column (OLTP) | Clean alias | Type | Nullable | Notes |
+|---|---|---|---|---|
+| `id` | `id` | BIGSERIAL | NOT NULL | **PK** |
+| `external_id` | `id_external` | VARCHAR | NULL | 3P external listing id |
+| `property_id` | `id_property` | BIGINT | NULL | Main property id |
+| `trace_id` | `id_trace` | VARCHAR | NULL | Request trace id |
+| `complement_raw` | `complement_raw` | TEXT | NULL | Original complement string |
+| `mode_requested` | `mode_requested` | VARCHAR | NULL | LEGACY, ATLAS, AUTO, SHADOW |
+| `strategy_used` | `strategy_used` | VARCHAR | NULL | NONE, LEGACY, ATLAS, LEGACY_FALLBACK |
+| `fallback_reason` | `fallback_reason` | VARCHAR | NULL | Atlas fallback reason |
+| `legacy_unit` / `legacy_building` | same | VARCHAR | NULL | Legacy parser output |
+| `legacy_empty` | `legacy_empty` | BOOLEAN | NULL | |
+| `atlas_unit` / `atlas_building` | same | VARCHAR | NULL | Atlas parser output |
+| `atlas_empty` | `atlas_empty` | BOOLEAN | NULL | |
+| `atlas_error` | `atlas_error` | TEXT | NULL | |
+| `components_match` | `components_match` | BOOLEAN | NULL | Parsers agree on unit+building |
+| `primary_total_hits` / `shadow_total_hits` | same | INTEGER | NULL | ES hit counts |
+| `search_diverged` | `search_diverged` | BOOLEAN | NULL | ES result sets differ |
+| `primary_hit_ids_pre_cep` | `primary_hit_ids_pre_cep` | TEXT | NULL | JSON array of house IDs pre-CEP (V11) |
+| `shadow_hit_ids_pre_cep` | `shadow_hit_ids_pre_cep` | TEXT | NULL | JSON array of house IDs pre-CEP (V11) |
+| `primary_hit_ids_post_cep` | `primary_hit_ids_post_cep` | TEXT | NULL | JSON array post-CEP filter |
+| `shadow_hit_ids_post_cep` | `shadow_hit_ids_post_cep` | TEXT | NULL | JSON array post-CEP filter |
+| `cep_filtered_diverged` | `cep_filtered_diverged` | BOOLEAN | NULL | Post-CEP ID sets differ |
+| `action_primary` / `action_shadow` | same | VARCHAR | NULL | BLOCK, ALERT, ALLOW (async) |
+| `actions_match` | `actions_match` | BOOLEAN | NULL | Production decision would change |
+| `async_evaluated` | `async_evaluated` | BOOLEAN | NOT NULL | DEFAULT false |
+| `async_completed_at` | `ts_async_completed` | TIMESTAMPTZ | NULL | |
+| `ts_decision` | `ts_decision` | TIMESTAMPTZ | NOT NULL | Sync audit timestamp |
+| `created_at` | `ts_created` | TIMESTAMPTZ | NOT NULL | DEFAULT `now()` |
+| `updated_at` | `ts_updated` | TIMESTAMPTZ | NOT NULL | DEFAULT `now()` |
+
+---
+
 ## Sensitive columns summary
 
 | Table | Columns | Handling |
 |---|---|---|
 | `similar_property` | `address` (street, lat/lng) | Location PII — may contain full address |
+| `dedup_complement_parse_audit` | `complement_raw` | May contain apartment/building complement text |
 
 ---
 
@@ -461,5 +523,5 @@ Rules-engine outcome for a single `similar_property` candidate. Persisted 1:1 wi
 
 | Layer | Schema | Tables |
 |---|---|---|
-| Raw | `datalake_property_dedup_raw` | 2 source tables (CDC) |
-| Clean | `datalake_property_dedup_clean` | 2 normalized tables (`similar_property`, `duplicity_output`) |
+| Raw | `datalake_property_dedup_raw` | 3 source tables (CDC) |
+| Clean | `datalake_property_dedup_clean` | 3 normalized tables (`similar_property`, `duplicity_output`, `dedup_complement_parse_audit`) |
