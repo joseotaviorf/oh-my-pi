@@ -41,11 +41,3 @@ workflow:
       clean_table_name: webhook_request
     asset:
       clean_table_name: asset
-    credit_line:
-      clean_table_name: credit_line
-    credit_line_draw:
-      clean_table_name: credit_line_draw
-    credit_line_draw_status:
-      clean_table_name: credit_line_draw_status
-    credit_line_status:
-      clean_table_name: credit_line_status
