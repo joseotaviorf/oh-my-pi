@@ -1,13 +1,9 @@
 cluster:
-  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
-    master_node_type_id: m6g.xlarge
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      spark.driver.memory: 3g
-      spark.driver.memoryOverhead: 1g
-      spark.yarn.am.memory: 512m
     core_nodes:
       target_on_demand: 2
       target_spot: 0

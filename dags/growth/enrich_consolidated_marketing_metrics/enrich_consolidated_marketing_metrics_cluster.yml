@@ -1,5 +1,5 @@
 cluster:
-  type: emr_7_12_consolidation_xs_memory_fleet_cluster
+  type: emr_7_12_consolidation_s_memory_fleet_cluster
   custom_configurations:
     core_nodes:
       target_on_demand: 2
@@ -17,7 +17,3 @@ cluster:
       target_spot: 1
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
-    spark_conf:
-      spark.driver.memory: 3g
-      spark.driver.memoryOverhead: 1g
-      spark.yarn.am.memory: 512m

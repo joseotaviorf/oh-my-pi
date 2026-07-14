@@ -5,8 +5,8 @@ cluster:
     master_node_type_id: r6g.2xlarge
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      spark.driver.memory: 6g
-      spark.driver.memoryOverhead: 1g
+      spark.driver.memory: 8g
+      spark.driver.memoryOverhead: 2g
       spark.yarn.am.memory: 2g
     aws_attributes:
       ebs_volume_size: 200
