@@ -309,9 +309,11 @@ WITH invoice_all AS (
         i.account_type,
         i.account_classification,
         i.status,
+        re.status AS entry_status,
         i.payment_status,
         i.reason,
         i.producer,
+        re.producer AS entry_producer,
         i.closing_mode,
         i.paid_via,
         i.entry_created_time,
@@ -323,6 +325,7 @@ WITH invoice_all AS (
         i.is_reversed,
         i.is_write_off,
         i.is_not_invoiceable_inconsiderable,
+        re.is_not_invoicable,
         i.has_negotiation,
         i.has_installments,
         i.due_amount,
@@ -373,6 +376,10 @@ WITH invoice_all AS (
         i.invoice_paid_date_next_business_day,
         i.real_invoice_paid_date,
         i.contract_start,
-        i.contract_annulment
+        i.contract_annulment,
+        re.ts_retsuko_updated
     FROM
-        invoice_classification AS i 
+        invoice_classification AS i
+    LEFT JOIN
+        datalake_retsuko_clean.entry AS re
+            ON re.id_external = i.id_entry

@@ -1480,6 +1480,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.monopoly:load-clean-sale-revision:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale-transaction:first-run-of-day
   - bietlejuice.monopoly:load-clean-sale:first-run-of-day
+  - bietlejuice.retsuko:load-clean-entry:first-run-of-day
   - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-source:first-run-of-day

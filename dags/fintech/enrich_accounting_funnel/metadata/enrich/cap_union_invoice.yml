@@ -100,6 +100,10 @@ columns:
       - datalake_accounting_funnel.invoice_all.status
       - datalake_accounting_funnel.accounts_payable.status
     description: "Description of payment status"
+  entry_status:
+    lineage:
+      - datalake_retsuko_clean.entry.status
+    description: "Retsuko entry status indicating if the entry is pending (not-invoiceable) or success; NULL on CAP rows without id_entry"
   payment_status:
     lineage:
       - datalake_accounting_funnel.invoice_all.payment_status
@@ -112,6 +116,10 @@ columns:
     lineage:
       - datalake_accounting_funnel.invoice_all.producer
     description: "Routine that produced the entry; NULL on CAP union rows"
+  entry_producer:
+    lineage:
+      - datalake_retsuko_clean.entry.producer
+    description: "System or service that produced the entry in Retsuko; NULL on CAP rows without id_entry"
   closing_mode:
     lineage:
       - datalake_accounting_funnel.invoice_all.closing_mode
@@ -176,6 +184,10 @@ columns:
       - datalake_accounting_funnel.invoice_all.is_not_invoiceable_inconsiderable
       - datalake_accounting_funnel.accounts_payable.is_not_invoiceable_inconsiderable
     description: "Flag that indicates, if true, that an entry is a not-invoiceable/reversed inconsiderable"
+  is_not_invoicable:
+    lineage:
+      - datalake_retsuko_clean.entry.is_not_invoicable
+    description: "Flag from Retsuko indicating whether the entry is not-invoiceable; NULL on CAP rows without id_entry"
   has_negotiation:
     lineage:
       - datalake_accounting_funnel.invoice_all.has_negotiation
@@ -379,3 +391,7 @@ columns:
       - datalake_accounting_funnel.invoice_all.contract_annulment
       - datalake_accounting_funnel.accounts_payable.contract_annulment
     description: "Annulment of contract date"
+  ts_retsuko_updated:
+    lineage:
+      - datalake_retsuko_clean.entry.ts_retsuko_updated
+    description: "Last update timestamp of the entry in Retsuko; NULL on CAP rows without id_entry"
