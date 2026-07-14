@@ -1,0 +1,69 @@
+---
+database_name: datalake_big_agent_clean
+table_name: partner_metric_monthly_aggregate
+description: |
+  Cleaned monthly aggregate of partner metrics, keeping the highest revision
+  observed per partner/metric/reference month, with partitions.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.id
+    description: Partner metric monthly aggregate record identifier.
+  id_partner_external:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.partner_external_id
+    description: External identifier of the partner.
+  id_user:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.user_id
+    description: Identifier of the user associated to the partner.
+  partner_external_type:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.partner_external_type
+    description: External partner type discriminator.
+  metric_name:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.metric_name
+    description: Name of the aggregated metric.
+  dt_reference:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.reference_date
+    description: Reference month/date of the aggregated metric.
+  metric_value:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.metric_value
+    description: Aggregated value of the metric for the partner/reference date.
+  highest_revision:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.highest_revision
+    description: Highest revision number considered when producing the aggregate.
+  ts_highest_source_updated:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.highest_source_updated_at
+    description: Timestamp of the last update from the source that produced the highest revision.
+  source:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.source
+    description: Origin of the aggregate (e.g. AGENT_METRIC_EVENTS, ACCREDITATION_BACKFILL).
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.created_at
+    description: Creation timestamp of the raw record.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.updated_at
+    description: Last update timestamp of the raw record.
+  year:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.year
+    description: Partition year.
+  month:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.month
+    description: Partition month.
+  day:
+    lineage:
+      - datalake_big_agent_raw.partner_metric_monthly_aggregate.day
+    description: Partition day.

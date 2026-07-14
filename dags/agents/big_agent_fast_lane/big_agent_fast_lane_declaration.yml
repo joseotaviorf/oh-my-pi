@@ -61,6 +61,7 @@ workflow:
     partner_metric_aud: {}
     partner_metric_manual_ingestion_info: {}
     partner_metric_manual_ingestion_info_aud: {}
+    partner_metric_monthly_aggregate: {}
     partner_tier: {}
     partner_tier_aud: {}
     partner_tier_overwritten_info: {}
