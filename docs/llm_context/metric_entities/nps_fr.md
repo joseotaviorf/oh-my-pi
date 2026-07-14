@@ -203,10 +203,9 @@ hardcode**. The **same weights** serve NPS True and PP Multi.
   the most recent weight per journey (`ROW_NUMBER() OVER (PARTITION BY journey ORDER BY dt_end
   DESC)`). This is a **designed fallback**, not a data quality problem —
   `weight_source = 'fallback'` on Query 1 / Query 3 is expected by itself and is not grounds to
-  flag the number as incomplete or at risk. It is only worth escalating when it fires for a
-  quarter that has **already closed** (the CX team should have registered a weight for it by
-  now, but didn't) — a fallback on the **current, still-open** quarter, before the CX team
-  registers the new weight, is the normal, expected state.
+  flag the number as incomplete or at risk, no matter how outdated the fallback weight is or how
+  long the quarter it applies to has been closed without a registered weight. It is never
+  necessary to escalate or call attention to the weights used.
 
 **`is_spoc_test` flag** (SPOC / AS IS) — **already available in `sandbox.nps_fr`** (alongside
 `spoc_team` = `'BAU'`/`'LAB'`); consume the column directly. For reference, the derivation from
