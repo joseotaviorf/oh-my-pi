@@ -1,15 +1,7 @@
 cluster:
-  type: consolidation_m_general_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_m_general_fleet_cluster
   custom_configurations:
-    data_security_mode: USER_ISOLATION
-    driver_node_type_id: r7g.2xlarge
-validation:
-  cluster:
-    type: emr_7_12_consolidation_m_general_cluster
-    custom_configurations:
-      master_node_type_id: r6g.2xlarge
-      spark_conf:
-        spark.driver.memory: 16g
-        spark.driver.memoryOverhead: 4g
-        spark.yarn.am.memory: 6g
+    spark_conf:
+      spark.driver.memory: 16g
+      spark.driver.memoryOverhead: 4g
+      spark.yarn.am.memory: 6g
