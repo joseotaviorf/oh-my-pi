@@ -1,32 +1,42 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: user_house_brokerage
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.id
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.id
+    description: Surrogate primary key of the user house brokerage row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.imovel_id
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.usuario_id
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.criado_por
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.criado_por
+    description: Identifier of the user who created this agent-to-property commission assignment.
   removed_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.removido_por
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.removido_por
+    description: Identifier of the user who removed this agent-to-property commission assignment.
   brokerage_fee:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.comissao
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.comissao
+    description: Brokerage commission attributed to this user for the property.
   is_principal:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.principal
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.principal
+    description: Boolean flag indicating whether principal applies to this record.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.criado_em
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_deleted:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.deletado_em
+    - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.deletado_em
+    description: Timestamp when this agent-to-property commission assignment was soft-deleted in the source CRM.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of user house brokerage sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per user house brokerage record with standardized names and types in datalake_casa_mineira_crm_clean.

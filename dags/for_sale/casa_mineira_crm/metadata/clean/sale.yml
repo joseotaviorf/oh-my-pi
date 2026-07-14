@@ -1,50 +1,66 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: sale
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.id
+    - datalake_casa_mineira_crm_raw.venda.id
+    description: Surrogate primary key of the sale row in the source system.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.usuario_id
+    - datalake_casa_mineira_crm_raw.venda.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.imovel_id
+    - datalake_casa_mineira_crm_raw.venda.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.cliente_id
+    - datalake_casa_mineira_crm_raw.venda.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   buyer_email:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.comprador_email
+    - datalake_casa_mineira_crm_raw.venda.comprador_email
+    description: Contact email address of the buyer in this sale.
   buyer_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.comprador_nome
+    - datalake_casa_mineira_crm_raw.venda.comprador_nome
+    description: Full name of the buyer in this sale.
   buyer_phone_number:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.comprador_telefone
+    - datalake_casa_mineira_crm_raw.venda.comprador_telefone
+    description: Contact phone number of the buyer in this sale.
   acquisition_brokerage_fee:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.porcentagem_comissao_captacao
+    - datalake_casa_mineira_crm_raw.venda.porcentagem_comissao_captacao
+    description: Brokerage commission percentage attributed to the acquisition (listing capture) side of this sale.
   listing_sale_price:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.preco_anunciado
+    - datalake_casa_mineira_crm_raw.venda.preco_anunciado
+    description: Advertised listing price of the property at the time of sale.
   sale_price_agreed:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.preco_negociado
+    - datalake_casa_mineira_crm_raw.venda.preco_negociado
+    description: Final negotiated sale price agreed between buyer and seller.
   brokarage_fee_agreed:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.comissao_negociada
+    - datalake_casa_mineira_crm_raw.venda.comissao_negociada
+    description: Final negotiated brokerage commission agreed for this sale.
   bonus:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.bonus
+    - datalake_casa_mineira_crm_raw.venda.bonus
+    description: Additional bonus amount applied to this sale.
   ts_sold:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.vendido_em
+    - datalake_casa_mineira_crm_raw.venda.vendido_em
+    description: Timestamp when the sale was closed in the source CRM.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.criado_em
+    - datalake_casa_mineira_crm_raw.venda.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda.atualizado_em
+    - datalake_casa_mineira_crm_raw.venda.atualizado_em
+    description: Timestamp when the row was last updated in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per sale record with standardized names and types in datalake_casa_mineira_crm_clean.

@@ -1,44 +1,58 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: owner
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.id
+    - datalake_casa_mineira_crm_raw.proprietario.id
+    description: Surrogate primary key of the owner row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.imovel_id
+    - datalake_casa_mineira_crm_raw.proprietario.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   owner_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.tipo
+    - datalake_casa_mineira_crm_raw.proprietario.tipo
+    description: Classification of the property owner, distinguishing individual (pessoa fisica) from company (pessoa juridica) records.
   owner_neighborhood:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.bairro
+    - datalake_casa_mineira_crm_raw.proprietario.bairro
+    description: Neighborhood of the owner address as registered in the source CRM.
   owner_city:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.cidade
+    - datalake_casa_mineira_crm_raw.proprietario.cidade
+    description: City of the owner address as registered in the source CRM.
   owner_uf:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.uf
+    - datalake_casa_mineira_crm_raw.proprietario.uf
+    description: Brazilian state (UF) of the owner address as registered in the source CRM.
   owner_zip_code:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.cep
+    - datalake_casa_mineira_crm_raw.proprietario.cep
+    description: Postal code (CEP) of the owner address as registered in the source CRM.
   name:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.nome
+    - datalake_casa_mineira_crm_raw.proprietario.nome
+    description: Human-readable display name associated with the person or entity in this row.
   email:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.email
+    - datalake_casa_mineira_crm_raw.proprietario.email
+    description: Contact email address used for notifications and identity matching.
   phone:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.telefone
+    - datalake_casa_mineira_crm_raw.proprietario.telefone
+    description: Contact phone number stored for coordination during the For Sale transaction.
   address:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.endereco
+    - datalake_casa_mineira_crm_raw.proprietario.endereco
+    description: Street address (logradouro) of the owner as registered in the source CRM.
   observation:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.observacao
+    - datalake_casa_mineira_crm_raw.proprietario.observacao
+    description: Free-text notes recorded by the agent about the owner.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario.criado_em
+    - datalake_casa_mineira_crm_raw.proprietario.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of owner sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per owner record with standardized names and types in datalake_casa_mineira_crm_clean.

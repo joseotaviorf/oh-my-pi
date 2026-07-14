@@ -1,47 +1,62 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: visit
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.id
+    - datalake_casa_mineira_crm_raw.visita.id
+    description: Surrogate primary key of the visit row in the source system.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.cliente_id
+    - datalake_casa_mineira_crm_raw.visita.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   id_form:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.ficha_id
+    - datalake_casa_mineira_crm_raw.visita.ficha_id
+    description: Foreign key to the visit form (ficha) associated with this visit in the source CRM.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.imovel_id
+    - datalake_casa_mineira_crm_raw.visita.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_request:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.solicitacao_id
+    - datalake_casa_mineira_crm_raw.visita.solicitacao_id
+    description: Foreign key to the originating request (solicitacao) that generated this visit in the source CRM.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.usuario_id
+    - datalake_casa_mineira_crm_raw.visita.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   id_user_validation:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.usuario_validacao_id
+    - datalake_casa_mineira_crm_raw.visita.usuario_validacao_id
+    description: Foreign key to the user in datalake_casa_mineira_crm_clean.user who validated this visit.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.criado_por
+    - datalake_casa_mineira_crm_raw.visita.criado_por
+    description: Identifier of the user who created this visit record in the source CRM.
   validation_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.validacao
+    - datalake_casa_mineira_crm_raw.visita.validacao
+    description: Type or outcome of the visit validation performed.
   observation:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.observacao
+    - datalake_casa_mineira_crm_raw.visita.observacao
+    description: Free-text notes recorded by the agent about the visit.
   is_virtual:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.virtual
+    - datalake_casa_mineira_crm_raw.visita.virtual
+    description: Boolean flag indicating whether virtual applies to this record.
   ts_visited:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.visita_em
+    - datalake_casa_mineira_crm_raw.visita.visita_em
+    description: Timestamp when the property visit took place.
   ts_validated:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.validado_em
+    - datalake_casa_mineira_crm_raw.visita.validado_em
+    description: Timestamp when the visit was validated in the source CRM.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.visita.criado_em
+    - datalake_casa_mineira_crm_raw.visita.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of visit sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per visit record with standardized names and types in datalake_casa_mineira_crm_clean.

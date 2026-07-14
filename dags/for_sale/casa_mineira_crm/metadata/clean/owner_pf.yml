@@ -1,50 +1,66 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: owner_pf
 domain: For Sale
-columns: 
+columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.id
-  proprietario_id:
+    - datalake_casa_mineira_crm_raw.proprietario_pf.id
+    description: Surrogate primary key of the owner pf row in the source system.
+  id_owner:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.proprietario_id
+    - datalake_casa_mineira_crm_raw.proprietario_pf.proprietario_id
+    description: Foreign key to the owner in datalake_casa_mineira_crm_clean.owner that this individual-person detail row extends.
   cpf:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.cpf
+    - datalake_casa_mineira_crm_raw.proprietario_pf.cpf
+    description: Brazilian individual taxpayer registry number (CPF) of the owner.
   rg:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.rg
+    - datalake_casa_mineira_crm_raw.proprietario_pf.rg
+    description: Brazilian general registry identity document number (RG) of the owner.
   profession:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.profissao
+    - datalake_casa_mineira_crm_raw.proprietario_pf.profissao
+    description: Declared profession or occupation of the individual owner.
   marital_status:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.estado_civil
+    - datalake_casa_mineira_crm_raw.proprietario_pf.estado_civil
+    description: Marital status of the individual owner as registered in the source CRM.
   spouse_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_nome
+    - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_nome
+    description: Full name of the owner spouse.
   spouse_email:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_email
+    - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_email
+    description: Contact email address of the owner spouse.
   spouse_phone:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_telefone
+    - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_telefone
+    description: Contact phone number of the owner spouse.
   spouse_cpf:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_cpf
+    - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_cpf
+    description: Brazilian individual taxpayer registry number (CPF) of the owner spouse.
   spouse_rg:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_rg
+    - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_rg
+    description: Brazilian general registry identity document number (RG) of the owner spouse.
   spouse_profession:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_profissao
+    - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_profissao
+    description: Declared profession or occupation of the owner spouse.
   dt_birth:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.data_nascimento
+    - datalake_casa_mineira_crm_raw.proprietario_pf.data_nascimento
+    description: Calendar date of birth for this owner pf record.
   dt_spouse_birth:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_data_nascimento
+    - datalake_casa_mineira_crm_raw.proprietario_pf.conjuge_data_nascimento
+    description: Calendar date of spouse birth for this owner pf record.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pf.criado_em
+    - datalake_casa_mineira_crm_raw.proprietario_pf.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of owner pf sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per owner pf record with standardized names and types in datalake_casa_mineira_crm_clean.

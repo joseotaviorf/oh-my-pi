@@ -1,44 +1,58 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: unit
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.id
+    - datalake_casa_mineira_crm_raw.unidade.id
+    description: Surrogate primary key of the unit row in the source system.
   id_neighborhood:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.bairro_id
+    - datalake_casa_mineira_crm_raw.unidade.bairro_id
+    description: Foreign key to the neighborhood where this Casa Mineira franchise unit is located.
   unit_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.nome
+    - datalake_casa_mineira_crm_raw.unidade.nome
+    description: Display name of the Casa Mineira franchise unit.
   business_unit:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.hub
+    - datalake_casa_mineira_crm_raw.unidade.hub
+    description: Business hub the unit belongs to within Casa Mineira operations.
   unit_slug_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.slug
+    - datalake_casa_mineira_crm_raw.unidade.slug
+    description: URL-friendly slug derived from the unit name.
   address:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.logradouro
+    - datalake_casa_mineira_crm_raw.unidade.logradouro
+    description: Street address (logradouro) where the unit is located.
   unit_number:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.numero
+    - datalake_casa_mineira_crm_raw.unidade.numero
+    description: Street number of the unit address.
   address_complement:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.complemento
+    - datalake_casa_mineira_crm_raw.unidade.complemento
+    description: Address complement of the unit, such as suite or floor.
   phone_for_sale:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.telefone_venda
+    - datalake_casa_mineira_crm_raw.unidade.telefone_venda
+    description: Phone number used by the unit for sale (venda) inquiries.
   phone_for_rent:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.telefone_aluguel
+    - datalake_casa_mineira_crm_raw.unidade.telefone_aluguel
+    description: Phone number used by the unit for rental (aluguel) inquiries.
   is_visible:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.visivel
+    - datalake_casa_mineira_crm_raw.unidade.visivel
+    description: Boolean flag indicating whether visible applies to this record.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.criado_em
+    - datalake_casa_mineira_crm_raw.unidade.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_disabled:
     lineage:
-      - datalake_casa_mineira_crm_raw.unidade.desativado_em
+    - datalake_casa_mineira_crm_raw.unidade.desativado_em
+    description: Timestamp when the unit was deactivated in the source CRM.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of unit sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per unit record with standardized names and types in datalake_casa_mineira_crm_clean.

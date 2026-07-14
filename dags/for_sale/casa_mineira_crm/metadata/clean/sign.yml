@@ -1,41 +1,54 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: sign
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.id
+    - datalake_casa_mineira_crm_raw.placa.id
+    description: Surrogate primary key of the sign row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.imovel_id
+    - datalake_casa_mineira_crm_raw.placa.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.usuario_id
+    - datalake_casa_mineira_crm_raw.placa.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   id_user_scheduling:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.usuario_agendamento_id
+    - datalake_casa_mineira_crm_raw.placa.usuario_agendamento_id
+    description: Foreign key to the user in datalake_casa_mineira_crm_clean.user who scheduled the sign installation.
   entry_form:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.forma_entrada
+    - datalake_casa_mineira_crm_raw.placa.forma_entrada
+    description: Channel or form through which the sign request was entered.
   installation_place:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.local_instalacao
+    - datalake_casa_mineira_crm_raw.placa.local_instalacao
+    description: Location on the property where the for-sale sign was installed.
   sign_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.tipo
+    - datalake_casa_mineira_crm_raw.placa.tipo
+    description: Type of for-sale sign placed on the property.
   observation:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.observacao
+    - datalake_casa_mineira_crm_raw.placa.observacao
+    description: Free-text notes recorded by the agent about the sign.
   has_maintenance:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.manutencao
+    - datalake_casa_mineira_crm_raw.placa.manutencao
+    description: Boolean flag indicating whether maintenance applies to this record.
   is_exclusive_sign:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.placa_exclusiva
+    - datalake_casa_mineira_crm_raw.placa.placa_exclusiva
+    description: Boolean flag indicating whether exclusive sign applies to this record.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.criado_em
+    - datalake_casa_mineira_crm_raw.placa.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_casa_mineira_crm_raw.placa.atualizado_em
+    - datalake_casa_mineira_crm_raw.placa.atualizado_em
+    description: Timestamp when the row was last updated in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sign sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per sign record with standardized names and types in datalake_casa_mineira_crm_clean.

@@ -1,41 +1,54 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: sale_brokerage
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.id
+    - datalake_casa_mineira_crm_raw.venda_comissao.id
+    description: Surrogate primary key of the sale brokerage row in the source system.
   id_sale:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.venda_id
+    - datalake_casa_mineira_crm_raw.venda_comissao.venda_id
+    description: Foreign key to the sale in datalake_casa_mineira_crm_clean.sale that this brokerage commission line belongs to.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.usuario_id
+    - datalake_casa_mineira_crm_raw.venda_comissao.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   sale_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.tipo
+    - datalake_casa_mineira_crm_raw.venda_comissao.tipo
+    description: Type of the brokerage commission line for this sale.
   sale_subtype:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.subtipo
+    - datalake_casa_mineira_crm_raw.venda_comissao.subtipo
+    description: Subtype further qualifying the brokerage commission type for this sale.
   sale_status:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.status
+    - datalake_casa_mineira_crm_raw.venda_comissao.status
+    description: Processing status of the brokerage commission line for this sale.
   office:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.escritorio
+    - datalake_casa_mineira_crm_raw.venda_comissao.escritorio
+    description: Office or branch credited with the brokerage commission for this sale.
   percentage_brokerage_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.porcentagem_comissao_tipo
+    - datalake_casa_mineira_crm_raw.venda_comissao.porcentagem_comissao_tipo
+    description: Commission percentage applied for this brokerage type.
   percentage_total_brokerage:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.porcentagem_comissao_total
+    - datalake_casa_mineira_crm_raw.venda_comissao.porcentagem_comissao_total
+    description: Total brokerage commission percentage applied to this sale.
   gross_brokerage_value:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.comissao_bruta
+    - datalake_casa_mineira_crm_raw.venda_comissao.comissao_bruta
+    description: Gross brokerage commission amount before taxes for this sale.
   taxes_brokerage_value:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.comissao_impostos
+    - datalake_casa_mineira_crm_raw.venda_comissao.comissao_impostos
+    description: Taxes deducted from the brokerage commission for this sale.
   net_brokerage_value:
     lineage:
-      - datalake_casa_mineira_crm_raw.venda_comissao.comissao_liquida
+    - datalake_casa_mineira_crm_raw.venda_comissao.comissao_liquida
+    description: Net brokerage commission amount after taxes for this sale.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of sale brokerage sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per sale brokerage record with standardized names and types in datalake_casa_mineira_crm_clean.

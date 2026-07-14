@@ -1,17 +1,22 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: user_group
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_grupo.id
+    - datalake_casa_mineira_crm_raw.usuario_grupo.id
+    description: Surrogate primary key of the user group row in the source system.
   group_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_grupo.nome
+    - datalake_casa_mineira_crm_raw.usuario_grupo.nome
+    description: Display name of the user group (role or team) in the CRM.
   slug_group_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_grupo.slug
+    - datalake_casa_mineira_crm_raw.usuario_grupo.slug
+    description: URL-friendly slug derived from the user group name.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_grupo.criado_em
+    - datalake_casa_mineira_crm_raw.usuario_grupo.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of user group sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per user group record with standardized names and types in datalake_casa_mineira_crm_clean.

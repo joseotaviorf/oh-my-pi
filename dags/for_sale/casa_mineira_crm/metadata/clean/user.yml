@@ -1,62 +1,82 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: user
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.id
+    - datalake_casa_mineira_crm_raw.usuario.id
+    description: Surrogate primary key of the user row in the source system.
   id_group:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.grupo_id
+    - datalake_casa_mineira_crm_raw.usuario.grupo_id
+    description: Foreign key to the user group in datalake_casa_mineira_crm_clean.user_group this user belongs to.
   id_manager:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.gerente_id
+    - datalake_casa_mineira_crm_raw.usuario.gerente_id
+    description: Foreign key to the user in datalake_casa_mineira_crm_clean.user who manages this user.
   id_unit:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.unidade_id
+    - datalake_casa_mineira_crm_raw.usuario.unidade_id
+    description: Foreign key to the franchise unit in datalake_casa_mineira_crm_clean.unit this user is assigned to.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.criado_por
+    - datalake_casa_mineira_crm_raw.usuario.criado_por
+    description: Identifier of the user who created this user record in the source CRM.
   level:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.nivel
+    - datalake_casa_mineira_crm_raw.usuario.nivel
+    description: Access or hierarchy level assigned to the user in the CRM.
   user_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.nome
+    - datalake_casa_mineira_crm_raw.usuario.nome
+    description: Short or display name of the user.
   user_full_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.nome_completo
+    - datalake_casa_mineira_crm_raw.usuario.nome_completo
+    description: Full legal name of the user.
   email:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.email
+    - datalake_casa_mineira_crm_raw.usuario.email
+    description: Contact email address used for notifications and identity matching.
   cpf:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.cpf
+    - datalake_casa_mineira_crm_raw.usuario.cpf
+    description: Brazilian individual taxpayer registry number (CPF) of the user, formatted with separators.
   phone:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.telefone
+    - datalake_casa_mineira_crm_raw.usuario.telefone
+    description: Contact phone number stored for coordination during the For Sale transaction.
   percentage_comission:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.percentual_comissao
+    - datalake_casa_mineira_crm_raw.usuario.percentual_comissao
+    description: Default commission percentage earned by this user (agent) on deals.
   is_intern:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.interno
+    - datalake_casa_mineira_crm_raw.usuario.interno
+    description: Boolean flag indicating whether intern applies to this record.
   is_suspended:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.suspenso
+    - datalake_casa_mineira_crm_raw.usuario.suspenso
+    description: Boolean flag indicating whether suspended applies to this record.
   dt_agent_contract:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.contrato_corretor_data
+    - datalake_casa_mineira_crm_raw.usuario.contrato_corretor_data
+    description: Calendar date of agent contract for this user record.
   ts_started:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.entrou_em
+    - datalake_casa_mineira_crm_raw.usuario.entrou_em
+    description: Timestamp when the user joined or started at the company in the source CRM.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.criado_em
+    - datalake_casa_mineira_crm_raw.usuario.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.atualizado_em
+    - datalake_casa_mineira_crm_raw.usuario.atualizado_em
+    description: Timestamp when the row was last updated in the source operational system.
   ts_deleted:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario.deletado_em
+    - datalake_casa_mineira_crm_raw.usuario.deletado_em
+    description: Timestamp when the user record was soft-deleted in the source CRM.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of user sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per user record with standardized names and types in datalake_casa_mineira_crm_clean.

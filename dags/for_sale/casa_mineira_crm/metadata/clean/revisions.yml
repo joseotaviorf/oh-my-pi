@@ -1,32 +1,42 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: revisions
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.id
+    - datalake_casa_mineira_crm_raw.revisions.id
+    description: Surrogate primary key of the revisions row in the source system.
   id_revisionable:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.revisionable_id
+    - datalake_casa_mineira_crm_raw.revisions.revisionable_id
+    description: Identifier of the source record that was changed, resolved together with revisionable_type in this polymorphic audit log.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.user_id
+    - datalake_casa_mineira_crm_raw.revisions.user_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   revision_key:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.key
+    - datalake_casa_mineira_crm_raw.revisions.key
+    description: Name of the source-record field that was changed in this revision entry.
   revisionable_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.revisionable_type
+    - datalake_casa_mineira_crm_raw.revisions.revisionable_type
+    description: Source entity type of the revised record, qualifying the polymorphic id_revisionable reference.
   old_value:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.old_value
+    - datalake_casa_mineira_crm_raw.revisions.old_value
+    description: Previous value of the changed field before this revision.
   new_value:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.new_value
+    - datalake_casa_mineira_crm_raw.revisions.new_value
+    description: Updated value of the changed field after this revision.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.created_at
+    - datalake_casa_mineira_crm_raw.revisions.created_at
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_casa_mineira_crm_raw.revisions.updated_at
+    - datalake_casa_mineira_crm_raw.revisions.updated_at
+    description: Timestamp when the row was last updated in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of revisions sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per revisions record with standardized names and types in datalake_casa_mineira_crm_clean.

@@ -1,44 +1,58 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: owner_pj
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.id
+    - datalake_casa_mineira_crm_raw.proprietario_pj.id
+    description: Surrogate primary key of the owner pj row in the source system.
   id_owner:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.proprietario_id
+    - datalake_casa_mineira_crm_raw.proprietario_pj.proprietario_id
+    description: Foreign key to the owner in datalake_casa_mineira_crm_clean.owner that this company-entity detail row extends.
   cnpj:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.cnpj
+    - datalake_casa_mineira_crm_raw.proprietario_pj.cnpj
+    description: Brazilian company taxpayer registry number (CNPJ) of the corporate owner.
   state_registration:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.inscricao_estadual
+    - datalake_casa_mineira_crm_raw.proprietario_pj.inscricao_estadual
+    description: State tax registration number (inscricao estadual) of the corporate owner.
   responsible_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_nome
+    - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_nome
+    description: Full name of the legal representative responsible for the corporate owner.
   responsible_email:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_email
+    - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_email
+    description: Contact email address of the legal representative for the corporate owner.
   responsible_phone:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_telefone
+    - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_telefone
+    description: Contact phone number of the legal representative for the corporate owner.
   responsible_cpf:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_cpf
+    - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_cpf
+    description: Brazilian individual taxpayer registry number (CPF) of the legal representative.
   responsible_rg:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_rg
+    - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_rg
+    description: Brazilian general registry identity document number (RG) of the legal representative.
   responsible_profession:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_profissao
+    - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_profissao
+    description: Declared profession or occupation of the legal representative.
   responsible_marital_status:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_estado_civil
+    - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_estado_civil
+    description: Marital status of the legal representative for the corporate owner.
   dt_responsible_birth:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_data_nascimento
+    - datalake_casa_mineira_crm_raw.proprietario_pj.responsavel_data_nascimento
+    description: Calendar date of responsible birth for this owner pj record.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.proprietario_pj.criado_em
+    - datalake_casa_mineira_crm_raw.proprietario_pj.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of owner pj sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per owner pj record with standardized names and types in datalake_casa_mineira_crm_clean.

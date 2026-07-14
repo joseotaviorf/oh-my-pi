@@ -1,20 +1,26 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: user_login
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_login.id
+    - datalake_casa_mineira_crm_raw.usuario_login.id
+    description: Surrogate primary key of the user login row in the source system.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_login.usuario_id
+    - datalake_casa_mineira_crm_raw.usuario_login.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   ip:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_login.ip
+    - datalake_casa_mineira_crm_raw.usuario_login.ip
+    description: IP address from which the user logged in.
   device:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_login.dispositivo
+    - datalake_casa_mineira_crm_raw.usuario_login.dispositivo
+    description: Device or user-agent used for the login session.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.usuario_login.criado_em
+    - datalake_casa_mineira_crm_raw.usuario_login.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of user login sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per user login record with standardized names and types in datalake_casa_mineira_crm_clean.

@@ -1,20 +1,26 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: uf
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.uf.id
+    - datalake_casa_mineira_crm_raw.uf.id
+    description: Surrogate primary key of the uf row in the source system.
   uf_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.uf.nome
+    - datalake_casa_mineira_crm_raw.uf.nome
+    description: Full name of the Brazilian state (UF).
   uf_slug_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.uf.slug
+    - datalake_casa_mineira_crm_raw.uf.slug
+    description: URL-friendly slug derived from the Brazilian state name.
   uf_initials:
     lineage:
-      - datalake_casa_mineira_crm_raw.uf.sigla
+    - datalake_casa_mineira_crm_raw.uf.sigla
+    description: Two-letter abbreviation of the Brazilian state (UF), such as SP or MG.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.uf.criado_em
+    - datalake_casa_mineira_crm_raw.uf.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of uf sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per uf record with standardized names and types in datalake_casa_mineira_crm_clean.
