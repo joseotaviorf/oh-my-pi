@@ -347,24 +347,24 @@ WITH invoice_all AS (
         END AS conta_resultado,
         SUM(
             CASE 
-                WHEN bill_item = 'cap' THEN 1
+                WHEN i.bill_item = 'cap' THEN 1
                 ELSE 0
             END
-        ) OVER (PARTITION BY i.sk_contract, i.accrual_year_month, conta_contabil) > 0 AS has_paid_amount,
+        ) OVER (PARTITION BY i.sk_contract, i.accrual_year_month, i.conta_contabil) > 0 AS has_paid_amount,
         SUM(
             CASE 
-                WHEN NOT(bill_item = 'cap') THEN 1
+                WHEN NOT(i.bill_item = 'cap') THEN 1
                 ELSE 0
             END
         ) OVER (PARTITION BY i.sk_contract, i.accrual_year_month, conta_contabil) > 0 AS has_receivable_amount,
         IF(NOT(
-        (status != 'not-invoiceable') OR 
-        (status = 'not-invoiceable' AND entry_accrual_year_month >= 202508) OR 
-        (status = 'not-invoiceable' AND entry_accrual_year_month >= 202506 AND to_account_type = 'contract' AND bill_item IN ('early termination fee', 'early termination fee non protection')) OR
-        (status = 'not-invoiceable' AND bill_item = 'condominium fine') 
+        (i.status != 'not-invoiceable') OR 
+        (i.status = 'not-invoiceable' AND i.entry_accrual_year_month >= 202508) OR 
+        (i.status = 'not-invoiceable' AND i.entry_accrual_year_month >= 202506 AND to_account_type = 'contract' AND i.bill_item IN ('early termination fee', 'early termination fee non protection')) OR
+        (i.status = 'not-invoiceable' AND i.bill_item = 'condominium fine') 
         ), TRUE, FALSE) AS is_not_invoiceable_inconsiderable_workaround,
         IF(
-        NOT(status = 'not-invoiceable' AND entry_accrual_year_month >= 202506 AND to_account_type = 'contract' AND bill_item IN ('early termination fee', 'early termination fee non protection')), TRUE, FALSE
+        NOT(i.status = 'not-invoiceable' AND entry_accrual_year_month >= 202506 AND to_account_type = 'contract' AND i.bill_item IN ('early termination fee', 'early termination fee non protection')), TRUE, FALSE
         ) AS is_not_invoiceable_inconsiderable_early_termination,
         i.entry_created_date,
         i.invoice_created_date,
