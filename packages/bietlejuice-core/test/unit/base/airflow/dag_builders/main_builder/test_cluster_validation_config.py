@@ -319,6 +319,8 @@ class TestMergeValidationClusterArgs:
                 "driver_node_type_id": "r6g.2xlarge",
                 "node_type_id": "r6g.2xlarge",
                 "runtime_engine": "PHOTON",
+                "data_security_mode": "SINGLE_USER",
+                "single_user_name": "{{ var.value.databricks_single_user_name }}",
                 "spark_conf": {"spark.sql.shuffle.partitions": "200"},
             },
         }
@@ -336,6 +338,8 @@ class TestMergeValidationClusterArgs:
             "core_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 1},
             "task_nodes": {"node_type_id": "r7g.8xlarge", "instance_count": 2},
         }
+        assert "data_security_mode" not in merged["custom_configurations"]
+        assert "single_user_name" not in merged["custom_configurations"]
 
     def test_deep_merges_spark_conf_for_databricks_to_emr_validation(self):
         prod = {

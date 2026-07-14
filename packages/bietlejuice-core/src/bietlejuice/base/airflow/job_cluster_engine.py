@@ -259,10 +259,14 @@ class DatabricksJobClusterEngine(JobClusterEngine):
     def _input_databricks_default_service_credential_name(
         self, cluster_configuration: dict
     ) -> dict:
-        dbr_version = cluster_configuration["spark_version"]
-        data_security_mode = cluster_configuration["data_security_mode"]
-
-        if data_security_mode == "USER_ISOLATION" and dbr_version >= "16.4":
+        dbr_version = cluster_configuration.get("spark_version")
+        data_security_mode = cluster_configuration.get("data_security_mode")
+        # EMR (and mis-routed configs) have no data_security_mode — skip quietly.
+        if (
+            data_security_mode == "USER_ISOLATION"
+            and dbr_version
+            and dbr_version >= "16.4"
+        ):
             cluster_configuration["spark_env_vars"][
                 "DATABRICKS_DEFAULT_SERVICE_CREDENTIAL_NAME"
             ] = self._config_service.get_config(

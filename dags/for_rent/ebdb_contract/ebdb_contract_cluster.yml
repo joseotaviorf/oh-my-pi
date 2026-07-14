@@ -3,8 +3,6 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
     core_nodes:
       instance_types:
       - r6g.2xlarge

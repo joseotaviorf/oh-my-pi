@@ -42,6 +42,8 @@ _DATABRICKS_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
         "driver_instance_pool_id",
         "autoscale",
         "spark_version",
+        "data_security_mode",
+        "single_user_name",
     }
 )
 

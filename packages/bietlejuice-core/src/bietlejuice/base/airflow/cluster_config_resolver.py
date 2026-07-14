@@ -57,8 +57,18 @@ def is_airflow_emr_cluster(spark_version: str) -> bool:
     return str(spark_version).lower().startswith("emr-")
 
 
+def is_airflow_emr_cluster_type(cluster_type: str) -> bool:
+    """True when the declared preset name is an EMR cluster (emr_*)."""
+    return str(cluster_type or "").startswith("emr_")
+
+
 def resolve_airflow_compute_mode(
     cluster_args: Dict[str, Any], config_service: ConfigurationService
 ) -> Tuple[bool, Dict[str, Any]]:
     merged = merge_cluster_configuration(cluster_args, config_service)
-    return is_airflow_emr_cluster(merged.get("spark_version", "")), merged
+    # Prefer preset type over spark_version: leftover Databricks spark_version in
+    # custom_configurations must not route an emr_* cluster through Databricks.
+    use_emr = is_airflow_emr_cluster_type(
+        cluster_args.get("type", "")
+    ) or is_airflow_emr_cluster(merged.get("spark_version", ""))
+    return use_emr, merged

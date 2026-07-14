@@ -49,6 +49,33 @@ class TestResolveAirflowComputeMode:
         use_emr, _ = resolve_airflow_compute_mode({"type": "dbr"}, config)
         assert use_emr is False
 
+    def test_emr_type_wins_over_leftover_databricks_spark_version(self):
+        """Regression: promoted EMR clusters with leftover DBR spark_version.
+
+        Leftover ``spark_version: 13.3.x-scala2.12`` must not route ``emr_*``
+        presets through DatabricksJobClusterEngine (KeyError data_security_mode).
+        """
+        from bietlejuice.base.airflow.cluster_config_resolver import (
+            resolve_airflow_compute_mode,
+        )
+
+        config = MagicMock()
+        config._deep_update = lambda a, b: {**a, **(b or {})}
+        config.get_config.side_effect = lambda key: {
+            "emr_7_12_consolidation_s_general_single_node_fleet_cluster": {
+                "spark_version": "emr-7.12.0",
+            },
+        }[key]
+        use_emr, merged = resolve_airflow_compute_mode(
+            {
+                "type": "emr_7_12_consolidation_s_general_single_node_fleet_cluster",
+                "custom_configurations": {"spark_version": "13.3.x-scala2.12"},
+            },
+            config,
+        )
+        assert use_emr is True
+        assert merged["spark_version"] == "13.3.x-scala2.12"
+
 
 class TestBuildJobClusterEngine:
     @pytest.fixture
