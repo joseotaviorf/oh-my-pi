@@ -51,7 +51,6 @@ SELECT
     es.status AS earning_source_status,
     es.failure_reason AS earning_source_status_reason,
     rs.relation_type AS revenue_share_relation_type,
-    rs.type AS revenue_share_type,
     ROUND(es.base_amount, 2) AS base_amount,
     ROUND(es.revenue_share_total_amount, 2) AS revenue_share_total_amount,
     ROUND(ne.revenue_amount, 2) AS revenue_amount,
