@@ -36,8 +36,6 @@ columns:
     description: |
       Event Gateway update epoch in milliseconds; ReplacingMergeTree version column
       used for deduplication ordering in the clean layer.
-  timestamp_dt:
-    description: Event timestamp in UTC; drives incremental load windows and partitions.
   _ingested_at:
     description: ClickHouse ingestion timestamp used as a secondary dedup tie-breaker.
   enrichments:
@@ -47,10 +45,10 @@ columns:
   contract_id:
     description: Native contract identifier from events_api when present.
   year:
-    description: UTC year partition derived from timestamp_dt.
+    description: UTC year partition derived from ClickHouse timestamp_dt at export.
   month:
-    description: UTC month partition derived from timestamp_dt.
+    description: UTC month partition derived from ClickHouse timestamp_dt at export.
   day:
-    description: UTC day partition derived from timestamp_dt.
+    description: UTC day partition derived from ClickHouse timestamp_dt at export.
   hour:
-    description: UTC hour partition derived from timestamp_dt.
+    description: UTC hour partition derived from ClickHouse timestamp_dt at export.

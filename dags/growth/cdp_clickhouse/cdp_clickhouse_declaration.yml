@@ -22,8 +22,8 @@ workflow:
   default_partitions: [year, month, day, hour]
   execution_timeout_hours: 2
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S'), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_end.strftime('%Y-%m-%d %H:%M:%S'), 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, (data_interval_end + macros.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'), 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"

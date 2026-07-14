@@ -258,7 +258,7 @@ columns:
       Client-reported event time in UTC, converted from hub timestamp epoch
       milliseconds.
     lineage:
-      - datalake_cdp_raw.events_api.timestamp_dt
+      - datalake_cdp_raw.events_api.timestamp
   ts_egw:
     description: |
       Time when Event Gateway ingested the event in UTC, converted from
@@ -270,7 +270,7 @@ columns:
       Approximate Kafka-style timestamp built from the calendar components of
       ts_event (year, month, day, hour, minute).
     lineage:
-      - datalake_cdp_raw.events_api.timestamp_dt
+      - datalake_cdp_raw.events_api.timestamp
   ts_load:
     description: |
       Databricks processing time when the cdp_clickhouse batch job wrote or updated
@@ -279,14 +279,14 @@ columns:
     description: |
       Partition key; calendar year of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.events_api.timestamp_dt
+      - datalake_cdp_raw.events_api.timestamp
   month:
     description: |
       Partition key; calendar month of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.events_api.timestamp_dt
+      - datalake_cdp_raw.events_api.timestamp
   day:
     description: |
       Partition key; calendar day of ts_event for partition pruning.
     lineage:
-      - datalake_cdp_raw.events_api.timestamp_dt
+      - datalake_cdp_raw.events_api.timestamp
