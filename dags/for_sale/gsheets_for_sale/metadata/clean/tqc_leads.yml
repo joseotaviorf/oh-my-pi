@@ -4,37 +4,51 @@ domain: For Sale
 columns:
   agent_email:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.agent_email
+    - datalake_gsheets_raw.tqc_leads.agent_email
+    description: Email address of the agent who registered the lead, lower-cased.
   agent_cpf:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.agent_cpf
+    - datalake_gsheets_raw.tqc_leads.agent_cpf
+    description: Brazilian taxpayer identifier (CPF) of the agent, formatted and masked when invalid.
   agent_creci:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.agent_creci
+    - datalake_gsheets_raw.tqc_leads.agent_creci
+    description: Real-estate broker registration number (CRECI) of the agent.
   lead_name:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.lead_name
+    - datalake_gsheets_raw.tqc_leads.lead_name
+    description: Name of the lead, capitalized.
   lead_phone:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.lead_phone
+    - datalake_gsheets_raw.tqc_leads.lead_phone
+    description: Phone number of the lead, validated against Brazilian phone formats.
   lead_email:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.lead_email
+    - datalake_gsheets_raw.tqc_leads.lead_email
+    description: Email address of the lead, lower-cased.
   agent_visits:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.agent_visits
+    - datalake_gsheets_raw.tqc_leads.agent_visits
+    description: Number of visits performed by the agent for this lead.
   lead_interest_area:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.lead_interest_area
+    - datalake_gsheets_raw.tqc_leads.lead_interest_area
+    description: Area or region the lead is interested in.
   program_phase:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.program_phase
+    - datalake_gsheets_raw.tqc_leads.program_phase
+    description: Phase of the TQC program the lead is in.
   is_valid_lead:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.is_valid_lead
+    - datalake_gsheets_raw.tqc_leads.is_valid_lead
+    description: Boolean flag indicating whether valid lead applies to this record.
   ts_appointment:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.appointment_date
+    - datalake_gsheets_raw.tqc_leads.appointment_date
+    description: Timestamp when appointment occurred in the operational or warehouse pipeline.
   ts_new_lead:
     lineage:
-      - datalake_gsheets_raw.tqc_leads.new_lead_date
+    - datalake_gsheets_raw.tqc_leads.new_lead_date
+    description: Timestamp when new lead occurred in the operational or warehouse pipeline.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of tqc leads sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per tqc leads record with standardized names and types in datalake_gsheets_clean.

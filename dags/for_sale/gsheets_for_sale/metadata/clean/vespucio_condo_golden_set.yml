@@ -4,91 +4,123 @@ domain: For Sale
 columns:
   email:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.email_address
+    - datalake_gsheets_raw.vespucio_condo_golden_set.email_address
+    description: Contact email address used for notifications and identity matching.
   condo_affiliation_type:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.qual_a_sua_relacao_com_este_condominio
+    - datalake_gsheets_raw.vespucio_condo_golden_set.qual_a_sua_relacao_com_este_condominio
+    description: Respondent's relationship to the condominium (e.g. resident, manager).
   score:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.score
+    - datalake_gsheets_raw.vespucio_condo_golden_set.score
+    description: Confidence or quality score assigned to the condominium record.
   condo_name:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.qual_o_nome_do_condominio
+    - datalake_gsheets_raw.vespucio_condo_golden_set.qual_o_nome_do_condominio
+    description: Name of the condominium.
   condo_cnpj:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.cnpj_base
+    - datalake_gsheets_raw.vespucio_condo_golden_set.cnpj_base
+    description: Brazilian company identifier (CNPJ base) of the condominium.
   address_type:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.tipo_de_logradouro
+    - datalake_gsheets_raw.vespucio_condo_golden_set.tipo_de_logradouro
+    description: Type of the street (logradouro) of the condominium address.
   address:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.nome_do_logradouro
+    - datalake_gsheets_raw.vespucio_condo_golden_set.nome_do_logradouro
+    description: Street name (logradouro) of the condominium address.
   number:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.numero
+    - datalake_gsheets_raw.vespucio_condo_golden_set.numero
+    description: Street number of the condominium address.
   zipcode:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.cep
+    - datalake_gsheets_raw.vespucio_condo_golden_set.cep
+    description: Postal code (CEP) of the condominium address.
   complement:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.alguma_outra_informacao_importante_para_identificar_o_endereco_do_seu_condominio_descreva_abaixo
+    - datalake_gsheets_raw.vespucio_condo_golden_set.alguma_outra_informacao_importante_para_identificar_o_endereco_do_seu_condominio_descreva_abaixo
+    description: Additional information provided to identify the condominium address.
   neighborhood:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.bairro
+    - datalake_gsheets_raw.vespucio_condo_golden_set.bairro
+    description: Neighborhood (bairro) of the condominium.
   city:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.cidade
+    - datalake_gsheets_raw.vespucio_condo_golden_set.cidade
+    description: City of the condominium.
   state:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.estado
+    - datalake_gsheets_raw.vespucio_condo_golden_set.estado
+    description: State (UF) of the condominium.
   user_condo_comments:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.alguma_outra_informacao_relevante_sobre_este_condominio
+    - datalake_gsheets_raw.vespucio_condo_golden_set.alguma_outra_informacao_relevante_sobre_este_condominio
+    description: Free-text comments provided about the condominium.
   has_garage:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_garagem
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_garagem
+    description: Boolean flag indicating whether garage applies to this record.
   has_swim_pool:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_piscina
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_piscina
+    description: Boolean flag indicating whether swim pool applies to this record.
   has_gym:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_academia
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_academia
+    description: Boolean flag indicating whether gym applies to this record.
   has_party_hall:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_salao_de_festas
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_salao_de_festas
+    description: Boolean flag indicating whether party hall applies to this record.
   has_grill_area:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_churrasqueira
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_churrasqueira
+    description: Boolean flag indicating whether grill area applies to this record.
   has_sports_court:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_quadra_poliesportiva
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_quadra_poliesportiva
+    description: Boolean flag indicating whether sports court applies to this record.
   has_playground:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_playground
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_playground
+    description: Boolean flag indicating whether playground applies to this record.
   has_toy_library:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_brinquedoteca
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_brinquedoteca
+    description: Boolean flag indicating whether toy library applies to this record.
   has_elevator:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_elevador
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_elevador
+    description: Boolean flag indicating whether elevator applies to this record.
   has_entrance_hall:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_portaria_24h
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_portaria_24h
+    description: Boolean flag indicating whether entrance hall applies to this record.
   has_sauna:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_sauna
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_sauna
+    description: Boolean flag indicating whether sauna applies to this record.
   has_laundry:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_lavanderia_no_predio
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_lavanderia_no_predio
+    description: Boolean flag indicating whether laundry applies to this record.
   has_piped_gas:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_gas_encanado
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_gas_encanado
+    description: Boolean flag indicating whether piped gas applies to this record.
   has_gourmet_area:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_area_gourmet
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_area_gourmet
+    description: Boolean flag indicating whether gourmet area applies to this record.
   has_metro_or_train_close:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_e_proximo_ao_metro_ou_trem
+    - datalake_gsheets_raw.vespucio_condo_golden_set.o_condominio_possui_as_amenidades_abaixo_e_proximo_ao_metro_ou_trem
+    description: Boolean flag indicating whether metro or train close applies to this record.
   dt_created:
     lineage:
-      - datalake_gsheets_raw.vespucio_condo_golden_set.timestamp
+    - datalake_gsheets_raw.vespucio_condo_golden_set.timestamp
+    description: Calendar date of created for this vespucio condo golden set record.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of vespucio condo golden set sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per vespucio condo golden set record with standardized names and types in datalake_gsheets_clean.

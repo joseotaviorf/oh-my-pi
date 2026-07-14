@@ -4,46 +4,63 @@ domain: For Sale
 columns:
   ccv:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.ccv
+    - datalake_gsheets_raw.target_sale_cohort_demand.ccv
+    description: Target volume of signed contracts (CCV) in the demand cohort.
   os2ccv:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.os2ccv
+    - datalake_gsheets_raw.target_sale_cohort_demand.os2ccv
+    description: Target conversion rate from submitted offer (OS) to signed contract (CCV) in the cohort.
   cidade:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.cidade
+    - datalake_gsheets_raw.target_sale_cohort_demand.cidade
+    description: City the demand cohort applies to.
   deal_quali:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.deal_quali
+    - datalake_gsheets_raw.target_sale_cohort_demand.deal_quali
+    description: Deal qualification classification of the cohort segment.
   offer_accepted:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.offer_accepted
+    - datalake_gsheets_raw.target_sale_cohort_demand.offer_accepted
+    description: Target volume of accepted offers in the cohort.
   offer_sent:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.offer_sent
+    - datalake_gsheets_raw.target_sale_cohort_demand.offer_sent
+    description: Target volume of submitted offers in the cohort.
   origem:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.origem
+    - datalake_gsheets_raw.target_sale_cohort_demand.origem
+    description: Acquisition origin of the demand cohort.
   modelo:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.modelo
+    - datalake_gsheets_raw.target_sale_cohort_demand.modelo
+    description: Business model of the cohort segment.
   operacao:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.operacao
+    - datalake_gsheets_raw.target_sale_cohort_demand.operacao
+    description: Operation the demand cohort applies to.
   fluxo:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.fluxo
+    - datalake_gsheets_raw.target_sale_cohort_demand.fluxo
+    description: Process flux or stage of the cohort segment.
   fb:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.FB
+    - datalake_gsheets_raw.target_sale_cohort_demand.FB
+    description: First-booking (FB) indicator for the cohort segment.
   visit_booked:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.visit_booked
+    - datalake_gsheets_raw.target_sale_cohort_demand.visit_booked
+    description: Target volume of booked visits in the cohort.
   visit_completed:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.visit_completed
+    - datalake_gsheets_raw.target_sale_cohort_demand.visit_completed
+    description: Target volume of completed visits in the cohort.
   week:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.week
+    - datalake_gsheets_raw.target_sale_cohort_demand.week
+    description: Conversion week the cohort target refers to.
   week_origin:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_demand.week_origin
+    - datalake_gsheets_raw.target_sale_cohort_demand.week_origin
+    description: Origin week that defines the cohort.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of target sale cohort demand sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per target sale cohort demand record with standardized names and types in datalake_gsheets_clean.

@@ -4,22 +4,31 @@ domain: For Sale
 columns:
   id_house_quintoandar:
     lineage:
-      - datalake_gsheets_raw.split_ciq_bh.id_imovel_5a
+    - datalake_gsheets_raw.split_ciq_bh.id_imovel_5a
+    description: QuintoAndar identifier of the listing the capture split refers to.
   id_ciq_quintoandar:
     lineage:
-      - datalake_gsheets_raw.split_ciq_bh.id_ciq_5a
+    - datalake_gsheets_raw.split_ciq_bh.id_ciq_5a
+    description: QuintoAndar CIQ identifier of the capture agent in the split.
   name_participant:
     lineage:
-      - datalake_gsheets_raw.split_ciq_bh.name_participante
+    - datalake_gsheets_raw.split_ciq_bh.name_participante
+    description: Name of the participant in the capture split.
   email:
     lineage:
-      - datalake_gsheets_raw.split_ciq_bh.email
+    - datalake_gsheets_raw.split_ciq_bh.email
+    description: Contact email address used for notifications and identity matching.
   participant:
     lineage:
-      - datalake_gsheets_raw.split_ciq_bh.participante
+    - datalake_gsheets_raw.split_ciq_bh.participante
+    description: Role or label of the participant in the capture split.
   n_participants:
     lineage:
-      - datalake_gsheets_raw.split_ciq_bh.n_participantes
+    - datalake_gsheets_raw.split_ciq_bh.n_participantes
+    description: Number of participants sharing the capture split.
   perc_captation:
     lineage:
-      - datalake_gsheets_raw.split_ciq_bh.perc_captacao
+    - datalake_gsheets_raw.split_ciq_bh.perc_captacao
+    description: Percentage of the capture attributed to the participant.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of split ciq bh sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per split ciq bh record with standardized names and types in datalake_gsheets_clean.

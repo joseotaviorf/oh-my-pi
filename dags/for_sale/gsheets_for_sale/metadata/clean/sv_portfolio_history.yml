@@ -1,16 +1,15 @@
----
 database_name: datalake_gsheets_clean
 table_name: sv_portfolio_history
-owner: esthella.silva@quintoandar.com
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: 'Sheets with sv_portfolio_history'
+description: Sheets with sv_portfolio_history
 columns:
   id_user_agent:
-    description: 'Unique identifier representing the user agent. Primary key for user identification across all QuintoAndar systems.'
+    description: Unique identifier representing the user agent. Primary key for user identification across all QuintoAndar systems.
     lineage:
     - datalake_gsheets_raw.sv_portfolio_history.sk_user_agent
   portfolio:
-    description: 'Descriptive name of the detailed operational cluster combining the neighborhood/region with a specific team identifier (e.g., "Vila Mariana 6").'
+    description: Descriptive name of the detailed operational cluster combining the neighborhood/region with a specific team identifier (e.g., "Vila Mariana 6").
     lineage:
     - datalake_gsheets_raw.sv_portfolio_history.portfolio
   dt_reference:

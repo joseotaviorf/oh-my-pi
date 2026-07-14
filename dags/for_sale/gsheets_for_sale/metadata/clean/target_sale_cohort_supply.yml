@@ -4,37 +4,51 @@ domain: For Sale
 columns:
   op:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.op
+    - datalake_gsheets_raw.target_sale_cohort_supply.op
+    description: Target volume of owner prospects (OP) in the supply cohort.
   city:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.cidade
+    - datalake_gsheets_raw.target_sale_cohort_supply.cidade
+    description: City the supply cohort applies to (renamed from cidade in the raw sheet).
   first_listing:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.first_listing
+    - datalake_gsheets_raw.target_sale_cohort_supply.first_listing
+    description: Target volume of first listings in the cohort.
   mkt_origin:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.mkt_origin
+    - datalake_gsheets_raw.target_sale_cohort_supply.mkt_origin
+    description: Marketing origin of the cohort segment.
   operation:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.operacao
+    - datalake_gsheets_raw.target_sale_cohort_supply.operacao
+    description: Operation the supply cohort applies to (renamed from operacao in the raw sheet).
   canal_planning:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.canal_planning
+    - datalake_gsheets_raw.target_sale_cohort_supply.canal_planning
+    description: Planning channel of the cohort segment.
   fb:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.FB
+    - datalake_gsheets_raw.target_sale_cohort_supply.FB
+    description: First-booking (FB) indicator for the cohort segment.
   opportunity:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.opportunity
+    - datalake_gsheets_raw.target_sale_cohort_supply.opportunity
+    description: Target volume of opportunities in the cohort.
   qualified:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.qualified
+    - datalake_gsheets_raw.target_sale_cohort_supply.qualified
+    description: Target volume of qualified leads in the cohort.
   available_qualified:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.available_qualified
+    - datalake_gsheets_raw.target_sale_cohort_supply.available_qualified
+    description: Target volume of available qualified leads in the cohort.
   dt_week:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.week
+    - datalake_gsheets_raw.target_sale_cohort_supply.week
+    description: Calendar date of week for this target sale cohort supply record.
   week_origin:
     lineage:
-      - datalake_gsheets_raw.target_sale_cohort_supply.week_origin
+    - datalake_gsheets_raw.target_sale_cohort_supply.week_origin
+    description: Origin week that defines the cohort.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of target sale cohort supply sourced from operational systems backing Google Sheets curated reference data maintained by the For Sale analytics team. One row per target sale cohort supply record with standardized names and types in datalake_gsheets_clean.
