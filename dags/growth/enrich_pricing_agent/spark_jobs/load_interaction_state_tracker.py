@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from datetime import date, timedelta
 
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 from pyspark.sql.window import Window
@@ -59,10 +59,12 @@ EXPECTED_SCHEMA = T.StructType(
 )
 
 
-def _build_langfuse_classifications(load_start_date: str) -> DataFrame:
+def _build_langfuse_classifications(
+    spark: SparkSession, load_start_date: str
+) -> DataFrame:
     """Parse Langfuse PricingStateClassification scores for the given date."""
     return (
-        spark.table("datalake_langfuse_clean.scores")  # noqa: F821
+        spark.table("datalake_langfuse_clean.scores")
         .filter(
             F.make_date(F.col("year"), F.col("month"), F.col("day"))
             == F.lit(load_start_date).cast(T.DateType())
@@ -102,14 +104,14 @@ def _keep_most_recent_session(classification_df: DataFrame) -> DataFrame:
     )
 
 
-def _build_hsm_counts(load_start_date: str) -> DataFrame:
+def _build_hsm_counts(spark: SparkSession, load_start_date: str) -> DataFrame:
     """Build WhatsApp HSM message counts per (business_context, id_house, id_user).
 
     Unity Catalog namespace (quintoandar_{env}) is resolved at cluster level via
     spark.databricks.sql.initial.catalog.namespace — 2-part table names are sufficient.
     """
     hsm_messages_df = (
-        spark.table("datalake_copilot_service_clean.message")  # noqa: F821
+        spark.table("datalake_copilot_service_clean.message")
         .filter(F.col("ts_created").cast("date") <= F.lit(load_start_date))
         .filter(F.col("channel") == "WHATSAPP_PRICING_AI_CHAT")
         .filter(F.col("role") == "HARDCODED")
@@ -123,7 +125,7 @@ def _build_hsm_counts(load_start_date: str) -> DataFrame:
         .dropDuplicates()
     )
 
-    message_state_df = spark.table("datalake_copilot_service_clean.state").select(  # noqa: F821
+    message_state_df = spark.table("datalake_copilot_service_clean.state").select(
         "id_session",
         "id_message",
         F.get_json_object(F.col("state"), "$.payload.userId").alias("id_user"),
@@ -177,14 +179,14 @@ def _build_hsm_counts(load_start_date: str) -> DataFrame:
     )
 
 
-def build_interaction_state(load_start_date: str) -> DataFrame:
+def build_interaction_state(spark: SparkSession, load_start_date: str) -> DataFrame:
     """Build pricing agent interaction state per (business_context, id_house, id_user).
 
     Sources: Langfuse classifications (scores table) joined with WhatsApp HSM message counts.
     ASP-allocated houses are excluded via left-anti join.
     """
     classification_df = _keep_most_recent_session(
-        _build_langfuse_classifications(load_start_date)
+        _build_langfuse_classifications(spark, load_start_date)
     )
 
     fup_state_df = classification_df.select(
@@ -199,12 +201,12 @@ def build_interaction_state(load_start_date: str) -> DataFrame:
         "calculator_p90_price",
         F.col("first_message_ts").cast("date").alias("dt_state"),
     ).join(
-        _build_hsm_counts(load_start_date),
+        _build_hsm_counts(spark, load_start_date),
         how="left",
         on=["business_context", "id_house", "id_user"],
     )
 
-    asp_allocation_df = spark.table("datalake_gsheets_clean.asp_for_sale_alocated")  # noqa: F821
+    asp_allocation_df = spark.table("datalake_gsheets_clean.asp_for_sale_alocated")
     return fup_state_df.join(
         asp_allocation_df.select("id_house"), on=["id_house"], how="leftanti"
     )
@@ -332,7 +334,8 @@ if __name__ == "__main__":
         f"msg=Starting Spark job"
     )
 
-    output_df = build_interaction_state(load_start_date)
+    spark_client = SparkClient(app_name=JOB_NAME)
+    output_df = build_interaction_state(spark_client.conn, load_start_date)
     row_count = validate_schema_and_return_row_count(output_df)
     if row_count == 0:
         logger.info(
@@ -340,7 +343,7 @@ if __name__ == "__main__":
         )
     else:
         save_to_enrich(
-            SparkClient(),
+            spark_client,
             output_df,
             env,
             datalake_bucket,

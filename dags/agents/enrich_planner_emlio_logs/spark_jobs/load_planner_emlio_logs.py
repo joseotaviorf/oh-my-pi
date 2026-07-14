@@ -416,7 +416,9 @@ def _final_columns() -> list:
     )
 
 
-def build_planner_emlio_logs(load_start_date: str, load_end_date: str) -> DataFrame:
+def build_planner_emlio_logs(
+    spark: SparkSession, load_start_date: str, load_end_date: str
+) -> DataFrame:
     """Build the planner_emlio_logs enriched dataset.
 
     Reads planner-ml-service logs from the emlio clean layer for the window
@@ -430,7 +432,7 @@ def build_planner_emlio_logs(load_start_date: str, load_end_date: str) -> DataFr
         & (F.to_date("ts_log") <= load_end_date)
     )
 
-    df = spark.table(SOURCE_TABLE).filter(date_filter)  # noqa: F821
+    df = spark.table(SOURCE_TABLE).filter(date_filter)
     df = _build_payload_envelope(df)
     df = _apply_specs(df, INPUT_SPECS + OUTPUT_SPECS)
     df = _extract_observability_derived(df)
@@ -540,7 +542,7 @@ def _save_to_enrich(
     full_table_name = f"{write_database_name}.{write_table_name}"
     s3_path = f"{write_location}{write_table_name}"
 
-    SparkSession.builder.getOrCreate().conf.set(
+    spark_client.conn.conf.set(
         "spark.databricks.delta.schema.autoMerge.enabled", "true"
     )
 
@@ -604,9 +606,12 @@ def main(args: Optional[Namespace] = None) -> None:
         f"table_name={args.table_name}, "
         f"interval=[{args.load_start_date}, {args.load_end_date}]"
     )
-    output_df = build_planner_emlio_logs(args.load_start_date, args.load_end_date)
+    spark_client = SparkClient(app_name=JOB_NAME)
+    output_df = build_planner_emlio_logs(
+        spark_client.conn, args.load_start_date, args.load_end_date
+    )
     row_count = validate_before_write(output_df)
-    save_df(SparkClient(), output_df, args, row_count=row_count)
+    save_df(spark_client, output_df, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
 
 
