@@ -22,4 +22,5 @@ workflow:
     search_profile: {}
     search_profile_filters: {}
     search_profile_description: {}
+    concierge_trigger: {}
 

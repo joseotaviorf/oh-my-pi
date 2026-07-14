@@ -1,0 +1,43 @@
+---
+database_name: datalake_house_listing_search_clean
+table_name: concierge_trigger
+owner: thiago.nakamura@quintoandar.com.br
+domain: Conversational XP
+description: "Audit table for Concierge trigger processing outcomes from house-listing-search"
+columns:
+  id:
+    description: "Surrogate primary key for the concierge trigger row in the transactional database"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.id
+  uuid_trigger_id:
+    description: "UUID that identifies the Concierge trigger event in the source system"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.trigger_id
+  id_user:
+    description: "Identifier of the user associated with the Concierge trigger"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.user_id
+  phone_number:
+    description: "Phone number associated with the Concierge trigger"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.phone_number
+  chatbot:
+    description: "Chatbot that processed the Concierge trigger"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.chatbot
+  intent:
+    description: "Detected intent for the Concierge trigger"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.intent
+  trigger_event:
+    description: "JSON payload with the original trigger event data from the source system"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.trigger_event
+  outcome:
+    description: "Processing outcome for the Concierge trigger"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.outcome
+  ts_created:
+    description: "Timestamp when the concierge trigger row was first created in the source database"
+    lineage:
+    - datalake_house_listing_search_raw.concierge_trigger.created_at
