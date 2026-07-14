@@ -1,29 +1,38 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: document
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento.id
+    - datalake_casa_mineira_crm_raw.documento.id
+    description: Surrogate primary key of the document row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento.imovel_id
+    - datalake_casa_mineira_crm_raw.documento.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento.tipo_id
+    - datalake_casa_mineira_crm_raw.documento.tipo_id
+    description: Foreign key to the document category in datalake_casa_mineira_crm_clean.document_type.
   file:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento.arquivo
+    - datalake_casa_mineira_crm_raw.documento.arquivo
+    description: Stored file path or reference for the uploaded document.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento.criado_por
+    - datalake_casa_mineira_crm_raw.documento.criado_por
+    description: Identifier of the user who uploaded this document.
   removed_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento.removido_por
+    - datalake_casa_mineira_crm_raw.documento.removido_por
+    description: Identifier of the user who removed this document.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento.criado_em
+    - datalake_casa_mineira_crm_raw.documento.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_deleted:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento.deletado_em
+    - datalake_casa_mineira_crm_raw.documento.deletado_em
+    description: Timestamp when the document was soft-deleted in the source system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of document sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per document record with standardized names and types in datalake_casa_mineira_crm_clean.

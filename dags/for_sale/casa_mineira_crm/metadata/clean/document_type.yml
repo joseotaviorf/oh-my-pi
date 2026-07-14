@@ -1,14 +1,18 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: document_type
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento_tipo.id
+    - datalake_casa_mineira_crm_raw.documento_tipo.id
+    description: Surrogate primary key of the document type row in the source system.
   document_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento_tipo.nome
+    - datalake_casa_mineira_crm_raw.documento_tipo.nome
+    description: Display name of the document type category.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.documento_tipo.criado_em
+    - datalake_casa_mineira_crm_raw.documento_tipo.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of document type sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per document type record with standardized names and types in datalake_casa_mineira_crm_clean.

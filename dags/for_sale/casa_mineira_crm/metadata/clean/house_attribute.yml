@@ -1,14 +1,18 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: house_attribute
 domain: For Sale
 columns:
   id_attribute:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_atributo.atributo_id
+    - datalake_casa_mineira_crm_raw.imovel_atributo.atributo_id
+    description: Foreign key to the attribute (amenity or feature) assigned to the property.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_atributo.imovel_id
+    - datalake_casa_mineira_crm_raw.imovel_atributo.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_atributo.criado_em
+    - datalake_casa_mineira_crm_raw.imovel_atributo.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of house attribute sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per house attribute record with standardized names and types in datalake_casa_mineira_crm_clean.

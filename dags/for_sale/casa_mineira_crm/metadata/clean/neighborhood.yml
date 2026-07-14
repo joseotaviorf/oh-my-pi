@@ -1,32 +1,42 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: neighborhood
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.id
+    - datalake_casa_mineira_crm_raw.bairro.id
+    description: Surrogate primary key of the neighborhood row in the source system.
   id_city:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.cidade_id
+    - datalake_casa_mineira_crm_raw.bairro.cidade_id
+    description: Foreign key to the city this neighborhood belongs to.
   neighborhood_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.nome
+    - datalake_casa_mineira_crm_raw.bairro.nome
+    description: Display name of the neighborhood.
   neighborhood_slug_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.slug
+    - datalake_casa_mineira_crm_raw.bairro.slug
+    description: URL-friendly slug identifier for the neighborhood.
   neighborhood_full_slug_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.slug_completo
+    - datalake_casa_mineira_crm_raw.bairro.slug_completo
+    description: Full slug for the neighborhood including its city or region path.
   region_code_5a:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.codigo_regiao_quintoandar
+    - datalake_casa_mineira_crm_raw.bairro.codigo_regiao_quintoandar
+    description: QuintoAndar region code mapping this neighborhood to a standardized region.
   is_priority:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.prioridade
+    - datalake_casa_mineira_crm_raw.bairro.prioridade
+    description: Boolean flag indicating whether priority applies to this record.
   is_visible:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.visibilidade
+    - datalake_casa_mineira_crm_raw.bairro.visibilidade
+    description: Boolean flag indicating whether visible applies to this record.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.bairro.criado_em
+    - datalake_casa_mineira_crm_raw.bairro.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of neighborhood sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per neighborhood record with standardized names and types in datalake_casa_mineira_crm_clean.

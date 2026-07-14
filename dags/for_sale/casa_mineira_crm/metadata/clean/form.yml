@@ -1,20 +1,26 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: form
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.ficha.id
+    - datalake_casa_mineira_crm_raw.ficha.id
+    description: Surrogate primary key of the form row in the source system.
   ip:
     lineage:
-      - datalake_casa_mineira_crm_raw.ficha.ip
+    - datalake_casa_mineira_crm_raw.ficha.ip
+    description: IP address recorded when the form was submitted.
   confirmation:
     lineage:
-      - datalake_casa_mineira_crm_raw.ficha.confirmacao
+    - datalake_casa_mineira_crm_raw.ficha.confirmacao
+    description: Confirmation code or status recorded for the submitted form.
   file:
     lineage:
-      - datalake_casa_mineira_crm_raw.ficha.arquivo
+    - datalake_casa_mineira_crm_raw.ficha.arquivo
+    description: Stored file path or reference for the submitted form document.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.ficha.criado_em
+    - datalake_casa_mineira_crm_raw.ficha.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of form sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per form record with standardized names and types in datalake_casa_mineira_crm_clean.

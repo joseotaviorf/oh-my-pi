@@ -1,23 +1,30 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: house_type
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.tipo.id
+    - datalake_casa_mineira_crm_raw.tipo.id
+    description: Surrogate primary key of the house type row in the source system.
   house_type_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.tipo.nome
+    - datalake_casa_mineira_crm_raw.tipo.nome
+    description: Display name of the property type (e.g. apartment, house, store).
   house_type_plural_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.tipo.nome_plural
+    - datalake_casa_mineira_crm_raw.tipo.nome_plural
+    description: Plural form of the property type display name.
   house_type_slug_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.tipo.slug
+    - datalake_casa_mineira_crm_raw.tipo.slug
+    description: URL-friendly slug identifier for the property type.
   house_type_order:
     lineage:
-      - datalake_casa_mineira_crm_raw.tipo.ordem
+    - datalake_casa_mineira_crm_raw.tipo.ordem
+    description: Sort order used to display property types in the interface.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.tipo.criado_em
+    - datalake_casa_mineira_crm_raw.tipo.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of house type sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per house type record with standardized names and types in datalake_casa_mineira_crm_clean.

@@ -1,290 +1,386 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: house
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.id
+    - datalake_casa_mineira_crm_raw.imovel.id
+    description: Surrogate primary key of the house row in the source system.
   id_real_estate_agency:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.imobiliaria_id
+    - datalake_casa_mineira_crm_raw.imovel.imobiliaria_id
+    description: Foreign key to the real estate agency that owns or manages this listing.
   id_condo:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.condominio_id
+    - datalake_casa_mineira_crm_raw.imovel.condominio_id
+    description: Foreign key to the condominium or building this property belongs to.
   id_house_quintoandar:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.codigo_quintoandar
+    - datalake_casa_mineira_crm_raw.imovel.codigo_quintoandar
+    description: QuintoAndar property code linking this listing to the corresponding house in QuintoAndar systems.
   id_key:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.chave_id
+    - datalake_casa_mineira_crm_raw.imovel.chave_id
+    description: Foreign key to the key record in datalake_casa_mineira_crm_clean.keys for this property.
   id_neighborhood:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.bairro_id
+    - datalake_casa_mineira_crm_raw.imovel.bairro_id
+    description: Foreign key to the neighborhood in datalake_casa_mineira_crm_clean.neighborhood where this property is located.
   id_status:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.status_id
+    - datalake_casa_mineira_crm_raw.imovel.status_id
+    description: Foreign key to the listing status in datalake_casa_mineira_crm_clean.house_status.
   id_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.tipo_id
+    - datalake_casa_mineira_crm_raw.imovel.tipo_id
+    description: Foreign key to the property type in datalake_casa_mineira_crm_clean.house_type.
   address:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.logradouro
+    - datalake_casa_mineira_crm_raw.imovel.logradouro
+    description: Street address (logradouro) of the property.
   complement:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.complemento
+    - datalake_casa_mineira_crm_raw.imovel.complemento
+    description: Address complement such as apartment or unit number.
   bank:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.banco
+    - datalake_casa_mineira_crm_raw.imovel.banco
+    description: Bank associated with the property financing or outstanding mortgage balance.
   coverage_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_tipo
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_tipo
+    description: Type of penthouse (cobertura) configuration for the property.
   hangar_roof:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.galpao_telhado
+    - datalake_casa_mineira_crm_raw.imovel.galpao_telhado
+    description: Roof type of the warehouse or hangar structure on the property.
   hangar_structure:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.galpao_estrutura
+    - datalake_casa_mineira_crm_raw.imovel.galpao_estrutura
+    description: Structural type of the warehouse or hangar on the property.
   lot_geometry:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.lote_geometria
+    - datalake_casa_mineira_crm_raw.imovel.lote_geometria
+    description: Geometric shape classification of the property lot.
   lot_inclination:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.lote_inclinacao
+    - datalake_casa_mineira_crm_raw.imovel.lote_inclinacao
+    description: Slope or inclination classification of the property lot.
   lot_zoning:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.lote_zoneamento
+    - datalake_casa_mineira_crm_raw.imovel.lote_zoneamento
+    description: Municipal zoning classification of the property lot.
   partner_indication:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.imobiliaria_indicacao
+    - datalake_casa_mineira_crm_raw.imovel.imobiliaria_indicacao
+    description: Real estate agency referral or indication associated with this listing.
   iptu_cadastral_index:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.indice_cadastral_do_iptu
+    - datalake_casa_mineira_crm_raw.imovel.indice_cadastral_do_iptu
+    description: Municipal cadastral index code used for the property IPTU tax registration.
   store_position:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.loja_posicao
+    - datalake_casa_mineira_crm_raw.imovel.loja_posicao
+    description: Position or frontage classification of the commercial store unit.
   sun_position:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.posicao
+    - datalake_casa_mineira_crm_raw.imovel.posicao
+    description: Solar orientation or sun exposure position of the property.
   video_url:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.video_url
+    - datalake_casa_mineira_crm_raw.imovel.video_url
+    description: URL of the property tour or promotional video.
   visit_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.visita_forma
+    - datalake_casa_mineira_crm_raw.imovel.visita_forma
+    description: Business context of the visit such as For Rent versus For Sale.
   visit_phone:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.visita_telefone_principal
+    - datalake_casa_mineira_crm_raw.imovel.visita_telefone_principal
+    description: Primary phone number for scheduling a visit to the property.
   visit_phone_secondary:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.visita_telefone_secundario
+    - datalake_casa_mineira_crm_raw.imovel.visita_telefone_secundario
+    description: Secondary phone number for scheduling a visit to the property.
   visit_observation:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.visita_observacao
+    - datalake_casa_mineira_crm_raw.imovel.visita_observacao
+    description: Free-text notes about visit scheduling or access to the property.
   zip_code:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cep
+    - datalake_casa_mineira_crm_raw.imovel.cep
+    description: Brazilian postal code (CEP) of the property address.
   garage_info:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.garagem_informacao
+    - datalake_casa_mineira_crm_raw.imovel.garagem_informacao
+    description: Free-text details about the property garage or parking arrangement.
   house_details:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.detalhes_imovel
+    - datalake_casa_mineira_crm_raw.imovel.detalhes_imovel
+    description: Free-text description of the property unit details.
   condo_details:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.detalhes_edificio
+    - datalake_casa_mineira_crm_raw.imovel.detalhes_edificio
+    description: Free-text description of the building or condominium details.
   status_observation:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.observacao_status
+    - datalake_casa_mineira_crm_raw.imovel.observacao_status
+    description: Free-text notes explaining the current listing status.
   exchange_observation:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.observacao_permuta
+    - datalake_casa_mineira_crm_raw.imovel.observacao_permuta
+    description: Free-text notes about property exchange (permuta) terms accepted by the owner.
   number:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.numero
+    - datalake_casa_mineira_crm_raw.imovel.numero
+    description: Street number of the property address.
   bathrooms:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.banheiros
+    - datalake_casa_mineira_crm_raw.imovel.banheiros
+    description: Number of bathrooms in the property.
   bedrooms:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.quartos
+    - datalake_casa_mineira_crm_raw.imovel.quartos
+    description: Number of bedrooms in the property.
   brokerage:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.comissao
+    - datalake_casa_mineira_crm_raw.imovel.comissao
+    description: Brokerage commission rate or amount applied to the sale.
   brokerage_bonus:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.comissao_bonus
+    - datalake_casa_mineira_crm_raw.imovel.comissao_bonus
+    description: Additional bonus commission offered on top of the standard brokerage fee.
   building_floors:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.numero_andares
+    - datalake_casa_mineira_crm_raw.imovel.numero_andares
+    description: Total number of floors in the building.
   condo_price:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.valor_condominio
+    - datalake_casa_mineira_crm_raw.imovel.valor_condominio
+    description: Monthly condominium fee charged for the property.
   evaluation_price:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.preco_avaliacao
+    - datalake_casa_mineira_crm_raw.imovel.preco_avaliacao
+    description: Appraised valuation price of the property.
   iptu_price:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.valor_iptu
+    - datalake_casa_mineira_crm_raw.imovel.valor_iptu
+    description: Annual IPTU property tax amount for the property.
   predicted_price:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.preco_modelo
+    - datalake_casa_mineira_crm_raw.imovel.preco_modelo
+    description: Model-predicted price estimated for the property.
   price:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.preco
+    - datalake_casa_mineira_crm_raw.imovel.preco
+    description: Listed sale price of the property.
   debit_balance_value:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.valor_saldo_devedor
+    - datalake_casa_mineira_crm_raw.imovel.valor_saldo_devedor
+    description: Outstanding debit balance owed on the property financing.
   construction_year:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.ano_construcao
+    - datalake_casa_mineira_crm_raw.imovel.ano_construcao
+    description: Year the property was constructed.
   covered_parking_slots:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.vagas_cobertas
+    - datalake_casa_mineira_crm_raw.imovel.vagas_cobertas
+    description: Number of covered parking spaces at the property.
   elevators:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.elevadores
+    - datalake_casa_mineira_crm_raw.imovel.elevadores
+    description: Number of elevators in the building.
   floor:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.andar
+    - datalake_casa_mineira_crm_raw.imovel.andar
+    description: Floor number on which the unit is located.
   floor_unities:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.unidade_andar
+    - datalake_casa_mineira_crm_raw.imovel.unidade_andar
+    description: Number of units per floor in the building.
   hangar_ceiling_height:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.galpao_pe_direito
+    - datalake_casa_mineira_crm_raw.imovel.galpao_pe_direito
+    description: Ceiling height of the warehouse or hangar structure.
   hangar_front:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.galpao_frente
+    - datalake_casa_mineira_crm_raw.imovel.galpao_frente
+    description: Front width measurement of the warehouse or hangar structure.
   hangar_lateral:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.galpao_lateral
+    - datalake_casa_mineira_crm_raw.imovel.galpao_lateral
+    description: Lateral depth measurement of the warehouse or hangar structure.
   house_floors:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.casa_andares
+    - datalake_casa_mineira_crm_raw.imovel.casa_andares
+    description: Number of floors in the house unit.
   images_quality:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.qualidade_imagens
+    - datalake_casa_mineira_crm_raw.imovel.qualidade_imagens
+    description: Quality score assigned to the listing images.
   lat:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.latitude
+    - datalake_casa_mineira_crm_raw.imovel.latitude
+    description: Geographic latitude coordinate of the property location.
   lng:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.longitude
+    - datalake_casa_mineira_crm_raw.imovel.longitude
+    description: Geographic longitude coordinate of the property location.
   line_parking_slots:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.vagas_linha
+    - datalake_casa_mineira_crm_raw.imovel.vagas_linha
+    description: Number of tandem (in-line) parking spaces at the property.
   liquidity:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.liquidez
+    - datalake_casa_mineira_crm_raw.imovel.liquidez
+    description: Estimated market liquidity score for the property.
   inferior_liquidity:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.liquidez_inferior
+    - datalake_casa_mineira_crm_raw.imovel.liquidez_inferior
+    description: Lower bound of the estimated market liquidity range for the property.
   superior_liquidity:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.liquidez_superior
+    - datalake_casa_mineira_crm_raw.imovel.liquidez_superior
+    description: Upper bound of the estimated market liquidity range for the property.
   living_rooms:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.salas
+    - datalake_casa_mineira_crm_raw.imovel.salas
+    description: Number of living rooms in the property.
   lot_area:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.lote_area
+    - datalake_casa_mineira_crm_raw.imovel.lote_area
+    description: Total land area of the property lot.
   lot_front:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.lote_frente
+    - datalake_casa_mineira_crm_raw.imovel.lote_frente
+    description: Front width measurement of the property lot.
   lot_lateral:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.lote_lateral
+    - datalake_casa_mineira_crm_raw.imovel.lote_lateral
+    description: Lateral depth measurement of the property lot.
   mezzanine_store_area:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.loja_sobreloja_area
+    - datalake_casa_mineira_crm_raw.imovel.loja_sobreloja_area
+    description: Floor area of the store mezzanine (sobreloja).
   open_parking_slots:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.vagas_livres
+    - datalake_casa_mineira_crm_raw.imovel.vagas_livres
+    description: Number of open (uncovered) parking spaces at the property.
   parking_slots:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.vagas
+    - datalake_casa_mineira_crm_raw.imovel.vagas
+    description: Total number of parking spaces at the property.
   private_area:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.quantidade_area_privativa
+    - datalake_casa_mineira_crm_raw.imovel.quantidade_area_privativa
+    description: Private (usable) floor area of the property unit.
   roof_building_area:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_area_construida
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_area_construida
+    description: Built (covered) floor area of the penthouse (cobertura).
   roof_terrace_area:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_area_terraco
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_area_terraco
+    description: Terrace area of the penthouse (cobertura).
   semi_suites:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.semissuites
+    - datalake_casa_mineira_crm_raw.imovel.semissuites
+    description: Number of semi-suite bedrooms in the property.
   store_ceiling_height:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.loja_pe_direito
+    - datalake_casa_mineira_crm_raw.imovel.loja_pe_direito
+    description: Ceiling height of the commercial store unit.
   store_mezzanine:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.loja_sobreloja
+    - datalake_casa_mineira_crm_raw.imovel.loja_sobreloja
+    description: Number of mezzanine levels (sobreloja) in the commercial store unit.
   suites:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.suites
+    - datalake_casa_mineira_crm_raw.imovel.suites
+    description: Number of en-suite bedrooms in the property.
   toilets:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.lavabos
+    - datalake_casa_mineira_crm_raw.imovel.lavabos
+    description: Number of half-bathrooms (lavabos) in the property.
   total_area:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.area
+    - datalake_casa_mineira_crm_raw.imovel.area
+    description: Total floor area of the property.
   has_roof_pool:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_piscina
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_piscina
+    description: Boolean flag indicating whether roof pool applies to this record.
   has_roof_sauna:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_sauna
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_sauna
+    description: Boolean flag indicating whether roof sauna applies to this record.
   has_roof_grill:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_churrasqueira
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_churrasqueira
+    description: Boolean flag indicating whether roof grill applies to this record.
   has_roof_douche:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_ducha
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_ducha
+    description: Boolean flag indicating whether roof douche applies to this record.
   has_roof_ofuro:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_ofuro
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_ofuro
+    description: Boolean flag indicating whether roof ofuro applies to this record.
   has_roof_gourmet_area:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.cobertura_espaco_gourmet
+    - datalake_casa_mineira_crm_raw.imovel.cobertura_espaco_gourmet
+    description: Boolean flag indicating whether roof gourmet area applies to this record.
   is_house_entrance_semi_detached:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.casa_geminada_entrada
+    - datalake_casa_mineira_crm_raw.imovel.casa_geminada_entrada
+    description: Boolean flag indicating whether house entrance semi detached applies to this record.
   is_permute_accepted:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.aceita_permuta
+    - datalake_casa_mineira_crm_raw.imovel.aceita_permuta
+    description: Boolean flag indicating whether permute accepted applies to this record.
   is_portal_published:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.publicar_portais
+    - datalake_casa_mineira_crm_raw.imovel.publicar_portais
+    description: Boolean flag indicating whether portal published applies to this record.
   is_profissional_photos:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.fotos_profissionais
+    - datalake_casa_mineira_crm_raw.imovel.fotos_profissionais
+    description: Boolean flag indicating whether profissional photos applies to this record.
   is_walled_lot:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.lote_murado
+    - datalake_casa_mineira_crm_raw.imovel.lote_murado
+    description: Boolean flag indicating whether walled lot applies to this record.
   ts_construction_ended:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.obra_entregue_em
+    - datalake_casa_mineira_crm_raw.imovel.obra_entregue_em
+    description: Timestamp when the property construction was completed and delivered.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.criado_em
+    - datalake_casa_mineira_crm_raw.imovel.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_deleted:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.deletado_em
+    - datalake_casa_mineira_crm_raw.imovel.deletado_em
+    description: Timestamp when the property listing was soft-deleted in the source system.
   ts_disabled:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.desativado_em
+    - datalake_casa_mineira_crm_raw.imovel.desativado_em
+    description: Timestamp when the property listing was disabled.
   ts_publication_requested:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.publicacao_solicitada_em
+    - datalake_casa_mineira_crm_raw.imovel.publicacao_solicitada_em
+    description: Timestamp when publication of the listing was requested.
   ts_published:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.publicado_em
+    - datalake_casa_mineira_crm_raw.imovel.publicado_em
+    description: Timestamp when the listing was first published.
   ts_republished:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.republicado_em
+    - datalake_casa_mineira_crm_raw.imovel.republicado_em
+    description: Timestamp when the listing was republished after being taken down.
   ts_updated:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel.atualizado_em
+    - datalake_casa_mineira_crm_raw.imovel.atualizado_em
+    description: Timestamp when the row was last updated in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of house sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per house record with standardized names and types in datalake_casa_mineira_crm_clean.

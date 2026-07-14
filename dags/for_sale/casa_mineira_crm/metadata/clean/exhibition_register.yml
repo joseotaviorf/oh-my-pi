@@ -1,17 +1,22 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: exhibition_register
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_exibicao.id
+    - datalake_casa_mineira_crm_raw.registro_exibicao.id
+    description: Surrogate primary key of the exhibition register row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_exibicao.imovel_id
+    - datalake_casa_mineira_crm_raw.registro_exibicao.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_exibicao.usuario_id
+    - datalake_casa_mineira_crm_raw.registro_exibicao.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.registro_exibicao.criado_em
+    - datalake_casa_mineira_crm_raw.registro_exibicao.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of exhibition register sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per exhibition register record with standardized names and types in datalake_casa_mineira_crm_clean.

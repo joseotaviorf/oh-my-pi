@@ -1,14 +1,18 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: keys
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.chave.id
+    - datalake_casa_mineira_crm_raw.chave.id
+    description: Surrogate primary key of the keys row in the source system.
   key_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.chave.nome
+    - datalake_casa_mineira_crm_raw.chave.nome
+    description: Label identifying the physical key set for property access.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.chave.criado_em
+    - datalake_casa_mineira_crm_raw.chave.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of keys sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per keys record with standardized names and types in datalake_casa_mineira_crm_clean.

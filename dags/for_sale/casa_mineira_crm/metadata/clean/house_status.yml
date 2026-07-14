@@ -1,14 +1,18 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: house_status
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.status.id
+    - datalake_casa_mineira_crm_raw.status.id
+    description: Surrogate primary key of the house status row in the source system.
   house_status_name:
     lineage:
-      - datalake_casa_mineira_crm_raw.status.nome
+    - datalake_casa_mineira_crm_raw.status.nome
+    description: Display name of the property listing status.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.status.criado_em
+    - datalake_casa_mineira_crm_raw.status.criado_em
+    description: Timestamp when the row was first created in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of house status sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per house status record with standardized names and types in datalake_casa_mineira_crm_clean.

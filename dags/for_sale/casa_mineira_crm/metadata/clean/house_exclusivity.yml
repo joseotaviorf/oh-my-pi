@@ -1,35 +1,46 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: house_exclusivity
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.id
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.id
+    description: Surrogate primary key of the house exclusivity row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.imovel_id
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_user_cancellation:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.usuario_cancelamento_id
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.usuario_cancelamento_id
+    description: Foreign key to the user who cancelled this exclusivity agreement.
   id_user_exclusion:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.usuario_exclusao_id
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.usuario_exclusao_id
+    description: Foreign key to the user who deleted this exclusivity record.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.criado_por
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.criado_por
+    description: Identifier of the user who created this exclusivity agreement.
   observation:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.observacao
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.observacao
+    description: Free-text notes about the exclusivity agreement terms.
   dt_begun:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.inicio_em
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.inicio_em
+    description: Date when the exclusivity agreement started.
   dt_cancelled:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.cancelado_em
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.cancelado_em
+    description: Date when the exclusivity agreement was cancelled.
   dt_deleted:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.deletado_em
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.deletado_em
+    description: Date when the exclusivity record was soft-deleted.
   dt_finished:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_exclusividade.termino_em
+    - datalake_casa_mineira_crm_raw.imovel_exclusividade.termino_em
+    description: Date when the exclusivity agreement ended.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of house exclusivity sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per house exclusivity record with standardized names and types in datalake_casa_mineira_crm_clean.

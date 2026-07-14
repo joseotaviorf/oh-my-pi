@@ -1,62 +1,82 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: contact
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.id
+    - datalake_casa_mineira_crm_raw.contato.id
+    description: Surrogate primary key of the contact row in the source system.
   id_client:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.cliente_id
+    - datalake_casa_mineira_crm_raw.contato.cliente_id
+    description: Foreign key to the client master record in Atta or Sales Flow.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.imovel_id
+    - datalake_casa_mineira_crm_raw.contato.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_media:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.midia_id
+    - datalake_casa_mineira_crm_raw.contato.midia_id
+    description: Foreign key to the media channel in datalake_casa_mineira_crm_clean.media_contact that generated this contact.
   id_origin:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.origem_id
+    - datalake_casa_mineira_crm_raw.contato.origem_id
+    description: Foreign key to the contact origin in datalake_casa_mineira_crm_clean.origin_contact identifying where the lead came from.
   id_user_attendance:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.usuario_atendimento_id
+    - datalake_casa_mineira_crm_raw.contato.usuario_atendimento_id
+    description: Foreign key to the user who handled the attendance for this contact.
   id_user_forwarding:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.usuario_encaminhamento_id
+    - datalake_casa_mineira_crm_raw.contato.usuario_encaminhamento_id
+    description: Foreign key to the user who forwarded or routed this contact to another agent.
   id_user_rejection:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.usuario_rejeicao_id
+    - datalake_casa_mineira_crm_raw.contato.usuario_rejeicao_id
+    description: Foreign key to the user who rejected this contact.
   conversion_url:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.url_conversao
+    - datalake_casa_mineira_crm_raw.contato.url_conversao
+    description: Landing page URL where the lead converted into this contact.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.criado_por
+    - datalake_casa_mineira_crm_raw.contato.criado_por
+    description: Identifier of the user or process that created this contact record.
   email:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.email
+    - datalake_casa_mineira_crm_raw.contato.email
+    description: Contact email address used for notifications and identity matching.
   name:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.nome
+    - datalake_casa_mineira_crm_raw.contato.nome
+    description: Human-readable display name associated with the person or entity in this row.
   phone_number:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.telefone
+    - datalake_casa_mineira_crm_raw.contato.telefone
+    description: Phone number provided by the contact for follow-up communication.
   token:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.token
+    - datalake_casa_mineira_crm_raw.contato.token
+    description: Unique token used to identify or authenticate this contact externally.
   contact_type:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.tipo
+    - datalake_casa_mineira_crm_raw.contato.tipo
+    description: Category of the contact such as buyer, seller, or visit lead.
   is_automated:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.automatizado
+    - datalake_casa_mineira_crm_raw.contato.automatizado
+    description: Boolean flag indicating whether automated applies to this record.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.criado_em
+    - datalake_casa_mineira_crm_raw.contato.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_attended:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.atendimento_em
+    - datalake_casa_mineira_crm_raw.contato.atendimento_em
+    description: Timestamp when the contact was first attended by an agent.
   ts_rejected:
     lineage:
-      - datalake_casa_mineira_crm_raw.contato.rejeitado_em
+    - datalake_casa_mineira_crm_raw.contato.rejeitado_em
+    description: Timestamp when the contact was rejected.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of contact sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per contact record with standardized names and types in datalake_casa_mineira_crm_clean.

@@ -1,29 +1,38 @@
----
 database_name: datalake_casa_mineira_crm_clean
 table_name: house_acquisition_participant
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.id
+    - datalake_casa_mineira_crm_raw.imovel_captacao_participante.id
+    description: Surrogate primary key of the house acquisition participant row in the source system.
   id_house:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.imovel_id
+    - datalake_casa_mineira_crm_raw.imovel_captacao_participante.imovel_id
+    description: Foreign key to the property listing involved in the visit or transaction.
   id_user:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.usuario_id
+    - datalake_casa_mineira_crm_raw.imovel_captacao_participante.usuario_id
+    description: Foreign key to the QuintoAndar user who performed the action.
   id_user_group:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.usuario_grupo_id
+    - datalake_casa_mineira_crm_raw.imovel_captacao_participante.usuario_grupo_id
+    description: Foreign key to the user group the participating user belongs to.
   created_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.criado_por
+    - datalake_casa_mineira_crm_raw.imovel_captacao_participante.criado_por
+    description: Identifier of the user who registered this acquisition participant.
   removed_by:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.removido_por
+    - datalake_casa_mineira_crm_raw.imovel_captacao_participante.removido_por
+    description: Identifier of the user who removed this acquisition participant.
   ts_created:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.criado_em
+    - datalake_casa_mineira_crm_raw.imovel_captacao_participante.criado_em
+    description: Timestamp when the row was first created in the source operational system.
   ts_deleted:
     lineage:
-      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.deletado_em
+    - datalake_casa_mineira_crm_raw.imovel_captacao_participante.deletado_em
+    description: Timestamp when this acquisition participant record was soft-deleted.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of house acquisition participant sourced from operational systems backing Casa Mineira CRM partner data for For Sale brokerage and franchise operations. One row per house acquisition participant record with standardized names and types in datalake_casa_mineira_crm_clean.
