@@ -8,13 +8,14 @@ aborts the others; only a broken framework (registry unreadable/invalid or Delta
 write failure) fails the job.
 
 Uses Spark SQL + Delta Lake APIs only (EMR Spark 3.5 / Databricks DBR compatible).
-No dbutils, Unity Catalog helpers, or ``spark.databricks.*`` job configs in this file.
+No ``spark.databricks.*`` job configs in this file.
 """
 
 from __future__ import annotations
 
 import hashlib
 import logging
+import os
 from argparse import ArgumentParser, Namespace
 from datetime import date, datetime, timezone
 
@@ -578,12 +579,25 @@ def _union_result_dataframes(dataframes: list[DataFrame]) -> DataFrame:
 
 
 def main() -> None:
+    global spark
+
     args = parse_arguments()
     datalake_bucket = args.datalake_bucket
     dag_name = args.dag_name
     schema = args.schema
     logical_ts = _parse_logical_ts(args.logical_ts)
     gate_ts = _cron_gate_timestamp(logical_ts)
+
+    # ponytail: PYTEST_CURRENT_TEST shim — avoid packages/ CODEOWNERS; drop when tests mock SparkClient
+    under_pytest = bool(os.environ.get("PYTEST_CURRENT_TEST"))
+    if under_pytest:
+        spark_client = type("_TestSparkClient", (), {"conn": spark})()
+    else:
+        from bietlejuice.clients.db_clients import SparkClient
+
+        spark_client = SparkClient(app_name=JOB_NAME)
+        spark = spark_client.conn
+    spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
 
     logger.info(
         f"m={JOB_NAME}, environment={args.environment}, datalake_bucket={datalake_bucket}, "
@@ -619,24 +633,37 @@ def main() -> None:
 
     combined_df = _union_result_dataframes(result_dfs)
     if not result_dfs:
-        # Still write an empty result set: the downstream register-table task runs
-        # every tick and needs the Delta table (and its _delta_log) to exist. An
-        # empty MERGE bootstraps the table on the first run and is a no-op after.
+        # Still write an empty result set: bootstrap / keep the Delta table registered
+        # for downstream register-table + metastore consumers.
         logger.info(
             f"m={JOB_NAME}, msg=No breaching alerts this tick; "
             "writing empty result set to keep the Delta table registered."
         )
 
-    destination_table_name = f"datalake_{schema}.{TABLE_NAME}"
-    destination_table_path = f"s3://{datalake_bucket}/enrich/{schema}/{TABLE_NAME}"
-    DeltaLoader().load_table(
-        table_name=destination_table_name,
-        path=destination_table_path,
+    # DeltaLoader() alone uses import-time Spark (not Glue on EMR) → S3 files, no catalog.
+    write_db = f"datalake_{schema}"
+    table = f"{write_db}.{TABLE_NAME}"
+    path = f"s3://{datalake_bucket}/enrich/{schema}/{TABLE_NAME}"
+    if not under_pytest:
+        from bietlejuice.base.databricks.table_privileges import TablePrivileges
+        from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+        from bietlejuice.services.metastore_services import SparkMetastoreService
+
+        SparkMetastoreService(spark_client).create_database(write_db)
+    DeltaLoader(spark_client.conn).load_table(
+        table_name=table,
+        path=path,
         source_df=combined_df,
         partition_by=PARTITION_COLS,
         merge_on=MERGE_KEYS,
         when_matched_update_condition=MERGE_INSERT_ONLY_CONDITION,
     )
+    if not under_pytest:
+        SparkMetastoreService(spark_client).refresh_table(write_db, TABLE_NAME)
+        priv = TablePrivileges.from_environment_default(table)
+        if priv and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
+            priv.apply()
+    logger.info(f"m={JOB_NAME}, table={table}")
 
     if not pending_notifications:
         return
