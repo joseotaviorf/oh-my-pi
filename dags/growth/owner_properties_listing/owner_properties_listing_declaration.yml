@@ -85,18 +85,10 @@ workflow:
       clean_table_name: related_as
       clean_primary_keys: [id]
       raw_primary_keys: [id]
-    tb_related_as_aud:
-      clean_table_name: related_as_aud
-      clean_primary_keys: [id, rev]
-      raw_primary_keys: [id, rev]
     tb_source_type:
       clean_table_name: source_type
       clean_primary_keys: [id]
       raw_primary_keys: [id]
-    tb_source_type_aud:
-      clean_table_name: source_type_aud
-      clean_primary_keys: [id, rev]
-      raw_primary_keys: [id, rev]
     tb_status_offer:
       clean_table_name: status_offer
       clean_primary_keys: [id]
