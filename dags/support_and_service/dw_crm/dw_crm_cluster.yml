@@ -1,21 +1,13 @@
 cluster:
   type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
+    # Overnight 2026-07-15 (j-31QDKKZFPIANY): all workers core OD; task fleet left at preset 0.
     core_nodes:
-      target_on_demand: 2
+      target_on_demand: 4
       target_spot: 0
       instance_types:
       - r6g.4xlarge
       - r7g.4xlarge
       - r6i.4xlarge
-    task_nodes:
-      instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
-      target_on_demand: 0
-      target_spot: 2
-      allocation_strategy: price-capacity-optimized
-      bid_price_percentage: 100
     aws_attributes:
       ebs_volume_size: 200

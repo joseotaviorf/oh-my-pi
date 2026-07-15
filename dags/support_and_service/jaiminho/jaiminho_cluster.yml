@@ -3,22 +3,14 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    # Overnight 2026-07-15 (j-2GFLOQLL88ZZL): all workers core OD; task fleet left at preset 0.
     core_nodes:
       instance_types:
       - r6g.4xlarge
       - r7g.4xlarge
       - r6i.4xlarge
-      target_on_demand: 2
+      target_on_demand: 4
       target_spot: 0
-    task_nodes:
-      instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
-      target_on_demand: 0
-      target_spot: 2
-      allocation_strategy: price-capacity-optimized
-      bid_price_percentage: 100
     spark_conf:
       spark.driver.memory: 16g
       spark.driver.memoryOverhead: 4g
