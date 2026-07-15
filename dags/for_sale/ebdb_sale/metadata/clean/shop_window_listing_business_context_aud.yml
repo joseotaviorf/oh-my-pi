@@ -1,32 +1,42 @@
----
 database_name: datalake_ebdb_clean
 table_name: shop_window_listing_business_context_aud
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.id
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.id
+    description: Surrogate primary key of the shop window listing business context aud row in the source system.
   id_shop_window:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.shopwindow_id
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.shopwindow_id
+    description: Audited identifier of the shop window in this listing business context link.
   id_listing_business_context:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.listingbusinesscontext_id
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.listingbusinesscontext_id
+    description: Audited identifier of the listing business context tied to the shop window.
   rev:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.rev
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.rev
+    description: Envers revision number grouping field-level changes in this audit snapshot.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.revtype
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.revtype
+    description: 'Envers revision type code: insert, update, or delete for the audited row.'
   is_active:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.isactive
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.isactive
+    description: Whether the party or record remains active in the current sales flow.
   mod_id_shop_window:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.shopwindow_id_mod
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.shopwindow_id_mod
+    description: Envers boolean flag indicating whether id shop window changed in this audit revision.
   mod_id_listing_business_context:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.listingbusinesscontext_id_mod
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.listingbusinesscontext_id_mod
+    description: Envers boolean flag indicating whether id listing business context changed in this audit revision.
   mod_is_active:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.isactive_mod
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext_aud.isactive_mod
+    description: Envers boolean flag indicating whether is active changed in this audit revision.
+owner: guilherme.rocha@quintoandar.com.br
+description: Hibernate Envers audit trail of shop window listing business context rows from EBDB For Sale operational tables from core listing and transaction services. Each revision records field-level changes for compliance and operational forensics.

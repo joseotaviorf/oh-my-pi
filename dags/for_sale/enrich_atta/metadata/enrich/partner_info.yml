@@ -1,37 +1,38 @@
----
 database_name: datalake_atta
 table_name: partner_info
 description: Table containing the details from atta partners
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_partner:
     lineage:
-      - datalake_atta_clean.partner_info.id_partner
-    description: "Partner's identification number"
+    - datalake_atta_clean.partner_info.id_partner
+    description: Partner's identification number
   id_admin_user:
     lineage:
-      - datalake_atta_clean.partner_info.id_admin_user
-    description: "Admin user's identification number"
+    - datalake_atta_clean.partner_info.id_admin_user
+    description: Admin user's identification number
   id_franchise:
     lineage:
-      - datalake_atta_clean.partner_info.id_franchise
-    description: "Franchise's identification number"
+    - datalake_atta_clean.partner_info.id_franchise
+    description: Franchise's identification number
   id_registration_user:
     lineage:
-      - datalake_atta_clean.partner_info.id_registration_user
-    description: "User's identification number"
+    - datalake_atta_clean.partner_info.id_registration_user
+    description: User's identification number
   partner_name:
     lineage:
-      - datalake_atta_clean.partner_info.partner_name
-    description: "Partner's name"
+    - datalake_atta_clean.partner_info.partner_name
+    description: Legal or commercial name of the financing or brokerage partner entity.
   wallet:
-    description: "Partnerships description"
+    description: Partnerships description
+    lineage:
+    - datalake_atta_clean.partner_info.partner_name
   ts_registration:
     lineage:
-      - datalake_atta_clean.partner_info.ts_registration
-    description: "Registration timestamp"
+    - datalake_atta_clean.partner_info.ts_registration
+    description: Timestamp when the partner was registered on the Atta platform.
   ts_inactive_user:
     lineage:
-      - datalake_atta_clean.partner_info.ts_inactive_user
-    description: "Timestamp when user became inactive"
+    - datalake_atta_clean.partner_info.ts_inactive_user
+    description: Timestamp when user became inactive

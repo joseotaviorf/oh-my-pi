@@ -1,142 +1,141 @@
----
 database_name: datalake_atta
 table_name: proposal_dates
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
-description: "Table containing dates for each proposal situation"
+owner: helder.rodrigues@quintoandar.com.br
+description: Table containing dates for each proposal situation
 columns:
   id_proposal:
-    description: "Proposal ID"
+    description: Foreign key to the financing or sale proposal in the Atta platform.
     lineage:
-      - datalake_atta_clean.log_isolve_v1.id_proposal
-      - datalake_atta_clean.log_isolve_v2.id_proposal
+    - datalake_atta_clean.log_isolve_v1.id_proposal
+    - datalake_atta_clean.log_isolve_v2.id_proposal
   ts_credit_started:
-    description: "Timestamp in wich the credit started"
+    description: Timestamp in wich the credit started
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_credit_ended:
-    description: "Timestamp in wich the credit ended"
+    description: Timestamp in wich the credit ended
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_financing_started:
-    description: "Timestamp in wich the financing started"
+    description: Timestamp in wich the financing started
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_bank_legal_analysis_started:
-    description: "Timestamp in wich the bank started the analysis"
+    description: Timestamp in wich the bank started the analysis
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_bank_legal_analysis_ended:
-    description: "Timestamp in wich the bank finished the analysis"
+    description: Timestamp in wich the bank finished the analysis
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_last_approved_log:
-    description: "Timestamp of last approval"
+    description: Timestamp of last approval
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_first_cancelation:
-    description: "Timestamp in wich happened the first cancelation"
+    description: Timestamp in wich happened the first cancelation
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_last_cancelation:
-    description: "Timestamp in wich happened the last cancelation"
+    description: Timestamp in wich happened the last cancelation
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_pre_analysis:
-    description: "First timestamp of pre analysis"
+    description: First timestamp of pre analysis
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_pre_analysis:
-    description: "Last timestamp of pre analysis"
+    description: Last timestamp of pre analysis
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_credit_application:
-    description: "First timestamp of credit application"
+    description: First timestamp of credit application
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_credit_application:
-    description: "Last timestamp of credit application"
+    description: Last timestamp of credit application
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_credit_application_approval:
-    description: "First timestamp of credit application approval"
+    description: First timestamp of credit application approval
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_credit_application_approval:
-    description: "Last timestamp of credit application approval"
+    description: Last timestamp of credit application approval
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_credit_application_reproval:
-    description: "First timestamp of credit application repproval"
+    description: First timestamp of credit application repproval
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_credit_application_reproval:
-    description: "Last timestamp of credit application repproval"
+    description: Last timestamp of credit application repproval
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_inspection:
-    description: "First timestamp of inspection"
+    description: First timestamp of inspection
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_inspection:
-    description: "Last timestamp of inspection"
+    description: Last timestamp of inspection
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_checklist:
-    description: "First timestamp of checklist"
+    description: First timestamp of checklist
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_checklist:
-    description: "Last timestamp of checklist"
+    description: Last timestamp of checklist
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_bank_application:
-    description: "First timestamp of bank application"
+    description: First timestamp of bank application
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_bank_application:
-    description: "Last timestamp of bank application"
+    description: Last timestamp of bank application
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_financing_contract:
-    description: "First timestamp of financing contract"
+    description: First timestamp of financing contract
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_financing_contract:
-    description: "Last timestamp of financing contract"
+    description: Last timestamp of financing contract
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_min_contracted:
-    description: "First timestamp of contract"
+    description: First timestamp of contract
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to
   ts_max_contracted:
-    description: "Last timestamp of contract"
+    description: Last timestamp of contract
     lineage:
-      - datalake_atta_clean.log_isolve_v1.ts_current_log
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.ts_current_log
+    - datalake_atta_clean.log_isolve_v2.to

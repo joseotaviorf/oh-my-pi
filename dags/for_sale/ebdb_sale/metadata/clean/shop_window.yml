@@ -1,4 +1,3 @@
----
 database_name: datalake_ebdb_clean
 table_name: shop_window
 domain: For Sale

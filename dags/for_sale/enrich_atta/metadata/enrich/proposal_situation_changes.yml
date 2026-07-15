@@ -1,40 +1,40 @@
 database_name: datalake_atta
 table_name: proposal_situation_changes
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
-description: "Table containing the leadtime for each proposal situation"
+owner: helder.rodrigues@quintoandar.com.br
+description: Table containing the leadtime for each proposal situation
 columns:
   id_proposal:
-    description: "Proposal ID"
+    description: Foreign key to the financing or sale proposal in the Atta platform.
     lineage:
-      - datalake_atta_clean.log_isolve_v1.id_proposal
-      - datalake_atta_clean.log_isolve_v2.id_proposal
+    - datalake_atta_clean.log_isolve_v1.id_proposal
+    - datalake_atta_clean.log_isolve_v2.id_proposal
   id_partner:
-    description: "ID to identify the partner"
+    description: ID to identify the partner
     lineage:
-      - datalake_atta_clean.log_isolve_v1.id_current_status
-      - datalake_atta_clean.log_isolve_v2.to
+    - datalake_atta_clean.log_isolve_v1.id_current_status
+    - datalake_atta_clean.log_isolve_v2.to
   proposal_order:
-    description: "Number to identify the order of situation"
+    description: Number to identify the order of situation
   proposal_status:
-    description: "Status description"
+    description: Current status of the financing or sale proposal in the partner workflow.
     lineage:
-      - datalake_atta_clean.track_step_detail.proposal_status
+    - datalake_atta_clean.track_step_detail.proposal_status
   situation_history:
-    description: "Situation description"
+    description: Previous proposal situation label preceding this transition (for example Andamento, Aprovado, Pendente).
   next_situation:
-    description: "Next situation description"
+    description: Next situation description
   ts_proposal_registration:
-    description: "Proposal registration timestamp"
+    description: Proposal registration timestamp
   ts_start_situation:
-    description: "Start current situation timestamp"
+    description: Start current situation timestamp
   ts_end_situation:
-    description: "End current situation timestamp"
+    description: End current situation timestamp
   lead_time_situation_in_minutes:
-    description: "Situation leadtime in minutes"
+    description: Situation leadtime in minutes
   lead_time_situation_in_hour:
-    description: "Situation leadtime in hours"
+    description: Situation leadtime in hours
   lead_time_situation_in_day:
-    description: "Situation leadtime in days"
+    description: Situation leadtime in days
   lead_time_status_in_day:
-    description: "Status leadtime in days"
+    description: Status leadtime in days

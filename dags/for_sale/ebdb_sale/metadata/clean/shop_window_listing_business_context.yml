@@ -1,23 +1,30 @@
----
 database_name: datalake_ebdb_clean
 table_name: shop_window_listing_business_context
 domain: For Sale
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext.id
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext.id
+    description: Surrogate primary key of the shop window listing business context row in the source system.
   id_shop_window:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext.shopwindow_id
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext.shopwindow_id
+    description: Identifier of the shop window associated in this listing business context link.
   id_listing_business_context:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext.listingbusinesscontext_id
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext.listingbusinesscontext_id
+    description: Identifier of the listing business context tied to the shop window.
   is_active:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext.isactive
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext.isactive
+    description: Whether the party or record remains active in the current sales flow.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext.criadoem
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext.criadoem
+    description: Timestamp when the row was first created in the source operational system.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.shopwindow_listingbusinesscontext.atualizadoem
+    - datalake_ebdb_raw.shopwindow_listingbusinesscontext.atualizadoem
+    description: Timestamp when the row was last updated in the source operational system.
+owner: guilherme.rocha@quintoandar.com.br
+description: Cleaned snapshot of shop window listing business context sourced from operational systems backing EBDB For Sale operational tables from core listing and transaction services. One row per shop window listing business context record with standardized names and types in datalake_ebdb_clean.
