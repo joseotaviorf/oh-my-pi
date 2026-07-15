@@ -5,6 +5,7 @@ cluster:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     aws_attributes:
+      availability: ON_DEMAND
       ebs_volume_size: 500
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
