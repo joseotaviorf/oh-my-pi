@@ -2,8 +2,14 @@ cluster:
   type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
-      ebs_volume_size: 200
-    # Overnight 2026-07-15 (j-2GFLOQLL88ZZL): all workers core OD; task fleet left at preset 0.
+      # j-3TVDO7DLDZ30R: cores UNHEALTHY — /mnt/yarn + yarn container logs >90%.
+      ebs_volume_size: 500
+    # EMR RunJobFlow StepConcurrencyLevel (airflow-plugins default 8). Cap how many
+    # Spark steps run at once on this cluster; extras stay PENDING until a slot frees.
+    step_concurrency_level: 3
+    # Overnight 2026-07-15 (j-2GFLOQLL88ZZL): moved workers to core OD (kept count=4).
+    # Follow-up (j-3TVDO7DLDZ30R): disk pressure → ExecutorLost / AM -1000.
+    # Add task OD capacity; staging retention is global (emr_spark_base).
     core_nodes:
       instance_types:
       - r6g.4xlarge
@@ -11,11 +17,25 @@ cluster:
       - r6i.4xlarge
       target_on_demand: 4
       target_spot: 0
+    task_nodes:
+      instance_types:
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
+      target_on_demand: 2
+      target_spot: 0
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
     spark_conf:
       spark.driver.memory: 16g
       spark.driver.memoryOverhead: 4g
       spark.yarn.am.memory: 4g
-      spark.sql.shuffle.partitions: '600'
-      spark.dynamicAllocation.maxExecutors: '12'
+      # Fewer mid-size executors (4c/48g — not tiny 1c, not huge monolithic).
+      spark.executor.cores: '4'
+      spark.executor.memory: 48g
+      spark.executor.memoryOverhead: 4g
+      spark.dynamicAllocation.maxExecutors: '6'
+      # Fewer partitions → larger shuffle tasks (600 was too chatty; avoid going tiny).
+      spark.sql.shuffle.partitions: '200'
       spark.memory.fraction: '0.8'
       spark.memory.storageFraction: '0.3'
