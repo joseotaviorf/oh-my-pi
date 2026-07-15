@@ -59,7 +59,9 @@ columns:
   ts_ended:
     lineage:
       - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.updated_at
-    description: Timestamp when the next revision for the same settings record became effective; null for the latest row.
+    description: |
+      End of this capability settings revision window: day before the next update for
+      the same settings id, or the load end date when this is the latest revision.
   year:
     lineage:
       - datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings.year

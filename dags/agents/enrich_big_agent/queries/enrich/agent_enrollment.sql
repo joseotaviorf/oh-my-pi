@@ -57,7 +57,7 @@ agent_domain AS (
     FROM
         datalake_agent_accreditation.agent AS agent_domain
 )
-SELECT
+SELECT DISTINCT
     CONCAT(a.id, '_', a.id_enrollment) AS id_agent_enrollment,
     a.id AS id_internal_agent,
     ag.id_agent,

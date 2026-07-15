@@ -36,11 +36,7 @@ legacy_agent_data_business_contexts AS (
         aud.business_context,
         aud.rev_type,
         ROW_NUMBER() OVER(PARTITION BY aud.id_agent_data, DATE(u.ts_revision) ORDER BY u.ts_revision DESC) = 1 AS is_last_update_by_date,
-        u.ts_revision AS ts_revision_started,
-        COALESCE(
-            LEAD(u.ts_revision) OVER (PARTITION BY aud.id_agent_data, aud.business_context ORDER BY u.ts_revision) - INTERVAL 1 DAY,
-            '{load_end_date}'
-        ) AS ts_revision_ended
+        u.ts_revision AS ts_revision_started
     FROM
         agent_data_updated AS ad
     JOIN
@@ -58,8 +54,7 @@ new_business_contexts AS (
         agent.id_user,
         settings.business_context,
         "AGENT_DOMAIN" AS system_name,
-        settings.ts_started AS ts_revision_started,
-        COALESCE(settings.ts_ended - INTERVAL 1 DAY, '{load_end_date}') AS ts_revision_ended
+        settings.ts_started AS ts_revision_started
     FROM
         agent_updated AS updated
     JOIN
@@ -79,8 +74,7 @@ legacy_business_contexts AS (
         user.id AS id_user,
         bc.business_context,
         "LEGACY_SYSTEM" AS system_name,
-        bc.ts_revision_started,
-        bc.ts_revision_ended
+        bc.ts_revision_started
     FROM
         legacy_agent_data_business_contexts AS bc
     LEFT JOIN
@@ -96,6 +90,29 @@ legacy_business_contexts AS (
             new.id_agent_data IS NULL
             OR bc.ts_revision_started < new.ts_revision_started
         )
+),
+business_contexts AS (
+    SELECT
+        id_agent_business_context,
+        id_agent,
+        id_agent_data,
+        id_user,
+        business_context,
+        system_name,
+        ts_revision_started
+    FROM
+        new_business_contexts
+    UNION
+    SELECT
+        id_agent_business_context,
+        id_agent,
+        id_agent_data,
+        id_user,
+        business_context,
+        system_name,
+        ts_revision_started
+    FROM
+        legacy_business_contexts
 )
 SELECT
     id_agent_business_context,
@@ -105,18 +122,9 @@ SELECT
     business_context,
     system_name,
     ts_revision_started,
-    ts_revision_ended
+    COALESCE(
+        LEAD(ts_revision_started) OVER (PARTITION BY id_user, id_agent ORDER BY ts_revision_started) - INTERVAL 1 DAY,
+        '{load_end_date}'
+    ) AS ts_revision_ended
 FROM
-    new_business_contexts
-UNION ALL
-SELECT
-    id_agent_business_context,
-    id_agent,
-    id_agent_data,
-    id_user,
-    business_context,
-    system_name,
-    ts_revision_started,
-    ts_revision_ended
-FROM
-    legacy_business_contexts
+    business_contexts

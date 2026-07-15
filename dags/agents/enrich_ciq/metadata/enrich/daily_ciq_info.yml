@@ -47,13 +47,18 @@ columns:
       "CheckUpLar": "Agents responsible for performing/analyzing reported repairs to the properties"
       "N/A" : "The user in question is a CIQ only and has no Agent information."
   business_context:
-    description: Represents the specific business context assigned to the agent during the given period. Which can be Sale or Rent.
+    description: |
+      Business context assigned to the CIQ on the reference date, matched via Dados Agente
+      id (`id_agent_data`) over the contiguous revision window; Sale, Rent, or N/A when none applies.
     categories:
       "SALE": "The agent is responsible for conducting visits with potential buyers for properties on sale."
       "RENT": "The agent is responsible for conducting visits with potential tenants for rental properties."
       "N/A": "The agent is not assigned to a specific business context during this period."
     lineage:
       - datalake_agent_accreditation.business_context.business_context
+      - datalake_agent_accreditation.business_context.id_agent_data
+      - datalake_agent_accreditation.business_context.ts_revision_started
+      - datalake_agent_accreditation.business_context.ts_revision_ended
   is_agent_active:
     description: Indicates whether the Agent has an active registration.
     lineage:

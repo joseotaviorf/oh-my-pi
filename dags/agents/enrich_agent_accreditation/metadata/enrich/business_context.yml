@@ -4,7 +4,8 @@ table_name: business_context
 description: |
   Historical record of business contexts assigned to visit agents over time.
   Combines legacy agent-data audit intervals with Agent Domain capability settings,
-  exposing EBDB agent id, Dados Agente id, user id, and the source system for each interval.
+  then builds contiguous validity windows per user and agent across both sources so
+  open-ended or fragmented revision ends do not leave null gaps for consumers.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -55,5 +56,8 @@ columns:
   ts_revision_ended:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_ebdb_agent_events.capability_settings.ts_ended
-    description: Timestamp when the business context assignment interval ended, or the load end date when still open.
+      - datalake_ebdb_agent_events.capability_settings.ts_started
+    description: |
+      End of the business context validity window: day before the next revision start
+      for the same user and agent across Agent Domain and legacy rows, or the load end
+      date when this is the latest interval.
