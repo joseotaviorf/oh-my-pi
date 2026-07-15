@@ -12,6 +12,9 @@
 #   master → prod-<target>-latest   + prod-<target>-<sha7>
 #
 # No custom clone: default plugin-git shallow clone is enough (Docker build only; no git diff).
+#
+# Path filters scope workspace/package deps used by .container/Dockerfile — not **/pyproject.toml
+# (which would match unrelated local tools under local/**).
 when:
   - event: pull_request
   - event: push
@@ -38,11 +41,13 @@ steps:
     when:
       event: pull_request
       path:
-        include:
+        include: &container_dep_paths
           - '.woodpecker/containers.yml'
           - '.container/Dockerfile'
-          - '**/pyproject.toml'
-          - '**/uv.lock'
+          - 'pyproject.toml'
+          - 'uv.lock'
+          - 'packages/**/pyproject.toml'
+          - 'packages/**/uv.lock'
           - 'packages/bietlejuice-runtime/hatch_build.py'
 
   publish-ci-base-prod:
@@ -63,12 +68,7 @@ steps:
         from_secret: github_token
     when:
       - path:
-          include:
-            - '.woodpecker/containers.yml'
-            - '.container/Dockerfile'
-            - '**/pyproject.toml'
-            - '**/uv.lock'
-            - 'packages/bietlejuice-runtime/hatch_build.py'
+          include: *container_dep_paths
         branch: [master]
         event: push
       - branch: [master]
@@ -92,12 +92,7 @@ steps:
         from_secret: github_token
     when:
       - path:
-          include:
-            - '.woodpecker/containers.yml'
-            - '.container/Dockerfile'
-            - '**/pyproject.toml'
-            - '**/uv.lock'
-            - 'packages/bietlejuice-runtime/hatch_build.py'
+          include: *container_dep_paths
         branch: [master]
         event: push
       - branch: [master]
@@ -121,12 +116,14 @@ steps:
         from_secret: github_token
     when:
       - path:
-          include:
+          include: &container_devcontainer_paths
             - '.woodpecker/containers.yml'
             - '.container/Dockerfile'
             - '.devcontainer/**'
-            - '**/pyproject.toml'
-            - '**/uv.lock'
+            - 'pyproject.toml'
+            - 'uv.lock'
+            - 'packages/**/pyproject.toml'
+            - 'packages/**/uv.lock'
             - 'packages/bietlejuice-runtime/hatch_build.py'
         branch: [master]
         event: push

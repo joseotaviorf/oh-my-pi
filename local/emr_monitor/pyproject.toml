@@ -1,0 +1,15 @@
+[project]
+name = "emr_monitor"
+version = "0.1.0"
+description = "Local Streamlit UI for EMR cluster CloudWatch metrics"
+requires-python = ">=3.10"
+dependencies = [
+    "boto3>=1.34",
+    "pandas>=2.0",
+    "plotly>=5.18",
+    "streamlit>=1.32",
+    "streamlit-autorefresh>=1.0.1",
+]
+
+[tool.uv]
+dev-dependencies = []
