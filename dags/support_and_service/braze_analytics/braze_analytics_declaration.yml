@@ -1,6 +1,6 @@
 dag:
   name: braze_analytics
-  owner: Data Growth
+  owner: Data SS
   schedule_start_date: 2020, 11, 1
   schedule_interval: "30 0 * * *"
   documentation:

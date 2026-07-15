@@ -2,7 +2,7 @@
 dag:
   name: enrich_braze_events
   schedule_start_date: 2020, 11, 1
-  owner: Data Growth
+  owner: Data SS
   documentation:
     dag_purpose: This DAG creates the enriched tables of the first layer of enrichment from Braze Events DAG, by cleaning data and applying an event type filter.
 workflow:

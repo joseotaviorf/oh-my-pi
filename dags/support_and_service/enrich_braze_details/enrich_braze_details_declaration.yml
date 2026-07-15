@@ -2,7 +2,7 @@
 dag:
   name: enrich_braze_details
   schedule_start_date: 2022, 10, 18
-  owner: Data Growth
+  owner: Data SS
   documentation:
     dag_purpose: This DAG creates the incremental enriched table from Braze Details clean tables.
 workflow:

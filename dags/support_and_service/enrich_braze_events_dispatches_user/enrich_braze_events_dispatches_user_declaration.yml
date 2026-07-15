@@ -2,7 +2,7 @@
 dag:
   name: enrich_braze_events_dispatches_user
   schedule_start_date: 2020, 11, 1
-  owner: Data Growth
+  owner: Data SS
   documentation:
     dag_purpose: This DAG creates the incremental enriched tables for dispatches for both tenants and owners users from Braze.
 workflow:

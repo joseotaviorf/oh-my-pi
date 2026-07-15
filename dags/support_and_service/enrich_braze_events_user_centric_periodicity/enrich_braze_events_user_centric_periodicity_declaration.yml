@@ -2,7 +2,7 @@
 dag:
   name: enrich_braze_events_user_centric_periodicity
   schedule_start_date: 2020, 11, 1
-  owner: Data Growth
+  owner: Data SS
   documentation:
     dag_purpose: This DAG creates the enriched tables for Braze user centric events by periodicity.
 workflow:
