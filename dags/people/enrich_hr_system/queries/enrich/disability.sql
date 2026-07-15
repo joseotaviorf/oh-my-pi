@@ -1,5 +1,5 @@
 WITH
-disabilities AS (
+ranked_disabilities AS (
   SELECT
     id_person,
     person_number,
@@ -12,11 +12,32 @@ disabilities AS (
     COALESCE(legislative_info[0].legislativeInfoDFF[0].possuiAlgumaDeficiencia = 'Sim', False) AS has_self_declared_disability,
     CAST(disabilities[0].CreationDate AS TIMESTAMP) AS ts_documented_created,
     CAST(disabilities[0].LastUpdateDate AS TIMESTAMP) AS ts_documented_updated,
-    ts_load
+    ts_load,
+    ROW_NUMBER() OVER (
+      PARTITION BY person_number
+      ORDER BY dt_effective
+    ) AS rn
   FROM
     datalake_hr_system_clean.workers
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY person_number ORDER BY dt_effective) = 1
+),
+disabilities AS (
+  SELECT
+    id_person,
+    person_number,
+    id_disability,
+    documented_code,
+    status_documented,
+    self_declared_code,
+    created_by_documented,
+    updated_by_documented,
+    has_self_declared_disability,
+    ts_documented_created,
+    ts_documented_updated,
+    ts_load
+  FROM
+    ranked_disabilities
+  WHERE
+    rn = 1
 ),
 selfdeclared_lookup AS (
   SELECT

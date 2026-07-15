@@ -1,4 +1,19 @@
-WITH hr_system_workers AS (
+WITH ranked_hr_system_workers AS (
+  SELECT
+    id_person,
+    legislative_info,
+    external_identifiers,
+    ethnicities,
+    religions,
+    DENSE_RANK() OVER (
+      PARTITION BY id_person
+      ORDER BY
+        dt_effective
+    ) AS worker_rank
+  FROM
+    datalake_hr_system_clean.workers
+),
+hr_system_workers AS (
   SELECT
     id_person,
     legislative_info,
@@ -6,13 +21,9 @@ WITH hr_system_workers AS (
     ethnicities,
     religions
   FROM
-    datalake_hr_system_clean.workers
-  QUALIFY
-    DENSE_RANK() OVER (
-      PARTITION BY id_person
-      ORDER BY
-        dt_effective
-    ) = 1
+    ranked_hr_system_workers
+  WHERE
+    worker_rank = 1
 ),
 external_identifiers_step1 AS (
   SELECT
@@ -122,7 +133,7 @@ ethnicities_step1 AS (
   FROM
     hr_system_workers
 ),
-ethnicities AS (
+ethnicities_primary AS (
   SELECT
     id_person,
     ethnicities ['EthnicityId'] AS id_ethnicity,
@@ -143,11 +154,26 @@ ethnicities AS (
         19
       ),
       'yyyy-MM-dd HH:mm:ss'
-    ) AS ts_last_update
+    ) AS ts_last_update,
+    ethnicities ['LastUpdateDate'] AS last_update_raw,
+    MAX(ethnicities ['LastUpdateDate']) OVER (PARTITION BY id_person) AS max_last_update_raw
   FROM
     ethnicities_step1
   WHERE
-    ethnicities ['PrimaryFlag'] = 'true' QUALIFY ethnicities ['LastUpdateDate'] = MAX(ethnicities ['LastUpdateDate']) OVER (PARTITION BY id_person)
+    ethnicities ['PrimaryFlag'] = 'true'
+),
+ethnicities AS (
+  SELECT
+    id_person,
+    id_ethnicity,
+    ethnicity,
+    legislation_code,
+    ts_created,
+    ts_last_update
+  FROM
+    ethnicities_primary
+  WHERE
+    last_update_raw = max_last_update_raw
 ),
 religions_step1 AS (
   SELECT
@@ -156,7 +182,7 @@ religions_step1 AS (
   FROM
     hr_system_workers
 ),
-religions AS (
+religions_primary AS (
   SELECT
     id_person,
     religions ['ReligionId'] AS id_religion,
@@ -177,11 +203,26 @@ religions AS (
         19
       ),
       'yyyy-MM-dd HH:mm:ss'
-    ) AS ts_last_update
+    ) AS ts_last_update,
+    religions ['LastUpdateDate'] AS last_update_raw,
+    MAX(religions ['LastUpdateDate']) OVER (PARTITION BY id_person) AS max_last_update_raw
   FROM
     religions_step1
   WHERE
-    religions ["PrimaryFlag"] = 'true' QUALIFY religions ['LastUpdateDate'] = MAX(religions ['LastUpdateDate']) OVER (PARTITION BY id_person)
+    religions ["PrimaryFlag"] = 'true'
+),
+religions AS (
+  SELECT
+    id_person,
+    id_religion,
+    religion,
+    legislation_code,
+    ts_created,
+    ts_last_update
+  FROM
+    religions_primary
+  WHERE
+    last_update_raw = max_last_update_raw
 )
 SELECT
   -- ids
