@@ -109,6 +109,22 @@ visit_demand_history AS (
     WHERE
         rn = 1
 ),
+tier AS (
+    SELECT
+        daily_status.id_agent_daily,
+        MAX(pt.id_tier) FILTER(WHERE pt.incentive_system = 'DEMAND_CONVERSION_FR') AS sk_tier_demand_conversion_fr,
+        MAX(pt.id_tier) FILTER(WHERE pt.incentive_system = 'DEMAND_CONVERSION_FS') AS sk_tier_demand_conversion_fs
+    FROM
+        daily_status
+    JOIN
+        datalake_big_agent.partner_tier AS pt
+            ON daily_status.uuid_person = pt.uuid_person
+            AND daily_status.dt_ref >= pt.dt_validity_started
+            AND daily_status.dt_ref <= pt.dt_validity_ended
+    WHERE
+        pt.is_valid
+    GROUP BY 1
+),
 old_agent_history AS (
     WITH old_agent_history_ranked AS (
         SELECT
@@ -139,6 +155,8 @@ SELECT
     COALESCE(ad.id_agent_data, ds.id_agent_data) AS sk_agent_data,
     COALESCE(ad.id_partner, ds.id_partner) AS sk_partner,
     COALESCE(ad.id_user, ds.id_user) AS sk_user,
+    IF(ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED'), t.sk_tier_demand_conversion_fr, NULL) AS sk_tier_demand_conversion_fr,
+    IF(ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED'), t.sk_tier_demand_conversion_fs, NULL) AS sk_tier_demand_conversion_fs,
     COALESCE(ad.uuid_company, ds.uuid_company) AS uuid_company,
     COALESCE(ad.uuid_agent, ds.uuid_agent) AS uuid_agent,
     COALESCE(ad.uuid_person, ds.uuid_person) AS uuid_person,
@@ -175,6 +193,9 @@ LEFT JOIN
 LEFT JOIN
     old_agent_history AS oah
         ON oah.id_agent_daily = ds.id_agent_daily
+LEFT JOIN
+    tier AS t
+        ON t.id_agent_daily = ds.id_agent_daily
 WHERE
     ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')
     OR (ds.agent_status = 'AGENT_INACTIVATED' AND TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) < 1)

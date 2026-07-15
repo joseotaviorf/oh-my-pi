@@ -41,6 +41,14 @@ columns:
     lineage:
       - datalake_agent_accreditation.agent_daily.id_user
       - datalake_agent_accreditation.agent.id_user
+  sk_tier_demand_conversion_fr:
+    description: Tier identifier for the for rent demand conversion incentive system. Only available for active agents.
+    lineage:
+      - datalake_big_agent.partner_tier.id_tier
+  sk_tier_demand_conversion_fs:
+    description: Tier identifier for the for sale demand conversion incentive system. Only available for active agents.
+    lineage:
+      - datalake_big_agent.partner_tier.id_tier
   uuid_company:
     description: |
       Company UUID when the agent partnership representative type is COMPANY_UUID on the

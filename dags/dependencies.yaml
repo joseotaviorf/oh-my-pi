@@ -104,6 +104,7 @@ bietlejuice.dw_agent_accreditation:
   - bietlejuice.enrich_agent:load-enrich-contract-process:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-prospect-agent:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-qualification-step:first-run-of-day
+  - bietlejuice.enrich_big_agent_incentives:load-enrich-partner-tier:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
 bietlejuice.dw_agent_contract:
   - bietlejuice.enrich_agenda_allocation:load-enrich-agents-slots-hourly:first-run-of-day
