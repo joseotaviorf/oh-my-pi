@@ -3,7 +3,9 @@ reports/**
 watchers/**
 *.log
 _*.py
+!**/__init__.py
 _*.sh
+!**/__main__.py
 validation_results.json
 .session.yml
 migration-emr-cli/dist/

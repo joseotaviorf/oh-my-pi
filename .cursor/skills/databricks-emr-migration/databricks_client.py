@@ -80,6 +80,13 @@ def parse_command_result(results: Optional[Dict[str, Any]]) -> ParsedResult:
     return ParsedResult(columns=[], rows=[], row_dicts=[])
 
 
+# Default UC catalog for DAG tables (matches spark.databricks.sql.initial.catalog.namespace).
+_PROFILE_CATALOG = {
+    "PROD": "quintoandar_prod",
+    "FORNO": "quintoandar_forno",
+}
+
+
 class DatabricksAPI:
     """Databricks Commands API 1.2 client with polling."""
 
@@ -94,6 +101,12 @@ class DatabricksAPI:
         env.pop("DATABRICKS_USERNAME", None)
         env["DATABRICKS_CONFIG_PROFILE"] = self.profile
         return env
+
+    def _catalog_name(self) -> Optional[str]:
+        override = os.environ.get("DATABRICKS_CATALOG", "").strip()
+        if override:
+            return override
+        return _PROFILE_CATALOG.get(self.profile.upper())
 
     def _run_api(
         self,
@@ -124,6 +137,11 @@ class DatabricksAPI:
             )
             self.context_id = data["id"]
             logger.info("Context opened: %s", self.context_id)
+            catalog = self._catalog_name()
+            if catalog:
+                # All-purpose clusters often default to hive_metastore; DAG SQL expects UC.
+                self.execute_sql(f"USE CATALOG {catalog}")
+                logger.info("Using catalog: %s", catalog)
             return True
         except Exception as exc:
             logger.error("Failed to open context: %s", exc)
