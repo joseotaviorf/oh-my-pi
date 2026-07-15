@@ -77,6 +77,19 @@ def trigger_insert_into_clickhouse_procedure(
     logger.info("data dumped successfully!")
 
 
+def _does_this_path_exist(spark_session, path: str) -> bool:
+    """
+    Check if the given S3 path exists.
+    """
+    hadoop_conf = spark_session.sparkContext._jsc.hadoopConfiguration()
+    hadoop_path = spark_session.sparkContext._jvm.org.apache.hadoop.fs.Path(path)
+    hadoop_fs = spark_session.sparkContext._jvm.org.apache.hadoop.fs.FileSystem.get(
+        hadoop_path.toUri(), hadoop_conf
+    )
+
+    return hadoop_fs.exists(hadoop_path)
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod environment")
@@ -102,8 +115,14 @@ if __name__ == "__main__":
     schema = args.schema
     table_name = args.table_name
     extraction_type = args.extraction_type
-    load_start_date = args.load_start_date
-    load_end_date = args.load_end_date
+
+    load_start_date = datetime.fromisoformat(args.load_start_date).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    load_end_date = datetime.fromisoformat(args.load_end_date).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
 
     os.environ["ENVIRONMENT"] = environment
     env_prefix = environment.upper()
@@ -208,7 +227,16 @@ if __name__ == "__main__":
         )
     ]
 
-    df = spark.read.parquet(*source_paths)
+    source_paths_filtered = [
+        path for path in source_paths if _does_this_path_exist(spark, path)
+    ]
+
+    if not source_paths_filtered:
+        raise FileNotFoundError(
+            "No exported Parquet files were found for the requested load window."
+        )
+
+    df = spark.read.parquet(*source_paths_filtered)
     logger.info("data loaded successfully!")
 
     """
