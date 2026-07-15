@@ -248,10 +248,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.FS_BYNextContactDate__c
     description: FS buyer next contact date.
-  dt_fs_dd_accepted_date:
-    lineage:
-      - datalake_salesforce_raw.case.FS_DDAcceptedDate__c
-    description: Calendar date associated with fs dd accepted date in the business process.
   dt_fs_pds_subscription_scheduling:
     lineage:
       - datalake_salesforce_raw.case.FS_PDSL_SubscriptionSchedulingDate__c
@@ -444,10 +440,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.serviceProviderName__c
     description: Human-readable service provider name used in dashboards and operational reports.
-  service_provider_phone:
-    lineage:
-      - datalake_salesforce_raw.case.serviceProviderPhone__c
-    description: Business value representing service provider phone on the cases clean dataset.
   service_provider_type:
     lineage:
       - datalake_salesforce_raw.case.serviceProviderType__c
