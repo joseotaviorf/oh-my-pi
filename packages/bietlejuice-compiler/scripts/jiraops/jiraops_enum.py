@@ -23,6 +23,7 @@ class JiraOpsEnum(enum.Enum):
         "execute-job-cluster",
         "job-cluster-finished",
         "terminate-cluster",
+        "terminate-emr-cluster",
     )
 
     DAG_ID_PREFIX = "bietlejuice."
@@ -47,7 +48,9 @@ class JiraOpsEnum(enum.Enum):
         "sync-",
         "execute-job-cluster",
     )
-    GENERAL_TASK_IDS = frozenset({"job-cluster-finished", "terminate-cluster"})
+    GENERAL_TASK_IDS = frozenset(
+        {"job-cluster-finished", "terminate-cluster", "terminate-emr-cluster"}
+    )
     JIRA_OPS_MUTE_LIST_PATH = Path(__file__).resolve().parent / "jiraops_mute_list.yml"
     JIRA_OPS_ROUTINE_EXCEPTIONS_PATH = (
         Path(__file__).resolve().parent / "jiraops_mute_list_exceptions.yml"

@@ -276,7 +276,11 @@ class TestDagNamePatterns:
 
 
 class TestTaskNamePatterns:
-    def test_accepts_global_cluster_task(self, validator_factory):
+    @pytest.mark.parametrize(
+        "task_id",
+        ["terminate-cluster", "terminate-emr-cluster", "job-cluster-finished"],
+    )
+    def test_accepts_global_cluster_task(self, validator_factory, task_id):
         # Arrange
         validator = validator_factory(
             {"DAG": {}, "Task": {}, "DAGOwner": {}},
@@ -284,9 +288,7 @@ class TestTaskNamePatterns:
         )
 
         # Act
-        is_valid = validator._check_task_criterion(
-            "equals", "bietlejuice.*:terminate-cluster"
-        )
+        is_valid = validator._check_task_criterion("equals", f"bietlejuice.*:{task_id}")
 
         # Assert
         assert is_valid is True

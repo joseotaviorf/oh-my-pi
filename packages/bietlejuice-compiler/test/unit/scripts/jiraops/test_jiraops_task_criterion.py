@@ -1,5 +1,7 @@
 import re
 
+import pytest
+
 from scripts.jiraops.jiraops_task_criterion import (
     parse_task_criterion,
     routing_property_for_task,
@@ -37,15 +39,19 @@ class TestParseTaskCriterion:
 
 
 class TestRoutingPropertyForTask:
-    def test_global_equals_uses_task_key(self):
+    @pytest.mark.parametrize(
+        "task_id",
+        ["terminate-cluster", "terminate-emr-cluster"],
+    )
+    def test_global_equals_uses_task_key(self, task_id):
         # Arrange
-        parsed = parse_task_criterion("bietlejuice.*:terminate-cluster")
+        parsed = parse_task_criterion(f"bietlejuice.*:{task_id}")
 
         # Act
         key, value = routing_property_for_task(parsed, "equals")
 
         # Assert
-        assert (key, value) == ("Task", "terminate-cluster")
+        assert (key, value) == ("Task", task_id)
 
     def test_dag_specific_equals_uses_task_path(self):
         # Arrange

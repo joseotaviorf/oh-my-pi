@@ -56,6 +56,7 @@ Task:
   equals:
     - bietlejuice.*:job-cluster-finished
     - bietlejuice.*:terminate-cluster
+    - bietlejuice.*:terminate-emr-cluster
     - bietlejuice.retsuko_fast_lane:load-clean-entry-partitioned
     - bietlejuice.retsuko:load-clean-invoice-partitioned
     - bietlejuice.retsuko_fast_lane:load-clean-invoice-partitioned

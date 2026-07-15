@@ -94,16 +94,20 @@ DAGOwner:
         assert dag_owner["key"] == "DAGOwner"
         assert dag_owner["operation"] == "equals"
 
-    def test_maps_global_task_to_task_key(self, tmp_path: Path):
+    @pytest.mark.parametrize(
+        "task_id",
+        ["terminate-cluster", "terminate-emr-cluster"],
+    )
+    def test_maps_global_task_to_task_key(self, tmp_path: Path, task_id: str):
         # Arrange
         path = tmp_path / "jiraops_mute_list.yml"
         path.write_text(
-            """
+            f"""
 Task:
   equals:
-    - bietlejuice.*:terminate-cluster
-DAG: {}
-DAGOwner: {}
+    - bietlejuice.*:{task_id}
+DAG: {{}}
+DAGOwner: {{}}
 """.strip(),
             encoding="utf-8",
         )
@@ -115,7 +119,7 @@ DAGOwner: {}
 
         # Assert
         assert condition["key"] == "Task"
-        assert condition["expectedValue"] == "terminate-cluster"
+        assert condition["expectedValue"] == task_id
 
     def test_maps_dag_specific_task_to_task_path(self, tmp_path: Path):
         # Arrange
