@@ -308,10 +308,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.FS_SubscriptionModelSeller__c
     description: Business value representing fs subscription model seller on the cases clean dataset.
-  id_customer:
-    lineage:
-      - datalake_salesforce_raw.case.customerId__c
-    description: Customer identification key.
   id_last_modified_by:
     lineage:
       - datalake_salesforce_raw.case.LastModifiedById

@@ -443,10 +443,6 @@ columns:
     lineage:
     - datalake_salesforce_raw.task.FS_RegistrationReceived__c
     description: Business value representing fs registration received on the task clean dataset.
-  fs_cancelled_not_following_crn:
-    lineage:
-    - datalake_salesforce_raw.task.FS_CancelledNotFollowingCRN__c
-    description: Business value representing fs cancelled not following crn on the task clean dataset.
   fs_draft_received_buyers:
     lineage:
     - datalake_salesforce_raw.task.FS_DraftReceivedBuyers__c

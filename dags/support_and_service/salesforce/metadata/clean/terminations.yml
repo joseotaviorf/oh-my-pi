@@ -17,10 +17,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.ContractId__c
     description: Contract identification key in Sales Force.
-  id_house:
-    lineage:
-      - datalake_salesforce_raw.terminations.PropertyId__c
-    description: House identification key in Sales Force.
   id_external:
     lineage:
       - datalake_salesforce_raw.terminations.ExternalId__c
@@ -121,10 +117,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.ProOwner__c
     description: Indicates if the termination is in favor of the property owner.
-  repairs_charged_ar_or_pp:
-    lineage:
-      - datalake_salesforce_raw.terminations.RepairsChargedARorPP__c
-    description: Identifies if repairs are charged to AR or PP.
   repairs_charged_pp:
     lineage:
       - datalake_salesforce_raw.terminations.RepairsChargedPP__c

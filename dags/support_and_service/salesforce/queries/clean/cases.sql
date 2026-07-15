@@ -19,7 +19,6 @@ SELECT
     ServiceContractId AS id_service_contract,
     ZendeskId__c AS id_zendesk,
     LastModifiedById AS id_last_modified_by,
-    customerId__c AS id_customer,
     PurchaseSaleContract__c AS id_purchase_sale_contract,
     SuppliedName AS supplied_name,
     SuppliedEmail AS supplied_email,

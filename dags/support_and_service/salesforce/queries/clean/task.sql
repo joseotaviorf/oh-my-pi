@@ -123,7 +123,6 @@ SELECT
     IntegrationJob__c AS integration_job,
     FS_CRIDoneDateTask__c AS dt_fs_cri_done_date_task,
     FS_RegistrationReceived__c AS fs_registration_received,
-    FS_CancelledNotFollowingCRN__c AS fs_cancelled_not_following_crn,
     FS_DraftReceivedBuyers__c AS fs_draft_received_buyers,
     FS_DraftReceivedSellers__c AS fs_draft_received_sellers,
     FS_CanceledReason__c AS fs_canceled_reason,
