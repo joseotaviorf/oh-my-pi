@@ -34,7 +34,7 @@ columns:
   uuid_person:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: "Person UUID of the signatory parsed from the uuid_person field of the event payload. Nullable when the signatory has no platform account. Nullability drives contract-level gate evaluation: a contract where every signatory is non-null satisfies Gate 1; a contract with any null satisfies Gate 2."
+    description: "Person UUID of the signatory parsed from the uuid_person field of the event payload. Nullable when the signatory has no platform account."
   address_text:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -68,7 +68,15 @@ columns:
   is_participant:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: "True when the signatory meets any of the three independently-expandable Sonia Closing gates (OR logic): Gate 0 (number_of_signatories = 2, independently tunable threshold), Gate 1 (all signatories in the contract are registered, i.e. every uuid_person NOT NULL), or Gate 2 (the contract has at least one unregistered signatory, i.e. any uuid_person IS NULL). Gates 1 and 2 are evaluated at contract level — every signatory row in the contract inherits the same gate result. Thresholds are constants in the SQL (0-100, 0 = blocked, 100 = fully open); raise each independently to expand that audience segment without retroactively changing earlier buckets."
+    description: "True when the signatory meets any of the two independently-expandable Sonia Closing gates (OR logic): Gate 0 (number_of_signatories = 2, tuned by id_contract % 100 < threshold), or Gate 1+2 (all contracts regardless of registration status, tuned by binning_value < threshold). Thresholds are constants in the SQL (0-100, 0 = blocked, 100 = fully open)."
+  n_signatories:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: "Number of active (non-removed) signatories on the contract. Contract-level value propagated to every signatory row. Use to identify Gate 0 participants (n_signatories = 2)."
+  n_unregistered:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: "Number of active (non-removed) signatories on the contract whose uuid_person is null, i.e. have no platform account. Contract-level value propagated to every signatory row. 0 means all signatories are registered (Gate 1+2 all-registered cohort); ≥ 1 means at least one unregistered signatory (Gate 1+2 unregistered-signatory cohort)."
   n_sent:
     lineage:
       - datalake_cdp_clean.transactional.event_name

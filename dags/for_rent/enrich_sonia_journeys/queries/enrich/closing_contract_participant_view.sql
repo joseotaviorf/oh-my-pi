@@ -81,7 +81,11 @@ SELECT
       OR (binning_value_contract_id < 10 AND ts_created >= TIMESTAMP '2026-06-02 00:00:00' AND ts_created < TIMESTAMP '2026-06-17 18:00:00')
       OR (binning_value_contract_id < 50 AND ts_created >= TIMESTAMP '2026-06-17 18:00:00')
     ))
-    OR (binning_value < 0)
+    -- Gate 1+2: all contracts (registered and unregistered alike), binning_value < threshold
+    OR (binning_value < CASE
+        WHEN ts_created >= TIMESTAMP '2026-07-16 13:00:00' THEN 5
+        ELSE 0
+      END)
   ) AS is_participant,
   ts_created
 FROM contract_gates

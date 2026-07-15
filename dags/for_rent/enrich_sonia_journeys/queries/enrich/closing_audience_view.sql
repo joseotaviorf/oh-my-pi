@@ -1,9 +1,8 @@
 -- Sonia Closing audience view: one row per contract signatory from per-person contract-sent events.
 -- Source: rent_flow_[tenant|owner]_contract_sent CDP events from 2026-04.
--- is_participant encodes three independently-expandable gates (all use the same binning_value):
---   Gate 0: number_of_signatories = 2,                                        threshold 0-100 (100 = fully open)
---   Gate 1: all contract signatories registered (every uuid_person NOT NULL),  threshold 0-100 (100 = fully open)
---   Gate 2: contract has any unregistered signatory (any uuid_person IS NULL), threshold 0-100 (100 = fully open)
+-- is_participant encodes two independently-expandable gates (all use the same binning_value):
+--   Gate 0:   number_of_signatories = 2,  threshold 0-100 (100 = fully open)
+--   Gate 1+2: all contracts regardless of registration status, threshold 0-100 (100 = fully open)
 WITH
 cdp_events AS (
   SELECT
@@ -135,11 +134,14 @@ SELECT
         WHEN e.ts_first_sent >= CAST('2026-06-17 18:00:00' AS TIMESTAMP) THEN 50
         ELSE 0
      END)
-    -- Gate 1: all signatories registered
-    OR (e.n_unregistered = 0 AND e.binning_value < 0)
-    -- Gate 2: contract has an unregistered signatory
-    OR (e.n_unregistered > 0 AND e.binning_value < 0)
+    -- Gate 1+2: all contracts (registered and unregistered alike), binning_value < threshold
+    OR (e.binning_value < CASE
+        WHEN e.ts_first_sent >= CAST('2026-07-16 13:00:00' AS TIMESTAMP) THEN 5
+        ELSE 0
+     END)
   ) AS is_participant,
+  e.number_of_signatories AS n_signatories,
+  e.n_unregistered,
   e.n_sent,
   DATE_FORMAT(e.ts_first_sent,  '%Y-%m-%d %T') AS ts_first_sent,
   DATE_FORMAT(e.ts_last_sent,   '%Y-%m-%d %T') AS ts_last_sent,
