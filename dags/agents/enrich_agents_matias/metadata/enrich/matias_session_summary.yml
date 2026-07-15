@@ -37,6 +37,14 @@ columns:
     description: Communication channel of the session (e.g. whatsapp, web).
     lineage:
       - datalake_agents_matias.eval_session_bundle.channel
+  active_feature_flags:
+    description: >
+      Array of feature-flag names that were enabled (true) on the first
+      Langfuse trace for this session. Propagated from eval_session_bundle
+      (sourced from chatbot sessions). NULL when no feature_flags payload
+      exists; empty array when every flag is false.
+    lineage:
+      - datalake_agents_matias.eval_session_bundle.active_feature_flags
   session_start_ts:
     description: Timestamp of the first message in the session (session start).
     lineage:

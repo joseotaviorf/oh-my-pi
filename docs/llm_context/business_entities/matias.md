@@ -44,7 +44,7 @@ The domain has two tables in `datalake_agents_matias`:
 
 ### `matias_session_summary` struct layout
 
-Flat keys: `id_session` (merge key), `id_langfuse_session`, `id_copilot_session`, `user_id` (parsed from trace input; NULL for a small share of sessions), `bot`, `channel`, `session_start_ts`, `session_end_ts`, `session_date`, `weekday`, `is_weekend`, `is_partial_day`, `hour_brt`, `year`, `month`, `day`, `ts_load`.
+Flat keys: `id_session` (merge key), `id_langfuse_session`, `id_copilot_session`, `user_id` (parsed from trace input; NULL for a small share of sessions), `bot`, `channel`, `active_feature_flags` (array of enabled flag names from the first Langfuse trace; NULL when missing), `session_start_ts`, `session_end_ts`, `session_date`, `weekday`, `is_weekend`, `is_partial_day`, `hour_brt`, `year`, `month`, `day`, `ts_load`.
 
 | Struct | Fields |
 |--------|--------|

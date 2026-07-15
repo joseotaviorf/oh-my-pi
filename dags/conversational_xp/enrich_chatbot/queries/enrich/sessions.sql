@@ -18,7 +18,18 @@ WITH langfuse AS (
     FIRST_VALUE(t.tags[0]) OVER (
       PARTITION BY t.id_session ORDER BY t.ts_created DESC
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) AS host_tag
+    ) AS host_tag,
+    FIRST_VALUE(
+      MAP_KEYS(
+        MAP_FILTER(
+          FROM_JSON(t.feature_flags, 'MAP<STRING, BOOLEAN>'),
+          (k, v) -> v
+        )
+      )
+    ) IGNORE NULLS OVER (
+      PARTITION BY t.id_session ORDER BY t.ts_created ASC
+      ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) AS active_feature_flags
   FROM
     datalake_langfuse_clean.traces AS t
   INNER JOIN
@@ -185,7 +196,8 @@ SELECT
   REPLACE(COALESCE(c_sss.last_queue, c_sauron.last_queue, c_sauron_sss.last_queue), '[AeC] ', '') AS last_queue,
   COALESCE(c_sss.id_task, c_sauron.id_task, c_sauron_sss.id_task) IS NOT NULL AS is_escalated,
   s.ts_created,
-  s.ts_updated
+  s.ts_updated,
+  lf.active_feature_flags
 FROM
   chatbot_sessions AS s
 LEFT JOIN

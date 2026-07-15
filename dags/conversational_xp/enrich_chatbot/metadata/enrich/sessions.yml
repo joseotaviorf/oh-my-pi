@@ -111,3 +111,12 @@ columns:
     lineage:
     - datalake_support_session_service_clean.support_session.ts_updated
     - datalake_sauron_clean.session.ts_updated
+  active_feature_flags:
+    description: >
+      Array of feature-flag names that were enabled (true) on the first
+      Langfuse trace for this session. Parsed from the trace feature_flags JSON
+      map; only keys with value true are kept. NULL when the session has no
+      Langfuse traces or no feature_flags payload. Empty array when a payload
+      exists but every flag is false.
+    lineage:
+    - datalake_langfuse_clean.traces.feature_flags

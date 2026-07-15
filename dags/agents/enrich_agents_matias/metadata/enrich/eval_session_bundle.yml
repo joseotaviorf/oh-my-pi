@@ -41,6 +41,14 @@ columns:
     description: Communication channel of the session (e.g. whatsapp, web).
     lineage:
       - datalake_chatbot.sessions.channel
+  active_feature_flags:
+    description: >
+      Array of feature-flag names that were enabled (true) on the first
+      Langfuse trace for this session. Propagated from chatbot sessions;
+      NULL when the session has no Langfuse feature_flags payload. Empty
+      array when a payload exists but every flag is false.
+    lineage:
+      - datalake_chatbot.sessions.active_feature_flags
   session_date:
     description: Calendar date of session_start_ts.
     lineage:

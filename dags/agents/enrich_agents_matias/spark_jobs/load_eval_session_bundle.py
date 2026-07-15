@@ -326,6 +326,7 @@ def build_eval_session_bundle(
             col("ts_created").alias("session_start_ts"),
             col("is_escalated"),
             col("channel"),
+            col("active_feature_flags"),
             F.to_date(col("ts_created")).alias("session_date"),
             F.year(col("ts_created")).alias("year"),
             F.month(col("ts_created")).alias("month"),
