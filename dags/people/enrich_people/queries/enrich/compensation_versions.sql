@@ -431,7 +431,7 @@ person_plr_base AS (
 ),
 person_plr_multiplier_ranked AS (
     -- Rank PLR multiplier entries by (id_person, dt_valid_from) keeping the latest update.
-    -- Subquery + WHERE row_num = 1 instead of QUALIFY for EMR/Spark compatibility.
+    -- Subquery + WHERE row_num = 1 for EMR Spark 3.5 dual-runtime compatibility.
     SELECT
         id_person,
         dt_valid_from,
@@ -462,7 +462,7 @@ person_plr_multiplier AS (
 ),
 person_plr_amount_ranked AS (
     -- Rank PLR fixed-amount entries by (id_person, dt_valid_from) keeping the latest update.
-    -- Subquery + WHERE row_num = 1 instead of QUALIFY for EMR/Spark compatibility.
+    -- Subquery + WHERE row_num = 1 for EMR Spark 3.5 dual-runtime compatibility.
     SELECT
         id_person,
         currency_code,

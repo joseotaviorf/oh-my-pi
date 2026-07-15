@@ -567,7 +567,10 @@ hierarchy_versioned AS (
 ),
 hierarchy_tail_resolved AS (
     SELECT
-        * EXCEPT (dt_valid_to),
+        assignment_number,
+        manager_struct_path,
+        dt_valid_from,
+        hierarchy_version_seq,
         CASE
             WHEN ROW_NUMBER() OVER (
                 PARTITION BY assignment_number

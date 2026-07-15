@@ -1,21 +1,30 @@
 WITH
+ranked_employee_ids AS (
+  SELECT
+    work_email,
+    person_number,
+    name,
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        person_number
+      ORDER BY
+        assignment_number DESC
+    ) AS rn
+  FROM
+    datalake_people.identifier_mapping
+  WHERE
+    person_number IS NOT NULL
+    AND assignment_type IN ('E', 'C')
+),
 employee_ids AS (
   SELECT
     work_email,
     person_number,
     name
   FROM
-    datalake_people.identifier_mapping
+    ranked_employee_ids
   WHERE
-    person_number IS NOT NULL
-    AND assignment_type IN ('E', 'C')
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY
-        person_number
-      ORDER BY
-        assignment_number DESC
-    ) = 1
+    rn = 1
 ),
 new_emails_from_mapping AS (
   SELECT
@@ -153,7 +162,7 @@ with_version AS (
   FROM
     codex_ordered
 ),
-one_per_version AS (
+ranked_one_per_version AS (
   SELECT
     cost_center_code,
     business,
@@ -170,17 +179,39 @@ one_per_version AS (
     headcount_type,
     dt_closing_month AS dt_valid_from,
     ts_load,
-    version_num
-  FROM
-    with_version
-  QUALIFY
+    version_num,
     ROW_NUMBER() OVER (
       PARTITION BY
         cost_center_code,
         version_num
       ORDER BY
         dt_closing_month
-    ) = 1
+    ) AS rn
+  FROM
+    with_version
+),
+one_per_version AS (
+  SELECT
+    cost_center_code,
+    business,
+    product,
+    brand,
+    vertical,
+    structure,
+    team,
+    chapter,
+    line,
+    owner_l1_name,
+    owner_l2_name,
+    owner_l3_name,
+    headcount_type,
+    dt_valid_from,
+    ts_load,
+    version_num
+  FROM
+    ranked_one_per_version
+  WHERE
+    rn = 1
 )
 SELECT
   cost_center_code,
