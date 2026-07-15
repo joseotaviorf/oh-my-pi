@@ -20,7 +20,7 @@ performance_calibration_with_meeting_year AS (
         dw_performance.dim_committee_meeting AS dcm
             ON fpc.sk_committee_meeting = dcm.sk_meeting
 ),
-assignments_plr_eligibility AS (
+assignments_plr_eligibility_ranked AS (
     /* Base eligibility rules: hired by cutoff date, 90+ days in year (only for hires in reference year;
        hires before reference year are eligible regardless of days worked), not terminated for just cause.
        Date calculation: first day of work counts (exit_date - admission_date + 1).
@@ -68,7 +68,11 @@ assignments_plr_eligibility AS (
             FALSE
         ) AS is_terminated_before_evaluation_cycle_started,
         COALESCE(im.dt_actual_termination < plr_params.dt_payment_cutoff, FALSE) AS is_terminated_before_payment_cutoff,
-        plr_params.reference_year
+        plr_params.reference_year,
+        ROW_NUMBER() OVER (
+            PARTITION BY im.person_number, plr_params.reference_year
+            ORDER BY fpc.meeting_year DESC, fpc.sk_committee_meeting DESC
+        ) AS rn
     FROM
         datalake_people.identifier_mapping AS im
     LEFT JOIN
@@ -88,11 +92,36 @@ assignments_plr_eligibility AS (
         )
         AND im.assignment_type <> 'P'
         AND NOT im.is_user_test
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY im.person_number, plr_params.reference_year
-            ORDER BY fpc.meeting_year DESC, fpc.sk_committee_meeting DESC
-        ) = 1
+),
+assignments_plr_eligibility AS (
+    SELECT
+        sk_period_of_service,
+        sk_contract,
+        assignment_number,
+        person_number,
+        dismissal_type,
+        dismissal_reason,
+        performa_score,
+        performa_ipa,
+        dt_hired,
+        dt_terminated,
+        days_worked_in_year_before_removing_unpaid_leaves,
+        pct_default_corporate_goals_terminated,
+        pct_default_ipa_terminated,
+        pct_min_protected_leave_ipa,
+        pct_corporate_goals,
+        min_days_worked_in_year_for_eligibility,
+        min_days_worked_in_month_to_count,
+        pct_min_corporate_goals,
+        is_eligible_by_hired_date,
+        is_eligible_by_dismissal_reason,
+        is_terminated_before_evaluation_cycle_started,
+        is_terminated_before_payment_cutoff,
+        reference_year
+    FROM
+        assignments_plr_eligibility_ranked
+    WHERE
+        rn = 1
 ),
 plr_reference_months AS (
     /* Calendar months for the PLR reference year (January to December). */
@@ -169,7 +198,7 @@ absence_days_by_assignment_year AS (
     GROUP BY
         sk_assignment
 ),
-compensation_by_contract_month AS (
+compensation_by_contract_month_ranked AS (
     /* Monthly compensation and job info: eligibility by country/band (BR/PT/US exclude interns, LATAM requires Band 9+).
        Target PLR calculation: Core countries use monthly salary * multiplier / 12, LATAM uses last salary in position * multiplier / 12. */
     SELECT
@@ -198,7 +227,8 @@ compensation_by_contract_month AS (
         CASE
             WHEN dj.country IN ('Brazil', 'Portugal', 'United States') THEN TRUE
             ELSE FALSE
-        END AS is_core_country
+        END AS is_core_country,
+        ROW_NUMBER() OVER (PARTITION BY fc.sk_contract, mc.dt_month_started ORDER BY fc.dt_valid_from DESC) AS rn
     FROM
         dw_compensation.fact_compensations AS fc
     LEFT JOIN
@@ -213,8 +243,28 @@ compensation_by_contract_month AS (
     WHERE
         plr_params.reference_year BETWEEN YEAR(fc.dt_valid_from)
             AND YEAR(fc.dt_valid_to)
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY fc.sk_contract, mc.dt_month_started ORDER BY fc.dt_valid_from DESC) = 1
+),
+compensation_by_contract_month AS (
+    SELECT
+        dt_month_started,
+        dt_month_ended,
+        sk_contract,
+        sk_job_version,
+        currency_code,
+        amount_salary,
+        last_salary_in_position,
+        country,
+        band,
+        target_plr,
+        target_plr_salary_multiplier,
+        dt_job_info_valid_from,
+        dt_job_info_valid_to,
+        is_eligible_by_country_and_band,
+        is_core_country
+    FROM
+        compensation_by_contract_month_ranked
+    WHERE
+        rn = 1
 ),
 base_calculations AS (
     /* Consolidates all base calculations: worked days (monthly and yearly), absences, compensation, and eligibility flags.
