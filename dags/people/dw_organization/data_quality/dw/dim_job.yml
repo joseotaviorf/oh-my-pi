@@ -1,6 +1,6 @@
 ---
 table_name: dw_organization.dim_job
-alert_channel: PEOPLE_ALERTS
+alert_channel: "#alerts-de-airflow-dags"
 
 table_level_validations:
   has_size:
