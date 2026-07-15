@@ -14,3 +14,144 @@ alerts:
       FROM datalake_agent_accreditation.prospect_agent AS pa
       WHERE pa.status = 'WAITING_CONVERSION'
         AND pa.ts_updated <= CURRENT_TIMESTAMP() - INTERVAL 6 HOURS
+  rent_hub_missing_incentive_engine:
+    description: >
+      For Rent hubs (TEAM_MANAGEMENT / ACCREDITATION_AND_TEAM_MANAGEMENT) without an
+      ENABLED DEMAND_CONVERSION_FR incentive_engine covering the current 2-month cycle.
+    channel: "#alerts_incentives_and_payments_1p"
+    cron: "0 12 * * 1"
+    threshold: 0
+    severity: Error
+    id_column: id_business_unit
+    value_column: hub_label
+    criteria_sql: |
+      WITH cycle_bounds AS (
+        SELECT
+          ADD_MONTHS(
+            DATE_TRUNC('month', CURRENT_TIMESTAMP()),
+            -((MONTH(CURRENT_TIMESTAMP()) - 1) % 2)
+          ) AS current_cycle_start
+      ),
+      active_agents AS (
+        SELECT
+          mp.id_business_unit,
+          COUNT(DISTINCT u.id_external) AS active_agents_count
+        FROM datalake_hub_services_clean.member_profile AS mp
+        INNER JOIN datalake_hub_services_clean.users AS u
+          ON CAST(u.id AS BIGINT) = CAST(mp.id_user AS BIGINT)
+        INNER JOIN datalake_agent_accreditation.agent AS ag
+          ON CAST(ag.id_user AS BIGINT) = CAST(u.id_external AS BIGINT)
+        INNER JOIN datalake_agent_accreditation.agent_capability AS cap
+          ON cap.id_agent = ag.id_agent
+        WHERE mp.is_active = TRUE
+          AND ag.status = 'ACTIVE'
+          AND cap.type = 'DEMAND_VISIT_MANAGEMENT'
+          AND cap.business_context = 'RENT'
+          AND cap.status = 'ENABLED'
+        GROUP BY mp.id_business_unit
+      )
+      SELECT
+        hub.id AS id_business_unit,
+        CONCAT(
+          hub.hub_name,
+          ' (agents=',
+          CAST(COALESCE(aa.active_agents_count, 0) AS STRING),
+          ')'
+        ) AS hub_label
+      FROM datalake_hub_services_clean.business_unit AS hub
+      LEFT JOIN active_agents AS aa
+        ON aa.id_business_unit = hub.id
+      CROSS JOIN cycle_bounds AS cb
+      WHERE hub.business_context = 'RENT'
+        AND hub.operational_context IN (
+          'TEAM_MANAGEMENT',
+          'ACCREDITATION_AND_TEAM_MANAGEMENT'
+        )
+        AND hub.hub_name NOT LIKE '%[NÃO UTILIZAR]%'
+        AND hub.hub_name NOT LIKE '%[NÃO_UTILIZAR]%'
+        AND hub.hub_name NOT LIKE '%3P%'
+        AND hub.hub_name NOT LIKE '%SEC%'
+        AND hub.hub_name NOT LIKE '%Secretaria%'
+        AND hub.hub_name NOT LIKE '%[For rent]%'
+        AND NOT EXISTS (
+          SELECT 1
+          FROM datalake_big_agent_clean.incentive_engine AS ie
+          WHERE ie.status = 'ENABLED'
+            AND ie.incentive_system = 'DEMAND_CONVERSION_FR'
+            AND CAST(ie.id_external_condition AS BIGINT) = hub.id
+            AND ie.ts_validity_started < ADD_MONTHS(cb.current_cycle_start, 4)
+            AND (
+              ie.ts_validity_ended IS NULL
+              OR ie.ts_validity_ended >= ADD_MONTHS(cb.current_cycle_start, 2)
+            )
+        )
+  sale_hub_missing_incentive_engine:
+    description: >
+      For Sale hubs (TEAM_MANAGEMENT / ACCREDITATION_AND_TEAM_MANAGEMENT) without an
+      ENABLED DEMAND_CONVERSION_FS incentive_engine covering the current 2-month cycle.
+    channel: "#alerts_incentives_and_payments_1p"
+    cron: "0 12 * * 1"
+    threshold: 0
+    severity: Error
+    id_column: id_business_unit
+    value_column: hub_label
+    criteria_sql: |
+      WITH cycle_bounds AS (
+        SELECT
+          ADD_MONTHS(
+            DATE_TRUNC('month', CURRENT_TIMESTAMP()),
+            -((MONTH(CURRENT_TIMESTAMP()) - 1) % 2)
+          ) AS current_cycle_start
+      ),
+      active_agents AS (
+        SELECT
+          mp.id_business_unit,
+          COUNT(DISTINCT u.id_external) AS active_agents_count
+        FROM datalake_hub_services_clean.member_profile AS mp
+        INNER JOIN datalake_hub_services_clean.users AS u
+          ON CAST(u.id AS BIGINT) = CAST(mp.id_user AS BIGINT)
+        INNER JOIN datalake_agent_accreditation.agent AS ag
+          ON CAST(ag.id_user AS BIGINT) = CAST(u.id_external AS BIGINT)
+        INNER JOIN datalake_agent_accreditation.agent_capability AS cap
+          ON cap.id_agent = ag.id_agent
+        WHERE mp.is_active = TRUE
+          AND ag.status = 'ACTIVE'
+          AND cap.type = 'DEMAND_VISIT_MANAGEMENT'
+          AND cap.business_context = 'SALE'
+          AND cap.status = 'ENABLED'
+        GROUP BY mp.id_business_unit
+      )
+      SELECT
+        hub.id AS id_business_unit,
+        CONCAT(
+          hub.hub_name,
+          ' (agents=',
+          CAST(COALESCE(aa.active_agents_count, 0) AS STRING),
+          ')'
+        ) AS hub_label
+      FROM datalake_hub_services_clean.business_unit AS hub
+      LEFT JOIN active_agents AS aa
+        ON aa.id_business_unit = hub.id
+      CROSS JOIN cycle_bounds AS cb
+      WHERE hub.business_context = 'SALE'
+        AND hub.operational_context IN (
+          'TEAM_MANAGEMENT',
+          'ACCREDITATION_AND_TEAM_MANAGEMENT'
+        )
+        AND hub.hub_name NOT LIKE '%[NÃO UTILIZAR]%'
+        AND hub.hub_name NOT LIKE '%[NÃO_UTILIZAR]%'
+        AND hub.hub_name NOT LIKE '%3P%'
+        AND hub.hub_name NOT LIKE '%SEC%'
+        AND hub.hub_name NOT LIKE '%Secretaria%'
+        AND NOT EXISTS (
+          SELECT 1
+          FROM datalake_big_agent_clean.incentive_engine AS ie
+          WHERE ie.status = 'ENABLED'
+            AND ie.incentive_system = 'DEMAND_CONVERSION_FS'
+            AND CAST(ie.id_external_condition AS BIGINT) = hub.id
+            AND ie.ts_validity_started < ADD_MONTHS(cb.current_cycle_start, 4)
+            AND (
+              ie.ts_validity_ended IS NULL
+              OR ie.ts_validity_ended >= ADD_MONTHS(cb.current_cycle_start, 2)
+            )
+        )
