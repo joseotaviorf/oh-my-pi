@@ -45,17 +45,29 @@ agent AS (
             ON e.id_program = p.id
     WHERE
         a.ts_updated BETWEEN '{load_start_date}' AND '{load_end_date}'
+),
+agent_domain AS (
+    SELECT
+        id_user,
+        id_agent,
+        id_agent_data,
+        uuid_agent,
+        uuid_person,
+        ROW_NUMBER() OVER(PARTITION BY id_user ORDER BY IF(status = 'ACTIVE', 1, 0) DESC, ts_updated DESC) = 1 AS is_last_agent_domain_by_user
+    FROM
+        datalake_agent_accreditation.agent AS agent_domain
 )
 SELECT
     CONCAT(a.id, '_', a.id_enrollment) AS id_agent_enrollment,
-    a.id AS id_agent,
+    a.id AS id_internal_agent,
+    ag.id_agent,
     a.id_user,
     a.id_partner,
-    agent_domain.id_agent_data,
+    ag.id_agent_data,
     a.id_enrollment,
     a.id_program,
-    agent_domain.uuid_agent,
-    agent_domain.uuid_person,
+    ag.uuid_agent,
+    ag.uuid_person,
     a.consultant_type,
     a.is_last_enrollment_by_agent,
     a.is_agent_active,
@@ -69,5 +81,6 @@ SELECT
 FROM
     agent AS a
 LEFT JOIN
-    datalake_agent_accreditation.agent AS agent_domain
-        ON a.id_user = agent_domain.id_user
+    agent_domain AS ag
+        ON a.id_user = ag.id_user
+        AND ag.is_last_agent_domain_by_user = True

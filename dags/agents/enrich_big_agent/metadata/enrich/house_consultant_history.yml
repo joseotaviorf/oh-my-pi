@@ -17,7 +17,7 @@ columns:
     description: Enrollment version linked to the agency revision in agency audit history.
   id_internal_agent:
     lineage:
-      - datalake_big_agent.agent_enrollment.id_agent
+      - datalake_big_agent.agent_enrollment.id_internal_agent
     description: Internal Big Agent agent id from the enrollment linked to this agency revision.
   id_house:
     lineage:

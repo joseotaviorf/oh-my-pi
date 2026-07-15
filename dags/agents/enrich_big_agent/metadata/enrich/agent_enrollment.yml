@@ -13,10 +13,16 @@ columns:
     lineage:
       - datalake_big_agent_clean.agent.id
       - datalake_big_agent_clean.enrollment.id
-  id_agent:
+  id_internal_agent:
     lineage:
       - datalake_big_agent_clean.agent.id
     description: Internal Big Agent identifier of the consultant agent record.
+  id_agent:
+    lineage:
+      - datalake_agent_accreditation.agent.id_agent
+    description: |
+      Agent-domain identifier from accreditation for the resolved user, using the latest
+      ACTIVE agent row per user to avoid fan-out into enrollment and downstream dim_user joins.
   id_user:
     lineage:
       - datalake_big_agent_clean.agent.details

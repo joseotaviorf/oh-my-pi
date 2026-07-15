@@ -51,7 +51,7 @@ last_status_agency AS (
 SELECT
     aeh.id_agency,
     aeh.id_enrollment,
-    ag.id_agent AS id_internal_agent,
+    ag.id_internal_agent,
     GET_JSON_OBJECT(h.details, '$.houseExternalId') AS id_house,
     ag.id_partner,
     ag.id_user,
