@@ -17,10 +17,16 @@ columns:
     description: Table name in the metastore schema.
   classification:
     description: |
-      Mapped from ``fairness_assessment.tier_achieved``: 0 → "Not FAIR", 1 →
-      "Findable, Accessible", 2 → "Findable, Accessible, Interoperable", 3 →
-      "Findable, Accessible, Interoperable and Reusable", 4 → "FAIR Masterpiece"
-      (see ``tier_achieved_to_classification`` in ``bietlejuice.governance.fairness_assessment.tiering``).
+      FAIR tier label mapped from ``fairness_assessment.tier_achieved``: 0 → "Not FAIR",
+      1 → "FAIR Tier 1" (Findable, Accessible), 2 → "FAIR Tier 2" (adds Interoperable),
+      3 → "FAIR Tier 3", 4 → "FAIR Tier 4" (see ``tier_achieved_to_classification`` in
+      ``bietlejuice.governance.fairness_assessment.tiering``). These labels are the allowed values
+      of the ``fairness-classification-sp`` DataHub structured property. The
+      ``fairness_classification`` task upserts that SP only for FQNs assessed in the **current**
+      DAG run (``fairness_assessment`` partition for ``load_start_date``), matched by FQN across
+      platforms — not for every historical row in this table. Legacy rows still carrying the old
+      verbose labels are normalized to these tier labels at push time via
+      ``normalize_classification_to_sp_value``.
   ts_assessed:
     lineage:
       - datalake_fairness_assessment.fairness_assessment.ts_assessed

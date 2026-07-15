@@ -41,6 +41,7 @@ from bietlejuice.governance.fairness_assessment.datahub_graphql import (  # noqa
     compute_has_data_contract_by_fqn,
     compute_i3_lineage_pass_and_totals_by_fqn,
     compute_i3_ownership_pass_by_fqn,
+    push_classifications,
     resolve_datahub_urn_flags,
 )
 from bietlejuice.governance.fairness_assessment.description_quality import (  # noqa: E501
@@ -227,15 +228,6 @@ def main() -> None:
 
     args = parse_args()
     logger = QuintoAndarLogger(JOB_NAME)
-    if args.table_name == "fairness_classification":
-        # Written in the same run as ``fairness_assessment``; this task only satisfies DAG wiring.
-        logger.info(
-            "m=skip_redundant_fairness_classification_spark,msg=classification upsert "
-            "runs with load-enrich-fairness-assessment-fairness-assessment"
-        )
-        return
-    spark = BaseSparkContext.spark
-    partition_cols = ast.literal_eval(args.partitions) if args.partitions else []
 
     datahub_graphql = os.environ.get("DATAHUB_GRAPHQL_URL", "").strip()
     if not datahub_graphql:
@@ -255,6 +247,59 @@ def main() -> None:
         token = os.environ.get("DATAHUB_API_KEY", "").strip() or None
     if not token:
         token = os.environ.get("DATAHUB_API_TOKEN", "").strip() or None
+
+    spark = BaseSparkContext.spark
+
+    if args.table_name == "fairness_classification":
+        # The classification Delta is written within the ``fairness_assessment`` task; this
+        # downstream task reads it back and pushes each FQN's classification to DataHub as the
+        # ``fairness-classification-sp`` structured property (FQN-matched across platforms).
+        # Scope = current assessment run only (same year/month/day as ``load_start_date``), not
+        # the full historical ``fairness_classification`` table.
+        # Skip on validation-target runs (CI / backfills) so we never mutate the prod catalog.
+        if args.target_database_name or args.target_table_name:
+            logger.info(
+                "m=skip_datahub_classification_sync,reason=validation_target_run"
+            )
+            return
+        db_info = DatalakeMetastoreService.get_db_info(
+            args.environment, args.schema, args.datalake_bucket
+        )
+        enrich_db = db_info["db_enrich_databricks"]
+        class_full = f"{enrich_db}.fairness_classification"
+        assess_full = f"{enrich_db}.fairness_assessment"
+        load_start_dt = datetime.strptime(args.load_start_date, "%Y-%m-%d")
+        # FQNs assessed in this DAG run's inventory day (partition columns on fairness_assessment).
+        current_fqns = (
+            spark.table(assess_full)
+            .filter(F.col("year") == load_start_dt.year)
+            .filter(F.col("month") == load_start_dt.month)
+            .filter(F.col("day") == load_start_dt.day)
+            .select("database_name", "table_name")
+            .distinct()
+        )
+        class_rows = (
+            spark.table(class_full)
+            .join(current_fqns, on=["database_name", "table_name"], how="inner")
+            .select("database_name", "table_name", "classification")
+            .collect()
+        )
+        rows = [
+            (r["database_name"], r["table_name"], r["classification"])
+            for r in class_rows
+        ]
+        logger.info(
+            "m=datahub_classification_sync_scope,"
+            f"assess_partition={args.load_start_date},"
+            f"fqn_count={len(rows)}"
+        )
+        summary = push_classifications(datahub_graphql, token, rows)
+        logger.info(
+            f"m=datahub_classification_sync_done,table={class_full},summary={summary}"
+        )
+        return
+
+    partition_cols = ast.literal_eval(args.partitions) if args.partitions else []
 
     doc_dt = F.make_date(
         F.col("year").cast("int"),

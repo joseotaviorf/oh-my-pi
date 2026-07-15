@@ -374,6 +374,13 @@ DATAHUB_OWNERSHIP_TYPE_APPROVERS_URN = (
     "urn:li:ownershipType:9344e0b1-5225-40f3-8e57-c5f829761f3d"
 )
 
+# Write target for the fairness classification push (``upsertStructuredProperties``). String-typed
+# SP on ``dataset`` entities; allowed values: Not FAIR, FAIR Tier 1..4 (must match exactly). The
+# enrich_fairness_assessment DAG sets this per FQN from ``fairness_classification.classification``.
+DATAHUB_SP_FAIRNESS_CLASSIFICATION_URN = (
+    "urn:li:structuredProperty:fairness-classification-sp"
+)
+
 # GraphQL batching defaults: 25 URNs per POST × 4 driver workers = 100 URNs in flight.
 # Both knobs accept env overrides (``DATAHUB_GRAPHQL_BATCH_SIZE`` / ``DATAHUB_GRAPHQL_BATCH_WORKERS``)
 # resolved in ``compute_fqn_datahub_signals.resolve_datahub_urn_flags`` at call time, mirroring the

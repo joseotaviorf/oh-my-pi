@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Final, FrozenSet, Mapping
+from typing import Final, FrozenSet, Mapping, Optional
 
 from bietlejuice.governance.fairness_assessment.constants import (
     MVP_TIER2_SCOPED_REQUIREMENT_IDS,
@@ -19,11 +19,28 @@ from bietlejuice.governance.fairness_assessment.models import (
 
 TIER_ACHIEVED_TO_CLASSIFICATION: Final[Mapping[int, str]] = {
     0: "Not FAIR",
-    1: "Findable, Accessible",
-    2: "Findable, Accessible, Interoperable",
-    3: "Findable, Accessible, Interoperable and Reusable",
-    4: "FAIR Masterpiece",
+    1: "FAIR Tier 1",
+    2: "FAIR Tier 2",
+    3: "FAIR Tier 3",
+    4: "FAIR Tier 4",
 }
+
+# De/para for legacy verbose ``classification`` labels written before the tier-label rollout.
+# The ``fairness_classification`` table is upserted (merge on FQN), so rows produced by older runs
+# keep the old label until reprocessed. The DataHub push normalizes any persisted label to the
+# current structured-property allowed value via :func:`normalize_classification_to_sp_value`.
+_LEGACY_CLASSIFICATION_TO_SP_VALUE: Final[Mapping[str, str]] = {
+    "Not FAIR": "Not FAIR",
+    "Findable, Accessible": "FAIR Tier 1",
+    "Findable, Accessible, Interoperable": "FAIR Tier 2",
+    "Findable, Accessible, Interoperable and Reusable": "FAIR Tier 3",
+    "FAIR Masterpiece": "FAIR Tier 4",
+}
+
+# Current tier labels (pass through unchanged); equal to the DataHub SP allowed values.
+_CLASSIFICATION_ALLOWED_VALUES: Final[FrozenSet[str]] = frozenset(
+    TIER_ACHIEVED_TO_CLASSIFICATION.values()
+)
 
 
 def tier_achieved_to_classification(tier_achieved: int) -> str:
@@ -31,6 +48,27 @@ def tier_achieved_to_classification(tier_achieved: int) -> str:
     if tier_achieved not in TIER_ACHIEVED_TO_CLASSIFICATION:
         raise ValueError(f"Unknown tier_achieved {tier_achieved!r}; expected 0..4")
     return TIER_ACHIEVED_TO_CLASSIFICATION[tier_achieved]
+
+
+def normalize_classification_to_sp_value(
+    classification: Optional[str],
+) -> Optional[str]:
+    """Normalize a persisted ``classification`` label to a DataHub SP allowed value.
+
+    Accepts both current tier labels (``FAIR Tier N`` / ``Not FAIR``, returned unchanged) and the
+    legacy verbose labels (mapped via :data:`_LEGACY_CLASSIFICATION_TO_SP_VALUE`). Returns ``None``
+    for blank or unknown values so callers can log-and-skip rather than send an invalid value that
+    the structured-property mutation would reject.
+    """
+
+    if classification is None:
+        return None
+    label = classification.strip()
+    if not label:
+        return None
+    if label in _CLASSIFICATION_ALLOWED_VALUES:
+        return label
+    return _LEGACY_CLASSIFICATION_TO_SP_VALUE.get(label)
 
 
 def cumulative_ids_for_tier(tier: int) -> FrozenSet[str]:

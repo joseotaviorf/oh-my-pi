@@ -25,6 +25,7 @@ from bietlejuice.governance.fairness_assessment import (
     dataset_id_for_platform,
     evaluate_mvp_checks_from_row,
     list_platform_urns_for_fqn,
+    normalize_classification_to_sp_value,
     resolve_datahub_gms_base_url,
     resolve_datahub_graphql_url,
     tier_achieved_to_classification,
@@ -42,16 +43,10 @@ _SUBSTANTIVE_FACT_CONTRACT_DESC = (
 class TestTierAchievedToClassification(unittest.TestCase):
     def test_map_0_to_4(self):
         self.assertEqual(tier_achieved_to_classification(0), "Not FAIR")
-        self.assertEqual(tier_achieved_to_classification(1), "Findable, Accessible")
-        self.assertEqual(
-            tier_achieved_to_classification(2),
-            "Findable, Accessible, Interoperable",
-        )
-        self.assertEqual(
-            tier_achieved_to_classification(3),
-            "Findable, Accessible, Interoperable and Reusable",
-        )
-        self.assertEqual(tier_achieved_to_classification(4), "FAIR Masterpiece")
+        self.assertEqual(tier_achieved_to_classification(1), "FAIR Tier 1")
+        self.assertEqual(tier_achieved_to_classification(2), "FAIR Tier 2")
+        self.assertEqual(tier_achieved_to_classification(3), "FAIR Tier 3")
+        self.assertEqual(tier_achieved_to_classification(4), "FAIR Tier 4")
 
     def test_labels_frozen(self):
         self.assertEqual(len(TIER_ACHIEVED_TO_CLASSIFICATION), 5)
@@ -59,6 +54,48 @@ class TestTierAchievedToClassification(unittest.TestCase):
     def test_unknown_tier_raises(self):
         with self.assertRaises(ValueError):
             tier_achieved_to_classification(99)
+
+
+class TestNormalizeClassificationToSpValue(unittest.TestCase):
+    def test_current_tier_labels_pass_through(self):
+        for label in (
+            "Not FAIR",
+            "FAIR Tier 1",
+            "FAIR Tier 2",
+            "FAIR Tier 3",
+            "FAIR Tier 4",
+        ):
+            self.assertEqual(normalize_classification_to_sp_value(label), label)
+
+    def test_legacy_labels_are_mapped(self):
+        self.assertEqual(
+            normalize_classification_to_sp_value("Findable, Accessible"), "FAIR Tier 1"
+        )
+        self.assertEqual(
+            normalize_classification_to_sp_value("Findable, Accessible, Interoperable"),
+            "FAIR Tier 2",
+        )
+        self.assertEqual(
+            normalize_classification_to_sp_value(
+                "Findable, Accessible, Interoperable and Reusable"
+            ),
+            "FAIR Tier 3",
+        )
+        self.assertEqual(
+            normalize_classification_to_sp_value("FAIR Masterpiece"), "FAIR Tier 4"
+        )
+
+    def test_whitespace_is_trimmed(self):
+        self.assertEqual(
+            normalize_classification_to_sp_value("  FAIR Tier 1  "), "FAIR Tier 1"
+        )
+
+    def test_unknown_or_blank_returns_none(self):
+        self.assertIsNone(normalize_classification_to_sp_value(None))
+        self.assertIsNone(normalize_classification_to_sp_value(""))
+        self.assertIsNone(normalize_classification_to_sp_value("   "))
+        self.assertIsNone(normalize_classification_to_sp_value("Tier 1"))
+        self.assertIsNone(normalize_classification_to_sp_value("garbage"))
 
 
 class TestComputeTierMvp(unittest.TestCase):

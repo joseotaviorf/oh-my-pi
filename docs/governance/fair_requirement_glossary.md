@@ -13,12 +13,21 @@ Technical IDs (`F2-01`, `I1-01`, …) appear in `checks_result_json` and lake ta
 
 ## Tier labels (`tier_achieved` / `classification`)
 
-| `tier_achieved` | `classification` (lake) | Business summary |
-|-----------------|-------------------------|------------------|
-| 0 | Not FAIR | Blocking gaps (metadata and/or platform catalog signals) |
-| 1 | Findable, Accessible | Discoverable/reachable, but column docs or schema alignment still fail |
-| 2 | Findable, Accessible, Interoperable | MVP program bar met (all scoped checks pass, including platform-owned) |
-| 3–4 | … | Reserved; not emitted in current MVP mode |
+These labels are written to `fairness_classification.classification` and pushed to DataHub as
+the `fairness-classification-sp` structured property (allowed values must match exactly). Each
+DAG run upserts only FQNs assessed in that run's `fairness_assessment` partition
+(`load_start_date`), not the full historical classification table.
+
+| `tier_achieved` | `classification` (lake / DataHub SP) | Meaning (FAIR pillars) | Business summary |
+|-----------------|--------------------------------------|------------------------|------------------|
+| 0 | Not FAIR | — | Blocking gaps (metadata and/or platform catalog signals) |
+| 1 | FAIR Tier 1 | Findable, Accessible | Discoverable/reachable; column docs or schema alignment may still fail |
+| 2 | FAIR Tier 2 | Findable, Accessible, Interoperable | MVP program bar met (all scoped checks pass, including platform-owned) |
+| 3 | FAIR Tier 3 | (+ Reusable) | Reserved; not emitted in current MVP mode |
+| 4 | FAIR Tier 4 | Full FAIR | Reserved; not emitted in current MVP mode |
+
+Legacy lake rows may still carry the old verbose labels (`Findable, Accessible`, …,
+`FAIR Masterpiece`); the DataHub push normalizes them to the tier labels above.
 
 A table can have perfect metadata and still show tier &lt; 2 if **platform-owned** checks fail — that is not a metadata-PR action item.
 
