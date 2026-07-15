@@ -1,0 +1,19 @@
+---
+table_name: dw_agent_payments.fact_earnings
+alert_channel: "#agents-data-alarms"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_earning:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_earning_source:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error

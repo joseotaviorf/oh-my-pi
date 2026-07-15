@@ -1,0 +1,16 @@
+---
+dag:
+  name: dw_agent_payments
+  schedule_start_date: 2026, 6, 25
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      DW layer for Big Agent Incentives Engine. Projects enrich_big_agent_incentives
+      tables into dimensional and fact models for analytics consumption.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: agent_payments
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
