@@ -106,7 +106,7 @@ The month axis and the range predicates below bucket by the **calendar date** of
 SELECT DATE_TRUNC('month', CAST(obt.ts_termination_finished AS DATE)) AS ref_month, COUNT(*) AS total_terminations, CAST(COUNT_IF(obt.has_mediation_ticket = false) AS DOUBLE) / COUNT(*) AS pct_offb_wo_mediation, CAST(COUNT_IF(obt.has_repairs = false) AS DOUBLE) / COUNT(*) AS pct_without_repairs, CAST( COUNT_IF( obt.has_repairs = true AND obt.has_agreement = true AND (obt.has_early_agreement = true OR obt.has_late_agreement = true) ) AS DOUBLE ) / CAST(NULLIF(COUNT_IF(obt.has_repairs = true), 0) AS DOUBLE) AS pct_both_agree, ( CAST( COUNT_IF( obt.has_repairs = true AND obt.has_agreement = true AND obt.has_discount_agreement = true ) AS DOUBLE ) + CAST( COUNT_IF( obt.has_repairs = true AND obt.has_compulsory_agreement = true ) AS DOUBLE ) ) / CAST(NULLIF(COUNT_IF(obt.has_repairs = true), 0) AS DOUBLE) AS pct_compulsory_bandaid2FROM dw_offboarding.obt_offboarding AS obtWHERE obt.is_eviction = false AND obt.ts_termination_finished IS NOT NULL AND CAST(obt.ts_termination_finished AS DATE) >= DATE_ADD('month', -24, CURRENT_DATE) AND CAST(obt.ts_termination_finished AS DATE) < CURRENT_DATEGROUP BY 1ORDER BY 1
 ```
   
-To isolate a single indicator, keep only its numerator/denominator pair and the same `FROM` / `WHERE`.
+To isolate a single indicator, keep only its numerator/denominator pair and the same`FROM` / `WHERE`.
 
 ## Superset Golden Assets
 
