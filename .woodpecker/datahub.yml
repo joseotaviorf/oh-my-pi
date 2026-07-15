@@ -22,17 +22,37 @@
 # Steps:
 #   get-credentials-prod — Vault OPENAI_API_KEY for LiteLLM (push only)
 #   push-datahub-business-context — LLM → ephemeral YAML → DataHub via
-#                                   generate_and_push_datahub_entities.py (push only)
+#                                   generate_and_push_datahub_entities.py (push only).
+#                                   The Data Product `product_description` it writes is
+#                                   NEVER LLM-authored: it's the full Markdown body
+#                                   (verbatim, minus Ownership/MBR/Tables/Synonyms/Golden
+#                                   Queries/Catalog sections) injected deterministically —
+#                                   see _extract_description_from_md() in that script.
+#                                   depends_on sync-tars-entities (see below) so this is
+#                                   always the LAST writer of the description: the full
+#                                   Markdown always wins over the condensed overview.
 #   validate-datahub-entities — smoke full catalog on pull_request (no push-only deps)
 #   validate-datahub-entities-post-push — smoke after publish (push only;
 #       must be a separate step: Woodpecker PR pipelines omit push-only steps, so
 #       depends_on push-datahub-business-context fails on pull_request)
 #   sync-tars-entities — sync_tars_entities.py (direct mode) for DataHub Context Documents
-#                         tagged tars-entity (domain) or tars-metrics (metric).
-#                         No depends_on: its path filter includes sync/** (code changes),
-#                         which would omit push-datahub-business-context from the pipeline
-#                         and cause "depends on unknown step". Data Products already exist
-#                         in DataHub so strict ordering is not required.
+#                         tagged tars-entity (domain) or tars-metrics (metric). Source of
+#                         truth is the LIVE DataHub Context Document (may be ahead of the
+#                         committed Markdown), so its product_description is intentionally
+#                         condensed (first 6 Overview paragraphs + a "Further detail and
+#                         table routing: <path>.md" link — see _condense_overview() in
+#                         sync/yaml_generator.py) — it's a quick preview, not the final
+#                         word. push-datahub-business-context depends_on this step so it
+#                         always runs and finishes first: without that ordering, both
+#                         steps write the same Data Product description with no shared
+#                         state, and whichever finished last (a race — timing depends on
+#                         LLM latency, doc count, etc.) won non-deterministically. Marked
+#                         failure: ignore so a transient error here (e.g. one of the ~36
+#                         tagged docs still being authored) never blocks the authoritative
+#                         full-Markdown publish below. Its own path filter (sync/** code
+#                         changes included) is a superset of push-datahub-business-context's,
+#                         so it is always present whenever push-datahub-business-context runs
+#                         — depends_on can safely point at it without "unknown step" errors.
 #   push-context-documents — push_context_documents.py on push to master / hotfix/*
 #                             (idempotent; stable document IDs)
 #
@@ -98,7 +118,9 @@ steps:
       - event: push
         branch: [master, hotfix/*]
         path: *datahub_path
-    depends_on: [get-credentials-prod]
+    # Runs after sync-tars-entities so this step's full-Markdown description is always
+    # the last write to the Data Product (see step comment above for the race it avoids).
+    depends_on: [get-credentials-prod, sync-tars-entities]
 
   validate-datahub-entities:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -149,6 +171,9 @@ steps:
       TARS_SYNC_MODE: direct
     commands:
       - uv run python dags/governance/datahub_business_context/sync_tars_entities.py --mode direct
+    # A failure here (e.g. one tagged doc still being authored) must never block the
+    # authoritative push-datahub-business-context publish that depends_on this step.
+    failure: ignore
     when:
       - event: push
         branch: [master, hotfix/*]
