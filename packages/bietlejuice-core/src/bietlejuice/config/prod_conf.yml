@@ -1773,13 +1773,17 @@ emr_cluster_base: &emr_cluster_anchor
         spark.openlineage.transport.type: "http"
         spark.openlineage.transport.url: "https://metadata-propagator.apps.data-prd-blue.habitat.zone"
         spark.openlineage.transport.endpoint: "/openlineage/events"
-        # Spark event logs → S3; ingested by bietlejuice.enrich_spark_event_logs.
+        # Keep event logs on the EMR default path (do not set spark.eventLog.dir)
+        # so Persistent Application UI / History Server can still show them.
         spark.eventLog.enabled: "true"
-        spark.eventLog.dir: "s3a://{{ var.value.databricks_s3_bucket }}/spark-event-logs-emr/{{ dag.dag_id }}"
         spark.eventLog.compress: "true"
         spark.eventLog.compression.codec: "zstd"
         spark.eventLog.logStageExecutorMetrics: "true"
         spark.eventLog.rolling.enabled: "true"
+        # YARN app staging on S3 (not cluster HDFS) so AM relaunches after lost NM /
+        # node blips still find __spark_conf__.zip / pyspark.zip. Default cleanup
+        # stays on; recommend an S3 lifecycle rule on emr/spark-staging/.
+        spark.yarn.stagingDir: "s3a://{{ var.value.artifacts_bucket | replace('s3://', '') }}/emr/spark-staging/{{ dag.dag_id }}"
 
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"
