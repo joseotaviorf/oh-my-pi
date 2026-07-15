@@ -1,9 +1,8 @@
 database_name: datalake_booking
 table_name: booking_cancellation
-description: This table contains information about the first booking cancellation,
-  having granularity of booking and event precision in seconds.
+description: This table contains information about the first booking cancellation, having granularity of booking and event precision in seconds.
 domain: For Sale
-owner: ''
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_booking:
     lineage:
@@ -12,21 +11,16 @@ columns:
   id_user_cancellation:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.id_user
-    description: An identifier for who had cancelled the booking for the first time.
-      Its value can be NULL and in this case the cancellation was made by an automatic
-      process.
+    description: An identifier for who had cancelled the booking for the first time. Its value can be NULL and in this case the cancellation was made by an automatic process.
   ts_first_cancelled:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: Timestamp indicating the moment when the booking was cancelled for
-      the first time. Its precision is second.
+    description: Timestamp indicating the moment when the booking was cancelled for the first time. Its precision is second.
   cancelled_by:
     description: A taxonomy that define a group for who had cancelled the booking.
     categories:
       Owner: A house's owner had cancelled the booking.
       Agent: An agent had cancelled the booking.
       Tenant: A tenant had cancelled the booking.
-      QuintoAndar: Someone with an email associated with Quinto Andar had cancelled
-        the booking.
-      Automatic: In this case we don't have a user associated with the cancellation
-        action.
+      QuintoAndar: Someone with an email associated with Quinto Andar had cancelled the booking.
+      Automatic: In this case we don't have a user associated with the cancellation action.

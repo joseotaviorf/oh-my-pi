@@ -1,19 +1,17 @@
 database_name: datalake_booking
 table_name: booking
-description: This table contains information about booking and is the main source
-  for the dim_booking. Here, id is a PK and we have only one booking per line.
+description: This table contains information about booking and is the main source for the dim_booking. Here, id is a PK and we have only one booking per line.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id:
     lineage:
     - datalake_ebdb_clean.booking.id
-    description: Its the PK for this table and the identifier of bookings. Must be
-      unique.
+    description: Its the PK for this table and the identifier of bookings. Must be unique.
   id_country:
     lineage:
     - datalake_ebdb_listing.house.id_country
-    description: Identifier of the country where the booked house is located, sourced from the listing house dimension.
+    description: Identifier of the country where the visited house is located, derived from the house listing.
   id_rescheduled_booking:
     lineage:
     - datalake_ebdb_clean.booking.id_rescheduled_booking
@@ -25,7 +23,7 @@ columns:
   id_visit:
     lineage:
     - datalake_ebdb_clean.booking.id_visit
-    description: Identifier of visit entity linked to the booking schedule in EBDB.
+    description: Natural key of the consolidated visit in the operational visit service.
   id_user_creation:
     lineage:
     - datalake_ebdb_clean.visit_status_log.id_author_user
@@ -34,10 +32,8 @@ columns:
     description: An identifier for who had created the booking.
   id_user_cancelation:
     lineage:
-      - datalake_booking.booking_status_change_unified.id_user
-    description: An identifier for who had cancelled the booking for the first time.
-      Its value can be NULL and in this case the cancellation was made by an automatic
-      process.
+    - datalake_booking.booking_status_change_unified.id_user
+    description: An identifier for who had cancelled the booking for the first time. Its value can be NULL and in this case the cancellation was made by an automatic process.
   id_house:
     lineage:
     - datalake_ebdb_clean.booking.id_house
@@ -53,9 +49,7 @@ columns:
   id_attendant:
     lineage:
     - datalake_ebdb_clean.booking.id_attendant
-    description: The user ID (sk_user) of the user who booked this visit, but only
-      if the booking was created by a QuintoAndar agent or a QuintoAndar employee,
-      and not by the visitor himself
+    description: The user ID (sk_user) of the user who booked this visit, but only if the booking was created by a QuintoAndar agent or a QuintoAndar employee, and not by the visitor himself
   id_user_sale_attendence_5a:
     lineage:
     - datalake_secretariat.secretariat_allocation_history.id_secretariat_user
@@ -76,7 +70,7 @@ columns:
     lineage:
     - datalake_ebdb_clean.booking.id_visitor
     - datalake_ebdb_clean.booking.id_house
-    description: Synthetic sale-flow key built by concatenating visitor and house identifiers to represent the buyer-house pairing in For Sale.
+    description: Sale flow identifier for SALE-context bookings, built by concatenating the visitor id and the house id. NULL for non-sale bookings.
   id_real_estate_agent_rating:
     lineage:
     - datalake_ebdb_clean.visit.id_real_estate_agent_rating
@@ -107,12 +101,12 @@ columns:
     description: Id of the demand partner. Obtained from visit_business_model which consolidates demand partner data.
   id_schedule:
     lineage:
-      - datalake_ebdb_clean.booking.id_schedule
+    - datalake_ebdb_clean.booking.id_schedule
     description: Scheduling identification key in the schedules database.
   country_code:
     lineage:
     - datalake_ebdb_listing.house.country_code
-    description: Country code of the booked listing used for regional segmentation and downstream country-level joins.
+    description: ISO country code of the house being visited, defaulting to 'Undefined' when not available.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
@@ -127,19 +121,16 @@ columns:
   status:
     lineage:
     - datalake_ebdb_clean.booking.status
-    description: Gives the booking status, for exemple to show if the visit is canceled
-      or not
+    description: Gives the booking status, for exemple to show if the visit is canceled or not
     categories:
-      AguardandoConfirmacao: Waiting for tenant to confirm visit (only required for
-        visits booked at least 48 hours in advance)
+      AguardandoConfirmacao: Waiting for tenant to confirm visit (only required for visits booked at least 48 hours in advance)
       Cancelado: Visit was canceled
       Marcado: Visit is scheduled
       Realizado: Visit was completed
   visit_intent:
     lineage:
     - datalake_ebdb_clean.booking.business_context
-    description: Lists the visitors intention for this visit (if he was looking to
-      rent or buy the property)
+    description: Lists the visitors intention for this visit (if he was looking to rent or buy the property)
     categories:
       RENT: A booking related to the ForRent context, rent intention
       SALE: A booking related to the ForSale context, buyer intention
@@ -184,8 +175,8 @@ columns:
     description: Email from who had created the booking.
   first_update_source:
     lineage:
-      - datalake_ebdb_clean.visit_origin.name
-      - datalake_ebdb_clean.visit_status_log.channel
+    - datalake_ebdb_clean.visit_origin.name
+    - datalake_ebdb_clean.visit_status_log.channel
     description: Shows the origin from the booking, self service web, booked by agent
   code:
     lineage:
@@ -270,94 +261,69 @@ columns:
       AGENT_TRANSFER: ''
       BAD_SCHEDULING: '#N/A'
       BUG_IN_INSPECTION_APP: '#N/A'
-      CANCELED_AGENT_CAN_NOT_ATTEND: Corretor avisa que não conseguirá comparecer
-        cx ou pelo app de corretor com motivo 'Não poderei comparecer na visita'
-      CANCELED_AGENT_CAN_NOT_JOIN: Corretor cancela pelo app com o motivo "Não poderei
-        comparecer à visita"
+      CANCELED_AGENT_CAN_NOT_ATTEND: Corretor avisa que não conseguirá comparecer cx ou pelo app de corretor com motivo 'Não poderei comparecer na visita'
+      CANCELED_AGENT_CAN_NOT_JOIN: Corretor cancela pelo app com o motivo "Não poderei comparecer à visita"
       CANCELED_AGENT_DEACTIVATED: Corretor descredenciado
-      CANCELED_AGENT_LATE_POOL: Corretor cancela visita subsequente à pool por atraso
-        na visita pool, pelo app com motivo 'Visita em grupo atrasou e não será possível
-        chegar na próxima visita'
-      CANCELED_AGENT_VISIT_TOO_FAR: Corretor cancela pelo app com o motivo "Visita
-        agendada em local muito longe"
+      CANCELED_AGENT_LATE_POOL: Corretor cancela visita subsequente à pool por atraso na visita pool, pelo app com motivo 'Visita em grupo atrasou e não será possível chegar na próxima visita'
+      CANCELED_AGENT_VISIT_TOO_FAR: Corretor cancela pelo app com o motivo "Visita agendada em local muito longe"
       CANCELED_AUTOMATICALLY_PROPERTY_UNPUBLISHED: Imóvel despublicado
-      CANCELED_BLOCKED_SCHEDULE: Visita agendada em horário bloqueado na agenda do
-        corretor e cancelada pelo app com motivo 'Agenda estava bloqueada e entrou
-        uma visita'
+      CANCELED_BLOCKED_SCHEDULE: Visita agendada em horário bloqueado na agenda do corretor e cancelada pelo app com motivo 'Agenda estava bloqueada e entrou uma visita'
       CANCELED_BY_OWNER_FROM_APP: PP cancelamento via PWA
       CANCELED_BY_OWNER_FROM_LINK: ''
       CANCELED_BY_PHOTOGRAPHER_FROM_APP: '#N/A'
-      CANCELED_BY_TENANT_CAN_NOT_ATTEND: Inquilino não comparecerá na visita mas ainda
-        tem interesse no imóvel
+      CANCELED_BY_TENANT_CAN_NOT_ATTEND: Inquilino não comparecerá na visita mas ainda tem interesse no imóvel
       CANCELED_BY_TENANT_FROM_APP: Todos cancelamentos vindos do PWA
       CANCELED_BY_TENANT_FROM_CHECK_IN: Inquilino cancela via link do check-in
       CANCELED_BY_TENANT_NOT_BUYING: ''
       CANCELED_BY_TENANT_NOT_BUYING_BY_5A: ''
-      CANCELED_BY_TENANT_NOT_INTERESTED: Inquilino não tem mais interesse no imóvel
-        mas continua procurando um imóvel
+      CANCELED_BY_TENANT_NOT_INTERESTED: Inquilino não tem mais interesse no imóvel mas continua procurando um imóvel
       CANCELED_BY_TENANT_NOT_RENTING: Inquilino não está mais procurando imóveis
       CANCELED_BY_TENANT_NOT_RENTING_BY_5A: Inquilino não quer mais alugar pelo QuintoAndar
-      CANCELED_BY_TENANT_OTHER_REASON: Inquilino não quer alugar por outro motivo,
-        escrito manualmente
-      CANCELED_CANT_FIND_ANOTHER_AGENT: Corretor descredenciado, e não se aloca outro
-        corretor para o booking, gerando o cancelamento
+      CANCELED_BY_TENANT_OTHER_REASON: Inquilino não quer alugar por outro motivo, escrito manualmente
+      CANCELED_CANT_FIND_ANOTHER_AGENT: Corretor descredenciado, e não se aloca outro corretor para o booking, gerando o cancelamento
       CANCELED_CHECKIN_NOT_DONE: Inquilino não confirmou a visita via check in
-      CANCELED_CLIENT_CAN_NOT_ATTEND: Corretor cancela pelo app com o motivo "Cliente
-        não poderá comparecer"
-      CANCELED_CLIENT_GAVE_UP: Cancelamento por ligação ao CX ou pelo app do corretor
-        com motivo "Cliente desistiu da visita"
+      CANCELED_CLIENT_CAN_NOT_ATTEND: Corretor cancela pelo app com o motivo "Cliente não poderá comparecer"
+      CANCELED_CLIENT_GAVE_UP: Cancelamento por ligação ao CX ou pelo app do corretor com motivo "Cliente desistiu da visita"
       CANCELED_CLIENT_GAVE_UP_APARTMENT: Não quer mais alugar atendimento CX
       CANCELED_CLIENT_IS_REPAIRING_HOUSE: '#N/A'
       CANCELED_CLIENT_IS_STILL_IN_PROPERTY: '#N/A'
       CANCELED_CLIENT_NOT_BUYING: ''
-      CANCELED_CLIENT_NOT_RENTING: Inquilino liga por CX avisando que não tem mais
-        intenção de alugar o apartamento
+      CANCELED_CLIENT_NOT_RENTING: Inquilino liga por CX avisando que não tem mais intenção de alugar o apartamento
       CANCELED_CLIENT_NOT_RENTING_OR_BUYING: ''
       CANCELED_CONTRACT_CANCELED: ''
       CANCELED_HOUSE_INACCESSIBLE: ''
       CANCELED_HOUSE_OCCUPIED: ''
       CANCELED_HOUSE_REPAIRING: ''
       CANCELED_HOUSE_RESERVED: Reserva do Imóvel derruba todas as visitas
-      CANCELED_INCORRECT_SCHEDULE: Corretor cancela pelo app com o motivo "Cliente
-        agendou incorretamente"
+      CANCELED_INCORRECT_SCHEDULE: Corretor cancela pelo app com o motivo "Cliente agendou incorretamente"
       CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION: '#N/A'
       CANCELED_INSPECTOR_WITHOUT_KEYS: '#N/A'
       CANCELED_OTHER_CLIENT: cancelamento via CX sem razão especificada
       CANCELED_OTHER_INSPECTOR: ''
       CANCELED_OTHER_OWNER: PP cancela sem motivo explicitado
-      CANCELED_OWNER_CAN_NOT_ATTEND: Proprietário não poderá ir à visita cancelado
-        pelo corretor via app com motivo 'Proprietário não poderá comparecer'
-      CANCELED_OWNER_CAN_NOT_ATTEND_INSPECTION: Imóvel suspenso por gestão de consequência
-        do pp
-      CANCELED_OWNER_CONSEQUENCE_MANAGEMENT: Imóvel suspenso por gestão de consequência
-        do pp
-      CANCELED_OWNER_CONSEQUENCE_MANAGEMENT_SUSPENDED: Proprietário não responde as
-        offers e é despublicado, "gestão de consequências"
+      CANCELED_OWNER_CAN_NOT_ATTEND: Proprietário não poderá ir à visita cancelado pelo corretor via app com motivo 'Proprietário não poderá comparecer'
+      CANCELED_OWNER_CAN_NOT_ATTEND_INSPECTION: Imóvel suspenso por gestão de consequência do pp
+      CANCELED_OWNER_CONSEQUENCE_MANAGEMENT: Imóvel suspenso por gestão de consequência do pp
+      CANCELED_OWNER_CONSEQUENCE_MANAGEMENT_SUSPENDED: Proprietário não responde as offers e é despublicado, "gestão de consequências"
       CANCELED_OWNER_DID_NOT_ATTEND: '#N/A'
       CANCELED_OWNER_EXEMPTED_INSPECTION: '#N/A'
       CANCELED_OWNER_IS_REPAIRING_HOUSE: '#N/A'
       CANCELED_OWNER_NOT_RENTING: Proprietário desistiu de alugar
       CANCELED_OWNER_NO_RETURN_NEGOTIATIONS: ''
-      CANCELED_OWNER_PROPERTY_ALREADY_RENTED_5A: Proprietário já alugou o Imóvel pelo
-        5A
-      CANCELED_OWNER_PROPERTY_ALREADY_RENTED_OTHER: Proprietário já alugou o Imóvel
-        por fora do 5A
+      CANCELED_OWNER_PROPERTY_ALREADY_RENTED_5A: Proprietário já alugou o Imóvel pelo 5A
+      CANCELED_OWNER_PROPERTY_ALREADY_RENTED_OTHER: Proprietário já alugou o Imóvel por fora do 5A
       CANCELED_OWNER_SUSPENDED: Imóvel suspenso por gestão de consequência do pp
-      CANCELED_OWNER_UNREACHABLE: Quando liga para confirmar a visita, o proprietário
-        não atende em imóveis onde o PP acompanha
-      CANCELED_OWNER_UNREACHABLE_UNPUBLISHED: Quando liga para confirmar se o imóvel
-        ainda está disponível, o proprietário não atende e por isso há despublicação
+      CANCELED_OWNER_UNREACHABLE: Quando liga para confirmar a visita, o proprietário não atende em imóveis onde o PP acompanha
+      CANCELED_OWNER_UNREACHABLE_UNPUBLISHED: Quando liga para confirmar se o imóvel ainda está disponível, o proprietário não atende e por isso há despublicação
       CANCELED_PROBLEM_INSPECTOR: ''
       CANCELED_PROBLEM_OWNER_OR_TENANT_OR_HOUSE: ''
       CANCELED_PROPERTY_SUSPENDED_ADVANCED_NEGOTIATIONS: Negociação avançada
-      CANCELED_PROPERTY_SUSPENDED_UNAVAILABLE: Imóvel suspenso cancelado pelo app
-        do corretor com o motivo 'Imóvel indisponível e/ou já alugado'
+      CANCELED_PROPERTY_SUSPENDED_UNAVAILABLE: Imóvel suspenso cancelado pelo app do corretor com o motivo 'Imóvel indisponível e/ou já alugado'
       CANCELED_PROPERTY_UNAVAILABLE: Imóvel despublicado
       CANCELED_RELOCATION: ''
       CANCELED_RELOCATION_BY_BUG: ''
       CANCELED_REQUEST_BY_OWNER_OR_TENANT: ''
-      CANCELED_SCHEDULED_OTHER_TIME: O corretor cancela a visita do inquilino com
-        o motivo 'Visita realizada em outro horário'
+      CANCELED_SCHEDULED_OTHER_TIME: O corretor cancela a visita do inquilino com o motivo 'Visita realizada em outro horário'
       CANCELED_SELF_SERVICE_PARTIAL: Não é mais utilizado
       CANCELED_TENANT_CAN_NOT_ATTEND_INSPECTION: ''
       EXPECTED_TERMINATION_DATE_CHANGE: ''
@@ -378,10 +344,8 @@ columns:
     description: Cancelation category as in the sheets above
     categories:
       Agent: The agent cancelled the booking
-      Consequence Management: The booking was cancelled because the owner was suspended
-        because of "consequence management" reasons
-      House Reserved: The house was reserved by a tenant, thus cancelling all bookings
-        automatically
+      Consequence Management: The booking was cancelled because the owner was suspended because of "consequence management" reasons
+      House Reserved: The house was reserved by a tenant, thus cancelling all bookings automatically
       House Suspended: ''
       House Unlisted: ''
       Other: ''
@@ -454,7 +418,7 @@ columns:
     description: Datetime of the booking updating.
   ts_first_canceled:
     lineage:
-      - datalake_booking.booking_status_change.ts_created
+    - datalake_booking.booking_status_change.ts_created
     description: Datetime of the first cancellation.
   ts_first_canceled_unevaluated:
     lineage:
@@ -578,100 +542,97 @@ columns:
     categories:
       Other: ''
       Owner: Cancelled by owner
-      QuintoAndar: Cancelled by QuintoAndar, includes agents, consequence management,
-        reservation, suspension, and unlisting
+      QuintoAndar: Cancelled by QuintoAndar, includes agents, consequence management, reservation, suspension, and unlisting
       Reschedule: Rescheduled by agent or tenant
       Tenant: Cancelled by tenant
       Unknown: ''
   app_type:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.app_type
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
-    description: >
+    - datalake_amplitude_visit.amplitude_visit.app_type
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_app_type
+    description: |
       App used to book the visit.
     categories:
-      Android: >
+      Android: |
         ''
-      Web: >
+      Web: |
         ''
-      amp: >
+      amp: |
         ''
-      android: >
+      android: |
         ''
-      android_flutter: >
+      android_flutter: |
         ''
-      backend: >
+      backend: |
         ''
-      iOS: >
+      iOS: |
         ''
-      ios: >
+      ios: |
         ''
-      offline_table: >
+      offline_table: |
         ''
-      twa: >
+      twa: |
         ''
-      web_desktop: >
+      web_desktop: |
         ''
-      web_mobile: >
+      web_mobile: |
         ''
   media_source:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.media_source
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_media_source
-    description: >
+    - datalake_amplitude_visit.amplitude_visit.media_source
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_media_source
+    description: |
       Type of media source from which comes the booking.
   utm_source:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_source
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_source
-    description: >
+    - datalake_amplitude_visit.amplitude_visit.utm_source
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_source
+    description: |
       UTM (a parameter added to the destination URL) used to track the advertising source.
   utm_medium:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_medium
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
-    description: >
+    - datalake_amplitude_visit.amplitude_visit.utm_medium
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
+    description: |
       UTM (a parameter added to the destination URL) used to track the advertising medium.
   utm_campaign:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_campaign
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
-    description: >
+    - datalake_amplitude_visit.amplitude_visit.utm_campaign
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
+    description: |
       UTM (a parameter added to the destination URL) used to identify the campaign in the media.
   utm_content:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_content
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_content
-    description: >
+    - datalake_amplitude_visit.amplitude_visit.utm_content
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_content
+    description: |
       Identifies what specifically was clicked to bring the user to the site, such as a banner ad or a text link. It is often used for A/B testing and content-targeted ads.
   utm_term:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.utm_term
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_term
-    description: >
+    - datalake_amplitude_visit.amplitude_visit.utm_term
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_term
+    description: |
       Identifies search terms that brought the lead.
   branded:
     lineage:
-      - datalake_amplitude_visit.amplitude_visit.branded
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
-    description: >
+    - datalake_amplitude_visit.amplitude_visit.branded
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
+    description: |
       Identifies if the visit was branded or not. Obtained from attribution data.
   final_attribution_origin:
     lineage:
-      - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
-    description: >
-      Marketing channel surface credited for the booking visit attribution, such as App, Web, CX, or Secretaria.
-      Sourced from cross-channel attribution when available; otherwise set to old_attribution for the legacy Amplitude model.
+    - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
+    description: Channel through which the booking was attributed (App, Web, CX, Secretaria), or old_attribution for visits without cross-channel attribution data.
     categories:
-      App: >
+      App: |
         ''
-      CX: >
+      CX: |
         ''
-      Secretaria: >
+      Secretaria: |
         ''
-      Web: >
+      Web: |
         ''
-      old_attribution: >
+      old_attribution: |
         ''
   days_visit_booked_to_visit_cancelled:
     lineage:

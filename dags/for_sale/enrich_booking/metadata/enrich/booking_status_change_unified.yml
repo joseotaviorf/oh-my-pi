@@ -2,84 +2,66 @@ database_name: datalake_booking
 table_name: booking_status_change_unified
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
-description: Unified view of booking status change events that combines data from booking events systems.
-  This table provides a comprehensive view of all booking status transitions.
-  Visit bookings are tracked in the visit_status_log system from 2025-09-01, before that, they were tracked in the booking_status_change system.
-  Non-visit bookings are tracked in the booking_status_change system. Each row is a unique status for each booking.
+description: Unified view of booking status change events that combines data from booking events systems. This table provides a comprehensive view of all booking status transitions. Visit bookings are tracked in the visit_status_log system from 2025-09-01, before that, they were tracked in the booking_status_change system. Non-visit bookings are tracked in the booking_status_change system. Each row is a unique status for each booking.
 columns:
   id_booking_status:
     description: Unique identifier for the booking status. It is a concatenation of the booking id and the status.
     lineage:
-      - datalake_ebdb_clean.booking_status_change_unified.id_booking
-      - datalake_ebdb_clean.visit_status_log.id_schedule
-      - datalake_ebdb_clean.booking_status_change_unified.status
-      - datalake_ebdb_clean.visit_status_log.event_type
+    - datalake_ebdb_clean.booking_status_change_unified.id_booking
+    - datalake_ebdb_clean.visit_status_log.id_schedule
+    - datalake_ebdb_clean.booking_status_change_unified.status
+    - datalake_ebdb_clean.visit_status_log.event_type
   id_booking:
-    description: Unique identifier for the booking or visit schedule. In the old system, this corresponds
-      to id_booking from datalake_ebdb_clean.booking_status_change, while in the new system
-      it corresponds to id_schedule from datalake_ebdb_clean.visit_status_log.
+    description: Unique identifier for the booking or visit schedule. In the old system, this corresponds to id_booking from datalake_ebdb_clean.booking_status_change, while in the new system it corresponds to id_schedule from datalake_ebdb_clean.visit_status_log.
     lineage:
-      - datalake_ebdb_clean.booking_status_change.id_booking
-      - datalake_ebdb_clean.visit_status_log.id_schedule
+    - datalake_ebdb_clean.booking_status_change.id_booking
+    - datalake_ebdb_clean.visit_status_log.id_schedule
   id_user:
-    description: Identifier of the user who triggered or authored the booking status change. This could be
-      a customer, agent, or system user depending on the context of the status change.
+    description: Identifier of the user who triggered or authored the booking status change. This could be a customer, agent, or system user depending on the context of the status change.
     lineage:
-      - datalake_ebdb_clean.booking_status_change.id_user
-      - datalake_ebdb_clean.visit_status_log.id_author_user
+    - datalake_ebdb_clean.booking_status_change.id_user
+    - datalake_ebdb_clean.visit_status_log.id_author_user
   status:
-    description: Status of the booking.
+    description: Booking status reached by this status-change event, such as requested, confirmed, or canceled.
     categories:
       AguardandoConfirmacao: When the booking was requested.
       Marcado: When the booking was confirmed.
       Cancelado: When the booking was canceled.
     lineage:
-      - datalake_ebdb_clean.booking_status_change.status
-      - datalake_ebdb_clean.visit_status_log.event_type
+    - datalake_ebdb_clean.booking_status_change.status
+    - datalake_ebdb_clean.visit_status_log.event_type
   reason:
-    description: Description explaining the reason for the booking status change. This field
-      contains detailed explanations such as 'Visita extra de encaixe', 'Agendamento via site',
-      or specific cancellation reasons. Values are normalized across both old and new systems for consistency.
+    description: Description explaining the reason for the booking status change. This field contains detailed explanations such as 'Visita extra de encaixe', 'Agendamento via site', or specific cancellation reasons. Values are normalized across both old and new systems for consistency.
     lineage:
-      - datalake_ebdb_clean.booking_status_change.reason
-      - datalake_ebdb_clean.visit_status_log.reason
+    - datalake_ebdb_clean.booking_status_change.reason
+    - datalake_ebdb_clean.visit_status_log.reason
   reason_enum:
-    description: Enumerated version of the booking status change reason. This field provides a standardized
-      format of the reason that can be used for systematic analysis and reporting.
-      Values are normalized across both old and new systems for consistency.
+    description: Enumerated version of the booking status change reason. This field provides a standardized format of the reason that can be used for systematic analysis and reporting. Values are normalized across both old and new systems for consistency.
     lineage:
-      - datalake_ebdb_clean.booking_status_change.reason_enum
-      - datalake_ebdb_clean.visit_status_log.reason
+    - datalake_ebdb_clean.booking_status_change.reason_enum
+    - datalake_ebdb_clean.visit_status_log.reason
   reason_category:
-    description: Who is related to the status of the booking status change. Groups similar reasons into
-      broader categories such as 'Tenant', 'Owner', 'Agent', or 'Other'.
+    description: Who is related to the status of the booking status change. Groups similar reasons into broader categories such as 'Tenant', 'Owner', 'Agent', or 'Other'.
     lineage:
-      - datalake_ebdb_clean.appointment_change_reason_category.name
-      - datalake_ebdb_clean.visit_status_log.on_behalf_of
+    - datalake_ebdb_clean.appointment_change_reason_category.name
+    - datalake_ebdb_clean.visit_status_log.on_behalf_of
   source:
-    description: Indicates the data source system for this booking status change record. 'OLD' represents
-      data from the legacy booking_status_change system (typically for non-visit bookings or
-      visits before September 2025), while 'NEW' represents data from the modern visit_status_log
-      system (for visits from September 2025 onwards).
+    description: Indicates the data source system for this booking status change record. 'OLD' represents data from the legacy booking_status_change system (typically for non-visit bookings or visits before September 2025), while 'NEW' represents data from the modern visit_status_log system (for visits from September 2025 onwards).
     lineage:
-      - datalake_ebdb_clean.booking_status_change
-      - datalake_ebdb_clean.visit_status_log
+    - datalake_ebdb_clean.booking_status_change
+    - datalake_ebdb_clean.visit_status_log
   type:
-    description: Type of the booking or appointment. This field
-      helps categorize different types of appointments and bookings within the system.
+    description: Type of the booking or appointment. This field helps categorize different types of appointments and bookings within the system.
     lineage:
-      - datalake_ebdb_clean.booking.type
-      - datalake_ebdb_clean.visit_status_log.event_type
+    - datalake_ebdb_clean.booking.type
+    - datalake_ebdb_clean.visit_status_log.event_type
   ts_created:
-    description: Timestamp when the booking status change event was created or occurred. This represents the
-      exact moment when the status transition happened.
+    description: Timestamp when the booking status change event was created or occurred. This represents the exact moment when the status transition happened.
     lineage:
-      - datalake_ebdb_clean.booking_status_change.ts_created
-      - datalake_ebdb_clean.visit_status_log.ts_created
+    - datalake_ebdb_clean.booking_status_change.ts_created
+    - datalake_ebdb_clean.visit_status_log.ts_created
   ts_first_event:
-    description: Timestamp of the first event associated with this booking. This serves
-      as a reference point for calculating time differences and understanding the complete timeline
-      of a booking from its initial creation to various status changes.
+    description: Timestamp of the first event associated with this booking. This serves as a reference point for calculating time differences and understanding the complete timeline of a booking from its initial creation to various status changes.
     lineage:
-      - datalake_ebdb_clean.booking_status_change.ts_created
-      - datalake_ebdb_clean.visit_status_log.ts_created
+    - datalake_ebdb_clean.booking_status_change.ts_created
+    - datalake_ebdb_clean.visit_status_log.ts_created

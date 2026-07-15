@@ -1,402 +1,402 @@
 database_name: datalake_buyer_prospect
 table_name: buyer_prospect
-owner: thiago.bueno@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description: Enriched table containing comprehensive buyer prospect information, aggregating sale flow activities, booking events, offer events, and buyer profile flags to provide a 360-degree view of each buyer's journey.
 columns:
   id_buyer:
     lineage:
-      - datalake_sale_flows.sale_flow.id_buyer
+    - datalake_sale_flows.sale_flow.id_buyer
     description: Unique identifier of the buyer prospect.
   id_first_region:
     lineage:
-      - datalake_sale_flows.sale_flow.id_region
+    - datalake_sale_flows.sale_flow.id_region
     description: Region identifier where the buyer's first sale flow occurred.
   id_last_region:
     lineage:
-      - datalake_sale_flows.sale_flow.id_region
+    - datalake_sale_flows.sale_flow.id_region
     description: Region identifier where the buyer's most recent sale flow occurred.
   first_event:
     lineage:
-      - datalake_sale_flows.sale_flow.first_event
+    - datalake_sale_flows.sale_flow.first_event
     description: Type of the first event that initiated the buyer's first sale flow.
   last_event:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-      - datalake_sale_flows.sale_flow.first_event
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_flows.sale_flow.first_event
+    - datalake_sale_flows.sale_flow.ts_first_event
     description: Type of the most recent event in the buyer's journey (booking_created, visit_completed, offer_submitted, offer_accepted, sale_agreement_signed, or talk_to_agent).
   further_funnel_step:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: The furthest step the buyer has reached in the sales funnel (talk_to_agent, booking_created, visit_completed, offer_submitted, offer_accepted, or sale_agreement_signed).
   first_buyer_intention:
     lineage:
-      - datalake_booking.booking.buyer_intention
+    - datalake_booking.booking.buyer_intention
     description: The buyer's stated intention at their first booking for sale visits.
   is_tenant:
     lineage:
-      - datalake_ebdb_clean.contract_person.type
+    - datalake_ebdb_clean.contract_person.type
     description: Boolean flag indicating if the buyer is or has been a tenant (Inquilino or Morador) in any contract.
   is_current_tenant:
     lineage:
-      - datalake_ebdb_contract.contract.status
-      - datalake_ebdb_clean.contract_person.type
+    - datalake_ebdb_contract.contract.status
+    - datalake_ebdb_clean.contract_person.type
     description: Boolean flag indicating if the buyer is currently an active tenant (Inquilino or Morador with active contract status).
   is_contract_owner:
     lineage:
-      - datalake_ebdb_clean.contract_person.type
+    - datalake_ebdb_clean.contract_person.type
     description: Boolean flag indicating if the buyer is a property owner (Proprietario) in any contract.
   is_tenant_prospect:
     lineage:
-      - datalake_booking.booking.visit_intent
-      - datalake_offer.offer.id_client
+    - datalake_booking.booking.visit_intent
+    - datalake_offer.offer.id_client
     description: Boolean flag indicating if the buyer has shown interest in renting (has rent bookings or rental offers).
   sale_flows:
     lineage:
-      - datalake_sale_flows.sale_flow.id_sale_flow
+    - datalake_sale_flows.sale_flow.id_sale_flow
     description: Total count of distinct sale flows initiated by the buyer.
   regions_with_sale_flows:
     lineage:
-      - datalake_sale_flows.sale_flow.id_region
+    - datalake_sale_flows.sale_flow.id_region
     description: Number of distinct regions where the buyer has initiated sale flows.
   weeks_with_sale_flows:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_sale_flows.sale_flow.ts_first_event
     description: Number of distinct weeks in which the buyer has initiated sale flows.
   bookings_created:
     lineage:
-      - datalake_booking.booking.id
+    - datalake_booking.booking.id
     description: Total count of sale visit bookings created by the buyer.
   bookings_created_by_agent:
     lineage:
-      - datalake_booking.booking.id
-      - datalake_booking.booking.first_update_source
+    - datalake_booking.booking.id
+    - datalake_booking.booking.first_update_source
     description: Count of sale visit bookings created by an agent (via AGENT_PWA) on behalf of the buyer.
   bookings_canceled:
     lineage:
-      - datalake_booking.booking.id
-      - datalake_booking.booking.is_canceled
+    - datalake_booking.booking.id
+    - datalake_booking.booking.is_canceled
     description: Count of sale visit bookings that were canceled.
   visits_completed:
     lineage:
-      - datalake_booking.booking.id
-      - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.id
+    - datalake_booking.booking.is_visit_completed
     description: Count of sale visits that were successfully completed.
   offers_submitted:
     lineage:
-      - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.id_offer
     description: Total count of sale offers submitted by the buyer.
   offers_accepted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.id_offer
     description: Count of sale offers that were accepted by sellers.
   offers_dismissed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_dismissed
-      - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.ts_offer_dismissed
+    - datalake_sale_offer.sale_offer.id_offer
     description: Count of sale offers that were dismissed or rejected.
   sale_agreements_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.id_offer
     description: Count of sale agreements (CCV) signed by the buyer.
   avg_sale_price:
     lineage:
-      - datalake_ebdb_clean.house.sale_price
+    - datalake_ebdb_clean.house.sale_price
     description: Average sale price of properties in the buyer's sale flows.
   avg_offer_price:
     lineage:
-      - datalake_sale_offer.sale_offer.first_price_offered_by_buyer
+    - datalake_sale_offer.sale_offer.first_price_offered_by_buyer
     description: Average of the first prices offered by the buyer across all offers.
   avg_offer_discount:
     lineage:
-      - datalake_sale_offer.sale_offer.first_price_offered_by_buyer
-      - datalake_sale_offer.sale_offer.sale_price
+    - datalake_sale_offer.sale_offer.first_price_offered_by_buyer
+    - datalake_sale_offer.sale_offer.sale_price
     description: Average discount percentage proposed by the buyer, calculated as 1 - (first_price_offered / sale_price).
   houses_owned:
     lineage:
-      - datalake_ebdb_clean.house.id
+    - datalake_ebdb_clean.house.id
     description: Count of properties owned by the buyer.
   listings_for_sale:
     lineage:
-      - datalake_ebdb_clean.house.id
-      - datalake_ebdb_listing.listing_business_context.business_context
+    - datalake_ebdb_clean.house.id
+    - datalake_ebdb_listing.listing_business_context.business_context
     description: Count of properties owned by the buyer that are listed for sale.
   listings_for_rent:
     lineage:
-      - datalake_ebdb_clean.house.id
-      - datalake_ebdb_listing.listing_business_context.business_context
+    - datalake_ebdb_clean.house.id
+    - datalake_ebdb_listing.listing_business_context.business_context
     description: Count of properties owned by the buyer that are listed for rent.
   days_first_sale_flow_to_first_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the first booking created.
+    - datalake_booking.booking.ts_created
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their first sale booking created.
   days_first_sale_flow_to_first_visit_completed:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the first completed visit.
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their first completed visit.
   days_first_sale_flow_to_first_offer_submitted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the first offer submitted.
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their first offer submitted.
   days_first_sale_flow_to_first_offer_accepted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the first offer accepted.
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their first offer accepted.
   days_first_sale_flow_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the first sale agreement signed.
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their first sale agreement (CCV) signed.
   days_first_booking_created_to_first_visit_completed:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-    description: Number of days between the first booking created and the first completed visit.
+    - datalake_booking.booking.ts_created
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    description: Number of days between the buyer's first booking created and their first completed visit.
   days_first_booking_created_to_first_offer_submitted:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Number of days between the first booking created and the first offer submitted.
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Number of days between the buyer's first booking created and their first offer submitted.
   days_first_booking_created_to_first_offer_accepted:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-    description: Number of days between the first booking created and the first offer accepted.
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    description: Number of days between the buyer's first booking created and their first offer accepted.
   days_first_booking_created_to_first_sale_agreement_signed:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-    description: Number of days between the first booking created and the first sale agreement signed.
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: Number of days between the buyer's first booking created and their first sale agreement (CCV) signed.
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Number of days between the first completed visit and the first offer submitted.
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Number of days between the buyer's first completed visit and their first offer submitted.
   days_first_visit_completed_to_first_offer_accepted:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-    description: Number of days between the first completed visit and the first offer accepted.
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    description: Number of days between the buyer's first completed visit and their first offer accepted.
   days_first_visit_completed_to_first_sale_agreement_signed:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-    description: Number of days between the first completed visit and the first sale agreement signed.
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: Number of days between the buyer's first completed visit and their first sale agreement (CCV) signed.
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Number of days between the first offer submitted and the first offer accepted.
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Number of days between the buyer's first offer submitted and their first offer accepted.
   days_first_offer_submitted_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Number of days between the first offer submitted and the first sale agreement signed.
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Number of days between the buyer's first offer submitted and their first sale agreement (CCV) signed.
   days_first_offer_accepted_to_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-    description: Number of days between the first offer accepted and the first sale agreement signed.
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: Number of days between the buyer's first offer accepted and their first sale agreement (CCV) signed.
   days_first_sale_flow_to_last_sale_flow:
     lineage:
-      - datalake_sale_flows.sale_flow.id_sale_flow
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_sale_flows.sale_flow.id_sale_flow
+    - datalake_sale_flows.sale_flow.ts_first_event
     description: Number of days between the first and last sale flow. Null if buyer has only one sale flow.
   days_first_sale_flow_to_last_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the last booking created.
+    - datalake_booking.booking.ts_created
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their most recent booking created.
   days_first_sale_flow_to_last_visit_completed:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the last completed visit.
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their most recent completed visit.
   days_first_sale_flow_to_last_offer_submitted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the last offer submitted.
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their most recent offer submitted.
   days_first_sale_flow_to_last_offer_accepted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the last offer accepted.
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their most recent offer accepted.
   days_first_sale_flow_to_last_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_flows.sale_flow.ts_first_event
-    description: Number of days between the first sale flow and the last sale agreement signed.
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_flows.sale_flow.ts_first_event
+    description: Number of days between the buyer's first sale flow and their most recent sale agreement (CCV) signed.
   days_first_sale_flow_to_last_event:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_event
     description: Number of days between the first sale flow and the most recent event of any type.
   days_first_booking_created_to_last_booking_created:
     lineage:
-      - datalake_booking.booking.id
-      - datalake_booking.booking.ts_created
+    - datalake_booking.booking.id
+    - datalake_booking.booking.ts_created
     description: Number of days between the first and last booking created. Null if buyer has only one booking.
   days_first_booking_created_to_last_visit_completed:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-    description: Number of days between the first booking created and the last completed visit.
+    - datalake_booking.booking.ts_created
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    description: Number of days between the buyer's first booking created and their most recent completed visit.
   days_first_booking_created_to_last_offer_submitted:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Number of days between the first booking created and the last offer submitted.
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Number of days between the buyer's first booking created and their most recent offer submitted.
   days_first_booking_created_to_last_offer_accepted:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-    description: Number of days between the first booking created and the last offer accepted.
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    description: Number of days between the buyer's first booking created and their most recent offer accepted.
   days_first_booking_created_to_last_sale_agreement_signed:
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-    description: Number of days between the first booking created and the last sale agreement signed.
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: Number of days between the buyer's first booking created and their most recent sale agreement (CCV) signed.
   days_first_visit_completed_to_last_visit_completed:
     lineage:
-      - datalake_booking.booking.id
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.id
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
     description: Number of days between the first and last completed visit. Null if buyer has only one completed visit.
   days_first_visit_completed_to_last_offer_submitted:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Number of days between the first completed visit and the last offer submitted.
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Number of days between the buyer's first completed visit and their most recent offer submitted.
   days_first_visit_completed_to_last_offer_accepted:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-    description: Number of days between the first completed visit and the last offer accepted.
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    description: Number of days between the buyer's first completed visit and their most recent offer accepted.
   days_first_visit_completed_to_last_sale_agreement_signed:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-    description: Number of days between the first completed visit and the last sale agreement signed.
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: Number of days between the buyer's first completed visit and their most recent sale agreement (CCV) signed.
   days_first_offer_submitted_to_last_offer_submitted:
     lineage:
-      - datalake_sale_offer.sale_offer.id_offer
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Number of days between the first and last offer submitted. Null if buyer has only one offer.
   days_first_offer_submitted_to_last_offer_accepted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Number of days between the first offer submitted and the last offer accepted.
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Number of days between the buyer's first offer submitted and their most recent offer accepted.
   days_first_offer_submitted_to_last_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-    description: Number of days between the first offer submitted and the last sale agreement signed.
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    description: Number of days between the buyer's first offer submitted and their most recent sale agreement (CCV) signed.
   days_first_offer_accepted_to_last_offer_accepted:
     lineage:
-      - datalake_sale_offer.sale_offer.id_offer
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Number of days between the first and last offer accepted. Null if buyer has only one accepted offer.
   days_first_offer_accepted_to_last_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-    description: Number of days between the first offer accepted and the last sale agreement signed.
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    description: Number of days between the buyer's first offer accepted and their most recent sale agreement (CCV) signed.
   days_first_sale_agreement_signed_to_last_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.id_offer
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Number of days between the first and last sale agreement signed. Null if buyer has only one signed agreement.
   ts_first_sale_flow:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_sale_flows.sale_flow.ts_first_event
     description: Timestamp of the buyer's first sale flow event.
   ts_first_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
+    - datalake_booking.booking.ts_created
     description: Timestamp when the buyer's first sale visit booking was created.
   ts_first_visit_completed:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
     description: Timestamp when the buyer's first sale visit was completed.
   ts_first_offer_submitted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Timestamp when the buyer's first sale offer was submitted.
   dt_first_offer_accepted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Timestamp when the buyer's first sale offer was accepted.
   dt_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Timestamp when the buyer's first sale agreement (CCV) was signed.
   ts_last_sale_flow:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_sale_flows.sale_flow.ts_first_event
     description: Timestamp of the buyer's most recent sale flow event.
   ts_last_booking_created:
     lineage:
-      - datalake_booking.booking.ts_created
+    - datalake_booking.booking.ts_created
     description: Timestamp when the buyer's most recent sale visit booking was created.
   ts_last_visit_completed:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
     description: Timestamp when the buyer's most recent sale visit was completed.
   ts_last_offer_submitted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
     description: Timestamp when the buyer's most recent sale offer was submitted.
   dt_last_offer_accepted:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
     description: Timestamp when the buyer's most recent sale offer was accepted.
   dt_last_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Timestamp when the buyer's most recent sale agreement (CCV) was signed.
   ts_last_event:
     lineage:
-      - datalake_booking.booking.is_visit_completed
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_booking.booking.ts_created
-      - datalake_sale_offer.sale_offer.ts_offer_accepted
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
-      - datalake_sale_offer.sale_offer.ts_offer_submitted
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_booking.booking.is_visit_completed
+    - datalake_booking.booking.ts_booking_utc
+    - datalake_booking.booking.ts_created
+    - datalake_sale_offer.sale_offer.ts_offer_accepted
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_event
     description: Timestamp of the buyer's most recent event of any type in the sales journey.

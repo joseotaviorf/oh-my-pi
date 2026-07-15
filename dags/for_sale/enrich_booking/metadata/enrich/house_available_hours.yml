@@ -1,27 +1,17 @@
 database_name: datalake_booking
 table_name: house_available_hours
-description: In this table, each line represents the daily availability in a specific
-  day of the week for a house, in a specific period. Basically, this tables act like
-  an aud, but with two columns indicating the dates when the availability is valid.
-  id_house_date is the PK, built by the concatenation of id_house, dt_available_started
-  and day_of_week.
+description: In this table, each line represents the daily availability in a specific day of the week for a house, in a specific period. Basically, this tables act like an aud, but with two columns indicating the dates when the availability is valid. id_house_date is the PK, built by the concatenation of id_house, dt_available_started and day_of_week.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_house:
     lineage:
     - datalake_ebdb_clean.house.id
     - datalake_ebdb_clean.house_weekly_schedule.id_house
     - datalake_ebdb_clean.house_weekly_schedule_aud.id_house
-    description: Key for house.
+    description: Identifier of the house whose weekly visit availability schedule this row describes.
   id_house_date:
-    lineage:
-      - datalake_ebdb_clean.house.id
-      - datalake_ebdb_clean.house_weekly_schedule.id_house
-      - datalake_ebdb_clean.house_weekly_schedule_aud.id_house
-      - datalake_ebdb_clean.house_weekly_schedule.ts_created
-      - datalake_ebdb_clean.house_weekly_schedule_aud.ts_revision
-    description:
+    description: PK composed by the concatenation of id_house, dt_available_started and day_of_weeek.
   id_user:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.id_user
@@ -30,7 +20,7 @@ columns:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.weekday
     - datalake_ebdb_clean.house_weekly_schedule_aud.weekday
-    description: Day of the week from 1 to 7.
+    description: Day of the week this availability row refers to, encoded as an integer from 1 (Monday) to 7 (Sunday).
   has_hours_available_08to09:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_08_and_09
@@ -40,68 +30,57 @@ columns:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_09_and_10
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_09_and_10
-    description: Boolean that indicates if there is availability between 9 and 10
-      am.
+    description: Boolean that indicates if there is availability between 9 and 10 am.
   has_hours_available_10to11:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_10_and_11
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_10_and_11
-    description: Boolean that indicates if there is availability between 10 and 11
-      am.
+    description: Boolean that indicates if there is availability between 10 and 11 am.
   has_hours_available_11to12:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_11_and_12
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_11_and_12
-    description: Boolean that indicates if there is availability between 11 and 12
-      am.
+    description: Boolean that indicates if there is availability between 11 and 12 am.
   has_hours_available_12to13:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_12_and_13
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_12_and_13
-    description: Boolean that indicates if there is availability between 12 and 13
-      pm.
+    description: Boolean that indicates if there is availability between 12 and 13 pm.
   has_hours_available_13to14:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_13_and_14
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_13_and_14
-    description: Boolean that indicates if there is availability between 13 and 14
-      pm.
+    description: Boolean that indicates if there is availability between 13 and 14 pm.
   has_hours_available_14to15:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_14_and_15
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_14_and_15
-    description: Boolean that indicates if there is availability between 14 and 15
-      pm.
+    description: Boolean that indicates if there is availability between 14 and 15 pm.
   has_hours_available_15to16:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_15_and_16
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_15_and_16
-    description: Boolean that indicates if there is availability between 15 and 16
-      pm.
+    description: Boolean that indicates if there is availability between 15 and 16 pm.
   has_hours_available_16to17:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_16_and_17
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_16_and_17
-    description: Boolean that indicates if there is availability between 16 and 17
-      pm.
+    description: Boolean that indicates if there is availability between 16 and 17 pm.
   has_hours_available_17to18:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_17_and_18
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_17_and_18
-    description: Boolean that indicates if there is availability between 17 and 18
-      pm.
+    description: Boolean that indicates if there is availability between 17 and 18 pm.
   has_hours_available_18to19:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_18_and_19
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_18_and_19
-    description: Boolean that indicates if there is availability between 18 and 19
-      pm.
+    description: Boolean that indicates if there is availability between 18 and 19 pm.
   has_hours_available_19to20:
     lineage:
     - datalake_ebdb_clean.house_weekly_schedule.is_available_between_19_and_20
     - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_19_and_20
-    description: Boolean that indicates if there is availability between 19 and 20
-      pm.
+    description: Boolean that indicates if there is availability between 19 and 20 pm.
   dt_available_started:
     lineage:
     - datalake_ebdb_clean.house.dt_creation
@@ -114,9 +93,6 @@ columns:
     - datalake_ebdb_clean.house_weekly_schedule.ts_created
     - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: Date of when this availability expired.
-  id_house_date:
-    description: PK composed by the concatenation of id_house, dt_available_started
-      and day_of_weeek.
   day_hours_available:
     description: Amount of hours available in the day.
   has_artificial_schedule:

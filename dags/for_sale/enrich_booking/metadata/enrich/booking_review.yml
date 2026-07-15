@@ -1,90 +1,89 @@
----
 database_name: datalake_booking
 table_name: booking_review
 description: Enriched table that consolidates the booking review. Each line is a review for a specific booking.
 domain: For Sale
-owner: bruna.prates@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_booking:
-    description: Id of the booking.
+    description: Natural key of the visit booking (agendamento) in EBDB scheduling.
     lineage:
-      - datalake_ebdb_clean.booking.id
+    - datalake_ebdb_clean.booking.id
   review_status:
-    description: Status of the booking review.
+    description: Completion status of the post-visit booking review, indicating whether it is pending, dismissed, or done.
     categories:
-      PENDING: 'Booking review pending, not yet answered.'
-      DISMISSED: 'Booking review not answered.'
-      DONE: 'Booking review has already been answered.'
+      PENDING: Booking review pending, not yet answered.
+      DISMISSED: Booking review not answered.
+      DONE: Booking review has already been answered.
     lineage:
-      - datalake_insider_clean.review.status
+    - datalake_insider_clean.review.status
   review_type:
     description: The type of the booking review. It concerns what the review is about and by whom it was done.
     lineage:
-      - datalake_insider_clean.review.type
+    - datalake_insider_clean.review.type
   visit_not_happened_reason:
     description: The reason why the visit didn't happen.
     lineage:
-      - datalake_insider_clean.review.labels
+    - datalake_insider_clean.review.labels
   wrong_listing_info:
     description: The wrong listing information reported if something in the listing does not correspond to the real house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   no_offer_intent_reason:
     description: The reason why an offer was not made for the house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   painting:
     description: The score (range 1-5) given regarding the painting of the house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   cost_benefit:
     description: The score (range 1-5) given regarding the cost benefit of the house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   conservation:
     description: The score (range 1-5) given regarding the conservation of the house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   cleaning:
     description: The score (range 1-5) given regarding the cleanliness of the house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   furniture:
     description: The score (range 1-5) given regarding the furniture of the house. If the house has no furniture, then it's null.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   natural_light:
     description: The score (range 1-5) given regarding the natural light of the house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   indoor_silence:
     description: The score (range 1-5) given regarding the indoor silence of the house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   agent_performance:
     description: The score (range 1-5) given regarding the performance of the agent.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   does_want_same_agent:
     description: Boolean indicating whether the tenant wants to be attended by the same agent on future visits.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   visit_type:
-    description: The type of the visit.
+    description: Business context of the visit such as For Rent versus For Sale.
     categories:
-      presential: 'The visit is in-person'
-      video: 'The visit is virtual'
+      presential: The visit is in-person
+      video: The visit is virtual
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   comment:
     description: Comments about the visit, answered to in free-form input field.
     lineage:
-      - datalake_insider_clean.review.comment
+    - datalake_insider_clean.review.comment
   is_listing_accurate:
     description: Boolean indicating whether the listing corresponds to the real house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
   is_offer_intent:
     description: Boolean indicating whether there is an intention to make an offer for the house.
     lineage:
-      - datalake_insider_clean.review_feature.rating_selected
+    - datalake_insider_clean.review_feature.rating_selected
