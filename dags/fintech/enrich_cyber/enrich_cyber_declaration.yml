@@ -22,7 +22,10 @@ workflow:
       - contract_agency_distribution
     historical_tree_timeline:
       - queue_decision_tree
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 2), 'load_end_date') }}"
   tables_customization:
     historical_tree_timeline:
       extraction_type: incremental
-      partitions: [ year, month, day ]
+      partitions: [year, month, day]
