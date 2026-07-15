@@ -14,12 +14,26 @@ columns:
     description: >
       Follow-up use case identifier consumed by HighTouch and HLS routing.
       Values: greeting_context (A1), greeting_generic (A2/D1), greeting_filters (D2),
-      confirm_contact (B1), confirm_contact_returning (B2), confirm_contact_visit (C1/C2),
+      confirm_contact (B1), confirm_contact_returning (B2), confirm_contact_visit (C1/C2 — no enrichment),
       after_recommendations (E1).
+  id_session:
+    description: Copilot session id for the stalled conversation — join key to copilot state
+    lineage:
+      - datalake_copilot_service_clean.message.id_session
+  signal_message_id:
+    description: Copilot message id of the qualifying Bianca template — join key to copilot state
+    lineage:
+      - datalake_copilot_service_clean.message.id
   signal_timestamp:
     description: Timestamp of the last qualifying Bianca message in the session
     lineage:
       - datalake_copilot_service_clean.message.ts_created
+  filters_applied:
+    description: >
+      Pre-formatted filters_applied string from the Jaiminho notification payload (templateVariables slot 1)
+      for greeting_filters (D2). Null for all other trigger types.
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.payload
   created_at:
     description: Timestamp when the record was created by the batch job
   year:
