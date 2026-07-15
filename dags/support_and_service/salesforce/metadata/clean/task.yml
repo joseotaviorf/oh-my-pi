@@ -120,10 +120,6 @@ columns:
     lineage:
     - datalake_salesforce_raw.task.CaseCriticality
     description: Criticality level of the related case.
-  case_account:
-    lineage:
-    - datalake_salesforce_raw.task.CaseAccount
-    description: Account associated with the case.
   observation:
     lineage:
     - datalake_salesforce_raw.task.Observation
@@ -359,10 +355,6 @@ columns:
     lineage:
     - datalake_salesforce_raw.task.FS_CRI_RegistrationCompleted__c
     description: Business value representing fs cri registration completed on the task clean dataset.
-  fs_cri_registration_completed_2:
-    lineage:
-    - datalake_salesforce_raw.task.FS_CRI_Registration_Completed__c
-    description: Business value representing fs cri registration completed 2 on the task clean dataset.
   fs_client_request_time:
     lineage:
     - datalake_salesforce_raw.task.FS_ClientRequestTime__c

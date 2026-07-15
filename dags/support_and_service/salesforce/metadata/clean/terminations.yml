@@ -61,10 +61,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.AdminTermination__c
     description: Indicates whether the termination was administratively initiated.
-  all_repairs_exempted_by_owner:
-    lineage:
-      - datalake_salesforce_raw.terminations.AllRepairsExemptedByOwner__c
-    description: Flag indicating if the owner exempted all repairs.
   before_rental:
     lineage:
       - datalake_salesforce_raw.terminations.BeforeRental__c
@@ -77,10 +73,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.Eviction__c
     description: Indicates whether the termination is due to eviction.
-  consumption_proof_submission_iq:
-    lineage:
-      - datalake_salesforce_raw.terminations.ConsumptionProofSubmissionIQ__c
-    description: Status of consumption proof submission in IQ process.
   high_value_contract:
     lineage:
       - datalake_salesforce_raw.terminations.HighValueContract__c
@@ -141,10 +133,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.TerminationInFirstYear__c
     description: Indicates if the termination occurred within the first year.
-  termination_with_penalty:
-    lineage:
-      - datalake_salesforce_raw.terminations.TerminationWithPenalty__c
-    description: Specifies if the termination incurs a penalty.
   ts_created:
     lineage:
       - datalake_salesforce_raw.terminations.CreatedDate
@@ -203,9 +191,6 @@ columns:
   is_valid_letter:
     lineage: []
     description: Indicates whether valid letter applies to this record.
-  feed_item_comment:
-    lineage: []
-    description: Business value representing feed item comment on the terminations clean dataset.
   dt_vacancy:
     lineage: []
     description: Calendar date associated with vacancy in the business process.
