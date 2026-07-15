@@ -1,12 +1,8 @@
----
 database_name: datalake_for_sale_experiment
 table_name: exp_identifier_unified
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description:
-  Consolidated experiment identifier table that combines all identifier types (visitor, visit, owner).
-  Each identifier appears with their respective experiment assignment and participation timeline
-  for comprehensive A/B testing analysis.
+description: Consolidated experiment identifier table that combines all identifier types (visitor, visit, owner). Each identifier appears with their respective experiment assignment and participation timeline for comprehensive A/B testing analysis.
 columns:
   id_element_exp:
     description: Unique identifier of the experiment and identifier participating in the experiment.

@@ -1,24 +1,18 @@
----
 database_name: datalake_for_sale_experiment
 table_name: exp_1_11_visits_confirmation_agent
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description:
-  Experiment table for visits confirmation agent (Visits XP Team).
-  This table tracks visitor participation in an A/B test designed to evaluate the impact
-  of confirming the agent. Visitors are randomly assigned to control or treatment groups
-  based on their main phone number, with the experiment focusing on rent and sale context visits
-  starting from December 10, 2025.
+description: Experiment table for visits confirmation agent (Visits XP Team). This table tracks visitor participation in an A/B test designed to evaluate the impact of confirming the agent. Visitors are randomly assigned to control or treatment groups based on their main phone number, with the experiment focusing on rent and sale context visits starting from December 10, 2025.
 columns:
   identifier_bc:
     description: Unique identifier of the visitor participating in the experiment by business_context.
     lineage:
-      - datalake_ebdb_clean.visit.id_visitor
-      - datalake_ebdb_clean.visit.business_context
+    - datalake_ebdb_clean.visit.id_visitor
+    - datalake_ebdb_clean.visit.business_context
   identifier:
     description: Unique identifier of the visitor participating in the experiment.
     lineage:
-      - datalake_ebdb_clean.visit.id_visitor
+    - datalake_ebdb_clean.visit.id_visitor
   id_neotribe:
     description: Identifier for the neotribe of For Sale line.
   id_experiment:
@@ -32,11 +26,11 @@ columns:
   business_context:
     description: Business context related to the experiment.
     lineage:
-      - datalake_ebdb_clean.visit.business_context
+    - datalake_ebdb_clean.visit.business_context
   test_group:
     description: Experiment group assignment based on main phone number hash calculation.
     lineage:
-      - datalake_ebdb_clean.user.main_phone
+    - datalake_ebdb_clean.user.main_phone
     categories:
       CONTROL: Control group (main phone number >= 500).
       TREATMENT: Treatment group (main phone number <= 499).
@@ -47,8 +41,8 @@ columns:
   dt_identifier_started:
     description: Earliest date when this specific visitor started participating in the experiment based on visit creation timestamp.
     lineage:
-      - datalake_ebdb_clean.visit.ts_created
+    - datalake_ebdb_clean.visit.ts_created
   dt_identifier_ended:
     description: Latest date when this specific visitor participated in the experiment based on visit creation timestamp.
     lineage:
-      - datalake_ebdb_clean.visit.ts_created
+    - datalake_ebdb_clean.visit.ts_created

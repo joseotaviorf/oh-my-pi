@@ -1,53 +1,70 @@
----
 database_name: datalake_legaut
 table_name: legaut_crawlers_kr
 domain: For Sale
 columns:
   id_crawler:
     lineage:
-      - datalake_legaut_clean.crawlers_crawler.id
+    - datalake_legaut_clean.crawlers_crawler.id
+    description: Identifier of the Legaut crawler run that produced this key result row.
   link_imovel_analise:
     lineage:
-      - datalake_legaut_clean.crawlers_crawler.id_unit
+    - datalake_legaut_clean.crawlers_crawler.id_unit
+    description: URL to the property analysis page on Legaut, built from the crawler unit id.
   link_imovel_imoveis:
     lineage:
-      - datalake_legaut_clean.meusite_unit.id_operation
+    - datalake_legaut_clean.meusite_unit.id_operation
+    description: URL to the property building page on Legaut imoveis, built from the operation id.
   crawler_type:
     lineage:
-      - datalake_legaut_clean.crawlers_crawler.type
+    - datalake_legaut_clean.crawlers_crawler.type
+    description: Type code of the crawler, identifying which document or pendency it collects.
   crawler_state:
     lineage:
-      - datalake_legaut_clean.meusite_state.name
+    - datalake_legaut_clean.meusite_state.name
+    description: Name of the state where the crawled property is located.
   crawler_city:
     lineage:
-      - datalake_legaut_clean.meusite_city.name
+    - datalake_legaut_clean.meusite_city.name
+    description: Name of the city where the crawled property is located.
   project:
     lineage:
-      - datalake_legaut_clean.meusite_project.name
+    - datalake_legaut_clean.meusite_project.name
+    description: Name of the Legaut project the crawled unit belongs to.
   crawler_type_label:
     lineage:
-      - datalake_legaut_clean.crawlers_crawlertype.label
+    - datalake_legaut_clean.crawlers_crawlertype.label
+    description: Human-readable label describing the crawler type.
   crawler_status:
     lineage:
-      - datalake_legaut_clean.crawlers_crawler.status
+    - datalake_legaut_clean.crawlers_crawler.status
+    description: Current execution status of the crawler run.
   document:
     lineage:
-      - datalake_legaut_clean.meusite_document.file_name
+    - datalake_legaut_clean.meusite_document.file_name
+    description: File name of the document delivered by the crawler for the property.
   ts_operation_created:
     lineage:
-      - datalake_legaut_clean.meusite_unit.ts_created
+    - datalake_legaut_clean.meusite_unit.ts_created
+    description: Timestamp when the Legaut operation (unit) was created.
   ts_operation_delivered:
     lineage:
-      - datalake_legaut_clean.meusite_unit.ts_delivered
+    - datalake_legaut_clean.meusite_unit.ts_delivered
+    description: Timestamp when the Legaut operation (unit) was delivered.
   ts_document_delivered:
     lineage:
-      - datalake_legaut_clean.meusite_document.ts_delivered
+    - datalake_legaut_clean.meusite_document.ts_delivered
+    description: Timestamp when the crawled document was delivered.
   ts_crawler_run_deleted:
     lineage:
-      - datalake_legaut_clean.crawlers_crawler.ts_run_deleted
+    - datalake_legaut_clean.crawlers_crawler.ts_run_deleted
+    description: Timestamp when the crawler run was deleted, if it was removed.
   ts_crawler_run_start:
     lineage:
-      - datalake_legaut_clean.crawlers_crawler.ts_run_start
+    - datalake_legaut_clean.crawlers_crawler.ts_run_start
+    description: Timestamp when the crawler run started.
   ts_crawler_run_end:
     lineage:
-      - datalake_legaut_clean.crawlers_crawler.ts_run_end
+    - datalake_legaut_clean.crawlers_crawler.ts_run_end
+    description: Timestamp when the crawler run finished.
+owner: helder.rodrigues@quintoandar.com.br
+description: Enriched legaut crawlers kr table combining upstream clean and warehouse sources for Enriched Legaut legal automation tables for contract analysis and pendencies. Rows are shaped for analytics with derived attributes and business keys.

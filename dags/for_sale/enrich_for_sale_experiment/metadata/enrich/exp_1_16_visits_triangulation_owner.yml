@@ -1,23 +1,18 @@
----
 database_name: datalake_for_sale_experiment
 table_name: exp_1_16_visits_triangulation_owner
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description:
-  Experiment table for visits triangulation owner (Visits XP Team) starting from June 1, 2026.
-  This table tracks owner participation in an A/B test designed to evaluate triangulation
-  for owners with visits. Owners are assigned to control or treatment groups based on the
-  last digit of their main phone number, segmented by business context (rent and sale).
+description: Experiment table for visits triangulation owner (Visits XP Team) starting from June 1, 2026. This table tracks owner participation in an A/B test designed to evaluate triangulation for owners with visits. Owners are assigned to control or treatment groups based on the last digit of their main phone number, segmented by business context (rent and sale).
 columns:
   identifier_bc:
     description: Unique identifier of the owner participating in the experiment by business context.
     lineage:
-      - datalake_ebdb_clean.house.id_user
-      - datalake_ebdb_clean.visit.business_context
+    - datalake_ebdb_clean.house.id_user
+    - datalake_ebdb_clean.visit.business_context
   identifier:
     description: Unique identifier of the owner participating in the experiment (same as id_user).
     lineage:
-      - datalake_ebdb_clean.house.id_user
+    - datalake_ebdb_clean.house.id_user
   id_neotribe:
     description: Identifier for the neotribe conducting the experiment (1 for VISITS XP).
   id_experiment:
@@ -31,11 +26,11 @@ columns:
   business_context:
     description: Business context related to the experiment (rent or sale).
     lineage:
-      - datalake_ebdb_clean.visit.business_context
+    - datalake_ebdb_clean.visit.business_context
   test_group:
     description: Experiment group assignment based on the last digit of the owner main phone number.
     lineage:
-      - datalake_ebdb_clean.user.main_phone
+    - datalake_ebdb_clean.user.main_phone
     categories:
       CONTROL: Last phone digit in (1, 3, 4, 6, 9).
       TREATMENT: Last phone digit in (0, 2, 5, 7, 8).
@@ -47,8 +42,8 @@ columns:
   dt_identifier_started:
     description: Earliest visit creation date for this owner and business context in the experiment window.
     lineage:
-      - datalake_ebdb_clean.visit.ts_created
+    - datalake_ebdb_clean.visit.ts_created
   dt_identifier_ended:
     description: Latest visit creation date for this owner and business context in the experiment window.
     lineage:
-      - datalake_ebdb_clean.visit.ts_created
+    - datalake_ebdb_clean.visit.ts_created

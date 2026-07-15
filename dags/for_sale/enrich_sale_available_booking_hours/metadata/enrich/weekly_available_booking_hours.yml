@@ -1,54 +1,52 @@
----
 database_name: datalake_sale_available_booking_hours
 table_name: weekly_available_booking_hours
 description: This table tracks all changes to the visit schedule of a ForSale listing. Each change in the schedule will create a new row in the table, with a start and end date.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_booking.house_available_hours.id_house
-    description: > 
+    - datalake_booking.house_available_hours.id_house
+    description: |
       Foreign key referring to the house ID.
   id_region:
     lineage:
-      - datalake_ebdb_clean.house.id_region
-    description: > 
+    - datalake_ebdb_clean.house.id_region
+    description: |
       Foreign key of region where house listing is located in.
   week_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the sum of the amount of hours available for the visit of the property for every day of the week, that is, on the day that is linked to the snapshot, it has x hours available for the visit.
   workdays_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the sum of the number of hours available for the visit of the property on business days, that is, on the day that the snapshot is linked to, it has x hours available for the visit.
   monday_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the amount of hours available to visit the property on Monday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   tuesday_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the amount of hours available to visit the property on Tuesday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   wednesday_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the amount of hours available to visit the property on Wednesday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   thursday_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the amount of hours available to visit the property on Thursday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   friday_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the amount of hours available to visit the property on Friday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   saturday_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the amount of hours available to visit the property on Saturday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   sunday_available_hours:
-    description: >
+    description: |
       It tells us the snapshot of the amount of hours available to visit the property on Sunday, that is, on the day that tied to the snapshot, it has X hours available for the visit.
   dt_schedule_started:
     lineage:
-      - datalake_booking.house_available_hours.dt_available_started
-    description: > 
+    - datalake_booking.house_available_hours.dt_available_started
+    description: |
       Date of the listing schedule change. This can be a change in one or more days. Any change in a schedule will generate a new line in the table.
   dt_schedule_ended:
     lineage:
-      - datalake_booking.house_available_hours.dt_available_started
-    description: > 
-      Data of the next listing schedule change (if any). Marks the end of a schedule schema.
+    - datalake_booking.house_available_hours.dt_available_started
+    description: Data of the next listing schedule change (if any). Marks the end of a schedule schema.

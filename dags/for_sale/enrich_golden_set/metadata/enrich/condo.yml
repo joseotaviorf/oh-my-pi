@@ -1,92 +1,89 @@
----
 database_name: datalake_golden_set
 table_name: condo
-description: The purpose of this table is to validate the condo information we see in Vespúcio. To do this, Growth's Product and Technology teams and Rede QuintoAndar created a forms to collect condo data from employees, to gather correct information from these condos.
-  With this data we will make a validation base for Vespúcio, comparing these condo raised in Gsheet with the information from Vespúcio.
-  Where row line is a different registered condo.
-domain: Growth
-owner: augusto.marcolin@quintoandar.com.br
+description: The purpose of this table is to validate the condo information we see in Vespúcio. To do this, Growth's Product and Technology teams and Rede QuintoAndar created a forms to collect condo data from employees, to gather correct information from these condos. With this data we will make a validation base for Vespúcio, comparing these condo raised in Gsheet with the information from Vespúcio. Where row line is a different registered condo.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
 columns:
-  id: 
-    description: "Line identifier of each answer collected from the Golden Set."
+  id:
+    description: Line identifier of each answer collected from the Golden Set.
   id_dejavu:
-    description: Id created by S2Cell library. This is generated of the latitude and longitude coordinates in S2Cell token. The S2 geometry library is a spatial indexing system that divides the Earth's surface into cells identified by a token. 
+    description: Id created by S2Cell library. This is generated of the latitude and longitude coordinates in S2Cell token. The S2 geometry library is a spatial indexing system that divides the Earth's surface into cells identified by a token.
     lineage:
-      - datalake_vespucio.dejavu.id_dejavu
+    - datalake_vespucio.dejavu.id_dejavu
   id_address:
-    description: "A hashed ID that is created by concatenating the address, number, neighborhood, zip code and city. It is used for geocoding (deduplicating condo)."
-  id_region: 
+    description: A hashed ID that is created by concatenating the address, number, neighborhood, zip code and city. It is used for geocoding (deduplicating condo).
+  id_region:
     description: Foreign key of region where listing is located in.
     lineage:
-      - datalake_vespucio.dejavu.id_region
-  condo: 
-    description: "Foreign key of region where house listing is located in. Can be  joined with dw_public.dim_region."
+    - datalake_vespucio.dejavu.id_region
+  condo:
+    description: Condominium name reported in the Golden Set form, used to validate Vespucio condo data.
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.condo
+    - datalake_gsheets_clean.vespucio_condo_golden_set.condo
   cnpj:
-    description: "The CNPJ (National Registry of Legal Entities) of the condo."
+    description: The CNPJ (National Registry of Legal Entities) of the condo.
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.condo_cnpj
+    - datalake_gsheets_clean.vespucio_condo_golden_set.condo_cnpj
   address:
-    description: "Combined street type and street name from employee Golden Set submissions, normalized with INITCAP before geocoding."
+    description: Combined street type and street name from employee Golden Set submissions, normalized with INITCAP before geocoding.
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.address_type
-      - datalake_gsheets_clean.vespucio_condo_golden_set.address
+    - datalake_gsheets_clean.vespucio_condo_golden_set.address_type
+    - datalake_gsheets_clean.vespucio_condo_golden_set.address
   number:
-    description: "The address number of the condo."
+    description: The address number of the condo.
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.number
+    - datalake_gsheets_clean.vespucio_condo_golden_set.number
   neighborhood:
-    description: "The address neighborhood of the condo."
+    description: The address neighborhood of the condo.
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.neighborhood
+    - datalake_gsheets_clean.vespucio_condo_golden_set.neighborhood
   zip_code:
-    description: "The address zipcode of the condo."
+    description: The address zipcode of the condo.
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.zipcode
+    - datalake_gsheets_clean.vespucio_condo_golden_set.zipcode
   city:
-    description: "The address city of the condo."
+    description: The address city of the condo.
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.city
+    - datalake_gsheets_clean.vespucio_condo_golden_set.city
   state:
-    description: "The address state of the condo."
+    description: The address state of the condo.
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.state
-  lat: 
-    description: "Latitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
+    - datalake_gsheets_clean.vespucio_condo_golden_set.state
+  lat:
+    description: Latitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure.
     lineage:
-      - datalake_vespucio.dejavu.latitude
+    - datalake_vespucio.dejavu.latitude
   lng:
-    description: "Longitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure."
+    description: Longitude of the property, retrieved via Google's Geocoding API, using the Vespúcio infrastructure.
     lineage:
-      - datalake_vespucio.dejavu.longitude
+    - datalake_vespucio.dejavu.longitude
   has_elevator:
-    description: "Boolean value to indicate if the condo has an elevator."
+    description: Boolean value to indicate if the condo has an elevator.
   has_entrance_hall:
-    description: "Boolean value to indicate if the condo has a concierge/ordinance."
+    description: Boolean value to indicate if the condo has a concierge/ordinance.
   has_grill_area:
-    description: "Boolean value to indicate if the condo has a barbecue area."
+    description: Boolean value to indicate if the condo has a barbecue area.
   has_swim_pool:
-    description: "Boolean value to indicate if the condo has a pool."
+    description: Boolean value to indicate if the condo has a pool.
   has_sports_court:
-    description: "Boolean value to indicate if the condo has a sports court."
+    description: Boolean value to indicate if the condo has a sports court.
   has_gym:
-    description: "Boolean value to indicate if the condo has a gym."
+    description: Boolean value to indicate if the condo has a gym.
   has_party_hall:
-    description: "Boolean value to indicate if the condo has a party hall."
+    description: Boolean value to indicate if the condo has a party hall.
   has_sauna:
-    description: "Boolean value to indicate if the condo has a sauna."
+    description: Boolean value to indicate if the condo has a sauna.
   has_laundry:
-    description: "Boolean value to indicate if the condo has laundry."
+    description: Boolean value to indicate if the condo has laundry.
   has_piped_gas:
-    description: "Boolean value to indicate if the condo has piped gas."
+    description: Boolean value to indicate if the condo has piped gas.
   has_gourmet_area:
-    description: "Boolean value to indicate if the condo has a gourmet area."
+    description: Boolean value to indicate if the condo has a gourmet area.
   has_metro_or_train_close:
-    description: "Boolean value to indicate if the condo has a metro or train station close."
+    description: Boolean value to indicate if the condo has a metro or train station close.
   has_toy_library:
-    description: "Boolean value to indicate if the condo has a toy library."
+    description: Boolean value to indicate if the condo has a toy library.
   ts_updated:
-    description: "Timestamp of condominium data last update"
+    description: Timestamp of condominium data last update
     lineage:
-      - datalake_gsheets_clean.vespucio_condo_golden_set.dt_created
+    - datalake_gsheets_clean.vespucio_condo_golden_set.dt_created
