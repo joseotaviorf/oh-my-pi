@@ -1781,9 +1781,11 @@ emr_cluster_base: &emr_cluster_anchor
         spark.eventLog.logStageExecutorMetrics: "true"
         spark.eventLog.rolling.enabled: "true"
         # YARN app staging on S3 (not cluster HDFS) so AM relaunches after lost NM /
-        # node blips still find __spark_conf__.zip / pyspark.zip. Default cleanup
-        # stays on; recommend an S3 lifecycle rule on emr/spark-staging/.
+        # node blips still find __spark_conf__.zip / pyspark.zip. Keep staged files
+        # until the app finishes (default false can delete them mid-relaunch).
+        # Recommend an S3 lifecycle rule on emr/spark-staging/.
         spark.yarn.stagingDir: "s3a://{{ var.value.artifacts_bucket | replace('s3://', '') }}/emr/spark-staging/{{ dag.dag_id }}"
+        spark.yarn.preserve.staging.files: "true"
 
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"
