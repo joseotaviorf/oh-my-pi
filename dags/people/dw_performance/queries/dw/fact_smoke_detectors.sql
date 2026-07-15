@@ -19,20 +19,28 @@ eval AS (
   FROM
     dw_performance.fact_performance_evaluations AS fpe
 ),
-assignment_to_person AS (
+assignment_to_person_ranked AS (
   SELECT
     SPLIT_PART(LOWER(TRIM(im.assignment_number)), '-', 1) AS assignment_key,
-    im.person_number
-  FROM
-    datalake_people.identifier_mapping AS im
-  WHERE
-    im.is_person_latest_assignment = TRUE
-  QUALIFY
+    im.person_number,
     ROW_NUMBER() OVER (
       PARTITION BY SPLIT_PART(LOWER(TRIM(im.assignment_number)), '-', 1)
       ORDER BY
         im.person_number
-    ) = 1
+    ) AS rn
+  FROM
+    datalake_people.identifier_mapping AS im
+  WHERE
+    im.is_person_latest_assignment = TRUE
+),
+assignment_to_person AS (
+  SELECT
+    assignment_key,
+    person_number
+  FROM
+    assignment_to_person_ranked
+  WHERE
+    rn = 1
 ),
 eval_with_person AS (
   SELECT
