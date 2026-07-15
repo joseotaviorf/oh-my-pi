@@ -1,0 +1,30 @@
+---
+database_name: datalake_negotiation_clean
+table_name: installment_order
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Payment orders created for individual installments, linking each installment to
+  an external payment provider order. Tracks the order identifier used to process
+  the installment payment through the payment gateway.
+columns:
+  id:
+    description: Surrogate primary key for the installment order record in the source database.
+    lineage:
+      - datalake_negotiation_raw.installment_order.id
+  id_installment:
+    description: Foreign key referencing the installment for which this payment order was created.
+    lineage:
+      - datalake_negotiation_raw.installment_order.installment_id
+  id_order:
+    description: External payment provider order identifier used to track and reconcile the installment payment.
+    lineage:
+      - datalake_negotiation_raw.installment_order.order_id
+  ts_created:
+    description: Timestamp when the installment order was created in the source system.
+    lineage:
+      - datalake_negotiation_raw.installment_order.created_at
+  ts_updated:
+    description: Timestamp of the most recent update to the installment order in the source system.
+    lineage:
+      - datalake_negotiation_raw.installment_order.updated_at

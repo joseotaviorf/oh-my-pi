@@ -1,0 +1,46 @@
+---
+database_name: datalake_negotiation_clean
+table_name: installment_order_aud
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Hibernate Envers audit history for the installment_order table. Each row captures
+  a revision of a payment order linked to an installment, allowing tracking of
+  order identifier changes over time.
+columns:
+  id:
+    description: Identifier of the installment order record that was audited in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.id
+  rev:
+    description: Revision number from the Hibernate Envers revinfo table, used to order audit events chronologically.
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.rev
+  revtype:
+    description: Type of database operation that triggered this audit record (0=INSERT, 1=UPDATE, 2=DELETE).
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.revtype
+  id_installment:
+    description: Foreign key referencing the installment this order belongs to, at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.installment_id
+  id_order:
+    description: External payment provider order identifier at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.order_id
+  ts_created:
+    description: Original creation timestamp of the installment order, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.created_at
+  ts_updated:
+    description: Last update timestamp of the installment order, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.updated_at
+  mod_id_installment:
+    description: Boolean flag indicating whether the parent installment reference was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.installment_id_mod
+  mod_id_order:
+    description: Boolean flag indicating whether the external order identifier was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_order_aud.order_id_mod

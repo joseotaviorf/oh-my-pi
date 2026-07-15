@@ -1,0 +1,63 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_aud
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Hibernate Envers audit history for the negotiation table. Each row captures a
+  revision of a negotiation record, enabling point-in-time analysis of status
+  transitions and channel changes. The rev column orders revisions chronologically
+  and revtype indicates whether the row was inserted (0), updated (1), or deleted (2).
+columns:
+  id:
+    description: Identifier of the negotiation record that was audited in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.id
+  rev:
+    description: Revision number from the Hibernate Envers revinfo table, used to order audit events chronologically.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.rev
+  revtype:
+    description: Type of database operation that triggered this audit record (0=INSERT, 1=UPDATE, 2=DELETE).
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.revtype
+  uuid_negotiation:
+    description: Universally unique identifier of the negotiation at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.uuid
+  status:
+    description: Lifecycle status of the negotiation at the time of this revision (e.g. PENDING, ACCEPTED, CANCELLED).
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.status
+  channel:
+    description: Channel of the negotiation at the time of this revision (e.g. PORTAL, API, BACKOFFICE).
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.channel
+  has_write_off:
+    description: Write-off flag of the negotiation at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.has_write_off
+  ts_created:
+    description: Timestamp when the negotiation was originally created, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.created_at
+  ts_updated:
+    description: Timestamp of the last update to the negotiation, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.updated_at
+  mod_uuid_negotiation:
+    description: Boolean flag indicating whether the negotiation UUID was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.uuid_mod
+  mod_status:
+    description: Boolean flag indicating whether the negotiation status was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.status_mod
+  mod_channel:
+    description: Boolean flag indicating whether the negotiation channel was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.channel_mod
+  mod_has_write_off:
+    description: Boolean flag indicating whether the write-off flag was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_aud.has_write_off_mod

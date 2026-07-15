@@ -1,0 +1,51 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_policy
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Catalogue of negotiation policies that define the upper bounds and rules for
+  debt repayment terms. Policies constrain what negotiation options can be offered,
+  specifying maximum discount percentages and installment limits applicable to
+  a given debt negotiation context.
+columns:
+  id:
+    description: Surrogate primary key for the negotiation policy record in the source database.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.id
+  key:
+    description: Unique business key identifying the negotiation policy (e.g. a slug used by the platform).
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.key
+  installment_interval:
+    description: Frequency at which installments are due under this policy (e.g. MONTHLY, WEEKLY).
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.installment_interval
+  max_number_of_installments:
+    description: Maximum number of installments allowed for negotiations governed by this policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.max_number_of_installments
+  min_down_payment_percentage:
+    description: Minimum down payment percentage required for negotiations governed by this policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.min_down_payment_percentage
+  max_discount_on_interest_percentage:
+    description: Maximum percentage discount that can be applied to the interest component under this policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.max_discount_on_interest_percentage
+  max_discount_on_fine_percentage:
+    description: Maximum percentage discount that can be applied to fines (multas) under this policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.max_discount_on_fine_percentage
+  max_discount_on_principal_amount_percentage:
+    description: Maximum percentage discount that can be applied on the principal (capital) debt amount under this policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.max_discount_on_principal_amount_percentage
+  ts_created:
+    description: Timestamp when the negotiation policy was created in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.created_at
+  ts_updated:
+    description: Timestamp of the most recent update to the negotiation policy in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy.updated_at

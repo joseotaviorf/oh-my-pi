@@ -1,0 +1,94 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_option_aud
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Hibernate Envers audit history for the negotiation_option table. Each row captures
+  a revision of a negotiation option, enabling analysis of how repayment terms and
+  discount percentages evolved over time.
+columns:
+  id:
+    description: Identifier of the negotiation option record that was audited in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.id
+  rev:
+    description: Revision number from the Hibernate Envers revinfo table, used to order audit events chronologically.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.rev
+  revtype:
+    description: Type of database operation that triggered this audit record (0=INSERT, 1=UPDATE, 2=DELETE).
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.revtype
+  key:
+    description: Business key of the negotiation option at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.key
+  installment_interval:
+    description: Installment frequency of the negotiation option at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.installment_interval
+  number_of_installments:
+    description: Number of installments of the negotiation option at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.number_of_installments
+  down_payment_percentage:
+    description: Down payment percentage of the negotiation option at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.down_payment_percentage
+  discount_on_interest_percentage:
+    description: Interest discount percentage of the negotiation option at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.discount_on_interest_percentage
+  discount_on_fine_percentage:
+    description: Fine discount percentage of the negotiation option at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.discount_on_fine_percentage
+  discount_on_additional_charges_percentage:
+    description: Additional charges discount percentage of the negotiation option at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.discount_on_additional_charges_percentage
+  discount_on_principal_amount_percentage:
+    description: Principal discount percentage of the negotiation option at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.discount_on_principal_amount_percentage
+  ts_created:
+    description: Original creation timestamp of the negotiation option, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.created_at
+  ts_updated:
+    description: Last update timestamp of the negotiation option, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.updated_at
+  mod_key:
+    description: Boolean flag indicating whether the negotiation option key was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.key_mod
+  mod_installment_interval:
+    description: Boolean flag indicating whether the installment interval was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.installment_interval_mod
+  mod_number_of_installments:
+    description: Boolean flag indicating whether the number of installments was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.number_of_installments_mod
+  mod_down_payment_percentage:
+    description: Boolean flag indicating whether the down payment percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.down_payment_percentage_mod
+  mod_discount_on_interest_percentage:
+    description: Boolean flag indicating whether the interest discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.discount_on_interest_percentage_mod
+  mod_discount_on_fine_percentage:
+    description: Boolean flag indicating whether the fine discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.discount_on_fine_percentage_mod
+  mod_discount_on_additional_charges_percentage:
+    description: Boolean flag indicating whether the additional charges discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.discount_on_additional_charges_percentage_mod
+  mod_discount_on_principal_amount_percentage:
+    description: Boolean flag indicating whether the principal discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option_aud.discount_on_principal_amount_percentage_mod

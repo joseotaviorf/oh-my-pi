@@ -1,0 +1,38 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Core negotiation records from the negotiation microservice. Each row represents
+  a debt negotiation initiated across QuintoAndar business lines (e.g. rental contracts,
+  installments). Tracks lifecycle status, originating channel, and write-off flag.
+columns:
+  id:
+    description: Surrogate primary key for the negotiation record in the source database.
+    lineage:
+      - datalake_negotiation_raw.negotiation.id
+  uuid_negotiation:
+    description: Universally unique identifier for the negotiation, used for cross-system references.
+    lineage:
+      - datalake_negotiation_raw.negotiation.uuid
+  status:
+    description: Current lifecycle status of the negotiation (e.g. PENDING, ACCEPTED, CANCELLED, COMPLETED).
+    lineage:
+      - datalake_negotiation_raw.negotiation.status
+  channel:
+    description: Channel through which the negotiation was originated (e.g. PORTAL, API, BACKOFFICE).
+    lineage:
+      - datalake_negotiation_raw.negotiation.channel
+  has_write_off:
+    description: Indicates whether the negotiation has been written off, meaning the debt was considered unrecoverable.
+    lineage:
+      - datalake_negotiation_raw.negotiation.has_write_off
+  ts_created:
+    description: Timestamp when the negotiation record was created in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation.created_at
+  ts_updated:
+    description: Timestamp of the most recent update to the negotiation record in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation.updated_at

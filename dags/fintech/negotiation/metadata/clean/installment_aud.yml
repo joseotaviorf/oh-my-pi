@@ -1,0 +1,142 @@
+---
+database_name: datalake_negotiation_clean
+table_name: installment_aud
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Hibernate Envers audit history for the installment table. Each row captures a
+  revision of an installment record, enabling analysis of payment status transitions
+  and monetary amount changes over the installment lifecycle.
+columns:
+  id:
+    description: Identifier of the installment record that was audited in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.id
+  rev:
+    description: Revision number from the Hibernate Envers revinfo table, used to order audit events chronologically.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.rev
+  revtype:
+    description: Type of database operation that triggered this audit record (0=INSERT, 1=UPDATE, 2=DELETE).
+    lineage:
+      - datalake_negotiation_raw.installment_aud.revtype
+  uuid_installment:
+    description: Universally unique identifier of the installment at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.uuid
+  id_negotiation:
+    description: Foreign key referencing the parent negotiation at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.negotiation_id
+  id_finance_entity:
+    description: Finance entity identifier associated with the installment at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.finance_entity_id
+  installment_number:
+    description: Sequential position of the installment within the repayment plan at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.installment_number
+  status:
+    description: Payment status of the installment at the time of this revision (e.g. PENDING, PAID, OVERDUE).
+    lineage:
+      - datalake_negotiation_raw.installment_aud.status
+  grace_period_days:
+    description: Grace period in days allowed after the due date, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.grace_period_days
+  total_amount:
+    description: Total amount due for the installment in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.total_amount
+  principal_amount:
+    description: Principal portion of the installment in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.principal_amount
+  fine_amount:
+    description: Fine component of the installment in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.fine_amount
+  interest_amount:
+    description: Interest component of the installment in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.interest_amount
+  discount_amounts:
+    description: JSON object of discount amounts applied to the installment at the time of this revision, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.discount_amounts
+  residual_amounts:
+    description: JSON object of residual amounts included in the installment at the time of this revision, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.residual_amounts
+  additional_charges_amounts:
+    description: JSON object of additional charge amounts included in the installment at the time of this revision, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.additional_charges_amounts
+  dt_due:
+    description: Due date of the installment at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.due_date
+  ts_created:
+    description: Original creation timestamp of the installment, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.created_at
+  ts_updated:
+    description: Last update timestamp of the installment, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.updated_at
+  mod_uuid_installment:
+    description: Boolean flag indicating whether the installment UUID was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.uuid_mod
+  mod_id_negotiation:
+    description: Boolean flag indicating whether the parent negotiation reference was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.negotiation_id_mod
+  mod_id_finance_entity:
+    description: Boolean flag indicating whether the finance entity identifier was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.finance_entity_id_mod
+  mod_installment_number:
+    description: Boolean flag indicating whether the installment number was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.installment_number_mod
+  mod_status:
+    description: Boolean flag indicating whether the installment payment status was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.status_mod
+  mod_grace_period_days:
+    description: Boolean flag indicating whether the grace period days were modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.grace_period_days_mod
+  mod_total_amount:
+    description: Boolean flag indicating whether the total amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.total_amount_mod
+  mod_principal_amount:
+    description: Boolean flag indicating whether the principal amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.principal_amount_mod
+  mod_fine_amount:
+    description: Boolean flag indicating whether the fine amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.fine_amount_mod
+  mod_interest_amount:
+    description: Boolean flag indicating whether the interest amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.interest_amount_mod
+  mod_discount_amounts:
+    description: Boolean flag indicating whether the discount amounts were modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.discount_amounts_mod
+  mod_residual_amounts:
+    description: Boolean flag indicating whether the residual amounts were modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.residual_amounts_mod
+  mod_additional_charges_amounts:
+    description: Boolean flag indicating whether the additional charges amounts were modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.additional_charges_amounts_mod
+  mod_dt_due:
+    description: Boolean flag indicating whether the due date was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.installment_aud.due_date_mod

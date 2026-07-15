@@ -1,0 +1,126 @@
+---
+database_name: datalake_negotiation_clean
+table_name: break_bill_aud
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Hibernate Envers audit history for the break_bill table. Each row captures a
+  revision of a break bill record, enabling analysis of monetary amount changes
+  and corrections made to break bills after the negotiation was broken.
+columns:
+  id:
+    description: Identifier of the break bill record that was audited in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.id
+  rev:
+    description: Revision number from the Hibernate Envers revinfo table, used to order audit events chronologically.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.rev
+  revtype:
+    description: Type of database operation that triggered this audit record (0=INSERT, 1=UPDATE, 2=DELETE).
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.revtype
+  id_negotiation:
+    description: Foreign key referencing the negotiation that was broken, at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.negotiation_id
+  id_finance_entity:
+    description: Finance entity identifier associated with the break bill at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.finance_entity_id
+  channel:
+    description: Channel of the original negotiation at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.channel
+  domain:
+    description: Business domain of the debt at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.domain
+  total_amount:
+    description: Total outstanding amount of the break bill in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.total_amount
+  principal_amount:
+    description: Principal portion of the break bill in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.principal_amount
+  fine_amount:
+    description: Fine component of the break bill in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.fine_amount
+  interest_amount:
+    description: Interest component of the break bill in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.interest_amount
+  reversed_discount_amounts:
+    description: JSON object of clawed-back discount amounts in the break bill at the time of this revision, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.reversed_discount_amounts
+  residual_amounts:
+    description: JSON object of residual amounts in the break bill at the time of this revision, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.residual_amounts
+  additional_charges_amounts:
+    description: JSON object of additional charge amounts in the break bill at the time of this revision, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.additional_charges_amounts
+  dt_due:
+    description: Due date of the break bill at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.due_date
+  ts_created:
+    description: Original creation timestamp of the break bill, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.created_at
+  ts_updated:
+    description: Last update timestamp of the break bill, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.updated_at
+  mod_id_negotiation:
+    description: Boolean flag indicating whether the parent negotiation reference was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.negotiation_id_mod
+  mod_id_finance_entity:
+    description: Boolean flag indicating whether the finance entity identifier was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.finance_entity_id_mod
+  mod_channel:
+    description: Boolean flag indicating whether the channel was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.channel_mod
+  mod_domain:
+    description: Boolean flag indicating whether the business domain was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.domain_mod
+  mod_total_amount:
+    description: Boolean flag indicating whether the total amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.total_amount_mod
+  mod_principal_amount:
+    description: Boolean flag indicating whether the principal amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.principal_amount_mod
+  mod_fine_amount:
+    description: Boolean flag indicating whether the fine amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.fine_amount_mod
+  mod_interest_amount:
+    description: Boolean flag indicating whether the interest amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.interest_amount_mod
+  mod_reversed_discount_amounts:
+    description: Boolean flag indicating whether the reversed discount amounts were modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.reversed_discount_amounts_mod
+  mod_residual_amounts:
+    description: Boolean flag indicating whether the residual amounts were modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.residual_amounts_mod
+  mod_additional_charges_amounts:
+    description: Boolean flag indicating whether the additional charges amounts were modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.additional_charges_amounts_mod
+  mod_dt_due:
+    description: Boolean flag indicating whether the due date was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.break_bill_aud.due_date_mod

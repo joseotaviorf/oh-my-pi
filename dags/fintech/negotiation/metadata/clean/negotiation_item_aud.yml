@@ -1,0 +1,70 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_item_aud
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Hibernate Envers audit history for the negotiation_item table. Each row captures
+  a revision of a negotiation item, allowing tracking of changes to the business
+  entity, finance entity, and write-off date over time.
+columns:
+  id:
+    description: Identifier of the negotiation item record that was audited in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.id
+  rev:
+    description: Revision number from the Hibernate Envers revinfo table, used to order audit events chronologically.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.rev
+  revtype:
+    description: Type of database operation that triggered this audit record (0=INSERT, 1=UPDATE, 2=DELETE).
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.revtype
+  id_negotiation:
+    description: Foreign key referencing the parent negotiation at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.negotiation_id
+  domain:
+    description: Business domain of the negotiation item at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.domain
+  id_business_entity:
+    description: Business entity identifier of the negotiation item at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.business_entity_id
+  id_finance_entity:
+    description: Finance entity identifier of the negotiation item at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.finance_entity_id
+  dt_write_off:
+    description: Write-off date of the negotiation item at the time of this revision, if applicable.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.write_off_at
+  ts_created:
+    description: Original creation timestamp of the negotiation item, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.created_at
+  ts_updated:
+    description: Last update timestamp of the negotiation item, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.updated_at
+  mod_id_negotiation:
+    description: Boolean flag indicating whether the parent negotiation reference was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.negotiation_id_mod
+  mod_id_business_entity:
+    description: Boolean flag indicating whether the business entity identifier was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.business_entity_id_mod
+  mod_id_finance_entity:
+    description: Boolean flag indicating whether the finance entity identifier was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.finance_entity_id_mod
+  mod_domain:
+    description: Boolean flag indicating whether the business domain was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.domain_mod
+  mod_dt_write_off:
+    description: Boolean flag indicating whether the write-off date was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item_aud.write_off_at_mod

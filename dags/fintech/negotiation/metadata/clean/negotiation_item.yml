@@ -1,0 +1,42 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_item
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Items linked to a negotiation, each representing a specific debt obligation within
+  a business domain (e.g. rent, condominium). Identifies the business entity and
+  finance entity involved and tracks write-off date when applicable.
+columns:
+  id:
+    description: Surrogate primary key for the negotiation item record in the source database.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item.id
+  id_negotiation:
+    description: Foreign key referencing the parent negotiation this item belongs to.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item.negotiation_id
+  domain:
+    description: Business domain associated with the negotiation item (e.g. RENT, CONDO, INSURANCE).
+    lineage:
+      - datalake_negotiation_raw.negotiation_item.domain
+  id_business_entity:
+    description: Identifier of the business entity (e.g. contract ID) linked to this negotiation item in the source operational system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item.business_entity_id
+  id_finance_entity:
+    description: Identifier of the financial entity (e.g. invoice or billing record) linked to this negotiation item.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item.finance_entity_id
+  dt_write_off:
+    description: Date when this negotiation item was written off, indicating the debt was deemed unrecoverable.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item.write_off_at
+  ts_created:
+    description: Timestamp when the negotiation item was created in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item.created_at
+  ts_updated:
+    description: Timestamp of the most recent update to the negotiation item in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_item.updated_at

@@ -1,0 +1,95 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_condition
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Financial conditions agreed upon for a specific negotiation. One-to-one with the
+  negotiation table. Records the exact monetary breakdown (principal, interest, fines,
+  discounts, residuals, additional charges) and the repayment terms (installments,
+  down payment) as accepted by the debtor, derived from a negotiation option or policy.
+columns:
+  id:
+    description: Surrogate primary key for the negotiation condition record in the source database.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.id
+  id_negotiation:
+    description: Foreign key referencing the negotiation this condition belongs to (one-to-one relationship).
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.negotiation_id
+  source_key:
+    description: Key of the originating negotiation option or policy from which this condition was derived.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.source_key
+  source_type:
+    description: Discriminator indicating whether the condition originated from an OPTION or a POLICY.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.source_type
+  installment_interval:
+    description: Installment frequency applied to this negotiation condition as agreed at acceptance time (e.g. MONTHLY, WEEKLY), copied from the originating option or policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.installment_interval
+  number_of_installments:
+    description: Number of installments agreed for repaying the debt under this negotiation condition.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.number_of_installments
+  down_payment_percentage:
+    description: Down payment percentage applied at acceptance time, copied from the originating option or policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.down_payment_percentage
+  down_payment:
+    description: Monetary value of the down payment the debtor must pay upfront, in BRL.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.down_payment
+  total_amount:
+    description: Total monetary amount to be paid under this negotiation condition, including all components, in BRL.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.total_amount
+  principal_amount:
+    description: Principal (capital) portion of the debt covered by this negotiation condition, in BRL.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.principal_amount
+  discount_amount:
+    description: Total discount amount applied to the debt under this negotiation condition, in BRL.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.discount_amount
+  discount_on_interest_percentage:
+    description: Interest discount percentage applied at acceptance time, copied from the originating option or policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.discount_on_interest_percentage
+  discount_on_fine_percentage:
+    description: Fine discount percentage applied at acceptance time, copied from the originating option or policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.discount_on_fine_percentage
+  discount_on_principal_amount_percentage:
+    description: Principal discount percentage applied at acceptance time, copied from the originating option or policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.discount_on_principal_amount_percentage
+  discount_on_additional_charges_percentage:
+    description: Additional charges discount percentage applied at acceptance time, copied from the originating option or policy.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.discount_on_additional_charges_percentage
+  fine_amount:
+    description: Fine (multa) component of the debt covered by this negotiation condition, in BRL.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.fine_amount
+  interest_amount:
+    description: Interest (juros) component of the debt covered by this negotiation condition, in BRL.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.interest_amount
+  residual_amount:
+    description: Residual amount remaining after discounts and payments are applied, in BRL.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.residual_amount
+  additional_charges_amount:
+    description: Additional charges (encargos) component of the debt covered by this negotiation condition, in BRL.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.additional_charges_amount
+  ts_created:
+    description: Timestamp when the negotiation condition was created in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.created_at
+  ts_updated:
+    description: Timestamp of the most recent update to the negotiation condition in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition.updated_at

@@ -1,0 +1,71 @@
+---
+database_name: datalake_negotiation_clean
+table_name: break_bill
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Break bills generated when a debtor fails to fulfil a negotiation agreement,
+  causing the negotiation to be broken. Each record captures the full monetary
+  breakdown of the outstanding debt at the moment of the break, including the
+  channel and business domain of the originating debt.
+columns:
+  id:
+    description: Surrogate primary key for the break bill record in the source database.
+    lineage:
+      - datalake_negotiation_raw.break_bill.id
+  id_negotiation:
+    description: Foreign key referencing the negotiation that was broken, triggering this break bill.
+    lineage:
+      - datalake_negotiation_raw.break_bill.negotiation_id
+  id_finance_entity:
+    description: Identifier of the financial entity (e.g. invoice or billing record) associated with this break bill.
+    lineage:
+      - datalake_negotiation_raw.break_bill.finance_entity_id
+  channel:
+    description: Channel through which the original negotiation was originated (e.g. PORTAL, API, BACKOFFICE).
+    lineage:
+      - datalake_negotiation_raw.break_bill.channel
+  domain:
+    description: Business domain of the debt that generated this break bill (e.g. RENT, CONDO, INSURANCE).
+    lineage:
+      - datalake_negotiation_raw.break_bill.domain
+  total_amount:
+    description: Total outstanding amount captured in the break bill, sum of all components, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill.total_amount
+  principal_amount:
+    description: Principal (capital) portion of the outstanding debt captured in the break bill, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill.principal_amount
+  fine_amount:
+    description: Fine (multa) component of the outstanding debt captured in the break bill, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill.fine_amount
+  interest_amount:
+    description: Interest (juros) component of the outstanding debt captured in the break bill, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill.interest_amount
+  reversed_discount_amounts:
+    description: JSON object mapping discount types to their reversed (clawed-back) monetary values in the break bill, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill.reversed_discount_amounts
+  residual_amounts:
+    description: JSON object mapping residual charge types to their monetary values in the break bill, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill.residual_amounts
+  additional_charges_amounts:
+    description: JSON object mapping additional charge types to their monetary values in the break bill, in BRL.
+    lineage:
+      - datalake_negotiation_raw.break_bill.additional_charges_amounts
+  dt_due:
+    description: Due date of the break bill, indicating when the outstanding amount must be settled.
+    lineage:
+      - datalake_negotiation_raw.break_bill.due_date
+  ts_created:
+    description: Timestamp when the break bill was created in the source system.
+    lineage:
+      - datalake_negotiation_raw.break_bill.created_at
+  ts_updated:
+    description: Timestamp of the most recent update to the break bill in the source system.
+    lineage:
+      - datalake_negotiation_raw.break_bill.updated_at

@@ -1,0 +1,57 @@
+dag:
+  name: negotiation
+  schedule_start_date: 2026,07,07
+  schedule_interval: 0 3,8,12 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      The dag is responsible for ingesting negotiation DB data. This database contains negotiation info across QuintoAndar's business lines, such as the negotiation terms, installment breakdown, negotiation lifecycle, etc. For more info, check https://github.com/quintoandar/backend-services/tree/main/applications/negotiation
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: negotiation
+  dbutils_secret_key: NEGOTIATION_DB
+  lineage_product_database_name: negotiation
+  tables_customization:
+    negotiation:
+      get_table_metrics:
+        count: "id"
+    negotiation_aud:
+      raw_primary_keys: ["id", "rev"]
+    negotiation_item:
+      get_table_metrics:
+        count: "id"
+    negotiation_item_aud:
+      raw_primary_keys: ["id", "rev"]
+    negotiation_option:
+      get_table_metrics:
+        count: "id"
+    negotiation_option_aud:
+      raw_primary_keys: ["id", "rev"]
+    negotiation_condition:
+      get_table_metrics:
+        count: "id"
+    negotiation_condition_aud:
+      raw_primary_keys: ["id", "rev"]
+    negotiation_policy:
+      get_table_metrics:
+        count: "id"
+    negotiation_policy_aud:
+      raw_primary_keys: ["id", "rev"]
+    installment:
+      get_table_metrics:
+        count: "id"
+    installment_aud:
+      raw_primary_keys: ["id", "rev"]
+    installment_order:
+      get_table_metrics:
+        count: "id"
+    installment_order_aud:
+      raw_primary_keys: ["id", "rev"]
+    break_bill:
+      get_table_metrics:
+        count: "id"
+    break_bill_aud:
+      raw_primary_keys: ["id", "rev"]

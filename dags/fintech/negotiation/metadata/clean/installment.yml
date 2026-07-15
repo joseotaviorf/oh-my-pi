@@ -1,0 +1,79 @@
+---
+database_name: datalake_negotiation_clean
+table_name: installment
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Individual installment records generated for an accepted negotiation. Each row
+  represents one scheduled payment within the repayment plan, including the full
+  monetary breakdown (principal, interest, fines, discounts, residuals, additional
+  charges) and the payment status. Used to track collection progress per installment.
+columns:
+  id:
+    description: Surrogate primary key for the installment record in the source database.
+    lineage:
+      - datalake_negotiation_raw.installment.id
+  uuid_installment:
+    description: Universally unique identifier for the installment, used for cross-system references.
+    lineage:
+      - datalake_negotiation_raw.installment.uuid
+  id_negotiation:
+    description: Foreign key referencing the negotiation this installment belongs to.
+    lineage:
+      - datalake_negotiation_raw.installment.negotiation_id
+  id_finance_entity:
+    description: Identifier of the financial entity (e.g. billing record or invoice) associated with this installment.
+    lineage:
+      - datalake_negotiation_raw.installment.finance_entity_id
+  installment_number:
+    description: Sequential position of this installment within the negotiation repayment plan (1-based).
+    lineage:
+      - datalake_negotiation_raw.installment.installment_number
+  status:
+    description: Current payment status of the installment (e.g. PENDING, PAID, OVERDUE, CANCELLED).
+    lineage:
+      - datalake_negotiation_raw.installment.status
+  grace_period_days:
+    description: Number of grace period days allowed after the due date before the installment is considered overdue.
+    lineage:
+      - datalake_negotiation_raw.installment.grace_period_days
+  total_amount:
+    description: Total amount due for this installment, sum of all components, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment.total_amount
+  principal_amount:
+    description: Principal (capital) portion of this installment, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment.principal_amount
+  fine_amount:
+    description: Fine (multa) component included in this installment, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment.fine_amount
+  interest_amount:
+    description: Interest (juros) component included in this installment, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment.interest_amount
+  discount_amounts:
+    description: JSON object mapping discount types to their monetary values applied to this installment, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment.discount_amounts
+  residual_amounts:
+    description: JSON object mapping residual charge types to their monetary values included in this installment, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment.residual_amounts
+  additional_charges_amounts:
+    description: JSON object mapping additional charge types to their monetary values included in this installment, in BRL.
+    lineage:
+      - datalake_negotiation_raw.installment.additional_charges_amounts
+  dt_due:
+    description: Date on which this installment payment is due.
+    lineage:
+      - datalake_negotiation_raw.installment.due_date
+  ts_created:
+    description: Timestamp when the installment record was created in the source system.
+    lineage:
+      - datalake_negotiation_raw.installment.created_at
+  ts_updated:
+    description: Timestamp of the most recent update to the installment record in the source system.
+    lineage:
+      - datalake_negotiation_raw.installment.updated_at

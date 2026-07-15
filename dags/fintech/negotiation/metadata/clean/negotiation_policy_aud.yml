@@ -1,0 +1,94 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_policy_aud
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Hibernate Envers audit history for the negotiation_policy table. Each row captures
+  a revision of a negotiation policy, enabling analysis of how policy limits and
+  discount caps changed over time.
+columns:
+  id:
+    description: Identifier of the negotiation policy record that was audited in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.id
+  rev:
+    description: Revision number from the Hibernate Envers revinfo table, used to order audit events chronologically.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.rev
+  revtype:
+    description: Type of database operation that triggered this audit record (0=INSERT, 1=UPDATE, 2=DELETE).
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.revtype
+  key:
+    description: Business key of the negotiation policy at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.key
+  installment_interval:
+    description: Installment frequency of the policy at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.installment_interval
+  max_number_of_installments:
+    description: Maximum number of installments allowed by the policy at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.max_number_of_installments
+  min_down_payment_percentage:
+    description: Minimum down payment percentage required by the policy at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.min_down_payment_percentage
+  max_discount_on_interest_percentage:
+    description: Maximum interest discount percentage allowed by the policy at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.max_discount_on_interest_percentage
+  max_discount_on_fine_percentage:
+    description: Maximum fine discount percentage allowed by the policy at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.max_discount_on_fine_percentage
+  max_discount_on_principal_amount_percentage:
+    description: Maximum principal discount percentage allowed by the policy at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.max_discount_on_principal_amount_percentage
+  ts_created:
+    description: Original creation timestamp of the negotiation policy, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.created_at
+  ts_updated:
+    description: Last update timestamp of the negotiation policy, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.updated_at
+  mod_key:
+    description: Boolean flag indicating whether the policy key was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.key_mod
+  mod_installment_interval:
+    description: Boolean flag indicating whether the installment interval was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.installment_interval_mod
+  mod_max_number_of_installments:
+    description: Boolean flag indicating whether the maximum number of installments was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.max_number_of_installments_mod
+  mod_min_down_payment_percentage:
+    description: Boolean flag indicating whether the minimum down payment percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.min_down_payment_percentage_mod
+  mod_max_discount_on_interest_percentage:
+    description: Boolean flag indicating whether the maximum interest discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.max_discount_on_interest_percentage_mod
+  mod_max_discount_on_fine_percentage:
+    description: Boolean flag indicating whether the maximum fine discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.max_discount_on_fine_percentage_mod
+  mod_max_discount_on_principal_amount_percentage:
+    description: Boolean flag indicating whether the maximum principal discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.max_discount_on_principal_amount_percentage_mod
+  mod_ts_created:
+    description: Boolean flag indicating whether the creation timestamp was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.created_at_mod
+  mod_ts_updated:
+    description: Boolean flag indicating whether the update timestamp was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_policy_aud.updated_at_mod

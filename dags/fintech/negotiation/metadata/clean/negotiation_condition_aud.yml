@@ -1,0 +1,175 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_condition_aud
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Hibernate Envers audit history for the negotiation_condition table. Each row
+  captures a revision of the financial conditions agreed for a negotiation, enabling
+  analysis of how monetary terms (principal, discounts, installments) evolved during
+  the negotiation lifecycle.
+columns:
+  id:
+    description: Identifier of the negotiation condition record that was audited in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.id
+  rev:
+    description: Revision number from the Hibernate Envers revinfo table, used to order audit events chronologically.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.rev
+  revtype:
+    description: Type of database operation that triggered this audit record (0=INSERT, 1=UPDATE, 2=DELETE).
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.revtype
+  id_negotiation:
+    description: Foreign key referencing the negotiation this condition belongs to, at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.negotiation_id
+  source_key:
+    description: Key of the originating negotiation option or policy at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.source_key
+  source_type:
+    description: Discriminator indicating the source type (OPTION or POLICY) at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.source_type
+  installment_interval:
+    description: Installment frequency of the negotiation condition at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.installment_interval
+  number_of_installments:
+    description: Number of installments agreed for the negotiation at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.number_of_installments
+  down_payment_percentage:
+    description: Down payment percentage of the negotiation condition at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.down_payment_percentage
+  down_payment:
+    description: Down payment amount in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.down_payment
+  total_amount:
+    description: Total amount to be paid in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.total_amount
+  principal_amount:
+    description: Principal debt amount in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.principal_amount
+  discount_amount:
+    description: Total discount applied in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_amount
+  discount_on_interest_percentage:
+    description: Interest discount percentage of the negotiation condition at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_on_interest_percentage
+  discount_on_fine_percentage:
+    description: Fine discount percentage of the negotiation condition at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_on_fine_percentage
+  discount_on_principal_amount_percentage:
+    description: Principal discount percentage of the negotiation condition at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_on_principal_amount_percentage
+  discount_on_additional_charges_percentage:
+    description: Additional charges discount percentage of the negotiation condition at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_on_additional_charges_percentage
+  fine_amount:
+    description: Fine component in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.fine_amount
+  interest_amount:
+    description: Interest component in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.interest_amount
+  residual_amount:
+    description: Residual amount in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.residual_amount
+  additional_charges_amount:
+    description: Additional charges in BRL at the time of this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.additional_charges_amount
+  ts_created:
+    description: Original creation timestamp of the negotiation condition, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.created_at
+  ts_updated:
+    description: Last update timestamp of the negotiation condition, as captured in this audit revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.updated_at
+  mod_id_negotiation:
+    description: Boolean flag indicating whether the parent negotiation reference was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.negotiation_id_mod
+  mod_source_key:
+    description: Boolean flag indicating whether the source key was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.source_key_mod
+  mod_source_type:
+    description: Boolean flag indicating whether the source type was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.source_type_mod
+  mod_installment_interval:
+    description: Boolean flag indicating whether the installment interval was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.installment_interval_mod
+  mod_number_of_installments:
+    description: Boolean flag indicating whether the number of installments was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.number_of_installments_mod
+  mod_down_payment_percentage:
+    description: Boolean flag indicating whether the down payment percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.down_payment_percentage_mod
+  mod_down_payment:
+    description: Boolean flag indicating whether the down payment amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.down_payment_mod
+  mod_total_amount:
+    description: Boolean flag indicating whether the total amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.total_amount_mod
+  mod_principal_amount:
+    description: Boolean flag indicating whether the principal amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.principal_amount_mod
+  mod_discount_amount:
+    description: Boolean flag indicating whether the discount amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_amount_mod
+  mod_discount_on_interest_percentage:
+    description: Boolean flag indicating whether the interest discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_on_interest_percentage_mod
+  mod_discount_on_fine_percentage:
+    description: Boolean flag indicating whether the fine discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_on_fine_percentage_mod
+  mod_discount_on_principal_amount_percentage:
+    description: Boolean flag indicating whether the principal discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_on_principal_amount_percentage_mod
+  mod_discount_on_additional_charges_percentage:
+    description: Boolean flag indicating whether the additional charges discount percentage was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.discount_on_additional_charges_percentage_mod
+  mod_fine_amount:
+    description: Boolean flag indicating whether the fine amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.fine_amount_mod
+  mod_interest_amount:
+    description: Boolean flag indicating whether the interest amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.interest_amount_mod
+  mod_residual_amount:
+    description: Boolean flag indicating whether the residual amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.residual_amount_mod
+  mod_additional_charges_amount:
+    description: Boolean flag indicating whether the additional charges amount was modified in this revision.
+    lineage:
+      - datalake_negotiation_raw.negotiation_condition_aud.additional_charges_amount_mod

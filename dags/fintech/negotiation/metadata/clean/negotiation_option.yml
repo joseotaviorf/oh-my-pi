@@ -1,0 +1,55 @@
+---
+database_name: datalake_negotiation_clean
+table_name: negotiation_option
+owner: joao.bmunhoz@quintoandar.com.br
+domain: Fintech
+description: >
+  Catalogue of negotiation options available to debtors. Each option defines the
+  repayment terms offered (number of installments, interval, discount percentages
+  on principal, interest, fines, and additional charges). Used as the template
+  from which negotiation conditions are derived.
+columns:
+  id:
+    description: Surrogate primary key for the negotiation option record in the source database.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.id
+  key:
+    description: Unique business key identifying the negotiation option (e.g. a slug used by the platform).
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.key
+  installment_interval:
+    description: Frequency at which installments are due (e.g. MONTHLY, WEEKLY).
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.installment_interval
+  number_of_installments:
+    description: Total number of installments defined for this negotiation option.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.number_of_installments
+  down_payment_percentage:
+    description: Percentage of the total debt amount required as a down payment at the start of the negotiation.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.down_payment_percentage
+  discount_on_interest_percentage:
+    description: Percentage discount applied on the interest component of the debt for this option.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.discount_on_interest_percentage
+  discount_on_fine_percentage:
+    description: Percentage discount applied on fines (multas) accrued on the debt for this option.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.discount_on_fine_percentage
+  discount_on_additional_charges_percentage:
+    description: Percentage discount applied on additional charges (encargos) of the debt for this option.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.discount_on_additional_charges_percentage
+  discount_on_principal_amount_percentage:
+    description: Percentage discount applied directly on the principal (capital) amount of the debt for this option.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.discount_on_principal_amount_percentage
+  ts_created:
+    description: Timestamp when the negotiation option was created in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.created_at
+  ts_updated:
+    description: Timestamp of the most recent update to the negotiation option in the source system.
+    lineage:
+      - datalake_negotiation_raw.negotiation_option.updated_at
