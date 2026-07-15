@@ -1,4 +1,36 @@
 WITH
+job_ranked AS (
+    SELECT
+        id_job,
+        job_code,
+        id_job_family,
+        contribution_level,
+        id_grade_ladder,
+        id_set,
+        work_arrangement,
+        target_sop_currency,
+        weekly_hours,
+        target_plr,
+        target_plr_salary_multiplier,
+        target_rvv,
+        target_sop,
+        target_hiring_sop,
+        target_bonus_tech_usd,
+        is_active,
+        is_time_clocking_required,
+        dt_effective_started,
+        dt_effective_ended,
+        ts_updated,
+        object_version_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_job
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.job
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+),
 job_latest AS (
     SELECT
         id_job,
@@ -23,16 +55,27 @@ job_latest AS (
         ts_updated,
         object_version_number
     FROM
-        datalake_pin_core_clean.job
+        job_ranked
     WHERE
-        dt_effective_started < DATE('{load_end_date}')
-    QUALIFY
+        rn = 1
+),
+job_tl_ranked AS (
+    SELECT
+        id_job,
+        name,
+        dt_effective_started,
+        object_version_number,
+        language,
         ROW_NUMBER() OVER (
             PARTITION BY id_job
             ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.job_translation
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
+        AND language = 'PTB'
 ),
-
 job_tl_latest AS (
     SELECT
         id_job,
@@ -41,17 +84,28 @@ job_tl_latest AS (
         object_version_number,
         language
     FROM
-        datalake_pin_core_clean.job_translation
+        job_tl_ranked
+    WHERE
+        rn = 1
+),
+rate_val_ranked AS (
+    SELECT
+        id_rate,
+        id_rate_object,
+        minimum_value,
+        maximum_value,
+        mid_value,
+        dt_effective_started,
+        object_version_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_rate, id_rate_object
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.rate_values
     WHERE
         dt_effective_started < DATE('{load_end_date}')
-        AND language = 'PTB'
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_job
-            ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
 ),
-
 rate_val_latest AS (
     SELECT
         id_rate,
@@ -62,16 +116,25 @@ rate_val_latest AS (
         dt_effective_started,
         object_version_number
     FROM
-        datalake_pin_core_clean.rate_values
+        rate_val_ranked
+    WHERE
+        rn = 1
+),
+job_family_tl_ranked AS (
+    SELECT
+        id_job_family,
+        job_family_name,
+        dt_effective_started,
+        object_version_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_job_family
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.job_family_translation
     WHERE
         dt_effective_started < DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_rate, id_rate_object
-            ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
 ),
-
 job_family_tl_latest AS (
     SELECT
         id_job_family,
@@ -79,16 +142,25 @@ job_family_tl_latest AS (
         dt_effective_started,
         object_version_number
     FROM
-        datalake_pin_core_clean.job_family_translation
+        job_family_tl_ranked
+    WHERE
+        rn = 1
+),
+job_leg_ranked AS (
+    SELECT
+        id_job,
+        brazilian_occupation_code,
+        dt_effective_started,
+        object_version_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_job
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.job_legislative
     WHERE
         dt_effective_started < DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_job_family
-            ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
 ),
-
 job_leg_latest AS (
     SELECT
         id_job,
@@ -96,16 +168,25 @@ job_leg_latest AS (
         dt_effective_started,
         object_version_number
     FROM
-        datalake_pin_core_clean.job_legislative
+        job_leg_ranked
     WHERE
-        dt_effective_started < DATE('{load_end_date}')
-    QUALIFY
+        rn = 1
+),
+valid_grades_ranked AS (
+    SELECT
+        id_job,
+        id_grade,
+        dt_effective_started,
+        object_version_number,
         ROW_NUMBER() OVER (
             PARTITION BY id_job
             ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.valid_grades
+    WHERE
+        dt_effective_started < DATE('{load_end_date}')
 ),
-
 valid_grades_latest AS (
     SELECT
         id_job,
@@ -113,16 +194,25 @@ valid_grades_latest AS (
         dt_effective_started,
         object_version_number
     FROM
-        datalake_pin_core_clean.valid_grades
+        valid_grades_ranked
+    WHERE
+        rn = 1
+),
+grade_tl_ranked AS (
+    SELECT
+        id_grade,
+        name,
+        dt_effective_started,
+        object_version_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_grade
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.grade_translation
     WHERE
         dt_effective_started < DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_job
-            ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
 ),
-
 grade_tl_latest AS (
     SELECT
         id_grade,
@@ -130,16 +220,25 @@ grade_tl_latest AS (
         dt_effective_started,
         object_version_number
     FROM
-        datalake_pin_core_clean.grade_translation
+        grade_tl_ranked
+    WHERE
+        rn = 1
+),
+grade_ladder_tl_ranked AS (
+    SELECT
+        id_grade_ladder,
+        name,
+        dt_effective_started,
+        object_version_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_grade_ladder
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.grade_ladder_translation
     WHERE
         dt_effective_started < DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_grade
-            ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
 ),
-
 grade_ladder_tl_latest AS (
     SELECT
         id_grade_ladder,
@@ -147,16 +246,26 @@ grade_ladder_tl_latest AS (
         dt_effective_started,
         object_version_number
     FROM
-        datalake_pin_core_clean.grade_ladder_translation
+        grade_ladder_tl_ranked
+    WHERE
+        rn = 1
+),
+rates_ranked AS (
+    SELECT
+        id_grade_ladder,
+        id_rate,
+        currency_code,
+        dt_effective_started,
+        object_version_number,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_grade_ladder, id_rate
+            ORDER BY dt_effective_started DESC, object_version_number DESC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.rates
     WHERE
         dt_effective_started < DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_grade_ladder
-            ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
 ),
-
 rates_latest AS (
     SELECT
         id_grade_ladder,
@@ -165,16 +274,23 @@ rates_latest AS (
         dt_effective_started,
         object_version_number
     FROM
-        datalake_pin_core_clean.rates
+        rates_ranked
     WHERE
-        dt_effective_started < DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_grade_ladder, id_rate
-            ORDER BY dt_effective_started DESC, object_version_number DESC
-        ) = 1
+        rn = 1
 ),
-
+set_id_ranked AS (
+    SELECT
+        id_set,
+        set_name,
+        language,
+        ts_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_set
+            ORDER BY CASE WHEN language = 'PTB' THEN 1 ELSE 2 END, ts_updated DESC
+        ) AS rn
+    FROM
+        datalake_pin_core_clean.set_identifiers
+),
 set_id_latest AS (
     SELECT
         id_set,
@@ -182,14 +298,10 @@ set_id_latest AS (
         language,
         ts_updated
     FROM
-        datalake_pin_core_clean.set_identifiers
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_set
-            ORDER BY CASE WHEN language = 'PTB' THEN 1 ELSE 2 END, ts_updated DESC
-        ) = 1
+        set_id_ranked
+    WHERE
+        rn = 1
 )
-
 SELECT
     job_latest.id_job AS sk_job,
     job_latest.job_code,
@@ -240,7 +352,6 @@ SELECT
     job_latest.dt_effective_started AS dt_effective_started,
     job_latest.dt_effective_ended AS dt_effective_ended,
     job_latest.ts_updated AS ts_updated
-
 FROM
     job_latest
 LEFT JOIN

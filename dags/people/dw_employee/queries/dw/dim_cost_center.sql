@@ -1,13 +1,7 @@
-WITH active_department_responsibility AS (
+WITH active_department_responsibility_ranked AS (
   SELECT
     id_department,
-    id_assignment
-  FROM
-    datalake_hr_system_clean.areas_of_responsibility
-  WHERE
-    active_status = 'A'
-    AND id_template IS NOT NULL
-  QUALIFY
+    id_assignment,
     ROW_NUMBER() OVER (
       PARTITION BY id_department
       ORDER BY
@@ -15,7 +9,21 @@ WITH active_department_responsibility AS (
         dt_ended DESC NULLS LAST,
         ts_load DESC,
         id_assignment DESC
-    ) = 1
+    ) AS rn
+  FROM
+    datalake_hr_system_clean.areas_of_responsibility
+  WHERE
+    active_status = 'A'
+    AND id_template IS NOT NULL
+),
+active_department_responsibility AS (
+  SELECT
+    id_department,
+    id_assignment
+  FROM
+    active_department_responsibility_ranked
+  WHERE
+    rn = 1
 )
 SELECT
   o.id_organization AS sk_cost_center,
@@ -42,11 +50,11 @@ SELECT
   NOW () AS ts_load
 FROM
   datalake_hr_system_clean.organizations AS o
-LEFT JOIN 
-  active_department_responsibility AS r 
+LEFT JOIN
+  active_department_responsibility AS r
     ON o.id_organization = r.id_department
-LEFT JOIN 
-  datalake_people.identifier_mapping AS e 
+LEFT JOIN
+  datalake_people.identifier_mapping AS e
     ON e.id_assignment = r.id_assignment
 WHERE
   o.classification_code = 'DEPARTMENT'

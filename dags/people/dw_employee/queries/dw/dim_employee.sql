@@ -1,31 +1,37 @@
-WITH cte_enrich_demographic_attributes AS (
+WITH cte_enrich_demographic_attributes_ranked AS (
+  SELECT
+    id_person,
+    marital_status,
+    highest_education_level,
+    gender,
+    ts_last_update,
+    MAX(ts_last_update) OVER (PARTITION BY id_person) AS max_ts_last_update
+  FROM
+    datalake_hr_system.demographic_attributes
+),
+cte_enrich_demographic_attributes AS (
   SELECT
     id_person,
     marital_status,
     highest_education_level,
     gender
   FROM
-    datalake_hr_system.demographic_attributes 
-  QUALIFY 
-    ts_last_update = MAX(ts_last_update) OVER (PARTITION BY id_person)
+    cte_enrich_demographic_attributes_ranked
+  WHERE
+    ts_last_update = max_ts_last_update
 )
 SELECT
-  --  ids
   emp_info.id_person AS sk_employee,
-  -- -- non metric
   emp_info.person_number,
   im.name AS full_name,
-  -- -- name information,
   emp_info.documented_first_name,
   emp_info.documented_last_name,
   emp_info.documented_full_name,
   emp_info.first_social_name,
   emp_info.last_social_name,
-  -- -- birth info,
   emp_info.birth_town,
   emp_info.birth_state,
   emp_info.birth_country,
-  -- -- personal info,
   emp_info.mother_name,
   emp_info.father_name,
   COALESCE(da.gender, '-1') AS gender_code,
@@ -74,25 +80,24 @@ SELECT
     ELSE '-1'
   END AS highest_education_level_description,
   CASE
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) < 21 THEN 'menos de 21 anos'
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 21
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) < 21 THEN 'menos de 21 anos'
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) BETWEEN 21
     AND 25 THEN 'de 21 até 25 anos'
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 26
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) BETWEEN 26
     AND 30 THEN 'de 26 até 30 anos'
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 31
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) BETWEEN 31
     AND 35 THEN 'de 31 até 35 anos'
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 36
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) BETWEEN 36
     AND 40 THEN 'de 36 até 40 anos'
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 41
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) BETWEEN 41
     AND 45 THEN 'de 41 até 45 anos'
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 46
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) BETWEEN 46
     AND 50 THEN 'de 46 até 50 anos'
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) BETWEEN 51
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) BETWEEN 51
     AND 55 THEN 'de 51 até 55 anos'
-    WHEN DATEDIFF(YEAR, emp_info.dt_birth, current_date()) > 55 THEN 'mais de 55 anos'
+    WHEN TIMESTAMPDIFF(YEAR, emp_info.dt_birth, CURRENT_DATE()) > 55 THEN 'mais de 55 anos'
     ELSE NULL
   END AS age_range,
-  -- -- dates
   DATE(emp_info.dt_birth) AS dt_birth,
   NOW() AS ts_load
 FROM

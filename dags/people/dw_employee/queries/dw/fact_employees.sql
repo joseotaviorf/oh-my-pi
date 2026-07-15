@@ -1,9 +1,13 @@
 WITH
-terminated_for_transfer AS (
+terminated_for_transfer_ranked AS (
   SELECT
     aa_next.id_period_of_service AS id_period_of_service_next,
     ps_prev.dt_started AS previous_dt_started,
-    (aa.action_code = 'GLB_TRANSFER') AS is_transfered
+    (aa.action_code = 'GLB_TRANSFER') AS is_transfered,
+    ROW_NUMBER() OVER(
+      PARTITION BY aa.id_period_of_service
+      ORDER BY aa.dt_effective_started ASC
+    ) AS rn
   FROM
     datalake_pin_core_clean.all_assignments AS aa
   INNER JOIN
@@ -16,13 +20,17 @@ terminated_for_transfer AS (
   WHERE
     aa.assignment_status_type = 'INACTIVE'
     AND aa.action_code = 'GLB_TRANSFER'
-  QUALIFY
-    ROW_NUMBER() OVER(
-      PARTITION BY aa.id_period_of_service
-      ORDER BY aa.dt_effective_started ASC
-      ) = 1
+),
+terminated_for_transfer AS (
+  SELECT
+    id_period_of_service_next,
+    previous_dt_started,
+    is_transfered
+  FROM
+    terminated_for_transfer_ranked
+  WHERE
+    rn = 1
 )
-
 SELECT
     fa.sk_assignment,
     fa.sk_employee,
@@ -45,7 +53,7 @@ SELECT
     fa.is_active,
     fa.is_pending_worker,
     fa.is_manager,
-    CASE 
+    CASE
       WHEN fa.is_pending_worker THEN 0
       ELSE FLOOR(MONTHS_BETWEEN(
         COALESCE(
@@ -74,6 +82,6 @@ FROM
 LEFT JOIN
     terminated_for_transfer AS tfac
         ON tfac.id_period_of_service_next = fa.sk_assignment
-WHERE 
+WHERE
     NOT fa.is_pending_worker
     AND fa.is_last_valid_work_relationship

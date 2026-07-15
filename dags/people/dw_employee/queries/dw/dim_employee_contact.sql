@@ -1,4 +1,17 @@
 WITH
+  hr_system_workers_ranked AS (
+    SELECT
+      id_person,
+      emails,
+      addresses,
+      phones,
+      DENSE_RANK() OVER (
+        PARTITION BY id_person
+        ORDER BY dt_effective
+      ) AS dense_rank_effective
+    FROM
+      datalake_hr_system_clean.workers
+  ),
   hr_system_workers AS (
     SELECT
       id_person,
@@ -6,13 +19,9 @@ WITH
       addresses,
       phones
     FROM
-      datalake_hr_system_clean.workers
-    QUALIFY 1 = DENSE_RANK() OVER (
-        PARTITION BY
-          id_person
-        ORDER BY
-          dt_effective
-      )
+      hr_system_workers_ranked
+    WHERE
+      dense_rank_effective = 1
   ),
   emails_step1 AS (
     SELECT
@@ -21,7 +30,7 @@ WITH
     FROM
       hr_system_workers
   ),
-  emails AS (
+  emails_ranked AS (
     SELECT
       id_person,
       emails['EmailAddressId'] AS id_email_address,
@@ -32,20 +41,33 @@ WITH
         SUBSTR(REPLACE(emails['LastUpdateDate'], 'T', ' '), 0, 19),
         'yyyy-MM-dd HH:mm:ss'
       ) AS ts_last_update,
+      emails['LastUpdateDate'] AS last_update_date,
+      MAX(emails['LastUpdateDate']) OVER (
+        PARTITION BY id_person, emails['EmailType']
+      ) AS max_last_update_date,
       ROW_NUMBER() OVER (
-        PARTITION BY id_person, emails ['EmailType']
-        ORDER BY emails ['LastUpdateDate'] DESC
+        PARTITION BY id_person, emails['EmailType']
+        ORDER BY emails['LastUpdateDate'] DESC
       ) AS row_number
     FROM
       emails_step1
     WHERE
       emails['ToDate'] IS NULL
       OR emails['ToDate'] = '4712-12-31'
-    QUALIFY emails['LastUpdateDate'] = MAX(emails['LastUpdateDate']) OVER (
-        PARTITION BY
-          id_person,
-          emails['EmailType']
-      )
+  ),
+  emails AS (
+    SELECT
+      id_person,
+      id_email_address,
+      email_type,
+      email_address,
+      primary_flag,
+      ts_last_update,
+      row_number
+    FROM
+      emails_ranked
+    WHERE
+      last_update_date = max_last_update_date
   ),
   addresses_step1 AS (
     SELECT
@@ -54,7 +76,7 @@ WITH
     FROM
       hr_system_workers
   ),
-  addresses AS (
+  addresses_ranked AS (
     SELECT
       id_person,
       addresses['AddressId'] AS id_address,
@@ -67,17 +89,34 @@ WITH
       addresses['TownOrCity'] AS town_or_city,
       addresses['Region2'] AS region_2,
       addresses['Country'] AS country,
-      DATE(addresses['EffectiveStartDate']) AS dt_effective_start
-    FROM
-      addresses_step1
-    QUALIFY
+      DATE(addresses['EffectiveStartDate']) AS dt_effective_start,
       ROW_NUMBER() OVER(
-        PARTITION BY
-          id_person
+        PARTITION BY id_person
         ORDER BY
           addresses['PrimaryFlag'] DESC,
           DATE(addresses['EffectiveStartDate']) DESC
-      ) = 1
+      ) AS rn
+    FROM
+      addresses_step1
+  ),
+  addresses AS (
+    SELECT
+      id_person,
+      id_address,
+      addl_address_attribute_3,
+      address_line_1,
+      address_line_2,
+      address_line_3,
+      address_line_4,
+      postal_code,
+      town_or_city,
+      region_2,
+      country,
+      dt_effective_start
+    FROM
+      addresses_ranked
+    WHERE
+      rn = 1
   ),
   phones_step1 AS (
     SELECT
