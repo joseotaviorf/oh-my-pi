@@ -1,4 +1,4 @@
-WITH deduped_business_rules_groups AS (
+WITH ranked_business_rules_groups AS (
     SELECT
         src.id_business_rules_group,
         src.group_name,
@@ -8,13 +8,7 @@ WITH deduped_business_rules_groups AS (
         src.ts_created,
         src.ts_updated,
         src.business_rules,
-        src.ts_load
-    FROM
-        datalake_oitchau_clean.business_rules_groups AS src
-    WHERE
-        MAKE_DATE(src.year, src.month, src.day) BETWEEN DATE('{load_start_date}')
-            AND DATE('{load_end_date}')
-    QUALIFY
+        src.ts_load,
         ROW_NUMBER() OVER (
             PARTITION BY
                 src.id_business_rules_group
@@ -23,7 +17,28 @@ WITH deduped_business_rules_groups AS (
                 src.year DESC,
                 src.month DESC,
                 src.day DESC
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_oitchau_clean.business_rules_groups AS src
+    WHERE
+        MAKE_DATE(src.year, src.month, src.day) BETWEEN DATE('{load_start_date}')
+            AND DATE('{load_end_date}')
+),
+deduped_business_rules_groups AS (
+    SELECT
+        ranked.id_business_rules_group,
+        ranked.group_name,
+        ranked.group_status,
+        ranked.user_profiles_count,
+        ranked.is_default_group,
+        ranked.ts_created,
+        ranked.ts_updated,
+        ranked.business_rules,
+        ranked.ts_load
+    FROM
+        ranked_business_rules_groups AS ranked
+    WHERE
+        ranked.rn = 1
 ),
 business_rules_with_version_arrays AS (
     SELECT
@@ -108,7 +123,7 @@ hours_bank_phase_segments_exploded AS (
     LATERAL VIEW
         EXPLODE_OUTER(pe.rule_segments) sg AS sr
 ),
-hours_bank_rule_segments_deduplicated AS (
+ranked_hours_bank_rule_segments AS (
     SELECT
         ps.group_name,
         ps.group_status,
@@ -138,19 +153,54 @@ hours_bank_rule_segments_deduplicated AS (
         ps.segment_limit_minutes,
         ps.segment_extra_hours,
         ps.days_mask,
-        ps.day_type_based_on_schedule
-    FROM
-        hours_bank_phase_segments_exploded AS ps
-    WHERE
-        ps.hours_bank_rule_key IS NOT NULL
-        AND TRIM(ps.hours_bank_rule_key) <> ''
-    QUALIFY
+        ps.day_type_based_on_schedule,
         ROW_NUMBER() OVER (
             PARTITION BY
                 ps.hours_bank_rule_key
             ORDER BY
                 ps.ts_load DESC NULLS LAST
-        ) = 1
+        ) AS rn
+    FROM
+        hours_bank_phase_segments_exploded AS ps
+    WHERE
+        ps.hours_bank_rule_key IS NOT NULL
+        AND TRIM(ps.hours_bank_rule_key) <> ''
+),
+hours_bank_rule_segments_deduplicated AS (
+    SELECT
+        ranked.group_name,
+        ranked.group_status,
+        ranked.user_profiles_count,
+        ranked.is_default_group,
+        ranked.ts_created,
+        ranked.ts_updated,
+        ranked.ts_load,
+        ranked.split_days_based_on,
+        ranked.phases_type,
+        ranked.weekday_stage,
+        ranked.holiday_stage,
+        ranked.missing_day_strategy,
+        ranked.ignore_overtime_on_non_planned_days,
+        ranked.hours_bank_recurrence_period,
+        ranked.hours_bank_recurrence_interval,
+        ranked.hours_bank_reset_type,
+        ranked.hours_bank_balance_alert_active,
+        ranked.hours_bank_balance_alert_limit,
+        ranked.hours_bank_balance_alert_limit_type,
+        ranked.extra_hours_balance_alert_active,
+        ranked.extra_hours_balance_alert_limit,
+        ranked.extra_hours_balance_alert_limit_type,
+        ranked.hours_bank_rule_key,
+        ranked.segment_label,
+        ranked.segment_type,
+        ranked.segment_limit_minutes,
+        ranked.segment_extra_hours,
+        ranked.days_mask,
+        ranked.day_type_based_on_schedule
+    FROM
+        ranked_hours_bank_rule_segments AS ranked
+    WHERE
+        ranked.rn = 1
 )
 SELECT
     XXHASH64(

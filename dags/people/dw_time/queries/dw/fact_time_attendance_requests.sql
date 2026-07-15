@@ -1,4 +1,46 @@
-WITH deduped_time_requests AS (
+WITH ranked_time_requests AS (
+    SELECT
+        id_request,
+        id_employee_profile,
+        id_request_subtype,
+        approval_status,
+        approval_stage,
+        approval_flow,
+        request_type,
+        request_subtype_state,
+        hours_calculation_type,
+        is_all_day,
+        is_paid_request,
+        is_locked,
+        is_endless,
+        is_night_shift,
+        is_up_to_date,
+        ts_interval_started,
+        ts_interval_ended,
+        ts_created,
+        ts_updated,
+        ts_deleted,
+        ts_synced,
+        ts_load,
+        year,
+        month,
+        day,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                id_request
+            ORDER BY
+                ts_load DESC NULLS LAST,
+                year DESC,
+                month DESC,
+                day DESC
+        ) AS rn
+    FROM
+        datalake_oitchau_clean.requests
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
+            AND DATE('{load_end_date}')
+),
+deduped_time_requests AS (
     SELECT
         id_request,
         id_employee_profile,
@@ -26,20 +68,29 @@ WITH deduped_time_requests AS (
         month,
         day
     FROM
-        datalake_oitchau_clean.requests
+        ranked_time_requests
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
-            AND DATE('{load_end_date}')
-    QUALIFY
+        rn = 1
+),
+ranked_employee_registration AS (
+    SELECT
+        id_employee_profile,
+        id_external,
+        ts_load,
+        year,
+        month,
+        day,
         ROW_NUMBER() OVER (
             PARTITION BY
-                id_request
+                id_employee_profile
             ORDER BY
                 ts_load DESC NULLS LAST,
                 year DESC,
                 month DESC,
                 day DESC
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_oitchau_clean.employees
 ),
 employee_registration AS (
     SELECT
@@ -50,17 +101,9 @@ employee_registration AS (
         month,
         day
     FROM
-        datalake_oitchau_clean.employees
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                id_employee_profile
-            ORDER BY
-                ts_load DESC NULLS LAST,
-                year DESC,
-                month DESC,
-                day DESC
-        ) = 1
+        ranked_employee_registration
+    WHERE
+        rn = 1
 ),
 time_requests_with_person AS (
     SELECT

@@ -1,4 +1,4 @@
-WITH requests_subtypes AS (
+WITH ranked_requests_subtypes AS (
     SELECT
         XXHASH64(
             TRIM(CAST(id_request_subtype AS STRING))
@@ -12,13 +12,7 @@ WITH requests_subtypes AS (
         is_paid_subtype,
         is_discount_dsr,
         ts_updated,
-        ts_load
-    FROM
-        datalake_oitchau_clean.requests_types_subtypes
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
-            AND DATE('{load_end_date}')
-    QUALIFY
+        ts_load,
         ROW_NUMBER() OVER (
             PARTITION BY
                 id_request_subtype
@@ -27,7 +21,30 @@ WITH requests_subtypes AS (
                 year DESC,
                 month DESC,
                 day DESC
-        ) = 1
+        ) AS rn
+    FROM
+        datalake_oitchau_clean.requests_types_subtypes
+    WHERE
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
+            AND DATE('{load_end_date}')
+),
+requests_subtypes AS (
+    SELECT
+        sk_request,
+        id_request_subtype,
+        subtype_name,
+        subtype_name_key,
+        translation_key,
+        hours_calculation_type,
+        is_active,
+        is_paid_subtype,
+        is_discount_dsr,
+        ts_updated,
+        ts_load
+    FROM
+        ranked_requests_subtypes
+    WHERE
+        rn = 1
 ),
 request_subtypes_seen_in_requests AS (
     SELECT DISTINCT
