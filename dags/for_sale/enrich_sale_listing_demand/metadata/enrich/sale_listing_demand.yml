@@ -1,77 +1,76 @@
----
 database_name: datalake_sale_listing_demand
 table_name: sale_listing_demand
 domain: For Sale
-owner: gustavo.miller@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 description: Demand information about sale listings, such as first sales flow, first booking, first offer, total offers, and others.
 columns:
   id_sale_listing:
     lineage:
-      - datalake_sale_listings.sale_listing.id_sale_listing
+    - datalake_sale_listings.sale_listing.id_sale_listing
     description: Unique identifier of the sale listing.
   id_house:
     lineage:
-      - datalake_sale_listings.sale_listing.id_house
+    - datalake_sale_listings.sale_listing.id_house
     description: Unique identifier of the house.
   days_first_publication_to_first_sale_flow:
-    description: Number of days between the first publication and the first sale flow.
+    description: Number of days between the listing's first publication and its first sale flow starting.
   days_first_publication_to_first_booking:
-    description: Number of days between the first publication and the first booking.
+    description: Number of days between the listing's first publication and its first booking being created.
   days_first_publication_to_visit_completed:
-    description: Number of days between the first publication and the first visit completed.
+    description: Number of days between the listing's first publication and the first completed visit.
   days_first_publication_to_first_offer_submitted:
-    description: Number of days between the first publication and the first offer submitted.
+    description: Number of days between the listing's first publication and the first offer submitted.
   days_first_publication_to_first_offer_accepted:
-    description: Number of days between the first publication and the first offer accepted.
+    description: Number of days between the listing's first publication and the first offer accepted.
   days_first_publication_to_first_sale_agreement_signed:
-    description: Number of days between the first publication and the first sale agreement signed.
+    description: Number of days between the listing's first publication and the first sale agreement (CCV) signed.
   days_first_publication_to_house_registry_ended:
-    description: Number of days between the first publication and the house registry ended.
+    description: Number of days between the listing's first publication and the house registry process ending.
   days_first_booking_to_first_visit_completed:
-    description: Number of days between the first booking and the first visit completed.
+    description: Number of days between the first booking being created and the first completed visit.
   days_first_visit_completed_to_first_offer_submitted:
-    description: Number of days between the first visit completed and the first offer submitted.
+    description: Elapsed days from when a buyer concluded the initial property visit until they sent in a purchase proposal.
   days_first_offer_submitted_to_first_offer_accepted:
-    description: Number of days between the first offer submitted and the first offer accepted.
+    description: Elapsed days a buyer's initial proposal waited before the seller agreed to it, measuring negotiation duration.
   days_first_offer_accepted_to_first_sale_agreement_signed:
-    description: Number of days between the first offer accepted and the first sale agreement signed.
+    description: Number of days between the first offer accepted and the first sale agreement (CCV) signed.
   total_listings_visit_completed:
     lineage:
-      - datalake_sale_flows.sale_flow.total_listings_visit_completed
+    - datalake_sale_flows.sale_flow.total_listings_visit_completed
     description: Total number of visits completed.
   total_listings_offer_submited:
     lineage:
-      - datalake_sale_flows.sale_flow.total_listings_offer_submited
+    - datalake_sale_flows.sale_flow.total_listings_offer_submited
     description: Total number of offers submitted.
   total_listings_offer_accepted:
     lineage:
-      - datalake_sale_flows.sale_flow.total_listings_offer_accepted
+    - datalake_sale_flows.sale_flow.total_listings_offer_accepted
     description: Total number of offers accepted.
   ts_first_sale_flow:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_sale_flow
+    - datalake_sale_flows.sale_flow.ts_first_sale_flow
     description: Timestamp of the first sale flow.
   ts_first_booking:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_booking_created
+    - datalake_sale_flows.sale_flow.ts_first_booking_created
     description: Timestamp of the first booking.
   ts_first_visit_completed:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_visit_completed
+    - datalake_sale_flows.sale_flow.ts_first_visit_completed
     description: Timestamp of the first visit completed.
   ts_first_offer_submitted:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_offer_submitted
     description: Timestamp of the first offer submitted.
   dt_first_offer_accepted:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
+    - datalake_sale_flows.sale_flow.dt_first_offer_accepted
     description: Date of the first offer accepted.
   dt_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+    - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
     description: Date of the first sale agreement signed.
   dt_house_registry_ended:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_house_registry_ended
+    - datalake_sale_flows.sale_flow.dt_house_registry_ended
     description: Date of the house registry ended.

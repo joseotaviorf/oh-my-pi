@@ -1,314 +1,309 @@
 database_name: datalake_sale_closing_flows
 table_name: closing_flow
-description:
-  Enriched table for sale closing flows, which is used to monitor and analyze
-  the closing funnel in For Sale
+description: Enriched table for sale closing flows, which is used to monitor and analyze the closing funnel in For Sale
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_offer:
     lineage:
-      - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.id_offer
     description: Identification key of the offer.
   id_buyer:
     lineage:
-      - datalake_sale_offer.sale_offer.id_buyer
+    - datalake_sale_offer.sale_offer.id_buyer
     description: Identification key of the user who sent the offer.
   id_owner:
     lineage:
-      - datalake_sale_offer.sale_offer.id_owner
+    - datalake_sale_offer.sale_offer.id_owner
     description: House owner to whom an offer has been sent.
   id_house:
     lineage:
-      - datalake_sale_offer.sale_offer.id_house
+    - datalake_sale_offer.sale_offer.id_house
     description: Identification key of the house linked to the offer.
   id_company_supply:
     lineage:
-      - datalake_sale_offer.sale_offer.id_company_supply
+    - datalake_sale_offer.sale_offer.id_company_supply
     description: Id of the supply partner in HubSpot
   uuid_company_supply:
     lineage:
-      - datalake_company.company_sks.uuid_company
+    - datalake_company.company_sks.uuid_company
     description: UUID of the supply partner in the company domain
   id_company_demand:
     lineage:
-      - datalake_sale_offer.sale_offer.id_company_demand
+    - datalake_sale_offer.sale_offer.id_company_demand
     description: Id of the demand partner
   id_closing_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_consultant
-      - datalake_firestore.monday.id_closing_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_consultant
+    - datalake_firestore.monday.id_closing_specialist
     description: Identification key of the closing specialist.
   id_legal_risk_analyst:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_legal_risk_analyst
-      - datalake_firestore.monday.id_legal_risk_analyst
+    - datalake_sale_offer_flows.sale_offer_flows.id_legal_risk_analyst
+    - datalake_firestore.monday.id_legal_risk_analyst
     description: Identification key of the legal risk analyst.
   id_pre_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_pre_specialist
-      - datalake_firestore.monday.id_pre_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_pre_specialist
+    - datalake_firestore.monday.id_pre_specialist
     description: Identification key of the pre credit specialist.
   id_post_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_post_specialist
-      - datalake_firestore.monday.id_post_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_post_specialist
+    - datalake_firestore.monday.id_post_specialist
     description: Identification key of the post credit specialist.
   id_start_financing_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_start_financing_specialist
-      - datalake_firestore.monday.id_start_financing_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_start_financing_specialist
+    - datalake_firestore.monday.id_start_financing_specialist
     description: Identification key of the start financing specialist.
   id_follow_up_financing_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_follow_up_financing_specialist
-      - datalake_firestore.monday.id_follow_up_financing_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_follow_up_financing_specialist
+    - datalake_firestore.monday.id_follow_up_financing_specialist
     description: Identification key of the follow up financing specialist.
   id_end_financing_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_end_financing_specialist
-      - datalake_firestore.monday.id_end_financing_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_end_financing_specialist
+    - datalake_firestore.monday.id_end_financing_specialist
     description: Identification key of the end financing specialist.
   id_credit_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_credit_specialist
-      - datalake_firestore.monday.id_credit_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_credit_specialist
+    - datalake_firestore.monday.id_credit_specialist
     description: Identification key of the credit specialist.
   id_notes_registry_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_notes_registry_specialist
-      - datalake_firestore.monday.id_notes_registry_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_notes_registry_specialist
+    - datalake_firestore.monday.id_notes_registry_specialist
     description: Identification key of the notes registry specialist.
   id_real_estate_register_specialist:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_real_estate_register_specialist
-      - datalake_firestore.monday.id_real_estate_register_specialist
+    - datalake_sale_offer_flows.sale_offer_flows.id_real_estate_register_specialist
+    - datalake_firestore.monday.id_real_estate_register_specialist
     description: Identification key of the real estate register specialist.
   partner_3p_supply:
     lineage:
-      - datalake_company.company_sks.company_name
+    - datalake_company.company_sks.company_name
     description: Name of the Rede partner that supplied the property.
   partner_3p_demand:
     lineage:
-      - datalake_company.company_sks.company_name
+    - datalake_company.company_sks.company_name
     description: Name of the Rede partner that demanded the property.
   is_3p_supply:
     lineage:
-      - datalake_sale_offer.sale_offer.is_3p_supply
+    - datalake_sale_offer.sale_offer.is_3p_supply
     description: Boolean flag indicating if the closing flow has 3P supply partner. Obtained from sale_offer table which gets it from visit_business_model.
   is_3p_demand:
     lineage:
-      - datalake_sale_offer.sale_offer.is_3p_demand
+    - datalake_sale_offer.sale_offer.is_3p_demand
     description: Boolean flag indicating if the closing flow has 3P demand partner. Obtained from sale_offer table which gets it from visit_business_model.
   is_3p_lead_gen:
     lineage:
-      - datalake_sale_offer.sale_offer.is_3p_lead_gen
+    - datalake_sale_offer.sale_offer.is_3p_lead_gen
     description: Boolean flag indicating if the closing flow has 3P lead generation partner. Obtained from sale_offer table which gets it from visit_business_model.
   has_3p_access_control:
     lineage:
-      - datalake_sale_offer.sale_offer.has_3p_access_control
+    - datalake_sale_offer.sale_offer.has_3p_access_control
     description: Boolean flag indicating if the closing flow has any 3P access control (supply, demand, or lead gen). Obtained from sale_offer table which gets it from visit_business_model.
   days_sale_agreement_created_to_legaut_analysis_started:
-    description: Days between Sale Agreement Created and Legaut Analysis Started
+    description: Number of days between the sale agreement (CCV) being created and the legal-utility (legaut) analysis starting.
   days_sale_agreement_signed_to_house_registry_started:
-    description: Days between Sale Agreement Signed and House Registry Started
+    description: Number of days between the sale agreement (CCV) being signed and the house registry process starting.
   days_sale_agreement_signed_to_house_registry_ended:
-    description: Days between Sale Agreement Signed and House Registry Ended
+    description: Number of days between the sale agreement (CCV) being signed and the house registry process ending.
   days_sale_agreement_signed_to_sale_agreement_cancelled:
-    description: Days between Sale Agreement Signed and Sale Agreement Canceled
+    description: Number of days between the sale agreement (CCV) being signed and that same agreement being cancelled.
   days_sale_agreement_signed_to_onboarding_ended:
-    description: Days between Sale Agreement Signed and Onboarding Ended
+    description: Number of days between the sale agreement (CCV) being signed and the closing onboarding ending.
   days_sale_agreement_signed_to_credit_analysis_started:
-    description: Days between Sale Agreement Signed and Credit Analysis Started
+    description: Number of days between the sale agreement (CCV) being signed and the credit analysis starting.
   days_sale_agreement_signed_to_credit_analysis_ended:
-    description: Days between Sale Agreement Signed and Credit Analysis Ended
+    description: Number of days between the sale agreement (CCV) being signed and the credit analysis ending.
   days_sale_agreement_signed_to_financing_started:
-    description: Days between Sale Agreement Signed and Financing Started
+    description: Number of days between the sale agreement (CCV) being signed and the financing process starting.
   days_sale_agreement_signed_to_financing_ended:
-    description: Days from Sale Agreement Signed to Financing Ended
+    description: Number of days between the sale agreement (CCV) being signed and the financing process ending.
   days_sale_agreement_signed_to_notes_registry_started:
-    description: Days between Sale Agreement Signed and Notes Registry Started
+    description: Number of days between the sale agreement (CCV) being signed and the notary notes registry starting.
   days_sale_agreement_signed_to_notes_registry_ended:
-    description: Days between Sale Agreement Signed and Notes Registry Ended
+    description: Number of days between the sale agreement (CCV) being signed and the notary notes registry ending.
   days_sale_agreement_signed_to_legaut_analysis_started:
-    description: Days between Sale Agreement Signed and Legaut Analysis Started
+    description: Number of days between the sale agreement (CCV) being signed and the legal-utility (legaut) analysis starting.
   days_sale_agreement_signed_to_legaut_analysis_ended:
-    description: Days between Sale Agreement Signed and Legaut Analysis Ended
+    description: Number of days between the sale agreement (CCV) being signed and the legal-utility (legaut) analysis ending.
   days_sale_agreement_signed_to_legal_risk_ended:
-    description: Days between Sale Agreement Signed and Legal Risk Ended
+    description: Number of days between the sale agreement (CCV) being signed and the legal risk analysis ending.
   days_sale_agreement_signed_to_bank_legal_analysis_started:
-    description: Days between Sale Agreement Signed and Bank Legal Analysis Started
+    description: Number of days between the sale agreement (CCV) being signed and the bank legal analysis starting.
   days_sale_agreement_signed_to_legal_analysis_ended:
-    description: Days from Sale Agreement Signed to Legal Analysis Ended
+    description: Number of days between the sale agreement (CCV) being signed and the legal analysis ending.
   days_legal_risk_started_to_legal_risk_ended:
-    description: Days between Legal Risk Started and Legal Risk Ended
+    description: Number of days the legal risk analysis took, from its start to its end.
   days_legal_risk_ended_to_legal_analysis_ended:
-    description: Days between Legal Risk Ended and Legal Analysis Ended
+    description: Number of days between the legal risk analysis ending and the legal analysis ending.
   days_legaut_analysis_started_to_legaut_analysis_ended:
-    description: Days between Legaut Analysis Started and Legaut Analysis Ended
+    description: Number of days the legal-utility (legaut) analysis took, from its start to its end.
   days_legaut_analysis_ended_to_legal_risk_ended:
-    description: Days between Legaut Analysis Ended and Legal Risk Ended
+    description: Number of days between the legal-utility (legaut) analysis ending and the legal risk analysis ending.
   days_legal_analysis_ended_notes_registry_ended:
-    description: Days between Legal Analysis Ended and Notes Registry Ended
+    description: Number of days between the legal analysis ending and the notary notes registry ending.
   days_legal_analysis_ended_to_bank_legal_analysis_started:
-    description: Days between Legal Analysis Ended and Bank Legal Analysis Started
+    description: Number of days between the legal analysis ending and the bank legal analysis starting.
   days_bank_legal_analysis_started_to_financing_ended:
-    description: Days between Bank Legal Analysis Started and Financing Ended
+    description: Number of days between the bank legal analysis starting and the financing process ending.
   days_bank_legal_analysis_started_to_house_registry_started:
-    description: Days between Bank Legal Analysis Started and House Registry Started
+    description: Number of days between the bank legal analysis starting and the house registry process starting.
   days_credit_analysis_started_to_credit_analysis_ended:
-    description: Days between Credit Analysis Started and Credit Analysis Ended
+    description: Number of days the credit analysis took, from its start to its end.
   days_credit_analysis_ended_to_bank_legal_analysis_started:
-    description: Days between Credit Analysis Ended and Bank Legal Analysis Started
+    description: Number of days between the credit analysis ending and the bank legal analysis starting.
   days_credit_analysis_ended_to_financing_started:
-    description: Days from Credit Analysis Ended to Financing Started
+    description: Number of days between the credit analysis ending and the financing process starting.
   days_financing_started_to_bank_legal_analysis_started:
-    description: Days from Financing Started to Bank Legal Analysis Started
+    description: Number of days between the financing process starting and the bank legal analysis starting.
   days_financing_started_to_financing_ended:
-    description: Days between Financing Started and Financing Ended
+    description: Number of days the financing process took, from its start to its end.
   days_financing_ended_to_house_registry_ended:
-    description: Days between Financing Ended and House Registry Ended
+    description: Number of days between the financing process ending and the house registry process ending.
   days_financing_ended_to_house_registry_started:
-    description: Days between Financing Ended and House Registry Started
+    description: Number of days between the financing process ending and the house registry process starting.
   days_notes_registry_started_to_notes_registry_ended:
-    description: Days between Notes Registry Started and Notes Registry Ended
+    description: Number of days the notary notes registry took, from its start to its end.
   days_house_registry_started_to_house_registry_ended:
-    description: Days between House Registry Started and House Registry Ended
+    description: Number of days the house registry process took, from its start to its end.
   days_notes_registry_ended_to_house_registry_started:
-    description: Days between Notes Registry Ended and House Registry Started
+    description: Number of days between the notary notes registry ending and the house registry process starting.
   days_notes_registry_ended_to_house_registry_ended:
-    description: Days between Notes Registry Ended and House Registry Ended
+    description: Number of days between the notary notes registry ending and the house registry process ending.
   days_house_registry_ended_to_sale_key_delivered:
-    description: Days between House Registry Ended and Sale Key Delivered
+    description: Number of days between the house registry process ending and the property keys being delivered to the buyer.
   days_house_registry_ended_to_sale_transaction_paid:
-    description: Days between House Registry Ended and Sale Transaction Paid
+    description: Number of days between the house registry process ending and the seller receiving the sale payment.
   dt_sale_agreement_created:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_created
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_created
     description: Date when the CCV was created
   dt_sale_agreement_signed:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+    - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
     description: Date when the CCV was signed
   dt_sale_agreement_cancelled:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_cancelled
+    - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_cancelled
     description: Date when the CCV was cancelled
   dt_sale_agreement_rescued:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_rescued
+    - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_rescued
     description: Date when the CCV was rescued
   dt_onboarding_ended:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_onboarding_ended
-      - datalake_firestore.monday.dt_onboarding_ended
+    - datalake_sale_offer_flows.sale_offer_flows.dt_onboarding_ended
+    - datalake_firestore.monday.dt_onboarding_ended
     description: Date when the onboarding was ended
   dt_legal_analysis_ended:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
-      - datalake_firestore.monday.dt_legal_analysis_ended
+    - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
+    - datalake_firestore.monday.dt_legal_analysis_ended
     description: Date when the legal analysis was ended
   dt_legaut_analysis_started:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_started
-      - datalake_firestore.monday.dt_legaut_analysis_started
+    - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_started
+    - datalake_firestore.monday.dt_legaut_analysis_started
     description: Date when the legaut analysis was started
   dt_legaut_analysis_ended:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_ended
-      - datalake_firestore.monday.dt_legaut_analysis_ended
+    - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_ended
+    - datalake_firestore.monday.dt_legaut_analysis_ended
     description: Date when the legaut analysis was ended
   dt_legal_risk_started:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_started
-      - datalake_firestore.monday.dt_legal_risk_started
+    - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_started
+    - datalake_firestore.monday.dt_legal_risk_started
     description: Date when the legal risk analysis was started
   dt_legal_risk_ended:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_ended
-      - datalake_firestore.monday.dt_legal_risk_ended
+    - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_ended
+    - datalake_firestore.monday.dt_legal_risk_ended
     description: Date when the legal risk analysis was ended
   dt_bank_legal_analysis_started:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
-      - datalake_firestore.monday.dt_bank_legal_analysis_started
+    - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
+    - datalake_firestore.monday.dt_bank_legal_analysis_started
     description: Date when the bank legal analysis was started
   dt_credit_analysis_started:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_started
-      - datalake_firestore.monday.dt_credit_analysis_started
+    - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_started
+    - datalake_firestore.monday.dt_credit_analysis_started
     description: Date when the credit analysis was started
   dt_credit_analysis_ended:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
-      - datalake_firestore.monday.dt_credit_analysis_ended
+    - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
+    - datalake_firestore.monday.dt_credit_analysis_ended
     description: Date when the credit analysis was ended
   dt_financing_started:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_started
-      - datalake_firestore.monday.dt_financing_started
+    - datalake_sale_offer_flows.sale_offer_flows.dt_financing_started
+    - datalake_firestore.monday.dt_financing_started
     description: Date when the financing was started
   dt_financing_ended:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
-      - datalake_firestore.monday.dt_financing_ended
+    - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
+    - datalake_firestore.monday.dt_financing_ended
     description: Date when the financing was ended
   dt_notes_registry_started:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_started
-      - datalake_firestore.monday.dt_notes_registry_started
+    - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_started
+    - datalake_firestore.monday.dt_notes_registry_started
     description: Date when the notes registry was started
   dt_notes_registry_ended:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
-      - datalake_firestore.monday.dt_notes_registry_ended
+    - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
+    - datalake_firestore.monday.dt_notes_registry_ended
     description: Date when the notes registry was ended
   dt_house_registry_started:
     lineage:
-      - datalake_sales_flow_clean.notary.ts_started
-      - datalake_firestore.monday.dt_house_registry_started
+    - datalake_sales_flow_clean.notary.ts_started
+    - datalake_firestore.monday.dt_house_registry_started
     description: Date when the house registry started
   dt_house_registry_ended:
     lineage:
-      - datalake_sales_flow_clean.notary.ts_ended
-      - datalake_firestore.monday.dt_house_registry_ended
+    - datalake_sales_flow_clean.notary.ts_ended
+    - datalake_firestore.monday.dt_house_registry_ended
     description: Date when the house registry ended
   dt_sale_key_delivered:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_key_delivered
-      - datalake_firestore.monday.dt_sale_key_delivered
+    - datalake_sale_offer_flows.sale_offer_flows.dt_sale_key_delivered
+    - datalake_firestore.monday.dt_sale_key_delivered
     description: Date when the sale key was delivered
   dt_sale_transacton_paid:
     lineage:
-      - datalake_sales_flow_clean.mortgage_aud.ts_seller_paid
-      - datalake_firestore.monday.dt_sale_transacton_paid
-    description:
-      Date when the seller received the payment from the financing company.
-      In Closing Assistance model, the full closing process is not monitored. After
-      July 2022 there is no date.
+    - datalake_sales_flow_clean.mortgage_aud.ts_seller_paid
+    - datalake_firestore.monday.dt_sale_transacton_paid
+    description: Date when the seller received the payment from the financing company. In Closing Assistance model, the full closing process is not monitored. After July 2022 there is no date.
   dt_diligence_buyer_sent_at:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_diligence_buyer_sent_at
+    - datalake_sale_offer_flows.sale_offer_flows.dt_diligence_buyer_sent_at
     description: Date when the diligence was sent by the buyer
   dt_diligence_seller_sent_at:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.dt_diligence_seller_sent_at
+    - datalake_sale_offer_flows.sale_offer_flows.dt_diligence_seller_sent_at
     description: Date when the diligence was sent by the seller
   dt_payment_allowed:
     lineage:
-      - datalake_monopoly.sale.dt_occurence
-      - datalake_sales_flow_clean.diligence_aud.ts_buyer_seller_ended
-      - datalake_sales_flow_clean.mortgage_aud.dt_credit_ended
-      - datalake_firestore.monday.dt_legal_analysis_ended
-      - datalake_firestore.monday.dt_credit_analysis_ended
+    - datalake_monopoly.sale.dt_occurence
+    - datalake_sales_flow_clean.diligence_aud.ts_buyer_seller_ended
+    - datalake_sales_flow_clean.mortgage_aud.dt_credit_ended
+    - datalake_firestore.monday.dt_legal_analysis_ended
+    - datalake_firestore.monday.dt_credit_analysis_ended
     description: Date when payment was allowed based on payment method rules
   dt_down_payment:
     lineage:
-      - datalake_monopoly.sale.dt_occurence
+    - datalake_monopoly.sale.dt_occurence
     description: Date when the down payment was made
   ts_updated:
     lineage:
-      - datalake_sale_offer.sale_offer.ts_updated
+    - datalake_sale_offer.sale_offer.ts_updated
     description: Timestamp when the offer was updated
   ts_load:
     description: Timestamp indicating when this table was last updated.

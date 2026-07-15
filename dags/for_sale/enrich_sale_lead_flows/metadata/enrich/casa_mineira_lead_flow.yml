@@ -1,97 +1,96 @@
----
 database_name: datalake_sale_lead_flows
 table_name: casa_mineira_lead_flow
 description: Enriched table to track the lead from Casa Mineira journey.
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_secretariat_client:
     description: User ID from CasaMineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.client.id
-      - datalake_casa_mineira_crm_clean.contact.id_client
+    - datalake_casa_mineira_crm_clean.client.id
+    - datalake_casa_mineira_crm_clean.contact.id_client
   id_first_region_contact_prospect:
     description: Region ID which the first contact happened
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_last_region_contact_prospect:
     description: Region ID which the last contact happened
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_first_region_booking:
     description: QuintoAndar region identifier of the property linked to the user's earliest visit booking in Casa Mineira.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_last_region_booking:
     description: QuintoAndar region identifier of the property linked to the user's most recent visit booking in Casa Mineira.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_first_region_offer:
     description: QuintoAndar region identifier of the property associated with the user's first submitted offer.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_last_region_offer:
     description: QuintoAndar region identifier of the property associated with the user's most recent submitted offer.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_first_house_5a_secretariat_contact:
     description: 5A House ID which this user first contacted Secretaria for.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+    - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
   id_first_house_cm_secretariat_contact:
     description: Casa Mineira House ID which this user first contacted Secretaria for.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id
+    - datalake_casa_mineira_crm_clean.house.id
   id_last_house_5a_secretariat_contact:
     description: 5A House ID which this user first contacted Secretaria for.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+    - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
   id_last_house_cm_secretariat_contact:
     description: Casa Mineira House ID which this user last contacted Secretaria for.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id
+    - datalake_casa_mineira_crm_clean.house.id
   id_first_house_5a_booking:
     description: QuintoAndar house identifier for the listing where the user scheduled their first visit booking.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+    - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
   id_first_house_cm_booking:
     description: Casa Mineira house identifier for the listing where the user scheduled their first visit booking.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id
+    - datalake_casa_mineira_crm_clean.house.id
   id_last_house_5a_booking:
     description: QuintoAndar house identifier for the listing where the user scheduled their most recent visit booking.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+    - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
   id_last_house_cm_booking:
     description: Casa Mineira house identifier for the listing where the user scheduled their most recent visit booking.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id
+    - datalake_casa_mineira_crm_clean.house.id
   id_first_house_cm_offer:
     description: Casa Mineira house identifier for the listing where the user submitted their first purchase offer.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id
+    - datalake_casa_mineira_crm_clean.house.id
   id_last_house_cm_offer:
     description: Casa Mineira house identifier for the listing where the user submitted their most recent purchase offer.
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id
+    - datalake_casa_mineira_crm_clean.house.id
   id_first_house_cm_sale_agreement:
     description: Casa Mineira house ID for this user first CCV
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id
+    - datalake_casa_mineira_crm_clean.house.id
   id_last_house_cm_sale_agreement:
     description: Casa Mineira house ID for this user last CCV
     lineage:
-      - datalake_casa_mineira_crm_clean.house.id
+    - datalake_casa_mineira_crm_clean.house.id
   list_emails:
     description: Aggregated list of email addresses registered for the user across Casa Mineira CRM client and contact records.
     lineage:
-      - datalake_casa_mineira_crm_clean.client.email
-      - datalake_casa_mineira_crm_clean.contact.email
+    - datalake_casa_mineira_crm_clean.client.email
+    - datalake_casa_mineira_crm_clean.contact.email
   list_phone_numbers:
     description: User list of phone numbers
     lineage:
-      - datalake_casa_mineira_crm_clean.client.phone_number
-      - datalake_casa_mineira_crm_clean.contact.phone_number
+    - datalake_casa_mineira_crm_clean.client.phone_number
+    - datalake_casa_mineira_crm_clean.contact.phone_number
   further_funnel_step:
     description: The furthest step the user has reached in the Casa Mineira sale funnel.
     categories:
@@ -104,35 +103,35 @@ columns:
   first_city_contact_prospect:
     description: City name which this user first contact.
     lineage:
-      - datalake_casa_mineira_crm_clean.city.city_name
+    - datalake_casa_mineira_crm_clean.city.city_name
   last_city_contact_prospect:
     description: City name which this user last contact.
     lineage:
-      - datalake_casa_mineira_crm_clean.city.city_name
+    - datalake_casa_mineira_crm_clean.city.city_name
   first_secretariat_contact_origin:
     description: Lead acquisition channel recorded for the user's first secretariat contact in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
+    - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
   last_secretariat_contact_origin:
     description: Lead acquisition channel recorded for the user's most recent secretariat contact in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
+    - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
   first_secretariat_contact_media:
     description: Marketing or communication medium recorded for the user's first secretariat contact in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.media_contact
+    - datalake_casa_mineira_crm_clean.media_contact
   last_secretariat_contact_media:
     description: Marketing or communication medium recorded for the user's most recent secretariat contact in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.media_contact
+    - datalake_casa_mineira_crm_clean.media_contact
   first_city_booking:
     description: City name of the property where the user scheduled their first visit booking in Casa Mineira.
     lineage:
-      - datalake_casa_mineira_crm_clean.city.city_name
+    - datalake_casa_mineira_crm_clean.city.city_name
   last_city_booking:
     description: City name of the property where the user scheduled their most recent visit booking in Casa Mineira.
     lineage:
-      - datalake_casa_mineira_crm_clean.city.city_name
+    - datalake_casa_mineira_crm_clean.city.city_name
   first_offer_flow:
     description: Offer flow label for the user's first offer (Casa Mineira context).
   last_offer_flow:
@@ -144,104 +143,104 @@ columns:
   first_business_unit_region_intent_lead:
     description: Business unit name for the lead first secretariat contact.
     lineage:
-      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+    - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   last_business_unit_region_intent_lead:
     description: Business unit name for the lead last secretariat contact.
     lineage:
-      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+    - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   first_business_unit_region_new_buyer_prospect:
     description: Business unit name for the lead first booking.
     lineage:
-      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+    - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   first_offer_business_unit:
     description: Business unit name where the user's first offer was served.
     lineage:
-      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+    - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   last_offer_business_unit:
     description: Business unit name where the user's last offer was served.
     lineage:
-      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+    - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   first_ccv_business_unit:
     description: Business unit name where the user's first sale agreement was signed.
     lineage:
-      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+    - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   last_ccv_business_unit:
     description: Business unit name where the user's last sale agreement was signed.
     lineage:
-      - datalake_sale_visit_hubs.business_unit_region_history.hub_name
+    - datalake_sale_visit_hubs.business_unit_region_history.hub_name
   has_first_booking:
     description: Flag indicating whether the user created at least one booking.
     lineage:
-      - datalake_casa_mineira_crm_clean.visit.id
+    - datalake_casa_mineira_crm_clean.visit.id
   has_secretariat_contact_created:
     description: Flag indicating whether the user has at least one secretariat contact record.
     lineage:
-      - datalake_casa_mineira_crm_clean.contact.id_client
+    - datalake_casa_mineira_crm_clean.contact.id_client
   total_bookings_created:
     description: Total number of bookings created by the user in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.visit.id
+    - datalake_casa_mineira_crm_clean.visit.id
   total_bookings_canceled:
     description: Total number of bookings canceled by the user in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.visit.id
+    - datalake_casa_mineira_crm_clean.visit.id
   total_visits_completed:
     description: Total number of visits completed by the user in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.visit.ts_visited
+    - datalake_casa_mineira_crm_clean.visit.ts_visited
   total_offers_submitted:
     description: Total number of offers submitted by the user in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.sale.ts_created
+    - datalake_casa_mineira_crm_clean.sale.ts_created
   total_sale_agreements_signed:
     description: Total number of sale agreements (CCV) signed by the user in Casa Mineira CRM.
     lineage:
-      - datalake_casa_mineira_crm_clean.sale.ts_sold
+    - datalake_casa_mineira_crm_clean.sale.ts_sold
   ts_first_contact_prospect:
     description: Timestamp indicating this user first secretariat contact
     lineage:
-      - datalake_casa_mineira_crm_clean.contact.ts_created
+    - datalake_casa_mineira_crm_clean.contact.ts_created
   ts_last_contact_prospect:
     description: Timestamp indicating this user last secretariat contact
     lineage:
-      - datalake_casa_mineira_crm_clean.contact.ts_created
+    - datalake_casa_mineira_crm_clean.contact.ts_created
   ts_first_combo_event_contact_prospect:
     description: Timestamp indicating this user first combo contact
     lineage:
-      - datalake_casa_mineira_crm_clean.contact.ts_created
+    - datalake_casa_mineira_crm_clean.contact.ts_created
   ts_last_combo_event_contact_prospect:
     description: Timestamp indicating this user last combo contact
     lineage:
-      - datalake_casa_mineira_crm_clean.contact.ts_created
+    - datalake_casa_mineira_crm_clean.contact.ts_created
   ts_first_booking_created:
     description: Timestamp indicating this user first booking creation
     lineage:
-      - datalake_casa_mineira_crm_clean.visit.ts_created
+    - datalake_casa_mineira_crm_clean.visit.ts_created
   ts_last_booking_created:
     description: Timestamp indicating this user last booking creation
     lineage:
-      - datalake_casa_mineira_crm_clean.visit.ts_created
+    - datalake_casa_mineira_crm_clean.visit.ts_created
   ts_first_visit_completed:
     description: Timestamp indicating this user first visit completed
     lineage:
-      - datalake_casa_mineira_crm_clean.visit.ts_visited
+    - datalake_casa_mineira_crm_clean.visit.ts_visited
   ts_last_visit_completed:
     description: Timestamp indicating this user last visit completed
     lineage:
-      - datalake_casa_mineira_crm_clean.visit.ts_visited
+    - datalake_casa_mineira_crm_clean.visit.ts_visited
   ts_first_offer_submitted:
     description: Timestamp indicating this user first offer submitted
     lineage:
-      - datalake_casa_mineira_crm_clean.sale.ts_created
+    - datalake_casa_mineira_crm_clean.sale.ts_created
   ts_last_offer_submitted:
     description: Timestamp indicating this user last offer submitted
     lineage:
-      - datalake_casa_mineira_crm_clean.sale.ts_created
+    - datalake_casa_mineira_crm_clean.sale.ts_created
   ts_first_sale_agreement_signed:
     description: Timestamp indicating this user first CCV signed
     lineage:
-      - datalake_casa_mineira_crm_clean.sale.ts_sold
+    - datalake_casa_mineira_crm_clean.sale.ts_sold
   ts_last_sale_agreement_signed:
     description: Timestamp indicating this user last CCV signed
     lineage:
-      - datalake_casa_mineira_crm_clean.sale.ts_sold
+    - datalake_casa_mineira_crm_clean.sale.ts_sold

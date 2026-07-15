@@ -1,93 +1,92 @@
----
 database_name: datalake_sale_flows
 table_name: house_address_data
 description: Historical data about the property address
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - datalake_sales_flow_clean.house.id
+    - datalake_sales_flow_clean.house.id
     description: Unique identifier of the house
   id_address_data:
     lineage:
-      - datalake_sales_flow_clean.house.id_address_data
+    - datalake_sales_flow_clean.house.id_address_data
     description: Unique identifier of the house address
   house_registration_status:
     lineage:
-      - datalake_sales_flow_clean.house.house_registration_status
-    description: House Diligence status
+    - datalake_sales_flow_clean.house.house_registration_status
+    description: Registration status of the house in the property registry (e.g. whether the deed is registered).
   land_tenure:
     lineage:
-      - datalake_sales_flow_clean.house.land_tenure
-    description: Land tenure
+    - datalake_sales_flow_clean.house.land_tenure
+    description: Type of land tenure or ownership regime of the property.
   street:
     lineage:
-      - datalake_sales_flow_clean.address_data.street
-    description: House address street
+    - datalake_sales_flow_clean.address_data.street
+    description: Street name of the property address.
   number:
     lineage:
-      - datalake_sales_flow_clean.address_data.number
-    description: House address number
+    - datalake_sales_flow_clean.address_data.number
+    description: Street number of the property address.
   complement:
     lineage:
-      - datalake_sales_flow_clean.address_data.complement
-    description: House address complement
+    - datalake_sales_flow_clean.address_data.complement
+    description: Address complement of the property (e.g. apartment, block or unit number).
   neighborhood:
     lineage:
-      - datalake_sales_flow_clean.address_data.neighborhood
-    description: House address neighborhood
+    - datalake_sales_flow_clean.address_data.neighborhood
+    description: Neighborhood where the property is located.
   city:
     lineage:
-      - datalake_sales_flow_clean.address_data.city
-    description: House address city 
+    - datalake_sales_flow_clean.address_data.city
+    description: City where the property is located.
   state:
     lineage:
-      - datalake_sales_flow_clean.address_data.state
-    description: House address state
+    - datalake_sales_flow_clean.address_data.state
+    description: State (federative unit) where the property is located.
   zip_code:
     lineage:
-      - datalake_sales_flow_clean.address_data.zip_code
-    description: House address zip code
+    - datalake_sales_flow_clean.address_data.zip_code
+    description: Postal code (CEP) of the property address.
   address:
     lineage:
-      - datalake_sales_flow_clean.address_data.street
-      - datalake_sales_flow_clean.address_data.number
-      - datalake_sales_flow_clean.address_data.complement
-      - datalake_sales_flow_clean.address_data.neighborhood
-      - datalake_sales_flow_clean.address_data.city
-      - datalake_sales_flow_clean.address_data.state
-      - datalake_sales_flow_clean.address_data.zip_code
-    description: House address
+    - datalake_sales_flow_clean.address_data.street
+    - datalake_sales_flow_clean.address_data.number
+    - datalake_sales_flow_clean.address_data.complement
+    - datalake_sales_flow_clean.address_data.neighborhood
+    - datalake_sales_flow_clean.address_data.city
+    - datalake_sales_flow_clean.address_data.state
+    - datalake_sales_flow_clean.address_data.zip_code
+    description: Full property address assembled from street, number, complement, neighborhood, city, state and zip code.
   has_seller_debt_payments:
     lineage:
-      - datalake_sales_flow_clean.house.has_seller_debt_payments
-    description: Has debt payments from the seller
+    - datalake_sales_flow_clean.house.has_seller_debt_payments
+    description: Boolean flag indicating whether seller debt payments applies to this record.
   ts_house_created:
     lineage:
-      - datalake_sales_flow_clean.house.ts_house_created
+    - datalake_sales_flow_clean.house.ts_house_created
     description: House creation date
   ts_last_house_updated:
     lineage:
-      - datalake_sales_flow_clean.house.ts_last_house_updated
+    - datalake_sales_flow_clean.house.ts_last_house_updated
     description: Date of last house update
   ts_created:
     lineage:
-      - datalake_sales_flow_clean.address_data.ts_created
+    - datalake_sales_flow_clean.address_data.ts_created
     description: Address creation date
   ts_updated:
     lineage:
-      - datalake_sales_flow_clean.address_data.ts_updated
+    - datalake_sales_flow_clean.address_data.ts_updated
     description: Address update date
   year:
     lineage:
-      - datalake_sales_flow_clean.address_data.year
+    - datalake_sales_flow_clean.address_data.year
     description: Year of update date
   day:
     lineage:
-      - datalake_sales_flow_clean.address_data.day
-    description: Month of update date
+    - datalake_sales_flow_clean.address_data.day
+    description: Day of the address update date.
   month:
     lineage:
-      - datalake_sales_flow_clean.address_data.month
-    description: Day of update date
+    - datalake_sales_flow_clean.address_data.month
+    description: Month of the address update date.

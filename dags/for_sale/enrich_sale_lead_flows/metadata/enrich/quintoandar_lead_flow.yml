@@ -2,38 +2,38 @@ database_name: datalake_sale_lead_flows
 table_name: quintoandar_lead_flow
 description: Enriched table to track the lead from 5A journey.
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_user:
     description: SK User on 5A main table. JOINs with dw_public.dim_user
     lineage:
     - datalake_ebdb_clean.user_aud.id_user
   id_region_first_booking:
-    description: Booking first region ID.
+    description: Identifier of the region of the house from the user's first booking.
     lineage:
     - datalake_ebdb_clean.house.id_region
   id_region_last_booking:
-    description: Booking last region ID.
+    description: Identifier of the region of the house from the user's last booking.
     lineage:
     - datalake_ebdb_clean.house.id_region
   id_region_first_visit_intent:
-    description: Visit first region ID.
+    description: Identifier of the region of the house from the user's first visit intent.
     lineage:
     - datalake_ebdb_clean.house.id_region
   id_region_last_visit_intent:
-    description: Visit last region ID.
+    description: Identifier of the region of the house from the user's last visit intent.
     lineage:
     - datalake_ebdb_clean.house.id_region
   id_region_first_offer:
-    description: Offer first region ID.
+    description: Identifier of the region of the house from the user's first offer.
     lineage:
     - datalake_ebdb_clean.house.id_region
   id_region_last_offer:
-    description: Offer last region ID.
+    description: Identifier of the region of the house from the user's last offer.
     lineage:
     - datalake_ebdb_clean.house.id_region
   id_first_region:
-    description: Offer first region ID.
+    description: Identifier of the region of the house tied to the user's earliest event in the journey.
     lineage:
     - datalake_ebdb_clean.house.id_region
   id_house_first_booking:
@@ -75,11 +75,11 @@ columns:
     - datalake_sale_offer.sale_offer.id_house
     description: Key of first property/house based on the earliest event (visit intent, booking, or offer).
   email:
-    description: User email
+    description: Contact email address used for notifications and identity matching.
     lineage:
     - datalake_ebdb_clean.user_aud.email
   phone_number:
-    description: User phone
+    description: Contact phone number of the QuintoAndar user associated with the lead.
     lineage:
     - datalake_ebdb_clean.user_aud.phone_number
   first_offer_flow:
@@ -101,23 +101,19 @@ columns:
   first_business_unit_region_new_buyer_prospect:
     lineage:
     - datalake_hub_services.business_unit_region.hub_name
-    description: Last BU name. So if this BU had a different name in the past it won't
-      be considered.
+    description: Last BU name. So if this BU had a different name in the past it won't be considered.
   last_business_unit_region_new_buyer_prospect:
     lineage:
     - datalake_hub_services.business_unit_region.hub_name
-    description: Last BU name. So if this BU had a different name in the past it won't
-      be considered.
+    description: Last BU name. So if this BU had a different name in the past it won't be considered.
   first_business_unit_region_intent_lead:
     lineage:
     - datalake_hub_services.business_unit_region.hub_name
-    description: Last BU name. So if this BU had a different name in the past it won't
-      be considered.
+    description: Last BU name. So if this BU had a different name in the past it won't be considered.
   last_business_unit_region_intent_lead:
     lineage:
     - datalake_hub_services.business_unit_region.hub_name
-    description: Last BU name. So if this BU had a different name in the past it won't
-      be considered.
+    description: Last BU name. So if this BU had a different name in the past it won't be considered.
   ts_first_visit_scheduling_event:
     description: Timestamp indicating the first visit intent event on Amplitude
     lineage:

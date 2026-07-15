@@ -1,123 +1,122 @@
----
 database_name: datalake_sale_lead_flows
 table_name: hub_services_lead_flow
 description: Enriched table to track the lead from HubService.
 domain: For Sale
-owner: herivelto.junior@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_visitor:
     description: Visitor ID assigned for this lead on HubService.
     lineage:
-      - datalake_hub_services_clean.lead_aud.id_visitor
+    - datalake_hub_services_clean.lead_aud.id_visitor
   id_external:
     description: User ID on 5A main tables.
     lineage:
-      - datalake_hub_services_clean.visitor.id_external
+    - datalake_hub_services_clean.visitor.id_external
   id_first_house:
     description: ID House for the first property for this lead.
     lineage:
-      - datalake_ebdb_clean.house.id
+    - datalake_ebdb_clean.house.id
   id_last_house:
     description: ID House for the last property for this lead.
     lineage:
-      - datalake_ebdb_clean.house.id
+    - datalake_ebdb_clean.house.id
   id_first_region:
     description: ID region for the first house.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_first_contact_prospect_region:
     description: ID region for the first region that this lead got in contact with Secretariat.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_last_contact_prospect_region:
     description: ID region for the last region that this lead got in contact with Secretariat.
     lineage:
-      - datalake_ebdb_clean.house.id_region
+    - datalake_ebdb_clean.house.id_region
   id_first_business_unit:
     description: ID BusinessUnit for the first BU that this lead got in contact with Secretariat.
     lineage:
-      - datalake_hub_services_clean.lead_aud.id_business_unit
-      - datalake_hub_services.business_unit_region.id_business_unit
+    - datalake_hub_services_clean.lead_aud.id_business_unit
+    - datalake_hub_services.business_unit_region.id_business_unit
   id_last_business_unit:
     description: ID BusinessUnit for the last BU that this lead got in contact with Secretariat.
     lineage:
-      - datalake_hub_services_clean.lead_aud.id_business_unit
-      - datalake_hub_services.business_unit_region.id_business_unit
+    - datalake_hub_services_clean.lead_aud.id_business_unit
+    - datalake_hub_services.business_unit_region.id_business_unit
   email:
-    description: Lead email.
+    description: Contact email address used for notifications and identity matching.
     lineage:
-      - datalake_hub_services_clean.visitor.email
+    - datalake_hub_services_clean.visitor.email
   phone_number:
-    description: Lead phone number.
+    description: Contact phone number of the HubService lead's visitor.
     lineage:
-      - datalake_hub_services_clean.visitor.phone_number
+    - datalake_hub_services_clean.visitor.phone_number
   first_contact_prospect_origin:
     description: First contact type for this lead
     lineage:
-      - datalake_hub_services_clean.lead_aud.lead_type
+    - datalake_hub_services_clean.lead_aud.lead_type
   last_contact_prospect_origin:
     description: Last contact type for this lead
     lineage:
-      - datalake_hub_services_clean.lead_aud.lead_type
+    - datalake_hub_services_clean.lead_aud.lead_type
   first_contact_prospect_midia:
     description: First contact media for this lead
     lineage:
-      - datalake_hub_services_clean.lead_aud.lead_type
+    - datalake_hub_services_clean.lead_aud.lead_type
   last_contact_prospect_midia:
     description: Last contact media for this lead
     lineage:
-      - datalake_hub_services_clean.lead_aud.lead_type
+    - datalake_hub_services_clean.lead_aud.lead_type
   first_contact_prospect_region_name:
     description: Region name for the first BU that this lead got in contact with Secretariat.
     lineage:
-      - datalake_ebdb_clean.region.name
+    - datalake_ebdb_clean.region.name
   last_contact_prospect_region_name:
     description: Region name for the last BU that this lead got in contact with Secretariat.
     lineage:
-      - datalake_ebdb_clean.region.name
+    - datalake_ebdb_clean.region.name
   first_contact_prospect_city_name:
     description: City name for the first BU that this lead got in contact with Secretariat.
     lineage:
-      - datalake_ebdb_clean.house.city
+    - datalake_ebdb_clean.house.city
   last_contact_prospect_city_name:
     description: City name for the last BU that this lead got in contact with Secretariat.
     lineage:
-      - datalake_ebdb_clean.house.city
+    - datalake_ebdb_clean.house.city
   first_business_unit_hub_name:
     description: First BU name that this lead got in contact with Secretariat.
     lineage:
-      - datalake_gsheets_clean.business_unit_region.business_unit
-      - datalake_hub_services_clean.business_unit_aud
+    - datalake_gsheets_clean.business_unit_region.business_unit
+    - datalake_hub_services_clean.business_unit_aud
   last_business_unit_hub_name:
     description: Last BU name that this lead got in contact with Secretariat.
     lineage:
-      - datalake_gsheets_clean.business_unit_region.business_unit
-      - datalake_hub_services_clean.business_unit_aud
+    - datalake_gsheets_clean.business_unit_region.business_unit
+    - datalake_hub_services_clean.business_unit_aud
   has_secretariat_contact_created:
     description: Flag to indicate if this lead has a contact with Secretariat. Always TRUE in this table.
     lineage:
-      - datalake_hub_services_clean.lead_aud.id_business_unit
+    - datalake_hub_services_clean.lead_aud.id_business_unit
   ts_first_visit_lead_intent:
     description: Timestamp for this lead first visit intent contact.
     lineage:
-      - datalake_hub_services_clean.lead_aud.ts_created
+    - datalake_hub_services_clean.lead_aud.ts_created
   ts_last_visit_lead_intent:
     description: Timestamp for this lead last visit intent contact.
     lineage:
-      - datalake_hub_services_clean.lead_aud.ts_created
+    - datalake_hub_services_clean.lead_aud.ts_created
   ts_first_talk_to_secretariat:
     description: Timestamp for this lead first contact with Secretariat.
     lineage:
-      - datalake_hub_services_clean.lead_aud.ts_created
+    - datalake_hub_services_clean.lead_aud.ts_created
   ts_last_talk_to_secretariat:
     description: Timestamp for this lead last contact with Secretariat.
     lineage:
-      - datalake_hub_services_clean.lead_aud.ts_created
+    - datalake_hub_services_clean.lead_aud.ts_created
   ts_first_contact_prospect:
     description: Timestamp for this lead first contact.
     lineage:
-      - datalake_hub_services_clean.lead_aud.ts_created
+    - datalake_hub_services_clean.lead_aud.ts_created
   ts_last_contact_prospect:
     description: Timestamp for this lead last contact.
     lineage:
-      - datalake_hub_services_clean.lead_aud.ts_created
+    - datalake_hub_services_clean.lead_aud.ts_created

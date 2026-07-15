@@ -1,193 +1,192 @@
----
 database_name: datalake_sale_lead_flows
 table_name: lead_flow
-owner: gabriel.firmino@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description: With this enrichment, we want to analyze mainly the user's contact data during the entire flow within our funnel. Here we have contact data from the bases of Main 5A, Hub Services, Classifieds and Casa Mineira.
 columns:
   id_lead:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_secretariat_client
-      - datalake_sale_lead_flows.classified_lead_flow.id_classified_lead
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_user
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_secretariat_client
+    - datalake_sale_lead_flows.classified_lead_flow.id_classified_lead
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_user
     description: Primary key that identifies a contact and the platform from which it originated. Ex - 5A users have their id_user contacted to '_5A' (Casa Mineira '_CM' and Classifieds '_lc').
   id_user:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_user
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_user
     description: Key that identifies a contact originating from the 5A CRM.
   id_secretariat_client:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_secretariat_client
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_secretariat_client
     description: Key that identifies a contact originating from the SCM.
   id_classified_lead:
     lineage:
-      - datalake_sale_lead_flows.classified_lead_flow.id_classified_lead
+    - datalake_sale_lead_flows.classified_lead_flow.id_classified_lead
     description: Key that identifies a contact originated by classified partners.
   id_visitor_hub_service:
     lineage:
-      - datalake_sale_lead_flows.hub_services_lead_flow.id_visitor
+    - datalake_sale_lead_flows.hub_services_lead_flow.id_visitor
     description: Key that identifies a contact originating from the Hub Service.
   id_region_classified:
     lineage:
-      - datalake_sale_lead_flows.classified_lead_flow.id_region
+    - datalake_sale_lead_flows.classified_lead_flow.id_region
     description: Key that identifies a contact originated by classified partners.
   id_region_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_contact_prospect
-      - datalake_sale_lead_flows.hub_services_lead_flow.id_first_contact_prospect_region
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_contact_prospect
+    - datalake_sale_lead_flows.hub_services_lead_flow.id_first_contact_prospect_region
     description: Key that identifies the region of the property that originated the first contact prospection, made via SCM or Hub Service.
   id_region_booking_cm:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_booking
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_booking
     description: Key that identifies the region of the property where the contact scheduled their first visit, via SCM.
   id_region_visit_intent:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_visit_intent
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_visit_intent
     description: Key that identifies the region of the first property that the contact showed the intention to visit in 5A.
   id_region_booking_5a:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_booking
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_booking
     description: Key that identifies the region of the property where the contact scheduled their first visit, via 5A.
   id_first_region:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_contact_prospect
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_booking
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_offer
-      - datalake_sale_lead_flows.classified_lead_flow.id_region
-      - datalake_sale_lead_flows.hub_services_lead_flow.id_first_region
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_booking
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_offer
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_visit_intent
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_contact_prospect
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_booking
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_offer
+    - datalake_sale_lead_flows.classified_lead_flow.id_region
+    - datalake_sale_lead_flows.hub_services_lead_flow.id_first_region
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_booking
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_offer
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_visit_intent
     description: Key that identifies the region of the first property that the contact interacted with, considering all top-of-the-funnel events and CRMs.
   id_first_house:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_house_5a_secretariat_contact
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_house_5a_booking
-      - datalake_sale_lead_flows.classified_lead_flow.id_house
-      - datalake_sale_lead_flows.hub_services_lead_flow.id_first_house
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_booking
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_offer
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_visit_intent
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_house_5a_secretariat_contact
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_house_5a_booking
+    - datalake_sale_lead_flows.classified_lead_flow.id_house
+    - datalake_sale_lead_flows.hub_services_lead_flow.id_first_house
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_booking
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_offer
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_visit_intent
     description: Key that identifies the first property with which the contact interacted, considering all top-of-the-funnel events and CRMs.
   id_first_house_sale_agreement:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_sale_agreement
+    - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_sale_agreement
     description: Key that identifies the property where the buyer closed their first CCV.
   first_touch:
     description: Flag of the first source/prospecting event of the contact.
   first_classified_partner:
     lineage:
-      - datalake_sale_lead_flows.classified_lead_flow.origin_partner
+    - datalake_sale_lead_flows.classified_lead_flow.origin_partner
     description: First partner classifieds platform to prospect contact.
   first_business_unit_region_intent_lead:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_business_unit_region_intent_lead
-      - datalake_sale_lead_flows.hub_services_lead_flow.first_business_unit_hub_name
-      - datalake_sale_lead_flows.quintoandar_lead_flow.first_business_unit_region_intent_lead
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_business_unit_region_intent_lead
+    - datalake_sale_lead_flows.hub_services_lead_flow.first_business_unit_hub_name
+    - datalake_sale_lead_flows.quintoandar_lead_flow.first_business_unit_region_intent_lead
     description: Business Unit serving the region of the first property where the contact held their first top-of-the-funnel event, considering SCM, 5A and HS.
   last_business_unit_region_intent_lead:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.last_business_unit_region_intent_lead
-      - datalake_sale_lead_flows.hub_services_lead_flow.last_business_unit_hub_name
-      - datalake_sale_lead_flows.quintoandar_lead_flow.last_business_unit_region_intent_lead
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.last_business_unit_region_intent_lead
+    - datalake_sale_lead_flows.hub_services_lead_flow.last_business_unit_hub_name
+    - datalake_sale_lead_flows.quintoandar_lead_flow.last_business_unit_region_intent_lead
     description: Business Unit serving the region of the last property where the contact held their first top-of-the-funnel event, considering SCM, 5A and HS.
   first_business_unit_region_new_buyer_prospect:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_business_unit_region_new_buyer_prospect
-      - datalake_sale_lead_flows.quintoandar_lead_flow.first_business_unit_region_new_buyer_prospect
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_business_unit_region_new_buyer_prospect
+    - datalake_sale_lead_flows.quintoandar_lead_flow.first_business_unit_region_new_buyer_prospect
     description: Business unit that serves the region of the property where the contact made their first visit, via SCM or 5A.
   first_city_booking_cm:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_city_booking
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_city_booking
     description: City of the property where the contact scheduled their first visit in SCM.
   first_city_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_city_contact_prospect
-      - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_city_name
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_city_contact_prospect
+    - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_city_name
     description: City of the property that prospected the contact for the first time, via SCM or HS.
   first_contact_prospect_origin:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_secretariat_contact_origin
-      - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_origin
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_secretariat_contact_origin
+    - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_origin
     description: Origin of the contact's first prospect.
   last_contact_prospect_origin:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.last_secretariat_contact_origin
-      - datalake_sale_lead_flows.hub_services_lead_flow.last_contact_prospect_origin
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.last_secretariat_contact_origin
+    - datalake_sale_lead_flows.hub_services_lead_flow.last_contact_prospect_origin
     description: Origin of the contact's last prospect.
   first_contact_prospect_media:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_secretariat_contact_media
-      - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_midia
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_secretariat_contact_media
+    - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_midia
     description: First contact channel used in the first contact prospecting.
   last_contact_prospect_media:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.last_secretariat_contact_media
-      - datalake_sale_lead_flows.hub_services_lead_flow.last_contact_prospect_midia
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.last_secretariat_contact_media
+    - datalake_sale_lead_flows.hub_services_lead_flow.last_contact_prospect_midia
     description: Means of communication used in the last prospection of the contact.
   first_offer_flow:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_offer_flow
-      - datalake_sale_lead_flows.quintoandar_lead_flow.first_offer_flow
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_offer_flow
+    - datalake_sale_lead_flows.quintoandar_lead_flow.first_offer_flow
     description: First negotiation flow that dealt with the buyer prospect.
   first_ccv_flow:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_ccv_flow
-      - datalake_sale_lead_flows.quintoandar_lead_flow.first_ccv_flow
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_ccv_flow
+    - datalake_sale_lead_flows.quintoandar_lead_flow.first_ccv_flow
     description: First deal flow in which the buyer closed their first CCV.
   first_offer_business_unit:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_offer_business_unit
-      - datalake_sale_lead_flows.quintoandar_lead_flow.first_offer_business_unit
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_offer_business_unit
+    - datalake_sale_lead_flows.quintoandar_lead_flow.first_offer_business_unit
     description: Business unit that serves the region of the property for which the buyer prospect sent their first offer.
   first_ccv_business_unit:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_ccv_business_unit
-      - datalake_sale_lead_flows.quintoandar_lead_flow.first_ccv_business_unit
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.first_ccv_business_unit
+    - datalake_sale_lead_flows.quintoandar_lead_flow.first_ccv_business_unit
     description: Business unit that serves the region of the property where the first cvv of the buyer prospect was created.
   further_funnel_step:
     description: Next step of the conversion funnel foreseen for the contact prospect's journey.
   first_booking_creator_5a:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.first_booking_creator_5a
+    - datalake_sale_lead_flows.quintoandar_lead_flow.first_booking_creator_5a
     description: Type of user who created the schedule for the contact's first visit.
   has_secretariat_contact_created:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.has_secretariat_contact_created
-      - datalake_sale_lead_flows.hub_services_lead_flow.has_secretariat_contact_created
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.has_secretariat_contact_created
+    - datalake_sale_lead_flows.hub_services_lead_flow.has_secretariat_contact_created
     description: Boolean variable that signals whether the contact was created in SCM or HS.
   has_booking_before_secretariat_contact:
     description: Boolean variable that indicates if the user booked a visit before talking to the secretariat.
   has_first_booking:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.has_first_booking
-      - datalake_sale_lead_flows.quintoandar_lead_flow.has_first_booking
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.has_first_booking
+    - datalake_sale_lead_flows.quintoandar_lead_flow.has_first_booking
     description: Boolean variable that signals whether the contact has already had a visit scheduled, via SCM or HS.
   has_tenant_rental_contract:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.has_tenant_rental_contract
+    - datalake_sale_lead_flows.quintoandar_lead_flow.has_tenant_rental_contract
     description: Boolean variable that signals whether the contact had a rental contract with 5A.
   is_ongoing_tenant_rental_contract:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.is_ongoing_tenant_rental_contract
+    - datalake_sale_lead_flows.quintoandar_lead_flow.is_ongoing_tenant_rental_contract
     description: Boolean variable that signals whether the contact has an ongoing rental contract.
   has_owner_rental_contract:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.has_owner_rental_contract
+    - datalake_sale_lead_flows.quintoandar_lead_flow.has_owner_rental_contract
     description: Boolean variable that signals whether the contact is/was the owner of a 5A rental contract.
   has_rental_visit_intent:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.has_rental_visit
+    - datalake_sale_lead_flows.quintoandar_lead_flow.has_rental_visit
     description: Boleyn variable that signals whether the contact has shown any intent to visit rental properties.
   total_bookings_created_by_secretariat:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.total_bookings_created_by_secretariat
+    - datalake_sale_lead_flows.quintoandar_lead_flow.total_bookings_created_by_secretariat
     description: Total bookings created by secretary for the buyer prospect.
   total_bookings_created:
     description: Total bookings created (we don't look at who created them).
   total_visits_completed_by_secretariat:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.total_visits_completed_by_secretariat
+    - datalake_sale_lead_flows.quintoandar_lead_flow.total_visits_completed_by_secretariat
     description: Total number of visits identified as completed by the secretariat.
   total_visits_completed:
     description: Total visits completed by the buyer prospect.
@@ -227,158 +226,158 @@ columns:
     description: Number of days the user took from the first accepted offer to the first signed contract.
   ts_first_talk_to_secretariat:
     lineage:
-      - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_talk_to_secretariat
+    - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_talk_to_secretariat
     description: Timestamp of the first TTS event made by the contact.
   ts_last_talk_to_secretariat:
     lineage:
-      - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_talk_to_secretariat
+    - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_talk_to_secretariat
     description: Timestamp of the last TTS event made by the contact.
   ts_first_visit_lead_intent:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_contact_prospect
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_offer_submitted
-      - datalake_sale_lead_flows.classified_lead_flow.ts_intent
-      - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_visit_lead_intent
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_scheduling_event
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_submitted
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_contact_prospect
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_offer_submitted
+    - datalake_sale_lead_flows.classified_lead_flow.ts_intent
+    - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_visit_lead_intent
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_scheduling_event
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_submitted
     description: Timestamp of the first visit intent event performed by the contact, either by classifieds, 5A, HB or CM.
   ts_last_visit_lead_intent:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_contact_prospect
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_offer_submitted
-      - datalake_sale_lead_flows.classified_lead_flow.ts_intent
-      - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_visit_lead_intent
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_scheduling_event
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_submitted
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_contact_prospect
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_offer_submitted
+    - datalake_sale_lead_flows.classified_lead_flow.ts_intent
+    - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_visit_lead_intent
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_scheduling_event
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_submitted
     description: Timestamp of the last visit intent event performed by the contact, either by classifieds, 5A, HB or CM.
   ts_first_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_contact_prospect
-      - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_contact_prospect
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_contact_prospect
+    - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_contact_prospect
     description: Timestamp of the first event that generated the prospecting of the contact, either by the CM or HS system.
   ts_last_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_contact_prospect
-      - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_contact_prospect
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_contact_prospect
+    - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_contact_prospect
     description: Timestamp of the last contact prospect made by the contact, either by the CM or HS system.
   ts_first_classified_intent:
     lineage:
-      - datalake_sale_lead_flows.classified_lead_flow.ts_intent
+    - datalake_sale_lead_flows.classified_lead_flow.ts_intent
     description: Timestamp of the first visit intent performed by the contact via classifieds.
   ts_last_classified_intent:
     lineage:
-      - datalake_sale_lead_flows.classified_lead_flow.ts_intent
+    - datalake_sale_lead_flows.classified_lead_flow.ts_intent
     description: Timestamp of the last visit intent performed by the contact via classifieds.
   ts_first_visit_scheduling_event:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_scheduling_event
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_scheduling_event
     description: Timestamp of the first visit scheduling event, via 5A.
   ts_last_visit_scheduling_event:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_scheduling_event
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_scheduling_event
     description: Timestamp of the last visit scheduling event, via 5A.
   ts_first_tta_message_sent:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_tta_message_sent
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_tta_message_sent
     description: Timestamp of the first message event in the sent talk to agent.
   ts_last_tta_message_sent:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_tta_message_sent
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_tta_message_sent
     description: Timestamp of the last message event in the sent talk to agent.
   ts_first_booking_created_5a:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
     description: Timestamp of the first booking creation event, via 5A.
   ts_last_booking_created_5a:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
     description: Timestamp of the last booking creation event, via 5A.
   ts_first_visit_completed_5a:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_completed
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_completed
     description: Timestamp of first complete visit by contact, via 5A.
   ts_last_visit_completed_5a:
     lineage:
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_completed
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_completed
     description: Timestamp of last completed visit by contact, via 5A.
   ts_first_booking_created_cm:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
     description: Timestamp of the first booking creation event, via CM.
   ts_last_booking_created_cm:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_booking_created
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_booking_created
     description: Timestamp of the last booking creation event, via CM.
   ts_first_visit_completed_cm:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_visit_completed
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_visit_completed
     description: Timestamp of the first complete visit by the contact, via CM.
   ts_last_visit_completed_cm:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_visit_completed
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_visit_completed
     description: Timestamp of the last complete visit by the contact, via CM.
   ts_new_buyer_prospect:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_event
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_event
     description: Timestamp of the conversion of the contact into NBP, performed at the time of your first scheduled visit.
   ts_first_booking_created:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
     description: Timestamp of the first booking creation event, either via 5A or CM.
   ts_last_booking_created:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_booking_created
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_booking_created
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
     description: Timestamp of the last booking creation event, either via 5A or CM.
   ts_first_visit_completed:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_visit_completed
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_completed
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_visit_completed
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_completed
     description: Timestamp of the first complete visit by the contact, via 5A or CM.
   ts_last_visit_completed:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_visit_completed
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_completed
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_visit_completed
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_completed
     description: Timestamp of the last complete visit by the contact, via 5A or CM.
   ts_first_offer_submitted:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_offer_submitted
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_submitted
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_offer_submitted
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_submitted
     description: Timestamp of the first offer submitted by the buyer, via 5A or CM.
   ts_last_offer_submitted:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_offer_submitted
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_submitted
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_offer_submitted
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_submitted
     description: Timestamp of the last offer submitted by the buyer, via 5A or CM.
   ts_first_offer_accepted:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_sale_agreement_signed
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_accepted
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_sale_agreement_signed
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_accepted
     description: Timestamp of the first offer accepted by the buyer, via 5A or CM.
   ts_last_offer_accepted:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_sale_agreement_signed
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_accepted
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_sale_agreement_signed
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_accepted
     description: Timestamp of the last accepted offer from the buyer, via 5A or CM.
   ts_first_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_sale_agreement_signed
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_sale_agreement_signed
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_sale_agreement_signed
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_sale_agreement_signed
     description: Timestamp of the first CCV signed by the buyer, via 5A or CM.
   ts_last_sale_agreement_signed:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_sale_agreement_signed
-      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_sale_agreement_signed
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_sale_agreement_signed
+    - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_sale_agreement_signed
     description: Timestamp of the last CCV signed by the buyer, via 5A or CM.
   ts_first_combo_event_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_combo_event_contact_prospect
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_combo_event_contact_prospect
     description: Timestamp of the first event combo performed by the contact on the website/app.
   ts_last_combo_event_contact_prospect:
     lineage:
-      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_combo_event_contact_prospect
+    - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_combo_event_contact_prospect
     description: Timestamp of the last event combo performed by the contact on the website/app.
