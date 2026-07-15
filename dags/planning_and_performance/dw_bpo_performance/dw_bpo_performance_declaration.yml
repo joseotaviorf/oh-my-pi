@@ -58,7 +58,8 @@ workflow:
       extraction_type: full
     segments_perspective:
       partitions: [year, month, day]
-      extraction_type: full
+      extraction_type: incremental
+      merge_on: [sk_interaction]
     speech_call:
       partitions: [year, month, day]
       extraction_type: full

@@ -67,20 +67,32 @@ fact_service AS (
 
 satisfaction_ratings AS (
     SELECT
-        fa.sk_support_session,
-        fa.satisfaction_score,
-        fa.is_solved,
-        fa.ts_submitted
-    FROM dw_satisfaction_rating.fact_answer AS fa
-    LEFT JOIN datalake_satisfaction_rating.satisfaction_answers sa
-      ON sa.id_answer = fa.sk_answer
-    WHERE 
-      fa.ts_submitted >= '{load_start_date}'
-      AND fa.ts_submitted <= '{load_end_date}'
-      AND (
-          (sa.service_context IN ('call', 'call inapp') AND sa.score_description = 'satisfaction evaluation')
-       OR (sa.service_context NOT IN ('call', 'call inapp') OR sa.service_context IS NULL)
-      )
+        sk_support_session,
+        satisfaction_score,
+        is_solved,
+        ts_submitted
+    FROM (
+        SELECT
+            fa.sk_support_session,
+            fa.satisfaction_score,
+            fa.is_solved,
+            fa.ts_submitted,
+            ROW_NUMBER() OVER (
+                PARTITION BY fa.sk_support_session 
+                ORDER BY fa.ts_submitted DESC
+            ) AS rn
+        FROM dw_satisfaction_rating.fact_answer AS fa
+        LEFT JOIN datalake_satisfaction_rating.satisfaction_answers sa
+          ON sa.id_answer = fa.sk_answer
+        WHERE 
+          fa.ts_submitted >= '{load_start_date}'
+          AND fa.ts_submitted <= '{load_end_date}'
+          AND (
+              (sa.service_context IN ('call', 'call inapp') AND sa.score_description = 'satisfaction evaluation')
+           OR (sa.service_context NOT IN ('call', 'call inapp') OR sa.service_context IS NULL)
+          )
+    ) sub
+    WHERE rn = 1
 ),
 
 contacts AS (
@@ -268,8 +280,6 @@ segments_perspective AS (
     WHERE
       fcc.channel IN ('chat','call')
       AND fcc.origin NOT IN ('outbound')
-      AND fcc.ts_task_created >= '{load_start_date}'
-      AND fcc.ts_task_created <=  '{load_end_date}'
       AND dd.area = 'CX'
 )
 

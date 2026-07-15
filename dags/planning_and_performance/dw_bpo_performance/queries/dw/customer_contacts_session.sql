@@ -170,7 +170,7 @@ SELECT DISTINCT
          WHEN cc.agent_email LIKE '%atento%' THEN 'atento'
          WHEN cc.agent_email LIKE '%aec%' THEN 'aec'
          WHEN cc.agent_email LIKE '%quintoandar%' THEN 'quintoandar'
-         END as agent_organization_calc,
+         END as agent_organization_calc, 
              
     --cc.origin, 
     cc.channel, 
@@ -249,7 +249,7 @@ WHERE
 
 LEFT JOIN satisfaction_ratings AS sa
     ON sa.sk_support_session_fallback_ticket = COALESCE(NULLIF(cc.sk_support_session, '-1'), CAST(tp.sk_ticket AS STRING), CAST(cc.sk_ticket AS STRING))
-   AND sa.rn = 1 
+   AND sa.rn = 1 and sa.sk_support_session_fallback_ticket != '-1'
 
 LEFT JOIN -- Informações do first interaction
   customer_contacts cc_first
