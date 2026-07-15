@@ -412,3 +412,22 @@ steps:
         branch: [master, hotfix/*, forno]
         path: *databricks_sql_constructs_path
     depends_on: [setup]
+
+  validate-no-new-databricks-clusters:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make validate-no-new-databricks-clusters
+    when:
+      - event: pull_request
+        path: &no_new_databricks_clusters_path
+          include:
+            - "dags/**/*_cluster.yml"
+            - "dags/**/*_declaration.yml"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/validate_no_new_databricks_clusters.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/databricks_cluster_exceptions.yml"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno]
+        path: *no_new_databricks_clusters_path
+    depends_on: [setup]

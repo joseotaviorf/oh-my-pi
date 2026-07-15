@@ -1,0 +1,16 @@
+# DAGs allowed to introduce or keep shipping Databricks production runtime.
+# Changes to this file require @quintoandar/data-ingestion-code-owners approval
+# (see CODEOWNERS).
+#
+# Match by DAG folder name (`dag`) and/or repo-relative path (`path`), e.g.:
+#   dags/tech_platform/enrich_databricks_query_history
+#
+# exceptions:
+#   - dag: enrich_databricks_query_history
+#     reason: "Reads Databricks system tables; cannot run on EMR"
+#     approved_by: person@quintoandar.com.br
+#   - path: dags/platform/some_dag
+#     reason: "..."
+#     approved_by: person@quintoandar.com.br
+
+exceptions: []

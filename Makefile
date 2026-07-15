@@ -1062,6 +1062,25 @@ validate-databricks-sql-constructs-all:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_databricks_sql_constructs.py -a
 
+.PHONY: validate-no-new-databricks-clusters
+## Fail if a PR introduces Databricks prod runtime (new DAG or EMR→Databricks)
+validate-no-new-databricks-clusters:
+	@echo ""
+	@echo "Validating no new Databricks production cluster introductions"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_no_new_databricks_clusters.py -b "$(CI_COMMIT_BRANCH)"
+
+.PHONY: validate-no-new-databricks-clusters-all
+## List all DAGs with Databricks prod clusters (local audit)
+validate-no-new-databricks-clusters-all:
+	@echo ""
+	@echo "Listing DAGs with Databricks production runtime"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_no_new_databricks_clusters.py -a
+
 MAKE_TARGET ?=
 MAKE_EXTRA_ARGS ?=
 .PHONY: run-domain-validation
