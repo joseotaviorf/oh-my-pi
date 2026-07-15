@@ -11,7 +11,7 @@ description: >
   For CCV details (payment method, credit model, cancellation reason), join with dw_sale.dim_sale_agreement.
   Note: date surrogate keys use -1 as sentinel when the event has not occurred yet.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_offer:
     lineage:

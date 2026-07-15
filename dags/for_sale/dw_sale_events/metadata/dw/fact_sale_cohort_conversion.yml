@@ -1,31 +1,22 @@
----
 database_name: dw_sale
 table_name: fact_sale_cohort_conversion
-description: 'Transactional fact table that registers a row for each conversion in
-  the funnel of ForSale demand. All types of conversions that show up in this table
-  arte described in the dimension dw_sale.dim_sale_cohort_type. The goal of this table
-  is to make it easy to analyze conversions. Along with the conversion, we have several
-  dimension tables that contextualize it, such as the house, the region, the date,
-  the buyer, the seller, the agent, their contract, the booking, the offer, companies
-  for Rede Supply and Demand, and the business unit. '
+description: 'Transactional fact table that registers a row for each conversion in the funnel of ForSale demand. All types of conversions that show up in this table arte described in the dimension dw_sale.dim_sale_cohort_type. The goal of this table is to make it easy to analyze conversions. Along with the conversion, we have several dimension tables that contextualize it, such as the house, the region, the date, the buyer, the seller, the agent, their contract, the booking, the offer, companies for Rede Supply and Demand, and the business unit. '
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_sale_cohort_conversion:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_sale_demand_event
     - dw_sale.fact_sale_demand_event.sk_event_type
-    description: Primary key of the table.
+    description: Primary key of this fact, one row per conversion, derived from the base demand event and its conversion event type.
   sk_base_date:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_event_date
-    description: Date key of when the base event happened. For example, if it is a
-      VB2VC, this would be the VB date. Can be joined with dw_public.dim_date.
+    description: Date key of when the base event happened. For example, if it is a VB2VC, this would be the VB date. Can be joined with dw_public.dim_date.
   sk_conversion_date:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_event_date
-    description: Date key of when the conversion event happened. For example, if it
-      is a VB2VC, this would be the VC date. Can be joined with dw_public.dim_date.
+    description: Date key of when the conversion event happened. For example, if it is a VB2VC, this would be the VC date. Can be joined with dw_public.dim_date.
   sk_booking:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_booking
@@ -53,35 +44,23 @@ columns:
   sk_agent:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_agent
-    description: 'Key of the agent. Can be joined with dw_public.dim_agent. Note:
-      this is NOT the key of the user, so it cannot be joined with the primary key
-      of dim_user. However, it can be joined with dw_public.dim_user.dados_agente_id.
-      However, that is not recommended, since dim_user is much bigger than dim_agent,
-      reducing performance.'
+    description: 'Key of the agent. Can be joined with dw_public.dim_agent. Note: this is NOT the key of the user, so it cannot be joined with the primary key of dim_user. However, it can be joined with dw_public.dim_user.dados_agente_id. However, that is not recommended, since dim_user is much bigger than dim_agent, reducing performance.'
   sk_agent_work_contract:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_agent_work_contract
-    description: 'Key of the agent''s work contract at the start of the funnel. It
-      can be joined with dw_agent.dim_work_contract. Note: this is not the same as
-      id_work_contract, and cannot be joined with any table other than the dimension
-      previously stated. That is because dim_work_contract includes the contract,
-      but also aggregate contextual information, such as if the agent is active on
-      Main, and the business context (Sale, Rent or both).'
+    description: 'Key of the agent''s work contract at the start of the funnel. It can be joined with dw_agent.dim_work_contract. Note: this is not the same as id_work_contract, and cannot be joined with any table other than the dimension previously stated. That is because dim_work_contract includes the contract, but also aggregate contextual information, such as if the agent is active on Main, and the business context (Sale, Rent or both).'
   sk_business_unit:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_business_unit
-    description: Key of the agent's business context at the start of the funnel. There
-      are no associated dimensions yet, but it can be joined with datalake_hub_services_clean.business_unit.
+    description: Key of the agent's business context at the start of the funnel. There are no associated dimensions yet, but it can be joined with datalake_hub_services_clean.business_unit.
   sk_company_supply:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_company_supply
-    description: Key of the listing's origin company in Rede Supply, if that is the
-      case. It can be joined with dw_rede.dim_company.
+    description: Key of the listing's origin company in Rede Supply, if that is the case. It can be joined with dw_rede.dim_company.
   sk_company_demand:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_company_demand
-    description: Key of the agents's company in Rede Demand at the start of the funnel,
-      if that is the case. It can be joined with dw_rede.dim_company.
+    description: Key of the agents's company in Rede Demand at the start of the funnel, if that is the case. It can be joined with dw_rede.dim_company.
   sk_broker_supply:
     lineage:
     - dw_sale.fact_sale_demand_event.sk_broker_supply
@@ -105,36 +84,28 @@ columns:
   year:
     lineage:
     - dw_sale.fact_sale_demand_event.year
-    description: Year of when the base event happened. It is a partition key, so it
-      is performatic to filter or join by this column.
+    description: Year of when the base event happened. It is a partition key, so it is performatic to filter or join by this column.
   month:
     lineage:
     - dw_sale.fact_sale_demand_event.month
-    description: Month of when the base event happened. It is a partition key, so
-      it is performatic to filter or join by this column.
+    description: Month of when the base event happened. It is a partition key, so it is performatic to filter or join by this column.
   day:
     lineage:
     - dw_sale.fact_sale_demand_event.day
-    description: Day of when the base event happened. It is a partition key, so it
-      is performatic to filter or join by this column.
+    description: Day of when the base event happened. It is a partition key, so it is performatic to filter or join by this column.
   sk_cohort_type:
     description: Key of the type of conversion. Can be joined with dw_sale.dim_sale_cohort_type.
   days_to_conversion:
-    description: Amount of calendar days between the base event and the conversion
-      event.
+    description: Amount of calendar days between the base event and the conversion event.
   week_number:
-    description: Number of weeks in the conversion range. Not in calendar days! 0
-      means it converted within the same week (Monday-Sunday), 1 means it converted
-      on the following week, and so on.
+    description: Number of weeks in the conversion range. Not in calendar days! 0 means it converted within the same week (Monday-Sunday), 1 means it converted on the following week, and so on.
   ts_base_event:
     lineage:
     - dw_sale.fact_sale_demand_event.ts_event
-    description: Timestamp when the base event happened, in UTC. For example, if it is a
-      VB2VC, this would be the VB timestamp.
+    description: Timestamp when the base event happened, in UTC. For example, if it is a VB2VC, this would be the VB timestamp.
   ts_conversion_event:
     lineage:
     - dw_sale.fact_sale_demand_event.ts_event
-    description: Timestamp when the conversion event happened, in UTC. For example, if it
-      is a VB2VC, this would be the VC timestamp.
+    description: Timestamp when the conversion event happened, in UTC. For example, if it is a VB2VC, this would be the VC timestamp.
   ts_load:
     description: Timestamp of when the table loaded a given row.

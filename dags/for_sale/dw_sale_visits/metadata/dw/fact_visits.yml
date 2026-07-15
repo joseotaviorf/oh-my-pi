@@ -1,9 +1,8 @@
----
 database_name: dw_sale
 table_name: fact_visits
-description: 'Every row in this fact table is a ForSale visit booking.'
+description: Every row in this fact table is a ForSale visit booking.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_booking:
     lineage:
@@ -44,11 +43,11 @@ columns:
   sk_agent:
     lineage:
     - datalake_sale_visit.sale_visit.id_agent
-    description: 'ID of the agent associated with the booking. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id'
+    description: ID of the agent associated with the booking. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id
   sk_user_agent:
     lineage:
     - datalake_sale_visit.sale_visit.id_user_agent
-    description: 'ID of the agent''s user associated with the booking. Can be joined with dw_public.dim_agent.id_user or dw_public.dim_user.sk_user'
+    description: ID of the agent's user associated with the booking. Can be joined with dw_public.dim_agent.id_user or dw_public.dim_user.sk_user
   sk_user_en:
     lineage:
     - datalake_sale_visit.sale_visit.id_user_en
@@ -56,7 +55,7 @@ columns:
   sk_fixed_agent:
     lineage:
     - datalake_sale_visit.sale_visit.id_sale_fixed_agent
-    description: 'ID of the fixed agent associated with the buyer when the booking was created. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id'
+    description: ID of the fixed agent associated with the buyer when the booking was created. Can be joined with dw_public.dim_agent.sk_agent or dw_public.dim_user.dados_agente_id
   sk_buyer:
     lineage:
     - datalake_sale_visit.sale_visit.id_buyer
@@ -112,28 +111,23 @@ columns:
   sk_booking_created_date:
     lineage:
     - datalake_sale_visit.sale_visit.ts_booking_created
-    description: Date key to be joined with dim_date. Key to identify date of booking.
-      creation
+    description: Date key to be joined with dim_date. Key to identify date of booking. creation
   sk_visit_date:
     lineage:
     - datalake_sale_visit.sale_visit.ts_visit
-    description: Date key to be joined with dim_date. Key to identify date of visit.
-      completed
+    description: Date key to be joined with dim_date. Key to identify date of visit. completed
   sk_visit_canceled_date:
     lineage:
     - datalake_sale_visit.sale_visit.ts_visit_canceled
-    description: Date key to be joined with dim_date. Key to identify date of visit.
-      canceled
+    description: Date key to be joined with dim_date. Key to identify date of visit. canceled
   sk_visit_completed_date:
     lineage:
     - datalake_sale_visit.sale_visit.ts_visit_completed
-    description: Date key to be joined with dim_date. Key to identify date of visit
-      completed.
+    description: Date key to be joined with dim_date. Key to identify date of visit completed.
   sk_visit_follow_up_date:
     lineage:
     - datalake_sale_visit.sale_visit.ts_visit_follow_up
-    description: Date key to be joined with dim_date. Key to identify date of visit
-      follow up.
+    description: Date key to be joined with dim_date. Key to identify date of visit follow up.
   sk_buyer_review_rating_date:
     lineage:
     - datalake_sale_visit.sale_visit.ts_buyer_review_rating
@@ -158,8 +152,7 @@ columns:
   is_house_rented:
     lineage:
     - datalake_sale_visit.sale_visit.is_house_rented
-    description: True if the house booked had an active rental contract at 5A at the
-      booking date
+    description: True if the house booked had an active rental contract at 5A at the booking date
   is_virtual_visit:
     lineage:
     - datalake_sale_visit.sale_visit.is_virtual_visit
@@ -229,4 +222,4 @@ columns:
     - datalake_sale_visit.sale_visit.ts_buyer_review_rating
     description: Timestamp of the buyer booking review.
   ts_load:
-    description: 'Timestamp of when the data was last loaded in this table.'
+    description: Timestamp of when the data was last loaded in this table.

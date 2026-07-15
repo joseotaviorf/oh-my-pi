@@ -1,43 +1,42 @@
----
 database_name: dw_sale
 table_name: dim_sale_offer_user_info
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: This is a Junk dimension table. It contains all the possible combinations for some low cardinality characteristics of an user.
 columns:
   sk_user_info:
     description: Unique id for each combination of user characteristics.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.sk_user_info
+    - datalake_sale_offer_flows.sale_offer_users_info.sk_user_info
   user_type:
     description: User type, it can be BUYER or SELLER.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.user_type
+    - datalake_sale_offer_flows.sale_offer_users_info.user_type
   ccv_buyer_status:
     description: Flag from docx databases that indicates if this user will be on the sale agreement document.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.ccv_buyer_status
+    - datalake_sale_offer_flows.sale_offer_users_info.ccv_buyer_status
   seller_ccv_signer_status:
     description: Indicates if this seller is a sale agreement signer.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.seller_ccv_signer_status
+    - datalake_sale_offer_flows.sale_offer_users_info.seller_ccv_signer_status
   buyer_ccv_signer_status:
     description: For buyers this column indicates if this user is a ccv signer or not.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.buyer_ccv_signer_status
+    - datalake_sale_offer_flows.sale_offer_users_info.buyer_ccv_signer_status
   user_legal_type:
     description: Indicates if this user is a physical or legal person.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.user_legal_type
+    - datalake_sale_offer_flows.sale_offer_users_info.user_legal_type
   original_user_status:
     description: Indicates if this user is the one that made the offer in case of buyer and for seller indicates if it's the one that accepted. It can only exists 1 for each user type for each offer
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.original_user_status
+    - datalake_sale_offer_flows.sale_offer_users_info.original_user_status
   income_partner_status:
     description: Indicates if this user is participating on this offer as an income partner.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.income_partner_status
+    - datalake_sale_offer_flows.sale_offer_users_info.income_partner_status
   joint_buyer_status:
     description: Indicates if this user has another user as buyer for this offer.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.joint_buyer_status
+    - datalake_sale_offer_flows.sale_offer_users_info.joint_buyer_status

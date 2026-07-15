@@ -1,12 +1,8 @@
 database_name: dw_sale
 table_name: dim_sale_cohort_type
-description: Dimension table formed by the combination of all events in dim_sale_event_type,
-  representing conversions. For example, VISIT_BOOKED combined with VISIT_COMPLETED
-  would result in a VISIT_BOOKED_TO_VISIT_COMPLETED conversion, with a VB2VC abbreviation.
-  This table also has columns used to tell how much time it took to convert, grouped
-  in a way that makes analysis easier.
+description: Dimension table formed by the combination of all events in dim_sale_event_type, representing conversions. For example, VISIT_BOOKED combined with VISIT_COMPLETED would result in a VISIT_BOOKED_TO_VISIT_COMPLETED conversion, with a VB2VC abbreviation. This table also has columns used to tell how much time it took to convert, grouped in a way that makes analysis easier.
 domain: For Sale
-owner: ae-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_cohort_type:
     lineage:
@@ -19,47 +15,31 @@ columns:
   conversion_name:
     lineage:
     - dw_sale.dim_sale_event_type.event_name
-    description: Name of the conversion. It follows the standard of UPPER_SNAKE_CASE.
-      For example, VISIT_COMPLETED_TO_OFFER_SUBMITTED.
+    description: Name of the conversion. It follows the standard of UPPER_SNAKE_CASE. For example, VISIT_COMPLETED_TO_OFFER_SUBMITTED.
   first_event_abbreviation:
     lineage:
     - dw_sale.dim_sale_event_type.abbreviation
-    description: Abbreviation of the base event. For example, in a VB2VC conversion,
-      this would be VB.
+    description: Abbreviation of the base event. For example, in a VB2VC conversion, this would be VB.
   second_event_abbreviation:
     lineage:
     - dw_sale.dim_sale_event_type.abbreviation
-    description: Abbreviation of the conversion event. For example, in a VB2VC conversion,
-      this would be VC.
+    description: Abbreviation of the conversion event. For example, in a VB2VC conversion, this would be VC.
   first_event_name:
     lineage:
     - dw_sale.dim_sale_event_type.event_name
-    description: Name of the base event. For example, in a VB2VC conversion, this
-      would be VISIT_BOOKED.
+    description: Name of the base event. For example, in a VB2VC conversion, this would be VISIT_BOOKED.
   second_event_name:
     lineage:
     - dw_sale.dim_sale_event_type.event_name
-    description: Name of the conversion event. For example, in a VB2VC conversion,
-      this would be VISIT_COMPLETED.
+    description: Name of the conversion event. For example, in a VB2VC conversion, this would be VISIT_COMPLETED.
   week_number_up_to_20:
-    description: Number of weeks in the conversion range, limited by 20. E.g., W0,
-      W5, W15 or W2O+. Note, W0 means it was converted in the same week, and W1 means
-      it was converted in the following week, which can mean 1 calendar day (first
-      week Sunday to second week Monday) or even 13 calendar days (first week Monday
-      to second week Sunday)
+    description: Number of weeks in the conversion range, limited by 20. E.g., W0, W5, W15 or W2O+. Note, W0 means it was converted in the same week, and W1 means it was converted in the following week, which can mean 1 calendar day (first week Sunday to second week Monday) or even 13 calendar days (first week Monday to second week Sunday)
   week_number_up_to_5:
-    description: Number of weeks in the conversion range, limited by 5. E.g., W0,
-      W2, or W5+. Note, W0 means it was converted in the same week, and W1 means it
-      was converted in the following week, which can mean 1 calendar day (first week
-      Sunday to second week Monday) or even 13 calendar days (first week Monday to
-      second week Sunday)
+    description: Number of weeks in the conversion range, limited by 5. E.g., W0, W2, or W5+. Note, W0 means it was converted in the same week, and W1 means it was converted in the following week, which can mean 1 calendar day (first week Sunday to second week Monday) or even 13 calendar days (first week Monday to second week Sunday)
   calendar_days:
-    description: Number of calendar days the conversion took, limited by 140. E.g.,
-      0, 20, 140+.
+    description: Number of calendar days the conversion took, limited by 140. E.g., 0, 20, 140+.
   calendar_days_exponential:
-    description: Number of calendar days the conversion took, grouped by first week
-      (0-6), second week (7-14), second half of month, second month, third month,
-      fourth month, and after four months.
+    description: Number of calendar days the conversion took, grouped by first week (0-6), second week (7-14), second half of month, second month, third month, fourth month, and after four months.
     categories:
       0-6: First 7 calendar days
       7-14: Calendar days 7-14
@@ -69,10 +49,8 @@ columns:
       91-120: Calendar days 91-120, fourth month
       121+: After the fourth month
   calendar_days_by_week:
-    description: Number of calendar days the conversion took, grouped by 7 day ranges.
-      E.g., 0-6, 133-139, 140+.
+    description: Number of calendar days the conversion took, grouped by 7 day ranges. E.g., 0-6, 133-139, 140+.
   calendar_days_by_month:
-    description: Number of calendar days the conversion took, grouped by 30 day ranges.
-      E.g., 0-29, 90-119, 120+.
+    description: Number of calendar days the conversion took, grouped by 30 day ranges. E.g., 0-29, 90-119, 120+.
   ts_load:
     description: Timestamp indicating when this table was loaded.

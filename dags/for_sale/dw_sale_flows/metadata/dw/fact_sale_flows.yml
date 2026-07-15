@@ -128,8 +128,7 @@ columns:
   first_event:
     lineage:
     - datalake_sale_flows.sale_flow.first_event
-    description: Which event started the flow. It could be a booking, an offer or
-      a talk_to_agent message
+    description: Which event started the flow. It could be a booking, an offer or a talk_to_agent message
     categories:
       booking: ''
       offer: ''
@@ -137,8 +136,7 @@ columns:
   higher_intent_before_offer:
     lineage:
     - datalake_sale_flows.sale_flow.higher_intent_before_offer
-    description: Indicates the event with the higher intent before offer submission
-      (VC>VB>TTA> no event = Offer_only)
+    description: Indicates the event with the higher intent before offer submission (VC>VB>TTA> no event = Offer_only)
     categories:
       Direct_Offer: Made an offer without performing any event before.
       TTA_before_OS: Talked to the agent before the offer.
@@ -148,8 +146,7 @@ columns:
   higher_intent_after_offer:
     lineage:
     - datalake_sale_flows.sale_flow.higher_intent_after_offer
-    description: Indicates the event with the higher intent after offer submission
-      (VC>VB>TTA> no event = Direct_Offer)
+    description: Indicates the event with the higher intent after offer submission (VC>VB>TTA> no event = Direct_Offer)
     categories:
       TTA_after_OS: Talked to the agent after the offer.
       VB_after_OS: Booked a visit in the listing after the offer.
@@ -223,18 +220,15 @@ columns:
   days_first_publication_to_first_event:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_first_event
-    description: Days between the house first publication and the first event in the
-      sale flow
+    description: Days between the house first publication and the first event in the sale flow
   days_first_publication_to_first_booking_created:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_first_booking_created
-    description: Days between the house first publication and the first booking in
-      the sale flow
+    description: Days between the house first publication and the first booking in the sale flow
   days_first_publication_to_first_visit_completed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_first_visit_completed
-    description: Days between the house first publication and the first visit completed
-      in the sale flow
+    description: Days between the house first publication and the first visit completed in the sale flow
   days_first_publication_to_first_offer_submitted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_first_offer_submitted
@@ -243,13 +237,11 @@ columns:
   days_first_publication_to_first_offer_accepted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_first_offer_accepted
-    description: Days between the house first publication and the first offer accepted
-      in the sale flow
+    description: Days between the house first publication and the first offer accepted in the sale flow
   days_first_publication_to_sale_agreement_signed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_sale_agreement_signed
-    description: Days between the house first publication and sale agreement signed
-      in the sale flow
+    description: Days between the house first publication and sale agreement signed in the sale flow
   days_first_publication_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_publication_to_house_registry_ended
@@ -295,8 +287,7 @@ columns:
   days_first_event_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_event_to_house_registry_ended
-    description: Days between the first event and house registry ended in the sale
-      flow. (it means that the sale process was completed)
+    description: Days between the first event and house registry ended in the sale flow. (it means that the sale process was completed)
   days_first_booking_created_to_first_visit_completed:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_booking_created_to_first_visit_completed
@@ -334,8 +325,7 @@ columns:
   days_first_booking_created_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_booking_created_to_house_registry_ended
-    description: Days between the first booking and house registry ended in the sale
-      flow. (it means that the sale process was completed)
+    description: Days between the first booking and house registry ended in the sale flow. (it means that the sale process was completed)
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_visit_completed_to_first_offer_submitted
@@ -364,8 +354,7 @@ columns:
   days_first_visit_completed_to_house_registry_ended:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_visit_completed_to_house_registry_ended
-    description: Days between the first visit completed and house registry ended in
-      the sale flow (it means that the sale process was completed)
+    description: Days between the first visit completed and house registry ended in the sale flow (it means that the sale process was completed)
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
     - datalake_sale_flows.sale_flow.days_first_offer_submitted_to_first_offer_accepted
@@ -468,8 +457,7 @@ columns:
     - datalake_talk_to_agent.talk_to_agent_events.branded
     - datalake_amplitude_visit.amplitude_visit.branded
     - datalake_tracked_events.attribution_cross_channel.final_attribution_branded
-    description: If the sale flow came from a branded campaign as defined by the lead
-      taxonomy
+    description: If the sale flow came from a branded campaign as defined by the lead taxonomy
   final_attribution_origin:
     description: >
       Final origin assigned by the cross-channel attribution model
@@ -550,52 +538,51 @@ columns:
       Web Mobile: ''
   ts_first_listing:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_listing
+    - datalake_sale_flows.sale_flow.ts_first_listing
     description: Timestamp date of first publication of the house in sale context
   ts_first_event:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_event
+    - datalake_sale_flows.sale_flow.ts_first_event
     description: Timestamp date first event of the flow
   ts_first_tta_message_sent:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_tta_message_sent
-    description: Timestamp date of the first message sent through talk to agent feature in
-      the flow
+    - datalake_sale_flows.sale_flow.ts_first_tta_message_sent
+    description: Timestamp date of the first message sent through talk to agent feature in the flow
   ts_first_booking_created:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_booking_created
+    - datalake_sale_flows.sale_flow.ts_first_booking_created
     description: Timestamp date of the first booking created in the sale flow
   ts_first_visit_completed:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_visit_completed
+    - datalake_sale_flows.sale_flow.ts_first_visit_completed
     description: Timestamp date of the first visit completed in the sale flow
   ts_first_offer_submitted:
     lineage:
-      - datalake_sale_flows.sale_flow.ts_first_offer_submitted
+    - datalake_sale_flows.sale_flow.ts_first_offer_submitted
     description: Timestamp date of the first offer submitted in the flow
   ts_first_offer_accepted:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_first_offer_accepted
+    - datalake_sale_flows.sale_flow.dt_first_offer_accepted
     description: Timestamp date of the first offer acceptance in the flow
   ts_first_offer_dismissed:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_first_offer_dismissed
+    - datalake_sale_flows.sale_flow.dt_first_offer_dismissed
     description: Timestamp date of the first offer dismissed in the flow
   ts_sale_agreement_created:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_sale_agreement_created
+    - datalake_sale_flows.sale_flow.dt_sale_agreement_created
     description: Timestamp date of sale agreement creation
   ts_sale_agreement_signed:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+    - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
     description: Timestamp date of sale agreement signature
   ts_sale_agreement_cancelled:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_sale_agreement_cancelled
+    - datalake_sale_flows.sale_flow.dt_sale_agreement_cancelled
     description: Timestamp date of sale agreement cancellation
   ts_house_registry_ended:
     lineage:
-      - datalake_sale_flows.sale_flow.dt_house_registry_ended
+    - datalake_sale_flows.sale_flow.dt_house_registry_ended
     description: Timestamp date of the end of house registry transfered to buyer's name
   ts_load:
     description: Timestamp indicating when this table was loaded.

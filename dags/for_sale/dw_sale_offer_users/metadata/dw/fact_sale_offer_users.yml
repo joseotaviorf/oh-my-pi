@@ -1,7 +1,6 @@
----
 database_name: dw_sale
 table_name: fact_sale_offer_users
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: Fact table relating each user involved with an offer. In the case of users invited to participate in an offer it will only show them after the user accepts the invite.
 columns:
@@ -10,48 +9,48 @@ columns:
   sk_offer:
     description: Offer id. Can relate with dim_offer and dim_sale_agreement, for example.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_firestore
+    - datalake_sale_offer_flows.sale_offer_users.id_firestore
   sk_user_external:
     description: User id on dw_public.dim_user.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_external
+    - datalake_sale_offer_flows.sale_offer_users.id_external
   sk_user_sales_flow:
     description: Id used on sales flow databases.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_user
+    - datalake_sale_offer_flows.sale_offer_users.id_user
   sk_user_info:
     description: This id is used to get more information about this user on dim_sale_offer_user_info
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.sk_user_info
+    - datalake_sale_offer_flows.sale_offer_users_info.sk_user_info
   sk_inviter:
     description: Inviter user id on dw_public.dim_user.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_inviter
+    - datalake_sale_offer_flows.sale_offer_users.id_inviter
   sk_house:
-    description: House Id.
+    description: Surrogate key for the property listing visited during the schedule.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_house
+    - datalake_sale_offer_flows.sale_offer_users.id_house
   sk_house_docx_folder:
     description: House folder ID on docx.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_house_docx_folder
+    - datalake_sale_offer_flows.sale_offer_users.id_house_docx_folder
   sk_user_docx_folder:
-    description: User folder ID on docx.
+    description: Identifier of the document storage folder (docx) holding this user's paperwork for the offer.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_user_docx_folder
+    - datalake_sale_offer_flows.sale_offer_users.id_user_docx_folder
   sk_date_user_invited:
     description: Invite date on ID format compatible with dw_public.dim_date.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.ts_user_invited
+    - datalake_sale_offer_flows.sale_offer_users.ts_user_invited
   sk_date_user_invite_accepted:
     description: Invite accepted date on ID format compatible with dw_public.dim_date.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.ts_user_invite_accepted
+    - datalake_sale_offer_flows.sale_offer_users_info.ts_user_invite_accepted
   ts_user_invited:
     description: Invite timestamp.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.ts_user_invited
+    - datalake_sale_offer_flows.sale_offer_users.ts_user_invited
   ts_user_invite_accepted:
     description: Timestamp related to the time when the invitation to join the offer was accepted.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users_info.ts_user_invite_accepted
+    - datalake_sale_offer_flows.sale_offer_users_info.ts_user_invite_accepted

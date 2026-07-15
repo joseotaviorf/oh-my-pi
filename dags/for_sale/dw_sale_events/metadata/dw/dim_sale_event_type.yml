@@ -1,5 +1,6 @@
----
 database_name: dw_sale
 table_name: dim_sale_event_type
 domain: For Sale
-columns:
+columns: {}
+owner: guilherme.rocha@quintoandar.com.br
+description: Dimension holding the distinct For Sale demand event types (for example VISIT_BOOKED, VISIT_COMPLETED, OFFER_SUBMITTED) with their names and abbreviations. One row per event type; referenced by dw_sale.fact_sale_demand_event and combined into dw_sale.dim_sale_cohort_type to define conversions.

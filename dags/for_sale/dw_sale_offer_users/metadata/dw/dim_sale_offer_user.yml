@@ -1,74 +1,72 @@
----
 database_name: dw_sale
 table_name: dim_sale_offer_user
-owner: herivelto.junior@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
 description: This is a Junk dimension table. It contains all the possible combinations for some low cardinality characteristics of an user.
 columns:
   sk_user_sales_flow:
     description: Id used on sales flow databases.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_user
+    - datalake_sale_offer_flows.sale_offer_users.id_user
   sk_user_external:
     description: User id on dw_public.dim_user.
     lineage:
-      - datalake_sale_offer_flows.sale_offer_users.id_external
+    - datalake_sale_offer_flows.sale_offer_users.id_external
   name:
-    description: User name.
+    description: Human-readable display name associated with the person or entity in this row.
     lineage:
-      - dw_public.dim_user.nome
+    - dw_public.dim_user.nome
   gender:
-    description: User gender.
+    description: Gender of the offer user, sourced from the user master record.
     lineage:
-      - dw_public.dim_user.sexo
+    - dw_public.dim_user.sexo
   email:
-    description: User email.
+    description: Contact email address used for notifications and identity matching.
     lineage:
-      - dw_public.dim_user.email
+    - dw_public.dim_user.email
   phone_number:
-    description: User phone number.
+    description: Primary contact phone number of the offer user.
     lineage:
-      - dw_public.dim_user.telefone_principal
+    - dw_public.dim_user.telefone_principal
   address:
-    description: User address.
+    description: Street address registered for the offer user.
     lineage:
-      - dw_public.dim_user.endereco
+    - dw_public.dim_user.endereco
   postal_code:
-    description: User postal code (CEP).
+    description: Postal code (CEP) of the offer user's registered address.
     lineage:
-      - dw_public.dim_user.cep
+    - dw_public.dim_user.cep
   city:
-    description: User postal city.
+    description: City of the offer user's registered address.
     lineage:
-      - dw_public.dim_user.cidade
+    - dw_public.dim_user.cidade
   state:
-    description: User postal state.
+    description: State (federative unit) of the offer user's registered address.
     lineage:
-      - dw_public.dim_user.estado_nome
+    - dw_public.dim_user.estado_nome
   houses_owned:
     description: Houses quantity that this user owns.
     lineage:
-      - dw_public.dim_user.houses_owned
+    - dw_public.dim_user.houses_owned
   quintoandar_houses_owned:
     description: Houses quantity that this user owns and are listed on 5A.
     lineage:
-      - dw_public.dim_user.quintoandar_houses_owned
+    - dw_public.dim_user.quintoandar_houses_owned
   owns_a_property:
     description: Flag indicating if this user owns a property.
     lineage:
-      - dw_public.dim_user.tem_imovel
+    - dw_public.dim_user.tem_imovel
   active_contract_status:
     description: Flag indicating if this user has an active contract (Rent contract) on 5A.
     lineage:
-      - dw_public.dim_user.tem_contrato_ativo
+    - dw_public.dim_user.tem_contrato_ativo
   user_status:
     description: Flag indicating if this user is active on 5A platform.
     lineage:
-      - dw_public.dim_user.active
+    - dw_public.dim_user.active
   block_status:
     description: Flag indicating if this user is blocked on 5A platform.
     lineage:
-      - dw_public.dim_user.bloqueado
+    - dw_public.dim_user.bloqueado
   alternative_email:
-    description: User alternative_email.
-    
+    description: Secondary email address registered for the offer user, when provided.

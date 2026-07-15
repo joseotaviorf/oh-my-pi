@@ -4,11 +4,11 @@ description: >
   This table shows details and characteristics about signed sale agreements (CCV
   - Contrato de Compra e Venda).
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
-      - datalake_sale_offer.sale_offer.id_offer
+    - datalake_sale_offer.sale_offer.id_offer
     description: Offer unique identifier.
   ccv_type:
     lineage:
@@ -62,13 +62,13 @@ columns:
       - datalake_sale_offer.sale_offer.sale_agreement_cancellation_reason
     description: Reason for cancellation of the sale agreement (CCV), when applicable.
     categories:
-      Buyer Desistiu: ""
-      COVID: ""
-      Modelo QA: ""
-      Não se Aplica: ""
-      Reprovado Crédito: ""
-      Reprovado Diligência: ""
-      Seller Desistiu: ""
+      Buyer Desistiu: ''
+      COVID: ''
+      Modelo QA: ''
+      Não se Aplica: ''
+      Reprovado Crédito: ''
+      Reprovado Diligência: ''
+      Seller Desistiu: ''
   sale_price_agreed:
     lineage:
       - datalake_sale_offer.sale_offer.sale_price_agreed
@@ -127,10 +127,10 @@ columns:
       - datalake_sale_offer.sale_offer.is_ccv_5a_model
     description: Derived CCV model description, based on the is_5a_model flag.
     categories:
-      Not Answered: ""
-      Not a 5A model: ""
-      Is a 5A model: ""
-      Undefined: ""
+      Not Answered: ''
+      Not a 5A model: ''
+      Is a 5A model: ''
+      Undefined: ''
   closing_status:
     lineage:
       - datalake_sale_offer.sale_offer.closing_status

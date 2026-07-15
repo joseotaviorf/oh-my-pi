@@ -9,7 +9,7 @@ description: >
   Critical: tags_from_salesflow is the mandatory filter column for excluding legacy Casa Mineira flows
   (tags #fluxo-cm, #casa-mineira, #fluxo_cm) from 1P analyses. This column lives HERE, not in dim_sale_agreement.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: helder.rodrigues@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
