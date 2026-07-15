@@ -1,24 +1,21 @@
 cluster:
   type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
+    # j-1PHM2FYBXOE91: fact_listings + fact_listing_status ran concurrently with only
+    # ~1 executor each on 2 core + 1 Spot task; fat input splits (brokers/house/
+    # sale_listing_status) became long stragglers. All-core OD + smaller scan targets.
     core_nodes:
-      target_on_demand: 2
+      target_on_demand: 6
       target_spot: 0
       instance_types:
       - r6g.2xlarge
       - r7g.2xlarge
       - r6i.2xlarge
-    task_nodes:
-      instance_types:
-      - r6g.2xlarge
-      - r7g.2xlarge
-      - r6i.2xlarge
-      target_on_demand: 0
-      target_spot: 1
-      allocation_strategy: price-capacity-optimized
-      bid_price_percentage: 100
     aws_attributes:
       ebs_volume_size: 200
+    spark_conf:
+      spark.sql.files.maxPartitionBytes: "33554432"
+      spark.sql.shuffle.partitions: "200"
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
