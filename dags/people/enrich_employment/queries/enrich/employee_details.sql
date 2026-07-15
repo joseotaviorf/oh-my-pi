@@ -1,10 +1,14 @@
-WITH 
-terminations AS (
+WITH
+terminations_ranked AS (
   SELECT
     aa.id_period_of_service,
     aa.action_code,
     al.description AS dismissal_type,
-    art.action_reason AS dismissal_reason
+    art.action_reason AS dismissal_reason,
+    ROW_NUMBER() OVER (
+      PARTITION BY aa.id_period_of_service, aa.assignment_status_type
+      ORDER BY aa.dt_effective_ended ASC
+    ) AS rn
   FROM
     datalake_pin_core_clean.all_assignments AS aa
   LEFT JOIN
@@ -16,31 +20,41 @@ terminations AS (
   LEFT JOIN
     datalake_pin_core_clean.action_reason_translation AS art
       ON art.id_action_reason = arb.id_action_reason
-      AND art.language = 'PTB'  
+      AND art.language = 'PTB'
   WHERE
     aa.is_primary
     AND aa.assignment_type IN ('E', 'C')
     AND aa.action_code IN (
-      'TERMINATION', 
-      'RESIGNATION', 
+      'TERMINATION',
+      'RESIGNATION',
       'DEATH',
       'GLB_TRANSFER',
       'EXPATRIADO'
     )
-    AND aa.assignment_status_type = 'INACTIVE' 
-    QUALIFY 
-      ROW_NUMBER() OVER(
-        PARTITION BY id_period_of_service, assignment_status_type 
-        ORDER BY dt_effective_ended ASC
-      ) = 1
+    AND aa.assignment_status_type = 'INACTIVE'
 ),
-current_assignments AS (
-  SELECT 
-    id_period_of_service, 
-    legislation_code, 
+terminations AS (
+  SELECT
+    id_period_of_service,
+    action_code,
+    dismissal_type,
+    dismissal_reason
+  FROM
+    terminations_ranked
+  WHERE
+    rn = 1
+),
+current_assignments_ranked AS (
+  SELECT
+    id_period_of_service,
+    legislation_code,
     assignment_status_type,
-    dt_projected_started
-  FROM 
+    dt_projected_started,
+    ROW_NUMBER() OVER (
+      PARTITION BY id_period_of_service
+      ORDER BY dt_effective_ended ASC
+    ) AS rn
+  FROM
     datalake_pin_core_clean.all_assignments
   WHERE
     (
@@ -54,11 +68,17 @@ current_assignments AS (
       )
     )
     AND dt_effective_ended >= DATE('{load_end_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY id_period_of_service 
-      ORDER BY dt_effective_ended ASC
-    ) = 1
+),
+current_assignments AS (
+  SELECT
+    id_period_of_service,
+    legislation_code,
+    assignment_status_type,
+    dt_projected_started
+  FROM
+    current_assignments_ranked
+  WHERE
+    rn = 1
 )
 
 SELECT
@@ -77,16 +97,16 @@ SELECT
   pp.dt_actual_termination,
   pp.dt_notified_termination,
   NOW() AS ts_load
-FROM 
+FROM
   datalake_people.identifier_mapping AS ids
 INNER JOIN
-  current_assignments AS ca 
+  current_assignments AS ca
     ON ca.id_period_of_service = ids.id_period_of_service
-LEFT JOIN 
-  terminations AS t 
+LEFT JOIN
+  terminations AS t
     ON t.id_period_of_service = ids.id_period_of_service
-LEFT JOIN 
-  datalake_pin_core_clean.periods_of_service AS pp 
+LEFT JOIN
+  datalake_pin_core_clean.periods_of_service AS pp
     ON pp.id_period_of_service = ids.id_period_of_service
-WHERE 
+WHERE
   NOT ids.is_user_test
