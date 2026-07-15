@@ -1,6 +1,22 @@
-WITH 
+WITH
+filtered_assignments_ranked AS (
+  SELECT
+    assignment_number,
+    id_assignment,
+    id_person,
+    action_code,
+    reason_code,
+    dt_effective_started,
+    dt_effective_ended,
+    ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_started DESC) AS rn
+  FROM
+    datalake_pin_core_clean.all_assignments
+  WHERE
+    assignment_type IN ('E', 'C')
+    AND dt_effective_started <= DATE('{load_start_date}')
+),
 filtered_assignments AS (
-  SELECT 
+  SELECT
     assignment_number,
     id_assignment,
     id_person,
@@ -8,16 +24,12 @@ filtered_assignments AS (
     reason_code,
     dt_effective_started,
     dt_effective_ended
-  FROM 
-    datalake_pin_core_clean.all_assignments
-  WHERE 
-    assignment_type IN ('E', 'C')
-    AND dt_effective_started <= DATE('{load_start_date}')
-  QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_started DESC) = 1
+  FROM
+    filtered_assignments_ranked
+  WHERE
+    rn = 1
 )
-
-SELECT 
+SELECT
   a.id_assignment,
   s.id_manager_assignment,
   a.id_person,
@@ -37,9 +49,9 @@ SELECT
   s.ts_created,
   s.ts_updated,
   NOW() AS ts_load
-FROM 
+FROM
   filtered_assignments AS a
-LEFT JOIN 
+LEFT JOIN
   datalake_pin_core_clean.assignment_supervisor AS s
     ON a.id_assignment = s.id_assignment
 LEFT JOIN
