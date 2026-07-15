@@ -10,7 +10,7 @@ workflow:
   layer: raw
   load_spark_job: load_amplitude_new_raw
   custom_schema: amplitude_events
-  execution_timeout_hours: 3
+  execution_timeout_hours: 5
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
