@@ -20,16 +20,15 @@ agent_data_updated AS (
 agent_external_reference AS (
     SELECT
         aer.id_agent,
-        FIRST(aer.value) FILTER(WHERE aer.type = 'DADOS_AGENTE_ID') AS id_agent_data,
-        FIRST(u.id) AS id_user
+        CAST(aer.value AS BIGINT) AS id_agent_data,
+        u.id AS id_user
     FROM
         datalake_ebdb_clean.agent_external_reference AS aer
     LEFT JOIN
         datalake_ebdb_clean.user AS u
             ON CAST(aer.value AS BIGINT) = u.id_agent
-            AND aer.type = 'DADOS_AGENTE_ID'
-    GROUP BY
-        aer.id_agent
+    WHERE
+        aer.type = 'DADOS_AGENTE_ID'
 ),
 legacy_agent_data_business_contexts AS (
     SELECT
@@ -74,7 +73,7 @@ new_business_contexts AS (
 ),
 legacy_business_contexts AS (
     SELECT
-        XXHASH64(bc.id_agent_data, bc.business_context, bc.ts_revision_started) AS id_agent_business_context,
+        XXHASH64(bc.id_agent_data, new.id_agent, bc.business_context, bc.ts_revision_started) AS id_agent_business_context,
         new.id_agent,
         bc.id_agent_data,
         user.id AS id_user,
