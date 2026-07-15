@@ -307,7 +307,7 @@ cases_perspective AS (
         c.type as case_type, 
         CAST(c.created_date AS TIMESTAMP) - INTERVAL 3 HOURS as ts_created, 
         sd.ts_solved,
-        CAST(c.close_date AS TIMESTAMP) - INTERVAL 3 HOURS as ts_closed,
+        CAST(c.closed_date AS TIMESTAMP) - INTERVAL 3 HOURS as ts_closed,
         csat.sk_answer as sk_answer_csat,
         csat.ts_submitted as first_csat_ts_response, 
         csat.satisfaction_score as first_csat_score,
@@ -433,9 +433,9 @@ SELECT
     supplied_email,
     case_reason,
     Platform,
-    YEAR(COALESCE(ts_created, TIMESTAMP('1970-01-01'))) AS year,
-    MONTH(COALESCE(ts_created, TIMESTAMP('1970-01-01'))) AS month,
-    DAY(COALESCE(ts_created, TIMESTAMP('1970-01-01'))) AS day,
+    YEAR(CURRENT_DATE) AS year,
+    MONTH(CURRENT_DATE) AS month,
+    DAY(CURRENT_DATE) AS day,
     NOW() AS ts_load
 FROM cases_perspective
 WHERE rn = 1 
@@ -496,9 +496,9 @@ SELECT
     NULL AS supplied_email,
     NULL AS case_reason,
     Platform,
-    YEAR(COALESCE(ts_started, TIMESTAMP('1970-01-01'))) AS year,
-    MONTH(COALESCE(ts_started, TIMESTAMP('1970-01-01'))) AS month,
-    DAY(COALESCE(ts_started, TIMESTAMP('1970-01-01'))) AS day,
+    YEAR(CURRENT_DATE) AS year,
+    MONTH(CURRENT_DATE) AS month,
+    DAY(CURRENT_DATE) AS day,
     NOW() AS ts_load
 FROM tickets_perspective
 
