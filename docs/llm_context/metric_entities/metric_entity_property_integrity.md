@@ -1,6 +1,6 @@
-# **Property Integrity**
+# Property Integrity
 
-## **Ownership**
+## Ownership
 
   
 **Data Owner:**
@@ -12,26 +12,26 @@
 
 - [victor.prado@quintoandar.com.br](mailto:victor.prado@quintoandar.com.br)
 
-## **Overview**
+## Overview
 
   
 **Property Integrity** is a family of offboarding-quality metrics for the For Rent product thatmeasure how a termination resolves repairs and agreements — how often it closes **withoutfriction** (no mediation), **without repairs**, and, when repairs do exist, how the partiessettle them (mutual agreement vs. compulsory / band-aid). It covers four indicators:**% Offb. W/o Mediation**, **% Without Repairs**, **% Both Agree**, and**% Compulsory/Band-Aid 2**.  
 All four are computed from the pre-joined offboarding table `dw_offboarding.obt_offboarding`,which already carries every flag these metrics need at one row per termination.  
 **Exists exclusively for For Rent offboarding — these metrics have no equivalent for FS orother products.**  
 
-## **Related Business Entities**
+## Related Business Entities
 
   
 - Termination
 - Inspection
 - Repairs
 
-## **MBR**
+## MBR
 
 *   Post contract
     
 
-## **Glossary and Synonyms**
+## Glossary and Synonyms
 
   
 - **Property Integrity**, **integridade do imóvel**, **qualidade do offboarding** → this family of four metrics
@@ -41,13 +41,13 @@ All four are computed from the pre-joined offboarding table `dw_offboarding.obt_
 - **% Compulsory/Band-Aid 2**, **% compulsório/band-aid**, **compulsory or bandaid resolution** → % Compulsory/Band-Aid 2
 - **band-aid**, **bandaid**, **desconto automático**, **automatic discount** → the automatic-discount agreement flag (`has_discount_agreement`)
 
-## **Scope**
+## Scope
 
   
 **Included**: For Rent offboarding terminations that have already **finished** (non-null`ts_termination_finished`), **excluding evictions**. The reference axis for all four metrics isthe **termination-finished date** — the calendar date of `ts_termination_finished`(`CAST(ts_termination_finished AS DATE)`, UTC), matching the operational monthly reporting.  
 **Excluded**: evictions (`is_eviction = TRUE`), canceled terminations (already removed upstreamby the OBT), and terminations that have not yet reached closure (NULL `ts_termination_finished`).  
 
-## **Calculation**
+## Calculation
 
   
 Compute directly from `dw_offboarding.obt_offboarding`, reading the pre-materialized flags andapplying the exact `= true` / `= false` comparisons below (a NULL flag counts as neither `true`nor `false`).  
@@ -62,7 +62,7 @@ The four indicators, all over the same finished-non-eviction base:
   
 The denominators differ by metric: **% Offb. W/o Mediation** and **% Without Repairs** divide bythe whole finished-non-eviction base (`count(*)`); **% Both Agree** and **% Compulsory/Band-Aid 2**divide by the **with-repairs** subset (`count_if(has_repairs = true)`).  
 
-### **Canonical Filter**
+### Canonical Filter
 
   
 Apply on `dw_offboarding.obt_offboarding`:  
@@ -73,7 +73,7 @@ sqlis_eviction = falseAND ts_termination_finished IS NOT NULL -- finished termin
   
 **Warning**: dropping `is_eviction = false` lets evictions into the base and inflates everyratio, since eviction terminations behave very differently on repairs and mediation. Restrictingto finished terminations (non-null `ts_termination_finished`) is required for **% Offb. W/oMediation**: `has_mediation_ticket` is only populated once a termination reaches `DONE`, sostill-open terminations would be counted as "without mediation" and understate the mediationrate. Using `ts_termination_finished` as the axis naturally enforces this scope.  
 
-### **Nuances**
+### Nuances
 
   
 Every concept these metrics need is already a column in `dw_offboarding.obt_offboarding` — readit directly. Concept → column:  
@@ -103,7 +103,7 @@ Every concept these metrics need is already a column in `dw_offboarding.obt_offb
 - Don't include evictions, canceled, or still-open terminations in any denominator.
 - Don't `COALESCE` the agreement flags to `FALSE` before comparing with `= true` — it changes nothing (a NULL is already not `true`) and only obscures the intent.
 
-## **Golden Queries**
+## Golden Queries
 
   
 All four metrics share the same base, axis and filter, so a single scan of`dw_offboarding.obt_offboarding` produces them side by side. Trino dialect.  
@@ -116,7 +116,7 @@ SELECT DATE_TRUNC('month', CAST(obt.ts_termination_finished AS DATE)) AS ref_mon
   
 To isolate a single indicator, keep only its numerator/denominator pair and the same`FROM` / `WHERE`.  
 
-## **Superset Golden Assets**
+## Superset Golden Assets
 
   
 <!--BI reference only — where the user can find these indicators in Superset. NOT used in thecalculation.-->  

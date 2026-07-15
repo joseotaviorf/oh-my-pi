@@ -87,8 +87,11 @@ Post Contract
 
 
 def test_title_has_no_html_or_style_leakage():
+    # Also covers the whole-heading-bold-wrap rule: house style is that a
+    # DataHub Data Product's plain-text name field never carries the source
+    # heading's "**" — only the heading *level* signals emphasis.
     parsed = parse_entity_markdown(_GARBLED_DOC)
-    assert parsed.title == "**Property Integrity**"
+    assert parsed.title == "Property Integrity"
     assert "<span" not in parsed.raw_markdown
     assert "font-size" not in parsed.raw_markdown
 

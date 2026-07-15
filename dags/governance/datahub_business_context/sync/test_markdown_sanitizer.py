@@ -9,7 +9,7 @@ from sync.markdown_sanitizer import sanitize_datahub_markdown
 
 def test_strips_font_size_span_keeping_text():
     md = '# **<span style="font-size:12px">Property Integrity</span>**'
-    assert sanitize_datahub_markdown(md) == "# **Property Integrity**"
+    assert sanitize_datahub_markdown(md) == "# Property Integrity"
 
 
 def test_strips_u_tags_around_link_target():
@@ -189,6 +189,36 @@ def test_unwraps_bold_wrapped_h2_heading_with_trailing_hard_break():
 
 def test_does_not_unwrap_literal_bold_hashtag():
     md = "**#1 priority**"
+    assert sanitize_datahub_markdown(md) == md
+
+
+def test_strips_bold_wrapping_entire_h1_heading_text():
+    assert (
+        sanitize_datahub_markdown("# **Property Integrity**") == "# Property Integrity"
+    )
+
+
+def test_strips_bold_wrapping_entire_h2_heading_text():
+    assert sanitize_datahub_markdown("## **Ownership**") == "## Ownership"
+
+
+def test_strips_italic_wrapping_entire_heading_text():
+    assert sanitize_datahub_markdown("## _Overview_") == "## Overview"
+
+
+def test_strips_triple_asterisk_wrapping_entire_heading_text():
+    assert sanitize_datahub_markdown("### ***Nuances***") == "### Nuances"
+
+
+def test_does_not_strip_partial_bold_within_heading_text():
+    # Only part of the heading is bold — the emphasis is semantic, not a
+    # whole-heading wrapper, so it must be left alone.
+    md = "## Query 1 — **NPS** True (weighted)"
+    assert sanitize_datahub_markdown(md) == md
+
+
+def test_does_not_touch_plain_heading():
+    md = "## Overview"
     assert sanitize_datahub_markdown(md) == md
 
 

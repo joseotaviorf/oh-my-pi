@@ -20,6 +20,14 @@ artifacts its own markdown export can't express cleanly:
   following bullets don't get absorbed into a preceding list.
 - A heading marker (``##``/``###``) wrapped in bold (``**### Query 1**``)
   instead of being a real ATX heading, losing its heading semantics.
+- A real ATX heading (``#``/``##``/…) whose entire text is wrapped in bold or
+  italic (``# **Property Integrity**``, ``## _Overview_``) because a human
+  typed the heading text in bold/italic in DataHub's rich-text editor. House
+  style is that heading level alone carries the emphasis — heading text never
+  carries additional ``**``/``_`` — so this is unwrapped to plain text
+  (``# Property Integrity``). Only a heading *entirely* covered by one
+  emphasis run is touched; a heading with just part of its text in bold
+  (``## Query 1 **NPS**``) is left alone.
 - A whole GFM table flattened onto one physical line, with row breaks
   collapsed to ``||`` (the closing pipe of one row meeting the opening pipe
   of the next, newline eaten) — this renders as raw text instead of a table.
@@ -92,6 +100,16 @@ _MID_LINE_BULLET_RE = re.compile(r"(?<=\S)-\s+(?=\S)")
 # heading. Requires a space after the hashes (like a real ATX heading) so a
 # literal bold "**#1 priority**" is never touched.
 _BOLD_WRAPPED_HEADING_RE = re.compile(r"^\*\*(#{1,6}\s+\S.*?)\*\*[ \t]*$", re.MULTILINE)
+
+# A real ATX heading whose text is entirely wrapped in one emphasis run —
+# "# **Property Integrity**", "## _Overview_". The captured text is required
+# to contain no further asterisk/underscore so a heading only *partly* bold
+# ("## Query 1 **NPS**") never matches (the outer run wouldn't span the whole
+# line, so `$` anchoring plus the no-inner-delimiter class fails to match).
+_HEADING_BOLD_RE = re.compile(
+    r"^(#{1,6}\s+)\*{1,3}([^*\n]+?)\*{1,3}[ \t]*$", re.MULTILINE
+)
+_HEADING_ITALIC_RE = re.compile(r"^(#{1,6}\s+)_([^_\n]+?)_[ \t]*$", re.MULTILINE)
 
 # A table row DataHub exported as its own paragraph: each row already sits on
 # its own physical line (unlike the single-line-glued-with-"||" shape below),
@@ -301,6 +319,11 @@ def sanitize_datahub_markdown(markdown: str) -> str:
     protected = _ASTERISK_UNDERSCORE_EMPHASIS_RE.sub(r"**\1**", protected)
     protected = _BOLD_ITALIC_TRIPLE_RE.sub(r"**\1**", protected)
     protected = _SINGLE_ITALIC_ASTERISK_RE.sub(r"**\1**", protected)
+    # Strip emphasis wrapping a whole heading's text — must run after the
+    # emphasis-normalization above so a heading originally in ``*x*``/``***x***``
+    # form is already canonical ``**x**`` and matched by the single bold rule.
+    protected = _HEADING_BOLD_RE.sub(r"\1\2", protected)
+    protected = _HEADING_ITALIC_RE.sub(r"\1\2", protected)
     protected = _reflow_collapsed_tables(protected)
     protected = _join_blank_line_separated_table_rows(protected)
     protected = _reflow_inline_bullets(protected)
