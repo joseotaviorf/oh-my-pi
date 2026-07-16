@@ -240,21 +240,30 @@ class DatabricksJobClusterEngine(JobClusterEngine):
 
     def _get_libraries(self) -> list:
         default_libraries = self._config_service.get_config("default_libraries")
-        custom_libraries = [
-            (
-                {
-                    lib_type: lib_name.format(
-                        artifacts_bucket=self._config_service.get_config(
-                            "artifacts_bucket"
-                        )
+        # EMR-only pypi keys (no_deps, only_binary) must not be sent to Databricks.
+        _pypi_databricks_keys = frozenset({"package", "repo"})
+        custom_libraries = []
+        for custom_library in self._ctx.cluster_args.get("custom_libraries", []):
+            for lib_type, lib_name in custom_library.items():
+                if isinstance(lib_name, str):
+                    custom_libraries.append(
+                        {
+                            lib_type: lib_name.format(
+                                artifacts_bucket=self._config_service.get_config(
+                                    "artifacts_bucket"
+                                )
+                            )
+                        }
                     )
-                }
-                if isinstance(lib_name, str)
-                else {lib_type: lib_name}
-            )
-            for custom_libraries in self._ctx.cluster_args.get("custom_libraries", [])
-            for lib_type, lib_name in custom_libraries.items()
-        ]
+                elif lib_type == "pypi" and isinstance(lib_name, dict):
+                    cleaned = {
+                        key: value
+                        for key, value in lib_name.items()
+                        if key in _pypi_databricks_keys
+                    }
+                    custom_libraries.append({lib_type: cleaned})
+                else:
+                    custom_libraries.append({lib_type: lib_name})
         return default_libraries + custom_libraries
 
     def _input_databricks_default_service_credential_name(

@@ -17,6 +17,7 @@ QUINTOANDAR_LOGGER_WHEEL="${QUINTOANDAR_LOGGER_WHEEL:-quintoandar_logger-0.8.0-p
 REQUESTS_VERSION="${REQUESTS_VERSION:-2.32.5}"
 DATABRICKS_SDK_VERSION="${DATABRICKS_SDK_VERSION:-0.102.0}"
 CLUSTER_YAML_LOCAL="${TMP_DIR}/emr_dag_cluster.yml"
+CUSTOM_WHL_MANIFEST="${TMP_DIR}/emr_custom_whl_paths.txt"
 DAGS_S3_PREFIX="astronomer/dags/dags/"
 
 # Normalize Airflow dag_id → DAG package folder name.
@@ -77,9 +78,12 @@ _emr_download_cluster_yaml() {
     return 1
 }
 
-# Parse custom_libraries pypi.package entries from a cluster/declaration YAML.
-# Prints one package string per line. Always reads cluster.custom_libraries;
-# when IS_VALIDATION=1 also unions validation.cluster.custom_libraries.
+# Parse custom_libraries pypi entries from a cluster/declaration YAML.
+# Prints TSV lines: package<TAB>no_deps(0|1)<TAB>only_binary(0|1).
+# Always reads cluster.custom_libraries; when IS_VALIDATION=1 also unions
+# validation.cluster.custom_libraries. Optional EMR-only flags under pypi:
+#   no_deps: true       → pip --no-deps
+#   only_binary: true   → pip --only-binary=:all:
 _emr_extract_pypi_packages() {
     local cluster_yaml="$1"
     local is_validation="${2:-0}"
@@ -94,7 +98,7 @@ is_validation = os.environ.get("IS_VALIDATION") == "1"
 with open(path, encoding="utf-8") as fh:
     data = yaml.safe_load(fh) or {}
 
-packages = []
+entries = []
 
 
 def extract(libs):
@@ -107,7 +111,9 @@ def extract(libs):
         if isinstance(pypi, dict):
             package = pypi.get("package")
             if package:
-                packages.append(str(package).strip())
+                no_deps = 1 if pypi.get("no_deps") in (True, "true", "True", 1, "1") else 0
+                only_binary = 1 if pypi.get("only_binary") in (True, "true", "True", 1, "1") else 0
+                entries.append((str(package).strip(), no_deps, only_binary))
 
 
 cluster = data.get("cluster") or {}
@@ -117,10 +123,10 @@ if is_validation:
     extract(validation_cluster.get("custom_libraries"))
 
 seen = set()
-for pkg in packages:
+for pkg, no_deps, only_binary in entries:
     if pkg and pkg not in seen:
         seen.add(pkg)
-        print(pkg)
+        print(f"{pkg}\t{no_deps}\t{only_binary}")
 PY
 }
 
@@ -130,6 +136,9 @@ _emr_install_custom_pypi_libraries() {
     local is_validation="${2:-0}"
     local packages
     local pkg
+    local no_deps
+    local only_binary
+    local -a pip_flags
 
     echo "BEGIN: Install custom_libraries PyPI packages from cluster YAML"
 
@@ -151,17 +160,26 @@ _emr_install_custom_pypi_libraries() {
     fi
 
     echo "  Packages to install:"
-    while IFS= read -r pkg; do
+    while IFS=$'\t' read -r pkg no_deps only_binary; do
         [ -z "${pkg}" ] && continue
-        echo "    ${pkg}"
+        echo "    ${pkg} (no_deps=${no_deps:-0} only_binary=${only_binary:-0})"
     done <<EOF
 ${packages}
 EOF
 
-    while IFS= read -r pkg; do
+    while IFS=$'\t' read -r pkg no_deps only_binary; do
         [ -z "${pkg}" ] && continue
+        pip_flags=(--no-cache-dir)
+        if [ "${no_deps:-0}" = "1" ]; then
+            pip_flags+=(--no-deps)
+        else
+            pip_flags+=(-c "${EMR_CONSTRAINTS}")
+        fi
+        if [ "${only_binary:-0}" = "1" ]; then
+            pip_flags+=(--only-binary=:all:)
+        fi
         echo "  Installing ${pkg}..."
-        if ! $PIP_EXEC install --no-cache-dir -c "${EMR_CONSTRAINTS}" "${pkg}"; then
+        if ! $PIP_EXEC install "${pip_flags[@]}" "${pkg}"; then
             echo "Error: pip install of custom_libraries package '${pkg}' failed."
             exit 1
         fi
@@ -231,6 +249,143 @@ _emr_install_system_gnupg() {
     echo "END: Install gnupg2 / gpg-agent"
 }
 
+# Parse custom_libraries whl entries from a cluster/declaration YAML.
+# Prints one URI string per line (may contain {artifacts_bucket}). Always reads
+# cluster.custom_libraries; when IS_VALIDATION=1 also unions
+# validation.cluster.custom_libraries.
+_emr_extract_whl_uris() {
+    local cluster_yaml="$1"
+    local is_validation="${2:-0}"
+    IS_VALIDATION="${is_validation}" python3 - "${cluster_yaml}" <<'PY'
+import os
+import sys
+
+import yaml
+
+path = sys.argv[1]
+is_validation = os.environ.get("IS_VALIDATION") == "1"
+with open(path, encoding="utf-8") as fh:
+    data = yaml.safe_load(fh) or {}
+
+uris = []
+
+
+def extract(libs):
+    if not isinstance(libs, list):
+        return
+    for item in libs:
+        if not isinstance(item, dict):
+            continue
+        whl = item.get("whl")
+        if isinstance(whl, str) and whl.strip():
+            uris.append(whl.strip())
+
+
+cluster = data.get("cluster") or {}
+extract(cluster.get("custom_libraries"))
+if is_validation:
+    validation_cluster = (data.get("validation") or {}).get("cluster") or {}
+    extract(validation_cluster.get("custom_libraries"))
+
+seen = set()
+for uri in uris:
+    if uri and uri not in seen:
+        seen.add(uri)
+        print(uri)
+PY
+}
+
+# Resolve {artifacts_bucket} / accept s3:// URIs; download custom whls early
+# (awscli still intact) and write local paths to CUSTOM_WHL_MANIFEST.
+_emr_download_custom_whl_libraries() {
+    local cluster_yaml="$1"
+    local is_validation="${2:-0}"
+    local uris
+    local uri
+    local resolved
+    local basename
+    local local_path
+
+    echo "BEGIN: Download custom_libraries whl from cluster YAML"
+
+    rm -f "${CUSTOM_WHL_MANIFEST}"
+
+    if [ ! -f "${cluster_yaml}" ]; then
+        echo "  WARN: cluster YAML not present at ${cluster_yaml}; skipping"
+        echo "END: Download custom_libraries whl (skipped)"
+        return 0
+    fi
+
+    if ! uris="$(_emr_extract_whl_uris "${cluster_yaml}" "${is_validation}")"; then
+        echo "Error: failed to parse custom_libraries whl from ${cluster_yaml}"
+        exit 1
+    fi
+
+    if [ -z "${uris}" ]; then
+        echo "  No whl entries in custom_libraries; nothing to download"
+        echo "END: Download custom_libraries whl (none)"
+        return 0
+    fi
+
+    : >"${CUSTOM_WHL_MANIFEST}"
+
+    while IFS= read -r uri; do
+        [ -z "${uri}" ] && continue
+        resolved="${uri//\{artifacts_bucket\}/${ARTIFACTS_BUCKET}}"
+        case "${resolved}" in
+            s3://*)
+                ;;
+            *)
+                echo "Error: custom_libraries whl must resolve to an s3:// URI (got: ${resolved})"
+                echo "  Original: ${uri}"
+                exit 1
+                ;;
+        esac
+        basename="$(basename "${resolved}")"
+        local_path="${TMP_DIR}/wheels/${basename}"
+        echo "  Downloading ${resolved} -> ${local_path}"
+        if ! aws s3 cp "${resolved}" "${local_path}"; then
+            echo "Error: aws s3 cp of custom_libraries whl '${resolved}' failed."
+            exit 1
+        fi
+        printf '%s\n' "${local_path}" >>"${CUSTOM_WHL_MANIFEST}"
+    done <<EOF
+${uris}
+EOF
+
+    echo "END: Download custom_libraries whl"
+}
+
+# Install DAG-level custom_libraries wheels previously downloaded to CUSTOM_WHL_MANIFEST.
+# --no-deps: model/client wheels declare deps that are installed via pypi entries
+# (or already present). --ignore-requires-python: same as inmetro on EMR 3.9.
+_emr_install_custom_whl_libraries() {
+    local local_whl
+
+    echo "BEGIN: Install custom_libraries whl from cluster YAML"
+
+    if [ ! -f "${CUSTOM_WHL_MANIFEST}" ]; then
+        echo "  No custom whl manifest; nothing to install"
+        echo "END: Install custom_libraries whl (none)"
+        return 0
+    fi
+
+    while IFS= read -r local_whl; do
+        [ -z "${local_whl}" ] && continue
+        if [ ! -f "${local_whl}" ]; then
+            echo "Error: custom_libraries whl not found at ${local_whl}"
+            exit 1
+        fi
+        echo "  Installing ${local_whl}..."
+        if ! $PIP_EXEC install --no-cache-dir --no-deps --ignore-requires-python "${local_whl}"; then
+            echo "Error: pip install of custom_libraries whl '${local_whl}' failed."
+            exit 1
+        fi
+    done <"${CUSTOM_WHL_MANIFEST}"
+
+    echo "END: Install custom_libraries whl"
+}
+
 echo "BEGIN: Install QuintoAndar internal libs"
 
 if [ "${PROVIDER:-}" = "databricks" ]; then
@@ -270,7 +425,10 @@ else
     case "${AIRFLOW_DAG_ID}" in
         *__validation) EMR_IS_VALIDATION=1 ;;
     esac
-    if [ -n "${AIRFLOW_DAG_ID}" ]; then
+    if [ "${SKIP_CUSTOM_LIBRARIES:-0}" = "1" ]; then
+        echo "SKIP_CUSTOM_LIBRARIES=1; skipping DAG cluster YAML discovery"
+        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}"
+    elif [ -n "${AIRFLOW_DAG_ID}" ]; then
         echo "BEGIN: Download DAG cluster YAML for custom_libraries"
         EMR_DAG_FOLDER="$(_emr_normalize_dag_folder "${AIRFLOW_DAG_ID}")"
         echo "  airflow_dag_id=${AIRFLOW_DAG_ID} dag_folder=${EMR_DAG_FOLDER} is_validation=${EMR_IS_VALIDATION}"
@@ -281,7 +439,7 @@ else
         # Drop any leftover from a prior bootstrap on this host so install cannot
         # pick up another DAG's custom_libraries via the fixed CLUSTER_YAML_LOCAL path.
         echo "WARN: AIRFLOW_DAG_ID not set; skipping custom_libraries discovery"
-        rm -f "${CLUSTER_YAML_LOCAL}"
+        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}"
     fi
 fi
 
@@ -299,7 +457,17 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "${TMP_DIR}/wheels/${QUINTOANDAR_LOGGER_WHEEL}"
     aws s3 cp "${ARTIFACTS_BUCKET}/inmetro/inmetro-${INMETRO_VERSION}-py3-none-any.whl" \
         "${TMP_DIR}/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl"
-    
+
+    # Custom whl downloads while awscli is still reliable (before heavy pip).
+    if [ "${SKIP_CUSTOM_LIBRARIES:-0}" = "1" ]; then
+        echo "SKIP_CUSTOM_LIBRARIES=1; skipping custom_libraries whl download"
+        rm -f "${CUSTOM_WHL_MANIFEST}"
+    elif [ -n "${AIRFLOW_DAG_ID:-}" ]; then
+        _emr_download_custom_whl_libraries "${CLUSTER_YAML_LOCAL}" "${EMR_IS_VALIDATION:-0}"
+    else
+        rm -f "${CUSTOM_WHL_MANIFEST}"
+    fi
+
     # Pin urllib3 / requests for awscli before resolving the big stack.
     $PIP_EXEC install --upgrade --ignore-installed \
         "requests==${REQUESTS_VERSION}" 'urllib3>=1.25.4,<1.27'
@@ -417,12 +585,18 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         $PIP_EXEC install --no-cache-dir 'pandas>=2.0.0,<3'
     fi
 
-    # Databricks custom_libraries (pypi) parity — after all aws s3 cp (JARs/wheels).
-    # Extra pip resolver work can break python-dateutil / awscli; cluster YAML was
-    # fetched early for that reason. Only install when this bootstrap discovered YAML
-    # for AIRFLOW_DAG_ID (file was cleared when discovery was skipped).
-    if [ -n "${AIRFLOW_DAG_ID:-}" ]; then
+    # Databricks custom_libraries (pypi + whl) parity — after all aws s3 cp
+    # (JARs/default wheels). Extra pip resolver work can break python-dateutil /
+    # awscli; cluster YAML and custom whls were fetched early for that reason.
+    # Only install when this bootstrap discovered YAML for AIRFLOW_DAG_ID
+    # (file/manifest were cleared when discovery was skipped).
+    # SKIP_CUSTOM_LIBRARIES=1: wrappers that install pinned stacks themselves.
+    if [ "${SKIP_CUSTOM_LIBRARIES:-0}" = "1" ]; then
+        echo "SKIP_CUSTOM_LIBRARIES=1; skipping custom_libraries install"
+        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}"
+    elif [ -n "${AIRFLOW_DAG_ID:-}" ]; then
         _emr_install_custom_pypi_libraries "${CLUSTER_YAML_LOCAL}" "${EMR_IS_VALIDATION:-0}"
+        _emr_install_custom_whl_libraries
     fi
 
     echo "Restoring python-dateutil for awscli compatibility..."

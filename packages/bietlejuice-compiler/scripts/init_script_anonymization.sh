@@ -39,8 +39,25 @@ aws s3 cp "${ARTIFACTS_BUCKET}/bi-etl-ejuice/emr_init_script.sh" "${EMR_INIT_SCR
 aws s3 cp "${ARTIFACTS_BUCKET}/spacy-models/${SPACY_MODEL_WHL}" \
     "${TMP_DIR}/wheels/${SPACY_MODEL_WHL}"
 
+# Event-log prefix (normally created by emr_init when dag_id is passed).
+DATABRICKS_S3_BUCKET="${2:-}"
+AIRFLOW_DAG_ID="${3:-}"
+if [ -n "${DATABRICKS_S3_BUCKET}" ] && [ -n "${AIRFLOW_DAG_ID}" ]; then
+    echo "BEGIN: Create Spark event-log directory"
+    aws s3api put-object \
+        --bucket "${DATABRICKS_S3_BUCKET}" \
+        --key "spark-event-logs-emr/${AIRFLOW_DAG_ID}/" \
+        || echo "  WARN: failed to create Spark event-log prefix"
+    echo "END: Create Spark event-log directory"
+fi
+
 chmod +x "${EMR_INIT_SCRIPT}"
-"${EMR_INIT_SCRIPT}" "$@"
+# Omit airflow_dag_id so emr_init_script.sh does NOT install cluster
+# custom_libraries (YAML pypi:presidio pulls SpaCy 3.8 → blis source build
+# fails on EMR 7.12 Graviton/cp39). Also set SKIP_CUSTOM_LIBRARIES for
+# newer emr_init builds that honor the flag even when dag_id is present.
+export SKIP_CUSTOM_LIBRARIES=1
+"${EMR_INIT_SCRIPT}" "${ARTIFACTS_BUCKET}" "${DATABRICKS_S3_BUCKET}"
 
 echo "BEGIN: Install Presidio / SpaCy anonymization libraries"
 
@@ -50,11 +67,12 @@ numpy==${NUMPY_VERSION}
 spacy==${SPACY_VERSION}
 EOF
 
-echo "Installing numpy==${NUMPY_VERSION} and spacy==${SPACY_VERSION}..."
-if ! $PIP_EXEC install --no-cache-dir -c "${ANON_CONSTRAINTS}" \
+# --only-binary: never fall back to compiling thinc/blis on the cluster.
+echo "Installing numpy==${NUMPY_VERSION} and spacy==${SPACY_VERSION} (wheels only)..."
+if ! $PIP_EXEC install --no-cache-dir --only-binary=:all: -c "${ANON_CONSTRAINTS}" \
     "numpy==${NUMPY_VERSION}" \
     "spacy==${SPACY_VERSION}"; then
-    echo "Error: pip install of numpy/spacy failed."
+    echo "Error: pip install of numpy/spacy failed (need manylinux aarch64 wheels)."
     exit 1
 fi
 
