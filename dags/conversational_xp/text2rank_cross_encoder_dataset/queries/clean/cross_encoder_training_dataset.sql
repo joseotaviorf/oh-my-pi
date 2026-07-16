@@ -18,7 +18,7 @@ SELECT
   accept_pets,
   is_near_subway,
   is_furnished,
-  ingestion_date AS dt_ingested,
+  CAST(ingestion_date AS DATE) AS dt_ingested,
   amenities,
   installations,
   year,
