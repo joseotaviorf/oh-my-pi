@@ -4,7 +4,8 @@ table_name: ciq_listing_purchase
 description: >
   Enrich grain per house listing version in CIQ context: rent listing and contract path, Robin Hood
   listing-purchase payment, address-parsed and Atlas duplicity keys, city group, supply source,
-  pricing segment from listing business context transition rules, and inactivity days from house_listing
+  initial pricing segment from the AAREDE-470 transition rules (business context, consultant type,
+  contract signature date versus the 2026-07-01 cutover), and inactivity days from house_listing
   version windows.
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
@@ -91,7 +92,9 @@ columns:
     lineage:
       - datalake_big_agent.house_consultant_history.consultant_type
   listing_status:
-    description: Listing status from house listing version or listing business context fallback.
+    description: >
+      Listing status (uppercased for consistent comparisons) from house listing version or listing
+      business context fallback.
     lineage:
       - datalake_ebdb_listing.house_listing.status
       - datalake_ebdb_clean.listing_business_context.status
@@ -105,30 +108,31 @@ columns:
     description: Contract status from core contract.
     lineage:
       - core_contract.contract.status
-  payment_status:
+  initial_pricing_type_reason:
     description: >
-      Derived lifecycle: cancelled, paid when accounting entry exists, not-eligible without signed
-      contract, otherwise pending.
+      Full human-readable initial pricing segment from the AAREDE-470 transition rules: not-eligible
+      when business context is not RENT, consultant is not CIQ_FULL, there is no signed contract yet,
+      or the contract was signed before 2026-07-01; hybrid when the house converted from sale to rent;
+      new-listings when published and rented after the transition; ongoing-listings when published
+      before the transition with no previous contract and first rented after it; ongoing-rentals when
+      published before the transition with a previous contract and re-rented after it.
     lineage:
-      - core_contract.contract.status
-      - datalake_robin_hood.accounting_entry.id
-      - datalake_ebdb_listing.house_listing.ts_contract_signed
-  pricing_type_reason:
-    description: >
-      Full human-readable pricing segment from transition rules on first publication date,
-      listing status, contract path, and hybrid creation order.
-    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
-      - datalake_ebdb_clean.listing_business_context.status
+      - datalake_big_agent.house_consultant_history.consultant_type
       - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
       - datalake_ebdb_listing.house_listing.ts_contract_signed
-  pricing_type:
+  initial_pricing_type:
     description: >
-      Commercial segment prefix parsed from pricing_type_reason
-      (hybrid, new-listings, ongoing-rentals, ongoing-listings, or not-eligible).
+      Commercial segment prefix parsed from initial_pricing_type_reason
+      (hybrid, new-listings, ongoing-rentals, ongoing-listings, or not-eligible), before acquisition
+      and duplicity rules in listing_purchase_pricing are applied.
     lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
       - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_big_agent.house_consultant_history.consultant_type
       - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
   amount_paid:
     description: Due amount on the matched Robin Hood accounting entry when present.
     lineage:
@@ -179,10 +183,6 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing.status
       - datalake_ebdb_listing.house_listing.status_reason
-  is_eligible:
-    description: True when the house has a signed rent contract timestamp.
-    lineage:
-      - datalake_ebdb_listing.house_listing.ts_contract_signed
   is_paid:
     description: True when a non-blocked Robin Hood payment occurrence exists.
     lineage:

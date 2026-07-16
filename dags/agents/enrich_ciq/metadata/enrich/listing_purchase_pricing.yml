@@ -2,10 +2,12 @@
 database_name: datalake_ciq
 table_name: listing_purchase_pricing
 description: >
-  Acquisition pricing enrich for CIQ_FULL rent captures: maps pricing_type segments and
-  duplicity signals to acquisition_type (full-price, reduced-price, not-eligible) and
-  purchase_value (0, 150, or 1000 BRL). Grain is id_listing_purchase with optional
-  id_listing_duplicity from the last paid similar house.
+  Acquisition pricing enrich for CIQ_FULL rent captures under AAREDE-470: combines the initial
+  pricing segment from ciq_listing_purchase with previous-paid-listing and similar-house duplicity
+  signals to derive the final pricing_type/acquisition_type (full-price, reduced-price, not-eligible),
+  purchase_value (0, 150, or 1000 BRL), and payment_status. Grain is id_listing_purchase with optional
+  id_listing_duplicity from the last paid similar house and optional id_previous_listing_paid when the
+  same house already has an earlier paid listing; id_similar_house_paid points at a paid similar-address peer.
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
 columns:
@@ -25,40 +27,80 @@ columns:
     description: House listing id on the base listing-purchase row.
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_house_listing
-  id_similar_house:
-    description: House id of the matched similar-house peer used in pricing rules.
+  id_similar_house_paid:
+    description: >
+      House id of a similar-address peer that already has a paid listing-purchase capture; used to
+      avoid purchasing the same property again. Null when no paid similar house matched.
     lineage:
       - datalake_ciq.listing_purchase_duplicity.id_similar_house
-  pricing_type:
-    description: Commercial pricing segment prefix from pricing_type_reason on the base row.
-    lineage:
-      - datalake_ciq.ciq_listing_purchase.pricing_type
-  pricing_type_reason:
-    description: Full human-readable pricing segment explanation from ciq_listing_purchase.
-    lineage:
-      - datalake_ciq.ciq_listing_purchase.pricing_type_reason
-  acquisition_type_reason:
+  id_previous_listing_paid:
     description: >
-      Human-readable acquisition outcome combining pricing_type, city_group, supply_source, and
-      similar-house duplicity signals from listing_purchase_duplicity.
+      Earlier listing-purchase id on the same house with a smaller id_house_listing that is already
+      paid; null when no prior paid capture exists. Drives the not-eligible previous-paid rule.
     lineage:
-      - datalake_ciq.ciq_listing_purchase.pricing_type_reason
-      - datalake_ciq.listing_purchase_duplicity.dt_similiar_house_contract_termination
-      - datalake_ciq.listing_purchase_duplicity.similar_house_listing_status
-      - datalake_ciq.listing_purchase_duplicity.is_same_owner
+      - datalake_ciq.ciq_listing_purchase.id_listing_purchase
+      - datalake_ciq.ciq_listing_purchase.id_house
+      - datalake_ciq.ciq_listing_purchase.id_house_listing
+      - datalake_ciq.ciq_listing_purchase.is_paid
+  pricing_type:
+    description: >
+      Final commercial pricing segment prefix: falls back to acquisition_type when the initial
+      pricing segment (initial_pricing_type) was eligible but the acquisition rules (previous paid
+      listing or similar-house duplicity) made it not-eligible; otherwise passes through
+      initial_pricing_type unchanged.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.initial_pricing_type
+  pricing_type_reason:
+    description: >
+      Full human-readable explanation backing pricing_type: the acquisition_type_reason when the
+      acquisition rules downgraded an otherwise-eligible listing to not-eligible, otherwise the
+      initial_pricing_type_reason from ciq_listing_purchase.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.initial_pricing_type_reason
   acquisition_type:
     description: >
       Acquisition price bucket prefix parsed from acquisition_type_reason
       (full-price, reduced-price, or not-eligible).
     lineage:
-      - datalake_ciq.ciq_listing_purchase.pricing_type
+      - datalake_ciq.ciq_listing_purchase.initial_pricing_type
+      - datalake_ciq.ciq_listing_purchase.city_group
+      - datalake_ciq.ciq_listing_purchase.supply_source
       - datalake_ciq.listing_purchase_duplicity.is_same_owner
+  acquisition_type_reason:
+    description: >
+      Human-readable acquisition outcome combining a previous-paid-listing check,
+      similar-house duplicity signals from listing_purchase_duplicity, and the initial_pricing_type
+      segment (city_group for ongoing-listings, supply_source for hybrid houses).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house_listing
+      - datalake_ciq.ciq_listing_purchase.initial_pricing_type
+      - datalake_ciq.ciq_listing_purchase.initial_pricing_type_reason
+      - datalake_ciq.ciq_listing_purchase.city_group
+      - datalake_ciq.ciq_listing_purchase.supply_source
+      - datalake_ciq.listing_purchase_duplicity.dt_similiar_house_contract_termination
+      - datalake_ciq.listing_purchase_duplicity.similar_house_listing_status
+      - datalake_ciq.listing_purchase_duplicity.is_same_owner
+  is_eligible:
+    description: >
+      True when the final pricing_type is not not-eligible, after both the initial transition rules
+      and the acquisition/duplicity rules are applied.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.initial_pricing_type
   purchase_value:
     description: >
       Reference listing-purchase amount in BRL derived from acquisition_type
       (0 for not-eligible, 150 for reduced-price, 1000 for full-price).
     lineage:
-      - datalake_ciq.ciq_listing_purchase.pricing_type
+      - datalake_ciq.ciq_listing_purchase.initial_pricing_type
+      - datalake_ciq.ciq_listing_purchase.city_group
+      - datalake_ciq.ciq_listing_purchase.supply_source
       - datalake_ciq.listing_purchase_duplicity.is_same_owner
+  payment_status:
+    description: >
+      Payment lifecycle for the final acquisition outcome: not-eligible when acquisition_type is
+      not-eligible, paid when ciq_listing_purchase.is_paid is true, otherwise pending.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.initial_pricing_type
+      - datalake_ciq.ciq_listing_purchase.is_paid
   ts_load:
     description: Timestamp when this enrich row was materialized.

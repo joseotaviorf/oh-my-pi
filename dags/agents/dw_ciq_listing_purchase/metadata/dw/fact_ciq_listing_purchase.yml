@@ -13,7 +13,11 @@ columns:
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_listing_purchase
   sk_listing_duplicity:
-    description: Duplicity surrogate key from listing_purchase_pricing when a similar house matched.
+    description: >
+      Surrogate key that links this purchase to dw_ciq.fact_listing_purchase_duplicity when a
+      similar house was found by address parse or when an Atlas property-deduplication paid flow
+      matched; use that fact for peer-house and duplicity detail columns. Null when neither signal
+      produced a duplicity row on the pricing enrich.
     lineage:
       - datalake_ciq.listing_purchase_pricing.id_listing_duplicity
   sk_house:
@@ -24,10 +28,20 @@ columns:
     description: House listing surrogate key.
     lineage:
       - datalake_ciq.ciq_listing_purchase.id_house_listing
-  sk_similar_house:
-    description: Similar house id from listing_purchase_pricing when present.
+  sk_previous_listing_paid:
+    description: >
+      House listing surrogate key of another listing on the same house that was already purchased
+      earlier; used to avoid buying the same property again. 
+      Null when this house has no prior paid listing-purchase capture.
     lineage:
-      - datalake_ciq.listing_purchase_pricing.id_similar_house
+      - datalake_ciq.listing_purchase_pricing.id_previous_listing_paid
+  sk_similar_house_paid:
+    description: >
+      House surrogate key of another house with a similar address that was already purchased
+      (paid) in a prior listing-purchase capture; used to avoid buying the same property again.
+      Null when no paid similar-address peer was attached on the pricing enrich.
+    lineage:
+      - datalake_ciq.listing_purchase_pricing.id_similar_house_paid
   sk_contract:
     description: Rent contract surrogate key.
     lineage:
@@ -85,17 +99,24 @@ columns:
     lineage:
       - datalake_ciq.ciq_listing_purchase.contract_status
   payment_status:
-    description: Payment lifecycle from ciq_listing_purchase enrich.
+    description: >
+      Final payment lifecycle from listing_purchase_pricing (not-eligible, paid, or pending), computed
+      after the acquisition and duplicity rules are applied on top of the initial pricing segment.
     lineage:
-      - datalake_ciq.ciq_listing_purchase.payment_status
+      - datalake_ciq.listing_purchase_pricing.payment_status
   pricing_type:
-    description: Commercial pricing segment prefix from ciq_listing_purchase.
+    description: >
+      Final commercial pricing segment prefix from listing_purchase_pricing, after previous-paid-listing
+      and similar-house duplicity rules are applied on top of initial_pricing_type.
     lineage:
-      - datalake_ciq.ciq_listing_purchase.pricing_type
+      - datalake_ciq.listing_purchase_pricing.pricing_type
   pricing_type_reason:
-    description: Full human-readable pricing segment explanation from ciq_listing_purchase.
+    description: >
+      Full human-readable final pricing segment explanation from listing_purchase_pricing, after
+      previous-paid-listing and similar-house duplicity rules are applied on top of
+      initial_pricing_type_reason.
     lineage:
-      - datalake_ciq.ciq_listing_purchase.pricing_type_reason
+      - datalake_ciq.listing_purchase_pricing.pricing_type_reason
   acquisition_type:
     description: Acquisition price bucket (full-price, reduced-price, or not-eligible).
     lineage:
@@ -146,17 +167,20 @@ columns:
       - datalake_ciq.ciq_listing_purchase.is_house_inactive
   is_portfolio_loss:
     description: >
-      True when the listing is a Re-Listing still published without a signed rent contract and
-      total_days_since_publish exceeds 90 days (CIQ portfolio loss rule).
+      True when the listing is a Re-Listing still published (listing_status PUBLISHED or PUBLICADO,
+      uppercased) without a signed rent contract and total_days_since_publish exceeds 90 days
+      (CIQ portfolio loss rule).
     lineage:
       - datalake_ciq.ciq_listing_purchase.listing_category
       - datalake_ciq.ciq_listing_purchase.listing_status
       - datalake_ciq.ciq_listing_purchase.ts_contract_signed
       - datalake_ciq.ciq_listing_purchase.total_days_since_publish
   is_eligible:
-    description: True when the house has a signed rent contract timestamp.
+    description: >
+      True when the final pricing_type from listing_purchase_pricing is not not-eligible, after both
+      the initial transition rules and the acquisition/duplicity rules are applied.
     lineage:
-      - datalake_ciq.ciq_listing_purchase.is_eligible
+      - datalake_ciq.listing_purchase_pricing.is_eligible
   is_paid:
     description: Payment presence flag from enrich.
     lineage:

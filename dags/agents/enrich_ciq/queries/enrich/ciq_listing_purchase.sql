@@ -171,41 +171,30 @@ SELECT
     ssr.supply_source,
     lbc.business_context,
     hch.consultant_type,
-    COALESCE(hl.listing_status, lbc.status) AS listing_status,
+    UPPER(COALESCE(hl.listing_status, lbc.status)) AS listing_status,
     hl.listing_category,
     hl.contract_status,
     CASE
-        WHEN hl.contract_status = 'Cancelado'	THEN 'cancelled'
-        WHEN ae.id IS NOT NULL THEN 'paid'
-        WHEN hl.ts_contract_signed IS NULL THEN 'not-eligible'
-        ELSE 'pending'
-    END AS payment_status,
-    CASE
-        WHEN lbc.business_context <> 'RENT' THEN 'not-eligible: Business context is not RENT'
-        WHEN hch.consultant_type <> 'CIQ_FULL' THEN 'not-eligible: User consultant is not CIQ_FULL'
-        WHEN lbc.status = 'EDITING' OR lbc.ts_first_publication IS NULL THEN 'not-eligible: House is not published yet, is in editing status or suspended'
-        WHEN hl.ts_contract_signed IS NULL THEN 'not-eligible: House does not have a signed contract'
-        WHEN vfl.hybrid_creation_order = 'SALE > RENT' THEN 'hybrid: House is a hybrid house converted from sale to rent'
-        WHEN lbc.ts_first_publication >= DATE("2026-07-01") THEN 'new-listings: House listing published after the transition'
+        WHEN lbc.business_context <> 'RENT' OR lbc.business_context IS NULL THEN 'not-eligible: Business context is not RENT'
+        WHEN hch.consultant_type <> 'CIQ_FULL' OR hch.consultant_type IS NULL THEN 'not-eligible: User consultant is not CIQ_FULL'
+        WHEN hl.ts_contract_signed IS NULL THEN "not-eligible: Don't have a contract signed yet"
+        WHEN hl.ts_contract_signed < DATE("2026-07-01") THEN 'not-eligible: Contract signed before the transition'
+        WHEN lbc.ts_first_publication >= DATE("2026-07-01") 
+            AND vfl.hybrid_creation_order = 'SALE > RENT' 
+            THEN 'hybrid: House is a hybrid house converted from sale to rent'
+        WHEN lbc.ts_first_publication >= DATE("2026-07-01") 
+            AND hl.ts_contract_signed >= DATE("2026-07-01")
+            THEN 'new-listings: House listing published and rented after the transition'
         WHEN lbc.ts_first_publication < DATE("2026-07-01")
-            AND COALESCE(hl.listing_status, lbc.status) IN ('PUBLISHED', 'publicado')
-            THEN 'ongoing-listings: House listing published before the transition and is currently available for rental'
+            AND hl.ts_previous_contract_signed IS NULL
+            AND hl.ts_contract_signed >= DATE("2026-07-01")
+            THEN 'ongoing-listings: House listing published before the transition and first rented after the transition'
         WHEN lbc.ts_first_publication < DATE("2026-07-01")
-            AND hl.ts_contract_signed IS NOT NULL
-            AND hl.dt_termination IS NULL
-            THEN 'ongoing-rentals: House listing published before the transition and is currently rented'
-        WHEN lbc.ts_first_publication < DATE("2026-07-01")
-            AND hl.ts_contract_signed IS NOT NULL
-            AND hl.dt_termination IS NOT NULL
-            AND hl.has_republication IS FALSE
-            THEN 'not-eligible: Contract was terminated, but has not generated a relisting'
-        WHEN lbc.ts_first_publication < DATE("2026-07-01")
-            AND hl.ts_contract_signed IS NOT NULL
-            AND hl.dt_termination IS NOT NULL
-            AND hl.has_republication IS TRUE
-            THEN 'not-eligible: Contract was terminated and the house has generated a relisting'
-    END AS pricing_type_reason,
-    SPLIT(pricing_type_reason, ':')[0] AS pricing_type,
+            AND hl.ts_previous_contract_signed IS NOT NULL
+            AND hl.ts_contract_signed >= DATE("2026-07-01")
+            THEN 'ongoing-rentals: House listing published before the transition and re-rented after the transition'
+    END AS initial_pricing_type_reason,
+    SPLIT(initial_pricing_type_reason, ':')[0] AS initial_pricing_type,
     ae.due_amount AS amount_paid,
     IF(
         hl.is_house_inactive IS TRUE, 
@@ -220,7 +209,6 @@ SELECT
     hl.is_last_contract_signed AS is_last_contract_signed_by_house,
     hl.is_last_version AS is_last_house_listing,
     hl.is_house_inactive,
-    COALESCE(pricing_type, 'not-eligible') <> 'not-eligible' AS is_eligible,
     ae.dt_occurrence IS NOT NULL AS is_paid,
     ae.dt_occurrence AS dt_paid,
     hl.dt_termination AS dt_contract_termination,

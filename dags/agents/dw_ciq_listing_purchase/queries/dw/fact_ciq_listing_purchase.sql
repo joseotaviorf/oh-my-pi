@@ -3,7 +3,8 @@ SELECT
     lpp.id_listing_duplicity AS sk_listing_duplicity,
     clp.id_house AS sk_house,
     clp.id_house_listing AS sk_house_listing,
-    lpp.id_similar_house AS sk_similar_house,
+    lpp.id_previous_listing_paid AS sk_previous_listing_paid,
+    lpp.id_similar_house_paid AS sk_similar_house_paid,
     clp.id_contract AS sk_contract,
     clp.id_accounting_entry AS sk_accounting_entry,
     clp.id_partner AS sk_partner,
@@ -18,9 +19,9 @@ SELECT
     clp.listing_status,
     clp.listing_category,
     clp.contract_status,
-    clp.payment_status,
-    clp.pricing_type,
-    clp.pricing_type_reason,
+    lpp.payment_status,
+    lpp.pricing_type,
+    lpp.pricing_type_reason,
     lpp.acquisition_type,
     lpp.acquisition_type_reason,
     lpp.purchase_value,
@@ -36,11 +37,11 @@ SELECT
     COALESCE(
         clp.listing_category = 'Re-Listing'
         AND clp.ts_contract_signed IS NULL
-        AND clp.listing_status IN ('PUBLISHED', 'publicado')
+        AND clp.listing_status IN ('PUBLISHED', 'PUBLICADO')
         AND clp.total_days_since_publish > 90,
         FALSE
     ) AS is_portfolio_loss,
-    clp.is_eligible,
+    lpp.is_eligible,
     clp.is_paid,
     clp.dt_paid,
     clp.ts_contract_signed,
