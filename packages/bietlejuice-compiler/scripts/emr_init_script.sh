@@ -172,6 +172,65 @@ EOF
     echo "END: Install custom_libraries PyPI packages"
 }
 
+# Install system gnupg2 / gpg-agent so OIC PIN raw jobs can decrypt PGP payloads.
+# Databricks Runtime images already ship gpg-agent; EMR Amazon Linux 2023 ships
+# gnupg2-minimal (gpg without gpg-agent). Full gnupg2 conflicts with that package,
+# so install must use --allowerasing to replace it. Retry on RPM lock races that
+# happen when EMR bootstrap overlaps another package transaction on the node.
+_emr_install_system_gnupg() {
+    echo "BEGIN: Install gnupg2 / gpg-agent (PGP decrypt for OIC/PIN DAGs)"
+
+    if command -v gpg >/dev/null 2>&1 && command -v gpg-agent >/dev/null 2>&1; then
+        echo "  gpg already present: $(command -v gpg)"
+        echo "  gpg-agent already present: $(command -v gpg-agent)"
+        echo "END: Install gnupg2 / gpg-agent (already present)"
+        return 0
+    fi
+
+    local attempt
+    local max_attempts=8
+    local sleep_secs=15
+    local install_ok=0
+
+    for attempt in $(seq 1 "${max_attempts}"); do
+        echo "  attempt ${attempt}/${max_attempts}: install gnupg2 (replace gnupg2-minimal)"
+        if command -v dnf >/dev/null 2>&1; then
+            if sudo dnf install -y --allowerasing gnupg2; then
+                install_ok=1
+                break
+            fi
+        elif command -v yum >/dev/null 2>&1; then
+            if sudo yum install -y --allowerasing gnupg2; then
+                install_ok=1
+                break
+            fi
+        else
+            echo "Error: neither dnf nor yum is available to install gnupg2."
+            exit 1
+        fi
+        echo "  WARN: package install failed (often RPM lock). Retrying in ${sleep_secs}s..."
+        sleep "${sleep_secs}"
+    done
+
+    if [ "${install_ok}" -ne 1 ]; then
+        echo "Error: gnupg2 install failed after ${max_attempts} attempts."
+        exit 1
+    fi
+
+    if ! command -v gpg >/dev/null 2>&1; then
+        echo "Error: gpg binary still missing after gnupg2 install."
+        exit 1
+    fi
+    if ! command -v gpg-agent >/dev/null 2>&1; then
+        echo "Error: gpg-agent binary still missing after gnupg2 install."
+        exit 1
+    fi
+
+    echo "  gpg: $(command -v gpg)"
+    echo "  gpg-agent: $(command -v gpg-agent)"
+    echo "END: Install gnupg2 / gpg-agent"
+}
+
 echo "BEGIN: Install QuintoAndar internal libs"
 
 if [ "${PROVIDER:-}" = "databricks" ]; then
@@ -193,6 +252,9 @@ else
     AIRFLOW_DAG_ID="${3:-${AIRFLOW_DAG_ID:-}}"
     PIP_EXEC="sudo pip3"
     echo "Skipping awscli installation (assumed pre-installed on EMR)."
+
+    # Before wheel downloads / pip: PIN OIC raw decrypt needs gpg-agent on the node.
+    _emr_install_system_gnupg
 
     if [ -n "$DATABRICKS_S3_BUCKET" ] && [ -n "$AIRFLOW_DAG_ID" ]; then
         echo "BEGIN: Create Spark event-log directory"
