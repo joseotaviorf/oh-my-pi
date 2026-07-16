@@ -41,13 +41,30 @@ def _generate_date_range(start_date_str, end_date_str):
     return [(start + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days + 1)]
 
 
+def _build_inmetro_glob_path(inmetro_bucket, target_date):
+    """Shape: {bucket}/{repo}/{database}/{table}/{bucket_directory}/{date}."""
+    return f"{inmetro_bucket}/*/*/*/{bucket_directory}/{target_date}"
+
+
+def _build_inmetro_path_pattern(inmetro_bucket, target_date):
+    """Regex mirroring _build_inmetro_glob_path; captures repo/database/table."""
+    return rf"{inmetro_bucket}/([^/]+)/([^/]+)/([^/]+)/{bucket_directory}/{target_date}"
+
+
+def _path_has_objects(glob_path):
+    """Checks S3 object existence via Hadoop FileSystem globStatus — no data is read."""
+    sc = spark.sparkContext
+    hadoop_path = sc._jvm.org.apache.hadoop.fs.Path(glob_path)
+    file_system = hadoop_path.getFileSystem(sc._jsc.hadoopConfiguration())
+    statuses = file_system.globStatus(hadoop_path)
+    return statuses is not None and len(statuses) > 0
+
+
 def _load_single_date(
     target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket
 ):
-    file_path = f"{inmetro_bucket}/*/*/*/{bucket_directory}/{target_date}"
-    path_attributes_pattern = (
-        rf"{inmetro_bucket}/(\w+)/(\w+)/(\w+)/{bucket_directory}/{target_date}"
-    )
+    file_path = _build_inmetro_glob_path(inmetro_bucket, target_date)
+    path_attributes_pattern = _build_inmetro_path_pattern(inmetro_bucket, target_date)
 
     df = spark.read.format("json").load(file_path)
 
@@ -58,7 +75,8 @@ def _load_single_date(
 
     df = (
         df.withColumn(
-            "repo", regexp_extract(input_file_name(), path_attributes_pattern, 1)
+            "repo",
+            regexp_extract(input_file_name(), path_attributes_pattern, 1),
         )
         .withColumn(
             "database",
@@ -92,7 +110,30 @@ def get_inmetro_data(
     inmetro_bucket = config_service.get_config("inmetro_bucket")
 
     dfs = []
+    loaded, skipped_no_data, errored = [], [], []
     for target_date in dates:
+        glob_path = _build_inmetro_glob_path(inmetro_bucket, target_date)
+
+        # Check inside the date dir (/*) so an empty dir counts as "no data" and doesn't fail spark.read.
+        try:
+            path_has_objects = _path_has_objects(f"{glob_path}/*")
+        except Exception as e:
+            errored.append(target_date)
+            logger.error(
+                f"m={JOB_NAME}, date={target_date}, path={glob_path}, "
+                f"msg=Path existence check failed, error={e}",
+                exc_info=True,
+            )
+            continue
+
+        if not path_has_objects:
+            skipped_no_data.append(target_date)
+            logger.info(
+                f"m={JOB_NAME}, date={target_date}, path={glob_path}, "
+                "msg=No objects at path, skipping date"
+            )
+            continue
+
         try:
             df = _load_single_date(
                 target_date,
@@ -100,13 +141,25 @@ def get_inmetro_data(
                 partition_cols,
                 inmetro_bucket,
             )
-            dfs.append(df)
-            logger.info(f"m={JOB_NAME}, date={target_date}, msg=Loaded successfully")
         except Exception as e:
-            logger.warning(
-                f"m={JOB_NAME}, date={target_date}, msg=No data found, skipping. error={e}"
+            errored.append(target_date)
+            logger.error(
+                f"m={JOB_NAME}, date={target_date}, path={glob_path}, "
+                f"msg=Read failed although objects exist at path, error={e}",
+                exc_info=True,
             )
             continue
+
+        dfs.append(df)
+        loaded.append(target_date)
+        logger.info(f"m={JOB_NAME}, date={target_date}, msg=Loaded successfully")
+
+    summary_log = logger.warning if errored else logger.info
+    summary_log(
+        f"m={JOB_NAME}, requested={dates}, loaded={loaded}, "
+        f"skipped_no_data={skipped_no_data}, errored={errored}, "
+        "msg=Date range ingestion summary"
+    )
 
     if not dfs:
         return None
