@@ -35,7 +35,7 @@ SELECT
         WHEN es.is_manager IS TRUE THEN 1
         ELSE 0
     END AS fl_lider,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     es.dt_terminated AS dt_desligamento,
     es.termination_reason_name AS motivo_desligamento,
     LOWER(es.employment_type) AS vinculo,

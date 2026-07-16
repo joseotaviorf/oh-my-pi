@@ -7,7 +7,7 @@ SELECT
         WHEN es.is_active = TRUE THEN 'ACTIVE'
         ELSE 'INACTIVE'
     END AS status,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     LOWER(es.work_email) AS email,
     es.manager_name AS gestor,
     es.job_code AS cod_cargo,

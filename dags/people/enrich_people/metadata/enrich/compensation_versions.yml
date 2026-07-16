@@ -152,12 +152,12 @@ columns:
     description: Band of the job version effective for this period (from job_with_salary_table).
     lineage:
       - datalake_people.job_with_salary_table.band
-  dt_original_hired:
+  dt_employee_hired:
     description: |
       Hire date for the current continuous employment cycle (company tenure anchor). Resets only on true
       rehire; GLB_TRANSFER continuations preserve it.
     lineage:
-      - datalake_people.identifier_mapping.dt_original_hired
+      - datalake_people.identifier_mapping.dt_employee_hired
   dt_stint_start_position:
     description: |
       Start of the current job (position) stint within the employment cycle. Consumers compute position

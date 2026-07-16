@@ -17,7 +17,7 @@ SELECT
     ) AS centro_de_custo,
     NULLIF(LOWER(es.structure), '-1') AS structure,
     bu.consolidated_business_unit_name AS empresa,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     es.name_l1 AS l1_gestor,
     es.name_l2 AS l2_gestor,
     es.name_l3 AS l3_gestor,

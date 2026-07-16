@@ -18,7 +18,7 @@
  *   No transfer logic is reimplemented here.
  *
  * Tenure anchors:
- *   - Company : dt_original_hired from identifier_mapping (respects transfer continuity).
+ *   - Company : dt_employee_hired from identifier_mapping (respects transfer continuity).
  *   - Position: start of the current job stint within the cycle (gaps-and-islands on id_job).
  *               A→B→A returns a stint from the return date, not the original start.
  *   - Band    : start of the current band stint within the cycle (gaps-and-islands on band
@@ -74,7 +74,7 @@
  */
 WITH salary_with_person AS (
     -- Approved salaries enriched with person identifiers and cycle metadata from identifier_mapping.
-    -- dt_original_hired is the hire date for the current continuous employment cycle;
+    -- dt_employee_hired is the hire date for the current continuous employment cycle;
     -- it is used directly as the company tenure anchor in the final SELECT.
     SELECT
         sal.id_salary,
@@ -88,7 +88,7 @@ WITH salary_with_person AS (
         im.id_continuous_employment_cycle,
         im.person_number,
         im.assignment_number,
-        im.dt_original_hired,
+        im.dt_employee_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -506,7 +506,7 @@ salary_with_assignment_job AS (
         sal.id_continuous_employment_cycle,
         sal.person_number,
         sal.assignment_number,
-        sal.dt_original_hired,
+        sal.dt_employee_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -554,7 +554,7 @@ salary_with_job_version AS (
         sal.id_continuous_employment_cycle,
         sal.person_number,
         sal.assignment_number,
-        sal.dt_original_hired,
+        sal.dt_employee_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -749,7 +749,7 @@ salary_with_plr_target AS (
         sal.id_continuous_employment_cycle,
         sal.person_number,
         sal.assignment_number,
-        sal.dt_original_hired,
+        sal.dt_employee_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -809,7 +809,7 @@ salary_enriched AS (
         sal.id_job,
         sal.person_number,
         sal.assignment_number,
-        sal.dt_original_hired,
+        sal.dt_employee_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -859,7 +859,7 @@ salary_consolidation_base AS (
         id_job,
         person_number,
         assignment_number,
-        dt_original_hired,
+        dt_employee_hired,
         currency_code,
         salary_amount,
         annual_salary,
@@ -996,7 +996,7 @@ salary_consolidated AS (
         id_job,
         MAX(person_number) AS person_number,
         MAX(assignment_number) AS assignment_number,
-        MAX(dt_original_hired) AS dt_original_hired,
+        MAX(dt_employee_hired) AS dt_employee_hired,
         currency_code,
         salary_amount,
         annual_salary,
@@ -1101,7 +1101,7 @@ SELECT
     jst_band.band,
     -- Tenure anchors: stint start dates. Consumers compute DATEDIFF/MONTHS_BETWEEN against dt_reference,
     -- so the heavy stint detection (gaps-and-islands) lives here once.
-    sal.dt_original_hired,
+    sal.dt_employee_hired,
     jts.dt_stint_start AS dt_stint_start_position,
     bts.dt_stint_start AS dt_stint_start_band,
     sal.dt_reference,

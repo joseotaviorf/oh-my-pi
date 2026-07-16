@@ -28,7 +28,7 @@ column_level_validations:
   person_number:
     is_complete:
       severity_level: Error
-  dt_hired:
+  dt_assignment_started:
     is_complete:
       severity_level: Error
   exactly_one_current_snapshot_per_assignment:

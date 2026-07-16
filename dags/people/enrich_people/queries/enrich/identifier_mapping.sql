@@ -380,7 +380,7 @@ period_continuous_employment_cycles AS (
         id_period_of_service,
         MIN(dt_started) OVER (
             PARTITION BY id_person, employment_cycle_group
-        ) AS dt_original_hired,
+        ) AS dt_employee_hired,
         MIN(id_period_of_service) OVER (
             PARTITION BY id_person, employment_cycle_group
         ) AS id_continuous_employment_cycle
@@ -440,7 +440,7 @@ SELECT
             pp.dt_started DESC NULLS LAST
     ) = 1 AS is_person_latest_assignment,
     ca.dt_projected_started,
-    pcec.dt_original_hired,
+    pcec.dt_employee_hired,
     pp.dt_started,
     pp.dt_actual_termination,
     pp.dt_notified_termination,

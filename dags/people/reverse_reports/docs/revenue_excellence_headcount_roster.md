@@ -50,12 +50,12 @@
 | l6_gestor | Hierarchy level 6 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l6` |
 | l7_gestor | Hierarchy level 7 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l7` |
 | l8_gestor | Hierarchy level 8 manager name, lowercased. | `dw_employee_details.dim_management_hierarchy.name_l8` |
-| idade_empresa | Employee tenure in the company in full months. | `dw_employee_details.fact_assignment_snapshots.months_tenure_in_company` |
+| idade_empresa | Employee tenure in the company in full months. | `dw_employee_details.fact_assignment_snapshots.months_employee_tenure` |
 | fl_lider | 1 if the employee is a manager; 0 otherwise. | `dw_employee_details.fact_assignment_snapshots.is_manager` |
-| dt_inicio | Date when the current work relationship started. | `dw_employee_details.fact_assignment_snapshots.dt_hired` |
+| dt_inicio | Date when the current work relationship started. | `dw_employee_details.fact_assignment_snapshots.dt_employee_hired` |
 | dt_desligamento | Termination date when it is on or before today; NULL (empty) for active employees and not-yet-effective future terminations. | `dw_employee_details.fact_assignment_snapshots.dt_terminated` |
 | dt_last_update | Date when the snapshot was last loaded, in Brazil/São Paulo timezone. | `dw_employee_details.fact_assignment_snapshots.ts_load` |
-| dt_inicio_person | Earliest hire date across all assignments for this person (first day at the company). | `dw_employee_details.fact_assignment_snapshots.dt_hired` (MIN per person_number) |
+| dt_inicio_person | Earliest hire date across all assignments for this person (first day at the company). | `dw_employee_details.fact_assignment_snapshots.dt_employee_hired` (MIN per person_number) |
 | year | Partition year (from `{load_start_date}`). Not exported to the sheet. | — |
 | month | Partition month (from `{load_start_date}`). Not exported to the sheet. | — |
 | day | Partition day (from `{load_start_date}`). Not exported to the sheet. | — |

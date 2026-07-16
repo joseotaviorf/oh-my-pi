@@ -32,7 +32,7 @@ People lake → Google Sheets export with the vacation-balance panorama of activ
 | job_name | Job title (Função). | `dw_compensation.dim_job.job_name` |
 | cost_center_code | Cost centre code (Centro de Custo). | `dw_organization.dim_cost_center.cost_center_code` |
 | cost_center_name | Cost centre name. | `dw_organization.dim_cost_center.cost_center_name` |
-| dt_hired | Admission date of the current work relationship (Data de Admissão). | `dw_employee_details.fact_assignment_snapshots.dt_hired` |
+| dt_hired | Admission date of the current work relationship (Data de Admissão). | `dw_employee_details.fact_assignment_snapshots.dt_assignment_started` |
 | manager_name | Direct manager full name (Nome do Gestor). | `dw_employee_details.dim_employee.name` via `dim_management_hierarchy.manager_assignment_number` |
 | manager_email | Direct manager work email (E-mail do Gestor). | `dw_employee_details.dim_employee.work_email` via `dim_management_hierarchy.manager_assignment_number` |
 | acquisitive_period_start | Start of the vacation acquisitive period (Período Aquisitivo). | `dw_time.fact_vacation_balances.dt_vacation_period_started` |

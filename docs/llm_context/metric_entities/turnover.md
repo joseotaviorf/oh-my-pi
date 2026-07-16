@@ -71,10 +71,10 @@ Turnover is **only computed on a monthly basis**. For longer timeframes (quarter
 
 ### NH Attrition (3-Month / 6-Month / 12-Month Turnover)
 
-New Hire Attrition (NHA) is a **subgroup of turnover**; Global Turnover stays global (every effective worker). NHA restricts **both** sides of the ratio to employees with **≤ N months of tenure** (N = 3, 6, or 12) via `months_tenure_in_company`:
+New Hire Attrition (NHA) is a **subgroup of turnover**; Global Turnover stays global (every effective worker). NHA restricts **both** sides of the ratio to employees with **≤ N months of tenure** (N = 3, 6, or 12) via `months_employee_tenure`:
 
-- **Numerator (leavers)**: `is_turnover_termination = TRUE` with `months_tenure_in_company <= N`.
-- **Denominator (base)**: `is_eligible_to_turnover = TRUE` with `months_tenure_in_company <= N`.
+- **Numerator (leavers)**: `is_turnover_termination = TRUE` with `months_employee_tenure <= N`.
+- **Denominator (base)**: `is_eligible_to_turnover = TRUE` with `months_employee_tenure <= N`.
 - Both sides must use the same tenure group. Only the tenure threshold changes between the 3/6/12-month variants.
 
 ### Regrettable Turnover

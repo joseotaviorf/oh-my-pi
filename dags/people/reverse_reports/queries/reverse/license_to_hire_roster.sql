@@ -4,7 +4,7 @@ WITH
             es.person_number,
             es.name,
             LOWER(es.work_email) AS email,
-            es.dt_hired,
+            es.dt_employee_hired,
             es.band,
             LOWER(es.country) AS pais,
             NULLIF(es.owner_l1_name, '-1') AS l1_cc,
@@ -21,7 +21,7 @@ WITH
             END AS fl_lider,
             NULLIF(LOWER(es.structure), '-1') AS structure,
             NULLIF(LOWER(es.vertical), '-1') AS vertical,
-            FLOOR(MONTHS_BETWEEN(LAST_DAY(DATE('{load_start_date}')), es.dt_hired)) AS tenure_meses
+            FLOOR(MONTHS_BETWEEN(LAST_DAY(DATE('{load_start_date}')), es.dt_employee_hired)) AS tenure_meses
         FROM
             metric_people.employee_snapshots AS es
         WHERE
@@ -53,7 +53,7 @@ SELECT
     ) AS grupo,
     lb.name AS nome,
     lb.email,
-    lb.dt_hired AS dt_inicio,
+    lb.dt_employee_hired AS dt_inicio,
     lb.band,
     lb.pais,
     lb.l1_cc,

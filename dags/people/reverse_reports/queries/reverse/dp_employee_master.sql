@@ -4,7 +4,7 @@ SELECT
     bu.consolidated_business_unit_name AS empresa,
     es.name AS nome,
     es.cpf,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     es.dt_terminated AS dt_desligamento,
     LOWER(es.work_email) AS email,
     CASE
@@ -40,7 +40,7 @@ SELECT
     es.dt_birth AS dt_nascimento,
     CAST(FROM_UTC_TIMESTAMP(es.ts_load, 'America/Sao_Paulo') AS DATE) AS dt_last_update,
     LOWER(es.hrbp_work_email) AS hrbp,
-    es.months_tenure_in_company AS idade_empresa,
+    es.months_employee_tenure AS idade_empresa,
     mh.name_l0 AS l0_gestor,
     mh.name_l1 AS l1_gestor,
     mh.name_l2 AS l2_gestor,

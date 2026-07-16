@@ -58,9 +58,10 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Work email / corporate email** → `dim_employee.work_email`
 - **Birth date / date of birth** → `dim_employee` (PII; LGPD-sensitive)
 - **Education level / highest education / generation** → `dim_employee.highest_education_level`, `dim_employee.generation`
-- **Hire date / start date / assignment start / admissão** → `dt_hired` (current assignment only)
-- **Original hire date / company start date / first hire** → `dt_original_hire` (tenure crediting full company history)
-- **Tenure / time in company / time in role** → `days_tenure_in_company`, `months_tenure_in_company`, `days_tenure_in_assignment` on the fact (relative to `dt_reference`)
+- **Assignment start / start date / admissão (current contract)** → `dt_assignment_started` (current assignment only; restarts on both internal transfers and rehires)
+- **Company hire date / original hire / tenure start** → `dt_employee_hired` (current continuous cycle; stays across internal transfers, resets on a genuine rehire — use for company tenure)
+- **Tenure / time in company / time in role** → two kinds of tenure on the fact, both relative to `dt_reference`. **Employee tenure** (`days_employee_tenure`, `months_employee_tenure`) is company time anchored on `dt_employee_hired`: it keeps counting across internal transfers and resets only on a genuine rehire — the default for tenure questions. **Assignment tenure** (`days_tenure_in_assignment`) is time in the current assignment anchored on `dt_assignment_started`: it restarts on every transfer or rehire — use it for "time in current role/contract" questions.
+- **Employee country / country / país** → `fact_assignment_snapshots.business_unit_country` (job/business-unit country, e.g. Brazil, Mexico, Portugal) — the default for "employee country" questions, not `dw_compensation.dim_job.country` and not address country. Residence → `dim_contact.address_country` (Databricks-only); birth → `dim_documentation.birth_country` (Databricks-only)
 - **Termination / separation / offboarding / exit / turnover / demissão** → `employment_status = 'Terminated'`, `dt_terminated`; join `dim_event_definition` for labels
 - **Intern / Estagiário / Young Apprentice / Jovem Aprendiz / JA** → `dw_employee_details.dim_job.employment_type` (`'intern'`, `'young apprentice'`; lowercase), reached via `fact.sk_job_version = dim_job.sk_job_version`. `NULL` reflects an unmapped `job_family` (legacy job codes) and counts as regular population, not Intern/JA. To exclude Interns/JA without the join, use `is_effective_worker = FALSE` on the fact (effective/CLT employees are `is_effective_worker = TRUE`).
 - **Voluntary termination / resignation / quit / pedido de demissão** → filter `dim_event_definition` (`action_name`, `reason_name` in EN; `action_name_ptb`, `reason_name_ptb` in PT)
@@ -118,7 +119,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 ## Key Metrics
 
 - **Active headcount** — `COUNT(DISTINCT person_number)` where `is_current_for_employee = TRUE` and `is_active = TRUE`
-- **Tenure in company** — `days_tenure_in_company`, `months_tenure_in_company` (relative to `dt_reference`)
+- **Tenure in company** — `days_employee_tenure`, `months_employee_tenure` (relative to `dt_reference`)
 - **Tenure in assignment** — `days_tenure_in_assignment` (current role only)
 - **Span of control** — `count_direct_report`, `count_indirect_report` (pre-computed on the fact)
 - **Voluntary terminations** — `employment_status = 'Terminated'` + `dim_event_definition` filtered by `action_name` / `reason_name`
@@ -149,7 +150,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - Start from `fact_assignment_snapshots` with `is_current_for_employee = TRUE` for today's workforce state, or `is_monthly_snapshot_for_employee = TRUE` for historical state, one row per employee either way; reach for `is_current_for_assignment` / `is_monthly_snapshot_for_assignment` only when you need assignment-grain history.
 - Use `dim_employee.name` for communications; reserve `dim_documentation.legal_name` for compliance.
 - Join versioned dimensions through the `sk_*_version` keys on the fact for the snapshot date in scope.
-- Use `dt_original_hire` when tenure should credit prior company employment; `dt_hired` for seniority in the current contract only.
+- Use `dt_employee_hired` for company tenure (credits internal transfers, resets on rehire); `dt_assignment_started` for seniority in the current assignment only.
 - Check `dim_event_definition` for exact `reason_name` / `action_name` values before filtering terminations.
 - Treat future `dt_terminated` as scheduled **voluntary** exits only — not as a signal of impending involuntary dismissal.
 
@@ -183,7 +184,7 @@ SELECT
     hier.name_l3 AS manager_name,
     evt.action_name AS termination_action,
     evt.reason_name AS termination_reason,
-    fact.days_tenure_in_company,
+    fact.days_employee_tenure,
     fact.is_manager,
     fact.is_leadership_team_member,
     fact.is_active,

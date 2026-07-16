@@ -289,7 +289,7 @@ columns:
     description: Snapshot attribute for country on the employee_snapshots wide metric table.
     dimension: True
     lineage:
-      - dw_compensation.dim_job.country
+      - dw_employee_details.fact_assignment_snapshots.business_unit_country
 
   cost_center_code:
     description: Snapshot attribute for cost_center_code on the employee_snapshots wide metric table.
@@ -638,11 +638,11 @@ columns:
     lineage:
       - dw_compensation.fact_compensations.salary_range
 
-  tenure_range:
-    description: Snapshot attribute for tenure_range on the employee_snapshots wide metric table.
+  employee_tenure_range:
+    description: Tenure band of the employee at the reference date, based on whole months since their hire date (e.g. '3-11 months').
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.months_tenure_in_company
+      - dw_employee_details.fact_assignment_snapshots.employee_tenure_range
 
   last_raise_reason:
     description: Snapshot attribute for last_raise_reason on the employee_snapshots wide metric table.
@@ -763,17 +763,17 @@ columns:
     lineage:
       - dw_employee_details.fact_assignment_snapshots.count_total_report
 
-  months_tenure_in_company:
-    description: Snapshot attribute for months_tenure_in_company on the employee_snapshots wide metric table.
+  months_employee_tenure:
+    description: Employee's company tenure in whole months at the reference date (e.g. 12); preserved across internal transfers and reset on a genuine rehire. Use for company tenure analysis.
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.months_tenure_in_company
+      - dw_employee_details.fact_assignment_snapshots.months_employee_tenure
 
-  days_tenure_in_company:
-    description: Snapshot attribute for days_tenure_in_company on the employee_snapshots wide metric table.
+  days_employee_tenure:
+    description: Employee's company tenure in days at the reference date (e.g. 365); preserved across internal transfers and reset on a genuine rehire. Use for company tenure analysis.
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.days_tenure_in_company
+      - dw_employee_details.fact_assignment_snapshots.days_employee_tenure
 
   days_tenure_in_assignment:
     description: Snapshot attribute for days_tenure_in_assignment on the employee_snapshots wide metric table.
@@ -1002,23 +1002,23 @@ columns:
     lineage:
       - dw_employee_details.dim_employee.dt_birth
 
-  dt_hired:
-    description: Snapshot attribute for dt_hired on the employee_snapshots wide metric table.
+  dt_assignment_started:
+    description: Date this specific assignment started; restarts on internal transfers and rehires. Use for time in the current assignment (e.g. 2023-08-01).
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.dt_hired
+      - dw_employee_details.fact_assignment_snapshots.dt_assignment_started
 
   dt_terminated:
-    description: Snapshot attribute for dt_terminated on the employee_snapshots wide metric table.
+    description: Date the assignment ended (e.g. 2024-03-15). NULL while the assignment is active; a future date is a scheduled voluntary exit.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.dt_terminated
 
-  dt_original_hire:
-    description: Snapshot attribute for dt_original_hire on the employee_snapshots wide metric table.
+  dt_employee_hired:
+    description: Date the employee was hired for their current employment cycle; stays fixed across internal transfers and resets on a genuine rehire. Use for company tenure (e.g. 2021-05-10).
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.dt_original_hire
+      - dw_employee_details.fact_assignment_snapshots.dt_employee_hired
 
   dt_notified_termination:
     description: Snapshot attribute for dt_notified_termination on the employee_snapshots wide metric table.

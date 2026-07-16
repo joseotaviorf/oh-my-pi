@@ -200,7 +200,7 @@ SELECT
     NULLIF(LOWER(es.line), '-1') AS line,
     LOWER(COALESCE(es.hrbp_work_email, cc_current.hrbp_work_email)) AS hrbp,
     CASE WHEN es.is_manager IS TRUE THEN 1 ELSE 0 END AS fl_lider,
-    es.dt_original_hire AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     es.dt_terminated AS dt_desligamento,
     CASE
         WHEN es.termination_category IS NULL THEN NULL

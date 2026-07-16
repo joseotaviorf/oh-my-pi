@@ -8,9 +8,9 @@ SELECT
         WHEN es.is_leadership_team_member IS TRUE THEN 1
         ELSE 0
     END AS flag_LT,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     CASE
-        WHEN es.dt_hired > DATE_SUB(CURRENT_DATE(), 8) THEN 1
+        WHEN es.dt_employee_hired > DATE_SUB(CURRENT_DATE(), 8) THEN 1
         ELSE 0
     END AS `fl_new_hire (ult 7 dias)`,
     es.manager_name AS gestor,
@@ -58,4 +58,4 @@ WHERE
     es.is_current_for_employee = TRUE
     AND LOWER(es.status) = 'active'
 ORDER BY
-    es.dt_hired DESC
+    es.dt_employee_hired DESC

@@ -20,7 +20,7 @@ column_level_validations:
   assignment_number:
     is_complete:
       severity_level: Error
-  dt_hired:
+  dt_assignment_started:
     is_complete:
       severity_level: Error
   ts_load:

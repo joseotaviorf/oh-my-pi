@@ -66,10 +66,10 @@ SELECT
             THEN cv.salary_amount < 10000
     END AS is_eligible_internet_reimbursement,
     -- Metrics - Tenure (reference date = LEAST(CURRENT_DATE, dt_valid_to); current stint for band/job)
-    DATEDIFF(cv.dt_reference, cv.dt_original_hired) AS days_tenure_in_company,
+    DATEDIFF(cv.dt_reference, cv.dt_employee_hired) AS days_tenure_in_company,
     DATEDIFF(cv.dt_reference, cv.dt_stint_start_position) AS days_tenure_in_position,
     DATEDIFF(cv.dt_reference, cv.dt_stint_start_band) AS days_tenure_in_band,
-    FLOOR(MONTHS_BETWEEN(cv.dt_reference, cv.dt_original_hired)) AS months_tenure_in_company,
+    FLOOR(MONTHS_BETWEEN(cv.dt_reference, cv.dt_employee_hired)) AS months_tenure_in_company,
     FLOOR(MONTHS_BETWEEN(cv.dt_reference, cv.dt_stint_start_position)) AS months_tenure_in_position,
     FLOOR(MONTHS_BETWEEN(cv.dt_reference, cv.dt_stint_start_band)) AS months_tenure_in_band,
     -- SCD Type 2 fields

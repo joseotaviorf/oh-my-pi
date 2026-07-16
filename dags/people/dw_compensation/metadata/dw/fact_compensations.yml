@@ -165,14 +165,12 @@ columns:
       - datalake_people.compensation_versions.currency_code
   days_tenure_in_company:
     description: |
-      Tenure in the company in days.
-      Reference date is LEAST(CURRENT_DATE, dt_valid_to) so historical records reflect the full period.
-      Uses dt_original_hired from identifier_mapping, which already encodes transfer-continuation logic:
-      the date resets only on true rehire; GLB_TRANSFER continuations preserve the original hire date.
-      NULL when identifier_mapping data is unavailable.
+      Employee's company tenure in days at the reference date (e.g. 365).
+      Follows the current continuous employment cycle: preserved across internal transfers and reset on a genuine rehire; historical rows reflect tenure as of the period end.
+      NULL when the hire date is unavailable.
     lineage:
       - datalake_people.compensation_versions.dt_reference
-      - datalake_people.compensation_versions.dt_original_hired
+      - datalake_people.compensation_versions.dt_employee_hired
   days_tenure_in_position:
     description: |
       Tenure in the current job (position) in days, measured from the start of the current stint.
@@ -195,11 +193,12 @@ columns:
       - datalake_people.compensation_versions.dt_stint_start_band
   months_tenure_in_company:
     description: |
-      Tenure in the company in whole months.
-      Same logic as days_tenure_in_company (uses dt_original_hired, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+      Employee's company tenure in whole months at the reference date (e.g. 12).
+      Follows the current continuous employment cycle: preserved across internal transfers and reset on a genuine rehire; historical rows reflect tenure as of the period end.
+      NULL when the hire date is unavailable.
     lineage:
       - datalake_people.compensation_versions.dt_reference
-      - datalake_people.compensation_versions.dt_original_hired
+      - datalake_people.compensation_versions.dt_employee_hired
   months_tenure_in_position:
     description: |
       Tenure in the current job (position) in whole months. Same logic as days_tenure_in_position.

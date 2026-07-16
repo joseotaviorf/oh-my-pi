@@ -2,7 +2,7 @@ WITH
     dt_inicio_person AS (
         SELECT
             empl.person_number,
-            MIN(snap.dt_hired) AS dt_inicio_person
+            MIN(snap.dt_employee_hired) AS dt_inicio_person
         FROM
             dw_employee_details.fact_assignment_snapshots AS snap
         LEFT JOIN
@@ -67,12 +67,12 @@ SELECT
     LOWER(TRIM(h.name_l6)) AS l6_gestor,
     LOWER(TRIM(h.name_l7)) AS l7_gestor,
     LOWER(TRIM(h.name_l8)) AS l8_gestor,
-    f.months_tenure_in_company AS idade_empresa,
+    f.months_employee_tenure AS idade_empresa,
     CASE
         WHEN f.is_manager IS TRUE THEN 1
         ELSE 0
     END AS fl_lider,
-    f.dt_hired AS dt_inicio,
+    f.dt_employee_hired AS dt_inicio,
     CAST(FROM_UTC_TIMESTAMP(f.ts_load, 'America/Sao_Paulo') AS DATE) AS dt_last_update,
     dip.dt_inicio_person AS dt_inicio_person,
     YEAR(DATE('{load_start_date}')) AS year,
@@ -112,7 +112,7 @@ LEFT JOIN
 WHERE
     f.is_current_for_employee = TRUE
     AND (f.dt_terminated IS NULL OR f.dt_terminated >= CURRENT_DATE())
-    AND f.dt_hired <= CURRENT_DATE()
+    AND f.dt_assignment_started <= CURRENT_DATE()
     AND (LOWER(e.work_email) NOT LIKE '%@ext.%' OR e.work_email IS NULL)
 ORDER BY
     e.name

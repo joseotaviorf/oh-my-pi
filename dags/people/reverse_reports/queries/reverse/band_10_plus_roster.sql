@@ -17,7 +17,7 @@ SELECT
         WHEN es.is_leadership_team_member IS TRUE THEN 1
         ELSE 0
     END AS fl_lt,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     es.gender_identity AS identidade_genero,
     LOWER(es.registered_sex) AS sexo,
     YEAR(DATE('{load_start_date}')) AS year,

@@ -74,7 +74,7 @@ column_level_validations:
   is_active:
     is_complete:
       severity_level: Warning
-  dt_original_hired:
+  dt_employee_hired:
     is_complete:
       severity_level: Warning
   dt_started:
@@ -155,7 +155,7 @@ column_level_validations:
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.identifier_mapping
-         WHERE dt_original_hired IS NULL
+         WHERE dt_employee_hired IS NULL
         ) = 0
       severity_level: Warning
   pin_termination_status_consistency:
@@ -182,7 +182,7 @@ column_level_validations:
       severity_level: Warning
   glb_transfer_missing_continuation:
     custom:
-      # INACTIVE GLB_TRANSFER after which the person has no assignment at all (no assignment_sequence + 1 continuation and no other E/C assignment on/after the transfer close), which breaks is_transfer_hire / dt_original_hired chaining. A continuation outside the sequence pattern (e.g. a fresh assignment for the same person) is a valid rejoin, not an error.
+      # INACTIVE GLB_TRANSFER after which the person has no assignment at all (no assignment_sequence + 1 continuation and no other E/C assignment on/after the transfer close), which breaks is_transfer_hire / dt_employee_hired chaining. A continuation outside the sequence pattern (e.g. a fresh assignment for the same person) is a valid rejoin, not an error.
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT DISTINCT glb.id_assignment

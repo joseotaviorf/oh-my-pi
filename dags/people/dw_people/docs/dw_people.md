@@ -124,7 +124,7 @@ SELECT
     emp.name,
     emp.work_email,
     fact.dt_reference,
-    fact.tenure_months,
+    fact.months_employee_tenure,
     fact.is_active,
     hier.name_manager,
     hier.name_l0

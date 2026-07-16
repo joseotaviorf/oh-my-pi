@@ -7,8 +7,8 @@ description: |-
   Business rule for employment continuity:
   - GLB_TRANSFER continuation (same person and assignment_sequence + 1) keeps the same employment cycle when both assignments are type E or C.
   - Non-transfer rehiring starts a new employment cycle.
-  - dt_original_hired is the earliest dt_started inside the current employment cycle.
-  This means dt_original_hired is a cycle-based company tenure date.
+  - dt_employee_hired is the earliest dt_started inside the current employment cycle.
+  This means dt_employee_hired is a cycle-based company tenure date.
   It is not the PIN seniority rule date and it can differ from seniority_date.dt_seniority.
   Example: period A -> cycle A, period B (rehire) -> cycle B, period C (GLB_TRANSFER continuation of B) -> cycle B.
   Name columns: name is the preferred full name for reports and communications, resolved from person_name (GLOBAL) as concatenated social names when present, else display_name, else documented_full_name, then normalized in this query; use documented_* for official / document-aligned names from HCM.
@@ -150,19 +150,10 @@ columns:
     description: Projected start date for the employee's activities, usually for future hires.
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_projected_started
-  dt_original_hired:
+  dt_employee_hired:
     description: |
-      Original hire date for the current continuous employment cycle.
-      Calculation:
-      - restrict to employment periods (periods with at least one E or C assignment); pension / pre-hire (P) rows have NULL
-      - group periods_of_service by person and cycle continuity
-      - keep continuity for GLB_TRANSFER continuation (assignment_sequence + 1) for assignment types E and C only
-      - start a new cycle for non-transfer rehiring
-      - return the minimum dt_started inside the cycle
-      Interpretation for business users:
-      - preserves tenure across transfer continuations
-      - resets tenure on rehire
-      - may differ from PIN seniority_date.dt_seniority
+      Earliest hire date within the employee's current continuous employment cycle — the company-tenure anchor.
+      Preserved across GLB_TRANSFER continuations (assignment types E and C) and reset on a genuine rehire, so it can differ from the PIN seniority date.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
       - datalake_pin_core_clean.periods_of_service.id_period_of_service

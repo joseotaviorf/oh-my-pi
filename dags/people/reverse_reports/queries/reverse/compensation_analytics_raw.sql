@@ -5,7 +5,7 @@ SELECT DISTINCT
     es.name AS nome,
     es.job_name AS cargo,
     es.manager_name AS gestor,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     CONCAT(
         LOWER(es.cost_center_code),
         ' - ',

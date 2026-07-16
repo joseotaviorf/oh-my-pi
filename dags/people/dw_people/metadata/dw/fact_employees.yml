@@ -48,10 +48,10 @@ columns:
     description: Surrogate key for the management hierarchy version effective on this reference date (same grain as the assignment snapshot).
     lineage:
       - datalake_people.assignment_snapshots.sk_hierarchy_version
-  sk_hired_date:
-    description: Hire date in YYYYMMDD form for calendar-style joins.
+  sk_employee_hired_date:
+    description: Employee-cycle hire date in YYYYMMDD format for calendar-style joins (e.g. '20210510'). Consistent with dt_employee_hired on the same row.
     lineage:
-      - datalake_people.assignment_snapshots.sk_hired_date
+      - datalake_people.assignment_snapshots.dt_employee_hired
   sk_terminated_date:
     description: Termination date in YYYYMMDD form when the assignment has ended and termination is strictly before the load calendar date; NULL while still active or when termination is same-day or future relative to load (rule in this fact query).
     lineage:
@@ -65,10 +65,10 @@ columns:
     description: Country inferred for the job role on this snapshot (from job naming and classification rules).
     lineage:
       - datalake_people.assignment_snapshots.business_unit_country
-  tenure_months:
-    description: Months since the employee's first hire at the company.
+  months_employee_tenure:
+    description: Employee's company tenure in whole months at the reference date (e.g. 12). Preserved across internal transfers and reset on a genuine rehire.
     lineage:
-      - datalake_people.assignment_snapshots.months_tenure_in_company
+      - datalake_people.assignment_snapshots.months_employee_tenure
   is_active:
     description: True when the employee is currently active.
     lineage:
@@ -77,10 +77,10 @@ columns:
     description: True when the reference date is the latest observation day in the snapshot series (typically today).
     lineage:
       - datalake_people.assignment_snapshots.is_current_for_assignment
-  dt_hired:
-    description: Date the employee started this assignment.
+  dt_employee_hired:
+    description: Date the employee was hired for their current employment cycle (e.g. 2021-05-10). Stays the same across internal transfers and resets on a genuine rehire.
     lineage:
-      - datalake_people.assignment_snapshots.dt_hired
+      - datalake_people.assignment_snapshots.dt_employee_hired
   dt_terminated:
     description: Calendar date the assignment ended for reporting; NULL when still active or when termination is same-day or future relative to load (rule in this fact query).
     lineage:

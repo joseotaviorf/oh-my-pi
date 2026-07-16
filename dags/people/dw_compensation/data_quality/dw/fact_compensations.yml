@@ -69,7 +69,7 @@ column_level_validations:
       greater_than_or_equal_to: 0
       severity_level: Error
     has_completeness:
-      # dt_original_hired (and id_continuous_employment_cycle) should be populated for nearly all
+      # dt_employee_hired (and id_continuous_employment_cycle) should be populated for nearly all
       # compensation records; a low completeness rate signals a regression in identifier_mapping join.
       greater_than_or_equal_to: 0.95
       severity_level: Warning

@@ -1,7 +1,7 @@
 SELECT
     bu.consolidated_business_unit_name AS empresa,
     es.name AS nome,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     es.dt_terminated AS dt_desligamento,
     LOWER(es.work_email) AS email,
     CASE
@@ -25,7 +25,7 @@ SELECT
     es.dt_birth AS dt_nascimento,
     CAST(FROM_UTC_TIMESTAMP(es.ts_load, 'America/Sao_Paulo') AS DATE) AS dt_last_update,
     LOWER(es.hrbp_work_email) AS hrbp,
-    es.months_tenure_in_company AS idade_empresa,
+    es.months_employee_tenure AS idade_empresa,
     NULLIF(LOWER(es.business), '-1') AS business,
     NULLIF(LOWER(es.product), '-1') AS product,
     mh.name_l0 AS l0_gestor,
@@ -54,7 +54,7 @@ SELECT
     NULLIF(LOWER(es.brand), '-1') AS brand,
     NULLIF(LOWER(es.chapter), '-1') AS chapter,
     NULLIF(LOWER(es.line), '-1') AS line,
-    es.dt_original_hire AS dt_inicio_person,
+    es.dt_employee_hired AS dt_inicio_person,
     CASE
         WHEN LOWER(es.ethnicity) IN ('white', 'asian') THEN 'Non-BIM'
         WHEN LOWER(es.ethnicity) IN (

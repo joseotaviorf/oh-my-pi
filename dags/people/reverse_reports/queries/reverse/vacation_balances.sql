@@ -8,7 +8,7 @@ WITH active_assignment AS (
         snap.sk_cost_center_version,
         snap.sk_business_unit,
         snap.sk_hierarchy_version,
-        snap.dt_hired
+        snap.dt_assignment_started AS dt_hired
     FROM
         dw_employee_details.fact_assignment_snapshots AS snap
     WHERE

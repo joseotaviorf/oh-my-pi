@@ -236,15 +236,15 @@ assignment_snapshots_ranked AS (
             ELSE 'Active'
         END AS employment_status,
         CASE
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) IS NULL THEN CAST(NULL AS STRING)
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) < 3  THEN '< 3 months'
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) < 12 THEN '3-11 months'
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) < 36 THEN '1-2 years'
-            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) < 60 THEN '3-4 years'
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_employee_hired)) IS NULL THEN CAST(NULL AS STRING)
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_employee_hired)) < 3  THEN '< 3 months'
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_employee_hired)) < 12 THEN '3-11 months'
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_employee_hired)) < 36 THEN '1-2 years'
+            WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_employee_hired)) < 60 THEN '3-4 years'
             ELSE '5+ years'
-        END AS tenure_range,
-        DATEDIFF(ad.dt_reference, im.dt_original_hired) AS days_tenure_in_company,
-        FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_original_hired)) AS months_tenure_in_company,
+        END AS employee_tenure_range,
+        DATEDIFF(ad.dt_reference, im.dt_employee_hired) AS days_employee_tenure,
+        FLOOR(MONTHS_BETWEEN(ad.dt_reference, im.dt_employee_hired)) AS months_employee_tenure,
         DATEDIFF(ad.dt_reference, ad.dt_started) AS days_tenure_in_assignment,
         COALESCE(drc.count_direct_report, 0) AS count_direct_report,
         COALESCE(irc.count_indirect_report, 0) AS count_indirect_report,
@@ -299,8 +299,8 @@ assignment_snapshots_ranked AS (
             OR ad.dt_reference = ad.dt_series_end
         ) AS is_monthly_snapshot_for_assignment,
         ad.dt_reference = ad.dt_series_end AS is_current_for_assignment,
-        im.dt_original_hired AS dt_original_hire,
-        ad.dt_started AS dt_hired,
+        im.dt_employee_hired,
+        ad.dt_started AS dt_assignment_started,
         ad.dt_terminated,
         ad.dt_notified_termination,
         ad.dt_reference AS dt_reference,
@@ -476,9 +476,9 @@ SELECT
     asr.hierarchy_level,
     asr.hierarchy_depth,
     asr.employment_status,
-    asr.tenure_range,
-    asr.days_tenure_in_company,
-    asr.months_tenure_in_company,
+    asr.employee_tenure_range,
+    asr.days_employee_tenure,
+    asr.months_employee_tenure,
     asr.days_tenure_in_assignment,
     asr.count_direct_report,
     asr.count_indirect_report,
@@ -509,8 +509,8 @@ SELECT
     msfe.id_assignment IS NOT NULL AS is_monthly_snapshot_for_employee,
     asr.is_current_for_assignment,
     cpar.id_assignment IS NOT NULL AS is_current_for_employee,
-    asr.dt_original_hire,
-    asr.dt_hired,
+    asr.dt_employee_hired,
+    asr.dt_assignment_started,
     asr.dt_terminated,
     asr.dt_notified_termination,
     asr.dt_reference,

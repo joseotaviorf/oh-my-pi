@@ -11,7 +11,7 @@ description: |
   - Assignment-grain analysis: filter is_current_for_assignment = TRUE (current state) or is_monthly_snapshot_for_assignment = TRUE (monthly, join/group by dt_month_reference) to get every assignment instead of the employee-grain default above — active assignments use today's date; terminated ones use the termination date. Use only when you need every assignment (e.g. rehires, multiple terminations).
   - Historical point-in-time: filter by a specific dt_reference value to reconstruct the workforce as it stood on any past calendar day.
 
-  All job, org, and hierarchy attributes are time-valid: they reflect the state on dt_reference, not the current value. dt_original_hire is the earliest hire date within the current continuous employment cycle and is intended for tenure calculations only.
+  All job, org, and hierarchy attributes are time-valid: they reflect the state on dt_reference, not the current value. dt_employee_hired is the earliest hire date within the current continuous employment cycle and is intended for tenure calculations only.
 
 columns:
   id_assignment:
@@ -105,9 +105,9 @@ columns:
       "Terminated": Employee's assignment has ended on or before the reference date.
     lineage:
       - datalake_people.identifier_mapping.assignment_status_type
-  tenure_range:
+  employee_tenure_range:
     description: |
-      Tenure band based on months_tenure_in_company (months between original hire date and reference date).
+      Tenure band based on months_employee_tenure (whole months between the employment-cycle hire date and the reference date).
       Null when the hire date is unknown.
     categories:
       "< 3 months": Less than 3 months of tenure.
@@ -116,15 +116,15 @@ columns:
       "3-4 years": Between 3 and 4 years of tenure.
       "5+ years": 5 or more years of tenure.
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
-  days_tenure_in_company:
-    description: Days since the employee's first hire at the company.
+      - datalake_people.identifier_mapping.dt_employee_hired
+  days_employee_tenure:
+    description: Employee's company tenure in days on the reference date; follows the current continuous employment cycle, preserved across internal transfers and reset on a genuine rehire.
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
-  months_tenure_in_company:
-    description: Months since the employee's first hire at the company.
+      - datalake_people.identifier_mapping.dt_employee_hired
+  months_employee_tenure:
+    description: Employee's company tenure in whole months on the reference date; follows the current continuous employment cycle, preserved across internal transfers and reset on a genuine rehire.
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_people.identifier_mapping.dt_employee_hired
   days_tenure_in_assignment:
     description: Days since the employee started this specific assignment.
     lineage:
@@ -233,20 +233,20 @@ columns:
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_actual_termination
       - datalake_pin_core_clean.periods_of_service.dt_started
-  dt_original_hire:
-    description: Date of the employee's first hire at the company. Derived from MIN(dt_started) over periods_of_service per person (approximation). PER_SENIORITY_DATES_F will provide assignment-level value when available.
+  dt_employee_hired:
+    description: Date the employee was hired for their current continuous employment cycle. Stays fixed across internal transfers and resets on a genuine rehire. Use for company tenure.
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
-  dt_hired:
-    description: Date the employee started this assignment.
+      - datalake_people.identifier_mapping.dt_employee_hired
+  dt_assignment_started:
+    description: Date this specific assignment started. Restarts on both internal transfers and rehires (each opens a new assignment). Use for time in the current assignment.
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_people.identifier_mapping.dt_started
   dt_terminated:
-    description: Date the assignment ended. Shows 9999-12-31 when still active.
+    description: Date the assignment ended. NULL while the assignment is active.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_actual_termination
   dt_notified_termination:
-    description: Date when the termination was notified. Shows 9999-12-31 when still active.
+    description: Date when the termination was notified. NULL while the assignment is active.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_notified_termination
   dt_reference:

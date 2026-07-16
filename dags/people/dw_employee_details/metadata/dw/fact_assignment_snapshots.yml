@@ -75,9 +75,13 @@ columns:
       "Terminated": Employee's assignment has ended on or before the reference date.
     lineage:
       - datalake_people.assignment_snapshots.employment_status
-  tenure_range:
+  business_unit_country:
+    description: Country associated with the employee's job role on this snapshot (e.g. 'Brazil'). The main source for an employee's country; use for headcount and org allocation by country.
+    lineage:
+      - datalake_people.assignment_snapshots.business_unit_country
+  employee_tenure_range:
     description: |
-      Tenure band based on months_tenure_in_company (months between original hire date and reference date).
+      Tenure band based on whole months between the employee's hire date and the reference date.
       Null when the hire date is unknown.
     categories:
       "< 3 months": Less than 3 months of tenure.
@@ -86,15 +90,15 @@ columns:
       "3-4 years": Between 3 and 4 years of tenure.
       "5+ years": 5 or more years of tenure.
     lineage:
-      - datalake_people.assignment_snapshots.tenure_range
-  days_tenure_in_company:
-    description: Days since the employee's first hire at the company. Use for company tenure analysis.
+      - datalake_people.assignment_snapshots.employee_tenure_range
+  days_employee_tenure:
+    description: Employee's company tenure in days at the reference date (e.g. 365). Preserved across internal transfers and reset on a genuine rehire. Use for company tenure analysis.
     lineage:
-      - datalake_people.assignment_snapshots.days_tenure_in_company
-  months_tenure_in_company:
-    description: Months since the employee's first hire at the company. Use for company tenure analysis.
+      - datalake_people.assignment_snapshots.days_employee_tenure
+  months_employee_tenure:
+    description: Employee's company tenure in whole months at the reference date (e.g. 12). Preserved across internal transfers and reset on a genuine rehire. Use for company tenure analysis.
     lineage:
-      - datalake_people.assignment_snapshots.months_tenure_in_company
+      - datalake_people.assignment_snapshots.months_employee_tenure
   days_tenure_in_assignment:
     description: Days since the employee started this specific assignment. Use for time-in-current-role analysis.
     lineage:
@@ -187,20 +191,20 @@ columns:
     description: True on exactly one row per employee, the assignment active today or their most recent terminated assignment. Use this flag to filter for the employee's current state.
     lineage:
       - datalake_people.assignment_snapshots.is_current_for_employee
-  dt_original_hire:
-    description: Date of the employee's first hire at the company. Stays the same when they move between teams or roles.
+  dt_employee_hired:
+    description: Date the employee was hired for their current employment cycle. Stays the same across internal transfers and resets on a genuine rehire. Use for company tenure (e.g. 2021-05-10).
     lineage:
-      - datalake_people.assignment_snapshots.dt_original_hire
-  dt_hired:
-    description: Date the employee started this assignment.
+      - datalake_people.assignment_snapshots.dt_employee_hired
+  dt_assignment_started:
+    description: Date this specific assignment started. Restarts on internal transfers and rehires (each opens a new assignment). Use for time in the current assignment (e.g. 2023-08-01).
     lineage:
-      - datalake_people.assignment_snapshots.dt_hired
+      - datalake_people.assignment_snapshots.dt_assignment_started
   dt_terminated:
-    description: Date the assignment ended. Shows 9999-12-31 when still active (no end date yet).
+    description: Date the assignment ended (e.g. 2024-03-15). NULL while the assignment is active; a future date is a scheduled voluntary exit.
     lineage:
       - datalake_people.assignment_snapshots.dt_terminated
   dt_notified_termination:
-    description: Date when the termination was notified to HR. Shows 9999-12-31 when still active.
+    description: Date when the termination was notified to HR (e.g. 2024-03-01). NULL while the assignment is active.
     lineage:
       - datalake_people.assignment_snapshots.dt_notified_termination
   dt_reference:

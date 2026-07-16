@@ -31,7 +31,7 @@ SELECT
         ELSE 0
     END AS fl_lider,
     LOWER(es.personal_email) AS email_pessoal,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     es.dt_terminated AS dt_desligamento,
     LOWER(es.employment_type) AS vinculo,
     es.cpf,

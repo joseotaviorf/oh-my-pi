@@ -6,7 +6,7 @@ SELECT
     es.marital_status AS estado_civil,
     es.dt_birth AS dt_nascimento,
     es.cpf,
-    es.dt_hired AS dt_inicio,
+    es.dt_employee_hired AS dt_inicio,
     es.job_name AS cargo,
     NULLIF(LOWER(es.structure), '-1') AS departamento,
     CONCAT(

@@ -4,17 +4,17 @@ SELECT
     COALESCE(asn.sk_job_version, '-1') AS sk_job,
     COALESCE(asn.sk_cost_center_version, '-1') AS sk_cost_center_version,
     COALESCE(asn.sk_hierarchy_version, '-1') AS sk_manager_hierarchy,
-    asn.sk_hired_date,
+    DATE_FORMAT(asn.dt_employee_hired, 'yyyyMMdd') AS sk_employee_hired_date,
     CASE
         WHEN asn.dt_terminated <= DATE('{load_start_date}') THEN asn.sk_terminated_date
         ELSE NULL
     END AS sk_terminated_date,
     asn.sk_reference_date,
     asn.business_unit_country,
-    asn.months_tenure_in_company AS tenure_months,
+    asn.months_employee_tenure,
     asn.is_active,
     asn.is_current_for_assignment AS is_current,
-    asn.dt_hired,
+    asn.dt_employee_hired,
     CASE
         WHEN asn.dt_terminated <= DATE('{load_start_date}') THEN asn.dt_terminated
         ELSE NULL
