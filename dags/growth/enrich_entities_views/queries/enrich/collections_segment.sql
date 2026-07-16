@@ -12,24 +12,29 @@ WITH late_fee_discount_audiences AS (
         AND neg_option.discount_on_fee_percent = 100.00
         AND neg_option.discount_on_fine_percent = 100.00
 ),
-contracts_with_active_segmentation AS (
+customers_with_active_segmentation AS (
     SELECT DISTINCT
-        CAST(id_contract AS BIGINT) AS id_contract
+        customer_document_type,
+        customer_document_value,
+        id_priority_contract
     FROM
-        datalake_trato_feito_clean.contract_segment_distribution
+        datalake_trato_feito_clean.customer_segment_distribution
     WHERE
         is_active = TRUE
 ),
-collections_segment_base AS (
+collections_segment_ranked AS (
     SELECT
-        csd.id_contract_segment_distribution AS id_entity,
+        csd.id_customer_segment_distribution AS id_entity,
         ct.id_house,
         ct.id_contract,
-        ct.id_tenant,
+        COALESCE(
+            CAST(cl.person_uuid AS STRING),
+            CAST(cl.id_external AS STRING)
+        ) AS id_user,
         'FR_COLLECTIONS_SEGMENT' AS entity,
         'RENT' AS business_context,
         CASE
-            WHEN active_segmentation.id_contract IS NULL THEN 'debts_settled'
+            WHEN active_segmentation.id_priority_contract IS NULL THEN 'debts_settled'
             WHEN s.name = 'EVICTIONS' AND s.is_active = TRUE THEN 'is_on_evictions'
             WHEN s.name IN (
                 'ACTIVE_STOCK_RISK_DEAL_LOW',
@@ -41,12 +46,23 @@ collections_segment_base AS (
             ELSE 'is_segmented'
         END AS status,
         csd.ts_created,
-        csd.ts_updated
+        csd.ts_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY csd.id_customer_segment_distribution
+            ORDER BY cl.ts_created DESC
+        ) AS client_rank
     FROM
-        datalake_trato_feito_clean.contract_segment_distribution AS csd
+        datalake_trato_feito_clean.customer_segment_distribution AS csd
+    INNER JOIN
+        datalake_trato_feito_clean.client AS cl
+            ON LOWER(cl.document_type) = LOWER(csd.customer_document_type)
+            AND cl.document = csd.customer_document_value
+            AND cl.deleted = FALSE
+            AND cl.client_type <> 'landlord'
     LEFT JOIN
-        contracts_with_active_segmentation AS active_segmentation
-            ON CAST(csd.id_contract AS BIGINT) = active_segmentation.id_contract
+        customers_with_active_segmentation AS active_segmentation
+            ON csd.customer_document_type = active_segmentation.customer_document_type
+            AND csd.customer_document_value = active_segmentation.customer_document_value
     LEFT JOIN
         datalake_trato_feito_clean.segment AS s
             ON csd.id_segment = s.id_segment
@@ -55,16 +71,33 @@ collections_segment_base AS (
             ON csd.id_audience = lfd.id_audience
     INNER JOIN
         core_contract.contract AS ct
-            ON CAST(csd.id_contract AS BIGINT) = ct.id_contract
+            ON CAST(csd.id_priority_contract AS BIGINT) = ct.id_contract
     WHERE
         csd.is_active = TRUE
-        OR active_segmentation.id_contract IS NULL
+        OR active_segmentation.id_priority_contract IS NULL
+),
+collections_segment_base AS (
+    SELECT
+        id_entity,
+        id_house,
+        id_contract,
+        id_user,
+        entity,
+        business_context,
+        status,
+        ts_created,
+        ts_updated
+    FROM
+        collections_segment_ranked
+    WHERE
+        client_rank = 1
+        AND id_user IS NOT NULL
 )
 SELECT
     id_entity,
     id_house,
     id_contract,
-    id_tenant AS id_user,
+    id_user,
     entity,
     'TENANT' AS persona,
     business_context,
@@ -74,7 +107,7 @@ SELECT
             ts_created AS when
         )
     ) AS properties,
-    -- debts_settled is the only inactive status; all others mean the contract is still in collections
+    -- debts_settled is the only inactive status; all others mean the customer is still in collections
     CASE
         WHEN status = 'debts_settled' THEN FALSE
         ELSE TRUE

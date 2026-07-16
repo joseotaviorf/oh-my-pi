@@ -648,7 +648,8 @@ bietlejuice.enrich_entities_views:
     - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
     - bietlejuice.bob:load-clean-house-draft:first-run-of-day
     - bietlejuice.bob:load-clean-registrar:first-run-of-day
-    - bietlejuice.trato_feito:load-clean-contract-segment-distribution:first-run-of-day
+    - bietlejuice.trato_feito:load-clean-customer-segment-distribution:first-run-of-day
+    - bietlejuice.trato_feito:load-clean-client:first-run-of-day
     - bietlejuice.trato_feito:load-clean-segment:first-run-of-day
     - bietlejuice.trato_feito:load-clean-audience-negotiation-option:first-run-of-day
     - bietlejuice.trato_feito:load-clean-negotiation-option:first-run-of-day

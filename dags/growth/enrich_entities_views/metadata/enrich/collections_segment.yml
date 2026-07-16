@@ -2,52 +2,57 @@ database_name: datalake_entities_views
 table_name: collections_segment
 description: |
   Enriched CDP entity view for collections segmentation (FR_COLLECTIONS_SEGMENT). Each row represents a
-  tenant's contract in a Trato Feito collection segment (contract_segment_distribution), enriched with
-  contract and segment data. Tracks whether the tenant has a late fee discount offer, is in pre-evictions
-  (STOCK_RISK), is in evictions, or has settled their debts. Feeds enrich_transactional_entities for AI
-  initiatives such as Conv XP chatbots.
+  Trato Feito customer_segment_distribution record for a customer document, joined to the latest non-deleted
+  non-landlord trato_feito client for that document and to the priority contract via core_contract. Tracks
+  whether the customer has a late fee discount offer, is in pre-evictions (STOCK_RISK), is in evictions, or
+  has settled their debts. Feeds enrich_transactional_entities for AI initiatives such as Conv XP chatbots
+  and Datazord.
 domain: Fintech
 owner: erick.alexandre@quintoandar.com.br
 columns:
   id_entity:
     lineage:
-      - datalake_trato_feito_clean.contract_segment_distribution.id_contract_segment_distribution
-    description: Primary identifier of the collections segment entity; maps directly to id_contract_segment_distribution from the Trato Feito contract_segment_distribution table.
+      - datalake_trato_feito_clean.customer_segment_distribution.id_customer_segment_distribution
+    description: Primary identifier of the collections segment entity; maps directly to id_customer_segment_distribution from the Trato Feito customer_segment_distribution table.
   id_house:
     lineage:
       - core_contract.contract.id_house
-    description: House ID associated with the contract linked to this collection segment distribution, sourced from the core contract model.
+    description: House ID associated with the priority contract linked to this customer segment distribution, sourced from the core contract model.
   id_contract:
     lineage:
       - core_contract.contract.id_contract
-    description: Contract ID associated with this collection segment distribution, sourced from the core contract model via join on contract_segment_distribution.id_contract.
+    description: Priority contract ID for this customer segment distribution, sourced from the core contract model via join on customer_segment_distribution.id_priority_contract.
   id_user:
     lineage:
-      - core_contract.contract.id_tenant
+      - datalake_trato_feito_clean.client.person_uuid
+      - datalake_trato_feito_clean.client.id_external
     description: |
-      User ID of the tenant associated with the contract in collection. Sourced from core_contract.contract.id_tenant.
-      Only the TENANT persona is present; one row is generated per contract_segment_distribution record.
+      Datazord user key for the tenant associated with this customer segment distribution.
+      Resolved from the latest non-deleted, non-landlord trato_feito client matching customer_document_type
+      and customer_document_value as COALESCE(person_uuid, id_external) cast to string (person UUID preferred,
+      else Main external id). Only the TENANT persona is present; one row is generated per
+      customer_segment_distribution record that has a matching client with a resolvable identifier.
   entity:
     description: Entity type. Always 'FR_COLLECTIONS_SEGMENT' for all rows in this view, indicating a rental collections segment entity.
   persona:
-    description: Role of id_user in relation to this entity. Always 'TENANT', since collections segments are tracked per tenant on active rental contracts.
+    description: Role of id_user in relation to this entity. Always 'TENANT', since collections segments are tracked per customer document on rental contracts.
     categories:
-      TENANT: The tenant associated with the contract in a Trato Feito collection segment.
+      TENANT: The tenant associated with the customer document in a Trato Feito collection segment.
   business_context:
     description: Business context of this entity. Always 'RENT' since collections segments apply to the rental business only.
   properties:
     lineage:
-      - datalake_trato_feito_clean.contract_segment_distribution.is_active
+      - datalake_trato_feito_clean.customer_segment_distribution.is_active
       - datalake_trato_feito_clean.segment.name
       - datalake_trato_feito_clean.segment.is_active
       - datalake_trato_feito_clean.audience_negotiation_option.id_audience
       - datalake_trato_feito_clean.audience_negotiation_option.is_active
       - datalake_trato_feito_clean.negotiation_option.discount_on_fee_percent
       - datalake_trato_feito_clean.negotiation_option.discount_on_fine_percent
-      - datalake_trato_feito_clean.contract_segment_distribution.ts_created
+      - datalake_trato_feito_clean.customer_segment_distribution.ts_created
     description: |
       JSON structure containing collections segment properties: status and creation timestamp (when).
-      status values: 'debts_settled' (contract has no active contract_segment_distribution — tenant left collections, is_active = FALSE),
+      status values: 'debts_settled' (customer document has no active customer_segment_distribution — customer left collections, is_active = FALSE),
       'is_on_evictions' (segment name = EVICTIONS and segment is active),
       'is_on_pre_evictions' (segment name in ACTIVE_STOCK_RISK_DEAL_LOW, ACTIVE_STOCK_RISK_DEAL_HIGH, ACTIVE_STOCK_RISK_NODEAL_LOW, ACTIVE_STOCK_RISK_NODEAL_HIGH and segment is active),
       'has_late_fee_discount' (audience has a negotiation option with 100% discount on fee and fine),
@@ -55,20 +60,20 @@ columns:
       Structure: {"status": "<status_value>", "when": "<ts_created>"}
   is_active:
     lineage:
-      - datalake_trato_feito_clean.contract_segment_distribution.is_active
+      - datalake_trato_feito_clean.customer_segment_distribution.is_active
       - datalake_trato_feito_clean.segment.name
       - datalake_trato_feito_clean.segment.is_active
       - datalake_trato_feito_clean.audience_negotiation_option.id_audience
     description: |
       Boolean flag indicating whether the collections segment entity is currently active.
-      TRUE when the contract still has an active collections segmentation (status is not debts_settled).
-      FALSE only for debts_settled, when the contract has no active contract_segment_distribution record.
-      Superseded inactive segment rows are excluded when the contract moved to another active segment.
+      TRUE when the customer still has an active collections segmentation (status is not debts_settled).
+      FALSE only for debts_settled, when the customer document has no active customer_segment_distribution record.
+      Superseded inactive segment rows are excluded when the customer moved to another active segment.
   ts_created:
     lineage:
-      - datalake_trato_feito_clean.contract_segment_distribution.ts_created
-    description: Timestamp when the contract_segment_distribution record was created in the Trato Feito system.
+      - datalake_trato_feito_clean.customer_segment_distribution.ts_created
+    description: Timestamp when the customer_segment_distribution record was created in the Trato Feito system.
   ts_updated:
     lineage:
-      - datalake_trato_feito_clean.contract_segment_distribution.ts_updated
-    description: Timestamp when the contract_segment_distribution record was last updated in the Trato Feito system.
+      - datalake_trato_feito_clean.customer_segment_distribution.ts_updated
+    description: Timestamp when the customer_segment_distribution record was last updated in the Trato Feito system.
