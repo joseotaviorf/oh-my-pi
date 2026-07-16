@@ -1,8 +1,8 @@
-database_name: datalake_crawlers_listings
+database_name: datalake_sale_crawlers_listings
 table_name: loft_region_mapping
 description: Finds the id_neighborhood given the listing's latitude and longitude.
 domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_house:
     lineage:
@@ -11,7 +11,7 @@ columns:
   id_house_platform:
     lineage:
     - datalake_crawlers_listings_clean.loft.id
-    description: ID from platform.
+    description: External listing identifier assigned by the Loft sale crawler feed.
   id_neighborhood:
     lineage:
     - datalake_ebdb_clean.map_region.id
