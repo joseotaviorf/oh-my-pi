@@ -121,6 +121,18 @@ class MetadataFileService:
             return yaml.safe_load(f)
 
     @staticmethod
+    def _find_table_customization(table_name: str, tables_customization: dict) -> dict:
+        table_custom = tables_customization.get(table_name, {})
+        if isinstance(table_custom, dict) and table_custom:
+            return table_custom
+        for customization in tables_customization.values():
+            if not isinstance(customization, dict):
+                continue
+            if customization.get("clean_table_name") == table_name:
+                return customization
+        return {}
+
+    @staticmethod
     def _compute_schema(
         dag_name: str,
         layer: str,
@@ -129,8 +141,10 @@ class MetadataFileService:
         tables_customization: dict,
     ) -> str:
         # Per-table custom_schema takes precedence (used in DW layer)
-        table_custom = tables_customization.get(table_name, {})
-        if isinstance(table_custom, dict) and "custom_schema" in table_custom:
+        table_custom = MetadataFileService._find_table_customization(
+            table_name, tables_customization
+        )
+        if "custom_schema" in table_custom:
             return table_custom["custom_schema"]
         # Metric schema is always derived from dag name; workflow ignores custom_schema
         if layer == "metric":
