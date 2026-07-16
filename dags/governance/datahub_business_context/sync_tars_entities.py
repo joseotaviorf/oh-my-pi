@@ -350,7 +350,10 @@ def _process_document(
             document_urn=doc.urn,
             md_output_dir=_md_output_dir(doc.data_product_type),
         )
-        print(f"  ✓ opened PR #{pr.pr_number}: {pr.pr_url}")
+        if pr.pr_url:
+            print(f"  ✓ opened PR #{pr.pr_number}: {pr.pr_url}")
+        else:
+            print("  ↩ master already matches — nothing to sync")
         state.mark_synced(
             doc.urn,
             content_hash,

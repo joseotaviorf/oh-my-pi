@@ -240,6 +240,18 @@ def open_sync_pull_request(
             pr_number=int(existing_pr["number"]),
         )
 
+    # ── No open PR — but master might already have this exact content ─────────
+    # --mode gitops has no shared "already synced" memory across machines/CI:
+    # SyncStateStore persists to .tars_entity_sync_state.json, which is
+    # gitignored and local to whichever machine ran the script. A second
+    # invocation elsewhere (e.g. a periodic job) sees no prior state and would
+    # otherwise open a brand-new, no-op PR for content already merged. Compare
+    # against git itself — the actual source of truth — before committing.
+    master_content = _get_file_content(md_path, GITHUB_DEFAULT_BRANCH)
+    if master_content == md_content:
+        print(f"  ↩ {md_path} on master already has identical content — no PR needed")
+        return PullRequestResult(pr_url="", branch=branch, pr_number=0, updated=False)
+
     # ── No open PR — create branch, commit MD, and open a new PR ──────────────
     base_sha = _get_ref_sha()
     branch_already_existed = False
