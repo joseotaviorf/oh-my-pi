@@ -73,8 +73,7 @@ sessions_enriched AS (
         CASE
             WHEN m.bot = 'matthew' THEN 'Matthew in Whatsapp'
             WHEN m.bot = 'wall-e' AND (
-                COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
-                OR COALESCE(o.flag_collectionsinput_agent, 0) = 1
+                COALESCE(o.flag_collections_agent_input, 0) = 1
                 OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
                 OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
                 OR COALESCE(o.flag_debt_finder_tool, 0) = 1
@@ -87,8 +86,7 @@ sessions_enriched AS (
             ELSE 'Wall-e'
         END AS ai_agent_source_legacy,
         (
-            COALESCE(o.flag_collectionsinput_agent, 0) = 1
-            OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
+            COALESCE(o.flag_collections_agent_input, 0) = 1
             OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
             OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
             OR COALESCE(o.flag_debt_finder_tool, 0) = 1
@@ -96,8 +94,7 @@ sessions_enriched AS (
         CASE
             WHEN m.bot = 'matthew' THEN 1
             WHEN (
-                COALESCE(o.flag_collectionsinput_agent, 0) = 1
-                OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
+                COALESCE(o.flag_collections_agent_input, 0) = 1
                 OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
                 OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
                 OR COALESCE(o.flag_debt_finder_tool, 0) = 1
@@ -108,7 +105,8 @@ sessions_enriched AS (
             ELSE 0
         END AS flag_matthew_talked_to_user,
         CASE
-            WHEN COALESCE(o.flag_collectionsinputv3_agent, 0) = 1 THEN 'V3'
+            WHEN o.collections_agent_version IS NOT NULL
+                THEN CONCAT('V', CAST(o.collections_agent_version AS STRING))
             WHEN COALESCE(o.flag_collectionsinput_agent, 0) = 1 THEN 'V2'
             WHEN COALESCE(o.flag_debt_retriever_tool, 0) = 1
                 OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1 THEN 'V1.5'
@@ -116,7 +114,9 @@ sessions_enriched AS (
             ELSE NULL
         END AS matthew_version,
         CASE
-            WHEN m.bot = 'wall-e' AND (COALESCE(o.flag_collectionsinput_agent, 0) = 1 OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1) THEN TRUE
+            WHEN m.bot = 'wall-e'
+                AND COALESCE(o.flag_collections_agent_input, 0) = 1
+            THEN TRUE
             ELSE FALSE
         END AS flag_eval_matthew_in_chat,
         m.is_escalated AS is_escalation,

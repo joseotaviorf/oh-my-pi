@@ -39,7 +39,15 @@ columns:
   flag_collectionsinputv3_agent:
     lineage:
       - datalake_langfuse_clean.observations.name
-    description: "1 if the session contains the canonical Matthew V3 entrypoint observation, else 0. Built from observation names in ('collectionsagentv1input', 'collectionsagentv3input') because, during the V3 rollout, the backend still emits the legacy 'collectionsagentv1input' name for V3 sessions; both are matched until the upstream rename PR ships, after which only 'collectionsagentv3input' is expected."
+    description: "Compatibility flag for the Matthew V3 entrypoint. 1 when the session contains collectionsagentv1input or collectionsagentv3input, else 0; collectionsagentv1input is retained because it was emitted for V3 during rollout. This field intentionally remains V3-specific; use flag_collections_agent_input for version-neutral detection."
+  flag_collections_agent_input:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 when the session contains any Matthew collections-agent input entrypoint, else 0. Matches the legacy V2 collectionsinput observation and versioned names following collectionsagentv<number>input, including V3, V4, and future versions."
+  collections_agent_version:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "Highest numeric Matthew version detected from collectionsagentv<number>input observations in the session. The rollout name collectionsagentv1input maps to version 3; other names use their embedded number. NULL when only the legacy V2 collectionsinput entrypoint is present."
   is_notification_reply:
     lineage:
       - datalake_langfuse_clean.observations.name
@@ -96,12 +104,12 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.output
-    description: "1 if the session contains at least one 'CollectionsAgentV3 - ReactPlanner' observation whose output JSON carries a TalkToUserToolInput tool call (detected via output LIKE '%TalkToUserToolInput%'), signalling that the Matthew V3 planner chose to send a message directly to the user; else 0. V3-only signal — the ReactPlanner observation exists only for the V3 (MCP) agent, so this is 0 for V1/V1.5/V2 sessions."
+    description: "1 if the session contains at least one CollectionsAgentV<number> - ReactPlanner observation whose output JSON carries a TalkToUserToolInput tool call, signalling that a V3-or-later Matthew planner chose to send a message directly to the user; else 0. This signal is 0 for V1/V1.5/V2 sessions."
   flag_collectionsinput_talk_to_user:
     lineage:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.output
-    description: "1 if the session contains at least one 'CollectionsInput' observation whose output values array carries the legacy V2 verbatim-relay instruction (detected via GET_JSON_OBJECT(output, '$.values') LIKE '%RESPOND EXACTLY%'), signalling that the Matthew V2 collections sub-agent handed the host a message to relay to the user; else 0. Legacy V2 signal — the CollectionsInput 'RESPOND EXACTLY' mechanism is the V2 counterpart of the V3 TalkToUserTool; V3 sessions use flag_react_planner_talk_to_user instead."
+    description: "1 if the session contains at least one 'CollectionsInput' observation whose output values array carries the legacy V2 verbatim-relay instruction (detected via GET_JSON_OBJECT(output, '$.values') LIKE '%RESPOND EXACTLY%'), signalling that the Matthew V2 collections sub-agent handed the host a message to relay to the user; else 0. Legacy V2 signal — the CollectionsInput 'RESPOND EXACTLY' mechanism is the counterpart of the V3-or-later ReactPlanner TalkToUserTool captured by flag_react_planner_talk_to_user."
   flag_debt_summary_display_helper:
     lineage:
       - datalake_langfuse_clean.observations.name
@@ -144,9 +152,9 @@ columns:
       prorated rent error text (pattern: '%prorated rent%' or '%adjustments to the rent
       value%'). This error is raised by the annual-tax / paid-invoices report tools when a
       contract has rent value adjustments that prevent a clean invoice summary. Matches both
-      the V2 graph-node tool (get_yearly_paid_invoices_report_tool) and the V3 MCP tools
+      the V2 graph-node tool (get_yearly_paid_invoices_report_tool) and the V3+ MCP tools
       (get_annual_tax_report_v1, get_paid_invoices_annual_report_v1), so it is populated for
-      V2 and V3 sessions. Sourced from a sibling CTE scoped to TOOL observations only; 0 when
+      V2 and V3-or-later sessions. Sourced from a sibling CTE scoped to TOOL observations only; 0 when
       no matching output is found."
   ts_first_observation:
     lineage:

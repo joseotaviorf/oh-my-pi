@@ -1,6 +1,6 @@
 database_name: dw_collection_ai_agents
 table_name: fact_ai_agents_interaction
-description: AI agents interaction fact table — one row per chatbot session with bot info, Matthew agent flags (V1, V1.5, V2, V3), trace context, business signals unified across the V2 (observation) and V3 (matthew_mcp_observations) sources, user wallet snapshot and 2-day post-session payment / overdue-recovery for the user, plus the agglutinated conversation string.
+description: AI agents interaction fact table — one row per chatbot session with bot info, Matthew agent flags (V1, V1.5, V2, and dynamically detected V3-or-later versions), trace context, business signals unified across the V2 observation and V3+ matthew_mcp_observations sources, user wallet snapshot and 2-day post-session payment / overdue-recovery for the user, plus the agglutinated conversation string.
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
@@ -39,27 +39,27 @@ columns:
   ai_agent_source:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.ai_agent_source
-    description: "Source of the AI agent for the session: 'Matthew in Whatsapp', 'Matthew in Chat' (any of V1, V1.5, V2 or V3 Matthew signals detected on a wall-e session), or 'Wall-e'."
+    description: "Source of the AI agent for the session: 'Matthew in Whatsapp', 'Matthew in Chat' when any V1, V1.5, V2, or V3-or-later Matthew signal is detected on a wall-e session, or 'Wall-e'."
   ai_agent_source_legacy:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.ai_agent_source_legacy
-    description: "Legacy source of the AI agent for the session, derived from the Langfuse score (value > 0) under SessionContainsMatthewAgentEvaluator or MatthewVersionEvaluator (the latter encodes the version: 0=none, 1=V1, 1.5=V1.5, 2=V2). Kept to reproduce historical metrics that pre-date the observation-based logic; runs in parallel to ai_agent_source. Does not yet encode V3 — V3 detection lives in ai_agent_source / matthew_version only."
+    description: "Legacy source of the AI agent for the session, derived from the Langfuse score (value > 0) under SessionContainsMatthewAgentEvaluator or MatthewVersionEvaluator (the latter encodes the version: 0=none, 1=V1, 1.5=V1.5, 2=V2). Kept to reproduce historical metrics that pre-date the observation-based logic; it does not encode V3-or-later agents, which are detected by ai_agent_source and matthew_version."
   is_matthew_in_session:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.is_matthew_in_session
-    description: "Boolean flag indicating that any Matthew agent version (V1, V1.5, V2 or V3) was detected via observation signals (OR of CollectionsInputV3, CollectionsInput, DebtRetrieverTool, UserDebtClassifierTool and DebtFinderTool). Strictly narrower than ai_agent_source: historical bot='matthew' (Whatsapp) sessions without recorded traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE simultaneously. For 'was Matthew involved' use ai_agent_source <> 'Wall-e'."
+    description: "Boolean flag indicating that any Matthew agent version was detected via observation signals: a V2-or-later collections-agent input or a V1/V1.5 DebtRetrieverTool, UserDebtClassifierTool, or DebtFinderTool signal. Strictly narrower than ai_agent_source because historical bot='matthew' sessions without traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE. For 'was Matthew involved' use ai_agent_source <> 'Wall-e'."
   flag_matthew_talked_to_user:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.flag_matthew_talked_to_user
-    description: "1 when Matthew actually spoke to the user in the session, unified across all Matthew agent versions; else 0. Two branches: (1) Matthew is the WhatsApp host (bot='matthew') — always counts, since the host talks to the user directly even when it never calls the collections agent (V1/V1.5 are host-only); (2) Matthew runs inside the Wall-e host — counts only when Matthew was detected AND the collections agent relayed a message: V3 via the ReactPlanner TalkToUserTool or legacy V2 via the CollectionsInput 'RESPOND EXACTLY' relay instruction. Distinguishes sessions where Matthew engaged the user from Wall-e-hosted sessions where the collections agent only ran tools internally."
+    description: "1 when Matthew actually spoke to the user in the session, unified across all Matthew agent versions; else 0. Matthew as the WhatsApp host always counts. Inside the Wall-e host, Matthew must be detected and relay a message through the V3-or-later ReactPlanner TalkToUserTool or the legacy V2 CollectionsInput 'RESPOND EXACTLY' instruction. Distinguishes user engagement from sessions where the collections agent only ran tools internally."
   matthew_version:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.matthew_version
-    description: "Detected Matthew agent version: 'V3' (CollectionsInputV3 — also matched against the legacy 'collectionsagentv1input' name during the V3 rollout window), 'V2' (CollectionsInput), 'V1.5' (DebtRetrieverTool or UserDebtClassifierTool), 'V1' (DebtFinderTool), NULL when no Matthew signal was detected. Precedence is V3 > V2 > V1.5 > V1. Observation-derived only: historical Whatsapp Matthew sessions where traces were not recorded can be 'Matthew in Whatsapp' with matthew_version=NULL — downstream consumers should handle NULL explicitly (e.g. as a distinct 'unknown' bucket)."
+    description: "Detected Matthew agent version propagated from sessions. Versioned collectionsagentv<number>input observations dynamically produce V3, V4, V5, and later values, with collectionsagentv1input mapped to V3 for rollout compatibility; legacy signals produce V2, V1.5, or V1. NULL means no version signal, including some historical Whatsapp sessions without traces, and should be handled as an explicit unknown bucket."
   flag_eval_matthew_in_chat:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.flag_eval_matthew_in_chat
-    description: "Boolean flag indicating that the Matthew V2 or V3 agent (CollectionsInput or CollectionsInputV3) was active inside an in-app chat session (bot=wall-e). Narrower than is_matthew_in_session — kept as the eligibility flag for the V2-vs-V3 experiment."
+    description: "Boolean flag indicating that a V2-or-later Matthew collections agent was active inside an in-app chat session (bot=wall-e plus a recognized collections-agent input). Narrower than is_matthew_in_session and retained as the experiment-eligibility flag."
   is_escalation:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.is_escalation
@@ -115,7 +115,7 @@ columns:
   n_contracts:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.n_contracts
-    description: "Total number of contracts associated with the user at the session date (wallet snapshot). For the count of contracts the V3 agent saw during the conversation, use n_contracts_mcp."
+    description: "Total number of contracts associated with the user at the session date (wallet snapshot). For the count of contracts the V3-or-later MCP agent saw during the conversation, use n_contracts_mcp."
   active_contracts:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.active_contracts
@@ -127,11 +127,11 @@ columns:
   user_overdue_recovered_amount_t2_w_2:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.user_overdue_recovered_amount_t2_w_2
-    description: "Overdue amount in BRL recovered for the user within a 2-day window starting at the session date (sum across the user's contracts of overdue_recovered_amount_t2 plus the next day, from fact_user_wallet_timeline). Used to attribute Matthew's V2-vs-V3 lift on overdue recovery shortly after the conversation."
+    description: "Overdue amount in BRL recovered for the user within a 2-day window starting at the session date (sum across the user's contracts of overdue_recovered_amount_t2 plus the next day, from fact_user_wallet_timeline). Used to compare recovery outcomes across Matthew V2 and V3-or-later sessions."
   user_payment_w_2:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.user_payment_w_2
-    description: "Total payment amount in BRL recovered for the user within a 2-day window starting at the session date (sum across the user's contracts of recovered_amount plus the next day, from fact_user_wallet_timeline). Used to attribute Matthew's V2-vs-V3 lift on overall payments shortly after the conversation."
+    description: "Total payment amount in BRL recovered for the user within a 2-day window starting at the session date (sum across the user's contracts of recovered_amount plus the next day, from fact_user_wallet_timeline). Used to compare payment outcomes across Matthew V2 and V3-or-later sessions."
   array_open_invoices:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.array_open_invoices
@@ -148,28 +148,28 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.send_proposal_count
       - datalake_ai_collections_quintoandar.observation.send_proposal_count
-    description: "Number of negotiation proposals presented to the user during the session, unified across versions. V3: distinct Langfuse traces with a successful simulate_negotiation_v1 (matthew_mcp_observations); V2: count of send_proposal observations. 0 when neither source has activity."
+    description: "Number of negotiation proposals presented to the user during the session, unified across versions. V3 onward: distinct Langfuse traces with a successful simulate_negotiation_v1 in matthew_mcp_observations; V2: count of send_proposal observations. 0 when neither source has activity."
   flag_handle_segments_without_proposals:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_contracts_negotiation_options_not_found
       - datalake_ai_collections_quintoandar.observation.flag_handle_segments_without_proposals
-    description: "1 when the agent had a customer segment but no negotiation options to offer, unified across versions. V3: matthew_mcp_observations.n_contracts_negotiation_options_not_found > 0; V2: the handle_segments_without_proposals observation. 0 otherwise."
+    description: "1 when the agent had a customer segment but no negotiation options to offer, unified across versions. V3 onward: matthew_mcp_observations.n_contracts_negotiation_options_not_found > 0; V2: the handle_segments_without_proposals observation. 0 otherwise."
   handle_negotiation_cancelled_count:
     lineage:
       - datalake_ai_collections_quintoandar.observation.confirm_negotiation_count_v3
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_create_negotiation
       - datalake_ai_collections_quintoandar.observation.handle_negotiation_cancelled_count
-    description: "Whether a negotiation was confirmed by the user but ultimately not created (cancelled), unified across versions. V3: 1 when the user confirmed (confirm_negotiation_count_v3 > 0) but no negotiation was created (flag_create_negotiation = 0); V2: count of handle_negotiation_cancelled observations. 0 otherwise."
+    description: "Whether a negotiation was confirmed by the user but ultimately not created (cancelled), unified across versions. V3 onward: 1 when the user confirmed (confirm_negotiation_count_v3 > 0) but no negotiation was created (flag_create_negotiation = 0); V2: count of handle_negotiation_cancelled observations. 0 otherwise."
   confirm_negotiation_count:
     lineage:
       - datalake_ai_collections_quintoandar.observation.confirm_negotiation_count_v3
       - datalake_ai_collections_quintoandar.observation.confirm_negotiation_count
-    description: "Number of user-confirmed negotiation offers, unified across versions. V3: confirm_negotiation_count_v3 (count of create_negotiation_v1 TOOL observations with null output, each a confirmation prompt); V2: count of confirm_negotiation observations. 0 when no observations recorded."
+    description: "Number of user-confirmed negotiation offers, unified across versions. V3 onward: confirm_negotiation_count_v3 (count of create_negotiation_v1 TOOL observations with null output, each a confirmation prompt); V2: count of confirm_negotiation observations. 0 when no observations recorded."
   flag_create_negotiation:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_create_negotiation
       - datalake_ai_collections_quintoandar.observation.flag_create_negotiation
-    description: "1 when a debt negotiation was successfully created in the session (the main success outcome), unified across versions. V3: matthew_mcp_observations.flag_create_negotiation (a create_negotiation_v1 call succeeded); V2: the create_negotiation observation. 0 otherwise."
+    description: "1 when a debt negotiation was successfully created in the session (the main success outcome), unified across versions. V3 onward: matthew_mcp_observations.flag_create_negotiation (a create_negotiation_v1 call succeeded); V2: the create_negotiation observation. 0 otherwise."
   flag_fetch_financial_data:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_financial_context_calls
@@ -177,61 +177,61 @@ columns:
       - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
       - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
       - datalake_ai_collections_quintoandar.observation.flag_has_fetch_collections_data
-    description: "1 when the agent fetched the user's financial/collections context in the session, unified across versions. V3: matthew_mcp_observations.n_financial_context_calls > 0 (get_financial_context_v1, the single MCP tool that replaced the V2 fetch/debt tools); V2: OR of flag_debt_retriever_tool, flag_debt_finder_tool, flag_user_debt_classifier_tool, flag_has_fetch_collections_data. 0 otherwise. For the granular per-tool V2 flags / V3 call counts, query observation / matthew_mcp_observations directly."
+    description: "1 when the agent fetched the user's financial/collections context in the session, unified across versions. V3 onward: matthew_mcp_observations.n_financial_context_calls > 0 (get_financial_context_v1, the single MCP tool that replaced the V2 fetch/debt tools); V2: OR of flag_debt_retriever_tool, flag_debt_finder_tool, flag_user_debt_classifier_tool, flag_has_fetch_collections_data. 0 otherwise. For granular V2 flags or V3+ MCP call counts, query observation or matthew_mcp_observations directly."
   flag_fetch_financial_data_error:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_fetch_financial_data_error
       - datalake_ai_collections_quintoandar.observation.flag_has_collections_data_error
       - datalake_ai_collections_quintoandar.observation.flag_has_finance_fetch_error
-    description: "1 when fetching the user's financial/collections context failed in the session, unified across versions. V3: matthew_mcp_observations.flag_fetch_financial_data_error (any get_financial_context_v1 downstream call failed, excluding HTTP 404); V2: OR of flag_has_collections_data_error and flag_has_finance_fetch_error. 0 otherwise."
+    description: "1 when fetching the user's financial/collections context failed in the session, unified across versions. V3 onward: matthew_mcp_observations.flag_fetch_financial_data_error (any get_financial_context_v1 downstream call failed, excluding HTTP 404); V2: OR of flag_has_collections_data_error and flag_has_finance_fetch_error. 0 otherwise."
   flag_has_fetch_contracts:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_financial_context_calls
       - datalake_ai_collections_quintoandar.observation.flag_has_fetch_contracts
-    description: "1 when the agent attempted to fetch the user's contracts, unified across versions. V3: matthew_mcp_observations.n_financial_context_calls > 0 (contracts are fetched inside get_financial_context_v1); V2: the fetch_contracts observation. 0 otherwise."
+    description: "1 when the agent attempted to fetch the user's contracts, unified across versions. V3 onward: matthew_mcp_observations.n_financial_context_calls > 0 (contracts are fetched inside get_financial_context_v1); V2: the fetch_contracts observation. 0 otherwise."
   flag_handle_no_contracts:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_contracts
       - datalake_ai_collections_quintoandar.observation.flag_handle_no_contracts
-    description: "1 when the user had no contracts available to the agent, unified across versions. V3: matthew_mcp_observations.n_contracts = 0 (GetContracts returned an empty array; NULL n_contracts, i.e. no successful call, yields 0); V2: the handle_no_contracts observation. 0 otherwise."
+    description: "1 when the user had no contracts available to the agent, unified across versions. V3 onward: matthew_mcp_observations.n_contracts = 0 (GetContracts returned an empty array; NULL n_contracts, meaning no successful call, yields 0); V2: the handle_no_contracts observation. 0 otherwise."
   flag_get_yearly_paid_invoices_report_tool:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_annual_tax_report_calls
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_paid_invoices_report_calls
       - datalake_ai_collections_quintoandar.observation.flag_get_yearly_paid_invoices_report_tool
-    description: "1 when the yearly paid-invoices (IR / Imposto de Renda) report tool was invoked, unified across versions. V3: n_annual_tax_report_calls > 0 OR n_paid_invoices_report_calls > 0 (get_annual_tax_report_v1 was renamed from get_paid_invoices_annual_report_v1 — same tool, OR both); V2: the get_yearly_paid_invoices_report_tool observation. 0 otherwise. Keeps the V2 node name because it already existed in this table."
+    description: "1 when the yearly paid-invoices (IR / Imposto de Renda) report tool was invoked, unified across versions. V3 onward: n_annual_tax_report_calls > 0 OR n_paid_invoices_report_calls > 0 (get_annual_tax_report_v1 was renamed from get_paid_invoices_annual_report_v1); V2: the get_yearly_paid_invoices_report_tool observation. 0 otherwise. Keeps the V2 node name because it already existed in this table."
   flag_negotiation_proposer_tool:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_simulate_negotiation_calls
       - datalake_ai_collections_quintoandar.observation.flag_negotiation_proposer_tool
-    description: "1 when the agent ran the negotiation proposer / simulation, unified across versions. V3: matthew_mcp_observations.n_simulate_negotiation_calls > 0 (simulate_negotiation_v1); V2: the NegotiationProposerTool observation. 0 otherwise."
+    description: "1 when the agent ran the negotiation proposer / simulation, unified across versions. V3 onward: matthew_mcp_observations.n_simulate_negotiation_calls > 0 (simulate_negotiation_v1); V2: the NegotiationProposerTool observation. 0 otherwise."
   flag_ongoing_deal_renegotiation_request_helper:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_ongoing_negotiation_calls
       - datalake_ai_collections_quintoandar.observation.flag_ongoing_deal_renegotiation_request_helper
-    description: "1 when the user requested to renegotiate an ongoing deal, unified across versions. V3: matthew_mcp_observations.n_ongoing_negotiation_calls > 0 (get_ongoing_negotiation_information_v1); V2: the ongoing_deal_renegotiation_request_helper observation. 0 otherwise."
+    description: "1 when the user requested to renegotiate an ongoing deal, unified across versions. V3 onward: matthew_mcp_observations.n_ongoing_negotiation_calls > 0 (get_ongoing_negotiation_information_v1); V2: the ongoing_deal_renegotiation_request_helper observation. 0 otherwise."
   flag_handle_non_tenant:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.is_owner_only
       - datalake_ai_collections_quintoandar.observation.flag_handle_non_tenant
-    description: "1 when the user is not a tenant, unified across versions. V3: sessions.is_owner_only = 1 (the tenant gate moved to the host, so the collections agent is not called for non-tenants); V2: the handle_non_tenant observation. 0 otherwise."
+    description: "1 when the user is not a tenant, unified across versions. V3 onward: sessions.is_owner_only = 1 (the tenant gate moved to the host, so the collections agent is not called for non-tenants); V2: the handle_non_tenant observation. 0 otherwise."
   flag_empty_invoices_mismatch:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_all_empty_invoices
       - dw_collection_ai_agents.fact_user_wallet_timeline.array_open_invoices
       - dw_collection_ai_agents.fact_user_wallet_timeline.array_paid_invoices
       - dw_collection_ai_agents.fact_user_wallet_timeline.array_negotiated_invoices
-    description: "Data-quality cross-check (V3). 1 when the MCP agent saw only empty invoices (flag_all_empty_invoices_mcp = 1) yet the user wallet snapshot at the session date does have invoices (any of array_open_invoices / array_paid_invoices / array_negotiated_invoices is non-empty); else 0. Flags sessions where the agent's financial context disagreed with the wallet timeline."
+    description: "Data-quality cross-check for V3-or-later MCP agents. 1 when the agent saw only empty invoices (flag_all_empty_invoices_mcp = 1) yet the user wallet snapshot at the session date has invoices; else 0. Flags sessions where the agent's financial context disagreed with the wallet timeline."
   flag_no_contracts_mismatch:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_handle_no_contracts
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_contracts
       - dw_collection_ai_agents.fact_user_wallet_timeline.n_contracts
-    description: "Data-quality cross-check. 1 when the agent concluded the user had no contracts (V2 flag_handle_no_contracts = 1 or V3 n_contracts_mcp = 0) yet the user wallet snapshot shows contracts (fact_user_wallet_timeline.n_contracts > 0); else 0."
+    description: "Data-quality cross-check. 1 when the agent concluded the user had no contracts (V2 flag_handle_no_contracts = 1 or V3+ n_contracts_mcp = 0) yet the user wallet snapshot shows contracts (fact_user_wallet_timeline.n_contracts > 0); else 0."
   flag_has_prorated_rent:
     lineage:
       - datalake_ai_collections_quintoandar.observation.has_prorated_rent_error
-    description: "1 when an annual-tax / paid-invoices report tool output in the session mentioned prorated-rent adjustments that prevent a clean invoice summary; else 0. Sourced from the observation table (Langfuse TOOL output), available for V2 and V3 sessions."
+    description: "1 when an annual-tax / paid-invoices report tool output in the session mentioned prorated-rent adjustments that prevent a clean invoice summary; else 0. Sourced from Langfuse TOOL output and available for V2 and V3-or-later sessions."
   is_notification_reply:
     lineage:
       - datalake_ai_collections_quintoandar.observation.is_notification_reply
@@ -255,39 +255,39 @@ columns:
   n_contracts_mcp:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.n_contracts
-    description: "V3 only. Number of rental contracts the agent saw for the user during the conversation (GetContracts response length inside get_financial_context_v1). NULL for V2 sessions or when no successful GetContracts call exists; 0 means no contracts. For the wallet-snapshot contract count use n_contracts."
+    description: "V3 onward. Number of rental contracts the MCP agent saw for the user during the conversation (GetContracts response length inside get_financial_context_v1). NULL for V2 sessions or when no successful GetContracts call exists; 0 means no contracts. For the wallet-snapshot contract count use n_contracts."
   flag_all_empty_invoices_mcp:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_all_empty_invoices
-    description: "V3 only. 1 when every GetInvoicesForContract / GetDetailedBills downstream call returned empty (nothing to collect), 0 when at least one returned a non-empty response, NULL when neither call type appears in the session or for V2 sessions."
+    description: "V3 onward. 1 when every GetInvoicesForContract / GetDetailedBills downstream call returned empty (nothing to collect), 0 when at least one returned a non-empty response, NULL when neither call type appears in the session or for V2 sessions."
   user_segment:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.user_segment
-    description: "V3 only. ChargeHub customer segment guiding how the agent should approach the debt (e.g. EVICTIONS). NULL for V2 sessions or when no GetCustomerSegment call exists."
+    description: "V3 onward. ChargeHub customer segment guiding how the MCP agent should approach the debt (e.g. EVICTIONS). NULL for V2 sessions or when no GetCustomerSegment call exists."
   negotiation_options_list:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.negotiation_options_list
-    description: "V3 only. JSON array text of available negotiation option keys offered to the customer (e.g. [\"pixleto-1x-lpf\",\"cc-lpf\"]) from the first successful non-empty GetNegotiationOptions call. NULL for V2 sessions or when no eligible options were returned."
+    description: "V3 onward. JSON array text of available negotiation option keys offered to the customer (e.g. [\"pixleto-1x-lpf\",\"cc-lpf\"]) from the first successful non-empty GetNegotiationOptions call. NULL for V2 sessions or when no eligible options were returned."
   created_negotiation_option_key:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.created_negotiation_option_key
-    description: "V3 only. Negotiation option key the customer chose when a deal was closed. NULL for V2 sessions or when no successful create_negotiation_v1 call occurred."
+    description: "V3 onward. Negotiation option key the customer chose when a deal was closed. NULL for V2 sessions or when no successful create_negotiation_v1 call occurred."
   created_negotiation_payment_method:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.created_negotiation_payment_method
-    description: "V3 only. Payment method used when a deal was closed (BOLETO, PIX or CREDIT_CARD). NULL for V2 sessions or when no successful create_negotiation_v1 call occurred."
+    description: "V3 onward. Payment method used when a deal was closed (BOLETO, PIX or CREDIT_CARD). NULL for V2 sessions or when no successful create_negotiation_v1 call occurred."
   flag_negotiation_created_missing_payment_info:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.flag_negotiation_created_missing_payment_info
-    description: "V3 only. 1 when a deal was created but the final payment instructions were likely never shown to the customer (no successful GetOngoingNegotiation without an empty response was recorded after creation); else 0. NULL for V2 sessions."
+    description: "V3 onward. 1 when a deal was created but the final payment instructions were likely never shown to the customer (no successful GetOngoingNegotiation without an empty response was recorded after creation); else 0. NULL for V2 sessions."
   ts_first_mcp_call:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.ts_first_mcp_call
-    description: "V3 only. Timestamp of the earliest MCP tool request in the session. NULL for V2 sessions."
+    description: "V3 onward. Timestamp of the earliest MCP tool request in the session. NULL for V2 sessions."
   ts_last_mcp_call:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.ts_last_mcp_call
-    description: "V3 only. Timestamp of the latest MCP tool request in the session. NULL for V2 sessions."
+    description: "V3 onward. Timestamp of the latest MCP tool request in the session. NULL for V2 sessions."
   full_conversation:
     lineage:
       - datalake_ai_collections_quintoandar.messages.full_conversation

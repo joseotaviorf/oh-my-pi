@@ -60,7 +60,7 @@ SELECT
     f.array_open_invoices,
     f.array_negotiated_invoices,
     f.array_paid_invoices,
-    -- Business signals unified across V2 (observation) and V3 (matthew_mcp_observations);
+    -- Business signals unified across V2 (observation) and V3+ (matthew_mcp_observations);
     COALESCE(mcp.send_proposal_count, o.send_proposal_count, 0) AS send_proposal_count,
     COALESCE(mcp.flag_handle_segments_without_proposals, o.flag_handle_segments_without_proposals, 0) AS flag_handle_segments_without_proposals,
     COALESCE(
@@ -132,7 +132,7 @@ SELECT
     o.matthew_declared_escalation_reason,
     o.ts_first_observation,
     o.ts_last_observation,
-    -- V3-only MCP signals (NULL for V2 sessions)
+    -- V3+ MCP signals (NULL for V2 sessions)
     mcp.n_contracts_mcp,
     mcp.flag_all_empty_invoices AS flag_all_empty_invoices_mcp,
     mcp.user_segment,

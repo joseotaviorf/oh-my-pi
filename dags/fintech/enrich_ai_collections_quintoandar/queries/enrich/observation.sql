@@ -13,6 +13,28 @@ SELECT
     -- Group 2: Matthew technical-state signals
     MAX(CASE WHEN LOWER(obs.name) = 'collectionsinput' THEN 1 ELSE 0 END) AS flag_collectionsinput_agent,
     MAX(CASE WHEN LOWER(obs.name) IN ('collectionsagentv1input', 'collectionsagentv3input') THEN 1 ELSE 0 END) AS flag_collectionsinputv3_agent,
+    MAX(
+        CASE
+            WHEN LOWER(obs.name) = 'collectionsinput'
+                OR LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+input$'
+            THEN 1
+            ELSE 0
+        END
+    ) AS flag_collections_agent_input,
+    MAX(
+        CASE
+            WHEN LOWER(obs.name) = 'collectionsagentv1input' THEN 3
+            WHEN LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+input$'
+                THEN CAST(
+                    REGEXP_EXTRACT(
+                        LOWER(obs.name),
+                        '^collectionsagentv([0-9]+)input$',
+                        1
+                    ) AS INT
+                )
+            ELSE NULL
+        END
+    ) AS collections_agent_version,
     MAX(CASE WHEN LOWER(obs.name) = 'outbound_payload_from_dto' THEN 1 ELSE 0 END) AS is_notification_reply,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_collections_data_error' AND obs.type IN ('CHAIN', 'TOOL') THEN 1 ELSE 0 END) AS flag_has_collections_data_error,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_finance_fetch_error' THEN 1 ELSE 0 END) AS flag_has_finance_fetch_error,
@@ -28,7 +50,7 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'negotiationproposertool' THEN 1 ELSE 0 END) AS flag_negotiation_proposer_tool,
     MAX(
         CASE
-            WHEN LOWER(obs.name) = 'collectionsagentv3 - reactplanner'
+            WHEN LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+ - reactplanner$'
                 AND obs.output LIKE '%TalkToUserToolInput%'
             THEN 1
             ELSE 0
@@ -95,38 +117,39 @@ WHERE
     AND obs.ts_started >= TIMESTAMP('{load_start_date}')
     AND trc.environment = 'prod'
     AND trc.id_session IS NOT NULL
-    AND LOWER(obs.name) IN (
-        'ask_user_preferences',
-        'send_proposal',
-        'handle_segments_without_proposals',
-        'handle_negotiation_cancelled',
-        'confirm_negotiation',
-        'create_negotiation_v1',
-        'create_negotiation',
-        'collectionsinput',
-        'outbound_payload_from_dto',
-        'handle_collections_data_error',
-        'fetch_collections_data',
-        'handle_no_contracts',
-        'fetch_contracts',
-        'paymentallegationtool',
-        'debtretrievertool',
-        'userdebtclassifiertool',
-        'debtfindertool',
-        'get_yearly_paid_invoices_report_tool',
-        'negotiationproposertool',
-        'debt_summary_display_helper',
-        'original_invoice_values_disagreement_helper',
-        'ongoing_deal_renegotiation_request_helper',
-        'handle_non_tenant',
-        'escalate_to_human_for_collections',
-        'escalate_tool',
-        'handle_finance_fetch_error',
-        'collectionsagentv1input',
-        'collectionsagentv3input',
-        'collectionsagentv3 - reactplanner',
-        'get_annual_tax_report_v1',
-        'get_paid_invoices_annual_report_v1'
+    AND (
+        LOWER(obs.name) IN (
+            'ask_user_preferences',
+            'send_proposal',
+            'handle_segments_without_proposals',
+            'handle_negotiation_cancelled',
+            'confirm_negotiation',
+            'create_negotiation_v1',
+            'create_negotiation',
+            'collectionsinput',
+            'outbound_payload_from_dto',
+            'handle_collections_data_error',
+            'fetch_collections_data',
+            'handle_no_contracts',
+            'fetch_contracts',
+            'paymentallegationtool',
+            'debtretrievertool',
+            'userdebtclassifiertool',
+            'debtfindertool',
+            'get_yearly_paid_invoices_report_tool',
+            'negotiationproposertool',
+            'debt_summary_display_helper',
+            'original_invoice_values_disagreement_helper',
+            'ongoing_deal_renegotiation_request_helper',
+            'handle_non_tenant',
+            'escalate_to_human_for_collections',
+            'escalate_tool',
+            'handle_finance_fetch_error',
+            'get_annual_tax_report_v1',
+            'get_paid_invoices_annual_report_v1'
+        )
+        OR LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+input$'
+        OR LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+ - reactplanner$'
     )
 GROUP BY
     trc.id_session
