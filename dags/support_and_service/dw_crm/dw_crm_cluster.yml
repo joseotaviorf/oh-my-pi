@@ -1,19 +1,6 @@
 cluster:
-  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  type: consolidation_m_general_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 500
-    # query_delta fans out ~27 load-dw-* steps; default StepConcurrencyLevel 8 stacks
-    # client-mode drivers on the master and drives long driver GC under load.
-    step_concurrency_level: 3
-    # Overnight 2026-07-15 (j-31QDKKZFPIANY): all workers core OD; task fleet left at preset 0.
-    core_nodes:
-      target_on_demand: 4
-      target_spot: 0
-      instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
-    spark_conf:
-      spark.driver.memory: 16g
-      spark.driver.memoryOverhead: 4g
+    data_security_mode: USER_ISOLATION
+    driver_node_type_id: r7g.2xlarge
