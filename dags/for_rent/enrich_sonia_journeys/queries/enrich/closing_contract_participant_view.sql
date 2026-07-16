@@ -79,7 +79,8 @@ SELECT
       OR (binning_value_contract_id < 30 AND ts_created >= TIMESTAMP '2026-05-07 00:00:00' AND ts_created < TIMESTAMP '2026-05-09 00:00:00')
       OR (binning_value_contract_id < 50 AND ts_created >= TIMESTAMP '2026-05-09 00:00:00' AND ts_created < TIMESTAMP '2026-06-02 00:00:00')
       OR (binning_value_contract_id < 10 AND ts_created >= TIMESTAMP '2026-06-02 00:00:00' AND ts_created < TIMESTAMP '2026-06-17 18:00:00')
-      OR (binning_value_contract_id < 50 AND ts_created >= TIMESTAMP '2026-06-17 18:00:00')
+      OR (binning_value_contract_id < 50 AND ts_created >= TIMESTAMP '2026-06-17 18:00:00' AND ts_created < TIMESTAMP '2026-07-16 18:00:00')
+      OR (binning_value < 100 AND ts_created >= TIMESTAMP '2026-07-16 18:00:00')
     ))
     -- Gate 1+2: all contracts (registered and unregistered alike), binning_value < threshold
     OR (binning_value < CASE

@@ -130,10 +130,19 @@ SELECT
   (
     -- Gate 0: exactly 2 signatories, graduated rollout by first-sent date
     (e.number_of_signatories = 2
-     AND (e.id_contract % 100) < CASE
-        WHEN e.ts_first_sent >= CAST('2026-06-17 18:00:00' AS TIMESTAMP) THEN 50
-        ELSE 0
-     END)
+     AND (
+      (
+        e.ts_first_sent >= CAST('2026-06-17 18:00:00' AS TIMESTAMP) AND e.ts_first_sent < CAST('2026-07-16 18:00:00' AS TIMESTAMP)
+        AND (e.id_contract % 100) < 50
+      )
+      OR 
+      (
+        e.binning_value < CASE 
+          WHEN e.ts_first_sent >= CAST('2026-07-16 18:00:00' AS TIMESTAMP) THEN 100 
+          ELSE 0 
+        END
+      )
+     ))
     -- Gate 1+2: all contracts (registered and unregistered alike), binning_value < threshold
     OR (e.binning_value < CASE
         WHEN e.ts_first_sent >= CAST('2026-07-16 13:00:00' AS TIMESTAMP) THEN 5
