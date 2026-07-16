@@ -29,4 +29,5 @@ workflow:
     cases_perspective: {}
     backlog_metrics_salesforce: {}
     customer_contacts_session: {}
+    segments_perspective: {}
 

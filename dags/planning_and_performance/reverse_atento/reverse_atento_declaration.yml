@@ -40,3 +40,5 @@ workflow:
     twilio_chat_aht: {}
     customer_contacts_session: {}
     backlog_metrics_salesforce: {}
+    segments_perspective: {}
+
