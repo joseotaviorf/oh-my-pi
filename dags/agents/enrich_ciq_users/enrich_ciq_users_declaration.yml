@@ -1,0 +1,28 @@
+dag:
+  name: enrich_ciq_users
+  schedule_start_date: 2024,9,1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich CIQ identity and daily status tables (ciq_users, ciq_agents, daily_ciq_info).
+      Split from enrich_ciq so identity loads are not blocked by listing-purchase upstreams.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: ciq
+  inner_dependencies:
+    ciq_agents:
+      - ciq_users
+    daily_ciq_info:
+      - ciq_users
+  tables_customization:
+    daily_ciq_info:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    ciq_agents:
+      custom_schema: ebdb_agents
+    ciq_users:
+      custom_schema: ebdb_agents
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

@@ -256,7 +256,7 @@ Grain: **one row per `(id_revision, id_contract)`**. Columns: `id_revision`, `id
 
 ## `datalake_ebdb_agents` (PFA / PPA)
 
-**Purpose:** Preferred Fixed/Property Agent assignment. **Pipeline:** `enrich_ebdb_agents`.
+**Purpose:** Preferred Fixed/Property Agent assignment. **Pipeline:** `enrich_ebdb_agents_pfa`.
 
 ### `preferred_property_agent_relation_history`
 
@@ -334,7 +334,7 @@ Grain: **one row per `id_house`** — address-normalized dedup analysis over the
 
 **Purpose:** CIQ_FULL **rent listing-purchase** — which houses qualify for Compra de Carteira, Robin Hood payment state, commercial pricing (initial speculation → final after anti-repurchase rules), and **portfolio loss** (relist published >90 days without renting).
 
-**Pipelines:** `enrich_ciq` → `datalake_ciq.ciq_listing_purchase` → `listing_purchase_duplicity` → `listing_purchase_pricing`; `dw_ciq_listing_purchase` → `dw_ciq.fact_ciq_listing_purchase` (+ `fact_listing_purchase_duplicity`).
+**Pipelines:** `enrich_ciq_listing_purchase` → `datalake_ciq.ciq_listing_purchase` → `listing_purchase_duplicity` → `listing_purchase_pricing`; `dw_ciq_listing_purchase` → `dw_ciq.fact_ciq_listing_purchase` (+ `fact_listing_purchase_duplicity`).
 
 **Grain (enrich & fact):** one row per **house listing version** in CIQ context (house × `sk_house_listing` × partner × CIQ user × consultant type), not one row per house.
 

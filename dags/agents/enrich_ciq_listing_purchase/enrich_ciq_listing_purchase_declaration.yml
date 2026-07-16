@@ -1,0 +1,27 @@
+dag:
+  name: enrich_ciq_listing_purchase
+  schedule_start_date: 2024,9,1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich CIQ listing-purchase chain (supply events, purchase, duplicity, pricing).
+      Split from enrich_ciq so heavy listing/contract deps do not block CIQ identity loads.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: ciq
+  inner_dependencies:
+    listing_purchase_duplicity:
+      - ciq_listing_purchase
+    listing_purchase_pricing:
+      - listing_purchase_duplicity
+      - ciq_listing_purchase
+    ciq_listing_purchase:
+      - ciq_supply_events_tracking
+  tables_customization:
+    ciq_listing_purchase:
+      extraction_type: full
+      partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

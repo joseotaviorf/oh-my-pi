@@ -1,0 +1,21 @@
+---
+dag:
+  name: enrich_ebdb_agents_pfa
+  schedule_start_date: 2020, 7, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich Preferred Fixed Agent (PFA) and Preferred Property Agent (PPA) history and
+      program eligibility. Split from enrich_ebdb_agents so PFA/PPA loads are not blocked
+      by contract or geo upstreams.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: ebdb_agents
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    preferred_property_agent_program_eligibility:
+      extraction_type: incremental
+      merge_on: [id_snapshot]

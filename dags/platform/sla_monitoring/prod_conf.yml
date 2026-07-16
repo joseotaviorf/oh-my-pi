@@ -190,7 +190,9 @@ expected_times_to_finish:
   bietlejuice.enrich_buyer_prospect: 07:57
   bietlejuice.enrich_cdp_personas: 07:48
   bietlejuice.enrich_chatbot: 07:39
-  bietlejuice.enrich_ciq: 09:22
+  bietlejuice.enrich_ciq_listing_purchase: 09:22
+  bietlejuice.enrich_ciq_portfolio: 09:22
+  bietlejuice.enrich_ciq_users: 09:22
   bietlejuice.enrich_ciq_comissioning: 05:58
   bietlejuice.enrich_collections_quintocred: 08:24
   bietlejuice.enrich_company: 03:22
@@ -226,7 +228,9 @@ expected_times_to_finish:
   bietlejuice.enrich_documentation_metrics: 09:38
   bietlejuice.enrich_docx: 04:35
   bietlejuice.enrich_ebdb_affiliates_cost: 02:28
-  bietlejuice.enrich_ebdb_agents: 05:21
+  bietlejuice.enrich_ebdb_agents_contracts: 05:21
+  bietlejuice.enrich_ebdb_agents_geo: 05:21
+  bietlejuice.enrich_ebdb_agents_pfa: 05:21
   bietlejuice.enrich_ebdb_amenities: 03:20
   bietlejuice.enrich_ebdb_condo: 03:30
   bietlejuice.enrich_ebdb_contract: 06:02

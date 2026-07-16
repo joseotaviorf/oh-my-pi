@@ -1,0 +1,16 @@
+---
+dag:
+  name: enrich_ebdb_agents_geo
+  schedule_start_date: 2020, 7, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich agent region assignment and autonomous-agent geo/partner context. Split from
+      enrich_ebdb_agents so geo loads are not blocked by contract or PFA/PPA upstreams.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: ebdb_agents
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
