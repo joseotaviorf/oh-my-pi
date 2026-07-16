@@ -17,9 +17,3 @@ cluster:
       - r6g.2xlarge
       - r7g.2xlarge
       - r6i.2xlarge
-validation:
-  cluster:
-    type: consolidation_m_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      num_workers: 4
