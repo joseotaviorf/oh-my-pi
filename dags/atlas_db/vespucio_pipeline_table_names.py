@@ -60,6 +60,28 @@ class Tables:
     house_compounds = "vespucio_prod_delta.house_compounds"
     listings = "vespucio_prod_delta.listings"
 
+    # v2 pipeline (steps_v2: core_v2_registry_step / normalization_step / address_enrich_step).
+    # Sources are duplicated (own copies, suffixed _v2) so the v2 DAG runs independently of v1;
+    # geocode_step_cache / address_details_hasher_link / staged_parsed_complements are reused
+    # from v1 since those are stateful/expensive (live geocoding calls, address hashing).
+    source_cnefe_houses_v2 = "vespucio_sources_delta.source_cnefe_house_v2"
+    source_ebdb_houses_v2 = "vespucio_sources_delta.source_ebdb_house_v2"
+    source_navent_houses_composed_v2 = (
+        "vespucio_sources_delta.source_navent_houses_composed_v2"
+    )
+    source_union_houses_v2 = "vespucio_sources_delta.source_union_house_v2"
+    source_idactum_houses_v2 = "vespucio_sources_delta.source_idactum_houses_v2"
+    source_idactum_transactions_v2 = (
+        "vespucio_sources_delta.source_idactum_transactions_v2"
+    )
+    source_itbi_houses_v2 = "vespucio_sources_delta.source_itbi_house_v2"
+    source_iptu_houses_v2 = "vespucio_sources_delta.source_iptu_house_v2"
+    source_zap_imoveis_houses_v2 = "vespucio_sources_delta.source_zap_imoveis_house_v2"
+
+    registry_step_v2 = "vespucio_pipeline_delta.registry_step"
+    normalization_step_v2 = "vespucio_pipeline_delta.normalization_step"
+    address_enrich_step_v2 = "vespucio_pipeline_delta.address_enrich_step"
+
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
     classifieds_house_id = "vespucio_classifieds.classifieds_house_id"
     classified_v2_compounds = "vespucio_classifieds.classifieds_v2"

@@ -1,0 +1,28 @@
+dag_documentation:
+  dag_purpose:
+    "Vespúcio v2 is the next generation of the Vespúcio pipeline: a simplified registry →
+    normalization → address-enrichment chain that replaces the legacy staged/extract/cluster
+    steps with a single incremental registry of external listings/houses. This DAG orchestrates
+    core_v2_registry_step, core_v2_normalization_step and core_v2_address_enrich_step. For more
+    information, see the GitHub [Vespucio Repository](https://github.com/quintoandar/vespucio)"
+callback_by_task_failure: True
+callback_by_task_success: False
+webhook_vespucio_pipeline_v2: WEBHOOK_VESPUCIO_PIPELINE_PROD
+
+custom_cluster:
+  driver_node_type_id: r-fleet.4xlarge
+  node_type_id: r-fleet.4xlarge
+  num_workers: 6
+  spark_version: 16.4.x-scala2.12
+  aws_attributes:
+    ebs_volume_size: 200
+    instance_profile_arn: "{{ var.value.instance_profile_secret_arn_vespucio }}"
+  spark_conf:
+    # Temporary: Vespúcio instance profile lacks S3 on the Databricks workspace bucket for
+    # spark-event-logs/. Re-enable after IAM allows that prefix (same as default DE profile).
+    spark.eventLog.enabled: "false"
+    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.heartbeatInterval: "100s"
+    spark.network.timeout: "600s"
+    spark.metrics.appStatusSource.enabled: "true"
