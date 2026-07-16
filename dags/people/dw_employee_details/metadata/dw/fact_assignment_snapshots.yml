@@ -143,8 +143,16 @@ columns:
     description: True when the assignment was closed by an internal transfer rather than a real exit; the person stays employed under a continuation assignment. Filter is_transfer_termination = FALSE for genuine dismissals and turnover.
     lineage:
       - datalake_people.assignment_snapshots.is_transfer_termination
+  is_effectivation_hire:
+    description: True when the assignment began as an intern/apprentice effectivation (efetivação); the person enters the effective workforce for the first time, so it counts as a new hire (unlike an internal transfer, which does not).
+    lineage:
+      - datalake_people.assignment_snapshots.is_effectivation_hire
+  is_effectivation_termination:
+    description: True when the assignment closed as the intern/apprentice side of an effectivation (efetivação) rather than a real exit; the person continues as an effective worker under the new assignment.
+    lineage:
+      - datalake_people.assignment_snapshots.is_effectivation_termination
   is_turnover_new_hire:
-    description: TRUE on the employee's monthly closing snapshot (is_monthly_snapshot_for_employee) in the hire month for genuine company admissions (first hire or rehire) of effective workers, excluding the incoming side of internal transfers and excluding interns and apprentices; FALSE on other monthly snapshots; NULL on non-monthly-snapshot rows. Scoped for the turnover metric. Rehires count as new hires.
+    description: TRUE on the employee's monthly closing snapshot (is_monthly_snapshot_for_employee) in the hire month for genuine company admissions (first hire or rehire) of effective workers, excluding the incoming side of internal transfers and excluding interns and apprentices; intern/apprentice effectivations count (a newly effective employee). FALSE on other monthly snapshots; NULL on non-monthly-snapshot rows. Scoped for the turnover metric. Rehires count as new hires.
     lineage:
       - datalake_people.assignment_snapshots.is_turnover_new_hire
   is_turnover_termination:

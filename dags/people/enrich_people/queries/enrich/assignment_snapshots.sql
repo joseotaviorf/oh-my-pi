@@ -273,6 +273,8 @@ assignment_snapshots_ranked AS (
         pei.id_person IS NOT NULL AS has_emergency_contact,
         COALESCE(im.is_transfer_hire, FALSE) AS is_transfer_hire,
         COALESCE(im.is_transfer_termination, FALSE) AS is_transfer_termination,
+        COALESCE(im.is_effectivation_hire, FALSE) AS is_effectivation_hire,
+        COALESCE(im.is_effectivation_termination, FALSE) AS is_effectivation_termination,
         NOT COALESCE(im.is_transfer_hire, FALSE)
             AND COALESCE(jwst.is_effective_worker, TRUE)
             AND LAST_DAY(ad.dt_reference) = LAST_DAY(ad.dt_started)
@@ -489,6 +491,8 @@ SELECT
     asr.has_emergency_contact,
     asr.is_transfer_hire,
     asr.is_transfer_termination,
+    asr.is_effectivation_hire,
+    asr.is_effectivation_termination,
     CASE
         WHEN msfe.id_assignment IS NOT NULL THEN asr.is_new_hire
     END AS is_turnover_new_hire,

@@ -297,6 +297,8 @@ SELECT
     fas.has_emergency_contact,
     fas.is_transfer_hire,
     fas.is_transfer_termination,
+    fas.is_effectivation_hire,
+    fas.is_effectivation_termination,
     fas.is_turnover_new_hire,
     fas.is_turnover_termination,
     fas.is_eligible_to_turnover,

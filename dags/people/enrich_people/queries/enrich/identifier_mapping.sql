@@ -212,6 +212,38 @@ transfer_continuations AS (
 transfer_continuation_periods AS (
     SELECT DISTINCT id_period_of_service FROM transfer_continuations
 ),
+effectivation_continuations AS (
+    -- Intern/apprentice effectivation (efetivação): the incoming assignment opens with
+    -- HIRE_ADD_WORK_RELATION / EFETIVA_ESTAG at assignment_sequence + 1. Incoming side =
+    -- effectivation hire; the preceding assignment = effectivation termination.
+    SELECT
+        aa_next.id_assignment AS hire_id_assignment,
+        aa.id_assignment AS termination_id_assignment
+    FROM
+        datalake_pin_core_clean.all_assignments AS aa
+    INNER JOIN
+        datalake_pin_core_clean.all_assignments AS aa_next
+            ON aa_next.id_person = aa.id_person
+            AND aa_next.assignment_sequence = aa.assignment_sequence + 1
+    INNER JOIN
+        datalake_pin_core_clean.action_occurrence AS ao
+            ON ao.id_action_occurrence = aa_next.id_action_occurrence
+    INNER JOIN
+        datalake_pin_core_clean.action_reason_base AS arb
+            ON arb.id_action_reason = ao.id_action_reason
+    WHERE
+        aa.assignment_type IN ('E', 'C')
+        AND aa_next.assignment_type IN ('E', 'C')
+        AND aa.assignment_status_type = 'INACTIVE'
+        AND aa_next.action_code = 'HIRE_ADD_WORK_RELATION'
+        AND arb.action_reason_code = 'EFETIVA_ESTAG'
+),
+effectivation_hire_assignments AS (
+    SELECT DISTINCT hire_id_assignment AS id_assignment FROM effectivation_continuations
+),
+effectivation_termination_assignments AS (
+    SELECT DISTINCT termination_id_assignment AS id_assignment FROM effectivation_continuations
+),
 employment_periods AS (
     -- Periods of service with at least one employment assignment (E/C).
     -- Pension / pre-hire (P) periods are excluded from the continuous employment cycle
@@ -399,6 +431,8 @@ SELECT
     END AS is_active,
     COALESCE(ted.action_code = 'GLB_TRANSFER', FALSE) AS is_transfer_termination,
     tha.id_assignment IS NOT NULL AS is_transfer_hire,
+    eha.id_assignment IS NOT NULL AS is_effectivation_hire,
+    eta.id_assignment IS NOT NULL AS is_effectivation_termination,
     ROW_NUMBER() OVER (
         PARTITION BY
             ca.id_person
@@ -454,3 +488,9 @@ LEFT JOIN
 LEFT JOIN
     transfer_hire_assignments AS tha
         ON tha.id_assignment = ca.id_assignment
+LEFT JOIN
+    effectivation_hire_assignments AS eha
+        ON eha.id_assignment = ca.id_assignment
+LEFT JOIN
+    effectivation_termination_assignments AS eta
+        ON eta.id_assignment = ca.id_assignment

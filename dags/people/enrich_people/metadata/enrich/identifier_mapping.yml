@@ -124,6 +124,20 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_assignments.action_code
       - datalake_pin_core_clean.all_assignments.assignment_sequence
+  is_effectivation_hire:
+    description: True when the assignment was opened as an intern/apprentice effectivation (efetivação) — a HIRE_ADD_WORK_RELATION whose action reason is EFETIVA_ESTAG, continuing the intern/apprentice assignment; the person moves from intern/apprentice into the effective workforce, so it counts as a new effective hire (unlike an internal transfer, where the person was already an effective employee).
+    lineage:
+      - datalake_pin_core_clean.all_assignments.action_code
+      - datalake_pin_core_clean.all_assignments.assignment_sequence
+      - datalake_pin_core_clean.action_occurrence.id_action_reason
+      - datalake_pin_core_clean.action_reason_base.action_reason_code
+  is_effectivation_termination:
+    description: True when the assignment was closed as the outgoing side of an intern/apprentice effectivation (efetivação) — the intern/apprentice assignment immediately preceding an effectivation hire, not a real company exit.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.action_code
+      - datalake_pin_core_clean.all_assignments.assignment_sequence
+      - datalake_pin_core_clean.action_occurrence.id_action_reason
+      - datalake_pin_core_clean.action_reason_base.action_reason_code
   is_active_pin:
     description: Raw active status from Oracle HCM. On the termination date itself, Oracle still records TRUE; it only flips to FALSE the following day.
     lineage:
