@@ -64,7 +64,8 @@ duplicates_listing_relation AS (
       COUNT(*) AS total_duplicates
     FROM
       property_prefered_agent
-    GROUP BY ALL
+    GROUP BY
+      id_simultaneous_house_listing_relation
     HAVING total_duplicates > 1
 ),
 deduplication_house_listing_relation_windows AS (

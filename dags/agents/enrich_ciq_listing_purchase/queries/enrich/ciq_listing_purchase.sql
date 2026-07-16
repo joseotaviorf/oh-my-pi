@@ -57,7 +57,13 @@ house_consultant_history AS (
         MIN(ts_agency_created) AS ts_house_registration
     FROM
         datalake_big_agent.house_consultant_history AS hch
-    GROUP BY ALL
+    GROUP BY
+        hch.id_house,
+        hch.id_enrollment,
+        hch.id_partner,
+        hch.id_internal_agent,
+        hch.id_user,
+        hch.consultant_type
 ),
 house_city_clean AS (
     SELECT
