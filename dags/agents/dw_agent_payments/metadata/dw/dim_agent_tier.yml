@@ -1,0 +1,173 @@
+database_name: dw_agent_payments
+table_name: dim_agent_tier
+description: |
+  Dimension of Big Agent incentive tiers projected from enrich tier_rule.
+  Each row is one tier configuration with classifier and qualifier score rules
+  expanded per incentive operation for analytics joins with earnings.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  sk_tier:
+    lineage:
+      - datalake_big_agent.tier_rule.id_tier
+    description: Surrogate key of the Big Agent tier. Primary key of this dimension.
+  sk_business_unit:
+    lineage:
+      - datalake_big_agent.tier_rule.id_business_unit
+    description: Hub business unit identifier when the linked incentive engine external condition type is HUB; otherwise null.
+  incentive_engine_external_condition_type:
+    lineage:
+      - datalake_big_agent.tier_rule.incentive_engine_external_condition_type
+    description: External condition type of the incentive engine that scopes this tier (for example HUB).
+  incentive_system:
+    lineage:
+      - datalake_big_agent.tier_rule.incentive_system
+    description: Incentive system label from the linked incentive engine (for example DEMAND_CONVERSION_FS).
+  tier_name:
+    lineage:
+      - datalake_big_agent.tier_rule.tier_name
+    description: Display name of the tier in the Big Agent incentive configuration.
+  tier_priority:
+    lineage:
+      - datalake_big_agent.tier_rule.tier_priority
+    description: Priority order used when multiple tiers match the same agent score context; lower values rank higher.
+  classifier_min_score:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_min_score
+    description: Minimum agent score required to match the classifier score rule for this tier.
+  classifier_resume:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_resume
+    description: Array of structs summarizing each classifier points rule with operation, max points, min trigger, and multiplier.
+  qualifier_min_score:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_min_score
+    description: Minimum agent score required to match the qualifier score rule for this tier.
+  qualifier_resume:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_resume
+    description: Array of structs summarizing each qualifier points rule with operation, max points, min trigger, and multiplier.
+  classifier_max_points_cs:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_max_points_cs
+    description: Maximum points for the CS operation on the classifier score rule linked to this tier.
+  classifier_max_points_fl_rent:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_max_points_fl_rent
+    description: Maximum points for the FL_FR (first listing rent) operation on the classifier score rule.
+  classifier_max_points_ccv:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_max_points_ccv
+    description: Maximum points for the CCV operation on the classifier score rule linked to this tier.
+  classifier_max_points_fl_sale:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_max_points_fl_sale
+    description: Maximum points for the FL_FS (first listing sale) operation on the classifier score rule.
+  classifier_max_points_tqc:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_max_points_tqc
+    description: Maximum points for the TQC operation on the classifier score rule linked to this tier.
+  classifier_min_points_cs:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_min_points_cs
+    description: Minimum trigger points for the CS operation on the classifier score rule linked to this tier.
+  classifier_min_points_fl_rent:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_min_points_fl_rent
+    description: Minimum trigger points for the first listing rent operation on the classifier score rule.
+  classifier_min_points_ccv:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_min_points_ccv
+    description: Minimum trigger points for the CCV operation on the classifier score rule linked to this tier.
+  classifier_min_points_sale:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_min_points_sale
+    description: Minimum trigger points for the first listing sale operation on the classifier score rule.
+  classifier_min_points_tqc:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_min_points_tqc
+    description: Minimum trigger points for the TQC operation on the classifier score rule linked to this tier.
+  classifier_multiplier_cs:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_multiplier_cs
+    description: Points multiplier for a unitary CS event on the classifier score rule linked to this tier.
+  classifier_multiplier_fl_rent:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_multiplier_fl_rent
+    description: Points multiplier for a unitary FL_FR event on the classifier score rule.
+  classifier_multiplier_ccv:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_multiplier_ccv
+    description: Points multiplier for a unitary CCV event on the classifier score rule linked to this tier.
+  classifier_multiplier_fl_sale:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_multiplier_fl_sale
+    description: Points multiplier for a unitary FL_FS event on the classifier score rule.
+  classifier_multiplier_tqc:
+    lineage:
+      - datalake_big_agent.tier_rule.classifier_multiplier_tqc
+    description: Points multiplier for a unitary TQC event on the classifier score rule linked to this tier.
+  qualifier_max_points_cs:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_max_points_cs
+    description: Maximum points for the CS operation on the qualifier score rule linked to this tier.
+  qualifier_max_points_fl_rent:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_max_points_fl_rent
+    description: Maximum points for the first listing rent operation on the qualifier score rule.
+  qualifier_max_points_ccv:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_max_points_ccv
+    description: Maximum points for the CCV operation on the qualifier score rule linked to this tier.
+  qualifier_max_points_fl_sale:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_max_points_fl_sale
+    description: Maximum points for the first listing sale operation on the qualifier score rule.
+  qualifier_max_points_tqc:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_max_points_tqc
+    description: Maximum points for the TQC operation on the qualifier score rule linked to this tier.
+  qualifier_min_points_cs:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_min_points_cs
+    description: Minimum trigger points for the CS operation on the qualifier score rule linked to this tier.
+  qualifier_min_points_fl_rent:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_min_points_fl_rent
+    description: Minimum trigger points for the first listing rent operation on the qualifier score rule.
+  qualifier_min_points_ccv:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_min_points_ccv
+    description: Minimum trigger points for the CCV operation on the qualifier score rule linked to this tier.
+  qualifier_min_points_sale:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_min_points_sale
+    description: Minimum trigger points for the first listing sale operation on the qualifier score rule.
+  qualifier_min_points_tqc:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_min_points_tqc
+    description: Minimum trigger points for the TQC operation on the qualifier score rule linked to this tier.
+  qualifier_multiplier_cs:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_multiplier_cs
+    description: Points multiplier for a unitary CS event on the qualifier score rule linked to this tier.
+  qualifier_multiplier_fl_rent:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_multiplier_fl_rent
+    description: Points multiplier for a unitary FL_FR event on the qualifier score rule.
+  qualifier_multiplier_ccv:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_multiplier_ccv
+    description: Points multiplier for a unitary CCV event on the qualifier score rule linked to this tier.
+  qualifier_multiplier_fl_sale:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_multiplier_fl_sale
+    description: Points multiplier for a unitary FL_FS event on the qualifier score rule.
+  qualifier_multiplier_tqc:
+    lineage:
+      - datalake_big_agent.tier_rule.qualifier_multiplier_tqc
+    description: Points multiplier for a unitary TQC event on the qualifier score rule linked to this tier.
+  ts_created:
+    lineage:
+      - datalake_big_agent.tier_rule.ts_created
+    description: Timestamp when the tier was created in Big Agent.
