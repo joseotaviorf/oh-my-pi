@@ -1,9 +1,11 @@
 ---
 database_name: datalake_tracksale
 table_name: answer_cities
-description:
-  With this table we have the objective of applying business rules to facilitate analyzes by city,
-  each line of this table must refer to an nps response.
+description: >-
+  Enriched Tracksale NPS answers with city attribution rules applied for geographic analysis; one
+  row per survey response. City resolution may join datalake_firestore.sale_offer, a static table from
+  the deprecated enrich_sale_firestore pipeline (legacy Firestore/Monday system inactive since 2024),
+  for historical offer context only.
 domain: Support and Services
 owner: gabriel.firmino@quintoandar.com.br
 columns:

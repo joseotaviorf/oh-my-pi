@@ -5,11 +5,11 @@ columns:
   id_offer:
     lineage:
     - datalake_firestore.sale_offer.id
-    description: Natural key of the For Sale offer in Sales Flow or EBDB services.
+    description: Natural key of the For Sale offer in Sales Flow or EBDB services. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   id_consultant_adjusted:
     lineage:
     - datalake_firestore.monday.id_consultant
-    description: Monday consultant identifier assigned to the offer, after applying the consultant remapping rules (e.g. legacy id 11422665 reassigned). Joins to monday_users.
+    description: Monday consultant identifier assigned to the offer, after applying the consultant remapping rules (e.g. legacy id 11422665 reassigned). Joins to monday_users. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   id_closing_specialist:
     lineage:
     - datalake_gsheets_clean.monday_users.id_monday
@@ -25,44 +25,49 @@ columns:
   sale_agreement_status:
     lineage:
     - datalake_firestore.monday.sale_agreement_status
-    description: Sale agreement (CCV) status of the offer as recorded in the Monday board.
+    description: Sale agreement (CCV) status of the offer as recorded in the Monday board. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   status_type:
     lineage:
     - datalake_firestore.monday.status
-    description: Derived offer status bucket used in the deal making funnel reporting model.
+    description: Derived offer status bucket used in the deal making funnel reporting model. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   drop_reason_name:
     lineage:
     - datalake_firestore.monday.drop_reason
-    description: Human-readable drop reason label derived from Monday drop reason codes.
+    description: Human-readable drop reason label derived from Monday drop reason codes. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   drop_category:
     lineage:
     - datalake_firestore.monday.drop_reason
-    description: Qualified versus unqualified drop category derived from Monday drop reason codes.
+    description: Qualified versus unqualified drop category derived from Monday drop reason codes. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   drop_subcategory:
     lineage:
     - datalake_firestore.monday.drop_reason
-    description: Drop subcategory grouping derived from Monday drop reason codes.
+    description: Drop subcategory grouping derived from Monday drop reason codes. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   deal_breaker:
     lineage:
     - datalake_firestore.monday.drop_reason
-    description: Party responsible for the deal breaker derived from Monday drop reason codes.
+    description: Party responsible for the deal breaker derived from Monday drop reason codes. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   step_discard:
     lineage:
     - datalake_firestore.monday.drop_reason
     - datalake_firestore.monday.dt_offer_dismissed
-    description: Funnel step at which the offer was discarded in the deal making funnel.
+    description: Funnel step at which the offer was discarded in the deal making funnel. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   is_offer_dismissed:
     lineage:
     - datalake_firestore.monday.dt_offer_dismissed
     - datalake_firestore.monday.drop_reason
-    description: Boolean flag indicating whether the offer was dismissed in the deal making funnel.
+    description: Boolean flag indicating whether the offer was dismissed in the deal making funnel. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   dt_offer_dismissed_qualified:
     lineage:
     - datalake_firestore.monday.dt_offer_dismissed
-    description: Calendar date of offer dismissed qualified for this deal making funnel record.
+    description: Calendar date of offer dismissed qualified for this deal making funnel record. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   dt_offer_dismissed_unqualified:
     lineage:
     - datalake_firestore.monday.dt_offer_dismissed
-    description: Calendar date of offer dismissed unqualified for this deal making funnel record.
+    description: Calendar date of offer dismissed unqualified for this deal making funnel record. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
 owner: guilherme.rocha@quintoandar.com.br
-description: Data warehouse deal making funnel table supporting reporting on For Sale datamart tables for executive and product analytics. Grain and keys follow the dimensional model consumed by BI and metrics.
+description: >-
+  Data warehouse deal making funnel table supporting reporting on For Sale datamart tables for
+  executive and product analytics. Grain and keys follow the dimensional model consumed by BI and
+  metrics. Several attributes and dates are sourced from datalake_firestore.monday and
+  datalake_firestore.sale_offer — static tables from the deprecated enrich_sale_firestore pipeline
+  (legacy Firestore/Monday system inactive since 2024); those fields reflect historical records only.

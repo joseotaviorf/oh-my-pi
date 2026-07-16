@@ -32,4 +32,8 @@ columns:
     - datalake_tracksale.answer_tags.tag_value
     description: Identifier of the EBDB contract tagged on the NPS answer.
 owner: guilherme.rocha@quintoandar.com.br
-description: Enriched answer drivers table combining upstream clean and warehouse sources for Enriched NPS answer driver tables for For Sale customer satisfaction. Rows are shaped for analytics with derived attributes and business keys.
+description: >-
+  Enriched answer drivers table combining Tracksale NPS answers with For Sale context entities
+  (listings, bookings, offers, contracts). Offer validation joins datalake_firestore.sale_offer, a
+  static table from the deprecated enrich_sale_firestore pipeline (legacy Firestore/Monday system
+  inactive since 2024); offer context resolved via Firestore is historical only.

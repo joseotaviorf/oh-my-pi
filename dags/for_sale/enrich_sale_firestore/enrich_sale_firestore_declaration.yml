@@ -1,8 +1,0 @@
-dag:
-    name: enrich_sale_firestore
-    owner: Data ForSale
-    schedule_start_date: 2023, 1, 1
-workflow:
-    type: query_delta
-    layer: enrich
-    custom_schema: datalake_firestore

@@ -1,6 +1,10 @@
 database_name: datalake_sale_closing_flows
 table_name: closing_flow
-description: Enriched table for sale closing flows, which is used to monitor and analyze the closing funnel in For Sale
+description: >-
+  Enriched table for sale closing flows, used to monitor and analyze the closing funnel in For Sale.
+  Specialist assignments and closing milestone dates are sourced from datalake_firestore.monday, a
+  static table from the deprecated enrich_sale_firestore pipeline (legacy Firestore/Monday system
+  inactive since 2024); those fields reflect historical records only.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -36,52 +40,52 @@ columns:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_consultant
     - datalake_firestore.monday.id_closing_specialist
-    description: Identification key of the closing specialist.
+    description: Identification key of the closing specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_legal_risk_analyst:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_legal_risk_analyst
     - datalake_firestore.monday.id_legal_risk_analyst
-    description: Identification key of the legal risk analyst.
+    description: Identification key of the legal risk analyst. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_pre_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_pre_specialist
     - datalake_firestore.monday.id_pre_specialist
-    description: Identification key of the pre credit specialist.
+    description: Identification key of the pre credit specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_post_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_post_specialist
     - datalake_firestore.monday.id_post_specialist
-    description: Identification key of the post credit specialist.
+    description: Identification key of the post credit specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_start_financing_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_start_financing_specialist
     - datalake_firestore.monday.id_start_financing_specialist
-    description: Identification key of the start financing specialist.
+    description: Identification key of the start financing specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_follow_up_financing_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_follow_up_financing_specialist
     - datalake_firestore.monday.id_follow_up_financing_specialist
-    description: Identification key of the follow up financing specialist.
+    description: Identification key of the follow up financing specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_end_financing_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_end_financing_specialist
     - datalake_firestore.monday.id_end_financing_specialist
-    description: Identification key of the end financing specialist.
+    description: Identification key of the end financing specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_credit_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_credit_specialist
     - datalake_firestore.monday.id_credit_specialist
-    description: Identification key of the credit specialist.
+    description: Identification key of the credit specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_notes_registry_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_notes_registry_specialist
     - datalake_firestore.monday.id_notes_registry_specialist
-    description: Identification key of the notes registry specialist.
+    description: Identification key of the notes registry specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   id_real_estate_register_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_real_estate_register_specialist
     - datalake_firestore.monday.id_real_estate_register_specialist
-    description: Identification key of the real estate register specialist.
+    description: Identification key of the real estate register specialist. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   partner_3p_supply:
     lineage:
     - datalake_company.company_sks.company_name
@@ -200,87 +204,87 @@ columns:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_onboarding_ended
     - datalake_firestore.monday.dt_onboarding_ended
-    description: Date when the onboarding was ended
+    description: Date when the onboarding was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legal_analysis_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
     - datalake_firestore.monday.dt_legal_analysis_ended
-    description: Date when the legal analysis was ended
+    description: Date when the legal analysis was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legaut_analysis_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_started
     - datalake_firestore.monday.dt_legaut_analysis_started
-    description: Date when the legaut analysis was started
+    description: Date when the legaut analysis was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legaut_analysis_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_ended
     - datalake_firestore.monday.dt_legaut_analysis_ended
-    description: Date when the legaut analysis was ended
+    description: Date when the legaut analysis was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legal_risk_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_started
     - datalake_firestore.monday.dt_legal_risk_started
-    description: Date when the legal risk analysis was started
+    description: Date when the legal risk analysis was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_legal_risk_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_ended
     - datalake_firestore.monday.dt_legal_risk_ended
-    description: Date when the legal risk analysis was ended
+    description: Date when the legal risk analysis was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_bank_legal_analysis_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
     - datalake_firestore.monday.dt_bank_legal_analysis_started
-    description: Date when the bank legal analysis was started
+    description: Date when the bank legal analysis was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_credit_analysis_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_started
     - datalake_firestore.monday.dt_credit_analysis_started
-    description: Date when the credit analysis was started
+    description: Date when the credit analysis was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_credit_analysis_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
     - datalake_firestore.monday.dt_credit_analysis_ended
-    description: Date when the credit analysis was ended
+    description: Date when the credit analysis was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_financing_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_financing_started
     - datalake_firestore.monday.dt_financing_started
-    description: Date when the financing was started
+    description: Date when the financing was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_financing_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
     - datalake_firestore.monday.dt_financing_ended
-    description: Date when the financing was ended
+    description: Date when the financing was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_notes_registry_started:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_started
     - datalake_firestore.monday.dt_notes_registry_started
-    description: Date when the notes registry was started
+    description: Date when the notes registry was started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_notes_registry_ended:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
     - datalake_firestore.monday.dt_notes_registry_ended
-    description: Date when the notes registry was ended
+    description: Date when the notes registry was ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_house_registry_started:
     lineage:
     - datalake_sales_flow_clean.notary.ts_started
     - datalake_firestore.monday.dt_house_registry_started
-    description: Date when the house registry started
+    description: Date when the house registry started Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_house_registry_ended:
     lineage:
     - datalake_sales_flow_clean.notary.ts_ended
     - datalake_firestore.monday.dt_house_registry_ended
-    description: Date when the house registry ended
+    description: Date when the house registry ended Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_sale_key_delivered:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_sale_key_delivered
     - datalake_firestore.monday.dt_sale_key_delivered
-    description: Date when the sale key was delivered
+    description: Date when the sale key was delivered Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_sale_transacton_paid:
     lineage:
     - datalake_sales_flow_clean.mortgage_aud.ts_seller_paid
     - datalake_firestore.monday.dt_sale_transacton_paid
-    description: Date when the seller received the payment from the financing company. In Closing Assistance model, the full closing process is not monitored. After July 2022 there is no date.
+    description: Date when the seller received the payment from the financing company. In Closing Assistance model, the full closing process is not monitored. After July 2022 there is no date. Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_diligence_buyer_sent_at:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.dt_diligence_buyer_sent_at
@@ -296,7 +300,7 @@ columns:
     - datalake_sales_flow_clean.mortgage_aud.dt_credit_ended
     - datalake_firestore.monday.dt_legal_analysis_ended
     - datalake_firestore.monday.dt_credit_analysis_ended
-    description: Date when payment was allowed based on payment method rules
+    description: Date when payment was allowed based on payment method rules Values from datalake_firestore reflect a static snapshot only (legacy system inactive since 2024).
   dt_down_payment:
     lineage:
     - datalake_monopoly.sale.dt_occurence

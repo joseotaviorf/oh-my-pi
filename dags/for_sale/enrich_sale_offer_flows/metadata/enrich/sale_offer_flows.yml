@@ -2,7 +2,11 @@ database_name: datalake_sale_offer_flows
 table_name: sale_offer_flows
 owner: helder.rodrigues@quintoandar.com.br
 domain: For Sale
-description: Enriched table to sales flow database. The purpose of this table is to consolidate all offer information from the sales base.
+description: >-
+  Enriched table consolidating For Sale offer information from Sales Flow and related services.
+  id_sale_flow lineage includes datalake_firestore.sale_offer, a static table from the deprecated
+  enrich_sale_firestore pipeline (legacy Firestore/Monday system inactive since 2024); Firestore-sourced
+  identifiers reflect historical records only.
 columns:
   id_offer:
     lineage:
@@ -39,7 +43,7 @@ columns:
   id_sales_flow:
     lineage:
     - datalake_firestore.sale_offer.id_sale_flow
-    description: Identification key for the sales flow linked to an offer.
+    description: Identification key for the sales flow linked to an offer. Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
   sk_user_team_lead:
     lineage:
     - datalake_sales_flow.offer_specialists.id_user_team_lead

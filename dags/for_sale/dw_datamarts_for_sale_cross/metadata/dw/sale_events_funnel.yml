@@ -1,6 +1,10 @@
 database_name: dw_datamarts
 table_name: sale_events_funnel
-description: Aggregated funnel table for sale events tracking supply and demand metrics across the sales journey.
+description: >-
+  Aggregated funnel table for sale events tracking supply and demand metrics across the sales journey.
+  Part of the model reads datalake_firestore.monday, a static table from the deprecated
+  enrich_sale_firestore pipeline (legacy Firestore/Monday system inactive since 2024); columns with
+  lineage from datalake_firestore.* are historical only.
 domain: For Sale
 owner: guilherme.rocha@quintoandar.com.br
 columns:

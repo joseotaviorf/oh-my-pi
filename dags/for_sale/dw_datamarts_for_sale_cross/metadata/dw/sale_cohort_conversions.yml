@@ -2,7 +2,12 @@ database_name: dw_datamarts
 table_name: sale_cohort_conversions
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Aggregated table containing sale funnel conversion metrics by cohort, tracking conversions between different stages of the sale process (leads, visits, offers, CCV, diligence, financing, etc.) with multiple dimensional breakdowns.
+description: >-
+  Aggregated table containing sale funnel conversion metrics by cohort, tracking conversions between
+  different stages of the sale process (leads, visits, offers, CCV, diligence, financing, etc.) with
+  multiple dimensional breakdowns. Part of the model reads datalake_firestore.monday, a static table
+  from the deprecated enrich_sale_firestore pipeline (legacy Firestore/Monday system inactive since
+  2024); columns with lineage from datalake_firestore.* are historical only.
 columns:
   week_start:
     description: Start date of the week for the conversion event
@@ -72,7 +77,7 @@ columns:
     lineage:
     - dw_sale.fact_sale_flows.higher_intent_after_offer
   form_of_payment:
-    description: Payment method classification (Financiado, À Vista, À Vista + FGTS, Financiado + FGTS)
+    description: Payment method classification (Financiado, À Vista, À Vista + FGTS, Financiado + FGTS) Sourced from datalake_firestore static snapshot (legacy Firestore/Monday system inactive since 2024).
     lineage:
     - datalake_firestore.monday.payment_method
   hub_visit:
