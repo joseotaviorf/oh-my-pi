@@ -1,5 +1,5 @@
 cluster:
-  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  type: emr_7_12_consolidation_l_compute_fleet_cluster
   custom_configurations:
     aws_attributes:
       # Prior EMR runs filled /mnt under concurrent fact loads; keep headroom.
@@ -10,13 +10,17 @@ cluster:
       target_on_demand: 4
       target_spot: 0
       instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
+      - c6g.4xlarge
+      - c7g.4xlarge
     spark_conf:
       # j-2OPXNTRUAVU4W: AQE coalesce collapsed shuffles to ~10 multi-hour tasks.
       # Keep more shuffle partitions; accept more files — OPTIMIZE compacts after load.
       spark.sql.adaptive.coalescePartitions.enabled: 'false'
-      spark.sql.shuffle.partitions: '400'
+      spark.sql.shuffle.partitions: '200'
       spark.driver.memory: 16g
       spark.driver.memoryOverhead: 4g
+      spark.driver.maxResultSize: '0'
+      # Smaller executors on compute nodes → more concurrent slots for shuffle partitions.
+      spark.executor.memory: 6g
+      spark.executor.memoryOverhead: 2g
+      spark.executor.cores: '2'
