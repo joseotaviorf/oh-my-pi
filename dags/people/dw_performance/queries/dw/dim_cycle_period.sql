@@ -11,7 +11,8 @@ released_cycles AS (
       ('Talent Review 2024 Q2'),
       ('Talent Review 2024 Q3'),
       ('Talent Review 2025 H1'),
-      ('Talent Review 2025 H2')
+      ('Talent Review 2025 H2'),
+      ('Talent Review 2026 Q1')
   ) AS released (cycle_name)
 ),
 distinct_cycles AS (
