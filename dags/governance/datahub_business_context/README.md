@@ -100,6 +100,11 @@ uv run python dags/governance/datahub_business_context/sync_tars_entities.py --d
 
 # Single document
 uv run python dags/governance/datahub_business_context/sync_tars_entities.py --urn urn:li:document:...
+
+# CI usage — scope to entities whose MD changed in this commit (used by the
+# sync-tars-entities Woodpecker step; avoids re-condensing an unrelated,
+# already-full product's description on every unrelated push)
+uv run python dags/governance/datahub_business_context/sync_tars_entities.py --mode direct --changed-only
 ```
 
 After GitOps PR merge, CI runs `generate_and_push_datahub_entities.py` as for engineer-authored MDs. Direct mode bypasses Git and calls `load_collections_context.py` directly, then links the Data Product back to the source document.

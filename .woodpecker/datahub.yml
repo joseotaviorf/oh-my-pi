@@ -53,6 +53,13 @@
 #                         changes included) is a superset of push-datahub-business-context's,
 #                         so it is always present whenever push-datahub-business-context runs
 #                         — depends_on can safely point at it without "unknown step" errors.
+#                         Runs with --changed-only: without it, this script (unlike the push
+#                         step) reprocesses ALL tagged docs on every trigger, so e.g. adding a
+#                         brand-new entity's MD would re-condense an unrelated, already-full
+#                         product's description with no push-datahub-business-context re-run
+#                         to restore it (that step only touches the MD that changed). Falls
+#                         back to processing everything when the trigger is a sync/** code
+#                         change (no MD in the diff) — same intent as a deliberate full resync.
 #   push-context-documents — push_context_documents.py on push to master / hotfix/*
 #                             (idempotent; stable document IDs)
 #
@@ -170,7 +177,7 @@ steps:
         from_secret: datahub_api_key_prod
       TARS_SYNC_MODE: direct
     commands:
-      - uv run python dags/governance/datahub_business_context/sync_tars_entities.py --mode direct
+      - uv run python dags/governance/datahub_business_context/sync_tars_entities.py --mode direct --changed-only
     # A failure here (e.g. one tagged doc still being authored) must never block the
     # authoritative push-datahub-business-context publish that depends_on this step.
     failure: ignore

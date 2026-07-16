@@ -39,6 +39,7 @@ import argparse
 import hashlib
 import os
 import re
+import subprocess
 import sys
 import tempfile
 import unicodedata
@@ -114,6 +115,69 @@ def _title_to_slug(title: str) -> str:
     lower = ascii_only.lower()
     slug = re.sub(r"[^a-z0-9]+", "-", lower).strip("-")
     return slug
+
+
+def _git_changed_files() -> list[str]:
+    """Return repo-relative paths changed in the current CI commit.
+
+    Mirrors the identically-named helper in
+    ``generate_and_push_datahub_entities.py`` so both scripts scope to the
+    same diff, including its ``git show`` fallback: on a shallow clone
+    ``HEAD~1`` (or an unrelated ``CI_PREV_COMMIT_SHA``) can make ``git diff``
+    fail outright. Returning ``[]`` in that case would make ``--changed-only``
+    indistinguishable from "no entity Markdown changed" and fall back to
+    processing every tagged document — the exact collateral-damage bug this
+    flag exists to prevent, just triggered by a git failure instead.
+    """
+    prev_sha = os.environ.get("CI_PREV_COMMIT_SHA", "").strip()
+    curr_sha = os.environ.get("CI_COMMIT_SHA", "HEAD").strip() or "HEAD"
+    cmd = (
+        ["git", "diff", "--name-only", prev_sha, curr_sha]
+        if prev_sha
+        else ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
+    )
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    except subprocess.CalledProcessError:
+        try:
+            result = subprocess.run(
+                ["git", "show", "--name-only", "--format=", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        except subprocess.CalledProcessError:
+            return []
+    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def _changed_entity_slugs() -> set[str]:
+    """Underscore-form slugs for every entity Markdown changed in this commit.
+
+    Matches the ``entity_slug`` used for ``.md`` filenames (title/data_product_id
+    with hyphens replaced by underscores). Empty when nothing under
+    ``MD_OUTPUT_DIR``/``MD_OUTPUT_DIR_METRICS`` changed — e.g. a ``sync/**``
+    code change triggered this run, not a doc edit — so callers should treat
+    an empty result as "no filtering, process everything".
+    """
+    prefixes = (f"{MD_OUTPUT_DIR}/", f"{MD_OUTPUT_DIR_METRICS}/")
+    return {
+        Path(f).stem
+        for f in _git_changed_files()
+        if f.startswith(prefixes) and f.endswith(".md")
+    }
+
+
+def _candidate_entity_slug(doc: TarsEntityDocument) -> str:
+    """Best-effort entity slug for a document, without side effects.
+
+    Mirrors the derivation in ``_fill_derived_fields`` (structured property
+    if set, else derived from title) but avoids that function's
+    golden-query-URN write-back — this is only used for --changed-only
+    filtering before any document is actually processed.
+    """
+    product_id = doc.data_product_id or _title_to_slug(doc.title)
+    return product_id.replace("-", "_")
 
 
 def _is_safe_data_product_id(value: str) -> bool:
@@ -373,6 +437,17 @@ def main() -> int:
         default=_SCRIPT_DIR / "sync_output",
         help="Output directory for --dry-run (default: sync_output/).",
     )
+    parser.add_argument(
+        "--changed-only",
+        action="store_true",
+        help=(
+            "Only process documents whose entity Markdown changed in the current "
+            "commit (git diff), instead of every tagged document. Falls back to "
+            "processing everything when no entity Markdown changed (e.g. a "
+            "sync/** code change triggered this run). Prevents an unrelated push "
+            "from re-condensing the description of an untouched entity."
+        ),
+    )
     ns = parser.parse_args()
 
     if not os.environ.get("DATAHUB_GRAPHQL_URL", "").strip():
@@ -390,6 +465,26 @@ def main() -> int:
     if not documents:
         print("No tars-entity documents found.")
         return 0
+
+    if ns.changed_only and not ns.urn:
+        changed_slugs = _changed_entity_slugs()
+        if changed_slugs:
+            before = len(documents)
+            documents = [
+                d for d in documents if _candidate_entity_slug(d) in changed_slugs
+            ]
+            print(
+                f"--changed-only: {len(documents)}/{before} document(s) match "
+                f"changed Markdown ({', '.join(sorted(changed_slugs))})"
+            )
+            if not documents:
+                print("No documents match the changed Markdown files.")
+                return 0
+        else:
+            print(
+                "--changed-only: no entity Markdown changed in this commit — "
+                "processing all documents"
+            )
 
     print(f"Mode: {ns.mode} | Documents: {len(documents)} | dry_run={ns.dry_run}")
 
