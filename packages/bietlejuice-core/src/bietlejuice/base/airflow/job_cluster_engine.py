@@ -24,6 +24,7 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
 )
 from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.base.databricks.spark_event_log_cluster import (
+    apply_shard_event_log_dir_suffix,
     apply_validation_event_log_overrides,
 )
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -292,6 +293,10 @@ class DatabricksJobClusterEngine(JobClusterEngine):
     ) -> BaseOperator:
         _ = config_service
         cluster_configuration = self._get_cluster_configuration()
+        cluster_configuration = apply_shard_event_log_dir_suffix(
+            cluster_configuration,
+            execute_job_cluster_local_id=execute_job_cluster_local_id,
+        )
         cluster_configuration = self._input_spark_env_vars(cluster_configuration)
         if self._ctx.is_validation:
             cluster_configuration = apply_validation_event_log_overrides(

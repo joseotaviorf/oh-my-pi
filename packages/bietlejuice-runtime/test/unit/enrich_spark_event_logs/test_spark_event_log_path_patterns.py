@@ -52,6 +52,11 @@ from dags.platform.enrich_spark_event_logs.spark_jobs.load_spark_stage_metrics i
             "eventlog_v2_app-20260519083350-0000/events_1.zstd",
             "app-20260519083350-0000",
         ),
+        (
+            "s3a://b/spark-event-logs/bietlejuice.amplitude_subpartitioned/cluster-3/"
+            "eventlog_v2_app-20260519083350-0000/events_1.zstd",
+            "app-20260519083350-0000",
+        ),
     ],
 )
 def test_eventlog_segment_extracts_app_id(file_path: str, expected_id: str) -> None:
@@ -72,6 +77,11 @@ def test_eventlog_segment_extracts_app_id(file_path: str, expected_id: str) -> N
             "s3a://b/spark-event-logs-emr/bietlejuice.big_agent_fast_lane/"
             "eventlog_v2_local-1779162723207/events_4.zstd",
             "bietlejuice.big_agent_fast_lane",
+        ),
+        (
+            "s3a://b/spark-event-logs/bietlejuice.amplitude_subpartitioned/cluster-3/"
+            "eventlog_v2_app-20260519083350-0000/events_1.zstd",
+            "bietlejuice.amplitude_subpartitioned",
         ),
     ],
 )

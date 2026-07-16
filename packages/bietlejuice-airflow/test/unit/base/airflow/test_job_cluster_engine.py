@@ -695,6 +695,128 @@ class TestValidationEventLogOverrides:
         )
 
 
+class TestDatabricksShardEventLogDir:
+    _CLUSTER_TEMPLATE = {
+        "spark_version": "16.4.x-scala2.12",
+        "data_security_mode": "SINGLE_USER",
+        "spark_conf": {
+            "spark.eventLog.enabled": "true",
+            "spark.eventLog.dir": (
+                "s3a://{{ var.value.databricks_s3_bucket }}/spark-event-logs/"
+                "{{ dag.dag_id }}"
+            ),
+        },
+        "spark_env_vars": {},
+    }
+
+    @pytest.fixture
+    def dbr_ctx(self):
+        dag = DAG(dag_id="bietlejuice.amplitude_subpartitioned", schedule=None)
+        return DagExecutionContext(
+            dag=dag,
+            environment="forno",
+            bucket="b",
+            base_spark_jobs_path="/x/",
+            dag_args={},
+            workflow_args={},
+            cluster_args={"type": "cluster_key"},
+        )
+
+    def _config_service(self):
+        config = MagicMock()
+        config._deep_update = lambda a, b: {**a, **(b or {})}
+        config.get_config.side_effect = lambda key: {
+            "cluster_key": dict(self._CLUSTER_TEMPLATE),
+            "default_libraries": [],
+            "artifacts_bucket": "art",
+            "databricks_default_service_credential_name": "x",
+            "default_access_control_list": [
+                {"group_name": "g", "permission_level": "CAN_MANAGE"}
+            ],
+        }.get(key, [])
+        return config
+
+    def test_execute_cluster_task_appends_shard_suffix(self, dbr_ctx):
+        config = self._config_service()
+        mock_operator = MagicMock()
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine."
+            "QuintoAndarDatabricksExecuteJobClusterOperator",
+            mock_operator,
+        ):
+            engine = DatabricksJobClusterEngine(dbr_ctx, config)
+            engine.create_execute_cluster_task(
+                config_service=config,
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=3,
+            )
+
+        cluster_configuration = mock_operator.call_args.kwargs["cluster_configuration"]
+        assert cluster_configuration["spark_conf"]["spark.eventLog.dir"].endswith(
+            "/cluster-3"
+        )
+        assert mock_operator.call_args.kwargs["task_id"] == "execute-job-cluster-3"
+
+    def test_concurrent_shards_do_not_share_event_log_dir(self, dbr_ctx):
+        config = self._config_service()
+        mock_operator = MagicMock()
+        dirs = []
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine."
+            "QuintoAndarDatabricksExecuteJobClusterOperator",
+            mock_operator,
+        ):
+            engine = DatabricksJobClusterEngine(dbr_ctx, config)
+            for shard_id in (None, 2, 3):
+                mock_operator.reset_mock()
+                engine.create_execute_cluster_task(
+                    config_service=config,
+                    minimum_cluster_runtime_version=None,
+                    execute_job_cluster_local_id=shard_id,
+                )
+                dirs.append(
+                    mock_operator.call_args.kwargs["cluster_configuration"][
+                        "spark_conf"
+                    ]["spark.eventLog.dir"]
+                )
+
+        assert len(set(dirs)) == 3
+
+    def test_disabled_event_log_does_not_invent_dir(self, dbr_ctx):
+        template = dict(self._CLUSTER_TEMPLATE)
+        template["spark_conf"] = {"spark.eventLog.enabled": "false"}
+        config = MagicMock()
+        config._deep_update = lambda a, b: {**a, **(b or {})}
+        config.get_config.side_effect = lambda key: {
+            "cluster_key": template,
+            "default_libraries": [],
+            "artifacts_bucket": "art",
+            "databricks_default_service_credential_name": "x",
+            "default_access_control_list": [
+                {"group_name": "g", "permission_level": "CAN_MANAGE"}
+            ],
+        }.get(key, [])
+
+        mock_operator = MagicMock()
+        with patch(
+            "bietlejuice.base.airflow.job_cluster_engine."
+            "QuintoAndarDatabricksExecuteJobClusterOperator",
+            mock_operator,
+        ):
+            engine = DatabricksJobClusterEngine(dbr_ctx, config)
+            engine.create_execute_cluster_task(
+                config_service=config,
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=2,
+            )
+
+        spark_conf = mock_operator.call_args.kwargs["cluster_configuration"][
+            "spark_conf"
+        ]
+        assert spark_conf["spark.eventLog.enabled"] == "false"
+        assert "spark.eventLog.dir" not in spark_conf
+
+
 class TestDatabricksJobClusterEngineAcl:
     """ACL resolution moved from ExecuteJobClusterTaskCreator to DatabricksJobClusterEngine."""
 
