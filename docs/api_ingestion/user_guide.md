@@ -797,8 +797,6 @@ There is **no** dedicated `source` URL column written by `load_api_ingestion_raw
 
 - [`dags/people/oitchau_api/oitchau_api_declaration.yml`](../../dags/people/oitchau_api/oitchau_api_declaration.yml) — `api_ingestion` reference: **`token_request_format: json_body`** OAuth2, optional **`http_user_agent`**, **`credentials_scope`**, tables with **`params: {}`** where the API rejects default date filters, **`page_per_page`** on large list endpoints, **`id_expansion`** with **`param_name`** (hours bank), **`path_param`** + **`page_per_page`** (per-employee requests), **`json_body_field`** + **`correlation_field`** for **POST** `costs/list`, **`workflow.raw_inner_dependencies`** for fan-out after `employees`, plus **clean** tables in the same DAG package (`queries/clean/*.sql`, **`merge_on`**, **`default_clean_extraction_type`** / **`default_clean_partitions`**).
 
-Note: [`dags/people/currency/currency_declaration.yml`](../../dags/people/currency/currency_declaration.yml) uses **`custom_ingestion`** (`load_currency_raw`), not `api_ingestion`.
-
 ---
 
 ## Known limitations (current MVP)

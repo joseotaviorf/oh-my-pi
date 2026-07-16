@@ -23,14 +23,14 @@ MAIN ARGUMENTS:
   -nl, --no-lineage: (Optional) Disables column-level lineage generation.
 
 USAGE EXAMPLES:
-# Generate metadata for the 'closing_rates' table in the 'currency' folder
-uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/artifact_generation/generate_metadata.py -f currency -t closing_rates -o "your.name@quintoandar.com.br"
+# Generate metadata for the 'employees' table in the 'oitchau_api' folder
+uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/artifact_generation/generate_metadata.py -f oitchau_api -t employees -o "your.name@quintoandar.com.br"
 
-# Update the lineage for all tables in the 'currency' folder, preserving descriptions
-uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/artifact_generation/generate_metadata.py -f currency -o "your.name@quintoandar.com.br" -u
+# Update the lineage for all tables in the 'oitchau_api' folder, preserving descriptions
+uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/artifact_generation/generate_metadata.py -f oitchau_api -o "your.name@quintoandar.com.br" -u
 
-# Generate metadata for all tables in the 'currency' folder
-uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/artifact_generation/generate_metadata.py -f currency -o "your.name@quintoandar.com.br"
+# Generate metadata for all tables in the 'oitchau_api' folder
+uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/artifact_generation/generate_metadata.py -f oitchau_api -o "your.name@quintoandar.com.br"
 """
 
 import argparse

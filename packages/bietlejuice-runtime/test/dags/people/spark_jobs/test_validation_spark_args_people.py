@@ -7,7 +7,6 @@ import pytest
 _REPO_ROOT = Path(__file__).resolve().parents[6]
 
 _JOB_PATHS = [
-    "dags/people/currency/spark_jobs/load_currency_raw.py",
     "dags/people/degreed/spark_jobs/load_degreed_raw.py",
     "dags/people/enrich_hr_system_custom/spark_jobs/load_management_hierarchy_enrich.py",
     "dags/people/greenhouse_audit_log/spark_jobs/load_greenhouse_audit_log_raw.py",
@@ -25,7 +24,6 @@ _JOB_PATHS = [
 ]
 
 _JOBS_WITH_RESOLVE_CALL = {
-    "dags/people/currency/spark_jobs/load_currency_raw.py",
     "dags/people/enrich_hr_system_custom/spark_jobs/load_management_hierarchy_enrich.py",
     "dags/people/hr_system/spark_jobs/load_hr_system_raw.py",
     "dags/people/reverse_reports/spark_jobs/load_to_gsheet.py",
