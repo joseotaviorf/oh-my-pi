@@ -168,11 +168,29 @@ sheets_info:
     sheet_name: Base
     clean_table_name: for_sale_financial_flow
     sheet_context: fintech
+  
+  for_sale_invoice:
+    sheet_id: 1qCNXOZLnpwwVdwm9V3xCBV-CIPPeTLii-Xl9f5ybhIc
+    sheet_name: Sheet1
+    clean_table_name: for_sale_invoice
+    sheet_context: fintech
 
   for_sale_invoices_20220225:
     sheet_id: 1xemQxfpH5VuOyAXzUcYL1SfdP0T1gnJZy62AhmVxKdY
     sheet_name: bd_sap
     clean_table_name: for_sale_sap_invoices
+    sheet_context: fintech
+  
+  for_sale_legacy_control:
+    sheet_id: 1c9F91FwkOY_g10W9DhqKFpP7jbtramY1mphHRMEw4mA
+    sheet_name: Sheet1
+    clean_table_name: for_sale_legacy_control
+    sheet_context: fintech
+  
+  for_sale_manual_recon:
+    sheet_id: 1sIl3xlMFCjws38B8UKrWywr0tuhNOo5XsrUlLcF-N7c
+    sheet_name: Sheet1
+    clean_table_name: for_sale_manual_recon
     sheet_context: fintech
 
   for_sale_platform_invoice_control:

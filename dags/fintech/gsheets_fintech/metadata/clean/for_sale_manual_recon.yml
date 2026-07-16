@@ -1,0 +1,185 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_manual_recon
+description: >
+  Google Sheets manual reconciliation workbook for For Sale deals curated by
+  Fintech Operations. One row per offer with brokerage, payment, invoice, and
+  accounting adjustments used in For Sale financial close and reconciliation.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.id_offer
+    description: For Sale offer identifier tracked in the manual reconciliation spreadsheet.
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.id_house
+    description: House identifier linked to the For Sale offer in the reconciliation row.
+  business_unit_description:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.business_unit_description
+    description: Business unit label assigned to the For Sale deal in the reconciliation sheet.
+  payment_model:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.payment_model
+    description: Payment model applied to the For Sale transaction in the reconciliation workbook.
+  sale_price_agreed:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.sale_price_agreed
+    description: Agreed sale price in Brazilian reais recorded for the For Sale offer.
+  brokerage_fee:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.brokerage_fee
+    description: Brokerage fee percentage or rate agreed for the For Sale transaction.
+  dt_sale_agreement_signed:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.dt_sale_agreement_signed
+    description: Date when the For Sale purchase agreement was signed.
+  dt_legal_analysis:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.dt_legal_analysis
+    description: Date when legal analysis was completed for the For Sale offer.
+  dt_cancelled:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.dt_cancelled
+    description: Date when the For Sale offer was cancelled, when applicable.
+  offer_cancelled:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.offer_cancelled
+    description: Flag or label indicating whether the For Sale offer was cancelled.
+  cancellation_brokerage:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.cancellation_brokerage
+    description: Brokerage amount or rule applied when the For Sale offer is cancelled.
+  dt_payment_allowed:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.dt_payment_allowed
+    description: Date when payment was authorized for the For Sale transaction.
+  supply_x_demand:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.supply_x_demand
+    description: Supply versus demand classification used in the For Sale reconciliation row.
+  is_legal_entity:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.is_legal_entity
+    description: Indicates whether the buyer or counterparty is a legal entity.
+  is_contract_amendment:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.is_contract_amendment
+    description: Indicates whether the For Sale deal includes a contract amendment.
+  gross_brokerage_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.gross_brokerage_amount
+    description: Gross brokerage amount in Brazilian reais before taxes and deductions.
+  taxes_and_deductions:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.taxes_and_deductions
+    description: Taxes and deductions applied to the gross brokerage amount.
+  partner_fee_value_demand:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.partner_fee_value_demand
+    description: Partner fee amount attributed to the demand side of the For Sale deal.
+  brokerage_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.brokerage_amount
+    description: Net brokerage amount in Brazilian reais after adjustments.
+  brokerage_quinto_andar_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.brokerage_quinto_andar_amount
+    description: Brokerage share allocated to QuintoAndar on the For Sale transaction.
+  brokerage_estate_agent_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.brokerage_estate_agent_amount
+    description: Brokerage share allocated to the estate agent on the For Sale transaction.
+  total_received:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.total_received
+    description: Total amount received for the For Sale offer in the reconciliation period.
+  broker_payment:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.broker_payment
+    description: Payment amount due to the broker for the For Sale transaction.
+  broker_discount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.broker_discount
+    description: Discount applied to the broker payment on the For Sale deal.
+  invoice_amount_current_period:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.invoice_amount_current_period
+    description: Invoice amount recognized in the current reconciliation period.
+  invoice_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.invoice_amount
+    description: Total invoice amount recorded for the For Sale offer.
+  band_aid_cost:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.band_aid_cost
+    description: Band-aid cost amount associated with the For Sale reconciliation row.
+  broker_payment_platform:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.broker_payment_platform
+    description: Broker payment amount routed through the For Sale platform channel.
+  broker_payment_rede_ti:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.broker_payment_rede_ti
+    description: Broker payment amount routed through the Rede TI channel.
+  accounting_receivables:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_receivables
+    description: Accounting receivables balance recorded for the For Sale offer.
+  accounting_brokerage_provision:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_brokerage_provision
+    description: Brokerage provision amount posted in the accounting reconciliation.
+  accounting_cancellation_receivables:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_cancellation_receivables
+    description: Cancellation receivables amount posted for the For Sale offer.
+  accounting_advance_broker_payment:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_advance_broker_payment
+    description: Advance broker payment amount recorded in the accounting workbook.
+  accounting_advance_buyer_payment:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_advance_buyer_payment
+    description: Advance buyer payment amount recorded in the accounting workbook.
+  accounting_buyer_amount_to_transfer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_buyer_amount_to_transfer
+    description: Buyer amount pending transfer in the For Sale accounting reconciliation.
+  accounting_broker_amount_to_transfer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_broker_amount_to_transfer
+    description: Broker amount pending transfer in the For Sale accounting reconciliation.
+  accounting_brokerage_revenue:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_brokerage_revenue
+    description: Brokerage revenue recognized in the For Sale accounting reconciliation.
+  accounting_cancellation_revenue:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_cancellation_revenue
+    description: Cancellation revenue recognized for the For Sale offer in the current period.
+  accounting_total_loss:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_total_loss
+    description: Total accounting loss amount recorded for the For Sale reconciliation row.
+  accounting_band_aid_cost:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_band_aid_cost
+    description: Band-aid cost amount posted in the For Sale accounting reconciliation.
+  loss_adjust_invoice_current_period:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.loss_adjust_invoice_current_period
+    description: Loss adjustment applied to the invoice amount in the current period.
+  accounting_cancellation_revenue_previous_period:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_cancellation_revenue_previous_period
+    description: Cancellation revenue recognized in a previous reconciliation period.
+  accounting_total_loss_previous_period:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.accounting_total_loss_previous_period
+    description: Total accounting loss amount recognized in a previous reconciliation period.
+  pipeline:
+    lineage:
+      - datalake_gsheets_raw.for_sale_manual_recon.pipeline
+    description: Pipeline stage or status label for the For Sale offer in the reconciliation sheet.

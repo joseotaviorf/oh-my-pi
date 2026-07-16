@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_legacy_control
+description: >
+  Google Sheets control list of For Sale legacy offers curated by Fintech
+  Operations. One row per offer identifier used to flag legacy deals in
+  accounting and invoice reconciliation workflows.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_legacy_control.id_offer
+    description: >
+      For Sale offer identifier listed in the legacy control spreadsheet
+      for reconciliation of historical deals.

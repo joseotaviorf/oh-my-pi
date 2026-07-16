@@ -1,0 +1,29 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_invoice
+description: >
+  Google Sheets invoice control workbook for For Sale deals curated by Fintech
+  Operations. One row per offer with ledger reference dates and invoice amounts
+  used in For Sale accounting reconciliation and invoice validation.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoice.id_offer
+    description: For Sale offer identifier tracked in the invoice control spreadsheet.
+  dt_reference_ledger:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoice.dt_reference_ledger
+    description: Ledger reference date used to align the For Sale invoice row in accounting.
+  incorrect_ledger_invoice:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoice.incorrect_ledger_invoice
+    description: Flag or label indicating whether the ledger invoice entry is incorrect.
+  invoice_amount_current_period_sheet:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoice.invoice_amount_current_period_sheet
+    description: Invoice amount for the current period recorded in the control sheet.
+  invoice_amount_sheet:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoice.invoice_amount_sheet
+    description: Total invoice amount recorded in the For Sale invoice control sheet.
