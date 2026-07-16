@@ -17,6 +17,11 @@ Additionally, manual CSAT data is collected from Google Sheets for inspection an
 
 All sources are normalized to a common scale and unified in the enrich layer, then promoted to the DW layer as fact and dimension tables.
 
+## Related Metric Entities
+
+- [Customer Contacts Front](../metric_entities/customer_contacts_front.md) — DSat Front and Resolution Rate, computed from the satisfaction survey response on `dw_bpo_performance.customer_contacts_session`.
+- [Cases Perspective](../metric_entities/cases_perspective.md) — DSAT Back and Resolution Rate Back, computed from the satisfaction survey response on `dw_bpo_performance.cases_perspective`.
+
 ## Synonyms
 
 - **CSAT**, **satisfação**, **nota de satisfação** → `satisfaction` / `csat`

@@ -37,6 +37,11 @@ Contacts flow through the following system architecture:
 - **Canonical source for messages** in flows that **start with a chatbot interaction:** `datalake_chatbot.messages`
 - **`dw_customer_support.fact_sessions_chatbot` is deprecated** — do not use it for new analysis or dashboards
 
+## Related Metric Entities
+
+- [Customer Contacts Front](../metric_entities/customer_contacts_front.md) — Front Office DSat, Resolution Rate, and Recontato D0/D4 built on `dw_bpo_performance.customer_contacts_session`.
+- [Cases Perspective](../metric_entities/cases_perspective.md) — Post Contract Back Office SLA, DSAT, Resolution Rate, and Inbound/Outbound Volume built on `dw_bpo_performance.cases_perspective`.
+
 ## Synonyms
 
 - **Contato**, **atendimento**, **interação** → `contact`

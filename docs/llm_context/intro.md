@@ -128,6 +128,12 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/turnover.md` — Turnover: official monthly workforce attrition indicator (Leavers / Average Monthly Headcount), with NH Attrition (3/6/12-month), Regrettable Turnover (RL/VRTO), and Voluntary/Involuntary segmentation (turnover / rotatividade / NH attrition / regrettable turnover / VRTO). Builds on `business_entities/employee_details.md`.
 
+- `metric_entities/condo_garantido.md` — Condo Garantido (CG): two official For Rent metrics from one contract-×-month monitoring base — **% Adoption of CG within eligibility base** (penetration over the DDA-eligible base; broken out for the delinquent base `has_nprs_l12m`) and **% Payment Default Identified Automatically** (share of condo defaults on CG-active contracts; not risk-segmented). adoção do CG / cobertura / delinquent base / % identificação automática de inadimplência / DDA. Builds on `business_entities/collections.md`.
+
+- `metric_entities/customer_contacts_front.md` — Customer Contacts Front: four Front Office service-quality metrics on `dw_bpo_performance.customer_contacts_session` — **DSat Front**, **Resolution Rate**, and **Recontato D0/D4** (recontact within 0/4 days, Atento + AeC only) (DSat / taxa de insatisfação / taxa de resolução / recontato). Builds on `business_entities/contact.md`, `ticket.md`, `satisfaction.md`, `department.md`.
+
+- `metric_entities/cases_perspective.md` — Cases Perspective (Post Contract Back): official Back Office operational metrics on `dw_bpo_performance.cases_perspective` — **SLA Back**, **DSAT Back**, **Resolution Rate Back**, **Inbound/Outbound Volume**, **DSAT Response Analysis**, and **Created/Solved/Open Case Analysis** — restricted to the Post Contract Back scope (department whitelist + mandatory `last_team` exclusions) and broken down by operation via `last_team_adjusted` (SLA Back / DSAT Back / Resolution Rate Back / Post Contract Back / operação). Builds on `business_entities/contact.md`, `ticket.md`, `satisfaction.md`, `department.md`.
+
 ## Company-Wide Glossary
 
 These abbreviations appear across multiple entities and data domains. In column names, they map to specific prefixes:

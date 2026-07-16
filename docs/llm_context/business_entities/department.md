@@ -23,6 +23,11 @@ Journey step (e.g., Offboarding)
         └── Team (e.g., Offboarding Reparos Team A)
 ```
 
+## Related Metric Entities
+
+- [Customer Contacts Front](../metric_entities/customer_contacts_front.md) — Front Office DSat, Resolution Rate, and Recontato D0/D4, sliced by `front_or_back`/`last_department`/`last_team`.
+- [Cases Perspective](../metric_entities/cases_perspective.md) — Post Contract Back Office SLA/DSAT/Resolution Rate/Volume, scoped by `last_department` whitelist and mandatory `last_team` exclusions, broken down by `last_team_adjusted`.
+
 ## Synonyms
 
 - **Departamento**, **fila**, **caixa** → `department` / queue
