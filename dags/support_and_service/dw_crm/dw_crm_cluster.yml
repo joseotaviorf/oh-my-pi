@@ -21,8 +21,9 @@ cluster:
       spark.driver.memory: 16g
       spark.driver.memoryOverhead: 4g
       spark.driver.maxResultSize: '0'
-      # Pack more executors on r6g (~128 GiB / 16 vCPU): use all cores (~8×2c/node → ~64 slots).
-      # Safer heaps than 6g on compute; smaller than preset 48g/4c which only filled ~half the CPUs.
-      spark.executor.memory: 12g
+      # Preset maxExecutors=6 left ~10/64 vCores busy while tasks peaked at ~18 MiB (j-31QDKKZFPIANY).
+      # 6g + 2 cores → ~4 executors/node on r6g.4xlarge → 16 slots across 4 core nodes.
+      spark.dynamicAllocation.maxExecutors: '16'
+      spark.executor.memory: 6g
       spark.executor.memoryOverhead: 2g
       spark.executor.cores: '2'
