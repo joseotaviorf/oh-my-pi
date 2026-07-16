@@ -12,10 +12,6 @@ columns:
     lineage:
       - dw_customer_support.fact_tickets.ts_created
     description: Ticket opening date
-  ts_solved:
-    lineage:
-      - dw_customer_support.fact_tickets.ts_solved
-    description: Returns the date the ticket was resolved.
   last_team: 
     lineage: 
       - dw_customer_support.dim_department.team
@@ -47,6 +43,32 @@ columns:
     lineage: 
      - dw_customer_support.fact_tickets.ts_solved
     description: Returns the date of the first resolution by the analyst associated with the ticket. 
+  sk_session_and_ticket:
+    lineage: 
+     - dw_customer_support.fact_customer_contacts.sk_ticket
+     - dw_customer_support.fact_customer_contacts.sk_support_session
+    description: Call or chat identifier ID; here, we are looking at both the `sk_ticket` (from when Zendesk was used) and the new `sk_support_session` field.
+  sk_user:
+    lineage: 
+     - dw_customer_support.fact_tickets.sk_user
+     - dw_customer_support.fact_customer_contacts.sk_user
+    description: User identifier associated with the contact.
+  front_or_back:
+    lineage: 
+     - dw_customer_support.dim_department
+    description: Indicates whether the Case belongs to the Front or Back.
+  origin_fcc:
+    lineage: 
+     - dw_customer_support.fact_customer_contacts.origin
+    description: Communication origin channel of the contact, indicating whether it came through the in-app chat interface ('in_app') or WhatsApp ('whatsapp').
+  direction:
+    lineage: 
+     - dw_customer_support.fact_customer_contacts.origin
+    description: Communication origin channel of the contact, indicating whether it came through the in-app chat interface ('in_app') or WhatsApp ('whatsapp').   
+  last_agent_email:
+    lineage: 
+     - dw_customer_support.dim_analyst.email
+    description: Returns the last analyst assigned to the case.
   last_department:
     lineage:
       - dw_customer_support.dim_department.department
