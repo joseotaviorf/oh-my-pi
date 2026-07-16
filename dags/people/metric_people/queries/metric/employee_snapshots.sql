@@ -294,7 +294,7 @@ SELECT
     fas.is_leadership_team_member,
     fas.is_executive_team_member,
     fas.has_emergency_contact,
-    fas.is_internal_transfer,
+    fas.is_transfer_hire,
     fas.is_transfer_termination,
     fas.is_primary_assignment_for_snapshot,
     fas.is_current_for_employee AS is_current,

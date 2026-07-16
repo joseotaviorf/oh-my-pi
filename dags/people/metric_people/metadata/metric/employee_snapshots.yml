@@ -924,14 +924,14 @@ columns:
     lineage:
       - dw_employee_details.fact_assignment_snapshots.has_emergency_contact
 
-  is_internal_transfer:
-    description: Snapshot attribute for is_internal_transfer on the employee_snapshots wide metric table.
+  is_transfer_hire:
+    description: True when the assignment began as the incoming side of an internal transfer, so the person was already at the company. Filter is_transfer_hire = FALSE to keep transfers out of new-hire counts.
     dimension: True
     lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_internal_transfer
+      - dw_employee_details.fact_assignment_snapshots.is_transfer_hire
 
   is_transfer_termination:
-    description: True when the assignment was closed by an internal transfer instead of a real exit. The employee remains active under a new assignment; exclude these rows from dismissal and turnover counts.
+    description: True when the assignment was closed by an internal transfer rather than a real exit; the person stays employed under a continuation assignment. Filter is_transfer_termination = FALSE for genuine dismissals and turnover.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_transfer_termination

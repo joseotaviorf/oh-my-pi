@@ -165,12 +165,12 @@ columns:
     description: True when the employee has at least one emergency contact on file for this date.
     lineage:
       - datalake_pin_core_clean.people_extra_info.id_person
-  is_internal_transfer:
-    description: True when the employee was already at the company before this assignment.
+  is_transfer_hire:
+    description: True when this assignment was opened as the incoming side of an internal Global Transfer; the person was already employed before this assignment.
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_people.identifier_mapping.is_transfer_hire
   is_transfer_termination:
-    description: True when this assignment was closed by an internal transfer (GLB_TRANSFER) instead of a real exit. These assignments stay active on the transfer date and must not be counted as dismissals or turnover.
+    description: True when this assignment was closed by an internal Global Transfer rather than a real exit; the assignment stays active on the transfer date and the person continues under a new assignment.
     lineage:
       - datalake_people.identifier_mapping.is_transfer_termination
   is_latest_date:

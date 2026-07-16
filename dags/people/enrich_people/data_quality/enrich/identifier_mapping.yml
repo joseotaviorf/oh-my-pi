@@ -180,3 +180,26 @@ column_level_validations:
            AND dt_actual_termination < CURRENT_DATE
         ) = 0
       severity_level: Warning
+  glb_transfer_missing_continuation:
+    custom:
+      # INACTIVE GLB_TRANSFER after which the person has no assignment at all (no assignment_sequence + 1 continuation and no other E/C assignment on/after the transfer close), which breaks is_transfer_hire / dt_original_hired chaining. A continuation outside the sequence pattern (e.g. a fresh assignment for the same person) is a valid rejoin, not an error.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT DISTINCT glb.id_assignment
+          FROM datalake_pin_core_clean.all_assignments AS glb
+          WHERE glb.assignment_type IN ('E', 'C')
+            AND glb.assignment_status_type = 'INACTIVE'
+            AND glb.action_code = 'GLB_TRANSFER'
+            AND NOT EXISTS (
+              SELECT 1
+              FROM datalake_pin_core_clean.all_assignments AS continuation
+              WHERE continuation.id_person = glb.id_person
+                AND continuation.id_assignment != glb.id_assignment
+                AND continuation.assignment_type IN ('E', 'C')
+                AND (
+                  continuation.assignment_sequence = glb.assignment_sequence + 1
+                  OR continuation.dt_effective_started >= glb.dt_effective_started
+                )
+            )
+        )) = 0
+      severity_level: Warning

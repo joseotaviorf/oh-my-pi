@@ -270,8 +270,7 @@ assignment_snapshots_ranked AS (
             ELSE TRUE
         END AS is_active,
         pei.id_person IS NOT NULL AS has_emergency_contact,
-        im.dt_original_hired IS NOT NULL
-            AND im.dt_original_hired < ad.dt_started AS is_internal_transfer,
+        COALESCE(im.is_transfer_hire, FALSE) AS is_transfer_hire,
         COALESCE(im.is_transfer_termination, FALSE) AS is_transfer_termination,
         ad.is_latest_date,
         COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
@@ -476,7 +475,7 @@ SELECT
     asr.is_executive_team_member,
     asr.is_active,
     asr.has_emergency_contact,
-    asr.is_internal_transfer,
+    asr.is_transfer_hire,
     asr.is_transfer_termination,
     asr.is_latest_date,
     asr.is_primary_assignment_for_snapshot,

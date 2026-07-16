@@ -190,13 +190,13 @@ latest_periods_of_service AS (
     SELECT id_period_of_service, id_person, dt_started, ts_updated, year, month, day
     FROM latest_periods_of_service_ranked WHERE rn = 1
 ),
-transfer_continuation_periods_ranked AS (
+transfer_continuations AS (
+    -- Periods continuing after a GLB_TRANSFER, used to chain the continuous-employment cycle:
+    -- the immediately preceding assignment (assignment_sequence - 1) closed INACTIVE with GLB_TRANSFER.
+    -- is_transfer_hire is derived separately (transfer_hire_assignments) from the primary
+    -- termination event, so it stays symmetric with is_transfer_termination.
     SELECT
-        aa_next.id_period_of_service,
-        ROW_NUMBER() OVER (
-            PARTITION BY aa_next.id_period_of_service
-            ORDER BY aa.dt_effective_started ASC
-        ) AS rn
+        aa_next.id_period_of_service
     FROM
         datalake_pin_core_clean.all_assignments AS aa
     INNER JOIN
@@ -210,7 +210,7 @@ transfer_continuation_periods_ranked AS (
         AND aa.action_code = 'GLB_TRANSFER'
 ),
 transfer_continuation_periods AS (
-    SELECT id_period_of_service FROM transfer_continuation_periods_ranked WHERE rn = 1
+    SELECT DISTINCT id_period_of_service FROM transfer_continuations
 ),
 employment_periods AS (
     -- Periods of service with at least one employment assignment (E/C).
@@ -322,6 +322,26 @@ termination_event_definitions AS (
         datalake_pin_core_clean.action_occurrence AS ao
             ON ao.id_action_occurrence = ta.id_action_occurrence
 ),
+transfer_hire_assignments AS (
+    -- The incoming side of an internal transfer: the assignment opened at assignment_sequence + 1
+    -- after an assignment whose primary termination event is a GLB_TRANSFER — the same definition
+    -- that drives is_transfer_termination, so is_transfer_hire and is_transfer_termination always
+    -- form a symmetric pair (an incoming hire cannot be flagged without its outgoing termination).
+    SELECT DISTINCT
+        aa_next.id_assignment
+    FROM
+        termination_event_definitions AS ted
+    INNER JOIN
+        datalake_pin_core_clean.all_assignments AS aa
+            ON aa.id_assignment = ted.id_assignment
+    INNER JOIN
+        datalake_pin_core_clean.all_assignments AS aa_next
+            ON aa_next.id_person = aa.id_person
+            AND aa_next.assignment_sequence = aa.assignment_sequence + 1
+            AND aa_next.assignment_type IN ('E', 'C')
+    WHERE
+        ted.action_code = 'GLB_TRANSFER'
+),
 period_continuous_employment_cycles AS (
     SELECT
         id_person,
@@ -378,6 +398,7 @@ SELECT
         ELSE TRUE
     END AS is_active,
     COALESCE(ted.action_code = 'GLB_TRANSFER', FALSE) AS is_transfer_termination,
+    tha.id_assignment IS NOT NULL AS is_transfer_hire,
     ROW_NUMBER() OVER (
         PARTITION BY
             ca.id_person
@@ -430,3 +451,6 @@ LEFT JOIN
 LEFT JOIN
     termination_event_definitions AS ted
         ON ted.id_assignment = ca.id_assignment
+LEFT JOIN
+    transfer_hire_assignments AS tha
+        ON tha.id_assignment = ca.id_assignment

@@ -131,12 +131,12 @@ columns:
     description: True when the employee has at least one emergency contact on file.
     lineage:
       - datalake_people.assignment_snapshots.has_emergency_contact
-  is_internal_transfer:
-    description: True when the employee was already at the company before this assignment (e.g., moved between teams).
+  is_transfer_hire:
+    description: True when the assignment began as the incoming side of an internal transfer, so the person was already at the company. Filter is_transfer_hire = FALSE to keep transfers out of new-hire counts.
     lineage:
-      - datalake_people.assignment_snapshots.is_internal_transfer
+      - datalake_people.assignment_snapshots.is_transfer_hire
   is_transfer_termination:
-    description: True when this assignment was closed by an internal transfer instead of a real exit. The employee remains active and employed under a new assignment, so these rows must be excluded from dismissal and turnover counts.
+    description: True when the assignment was closed by an internal transfer rather than a real exit; the person stays employed under a continuation assignment. Filter is_transfer_termination = FALSE for genuine dismissals and turnover.
     lineage:
       - datalake_people.assignment_snapshots.is_transfer_termination
   is_primary_assignment_for_snapshot:

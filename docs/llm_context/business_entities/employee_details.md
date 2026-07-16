@@ -77,7 +77,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Manager / people manager** → `is_manager = TRUE`
 - **Leadership Team / LT / liderança** → `is_leadership_team_member = TRUE` (band 10+ or EXEC)
 - **Executive Team / ET** → `is_executive_team_member = TRUE` (L0/L1 in hierarchy and band 14+)
-- **Internal transfer / mobility / transferência interna** → `is_internal_transfer = TRUE` (flag on the **new** assignment created by the transfer)
+- **Internal transfer / mobility / transferência interna** → `is_transfer_hire = TRUE` (flag on the **new** assignment created by the transfer — the incoming side, symmetric to `is_transfer_termination`)
 - **Global Transfer / transfer termination event / transferência** → `dim_event_definition.action_name = 'Global Transfer'` on the old assignment's termination event — an internal move, **not** a real exit; must be excluded from dismissals and turnover
 - **Transfer termination / assignment closed by transfer** → `is_transfer_termination = TRUE` (flag on the **old** assignment closed by a Global Transfer) — the simplest way to exclude internal transfers from termination and turnover counts without joining `dim_event_definition`
 - **Validity window / SCD2 version** → `dt_valid_from` / `dt_valid_to` on hierarchy (and other SCD2 dims); `is_current = TRUE` for latest hierarchy version
