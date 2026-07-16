@@ -1,59 +1,62 @@
 database_name: datalake_access_logs_clean
 table_name: cloudfront
-description: Table with Cloudfront logs.
+description: |
+  Clean Amazon CloudFront standard access log events ingested from S3 tab-separated edge logs.
+  One row per CDN request with timing, cache result, client network attributes, and HTTP metadata
+  for perimeter access analytics and correlation with mesh authorization logs.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
   ts_event:
     lineage:
       - s3_cloudfront_bucket/date
       - s3_cloudfront_bucket/time
-    description: Request start time
+    description: UTC timestamp when CloudFront received the client request at the edge location.
   request_duration_s:
     lineage:
       - s3_cloudfront_bucket/time-taken
-    description: Request duration
-  edge_locaction:
+    description: Total elapsed time in seconds from request receipt to response completion at the edge.
+  edge_location:
     lineage:
       - s3_cloudfront_bucket/x-edge-location
-    description: Edge location (where the request was handled by cloudfront)
+    description: CloudFront edge PoP code that served the request, indicating geographic handling point.
   principal_ip:
     lineage:
       - s3_cloudfront_bucket/c-ip
-    description: Principal IP
+    description: Client IP address observed by CloudFront before upstream forwarding to origin or mesh.
   principal_port:
     lineage:
       - s3_cloudfront_bucket/c-port
-    description: Principal Port
+    description: Client TCP port number used for the connection to the CloudFront edge node.
   request_method:
     lineage:
       - s3_cloudfront_bucket/cs-method
-    description: Request method
+    description: HTTP verb (GET, POST, etc.) of the client request as logged by CloudFront.
   request_host:
     lineage:
       - s3_cloudfront_bucket/cs(Host)
-    description: Request host
+    description: Host header value requested by the client, typically the public domain name.
   request_path:
     lineage:
       - s3_cloudfront_bucket/cs-uri-stem
-    description: Request path
+    description: URI path component of the client request excluding the query string.
   request_user_agent:
     lineage:
       - s3_cloudfront_bucket/cs(User-Agent)
-    description: Request user agent
+    description: User-Agent header sent by the client browser or API consumer at the CDN edge.
   request_query:
     lineage:
       - s3_cloudfront_bucket/cs-uri-query
-    description: Request query
-  response_status:
+    description: Query string parameters appended to the request URL after the path.
+  response_code:
     lineage:
       - s3_cloudfront_bucket/sc-status
-    description: Response status
+    description: HTTP status code returned by CloudFront or origin to the client for the request.
   request_result_type:
     lineage:
       - s3_cloudfront_bucket/x-edge-result-type
-    description: Result type (hit|miss, for cache)
+    description: CloudFront cache disposition for the request, such as Hit, Miss, or Error.
   id_request:
     lineage:
       - s3_cloudfront_bucket/x-edge-request-id
-    description: Request ID
+    description: Unique CloudFront edge request identifier for correlation with OPA x-amz-cf-id headers.

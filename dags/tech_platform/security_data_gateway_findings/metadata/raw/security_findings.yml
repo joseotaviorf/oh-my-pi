@@ -2,7 +2,7 @@
 database_name: datalake_security_data_gateway_raw
 table_name: security_findings
 domain: Tech Platform
-owner: evandro.souza@quintoandar.com.br
+owner: evandro.souza@quintoandar.com
 description: |
   Raw landing table for all PII findings produced by the Security Data Gateway pipeline.
   One row per classified Google Drive file (files with zero PII detections are excluded at

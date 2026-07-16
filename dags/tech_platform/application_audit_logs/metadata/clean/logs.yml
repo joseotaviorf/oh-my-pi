@@ -1,8 +1,10 @@
 database_name: datalake_application_audit_logs_clean
 table_name: logs
-description: Cleaned application audit logs containing structured event data, used for tracking application activities relevant for compliance auditing.
+description: |
+  Clean application audit log events parsed from Kubernetes JSON payloads in S3.
+  One row per structured audit action with trace and transaction identifiers for compliance investigations.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
   namespace:
     lineage:

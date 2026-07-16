@@ -1,102 +1,105 @@
 database_name: datalake_access_logs_clean
 table_name: istio
-description: Table with Envoy access logs.
+description: |
+  Clean Istio Envoy sidecar access log events parsed from Kubernetes audit JSON stored in S3.
+  One row per HTTP request handled in the service mesh with timing, response status, JWT principal
+  claims, and distributed trace identifiers for security and platform observability analytics.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
   namespace:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/namespace
-    description: Kubernetes namespace
+    description: Kubernetes namespace of the pod that emitted the Istio sidecar access log entry.
   pod_name:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/pod_name
-    description: Kubernetes pod name
+    description: Kubernetes pod name of the workload proxy that handled the inbound HTTP request.
   request_traceparent:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/traceparent
-    description: Request trace id
+    description: W3C traceparent header value propagated across the mesh for distributed tracing.
   id_trace:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/traceparent
-    description: Request trace id
-  reques_method:
+    description: Trace identifier extracted from the traceparent header for correlation with OPA and downstream systems.
+  request_method:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/method
-    description: Request method
+    description: HTTP verb (GET, POST, etc.) recorded by the Envoy access log for the inbound request.
   request_user_agent:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/reqeust_user_agent
-    description: Request user agent
+    description: User-Agent header sent by the client, captured from the Istio sidecar access log.
   request_x_forwarded_for:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/x_forwarded_for
-    description: Request forwarded for IPs
+    description: Comma-separated client IP chain from the X-Forwarded-For header as seen by the sidecar.
   request_path:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/path
-    description: Request path
+    description: URL path of the HTTP request before query parameters, as logged by Envoy.
   ts_event:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/start_time
-    description: Request start time
+    description: UTC timestamp when the Envoy sidecar started processing the HTTP request.
   request_duration_ms:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/duration
-    description: Request duration
+    description: End-to-end request duration in milliseconds measured by the Istio sidecar.
   response_flags:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/response_flags
-    description: Response Flags
+    description: Envoy response flags indicating upstream or client anomalies for the request.
   response_code:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/response_code
-    description: Response Code
+    description: HTTP status code returned to the client for the evaluated request.
   app:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/app
-    description: App that handled the request
-  request_id:
+    description: Application label of the Kubernetes workload that handled the request in the mesh.
+  id_request:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/id_request
-    description: Request ID
+    description: Unique Envoy request identifier (x-request-id) for deduplication and cross-log joins.
   uuid_person_principal_user:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.personUUID
-    description: Person UUID extracted from the JWT payload
+    description: Person UUID claim extracted from the authenticated user JWT payload when present.
   id_principal_user:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.id
-    description: Main user ID extracted from the JWT payload
+    description: Internal QuintoAndar user identifier extracted from the JWT principal payload.
   principal_user_email:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.email
-    description: Email extracted from the JWT payload of the requesting user
+    description: Email address of the authenticated principal extracted from the JWT payload.
   principal_user_issuer:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.iss
-    description: JWT token issuer identifier (e.g. gandalf)
+    description: JWT issuer claim identifying the token provider (for example Gandalf or internal auth).
   principal_user_roles:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.roles
-    description: Roles assigned to the user in the JWT payload
+    description: JSON array of RBAC roles assigned to the principal in the JWT payload at request time.
   id_principal_user_impersonated_by:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.sudoed_by_id
-    description: ID of the user who impersonated this principal
+    description: User identifier of the operator who impersonated the principal via sudo, when applicable.
   principal_user_sub:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.sub
-    description: JWT subject claim identifying the principal (e.g. internal-bot)
+    description: JWT subject claim identifying the principal type (for example internal-bot or human user).
   principal_identities_json:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.identities
-    description: JSON object of linked principal identities by provider
+    description: JSON map of linked external identities keyed by provider, parsed from the JWT user payload.
   principal_service:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.service
-    description: mTLS service identity (SPIFFE URI) of the downstream peer
+    description: Normalized mTLS service account name derived from the downstream SPIFFE URI, excluding noise services.
   response_code_details:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.response_code_details
-    description: Envoy response code details explaining the response outcome
+    description: Envoy response code details string explaining routing, auth, or upstream failure outcomes.

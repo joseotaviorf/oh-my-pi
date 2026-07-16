@@ -1,135 +1,134 @@
 database_name: datalake_access_logs_clean
 table_name: opa
-description: Table with OPA decision logs.
+description: |
+  Clean Open Policy Agent (OPA) authorization decision logs parsed from Kubernetes audit JSON in S3.
+  One row per HTTP request evaluated by the mesh authorizer with allow/deny outcome, RBAC context,
+  and principal claims for security analytics and correlation with Istio access telemetry.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: luciane.lopes@quintoandar.com.br
 columns:
-  namespace:
-    lineage:
-      - s3_auditlogs_bucket/opa.namespace
-    description: Kubernetes namespace
   pod_name:
     lineage:
       - s3_auditlogs_bucket/opa.pod_name
-    description: Kubernetes pod name
+    description: Kubernetes pod name of the OPA sidecar or authorizer workload that emitted the decision log.
   ts_event:
     lineage:
       - s3_auditlogs_bucket/opa.timestamp
-    description: Authorizer timestamp
+    description: UTC timestamp when OPA recorded the authorization decision for the HTTP request.
   bundles:
     lineage:
       - s3_auditlogs_bucket/opa.bundles
-    description: Authorizer bundle versions
+    description: JSON map of OPA policy bundle names and revisions loaded when the decision was evaluated.
   id_decision:
     lineage:
       - s3_auditlogs_bucket/opa.decision_id
-    description: Authorizer decision_id
+    description: Unique identifier of the OPA authorization decision event for correlation with policy logs.
   erased:
     lineage:
       - s3_auditlogs_bucket/opa.erased
-    description: Authorizer erased data
+    description: Array of sensitive field names redacted from the OPA log payload before persistence.
   request_source_principal:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.source.principal
-    description: Requesting service principal
+    description: SPIFFE or service identity of the caller initiating the request in the mesh.
   request_destination_principal:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.destination.principal
-    description: Requesting service principal
+    description: SPIFFE or service identity of the upstream workload receiving the evaluated request.
   request_traceparent:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.traceparent
-    description: Traceparent
+    description: W3C traceparent header value propagated across the mesh for distributed tracing.
   id_trace:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.traceparent
-    description: Request trace id
+    description: Trace identifier extracted from the traceparent header for correlation with Istio logs.
   id_request:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.x-request-id
-    description: Request ID
+    description: Unique Envoy or gateway request identifier for deduplication and cross-log joins.
   id_amz_cf:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.x-amz-cf-id
-    description: Amazon CloudFront ID
+    description: Amazon CloudFront request identifier when the call entered through the CDN edge.
   request_real_ip:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.x-real-ip
-    description: Request real IP
+    description: Client IP address inferred by OPA after proxy headers are evaluated.
   request_parameterized_path:
     lineage:
       - s3_auditlogs_bucket/opa.result.dynamic_metadata.parameterized_path
-    description: Request parameterized path
+    description: URL path template with route parameters normalized for RBAC policy matching.
   request_path:
     lineage:
-      - s3_auditlogs_bucket/opa.input.attributes.request.path
-    description: Request path
+      - s3_auditlogs_bucket/opa.input.attributes.request.http.path
+    description: Raw URL path of the HTTP request before parameter templating.
   request_method:
     lineage:
-      - s3_auditlogs_bucket/opa.input.attributes.request.method
-    description: Request method
+      - s3_auditlogs_bucket/opa.input.attributes.request.http.method
+    description: HTTP verb (GET, POST, etc.) of the inbound request evaluated by OPA.
   request_authorized_by:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.authorized_by
-    description: Request authorized by (user|service)
-  request_provided_roles:
+    description: Principal type OPA used to authorize the request, such as user or service account.
+  request_required_roles:
     lineage:
-      - s3_auditlogs_bucket/opa.result.principalinfo.provided_roles
-    description: Request provided roles
-  result_allowed:
+      - s3_auditlogs_bucket/opa.result.principalinfo.required_roles
+    description: JSON array of RBAC roles OPA evaluated as required for the request path.
+  result_http_allowed:
     lineage:
       - s3_auditlogs_bucket/opa.result.allowed
-    description: Authorizer allowed
+    description: Boolean outcome indicating whether OPA allowed the HTTP request to proceed.
   result_decision:
     lineage:
       - s3_auditlogs_bucket/opa.result.decision
-    description: OPA result.decision boolean when present
+    description: OPA policy decision boolean when present in the authorizer result payload.
   result_decision_reasons:
     lineage:
       - s3_auditlogs_bucket/opa.result.context.reason_user.error
       - s3_auditlogs_bucket/opa.result.context.reason_admin.error
-    description: Array of decision reasons codes from result.context
+    description: Array of human-readable denial or error reason codes from OPA evaluation context.
   result_http_status:
     lineage:
       - s3_auditlogs_bucket/opa.result.http_status
-    description: Authorizer return status code
+    description: HTTP status code returned by the authorizer when the request is denied or fails policy checks.
   principal_user_email:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.user.payload.email
-    description: User Principal Email
+    description: Email address of the authenticated human principal extracted from the JWT payload.
   id_main_principal_user:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.user.payload.main_user_id
-    description: User Main ID
+    description: Primary internal QuintoAndar user identifier from the authenticated principal JWT.
   uuid_person_principal_user:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.user.payload.personUUID
-    description: User Person UUID
+    description: Person UUID linked to the authenticated user principal in identity systems.
   principal_user_provided_roles:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.user.provided_roles
-    description: User Roles provided by principal
+    description: JSON array of RBAC roles supplied by the authenticated user principal during evaluation.
   principal_user_idp:
     lineage:
-      - s3_auditlogs_bucket/opa.result.principalinfo.user.providerId
-    description: Identity Provider
+      - s3_auditlogs_bucket/opa.result.principalinfo.user.payload.providerId
+    description: Identity provider slug that issued the user credential for this request.
   principal_user_issuer:
     lineage:
-      - s3_auditlogs_bucket/opa.result.principalinfo.user.issuer
-    description: Identity Provider Issuer
+      - s3_auditlogs_bucket/opa.result.principalinfo.user.payload.iss
+    description: JWT issuer claim identifying the token provider realm that minted the user credential.
   id_principal_user_impersonated_by:
     lineage:
-      - s3_auditlogs_bucket/opa.result.principalinfo.user.impersonated_by
-    description: User impersonated by
+      - s3_auditlogs_bucket/opa.result.principalinfo.user.payload.sudoed_by_id
+    description: Internal identifier of the admin or service account that impersonated the end user.
   principal_service:
     lineage:
-      - s3_auditlogs_bucket/opa.result.principalinfo.service.payload.id
-    description: Service Principal
+      - s3_auditlogs_bucket/opa.result.principalinfo.service.id
+    description: Service account or workload identifier acting as the authenticated service principal.
   principal_service_provided_roles:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.service.provided_roles
-    description: Roles provided by service principal
+    description: JSON array of RBAC roles supplied by the calling service principal during OPA evaluation.
   app:
     lineage:
       - s3_auditlogs_bucket/app
-    description: App that handled the request
+    description: Application label of the Kubernetes workload associated with the authorizer log entry.

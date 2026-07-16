@@ -1,0 +1,81 @@
+database_name: datalake_botcity_audit_logs
+table_name: botcity_audit_logs
+description: |
+  Clean BotCity RPA platform audit events parsed from JSON activity logs in S3.
+  One row per automation lifecycle action with actor identity and resource parameters,
+  deduplicated by event id for compliance tracking of robotic process automation changes.
+domain: Tech Platform
+owner: josias.junior@quintoandar.com.br
+columns:
+  id_event:
+    lineage:
+      - s3_auditlogs_bucket/botcity.log_id
+    description: Unique BotCity audit event identifier used for deduplication across hourly loads.
+  ts_event:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: UTC timestamp when the BotCity platform recorded the automation audit action.
+  user_email:
+    lineage:
+      - s3_auditlogs_bucket/botcity.user.email
+    description: Corporate email of the BotCity user who triggered or owns the audited action.
+  user_name:
+    lineage:
+      - s3_auditlogs_bucket/botcity.user.name
+    description: Display name of the BotCity user associated with the audit event.
+  source:
+    lineage:
+      - s3_auditlogs_bucket/botcity.source
+    description: BotCity subsystem or integration channel that emitted the audit record.
+  type:
+    lineage:
+      - s3_auditlogs_bucket/botcity.type
+    description: Audit action category, such as create, update, delete, or run on an automation asset.
+  organization:
+    lineage:
+      - s3_auditlogs_bucket/botcity.organization
+    description: BotCity organization or tenant scope under which the automation resource lives.
+  params_resource:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.resource
+    description: BotCity resource type affected by the action, such as automation, credential, or schedule.
+  params_name:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.name
+    description: Human-readable name of the BotCity resource referenced in the audit payload.
+  id_params:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.id
+    description: Internal BotCity identifier of the resource targeted by the audited operation.
+  params_automation:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.automation
+    description: Name or identifier of the automation workflow involved in the audited change or execution.
+  params_cron:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.cron
+    description: Cron schedule expression attached to the automation when the event relates to scheduling.
+  params_version:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.version
+    description: Version label of the automation artifact at the time the audit event was recorded.
+  params_release:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.releaseVersion
+    description: Release or deployment tag associated with the automation package in the audit context.
+  year:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Partition year derived from ts_event; filter on this column for partition pruning.
+  month:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Partition month derived from ts_event; filter on this column for partition pruning.
+  day:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Partition day derived from ts_event; filter on this column for partition pruning.
+  hour:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Partition hour derived from ts_event; filter on this column for partition pruning.

@@ -1,114 +1,117 @@
 database_name: datalake_vault_audit_logs
 table_name: events
-description: Table with Vault audit events.
+description: |
+  Clean HashiCorp Vault audit events parsed from gzipped JSON request logs in S3.
+  One row per Vault API operation with authentication context, policy evaluation outcome,
+  and request metadata for secrets-management compliance and security investigations.
 domain: Tech Platform
-owner: identityplatform-team@quintoandar.com.br
+owner: thiago.costa@quintoandar.com.br
 columns:
   ts_event:
     lineage:
       - s3_auditlogs_bucket.time
-    description: Event timestamp
+    description: UTC timestamp when Vault recorded the audited API operation.
   id_request:
     lineage:
       - s3_auditlogs_bucket.request.id
-    description: Request ID
+    description: Unique Vault request identifier used to correlate related audit entries.
   type:
     lineage:
       - s3_auditlogs_bucket.type
-    description: Event type
+    description: Vault audit event category, such as request, response, or service-level audit type.
   time:
     lineage:
       - s3_auditlogs_bucket.time
-    description: Event timestamp
+    description: Raw RFC3339 timestamp string from the Vault audit payload before normalization.
   display_name:
     lineage:
-      - s3_auditlogs_bucket.auth.display_name
-    description: Display name
+      - s3_auditlogs_bucket/auth.display_name
+    description: Human-readable name of the authenticated Vault entity that performed the operation.
   policies:
     lineage:
-      - s3_auditlogs_bucket.auth.policies
-    description: Authentication policies list
+      - s3_auditlogs_bucket/auth.policies
+    description: Array of Vault ACL policy names attached to the token at authentication time.
   token_policies:
     lineage:
-      - s3_auditlogs_bucket.auth.token_policies
-    description: Token policies
+      - s3_auditlogs_bucket/auth.token_policies
+    description: Array of policy names embedded directly on the token used for the request.
   allowed:
     lineage:
-      - s3_auditlogs_bucket.auth.policy_results.allowed
-    description: Policy evaluation result
+      - s3_auditlogs_bucket/auth.policy_results.allowed
+    description: Policy evaluation outcome indicating whether Vault permitted the requested operation.
   granting_policies:
     lineage:
-      - s3_auditlogs_bucket.auth.policy_results.granting_policies
-    description: Granting policies
+      - s3_auditlogs_bucket/auth.policy_results.granting_policies
+    description: Structured list of Vault policies that granted access for the evaluated request.
   role:
     lineage:
-      - s3_auditlogs_bucket.auth.metadata.role
-    description: Authentication role
+      - s3_auditlogs_bucket/auth.metadata.role
+    description: Authentication role metadata associated with the token, such as approle or kubernetes role.
   entity_id:
     lineage:
-      - s3_auditlogs_bucket.auth.entity_id
-    description: Authentication entity identifier
+      - s3_auditlogs_bucket/auth.entity_id
+    description: Stable Vault identity entity identifier linked to the authenticated caller.
   token_type:
     lineage:
-      - s3_auditlogs_bucket.auth.token_type
-    description: Token type
+      - s3_auditlogs_bucket/auth.token_type
+    description: Vault token class used for the request, such as service, batch, or default token.
   token_ttl:
     lineage:
-      - s3_auditlogs_bucket.auth.token_ttl
-    description: Token time to live
+      - s3_auditlogs_bucket/auth.token_ttl
+    description: Remaining time-to-live in seconds configured on the token at request time.
   token_issue_time:
     lineage:
-      - s3_auditlogs_bucket.auth.token_issue_time
-    description: Token issue time
+      - s3_auditlogs_bucket/auth.token_issue_time
+    description: Timestamp when the Vault token was originally issued to the authenticated entity.
   request_id:
     lineage:
       - s3_auditlogs_bucket.request.id
-    description: Request ID
+    description: Duplicate of the Vault request identifier preserved from the nested request object.
   client_id:
     lineage:
       - s3_auditlogs_bucket.request.client_id
-    description: Request client identifier
+    description: Vault client identifier associated with the API caller when present in the audit log.
   operation:
     lineage:
       - s3_auditlogs_bucket.request.operation
-    description: Vault operation type
+    description: Vault API operation attempted, such as read, write, delete, or list on a secret path.
   mount_point:
     lineage:
       - s3_auditlogs_bucket.request.mount_point
-    description: Mount point
+    description: Vault secrets engine mount path targeted by the audited API call.
   mount_type:
     lineage:
       - s3_auditlogs_bucket.request.mount_type
-    description: Mount type
+    description: Secrets engine type backing the mount, such as kv, database, or transit.
   namespace:
     lineage:
       - s3_auditlogs_bucket.request.namespace.id
-    description: Vault namespace identifier
+    description: Vault enterprise namespace identifier scoping the audited request when enabled.
   path:
     lineage:
       - s3_auditlogs_bucket.request.path
-    description: Request path in Vault
+    description: Full logical secret or configuration path accessed within the Vault mount.
   remote_address:
     lineage:
       - s3_auditlogs_bucket.request.remote_address
-    description: Remote address
+    description: IP address of the remote client that initiated the Vault API request.
   remote_port:
     lineage:
       - s3_auditlogs_bucket.request.remote_port
-    description: Remote port
+    description: TCP port of the remote client connection to the Vault API endpoint.
   year:
     lineage:
       - s3_auditlogs_bucket.time
-    description: Event year partition
+    description: Partition year derived from ts_event; filter on this column for partition pruning.
   month:
     lineage:
       - s3_auditlogs_bucket.time
-    description: Event month partition
+    description: Partition month derived from ts_event; filter on this column for partition pruning.
   day:
     lineage:
       - s3_auditlogs_bucket.time
-    description: Event day partition
+    description: Partition day derived from ts_event; filter on this column for partition pruning.
   hour:
     lineage:
       - s3_auditlogs_bucket.time
-    description: Event hour partition
+    description: Partition hour derived from ts_event; filter on this column for partition pruning.
