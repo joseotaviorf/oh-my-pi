@@ -21,7 +21,7 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft.administrators
   id_main_owner:
-    description: Identifier for main owner
+    description: This column has been deprecated. Identifier for main owner
     lineage:
       - datalake_bob_clean.house_draft.owners
   registrar:
@@ -29,7 +29,7 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft.registrar
   owners_informations:
-    description: Raw JSON payload listing property owners and contact details captured during draft submission.
+    description: This column has been deprecated. Raw JSON payload listing property owners and contact details captured during draft submission.
     lineage:
       - datalake_bob_clean.house_draft.owners
   house_access_informations:
@@ -53,15 +53,15 @@ columns:
     lineage:
       - datalake_bob_clean.house_draft.administrators
   main_owner_name:
-    description: Full name of the primary property owner extracted from the owners JSON list.
+    description: This column has been deprecated. Full name of the primary property owner extracted from the owners JSON list.
     lineage:
       - datalake_bob_clean.house_draft.owners
   main_owner_email:
-    description: Email address of the primary property owner extracted from the owners JSON list.
+    description: This column has been deprecated. Email address of the primary property owner extracted from the owners JSON list.
     lineage:
       - datalake_bob_clean.house_draft.owners
   main_owner_phone_number:
-    description: Main owner's phone number
+    description: This column has been deprecated. Main owner's phone number
     lineage:
       - datalake_bob_clean.house_draft.owners
   house_appliances:

@@ -23,7 +23,7 @@ columns:
   owners:
     lineage:
       - datalake_bob_raw.house_draft.owners
-    description: JSON array of property owner contact and document details captured in the draft.
+    description: This column has been deprecated. JSON array of property owner contact and document details captured in the draft.
   details:
     lineage:
       - datalake_bob_raw.house_draft.details
