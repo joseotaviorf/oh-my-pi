@@ -5,15 +5,18 @@ cluster:
     num_workers: 3
     runtime_engine: PHOTON
     driver_node_type_id: r7g.xlarge
-# events_exploded is memory-bound (FROM_JSON on Amplitude props). L-memory preset (48g/4 cores)
-# still OOM'd (exit 137) on j-3HXJINPZEQK2S — pack ~1 fat executor per r6g.4xlarge instead of ~2.
+# events_exploded is memory-bound (FROM_JSON on Amplitude props).
+# j-376W89KQVGHII (L-memory, 96g/8 cores): not EBS (/mnt 14% free) — stage-8 shuffle
+# (~1 GiB × 8 tasks) caused GC stalls → heartbeat timeout → Yarn kill (exit 143).
+# Escalate to XL (r6g.8xlarge) with 1 fat executor/node but fewer cores so fewer
+# concurrent fat partitions share the heap.
 validation:
   cluster:
-    type: emr_7_12_consolidation_l_memory_fleet_cluster
+    type: emr_7_12_consolidation_xl_memory_fleet_cluster
     custom_configurations:
       spark_conf:
-        spark.executor.memory: "96g"
-        spark.executor.memoryOverhead: "8g"
-        spark.executor.cores: "8"
-        spark.sql.shuffle.partitions: "400"
+        spark.executor.memory: "180g"
+        spark.executor.memoryOverhead: "16g"
+        spark.executor.cores: "4"
+        spark.sql.shuffle.partitions: "800"
         spark.sql.execution.arrow.maxRecordsPerBatch: "10000"
