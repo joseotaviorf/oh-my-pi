@@ -13,11 +13,4 @@
 #     reason: "..."
 #     approved_by: person@quintoandar.com.br
 
-exceptions:
-  - dag: dw_crm
-    path: dags/support_and_service/dw_crm
-    reason: >-
-      Temporary EMR→Databricks revert while investigating slow
-      load-dw-crm-fact-credit-tasks / fact-closing-tasks / fact-repair-tasks
-      (full house_listing+rent_flow joins under EMR step concurrency).
-    approved_by: eduardo.soares@quintoandar.com.br
+exceptions: []
