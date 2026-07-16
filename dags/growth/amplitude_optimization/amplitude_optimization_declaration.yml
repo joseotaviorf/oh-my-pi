@@ -1,0 +1,31 @@
+dag:
+  name: amplitude_optimization
+  owner: Data Growth
+  schedule_interval: null
+  documentation:
+    dag_purpose: |
+      Manual clean-only twin of amplitude_new. Re-runs the clean Delta load from
+      datalake_amplitude_new_raw.events (Delta) into datalake_amplitude_events_v2_clean.events
+      with partitions [id_app, year, month, day] (no event_type partition) to prove
+      wall-clock and file-layout before cutting over production. Not scheduled and not
+      dataset-linked — trigger only after amplitude_new has succeeded for the target date
+      (coverage from 2026-06-07 onward). Does not write raw and does not change the
+      consumer view datalake_amplitude_clean.events.
+workflow:
+  type: query_delta
+  layer: clean
+  custom_schema: amplitude_events_v2
+  execution_timeout_hours: 5
+  default_extraction_type: incremental
+  incremental_optimize: true
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    events:
+      extraction_type: incremental
+      partitions: ["id_app", "year", "month", "day"]
+      z_order_by: ["event_type"]
+      run_optimize: true
+      run_vacuum: true
+      has_hive_sync: false

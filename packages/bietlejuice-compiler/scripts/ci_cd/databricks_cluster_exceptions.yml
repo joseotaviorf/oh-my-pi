@@ -13,4 +13,10 @@
 #     reason: "..."
 #     approved_by: person@quintoandar.com.br
 
-exceptions: []
+exceptions:
+  - dag: amplitude_optimization
+    reason: >-
+      Temporary clean twin to prove Amplitude events v2 partition layout
+      (no event_type partition) against production Delta raw before cutover;
+      matches current amplitude_new Databricks runtime until EMR migration.
+    approved_by: jose.rferreira@quintoandar.com.br

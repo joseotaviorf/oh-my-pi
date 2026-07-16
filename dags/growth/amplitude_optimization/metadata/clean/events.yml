@@ -1,0 +1,184 @@
+database_name: datalake_amplitude_events_v2_clean
+table_name: events
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
+description: Twin clean Amplitude events table for partition-layout validation (amplitude_optimization). Same grain and columns as production clean events, written from datalake_amplitude_new_raw.events (Delta) with partitions id_app, year, month, day only — event_type is a regular column with ZORDER, not a partition. Not consumer-facing; production still serves datalake_amplitude_clean.events until cutover.
+columns:
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_new_raw.events.amplitude_id
+    description: Amplitude distinct user identifier from raw export (amplitude_id).
+  ids_amplitude_attributed:
+    lineage:
+    - datalake_amplitude_new_raw.events.amplitude_attribution_ids
+    description: Attributed Amplitude IDs array from raw export for identity stitching.
+  adid:
+    description: Android advertising identifier. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  amplitude_event_type:
+    description: Internal Amplitude event classification. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  id_app:
+    lineage:
+    - datalake_amplitude_new_raw.events.app
+    description: Amplitude project or application identifier from the raw export app field. Partition column on this twin together with year, month, and day.
+  city:
+    lineage:
+    - datalake_amplitude_new_raw.events.city
+    description: City inferred by Amplitude geolocation in the raw export.
+  ts_client_event:
+    lineage:
+    - datalake_amplitude_new_raw.events.client_event_time
+    description: Client-side event timestamp from raw export client_event_time, in UTC.
+  ts_client_uploaded:
+    lineage:
+    - datalake_amplitude_new_raw.events.client_upload_time
+    description: Timestamp when the client uploaded the event batch to Amplitude servers.
+  country:
+    lineage:
+    - datalake_amplitude_new_raw.events.country
+    description: ISO country code from raw export geolocation fields.
+  data:
+    lineage:
+    - datalake_amplitude_new_raw.events.data
+    description: Additional raw JSON metadata from the Amplitude export not mapped to columns.
+  ts_server_received:
+    lineage:
+    - datalake_amplitude_new_raw.events.server_received_time
+    description: Server received timestamp from raw export server_received_time.
+  device_brand:
+    description: Device hardware brand. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  device_carrier:
+    lineage:
+    - datalake_amplitude_new_raw.events.device_carrier
+    description: Mobile carrier name from the raw Amplitude export when available.
+  device_family:
+    lineage:
+    - datalake_amplitude_new_raw.events.device_family
+    description: Device family grouping from Amplitude device detection in raw export.
+  id_device:
+    lineage:
+    - datalake_amplitude_new_raw.events.device_id
+    description: Amplitude device identifier (device_id) from the raw export.
+  device_manufacturer:
+    description: Device manufacturer. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  device_model:
+    description: Device model string. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  device_type:
+    lineage:
+    - datalake_amplitude_new_raw.events.device_type
+    description: Coarse device category from raw export (mobile, tablet, or desktop).
+  dma:
+    lineage:
+    - datalake_amplitude_new_raw.events.dma
+    description: US designated market area code from raw export geolocation when applicable.
+  id_event:
+    lineage:
+    - datalake_amplitude_new_raw.events.event_id
+    description: Amplitude event identifier (event_id) from the raw export batch.
+  ts_event:
+    lineage:
+    - datalake_amplitude_new_raw.events.event_time
+    description: Canonical event timestamp (event_time) from the raw export, in UTC.
+  event_type:
+    lineage:
+    - datalake_amplitude_new_raw.events.event_type
+    description: Product event name tracked in Amplitude from the raw export.
+  event_properties:
+    lineage:
+    - datalake_amplitude_new_raw.events.event_properties
+    description: JSON object with custom event attributes from the raw export payload.
+  is_attribution_event:
+    description: Attribution-event flag. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  idfa:
+    description: Apple Identifier for Advertisers. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  ip_address:
+    lineage:
+    - datalake_amplitude_new_raw.events.ip_address
+    description: Client IP address captured in the raw Amplitude export.
+  location_lat:
+    lineage:
+    - datalake_amplitude_new_raw.events.location_lat
+    description: Latitude from raw export geolocation or device GPS.
+  location_lng:
+    lineage:
+    - datalake_amplitude_new_raw.events.location_lng
+    description: Longitude from raw export geolocation or device GPS.
+  os_name:
+    lineage:
+    - datalake_amplitude_new_raw.events.os_name
+    description: Operating system name from the raw Amplitude export.
+  os_version:
+    lineage:
+    - datalake_amplitude_new_raw.events.os_version
+    description: Operating system version string from the raw Amplitude export.
+  platform:
+    lineage:
+    - datalake_amplitude_new_raw.events.platform
+    description: Amplitude platform label (iOS, Android, or Web) from raw export.
+  library:
+    lineage:
+    - datalake_amplitude_new_raw.events.library
+    description: Amplitude SDK library name and version from the raw export.
+  is_paying:
+    description: Paying-user flag. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  region:
+    lineage:
+    - datalake_amplitude_new_raw.events.region
+    description: State or region from raw export IP geolocation.
+  ts_server_uploaded:
+    lineage:
+    - datalake_amplitude_new_raw.events.server_upload_time
+    description: Server upload timestamp from raw export server_upload_time.
+  id_session:
+    lineage:
+    - datalake_amplitude_new_raw.events.session_id
+    description: Amplitude session identifier (session_id) from the raw export.
+  start_version:
+    lineage:
+    - datalake_amplitude_new_raw.events.start_version
+    description: Application version at first open from raw export start_version.
+  ts_user_created:
+    description: User profile creation timestamp. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  id_user:
+    lineage:
+    - datalake_amplitude_new_raw.events.user_id
+    description: Amplitude user identifier (user_id) from the raw export for identity joins.
+  user_properties:
+    lineage:
+    - datalake_amplitude_new_raw.events.user_properties
+    description: JSON object with persistent user attributes from the raw export.
+  language:
+    lineage:
+    - datalake_amplitude_new_raw.events.language
+    description: Device or browser language from the raw Amplitude export.
+  uuid:
+    lineage:
+    - datalake_amplitude_new_raw.events.uuid
+    description: Universally unique event identifier from the raw Amplitude export.
+  version_name:
+    lineage:
+    - datalake_amplitude_new_raw.events.version_name
+    description: Active application version name when the event was triggered.
+  id_schema:
+    description: Amplitude schema version identifier. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  ts_processed:
+    lineage:
+    - datalake_amplitude_new_raw.events.processed_time
+    description: Pipeline processing timestamp from raw export processed_time.
+  id_inserted:
+    lineage:
+    - datalake_amplitude_new_raw.events.insert_id
+    description: Insert identifier (insert_id) from the raw Amplitude export batch.
+  sample_rate:
+    description: Ingestion sampling rate. Always NULL in this twin because the column is absent from the Delta raw schema (same as production clean).
+  year:
+    lineage:
+    - datalake_amplitude_new_raw.events.year
+    description: Partition column (year) with id_app, month, and day on this twin (event_type is not a partition). Derived from event timestamps at clean ingestion.
+  month:
+    lineage:
+    - datalake_amplitude_new_raw.events.month
+    description: Partition column (month) with id_app, year, and day on this twin (event_type is not a partition). Derived from event timestamps at clean ingestion.
+  day:
+    lineage:
+    - datalake_amplitude_new_raw.events.day
+    description: Partition column (day) with id_app, year, and month on this twin (event_type is not a partition). Derived from event timestamps at clean ingestion.
