@@ -186,6 +186,10 @@ columns:
     description: Whether the job is currently active in the system.
     lineage:
       - datalake_pin_core_clean.job.is_active
+  is_effective_worker:
+    description: True when the job is a permanent/effective role (CLT); False for interns (job family Estagiario) and young apprentices (job family Jovem Aprendiz). Unmapped job families count as effective.
+    lineage:
+      - datalake_pin_core_clean.job_family_translation.job_family_name
   is_current:
     description: |
       Boolean flag indicating if this version is current as of the load reference date.

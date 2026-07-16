@@ -888,6 +888,12 @@ columns:
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_active
 
+  is_effective_worker:
+    description: True when the employee holds a permanent/effective role (CLT); False for interns and young apprentices. Use to scope headcount and turnover to the effective workforce.
+    dimension: True
+    lineage:
+      - dw_employee_details.fact_assignment_snapshots.is_effective_worker
+
   is_layoff:
     description: Snapshot attribute for is_layoff on the employee_snapshots wide metric table.
     dimension: True
@@ -935,6 +941,24 @@ columns:
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_transfer_termination
+
+  is_turnover_new_hire:
+    description: TRUE on the employee's monthly closing snapshot (is_monthly_snapshot_for_employee) in the hire month for genuine company admissions (first hire or rehire) of effective workers, excluding internal transfer-ins and excluding interns and apprentices; FALSE on other monthly snapshots; NULL on non-monthly-snapshot rows. Scoped for the turnover metric. Rehires count as new hires.
+    dimension: True
+    lineage:
+      - dw_employee_details.fact_assignment_snapshots.is_turnover_new_hire
+
+  is_turnover_termination:
+    description: TRUE on the employee's monthly closing snapshot (is_monthly_snapshot_for_employee) in the termination month for real company exits (voluntary, involuntary, or layoff) of effective workers, excluding internal transfers and excluding interns and apprentices; FALSE on other monthly snapshots; NULL on non-monthly-snapshot rows. Scoped for the turnover metric.
+    dimension: True
+    lineage:
+      - dw_employee_details.fact_assignment_snapshots.is_turnover_termination
+
+  is_eligible_to_turnover:
+    description: On the employee's monthly closing snapshot (is_monthly_snapshot_for_employee), TRUE for effective workers who were already in the company this month — the turnover-rate denominator base (excludes interns/apprentices and this month's new hires; includes internal transfer-ins and terminated employees); FALSE otherwise. NULL on non-monthly-snapshot rows.
+    dimension: True
+    lineage:
+      - dw_employee_details.fact_assignment_snapshots.is_eligible_to_turnover
 
   is_primary_assignment_for_snapshot:
     description: Snapshot attribute for is_primary_assignment_for_snapshot on the employee_snapshots wide metric table.

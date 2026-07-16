@@ -269,9 +269,20 @@ assignment_snapshots_ranked AS (
                 AND NOT COALESCE(im.is_transfer_termination, FALSE) THEN FALSE
             ELSE TRUE
         END AS is_active,
+        COALESCE(jwst.is_effective_worker, TRUE) AS is_effective_worker,
         pei.id_person IS NOT NULL AS has_emergency_contact,
         COALESCE(im.is_transfer_hire, FALSE) AS is_transfer_hire,
         COALESCE(im.is_transfer_termination, FALSE) AS is_transfer_termination,
+        NOT COALESCE(im.is_transfer_hire, FALSE)
+            AND COALESCE(jwst.is_effective_worker, TRUE)
+            AND LAST_DAY(ad.dt_reference) = LAST_DAY(ad.dt_started)
+        AS is_new_hire,
+        ad.dt_terminated IS NOT NULL
+            AND NOT COALESCE(im.is_transfer_termination, FALSE)
+            AND COALESCE(jwst.is_effective_worker, TRUE)
+            AND LAST_DAY(ad.dt_reference) = LAST_DAY(ad.dt_terminated)
+            AND ad.dt_reference >= ad.dt_terminated
+        AS is_turnover,
         ad.is_latest_date,
         COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
         CASE
@@ -474,9 +485,19 @@ SELECT
     asr.is_leadership_team_member,
     asr.is_executive_team_member,
     asr.is_active,
+    asr.is_effective_worker,
     asr.has_emergency_contact,
     asr.is_transfer_hire,
     asr.is_transfer_termination,
+    CASE
+        WHEN msfe.id_assignment IS NOT NULL THEN asr.is_new_hire
+    END AS is_turnover_new_hire,
+    CASE
+        WHEN msfe.id_assignment IS NOT NULL THEN asr.is_turnover
+    END AS is_turnover_termination,
+    CASE
+        WHEN msfe.id_assignment IS NOT NULL THEN asr.is_effective_worker AND NOT asr.is_new_hire
+    END AS is_eligible_to_turnover,
     asr.is_latest_date,
     asr.is_primary_assignment_for_snapshot,
     asr.is_reorganization_termination,

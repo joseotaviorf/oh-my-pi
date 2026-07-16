@@ -127,6 +127,10 @@ columns:
     description: True when the employee is currently active in this assignment.
     lineage:
       - datalake_people.assignment_snapshots.is_active
+  is_effective_worker:
+    description: True when the employee holds a permanent/effective role (CLT) on the reference date; False for interns and young apprentices. Use to scope headcount and turnover to the effective workforce.
+    lineage:
+      - datalake_people.assignment_snapshots.is_effective_worker
   has_emergency_contact:
     description: True when the employee has at least one emergency contact on file.
     lineage:
@@ -139,6 +143,18 @@ columns:
     description: True when the assignment was closed by an internal transfer rather than a real exit; the person stays employed under a continuation assignment. Filter is_transfer_termination = FALSE for genuine dismissals and turnover.
     lineage:
       - datalake_people.assignment_snapshots.is_transfer_termination
+  is_turnover_new_hire:
+    description: TRUE on the employee's monthly closing snapshot (is_monthly_snapshot_for_employee) in the hire month for genuine company admissions (first hire or rehire) of effective workers, excluding the incoming side of internal transfers and excluding interns and apprentices; FALSE on other monthly snapshots; NULL on non-monthly-snapshot rows. Scoped for the turnover metric. Rehires count as new hires.
+    lineage:
+      - datalake_people.assignment_snapshots.is_turnover_new_hire
+  is_turnover_termination:
+    description: TRUE on the employee's monthly closing snapshot (is_monthly_snapshot_for_employee) in the termination month for real company exits (voluntary, involuntary, or layoff) of effective workers, excluding internal transfers and excluding interns and apprentices; FALSE on other monthly snapshots; NULL on non-monthly-snapshot rows. Scoped for the turnover metric; use instead of sk_termination_event_definition, which is also populated for transfers.
+    lineage:
+      - datalake_people.assignment_snapshots.is_turnover_termination
+  is_eligible_to_turnover:
+    description: On the employee's monthly closing snapshot (is_monthly_snapshot_for_employee), TRUE for effective workers who were already in the company this month — the turnover-rate denominator base (excludes interns/apprentices and this month's new hires; includes internal transfer-ins and terminated employees); FALSE otherwise. NULL on non-monthly-snapshot rows.
+    lineage:
+      - datalake_people.assignment_snapshots.is_eligible_to_turnover
   is_primary_assignment_for_snapshot:
     description: True when this is the primary assignment for the employee on this snapshot date (the latest assignment when multiple assignments overlap for the same person and date).
     lineage:
