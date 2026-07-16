@@ -1,5 +1,5 @@
 cluster:
-  type: emr_7_12_consolidation_l_compute_fleet_cluster
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
       # Prior EMR runs filled /mnt under concurrent fact loads; keep headroom.
@@ -10,8 +10,9 @@ cluster:
       target_on_demand: 4
       target_spot: 0
       instance_types:
-      - c6g.4xlarge
-      - c7g.4xlarge
+      - r6g.4xlarge
+      - r7g.4xlarge
+      - r6i.4xlarge
     spark_conf:
       # j-2OPXNTRUAVU4W: AQE coalesce collapsed shuffles to ~10 multi-hour tasks.
       # Keep more shuffle partitions; accept more files — OPTIMIZE compacts after load.
@@ -20,7 +21,8 @@ cluster:
       spark.driver.memory: 16g
       spark.driver.memoryOverhead: 4g
       spark.driver.maxResultSize: '0'
-      # Smaller executors on compute nodes → more concurrent slots for shuffle partitions.
-      spark.executor.memory: 6g
+      # Pack more executors on r6g (~128 GiB / 16 vCPU): use all cores (~8×2c/node → ~64 slots).
+      # Safer heaps than 6g on compute; smaller than preset 48g/4c which only filled ~half the CPUs.
+      spark.executor.memory: 12g
       spark.executor.memoryOverhead: 2g
       spark.executor.cores: '2'
