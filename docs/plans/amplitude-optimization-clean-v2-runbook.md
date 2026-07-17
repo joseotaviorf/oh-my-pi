@@ -11,83 +11,117 @@ Manual twin for unlocking `amplitude_new` clean throughput. Code lives under
 | Datasets | none (`datasets = None`) |
 | Reads | `datalake_amplitude_new_raw.events` (Delta only) |
 | Writes | `datalake_amplitude_events_v2_clean.events` |
-| Partitions | `id_app, year, month, day` (+ ZORDER `event_type`) |
-| Cluster | `consolidation_l_memory_cluster`, 5 workers, Spot |
+| Partitions | `id_app, year, month, day` (no `event_type`; no ZORDER) |
+| Load window | **single day** by default (`load_start = load_end = D`) |
+| Optimize / vacuum | **off** (load layout from optimizeWrite is enough for experiments) |
+| Cluster | `consolidation_l_memory_cluster`, 5× **`r7gd.4xlarge`** workers (NVMe), Spot, driver `r7g.xlarge` |
 | Coverage | dates **≥ 2026-06-07** only |
 
 Production `amplitude_new` and the consumer VIEW `datalake_amplitude_clean.events` stay on v1 until cutover.
+
+## Findings so far (do not ignore)
+
+1. **Partition change ≠ wall-clock win.** Twin load for Jul 13–14 (~126M rows) was ~1h58m vs prod clean ~2h17m. Layout improved a lot (995 zstd files / 44 GiB vs v1 ~19k files / 113 GiB for the same rows), but EBS shuffle spill / iowait dominated.
+2. **OPTIMIZE + ZORDER as first configured was harmful.** It re-encoded zstd → snappy and inflated live v2 from ~44 GiB to ~1.2 TiB. Keep `run_optimize` / `run_vacuum` **false** on the twin until a safe codec + `maxFileSize` recipe is proven.
+3. **Raw Delta does not rewrite D−1.** All 35 large raw commits since Jun 14 write **exactly one** calendar day. The prod clean `[D−1, D]` window re-shuffles ~half the bytes with no raw update behind it. Twin defaults to **single-day**; use conf overrides only when you intentionally need a multi-day repair.
+
+## Manual trigger confs
+
+### Daily / prove (default — matches declaration)
+
+After `amplitude_new` succeeds for day `D`:
+
+```json
+{"load_start_date": "D", "load_end_date": "D"}
+```
+
+Example for Jul 14:
+
+```json
+{"load_start_date": "2026-07-14", "load_end_date": "2026-07-14"}
+```
+
+If you omit conf and set logical / data interval to `D`, declaration defaults are the same single day.
+
+### Repair / multi-day (override only)
+
+Force a 2-day window when repairing history (e.g. overwrite bad OPTIMIZE output):
+
+```json
+{"load_start_date": "2026-07-13", "load_end_date": "2026-07-14"}
+```
+
+Prefer **two sequential single-day runs** when measuring wall-clock so each run matches what raw actually wrote.
+
+### Repair current snappy v2 layout (Jul 13 then Jul 14)
+
+```json
+{"load_start_date": "2026-07-13", "load_end_date": "2026-07-13"}
+```
+
+then
+
+```json
+{"load_start_date": "2026-07-14", "load_end_date": "2026-07-14"}
+```
+
+## Success criteria (NVMe + single-day)
+
+Compare especially a Jul-14 single-day twin run vs prior twin (2-day on EBS) and vs prod clean:
+
+- `load-clean-events` wall-clock well under prior ~1h58m for two days (expect ~half bytes + faster spill disk)
+- Metrics: lower **iowait**; spill not stuck on a single EBS volume
+- S3: zstd, tens-of-MB files, ~20 GiB/day — **not** TiB snappy
+- Row parity vs v1 for that day (~62M for Jul 14)
+
+Optional parity SQL:
+
+```sql
+SELECT 'v1' AS src, COUNT(*) AS n
+FROM quintoandar_prod.datalake_amplitude_events_clean.events
+WHERE year = 2026 AND month = 7 AND day = 14
+UNION ALL
+SELECT 'v2', COUNT(*)
+FROM quintoandar_prod.datalake_amplitude_events_v2_clean.events
+WHERE year = 2026 AND month = 7 AND day = 14;
+```
 
 ## Backfill from June (`backfill-from-june`)
 
 For each date `D` from `2026-06-07` through yesterday:
 
 1. Confirm `bietlejuice.amplitude_new` succeeded for `D` (raw + clean).
-2. Trigger a manual DAG run of `bietlejuice.amplitude_optimization` with logical date / data interval for `D` (same load window params as prod: `load_start_date = D-1`, `load_end_date = D` via declaration defaults).
-3. Wait for `load-clean-events` (+ optimize) to succeed.
-4. Optional parity check:
+2. Trigger `bietlejuice.amplitude_optimization` with single-day conf for `D`.
+3. Wait for `load-clean-events` to succeed (optimize is disabled).
+4. Optional parity check (same SQL as above with `D`).
 
-```sql
-SELECT 'v1' AS src, COUNT(*) AS n
-FROM quintoandar_prod.datalake_amplitude_events_clean.events
-WHERE year = YEAR(DATE 'D') AND month = MONTH(DATE 'D') AND day = DAY(DATE 'D')
-UNION ALL
-SELECT 'v2', COUNT(*)
-FROM quintoandar_prod.datalake_amplitude_events_v2_clean.events
-WHERE year = YEAR(DATE 'D') AND month = MONTH(DATE 'D') AND day = DAY(DATE 'D');
-```
-
-Prefer starting with 1–2 recent successful prod days before walking history.
+Prefer proving NVMe + single-day on 1–2 recent days before walking history.
 
 ## Prove daily (`prove-daily`)
 
-After a few twin runs, compare against prod `load-clean-events` in
-`hive.dw_databricks_health.fact_databricks_task_run`:
+After a few twin runs:
 
-- Twin wall-clock << prod (expect large drop)
-- Mid-run CPU busy higher / wait lower on Databricks Metrics
+- Twin wall-clock << prod `load-clean-events` for the **same single day**
+- Lower iowait / healthier CPU than the EBS twin run
 - Row counts match for the same `D`
-- `DESCRIBE DETAIL …_v2_clean.events` shows partitions without `event_type` and far fewer files per day
+- v2 files stay zstd and well-sized (no accidental OPTIMIZE inflation)
 
 Do **not** cut over until this holds for several days.
+
+## Next experiments (only if still slow)
+
+- Disable `spark.databricks.delta.optimizeWrite` on the twin (isolate shuffle cost)
+- Prod candidates after a strong win: NVMe workers and/or single-day clean window on `amplitude_new` (separate change; prod stays 2-day until proven)
 
 ## Cutover (`declaration-cutover`) — do only after prove
 
 Single brief maintenance window:
 
 1. Pause `bietlejuice.amplitude_new` in Airflow.
-2. Update [`amplitude_new_declaration.yml`](../../dags/growth/amplitude_new/amplitude_new_declaration.yml):
-
-```yaml
-workflow:
-  type: custom_ingestion
-  layer: raw
-  load_spark_job: load_amplitude_new_raw
-  custom_schema: amplitude_events_v2
-  execution_timeout_hours: 5
-  incremental_optimize: true
-  # ... keep spark_job_arguments / extra_query_template_params ...
-  tables_customization:
-    events:
-      extraction_type: incremental
-      partitions: ["id_app", "year", "month", "day"]
-      z_order_by: ["event_type"]
-      extra_spark_job_arguments:
-        - "{{ data_interval_start | ds }}"
-      run_optimize: true
-      run_vacuum: true
-      has_hive_sync: false
-```
-
-3. On cluster YAML, add write-time coalescing (optional but recommended):
-
-```yaml
-spark_conf:
-  spark.databricks.delta.optimizeWrite.enabled: "true"
-```
-
+2. Update [`amplitude_new_declaration.yml`](../../dags/growth/amplitude_new/amplitude_new_declaration.yml) toward the proven twin layout (partitions without `event_type`; **revisit** optimize/ZORDER only with zstd + capped file size; strongly consider single-day `load_*` defaults).
+3. Align cluster with proven twin (e.g. `r7gd` workers if NVMe was the win).
 4. `make create-dag-files dag_name=amplitude_new` and merge.
-
-5. Swap the consumer view in Databricks:
+5. Swap the consumer view:
 
 ```sql
 CREATE OR REPLACE VIEW quintoandar_prod.datalake_amplitude_clean.events
@@ -104,9 +138,8 @@ AS SELECT * FROM quintoandar_prod.datalake_amplitude_events_v2_clean.events;
 For one week:
 
 - `load-clean-events` duration and timeout risk
-- Worker CPU busy/wait pattern (no long low-busy plateau)
-- v2 `numFiles` growth rate (`DESCRIBE DETAIL`)
-- `optimize-clean-*` duration should be minutes (real OPTIMIZE), not ~15s
+- Worker CPU busy / iowait pattern
+- v2 `numFiles` / size growth (`DESCRIBE DETAIL` + S3)
 - Consumer queries via `datalake_amplitude_clean.events` unchanged
 
 Then archive/drop the old physical v1 table when safe.

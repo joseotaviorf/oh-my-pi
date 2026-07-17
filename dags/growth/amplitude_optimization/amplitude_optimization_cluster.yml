@@ -11,4 +11,5 @@ cluster:
       spark.driver.maxResultSize: '0'
       spark.databricks.delta.optimizeWrite.enabled: 'true'
     driver_node_type_id: r7g.xlarge
+    node_type_id: r7gd.4xlarge
     num_workers: 5
