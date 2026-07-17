@@ -3,7 +3,7 @@ airflow parsing enforcement
 
 Note: this line above forces Airflow to parse this file for implemented DAGs.
 
-Runtime-anomaly monitor. Every 30 minutes it inspects every currently-running DAG
+Runtime-anomaly monitor. Every 5 minutes it inspects every currently-running DAG
 run and flags any whose elapsed time is anomalous *relative to that same DAG's own
 recent successful runs* (P<percentile> of the last <lookback_runs> durations times a
 small factor) — there are no hardcoded per-DAG time thresholds.
@@ -535,11 +535,11 @@ with DAG(
         "start_date": datetime(2026, 7, 16, 0, 0, 0, tzinfo=LOCAL_TZ),
     },
     description=(
-        "Every 30 min, flags running DAGs whose elapsed time is anomalous vs their own "
+        "Every 5 min, flags running DAGs whose elapsed time is anomalous vs their own "
         "recent successful runs (relative P-percentile baseline, no hardcoded thresholds). "
         "Critical DAGs page JiraOps on-caller; the rest are reported to a Google Chat webhook."
     ),
-    schedule="*/30 * * * *",
+    schedule="*/5 * * * *",
     catchup=False,
     tags=["monitoring", "platform", "runtime-anomaly"],
 ) as dag:

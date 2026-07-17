@@ -178,7 +178,7 @@ def test_build_alert_text_contains_key_facts():
 # --------------------------------------------------------------------------- #
 def test_dag_schedule_and_id():
     assert dag.dag_id == DAG_ID
-    assert dag.schedule_interval == "*/30 * * * *"
+    assert dag.schedule_interval == "*/5 * * * *"
 
 
 @pytest.mark.parametrize("query", [_RUNNING_QUERY, _HISTORY_QUERY])

@@ -1,6 +1,6 @@
 # dag_runtime_monitoring
 
-Every 30 minutes this DAG inspects every currently-running DAG and flags any whose
+Every 5 minutes this DAG inspects every currently-running DAG and flags any whose
 elapsed time is anomalous **relative to that same DAG's own recent successful runs**
 (P`percentile` of successful-run durations over the last `lookback_days` × `factor` — no hardcoded per-DAG
 thresholds). Findings are routed by tier:
