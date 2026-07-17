@@ -46,7 +46,6 @@ DAG:
     - bietlejuice.services_integration_validations
     - bietlejuice.signup
   contains:
-    - bietlejuice.qube_
     - bietlejuice.gsheets_
     - bietlejuice.idactum_
     - bietlejuice.dw_datamarts_
