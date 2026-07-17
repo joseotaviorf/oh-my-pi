@@ -4,7 +4,7 @@ dag_runtime_monitoring:
   lookback_days: 7
   min_history_runs: 3
   percentile: 90
-  factor: 1.1
+  factor: 1.5
   critical_dags:
     - bietlejuice.ebdb_location
     - bietlejuice.ebdb_user_fast_lane

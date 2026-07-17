@@ -53,7 +53,7 @@ _DEFAULT_CONFIG = {
     "lookback_days": 7,
     "min_history_runs": 3,
     "percentile": 90,
-    "factor": 1.1,
+    "factor": 1.5,
 }
 
 # Only "real" automatic runs count — scheduled, dataset-triggered, or mediator-triggered.
