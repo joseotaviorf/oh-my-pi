@@ -13,7 +13,7 @@
 
 ## Overview
 
-**Property Integrity** is a family of offboarding-quality metrics for the For Rent product that measure how a termination resolves repairs and agreements — how often it closes **without friction** (no mediation), **without repairs**, and, when repairs do exist, how the parties settle them (mutual agreement vs. compulsory / band-aid). It covers four indicators: **% Offb. W/o Mediation**, **% Without Repairs**, **% Both Agree**, and**% Compulsory/Band-Aid 2**.  
+**Property Integrity** is a family of offboarding-quality metrics for the For Rent (FR) product that measure how a termination resolves repairs and agreements — how often it closes **without friction** (no mediation), **without repairs**, and, when repairs do exist, how the parties settle them (mutual agreement vs. compulsory / band-aid). It covers four indicators: **% Offb. W/o Mediation**, **% Without Repairs**, **% Both Agree**, and**% Compulsory/Band-Aid 2**.  
 All four are computed from the pre-joined offboarding table `dw_offboarding.obt_offboarding`, which already carries every flag these metrics need at one row per termination.  
 **Exists exclusively for For Rent offboarding — these metrics have no equivalent for For Sale or other products.**
 
