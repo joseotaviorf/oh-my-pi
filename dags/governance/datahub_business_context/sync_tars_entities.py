@@ -157,8 +157,10 @@ def _changed_entity_slugs() -> set[str]:
     Matches the ``entity_slug`` used for ``.md`` filenames (title/data_product_id
     with hyphens replaced by underscores). Empty when nothing under
     ``MD_OUTPUT_DIR``/``MD_OUTPUT_DIR_METRICS`` changed — e.g. a ``sync/**``
-    code change triggered this run, not a doc edit — so callers should treat
-    an empty result as "no filtering, process everything".
+    code change triggered this run, not a doc edit, or the git diff itself
+    failed. ``main()``'s ``--changed-only`` filter treats an empty result as
+    "nothing to sync" (never as "process everything"): a code-only trigger
+    must never fan out and re-condense every tagged document's description.
     """
     prefixes = (f"{MD_OUTPUT_DIR}/", f"{MD_OUTPUT_DIR_METRICS}/")
     return {
@@ -445,10 +447,11 @@ def main() -> int:
         action="store_true",
         help=(
             "Only process documents whose entity Markdown changed in the current "
-            "commit (git diff), instead of every tagged document. Falls back to "
-            "processing everything when no entity Markdown changed (e.g. a "
-            "sync/** code change triggered this run). Prevents an unrelated push "
-            "from re-condensing the description of an untouched entity."
+            "commit (git diff), instead of every tagged document. Processes "
+            "nothing when no entity Markdown changed (e.g. a sync/** code change "
+            "triggered this run) -- run without --changed-only for a deliberate "
+            "full resync. Prevents an unrelated push from re-condensing the "
+            "description of an untouched entity."
         ),
     )
     ns = parser.parse_args()
@@ -470,24 +473,31 @@ def main() -> int:
         return 0
 
     if ns.changed_only and not ns.urn:
+        # Filter to documents whose slug is in the changed set. When nothing
+        # under docs/llm_context/** changed (empty set -- e.g. this run was
+        # triggered by a sync/** code change, not a doc edit, or git itself
+        # failed to report a diff), this naturally yields zero documents: we
+        # never fan out to every tagged document based on ambiguous/absent
+        # diff info. A deliberate full resync must be requested explicitly by
+        # omitting --changed-only.
         changed_slugs = _changed_entity_slugs()
+        before = len(documents)
+        documents = [d for d in documents if _candidate_entity_slug(d) in changed_slugs]
         if changed_slugs:
-            before = len(documents)
-            documents = [
-                d for d in documents if _candidate_entity_slug(d) in changed_slugs
-            ]
             print(
                 f"--changed-only: {len(documents)}/{before} document(s) match "
                 f"changed Markdown ({', '.join(sorted(changed_slugs))})"
             )
-            if not documents:
-                print("No documents match the changed Markdown files.")
-                return 0
         else:
             print(
-                "--changed-only: no entity Markdown changed in this commit — "
-                "processing all documents"
+                "--changed-only: no entity Markdown changed in this commit "
+                "(e.g. a sync/** code change triggered this run, or git "
+                "diff failed) — nothing to sync. Run without --changed-only "
+                "for a deliberate full resync."
             )
+        if not documents:
+            print("No documents match the changed Markdown files.")
+            return 0
 
     print(f"Mode: {ns.mode} | Documents: {len(documents)} | dry_run={ns.dry_run}")
 

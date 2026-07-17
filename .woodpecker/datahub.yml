@@ -57,9 +57,16 @@
 #                         step) reprocesses ALL tagged docs on every trigger, so e.g. adding a
 #                         brand-new entity's MD would re-condense an unrelated, already-full
 #                         product's description with no push-datahub-business-context re-run
-#                         to restore it (that step only touches the MD that changed). Falls
-#                         back to processing everything when the trigger is a sync/** code
-#                         change (no MD in the diff) — same intent as a deliberate full resync.
+#                         to restore it (that step only touches the MD that changed). Processes
+#                         NOTHING when the trigger is a sync/** code change (no MD in the
+#                         diff) — it must never fan out to every tagged document just because
+#                         its own path filter (a superset of push's, kept broad so this step
+#                         stays present whenever push's depends_on references it) matched a
+#                         code-only commit. Learned the hard way: PR #26310 (a pure code fix
+#                         to this same script) re-condensed Property Integrity's description
+#                         via the fan-out this comment now warns against. A deliberate full
+#                         resync (e.g. after a generator change) must be run explicitly without
+#                         --changed-only, as a one-off outside this path-scoped pipeline.
 #   push-context-documents — push_context_documents.py on push to master / hotfix/*
 #                             (idempotent; stable document IDs)
 #
