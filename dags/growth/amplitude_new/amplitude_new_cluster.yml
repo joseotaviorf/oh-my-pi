@@ -10,5 +10,8 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.driver.maxResultSize: '0'
+      spark.databricks.delta.optimizeWrite.enabled: 'true'
     driver_node_type_id: r7g.xlarge
+    # NVMe local SSD (proven on amplitude_optimization twin) — clean shuffle was EBS-bound.
+    node_type_id: r7gd.8xlarge
     num_workers: 6
