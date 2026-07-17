@@ -1,6 +1,3 @@
-# Twin "prod" cluster temporarily on EBS so validation.cluster (NVMe) differs —
-# required by DAGDeclarationValidator (validation must not resolve to prod spec).
-# During the control experiment trigger ONLY bietlejuice.amplitude_optimization__validation.
 cluster:
   type: consolidation_l_memory_cluster
   databricks_conn_id: databricks_new
@@ -14,24 +11,5 @@ cluster:
       spark.driver.maxResultSize: '0'
       spark.databricks.delta.optimizeWrite.enabled: 'true'
     driver_node_type_id: r7g.xlarge
-    node_type_id: r7g.4xlarge
+    node_type_id: r7gd.4xlarge
     num_workers: 5
-
-# Control run: same NVMe topology as the proven twin, throwaway UC/S3 target.
-# Writes: cluster_validation.datalake_amplitude_events_v2_clean___events
-# S3: s3a://{datalake_bucket}/validation/cluster_validation/datalake_amplitude_events_v2_clean/
-validation:
-  cluster:
-    type: consolidation_l_memory_cluster
-    custom_configurations:
-      single_user_name: '{{ var.value.databricks_single_user_name }}'
-      data_security_mode: SINGLE_USER
-      aws_attributes:
-        ebs_volume_size: 500
-      spark_conf:
-        spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-        spark.driver.maxResultSize: '0'
-        spark.databricks.delta.optimizeWrite.enabled: 'true'
-      driver_node_type_id: r7g.xlarge
-      node_type_id: r7gd.4xlarge
-      num_workers: 5
