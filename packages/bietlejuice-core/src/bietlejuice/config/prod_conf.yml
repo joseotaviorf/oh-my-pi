@@ -3756,6 +3756,7 @@ notification_webhooks_keys:
     stale_dag: GCHAT_STALE_DAG_WEBHOOK
     dag_rotation: NOTIFICATION_HUB_DAG_ROTATION_WEBHOOK
     iam_alerts: NOTIFICATION_HUB_IAM_ALERTS_WEBHOOK
+    dag_runtime_monitoring: GCHAT_DAG_RUNTIME_MONITORING_WEBHOOK
 
 vespucio_pipeline_version: "latest"
 vespucio_output_path: "s3://5a-vespucio-prod"

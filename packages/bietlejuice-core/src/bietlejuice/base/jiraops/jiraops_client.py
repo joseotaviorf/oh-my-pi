@@ -31,6 +31,7 @@ class JiraOpsClient:
         tags: list[str],
         extra_properties: dict,
         responder_team_id: str | None = None,
+        alias: str | None = None,
     ) -> requests.Response:
         """
         Create an alert in JiraOps using the provided payload.
@@ -42,6 +43,10 @@ class JiraOpsClient:
             extra_properties: Additional properties to include in the alert.
             responder_team_id: JiraOps team ID for responders and visibility.
                 Defaults to the Analytics Engineering team.
+            alias: Optional client-defined identifier used by JSM Ops to
+                de-duplicate alerts. When multiple alerts share the same alias,
+                JSM Ops groups them into a single open alert instead of opening
+                a new one. Omitted from the payload when not provided.
 
         Returns:
             Response: The response from the JiraOps API.
@@ -59,6 +64,9 @@ class JiraOpsClient:
             "tags": tags,
             "extraProperties": extra_properties,
         }
+
+        if alias is not None:
+            payload["alias"] = alias
 
         response = requests.post(
             url, data=json.dumps(payload), headers=headers, auth=auth
