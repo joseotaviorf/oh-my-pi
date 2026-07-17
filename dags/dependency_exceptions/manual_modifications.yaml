@@ -75,6 +75,7 @@ bietlejuice.dw_customer_support:
     - bietlejuice.zendesk:load-clean-ticket-comments:first-run-of-day
     - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
     - bietlejuice.enrich_zendesk:load-enrich-tickets:first-run-of-day
+    - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
 bietlejuice.dw_customer_support_view:
   remove:
     - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst:first-run-of-day
@@ -620,6 +621,7 @@ bietlejuice.enrich_offboarding:
     - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house:first-run-of-day
   remove:
     - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
+    - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
 bietlejuice.enrich_offer:
   remove:
     - bietlejuice.enrich_sale_firestore:load-enrich-monday:first-run-of-day
@@ -897,6 +899,7 @@ bietlejuice.enrich_ss_logic_model:
   remove:
     - bietlejuice.ebdb:load-clean-contract:first-run-of-day
     - bietlejuice.enrich_customer_support:load-enrich-email:first-run-of-day
+    - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
 bietlejuice.enrich_static_files:
   override: []
 bietlejuice.enrich_superset:
@@ -1124,6 +1127,7 @@ bietlejuice.reverse_birdie:
     - bietlejuice.dw_chattermill:load-dw-chattermill-fact-answer-category:first-run-of-day
     - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users:first-run-of-day
     - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
+    - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
 bietlejuice.reverse_birdie_access:
   add:
     - bietlejuice.reverse_birdie:load-reverse-dsat-bot:first-run-of-day
@@ -1451,3 +1455,6 @@ bietlejuice.enrich_ongoing_terminations_snapshot:
     - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
 bietlejuice.enrich_zendesk:
   override: []
+bietlejuice.dw_satisfaction_rating:
+  remove:
+    - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day

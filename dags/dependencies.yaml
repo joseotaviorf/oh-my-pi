@@ -540,7 +540,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics-tasks:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
-  - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification:first-run-of-day
@@ -1291,7 +1290,6 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-513020:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-700005-700008-700009-700010-700011:first-run-of-day
 bietlejuice.dw_satisfaction_rating:
-  - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
   - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-single-station-surveys:first-run-of-day
 bietlejuice.dw_search_session_event:
@@ -3238,7 +3236,6 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow:first-run-of-day
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow:first-run-of-day
-  - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house:first-run-of-day
@@ -4042,7 +4039,6 @@ bietlejuice.enrich_sorting_hat:
 bietlejuice.enrich_ss_logic_model:
   - bietlejuice.chat_fup:load-clean-rating:first-run-of-day
   - bietlejuice.enrich_app_installed:load-enrich-events:first-run-of-day
-  - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
   - bietlejuice.enrich_user:load-enrich-persona-type:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
@@ -4642,7 +4638,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.ebdb_visit_fast_lane:load-clean-booking:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
   - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline:first-run-of-day
-  - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-email:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
