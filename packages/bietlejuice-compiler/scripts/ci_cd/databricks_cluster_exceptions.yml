@@ -14,12 +14,6 @@
 #     approved_by: person@quintoandar.com.br
 
 exceptions:
-  - dag: amplitude_optimization
-    reason: >-
-      Temporary clean twin to prove Amplitude events v2 partition layout
-      (no event_type partition) against production Delta raw before cutover;
-      matches current amplitude_new Databricks runtime until EMR migration.
-    approved_by: jose.rferreira@quintoandar.com.br
   - dag: dw_crm
     path: dags/support_and_service/dw_crm
     reason: >-
