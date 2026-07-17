@@ -36,22 +36,6 @@ def _entity_slug(data_product_id: str) -> str:
     return data_product_id.replace("-", "_")
 
 
-def _condense_overview(
-    overview: str,
-    entity_slug: str,
-    max_paragraphs: int = 6,
-    *,
-    md_output_dir: str = MD_OUTPUT_DIR,
-) -> str:
-    paragraphs = [p.strip() for p in overview.split("\n\n") if p.strip()]
-    selected = paragraphs[:max_paragraphs]
-    body = "\n\n".join(selected)
-    suffix = f"\n\nFurther detail and table routing: {md_output_dir}/{entity_slug}.md"
-    if suffix.strip() not in body:
-        body += suffix
-    return body
-
-
 def _glossary_parent_node(domain_urn: str, override: Optional[str]) -> str:
     if override:
         return override
@@ -143,9 +127,11 @@ def build_datahub_yaml(
         "spec_version": 1,
         "kind": "data_product_curated_entity",
         "product_display_name": parsed.title,
-        "product_description": _condense_overview(
-            parsed.overview, entity_slug, md_output_dir=md_output_dir
-        ),
+        # No product_description here on purpose: push-datahub-business-context is the
+        # sole writer of that field (from the committed Markdown) so the two steps can
+        # never race or collapse each other's text — see load_collections_context.py's
+        # curated_push_assets(), which leaves the description untouched when this key
+        # is absent from the spec.
         "data_product_id": product_id,
         "domain_urn": domain_urn,
         "lifecycle_stage": lifecycle_stage or LIFECYCLE_STAGE_PROD,

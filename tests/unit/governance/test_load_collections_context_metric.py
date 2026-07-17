@@ -180,9 +180,7 @@ class TestPruneStaleAssets:
     def _fetch_response(*urns: str) -> dict:
         return {
             "dataProduct": {
-                "entities": {
-                    "searchResults": [{"entity": {"urn": u}} for u in urns]
-                }
+                "entities": {"searchResults": [{"entity": {"urn": u}} for u in urns]}
             }
         }
 
@@ -228,7 +226,11 @@ class TestPruneStaleAssets:
 
         def _post(query: str, variables: dict):
             calls.append((query, variables))
-            return self._fetch_response("urn:a") if "FetchDataProductAssets" in query else {}
+            return (
+                self._fetch_response("urn:a")
+                if "FetchDataProductAssets" in query
+                else {}
+            )
 
         monkeypatch.setattr(loader, "_post", _post)
         loader._prune_stale_assets("urn:li:dataProduct:x", ["urn:a", "urn:extra"])
@@ -240,7 +242,11 @@ class TestPruneStaleAssets:
 
         def _post(query: str, variables: dict):
             calls.append((query, variables))
-            return None if "FetchDataProductAssets" in query else {"batchSetDataProduct": True}
+            return (
+                None
+                if "FetchDataProductAssets" in query
+                else {"batchSetDataProduct": True}
+            )
 
         monkeypatch.setattr(loader, "_post", _post)
         loader._prune_stale_assets("urn:li:dataProduct:x", ["urn:a"])
@@ -263,9 +269,7 @@ class TestGetAssetCurrentProductUrn:
             }
         return {
             "entity": {
-                "relationships": {
-                    "relationships": [{"entity": {"urn": owner_urn}}]
-                }
+                "relationships": {"relationships": [{"entity": {"urn": owner_urn}}]}
             }
         }
 
@@ -294,17 +298,83 @@ class TestGetAssetCurrentProductUrn:
             lambda q, v: self._entity_owner_response(None),
         )
         assert (
-            loader._get_asset_current_product_urn(
-                "urn:li:chart:(superset,chart.56400)"
-            )
+            loader._get_asset_current_product_urn("urn:li:chart:(superset,chart.56400)")
             is None
         )
 
     def test_lookup_failure_returns_sentinel(self, monkeypatch) -> None:
         monkeypatch.setattr(loader, "_post", lambda q, v: None)
         assert (
-            loader._get_asset_current_product_urn(
-                "urn:li:chart:(superset,chart.56400)"
-            )
+            loader._get_asset_current_product_urn("urn:li:chart:(superset,chart.56400)")
             is loader._OWNER_UNKNOWN
         )
+
+
+class TestCreateOrUpdateDataProductDescriptionOwnership:
+    """product_description has a single writer: push-datahub-business-context. Callers
+    that don't own the field (sync-tars-entities) pass ``pdesc_raw=None``, which must
+    never appear as a ``description`` key in either the create or update mutation input
+    — on create it's simply absent (unset), on update the existing value is left alone."""
+
+    _DP_URN = "urn:li:dataProduct:x"
+
+    def test_create_omits_description_key_when_none(self, monkeypatch) -> None:
+        calls: list[dict] = []
+
+        def _graphql_root(query: str, variables: dict):
+            calls.append(variables)
+            return {"data": {"createDataProduct": {"urn": self._DP_URN}}}
+
+        monkeypatch.setattr(loader, "_graphql_root", _graphql_root)
+        ok = loader._create_or_update_data_product(
+            "x", "X", None, "urn:li:domain:d", self._DP_URN
+        )
+        assert ok is True
+        assert "description" not in calls[0]["input"]["properties"]
+
+    def test_create_includes_description_when_provided(self, monkeypatch) -> None:
+        calls: list[dict] = []
+
+        def _graphql_root(query: str, variables: dict):
+            calls.append(variables)
+            return {"data": {"createDataProduct": {"urn": self._DP_URN}}}
+
+        monkeypatch.setattr(loader, "_graphql_root", _graphql_root)
+        loader._create_or_update_data_product(
+            "x", "X", "full markdown text", "urn:li:domain:d", self._DP_URN
+        )
+        assert calls[0]["input"]["properties"]["description"] == "full markdown text"
+
+    def test_update_omits_description_key_when_none(self, monkeypatch) -> None:
+        calls: list[dict] = []
+
+        def _graphql_root(query: str, variables: dict):
+            calls.append(variables)
+            if "createDataProduct(" in query:
+                return {"errors": [{"message": "already exists"}]}
+            return {"data": {"updateDataProduct": {"urn": self._DP_URN}}}
+
+        monkeypatch.setattr(loader, "_graphql_root", _graphql_root)
+        ok = loader._create_or_update_data_product(
+            "x", "X", None, "urn:li:domain:d", self._DP_URN
+        )
+        assert ok is True
+        update_call = calls[-1]
+        assert "description" not in update_call["input"]
+        assert update_call["input"]["name"] == "X"
+
+    def test_update_includes_description_when_provided(self, monkeypatch) -> None:
+        calls: list[dict] = []
+
+        def _graphql_root(query: str, variables: dict):
+            calls.append(variables)
+            if "createDataProduct(" in query:
+                return {"errors": [{"message": "already exists"}]}
+            return {"data": {"updateDataProduct": {"urn": self._DP_URN}}}
+
+        monkeypatch.setattr(loader, "_graphql_root", _graphql_root)
+        loader._create_or_update_data_product(
+            "x", "X", "full markdown text", "urn:li:domain:d", self._DP_URN
+        )
+        update_call = calls[-1]
+        assert update_call["input"]["description"] == "full markdown text"

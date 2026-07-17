@@ -1822,21 +1822,27 @@ def _prune_stale_assets(dp_urn: str, desired_urns: list[str]) -> None:
 
 
 def _create_or_update_data_product(
-    pid: str, pname: Any, pdesc_raw: str, dom: Any, dp_u: str
+    pid: str, pname: Any, pdesc_raw: Optional[str], dom: Any, dp_u: str
 ) -> bool:
-    """Create the Data Product, or update its description when it already exists.
+    """Create the Data Product, or update it when it already exists.
+
+    ``pdesc_raw`` is ``None`` for callers that don't own the description field
+    (sync-tars-entities passes ``None`` — only push-datahub-business-context supplies a
+    description, so it stays the sole writer of that field and never gets overwritten
+    with the condensed TARS summary). When ``None``, the description key is omitted from
+    both mutations: create leaves it unset, update leaves the existing value untouched.
 
     Returns True when the product exists afterward (created or updated); False on a hard
     failure (already recorded via ``_fail``)."""
+    create_properties: dict[str, Any] = {"name": str(pname)}
+    if pdesc_raw is not None:
+        create_properties["description"] = pdesc_raw.strip()
     create_root = _graphql_root(
         _CREATE_DATA_PRODUCT,
         {
             "input": {
                 "id": pid,
-                "properties": {
-                    "name": str(pname),
-                    "description": pdesc_raw.strip(),
-                },
+                "properties": create_properties,
                 "domainUrn": str(dom),
             },
         },
@@ -1855,22 +1861,30 @@ def _create_or_update_data_product(
         _ok(f"Created DataProduct ({dp_u})")
         return True
     if _errors_indicate_already_exists(create_errors) or _data_product_exists(dp_u):
-        print("  -> DataProduct already exists — updating description...")
+        update_input: dict[str, Any] = {"name": str(pname)}
+        if pdesc_raw is not None:
+            update_input["description"] = pdesc_raw.strip()
+            print("  -> DataProduct already exists — updating description...")
+        else:
+            print(
+                "  -> DataProduct already exists — updating name only "
+                "(description is owned by push-datahub-business-context)..."
+            )
         upd = _graphql_root(
             _UPDATE_DATA_PRODUCT,
             {
                 "urn": dp_u,
-                "input": {
-                    "name": str(pname),
-                    "description": pdesc_raw.strip(),
-                },
+                "input": update_input,
             },
         )
         updated_dp = (upd.get("data") or {}).get("updateDataProduct") if upd else None
         if not updated_dp:
             _fail("curated.updateDataProduct", repr(upd))
             return False
-        _ok("Updated DataProduct description")
+        _ok(
+            "Updated DataProduct"
+            + (" description" if pdesc_raw is not None else " name")
+        )
         return True
     _fail(
         "curated.createDataProduct",
@@ -1884,9 +1898,12 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
     pid = str(cfg["data_product_id"])
     pname = cfg.get("product_display_name") or pid
     pdesc_raw = cfg.get("product_description")
+    # product_description is optional: only push-datahub-business-context supplies it
+    # (from the committed Markdown). Callers that omit it — sync-tars-entities — link
+    # datasets/owners/etc. below without ever touching the description field, so it
+    # stays single-writer.
+    has_description = isinstance(pdesc_raw, str) and bool(pdesc_raw.strip())
     dom = cfg.get("domain_urn") or _FALLBACK_DOMAIN_URN
-    if not isinstance(pdesc_raw, str) or not pdesc_raw.strip():
-        raise SystemExit("product_description (non-empty string) is required")
 
     dp_u = _data_product_urn(pid)
     # Resolve datasets. _curated_data_product_asset_urns populates _URN_CACHE so
@@ -1903,22 +1920,32 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
         )
         return
 
-    # Tables that don't exist in DataHub yet can't be linked — append their names to the
-    # description so the product is still useful while ingestion catches up.
+    # Tables that don't exist in DataHub yet can't be linked. When this caller owns the
+    # description, append their names to it so the product stays useful while ingestion
+    # catches up; otherwise just log it (the description isn't touched).
     if pending:
-        note = (
-            "\n\n---\n\n**Tables not yet available in DataHub** "
-            "(will be linked automatically once ingested):\n"
-            + "\n".join(f"- `{t}`" for t in sorted(pending))
-        )
-        pdesc_raw = pdesc_raw.rstrip() + note
-        print(
-            f"  -> {len(pending)} dataset(s) not yet in DataHub — "
-            "noting them in the product description.",
-            file=sys.stderr,
-        )
+        if has_description:
+            note = (
+                "\n\n---\n\n**Tables not yet available in DataHub** "
+                "(will be linked automatically once ingested):\n"
+                + "\n".join(f"- `{t}`" for t in sorted(pending))
+            )
+            pdesc_raw = pdesc_raw.rstrip() + note
+            print(
+                f"  -> {len(pending)} dataset(s) not yet in DataHub — "
+                "noting them in the product description.",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"  -> {len(pending)} dataset(s) not yet in DataHub "
+                "(will be linked automatically once ingested).",
+                file=sys.stderr,
+            )
 
-    if not _create_or_update_data_product(pid, pname, pdesc_raw, dom, dp_u):
+    if not _create_or_update_data_product(
+        pid, pname, pdesc_raw if has_description else None, dom, dp_u
+    ):
         return
 
     # Full-overwrite: detach anything currently linked that the YAML no longer lists, so the

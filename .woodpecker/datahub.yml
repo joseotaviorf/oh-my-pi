@@ -27,45 +27,45 @@
 #                                   NEVER LLM-authored: it's the full Markdown body
 #                                   (verbatim, minus Ownership/MBR/Tables/Synonyms/Golden
 #                                   Queries/Catalog sections) injected deterministically —
-#                                   see _extract_description_from_md() in that script.
-#                                   depends_on sync-tars-entities (see below) so this is
-#                                   always the LAST writer of the description: the full
-#                                   Markdown always wins over the condensed overview.
+#                                   see _extract_description_from_md() in that script. It
+#                                   is the SOLE writer of `product_description`: sync-tars-
+#                                   entities (below) never sets that field, so the two
+#                                   steps can't race on it. depends_on sync-tars-entities
+#                                   below purely for run-order determinism (e.g. dataset
+#                                   linking happening before/after), not description
+#                                   ownership.
 #   validate-datahub-entities — smoke full catalog on pull_request (no push-only deps)
 #   validate-datahub-entities-post-push — smoke after publish (push only;
 #       must be a separate step: Woodpecker PR pipelines omit push-only steps, so
 #       depends_on push-datahub-business-context fails on pull_request)
-#   sync-tars-entities — sync_tars_entities.py (direct mode) for DataHub Context Documents
-#                         tagged tars-entity (domain) or tars-metrics (metric). Source of
-#                         truth is the LIVE DataHub Context Document (may be ahead of the
-#                         committed Markdown), so its product_description is intentionally
-#                         condensed (first 6 Overview paragraphs + a "Further detail and
-#                         table routing: <path>.md" link — see _condense_overview() in
-#                         sync/yaml_generator.py) — it's a quick preview, not the final
-#                         word. push-datahub-business-context depends_on this step so it
-#                         always runs and finishes first: without that ordering, both
-#                         steps write the same Data Product description with no shared
-#                         state, and whichever finished last (a race — timing depends on
-#                         LLM latency, doc count, etc.) won non-deterministically. Marked
-#                         failure: ignore so a transient error here (e.g. one of the ~36
-#                         tagged docs still being authored) never blocks the authoritative
-#                         full-Markdown publish below. Its own path filter (sync/** code
-#                         changes included) is a superset of push-datahub-business-context's,
-#                         so it is always present whenever push-datahub-business-context runs
-#                         — depends_on can safely point at it without "unknown step" errors.
-#                         Runs with --changed-only: without it, this script (unlike the push
-#                         step) reprocesses ALL tagged docs on every trigger, so e.g. adding a
-#                         brand-new entity's MD would re-condense an unrelated, already-full
-#                         product's description with no push-datahub-business-context re-run
-#                         to restore it (that step only touches the MD that changed). Processes
-#                         NOTHING when the trigger is a sync/** code change (no MD in the
-#                         diff) — it must never fan out to every tagged document just because
-#                         its own path filter (a superset of push's, kept broad so this step
-#                         stays present whenever push's depends_on references it) matched a
-#                         code-only commit. Learned the hard way: PR #26310 (a pure code fix
-#                         to this same script) re-condensed Property Integrity's description
-#                         via the fan-out this comment now warns against. A deliberate full
-#                         resync (e.g. after a generator change) must be run explicitly without
+#                         committed Markdown). It links datasets, owners, golden queries,
+#                         glossary terms and MBR — but it NEVER writes `product_description`.
+#                         build_datahub_yaml() (sync/yaml_generator.py) omits that key from
+#                         the generated spec, and curated_push_assets()
+#                         (load_collections_context.py) leaves the field untouched when the
+#                         key is absent, so it can never clobber push-datahub-business-
+#                         context's full-Markdown description — no shared state, no race.
+#                         (Previously this step wrote a condensed preview of the description
+#                         and the two steps raced on the field; that write path was removed
+#                         entirely rather than just re-ordered.) Marked failure: ignore so a
+#                         transient error here (e.g. one of the ~36 tagged docs still being
+#                         authored) never blocks the authoritative full-Markdown publish
+#                         below. Its own path filter (sync/** code changes included) is a
+#                         superset of push-datahub-business-context's, so it is always
+#                         present whenever push-datahub-business-context runs — depends_on
+#                         can safely point at it without "unknown step" errors.
+#                         Runs with --changed-only, which is orthogonal to the description fix
+#                         above: it limits which docs get their datasets/owners/golden
+#                         queries/glossary/MBR re-synced, not the description (that's now
+#                         structurally impossible to break regardless of this flag). Without
+#                         --changed-only, this script reprocesses ALL tagged docs on every
+#                         trigger; with it, an empty changed-slugs set (e.g. a sync/** code-only
+#                         commit, since this step's own path filter is a superset of push's)
+#                         now yields ZERO documents processed — never a fan-out. Learned the
+#                         hard way: PR #26310 (a pure code fix to this same script, before the
+#                         description write was removed) re-condensed Property Integrity's
+#                         description via exactly that fan-out. A deliberate full resync (e.g.
+#                         after a generator change) must be run explicitly without
 #                         --changed-only, as a one-off outside this path-scoped pipeline.
 #   push-context-documents — push_context_documents.py on push to master / hotfix/*
 #                             (idempotent; stable document IDs)
