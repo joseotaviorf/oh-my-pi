@@ -25,6 +25,29 @@ Production `amplitude_new` and the consumer VIEW `datalake_amplitude_clean.event
 2. **OPTIMIZE + ZORDER as first configured was harmful.** It re-encoded zstd → snappy and inflated live v2 from ~44 GiB to ~1.2 TiB. Keep `run_optimize` / `run_vacuum` **false** on the twin until a safe codec + `maxFileSize` recipe is proven.
 3. **Raw Delta does not rewrite D−1.** All 35 large raw commits since Jun 14 write **exactly one** calendar day. The prod clean `[D−1, D]` window re-shuffles ~half the bytes with no raw update behind it. Twin defaults to **single-day**; use conf overrides only when you intentionally need a multi-day repair.
 
+## Control run — v1 partitions via `__validation` (temporary)
+
+**Goal:** measure NVMe + single-day with production partition scheme
+`[id_app, event_type, year, month, day]` without writing into the live twin
+table (and without confounding the prior no-`event_type` layout).
+
+**Current branch state (revert after measurement):**
+
+| Item | Value |
+|------|--------|
+| Declaration partitions | `id_app, event_type, year, month, day` (match `amplitude_new`) |
+| Main twin cluster | EBS preset workers (`r7g.4xlarge` via `consolidation_l_memory_cluster`; no redundant `node_type_id`) |
+| Validation cluster | NVMe `r7gd.4xlarge` ×5 (control experiment) |
+| Validation write target | `cluster_validation.datalake_amplitude_events_v2_clean___events` |
+| Validation S3 | `s3a://{datalake_bucket}/validation/cluster_validation/datalake_amplitude_events_v2_clean/` |
+
+1. Deploy this branch (or sync local Airflow) so `bietlejuice.amplitude_optimization__validation` exists.
+2. Trigger **only** `bietlejuice.amplitude_optimization__validation` with a single-day conf (e.g. Jul 14).
+3. Compare wall-clock / iowait / file layout to the prior Jul-14 twin run (~29m, no `event_type` partition).
+4. Revert declaration partitions to `[id_app, year, month, day]`, restore twin cluster `node_type_id: r7gd.4xlarge`, and remove the `validation:` block (or keep validation only if still useful).
+
+Do **not** trigger `bietlejuice.amplitude_optimization` while partitions include `event_type` — that would overwrite go-forward days on `datalake_amplitude_events_v2_clean` with the v1 partition layout.
+
 ## Manual trigger confs
 
 ### Daily / prove (default — matches declaration)

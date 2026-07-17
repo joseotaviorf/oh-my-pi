@@ -11,5 +11,19 @@ cluster:
       spark.driver.maxResultSize: '0'
       spark.databricks.delta.optimizeWrite.enabled: 'true'
     driver_node_type_id: r7g.xlarge
-    node_type_id: r7gd.4xlarge
     num_workers: 5
+validation:
+  cluster:
+    type: consolidation_l_memory_cluster
+    custom_configurations:
+      single_user_name: '{{ var.value.databricks_single_user_name }}'
+      data_security_mode: SINGLE_USER
+      aws_attributes:
+        ebs_volume_size: 500
+      spark_conf:
+        spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+        spark.driver.maxResultSize: '0'
+        spark.databricks.delta.optimizeWrite.enabled: 'true'
+      driver_node_type_id: r7g.xlarge
+      node_type_id: r7gd.4xlarge
+      num_workers: 5
