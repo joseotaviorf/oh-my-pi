@@ -1,11 +1,13 @@
 cluster:
   type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
-    # j-1PHM2FYBXOE91: fact_listings + fact_listing_status ran concurrently with only
-    # ~1 executor each on 2 core + 1 Spot task; fat input splits (brokers/house/
-    # sale_listing_status) became long stragglers. All-core OD + smaller scan targets.
+    # j-1OLAFXUQKRXUA: fact_listings hung on ResultStage 63 task 3 (fat partition) while
+    # sharing the fleet with fact_listing_status — only 2 executors registered despite
+    # 6 core OD. Serialize Spark steps so each fact gets the full fleet; speculation
+    # recovers hung/straggler tasks; tighter scan targets reduce fat splits.
+    step_concurrency_level: 1
     core_nodes:
-      target_on_demand: 6
+      target_on_demand: 8
       target_spot: 0
       instance_types:
       - r6g.2xlarge
@@ -14,8 +16,14 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     spark_conf:
-      spark.sql.files.maxPartitionBytes: "33554432"
-      spark.sql.shuffle.partitions: "200"
+      # 8× r6g.2xlarge ≈ 16× (24g/4core) m_memory executors when one step runs alone.
+      spark.dynamicAllocation.maxExecutors: "16"
+      spark.speculation: "true"
+      spark.speculation.multiplier: "3"
+      spark.speculation.quantile: "0.75"
+      spark.sql.files.maxPartitionBytes: "16777216"
+      spark.sql.adaptive.advisoryPartitionSizeInBytes: "33554432"
+      spark.sql.shuffle.partitions: "400"
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
