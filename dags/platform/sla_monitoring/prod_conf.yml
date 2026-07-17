@@ -389,7 +389,6 @@ expected_times_to_finish:
   bietlejuice.enrich_velo_zendesk: 06:47
   bietlejuice.enrich_vespucio_pipeline: "12:00"
   bietlejuice.enrich_visit: 07:08
-  bietlejuice.enrich_visit_agent_performance: "10:10"
   bietlejuice.enrich_wololo: 04:31
   bietlejuice.enrich_worker_details: 08:47
   bietlejuice.enrich_zendesk: 05:16
@@ -445,7 +444,6 @@ expected_times_to_finish:
   bietlejuice.linhadireta: 07:23
   bietlejuice.meetcall: "10:16"
   bietlejuice.metabase: 09:29
-  bietlejuice.metric_agents__performance: "10:43"
   bietlejuice.metric_fintech__atta: 08:44
   bietlejuice.metric_growth__demand: "10:10"
   bietlejuice.metric_rent__bookings: 08:03
