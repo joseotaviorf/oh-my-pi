@@ -10,108 +10,50 @@ workflow:
   layer: dw
   custom_schema: crm
   default_extraction_type: full
-  # Scope OPTIMIZE WHERE to load_start/end day partitions by default.
-  # Full dims / fact_lead_tasks override incremental_optimize: false below
-  # (no year/month/day columns — WHERE would fail).
-  incremental_optimize: true
   inner_dependencies:
     fact_lead_tasks:
       - fact_lead_task_actions
   tables_customization:
-    # Full-extract dims (no year/month/day): OPTIMIZE full table, no date filter.
-    dim_closing_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_collection_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_credit_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_lead_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_linhadireta_chat_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_offboarding_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_onboarding_tenant_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_payment_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_photo_job_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_repair_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_ungrouped_manual_task:
-      run_optimize: true
-      incremental_optimize: false
-    dim_visit_task:
-      run_optimize: true
-      incremental_optimize: false
-    fact_lead_tasks:
-      run_optimize: true
-      incremental_optimize: false
-    # Day-partitioned tables: incremental OPTIMIZE + compaction after coalesce=off.
     dim_closing_task_transition:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     dim_closing_task_workflow:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_closing_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_closing_tasks_workflows_transitions:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_collection_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_credit_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_lead_task_actions:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_linhadireta_chat_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_offboarding_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_onboarding_tenant_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_payment_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_photo_job_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_repair_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
     fact_ungrouped_manual_tasks:
       extraction_type: incremental
       partitions: [year, month, day]
-      run_optimize: true
+

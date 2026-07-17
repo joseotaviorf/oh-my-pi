@@ -1,29 +1,6 @@
 cluster:
-  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  type: consolidation_m_general_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    aws_attributes:
-      # Prior EMR runs filled /mnt under concurrent fact loads; keep headroom.
-      ebs_volume_size: 500
-    # Cap concurrent Spark steps (default 8). Heavy facts share one fleet.
-    step_concurrency_level: 2
-    core_nodes:
-      target_on_demand: 4
-      target_spot: 0
-      instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
-    spark_conf:
-      # j-2OPXNTRUAVU4W: AQE coalesce collapsed shuffles to ~10 multi-hour tasks.
-      # Keep more shuffle partitions; accept more files — OPTIMIZE compacts after load.
-      spark.sql.adaptive.coalescePartitions.enabled: 'false'
-      spark.sql.shuffle.partitions: '200'
-      spark.driver.memory: 16g
-      spark.driver.memoryOverhead: 4g
-      spark.driver.maxResultSize: '0'
-      # Preset maxExecutors=6 left ~10/64 vCores busy while tasks peaked at ~18 MiB (j-31QDKKZFPIANY).
-      # 6g + 2 cores → ~4 executors/node on r6g.4xlarge → 16 slots across 4 core nodes.
-      spark.dynamicAllocation.maxExecutors: '16'
-      spark.executor.memory: 6g
-      spark.executor.memoryOverhead: 2g
-      spark.executor.cores: '2'
+    data_security_mode: USER_ISOLATION
+    driver_node_type_id: r7g.2xlarge
