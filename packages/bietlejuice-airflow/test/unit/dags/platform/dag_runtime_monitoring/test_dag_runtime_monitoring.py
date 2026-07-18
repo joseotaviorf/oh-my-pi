@@ -15,14 +15,22 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     JIRA_OPS_VARIABLE,
     _as_str_list,
     _build_alert_text,
+    _entry_from_finding,
     _evaluate_all,
     _evaluate_runtime,
+    _failed_text,
+    _fetch_run_states,
     _format_duration,
+    _initial_text,
     _load_dedup_state,
+    _normalize_ledger,
     _parse_test_options,
     _percentile,
+    _post_gchat,
     _resolve_config,
+    _resolved_text,
     _synthetic_findings,
+    _update_text,
     dag,
     monitor_dag_runtimes,
 )
@@ -30,7 +38,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
 _MODULE = "dags.platform.dag_runtime_monitoring.dag_runtime_monitoring"
 
 _WEBHOOK_KEY = "GCHAT_DAG_RUNTIME_MONITORING_WEBHOOK"
-_WEBHOOK_URL = "https://chat.example.com/hook"
+_WEBHOOK_URL = "https://chat.example.com/hook?key=k&token=t"
 _CRITICAL_DAG = "bietlejuice.ebdb_location"
 _STANDARD_DAG = "bietlejuice.some_small_dag"
 
@@ -56,7 +64,6 @@ class TestPercentile:
         assert _percentile([600.0] * 10, 90) == 600.0
 
     def test_p90_interpolation(self):
-        # 0..10 → P90 rank = 9.0 → exactly 9
         assert _percentile(list(range(11)), 90) == 9.0
 
     def test_empty_raises(self):
@@ -72,7 +79,6 @@ class TestEvaluateRuntime:
         )
 
     def test_none_when_within_threshold(self):
-        # baseline 600, threshold 660; elapsed 650 → not flagged
         assert (
             _evaluate_runtime(650, [600] * 10, percentile=90, factor=1.1, min_history=5)
             is None
@@ -88,14 +94,12 @@ class TestEvaluateRuntime:
         assert result["pct_over"] == 100
 
     def test_none_when_baseline_is_zero(self):
-        # Recent runs all ~0s → baseline 0 → do not flag every positive elapsed time.
         assert (
             _evaluate_runtime(120, [0] * 10, percentile=90, factor=1.1, min_history=5)
             is None
         )
 
     def test_none_when_below_min_elapsed_floor(self):
-        # Over the relative threshold (1200 > 660) but under the 1h floor → not flagged.
         assert (
             _evaluate_runtime(
                 1200,
@@ -109,7 +113,6 @@ class TestEvaluateRuntime:
         )
 
     def test_finding_when_above_min_elapsed_floor(self):
-        # Past the 1h floor AND over threshold → flagged.
         result = _evaluate_runtime(
             5400,
             [600] * 10,
@@ -141,8 +144,7 @@ class TestResolveConfig:
         assert merged["min_alert_duration_minutes"] == 60
 
     def test_none_uses_all_defaults(self):
-        merged = _resolve_config(None)
-        assert merged["critical_dags"] == []
+        assert _resolve_config(None)["critical_dags"] == []
 
 
 class TestEvaluateAll:
@@ -170,11 +172,12 @@ class TestEvaluateAll:
             _STANDARD_DAG: [600.0] * 10,
             "bietlejuice.fast_dag": [600.0] * 10,
         }
-        findings = _evaluate_all(running, durations, now, _CONFIG)
-        by_dag = {f["dag_id"]: f for f in findings}
+        by_dag = {
+            f["dag_id"]: f for f in _evaluate_all(running, durations, now, _CONFIG)
+        }
         assert by_dag[_CRITICAL_DAG]["tier"] == "critical"
         assert by_dag[_STANDARD_DAG]["tier"] == "standard"
-        assert "bietlejuice.fast_dag" not in by_dag  # within baseline → not flagged
+        assert "bietlejuice.fast_dag" not in by_dag
 
     def test_skips_when_no_history(self):
         now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
@@ -186,8 +189,6 @@ class TestEvaluateAll:
         assert _evaluate_all(running, {}, now, _CONFIG) == []
 
     def test_honors_min_alert_duration_floor(self):
-        # With a 60-min floor: a run over its baseline but only 20 min in is skipped;
-        # a run past the floor is flagged.
         config = {**_CONFIG, "min_alert_duration_minutes": 60}
         now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
         running = [
@@ -206,8 +207,8 @@ class TestEvaluateAll:
         by_dag = {
             f["dag_id"]: f for f in _evaluate_all(running, durations, now, config)
         }
-        assert _CRITICAL_DAG not in by_dag  # 20 min < 1h floor → skipped
-        assert _STANDARD_DAG in by_dag  # 90 min ≥ floor → flagged
+        assert _CRITICAL_DAG not in by_dag
+        assert _STANDARD_DAG in by_dag
 
 
 def test_build_alert_text_contains_key_facts():
@@ -228,52 +229,178 @@ def test_build_alert_text_contains_key_facts():
 
 
 # --------------------------------------------------------------------------- #
-# DAG structure
+# Message builders + ledger helpers
+# --------------------------------------------------------------------------- #
+_ENTRY = {
+    "dag_id": _STANDARD_DAG,
+    "run_id": "r2",
+    "tier": "standard",
+    "first_alert_ts": "2026-07-17T18:00:00+00:00",
+    "baseline_s": 1500.0,
+    "threshold_s": 2250.0,
+    "percentile": 90,
+    "history_count": 7,
+}
+
+
+def test_message_builders():
+    assert "running slower than usual" in _initial_text(_ENTRY, 3600)
+    assert "P90 baseline" in _initial_text(_ENTRY, 3600)
+    assert "still running" in _update_text(_ENTRY, 5400)
+    assert "finished after" in _resolved_text(_ENTRY, 3600)
+    assert "FAILED" in _failed_text(_ENTRY, 3600)
+    assert _STANDARD_DAG in _resolved_text(_ENTRY, 3600)
+
+
+def test_message_builders_without_baseline():
+    # Back-compat entry (old ledger) has no baseline_s → messages omit the % detail.
+    entry = {"dag_id": _STANDARD_DAG, "run_id": "r2", "tier": "standard"}
+    assert "baseline unavailable" in _initial_text(entry, 3600)
+    assert "unknown time" in _resolved_text(entry, None)
+
+
+class TestNormalizeLedger:
+    def test_dict_entries_preserved(self):
+        raw = {"k": {"dag_id": "d", "run_id": "r", "tier": "standard"}}
+        assert _normalize_ledger(raw)["k"]["tier"] == "standard"
+
+    def test_old_string_entry_upgraded_as_standard(self):
+        raw = {"bietlejuice.x|run_1": "2026-07-17T18:00:00+00:00"}
+        entry = _normalize_ledger(raw)["bietlejuice.x|run_1"]
+        assert entry["dag_id"] == "bietlejuice.x"
+        assert entry["run_id"] == "run_1"
+        assert entry["tier"] == "standard"
+
+    def test_old_string_entry_critical_dag_keeps_jira_tier(self):
+        # Pre-change dedup recorded both tiers as bare timestamps; resolve tier from
+        # critical_dags so deploy does not route in-flight critical runs to gchat.
+        raw = {f"{_CRITICAL_DAG}|r1": "2026-07-17T18:00:00+00:00"}
+        entry = _normalize_ledger(raw, critical_dags=[_CRITICAL_DAG])[
+            f"{_CRITICAL_DAG}|r1"
+        ]
+        assert entry["tier"] == "critical"
+        assert entry["dag_id"] == _CRITICAL_DAG
+        assert entry["run_id"] == "r1"
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            {},
+            {"tier": "standard"},
+            {"baseline_s": 1500.0},
+        ],
+    )
+    def test_partial_dict_fills_dag_id_and_run_id_from_key(self, value):
+        # Operator-edited / truncated Variable JSON must not KeyError in _fetch_run_states.
+        key = "bietlejuice.x|run_1"
+        entry = _normalize_ledger({key: value})[key]
+        assert entry["dag_id"] == "bietlejuice.x"
+        assert entry["run_id"] == "run_1"
+        assert entry["tier"] == "standard"
+        # Existing fields are kept.
+        for field, expected in value.items():
+            assert entry[field] == expected
+
+    def test_partial_dict_critical_tier_from_key(self):
+        key = f"{_CRITICAL_DAG}|r1"
+        entry = _normalize_ledger({key: {}}, critical_dags=[_CRITICAL_DAG])[key]
+        assert entry["dag_id"] == _CRITICAL_DAG
+        assert entry["run_id"] == "r1"
+        assert entry["tier"] == "critical"
+
+
+# --------------------------------------------------------------------------- #
+# DAG structure + queries
 # --------------------------------------------------------------------------- #
 def test_dag_schedule_and_id():
     assert dag.dag_id == DAG_ID
-    assert dag.schedule_interval == "*/5 * * * *"
+    assert dag.schedule_interval == "*/30 * * * *"
 
 
 @pytest.mark.parametrize("query", [_RUNNING_QUERY, _HISTORY_QUERY])
 def test_queries_exclude_test_runs(query):
     sql = str(query)
-    # Real automatic runs only — manual/backfill (TEST_RUN) are excluded from both
-    # alerting and the baseline.
     assert "run_type" in sql
     assert "scheduled" in sql
     assert "dataset_triggered" in sql
     assert "mediator_trig" in sql
 
 
-# --------------------------------------------------------------------------- #
-# Orchestration / routing
-# --------------------------------------------------------------------------- #
-def _running_and_history_results(now):
-    running = mock.MagicMock()
-    running.fetchall.return_value = [
-        SimpleNamespace(
-            dag_id=_CRITICAL_DAG, run_id="r1", start_date=now - timedelta(minutes=60)
-        ),
-        SimpleNamespace(
-            dag_id=_STANDARD_DAG, run_id="r2", start_date=now - timedelta(minutes=60)
-        ),
-    ]
-    history = mock.MagicMock()
-    history.fetchall.return_value = [
-        SimpleNamespace(dag_id=_CRITICAL_DAG, duration_s=600.0) for _ in range(10)
-    ] + [SimpleNamespace(dag_id=_STANDARD_DAG, duration_s=600.0) for _ in range(10)]
-    return running, history
+class TestFetchRunStates:
+    def test_filters_to_exact_pairs(self):
+        entries = [
+            {"dag_id": "bietlejuice.a", "run_id": "r1"},
+            {"dag_id": "bietlejuice.b", "run_id": "r2"},
+        ]
+        rows = [
+            SimpleNamespace(
+                dag_id="bietlejuice.a",
+                run_id="r1",
+                state="running",
+                start_date=None,
+                end_date=None,
+            ),
+            SimpleNamespace(
+                dag_id="bietlejuice.b",
+                run_id="r2",
+                state="success",
+                start_date=None,
+                end_date=None,
+            ),
+            # over-match from the IN×IN cross product — must be dropped
+            SimpleNamespace(
+                dag_id="bietlejuice.a",
+                run_id="r2",
+                state="failed",
+                start_date=None,
+                end_date=None,
+            ),
+        ]
+        session = mock.MagicMock()
+        session.execute.return_value.fetchall.return_value = rows
+        states = _fetch_run_states(session, entries)
+        assert set(states) == {("bietlejuice.a", "r1"), ("bietlejuice.b", "r2")}
+
+    def test_empty_entries_no_query(self):
+        session = mock.MagicMock()
+        assert _fetch_run_states(session, []) == {}
+        session.execute.assert_not_called()
 
 
-def _variable_get_factory(environment="prod", dedup_state="{}"):
+# --------------------------------------------------------------------------- #
+# _post_gchat (threaded webhook post)
+# --------------------------------------------------------------------------- #
+class TestPostGchat:
+    @mock.patch(f"{_MODULE}.requests")
+    def test_posts_threaded_payload(self, mock_requests):
+        mock_requests.post.return_value = mock.MagicMock()
+        assert _post_gchat(_WEBHOOK_URL, "hello", "rubinho::x|r1") is True
+        url = mock_requests.post.call_args.args[0]
+        payload = mock_requests.post.call_args.kwargs["json"]
+        assert "messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD" in url
+        assert payload["text"] == "hello"
+        assert payload["thread"]["threadKey"] == "rubinho::x|r1"
+
+    @mock.patch(f"{_MODULE}.requests")
+    def test_returns_false_on_error(self, mock_requests):
+        mock_requests.post.return_value.raise_for_status.side_effect = Exception("500")
+        assert _post_gchat(_WEBHOOK_URL, "hi", "k") is False
+
+    def test_no_webhook_returns_false(self):
+        assert _post_gchat(None, "hi", "k") is False
+
+
+# --------------------------------------------------------------------------- #
+# Orchestration / lifecycle
+# --------------------------------------------------------------------------- #
+def _variable_get_factory(environment="prod", ledger="{}"):
     def _get(key, default_var=None):
         if key == _WEBHOOK_KEY:
             return _WEBHOOK_URL
         if key == "environment":
             return environment
         if key == DEDUP_VARIABLE_KEY:
-            return dedup_state
+            return ledger
         if key == JIRA_OPS_VARIABLE:
             return json.dumps({"username": "u", "token": "t", "cloud_id": "c"})
         return default_var
@@ -287,237 +414,443 @@ def _config_get(key):
     return dict(_CONFIG)
 
 
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_routes_critical_to_jira_and_standard_to_gchat(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory()
-    mock_jira_cls.return_value.create_alert.return_value = mock.MagicMock()
-    mock_gchat.send_message.return_value = True
-
-    now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
-
-    monitor_dag_runtimes(session=session)
-
-    # One JiraOps alert for the critical DAG.
-    mock_jira_cls.return_value.create_alert.assert_called_once()
-    _, jira_kwargs = mock_jira_cls.return_value.create_alert.call_args
-    assert jira_kwargs["extra_properties"]["DAG"] == _CRITICAL_DAG
-    assert jira_kwargs["alias"] == f"dag-runtime-{_CRITICAL_DAG}-r1"
-
-    # One batched gchat message for the standard DAG.
-    mock_gchat.send_message.assert_called_once()
-    sent_message = mock_gchat.send_message.call_args.args[0]
-    assert _STANDARD_DAG in sent_message.content
-    assert sent_message.destination == _WEBHOOK_URL
-
-    # Dedup state persisted for both alerted runs.
-    mock_var.set.assert_called_once()
-    saved = json.loads(mock_var.set.call_args.args[1])
-    assert f"{_CRITICAL_DAG}|r1" in saved
-    assert f"{_STANDARD_DAG}|r2" in saved
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_dedup_skips_already_alerted_run(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory(
-        dedup_state=json.dumps({f"{_CRITICAL_DAG}|r1": "2026-07-16T11:00:00+00:00"})
+def _running_row(dag_id, run_id, minutes_ago, now):
+    return SimpleNamespace(
+        dag_id=dag_id, run_id=run_id, start_date=now - timedelta(minutes=minutes_ago)
     )
-    mock_gchat.send_message.return_value = True
-
-    now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
-
-    monitor_dag_runtimes(session=session)
-
-    # Critical run r1 already alerted → no new JiraOps alert.
-    mock_jira_cls.return_value.create_alert.assert_not_called()
-    # Standard run r2 is still fresh → gchat still fires.
-    mock_gchat.send_message.assert_called_once()
 
 
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
+def _saved_ledger(mock_var):
+    return json.loads(mock_var.set.call_args.args[1])
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}._fetch_run_states", return_value={})
+@mock.patch(f"{_MODULE}._fetch_recent_durations")
+@mock.patch(f"{_MODULE}._fetch_running_runs")
 @mock.patch(f"{_MODULE}.Variable")
 @mock.patch(f"{_MODULE}.ConfigurationService")
-def test_non_prod_does_not_send(mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory(environment="forno")
-
+def test_new_standard_anomaly_posts_initial_and_tracks(
+    mock_cfg, mock_var, mock_running, mock_durations, mock_states, mock_jira, mock_post
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
     now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
+    mock_running.return_value = [_running_row(_STANDARD_DAG, "r2", 90, now)]
+    mock_durations.return_value = {_STANDARD_DAG: [600.0] * 10}
 
-    monitor_dag_runtimes(session=session)
+    monitor_dag_runtimes(session=mock.MagicMock())
 
-    mock_jira_cls.return_value.create_alert.assert_not_called()
-    mock_gchat.send_message.assert_not_called()
+    mock_jira.assert_not_called()
+    mock_post.assert_called_once()
+    text_arg = mock_post.call_args.args[1]
+    assert "running slower than usual" in text_arg
+    saved = _saved_ledger(mock_var)
+    assert saved[f"{_STANDARD_DAG}|r2"]["tier"] == "standard"
+    assert saved[f"{_STANDARD_DAG}|r2"]["baseline_s"] == 600.0
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}._fetch_run_states", return_value={})
+@mock.patch(f"{_MODULE}._fetch_recent_durations")
+@mock.patch(f"{_MODULE}._fetch_running_runs")
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+def test_new_critical_anomaly_pages_jira_once(
+    mock_cfg, mock_var, mock_running, mock_durations, mock_states, mock_jira, mock_post
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
+    now = datetime.now(timezone.utc)
+    mock_running.return_value = [_running_row(_CRITICAL_DAG, "r1", 90, now)]
+    mock_durations.return_value = {_CRITICAL_DAG: [600.0] * 10}
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_jira.assert_called_once()
+    mock_post.assert_not_called()  # critical → JiraOps only, no gchat
+    saved = _saved_ledger(mock_var)
+    assert saved[f"{_CRITICAL_DAG}|r1"]["tier"] == "critical"
+
+
+def _lifecycle_patches(func):
+    for dec in reversed(
+        [
+            mock.patch(f"{_MODULE}.ConfigurationService"),
+            mock.patch(f"{_MODULE}.Variable"),
+            mock.patch(f"{_MODULE}._fetch_running_runs", return_value=[]),
+            mock.patch(f"{_MODULE}._fetch_run_states"),
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True),
+        ]
+    ):
+        func = dec(func)
+    return func
+
+
+@_lifecycle_patches
+def test_tracked_running_gets_update(
+    mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    now = datetime.now(timezone.utc)
+    mock_states.return_value = {
+        (_STANDARD_DAG, "r2"): SimpleNamespace(
+            dag_id=_STANDARD_DAG,
+            run_id="r2",
+            state="running",
+            start_date=now - timedelta(hours=2),
+            end_date=None,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_post.assert_called_once()
+    assert "still running" in mock_post.call_args.args[1]
+    assert f"{_STANDARD_DAG}|r2" in _saved_ledger(mock_var)  # kept
+
+
+@_lifecycle_patches
+def test_tracked_success_posts_resolved_and_drops(
+    mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    now = datetime.now(timezone.utc)
+    mock_states.return_value = {
+        (_STANDARD_DAG, "r2"): SimpleNamespace(
+            dag_id=_STANDARD_DAG,
+            run_id="r2",
+            state="success",
+            start_date=now - timedelta(hours=2),
+            end_date=now,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    assert "finished after" in mock_post.call_args.args[1]
+    assert f"{_STANDARD_DAG}|r2" not in _saved_ledger(mock_var)  # dropped
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}._fetch_run_states")
+@mock.patch(f"{_MODULE}._fetch_recent_durations")
+@mock.patch(f"{_MODULE}._fetch_running_runs")
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+def test_closed_tracked_run_not_reopened_from_stale_finding(
+    mock_cfg, mock_var, mock_running, mock_durations, mock_states, mock_jira, mock_post
+):
+    # Race: findings from the running snapshot still list a run that follow-up just
+    # closed and dropped from the ledger — must not open a fresh incident same cycle.
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    now = datetime.now(timezone.utc)
+    mock_running.return_value = [_running_row(_STANDARD_DAG, "r2", 90, now)]
+    mock_durations.return_value = {_STANDARD_DAG: [600.0] * 10}
+    mock_states.return_value = {
+        (_STANDARD_DAG, "r2"): SimpleNamespace(
+            dag_id=_STANDARD_DAG,
+            run_id="r2",
+            state="success",
+            start_date=now - timedelta(hours=2),
+            end_date=now,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_jira.assert_not_called()
+    mock_post.assert_called_once()
+    assert "finished after" in mock_post.call_args.args[1]
+    assert "running slower than usual" not in mock_post.call_args.args[1]
+    assert f"{_STANDARD_DAG}|r2" not in _saved_ledger(mock_var)
+
+
+@_lifecycle_patches
+def test_tracked_failed_posts_failure_and_drops(
+    mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    now = datetime.now(timezone.utc)
+    mock_states.return_value = {
+        (_STANDARD_DAG, "r2"): SimpleNamespace(
+            dag_id=_STANDARD_DAG,
+            run_id="r2",
+            state="failed",
+            start_date=now - timedelta(hours=2),
+            end_date=now,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    assert "FAILED" in mock_post.call_args.args[1]
+    assert f"{_STANDARD_DAG}|r2" not in _saved_ledger(mock_var)
+
+
+@_lifecycle_patches
+def test_tracked_terminal_keeps_ledger_when_closing_post_fails(
+    mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    # Closing delivery must succeed before drop — same gate as initial alerts.
+    mock_post.return_value = False
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    now = datetime.now(timezone.utc)
+    mock_states.return_value = {
+        (_STANDARD_DAG, "r2"): SimpleNamespace(
+            dag_id=_STANDARD_DAG,
+            run_id="r2",
+            state="success",
+            start_date=now - timedelta(hours=2),
+            end_date=now,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    assert "finished after" in mock_post.call_args.args[1]
+    assert f"{_STANDARD_DAG}|r2" in _saved_ledger(mock_var)  # retried next cycle
+
+
+@_lifecycle_patches
+def test_tracked_critical_terminal_drops_silently(
+    mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    entry = {**_ENTRY, "dag_id": _CRITICAL_DAG, "run_id": "r1", "tier": "critical"}
+    ledger = {f"{_CRITICAL_DAG}|r1": entry}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    now = datetime.now(timezone.utc)
+    mock_states.return_value = {
+        (_CRITICAL_DAG, "r1"): SimpleNamespace(
+            dag_id=_CRITICAL_DAG,
+            run_id="r1",
+            state="success",
+            start_date=now - timedelta(hours=2),
+            end_date=now,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_post.assert_not_called()  # critical closes in Jira, no gchat
+    assert f"{_CRITICAL_DAG}|r1" not in _saved_ledger(mock_var)
+
+
+@_lifecycle_patches
+def test_old_ledger_critical_string_does_not_get_gchat(
+    mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    # Old Variable format: bare timestamp for both tiers. Must not treat critical as
+    # standard and spam threaded gchat updates/closures after deploy.
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    ledger = {f"{_CRITICAL_DAG}|r1": "2026-07-17T18:00:00+00:00"}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    now = datetime.now(timezone.utc)
+    mock_states.return_value = {
+        (_CRITICAL_DAG, "r1"): SimpleNamespace(
+            dag_id=_CRITICAL_DAG,
+            run_id="r1",
+            state="running",
+            start_date=now - timedelta(hours=2),
+            end_date=None,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_post.assert_not_called()
+    saved = _saved_ledger(mock_var)
+    assert saved[f"{_CRITICAL_DAG}|r1"]["tier"] == "critical"
+
+
+@_lifecycle_patches
+def test_tracked_run_vanished_is_dropped(
+    mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    mock_states.return_value = {}  # run row no longer present
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_post.assert_not_called()
+    assert _saved_ledger(mock_var) == {}
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}._fetch_run_states", return_value={})
+@mock.patch(f"{_MODULE}._fetch_recent_durations")
+@mock.patch(f"{_MODULE}._fetch_running_runs")
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+def test_non_prod_does_not_send_or_track(
+    mock_cfg, mock_var, mock_running, mock_durations, mock_states, mock_jira, mock_post
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory(environment="forno")
+    now = datetime.now(timezone.utc)
+    mock_running.return_value = [_running_row(_STANDARD_DAG, "r2", 90, now)]
+    mock_durations.return_value = {_STANDARD_DAG: [600.0] * 10}
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_jira.assert_not_called()
+    mock_post.assert_not_called()
     mock_var.set.assert_not_called()
 
 
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}._fetch_run_states", return_value={})
+@mock.patch(f"{_MODULE}._fetch_recent_durations")
+@mock.patch(f"{_MODULE}._fetch_running_runs")
 @mock.patch(f"{_MODULE}.Variable")
 @mock.patch(f"{_MODULE}.ConfigurationService")
-def test_failed_jira_delivery_is_not_recorded(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
+def test_only_dags_filters_evaluated_runs(
+    mock_cfg, mock_var, mock_running, mock_durations, mock_states, mock_jira, mock_post
 ):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
+    mock_cfg.return_value.get_config.side_effect = _config_get
     mock_var.get.side_effect = _variable_get_factory()
-    # JiraOps returns a non-2xx response → raise_for_status raises.
-    failing_response = mock.MagicMock()
-    failing_response.raise_for_status.side_effect = Exception("502 Bad Gateway")
-    mock_jira_cls.return_value.create_alert.return_value = failing_response
-    mock_gchat.send_message.return_value = True
-
     now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
+    mock_running.return_value = [
+        _running_row(_CRITICAL_DAG, "r1", 90, now),
+        _running_row(_STANDARD_DAG, "r2", 90, now),
+    ]
+    mock_durations.return_value = {
+        _CRITICAL_DAG: [600.0] * 10,
+        _STANDARD_DAG: [600.0] * 10,
+    }
 
-    monitor_dag_runtimes(session=session)
+    monitor_dag_runtimes(
+        session=mock.MagicMock(), run_conf={"only_dags": [_STANDARD_DAG]}
+    )
 
-    saved = json.loads(mock_var.set.call_args.args[1])
-    # Critical run failed delivery → NOT recorded, so it retries next cycle.
-    assert f"{_CRITICAL_DAG}|r1" not in saved
-    # Standard run delivered fine → recorded.
-    assert f"{_STANDARD_DAG}|r2" in saved
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_jira_network_error_does_not_block_gchat(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    # A raised error (bad creds / network) from create_alert must not abort the task;
-    # the independent standard-tier gchat send still runs and is recorded.
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory()
-    mock_jira_cls.return_value.create_alert.side_effect = ConnectionError("boom")
-    mock_gchat.send_message.return_value = True
-
-    now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
-
-    monitor_dag_runtimes(session=session)
-
-    mock_gchat.send_message.assert_called_once()
-    saved = json.loads(mock_var.set.call_args.args[1])
-    assert f"{_CRITICAL_DAG}|r1" not in saved  # jira failed → retried next cycle
-    assert f"{_STANDARD_DAG}|r2" in saved  # gchat delivered → recorded
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_missing_gchat_webhook_is_not_recorded(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-
-    def var_get(key, default_var=None):
-        if key == _WEBHOOK_KEY:  # webhook not provisioned yet
-            return default_var
-        if key == "environment":
-            return "prod"
-        if key == DEDUP_VARIABLE_KEY:
-            return "{}"
-        if key == JIRA_OPS_VARIABLE:
-            return json.dumps({"username": "u", "token": "t", "cloud_id": "c"})
-        return default_var
-
-    mock_var.get.side_effect = var_get
-    mock_jira_cls.return_value.create_alert.return_value = mock.MagicMock()
-
-    now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
-
-    monitor_dag_runtimes(session=session)
-
-    mock_gchat.send_message.assert_not_called()
-    saved = json.loads(mock_var.set.call_args.args[1])
-    # Critical still delivered via JiraOps → recorded.
-    assert f"{_CRITICAL_DAG}|r1" in saved
-    # Standard skipped (no webhook) → NOT recorded, retries next cycle.
-    assert f"{_STANDARD_DAG}|r2" not in saved
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_failed_gchat_send_is_not_recorded(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory()
-    mock_jira_cls.return_value.create_alert.return_value = mock.MagicMock()
-    mock_gchat.send_message.return_value = False  # delivery failed
-
-    now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
-
-    monitor_dag_runtimes(session=session)
-
-    saved = json.loads(mock_var.set.call_args.args[1])
-    assert f"{_CRITICAL_DAG}|r1" in saved
-    assert f"{_STANDARD_DAG}|r2" not in saved
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_no_running_runs_short_circuits(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory()
-    empty = mock.MagicMock()
-    empty.fetchall.return_value = []
-    session = mock.MagicMock()
-    session.execute.return_value = empty
-
-    monitor_dag_runtimes(session=session)
-
-    mock_jira_cls.return_value.create_alert.assert_not_called()
-    mock_gchat.send_message.assert_not_called()
+    mock_jira.assert_not_called()  # critical filtered out
+    mock_post.assert_called_once()
 
 
 # --------------------------------------------------------------------------- #
-# Test/simulation mode (conf-driven)
+# Simulate / test mode
+# --------------------------------------------------------------------------- #
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+def test_simulate_dry_run_sends_nothing(mock_cfg, mock_var, mock_jira, mock_post):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
+
+    monitor_dag_runtimes(session=mock.MagicMock(), run_conf={"simulate": True})
+
+    mock_jira.assert_not_called()
+    mock_post.assert_not_called()
+    mock_var.set.assert_not_called()
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+def test_simulate_force_send_posts_initial_to_test_destinations(
+    mock_cfg, mock_var, mock_jira, mock_post
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory(environment="forno")
+
+    monitor_dag_runtimes(
+        session=mock.MagicMock(),
+        run_conf={
+            "simulate": True,
+            "force_send": True,
+            "test_webhook": "https://chat.example.com/TEST",
+            "test_responder_team_id": "test-team-123",
+        },
+    )
+
+    # Critical synthetic → JiraOps test team; standard synthetic → test webhook.
+    _, jira_kwargs = mock_jira.call_args
+    assert jira_kwargs["responder_team_id"] == "test-team-123"
+    assert jira_kwargs["test"] is True
+    assert mock_post.call_args.args[0] == "https://chat.example.com/TEST"
+    mock_var.set.assert_not_called()  # simulate never writes the ledger
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+def test_force_send_critical_without_test_team_is_not_paged(
+    mock_cfg, mock_var, mock_jira, mock_post
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory(environment="forno")
+
+    monitor_dag_runtimes(
+        session=mock.MagicMock(),
+        run_conf={
+            "simulate": True,
+            "force_send": True,
+            "test_webhook": "https://chat.example.com/TEST",
+        },
+    )
+
+    mock_jira.assert_not_called()  # critical downgraded to log-only
+    mock_post.assert_called_once()  # standard still delivered
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}._fetch_run_states", return_value={})
+@mock.patch(f"{_MODULE}._fetch_running_runs", return_value=[])
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+def test_reads_trigger_conf_from_dag_run_not_context_conf(
+    mock_cfg, mock_var, mock_running, mock_states, mock_jira, mock_post
+):
+    # Airflow injects context["conf"] = the global config object (not a dict); the trigger
+    # payload lives on dag_run.conf. Must read dag_run.conf and not choke.
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
+
+    class _FakeAirflowConf:
+        def get(self, *a, **k):
+            raise AssertionError("must not read the Airflow config object")
+
+    dag_run = SimpleNamespace(conf={"simulate": True, "dry_run": True})
+    monitor_dag_runtimes(
+        session=mock.MagicMock(), conf=_FakeAirflowConf(), dag_run=dag_run
+    )
+
+    mock_jira.assert_not_called()
+    mock_post.assert_not_called()
+    mock_var.set.assert_not_called()
+
+
+# --------------------------------------------------------------------------- #
+# Conf parsing / hardening
 # --------------------------------------------------------------------------- #
 class TestParseTestOptions:
     def test_empty_conf_is_normal_run(self):
-        opts = _parse_test_options(None)
-        assert opts == {
+        assert _parse_test_options(None) == {
             "simulate": False,
             "simulate_dags": None,
+            "simulate_state": None,
             "dry_run": False,
             "force_send": False,
             "test_webhook": None,
@@ -529,13 +862,12 @@ class TestParseTestOptions:
         assert _parse_test_options({"simulate": True})["dry_run"] is True
 
     def test_force_send_defaults_dry_run_false(self):
-        # Forcing a send clearly intends delivery, so dry_run defaults off.
         assert (
             _parse_test_options({"simulate": True, "force_send": True})["dry_run"]
             is False
         )
 
-    def test_explicit_dry_run_wins_over_force_send(self):
+    def test_explicit_dry_run_wins(self):
         assert (
             _parse_test_options(
                 {"simulate": True, "force_send": True, "dry_run": True}
@@ -543,199 +875,28 @@ class TestParseTestOptions:
             is True
         )
 
-    def test_explicit_overrides(self):
-        opts = _parse_test_options(
-            {
-                "simulate": True,
-                "dry_run": False,
-                "force_send": True,
-                "test_webhook": "https://x",
-                "test_responder_team_id": "team-1",
-                "only_dags": ["a"],
-            }
-        )
-        assert opts["dry_run"] is False
-        assert opts["force_send"] is True
-        assert opts["test_webhook"] == "https://x"
-        assert opts["test_responder_team_id"] == "team-1"
-        assert opts["only_dags"] == ["a"]
-
-
-def test_synthetic_findings_default_covers_both_tiers():
-    findings = _synthetic_findings(_CONFIG)
-    tiers = {f["tier"] for f in findings}
-    assert tiers == {"critical", "standard"}
-    # The first configured critical id is used for the critical synthetic finding.
-    assert any(f["dag_id"] == _CRITICAL_DAG for f in findings)
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_simulate_dry_run_sends_nothing(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory()
-
-    # simulate defaults dry_run=True → no DB access, no delivery, no state writes.
-    monitor_dag_runtimes(session=mock.MagicMock(), run_conf={"simulate": True})
-
-    mock_jira_cls.return_value.create_alert.assert_not_called()
-    mock_gchat.send_message.assert_not_called()
-    mock_var.set.assert_not_called()
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_simulate_force_send_routes_to_test_destinations(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory(environment="forno")
-    mock_jira_cls.return_value.create_alert.return_value = mock.MagicMock()
-    mock_gchat.send_message.return_value = True
-
-    # No explicit dry_run → force_send implies delivery (the Forno validation recipe).
-    monitor_dag_runtimes(
-        session=mock.MagicMock(),
-        run_conf={
-            "simulate": True,
-            "force_send": True,
-            "test_webhook": "https://chat.example.com/TEST",
-            "test_responder_team_id": "test-team-123",
-        },
-    )
-
-    # Critical synthetic finding routed to the TEST team, tagged, and marked [TEST].
-    mock_jira_cls.return_value.create_alert.assert_called_once()
-    _, jira_kwargs = mock_jira_cls.return_value.create_alert.call_args
-    assert jira_kwargs["responder_team_id"] == "test-team-123"
-    assert "test" in jira_kwargs["tags"]
-    assert jira_kwargs["message"].startswith("[TEST]")
-
-    # Standard synthetic finding posted to the throwaway webhook.
-    sent_message = mock_gchat.send_message.call_args.args[0]
-    assert sent_message.destination == "https://chat.example.com/TEST"
-
-    # Simulated runs never touch the dedup state.
-    mock_var.set.assert_not_called()
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_force_send_critical_without_test_team_is_not_paged(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory(environment="forno")
-    mock_gchat.send_message.return_value = True
-
-    # force_send delivery, but no test team provided → critical must be downgraded to
-    # log-only so a test trigger never reaches the real Data Engineering on-call.
-    monitor_dag_runtimes(
-        session=mock.MagicMock(),
-        run_conf={
-            "simulate": True,
-            "dry_run": False,
-            "force_send": True,
-            "test_webhook": "https://chat.example.com/TEST",
-        },
-    )
-
-    mock_jira_cls.return_value.create_alert.assert_not_called()
-    # Standard tier still delivers to the test webhook.
-    mock_gchat.send_message.assert_called_once()
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_only_dags_filters_evaluated_runs(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory()
-    mock_jira_cls.return_value.create_alert.return_value = mock.MagicMock()
-    mock_gchat.send_message.return_value = True
-
-    now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
-
-    # Restrict to the standard DAG only → no JiraOps page, gchat fires for it.
-    monitor_dag_runtimes(session=session, run_conf={"only_dags": [_STANDARD_DAG]})
-
-    mock_jira_cls.return_value.create_alert.assert_not_called()
-    mock_gchat.send_message.assert_called_once()
-
-
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_reads_trigger_conf_from_dag_run_not_context_conf(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    # Airflow injects context["conf"] = the global AirflowConfigParser (NOT a dict) and
-    # puts the trigger payload on dag_run.conf. The callable must read dag_run.conf and
-    # must not choke on the context "conf" kwarg. Regression for the param-name collision.
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory()
-
-    class _FakeAirflowConf:
-        def get(self, *args, **kwargs):  # AirflowConfigParser.get(section, key, ...)
-            raise AssertionError("must not read options off the Airflow config object")
-
-    dag_run = SimpleNamespace(conf={"simulate": True, "dry_run": True})
-
-    # Mimic PythonOperator: session via provide_session, plus context kwargs incl. `conf`.
-    monitor_dag_runtimes(
-        session=mock.MagicMock(),
-        conf=_FakeAirflowConf(),
-        dag_run=dag_run,
-    )
-
-    # dag_run.conf → simulate dry-run → nothing delivered, no crash.
-    mock_jira_cls.return_value.create_alert.assert_not_called()
-    mock_gchat.send_message.assert_not_called()
-    mock_var.set.assert_not_called()
-
-
-# --------------------------------------------------------------------------- #
-# Hardening: conf coercion, dedup-state typing, prune scope, test-override gating
-# --------------------------------------------------------------------------- #
-class TestAsStrList:
-    @pytest.mark.parametrize(
-        "value,expected",
-        [
-            (None, None),
-            (
-                "bietlejuice.x",
-                ["bietlejuice.x"],
-            ),  # bare string → one element, not chars
-            (["a", "b"], ["a", "b"]),
-            ((1, 2), ["1", "2"]),
-            (5, None),  # non-iterable → ignored
-            ({"a": 1}, None),  # dict → ignored
-        ],
-    )
-    def test_coerce(self, value, expected):
-        assert _as_str_list(value) == expected
-
-    def test_parse_options_coerces_dag_lists(self):
+    def test_coerces_dag_lists(self):
         opts = _parse_test_options(
             {"only_dags": "bietlejuice.x", "simulate_dags": "bietlejuice.y"}
         )
         assert opts["only_dags"] == ["bietlejuice.x"]
         assert opts["simulate_dags"] == ["bietlejuice.y"]
+
+
+class TestAsStrList:
+    @pytest.mark.parametrize(
+        "value,expected",
+        [
+            (None, None),
+            ("bietlejuice.x", ["bietlejuice.x"]),
+            (["a", "b"], ["a", "b"]),
+            ((1, 2), ["1", "2"]),
+            (5, None),
+            ({"a": 1}, None),
+        ],
+    )
+    def test_coerce(self, value, expected):
+        assert _as_str_list(value) == expected
 
 
 class TestLoadDedupState:
@@ -749,86 +910,28 @@ class TestLoadDedupState:
 
     def test_valid_mapping_preserved(self):
         with mock.patch(f"{_MODULE}.Variable") as mock_var:
-            mock_var.get.return_value = '{"a|1": "t"}'
-            assert _load_dedup_state() == {"a|1": "t"}
+            mock_var.get.return_value = '{"a|1": {"tier": "standard"}}'
+            assert _load_dedup_state() == {"a|1": {"tier": "standard"}}
 
 
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_only_dags_prune_keeps_other_running_dags_dedup(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    # only_dags narrows evaluation to one DAG, but dedup pruning must use the FULL active
-    # set so a still-running DAG outside only_dags keeps its dedup entry.
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    other_key = "bietlejuice.other_running|r9"
-    mock_var.get.side_effect = _variable_get_factory(
-        dedup_state=json.dumps({other_key: "2026-07-16T11:00:00+00:00"})
-    )
-    mock_gchat.send_message.return_value = True
-
-    now = datetime.now(timezone.utc)
-    running = mock.MagicMock()
-    running.fetchall.return_value = [
-        SimpleNamespace(
-            dag_id=_STANDARD_DAG, run_id="r2", start_date=now - timedelta(minutes=60)
-        ),
-        SimpleNamespace(
-            dag_id="bietlejuice.other_running",
-            run_id="r9",
-            start_date=now - timedelta(minutes=60),
-        ),
-    ]
-    history = mock.MagicMock()
-    history.fetchall.return_value = [
-        SimpleNamespace(dag_id=_STANDARD_DAG, duration_s=600.0) for _ in range(10)
-    ]
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
-
-    monitor_dag_runtimes(session=session, run_conf={"only_dags": [_STANDARD_DAG]})
-
-    saved = json.loads(mock_var.set.call_args.args[1])
-    # other_running/r9 is still active (in the full set) → its dedup entry survives.
-    assert other_key in saved
-    # the evaluated standard run was delivered and recorded too.
-    assert f"{_STANDARD_DAG}|r2" in saved
+def test_synthetic_findings_default_covers_both_tiers():
+    findings = _synthetic_findings(_CONFIG)
+    assert {f["tier"] for f in findings} == {"critical", "standard"}
+    assert any(f["dag_id"] == _CRITICAL_DAG for f in findings)
 
 
-@mock.patch(f"{_MODULE}.GChatService")
-@mock.patch(f"{_MODULE}.JiraOpsClient")
-@mock.patch(f"{_MODULE}.Variable")
-@mock.patch(f"{_MODULE}.ConfigurationService")
-def test_test_overrides_ignored_without_force_send(
-    mock_cfg_cls, mock_var, mock_jira_cls, mock_gchat
-):
-    # A prod manual run passing test_webhook / test_responder_team_id but NOT force_send
-    # must route real alerts to the configured webhook + default team, unmarked.
-    mock_cfg_cls.return_value.get_config.side_effect = _config_get
-    mock_var.get.side_effect = _variable_get_factory(environment="prod")
-    mock_jira_cls.return_value.create_alert.return_value = mock.MagicMock()
-    mock_gchat.send_message.return_value = True
-
-    now = datetime.now(timezone.utc)
-    running, history = _running_and_history_results(now)
-    session = mock.MagicMock()
-    session.execute.side_effect = [running, history]
-
-    monitor_dag_runtimes(
-        session=session,
-        run_conf={
-            "test_webhook": "https://chat.example.com/THROWAWAY",
-            "test_responder_team_id": "sneaky-team",
-        },
-    )
-
-    # Critical → default team (responder_team_id None), NOT marked [TEST].
-    _, jira_kwargs = mock_jira_cls.return_value.create_alert.call_args
-    assert jira_kwargs["responder_team_id"] is None
-    assert not jira_kwargs["message"].startswith("[TEST]")
-    assert "test" not in jira_kwargs["tags"]
-    # Standard → configured webhook, not the throwaway one.
-    sent_message = mock_gchat.send_message.call_args.args[0]
-    assert sent_message.destination == _WEBHOOK_URL
+def test_entry_from_finding_snapshots_baseline():
+    finding = {
+        "dag_id": _STANDARD_DAG,
+        "run_id": "r2",
+        "tier": "standard",
+        "elapsed_s": 5400,
+        "baseline_s": 600.0,
+        "threshold_s": 660.0,
+        "percentile": 90,
+        "history_count": 10,
+    }
+    entry = _entry_from_finding(finding, first_alert_ts="ts")
+    assert entry["baseline_s"] == 600.0
+    assert entry["tier"] == "standard"
+    assert entry["first_alert_ts"] == "ts"

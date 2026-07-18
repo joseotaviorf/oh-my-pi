@@ -1,6 +1,6 @@
 # dag_runtime_monitoring
 
-Every 5 minutes this DAG inspects every currently-running DAG and flags any whose
+Every 30 minutes this DAG inspects every currently-running DAG and flags any whose
 elapsed time is anomalous **relative to that same DAG's own recent successful runs**
 (P`percentile` of successful-run durations over the last `lookback_days` × `factor` — no hardcoded per-DAG
 thresholds) **and** only once the run has been executing for at least
@@ -8,9 +8,13 @@ thresholds) **and** only once the run has been executing for at least
 routed by tier:
 
 - **Critical** (DAGs in `critical_dags`, the top 50 by downstream `dw_*` impact) → JiraOps
-  on-caller alert, one per DAG.
-- **Standard** (every other running DAG over its baseline) → one batched Google Chat
-  message.
+  on-caller alert, opened once per run; people ack/close it in Jira.
+- **Standard** (every other running DAG over its baseline) → **Google Chat, tracked to
+  closure**. The monitor keeps a ledger (Airflow Variable `DAG_RUNTIME_MONITORING_ALERTED_RUNS`)
+  of each flagged run and, in a Chat **thread per run**, posts: an **initial** alert, an
+  **update** every 30-min cycle while it is still running (current elapsed, % over
+  baseline), and a **closing** message when the run **succeeds (✅) or fails (❌)** — after
+  which the run is dropped from the ledger.
 
 Real alerts are only delivered when `environment == prod`. Config lives in
 `prod_conf.yml` / `forno_conf.yml` (`lookback_days`, `min_history_runs`, `percentile`,

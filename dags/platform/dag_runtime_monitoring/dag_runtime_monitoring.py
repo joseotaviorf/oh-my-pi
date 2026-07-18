@@ -3,20 +3,22 @@ airflow parsing enforcement
 
 Note: this line above forces Airflow to parse this file for implemented DAGs.
 
-Runtime-anomaly monitor. Every 5 minutes it inspects every currently-running DAG
+Runtime-anomaly monitor. Every 30 minutes it inspects every currently-running DAG
 run and flags any whose elapsed time is anomalous *relative to that same DAG's own
-recent successful runs* (P<percentile> of the last <lookback_runs> durations times a
-small factor) — there are no hardcoded per-DAG time thresholds.
+recent successful runs* (P<percentile> of durations over the last <lookback_days>,
+times a factor, and only past an absolute min-duration floor) — no hardcoded per-DAG
+time thresholds.
 
 Alerting is tiered:
   * DAGs in the configured ``critical_dags`` list (highest downstream dw_* impact)
-    open a JiraOps on-caller alert (one per DAG).
-  * Every other over-baseline DAG is reported in a single Google Chat webhook
-    message (non-paging, informational).
+    open a JiraOps on-caller alert once (people ack/close it in Jira).
+  * Every other over-baseline DAG is reported to a Google Chat webhook and then
+    **tracked to closure**: the monitor keeps a ledger (Airflow Variable) of each
+    flagged run and, every cycle, posts a threaded update while it is still running
+    and a final message when it succeeds or fails.
 
-A dedup state (Airflow Variable) prevents the same slow run from re-alerting every
-cycle. Real alerts are only sent when ``environment == prod``; otherwise the DAG logs
-what it *would* send (so Forno/local runs still exercise the queries and logic).
+Real alerts are only sent when ``environment == prod`` (or a force_send test); otherwise
+the DAG logs what it *would* send (so Forno/local runs still exercise the queries).
 """
 
 from __future__ import annotations
@@ -25,8 +27,10 @@ import json
 import math
 import os
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 import pendulum
+import requests
 from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python import PythonOperator
@@ -36,8 +40,6 @@ from sqlalchemy import bindparam, text
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.jiraops.jiraops_client import JiraOpsClient
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.messaging_services.gchat_service import GChatService
-from bietlejuice.services.messaging_services.message import Message
 
 DAG_NAME = "dag_runtime_monitoring"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -93,6 +95,18 @@ _HISTORY_QUERY = text(
       AND end_date >= :since
     """
 ).bindparams(bindparam("dag_ids", expanding=True))
+
+# Look up the current state of specific runs we are already tracking (by exact run_id).
+_RUN_STATE_QUERY = text(
+    """
+    SELECT dag_id, run_id, state, start_date, end_date
+    FROM dag_run
+    WHERE run_id IN :run_ids AND dag_id IN :dag_ids
+    """
+).bindparams(bindparam("run_ids", expanding=True), bindparam("dag_ids", expanding=True))
+
+# A DagRun in one of these states is finished; anything else is still in flight.
+_TERMINAL_STATES = {"success", "failed"}
 
 
 # --------------------------------------------------------------------------- #
@@ -215,13 +229,65 @@ def _build_alert_text(finding: dict) -> str:
     )
 
 
-def _build_gchat_text(findings: list) -> str:
-    header = (
-        f"⏱️ *DAG runtime anomalies* — {len(findings)} DAG(s) running longer than usual "
-        f"({datetime.now().strftime('%Y-%m-%d %H:%M')})"
+def _thread_key(dag_id: str, run_id: str) -> str:
+    """Google Chat threadKey grouping the whole lifecycle of one run into one thread."""
+    return f"rubinho::{_run_key(dag_id, run_id)}"
+
+
+def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dict:
+    """Build the ledger entry (tracking snapshot) for a newly-alerted run."""
+    return {
+        "dag_id": finding["dag_id"],
+        "run_id": finding["run_id"],
+        "tier": finding["tier"],
+        "first_alert_ts": first_alert_ts,
+        "baseline_s": finding["baseline_s"],
+        "threshold_s": finding["threshold_s"],
+        "percentile": finding["percentile"],
+        "history_count": finding["history_count"],
+    }
+
+
+def _over_pct(elapsed_s: float, baseline_s: float | None) -> int | None:
+    if not baseline_s or baseline_s <= 0:
+        return None
+    return round((elapsed_s / baseline_s - 1) * 100)
+
+
+def _baseline_detail(entry: dict, elapsed_s: float) -> str:
+    baseline_s = entry.get("baseline_s")
+    over = _over_pct(elapsed_s, baseline_s)
+    if baseline_s and over is not None:
+        return (
+            f"P{entry.get('percentile')} baseline {_format_duration(baseline_s)} "
+            f"({over}% over)"
+        )
+    return "baseline unavailable"
+
+
+def _initial_text(entry: dict, elapsed_s: float) -> str:
+    return (
+        f"⏱️ *{entry['dag_id']}* is running slower than usual — elapsed "
+        f"{_format_duration(elapsed_s)}; {_baseline_detail(entry, elapsed_s)}. "
+        f"Tracking until it finishes. run_id={entry['run_id']}"
     )
-    lines = [f"• {_build_alert_text(f)}" for f in findings]
-    return "\n".join([header, *lines])
+
+
+def _update_text(entry: dict, elapsed_s: float) -> str:
+    return (
+        f"⏳ *{entry['dag_id']}* still running — {_format_duration(elapsed_s)} elapsed now "
+        f"({_baseline_detail(entry, elapsed_s)})."
+    )
+
+
+def _resolved_text(entry: dict, duration_s: float | None) -> str:
+    dur = _format_duration(duration_s) if duration_s is not None else "unknown time"
+    return f"✅ *{entry['dag_id']}* finished after {dur} (was flagged as slow)."
+
+
+def _failed_text(entry: dict, duration_s: float | None) -> str:
+    dur = _format_duration(duration_s) if duration_s is not None else "unknown time"
+    return f"❌ *{entry['dag_id']}* run FAILED after {dur} (was flagged as slow)."
 
 
 # --------------------------------------------------------------------------- #
@@ -268,32 +334,30 @@ def _send_jira_alert(
     return True
 
 
-def _send_gchat_alerts(findings: list, webhook_url: str | None) -> bool:
-    """Post one batched gchat message for the standard tier. Returns True on success.
+def _post_gchat(webhook_url: str | None, text_content: str, thread_key: str) -> bool:
+    """Post one Google Chat message into the run's thread. Returns True on success.
 
-    The message is all-or-nothing (a single batched post), so the return value applies
-    to every finding passed in.
+    Uses a direct webhook POST (like notify_stale_dags) so we can set a threadKey —
+    the initial alert, all updates, and the closing message for one run land in the same
+    Chat thread. Best-effort: logs and returns False on failure.
     """
     if not webhook_url:
         print(
             "⚠️  gchat webhook not configured "
             f"(Variable behind notification_webhooks_keys.{DAG_NAME}). "
-            "Skipping standard-tier notification; runs will be retried next cycle."
+            "Skipping gchat message."
         )
         return False
+    separator = "&" if "?" in webhook_url else "?"
+    url = f"{webhook_url}{separator}messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD"
+    payload = {"text": text_content, "thread": {"threadKey": thread_key}}
     try:
-        message = Message(content=_build_gchat_text(findings), destination=webhook_url)
-        sent = GChatService.send_message(message)
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
     except Exception as error:  # noqa: BLE001 - best-effort alerting, keep going
-        print(f"❌ Failed to send gchat notification: {error}. Will retry next cycle.")
+        print(f"❌ gchat post failed (thread {thread_key}): {error}.")
         return False
-    if sent:
-        print(f"✅ gchat notification sent for {len(findings)} standard-tier DAG(s).")
-    else:
-        print(
-            "❌ gchat notification not sent; standard-tier runs will be retried next cycle."
-        )
-    return bool(sent)
+    return True
 
 
 # --------------------------------------------------------------------------- #
@@ -313,6 +377,27 @@ def _fetch_recent_durations(session, dag_ids: list, since: datetime) -> dict:
     for row in rows:
         durations.setdefault(row.dag_id, []).append(float(row.duration_s))
     return durations
+
+
+def _fetch_run_states(session, entries: list) -> dict:
+    """Look up the current DagRun state/start/end for the tracked runs.
+
+    Returns a mapping ``(dag_id, run_id) -> row`` for the exact pairs we track (the
+    IN×IN query can over-match across dags, so we filter to the wanted pairs).
+    """
+    if not entries:
+        return {}
+    run_ids = list({e["run_id"] for e in entries})
+    dag_ids = list({e["dag_id"] for e in entries})
+    rows = session.execute(
+        _RUN_STATE_QUERY, {"run_ids": run_ids, "dag_ids": dag_ids}
+    ).fetchall()
+    wanted = {(e["dag_id"], e["run_id"]) for e in entries}
+    return {
+        (row.dag_id, row.run_id): row
+        for row in rows
+        if (row.dag_id, row.run_id) in wanted
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -348,6 +433,7 @@ def _parse_test_options(conf: dict | None) -> dict:
     return {
         "simulate": simulate,
         "simulate_dags": _as_str_list(conf.get("simulate_dags")),
+        "simulate_state": conf.get("simulate_state") or None,
         "dry_run": bool(conf.get("dry_run", simulate and not force_send)),
         "force_send": force_send,
         "test_webhook": conf.get("test_webhook"),
@@ -396,6 +482,42 @@ def _load_dedup_state() -> dict:
     return raw if isinstance(raw, dict) else {}
 
 
+def _normalize_ledger(raw: dict, critical_dags=None) -> dict:
+    """Coerce the stored ledger into {run_key: entry-dict}.
+
+    Back-compat: an older ledger stored a bare timestamp string per key (both tiers, no
+    tier field). Upgrade those using ``critical_dags`` so in-flight critical runs keep
+    the Jira-only path and do not get gchat follow-ups. No baseline snapshot — updates
+    just omit the % detail.
+
+    Partial/operator-edited dict entries (``{}`` or missing ``dag_id``/``run_id``) are
+    repaired from the run_key so ``_fetch_run_states`` never KeyErrors on a bad Variable.
+    """
+    critical = set(critical_dags or ())
+    ledger = {}
+    for run_key, value in raw.items():
+        dag_id, _, run_id = run_key.partition("|")
+        default_tier = "critical" if dag_id in critical else "standard"
+        if isinstance(value, dict):
+            entry = dict(value)
+            entry.setdefault("dag_id", dag_id)
+            entry.setdefault("run_id", run_id)
+            entry.setdefault("tier", default_tier)
+            ledger[run_key] = entry
+        else:
+            ledger[run_key] = {
+                "dag_id": dag_id,
+                "run_id": run_id,
+                "tier": default_tier,
+                "first_alert_ts": value if isinstance(value, str) else None,
+            }
+    return ledger
+
+
+def _save_ledger(ledger: dict) -> None:
+    Variable.set(DEDUP_VARIABLE_KEY, json.dumps(ledger))
+
+
 # --------------------------------------------------------------------------- #
 # Orchestration
 # --------------------------------------------------------------------------- #
@@ -432,111 +554,189 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         f"only_dags:{len(opts['only_dags']) if opts['only_dags'] else 0}}}"
     )
 
-    # Build findings: fabricated (simulate) or evaluated from the metadata DB.
-    # all_running_rows is the full active set (used for dedup pruning); running_rows is the
-    # possibly-narrowed set we actually evaluate.
+    # Test-destination overrides (test_webhook / test_responder_team_id) only apply to a
+    # force_send test delivery — never to a real prod run, which uses the configured
+    # webhook and the default on-call team.
+    is_test = opts["force_send"]
+    gchat_dest = (opts["test_webhook"] if is_test else None) or webhook_url
+    jira_team = opts["test_responder_team_id"] if is_test else None
+    deliver = (environment == "prod") or opts["force_send"]
+    now = datetime.now(timezone.utc)
+
+    # --- Simulate: fabricate findings and post a chosen lifecycle phase (no DB / ledger).
+    # simulate_state drives which message to emit for the SAME synthetic thread, so a few
+    # manual triggers walk the whole lifecycle: (unset)=initial → running → success/failed.
     if opts["simulate"]:
         findings = _synthetic_findings(config, opts["simulate_dags"])
-        all_running_rows = None
-        print(f"🧪 simulate mode: fabricated {len(findings)} synthetic finding(s).")
-    else:
-        all_running_rows = _fetch_running_runs(session)
-        running_rows = all_running_rows
-        if opts["only_dags"]:
-            wanted = set(opts["only_dags"])
-            running_rows = [row for row in all_running_rows if row.dag_id in wanted]
-        if not running_rows:
-            print("✅ No running DAG runs to evaluate.")
+        state = opts["simulate_state"]
+        print(
+            f"🧪 simulate mode ({state or 'initial'}): "
+            f"fabricated {len(findings)} synthetic finding(s)."
+        )
+        for f in findings:
+            print(f"   • [{f['tier']}] {_build_alert_text(f)}")
+        if opts["dry_run"] or not deliver:
+            print("ℹ️  Not delivering (simulate dry-run / gate). Logging only.")
             return
-        now = datetime.now(timezone.utc)
+        if not state:
+            for finding in findings:
+                _deliver_initial(finding, gchat_dest, jira_team, is_test)
+            return
+        # Follow-up phase: build a throwaway ledger + fabricated run states and run the
+        # real follow-up logic (standard tier only — critical has no gchat follow-up).
+        ledger = {}
+        states = {}
+        terminal = state in _TERMINAL_STATES
+        for finding in findings:
+            if finding["tier"] != "standard":
+                continue
+            key = _run_key(finding["dag_id"], finding["run_id"])
+            ledger[key] = _entry_from_finding(finding)
+            states[(finding["dag_id"], finding["run_id"])] = SimpleNamespace(
+                dag_id=finding["dag_id"],
+                run_id=finding["run_id"],
+                state=state,
+                start_date=now - timedelta(hours=2),
+                end_date=now if terminal else None,
+            )
+        _apply_follow_up(ledger, states, gchat_dest, now)
+        return
+
+    # --- Real run: evaluate current anomalies + follow up everything we're tracking ---
+    all_running_rows = _fetch_running_runs(session)
+    running_rows = all_running_rows
+    if opts["only_dags"]:
+        wanted = set(opts["only_dags"])
+        running_rows = [row for row in all_running_rows if row.dag_id in wanted]
+
+    findings = []
+    if running_rows:
         since = now - timedelta(days=config["lookback_days"])
         durations_by_dag = _fetch_recent_durations(
             session, {row.dag_id for row in running_rows}, since
         )
         findings = _evaluate_all(running_rows, durations_by_dag, now, config)
 
-    if not findings:
-        print("✅ No runtime anomalies detected.")
-        return
-
-    # Dedup for real runs only; simulated runs are always treated as fresh.
-    if opts["simulate"]:
-        fresh = findings
-        alerted_state = None
-    else:
-        alerted_state = _load_dedup_state()
-        fresh = [
-            f
-            for f in findings
-            if _run_key(f["dag_id"], f["run_id"]) not in alerted_state
-        ]
-        print(
-            f"⏱️ {len(findings)} anomalous run(s); {len(fresh)} new after dedup "
-            f"({len(findings) - len(fresh)} already alerted)."
-        )
-
+    ledger = _normalize_ledger(
+        _load_dedup_state(), critical_dags=config["critical_dags"]
+    )
     for f in findings:
         print(f"   • [{f['tier']}] {_build_alert_text(f)}")
+    print(
+        f"⏱️ {len(findings)} anomalous run(s); tracking {len(ledger)} run(s) for follow-up."
+    )
 
-    if not fresh:
-        if alerted_state is not None:
-            _prune_and_save_state(alerted_state, all_running_rows)
-        return
-
-    critical = [f for f in fresh if f["tier"] == "critical"]
-    standard = [f for f in fresh if f["tier"] == "standard"]
-
-    # Deliver in prod, or when force_send explicitly overrides the gate for a test.
-    deliver = (environment == "prod") or opts["force_send"]
     if opts["dry_run"] or not deliver:
         reason = (
             "dry_run"
             if opts["dry_run"]
             else f"environment={environment} and force_send=false"
         )
-        print(
-            f"ℹ️  Not delivering ({reason}). Would page JiraOps for {len(critical)} "
-            f"critical DAG(s) and post gchat for {len(standard)} standard DAG(s)."
-        )
+        print(f"ℹ️  Not delivering ({reason}); no messages sent, ledger unchanged.")
         return
 
-    # Test-destination overrides (test_webhook / test_responder_team_id) only apply to a
-    # force_send test delivery — never to a real prod run, which must use the configured
-    # webhook and the default on-call team.
-    is_test = opts["force_send"]
-    gchat_dest = (opts["test_webhook"] if is_test else None) or webhook_url
-    jira_team = opts["test_responder_team_id"] if is_test else None
+    # 1) Follow up runs we are already tracking (before opening new ones, so a run that is
+    #    both still-anomalous and already tracked gets exactly one update this cycle).
+    # Snapshot keys first: follow-up drops terminals from the ledger, but findings were
+    # built from the earlier running snapshot — without this, step 2 would re-open the
+    # same run (fresh gchat / Jira page) in the same cycle after closure.
+    already_tracked = set(ledger)
+    _follow_up_tracked_runs(session, ledger, gchat_dest, now)
 
-    # Only successfully-delivered runs are recorded; failed/skipped ones retry next cycle.
-    delivered_keys: set = set()
-    for finding in critical:
+    # 2) Open new incidents for anomalies not yet tracked (and not just closed above).
+    for finding in findings:
+        key = _run_key(finding["dag_id"], finding["run_id"])
+        if key in ledger or key in already_tracked:
+            continue
+        entry = _entry_from_finding(finding, first_alert_ts=now.isoformat())
+        if finding["tier"] == "critical":
+            if is_test and not jira_team:
+                print(
+                    f"⚠️  Refusing to page real on-call from a test trigger for "
+                    f"{finding['dag_id']} — pass test_responder_team_id. Logging only."
+                )
+                continue
+            if _send_jira_alert(finding, responder_team_id=jira_team, test=is_test):
+                ledger[key] = entry  # tracked for dedup only; JiraOps handled in Jira
+        elif _post_gchat(
+            gchat_dest,
+            _initial_text(entry, finding["elapsed_s"]),
+            _thread_key(finding["dag_id"], finding["run_id"]),
+        ):
+            ledger[key] = entry
+
+    _save_ledger(ledger)
+
+
+def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
+    """Send just the initial alert for one finding (used by simulate mode)."""
+    if finding["tier"] == "critical":
         if is_test and not jira_team:
             print(
                 f"⚠️  Refusing to page real on-call from a test trigger for "
-                f"{finding['dag_id']} — pass test_responder_team_id to route a critical "
-                "test alert. Logging only."
+                f"{finding['dag_id']} — pass test_responder_team_id. Logging only."
             )
+            return
+        _send_jira_alert(finding, responder_team_id=jira_team, test=is_test)
+    else:
+        entry = _entry_from_finding(finding)
+        _post_gchat(
+            gchat_dest,
+            _initial_text(entry, finding["elapsed_s"]),
+            _thread_key(finding["dag_id"], finding["run_id"]),
+        )
+
+
+def _follow_up_tracked_runs(session, ledger: dict, gchat_dest, now: datetime) -> None:
+    """Fetch the current state of tracked runs and apply follow-up messaging."""
+    if not ledger:
+        return
+    states = _fetch_run_states(session, list(ledger.values()))
+    _apply_follow_up(ledger, states, gchat_dest, now)
+
+
+def _apply_follow_up(ledger: dict, states: dict, gchat_dest, now: datetime) -> None:
+    """For each tracked run, post an update (still running) or a closing message
+    (terminal), and drop terminal/vanished runs from the ledger. Mutates ledger in place.
+
+    Only standard-tier runs get gchat follow-ups; critical runs are deduped here and
+    dropped on terminal (their incident lives in JiraOps, closed by people).
+
+    Standard-tier closing posts must succeed before the run is dropped — same delivery
+    gate as the initial alert — so a failed ✅/❌ webhook is retried next cycle.
+    """
+    for key, entry in list(ledger.items()):
+        row = states.get((entry["dag_id"], entry["run_id"]))
+        if row is None:
+            del ledger[key]  # run row gone → stop tracking
             continue
-        if _send_jira_alert(finding, responder_team_id=jira_team, test=is_test):
-            delivered_keys.add(_run_key(finding["dag_id"], finding["run_id"]))
-    if standard and _send_gchat_alerts(standard, gchat_dest):
-        delivered_keys.update(_run_key(f["dag_id"], f["run_id"]) for f in standard)
-
-    # Record delivered runs (real runs only) and forget runs no longer active. Prune uses
-    # the FULL active set (all_running_rows), so an only_dags-scoped run never drops other
-    # still-running DAGs' dedup entries.
-    if alerted_state is not None:
-        now_iso = datetime.now(timezone.utc).isoformat()
-        for key in delivered_keys:
-            alerted_state[key] = now_iso
-        _prune_and_save_state(alerted_state, all_running_rows)
-
-
-def _prune_and_save_state(alerted_state: dict, running_rows) -> None:
-    """Drop dedup keys whose run is no longer running, then persist the state."""
-    active_keys = {_run_key(row.dag_id, row.run_id) for row in running_rows}
-    pruned = {k: v for k, v in alerted_state.items() if k in active_keys}
-    Variable.set(DEDUP_VARIABLE_KEY, json.dumps(pruned))
+        is_standard = entry.get("tier", "standard") == "standard"
+        if row.state in _TERMINAL_STATES:
+            if is_standard:
+                duration_s = (
+                    (row.end_date - row.start_date).total_seconds()
+                    if row.end_date and row.start_date
+                    else None
+                )
+                text_content = (
+                    _resolved_text(entry, duration_s)
+                    if row.state == "success"
+                    else _failed_text(entry, duration_s)
+                )
+                if not _post_gchat(
+                    gchat_dest,
+                    text_content,
+                    _thread_key(entry["dag_id"], entry["run_id"]),
+                ):
+                    continue  # keep in ledger; retry closing message next cycle
+            del ledger[key]  # terminal → stop tracking (critical dropped silently)
+        elif is_standard and row.start_date is not None:
+            elapsed_s = (now - row.start_date).total_seconds()
+            _post_gchat(
+                gchat_dest,
+                _update_text(entry, elapsed_s),
+                _thread_key(entry["dag_id"], entry["run_id"]),
+            )
 
 
 with DAG(
@@ -546,11 +746,12 @@ with DAG(
         "start_date": datetime(2026, 7, 16, 0, 0, 0, tzinfo=LOCAL_TZ),
     },
     description=(
-        "Every 5 min, flags running DAGs whose elapsed time is anomalous vs their own "
+        "Every 30 min, flags running DAGs whose elapsed time is anomalous vs their own "
         "recent successful runs (relative P-percentile baseline, no hardcoded thresholds). "
-        "Critical DAGs page JiraOps on-caller; the rest are reported to a Google Chat webhook."
+        "Critical DAGs page JiraOps on-caller; the rest are reported to a Google Chat "
+        "webhook and tracked (threaded updates) until the run succeeds or fails."
     ),
-    schedule="*/5 * * * *",
+    schedule="*/30 * * * *",
     catchup=False,
     tags=["monitoring", "platform", "runtime-anomaly"],
 ) as dag:
