@@ -11,11 +11,14 @@
 # min_history_runs: skip DAGs with fewer successful runs in that window (avoids false alarms).
 # percentile:       percentile of historical durations used as the baseline (P90).
 # factor:           alert when elapsed_time > baseline * factor. Fully relative.
+# min_alert_duration_minutes: absolute floor — only alert on runs executing at least this
+#   long (AND the relative check), so quick DAGs never page regardless of relative swing.
 dag_runtime_monitoring:
   lookback_days: 7
   min_history_runs: 3
   percentile: 90
   factor: 1.5
+  min_alert_duration_minutes: 60
   # Soft-launch: empty = no JiraOps paging; all anomalies go to Google Chat only.
   critical_dags: []
   # To enable on-call paging, replace `critical_dags: []` above with this list:

@@ -40,6 +40,8 @@ _CONFIG = {
     "min_history_runs": 3,
     "percentile": 90,
     "factor": 1.1,
+    # Floor disabled in the shared fixture; exercised explicitly in dedicated tests.
+    "min_alert_duration_minutes": 0,
 }
 
 
@@ -92,6 +94,33 @@ class TestEvaluateRuntime:
             is None
         )
 
+    def test_none_when_below_min_elapsed_floor(self):
+        # Over the relative threshold (1200 > 660) but under the 1h floor → not flagged.
+        assert (
+            _evaluate_runtime(
+                1200,
+                [600] * 10,
+                percentile=90,
+                factor=1.1,
+                min_history=5,
+                min_elapsed_s=3600,
+            )
+            is None
+        )
+
+    def test_finding_when_above_min_elapsed_floor(self):
+        # Past the 1h floor AND over threshold → flagged.
+        result = _evaluate_runtime(
+            5400,
+            [600] * 10,
+            percentile=90,
+            factor=1.1,
+            min_history=5,
+            min_elapsed_s=3600,
+        )
+        assert result is not None
+        assert result["elapsed_s"] == 5400.0
+
 
 class TestFormatDuration:
     @pytest.mark.parametrize(
@@ -109,6 +138,7 @@ class TestResolveConfig:
         assert merged["percentile"] == 90
         assert merged["min_history_runs"] == 3
         assert merged["lookback_days"] == 7
+        assert merged["min_alert_duration_minutes"] == 60
 
     def test_none_uses_all_defaults(self):
         merged = _resolve_config(None)
@@ -154,6 +184,30 @@ class TestEvaluateAll:
             )
         ]
         assert _evaluate_all(running, {}, now, _CONFIG) == []
+
+    def test_honors_min_alert_duration_floor(self):
+        # With a 60-min floor: a run over its baseline but only 20 min in is skipped;
+        # a run past the floor is flagged.
+        config = {**_CONFIG, "min_alert_duration_minutes": 60}
+        now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
+        running = [
+            SimpleNamespace(
+                dag_id=_CRITICAL_DAG,
+                run_id="short",
+                start_date=now - timedelta(minutes=20),
+            ),
+            SimpleNamespace(
+                dag_id=_STANDARD_DAG,
+                run_id="long",
+                start_date=now - timedelta(minutes=90),
+            ),
+        ]
+        durations = {_CRITICAL_DAG: [600.0] * 10, _STANDARD_DAG: [600.0] * 10}
+        by_dag = {
+            f["dag_id"]: f for f in _evaluate_all(running, durations, now, config)
+        }
+        assert _CRITICAL_DAG not in by_dag  # 20 min < 1h floor → skipped
+        assert _STANDARD_DAG in by_dag  # 90 min ≥ floor → flagged
 
 
 def test_build_alert_text_contains_key_facts():

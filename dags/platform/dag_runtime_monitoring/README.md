@@ -3,7 +3,9 @@
 Every 5 minutes this DAG inspects every currently-running DAG and flags any whose
 elapsed time is anomalous **relative to that same DAG's own recent successful runs**
 (P`percentile` of successful-run durations over the last `lookback_days` × `factor` — no hardcoded per-DAG
-thresholds). Findings are routed by tier:
+thresholds) **and** only once the run has been executing for at least
+`min_alert_duration_minutes` (absolute floor, so quick DAGs never alert). Findings are
+routed by tier:
 
 - **Critical** (DAGs in `critical_dags`, the top 50 by downstream `dw_*` impact) → JiraOps
   on-caller alert, one per DAG.
@@ -12,7 +14,7 @@ thresholds). Findings are routed by tier:
 
 Real alerts are only delivered when `environment == prod`. Config lives in
 `prod_conf.yml` / `forno_conf.yml` (`lookback_days`, `min_history_runs`, `percentile`,
-`factor`, `critical_dags`).
+`factor`, `min_alert_duration_minutes`, `critical_dags`).
 
 ## How to test it
 

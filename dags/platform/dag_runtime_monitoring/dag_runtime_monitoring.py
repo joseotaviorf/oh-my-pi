@@ -54,6 +54,9 @@ _DEFAULT_CONFIG = {
     "min_history_runs": 3,
     "percentile": 90,
     "factor": 1.5,
+    # Absolute floor: only alert on runs that have been executing at least this long,
+    # so quick DAGs never page no matter how large their relative swing.
+    "min_alert_duration_minutes": 60,
 }
 
 # Only "real" automatic runs count — scheduled, dataset-triggered, or mediator-triggered.
@@ -117,15 +120,20 @@ def _evaluate_runtime(
     percentile: float,
     factor: float,
     min_history: int,
+    min_elapsed_s: float = 0,
 ) -> dict | None:
     """
     Decide whether a running DAG is anomalously slow vs its own recent history.
 
     Returns a finding dict when ``elapsed_s`` exceeds ``P<percentile> * factor`` of the
     historical durations, else ``None``. Returns ``None`` when there is not enough
-    history to form a reliable baseline (avoids false alarms on new/sparse DAGs).
+    history to form a reliable baseline (avoids false alarms on new/sparse DAGs), or when
+    the run has been executing for less than ``min_elapsed_s`` (absolute floor — quick
+    DAGs never alert regardless of their relative swing).
     """
     if len(history_durations_s) < min_history:
+        return None
+    if elapsed_s < min_elapsed_s:
         return None
     baseline = _percentile(history_durations_s, percentile)
     if baseline <= 0:
@@ -171,6 +179,7 @@ def _evaluate_all(
 ) -> list:
     """Build findings for every running run that is over its relative baseline."""
     critical = set(config["critical_dags"])
+    min_elapsed_s = config["min_alert_duration_minutes"] * 60
     findings = []
     for row in running_rows:
         history = durations_by_dag.get(row.dag_id, [])
@@ -181,6 +190,7 @@ def _evaluate_all(
             percentile=config["percentile"],
             factor=config["factor"],
             min_history=config["min_history_runs"],
+            min_elapsed_s=min_elapsed_s,
         )
         if result is None:
             continue
@@ -413,6 +423,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         f"percentile=P{config['percentile']}, factor={config['factor']}, "
         f"lookback_days={config['lookback_days']}, "
         f"min_history_runs={config['min_history_runs']}, "
+        f"min_alert_duration_minutes={config['min_alert_duration_minutes']}, "
         f"webhook_configured={'yes' if webhook_url else 'no'}, "
         # test_webhook value redacted so a throwaway URL never lands in logs
         f"test={{simulate:{opts['simulate']}, dry_run:{opts['dry_run']}, "

@@ -5,6 +5,7 @@ dag_runtime_monitoring:
   min_history_runs: 3
   percentile: 90
   factor: 1.5
+  min_alert_duration_minutes: 60
   critical_dags:
     - bietlejuice.ebdb_location
     - bietlejuice.ebdb_user_fast_lane
