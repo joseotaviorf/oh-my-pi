@@ -87,6 +87,15 @@ BASE_PARAMETERS = {
     "partition_hour": "{{ data_interval_start.strftime('%H') }}",
 }
 
+# ``services`` only does heavy work on the midnight run (full d-1 event volume),
+# which needs more headroom than the hourly ``cases`` load. Per-table overrides
+# avoid a single timeout that is either too tight for services or wastefully
+# long for cases.
+_DEFAULT_EXECUTION_TIMEOUT_HOURS = 2
+_EXECUTION_TIMEOUT_HOURS_BY_TABLE = {
+    "services": 4,
+}
+
 
 def build_dag_execution_context(dag: DAG) -> DagExecutionContext:
     context = DagExecutionContext(
@@ -135,13 +144,16 @@ def create_load_table_task(
         "table_config_relative_path": table_config_relative_path(table_stem),
     }
     base_parameters = parse_parameters(base_parameters)
+    execution_timeout_hours = _EXECUTION_TIMEOUT_HOURS_BY_TABLE.get(
+        table_stem, _DEFAULT_EXECUTION_TIMEOUT_HOURS
+    )
     return dag_execution_context.job_cluster_engine.create_spark_python_task(
         spark_job_path=(
             f"{BASE_SPARK_JOB_PATH}core_model/support_journey/{table_stem}.py"
         ),
         task_id=f"load_core_support_journey_{table_stem}",
         job_parameters=base_parameters,
-        execution_timeout_hours=2,
+        execution_timeout_hours=execution_timeout_hours,
     )
 
 

@@ -42,7 +42,7 @@ dependencies:
       - load-clean-support-session
 
 cluster:
-  type: emr_7_12_small_general_2xlarge_single_node_cluster
+  type: emr_7_12_min_memory_2_workers_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
