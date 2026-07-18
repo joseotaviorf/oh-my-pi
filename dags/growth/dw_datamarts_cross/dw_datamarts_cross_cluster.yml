@@ -21,7 +21,7 @@ cluster:
       - r6g.2xlarge
       - r7g.2xlarge
       - r6i.2xlarge
-      target_on_demand: 0
-      target_spot: 1
+      target_on_demand: 1
+      target_spot: 0
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
