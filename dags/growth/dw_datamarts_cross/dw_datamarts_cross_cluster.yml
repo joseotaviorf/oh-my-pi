@@ -1,32 +1,10 @@
 cluster:
-  # Cost/perf: stay on L (not XL). Fat executors (2c) + more shuffle partitions
-  # shrink per-task hash/agg working set after ~800 GiB memory spill on job 25.
-  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  # Match enrich_online_attribution EMR validation: XL + 180g fat executors.
+  type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      spark.driver.memory: 24g
-      spark.driver.memoryOverhead: 6g
-      spark.yarn.am.memory: 6g
+      spark.executor.memory: "180g"
+      spark.executor.memoryOverhead: "16g"
       spark.executor.cores: "2"
-      spark.dynamicAllocation.maxExecutors: "8"
       spark.sql.shuffle.partitions: "800"
-    aws_attributes:
-      ebs_volume_size: 300
-    core_nodes:
-      target_on_demand: 2
-      target_spot: 0
-      instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
-    task_nodes:
-      instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
-      target_on_demand: 2
-      target_spot: 0
-      allocation_strategy: price-capacity-optimized
-      bid_price_percentage: 100
+      spark.sql.execution.arrow.maxRecordsPerBatch: "10000"
