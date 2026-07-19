@@ -1,4 +1,5 @@
 cluster:
+  # Force Airflow/DAG package refresh so L-memory fleet (#26372) is picked up in prod.
   type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
