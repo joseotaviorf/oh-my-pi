@@ -11,3 +11,6 @@ workflow:
   inner_dependencies:
     affiliates_clusters:
       - lead_listing_flows
+  tables_customization:
+    affiliates_clusters:
+      execution_timeout_hours: 3

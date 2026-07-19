@@ -1,16 +1,16 @@
 cluster:
-  # L 2+2 OD r*.4xlarge: 2×48g executors/node, cores=2 → 16 parallel tasks.
-  # Shuffle 600.
-  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  # XL 2+2 OD r*.8xlarge: ~56g (slightly above L 48g) so 4 exec/node fit on 256 GiB.
+  # maxExecutors=16 × cores=2 → 32 parallel tasks; a bit more heap/task vs L to cut spill.
+  type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
     spark_conf:
       spark.driver.memory: 24g
       spark.driver.memoryOverhead: 6g
       spark.yarn.am.memory: 6g
-      spark.executor.memory: "48g"
-      spark.executor.memoryOverhead: "4g"
+      spark.executor.memory: "56g"
+      spark.executor.memoryOverhead: "6g"
       spark.executor.cores: "2"
-      spark.dynamicAllocation.maxExecutors: "8"
+      spark.dynamicAllocation.maxExecutors: "16"
       spark.sql.shuffle.partitions: "600"
     aws_attributes:
       ebs_volume_size: 500
@@ -18,14 +18,14 @@ cluster:
       target_on_demand: 3
       target_spot: 0
       instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
+      - r6g.8xlarge
+      - r7g.8xlarge
+      - r6i.8xlarge
     task_nodes:
       instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
+      - r6g.8xlarge
+      - r7g.8xlarge
+      - r6i.8xlarge
       target_on_demand: 0
       target_spot: 1
       allocation_strategy: price-capacity-optimized
