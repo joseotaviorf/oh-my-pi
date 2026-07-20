@@ -15,7 +15,7 @@ class ClusterEnvVarsHelper:
         "3.2": "2.3.0",  # Databricks 12.2 and 13.3 - keep compatibility
         "3.3": "4.10.1",  # Databricks 14.3+ - new version with content parameter support
         "3.4": "4.10.1",
-        "3.5": "4.10.1",
+        "3.5": "4.11.0",
     }
 
     DEEQU_VERSION_MAP = {
@@ -100,4 +100,27 @@ class ClusterEnvVarsHelper:
             cls.get_deequ_version(spark_version)
         )
 
+        return cluster_configuration
+
+    @classmethod
+    def input_emr_yarn_env_vars(cls, cluster_configuration: dict) -> dict:
+        """Sets INMETRO_VERSION and DEEQU_JAR_VERSION on EMR yarn-env export.
+
+        Uses SPARK_VERSION already present in yarn-env export Properties (defaults
+        to ``3.5``) and the same version maps as :meth:`input_spark_env_vars`.
+
+        EMR bootstrap (``emr_init_script.sh``) does not see yarn-env; keep that
+        script's ``INMETRO_VERSION`` default in lockstep via unit test.
+        """
+        emr_configurations = cluster_configuration.get("emr_configurations") or []
+        for config in emr_configurations:
+            if config.get("Classification") != "yarn-env":
+                continue
+            for nested in config.get("Configurations") or []:
+                if nested.get("Classification") != "export":
+                    continue
+                props = nested.setdefault("Properties", {})
+                spark_version = str(props.get("SPARK_VERSION") or "3.5")
+                props["INMETRO_VERSION"] = cls.get_inmetro_version(spark_version)
+                props["DEEQU_JAR_VERSION"] = cls.get_deequ_version(spark_version)
         return cluster_configuration

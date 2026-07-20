@@ -9,7 +9,9 @@ DEEQU_JAR_VERSION="${DEEQU_JAR_VERSION:-2.0.8}"
 SPARK_VERSION="${SPARK_VERSION:-3.5}"
 # Wheel metadata declares Requires-Python >=3.10; EMR default pip3 is 3.9 and installs with
 # --ignore-requires-python (validated on EMR 7.12).
-INMETRO_VERSION="${INMETRO_VERSION:-4.10.1}"
+# Keep in lockstep with ClusterEnvVarsHelper.INMETRO_VERSION_MAP["3.5"]
+# (yarn-env is not visible during EMR bootstrap; this default installs the wheel).
+INMETRO_VERSION="${INMETRO_VERSION:-4.11.0}"
 KAFKA_CLIENTS_JAR="${KAFKA_CLIENTS_JAR:-kafka-clients-3.5.0.jar}"
 OPENLINEAGE_JAR="${OPENLINEAGE_JAR:-openlineage-spark_2.12-1.46.0.jar}"
 MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"

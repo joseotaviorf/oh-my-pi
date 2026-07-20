@@ -38,6 +38,55 @@ DATAHUB_URL_TEMPLATE = (
 )
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
+
+
+# TEMPORARY (DBP-1710 / DBP-1711): Databricks-oriented workaround so
+# ``delta_verification_snapshot`` INFO lines reach ``cluster_log_conf`` driver
+# logs. Remove once snapshot capture is confirmed on the EMR log pipeline (or
+# inmetro emits these lines in a dual-runtime-friendly way). Do not extend.
+class _DriverPrintHandler(logging.Handler):
+    """TEMPORARY: print-backed handler for Databricks driver log capture.
+
+    Stdlib ``StreamHandler`` alone is not reliable on DBR job clusters: the
+    ``inmetro.utils.delta_snapshot`` logger may already have a non-capturing
+    handler, and ``propagate=False`` then drops the JSON snapshot lines.
+    EMR already surfaces these lines without this hack — keep only until
+    Databricks is fully retired or a dual-runtime logging path lands.
+    """
+
+    _MARKER = "dbp1710_delta_snapshot_driver_print"
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            print(
+                f"{record.levelname}:{record.name}:{record.getMessage()}",
+                flush=True,
+            )
+        except Exception:
+            self.handleError(record)
+
+
+def _ensure_inmetro_snapshot_logging() -> None:
+    """TEMPORARY: route inmetro Delta snapshot INFO lines to the driver log.
+
+    inmetro 4.11.0 emits ``delta_verification_snapshot`` JSON via the stdlib
+    logger ``inmetro.utils.delta_snapshot``. On Databricks, without this
+    handler those lines may never appear in ``cluster_log_conf`` (blocking
+    DBP-1710 / DBP-1711). Revisit/remove after EMR log-pipeline verification.
+    """
+    snapshot_logger = logging.getLogger("inmetro.utils.delta_snapshot")
+    snapshot_logger.setLevel(logging.INFO)
+    if not any(
+        getattr(handler, "_MARKER", None) == _DriverPrintHandler._MARKER
+        for handler in snapshot_logger.handlers
+    ):
+        handler = _DriverPrintHandler()
+        handler._MARKER = _DriverPrintHandler._MARKER
+        snapshot_logger.addHandler(handler)
+    snapshot_logger.propagate = False
+
+
+_ensure_inmetro_snapshot_logging()
 logger = QuintoAndarLogger(JOB_NAME)
 
 
@@ -243,11 +292,15 @@ class DataQualityTestsPipeline:
                 input_configs
             )
         )
-        pydeequ_validator = PyDeequValidator(
-            suite_name=f"Pipeline Validations: {database_name}.{table_name}",
-            validation_suite=validation_suite,
-            client=self.spark_client,
-        )
+        validator_kwargs = {
+            "suite_name": f"Pipeline Validations: {database_name}.{table_name}",
+            "validation_suite": validation_suite,
+            "client": self.spark_client,
+        }
+        validator_signature = inspect.signature(PyDeequValidator.__init__)
+        if "table_identifier" in validator_signature.parameters:
+            validator_kwargs["table_identifier"] = f"{database_name}.{table_name}"
+        pydeequ_validator = PyDeequValidator(**validator_kwargs)
 
         return pydeequ_validator.execute_and_parse(df)
 

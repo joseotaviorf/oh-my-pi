@@ -161,6 +161,37 @@ class TestEmrJobClusterEngineRetries:
         ctx.aws_conn_id = "aws_default"
         return ctx
 
+    def test_create_cluster_injects_inmetro_from_yarn_env_spark_version(self, emr_ctx):
+        mock_create = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(create_cls=mock_create)
+        merged = {
+            "spark_version": "emr-7-0",
+            "emr_configurations": [
+                {
+                    "Classification": "yarn-env",
+                    "Configurations": [
+                        {
+                            "Classification": "export",
+                            "Properties": {"SPARK_VERSION": "3.5"},
+                        }
+                    ],
+                    "Properties": {},
+                }
+            ],
+        }
+        engine = EmrJobClusterEngine(emr_ctx, merged, MagicMock())
+        with patcher:
+            engine.create_execute_cluster_task(
+                config_service=MagicMock(),
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=None,
+            )
+        props = mock_create.call_args.kwargs["cluster_configuration"][
+            "emr_configurations"
+        ][0]["Configurations"][0]["Properties"]
+        assert props["INMETRO_VERSION"] == "4.11.0"
+        assert props["DEEQU_JAR_VERSION"] == "2.0.8"
+
     def test_create_cluster_defaults_retries_three(self, emr_ctx):
         mock_create = MagicMock()
         fake, patcher = self._install_fake_emr_plugin(create_cls=mock_create)

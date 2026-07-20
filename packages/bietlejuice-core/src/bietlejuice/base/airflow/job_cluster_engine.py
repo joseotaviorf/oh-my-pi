@@ -427,6 +427,9 @@ class EmrJobClusterEngine(JobClusterEngine):
 
         cluster_configuration = dict(self._merged_cluster_configuration)
         self._strip_emr_deferrable_key(cluster_configuration)
+        cluster_configuration = ClusterEnvVarsHelper.input_emr_yarn_env_vars(
+            cluster_configuration
+        )
 
         return QuintoAndarEmrCreateClusterOperator(
             task_id=task_id,
