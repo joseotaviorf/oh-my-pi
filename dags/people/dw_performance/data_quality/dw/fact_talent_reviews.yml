@@ -19,25 +19,28 @@ column_level_validations:
       severity_level: Warning
     is_unique:
       severity_level: Warning
+  person_number:
+    is_complete:
+      severity_level: Warning
   is_last_cycle:
     is_complete:
       severity_level: Warning
-  is_latest_in_cycle:
+  is_latest_for_employee_in_cycle:
     is_complete:
       severity_level: Warning
-  one_latest_in_cycle_per_assignment_and_cycle:
+  one_latest_for_employee_in_cycle_per_person_and_cycle:
     custom:
-      # At most one row per assignment per cycle may be flagged is_latest_in_cycle (prevents downstream fan-out).
+      # At most one row per person per cycle may be flagged is_latest_for_employee_in_cycle (prevents downstream fan-out).
       constraint: |-
         (SELECT COUNT(*)
          FROM (
            SELECT
-             assignment_number,
+             person_number,
              sk_cycle_period
            FROM dw_performance.fact_talent_reviews
-           WHERE is_latest_in_cycle = TRUE
+           WHERE is_latest_for_employee_in_cycle = TRUE
            GROUP BY
-             assignment_number,
+             person_number,
              sk_cycle_period
            HAVING COUNT(*) > 1
          )

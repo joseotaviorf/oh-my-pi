@@ -53,6 +53,13 @@ SELECT
   c_rea.numeric_rating AS calibrated_numeric_readiness,
   i_pot.numeric_rating AS initial_numeric_potential,
   c_pot.numeric_rating AS calibrated_numeric_potential,
+  -- True when at least one calibrated numeric dimension is present (empty calibrations stay in enrich for coverage).
+  (
+    c_pot.numeric_rating IS NOT NULL
+    OR c_cri.numeric_rating IS NOT NULL
+    OR c_rea.numeric_rating IS NOT NULL
+    OR c_rol.numeric_rating IS NOT NULL
+  ) AS has_calibrated_rating,
   -- dates and timestamps
   DATE(hm.ts_meeting) AS dt_committee_meeting,
   hrd.ts_created,

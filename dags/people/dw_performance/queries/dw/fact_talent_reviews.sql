@@ -22,6 +22,8 @@ rating_change AS (
     AS dif_potential
   FROM
     datalake_performance.talent_review
+  WHERE
+    has_calibrated_rating = TRUE
 ),
 talent_review_base AS (
 SELECT
@@ -119,6 +121,7 @@ SELECT
         THEN 'Increased'
     END
   )) AS sk_talent_variation_calibration,
+  im.person_number,
   tr.assignment_number,
   tr.initial_numeric_risk_of_loss AS numeric_risk_of_loss_from_manager,
   tr.calibrated_numeric_risk_of_loss AS numeric_risk_of_loss_from_calibration,
@@ -144,20 +147,15 @@ INNER JOIN
   rating_change AS rc
     ON tr.id_period_of_service = rc.id_period_of_service 
     AND tr.id_meeting = rc.id_meeting
+INNER JOIN
+  datalake_people.identifier_mapping AS im
+    ON im.id_period_of_service = tr.id_period_of_service
 LEFT JOIN
   dw_performance.dim_committee_meeting AS dcm
     ON dcm.sk_meeting = tr.id_meeting
-WHERE 
-  COALESCE(
-    tr.id_risk_loss_rating_level_calibrated,
-    tr.id_metric_calibrated_value_4,
-    tr.id_metric_calibrated_value_3,
-    tr.id_potential_rating_level_calibrated,
-    tr.id_risk_loss_rating_level_initial,
-    tr.id_criticality_rating_level_initial,
-    tr.id_readiness_rating_level_initial,
-    tr.id_potential_rating_level_initial
-  ) IS NOT NULL
+-- Official DW rows: completed calibrations only (flag defined in enrich talent_review).
+WHERE
+  tr.has_calibrated_rating = TRUE
 )
 SELECT
   sk_talent_review,
@@ -169,6 +167,7 @@ SELECT
   sk_talent_rating_from_calibration,
   sk_talent_variation_period,
   sk_talent_variation_calibration,
+  person_number,
   assignment_number,
   numeric_risk_of_loss_from_manager,
   numeric_risk_of_loss_from_calibration,
@@ -183,13 +182,13 @@ SELECT
   (
     ROW_NUMBER() OVER (
       PARTITION BY
-        assignment_number,
+        person_number,
         sk_cycle_period
       ORDER BY
         ts_committee_meeting DESC NULLS LAST,
         sk_committee_meeting DESC
     ) = 1
-  ) AS is_latest_in_cycle,
+  ) AS is_latest_for_employee_in_cycle,
   ts_created,
   ts_updated,
   ts_load

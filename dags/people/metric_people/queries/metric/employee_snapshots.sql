@@ -384,9 +384,9 @@ LEFT JOIN
         AND fas.dt_reference BETWEEN cp_talent.dt_valid_from AND cp_talent.dt_valid_to
 LEFT JOIN
     dw_performance.fact_talent_reviews AS ftr
-        ON ftr.assignment_number = fas.assignment_number
+        ON ftr.person_number = fas.person_number
         AND ftr.sk_cycle_period = cp_talent.sk_cycle_period
-        AND ftr.is_latest_in_cycle = TRUE
+        AND ftr.is_latest_for_employee_in_cycle = TRUE
 LEFT JOIN
     dw_performance.dim_talent_rating AS dtr
         ON dtr.sk_talent_rating = ftr.sk_talent_rating_from_calibration

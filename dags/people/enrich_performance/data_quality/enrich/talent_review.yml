@@ -12,6 +12,9 @@ column_level_validations:
   id_period_of_service:
     is_complete:
       severity_level: Error
+  has_calibrated_rating:
+    is_complete:
+      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Error

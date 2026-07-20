@@ -88,12 +88,13 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 **Main join identifiers:**
 
-* `person_number` (Business key — present in calibration, goal, smoke-detector, continuous-management, and peer-evaluation facts; use to join to `dw_people.dim_employee`)
+* `person_number` (Business key — present in calibration, talent review, goal, smoke-detector, continuous-management, and peer-evaluation facts; use to join to `dw_people.dim_employee`)
 * `manager_person_number` (Manager business key — present in continuous-management facts; use to join manager attributes via `dw_people.dim_employee`)
 * `peer_person_number` (Peer evaluator business key — present in peer-evaluation facts; filter on this column to list feedback a person gave to others)
 * `review_period_name` (Review cycle label — present in continuous-management facts; e.g. Performa 2025)
 * `cycle_name` (Review cycle label — present in peer-evaluation facts; e.g. Performa 2025)
 * `assignment_number` (Assignment-level grain key — present in evaluation, talent review, smoke-detector, and peer-evaluation facts)
+* `is_latest_for_employee_in_cycle` (Talent Review only — TRUE on the official review per person per cycle; filter this when attaching one rating to employee snapshots)
 
 ## Core Features and Business Logic
 
@@ -152,9 +153,10 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 When joining performance data with other DW domains:
 
 1. Join on `person_number` to reach `dw_people.dim_employee` for employee attributes.
-2. Join on `assignment_number` when linking evaluations or talent reviews to assignment-level dimensions.
-3. Filter peer-evaluation facts on `cycle_name` and `participation_status = 'COMP'` when analyzing completed peer feedback only.
-4. Filter continuous-management facts on `review_period_name` and `document_type` when analyzing a specific Performa cycle or check-in type.
+2. Join talent reviews on `person_number` + `is_latest_for_employee_in_cycle = TRUE` (and `sk_cycle_period`) for one official rating per employee per cycle; use `assignment_number` when you need assignment-level history.
+3. Join on `assignment_number` when linking evaluations to assignment-level dimensions.
+4. Filter peer-evaluation facts on `cycle_name` and `participation_status = 'COMP'` when analyzing completed peer feedback only.
+5. Filter continuous-management facts on `review_period_name` and `document_type` when analyzing a specific Performa cycle or check-in type.
 
 ### Continuous Management (Exploratory Query)
 

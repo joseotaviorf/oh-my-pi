@@ -155,6 +155,10 @@ columns:
     description: Numeric representation of the employee's calibrated potential rating.
     lineage:
     - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  has_calibrated_rating:
+    description: True when at least one calibrated talent dimension (criticality, potential, readiness, or risk of loss) has a numeric rating. Enrich retains empty calibrations for coverage analysis; DW talent-review facts keep rows where this is True.
+    lineage:
+    - datalake_pin_talent_clean.rating_level_base.numeric_rating
   dt_committee_meeting:
     description: Date of the talent review committee meeting.
     lineage:

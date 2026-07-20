@@ -2,8 +2,11 @@ database_name: dw_performance
 table_name: fact_talent_reviews
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: |-
-  Fact table storing detailed records of talent reviews for employees.  It includes composite keys for initial and calibrated ratings, and  for changes in these ratings between review periods and during the calibration process.  It identifies regrettable loss scenarios and includes numeric values and timestamps related to the review process.
+description: |
+  Talent Review committee outcomes for employees, with manager and calibrated ratings across criticality, potential, readiness, and risk of loss.
+  One row per assignment × committee meeting for reviews with at least one calibrated numeric rating.
+  Covers employees who appear in Talent Review committee meetings.
+  Supports regrettable-loss analysis and cycle-level talent scores; filter is_latest_for_employee_in_cycle = TRUE for one official rating per employee per cycle, and resolve labels through the sk_talent_rating_* and sk_cycle_period keys.
 columns:
   sk_talent_review:
     description: Surrogate key for the talent review record, generated from id_period_of_service and id_meeting.
@@ -63,8 +66,12 @@ columns:
     - datalake_performance.talent_review.initial_numeric_potential
     - datalake_performance.talent_review.initial_numeric_readiness
     - datalake_performance.talent_review.initial_numeric_risk_of_loss
+  person_number:
+    description: Main business identifier of the employee in PIN for the reviewed assignment (e.g. '123456'). Links to dw_people.dim_employee; with is_latest_for_employee_in_cycle = TRUE, selects one official review per employee per cycle.
+    lineage:
+    - datalake_people.identifier_mapping.person_number
   assignment_number:
-    description: Employee's assignment number at the time of the review.
+    description: Main business identifier of the assignment in PIN at the time of the review (e.g. 'E123456'). Links assignment-level People tables when assignment history is needed.
     lineage:
     - datalake_performance.talent_review.assignment_number
   numeric_risk_of_loss_from_manager:
@@ -113,11 +120,11 @@ columns:
     lineage:
     - datalake_performance.talent_review.dt_committee_meeting
     - datalake_performance.talent_review.id_period_of_service
-  is_latest_in_cycle:
-    description: TRUE for the official talent-review record of an assignment within its review-period cycle, the latest committee meeting when a cycle spans several. Use this to read one rating per assignment per cycle.
+  is_latest_for_employee_in_cycle:
+    description: True for exactly one review per person_number and cycle — the latest committee meeting in that cycle. Filter for the employee's official Talent Review rating in the cycle.
     lineage:
     - dw_performance.dim_committee_meeting.ts_meeting
-    - datalake_performance.talent_review.assignment_number
+    - datalake_people.identifier_mapping.person_number
     - datalake_performance.talent_review.id_meeting
   ts_created:
     description: Timestamp of when the original talent review record was created in the source.
