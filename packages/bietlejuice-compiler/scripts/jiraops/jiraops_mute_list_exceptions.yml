@@ -45,7 +45,7 @@ DAGOwner:
       created_by: carolina.cavalcante@quintoandar.com.br
       approved_by: mario.abreu@quintoandar.com.br
     Data People:
-      reason: "People Data pipelines handle sensitive HR, compensation, and payroll data. Access to the data and code is strictly restricted to the People Data squad, so DE on-call engineers cannot investigate or remediate failures without violating access controls."
+      reason: "Enterprise Engineering (People domain) pipelines handle sensitive HR, compensation, and payroll data. Access to the data and code is strictly restricted to the Enterprise Engineering squad, so DE on-call engineers cannot investigate or remediate failures without violating access controls."
       deadline: Never
       created_by: isabella.araujo@quintoandar.com.br
       approved_by: pedro.prates@quintoandar.com.br

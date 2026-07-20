@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.dei_employee_diversity_analytics` |
 | **Business owner** | Julia Mesquita |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Monthly employee DEI analytics feed (inclusion flags, PwD, rewards cycle, committee) for the DEI Looker Studio dashboard. |
 | **Business purpose** | Powers DEI analytics in Looker Studio (`base_dei_v2`) for Julia, DEI, and Talent. Kept on Google Sheets because the team does not yet have full Superset access; this is an Exodus notebook migration. Migrated from Daily Pipeline notebook `dash_analytics_dei` ([DBP-1754](https://quintoandar.atlassian.net/browse/DBP-1754)). |

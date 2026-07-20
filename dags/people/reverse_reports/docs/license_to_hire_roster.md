@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.license_to_hire_roster` |
 | **Business owner** | TA / People |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Eligibility groups for License to Hire onboarding program. |
 | **Business purpose** | Employee roster segmented by eligibility groups for the License to Hire onboarding program. |

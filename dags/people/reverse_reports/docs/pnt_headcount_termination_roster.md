@@ -4,7 +4,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.pnt_headcount_termination_roster` |
 | **Business owner** | Fabiano Ribeiro (P&T) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | P&T headcount roster (active + terminated) with termination date, scoped to the P&T org by L1 manager (CTO + CPO). |
 | **Business purpose** | Weekly P&T headcount base reused by FP&A and P&T leadership (Paulo Golgher / Rafael Castro) for org analyses. Mirrors the `public_information` column set and adds `dt_desligamento` so terminations are visible. Created for DBP-1544, where the requester noted the termination date had been dropped from the weekly HC sheet. |

@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.governance_pm_roster` |
 | **Business owner** | Governance (karla.martins@quintoandar.com.br) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active roster for Deborah Saber org for project management. |
 | **Business purpose** | Active employee base scoped to the Deborah Saber organisation for Governance PM project-management workflows. |

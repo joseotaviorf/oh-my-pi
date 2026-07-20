@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.dei_employee_diversity_roster` |
 | **Business owner** | DEI |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Employee roster with DE&I self-declared attributes and derived inclusion flags for DEI programs. |
 | **Business purpose** | Base for DEI with ethnicity, gender identity, sexual orientation, disability, neurodiversity, and derived BIM/Women/LGBT+ groupings plus manager and org context. Migrated from notebook cell `base_div_completa`. |

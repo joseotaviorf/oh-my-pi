@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.compensation_analytics_raw` |
 | **Business owner** | Compensation |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Simplified active compensation export for analytics raw sheet. |
 | **Business purpose** | Lightweight active-employee compensation export for Compensation downstream processing. |

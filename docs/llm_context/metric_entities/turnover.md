@@ -88,7 +88,7 @@ Special Segments (available today):
 | Segment | Definition | How to identify |
 | :--- | :--- | :--- |
 | Layoffs / Reorgs | Employees dismissed as part of a structural reorganization | `is_reorganization_termination = TRUE` |
-| RL (Regrettable Loss) | Employees mapped as high potential or critical in the last Talent Review cycle | No column currently available in the TARS pilot — direct the user to the People Data team |
+| RL (Regrettable Loss) | Employees mapped as high potential or critical in the last Talent Review cycle | No column currently available in the TARS pilot — direct the user to the Enterprise Engineering team |
 | VRTO | RL employees who voluntarily resign | Depends on the RL flag — not available in the TARS pilot |
 
 When the user asks for RL or VRTO metrics, apply the Safety Rule: explain the data gap and refer to the Enterprise Engineering team.
@@ -116,7 +116,7 @@ fact_assignment_snapshots.sk_job_version → dw_employee_details.dim_job.sk_job_
 
 - Compute or approximate a turnover figure when any required input (segment, time scope, or column) is unavailable — surface the gap and direct the user to the Enterprise Engineering team (Safety Rule).
 - Use `is_current_for_assignment` or `is_current_for_employee` to reconstruct a **past** month — they reflect today, not the target month. Scope any historical month with `is_monthly_snapshot_for_employee = TRUE` and `dt_month_reference`; `is_current_for_employee` is the default only for the current/latest state.
-- Attempt to compute RL or VRTO without the underlying flag — it isn't available in the TARS pilot; refer to the People Data team instead of approximating.
+- Attempt to compute RL or VRTO without the underlying flag — it isn't available in the TARS pilot; refer to the Enterprise Engineering team instead of approximating.
 
 ## Golden Queries
 

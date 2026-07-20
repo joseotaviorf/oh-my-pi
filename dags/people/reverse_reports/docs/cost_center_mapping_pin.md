@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.cost_center_mapping_pin` |
 | **Business owner** | People Systems |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Cost center mapping with headcount and HRBP for PIN. |
 | **Business purpose** | Cost center mapping export with active/inactive status, vertical, Codex L1/L2 owners, HRBP email, and headcount totals for PIN ingestion. Migrated from Daily Pipeline `reports_dw.py` view `base_de_para`. |

@@ -4,7 +4,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.revenue_excellence_headcount_roster` |
 | **Business owner** | Diego Salas Trejo (diego.trejo@quintoandar.com.br) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Org-wide headcount roster (active + terminated) with termination date, for Revenue Excellence. |
 | **Business purpose** | Daily headcount base for the Revenue Excellence team (source: PDA-501). Mirrors the `public_information` ("Public PIN") column set and adds `dt_desligamento` so terminations stay visible (same active+terminated / status logic as `pnt_headcount_termination_roster`). Created for DBP-1546. |

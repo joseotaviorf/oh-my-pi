@@ -10,7 +10,7 @@ People lake → Google Sheets export with the vacation-balance panorama of activ
 | --- | --- |
 | **Metastore table** | `reverse_reports.vacation_balances` |
 | **Business owner** | Isabela Jorge da Silva (isabela.silva@quintoandar.com.br) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | One row per active employee × vacation acquisitive period exported to Google Sheets tab `Painel Geral` for the People/HR vacation-management process. |
 | **Business purpose** | Provides the general panorama of vacation balances (saldos de férias) for active employees of the MLSP and GRPQA (Brazilian QuintoAndar) companies. Replaces the manual Oracle BI report "Férias a Vencer" with an automated daily export. |

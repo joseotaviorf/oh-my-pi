@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.talent_review_dash_access_list` |
 | **Business owner** | Kevin Trindade |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Current employee access-list rows used to segregate Talent Review Looker dashboard access. |
 | **Business purpose** | Feeds the Talent Review Looker Studio dashboard access controls (PDS / `base_analytics` tab). Kept on Google Sheets while the TR dashboard remains Looker-backed; this is an Exodus notebook migration. Migrated from Daily Pipeline notebook `dash_talent_review` ([DBP-1756](https://quintoandar.atlassian.net/browse/DBP-1756)). |

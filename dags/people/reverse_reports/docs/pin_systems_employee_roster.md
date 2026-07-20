@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.pin_systems_employee_roster` |
 | **Business owner** | DP (Personnel Department) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Employee systems base for PIN tab `base_pin` (DP workbook). |
 | **Business purpose** | Employee roster with org, job, manager, and cost center for DP PIN systems consumption. Migrated from Daily Pipeline `reports_dw.py` view `wd_sistemas`. |

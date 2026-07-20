@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.pin_systems_employee_roster_shared` |
 | **Business owner** | Performance and Navent |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Shared employee systems base for PIN tab `base_pin` (Performance / Navent workbook). |
 | **Business purpose** | Same employee roster as `pin_systems_employee_roster`, delivered to a shared workbook consumed by Performance and Navent. Migrated from the second `table_to_gsheets` call for `wd_sistemas` in Daily Pipeline `reports_dw.py`. |

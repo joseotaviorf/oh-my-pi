@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.infosec_employee_roster` |
 | **Business owner** | InfoSec |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Daily employee roster with hierarchy and employment attributes for InfoSec operations. |
 | **Business purpose** | Base for the InfoSec team with employee identification, status, band, role, manager, org structure (cost center, CODEX), employment dates, and personal email. |

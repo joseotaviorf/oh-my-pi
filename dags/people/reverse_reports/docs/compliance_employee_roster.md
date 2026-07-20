@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.compliance_employee_roster` |
 | **Business owner** | Compliance |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Employee roster with role, cost center, VP, residence country, and termination details for Compliance. |
 | **Business purpose** | Base for Compliance with employee name, email, role, cost center, VP (L1 manager), residence country, company, band, status, and termination reason/date. |

@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.band_10_plus_roster` |
 | **Business owner** | Leadership Academy |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active band 10+ employees exported for Leadership Academy participation tracking. |
 | **Business purpose** | Eligibility roster for the Leadership Academy program: active employees at band 10 and above, used to identify and manage who participates in Leadership Academy. Migrated from `people_reports` notebook cell `base_bandas_10`. |

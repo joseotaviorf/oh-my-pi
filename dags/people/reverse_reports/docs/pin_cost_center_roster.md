@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.pin_cost_center_roster` |
 | **Business owner** | People Insights |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Person number to cost center code mapping for PIN Classifieds sync. |
 | **Business purpose** | Assignment-level mapping of `person_number` to `cost_center_code` for People Insights PIN Classifieds updates. Migrated from Daily Pipeline `reports_dw.py` view `centro_de_custo_pin`. |

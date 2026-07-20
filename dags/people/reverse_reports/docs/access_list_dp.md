@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.access_list_dp` |
 | **Business owner** | DP — `mariana.reberte@quintoandar.com.br` |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Per-employee Google Sheets access list for leaders and HR business partners (time bank). |
 | **Business purpose** | Supplies the `access_list` tab used by the time bank workbook so leaders and BPs can see only the rows they are allowed to view. Migrated from Daily Pipeline notebook `access_list.py` (cell `access_list_dp`). |

@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.leiturinha_holder_roster` |
 | **Business owner** | Benefits |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active BR plan holders for Leiturinha benefit with CNPJ mapping. |
 | **Business purpose** | Benefits roster of active Brazil employees (SP, SC, MG legal entities) with contact and address data for the Leiturinha benefit program. Migrated from Daily Pipeline `reports_dw.py` view `leiturinha_titular`. |

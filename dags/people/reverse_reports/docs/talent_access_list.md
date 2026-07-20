@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.talent_access_list` |
 | **Business owner** | People Team (Talent) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Person number and hierarchy access list for talent sheets. |
 | **Business purpose** | Access-control list of person numbers and hierarchy attributes for Performa/Talent dashboard cross-tab permissions. |

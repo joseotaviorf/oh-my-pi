@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.procurement_employee_manager_roster` |
 | **Business owner** | Procurement |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active and future-terminated employees with manager chain role and band per hierarchy level for Procurement. |
 | **Business purpose** | Daily base for Procurement with employee role/band and each manager level (L0–L8) name, email, role, and band. |

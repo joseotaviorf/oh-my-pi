@@ -19,7 +19,7 @@ Keep prose in **English**. Align the **column inventory** row order with the out
 | --- | --- |
 | **Metastore table** | `reverse_reports.<table_name>` (must match `queries/reverse/<table_name>.sql`) |
 | **Business owner** | Squad or role accountable for what the tab represents upstream (for example FP&A for CODEX, Compensation for salary tables). Name a contact email when the team expects one. |
-| **Technical owner** | Email of the engineer or squad that owns SQL, DAG wiring, `load_to_gsheet`, and sheet ACLs (often Data People). |
+| **Technical owner** | Email of the engineer or squad that owns SQL, DAG wiring, `load_to_gsheet`, and sheet ACLs (often Enterprise Engineering). |
 | **Domain** | People |
 | **One-line summary** | What each sheet row represents for the downstream consumer. |
 | **Business purpose** | Why this export exists (bridge, review workflow, etc.). |

@@ -10,7 +10,7 @@ People lake → Google Sheets export with approved vacation (and intern recess) 
 | --- | --- |
 | **Metastore table** | `reverse_reports.vacation_schedules` |
 | **Business owner** | Isabela Jorge da Silva (isabela.silva@quintoandar.com.br) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | One row per approved vacation/intern-recess request exported to Google Sheets tab `Agendamentos` for the People/HR vacation-management process. |
 | **Business purpose** | Provides the history and the future approved vacation schedules (agendamentos de férias aprovados) for active employees of the MLSP and GRPQA (Brazilian QuintoAndar) companies. Replaces the manual Oracle BI report "Férias e Afastamentos" with an automated daily export. |

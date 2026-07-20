@@ -6,7 +6,7 @@ Batch migration of Daily Pipeline notebook `recencia_cargos_tech` ([DBP-1513](ht
 | --- | --- |
 | **Metastore tables** | `reverse_reports.tech_recencia_cargos_*`, `reverse_reports.tech_ausencias_e_ferias_*` |
 | **Business owner** | People Analytics — Leonardo Oliveira |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Monthly job/band tenure and approved absences for Tech & Product engineering workflows. |
 | **Business purpose** | Refreshes leader-facing tenure and absence tabs used by Tech leaders and Tech HRBPs. Migrated from Exodus notebook `recencia_cargos_tech` to remove dependency on `base_fotografias_email_l` and legacy `dw_employee` absence tables. |

@@ -29,7 +29,7 @@ For Git sync and conflicts before a PR, use **Git Workflow** below.
 
 ### Jira (DBP) — where to look
 
-Stable Jira/API facts for the Data People squad (project key, cloud ID, kickoff policies, branch/slug naming, quirks, workflow snapshot) live in **`.cursor/rules/people/dbp-jira-reference.md`**. Use that file during delivery skills; do not duplicate long tables here.
+Stable Jira/API facts for the Enterprise Engineering squad (project key, cloud ID, kickoff policies, branch/slug naming, quirks, workflow snapshot) live in **`.cursor/rules/people/dbp-jira-reference.md`**. Use that file during delivery skills; do not duplicate long tables here.
 
 ### Delivery artifact folder (`.cursor/temp/`)
 

@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.wfa_active_employee_roster` |
 | **Business owner** | Benefits |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active employee roster with hierarchy for Work From Anywhere (WFA) benefit operations. |
 | **Business purpose** | Base for the Benefits team to support WFA (Work From Anywhere) processes with employee identification, status, hierarchy, and org attributes. Migrated from `people_reports` notebook cell `base_wfa`. |

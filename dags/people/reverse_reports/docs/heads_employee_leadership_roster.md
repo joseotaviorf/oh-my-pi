@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.heads_employee_leadership_roster` |
 | **Business owner** | Heads |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active-employee leadership roster with org hierarchy for Heads programs. |
 | **Business purpose** | Base of active employees with leadership flag, cost center, CODEX structure, and full manager chain for Heads stakeholders. |

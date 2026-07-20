@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.quintocare_titular_roster` |
 | **Business owner** | Benefits |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active BR titulares for QuintoCare with CNPJ mapping. |
 | **Business purpose** | Benefits team base of active Brazil benefit titulares for QuintoCare, including legal-entity CNPJ mapping. |

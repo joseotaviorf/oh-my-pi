@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.pin_current_employee_snapshot` |
 | **Business owner** | People Insights |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Full employee assignment snapshot for PIN Classifieds sync. |
 | **Business purpose** | Employee roster with org, manager, compensation, and contact fields used by People Insights to update PIN with Classifieds data. Migrated from Daily Pipeline `reports_dw.py` view `foto_atual_pin`. |

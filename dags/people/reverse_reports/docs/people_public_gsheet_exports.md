@@ -18,7 +18,7 @@ People lake → Google Sheets exports that provide the active-employee base for 
 | --- | --- |
 | **Metastore table** | `reverse_reports.public_information` |
 | **Business owner** | People team |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | One row per active employee (no salary band data) exported to Google Sheets tab `base - PIN` for downstream People Systems consumption. |
 | **Business purpose** | Provides an up-to-date employee roster (hierarchy, organisation, location, manager chain) for People Systems. The report excludes salary band to allow broader distribution. Migrated from the Daily Pipeline `external_reports` notebook cell `base_public_no_banda` to remove the dependency on the deprecated `datalake_people_analytics_sandbox.base_completa_hierarquia` table. |

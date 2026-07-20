@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.dp_employee_master` |
 | **Business owner** | DP (Personnel Department) |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Extended employee master with documentation and TMF identifiers for the Personnel Department (DP). |
 | **Business purpose** | Comprehensive employee export for DP with person/assignment numbers, org data, PII, mother's name, and TMF legacy registration. Migrated from notebook cell `base_sistemas_dp`. |

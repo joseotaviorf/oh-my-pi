@@ -5,7 +5,7 @@
 | --- | --- |
 | **Metastore table** | `reverse_reports.comms_employee_roster` |
 | **Business owner** | Internal Comms |
-| **Technical owner** | People Data |
+| **Technical owner** | Enterprise Engineering |
 | **Domain** | People |
 | **One-line summary** | Active employee roster for communications group management including new hire flag. |
 | **Business purpose** | Base for Internal Comms to manage communication groups with employee identification, org attributes, and a new-hire indicator. |
