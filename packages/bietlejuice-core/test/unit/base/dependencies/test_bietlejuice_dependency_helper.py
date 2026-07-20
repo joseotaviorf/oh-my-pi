@@ -4,6 +4,123 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
 
+# Graph used by reverse-lookup tests:
+#   clean → enrich → dw_a
+#                 → enrich_mid → dw_b
+#   clean → metric_x  (non-dw)
+_SAMPLE_DEPS = {
+    "bietlejuice.enrich_source": [
+        "bietlejuice.clean_source:load-clean-table:first-run-of-day",
+    ],
+    "bietlejuice.enrich_mid": [
+        "bietlejuice.enrich_source:load-enrich-table:first-run-of-day",
+    ],
+    "bietlejuice.dw_a": [
+        "bietlejuice.enrich_source:load-enrich-table:first-run-of-day",
+    ],
+    "bietlejuice.dw_b": [
+        "bietlejuice.enrich_mid:load-enrich-mid:first-run-of-day",
+    ],
+    "bietlejuice.metric_x": [
+        "bietlejuice.clean_source:load-clean-table:first-run-of-day",
+    ],
+}
+
+
+class TestBietlejuiceDependencyHelperDownstream:
+    def test_build_downstream_index_inverts_direct_edges(self):
+        index = BietlejuiceDependencyHelper.build_downstream_index(_SAMPLE_DEPS)
+        assert index["bietlejuice.clean_source"] == {
+            "bietlejuice.enrich_source",
+            "bietlejuice.metric_x",
+        }
+        assert index["bietlejuice.enrich_source"] == {
+            "bietlejuice.enrich_mid",
+            "bietlejuice.dw_a",
+        }
+        assert "bietlejuice.dw_a" not in index  # leaf: no dependents
+
+    def test_build_downstream_index_flattens_nested_any_all(self):
+        deps = {
+            "bietlejuice.dw_nested": {
+                "any": [
+                    "bietlejuice.enrich_a:load-enrich-a",
+                    {"all": ["bietlejuice.enrich_b:load-enrich-b"]},
+                ]
+            }
+        }
+        index = BietlejuiceDependencyHelper.build_downstream_index(deps)
+        assert index["bietlejuice.enrich_a"] == {"bietlejuice.dw_nested"}
+        assert index["bietlejuice.enrich_b"] == {"bietlejuice.dw_nested"}
+
+    def test_build_downstream_index_empty_and_none(self):
+        assert BietlejuiceDependencyHelper.build_downstream_index({}) == {}
+        assert BietlejuiceDependencyHelper.build_downstream_index(None) == {}
+
+    def test_find_downstream_dags_direct_only(self):
+        result = BietlejuiceDependencyHelper.find_downstream_dags(
+            "bietlejuice.enrich_source",
+            _SAMPLE_DEPS,
+            transitive=False,
+        )
+        assert result == ["bietlejuice.dw_a", "bietlejuice.enrich_mid"]
+
+    def test_find_downstream_dags_transitive(self):
+        result = BietlejuiceDependencyHelper.find_downstream_dags(
+            "bietlejuice.clean_source",
+            _SAMPLE_DEPS,
+            transitive=True,
+        )
+        assert result == [
+            "bietlejuice.dw_a",
+            "bietlejuice.dw_b",
+            "bietlejuice.enrich_mid",
+            "bietlejuice.enrich_source",
+            "bietlejuice.metric_x",
+        ]
+
+    def test_find_downstream_dags_excludes_self_and_is_cycle_safe(self):
+        cyclic = {
+            "bietlejuice.a": ["bietlejuice.b:load-x"],
+            "bietlejuice.b": ["bietlejuice.a:load-y"],
+        }
+        result = BietlejuiceDependencyHelper.find_downstream_dags(
+            "bietlejuice.a", cyclic, transitive=True
+        )
+        assert result == ["bietlejuice.b"]
+
+    def test_find_downstream_dags_reuses_prebuilt_index(self):
+        index = BietlejuiceDependencyHelper.build_downstream_index(_SAMPLE_DEPS)
+        result = BietlejuiceDependencyHelper.find_downstream_dags(
+            "bietlejuice.enrich_source",
+            downstream_index=index,
+            transitive=False,
+        )
+        assert result == ["bietlejuice.dw_a", "bietlejuice.enrich_mid"]
+
+    def test_find_downstream_dw_dags_filters_prefix(self):
+        result = BietlejuiceDependencyHelper.find_downstream_dw_dags(
+            "bietlejuice.clean_source",
+            _SAMPLE_DEPS,
+        )
+        assert result == ["bietlejuice.dw_a", "bietlejuice.dw_b"]
+
+    def test_find_downstream_dw_dags_empty_when_no_dw_dependents(self):
+        result = BietlejuiceDependencyHelper.find_downstream_dw_dags(
+            "bietlejuice.metric_x",
+            _SAMPLE_DEPS,
+        )
+        assert result == []
+
+    @mock.patch.object(BietlejuiceDependencyHelper, "read_dependencies")
+    def test_find_downstream_dags_reads_file_when_no_deps_passed(self, mock_read):
+        mock_read.return_value = _SAMPLE_DEPS
+        result = BietlejuiceDependencyHelper.find_downstream_dags(
+            "bietlejuice.enrich_source", transitive=False
+        )
+        mock_read.assert_called_once()
+        assert result == ["bietlejuice.dw_a", "bietlejuice.enrich_mid"]
+
 
 class TestBietlejuiceDependencyHelperExtractDagAndTable:
     """Tests for extract_dag_and_table_from_task_name and _get_table_name_from_dw_task."""

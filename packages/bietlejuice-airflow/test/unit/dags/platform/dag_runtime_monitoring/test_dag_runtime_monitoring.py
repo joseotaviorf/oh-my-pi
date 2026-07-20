@@ -9,20 +9,25 @@ import pytest
 
 from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _HISTORY_QUERY,
+    _IMPACTED_DW_LIST_LIMIT,
     _RUNNING_QUERY,
     DAG_ID,
     DEDUP_VARIABLE_KEY,
     JIRA_OPS_VARIABLE,
     _as_str_list,
     _build_alert_text,
+    _enrich_findings_with_dw_impact,
     _entry_from_finding,
     _evaluate_all,
     _evaluate_runtime,
     _failed_text,
     _fetch_run_states,
     _format_duration,
+    _format_impacted_dw_line,
     _initial_text,
+    _live_impacted_dw_count,
     _load_dedup_state,
+    _load_downstream_index_safe,
     _normalize_ledger,
     _parse_test_options,
     _percentile,
@@ -220,12 +225,14 @@ def test_build_alert_text_contains_key_facts():
         "history_count": 10,
         "percentile": 90,
         "pct_over": 500,
+        "impacted_dw_dags": ["bietlejuice.dw_foo"],
     }
     text = _build_alert_text(finding)
     assert _CRITICAL_DAG in text
     assert "P90" in text
     assert "500% over baseline" in text
     assert "r1" in text
+    assert "Impacted DW DAGs (1): bietlejuice.dw_foo." in text
 
 
 # --------------------------------------------------------------------------- #
@@ -240,13 +247,19 @@ _ENTRY = {
     "threshold_s": 2250.0,
     "percentile": 90,
     "history_count": 7,
+    "impacted_dw_dags": ["bietlejuice.dw_alpha", "bietlejuice.dw_beta"],
+    "impacted_dw_count": 2,
 }
 
 
 def test_message_builders():
-    assert "running slower than usual" in _initial_text(_ENTRY, 3600)
-    assert "P90 baseline" in _initial_text(_ENTRY, 3600)
-    assert "still running" in _update_text(_ENTRY, 5400)
+    initial = _initial_text(_ENTRY, 3600)
+    assert "running slower than usual" in initial
+    assert "P90 baseline" in initial
+    assert "Impacted DW DAGs (2): bietlejuice.dw_alpha, bietlejuice.dw_beta." in initial
+    update = _update_text(_ENTRY, 5400)
+    assert "still running" in update
+    assert "Still blocking 2 dw_* DAG(s)." in update
     assert "finished after" in _resolved_text(_ENTRY, 3600)
     assert "FAILED" in _failed_text(_ENTRY, 3600)
     assert _STANDARD_DAG in _resolved_text(_ENTRY, 3600)
@@ -256,7 +269,125 @@ def test_message_builders_without_baseline():
     # Back-compat entry (old ledger) has no baseline_s → messages omit the % detail.
     entry = {"dag_id": _STANDARD_DAG, "run_id": "r2", "tier": "standard"}
     assert "baseline unavailable" in _initial_text(entry, 3600)
+    assert "Impacted DW DAGs: none." in _initial_text(entry, 3600)
     assert "unknown time" in _resolved_text(entry, None)
+    assert "Still blocking" not in _update_text(entry, 5400)
+
+
+class TestFormatImpactedDwLine:
+    def test_none_and_empty(self):
+        assert _format_impacted_dw_line(None) == "Impacted DW DAGs: none."
+        assert _format_impacted_dw_line([]) == "Impacted DW DAGs: none."
+
+    def test_lists_all_when_under_limit(self):
+        dags = ["bietlejuice.dw_a", "bietlejuice.dw_b"]
+        assert (
+            _format_impacted_dw_line(dags)
+            == "Impacted DW DAGs (2): bietlejuice.dw_a, bietlejuice.dw_b."
+        )
+
+    def test_truncates_after_limit(self):
+        dags = [f"bietlejuice.dw_{i:02d}" for i in range(_IMPACTED_DW_LIST_LIMIT + 5)]
+        text = _format_impacted_dw_line(dags)
+        assert f"Impacted DW DAGs ({len(dags)}):" in text
+        assert "… and 5 more." in text
+        assert f"bietlejuice.dw_{_IMPACTED_DW_LIST_LIMIT - 1:02d}" in text
+        assert f"bietlejuice.dw_{_IMPACTED_DW_LIST_LIMIT:02d}" not in text
+
+
+_SAMPLE_IMPACT_DEPS = {
+    "bietlejuice.dw_impacted": [
+        f"{_STANDARD_DAG}:load-enrich-table:first-run-of-day",
+    ],
+    "bietlejuice.metric_not_listed": [
+        f"{_STANDARD_DAG}:load-enrich-table:first-run-of-day",
+    ],
+}
+
+
+class TestEnrichFindingsWithDwImpact:
+    def test_attaches_transitive_dw_only(self):
+        from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
+            BietlejuiceDependencyHelper,
+        )
+
+        findings = [{"dag_id": _STANDARD_DAG}]
+        index = BietlejuiceDependencyHelper.build_downstream_index(_SAMPLE_IMPACT_DEPS)
+        _enrich_findings_with_dw_impact(findings, index)
+        assert findings[0]["impacted_dw_dags"] == ["bietlejuice.dw_impacted"]
+        assert findings[0]["impacted_dw_count"] == 1
+
+    def test_empty_index_yields_empty_list(self):
+        findings = [{"dag_id": _STANDARD_DAG}]
+        _enrich_findings_with_dw_impact(findings, {})
+        assert findings[0]["impacted_dw_dags"] == []
+        assert findings[0]["impacted_dw_count"] == 0
+
+
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    side_effect=RuntimeError("boom"),
+)
+def test_load_downstream_index_safe_returns_none_on_read_error(mock_read):
+    assert _load_downstream_index_safe() is None
+    mock_read.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "invalid_upstreams",
+    [
+        {},
+        {"foo": []},
+        {"any": "not-a-list"},
+    ],
+)
+@mock.patch(f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies")
+def test_load_downstream_index_safe_returns_none_on_invalid_upstream_shape(
+    mock_read, invalid_upstreams
+):
+    # Invalid shapes raise ValueError in find_unique_dependencies_in_dependency_object;
+    # the monitor must not abort — alerts continue with Impacted DW DAGs: none.
+    mock_read.return_value = {"bietlejuice.dependent": invalid_upstreams}
+    assert _load_downstream_index_safe() is None
+    mock_read.assert_called_once()
+
+
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
+def test_load_downstream_index_safe_builds_index(mock_read):
+    index = _load_downstream_index_safe()
+    assert index[_STANDARD_DAG] == {
+        "bietlejuice.dw_impacted",
+        "bietlejuice.metric_not_listed",
+    }
+    mock_read.assert_called_once()
+
+
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value={},
+)
+def test_load_downstream_index_safe_returns_empty_dict_when_file_empty(mock_read):
+    assert _load_downstream_index_safe() == {}
+    mock_read.assert_called_once()
+
+
+class TestLiveImpactedDwCount:
+    def test_unavailable_index_returns_none(self):
+        assert _live_impacted_dw_count(_STANDARD_DAG, None) is None
+
+    def test_empty_index_returns_zero(self):
+        assert _live_impacted_dw_count(_STANDARD_DAG, {}) == 0
+
+    def test_recomputes_from_index(self):
+        from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
+            BietlejuiceDependencyHelper,
+        )
+
+        index = BietlejuiceDependencyHelper.build_downstream_index(_SAMPLE_IMPACT_DEPS)
+        assert _live_impacted_dw_count(_STANDARD_DAG, index) == 1
 
 
 class TestNormalizeLedger:
@@ -431,8 +562,19 @@ def _saved_ledger(mock_var):
 @mock.patch(f"{_MODULE}._fetch_running_runs")
 @mock.patch(f"{_MODULE}.Variable")
 @mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
 def test_new_standard_anomaly_posts_initial_and_tracks(
-    mock_cfg, mock_var, mock_running, mock_durations, mock_states, mock_jira, mock_post
+    mock_deps,
+    mock_cfg,
+    mock_var,
+    mock_running,
+    mock_durations,
+    mock_states,
+    mock_jira,
+    mock_post,
 ):
     mock_cfg.return_value.get_config.side_effect = _config_get
     mock_var.get.side_effect = _variable_get_factory()
@@ -446,9 +588,15 @@ def test_new_standard_anomaly_posts_initial_and_tracks(
     mock_post.assert_called_once()
     text_arg = mock_post.call_args.args[1]
     assert "running slower than usual" in text_arg
+    assert "bietlejuice.dw_impacted" in text_arg
+    assert "bietlejuice.metric_not_listed" not in text_arg
     saved = _saved_ledger(mock_var)
     assert saved[f"{_STANDARD_DAG}|r2"]["tier"] == "standard"
     assert saved[f"{_STANDARD_DAG}|r2"]["baseline_s"] == 600.0
+    assert saved[f"{_STANDARD_DAG}|r2"]["impacted_dw_dags"] == [
+        "bietlejuice.dw_impacted"
+    ]
+    assert saved[f"{_STANDARD_DAG}|r2"]["impacted_dw_count"] == 1
 
 
 @mock.patch(f"{_MODULE}._post_gchat", return_value=True)
@@ -458,12 +606,30 @@ def test_new_standard_anomaly_posts_initial_and_tracks(
 @mock.patch(f"{_MODULE}._fetch_running_runs")
 @mock.patch(f"{_MODULE}.Variable")
 @mock.patch(f"{_MODULE}.ConfigurationService")
-def test_new_critical_anomaly_pages_jira_once(
-    mock_cfg, mock_var, mock_running, mock_durations, mock_states, mock_jira, mock_post
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
+def test_new_critical_anomaly_pages_jira_with_dw_impact(
+    mock_deps,
+    mock_cfg,
+    mock_var,
+    mock_running,
+    mock_durations,
+    mock_states,
+    mock_jira,
+    mock_post,
 ):
     mock_cfg.return_value.get_config.side_effect = _config_get
     mock_var.get.side_effect = _variable_get_factory()
     now = datetime.now(timezone.utc)
+    # Critical DAG is upstream of a DW DAG in this fixture graph via STANDARD? Use
+    # a custom deps map where the critical DAG fans into dw_*.
+    mock_deps.return_value = {
+        "bietlejuice.dw_from_critical": [
+            f"{_CRITICAL_DAG}:load-clean-table:first-run-of-day",
+        ]
+    }
     mock_running.return_value = [_running_row(_CRITICAL_DAG, "r1", 90, now)]
     mock_durations.return_value = {_CRITICAL_DAG: [600.0] * 10}
 
@@ -471,8 +637,39 @@ def test_new_critical_anomaly_pages_jira_once(
 
     mock_jira.assert_called_once()
     mock_post.assert_not_called()  # critical → JiraOps only, no gchat
+    finding_arg = mock_jira.call_args.args[0]
+    assert finding_arg["impacted_dw_dags"] == ["bietlejuice.dw_from_critical"]
     saved = _saved_ledger(mock_var)
     assert saved[f"{_CRITICAL_DAG}|r1"]["tier"] == "critical"
+    assert saved[f"{_CRITICAL_DAG}|r1"]["impacted_dw_count"] == 1
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
+def test_simulate_attaches_dw_impact(
+    mock_deps, mock_cfg, mock_var, mock_jira, mock_post
+):
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
+
+    monitor_dag_runtimes(
+        session=mock.MagicMock(),
+        run_conf={
+            "simulate": True,
+            "force_send": True,
+            "test_webhook": _WEBHOOK_URL,
+            "simulate_dags": [_STANDARD_DAG],
+        },
+    )
+
+    mock_post.assert_called_once()
+    assert "bietlejuice.dw_impacted" in mock_post.call_args.args[1]
 
 
 def _lifecycle_patches(func):
@@ -490,8 +687,12 @@ def _lifecycle_patches(func):
 
 
 @_lifecycle_patches
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
 def test_tracked_running_gets_update(
-    mock_post, mock_states, mock_running, mock_var, mock_cfg
+    mock_deps, mock_post, mock_states, mock_running, mock_var, mock_cfg
 ):
     mock_cfg.return_value.get_config.side_effect = _config_get
     ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}
@@ -510,8 +711,41 @@ def test_tracked_running_gets_update(
     monitor_dag_runtimes(session=mock.MagicMock())
 
     mock_post.assert_called_once()
-    assert "still running" in mock_post.call_args.args[1]
+    text = mock_post.call_args.args[1]
+    assert "still running" in text
+    assert "Still blocking 1 dw_* DAG(s)." in text  # live count from deps
     assert f"{_STANDARD_DAG}|r2" in _saved_ledger(mock_var)  # kept
+
+
+@_lifecycle_patches
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    side_effect=RuntimeError("deps unavailable"),
+)
+def test_tracked_running_keeps_ledger_impact_when_deps_unavailable(
+    mock_deps, mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    # Regression: a later-cycle deps load failure must not wipe Still blocking N
+    # by forcing live_count=0 over the ledger snapshot from the initial alert.
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}  # impacted_dw_count=2
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    now = datetime.now(timezone.utc)
+    mock_states.return_value = {
+        (_STANDARD_DAG, "r2"): SimpleNamespace(
+            dag_id=_STANDARD_DAG,
+            run_id="r2",
+            state="running",
+            start_date=now - timedelta(hours=2),
+            end_date=None,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_post.assert_called_once()
+    text = mock_post.call_args.args[1]
+    assert "Still blocking 2 dw_* DAG(s)." in text
 
 
 @_lifecycle_patches
@@ -930,8 +1164,26 @@ def test_entry_from_finding_snapshots_baseline():
         "threshold_s": 660.0,
         "percentile": 90,
         "history_count": 10,
+        "impacted_dw_dags": ["bietlejuice.dw_impacted"],
+        "impacted_dw_count": 1,
     }
     entry = _entry_from_finding(finding, first_alert_ts="ts")
     assert entry["baseline_s"] == 600.0
     assert entry["tier"] == "standard"
     assert entry["first_alert_ts"] == "ts"
+    assert entry["impacted_dw_dags"] == ["bietlejuice.dw_impacted"]
+    assert entry["impacted_dw_count"] == 1
+
+
+def test_update_text_uses_live_impacted_count_override():
+    entry = dict(_ENTRY)
+    entry["impacted_dw_count"] = 2
+    text = _update_text(entry, 5400, impacted_dw_count=9)
+    assert "Still blocking 9 dw_* DAG(s)." in text
+
+
+def test_update_text_falls_back_to_ledger_when_live_count_unavailable():
+    entry = dict(_ENTRY)
+    entry["impacted_dw_count"] = 2
+    text = _update_text(entry, 5400, impacted_dw_count=None)
+    assert "Still blocking 2 dw_* DAG(s)." in text

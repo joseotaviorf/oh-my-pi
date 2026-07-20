@@ -17,6 +17,9 @@ Alerting is tiered:
     flagged run and, every cycle, posts a threaded update while it is still running
     and a final message when it succeeds or fails.
 
+Both alert paths include the transitive list of downstream ``bietlejuice.dw_*`` DAGs
+impacted by the slow run, computed each cycle from the deployed ``dependencies.yaml``.
+
 Real alerts are only sent when ``environment == prod`` (or a force_send test); otherwise
 the DAG logs what it *would* send (so Forno/local runs still exercise the queries).
 """
@@ -38,6 +41,9 @@ from airflow.utils.db import provide_session
 from sqlalchemy import bindparam, text
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
+    BietlejuiceDependencyHelper,
+)
 from bietlejuice.base.jiraops.jiraops_client import JiraOpsClient
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -48,6 +54,9 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 # Airflow Variables.
 JIRA_OPS_VARIABLE = "JIRA_OPS_ONCALL_APIKEY"
 DEDUP_VARIABLE_KEY = "DAG_RUNTIME_MONITORING_ALERTED_RUNS"
+
+# Cap the DW blast-radius list in Chat / JiraOps messages.
+_IMPACTED_DW_LIST_LIMIT = 25
 
 # Config fallbacks used when a key is missing from prod_conf.yml / forno_conf.yml.
 _DEFAULT_CONFIG = {
@@ -220,13 +229,15 @@ def _evaluate_all(
 
 
 def _build_alert_text(finding: dict) -> str:
-    return (
+    base = (
         f"*{finding['dag_id']}* runtime anomaly — running for "
         f"{_format_duration(finding['elapsed_s'])}; "
         f"P{finding['percentile']} of the last {finding['history_count']} successful runs is "
         f"{_format_duration(finding['baseline_s'])} "
         f"({finding['pct_over']}% over baseline). run_id={finding['run_id']}"
     )
+    impact = _format_impacted_dw_line(finding.get("impacted_dw_dags") or [])
+    return f"{base} {impact}"
 
 
 def _thread_key(dag_id: str, run_id: str) -> str:
@@ -236,6 +247,7 @@ def _thread_key(dag_id: str, run_id: str) -> str:
 
 def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dict:
     """Build the ledger entry (tracking snapshot) for a newly-alerted run."""
+    impacted = list(finding.get("impacted_dw_dags") or [])
     return {
         "dag_id": finding["dag_id"],
         "run_id": finding["run_id"],
@@ -245,6 +257,8 @@ def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dic
         "threshold_s": finding["threshold_s"],
         "percentile": finding["percentile"],
         "history_count": finding["history_count"],
+        "impacted_dw_dags": impacted,
+        "impacted_dw_count": finding.get("impacted_dw_count", len(impacted)),
     }
 
 
@@ -265,18 +279,94 @@ def _baseline_detail(entry: dict, elapsed_s: float) -> str:
     return "baseline unavailable"
 
 
+def _format_impacted_dw_line(
+    impacted_dw_dags: list | None, *, limit: int = _IMPACTED_DW_LIST_LIMIT
+) -> str:
+    """Render the DW blast-radius line for Chat / JiraOps (truncated after ``limit``)."""
+    dags = list(impacted_dw_dags or [])
+    if not dags:
+        return "Impacted DW DAGs: none."
+    shown = dags[:limit]
+    overflow = len(dags) - len(shown)
+    listed = ", ".join(shown)
+    suffix = f" … and {overflow} more" if overflow > 0 else ""
+    return f"Impacted DW DAGs ({len(dags)}): {listed}{suffix}."
+
+
+def _load_downstream_index_safe() -> dict | None:
+    """Load deployed dependencies.yaml and invert to a downstream index.
+
+    Never fail the monitor cycle on read/parse errors or invalid upstream shapes
+    (e.g. ``{}`` / dicts without ``any``/``all``), which raise ``ValueError`` inside
+    ``find_unique_dependencies_in_dependency_object``.
+
+    Returns ``None`` when the graph is unavailable so follow-ups can keep the
+    ledger snapshot instead of treating a load failure as ``Impacted DW DAGs: none``.
+    A successfully loaded empty file still returns ``{}``.
+    """
+    try:
+        deps = BietlejuiceDependencyHelper.read_dependencies()
+        if not isinstance(deps, dict):
+            return None
+        return BietlejuiceDependencyHelper.build_downstream_index(deps)
+    except Exception as exc:  # noqa: BLE001 — operational guard; keep alerting alive
+        print(f"⚠️  Failed to load/index dependencies.yaml for DW impact: {exc}")
+        return None
+
+
+def _enrich_findings_with_dw_impact(
+    findings: list, downstream_index: dict | None
+) -> None:
+    """Attach transitive ``bietlejuice.dw_*`` dependents to each finding in place."""
+    if not findings:
+        return
+    index = downstream_index if downstream_index is not None else {}
+    for finding in findings:
+        impacted = BietlejuiceDependencyHelper.find_downstream_dw_dags(
+            finding["dag_id"], downstream_index=index
+        )
+        finding["impacted_dw_dags"] = impacted
+        finding["impacted_dw_count"] = len(impacted)
+
+
+def _live_impacted_dw_count(dag_id: str, downstream_index: dict | None) -> int | None:
+    """Recompute DW blast-radius count from the live graph for follow-up updates.
+
+    Returns ``None`` when ``downstream_index`` is unavailable so callers fall back
+    to the ledger's ``impacted_dw_count`` instead of forcing ``0``.
+    """
+    if downstream_index is None:
+        return None
+    return len(
+        BietlejuiceDependencyHelper.find_downstream_dw_dags(
+            dag_id, downstream_index=downstream_index
+        )
+    )
+
+
 def _initial_text(entry: dict, elapsed_s: float) -> str:
     return (
         f"⏱️ *{entry['dag_id']}* is running slower than usual — elapsed "
         f"{_format_duration(elapsed_s)}; {_baseline_detail(entry, elapsed_s)}. "
-        f"Tracking until it finishes. run_id={entry['run_id']}"
+        f"Tracking until it finishes. run_id={entry['run_id']} "
+        f"{_format_impacted_dw_line(entry.get('impacted_dw_dags') or [])}"
     )
 
 
-def _update_text(entry: dict, elapsed_s: float) -> str:
+def _update_text(
+    entry: dict, elapsed_s: float, *, impacted_dw_count: int | None = None
+) -> str:
+    count = (
+        impacted_dw_count
+        if impacted_dw_count is not None
+        else entry.get("impacted_dw_count")
+    )
+    blocking = ""
+    if isinstance(count, int) and count > 0:
+        blocking = f" Still blocking {count} dw_* DAG(s)."
     return (
         f"⏳ *{entry['dag_id']}* still running — {_format_duration(elapsed_s)} elapsed now "
-        f"({_baseline_detail(entry, elapsed_s)})."
+        f"({_baseline_detail(entry, elapsed_s)}).{blocking}"
     )
 
 
@@ -563,11 +653,14 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     deliver = (environment == "prod") or opts["force_send"]
     now = datetime.now(timezone.utc)
 
+    downstream_index = _load_downstream_index_safe()
+
     # --- Simulate: fabricate findings and post a chosen lifecycle phase (no DB / ledger).
     # simulate_state drives which message to emit for the SAME synthetic thread, so a few
     # manual triggers walk the whole lifecycle: (unset)=initial → running → success/failed.
     if opts["simulate"]:
         findings = _synthetic_findings(config, opts["simulate_dags"])
+        _enrich_findings_with_dw_impact(findings, downstream_index)
         state = opts["simulate_state"]
         print(
             f"🧪 simulate mode ({state or 'initial'}): "
@@ -599,7 +692,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
                 start_date=now - timedelta(hours=2),
                 end_date=now if terminal else None,
             )
-        _apply_follow_up(ledger, states, gchat_dest, now)
+        _apply_follow_up(ledger, states, gchat_dest, now, downstream_index)
         return
 
     # --- Real run: evaluate current anomalies + follow up everything we're tracking ---
@@ -616,6 +709,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
             session, {row.dag_id for row in running_rows}, since
         )
         findings = _evaluate_all(running_rows, durations_by_dag, now, config)
+    _enrich_findings_with_dw_impact(findings, downstream_index)
 
     ledger = _normalize_ledger(
         _load_dedup_state(), critical_dags=config["critical_dags"]
@@ -641,7 +735,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     # built from the earlier running snapshot — without this, step 2 would re-open the
     # same run (fresh gchat / Jira page) in the same cycle after closure.
     already_tracked = set(ledger)
-    _follow_up_tracked_runs(session, ledger, gchat_dest, now)
+    _follow_up_tracked_runs(session, ledger, gchat_dest, now, downstream_index)
 
     # 2) Open new incidents for anomalies not yet tracked (and not just closed above).
     for finding in findings:
@@ -687,15 +781,23 @@ def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
         )
 
 
-def _follow_up_tracked_runs(session, ledger: dict, gchat_dest, now: datetime) -> None:
+def _follow_up_tracked_runs(
+    session, ledger: dict, gchat_dest, now: datetime, downstream_index: dict | None
+) -> None:
     """Fetch the current state of tracked runs and apply follow-up messaging."""
     if not ledger:
         return
     states = _fetch_run_states(session, list(ledger.values()))
-    _apply_follow_up(ledger, states, gchat_dest, now)
+    _apply_follow_up(ledger, states, gchat_dest, now, downstream_index)
 
 
-def _apply_follow_up(ledger: dict, states: dict, gchat_dest, now: datetime) -> None:
+def _apply_follow_up(
+    ledger: dict,
+    states: dict,
+    gchat_dest,
+    now: datetime,
+    downstream_index: dict | None = None,
+) -> None:
     """For each tracked run, post an update (still running) or a closing message
     (terminal), and drop terminal/vanished runs from the ledger. Mutates ledger in place.
 
@@ -732,9 +834,10 @@ def _apply_follow_up(ledger: dict, states: dict, gchat_dest, now: datetime) -> N
             del ledger[key]  # terminal → stop tracking (critical dropped silently)
         elif is_standard and row.start_date is not None:
             elapsed_s = (now - row.start_date).total_seconds()
+            live_count = _live_impacted_dw_count(entry["dag_id"], downstream_index)
             _post_gchat(
                 gchat_dest,
-                _update_text(entry, elapsed_s),
+                _update_text(entry, elapsed_s, impacted_dw_count=live_count),
                 _thread_key(entry["dag_id"], entry["run_id"]),
             )
 

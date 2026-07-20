@@ -20,6 +20,27 @@ Real alerts are only delivered when `environment == prod`. Config lives in
 `prod_conf.yml` / `forno_conf.yml` (`lookback_days`, `min_history_runs`, `percentile`,
 `factor`, `min_alert_duration_minutes`, `critical_dags`).
 
+## Downstream DW impact
+
+Each cycle the monitor loads the **deployed** `dags/dependencies.yaml` (same file Airflow
+ships with the `dags/` package) via `BietlejuiceDependencyHelper`, builds a reverse
+dependency index once, and for every flagged DAG attaches the **transitive** list of
+downstream IDs matching `bietlejuice.dw_*`.
+
+- **Initial** Google Chat / JiraOps messages include the full list (truncated after 25
+  names with `… and K more`).
+- **Follow-up** Chat updates recompute the count from the live YAML so a mid-incident
+  deploy that changes the graph is reflected (`Still blocking N dw_* DAG(s)`).
+  If the YAML cannot be loaded on a later cycle, the update keeps the ledger's
+  snapshot count from the initial alert instead of dropping the blocking line.
+- If the YAML cannot be read **or** inverted (invalid upstream shapes) on the
+  **initial** alert, messages still send with `Impacted DW DAGs: none` — the
+  monitor cycle never fails on a dependency-parse error.
+
+Freshness tracks DAG deploys: after `make dependencies-file` is committed and the
+`dags/` package is uploaded to Airflow, the next `*/30` run sees the new graph. No
+static list in `prod_conf.yml` is required for impact text.
+
 ## How to test it
 
 The monitor supports an on-demand **test mode** via the trigger `conf`, so you can

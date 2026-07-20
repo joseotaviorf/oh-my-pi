@@ -1,6 +1,7 @@
 import re
+from collections import deque
 from os.path import isfile, join
-from typing import Optional, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 from bietlejuice.base.paths import DAG_PACKAGES_ROOT
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -9,6 +10,8 @@ from bietlejuice.services.file_service import FileService
 DEPENDENCIES_PATTERN = r"bietlejuice\.(\w*):([^:]*)"
 
 DAGS_CROSS_DEPENDENCIES_FILE_NAME = "dependencies.yaml"
+
+_DW_DAG_PREFIX = "bietlejuice.dw_"
 
 
 def _get_cross_dependencies_path() -> str:
@@ -230,3 +233,84 @@ class BietlejuiceDependencyHelper:
             ):
                 return True
         return False
+
+    @classmethod
+    def build_downstream_index(
+        cls, dependencies: Optional[dict] = None
+    ) -> Dict[str, Set[str]]:
+        """
+        Invert dependent → [upstream_task…] into upstream_dag_id → {direct dependents}.
+
+        Upstream entries may be bare task strings or nested ``any`` / ``all`` objects;
+        nested forms are flattened via ``find_unique_dependencies_in_dependency_object``.
+        """
+        if dependencies is None:
+            dependencies = {}
+        index: Dict[str, Set[str]] = {}
+        for dependent_dag, upstreams in dependencies.items():
+            if upstreams is None:
+                continue
+            unique = cls.find_unique_dependencies_in_dependency_object(upstreams)
+            for dep in unique:
+                upstream_dag = dep.split(":")[0]
+                if not upstream_dag or upstream_dag == dependent_dag:
+                    continue
+                index.setdefault(upstream_dag, set()).add(dependent_dag)
+        return index
+
+    @classmethod
+    def find_downstream_dags(
+        cls,
+        dag_id: str,
+        dependencies: Optional[dict] = None,
+        *,
+        transitive: bool = True,
+        downstream_index: Optional[Dict[str, Set[str]]] = None,
+    ) -> List[str]:
+        """
+        Return DAGs that depend on ``dag_id`` (directly, or transitively when enabled).
+
+        Pass a prebuilt ``downstream_index`` to reuse one invert across many lookups.
+        When neither ``dependencies`` nor ``downstream_index`` is provided, reads
+        ``dependencies.yaml`` via ``read_dependencies()``.
+        """
+        if downstream_index is None:
+            if dependencies is None:
+                dependencies = cls.read_dependencies()
+            downstream_index = cls.build_downstream_index(dependencies)
+
+        direct = downstream_index.get(dag_id, set())
+        if not transitive:
+            return sorted(direct)
+
+        found: Set[str] = set()
+        queue: deque = deque(direct)
+        while queue:
+            current = queue.popleft()
+            if current == dag_id or current in found:
+                continue
+            found.add(current)
+            for child in downstream_index.get(current, set()):
+                if child not in found and child != dag_id:
+                    queue.append(child)
+        return sorted(found)
+
+    @classmethod
+    def find_downstream_dw_dags(
+        cls,
+        dag_id: str,
+        dependencies: Optional[dict] = None,
+        *,
+        downstream_index: Optional[Dict[str, Set[str]]] = None,
+    ) -> List[str]:
+        """Transitive downstream DAGs whose id starts with ``bietlejuice.dw_``."""
+        return [
+            dependent
+            for dependent in cls.find_downstream_dags(
+                dag_id,
+                dependencies=dependencies,
+                transitive=True,
+                downstream_index=downstream_index,
+            )
+            if dependent.startswith(_DW_DAG_PREFIX)
+        ]
