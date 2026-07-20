@@ -7,7 +7,7 @@ description: >
   a partner company (id_partner) and a QuintoAndar user account (id_user). Used alongside
   dim_partner to analyse partner agent activity and status. Partitioned by country_code.
 domain: Agents
-owner: gustavo.brunelli@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_partner_agent:
     lineage:

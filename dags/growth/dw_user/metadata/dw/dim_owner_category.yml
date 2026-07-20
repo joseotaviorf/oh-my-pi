@@ -6,7 +6,7 @@ description: Table that consolidates the historical category of a owner.
   In this table we're not bringing the B2B users.
   Each line of this table is an unique owner category, which is identified by the sk_owner_category column.
 domain: Growth
-owner: gustavo.brunelli@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_owner_category:
     lineage:

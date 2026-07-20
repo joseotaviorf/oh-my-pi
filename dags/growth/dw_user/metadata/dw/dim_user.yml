@@ -8,7 +8,7 @@ description: >
   Key for user-level analysis across the full rental funnel and for joining role-specific dimension
   tables (dim_user_doorman, dim_partner_agent). Partitioned by country_code.
 domain: Growth
-owner: gustavo.brunelli@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   sk_user:
     lineage:

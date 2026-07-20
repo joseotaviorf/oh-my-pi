@@ -1,0 +1,35 @@
+---
+table_name: dw_public.dim_user
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_user:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  country_code:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  active:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  criado_em:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  uuid_person:
+    is_complete:
+      severity_level: Error
+    # uuid_person is nullable in principle, but since is_complete above
+    # requires zero nulls, Deequ will never see a null group here — use
+    # Warning as a defensive default in case that assumption changes.
+    is_unique:
+      severity_level: Warning

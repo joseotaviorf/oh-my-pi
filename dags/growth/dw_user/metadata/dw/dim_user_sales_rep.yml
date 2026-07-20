@@ -8,7 +8,7 @@ description: >
   Might contain PII data.
   Used by Growth analytics to track sales rep performance and tenure. Partitioned by country_code.
 domain: Growth
-owner: gustavo.brunelli@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_user_sales_rep:
     lineage:

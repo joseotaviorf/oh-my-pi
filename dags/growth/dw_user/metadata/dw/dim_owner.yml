@@ -7,7 +7,7 @@ description: >
   used by operations and owner relationship management. Joinable with dim_user via
   sk_owner = sk_user. Partitioned by country_code.
 domain: Growth
-owner: gustavo.brunelli@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_owner:
     lineage:

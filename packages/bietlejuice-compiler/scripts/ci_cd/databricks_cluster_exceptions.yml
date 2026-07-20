@@ -21,3 +21,13 @@ exceptions:
       load-dw-crm-fact-credit-tasks / fact-closing-tasks / fact-repair-tasks
       (full house_listing+rent_flow joins under EMR step concurrency).
     approved_by: eduardo.soares@quintoandar.com.br
+  - dag: dw_user
+    path: dags/growth/dw_user
+    reason: >-
+      Folder relocated from dags/for_rent/dw_user to dags/growth/dw_user
+      (ownership move to the Growth team). The validator runs `git diff
+      --no-renames`, so the moved *_declaration.yml is seen as a brand-new
+      file and flagged as a new Databricks introduction; the DAG has run on
+      Databricks (consolidation_xs_memory_cluster) since before the move,
+      with no runtime change.
+    approved_by: isadora.gallerani@quintoandar.com.br
