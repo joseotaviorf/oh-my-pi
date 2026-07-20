@@ -35,6 +35,13 @@ columns:
     description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.custom_attributes
+  service_context:
+    description:
+      Channel or journey context in which the evaluated service occurred, used to identify
+      the touchpoint the respondent is rating (e.g. call, call inapp, chat, onboarding,
+      offboarding).
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.service_context
   ts_submitted:
     description: Date the satisfaction response was submitted.
     lineage:

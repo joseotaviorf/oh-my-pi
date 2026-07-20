@@ -6,6 +6,7 @@ SELECT
     sa.score_description,
     sa.secondary_score_description,
     sa.custom_attributes,
+    sa.service_context,
     sa.ts_submitted,
     NOW() AS ts_load,
     sa.year,
