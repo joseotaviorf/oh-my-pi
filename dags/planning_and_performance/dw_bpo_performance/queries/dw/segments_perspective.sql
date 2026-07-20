@@ -78,13 +78,13 @@ satisfaction_ratings AS (
             fa.is_solved,
             fa.ts_submitted,
             ROW_NUMBER() OVER (
-                PARTITION BY fa.sk_support_session 
+                PARTITION BY fa.sk_support_session
                 ORDER BY fa.ts_submitted DESC
             ) AS rn
         FROM dw_satisfaction_rating.fact_answer AS fa
         LEFT JOIN datalake_satisfaction_rating.satisfaction_answers sa
           ON sa.id_answer = fa.sk_answer
-        WHERE 
+        WHERE
           fa.ts_submitted >= '{load_start_date}'
           AND fa.ts_submitted <= '{load_end_date}'
           AND (
@@ -142,7 +142,7 @@ segments_perspective AS (
       fcc.is_per_team_task AS per_team_flag,
       UPPER(fcc.status) AS status,
       COALESCE(fcc.ts_reservation_created, fcc.ts_task_created) - INTERVAL '3' HOUR AS ts_reservation_created,
-      NULL AS average_reply_time,
+      CAST(NULL AS DOUBLE) AS average_reply_time,
       CASE
         WHEN COALESCE(qc.queue_time_calc, tm_fix.total_queue_time) > 1800 THEN NULL
         ELSE COALESCE(qc.queue_time_calc, tm_fix.total_queue_time)
@@ -279,7 +279,7 @@ segments_perspective AS (
       ON qc.id_reservation = fcc.sk_reservation
     WHERE
       fcc.channel IN ('chat','call')
-      AND fcc.direction IN ('inbound') 
+      AND fcc.direction IN ('inbound')
       AND dd.area = 'CX'
 )
 
