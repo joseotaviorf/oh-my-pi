@@ -105,6 +105,16 @@ deduplicated AS (
         END AS reason_name_ptb,
         at_ptb.description AS action_description_ptb,
         CASE
+            WHEN ab.action_code IN (
+                'TERMINATION',
+                'RESIGNATION',
+                'DEATH',
+                'GLB_TRANSFER',
+                'EXPATRIADO'
+            ) THEN TRUE
+            ELSE FALSE
+        END AS is_assignment_termination_event,
+        CASE
             -- Unknown-reason (-1) rows have no reason dates; is_current follows the action window only.
             WHEN ded.id_action_reason = -1 THEN
                 CASE
@@ -201,6 +211,7 @@ SELECT
     action_name_ptb,
     reason_name_ptb,
     action_description_ptb,
+    is_assignment_termination_event,
     is_current,
     dt_valid_from,
     dt_valid_to,

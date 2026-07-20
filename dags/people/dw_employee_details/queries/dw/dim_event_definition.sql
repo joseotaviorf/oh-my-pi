@@ -10,3 +10,4 @@ FROM
 WHERE
     ed.is_current = TRUE
     AND ed.id_event_definition IS NOT NULL
+    AND ed.is_assignment_termination_event = TRUE

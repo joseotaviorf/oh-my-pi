@@ -31,6 +31,8 @@ columns:
     description: Action-reason label in Portuguese (PTB), or Desconhecido when the action-reason is missing.
   action_description_ptb:
     description: Long description of the action in Portuguese (PTB).
+  is_assignment_termination_event:
+    description: True when the event closes an employee or contractor assignment through termination, resignation, death, global transfer, or the controlled expatriate flow.
   is_current:
     description: True when the action (and action-reason when present) is valid for the load date.
   dt_valid_from:
