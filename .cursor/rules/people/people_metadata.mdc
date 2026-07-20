@@ -1,0 +1,127 @@
+---
+description: "People Metadata Gold Standard: how to write table and column descriptions and categories blocks in dags/people/**/metadata/**/*.yml. Table description structure (Entity, Grain, Scope, Usage/Behavior), column description structure and per-family sentence patterns (sk_ FKs reference their table, is_/has_ 'True when', dt_/ts_ sentinels), mandatory example values on dw/metric columns (fabricated for keys and sensitive data), layer-driven orientation (clean/enrich engineering-facing; dw/metric business-facing), categories usage, affirmative self-contained prose, lineage only in lineage key, PIN not Oracle HCM, no Oracle object names in descriptions, FAIR F2-01/F2-02 authoring. Use when creating or updating People metadata."
+globs: dags/people/**/metadata/**/*.yml
+alwaysApply: false
+---
+# People Metadata — Gold Standard
+
+How to write table and column `description` fields and `categories` blocks in every `metadata/{layer}/{table}.yml` under `dags/people/` (`pin_*` clean schemas, domain enrich such as `datalake_people`, the `dw_*` 2.0 schemas, `metric_people`). Complements `governance_metadata.mdc` (YAML schema) and `fairness_metadata.mdc` (FAIR substance gates); pipeline design and SQL conventions live in `people_domain.mdc`.
+
+## Principles
+
+1. **Self-contained and absolute** — every description is complete on its own; a human or AI agent understands the field without opening the SQL or another description. Relative statements ("same as above", "see previous column") are prohibited.
+2. **Affirmative voice** — state what the data is and how to use it. Express guidance positively: "Use `name` in communications and reports; `legal_name` in `dim_documentation` serves legal and compliance processes." Descriptions carry no "do not", "avoid", or "never use" phrasing.
+3. **Layer sets the orientation** — clean and enrich are engineering- and modeling-facing: make the **behavior** of the column clear and how it is achieved. DW and metric are analytics- and business-facing: describe **what it is** and **how to use it**.
+4. **Code explains code** — why a snippet works the way it works lives in `--` comments inside the SQL file. Metadata is contextual; technical specifics live in the SQL. Enrich metadata may state the resulting guarantee ("exactly one row per employee is flagged; the assignment active today wins over terminated ones"); the implementing window/join logic stays in the SQL.
+5. **Current model only** — describe the table as it is today. Predecessor models, legacy table names, migration history, and future plans stay out of descriptions.
+6. **Lineage lives in `lineage`** — prose never restates source `database.table.column` paths. Derivations are described behaviorally ("derived from the assignment status"); the source columns appear only under `lineage`.
+7. **Front-load the key fact** — the first sentence answers "what is this?"; format, sentinels, and usage follow. Short sentences, no filler. Recurring column families use the fixed sentence patterns below so agents parse them predictably.
+
+## Layer orientation
+
+| Layer | Audience | Description answers |
+|-------|----------|---------------------|
+| **clean** (`pin_*`, API sources) | Engineers building enrich/DW | What the record is in the source system; effective-dating behavior; normalizations applied (sentinel dates, type casts, name expansion) |
+| **enrich** (`datalake_people`, domain enrich) | Engineers and modelers | The column's behavior and guarantee (grain flags, versioning, tie-break outcomes, NULL conditions) stated conceptually — mechanics stay in SQL comments |
+| **dw** (`dw_*` 2.0 schemas) | HR, People Insights, business consumers, AI agents | What the data means for the business and how to use it: canonical filters, join targets, official flags |
+| **metric** (`metric_people`) | Analysts, dashboards, AI agents | What the dimension or measure means and how to slice or aggregate it |
+
+**Source naming:** when the source system helps, name it **PIN** (Person Information). Oracle object names (`per_*`, `PER_*`, ICP internals, vendor table prefixes) appear in `lineage` and SQL comments only — never in `description` prose, on any layer.
+
+## Table description — mandatory components, in order
+
+Write the table `description` as a `|` block with one component per line or short paragraph, in this order:
+
+1. **Entity** — one sentence naming the business entity or process the table represents (no name echo, no "table containing…" filler).
+2. **Grain** — explicit: "One row per `<key>` [× `<key>`]". For SCD Type 2, state the versioning behavior (new version when any attribute changes; consecutive identical periods merged). For snapshots, state the cadence and how the current period is represented.
+3. **Scope** — the population covered, stated affirmatively and in business terms: "Covers all employees, active and terminated." Engineering filters that define the population (assignment types, test-user exclusion) stay in the SQL.
+4. **Usage** *(dw/metric)* — the analyses it supports and the canonical way in: official flags to filter, `sk_*` relationships to join. **Behavior** *(clean/enrich)* — update and effective-dating semantics, and the guarantees downstream consumers rely on.
+
+Tables with several canonical access patterns (e.g. snapshot tables) list them as short "to get X, filter Y" bullets inside the Usage component — `datalake_people.assignment_snapshots` is the reference example.
+
+```yaml
+# Good — dw fact
+description: |
+  Workforce assignments as of each calendar day, with tenure, report counts, leadership and activity flags, and keys to the People dimensions.
+  One row per assignment_number × dt_reference (point-in-time slice, not an SCD table).
+  Covers all employees, active and terminated.
+  Supports headcount, tenure, admissions and exits by date; filter is_current_for_employee = TRUE for the current workforce, and read dimension labels and PII attributes through the sk_* keys.
+```
+
+## Column description — mandatory components, in order
+
+A single sentence group on **one line** (no `|` / `|-` pipe blocks), in this order:
+
+1. **Meaning** — what the value is (business meaning on dw/metric; behavioral definition on clean/enrich).
+2. **Values and format** — unit, format, and sentinel semantics when they exist (`9999-12-31`, `'-1'`, `NULL` conditions, currency).
+3. **Usage / relationship** — the join target for keys, the canonical filter for flags, the intended analysis for measures.
+4. **Example** *(mandatory on dw/metric)* — at least one example of the data the column holds, in parentheses: "(e.g. '123456')". For keys and sensitive information, fabricate a value that follows the pattern of the real data (e.g. 'name.last_name@quintoandar.com.br'). Booleans and columns with a `categories:` block already expose their full value domain ("True when …" and the category list), which fulfills this component.
+
+Fixed sentence patterns per column family:
+
+| Family | Pattern | Example |
+|--------|---------|---------|
+| Own surrogate key | "Unique key for `<grain>`." + example + "Referenced by `<fact.column>`" when facts carry the key | `sk_contact_version`: "Unique key for the contact version (e.g. 'a1b2c3d4…'). Referenced by fact_assignment_snapshots.sk_contact_version for point-in-time joins." |
+| `sk_*` foreign key | "Key of the `<entity, with context>`. References `<schema.table>`." + sentinel + example | `sk_business_unit`: "Key of the assignment's business unit (e.g. '300000123456789'). References dw_organization.dim_business_unit." |
+| `sk_*_date` | "Key of the `<event>` date in YYYYMMDD format. References dim_date." + sentinel | `sk_terminated_date`: "Key of the assignment end date in YYYYMMDD format (e.g. '20240315'). References dim_date; 99991231 while the assignment is active." |
+| `id_*` / business keys | "Main business identifier of the `<entity>` in `<system>`." for the canonical keys (`person_number`, `assignment_number`); otherwise "`<What it identifies>` in `<system>`." + which tables it links + example | `person_number`: "Main business identifier of the employee in PIN, stable across assignments (e.g. '123456'). Links all dw_employee_details tables." |
+| `is_*` / `has_*` | "True when `<condition>`." + cardinality guarantee + canonical use | `is_current_for_employee`: "True on exactly one row per employee — the assignment active today or the most recent terminated one. Filter for the employee's current state." |
+| `dt_*` / `ts_*` | "Date/Timestamp when `<event happened>`." + sentinel + example | `dt_terminated`: "Date the assignment ended (e.g. 2024-03-15). 9999-12-31 while the assignment is active." |
+| Measures | "`<What is counted or measured>`" + unit + zero/NULL semantics + example | `count_direct_report`: "Number of employees reporting directly to this assignment (e.g. 7). Zero when it has no reports." |
+| Categorical | One-line meaning + `categories:` block (below) | `employment_type`: "Employment relationship type derived from the job family." |
+
+```yaml
+# Good — dw column, business orientation, fabricated example following the real pattern
+personal_email:
+  description: Non-work email address registered in PIN for the employee (e.g. 'name.last_name@gmail.com').
+
+# Good — enrich column, engineering orientation (behavior, no mechanics)
+is_primary_assignment_for_snapshot:
+  description: True for the employee's primary assignment on the reference date; when assignments overlap, the effective one wins over pending, then the latest start date.
+
+# Bad — restates lineage, names Oracle objects, walks through the join
+personal_email:
+  description: Email from per_email_addresses where email_type = H1, joined at dt_effective_started.
+```
+
+## `categories` — enumerated value domains
+
+Add a `categories:` block to every column whose values form a stable, low-cardinality domain: statuses, classifications, normalized labels, bucketed ranges. Each entry defines the value affirmatively in one sentence — including the boundary rule for ranges and the trigger condition for statuses. The column `description` states what the column means and how the value is assigned; `categories` enumerates the domain.
+
+```yaml
+tenure_range:
+  description: Tenure band based on full months between the original hire date and the reference date. NULL when the hire date is unknown.
+  categories:
+    "< 3 months": Less than 3 months of tenure.
+    "3-11 months": Between 3 and 11 months of tenure.
+    "1-2 years": Between 1 and 2 years of tenure.
+    "3-4 years": Between 3 and 4 years of tenure.
+    "5+ years": 5 or more years of tenure.
+```
+
+`categories` is omitted for booleans (the "True when" pattern already defines both values), free text, high-cardinality codes, dates, and measures.
+
+## Keep out of descriptions
+
+Join targets are part of model usage and are allowed in column descriptions as `schema.table` (or `dim_date`), following the `sk_*` patterns above. Source provenance is different: full `database.table.column` paths belong only under `lineage`.
+
+| Content | Where it belongs instead |
+|---------|--------------------------|
+| Source provenance paths (`database.table.column`) | `lineage`; join targets (`schema.table`) remain allowed in descriptions |
+| Join algorithms, window/dedup mechanics, CTE walkthroughs, hash formulas | SQL `--` comments |
+| Legacy or predecessor models, migration history, future plans | PR description, if anywhere |
+| Access and permission notes ("access-restricted", who can read it) | Business docs (`dags/people/**/docs/`); grants live in the DAG declaration |
+| Oracle object names (`per_*`, `PER_*`, vendor prefixes) | `lineage` and SQL comments; prose says **PIN** |
+| Negative guidance ("do not", "avoid") | Rephrase affirmatively: state what the column **is** for |
+| Name echo and filler ("Attribute X on table Y", "Table containing…") | Rewrite with actual meaning |
+
+## Formatting and CI
+
+- **Column order** in metadata matches the SQL SELECT order (consumers and lineage validation depend on it).
+- **Calculated columns** (hash surrogate keys, `CURRENT_TIMESTAMP()`, hardcoded literals) carry no `lineage` block — there is no source column to trace.
+- When a file is in the PR diff, `make validate-fair-metadata` enforces substantive table (F2-01) and column (F2-02) descriptions on clean+. Distinct phrasing per column passes; repeated boilerplate fails as `boilerplate_or_name_echo`.
+- Touch only the columns you change when possible; expanding descriptions on unrelated columns triggers FAIR on the whole file.
+
+## People DW and metric metadata — business audience (FAIR F2-02)
+
+The Gold Standard above is the canonical guidance; this heading is kept for references from `people-dw-patterns`. For `metadata/dw/` and `metadata/metric/` the audience is HR, People Insights, Benefits, and other business consumers reading DataHub/catalog UIs — apply the dw/metric row of the Layer orientation table and the PIN source-naming rule.

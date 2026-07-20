@@ -1,5 +1,5 @@
 ---
-description: Conventions for People domain DAGs (dags/people): schema layout, DW 2.0 design, independent source SCD temporal resolution, EMR-safe SQL (no QUALIFY), business-first DW/metric metadata (PIN not Oracle HCM; no Oracle table names in descriptions), reverse export PII (no dim_person guard), Confluence People Data space identifiers for Atlassian MCP (cloudId, numeric spaceId, hub pageIds), reverse_reports migration, new DAG config (bucket, clusters), API reference links (Degreed, Greenhouse, Oracle HCM), Oracle HCM table naming (prefixes, suffixes), PIN to Data Lake via OIC (SFTP flow, DAG-to-prefix mapping, common errors, debugging), multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
+description: Conventions for People domain DAGs (dags/people): schema layout, DW 2.0 design, independent source SCD temporal resolution, EMR-safe SQL (no QUALIFY), Metadata Gold Standard pointer (canonical standard in people_metadata.mdc), reverse export PII (no dim_person guard), Confluence People Data space identifiers for Atlassian MCP (cloudId, numeric spaceId, hub pageIds), reverse_reports migration, new DAG config (bucket, clusters), API reference links (Degreed, Greenhouse, Oracle HCM), Oracle HCM table naming (prefixes, suffixes), PIN to Data Lake via OIC (SFTP flow, DAG-to-prefix mapping, common errors, debugging), multi-file consistency (queries/metadata/data_quality), data quality, conflict resolution, SCD Type 2. Use when editing People pipelines.
 globs: dags/people/**/*
 alwaysApply: false
 ---
@@ -666,73 +666,11 @@ Use terms that data consumers and HR stakeholders understand, independent of Ora
 
 ---
 
-## Metadata — Business Rules Clarity
+## Metadata — Gold Standard (pointer)
 
-Governance metadata (`metadata/{layer}/{table}.yml`) must clearly document **business rules**, not only column lineage.
+The canonical standard for People metadata — table and column `description` structure and order, layer-driven orientation (clean/enrich engineering-facing; dw/metric business-facing), per-family sentence patterns, `categories` usage, affirmative self-contained prose, PIN source naming — lives in **`.cursor/rules/people/people_metadata.mdc`** (auto-loads on `dags/people/**/metadata/**/*.yml`).
 
-- **Table description**: Explain grain, SCD behavior, merge logic, and how to join or use the table
-- **Column descriptions**: Clarify business meaning, valid values, and usage (e.g., "use display_name for communications; legal_name for compliance only")
-- **Lineage**: Keep lineage accurate, but descriptions should focus on what the data represents for the business
-- **Column order**: Column order in metadata must match the SQL query order (helps consumers and lineage validation)
-
-### People DW and metric metadata — business audience (FAIR F2-02)
-
-**Scope:** `metadata/dw/` and `metadata/metric/` under `dags/people/` (and People-facing columns in `metric_people`).
-
-**Audience:** HR, People Insights, Benefits, and other **business** consumers — not engineers tracing SQL. Descriptions are read in DataHub/catalog UIs; **`lineage`** carries technical provenance.
-
-| Rule | Detail |
-|------|--------|
-| **Business language only** | Grain, SCD behavior, what the column means for decisions, valid values, how to join at a **business** level |
-| **No implementation detail** | No join algorithms, effective-dating mechanics, CTE/window logic, or dedup rules in YAML — put those in SQL `--` comments |
-| **Never Oracle table/view names** | Do **not** cite `per_*`, `PER_*`, or any Oracle object name in table or column `description` |
-| **Prefer PIN over Oracle HCM** | If the source system must be named in prose, say **PIN** (Person Information), not "Oracle HCM", "Oracle", or vendor table prefixes |
-| **Lineage vs description** | `lineage` uses lake identifiers (`datalake_pin_core_clean.*`) for governance; descriptions stay vendor-agnostic |
-
-When a file is in the PR diff, `make validate-fair-metadata` enforces substantive descriptions. Balance business readability with CI:
-
-| Do | Avoid |
-|----|--------|
-| One-line business meaning per column | Repeating "at this version" on every column |
-| PIN or domain terms in table `description` when source context helps | Oracle/HCM table or view names anywhere in `description` |
-| SQL `--` comments for temporal join / dedup mechanics | Implementation walkthroughs in YAML `description` |
-| Distinct phrasing (e.g. "International dialing prefix…") | `boilerplate_or_name_echo` — description that only restates the column name |
-
-Touch only columns you change when possible; expanding descriptions on unrelated columns triggers FAIR on the whole file.
-
-```yaml
-# Good — metric/dw column (business)
-personal_email:
-  description: Non-work email address registered in PIN for the employee.
-
-# Bad — Oracle name or engineering detail in description
-personal_email:
-  description: Email from per_email_addresses where email_type = H1, joined at dt_effective_started.
-```
-
-### Column Descriptions — Single-Line Only
-
-Column `description` values must be **single-line strings**. Do not use multi-line YAML pipe blocks (`|` or `|-`). Write the full sentence on one line.
-
-```yaml
-# Good
-columns:
-  sk_employee:
-    description: "Employee surrogate key; join dw_people.dim_employee for name, email, and hierarchy."
-
-# Bad — do not use pipe blocks
-columns:
-  sk_employee:
-    description: |
-      Employee surrogate key shared across People marts; join
-      dw_people.dim_employee for name, email, and hierarchy.
-```
-
-### Calculated Columns — No Lineage
-
-Columns calculated in the query (e.g., `CURRENT_TIMESTAMP()`, `NOW()`, `CASE` expressions with no source reference, hash-based surrogate keys such as `MD5(CONCAT_WS(...))`) must **not** have a `lineage` block. The value is not derived from a specific source column.
-
-The metadata is the primary documentation for data consumers; it must be self-explanatory without reading the SQL.
+When editing People SQL, apply **Multi-File Consistency** above and read that file before creating or updating the paired `metadata/{layer}/{table}.yml`.
 
 ---
 

@@ -9,11 +9,10 @@ description: >-
 
 # People DW — SQL and metadata patterns
 
-**Canonical rules:** **`.cursor/rules/people/people_domain.mdc`**:
+**Canonical rules:**
 
-- **Temporal attribute resolution (independent source SCDs)**
-- **DW Layer — SQL (dual-runtime / EMR)**
-- **People DW and metric metadata — business audience (FAIR F2-02)**
+- **`.cursor/rules/people/people_domain.mdc`** — **Temporal attribute resolution (independent source SCDs)**, **DW Layer — SQL (dual-runtime / EMR)**
+- **`.cursor/rules/people/people_metadata.mdc`** — Metadata Gold Standard, including **People DW and metric metadata — business audience (FAIR F2-02)**
 
 Read those sections before implementing or reviewing. This skill is a **routing playbook**, not a duplicate of the rule file.
 
@@ -62,4 +61,4 @@ Read those sections before implementing or reviewing. This skill is a **routing 
 
 ## After merge — codify new learnings
 
-If review or Forno exposes a **durable** pattern (not ticket-specific data), extend **`people_domain.mdc`** in a small follow-up PR. See **`dbp-jira-reference.md`** § Codifying delivery learnings.
+If review or Forno exposes a **durable** pattern (not ticket-specific data), extend the rule that owns the concern in a small follow-up PR: **`people_domain.mdc`** for pipeline/SQL behavior, **`people_metadata.mdc`** for metadata authoring. See **`dbp-jira-reference.md`** § Codifying delivery learnings.
