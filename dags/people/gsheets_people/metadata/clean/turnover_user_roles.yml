@@ -2,8 +2,8 @@ database_name: datalake_gsheets_people_clean
 table_name: turnover_user_roles
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Access control mapping of employee emails to special dashboard roles in the Turnover analytics tool, defining
-  which users have elevated permissions such as Super_admin for company-wide attrition data visibility.
+description: Access control mapping of viewer emails to manager scopes in the Turnover analytics tool, with one row per viewer
+  and manager combination. Super_admin rows grant company-wide visibility; other rows limit visibility to a manager subtree.
 columns:
   email:
     description: Corporate email address of the employee who holds a special role in the Turnover dashboard, used to control
@@ -11,8 +11,8 @@ columns:
     lineage:
     - datalake_gsheets_people_raw.turnover_user_roles.email
   special_role:
-    description: Elevated permission level granted to the user in the Turnover dashboard (e.g. Super_admin), controlling access
-      to company-wide or cross-team attrition data.
+    description: Manager scope visible to the viewer in the Turnover dashboard, usually the manager display name. Super_admin
+      grants company-wide access instead of a single manager subtree.
     lineage:
     - datalake_gsheets_people_raw.turnover_user_roles.special_role
   ts_load:
