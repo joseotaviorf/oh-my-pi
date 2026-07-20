@@ -1,0 +1,87 @@
+---
+database_name: datalake_gsheets_clean
+table_name: feature_matrix
+description:
+  Google Sheets reference matrix curated by Fintech Operations mapping tools,
+  task features, expense types, and operational teams (Pay, Offboarding,
+  Onboarding, Repairs, CSI, RA, Mediation, SPOC). One row per feature mapping
+  with usage volume and business impact levels for process governance.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  pay_internal_analysts_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.pay_analistas_internos_celula_serfin_em_cx
+    description: Scope flag for Pay internal analysts (SerFin cell in CX) for the feature row.
+  pay_bpo_back_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.pay_bpo_back
+    description: Scope flag indicating whether Pay BPO Back teams use this feature.
+  pay_bpo_front_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.pay_bpo_front
+    description: Scope flag indicating whether Pay BPO Front teams use this feature.
+  offboarding_bpo_back_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.off_bpo_back
+    description: Scope flag indicating whether Offboarding BPO Back teams use this feature.
+  offboarding_bpo_front_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.off_bpo_front
+    description: Scope flag indicating whether Offboarding BPO Front teams use this feature.
+  onboarding_bpo_back_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.onb_bpo_back
+    description: Scope flag indicating whether Onboarding BPO Back teams use this feature.
+  onboarding_bpo_front_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.onb_bpo_front
+    description: Scope flag indicating whether Onboarding BPO Front teams use this feature.
+  repairs_bpo_back_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.reparos_bpo_back
+    description: Scope flag indicating whether Repairs BPO Back teams use this feature.
+  repairs_bpo_front_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.reparos_bpo_front
+    description: Scope flag indicating whether Repairs BPO Front teams use this feature.
+  csi_team_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.csi
+    description: Scope flag indicating whether the CSI team uses this feature.
+  ra_team_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.ra
+    description: Scope flag indicating whether the RA team uses this feature.
+  mediation_team_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.mediacao
+    description: Scope flag indicating whether the Mediation team uses this feature.
+  spoc_team_scope:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.spoc
+    description: Scope flag indicating whether the SPOC team uses this feature.
+  tool_system_name:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.ferramenta
+    description: Operational platform from the Ferramenta sheet column (e.g. Dispatcher, BotCity, Google Forms) where teams execute the mapped task or expense workflow.
+  task_feature_type:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.tipo_de_tarefa_feature
+    description: Task or feature type classification in the Fintech operations matrix.
+  sub_feature_category:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.tipo_de_despesa_bandaid_multa_fatura
+    description: Sub-category for expense, band-aid, fine, or invoice feature types.
+  expense_detail_type:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.despesa
+    description: Detailed expense type label for the feature mapping row.
+  usage_volume_level:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.volume_de_uso
+    description: Usage volume level assigned to the feature (e.g. high, medium, low).
+  business_impact_level:
+    lineage:
+      - datalake_gsheets_raw.feature_matrix.impacto
+    description: Business impact level of the feature for operational prioritization.

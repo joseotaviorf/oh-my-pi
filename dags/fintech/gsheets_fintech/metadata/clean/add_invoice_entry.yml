@@ -1,0 +1,83 @@
+---
+database_name: datalake_gsheets_clean
+table_name: add_invoice_entry
+description:
+  Google Sheets intake for additional invoice entry requests curated by Fintech
+  Operations. One row per invoice-entry automation or manual request with contract,
+  property, ticket, expense, payer/payee, and reference-period context. Consumed
+  to monitor Botcity/Dispatcher execution and reconcile ad-hoc invoice postings.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  execution_timestamp:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.execucao
+    description: Calendar date when the invoice-entry workflow run was executed in the sheet.
+  reference_month_date:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.ref_mes
+    description: Competency month the invoice entry should be booked against.
+  reference_start_date:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.ref_inicio
+    description: Start date of the reference period covered by the invoice entry.
+  reference_end_date:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.ref_final
+    description: End date of the reference period covered by the invoice entry.
+  dispatcher_execution_date:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.data_de_execucao_do_dispatcher
+    description: Calendar date when the Dispatcher automation executed the invoice entry.
+  request_id:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.solicitacao
+    description: Identifier of the invoice-entry request in the Google Sheets intake form.
+  contract_id:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.contrato
+    description: Rental contract identifier the invoice entry applies to.
+  property_id:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.imovel
+    description: Property listing identifier linked to the invoice-entry request.
+  ticket_id:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.ticket
+    description: Support or operations ticket associated with the invoice-entry request.
+  botcity_execution_id:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.id_da_botcity
+    description: Botcity RPA execution identifier for the automated invoice-entry run.
+  origin_source:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.origem
+    description: Channel or system that originated the invoice-entry request.
+  analyst_email:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.analista
+    description: Email of the Fintech analyst who submitted or validated the request.
+  request_type:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.tipodesolicitacao
+    description: Business classification of the invoice-entry request type.
+  payer_type:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.quempaga
+    description: Party responsible for paying the expense in the invoice entry.
+  receiver_type:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.quemrecebe
+    description: Party that should receive the expense amount in the invoice entry.
+  expense_type:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.despesa
+    description: Expense category or label being posted through the invoice entry.
+  expense_value:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.valor
+    description: Monetary amount in BRL to be posted for the invoice entry.
+  installment_count:
+    lineage:
+      - datalake_gsheets_raw.add_invoice_entry.parcelas
+    description: Number of installments planned for collecting or passing the expense.

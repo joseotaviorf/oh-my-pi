@@ -1,0 +1,143 @@
+---
+database_name: datalake_gsheets_clean
+table_name: early_termination_fee
+description:
+  Google Sheets intake for early termination fee requests curated by Fintech
+  Operations (Requests tab). One row per multa/rescisão request with contract,
+  property, negotiated amounts, installment plan, tenant bank details, and
+  automation context. Consumed to monitor fee processing and offboarding workflows.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  creation_timestamp:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.timestamp
+    description: Timestamp when the early-termination fee request was submitted in the sheet.
+  execution_timestamp:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.done_at
+    description: Timestamp when the early-termination fee workflow execution completed.
+  request_id:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.solicitacao
+    description: Identifier of the early-termination fee request in the Google Sheets form.
+  contract_id:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.contrato
+    description: Rental contract identifier linked to the early-termination fee request.
+  property_id:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.imovel
+    description: Property listing identifier linked to the early-termination fee request.
+  sheet_row_index:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.row
+    description: Row index of the request within the Google Sheets Requests tab.
+  total_value:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.valor_total
+    description: Total early-termination fee amount in BRL before negotiation.
+  negotiated_final_value:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.valor_final_negociado
+    description: Final negotiated early-termination fee amount in BRL after adjustments.
+  billing_installments:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.parcelas_cobranca
+    description: Number of installments planned for billing the early-termination fee.
+  payout_installments:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.parcelas_repasses
+    description: Number of installments planned for payout or pass-through of the fee.
+  requester_email:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.solicitante
+    description: Email of the analyst or operator who submitted the fee request.
+  team_name:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.time
+    description: Fintech team responsible for handling the early-termination fee request.
+  ticket_id:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.ticket
+    description: Support or operations ticket associated with the fee request.
+  request_summary:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.resumo
+    description: Short summary describing the early-termination fee request context.
+  penalty_type:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.tipo_de_multa
+    description: Classification of the early-termination penalty or fine type.
+  complied_notice_period:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.cumpriu_aviso_previo
+    description: Flag indicating whether the tenant complied with the notice period.
+  is_broker_fee_waived:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.tx_de_corretagem_corretor
+    description: Flag indicating whether the broker brokerage fee was waived.
+  is_company_fee_waived:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.tx_de_corretagem_5a
+    description: Flag indicating whether the QuintoAndar brokerage fee was waived.
+  is_getnet_payment:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.getnet
+    description: Flag indicating whether the fee should be settled via GetNet.
+  is_interest_waived:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.isencao_de_juros
+    description: Flag indicating whether interest charges were waived for this fee.
+  is_bandaid_opened:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.bandaid_aberto
+    description: Flag indicating whether a related bandaid was opened for this request.
+  bandaid_id:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.id_do_bandaid
+    description: Identifier of the bandaid linked to the early-termination fee request.
+  tenant_account_holder_name:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.dados_iq_titular
+    description: Tenant bank account holder name provided for reimbursement or payout.
+  tenant_tax_id:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.dados_iq_cpfcnpj
+    description: Tenant tax identifier (CPF or CNPJ) linked to the payout account.
+  tenant_bank_name:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.dados_iq_banco
+    description: Bank name provided for the tenant payout account.
+  tenant_bank_agency_code:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.dados_iq_agencia
+    description: Bank branch (agência) code for the tenant payout account.
+  tenant_bank_account_code:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.dados_iq_conta
+    description: Bank account number for the tenant payout.
+  tenant_bank_account_type:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.dados_iq_tipo_de_conta
+    description: Bank account type provided for the tenant payout.
+  execution_log:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.log
+    description: Execution log text captured during fee workflow processing.
+  bot_execution_id:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.bot
+    description: Bot or automation execution identifier for the fee request.
+  eviction_aux_notes:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.aux_evictions
+    description: Auxiliary eviction notes linked to the early-termination fee request.
+  split_queue_name:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.split_queue
+    description: Split queue name used to route the fee request in the workflow.
+  queue_target_id:
+    lineage:
+      - datalake_gsheets_raw.early_termination_fee.sendtoqueue
+    description: Target queue identifier where the fee request was sent for processing.

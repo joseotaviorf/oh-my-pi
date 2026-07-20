@@ -1,0 +1,131 @@
+---
+database_name: datalake_gsheets_clean
+table_name: extra_invoice
+description:
+  Google Sheets intake for extra invoice requests curated by Fintech Operations.
+  One row per supplemental invoice with contract, property, ticket, amounts,
+  payer/payee, bank details, and automation context. Consumed to track manual and
+  automated extra-invoice postings and payment reconciliation.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  creation_timestamp:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.timestamp
+    description: Timestamp when the extra-invoice request was submitted in the Google Sheet.
+  due_date:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.vencimento
+    description: Due date of the extra invoice charge.
+  request_id:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.solicitacao
+    description: Identifier of the extra-invoice request in the Google Sheets intake form.
+  contract_id:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.contrato
+    description: Rental contract identifier the extra invoice applies to.
+  property_id:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.imovel
+    description: Property listing identifier linked to the extra-invoice request.
+  ticket_id:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.ticket
+    description: Support or operations ticket associated with the extra-invoice request.
+  invoice_value:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.valor
+    description: Principal invoice amount in BRL before penalties or adjustments.
+  penalty_value:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.multa
+    description: Penalty or fine amount in BRL applied on top of the invoice value.
+  installment_count:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.parcelas
+    description: Number of installments planned for the extra-invoice charge.
+  hash_verification_id:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.tipo
+    description: Hash or type code used to verify the extra-invoice row in the sheet workflow.
+  sheet_row_index:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.linha
+    description: Row index of the request within the Google Sheets source tab.
+  automation_name:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.automacao
+    description: Name of the automation flow that processed or triggered the extra invoice.
+  analyst_email:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.analista
+    description: Email of the Fintech analyst who submitted or validated the extra invoice.
+  origin_source:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.origem
+    description: Channel or system that originated the extra-invoice request.
+  expense_type:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.despesa
+    description: Expense category or label being billed through the extra invoice.
+  payer_type:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.de
+    description: Party responsible for paying the extra invoice (from / de in the sheet).
+  receiver_type:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.para
+    description: Party that should receive the extra-invoice amount (to / para in the sheet).
+  is_getnet_payment:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.getnet
+    description: Flag indicating whether the extra invoice should be settled via GetNet.
+  is_waive_interest:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.isentar_juros
+    description: Flag indicating whether interest charges should be waived for this invoice.
+  invoice_summary:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.resumo
+    description: Short summary or description of the extra-invoice charge.
+  account_holder_name:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.titular
+    description: Bank account holder name provided for payout or reimbursement.
+  bank_version_id:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.banco
+    description: Bank identifier or version code associated with the payout account.
+  bank_agency_code:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.agencia
+    description: Bank branch (agência) code for the payout account.
+  bank_account_code:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.conta
+    description: Bank account number for the extra-invoice payout.
+  tax_id:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.cpf
+    description: Brazilian tax identifier (CPF) linked to the payout account holder.
+  due_month:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.mes_vencimento
+    description: Competency month label associated with the invoice due date.
+  execution_date:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.execucao
+    description: Execution date recorded when the extra-invoice workflow was run.
+  reference_month:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.ref_mes
+    description: Reference month used for financial booking of the extra invoice.
+  is_canceled:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.cancelado
+    description: Flag indicating whether the extra-invoice request was canceled.
+  internal_notes:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.observacao
+    description: Free-text operational notes captured for the extra-invoice request.

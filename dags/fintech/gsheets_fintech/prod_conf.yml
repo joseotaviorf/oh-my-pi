@@ -1,4 +1,10 @@
 sheets_info:
+  add_invoice_entry:
+    sheet_id: 1MUT59IVpVPU2aYUf0GWmqef_dGMsEUbFYxnOe_1q1TE
+    sheet_name: "Respostas"
+    clean_table_name: add_invoice_entry
+    sheet_context: fintech
+  
   advance_base:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: advance_base
@@ -34,6 +40,18 @@ sheets_info:
     sheet_name: aux_commission
     clean_table_name: aux_commission
     sheet_context: fintech
+  
+  bandaid:
+    sheet_id: 1-HKD9rv6Ov6_WLRDct56f3Gnur45-w004l_Q_ct8jX4
+    sheet_name: Respostas
+    clean_table_name: bandaid
+    sheet_context: fintech
+  
+  bandaid_payment:
+    sheet_id: 13IuO9GIFHVulqLlRD6ceUaEiBUGGjkOkjTMxsazSUMg
+    sheet_name: "Pagamentos Band-Aid"
+    clean_table_name: bandaid_payment
+    sheet_context: fintech
 
   business_rules_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
@@ -51,6 +69,12 @@ sheets_info:
     sheet_id: 1iG68JgfjlWezT1d5rMiCIQIoN3fgskXLpqnKs9OltyA
     sheet_name: clean
     clean_table_name: closing_analysts_hierarchy
+    sheet_context: fintech
+  
+  feature_matrix:
+    sheet_id: 1Vh2Z8IkGP-aar3t6yzp0f0IA4q7maWIJJEZdraOh_K0
+    sheet_name: "Times X Tarefas/Despesas"
+    clean_table_name: feature_matrix
     sheet_context: fintech
 
   serfin_closing_offboarding:
@@ -94,11 +118,29 @@ sheets_info:
     sheet_name: rotina_datalake
     clean_table_name: collections_for_sale_journey_routine
     sheet_context: fintech
+  
+  cnab_payment:
+    sheet_id: 13IuO9GIFHVulqLlRD6ceUaEiBUGGjkOkjTMxsazSUMg
+    sheet_name: "Pagamentos CNAB"
+    clean_table_name: cnab_payment
+    sheet_context: fintech
+  
+  early_termination_fee:
+    sheet_id: 1k4r39kKZJFG_oUozNf20oT4ENVczdm_ufFeSbARUiVA
+    sheet_name: Requests
+    clean_table_name: early_termination_fee
+    sheet_context: fintech
 
   expected_evers:
     sheet_id: 1-YXy2nUEvhwCkTAsWeWxzw7KF6clkmGFUtdz6ZRkI5I
     sheet_name: expected_evers
     clean_table_name: expected_evers
+    sheet_context: fintech
+  
+  extra_invoice:
+    sheet_id: 1k9Q91wHlF7TynIwVuV42_OCnoeM5scCZaXUSEUKm0_w
+    sheet_name: "Faturas Extras"
+    clean_table_name: extra_invoice
     sheet_context: fintech
 
   csat_vistoria_iq_entrada:
@@ -221,6 +263,12 @@ sheets_info:
     sheet_id: 1_pDCFmURUe7uYbmnkjw6GDaucfkjR-xNGJj9wKh-GMU
     sheet_name: carteira_inicial
     clean_table_name: imovelweb_customer_portfolio
+    sheet_context: fintech
+  
+  manual_payment:
+    sheet_id: 13IuO9GIFHVulqLlRD6ceUaEiBUGGjkOkjTMxsazSUMg
+    sheet_name: "Pagamentos Manuais"
+    clean_table_name: manual_payment
     sheet_context: fintech
 
   mova_lra_owners:

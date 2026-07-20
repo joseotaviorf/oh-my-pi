@@ -1,0 +1,151 @@
+---
+database_name: datalake_gsheets_clean
+table_name: bandaid_payment
+description:
+  Google Sheets intake for bandaid-linked utility payment requests curated by
+  Fintech Operations. One row per concessionária invoice settled through a
+  bandaid workflow, with contract, ticket, billing dates, barcode, and payment
+  context. Consumed to monitor bandaid payment tratativas and reconciliation.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  creation_timestamp:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.timestamp
+    description: Timestamp when the bandaid payment request was submitted in the Google Sheet.
+  termination_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_de_rescisao
+    description: Contract termination date associated with the bandaid payment case.
+  billing_period_start_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_inicio
+    description: Start date of the utility billing period covered by the bandaid payment request.
+  billing_period_end_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_final
+    description: End date of the utility billing period covered by the bandaid payment request.
+  due_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_de_vencimento
+    description: Due date of the utility invoice paid through the bandaid workflow.
+  cnab_generation_timestamp:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_cnab
+    description: Timestamp recorded for CNAB-related processing of the bandaid payment case.
+  request_id:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.solicitacao
+    description: Identifier of the bandaid payment request in the Google Sheets intake form.
+  contract_id:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.contrato
+    description: Rental contract identifier linked to the bandaid payment request.
+  property_id:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.imovel
+    description: Property listing identifier linked to the bandaid payment request.
+  ticket_id:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.ticket_da_tratativa
+    description: Support ticket identifier for the bandaid payment tratativa.
+  processing_time_seconds:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.temp_med_s
+    description: Average processing time in seconds recorded for the bandaid payment workflow.
+  sheet_row_index:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.row
+    description: Row index of the request within the Google Sheets source tab.
+  formatted_invoice_value:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.format_inv_amount
+    description: Invoice amount formatted for display or downstream bandaid payment processing.
+  task_name:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.tarefa
+    description: Operational task name associated with processing the bandaid payment.
+  contract_status:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.status_do_contrato
+    description: Contract status at the time the bandaid payment request was handled.
+  analyst_email:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.analista
+    description: Email of the Fintech analyst who submitted or validated the bandaid payment.
+  cost_center_name:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.centro_de_custo
+    description: Cost center assigned to the bandaid utility payment expense.
+  utility_company_name:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.nome_da_concessionaria
+    description: Name of the utility company issuing the bill paid through the bandaid workflow.
+  invoice_amount:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.valor_da_conta
+    description: Utility bill amount as recorded in the Google Sheets intake form.
+  barcode_number:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.cod_de_barras
+    description: Barcode number of the utility bill for bandaid payment.
+  invoice_file_url:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.upload_da_conta
+    description: URL or file reference for the uploaded utility invoice document.
+  case_summary:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.resumo
+    description: Short summary describing the bandaid payment case context.
+  expense_type:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.despesa
+    description: Expense category associated with the bandaid utility payment.
+  billing_charge_type:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.tipo_de_cobranca
+    description: Billing charge type applied to the bandaid payment (tenant, landlord, etc.).
+  execution_status:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.status
+    description: Processing status of the bandaid payment request in the Fintech workflow.
+  internal_notes:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.observacao
+    description: Free-text operational notes captured for the bandaid payment request.
+  tenant_charge_start_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_de_inicio_da_cobranca_ao_iq
+    description: Start date of the billing period charged to the tenant (inquilino).
+  tenant_charge_end_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_final_da_cobranca_ao_iq
+    description: End date of the billing period charged to the tenant (inquilino).
+  landlord_charge_start_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_de_inicio_da_cobranca_ao_pp
+    description: Start date of the billing period charged to the landlord (proprietário).
+  landlord_charge_end_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.data_final_da_cobranca_ao_pp
+    description: End date of the billing period charged to the landlord (proprietário).
+  accounting_system_log:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.lancamentos_sr_barriga
+    description: Accounting postings log reference from the Sr. Barriga system.
+  cnab_file_id:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.cnab
+    description: CNAB file identifier or reference linked to the bandaid payment case.
+  botcity_execution_id:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.id_da_botcity
+    description: BotCity RPA execution identifier for the automated bandaid-payment workflow.
+  suggested_action:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.acao_sugerida
+    description: Suggested operational action for handling the bandaid payment case.
+  action_justification:
+    lineage:
+      - datalake_gsheets_raw.bandaid_payment.detalhe_justificativa
+    description: Detail or justification supporting the suggested action.

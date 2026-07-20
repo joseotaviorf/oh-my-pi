@@ -1,0 +1,183 @@
+---
+database_name: datalake_gsheets_clean
+table_name: cnab_payment
+description:
+  Google Sheets intake for CNAB utility payment requests curated by Fintech
+  Operations. One row per concessionária invoice with contract, ticket, billing
+  dates, barcode, PDF extraction fields, and CNAB generation context. Consumed
+  to monitor utility bill payments and CNAB file production workflows.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  creation_timestamp:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.timestamp
+    description: Timestamp when the CNAB payment request was submitted in the Google Sheet.
+  termination_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_de_rescisao
+    description: Contract termination date associated with the utility payment case.
+  billing_period_start_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_inicio
+    description: Start date of the utility billing period covered by the payment request.
+  billing_period_end_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_final
+    description: End date of the utility billing period covered by the payment request.
+  due_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_de_vencimento
+    description: Due date of the utility invoice to be paid via CNAB.
+  cnab_generation_timestamp:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_cnab
+    description: Timestamp when the CNAB file was generated for the payment request.
+  pdf_extracted_due_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.vencimento_pdf
+    description: Due date extracted from the uploaded utility invoice PDF.
+  request_id:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.solicitacao
+    description: Identifier of the CNAB payment request in the Google Sheets intake form.
+  contract_id:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.contrato
+    description: Rental contract identifier linked to the CNAB payment request.
+  property_id:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.imovel
+    description: Property listing identifier linked to the CNAB payment request.
+  ticket_id:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.ticket_da_tratativa
+    description: Support ticket identifier for the utility payment tratativa.
+  processing_time_seconds:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.temp_med_s
+    description: Average processing time in seconds recorded for the payment workflow.
+  sheet_row_index:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.row
+    description: Row index of the request within the Google Sheets source tab.
+  formatted_invoice_value:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.format_inv_amount
+    description: Invoice amount formatted for display or downstream CNAB generation.
+  pdf_extracted_value:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.valor_pdf
+    description: Invoice amount extracted from the uploaded utility bill PDF.
+  task_name:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.tarefa
+    description: Operational task name associated with processing the CNAB payment.
+  contract_status:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.status_do_contrato
+    description: Contract status at the time the CNAB payment request was handled.
+  analyst_email:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.analista
+    description: Email of the Fintech analyst who submitted or validated the payment request.
+  cost_center_name:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.centro_de_custo
+    description: Cost center assigned to the utility payment expense.
+  utility_company_name:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.nome_da_concessionaria
+    description: Name of the utility company issuing the bill to be paid.
+  invoice_amount:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.valor_da_conta
+    description: Utility bill amount as recorded in the Google Sheets intake form.
+  barcode_number:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.cod_de_barras
+    description: Barcode number of the utility bill for CNAB payment.
+  invoice_file_url:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.upload_da_conta
+    description: URL or file reference for the uploaded utility invoice document.
+  case_summary:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.resumo
+    description: Short summary describing the CNAB payment case context.
+  expense_type:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.despesa
+    description: Expense category associated with the utility payment.
+  billing_charge_type:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.tipo_de_cobranca
+    description: Billing charge type applied to the utility payment (tenant, landlord, etc.).
+  execution_status:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.status
+    description: Processing status of the CNAB payment request in the Fintech workflow.
+  internal_notes:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.observacao
+    description: Free-text operational notes captured for the CNAB payment request.
+  tenant_charge_start_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_de_inicio_da_cobranca_ao_iq
+    description: Start date of the billing period charged to the tenant (inquilino).
+  tenant_charge_end_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_final_da_cobranca_ao_iq
+    description: End date of the billing period charged to the tenant (inquilino).
+  landlord_charge_start_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_de_inicio_da_cobranca_ao_pp
+    description: Start date of the billing period charged to the landlord (proprietário).
+  landlord_charge_end_date:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.data_final_da_cobranca_ao_pp
+    description: End date of the billing period charged to the landlord (proprietário).
+  accounting_system_log:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.lancamentos_sr_barriga
+    description: Accounting postings log reference from the Sr. Barriga system.
+  cnab_file_id:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.cnab
+    description: Identifier or reference of the generated CNAB payment file.
+  botcity_execution_id:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.id_da_botcity
+    description: BotCity RPA execution identifier for the automated CNAB workflow.
+  suggested_action:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.acao_sugerida
+    description: Suggested operational action for handling the payment case.
+  action_justification:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.detalhe_justificativa
+    description: Detail or justification supporting the suggested action.
+  pdf_extracted_barcode:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.codigo_barras_pdf
+    description: Barcode number extracted from the uploaded utility invoice PDF.
+  pdf_extracted_reference_month:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.referencia_pdf
+    description: Reference month extracted from the uploaded utility invoice PDF.
+  pdf_extracted_utility_name:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.concessionaria_pdf
+    description: Utility company name extracted from the uploaded invoice PDF.
+  pdf_reading_status:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.status_leitura_pdf
+    description: Status of the automated PDF reading step for the utility invoice.
+  pdf_reading_details:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.detalhe_leitura_pdf
+    description: Detail message from the automated PDF reading step.
+  pdf_vs_sheet_check_status:
+    lineage:
+      - datalake_gsheets_raw.cnab_payment.check_pdf_x_planilha
+    description: Result of cross-checking PDF-extracted fields against sheet values.
