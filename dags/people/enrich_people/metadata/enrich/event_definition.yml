@@ -3,68 +3,47 @@ table_name: event_definition
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
-  Enriched table that combines action and action_reason from PIN Core into event definitions.
-  
-  This table creates a unified view of all action-reason combinations that have been used
-  in action_occurrence, joining with translation tables for human-readable names.
-  
-  The grain is one row per unique combination of id_action + id_action_reason (event definition).
-  
-  Key features:
-  - Unified identifier (id_event_definition) combining action and reason IDs
-  - English and Portuguese translations for action and reason names
-  - Validity dates for both action and reason
-  
-  Use cases:
-  - Reference table for DW dimension tables (dim_event_definition)
-  - Lookup table for action and reason descriptions
-  - Cross-domain reference for People analytics
+  Catalog of PIN HR action and action-reason (Motivo da ação) pairs with English and Portuguese labels.
+  One row per id_action × id_reason.
+  Covers every action-reason combination observed in PIN action occurrences, including an unknown-reason sentinel when the action-reason is missing.
+  Supplies event keys and labels for termination and compensation joins; identifier_mapping and compensation_versions look up id_event_definition here, and DW dim_event_definition reads the current rows.
 
 columns:
   id_event_definition:
-    description: |
-      Unified identifier combining id_action and id_action_reason.
-      Format: {id_action}-{id_action_reason}
+    description: Unified event key as {id_action}-{id_reason}; when the action-reason (Motivo da ação) is missing, id_reason is the sentinel -1 so the key still resolves.
   id_action:
     description: System-generated primary key for the action.
   id_reason:
-    description: System-generated primary key for the action reason.
+    description: PIN identifier of the action-reason (Motivo da ação), or -1 when it is missing so the event still joins on the action alone.
   action_code:
     description: Unique code that identifies the action (e.g., "HIR", "TER", "PROM").
   reason_code:
-    description: Unique code that identifies the action reason.
+    description: Stable PIN code for the action-reason (Motivo da ação), or UNKNOWN when it is missing.
   action_name:
     description: Action name in English (US).
   reason_name:
-    description: Action reason name in English (US).
+    description: Action-reason label in English (US), or Unknown when the action-reason (Motivo da ação) is missing.
   action_description:
     description: Long description of the action in English (US).
   action_name_ptb:
     description: Action name in Portuguese (PTB).
   reason_name_ptb:
-    description: Action reason name in Portuguese (PTB).
+    description: Action-reason label in Portuguese (PTB), or Desconhecido when the action-reason is missing.
   action_description_ptb:
     description: Long description of the action in Portuguese (PTB).
   is_current:
-    description: |
-      TRUE if the event definition is currently valid.
-      Both action and reason must have no end date or end date in the future.
+    description: True when the action (and action-reason when present) is valid for the load date.
   dt_valid_from:
-    description: |
-      Start date of the event definition validity.
-      Calculated as GREATEST(dt_action_started, dt_reason_started).
+    description: First date the event definition is valid; for unknown-reason rows this follows the action start alone.
   dt_valid_to:
-    description: |
-      End date of the event definition validity.
-      Calculated as LEAST(dt_action_ended, dt_reason_ended).
-      NULL if both action and reason have no end date (or Oracle's 4712-12-31).
+    description: Last date the event definition is valid; open-ended periods use 9999-12-31, and unknown-reason rows follow the action end alone.
   dt_action_started:
     description: The date from which the action is active.
   dt_action_ended:
     description: The date until which the action is active (NULL if still active).
   dt_reason_started:
-    description: The date from which the action reason is active.
+    description: Date from which the action-reason (Motivo da ação) is active; for unknown-reason rows this mirrors the action start.
   dt_reason_ended:
-    description: The date until which the action reason is active (NULL if still active).
+    description: Date until which the action-reason (Motivo da ação) is active; 9999-12-31 for unknown-reason or open-ended reasons.
   ts_load:
     description: Timestamp of when the record was loaded into the table.

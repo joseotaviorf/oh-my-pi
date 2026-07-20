@@ -35,8 +35,9 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_people.id_person
   id_termination_event_definition:
-    description: Composite key identifying the termination event type, formed as id_action-id_action_reason. Null for active assignments.
+    description: Key of the assignment's termination event in event_definition; when the action-reason (Motivo da ação) is missing, the key uses reason sentinel -1 so the action (e.g. voluntary resignation) still resolves. NULL while the assignment has no termination event.
     lineage:
+      - datalake_people.event_definition.id_event_definition
       - datalake_pin_core_clean.all_assignments.action_code
       - datalake_pin_core_clean.action_occurrence.id_action
       - datalake_pin_core_clean.action_occurrence.id_action_reason

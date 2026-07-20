@@ -1,7 +1,7 @@
 WITH distinct_event_definition AS (
     SELECT DISTINCT
         id_action,
-        id_action_reason,
+        COALESCE(id_action_reason, -1) AS id_action_reason,
         id_business_group
     FROM
         datalake_pin_core_clean.action_occurrence
@@ -88,14 +88,34 @@ deduplicated AS (
         ded.id_action,
         ded.id_action_reason AS id_reason,
         ab.action_code,
-        arb.action_reason_code AS reason_code,
+        CASE
+            WHEN ded.id_action_reason = -1 THEN 'UNKNOWN'
+            ELSE arb.action_reason_code
+        END AS reason_code,
         at_us.action_name,
-        art_us.action_reason AS reason_name,
+        CASE
+            WHEN ded.id_action_reason = -1 THEN 'Unknown'
+            ELSE art_us.action_reason
+        END AS reason_name,
         at_us.description AS action_description,
         at_ptb.action_name AS action_name_ptb,
-        art_ptb.action_reason AS reason_name_ptb,
+        CASE
+            WHEN ded.id_action_reason = -1 THEN 'Desconhecido'
+            ELSE art_ptb.action_reason
+        END AS reason_name_ptb,
         at_ptb.description AS action_description_ptb,
         CASE
+            -- Unknown-reason (-1) rows have no reason dates; is_current follows the action window only.
+            WHEN ded.id_action_reason = -1 THEN
+                CASE
+                    WHEN ab.dt_started <= DATE('{load_start_date}')
+                        AND (
+                            ab.dt_ended >= DATE('9999-12-31')
+                            OR ab.dt_ended > DATE('{load_start_date}')
+                        )
+                    THEN TRUE
+                    ELSE FALSE
+                END
             WHEN GREATEST(ab.dt_started, arb.dt_started) <= DATE('{load_start_date}')
                 AND (
                     ab.dt_ended >= DATE('9999-12-31')
@@ -108,8 +128,12 @@ deduplicated AS (
             THEN TRUE
             ELSE FALSE
         END AS is_current,
-        GREATEST(ab.dt_started, arb.dt_started) AS dt_valid_from,
         CASE
+            WHEN ded.id_action_reason = -1 THEN ab.dt_started
+            ELSE GREATEST(ab.dt_started, arb.dt_started)
+        END AS dt_valid_from,
+        CASE
+            WHEN ded.id_action_reason = -1 THEN ab.dt_ended
             WHEN ab.dt_ended >= DATE('9999-12-31')
             THEN arb.dt_ended
             WHEN arb.dt_ended >= DATE('9999-12-31')
@@ -118,8 +142,14 @@ deduplicated AS (
         END AS dt_valid_to,
         ab.dt_started AS dt_action_started,
         ab.dt_ended AS dt_action_ended,
-        arb.dt_started AS dt_reason_started,
-        arb.dt_ended AS dt_reason_ended,
+        CASE
+            WHEN ded.id_action_reason = -1 THEN ab.dt_started
+            ELSE arb.dt_started
+        END AS dt_reason_started,
+        CASE
+            WHEN ded.id_action_reason = -1 THEN DATE('9999-12-31')
+            ELSE arb.dt_ended
+        END AS dt_reason_ended,
         NOW() AS ts_load,
         ROW_NUMBER() OVER (
             PARTITION BY
@@ -134,7 +164,7 @@ deduplicated AS (
         current_action_base AS ab
             ON ab.id_action = ded.id_action
             AND ab.id_business_group = ded.id_business_group
-    INNER JOIN
+    LEFT JOIN
         current_action_reason_base AS arb
             ON arb.id_action_reason = ded.id_action_reason
             AND arb.id_business_group = ded.id_business_group
@@ -183,3 +213,4 @@ FROM
     deduplicated
 WHERE
     rn = 1
+    AND reason_code IS NOT NULL

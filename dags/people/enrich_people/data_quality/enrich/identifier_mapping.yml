@@ -180,6 +180,32 @@ column_level_validations:
            AND dt_actual_termination < CURRENT_DATE
         ) = 0
       severity_level: Warning
+  termination_action_reason_must_be_present:
+    custom:
+      # PIN Motivo da ação (id_action_reason) should be filled for termination-class assignments
+      # on/after official PIN go-live (2024-03-01). Model uses reason sentinel -1 so consumers
+      # still resolve action labels; this warns on post-go-live source gaps only.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping AS im
+         INNER JOIN datalake_pin_core_clean.all_assignments AS aa
+           ON aa.id_assignment = im.id_assignment
+          AND aa.is_primary
+          AND aa.assignment_status_type = 'INACTIVE'
+          AND aa.action_code IN (
+            'TERMINATION',
+            'RESIGNATION',
+            'DEATH',
+            'GLB_TRANSFER',
+            'EXPATRIADO'
+          )
+         INNER JOIN datalake_pin_core_clean.action_occurrence AS ao
+           ON ao.id_action_occurrence = aa.id_action_occurrence
+         WHERE im.dt_actual_termination IS NOT NULL
+           AND im.dt_actual_termination >= DATE('2024-03-01')
+           AND ao.id_action_reason IS NULL
+        ) = 0
+      severity_level: Warning
   glb_transfer_missing_continuation:
     custom:
       # INACTIVE GLB_TRANSFER after which the person has no assignment at all (no assignment_sequence + 1 continuation and no other E/C assignment on/after the transfer close), which breaks is_transfer_hire / dt_employee_hired chaining. A continuation outside the sequence pattern (e.g. a fresh assignment for the same person) is a valid rejoin, not an error.

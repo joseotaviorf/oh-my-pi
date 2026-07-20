@@ -20,6 +20,8 @@ workflow:
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
   inner_dependencies:
+    identifier_mapping:
+      - event_definition
     assignment_termination:
       - identifier_mapping
     management_hierarchy:

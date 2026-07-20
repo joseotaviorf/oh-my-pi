@@ -343,16 +343,17 @@ termination_event_definitions AS (
     SELECT
         ta.id_assignment,
         ta.action_code,
-        CONCAT(
-            CAST(ao.id_action AS STRING),
-            '-',
-            CAST(ao.id_action_reason AS STRING)
-        ) AS id_event_definition
+        ed.id_event_definition
     FROM
         termination_assignments AS ta
     INNER JOIN
         datalake_pin_core_clean.action_occurrence AS ao
             ON ao.id_action_occurrence = ta.id_action_occurrence
+    LEFT JOIN
+        datalake_people.event_definition AS ed
+            ON ed.id_action = ao.id_action
+            AND ed.id_reason = COALESCE(ao.id_action_reason, -1)
+            AND ed.is_current = TRUE
 ),
 transfer_hire_assignments AS (
     -- The incoming side of an internal transfer: the assignment opened at assignment_sequence + 1
