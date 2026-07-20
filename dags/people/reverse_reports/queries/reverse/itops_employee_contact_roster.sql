@@ -7,7 +7,7 @@ SELECT
         WHEN LOWER(es.status) = 'terminated' THEN 'desligado'
         ELSE LOWER(es.status)
     END AS status,
-    mh.name_l1 AS gestor,
+    es.manager_name AS gestor,
     es.job_name AS cargo,
     es.job_family AS classe_cargo,
     CONCAT(
@@ -52,9 +52,5 @@ FROM
 LEFT JOIN
     dw_organization.dim_business_unit AS bu
         ON bu.sk_business_unit = es.sk_business_unit
-LEFT JOIN
-    dw_employee_details.dim_management_hierarchy AS mh
-        ON mh.assignment_number = es.assignment_number
-        AND mh.is_current = TRUE
 WHERE
     es.is_current_for_employee = TRUE
