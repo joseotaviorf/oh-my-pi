@@ -17,6 +17,7 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 ## Related Metric Entities
 
 - Journey PC
+- [Escalation Rate FR Offboarding](../metric_entities/escalation_rate_fr_offboarding.md) — official escalation rate for the For Rent offboarding agent (`ForRentOffboardingAgentV1`), per day, segmented by `sessions.is_escalated`.
 - [% Escalation Rate (Wall-E)](../metric_entities/escalation_rate_walle.md) — official escalation rate for Wall-E sessions, scoped with `bot = 'wall-e'`.
 - [% Escalation Error Rate (Wall-E)](../metric_entities/escalation_error_rate_walle.md) — official Wall-E escalation error rate, restricted to a curated front-facing queue whitelist.
 
