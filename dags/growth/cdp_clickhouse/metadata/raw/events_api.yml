@@ -37,7 +37,9 @@ columns:
       Event Gateway update epoch in milliseconds; ReplacingMergeTree version column
       used for deduplication ordering in the clean layer.
   _ingested_at:
-    description: ClickHouse ingestion timestamp used as a secondary dedup tie-breaker.
+    description: |
+      ClickHouse ingestion timestamp used to filter incremental exports from
+      events_api and as a secondary dedup tie-breaker in the clean layer.
   enrichments:
     description: JSON string of enrichment fields such as device_id and domain_user_id.
   house_id:
