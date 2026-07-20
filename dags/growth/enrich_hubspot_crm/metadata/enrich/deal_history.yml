@@ -406,6 +406,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Whether the FUP was completed without recovering the deal or not.
+  consorcio_entered_churn:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Whether the deal entered the churn initiative or not, meaning they have already been a part of rehabilitation, were never recovered and have received a churn communication.
   is_archived:
     lineage:
       - datalake_hubspot_clean.deal.is_archived

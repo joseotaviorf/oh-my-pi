@@ -278,6 +278,7 @@ deal:
       - cons_fup_inatividade_recovery_flag
       - cons_fup_inatividade_recovered_at
       - cons_fup_inatividade_discarded_by_cadence
+      - consorcio_entrou_churn
     propertiesWithHistory:
       - dealstage
       - pipeline
