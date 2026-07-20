@@ -17,6 +17,8 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 ## Related Metric Entities
 
 - Journey PC
+- [% Escalation Rate (Wall-E)](../metric_entities/escalation_rate_walle.md) — official escalation rate for Wall-E sessions, scoped with `bot = 'wall-e'`.
+- [% Escalation Error Rate (Wall-E)](../metric_entities/escalation_error_rate_walle.md) — official Wall-E escalation error rate, restricted to a curated front-facing queue whitelist.
 
 ## Glossary and Synonyms
 
