@@ -2247,9 +2247,6 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla:first-run-of-day
 bietlejuice.enrich_customer_support:
   - bietlejuice.bigfone:load-clean-event:first-run-of-day
-  - bietlejuice.chat_fup:load-clean-chats-chat:first-run-of-day
-  - bietlejuice.chat_fup:load-clean-surveys-answer:first-run-of-day
-  - bietlejuice.chat_fup:load-clean-surveys-survey:first-run-of-day
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day

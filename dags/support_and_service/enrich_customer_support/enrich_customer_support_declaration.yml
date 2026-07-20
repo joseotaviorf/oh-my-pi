@@ -22,8 +22,6 @@ workflow:
     - sla_journey
     - sla_theme
     - sla_theme_detail
-    csat:
-    - tickets
     tickets_backlog:
     - sla_journey
     - sla_theme
@@ -52,8 +50,6 @@ workflow:
       table_properties:
         "delta.dataSkippingNumIndexedCols": "0"
         "delta.dataSkippingStatsColumns": "id_ticket,id_call,id_session"
-    csat:
-      merge_on: [id_ticket]
     sla_journey:
       z_order_by: [journey_step]
     sla_theme:
