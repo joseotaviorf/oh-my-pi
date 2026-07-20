@@ -7,6 +7,7 @@ released_cycles AS (
     VALUES
       ('Performa 2023'),
       ('Performa 2024'),
+      ('Performa 2025'),
       ('Talent Review 2024 Q1'),
       ('Talent Review 2024 Q2'),
       ('Talent Review 2024 Q3'),
