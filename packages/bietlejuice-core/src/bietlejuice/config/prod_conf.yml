@@ -181,7 +181,7 @@ cluster_template:
             spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
             spark.sql.legacy.timeParserPolicy: LEGACY
             spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
-            spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.quintoandar.com.br"
+            spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.svc.core-prd.habitat.zone"
             spark.metrics.conf.*.sink.graphite.period: "15"
             spark.metrics.conf.*.sink.graphite.port: "9109"
             spark.metrics.conf.*.sink.graphite.unit: "seconds"
