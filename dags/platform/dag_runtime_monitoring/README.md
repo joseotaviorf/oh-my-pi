@@ -41,8 +41,13 @@ downstream IDs matching `bietlejuice.dw_*`.
   If the YAML cannot be loaded on a later cycle, the update keeps the ledger's
   snapshot count from the initial alert instead of dropping the blocking line.
 - If the YAML cannot be read **or** inverted (invalid upstream shapes) on the
-  **initial** alert, messages still send with `Impacted DW DAGs: none` — the
+  **initial** alert, messages still send with `• Impacted DW: none` — the
   monitor cycle never fails on a dependency-parse error.
+
+Alert text is multiline (🐌 + owner from Airflow `dag.owners` with fallback to
+serialized DAG `default_args.owner`, elapsed/baseline, run id, DW impact). Payloads
+are hard-capped before send: Google Chat `text` ≤ 4096 chars; JiraOps/Opsgenie
+`message` ≤ 130 and `description` ≤ 15000.
 
 Freshness tracks DAG deploys: after `make dependencies-file` is committed and the
 `dags/` package is uploaded to Airflow, the next `*/30` run sees the new graph. No

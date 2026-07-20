@@ -61,6 +61,13 @@ DEDUP_VARIABLE_KEY = "DAG_RUNTIME_MONITORING_ALERTED_RUNS"
 
 # Cap the DW blast-radius list in Chat / JiraOps messages.
 _IMPACTED_DW_LIST_LIMIT = 25
+_UNKNOWN_OWNER = "unknown"
+# Channel payload limits (hard caps; truncate before send).
+# GChat incoming webhooks reject text > 4096 characters.
+_GCHAT_TEXT_MAX = 4096
+# Opsgenie / JSM Ops: alert title (message) max 130; description max 15000.
+_JIRA_MESSAGE_MAX = 130
+_JIRA_DESCRIPTION_MAX = 15000
 # Job-cluster bootstrap task (and ``execute-job-cluster-N`` multi-cluster variants).
 _EXECUTE_JOB_CLUSTER_TASK_PREFIX = "execute-job-cluster"
 
@@ -163,6 +170,14 @@ _RUN_STATE_QUERY = text(
     GROUP BY dr.dag_id, dr.run_id, dr.state, dr.start_date, dr.end_date
     """
 ).bindparams(bindparam("run_ids", expanding=True), bindparam("dag_ids", expanding=True))
+
+_OWNERS_QUERY = text(
+    """
+    SELECT dag_id, owners
+    FROM dag
+    WHERE dag_id IN :dag_ids
+    """
+).bindparams(bindparam("dag_ids", expanding=True))
 
 # A DagRun in one of these states is finished; anything else is still in flight.
 _TERMINAL_STATES = {"success", "failed"}
@@ -325,15 +340,15 @@ def _evaluate_all(
 
 
 def _build_alert_text(finding: dict) -> str:
-    base = (
-        f"*{finding['dag_id']}* runtime anomaly — running for "
-        f"{_format_duration(finding['elapsed_s'])}; "
-        f"P{finding['percentile']} of the last {finding['history_count']} successful runs is "
-        f"{_format_duration(finding['baseline_s'])} "
-        f"({finding['pct_over']}% over baseline). run_id={finding['run_id']}"
+    """JiraOps description — same multiline layout as the Chat initial alert."""
+    return _slowness_body(
+        finding,
+        finding["elapsed_s"],
+        headline=f"🐌 *{finding['dag_id']}* running slower than usual",
+        include_run=True,
+        include_impact=True,
+        footer=None,
     )
-    impact = _format_impacted_dw_line(finding.get("impacted_dw_dags") or [])
-    return f"{base} {impact}"
 
 
 def _thread_key(dag_id: str, run_id: str) -> str:
@@ -357,6 +372,7 @@ def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dic
         "impacted_dw_count": finding.get("impacted_dw_count", len(impacted)),
         # ISO start used for elapsed (execute-job-cluster or dag_run); follow-ups reuse it.
         "work_start_date": finding.get("work_start_date"),
+        "owner": finding.get("owner") or _UNKNOWN_OWNER,
     }
 
 
@@ -366,29 +382,114 @@ def _over_pct(elapsed_s: float, baseline_s: float | None) -> int | None:
     return round((elapsed_s / baseline_s - 1) * 100)
 
 
-def _baseline_detail(entry: dict, elapsed_s: float) -> str:
+def _truncate_text(text: str, max_chars: int) -> str:
+    """Hard-cap a string for channel payload limits (keeps a trailing ellipsis)."""
+    if max_chars <= 0 or len(text) <= max_chars:
+        return text
+    if max_chars == 1:
+        return "…"
+    return text[: max_chars - 1] + "…"
+
+
+def _owner_label(entry: dict) -> str:
+    return (entry.get("owner") or _UNKNOWN_OWNER).strip() or _UNKNOWN_OWNER
+
+
+def _elapsed_bullet(entry: dict, elapsed_s: float) -> str:
     baseline_s = entry.get("baseline_s")
     over = _over_pct(elapsed_s, baseline_s)
     if baseline_s and over is not None:
+        sign = "+" if over >= 0 else ""
         return (
+            f"• Elapsed: {_format_duration(elapsed_s)} — "
             f"P{entry.get('percentile')} baseline {_format_duration(baseline_s)} "
-            f"({over}% over)"
+            f"({sign}{over}%)"
         )
-    return "baseline unavailable"
+    return f"• Elapsed: {_format_duration(elapsed_s)} — baseline unavailable"
 
 
 def _format_impacted_dw_line(
     impacted_dw_dags: list | None, *, limit: int = _IMPACTED_DW_LIST_LIMIT
 ) -> str:
-    """Render the DW blast-radius line for Chat / JiraOps (truncated after ``limit``)."""
+    """Render the DW blast-radius bullet for Chat / JiraOps (truncated after ``limit``)."""
     dags = list(impacted_dw_dags or [])
     if not dags:
-        return "Impacted DW DAGs: none."
+        return "• Impacted DW: none"
     shown = dags[:limit]
     overflow = len(dags) - len(shown)
     listed = ", ".join(shown)
     suffix = f" … and {overflow} more" if overflow > 0 else ""
-    return f"Impacted DW DAGs ({len(dags)}): {listed}{suffix}."
+    return f"• Impacted DW ({len(dags)}): {listed}{suffix}"
+
+
+def _slowness_body(
+    entry: dict,
+    elapsed_s: float,
+    *,
+    headline: str,
+    include_run: bool = False,
+    include_impact: bool = False,
+    blocking_count: int | None = None,
+    footer: str | None = None,
+) -> str:
+    """Shared multiline layout for slowness alerts (Chat + JiraOps)."""
+    lines = [
+        headline,
+        f"• Owner: {_owner_label(entry)}",
+        _elapsed_bullet(entry, elapsed_s),
+    ]
+    if include_run:
+        lines.append(f"• Run: {entry.get('run_id')}")
+    if include_impact:
+        lines.append(_format_impacted_dw_line(entry.get("impacted_dw_dags") or []))
+    if isinstance(blocking_count, int) and blocking_count > 0:
+        lines.append(f"• Still blocking {blocking_count} dw_* DAG(s)")
+    if footer:
+        lines.append(footer)
+    return "\n".join(lines)
+
+
+def _initial_text(entry: dict, elapsed_s: float) -> str:
+    return _slowness_body(
+        entry,
+        elapsed_s,
+        headline=f"🐌 *{entry['dag_id']}* running slower than usual",
+        include_run=True,
+        include_impact=True,
+        footer="Tracking until it finishes.",
+    )
+
+
+def _update_text(
+    entry: dict, elapsed_s: float, *, impacted_dw_count: int | None = None
+) -> str:
+    count = (
+        impacted_dw_count
+        if impacted_dw_count is not None
+        else entry.get("impacted_dw_count")
+    )
+    return _slowness_body(
+        entry,
+        elapsed_s,
+        headline=f"🐌 *{entry['dag_id']}* still running",
+        blocking_count=count if isinstance(count, int) else None,
+    )
+
+
+def _resolved_text(entry: dict, duration_s: float | None) -> str:
+    dur = _format_duration(duration_s) if duration_s is not None else "unknown time"
+    return (
+        f"✅ *{entry['dag_id']}* finished after {dur} (was flagged as slow).\n"
+        f"• Owner: {_owner_label(entry)}"
+    )
+
+
+def _failed_text(entry: dict, duration_s: float | None) -> str:
+    dur = _format_duration(duration_s) if duration_s is not None else "unknown time"
+    return (
+        f"❌ *{entry['dag_id']}* run FAILED after {dur} (was flagged as slow).\n"
+        f"• Owner: {_owner_label(entry)}"
+    )
 
 
 def _load_downstream_index_safe() -> dict | None:
@@ -442,42 +543,6 @@ def _live_impacted_dw_count(dag_id: str, downstream_index: dict | None) -> int |
     )
 
 
-def _initial_text(entry: dict, elapsed_s: float) -> str:
-    return (
-        f"⏱️ *{entry['dag_id']}* is running slower than usual — elapsed "
-        f"{_format_duration(elapsed_s)}; {_baseline_detail(entry, elapsed_s)}. "
-        f"Tracking until it finishes. run_id={entry['run_id']} "
-        f"{_format_impacted_dw_line(entry.get('impacted_dw_dags') or [])}"
-    )
-
-
-def _update_text(
-    entry: dict, elapsed_s: float, *, impacted_dw_count: int | None = None
-) -> str:
-    count = (
-        impacted_dw_count
-        if impacted_dw_count is not None
-        else entry.get("impacted_dw_count")
-    )
-    blocking = ""
-    if isinstance(count, int) and count > 0:
-        blocking = f" Still blocking {count} dw_* DAG(s)."
-    return (
-        f"⏳ *{entry['dag_id']}* still running — {_format_duration(elapsed_s)} elapsed now "
-        f"({_baseline_detail(entry, elapsed_s)}).{blocking}"
-    )
-
-
-def _resolved_text(entry: dict, duration_s: float | None) -> str:
-    dur = _format_duration(duration_s) if duration_s is not None else "unknown time"
-    return f"✅ *{entry['dag_id']}* finished after {dur} (was flagged as slow)."
-
-
-def _failed_text(entry: dict, duration_s: float | None) -> str:
-    dur = _format_duration(duration_s) if duration_s is not None else "unknown time"
-    return f"❌ *{entry['dag_id']}* run FAILED after {dur} (was flagged as slow)."
-
-
 # --------------------------------------------------------------------------- #
 # Side-effecting senders
 # --------------------------------------------------------------------------- #
@@ -491,21 +556,29 @@ def _send_jira_alert(
     ``responder_team_id`` overrides the default (Data Engineering) team — used to route a
     test alert to a test team. ``test`` marks the alert as a test (prefix + ``test`` tag).
     """
-    dag_id = finding["dag_id"]
-    run_id = finding["run_id"]
+    dag_id = finding.get("dag_id", "<unknown>")
+    run_id = finding.get("run_id", "<unknown>")
     tags = [dag_id, "runtime anomaly", "critical"]
     if test:
         tags.append("test")
     try:
+        # Title/description must stay inside try: a bad finding must not abort the
+        # whole monitor_dag_runtimes task — log and skip this page instead.
+        title = _truncate_text(
+            f"{'[TEST] ' if test else ''}DAG runtime anomaly: {dag_id}",
+            _JIRA_MESSAGE_MAX,
+        )
+        description = _truncate_text(_build_alert_text(finding), _JIRA_DESCRIPTION_MAX)
         creds = json.loads(Variable.get(JIRA_OPS_VARIABLE))
         client = JiraOpsClient(creds)
         response = client.create_alert(
-            message=f"{'[TEST] ' if test else ''}DAG runtime anomaly: {dag_id}",
-            description=_build_alert_text(finding),
+            message=title,
+            description=description,
             tags=tags,
             extra_properties={
                 "DAG": dag_id,
                 "RunId": run_id,
+                "DAGOwner": _owner_label(finding),
                 "PctOverBaseline": finding["pct_over"],
             },
             responder_team_id=responder_team_id,
@@ -527,7 +600,8 @@ def _post_gchat(webhook_url: str | None, text_content: str, thread_key: str) -> 
 
     Uses a direct webhook POST (like notify_stale_dags) so we can set a threadKey —
     the initial alert, all updates, and the closing message for one run land in the same
-    Chat thread. Best-effort: logs and returns False on failure.
+    Chat thread. Best-effort: logs and returns False on failure. Text is capped at
+    ``_GCHAT_TEXT_MAX`` (webhook hard limit).
     """
     if not webhook_url:
         print(
@@ -538,7 +612,10 @@ def _post_gchat(webhook_url: str | None, text_content: str, thread_key: str) -> 
         return False
     separator = "&" if "?" in webhook_url else "?"
     url = f"{webhook_url}{separator}messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD"
-    payload = {"text": text_content, "thread": {"threadKey": thread_key}}
+    payload = {
+        "text": _truncate_text(text_content, _GCHAT_TEXT_MAX),
+        "thread": {"threadKey": thread_key},
+    }
     try:
         response = requests.post(url, json=payload)
         response.raise_for_status()
@@ -565,6 +642,69 @@ def _fetch_recent_durations(session, dag_ids: list, since: datetime) -> dict:
     for row in rows:
         durations.setdefault(row.dag_id, []).append(float(row.duration_s))
     return durations
+
+
+def _primary_owner(raw: str | None) -> str | None:
+    """First owner from a comma-separated Airflow owners string (or None if empty)."""
+    if not raw or not str(raw).strip():
+        return None
+    primary = str(raw).split(",")[0].strip()
+    return primary or None
+
+
+def _owner_from_serialized_dag(session, dag_id: str) -> str | None:
+    """Resolve owner from ``serialized_dag`` when ``dag.owners`` is blank.
+
+    On Astro/Airflow the Details UI ``Owners`` field maps to ``dag.owners``, which is
+    often empty even though tasks inherit ``default_args.owner`` (visible after
+    deserializing the DAG). Prefer the aggregated ``SerializedDAG.owner``.
+    """
+    try:
+        from airflow.models.serialized_dag import SerializedDagModel
+
+        model = SerializedDagModel.get(dag_id, session=session)
+        if not model or not model.dag:
+            return None
+        return _primary_owner(model.dag.owner)
+    except Exception as exc:  # noqa: BLE001 — best-effort; never fail the monitor
+        print(f"⚠️  Failed to resolve owner from serialized_dag for {dag_id}: {exc}")
+        return None
+
+
+def _fetch_dag_owners(session, dag_ids) -> dict:
+    """Batch-load DAG owners keyed by dag_id (``dag.owners``, then serialized DAG)."""
+    if not dag_ids:
+        return {}
+    wanted = list(dag_ids)
+    rows = session.execute(_OWNERS_QUERY, {"dag_ids": wanted}).fetchall()
+    owners = {}
+    missing = []
+    for row in rows:
+        primary = _primary_owner(row.owners)
+        if primary:
+            owners[row.dag_id] = primary
+        else:
+            missing.append(row.dag_id)
+    seen = {row.dag_id for row in rows}
+    missing.extend(dag_id for dag_id in wanted if dag_id not in seen)
+
+    for dag_id in missing:
+        owners[dag_id] = _owner_from_serialized_dag(session, dag_id) or _UNKNOWN_OWNER
+
+    for dag_id in wanted:
+        owners.setdefault(dag_id, _UNKNOWN_OWNER)
+    return owners
+
+
+def _attach_owners(findings: list, owners_by_dag: dict) -> None:
+    for finding in findings:
+        finding["owner"] = owners_by_dag.get(finding["dag_id"], _UNKNOWN_OWNER)
+
+
+def _backfill_ledger_owners(ledger: dict, owners_by_dag: dict) -> None:
+    for entry in ledger.values():
+        if not entry.get("owner"):
+            entry["owner"] = owners_by_dag.get(entry["dag_id"], _UNKNOWN_OWNER)
 
 
 def _fetch_run_states(session, entries: list) -> dict:
@@ -759,6 +899,10 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     if opts["simulate"]:
         findings = _synthetic_findings(config, opts["simulate_dags"])
         _enrich_findings_with_dw_impact(findings, downstream_index)
+        _attach_owners(
+            findings,
+            _fetch_dag_owners(session, {f["dag_id"] for f in findings}),
+        )
         state = opts["simulate_state"]
         print(
             f"🧪 simulate mode ({state or 'initial'}): "
@@ -812,6 +956,12 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     ledger = _normalize_ledger(
         _load_dedup_state(), critical_dags=config["critical_dags"]
     )
+    owners_by_dag = _fetch_dag_owners(
+        session,
+        {f["dag_id"] for f in findings} | {e["dag_id"] for e in ledger.values()},
+    )
+    _attach_owners(findings, owners_by_dag)
+    _backfill_ledger_owners(ledger, owners_by_dag)
     for f in findings:
         print(f"   • [{f['tier']}] {_build_alert_text(f)}")
     print(

@@ -8,8 +8,11 @@ from unittest import mock
 import pytest
 
 from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
+    _GCHAT_TEXT_MAX,
     _HISTORY_QUERY,
     _IMPACTED_DW_LIST_LIMIT,
+    _JIRA_DESCRIPTION_MAX,
+    _JIRA_MESSAGE_MAX,
     _RUNNING_QUERY,
     DAG_ID,
     DEDUP_VARIABLE_KEY,
@@ -22,6 +25,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _evaluate_all,
     _evaluate_runtime,
     _failed_text,
+    _fetch_dag_owners,
     _fetch_run_states,
     _follow_up_clock_start,
     _format_duration,
@@ -37,6 +41,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _resolve_config,
     _resolved_text,
     _synthetic_findings,
+    _truncate_text,
     _update_text,
     dag,
     monitor_dag_runtimes,
@@ -317,14 +322,17 @@ def test_build_alert_text_contains_key_facts():
         "history_count": 10,
         "percentile": 90,
         "pct_over": 500,
+        "owner": "Data Platform",
         "impacted_dw_dags": ["bietlejuice.dw_foo"],
     }
     text = _build_alert_text(finding)
+    assert text.startswith("🐌")
     assert _CRITICAL_DAG in text
+    assert "• Owner: Data Platform" in text
     assert "P90" in text
-    assert "500% over baseline" in text
-    assert "r1" in text
-    assert "Impacted DW DAGs (1): bietlejuice.dw_foo." in text
+    assert "(+500%)" in text
+    assert "• Run: r1" in text
+    assert "• Impacted DW (1): bietlejuice.dw_foo" in text
 
 
 # --------------------------------------------------------------------------- #
@@ -339,6 +347,7 @@ _ENTRY = {
     "threshold_s": 2250.0,
     "percentile": 90,
     "history_count": 7,
+    "owner": "Data Fintech",
     "impacted_dw_dags": ["bietlejuice.dw_alpha", "bietlejuice.dw_beta"],
     "impacted_dw_count": 2,
 }
@@ -346,45 +355,132 @@ _ENTRY = {
 
 def test_message_builders():
     initial = _initial_text(_ENTRY, 3600)
+    assert initial.startswith("🐌")
     assert "running slower than usual" in initial
+    assert "• Owner: Data Fintech" in initial
     assert "P90 baseline" in initial
-    assert "Impacted DW DAGs (2): bietlejuice.dw_alpha, bietlejuice.dw_beta." in initial
+    assert "• Impacted DW (2): bietlejuice.dw_alpha, bietlejuice.dw_beta" in initial
+    assert "Tracking until it finishes." in initial
     update = _update_text(_ENTRY, 5400)
+    assert update.startswith("🐌")
     assert "still running" in update
-    assert "Still blocking 2 dw_* DAG(s)." in update
-    assert "finished after" in _resolved_text(_ENTRY, 3600)
+    assert "• Still blocking 2 dw_* DAG(s)" in update
+    resolved = _resolved_text(_ENTRY, 3600)
+    assert "finished after" in resolved
+    assert "• Owner: Data Fintech" in resolved
     assert "FAILED" in _failed_text(_ENTRY, 3600)
-    assert _STANDARD_DAG in _resolved_text(_ENTRY, 3600)
+    assert _STANDARD_DAG in resolved
 
 
 def test_message_builders_without_baseline():
     # Back-compat entry (old ledger) has no baseline_s → messages omit the % detail.
     entry = {"dag_id": _STANDARD_DAG, "run_id": "r2", "tier": "standard"}
     assert "baseline unavailable" in _initial_text(entry, 3600)
-    assert "Impacted DW DAGs: none." in _initial_text(entry, 3600)
+    assert "• Owner: unknown" in _initial_text(entry, 3600)
+    assert "• Impacted DW: none" in _initial_text(entry, 3600)
     assert "unknown time" in _resolved_text(entry, None)
     assert "Still blocking" not in _update_text(entry, 5400)
 
 
+class TestTruncateText:
+    def test_under_limit_unchanged(self):
+        assert _truncate_text("hello", 10) == "hello"
+
+    def test_exact_limit_unchanged(self):
+        assert _truncate_text("hello", 5) == "hello"
+
+    def test_over_limit_adds_ellipsis(self):
+        assert _truncate_text("hello world", 8) == "hello w…"
+        assert len(_truncate_text("hello world", 8)) == 8
+
+    def test_channel_limits_are_documented(self):
+        assert _GCHAT_TEXT_MAX == 4096
+        assert _JIRA_MESSAGE_MAX == 130
+        assert _JIRA_DESCRIPTION_MAX == 15000
+
+
 class TestFormatImpactedDwLine:
     def test_none_and_empty(self):
-        assert _format_impacted_dw_line(None) == "Impacted DW DAGs: none."
-        assert _format_impacted_dw_line([]) == "Impacted DW DAGs: none."
+        assert _format_impacted_dw_line(None) == "• Impacted DW: none"
+        assert _format_impacted_dw_line([]) == "• Impacted DW: none"
 
     def test_lists_all_when_under_limit(self):
         dags = ["bietlejuice.dw_a", "bietlejuice.dw_b"]
         assert (
             _format_impacted_dw_line(dags)
-            == "Impacted DW DAGs (2): bietlejuice.dw_a, bietlejuice.dw_b."
+            == "• Impacted DW (2): bietlejuice.dw_a, bietlejuice.dw_b"
         )
 
     def test_truncates_after_limit(self):
         dags = [f"bietlejuice.dw_{i:02d}" for i in range(_IMPACTED_DW_LIST_LIMIT + 5)]
         text = _format_impacted_dw_line(dags)
-        assert f"Impacted DW DAGs ({len(dags)}):" in text
-        assert "… and 5 more." in text
+        assert f"• Impacted DW ({len(dags)}):" in text
+        assert "… and 5 more" in text
         assert f"bietlejuice.dw_{_IMPACTED_DW_LIST_LIMIT - 1:02d}" in text
         assert f"bietlejuice.dw_{_IMPACTED_DW_LIST_LIMIT:02d}" not in text
+
+
+class TestFetchDagOwners:
+    def test_parses_primary_owner(self):
+        session = mock.MagicMock()
+        session.execute.return_value.fetchall.return_value = [
+            SimpleNamespace(dag_id="a", owners="Data Platform, other"),
+            SimpleNamespace(dag_id="b", owners=""),
+            SimpleNamespace(dag_id="c", owners=None),
+        ]
+        with mock.patch(
+            f"{_MODULE}._owner_from_serialized_dag", return_value=None
+        ) as mock_ser:
+            assert _fetch_dag_owners(session, ["a", "b", "c"]) == {
+                "a": "Data Platform",
+                "b": "unknown",
+                "c": "unknown",
+            }
+        mock_ser.assert_any_call(session, "b")
+        mock_ser.assert_any_call(session, "c")
+
+    def test_falls_back_to_serialized_dag_when_owners_blank(self):
+        session = mock.MagicMock()
+        session.execute.return_value.fetchall.return_value = [
+            SimpleNamespace(dag_id="bietlejuice.dw_customer_support", owners=None),
+        ]
+        with mock.patch(
+            f"{_MODULE}._owner_from_serialized_dag",
+            return_value="Data SS",
+        ) as mock_ser:
+            assert _fetch_dag_owners(session, ["bietlejuice.dw_customer_support"]) == {
+                "bietlejuice.dw_customer_support": "Data SS"
+            }
+        mock_ser.assert_called_once_with(session, "bietlejuice.dw_customer_support")
+
+    def test_empty_dag_ids(self):
+        session = mock.MagicMock()
+        assert _fetch_dag_owners(session, []) == {}
+        session.execute.assert_not_called()
+
+
+class TestOwnerFromSerializedDag:
+    def test_reads_serialized_owner(self):
+        with mock.patch("airflow.models.serialized_dag.SerializedDagModel") as mock_sdm:
+            mock_sdm.get.return_value = SimpleNamespace(
+                dag=SimpleNamespace(owner="Data SS, other")
+            )
+            from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
+                _owner_from_serialized_dag,
+            )
+
+            session = mock.MagicMock()
+            assert _owner_from_serialized_dag(session, "d1") == "Data SS"
+            mock_sdm.get.assert_called_once_with("d1", session=session)
+
+    def test_returns_none_when_missing(self):
+        with mock.patch("airflow.models.serialized_dag.SerializedDagModel") as mock_sdm:
+            mock_sdm.get.return_value = None
+            from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
+                _owner_from_serialized_dag,
+            )
+
+            assert _owner_from_serialized_dag(mock.MagicMock(), "missing") is None
 
 
 _SAMPLE_IMPACT_DEPS = {
@@ -438,7 +534,7 @@ def test_load_downstream_index_safe_returns_none_on_invalid_upstream_shape(
     mock_read, invalid_upstreams
 ):
     # Invalid shapes raise ValueError in find_unique_dependencies_in_dependency_object;
-    # the monitor must not abort — alerts continue with Impacted DW DAGs: none.
+    # the monitor must not abort — alerts continue with • Impacted DW: none.
     mock_read.return_value = {"bietlejuice.dependent": invalid_upstreams}
     assert _load_downstream_index_safe() is None
     mock_read.assert_called_once()
@@ -624,12 +720,77 @@ class TestPostGchat:
         assert payload["thread"]["threadKey"] == "rubinho::x|r1"
 
     @mock.patch(f"{_MODULE}.requests")
+    def test_truncates_text_to_gchat_limit(self, mock_requests):
+        mock_requests.post.return_value = mock.MagicMock()
+        oversized = "x" * (_GCHAT_TEXT_MAX + 50)
+        assert _post_gchat(_WEBHOOK_URL, oversized, "k") is True
+        text = mock_requests.post.call_args.kwargs["json"]["text"]
+        assert len(text) == _GCHAT_TEXT_MAX
+        assert text.endswith("…")
+
+    @mock.patch(f"{_MODULE}.requests")
     def test_returns_false_on_error(self, mock_requests):
         mock_requests.post.return_value.raise_for_status.side_effect = Exception("500")
         assert _post_gchat(_WEBHOOK_URL, "hi", "k") is False
 
     def test_no_webhook_returns_false(self):
         assert _post_gchat(None, "hi", "k") is False
+
+
+class TestSendJiraAlertTruncation:
+    @mock.patch(f"{_MODULE}.JiraOpsClient")
+    @mock.patch(f"{_MODULE}.Variable")
+    def test_truncates_message_and_description(self, mock_var, mock_client_cls):
+        mock_var.get.return_value = json.dumps(
+            {"username": "u", "token": "t", "cloud_id": "c"}
+        )
+        client = mock_client_cls.return_value
+        client.create_alert.return_value = mock.MagicMock()
+        long_dag = "bietlejuice." + ("x" * 200)
+        finding = {
+            "dag_id": long_dag,
+            "run_id": "r1",
+            "elapsed_s": 3600,
+            "baseline_s": 600,
+            "percentile": 90,
+            "pct_over": 500,
+            "history_count": 3,
+            "owner": "Data Platform",
+            "impacted_dw_dags": [f"bietlejuice.dw_{i}" for i in range(40)],
+        }
+        from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
+            _send_jira_alert,
+        )
+
+        assert _send_jira_alert(finding) is True
+        kwargs = client.create_alert.call_args.kwargs
+        assert len(kwargs["message"]) <= _JIRA_MESSAGE_MAX
+        assert kwargs["message"].endswith("…")
+        assert len(kwargs["description"]) <= _JIRA_DESCRIPTION_MAX
+        assert kwargs["extra_properties"]["DAGOwner"] == "Data Platform"
+
+    @mock.patch(f"{_MODULE}._build_alert_text", side_effect=KeyError("elapsed_s"))
+    @mock.patch(f"{_MODULE}.JiraOpsClient")
+    @mock.patch(f"{_MODULE}.Variable")
+    def test_description_build_failure_returns_false(
+        self, mock_var, mock_client_cls, _mock_build
+    ):
+        """Bad finding must not raise out of _send_jira_alert (task continues)."""
+        from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
+            _send_jira_alert,
+        )
+
+        finding = {"dag_id": "bietlejuice.broken", "run_id": "r1"}
+        assert _send_jira_alert(finding) is False
+        mock_client_cls.assert_not_called()
+        mock_var.get.assert_not_called()
+
+
+def _db_session():
+    """Session mock whose execute().fetchall() is safe for ``_fetch_dag_owners``."""
+    session = mock.MagicMock()
+    session.execute.return_value.fetchall.return_value = []
+    return session
 
 
 # --------------------------------------------------------------------------- #
@@ -697,7 +858,7 @@ def test_new_standard_anomaly_posts_initial_and_tracks(
     mock_running.return_value = [_running_row(_STANDARD_DAG, "r2", 90, now)]
     mock_durations.return_value = {_STANDARD_DAG: [600.0] * 10}
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_jira.assert_not_called()
     mock_post.assert_called_once()
@@ -748,7 +909,7 @@ def test_new_critical_anomaly_pages_jira_with_dw_impact(
     mock_running.return_value = [_running_row(_CRITICAL_DAG, "r1", 90, now)]
     mock_durations.return_value = {_CRITICAL_DAG: [600.0] * 10}
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_jira.assert_called_once()
     mock_post.assert_not_called()  # critical → JiraOps only, no gchat
@@ -774,7 +935,7 @@ def test_simulate_attaches_dw_impact(
     mock_var.get.side_effect = _variable_get_factory()
 
     monitor_dag_runtimes(
-        session=mock.MagicMock(),
+        session=_db_session(),
         run_conf={
             "simulate": True,
             "force_send": True,
@@ -823,12 +984,12 @@ def test_tracked_running_gets_update(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_post.assert_called_once()
     text = mock_post.call_args.args[1]
     assert "still running" in text
-    assert "Still blocking 1 dw_* DAG(s)." in text  # live count from deps
+    assert "• Still blocking 1 dw_* DAG(s)" in text  # live count from deps
     assert f"{_STANDARD_DAG}|r2" in _saved_ledger(mock_var)  # kept
 
 
@@ -861,7 +1022,7 @@ def test_follow_up_elapsed_uses_ledger_work_start_date(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_post.assert_called_once()
     text = mock_post.call_args.args[1]
@@ -894,11 +1055,11 @@ def test_tracked_running_keeps_ledger_impact_when_deps_unavailable(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_post.assert_called_once()
     text = mock_post.call_args.args[1]
-    assert "Still blocking 2 dw_* DAG(s)." in text
+    assert "• Still blocking 2 dw_* DAG(s)" in text
 
 
 @_lifecycle_patches
@@ -919,7 +1080,7 @@ def test_tracked_success_posts_resolved_and_drops(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     assert "finished after" in mock_post.call_args.args[1]
     assert f"{_STANDARD_DAG}|r2" not in _saved_ledger(mock_var)  # dropped
@@ -953,7 +1114,7 @@ def test_closed_tracked_run_not_reopened_from_stale_finding(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_jira.assert_not_called()
     mock_post.assert_called_once()
@@ -980,7 +1141,7 @@ def test_tracked_failed_posts_failure_and_drops(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     assert "FAILED" in mock_post.call_args.args[1]
     assert f"{_STANDARD_DAG}|r2" not in _saved_ledger(mock_var)
@@ -1006,7 +1167,7 @@ def test_tracked_terminal_keeps_ledger_when_closing_post_fails(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     assert "finished after" in mock_post.call_args.args[1]
     assert f"{_STANDARD_DAG}|r2" in _saved_ledger(mock_var)  # retried next cycle
@@ -1031,7 +1192,7 @@ def test_tracked_critical_terminal_drops_silently(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_post.assert_not_called()  # critical closes in Jira, no gchat
     assert f"{_CRITICAL_DAG}|r1" not in _saved_ledger(mock_var)
@@ -1057,7 +1218,7 @@ def test_old_ledger_critical_string_does_not_get_gchat(
         )
     }
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_post.assert_not_called()
     saved = _saved_ledger(mock_var)
@@ -1073,7 +1234,7 @@ def test_tracked_run_vanished_is_dropped(
     mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
     mock_states.return_value = {}  # run row no longer present
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_post.assert_not_called()
     assert _saved_ledger(mock_var) == {}
@@ -1095,7 +1256,7 @@ def test_non_prod_does_not_send_or_track(
     mock_running.return_value = [_running_row(_STANDARD_DAG, "r2", 90, now)]
     mock_durations.return_value = {_STANDARD_DAG: [600.0] * 10}
 
-    monitor_dag_runtimes(session=mock.MagicMock())
+    monitor_dag_runtimes(session=_db_session())
 
     mock_jira.assert_not_called()
     mock_post.assert_not_called()
@@ -1124,9 +1285,7 @@ def test_only_dags_filters_evaluated_runs(
         _STANDARD_DAG: [600.0] * 10,
     }
 
-    monitor_dag_runtimes(
-        session=mock.MagicMock(), run_conf={"only_dags": [_STANDARD_DAG]}
-    )
+    monitor_dag_runtimes(session=_db_session(), run_conf={"only_dags": [_STANDARD_DAG]})
 
     mock_jira.assert_not_called()  # critical filtered out
     mock_post.assert_called_once()
@@ -1143,7 +1302,7 @@ def test_simulate_dry_run_sends_nothing(mock_cfg, mock_var, mock_jira, mock_post
     mock_cfg.return_value.get_config.side_effect = _config_get
     mock_var.get.side_effect = _variable_get_factory()
 
-    monitor_dag_runtimes(session=mock.MagicMock(), run_conf={"simulate": True})
+    monitor_dag_runtimes(session=_db_session(), run_conf={"simulate": True})
 
     mock_jira.assert_not_called()
     mock_post.assert_not_called()
@@ -1161,7 +1320,7 @@ def test_simulate_force_send_posts_initial_to_test_destinations(
     mock_var.get.side_effect = _variable_get_factory(environment="forno")
 
     monitor_dag_runtimes(
-        session=mock.MagicMock(),
+        session=_db_session(),
         run_conf={
             "simulate": True,
             "force_send": True,
@@ -1189,7 +1348,7 @@ def test_force_send_critical_without_test_team_is_not_paged(
     mock_var.get.side_effect = _variable_get_factory(environment="forno")
 
     monitor_dag_runtimes(
-        session=mock.MagicMock(),
+        session=_db_session(),
         run_conf={
             "simulate": True,
             "force_send": True,
@@ -1221,7 +1380,7 @@ def test_reads_trigger_conf_from_dag_run_not_context_conf(
 
     dag_run = SimpleNamespace(conf={"simulate": True, "dry_run": True})
     monitor_dag_runtimes(
-        session=mock.MagicMock(), conf=_FakeAirflowConf(), dag_run=dag_run
+        session=_db_session(), conf=_FakeAirflowConf(), dag_run=dag_run
     )
 
     mock_jira.assert_not_called()
@@ -1317,6 +1476,7 @@ def test_entry_from_finding_snapshots_baseline():
         "threshold_s": 660.0,
         "percentile": 90,
         "history_count": 10,
+        "owner": "Data Platform",
         "impacted_dw_dags": ["bietlejuice.dw_impacted"],
         "impacted_dw_count": 1,
     }
@@ -1324,6 +1484,7 @@ def test_entry_from_finding_snapshots_baseline():
     assert entry["baseline_s"] == 600.0
     assert entry["tier"] == "standard"
     assert entry["first_alert_ts"] == "ts"
+    assert entry["owner"] == "Data Platform"
     assert entry["impacted_dw_dags"] == ["bietlejuice.dw_impacted"]
     assert entry["impacted_dw_count"] == 1
 
@@ -1332,11 +1493,11 @@ def test_update_text_uses_live_impacted_count_override():
     entry = dict(_ENTRY)
     entry["impacted_dw_count"] = 2
     text = _update_text(entry, 5400, impacted_dw_count=9)
-    assert "Still blocking 9 dw_* DAG(s)." in text
+    assert "• Still blocking 9 dw_* DAG(s)" in text
 
 
 def test_update_text_falls_back_to_ledger_when_live_count_unavailable():
     entry = dict(_ENTRY)
     entry["impacted_dw_count"] = 2
     text = _update_text(entry, 5400, impacted_dw_count=None)
-    assert "Still blocking 2 dw_* DAG(s)." in text
+    assert "• Still blocking 2 dw_* DAG(s)" in text
