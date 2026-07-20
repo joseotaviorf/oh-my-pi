@@ -84,7 +84,7 @@ month).
 
 ```
 % Adoption = COUNT(DISTINCT sk_contract WHERE is_activated = TRUE)
-           / COUNT(DISTINCT sk_contract WHERE is_eligible  = TRUE)
+           / COUNT(DISTINCT sk_contract WHERE is_eligible = TRUE)
 ```
 
 - **Numerator**: distinct contracts with CG **currently active** in the period (`is_activated`),
