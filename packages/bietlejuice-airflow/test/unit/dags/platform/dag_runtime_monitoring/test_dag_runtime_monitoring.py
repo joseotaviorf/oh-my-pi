@@ -551,6 +551,23 @@ def test_queries_exclude_test_runs(query):
     assert "task_instance" in sql
 
 
+def test_running_query_constrains_task_instance_to_running_runs():
+    """Regression: do not aggregate all execute-job-cluster* TIs before joining (#26399)."""
+    sql = " ".join(str(_RUNNING_QUERY).split())
+    assert "WITH running AS" in sql
+    assert "FROM running AS r" in sql or "FROM running AS r".lower() in sql.lower()
+    # Unbounded pre-aggregate pattern from the timed-out query must stay gone.
+    assert "FROM task_instance WHERE task_id LIKE" not in sql.replace("\n", " ")
+
+
+def test_history_query_joins_task_instance_from_filtered_dag_run():
+    sql = " ".join(str(_HISTORY_QUERY).split())
+    assert "FROM dag_run AS dr" in sql
+    assert "LEFT JOIN task_instance AS ti" in sql
+    assert "dr.dag_id IN" in sql
+    assert "dr.end_date >=" in sql
+
+
 class TestFetchRunStates:
     def test_filters_to_exact_pairs(self):
         entries = [

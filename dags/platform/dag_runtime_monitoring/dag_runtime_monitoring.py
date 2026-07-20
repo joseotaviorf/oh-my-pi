@@ -64,17 +64,6 @@ _IMPACTED_DW_LIST_LIMIT = 25
 # Job-cluster bootstrap task (and ``execute-job-cluster-N`` multi-cluster variants).
 _EXECUTE_JOB_CLUSTER_TASK_PREFIX = "execute-job-cluster"
 
-# Shared subquery: earliest work start for a DagRun (NULL start_date = not started yet).
-_EJC_WORK_START_SQL = f"""
-    SELECT
-        dag_id,
-        run_id,
-        MIN(start_date) AS work_start
-    FROM task_instance
-    WHERE task_id LIKE '{_EXECUTE_JOB_CLUSTER_TASK_PREFIX}%'
-    GROUP BY dag_id, run_id
-"""
-
 # Config fallbacks used when a key is missing from prod_conf.yml / forno_conf.yml.
 _DEFAULT_CONFIG = {
     "critical_dags": [],
@@ -91,29 +80,39 @@ _DEFAULT_CONFIG = {
 # Manual/backfill runs resolve to TEST_RUN in DatasetService._get_run_type (prod callbacks
 # skip them), so we exclude them from both alerting and the baseline. dag_run.conf is a
 # pickled column (not JSON-queryable), so we rely on the native run_type / run_id signals.
+_REAL_RUN_FILTER = (
+    "(run_type IN ('scheduled', 'dataset_triggered') "
+    "OR run_id LIKE 'mediator_trig\\_\\_%' ESCAPE '\\')"
+)
 _REAL_RUN_FILTER_DR = (
     "(dr.run_type IN ('scheduled', 'dataset_triggered') "
     "OR dr.run_id LIKE 'mediator_trig\\_\\_%' ESCAPE '\\')"
 )
 
+# Filter dag_run first, then join task_instance only for those (dag_id, run_id) pairs.
+# Never aggregate all execute-job-cluster* TIs — that timed out on the metadata DB (#26399).
 _RUNNING_QUERY = text(
     f"""
+    WITH running AS (
+        SELECT dag_id, run_id, start_date
+        FROM dag_run
+        WHERE state = 'running'
+          AND start_date IS NOT NULL
+          AND dag_id != :self_dag_id
+          AND {_REAL_RUN_FILTER}
+    )
     SELECT
-        dr.dag_id,
-        dr.run_id,
-        dr.start_date,
-        ejc.work_start,
-        (ejc.dag_id IS NOT NULL) AS has_execute_job_cluster
-    FROM dag_run AS dr
-    LEFT JOIN (
-        {_EJC_WORK_START_SQL}
-    ) AS ejc
-        ON ejc.dag_id = dr.dag_id
-        AND ejc.run_id = dr.run_id
-    WHERE dr.state = 'running'
-      AND dr.start_date IS NOT NULL
-      AND dr.dag_id != :self_dag_id
-      AND {_REAL_RUN_FILTER_DR}
+        r.dag_id,
+        r.run_id,
+        r.start_date,
+        MIN(ti.start_date) AS work_start,
+        COUNT(ti.task_id) > 0 AS has_execute_job_cluster
+    FROM running AS r
+    LEFT JOIN task_instance AS ti
+        ON ti.dag_id = r.dag_id
+       AND ti.run_id = r.run_id
+       AND ti.task_id LIKE '{_EXECUTE_JOB_CLUSTER_TASK_PREFIX}%'
+    GROUP BY r.dag_id, r.run_id, r.start_date
     """
 )
 
@@ -125,27 +124,23 @@ _HISTORY_QUERY = text(
     SELECT
         dr.dag_id,
         EXTRACT(
-            EPOCH FROM (dr.end_date - COALESCE(ejc.work_start, dr.start_date))
+            EPOCH FROM (
+                dr.end_date - COALESCE(MIN(ti.start_date), dr.start_date)
+            )
         ) AS duration_s
     FROM dag_run AS dr
-    LEFT JOIN (
-        SELECT
-            dag_id,
-            run_id,
-            MIN(start_date) AS work_start
-        FROM task_instance
-        WHERE task_id LIKE '{_EXECUTE_JOB_CLUSTER_TASK_PREFIX}%'
-          AND start_date IS NOT NULL
-        GROUP BY dag_id, run_id
-    ) AS ejc
-        ON ejc.dag_id = dr.dag_id
-        AND ejc.run_id = dr.run_id
+    LEFT JOIN task_instance AS ti
+        ON ti.dag_id = dr.dag_id
+       AND ti.run_id = dr.run_id
+       AND ti.task_id LIKE '{_EXECUTE_JOB_CLUSTER_TASK_PREFIX}%'
+       AND ti.start_date IS NOT NULL
     WHERE dr.state = 'success'
       AND dr.start_date IS NOT NULL
       AND dr.end_date IS NOT NULL
       AND {_REAL_RUN_FILTER_DR}
       AND dr.dag_id IN :dag_ids
       AND dr.end_date >= :since
+    GROUP BY dr.dag_id, dr.run_id, dr.start_date, dr.end_date
     """
 ).bindparams(bindparam("dag_ids", expanding=True))
 
@@ -158,14 +153,14 @@ _RUN_STATE_QUERY = text(
         dr.state,
         dr.start_date,
         dr.end_date,
-        ejc.work_start
+        MIN(ti.start_date) AS work_start
     FROM dag_run AS dr
-    LEFT JOIN (
-        {_EJC_WORK_START_SQL}
-    ) AS ejc
-        ON ejc.dag_id = dr.dag_id
-        AND ejc.run_id = dr.run_id
+    LEFT JOIN task_instance AS ti
+        ON ti.dag_id = dr.dag_id
+       AND ti.run_id = dr.run_id
+       AND ti.task_id LIKE '{_EXECUTE_JOB_CLUSTER_TASK_PREFIX}%'
     WHERE dr.run_id IN :run_ids AND dr.dag_id IN :dag_ids
+    GROUP BY dr.dag_id, dr.run_id, dr.state, dr.start_date, dr.end_date
     """
 ).bindparams(bindparam("run_ids", expanding=True), bindparam("dag_ids", expanding=True))
 

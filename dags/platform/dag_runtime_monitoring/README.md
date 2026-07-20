@@ -20,6 +20,8 @@ routed by tier:
 task, both live elapsed and the historical baseline start from that task’s earliest
 `start_date` (sensor / pre-cluster wait is excluded). Runs still waiting for that task
 to start are not evaluated. DAGs without that task keep full `dag_run` wall time.
+Metadata lookups join `task_instance` only for the filtered candidate `dag_run` rows
+(never a full-table aggregate of every `execute-job-cluster*` TI).
 
 Real alerts are only delivered when `environment == prod`. Config lives in
 `prod_conf.yml` / `forno_conf.yml` (`lookback_days`, `min_history_runs`, `percentile`,
