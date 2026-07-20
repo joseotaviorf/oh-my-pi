@@ -1,11 +1,14 @@
 # Runtime-anomaly monitoring config (production).
 #
-# critical_dags: DAGs that page JiraOps on-caller when anomalously slow.
+# critical_dags: protected set that escalates to JiraOps (in addition to Chat).
 #
-#   SOFT-LAUNCH (first moment in prod): this list is intentionally EMPTY, so nothing pages
-#   on-call — every anomaly is reported to Google Chat instead. Once we've observed the
-#   gchat signal and trust it, re-enable paging by uncommenting the seeded top-50 list
-#   below (top 50 DAGs by downstream dw_* impact, derived from dags/dependencies.yaml).
+#   Every slow DAG still alerts to Google Chat. When this list is non-empty, a DAG
+#   that is on the list OR transitively blocks one of these (via dependencies.yaml)
+#   also pages JiraOps. Soft-launch uses an empty list so nothing pages on-call.
+#
+#   SOFT-LAUNCH (first moment in prod): this list is intentionally EMPTY — every
+#   anomaly is Chat-only. Once the signal is trusted, uncomment the seeded top-50
+#   list below (top 50 DAGs by downstream dw_* impact from dags/dependencies.yaml).
 #
 # lookback_days:    time window (in days) of recent SUCCESS runs used for the baseline.
 # min_history_runs: skip DAGs with fewer successful runs in that window (avoids false alarms).

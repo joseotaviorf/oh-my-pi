@@ -4,17 +4,17 @@ Every 30 minutes this DAG inspects every currently-running DAG and flags any who
 elapsed time is anomalous **relative to that same DAG's own recent successful runs**
 (P`percentile` of successful-run durations over the last `lookback_days` × `factor` — no hardcoded per-DAG
 thresholds) **and** only once the run has been executing for at least
-`min_alert_duration_minutes` (absolute floor, so quick DAGs never alert). Findings are
-routed by tier:
+`min_alert_duration_minutes` (absolute floor, so quick DAGs never alert).
 
-- **Critical** (DAGs in `critical_dags`, the top 50 by downstream `dw_*` impact) → JiraOps
-  on-caller alert, opened once per run; people ack/close it in Jira.
-- **Standard** (every other running DAG over its baseline) → **Google Chat, tracked to
-  closure**. The monitor keeps a ledger (Airflow Variable `DAG_RUNTIME_MONITORING_ALERTED_RUNS`)
-  of each flagged run and, in a Chat **thread per run**, posts: an **initial** alert, an
-  **update** every 30-min cycle while it is still running (current elapsed, % over
-  baseline), and a **closing** message when the run **succeeds (✅) or fails (❌)** — after
-  which the run is dropped from the ledger.
+**Every anomaly goes to Google Chat** and is tracked to closure (ledger Variable
+`DAG_RUNTIME_MONITORING_ALERTED_RUNS`: initial alert, 30-min updates, ✅/❌ close).
+
+When `critical_dags` is non-empty, findings that are **in the list** or that
+**transitively block** one (via `dependencies.yaml`) **also** page JiraOps once.
+
+- **Empty `critical_dags`** (prod soft-launch): Chat only; nothing pages Jira.
+- **Critical / blocking critical** → Chat **+** JiraOps.
+- **Neither** → Chat only.
 
 **Elapsed clock:** when a run has an `execute-job-cluster` / `execute-job-cluster-N`
 task, both live elapsed and the historical baseline start from that task’s earliest
@@ -68,10 +68,12 @@ exercise the full detect → route → deliver path without waiting for a real s
 | `test_webhook` | Send standard-tier gchat to this throwaway webhook instead of the configured one. | — |
 | `test_responder_team_id` | Route critical JiraOps alerts to this **test** team (adds a `test` tag + `[TEST]` prefix). | — |
 | `only_dags` | Restrict real (non-simulated) evaluation to these dag_ids. | — |
+| `critical_dags` | Replace YAML `critical_dags` for this run only (string or list). | YAML value |
 
-**Safety rule:** when `force_send` is set, a *critical* finding is only paged if a
-`test_responder_team_id` is provided; otherwise it is downgraded to log-only. A test
-trigger can never reach the real Data Engineering on-call.
+**Safety rule:** when `force_send` is set, a *critical* finding is only **paged in
+JiraOps** if a `test_responder_team_id` is provided; otherwise Jira is skipped but
+**Chat still delivers**. A test trigger can never reach the real Data Engineering
+on-call.
 
 ### 1. Run Airflow locally
 

@@ -1,5 +1,8 @@
 # Runtime-anomaly monitoring config (Forno / local).
 # Small sample list + a low min_history_runs so the logic is exercisable with little data.
+# critical_dags = escalate to JiraOps (+ Chat). Upstreams that transitively block these
+# also get Chat+JiraOps; other slow DAGs are Chat-only. Override via trigger conf
+# ``critical_dags`` for a single run.
 dag_runtime_monitoring:
   lookback_days: 7
   min_history_runs: 3

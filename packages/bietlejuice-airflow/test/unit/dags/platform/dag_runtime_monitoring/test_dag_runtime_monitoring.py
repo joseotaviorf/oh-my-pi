@@ -18,6 +18,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     DEDUP_VARIABLE_KEY,
     JIRA_OPS_VARIABLE,
     _as_str_list,
+    _assign_alert_tiers,
     _build_alert_text,
     _effective_work_start,
     _enrich_findings_with_dw_impact,
@@ -30,6 +31,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _follow_up_clock_start,
     _format_duration,
     _format_impacted_dw_line,
+    _impacts_critical,
     _initial_text,
     _live_impacted_dw_count,
     _load_dedup_state,
@@ -484,6 +486,7 @@ class TestOwnerFromSerializedDag:
 
 
 _SAMPLE_IMPACT_DEPS = {
+    # STANDARD does not block CRITICAL → stays Chat-only when critical_dags is set.
     "bietlejuice.dw_impacted": [
         f"{_STANDARD_DAG}:load-enrich-table:first-run-of-day",
     ],
@@ -551,6 +554,53 @@ def test_load_downstream_index_safe_builds_index(mock_read):
         "bietlejuice.metric_not_listed",
     }
     mock_read.assert_called_once()
+
+
+class TestAssignAlertTiers:
+    """Tier = Chat+Jira when critical or blocking; else Chat-only. Never drop."""
+
+    _ORPHAN = "bietlejuice.orphan_no_critical_path"
+    _INDEX = {
+        _STANDARD_DAG: {_CRITICAL_DAG, "bietlejuice.dw_other"},
+        _ORPHAN: {"bietlejuice.unrelated_leaf"},
+    }
+
+    def _finding(self, dag_id, tier="standard"):
+        return {
+            "dag_id": dag_id,
+            "run_id": "r1",
+            "tier": tier,
+            "elapsed_s": 3600.0,
+            "baseline_s": 1500.0,
+            "pct_over": 140,
+        }
+
+    def test_empty_critical_all_standard(self):
+        findings = [
+            self._finding(self._ORPHAN),
+            self._finding(_CRITICAL_DAG, tier="critical"),
+        ]
+        _assign_alert_tiers(findings, [], self._INDEX)
+        assert all(f["tier"] == "standard" for f in findings)
+        assert not _impacts_critical(_CRITICAL_DAG, set(), self._INDEX)
+
+    def test_self_critical_pages_jira(self):
+        findings = [self._finding(_CRITICAL_DAG)]
+        _assign_alert_tiers(findings, [_CRITICAL_DAG], self._INDEX)
+        assert findings[0]["tier"] == "critical"
+        assert _impacts_critical(_CRITICAL_DAG, {_CRITICAL_DAG}, self._INDEX)
+
+    def test_upstream_blocking_critical_pages_jira(self):
+        findings = [self._finding(_STANDARD_DAG)]
+        _assign_alert_tiers(findings, [_CRITICAL_DAG], self._INDEX)
+        assert findings[0]["tier"] == "critical"
+        assert _impacts_critical(_STANDARD_DAG, {_CRITICAL_DAG}, self._INDEX)
+
+    def test_no_path_to_critical_chat_only(self):
+        findings = [self._finding(self._ORPHAN)]
+        _assign_alert_tiers(findings, [_CRITICAL_DAG], self._INDEX)
+        assert findings[0]["tier"] == "standard"
+        assert not _impacts_critical(self._ORPHAN, {_CRITICAL_DAG}, self._INDEX)
 
 
 @mock.patch(
@@ -912,12 +962,86 @@ def test_new_critical_anomaly_pages_jira_with_dw_impact(
     monitor_dag_runtimes(session=_db_session())
 
     mock_jira.assert_called_once()
-    mock_post.assert_not_called()  # critical → JiraOps only, no gchat
+    mock_post.assert_called_once()  # critical → Chat + JiraOps
     finding_arg = mock_jira.call_args.args[0]
     assert finding_arg["impacted_dw_dags"] == ["bietlejuice.dw_from_critical"]
     saved = _saved_ledger(mock_var)
     assert saved[f"{_CRITICAL_DAG}|r1"]["tier"] == "critical"
     assert saved[f"{_CRITICAL_DAG}|r1"]["impacted_dw_count"] == 1
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=False)
+@mock.patch(f"{_MODULE}._fetch_run_states", return_value={})
+@mock.patch(f"{_MODULE}._fetch_recent_durations")
+@mock.patch(f"{_MODULE}._fetch_running_runs")
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
+def test_critical_jira_failure_does_not_track_despite_chat_ok(
+    mock_deps,
+    mock_cfg,
+    mock_var,
+    mock_running,
+    mock_durations,
+    mock_states,
+    mock_jira,
+    mock_post,
+):
+    """Regression: Chat success must not ledger a critical run when JiraOps fails.
+
+    Otherwise the next cycle skips the finding (already tracked) and on-call is
+    never paged despite _send_jira_alert logging a next-cycle retry.
+    """
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
+    now = datetime.now(timezone.utc)
+    mock_running.return_value = [_running_row(_CRITICAL_DAG, "r1", 90, now)]
+    mock_durations.return_value = {_CRITICAL_DAG: [600.0] * 10}
+
+    monitor_dag_runtimes(session=_db_session())
+
+    mock_jira.assert_called_once()
+    mock_post.assert_called_once()  # Chat still attempted for visibility
+    assert f"{_CRITICAL_DAG}|r1" not in _saved_ledger(mock_var)
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}._fetch_run_states", return_value={})
+@mock.patch(f"{_MODULE}._fetch_recent_durations")
+@mock.patch(f"{_MODULE}._fetch_running_runs")
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies")
+def test_upstream_blocking_critical_pages_jira_and_chat(
+    mock_deps,
+    mock_cfg,
+    mock_var,
+    mock_running,
+    mock_durations,
+    mock_states,
+    mock_jira,
+    mock_post,
+):
+    """Slow upstream of a critical DAG → Chat + JiraOps (same as membership)."""
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
+    now = datetime.now(timezone.utc)
+    mock_deps.return_value = {
+        _CRITICAL_DAG: [f"{_STANDARD_DAG}:load-enrich-table:first-run-of-day"],
+    }
+    mock_running.return_value = [_running_row(_STANDARD_DAG, "r2", 90, now)]
+    mock_durations.return_value = {_STANDARD_DAG: [600.0] * 10}
+
+    monitor_dag_runtimes(session=_db_session())
+
+    mock_jira.assert_called_once()
+    mock_post.assert_called_once()
+    assert _saved_ledger(mock_var)[f"{_STANDARD_DAG}|r2"]["tier"] == "critical"
 
 
 @mock.patch(f"{_MODULE}._post_gchat", return_value=True)
@@ -1174,7 +1298,7 @@ def test_tracked_terminal_keeps_ledger_when_closing_post_fails(
 
 
 @_lifecycle_patches
-def test_tracked_critical_terminal_drops_silently(
+def test_tracked_critical_terminal_posts_chat_close(
     mock_post, mock_states, mock_running, mock_var, mock_cfg
 ):
     mock_cfg.return_value.get_config.side_effect = _config_get
@@ -1194,16 +1318,17 @@ def test_tracked_critical_terminal_drops_silently(
 
     monitor_dag_runtimes(session=_db_session())
 
-    mock_post.assert_not_called()  # critical closes in Jira, no gchat
+    mock_post.assert_called_once()
+    assert "finished after" in mock_post.call_args.args[1]
     assert f"{_CRITICAL_DAG}|r1" not in _saved_ledger(mock_var)
 
 
 @_lifecycle_patches
-def test_old_ledger_critical_string_does_not_get_gchat(
+def test_old_ledger_critical_string_gets_gchat_follow_up(
     mock_post, mock_states, mock_running, mock_var, mock_cfg
 ):
-    # Old Variable format: bare timestamp for both tiers. Must not treat critical as
-    # standard and spam threaded gchat updates/closures after deploy.
+    # Old Variable format: bare timestamp. After normalize to critical tier, Chat
+    # follow-ups still apply (critical is Chat + JiraOps, not Jira-only).
     mock_cfg.return_value.get_config.side_effect = _config_get
     ledger = {f"{_CRITICAL_DAG}|r1": "2026-07-17T18:00:00+00:00"}
     mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
@@ -1220,7 +1345,7 @@ def test_old_ledger_critical_string_does_not_get_gchat(
 
     monitor_dag_runtimes(session=_db_session())
 
-    mock_post.assert_not_called()
+    mock_post.assert_called_once()
     saved = _saved_ledger(mock_var)
     assert saved[f"{_CRITICAL_DAG}|r1"]["tier"] == "critical"
 
@@ -1270,8 +1395,19 @@ def test_non_prod_does_not_send_or_track(
 @mock.patch(f"{_MODULE}._fetch_running_runs")
 @mock.patch(f"{_MODULE}.Variable")
 @mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
 def test_only_dags_filters_evaluated_runs(
-    mock_cfg, mock_var, mock_running, mock_durations, mock_states, mock_jira, mock_post
+    mock_deps,
+    mock_cfg,
+    mock_var,
+    mock_running,
+    mock_durations,
+    mock_states,
+    mock_jira,
+    mock_post,
 ):
     mock_cfg.return_value.get_config.side_effect = _config_get
     mock_var.get.side_effect = _variable_get_factory()
@@ -1294,11 +1430,24 @@ def test_only_dags_filters_evaluated_runs(
 # --------------------------------------------------------------------------- #
 # Simulate / test mode
 # --------------------------------------------------------------------------- #
+# Default synthetic standard finding must transitively impact critical_dags or
+# the impact filter drops it when the YAML list is non-empty.
+# Empty deps: default synthetic critical (membership) → Chat+Jira; synthetic
+# standard (no path) → Chat only.
+_SIMULATE_DEPS = {}
+
+
 @mock.patch(f"{_MODULE}._post_gchat", return_value=True)
 @mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
 @mock.patch(f"{_MODULE}.Variable")
 @mock.patch(f"{_MODULE}.ConfigurationService")
-def test_simulate_dry_run_sends_nothing(mock_cfg, mock_var, mock_jira, mock_post):
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SIMULATE_DEPS,
+)
+def test_simulate_dry_run_sends_nothing(
+    mock_deps, mock_cfg, mock_var, mock_jira, mock_post
+):
     mock_cfg.return_value.get_config.side_effect = _config_get
     mock_var.get.side_effect = _variable_get_factory()
 
@@ -1313,8 +1462,12 @@ def test_simulate_dry_run_sends_nothing(mock_cfg, mock_var, mock_jira, mock_post
 @mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
 @mock.patch(f"{_MODULE}.Variable")
 @mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SIMULATE_DEPS,
+)
 def test_simulate_force_send_posts_initial_to_test_destinations(
-    mock_cfg, mock_var, mock_jira, mock_post
+    mock_deps, mock_cfg, mock_var, mock_jira, mock_post
 ):
     mock_cfg.return_value.get_config.side_effect = _config_get
     mock_var.get.side_effect = _variable_get_factory(environment="forno")
@@ -1329,11 +1482,16 @@ def test_simulate_force_send_posts_initial_to_test_destinations(
         },
     )
 
-    # Critical synthetic → JiraOps test team; standard synthetic → test webhook.
+    # Critical synthetic → JiraOps + Chat; standard synthetic → Chat only.
     _, jira_kwargs = mock_jira.call_args
     assert jira_kwargs["responder_team_id"] == "test-team-123"
     assert jira_kwargs["test"] is True
-    assert mock_post.call_args.args[0] == "https://chat.example.com/TEST"
+    assert mock_jira.call_count == 1
+    assert mock_post.call_count == 2
+    assert all(
+        call.args[0] == "https://chat.example.com/TEST"
+        for call in mock_post.call_args_list
+    )
     mock_var.set.assert_not_called()  # simulate never writes the ledger
 
 
@@ -1341,8 +1499,12 @@ def test_simulate_force_send_posts_initial_to_test_destinations(
 @mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
 @mock.patch(f"{_MODULE}.Variable")
 @mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SIMULATE_DEPS,
+)
 def test_force_send_critical_without_test_team_is_not_paged(
-    mock_cfg, mock_var, mock_jira, mock_post
+    mock_deps, mock_cfg, mock_var, mock_jira, mock_post
 ):
     mock_cfg.return_value.get_config.side_effect = _config_get
     mock_var.get.side_effect = _variable_get_factory(environment="forno")
@@ -1356,8 +1518,9 @@ def test_force_send_critical_without_test_team_is_not_paged(
         },
     )
 
-    mock_jira.assert_not_called()  # critical downgraded to log-only
-    mock_post.assert_called_once()  # standard still delivered
+    mock_jira.assert_not_called()  # critical refused without test team
+    assert mock_post.call_count == 2  # both critical + standard still Chat
+    mock_var.set.assert_not_called()
 
 
 @mock.patch(f"{_MODULE}._post_gchat", return_value=True)
@@ -1402,6 +1565,7 @@ class TestParseTestOptions:
             "test_webhook": None,
             "test_responder_team_id": None,
             "only_dags": None,
+            "critical_dags": None,
         }
 
     def test_simulate_defaults_dry_run_true(self):
@@ -1423,10 +1587,49 @@ class TestParseTestOptions:
 
     def test_coerces_dag_lists(self):
         opts = _parse_test_options(
-            {"only_dags": "bietlejuice.x", "simulate_dags": "bietlejuice.y"}
+            {
+                "only_dags": "bietlejuice.x",
+                "simulate_dags": "bietlejuice.y",
+                "critical_dags": "bietlejuice.z",
+            }
         )
         assert opts["only_dags"] == ["bietlejuice.x"]
         assert opts["simulate_dags"] == ["bietlejuice.y"]
+        assert opts["critical_dags"] == ["bietlejuice.z"]
+
+
+@mock.patch(f"{_MODULE}._post_gchat", return_value=True)
+@mock.patch(f"{_MODULE}._send_jira_alert", return_value=True)
+@mock.patch(f"{_MODULE}.Variable")
+@mock.patch(f"{_MODULE}.ConfigurationService")
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value={},
+)
+def test_conf_critical_dags_override_makes_dag_critical(
+    mock_deps, mock_cfg, mock_var, mock_jira, mock_post
+):
+    """Trigger conf ``critical_dags`` replaces YAML for that run (JiraOps tier)."""
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    mock_var.get.side_effect = _variable_get_factory()
+    override_dag = "bietlejuice.conf_override_critical"
+
+    monitor_dag_runtimes(
+        session=mock.MagicMock(),
+        run_conf={
+            "simulate": True,
+            "force_send": True,
+            "test_responder_team_id": "test-team",
+            "critical_dags": [override_dag],
+            "simulate_dags": [override_dag],
+        },
+    )
+
+    mock_jira.assert_called_once()
+    finding = mock_jira.call_args.args[0]
+    assert finding["dag_id"] == override_dag
+    assert finding["tier"] == "critical"
+    mock_post.assert_called_once()  # Chat + JiraOps
 
 
 class TestAsStrList:

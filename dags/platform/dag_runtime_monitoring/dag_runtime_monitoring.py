@@ -9,13 +9,11 @@ recent successful runs* (P<percentile> of durations over the last <lookback_days
 times a factor, and only past an absolute min-duration floor) — no hardcoded per-DAG
 time thresholds.
 
-Alerting is tiered:
-  * DAGs in the configured ``critical_dags`` list (highest downstream dw_* impact)
-    open a JiraOps on-caller alert once (people ack/close it in Jira).
-  * Every other over-baseline DAG is reported to a Google Chat webhook and then
-    **tracked to closure**: the monitor keeps a ledger (Airflow Variable) of each
-    flagged run and, every cycle, posts a threaded update while it is still running
-    and a final message when it succeeds or fails.
+Alerting is tiered by ``critical_dags`` (soft-launch: empty list → Chat only):
+  * Every over-baseline DAG is reported to Google Chat and **tracked to closure**
+    (threaded updates while running, final message on success/failure).
+  * Additionally, DAGs in ``critical_dags`` **or** that transitively block one
+    (via ``dependencies.yaml``) also open a JiraOps on-caller alert once.
 
 Elapsed time and historical baselines are anchored on the earliest
 ``execute-job-cluster*`` task start when that task exists for the run (so sensor /
@@ -528,6 +526,41 @@ def _enrich_findings_with_dw_impact(
         finding["impacted_dw_count"] = len(impacted)
 
 
+def _impacts_critical(
+    dag_id: str, critical: set, downstream_index: dict | None
+) -> bool:
+    """True if ``dag_id`` is in ``critical`` or transitively blocks any critical DAG.
+
+    When ``critical`` is empty, returns False (soft-launch: nothing pages Jira).
+    """
+    if not critical:
+        return False
+    if dag_id in critical:
+        return True
+    index = downstream_index if downstream_index is not None else {}
+    downstream = BietlejuiceDependencyHelper.find_downstream_dags(
+        dag_id, downstream_index=index
+    )
+    return bool(critical.intersection(downstream))
+
+
+def _assign_alert_tiers(
+    findings: list, critical_dags, downstream_index: dict | None
+) -> None:
+    """Set ``tier`` on each finding for Chat vs Chat+JiraOps routing.
+
+    * Empty ``critical_dags`` → all ``standard`` (Chat only; soft-launch).
+    * Non-empty → ``critical`` (Chat + JiraOps) if the DAG is in the set or
+      transitively blocks one; otherwise ``standard`` (Chat only).
+    """
+    critical = set(critical_dags or ())
+    for finding in findings:
+        if _impacts_critical(finding["dag_id"], critical, downstream_index):
+            finding["tier"] = "critical"
+        else:
+            finding["tier"] = "standard"
+
+
 def _live_impacted_dw_count(dag_id: str, downstream_index: dict | None) -> int | None:
     """Recompute DW blast-radius count from the live graph for follow-up updates.
 
@@ -767,6 +800,8 @@ def _parse_test_options(conf: dict | None) -> dict:
         "test_webhook": conf.get("test_webhook"),
         "test_responder_team_id": conf.get("test_responder_team_id"),
         "only_dags": _as_str_list(conf.get("only_dags")),
+        # Optional override of YAML critical_dags for this run only.
+        "critical_dags": _as_str_list(conf.get("critical_dags")),
     }
 
 
@@ -861,6 +896,8 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
 
     service = ConfigurationService(dag_name=DAG_NAME)
     config = _resolve_config(service.get_config(DAG_NAME))
+    if opts["critical_dags"] is not None:
+        config["critical_dags"] = opts["critical_dags"]
     webhook_key = service.get_config("notification_webhooks_keys").get(DAG_NAME)
     webhook_url = Variable.get(webhook_key, default_var=None) if webhook_key else None
     environment = Variable.get("environment", default_var="local")
@@ -879,7 +916,8 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         f"test={{simulate:{opts['simulate']}, dry_run:{opts['dry_run']}, "
         f"force_send:{opts['force_send']}, test_webhook:{'yes' if opts['test_webhook'] else 'no'}, "
         f"test_team:{'yes' if opts['test_responder_team_id'] else 'no'}, "
-        f"only_dags:{len(opts['only_dags']) if opts['only_dags'] else 0}}}"
+        f"only_dags:{len(opts['only_dags']) if opts['only_dags'] else 0}, "
+        f"critical_override:{'yes' if opts['critical_dags'] is not None else 'no'}}}"
     )
 
     # Test-destination overrides (test_webhook / test_responder_team_id) only apply to a
@@ -899,6 +937,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     if opts["simulate"]:
         findings = _synthetic_findings(config, opts["simulate_dags"])
         _enrich_findings_with_dw_impact(findings, downstream_index)
+        _assign_alert_tiers(findings, config["critical_dags"], downstream_index)
         _attach_owners(
             findings,
             _fetch_dag_owners(session, {f["dag_id"] for f in findings}),
@@ -918,13 +957,11 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
                 _deliver_initial(finding, gchat_dest, jira_team, is_test)
             return
         # Follow-up phase: build a throwaway ledger + fabricated run states and run the
-        # real follow-up logic (standard tier only — critical has no gchat follow-up).
+        # real follow-up logic (Chat lifecycle for every tier).
         ledger = {}
         states = {}
         terminal = state in _TERMINAL_STATES
         for finding in findings:
-            if finding["tier"] != "standard":
-                continue
             key = _run_key(finding["dag_id"], finding["run_id"])
             ledger[key] = _entry_from_finding(finding)
             states[(finding["dag_id"], finding["run_id"])] = SimpleNamespace(
@@ -952,6 +989,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         )
         findings = _evaluate_all(running_rows, durations_by_dag, now, config)
     _enrich_findings_with_dw_impact(findings, downstream_index)
+    _assign_alert_tiers(findings, config["critical_dags"], downstream_index)
 
     ledger = _normalize_ledger(
         _load_dedup_state(), critical_dags=config["critical_dags"]
@@ -991,42 +1029,53 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         if key in ledger or key in already_tracked:
             continue
         entry = _entry_from_finding(finding, first_alert_ts=now.isoformat())
+        # Every anomaly goes to Chat (lifecycle). Critical tier also pages JiraOps.
+        # Gate ledger on *all* required deliveries: if Chat succeeds but Jira fails,
+        # do not track yet — otherwise later cycles skip the finding and on-call is
+        # never paged despite _send_jira_alert's "retry next cycle" log.
+        jira_ok = True
         if finding["tier"] == "critical":
             if is_test and not jira_team:
                 print(
                     f"⚠️  Refusing to page real on-call from a test trigger for "
-                    f"{finding['dag_id']} — pass test_responder_team_id. Logging only."
+                    f"{finding['dag_id']} — pass test_responder_team_id. "
+                    f"Chat alert still sent."
                 )
-                continue
-            if _send_jira_alert(finding, responder_team_id=jira_team, test=is_test):
-                ledger[key] = entry  # tracked for dedup only; JiraOps handled in Jira
-        elif _post_gchat(
+            else:
+                jira_ok = _send_jira_alert(
+                    finding, responder_team_id=jira_team, test=is_test
+                )
+        chat_ok = _post_gchat(
             gchat_dest,
             _initial_text(entry, finding["elapsed_s"]),
             _thread_key(finding["dag_id"], finding["run_id"]),
-        ):
+        )
+        if jira_ok and chat_ok:
             ledger[key] = entry
 
     _save_ledger(ledger)
 
 
 def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
-    """Send just the initial alert for one finding (used by simulate mode)."""
+    """Send the initial alert for one finding (used by simulate mode).
+
+    Chat always; JiraOps additionally for critical tier (when test team is set).
+    """
     if finding["tier"] == "critical":
         if is_test and not jira_team:
             print(
                 f"⚠️  Refusing to page real on-call from a test trigger for "
-                f"{finding['dag_id']} — pass test_responder_team_id. Logging only."
+                f"{finding['dag_id']} — pass test_responder_team_id. "
+                f"Chat alert still sent."
             )
-            return
-        _send_jira_alert(finding, responder_team_id=jira_team, test=is_test)
-    else:
-        entry = _entry_from_finding(finding)
-        _post_gchat(
-            gchat_dest,
-            _initial_text(entry, finding["elapsed_s"]),
-            _thread_key(finding["dag_id"], finding["run_id"]),
-        )
+        else:
+            _send_jira_alert(finding, responder_team_id=jira_team, test=is_test)
+    entry = _entry_from_finding(finding)
+    _post_gchat(
+        gchat_dest,
+        _initial_text(entry, finding["elapsed_s"]),
+        _thread_key(finding["dag_id"], finding["run_id"]),
+    )
 
 
 def _follow_up_tracked_runs(
@@ -1049,11 +1098,11 @@ def _apply_follow_up(
     """For each tracked run, post an update (still running) or a closing message
     (terminal), and drop terminal/vanished runs from the ledger. Mutates ledger in place.
 
-    Only standard-tier runs get gchat follow-ups; critical runs are deduped here and
-    dropped on terminal (their incident lives in JiraOps, closed by people).
+    Every tracked run gets Chat follow-ups (critical tier also had an initial JiraOps
+    page; the Chat thread is still tracked to closure).
 
-    Standard-tier closing posts must succeed before the run is dropped — same delivery
-    gate as the initial alert — so a failed ✅/❌ webhook is retried next cycle.
+    Closing posts must succeed before the run is dropped — same delivery gate as the
+    initial alert — so a failed ✅/❌ webhook is retried next cycle.
 
     Elapsed / terminal duration prefer ledger ``work_start_date`` (or joined
     ``work_start``) so Chat follow-ups stay aligned with the job-cluster clock.
@@ -1063,28 +1112,26 @@ def _apply_follow_up(
         if row is None:
             del ledger[key]  # run row gone → stop tracking
             continue
-        is_standard = entry.get("tier", "standard") == "standard"
         clock_start = _follow_up_clock_start(entry, row)
         if row.state in _TERMINAL_STATES:
-            if is_standard:
-                duration_s = (
-                    (row.end_date - clock_start).total_seconds()
-                    if row.end_date and clock_start
-                    else None
-                )
-                text_content = (
-                    _resolved_text(entry, duration_s)
-                    if row.state == "success"
-                    else _failed_text(entry, duration_s)
-                )
-                if not _post_gchat(
-                    gchat_dest,
-                    text_content,
-                    _thread_key(entry["dag_id"], entry["run_id"]),
-                ):
-                    continue  # keep in ledger; retry closing message next cycle
-            del ledger[key]  # terminal → stop tracking (critical dropped silently)
-        elif is_standard and clock_start is not None:
+            duration_s = (
+                (row.end_date - clock_start).total_seconds()
+                if row.end_date and clock_start
+                else None
+            )
+            text_content = (
+                _resolved_text(entry, duration_s)
+                if row.state == "success"
+                else _failed_text(entry, duration_s)
+            )
+            if not _post_gchat(
+                gchat_dest,
+                text_content,
+                _thread_key(entry["dag_id"], entry["run_id"]),
+            ):
+                continue  # keep in ledger; retry closing message next cycle
+            del ledger[key]
+        elif clock_start is not None:
             elapsed_s = (now - clock_start).total_seconds()
             live_count = _live_impacted_dw_count(entry["dag_id"], downstream_index)
             _post_gchat(
@@ -1103,8 +1150,8 @@ with DAG(
     description=(
         "Every 30 min, flags running DAGs whose elapsed time is anomalous vs their own "
         "recent successful runs (relative P-percentile baseline, no hardcoded thresholds). "
-        "Critical DAGs page JiraOps on-caller; the rest are reported to a Google Chat "
-        "webhook and tracked (threaded updates) until the run succeeds or fails."
+        "Every anomaly goes to Google Chat (tracked to closure); DAGs in critical_dags "
+        "or that block them also page JiraOps on-caller."
     ),
     schedule="*/30 * * * *",
     catchup=False,
