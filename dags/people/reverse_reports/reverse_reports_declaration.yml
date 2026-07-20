@@ -136,6 +136,11 @@ workflow:
       extra_spark_job_arguments:
         - "12ao2yTFNffNaZWlb72hlU7mSS_WTob9MMs4UsFJLdBg"
         - "base"
+    # Former notebook: dash_analytics_dei (Daily Pipeline).
+    dei_employee_diversity_analytics:
+      extra_spark_job_arguments:
+        - "16u0I2lV6dDzhslWyVw6S62N-M7XrIHgnWpy05awQPcQ"
+        - "base_dei_v2"
 
     # --- people_reports notebook migration (Tier-1 validated) ---
     # Former notebook view: base_wfa
