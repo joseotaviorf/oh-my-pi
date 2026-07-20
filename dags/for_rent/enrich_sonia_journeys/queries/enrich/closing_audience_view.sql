@@ -145,6 +145,7 @@ SELECT
      ))
     -- Gate 1+2: all contracts (registered and unregistered alike), binning_value < threshold
     OR (e.binning_value < CASE
+        WHEN e.ts_first_sent >= CAST('2026-07-21 10:00:00' AS TIMESTAMP) THEN 15
         WHEN e.ts_first_sent >= CAST('2026-07-16 13:00:00' AS TIMESTAMP) THEN 5
         ELSE 0
      END)
