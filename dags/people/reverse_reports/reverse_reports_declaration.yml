@@ -108,6 +108,10 @@ workflow:
       extra_spark_job_arguments:
         - "1_3VUrs066sRdtQhzKz71g5S64ZlONbewj575BHWCk3E"
         - "base"
+    compliance_conflict_of_interest_employee_roster:
+      extra_spark_job_arguments:
+        - "1D84RkgMoQ8zSG3Nj-MutCqpMqR1bdWM3x7_fz8CoCgY"
+        - "_base"
     itops_employee_contact_roster:
       extra_spark_job_arguments:
         - "15cDUEPUHT9FWtWMX5hvgJjRMCIP288FYj1Kvl3hYuwg"
