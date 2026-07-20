@@ -9,7 +9,8 @@ dag:
       Debezium and Kafka Connect are provisioned outside this repository; this DAG reads landing data
       from the S3 sink and materializes transactional, raw Delta, and clean tables.
       Core tables: similar_property (candidate duplicate), duplicity_output (rules-engine outcome),
-      dedup_complement_parse_audit (complement parser shadow audit).
+      dedup_complement_parse_audit (complement parser shadow audit),
+      dedup_contextual_cep_neighborhood_shadow_audit (contextual CEP neighborhood filter shadow audit).
 
       Source repo: backend-services/applications/property-dedup
       Database documentation: dags/growth/property_dedup/property_dedup.md
@@ -36,6 +37,11 @@ workflow:
       clean_primary_keys: [id]
     dedup_complement_parse_audit:
       clean_table_name: dedup_complement_parse_audit
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      z_order_by: [id]
+    dedup_contextual_cep_neighborhood_shadow_audit:
+      clean_table_name: dedup_contextual_cep_neighborhood_shadow_audit
       raw_primary_keys: [id]
       clean_primary_keys: [id]
       z_order_by: [id]

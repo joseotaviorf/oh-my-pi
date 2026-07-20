@@ -66,7 +66,7 @@ Return duplicate list to caller
 
 ## Entity-relationship diagram
 
-The diagram shows **all tables in the production `propertydedup` database**. Ingested tables (`similar_property`, `duplicity_output`, `dedup_complement_parse_audit`) use **clean layer** naming (`datalake_property_dedup_clean`); non-ingested tables use their OLTP column names. Only `duplicity_output → similar_property` is a real DB foreign key; audit/`rev` links and cross-system IDs are logical references.
+The diagram shows **all tables in the production `propertydedup` database**. Ingested tables (`similar_property`, `duplicity_output`, `dedup_complement_parse_audit`, `dedup_contextual_cep_neighborhood_shadow_audit`) use **clean layer** naming (`datalake_property_dedup_clean`); non-ingested tables use their OLTP column names. Only `duplicity_output → similar_property` is a real DB foreign key; audit/`rev` links and cross-system IDs are logical references.
 
 ```mermaid
 erDiagram
@@ -155,6 +155,32 @@ erDiagram
         boolean cep_filtered_diverged
         varchar action_primary
         varchar action_shadow
+        boolean actions_match
+        boolean async_evaluated
+        timestamptz ts_async_completed
+        timestamptz ts_decision
+        timestamptz ts_created
+        timestamptz ts_updated
+    }
+
+    dedup_contextual_cep_neighborhood_shadow_audit {
+        bigint id PK
+        varchar id_external
+        bigint id_property
+        varchar id_trace
+        varchar request_state
+        varchar request_city
+        varchar request_neighborhood
+        varchar request_cep_prefix
+        integer vespucio_total_hits
+        varchar production_filter_mode
+        integer hits_with_neighborhood_filter
+        integer hits_without_neighborhood_filter
+        text hit_ids_with_neighborhood
+        text hit_ids_without_neighborhood
+        boolean cep_filtered_diverged
+        varchar action_with_neighborhood
+        varchar action_without_neighborhood
         boolean actions_match
         boolean async_evaluated
         timestamptz ts_async_completed
@@ -510,12 +536,44 @@ Complement parser shadow audit — one row per dedup request when audit is enabl
 
 ---
 
+### `dedup_contextual_cep_neighborhood_shadow_audit`
+
+Contextual CEP neighborhood filter shadow audit — one row per dedup request when shadow mode is enabled. Compares vespucio search and duplicity actions with vs without neighborhood matching on the same 5-digit CEP prefix. Grain: one row per audited request. **PK:** `id` (`BIGSERIAL`). Indexed on `external_id`, `property_id`, `created_at`.
+
+| Column (OLTP) | Clean alias | Type | Nullable | Notes |
+|---|---|---|---|---|
+| `id` | `id` | BIGSERIAL | NOT NULL | **PK** |
+| `external_id` | `id_external` | VARCHAR | NULL | 3P external listing id |
+| `property_id` | `id_property` | BIGINT | NULL | Main property id |
+| `trace_id` | `id_trace` | VARCHAR | NULL | Request trace id |
+| `request_state` | `request_state` | VARCHAR | NULL | State for geo matching |
+| `request_city` | `request_city` | VARCHAR | NULL | City for geo matching |
+| `request_neighborhood` | `request_neighborhood` | VARCHAR | NULL | Neighborhood for filter comparison |
+| `request_cep_prefix` | `request_cep_prefix` | VARCHAR(5) | NULL | 5-digit CEP prefix |
+| `vespucio_total_hits` | `vespucio_total_hits` | INTEGER | NULL | ES hits before CEP filter |
+| `production_filter_mode` | `production_filter_mode` | VARCHAR(32) | NOT NULL | STRICT_EIGHT_DIGIT or CONTEXTUAL_FIVE_DIGIT |
+| `hits_with_neighborhood_filter` | `hits_with_neighborhood_filter` | INTEGER | NULL | Hits after CEP + neighborhood |
+| `hits_without_neighborhood_filter` | `hits_without_neighborhood_filter` | INTEGER | NULL | Hits after CEP only |
+| `hit_ids_with_neighborhood` | `hit_ids_with_neighborhood` | TEXT | NULL | JSON array of house IDs |
+| `hit_ids_without_neighborhood` | `hit_ids_without_neighborhood` | TEXT | NULL | JSON array of house IDs |
+| `cep_filtered_diverged` | `cep_filtered_diverged` | BOOLEAN | NULL | Hit ID sets differ between branches |
+| `action_with_neighborhood` / `action_without_neighborhood` | same | VARCHAR | NULL | BLOCK, ALERT, ALLOW (async) |
+| `actions_match` | `actions_match` | BOOLEAN | NULL | Production decision would change |
+| `async_evaluated` | `async_evaluated` | BOOLEAN | NOT NULL | DEFAULT false |
+| `async_completed_at` | `ts_async_completed` | TIMESTAMPTZ | NULL | |
+| `ts_decision` | `ts_decision` | TIMESTAMPTZ | NOT NULL | Sync audit timestamp |
+| `created_at` | `ts_created` | TIMESTAMPTZ | NOT NULL | DEFAULT `now()` |
+| `updated_at` | `ts_updated` | TIMESTAMPTZ | NOT NULL | DEFAULT `now()` |
+
+---
+
 ## Sensitive columns summary
 
 | Table | Columns | Handling |
 |---|---|---|
 | `similar_property` | `address` (street, lat/lng) | Location PII — may contain full address |
 | `dedup_complement_parse_audit` | `complement_raw` | May contain apartment/building complement text |
+| `dedup_contextual_cep_neighborhood_shadow_audit` | `request_state`, `request_city`, `request_neighborhood` | Location context from dedup request |
 
 ---
 
@@ -523,5 +581,5 @@ Complement parser shadow audit — one row per dedup request when audit is enabl
 
 | Layer | Schema | Tables |
 |---|---|---|
-| Raw | `datalake_property_dedup_raw` | 3 source tables (CDC) |
-| Clean | `datalake_property_dedup_clean` | 3 normalized tables (`similar_property`, `duplicity_output`, `dedup_complement_parse_audit`) |
+| Raw | `datalake_property_dedup_raw` | 4 source tables (CDC) |
+| Clean | `datalake_property_dedup_clean` | 4 normalized tables (`similar_property`, `duplicity_output`, `dedup_complement_parse_audit`, `dedup_contextual_cep_neighborhood_shadow_audit`) |
