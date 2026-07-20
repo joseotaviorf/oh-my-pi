@@ -237,7 +237,7 @@ segments_perspective AS (
       COALESCE(ftc.ts_first_response, sa.ts_submitted) AS response_date,
       COALESCE(ftc.is_solved, sa.is_solved) AS resolution_survey,
       fcc.is_spoc_task,
-      fcc.direction AS spoc_direction,
+      fcc.direction,
       REPLACE(get_json_object(custom_fields, '$["Session Source"]'), '#', '') AS session_source,
       fcc.sk_analyst,
       fii.step_name,
@@ -279,7 +279,7 @@ segments_perspective AS (
       ON qc.id_reservation = fcc.sk_reservation
     WHERE
       fcc.channel IN ('chat','call')
-      AND fcc.origin NOT IN ('outbound')
+      AND fcc.direction IN ('inbound') 
       AND dd.area = 'CX'
 )
 
@@ -355,7 +355,7 @@ SELECT
     sp.response_date,
     sp.resolution_survey,
     sp.is_spoc_task,
-    sp.spoc_direction,
+    sp.direction,
     sp.session_source,
     sp.sk_analyst,
     sp.step_name,

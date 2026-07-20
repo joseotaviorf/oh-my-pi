@@ -299,7 +299,7 @@ columns:
     lineage:
       - dw_customer_support.fact_customer_contacts.is_spoc_task
     description: Indicates whether the task was initiated by SPOC.
-  spoc_direction:
+  direction:
     lineage:
       - dw_customer_support.fact_customer_contacts.direction
     description: Direction associated with the SPOC task.
