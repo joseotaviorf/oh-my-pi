@@ -181,6 +181,12 @@ workflow:
       extra_spark_job_arguments:
         - "1smsqH7R_-xjxZm5Ca2eVSTKzN9OQqPOUF74uVtO2ZYE"
         - "access_list_talent"
+    # Former notebook: dash_talent_review (Daily Pipeline).
+    talent_review_dash_access_list:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "1-ZcEzJ1Q_bF51iweAFS7rHkgqr9WPdjic_9B6hd0T4k"
+        - "base_analytics"
 
     # --- reports_dw.py notebook migration (DBP-1333) ---
     # Former notebook view: base_de_para
