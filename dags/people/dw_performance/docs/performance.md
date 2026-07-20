@@ -95,6 +95,8 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 * `cycle_name` (Review cycle label — present in peer-evaluation facts; e.g. Performa 2025)
 * `assignment_number` (Assignment-level grain key — present in evaluation, talent review, smoke-detector, and peer-evaluation facts)
 * `is_latest_for_employee_in_cycle` (Talent Review only — TRUE on the official review per person per cycle; filter this when attaching one rating to employee snapshots)
+* `is_latest_for_employee` (Talent Review only — TRUE on the employee's current official review across **released** cycles; use for “latest talent review” per person. Prefer this over `is_last_cycle`, which is period-of-service grain and can duplicate people with multiple assignments)
+* `is_last_cycle` (Talent Review only — TRUE on the latest meeting per period of service / assignment; not one-row-per-employee)
 
 ## Core Features and Business Logic
 
@@ -153,7 +155,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 When joining performance data with other DW domains:
 
 1. Join on `person_number` to reach `dw_people.dim_employee` for employee attributes.
-2. Join talent reviews on `person_number` + `is_latest_for_employee_in_cycle = TRUE` (and `sk_cycle_period`) for one official rating per employee per cycle; use `assignment_number` when you need assignment-level history.
+2. Join talent reviews on `person_number` + `is_latest_for_employee_in_cycle = TRUE` (and `sk_cycle_period`) for one official rating per employee per cycle; use `is_latest_for_employee = TRUE` for the current official released review across cycles; use `assignment_number` when you need assignment-level history.
 3. Join on `assignment_number` when linking evaluations to assignment-level dimensions.
 4. Filter peer-evaluation facts on `cycle_name` and `participation_status = 'COMP'` when analyzing completed peer feedback only.
 5. Filter continuous-management facts on `review_period_name` and `document_type` when analyzing a specific Performa cycle or check-in type.

@@ -156,41 +156,91 @@ LEFT JOIN
 -- Official DW rows: completed calibrations only (flag defined in enrich talent_review).
 WHERE
   tr.has_calibrated_rating = TRUE
+),
+with_in_cycle AS (
+  SELECT
+    sk_talent_review,
+    sk_assignment,
+    sk_committee_meeting,
+    sk_committee_meeting_date,
+    sk_cycle_period,
+    sk_talent_rating_from_manager,
+    sk_talent_rating_from_calibration,
+    sk_talent_variation_period,
+    sk_talent_variation_calibration,
+    person_number,
+    assignment_number,
+    numeric_risk_of_loss_from_manager,
+    numeric_risk_of_loss_from_calibration,
+    numeric_criticality_from_manager,
+    numeric_criticality_from_calibration,
+    numeric_readiness_from_manager,
+    numeric_readiness_from_calibration,
+    numeric_potential_from_manager,
+    numeric_potential_from_calibration,
+    is_regrettable_loss,
+    is_last_cycle,
+    (
+      ROW_NUMBER() OVER (
+        PARTITION BY
+          person_number,
+          sk_cycle_period
+        ORDER BY
+          ts_committee_meeting DESC NULLS LAST,
+          sk_committee_meeting DESC
+      ) = 1
+    ) AS is_latest_for_employee_in_cycle,
+    ts_committee_meeting,
+    ts_created,
+    ts_updated,
+    ts_load
+  FROM
+    talent_review_base
 )
 SELECT
-  sk_talent_review,
-  sk_assignment,
-  sk_committee_meeting,
-  sk_committee_meeting_date,
-  sk_cycle_period,
-  sk_talent_rating_from_manager,
-  sk_talent_rating_from_calibration,
-  sk_talent_variation_period,
-  sk_talent_variation_calibration,
-  person_number,
-  assignment_number,
-  numeric_risk_of_loss_from_manager,
-  numeric_risk_of_loss_from_calibration,
-  numeric_criticality_from_manager,
-  numeric_criticality_from_calibration,
-  numeric_readiness_from_manager,
-  numeric_readiness_from_calibration,
-  numeric_potential_from_manager,
-  numeric_potential_from_calibration,
-  is_regrettable_loss,
-  is_last_cycle,
+  wic.sk_talent_review,
+  wic.sk_assignment,
+  wic.sk_committee_meeting,
+  wic.sk_committee_meeting_date,
+  wic.sk_cycle_period,
+  wic.sk_talent_rating_from_manager,
+  wic.sk_talent_rating_from_calibration,
+  wic.sk_talent_variation_period,
+  wic.sk_talent_variation_calibration,
+  wic.person_number,
+  wic.assignment_number,
+  wic.numeric_risk_of_loss_from_manager,
+  wic.numeric_risk_of_loss_from_calibration,
+  wic.numeric_criticality_from_manager,
+  wic.numeric_criticality_from_calibration,
+  wic.numeric_readiness_from_manager,
+  wic.numeric_readiness_from_calibration,
+  wic.numeric_potential_from_manager,
+  wic.numeric_potential_from_calibration,
+  wic.is_regrettable_loss,
+  wic.is_last_cycle,
+  wic.is_latest_for_employee_in_cycle,
   (
-    ROW_NUMBER() OVER (
-      PARTITION BY
-        person_number,
-        sk_cycle_period
+    COALESCE(dcp.is_released, FALSE)
+    AND wic.is_latest_for_employee_in_cycle
+    AND ROW_NUMBER() OVER (
+      PARTITION BY wic.person_number
       ORDER BY
-        ts_committee_meeting DESC NULLS LAST,
-        sk_committee_meeting DESC
+        CASE
+          WHEN COALESCE(dcp.is_released, FALSE)
+            AND wic.is_latest_for_employee_in_cycle
+          THEN 0
+          ELSE 1
+        END,
+        wic.ts_committee_meeting DESC NULLS LAST,
+        wic.sk_committee_meeting DESC
     ) = 1
-  ) AS is_latest_for_employee_in_cycle,
-  ts_created,
-  ts_updated,
-  ts_load
+  ) AS is_latest_for_employee,
+  wic.ts_created,
+  wic.ts_updated,
+  wic.ts_load
 FROM
-  talent_review_base
+  with_in_cycle AS wic
+LEFT JOIN
+  dw_performance.dim_cycle_period AS dcp
+    ON dcp.sk_cycle_period = wic.sk_cycle_period

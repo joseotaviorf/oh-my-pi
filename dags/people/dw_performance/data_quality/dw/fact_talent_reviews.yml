@@ -28,6 +28,9 @@ column_level_validations:
   is_latest_for_employee_in_cycle:
     is_complete:
       severity_level: Warning
+  is_latest_for_employee:
+    is_complete:
+      severity_level: Warning
   one_latest_for_employee_in_cycle_per_person_and_cycle:
     custom:
       # At most one row per person per cycle may be flagged is_latest_for_employee_in_cycle (prevents downstream fan-out).
@@ -42,6 +45,22 @@ column_level_validations:
            GROUP BY
              person_number,
              sk_cycle_period
+           HAVING COUNT(*) > 1
+         )
+        ) = 0
+      severity_level: Error
+  one_latest_for_employee_per_employee:
+    custom:
+      # At most one row per employee may be flagged is_latest_for_employee (prevents downstream fan-out).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             person_number
+           FROM dw_performance.fact_talent_reviews
+           WHERE is_latest_for_employee = TRUE
+           GROUP BY
+             person_number
            HAVING COUNT(*) > 1
          )
         ) = 0

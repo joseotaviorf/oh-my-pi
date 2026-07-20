@@ -6,7 +6,7 @@ description: |
   Talent Review committee outcomes for employees, with manager and calibrated ratings across criticality, potential, readiness, and risk of loss.
   One row per assignment × committee meeting for reviews with at least one calibrated numeric rating.
   Covers employees who appear in Talent Review committee meetings.
-  Supports regrettable-loss analysis and cycle-level talent scores; filter is_latest_for_employee_in_cycle = TRUE for one official rating per employee per cycle, and resolve labels through the sk_talent_rating_* and sk_cycle_period keys.
+  Supports regrettable-loss analysis and cycle-level talent scores; filter is_latest_for_employee_in_cycle = TRUE for one official rating per employee per cycle, or is_latest_for_employee = TRUE for the employee's current official review across released cycles; resolve labels through the sk_talent_rating_* and sk_cycle_period keys.
 columns:
   sk_talent_review:
     description: Surrogate key for the talent review record, generated from id_period_of_service and id_meeting.
@@ -126,6 +126,12 @@ columns:
     - dw_performance.dim_committee_meeting.ts_meeting
     - datalake_people.identifier_mapping.person_number
     - datalake_performance.talent_review.id_meeting
+  is_latest_for_employee:
+    description: True for exactly one review per person_number — the latest official (is_latest_for_employee_in_cycle) review in a released cycle (dim_cycle_period.is_released). Filter for the employee's current Talent Review across cycles. Distinct from is_last_cycle (period-of-service grain) and is_latest_for_employee_in_cycle (person × cycle).
+    lineage:
+    - dw_performance.dim_cycle_period.is_released
+    - dw_performance.dim_committee_meeting.ts_meeting
+    - datalake_people.identifier_mapping.person_number
   ts_created:
     description: Timestamp of when the original talent review record was created in the source.
     lineage:
