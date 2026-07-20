@@ -131,7 +131,7 @@ employee_access AS (
         he.line,
         he.hrbp_work_email,
         he.is_manager,
-        he.dt_original_hire,
+        he.dt_employee_hired,
         he.dt_terminated,
         he.termination_category,
         he.employment_type,
