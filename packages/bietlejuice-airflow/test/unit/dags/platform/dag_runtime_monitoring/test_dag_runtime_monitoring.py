@@ -16,12 +16,14 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     JIRA_OPS_VARIABLE,
     _as_str_list,
     _build_alert_text,
+    _effective_work_start,
     _enrich_findings_with_dw_impact,
     _entry_from_finding,
     _evaluate_all,
     _evaluate_runtime,
     _failed_text,
     _fetch_run_states,
+    _follow_up_clock_start,
     _format_duration,
     _format_impacted_dw_line,
     _initial_text,
@@ -160,16 +162,22 @@ class TestEvaluateAll:
                 dag_id=_CRITICAL_DAG,
                 run_id="r1",
                 start_date=now - timedelta(minutes=60),
+                work_start=None,
+                has_execute_job_cluster=False,
             ),
             SimpleNamespace(
                 dag_id=_STANDARD_DAG,
                 run_id="r2",
                 start_date=now - timedelta(minutes=60),
+                work_start=None,
+                has_execute_job_cluster=False,
             ),
             SimpleNamespace(
                 dag_id="bietlejuice.fast_dag",
                 run_id="r3",
                 start_date=now - timedelta(seconds=30),
+                work_start=None,
+                has_execute_job_cluster=False,
             ),
         ]
         durations = {
@@ -188,7 +196,11 @@ class TestEvaluateAll:
         now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
         running = [
             SimpleNamespace(
-                dag_id=_STANDARD_DAG, run_id="r2", start_date=now - timedelta(hours=5)
+                dag_id=_STANDARD_DAG,
+                run_id="r2",
+                start_date=now - timedelta(hours=5),
+                work_start=None,
+                has_execute_job_cluster=False,
             )
         ]
         assert _evaluate_all(running, {}, now, _CONFIG) == []
@@ -201,11 +213,15 @@ class TestEvaluateAll:
                 dag_id=_CRITICAL_DAG,
                 run_id="short",
                 start_date=now - timedelta(minutes=20),
+                work_start=None,
+                has_execute_job_cluster=False,
             ),
             SimpleNamespace(
                 dag_id=_STANDARD_DAG,
                 run_id="long",
                 start_date=now - timedelta(minutes=90),
+                work_start=None,
+                has_execute_job_cluster=False,
             ),
         ]
         durations = {_CRITICAL_DAG: [600.0] * 10, _STANDARD_DAG: [600.0] * 10}
@@ -214,6 +230,82 @@ class TestEvaluateAll:
         }
         assert _CRITICAL_DAG not in by_dag
         assert _STANDARD_DAG in by_dag
+
+    def test_skips_sensor_wait_before_execute_job_cluster(self):
+        # Regression: dag_run started hours ago but execute-job-cluster not started yet.
+        now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
+        running = [
+            SimpleNamespace(
+                dag_id=_STANDARD_DAG,
+                run_id="sensor_wait",
+                start_date=now - timedelta(hours=5),
+                work_start=None,
+                has_execute_job_cluster=True,
+            )
+        ]
+        durations = {_STANDARD_DAG: [600.0] * 10}
+        assert _evaluate_all(running, durations, now, _CONFIG) == []
+
+    def test_uses_execute_job_cluster_work_start_for_elapsed(self):
+        now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
+        work_start = now - timedelta(minutes=90)
+        running = [
+            SimpleNamespace(
+                dag_id=_STANDARD_DAG,
+                run_id="after_cluster",
+                start_date=now - timedelta(hours=5),  # sensor wait inflated
+                work_start=work_start,
+                has_execute_job_cluster=True,
+            )
+        ]
+        durations = {_STANDARD_DAG: [600.0] * 10}
+        findings = _evaluate_all(running, durations, now, _CONFIG)
+        assert len(findings) == 1
+        assert findings[0]["elapsed_s"] == pytest.approx(90 * 60)
+        assert findings[0]["work_start_date"] == work_start.isoformat()
+
+
+class TestEffectiveWorkStart:
+    def test_legacy_without_ejc_uses_dag_start(self):
+        now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
+        row = SimpleNamespace(
+            start_date=now - timedelta(hours=1),
+            work_start=None,
+            has_execute_job_cluster=False,
+        )
+        assert _effective_work_start(row) == row.start_date
+
+    def test_ejc_present_but_not_started_returns_none(self):
+        now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
+        row = SimpleNamespace(
+            start_date=now - timedelta(hours=5),
+            work_start=None,
+            has_execute_job_cluster=True,
+        )
+        assert _effective_work_start(row) is None
+
+    def test_ejc_started_prefers_work_start(self):
+        now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
+        work_start = now - timedelta(minutes=30)
+        row = SimpleNamespace(
+            start_date=now - timedelta(hours=5),
+            work_start=work_start,
+            has_execute_job_cluster=True,
+        )
+        assert _effective_work_start(row) == work_start
+
+    def test_follow_up_clock_prefers_ledger_then_row(self):
+        now = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
+        ledger_start = now - timedelta(minutes=40)
+        row_work = now - timedelta(minutes=30)
+        entry = {"work_start_date": ledger_start.isoformat()}
+        row = SimpleNamespace(start_date=now - timedelta(hours=2), work_start=row_work)
+        assert _follow_up_clock_start(entry, row) == ledger_start
+        assert _follow_up_clock_start({}, row) == row_work
+        assert (
+            _follow_up_clock_start({}, SimpleNamespace(start_date=now, work_start=None))
+            == now
+        )
 
 
 def test_build_alert_text_contains_key_facts():
@@ -455,6 +547,8 @@ def test_queries_exclude_test_runs(query):
     assert "scheduled" in sql
     assert "dataset_triggered" in sql
     assert "mediator_trig" in sql
+    assert "execute-job-cluster" in sql
+    assert "task_instance" in sql
 
 
 class TestFetchRunStates:
@@ -545,9 +639,13 @@ def _config_get(key):
     return dict(_CONFIG)
 
 
-def _running_row(dag_id, run_id, minutes_ago, now):
+def _running_row(dag_id, run_id, minutes_ago, now, *, work_start=None, has_ejc=False):
     return SimpleNamespace(
-        dag_id=dag_id, run_id=run_id, start_date=now - timedelta(minutes=minutes_ago)
+        dag_id=dag_id,
+        run_id=run_id,
+        start_date=now - timedelta(minutes=minutes_ago),
+        work_start=work_start,
+        has_execute_job_cluster=has_ejc,
     )
 
 
@@ -715,6 +813,44 @@ def test_tracked_running_gets_update(
     assert "still running" in text
     assert "Still blocking 1 dw_* DAG(s)." in text  # live count from deps
     assert f"{_STANDARD_DAG}|r2" in _saved_ledger(mock_var)  # kept
+
+
+@_lifecycle_patches
+@mock.patch(
+    f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+    return_value=_SAMPLE_IMPACT_DEPS,
+)
+def test_follow_up_elapsed_uses_ledger_work_start_date(
+    mock_deps, mock_post, mock_states, mock_running, mock_var, mock_cfg
+):
+    # Follow-up must report work elapsed (~40m), not full dag_run wall time (~2h).
+    mock_cfg.return_value.get_config.side_effect = _config_get
+    now = datetime.now(timezone.utc)
+    work_start = now - timedelta(minutes=40)
+    entry = {
+        **_ENTRY,
+        "work_start_date": work_start.isoformat(),
+    }
+    ledger = {f"{_STANDARD_DAG}|r2": entry}
+    mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
+    mock_states.return_value = {
+        (_STANDARD_DAG, "r2"): SimpleNamespace(
+            dag_id=_STANDARD_DAG,
+            run_id="r2",
+            state="running",
+            start_date=now - timedelta(hours=2),
+            end_date=None,
+            work_start=work_start,
+        )
+    }
+
+    monitor_dag_runtimes(session=mock.MagicMock())
+
+    mock_post.assert_called_once()
+    text = mock_post.call_args.args[1]
+    assert "still running" in text
+    assert "40m" in text
+    assert "2h" not in text
 
 
 @_lifecycle_patches

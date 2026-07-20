@@ -16,6 +16,11 @@ routed by tier:
   baseline), and a **closing** message when the run **succeeds (✅) or fails (❌)** — after
   which the run is dropped from the ledger.
 
+**Elapsed clock:** when a run has an `execute-job-cluster` / `execute-job-cluster-N`
+task, both live elapsed and the historical baseline start from that task’s earliest
+`start_date` (sensor / pre-cluster wait is excluded). Runs still waiting for that task
+to start are not evaluated. DAGs without that task keep full `dag_run` wall time.
+
 Real alerts are only delivered when `environment == prod`. Config lives in
 `prod_conf.yml` / `forno_conf.yml` (`lookback_days`, `min_history_runs`, `percentile`,
 `factor`, `min_alert_duration_minutes`, `critical_dags`).

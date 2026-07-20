@@ -17,6 +17,10 @@ Alerting is tiered:
     flagged run and, every cycle, posts a threaded update while it is still running
     and a final message when it succeeds or fails.
 
+Elapsed time and historical baselines are anchored on the earliest
+``execute-job-cluster*`` task start when that task exists for the run (so sensor /
+pre-cluster wait is excluded). DAGs without that task keep full ``dag_run`` wall time.
+
 Both alert paths include the transitive list of downstream ``bietlejuice.dw_*`` DAGs
 impacted by the slow run, computed each cycle from the deployed ``dependencies.yaml``.
 
@@ -57,6 +61,19 @@ DEDUP_VARIABLE_KEY = "DAG_RUNTIME_MONITORING_ALERTED_RUNS"
 
 # Cap the DW blast-radius list in Chat / JiraOps messages.
 _IMPACTED_DW_LIST_LIMIT = 25
+# Job-cluster bootstrap task (and ``execute-job-cluster-N`` multi-cluster variants).
+_EXECUTE_JOB_CLUSTER_TASK_PREFIX = "execute-job-cluster"
+
+# Shared subquery: earliest work start for a DagRun (NULL start_date = not started yet).
+_EJC_WORK_START_SQL = f"""
+    SELECT
+        dag_id,
+        run_id,
+        MIN(start_date) AS work_start
+    FROM task_instance
+    WHERE task_id LIKE '{_EXECUTE_JOB_CLUSTER_TASK_PREFIX}%'
+    GROUP BY dag_id, run_id
+"""
 
 # Config fallbacks used when a key is missing from prod_conf.yml / forno_conf.yml.
 _DEFAULT_CONFIG = {
@@ -74,43 +91,81 @@ _DEFAULT_CONFIG = {
 # Manual/backfill runs resolve to TEST_RUN in DatasetService._get_run_type (prod callbacks
 # skip them), so we exclude them from both alerting and the baseline. dag_run.conf is a
 # pickled column (not JSON-queryable), so we rely on the native run_type / run_id signals.
-_REAL_RUN_FILTER = (
-    "(run_type IN ('scheduled', 'dataset_triggered') "
-    "OR run_id LIKE 'mediator_trig\\_\\_%' ESCAPE '\\')"
+_REAL_RUN_FILTER_DR = (
+    "(dr.run_type IN ('scheduled', 'dataset_triggered') "
+    "OR dr.run_id LIKE 'mediator_trig\\_\\_%' ESCAPE '\\')"
 )
 
 _RUNNING_QUERY = text(
     f"""
-    SELECT dag_id, run_id, start_date
-    FROM dag_run
-    WHERE state = 'running'
-      AND start_date IS NOT NULL
-      AND dag_id != :self_dag_id
-      AND {_REAL_RUN_FILTER}
+    SELECT
+        dr.dag_id,
+        dr.run_id,
+        dr.start_date,
+        ejc.work_start,
+        (ejc.dag_id IS NOT NULL) AS has_execute_job_cluster
+    FROM dag_run AS dr
+    LEFT JOIN (
+        {_EJC_WORK_START_SQL}
+    ) AS ejc
+        ON ejc.dag_id = dr.dag_id
+        AND ejc.run_id = dr.run_id
+    WHERE dr.state = 'running'
+      AND dr.start_date IS NOT NULL
+      AND dr.dag_id != :self_dag_id
+      AND {_REAL_RUN_FILTER_DR}
     """
 )
 
 # Baseline is built from successful runs that finished within the lookback window
-# (end_date >= :since), rather than a fixed count of recent runs.
+# (end_date >= :since), rather than a fixed count of recent runs. Duration uses the
+# earliest execute-job-cluster start when present so baselines match live elapsed.
 _HISTORY_QUERY = text(
     f"""
-    SELECT dag_id, EXTRACT(EPOCH FROM (end_date - start_date)) AS duration_s
-    FROM dag_run
-    WHERE state = 'success'
-      AND start_date IS NOT NULL
-      AND end_date IS NOT NULL
-      AND {_REAL_RUN_FILTER}
-      AND dag_id IN :dag_ids
-      AND end_date >= :since
+    SELECT
+        dr.dag_id,
+        EXTRACT(
+            EPOCH FROM (dr.end_date - COALESCE(ejc.work_start, dr.start_date))
+        ) AS duration_s
+    FROM dag_run AS dr
+    LEFT JOIN (
+        SELECT
+            dag_id,
+            run_id,
+            MIN(start_date) AS work_start
+        FROM task_instance
+        WHERE task_id LIKE '{_EXECUTE_JOB_CLUSTER_TASK_PREFIX}%'
+          AND start_date IS NOT NULL
+        GROUP BY dag_id, run_id
+    ) AS ejc
+        ON ejc.dag_id = dr.dag_id
+        AND ejc.run_id = dr.run_id
+    WHERE dr.state = 'success'
+      AND dr.start_date IS NOT NULL
+      AND dr.end_date IS NOT NULL
+      AND {_REAL_RUN_FILTER_DR}
+      AND dr.dag_id IN :dag_ids
+      AND dr.end_date >= :since
     """
 ).bindparams(bindparam("dag_ids", expanding=True))
 
 # Look up the current state of specific runs we are already tracking (by exact run_id).
 _RUN_STATE_QUERY = text(
-    """
-    SELECT dag_id, run_id, state, start_date, end_date
-    FROM dag_run
-    WHERE run_id IN :run_ids AND dag_id IN :dag_ids
+    f"""
+    SELECT
+        dr.dag_id,
+        dr.run_id,
+        dr.state,
+        dr.start_date,
+        dr.end_date,
+        ejc.work_start
+    FROM dag_run AS dr
+    LEFT JOIN (
+        {_EJC_WORK_START_SQL}
+    ) AS ejc
+        ON ejc.dag_id = dr.dag_id
+        AND ejc.run_id = dr.run_id
+    WHERE dr.run_id IN :run_ids AND dr.dag_id IN :dag_ids
     """
 ).bindparams(bindparam("run_ids", expanding=True), bindparam("dag_ids", expanding=True))
 
@@ -197,16 +252,61 @@ def _resolve_config(raw: dict | None) -> dict:
     return merged
 
 
+def _effective_work_start(row) -> datetime | None:
+    """Clock start for elapsed time, or ``None`` to skip (pre-cluster / sensor wait).
+
+    When the run has any ``execute-job-cluster*`` task instance, use its earliest
+    ``start_date`` (skip while that is still null). Legacy DAGs without that task
+    keep ``dag_run.start_date``.
+    """
+    has_ejc = bool(getattr(row, "has_execute_job_cluster", False))
+    work_start = getattr(row, "work_start", None)
+    if has_ejc:
+        return work_start
+    return getattr(row, "start_date", None)
+
+
+def _parse_iso_datetime(value) -> datetime | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _follow_up_clock_start(entry: dict, row) -> datetime | None:
+    """Prefer ledger ``work_start_date``, then joined ``work_start``, else dag start."""
+    from_ledger = _parse_iso_datetime(entry.get("work_start_date"))
+    if from_ledger is not None:
+        return from_ledger
+    work_start = getattr(row, "work_start", None)
+    if work_start is not None:
+        return work_start
+    return getattr(row, "start_date", None)
+
+
 def _evaluate_all(
     running_rows, durations_by_dag: dict, now: datetime, config: dict
 ) -> list:
-    """Build findings for every running run that is over its relative baseline."""
+    """Build findings for every running run that is over its relative baseline.
+
+    Skips runs that have an ``execute-job-cluster*`` TI that has not started yet
+    (sensor / pre-cluster wait). Elapsed uses that task's start when present.
+    """
     critical = set(config["critical_dags"])
     min_elapsed_s = config["min_alert_duration_minutes"] * 60
     findings = []
     for row in running_rows:
         history = durations_by_dag.get(row.dag_id, [])
-        elapsed_s = (now - row.start_date).total_seconds()
+        work_start = _effective_work_start(row)
+        if work_start is None:
+            continue  # waiting on sensors / pre-cluster, or missing start
+        elapsed_s = (now - work_start).total_seconds()
         result = _evaluate_runtime(
             elapsed_s,
             history,
@@ -223,6 +323,7 @@ def _evaluate_all(
             history_count=len(history),
             percentile=config["percentile"],
             tier="critical" if row.dag_id in critical else "standard",
+            work_start_date=work_start.isoformat(),
         )
         findings.append(result)
     return findings
@@ -259,6 +360,8 @@ def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dic
         "history_count": finding["history_count"],
         "impacted_dw_dags": impacted,
         "impacted_dw_count": finding.get("impacted_dw_count", len(impacted)),
+        # ISO start used for elapsed (execute-job-cluster or dag_run); follow-ups reuse it.
+        "work_start_date": finding.get("work_start_date"),
     }
 
 
@@ -806,6 +909,9 @@ def _apply_follow_up(
 
     Standard-tier closing posts must succeed before the run is dropped — same delivery
     gate as the initial alert — so a failed ✅/❌ webhook is retried next cycle.
+
+    Elapsed / terminal duration prefer ledger ``work_start_date`` (or joined
+    ``work_start``) so Chat follow-ups stay aligned with the job-cluster clock.
     """
     for key, entry in list(ledger.items()):
         row = states.get((entry["dag_id"], entry["run_id"]))
@@ -813,11 +919,12 @@ def _apply_follow_up(
             del ledger[key]  # run row gone → stop tracking
             continue
         is_standard = entry.get("tier", "standard") == "standard"
+        clock_start = _follow_up_clock_start(entry, row)
         if row.state in _TERMINAL_STATES:
             if is_standard:
                 duration_s = (
-                    (row.end_date - row.start_date).total_seconds()
-                    if row.end_date and row.start_date
+                    (row.end_date - clock_start).total_seconds()
+                    if row.end_date and clock_start
                     else None
                 )
                 text_content = (
@@ -832,8 +939,8 @@ def _apply_follow_up(
                 ):
                     continue  # keep in ledger; retry closing message next cycle
             del ledger[key]  # terminal → stop tracking (critical dropped silently)
-        elif is_standard and row.start_date is not None:
-            elapsed_s = (now - row.start_date).total_seconds()
+        elif is_standard and clock_start is not None:
+            elapsed_s = (now - clock_start).total_seconds()
             live_count = _live_impacted_dw_count(entry["dag_id"], downstream_index)
             _post_gchat(
                 gchat_dest,
