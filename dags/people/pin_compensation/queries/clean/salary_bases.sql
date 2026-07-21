@@ -1,0 +1,25 @@
+SELECT
+    salary_basis_id AS id_salary_basis,
+    element_type_id AS id_element_type,
+    input_value_id AS id_input_value,
+    grade_rate_id AS id_grade_rate,
+    legislative_data_group_id AS id_legislative_data_group,
+    created_by,
+    last_updated_by AS updated_by,
+    name AS salary_basis_name,
+    code AS salary_basis_code_internal,
+    salary_basis_code,
+    fte_impact,
+    salary_basis_type,
+    CAST(object_version_number AS INT) AS object_version_number,
+    CAST(salary_annualization_factor AS INT) AS annualization_factor,
+    COALESCE(status = 'A', FALSE) AS is_active,
+    TO_DATE(available_from_date) AS dt_available_from,
+    TO_TIMESTAMP(creation_date) AS ts_created,
+    TO_TIMESTAMP(last_update_date) AS ts_updated,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_pin_compensation_raw.cmp_salary_bases

@@ -1,0 +1,65 @@
+database_name: datalake_pin_core_clean
+table_name: religion
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Stores religion data for individuals, specific to different legal contexts. A person may have multiple religion records under the same legal code.
+columns:
+  id_person:
+    description: Identifier of the person for whom the religion is recorded.
+    lineage:
+    - datalake_pin_core_raw.per_religions.person_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+    - datalake_pin_core_raw.per_religions.business_group_id
+  id_religion:
+    description: System-generated unique identifier for the religion record. Primary key.
+    lineage:
+    - datalake_pin_core_raw.per_religions.religion_id
+  created_by:
+    description: User who created the record.
+    lineage:
+    - datalake_pin_core_raw.per_religions.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+    - datalake_pin_core_raw.per_religions.last_updated_by
+  religion_code:
+    description: Code representing the religion, valid for the specified legal code.
+    lineage:
+    - datalake_pin_core_raw.per_religions.religion
+  legislation_code:
+    description: Legal code associated with this religion record.
+    lineage:
+    - datalake_pin_core_raw.per_religions.legislation_code
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+    - datalake_pin_core_raw.per_religions.object_version_number
+  is_primary:
+    description: Flag indicating if this is the primary religion for the person within the given legal code (Yes/No).
+    lineage:
+    - datalake_pin_core_raw.per_religions.primary_flag
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+    - datalake_pin_core_raw.per_religions.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+    - datalake_pin_core_raw.per_religions.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+    - datalake_pin_core_raw.per_religions.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+    - datalake_pin_core_raw.per_religions.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+    - datalake_pin_core_raw.per_religions.day

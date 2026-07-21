@@ -31,3 +31,59 @@ exceptions:
       Databricks (consolidation_xs_memory_cluster) since before the move,
       with no runtime change.
     approved_by: isadora.gallerani@quintoandar.com.br
+  - dag: pin_absence
+    path: dags/people/pin_absence
+    reason: >-
+      Temporary EMR→Databricks revert of PIN OIC ingestion (rollback of
+      DBP-1561 / unified pin EMR DAG) while investigating EMR runtime issues
+      with OIC→SFTP→PGP decrypt→raw/clean loads.
+    approved_by: isabella.araujo@quintoandar.com.br
+  - dag: pin_compensation
+    path: dags/people/pin_compensation
+    reason: >-
+      Temporary EMR→Databricks revert of PIN OIC ingestion (rollback of
+      DBP-1561 / unified pin EMR DAG) while investigating EMR runtime issues
+      with OIC→SFTP→PGP decrypt→raw/clean loads.
+    approved_by: isabella.araujo@quintoandar.com.br
+  - dag: pin_core
+    path: dags/people/pin_core
+    reason: >-
+      Temporary EMR→Databricks revert of PIN OIC ingestion (rollback of
+      DBP-1561 / unified pin EMR DAG) while investigating EMR runtime issues
+      with OIC→SFTP→PGP decrypt→raw/clean loads.
+    approved_by: isabella.araujo@quintoandar.com.br
+  - dag: pin_goal
+    path: dags/people/pin_goal
+    reason: >-
+      Temporary EMR→Databricks revert of PIN OIC ingestion (rollback of
+      DBP-1561 / unified pin EMR DAG) while investigating EMR runtime issues
+      with OIC→SFTP→PGP decrypt→raw/clean loads.
+    approved_by: isabella.araujo@quintoandar.com.br
+  - dag: pin_hr_review
+    path: dags/people/pin_hr_review
+    reason: >-
+      Temporary EMR→Databricks revert of PIN OIC ingestion (rollback of
+      DBP-1561 / unified pin EMR DAG) while investigating EMR runtime issues
+      with OIC→SFTP→PGP decrypt→raw/clean loads.
+    approved_by: isabella.araujo@quintoandar.com.br
+  - dag: pin_performance
+    path: dags/people/pin_performance
+    reason: >-
+      Temporary EMR→Databricks revert of PIN OIC ingestion (rollback of
+      DBP-1561 / unified pin EMR DAG) while investigating EMR runtime issues
+      with OIC→SFTP→PGP decrypt→raw/clean loads.
+    approved_by: isabella.araujo@quintoandar.com.br
+  - dag: pin_questionnaires
+    path: dags/people/pin_questionnaires
+    reason: >-
+      Temporary EMR→Databricks revert of PIN OIC ingestion (rollback of
+      DBP-1561 / unified pin EMR DAG) while investigating EMR runtime issues
+      with OIC→SFTP→PGP decrypt→raw/clean loads.
+    approved_by: isabella.araujo@quintoandar.com.br
+  - dag: pin_talent
+    path: dags/people/pin_talent
+    reason: >-
+      Temporary EMR→Databricks revert of PIN OIC ingestion (rollback of
+      DBP-1561 / unified pin EMR DAG) while investigating EMR runtime issues
+      with OIC→SFTP→PGP decrypt→raw/clean loads.
+    approved_by: isabella.araujo@quintoandar.com.br

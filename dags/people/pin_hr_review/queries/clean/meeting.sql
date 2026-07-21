@@ -1,0 +1,25 @@
+SELECT
+  business_group_id AS id_business_group,
+  meeting_id AS id_meeting,
+  meeting_organization_id AS id_meeting_organization,
+  meeting_leader_id AS id_meeting_leader,
+  dashboard_tmpl_id AS id_dashboard_template,
+  request_id AS id_request,
+  pref_review_qualifier_id AS id_pref_review_qualifier,
+  meeting_status_code,
+  meeting_title,
+  last_updated_by AS updated_by,
+  meeting_instructions,
+  include_matrix_mgmt = 'Y' AS is_matrix_management_included,
+  use_pot_assess_flag = 'Y' AS is_potential_assessment_used,
+  CAST(object_version_number AS INT) AS object_version_number,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  TO_TIMESTAMP(data_submit_date) AS ts_data_submit,
+  TO_TIMESTAMP(meeting_date) AS ts_meeting,
+  NOW() AS ts_load,
+  year,
+  month,
+  day
+FROM
+  datalake_pin_hr_review_raw.hrr_meetings

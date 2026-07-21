@@ -1,0 +1,27 @@
+SELECT
+  business_group_id AS id_business_group,
+  person_id AS id_person,
+  person_name_id AS id_person_name,
+  char_set_context AS character_encoding,
+  created_by,
+  last_updated_by AS updated_by,
+  SF_FORMAT_PROPER_NOUN(display_name) AS display_name,
+  SF_FORMAT_PROPER_NOUN(first_name) AS documented_first_name,
+  SF_FORMAT_PROPER_NOUN(last_name) AS documented_last_name,
+  SF_FORMAT_PROPER_NOUN(full_name) AS documented_full_name,
+  SF_FORMAT_PROPER_NOUN(list_name) AS list_name,
+  UPPER(name_type) AS name_type,
+  SF_FORMAT_PROPER_NOUN(nam_information15) AS first_social_name,
+  SF_FORMAT_PROPER_NOUN(nam_information16) AS last_social_name,
+  legislation_code,
+  CAST(object_version_number AS INT) AS object_version_number,
+  COALESCE(NULLIF(TO_DATE(effective_end_date), DATE('4712-12-31')), DATE('9999-12-31')) AS dt_effective_ended,
+  TO_DATE(effective_start_date) AS dt_effective_started,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  NOW() AS ts_load,
+  year,
+  month,
+  day
+FROM
+  datalake_pin_core_raw.per_person_names_f

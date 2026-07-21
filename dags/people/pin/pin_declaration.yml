@@ -1,12 +1,22 @@
 dag:
   name: pin
-  schedule_interval: 0 0 * * *
+  # Temporarily unscheduled while Forno EMR failures are investigated (SECHUB-18972).
+  # Active ingestion is the eight pin_* Databricks DAGs. Keep this DAG paused in Airflow
+  # and do not re-enable the schedule until EMR is healthy — both families write the same
+  # datalake_pin_* tables / OIC-SFTP endpoints.
+  schedule_interval: null
   owner: Data People
   callback_by_task: False
   dag_documentation:
-    dag_purpose: Unified PIN ingestion from Oracle HCM via Oracle Integration Cloud (OIC) and SFTP. Downloads, decrypts, parses,
-      and loads encrypted files into incoming and raw layers for all PIN modules (core, absence, compensation, goal, hr_review,
-      performance, questionnaires, talent). EMR step_concurrency_level caps concurrent OIC/SFTP access.
+    dag_purpose: |
+      Unified PIN ingestion from Oracle HCM via Oracle Integration Cloud (OIC) and SFTP.
+      Downloads, decrypts, parses, and loads encrypted files into incoming and raw layers
+      for all PIN modules (core, absence, compensation, goal, hr_review, performance,
+      questionnaires, talent). EMR step_concurrency_level caps concurrent OIC/SFTP access.
+
+      TEMPORARILY DISABLED (schedule_interval null + pause in Airflow) until SECHUB-18972
+      is resolved. Production ingestion runs on the split pin_* Databricks DAGs meanwhile.
+      Do not run this DAG alongside pin_* — they share the same lake tables and OIC/SFTP.
 workflow:
   layer: raw
   type: custom_ingestion

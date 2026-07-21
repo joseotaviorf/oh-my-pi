@@ -12,7 +12,14 @@ _JOB_PATHS = [
     "dags/people/greenhouse_audit_log/spark_jobs/load_greenhouse_audit_log_raw.py",
     "dags/people/greenhouse_v3/spark_jobs/load_greenhouse_v3_raw.py",
     "dags/people/hr_system/spark_jobs/load_hr_system_raw.py",
-    "dags/people/pin/spark_jobs/load_pin_raw.py",
+    "dags/people/pin_absence/spark_jobs/load_pin_absence_raw.py",
+    "dags/people/pin_compensation/spark_jobs/load_pin_compensation_raw.py",
+    "dags/people/pin_core/spark_jobs/load_pin_core_raw.py",
+    "dags/people/pin_goal/spark_jobs/load_pin_goal_raw.py",
+    "dags/people/pin_hr_review/spark_jobs/load_pin_hr_review_raw.py",
+    "dags/people/pin_performance/spark_jobs/load_pin_performance_raw.py",
+    "dags/people/pin_questionnaires/spark_jobs/load_pin_questionnaires_raw.py",
+    "dags/people/pin_talent/spark_jobs/load_pin_talent_raw.py",
     "dags/people/reverse_reports/spark_jobs/load_to_gsheet.py",
 ]
 
@@ -26,7 +33,14 @@ _JOBS_DELEGATING_TO_LIBRARY = {
     "dags/people/degreed/spark_jobs/load_degreed_raw.py",
     "dags/people/greenhouse_audit_log/spark_jobs/load_greenhouse_audit_log_raw.py",
     "dags/people/greenhouse_v3/spark_jobs/load_greenhouse_v3_raw.py",
-    "dags/people/pin/spark_jobs/load_pin_raw.py",
+    "dags/people/pin_absence/spark_jobs/load_pin_absence_raw.py",
+    "dags/people/pin_compensation/spark_jobs/load_pin_compensation_raw.py",
+    "dags/people/pin_core/spark_jobs/load_pin_core_raw.py",
+    "dags/people/pin_goal/spark_jobs/load_pin_goal_raw.py",
+    "dags/people/pin_hr_review/spark_jobs/load_pin_hr_review_raw.py",
+    "dags/people/pin_performance/spark_jobs/load_pin_performance_raw.py",
+    "dags/people/pin_questionnaires/spark_jobs/load_pin_questionnaires_raw.py",
+    "dags/people/pin_talent/spark_jobs/load_pin_talent_raw.py",
 }
 
 

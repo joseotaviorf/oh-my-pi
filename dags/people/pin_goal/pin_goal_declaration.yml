@@ -1,0 +1,54 @@
+dag:
+  name: pin_goal
+  schedule_interval: 30 1 * * *
+  owner: Data People
+  callback_by_task: False
+  dag_documentation:
+    dag_purpose: |
+      This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).
+      It downloads, decrypts, parses, and loads the files into both the `incoming` and `raw` layers of the Data Lake.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  load_spark_job: load_pin_goal_raw
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ data_interval_start | ds }}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+  tables_customization:
+    hrg_goal_plan_goals:
+      clean_table_name: goal_plan_to_goal
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_goal
+          date_column_to_partition: last_update_date
+    hrg_goal_plans_tl:
+      clean_table_name: goal_plan_translation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_goal
+          date_column_to_partition: last_update_date
+    hrg_goals:
+      clean_table_name: goal
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_goal
+          date_column_to_partition: last_update_date

@@ -1,0 +1,130 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: note
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Stores notes created in Oracle HCM (HRT_NOTES). Notes can be attached to different types of objects identified by object_type and id_object. Common object types are PER_PERSON (notes about a person, typically manager feedback) and ORA_DISCUSSION_TOPIC (notes linked to a check-in meeting discussion topic). The note_text field contains HTML-formatted content as stored by Oracle HCM.
+columns:
+  id_note:
+    description: Primary key. Unique identifier of the note in Oracle HCM.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.note_id
+  id_enterprise:
+    description: Foreign key referencing the enterprise. Always 1 for QuintoAndar.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.enterprise_id
+  id_object:
+    description: Polymorphic foreign key pointing to the object this note is attached to. Its meaning depends on object_type. For PER_PERSON, this is the Oracle HCM person ID (id_person). For ORA_DISCUSSION_TOPIC, this is the discussion topic ID.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.object_id
+  id_author_person:
+    description: Oracle HCM internal person ID of the user who authored the note.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.author_id
+  id_context:
+    description: Foreign key to the primary context object associated with this note. Populated when context_type is set.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.context_id
+  id_context_2:
+    description: Foreign key to a secondary context object. Populated when context_type2 is set.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.context_id2
+  object_type:
+    description: Identifies the type of object this note is attached to. PER_PERSON means the note is about a specific person. ORA_DISCUSSION_TOPIC means the note is linked to a check-in meeting discussion topic.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.object_type
+    categories:
+      PER_PERSON: Note is attached to a specific person record.
+      ORA_DISCUSSION_TOPIC: Note is linked to a check-in meeting discussion topic.
+      ORA_PERFORMANCE_GOAL: Note is linked to a performance goal.
+  note_visibility_code:
+    description: Controls who can view the note. MANAGERS_AND_SUBJECT means both the manager and the subject (worker) can see it.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.note_visibility_code
+    categories:
+      MANAGERS_AND_SUBJECT: Note is visible to both the manager and the worker (subject) of the check-in meeting.
+  note_type_code:
+    description: Oracle HCM code classifying the note type. May be null for general notes.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.note_type_code
+  note_code:
+    description: Oracle HCM classification code for the note. Stored for completeness and Oracle HCM audit trail.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.note_code
+  context_type:
+    description: Type of the primary context object. Identifies the entity type referenced by id_context.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.context_type
+  context_type_2:
+    description: Type of the secondary context object. Identifies the entity type referenced by id_context_2.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.context_type2
+  context_name_vo:
+    description: Oracle HCM View Object name for the primary context, used internally by Oracle for UI rendering.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.context_name_vo
+  context_name_vo_2:
+    description: Oracle HCM View Object name for the secondary context, used internally by Oracle for UI rendering.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.context_name_vo2
+  note_text:
+    description: Current content of the note in HTML format as stored by Oracle HCM. Contains the full note body written by the author.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.note_text
+  note_text_audit:
+    description: Audit snapshot of the note content in HTML format at the time of the last audit event. May differ from note_text if the note was edited after creation.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.note_text_audit
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to the record.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.object_version_number
+  reference_count:
+    description: Number of times this note is referenced by other Oracle HCM objects.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.reference_count
+  created_by:
+    description: Email of the Oracle HCM user who created this record.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.created_by
+  updated_by:
+    description: Email of the Oracle HCM user who last updated this record.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.last_updated_by
+  is_hidden:
+    description: True when this note is hidden from standard views in Oracle HCM (HIDDEN_FLAG = Y).
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.hidden_flag
+    categories:
+      'true': Note is hidden.
+      'false': Note is visible.
+  ts_note_created:
+    description: Timestamp when the note content was first created in Oracle HCM, sourced from NOTE_CREATION_DATE.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.note_creation_date
+  ts_note_updated:
+    description: Timestamp of the last update to the note content in Oracle HCM, sourced from NOTE_LAST_UPDATE_DATE.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.note_last_update_date
+  ts_created:
+    description: Timestamp when this record row was created in Oracle HCM, sourced from CREATION_DATE.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.creation_date
+  ts_updated:
+    description: Timestamp of the last update to this record row in Oracle HCM, sourced from LAST_UPDATE_DATE.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.last_update_date
+  ts_load:
+    description: Timestamp when this record was loaded into the clean table by the Spark job. Produced using NOW() and changes on reprocessing.
+  year:
+    description: Year partition derived from last_update_date, used for partition pruning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.year
+  month:
+    description: Month partition derived from last_update_date, used for partition pruning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.month
+  day:
+    description: Day partition derived from last_update_date, used for partition pruning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_notes.day
