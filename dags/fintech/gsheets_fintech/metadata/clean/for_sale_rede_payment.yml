@@ -1,0 +1,118 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_rede_payment
+description: >
+  Google Sheets workbook for For Sale third-party (3P) partner payments curated
+  by Fintech Operations on the Pagamentos 3P tab. One row per partner payment
+  with bank details, transfer model, and financial-flow balance used in For Sale
+  broker payment reconciliation and Rede payment validation.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.id_house
+    description: Property listing identifier associated with the 3P partner payment row.
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.id_offer
+    description: For Sale offer identifier linked to the 3P partner payment record.
+  address:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.address
+    description: Property address recorded for the 3P partner payment row.
+  partner_type:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.partner_type
+    description: Partner category or type assigned to the 3P payment record.
+  file_reference:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.file
+    description: File or document reference associated with the 3P partner payment.
+  partner_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.partner
+    description: Partner name responsible for the 3P payment on the For Sale deal.
+  sale_type:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.sale_type
+    description: Sale type classification for the offer linked to the 3P payment.
+  cnpj:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.cnpj
+    description: Brazilian company tax identifier (CNPJ) of the partner receiving the payment.
+  company_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.company_name
+    description: Legal company name of the partner entity receiving the 3P payment.
+  bank_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.bank_name
+    description: Bank name where the 3P partner payment is deposited.
+  bank_code:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.bank_code
+    description: Brazilian bank code used for the partner payment transfer.
+  bank_agency:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.agency
+    description: Bank agency number for the partner payment account.
+  bank_account_pj:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.account_pj
+    description: Legal-entity (PJ) bank account number for the 3P partner payment.
+  bank_account_type:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.account_type
+    description: Bank account type used for the 3P partner payment transfer.
+  found_in:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.found_in
+    description: Source system or control where the 3P payment row was identified.
+  status:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.status
+    description: Processing or reconciliation status of the 3P partner payment row.
+  has_financial_flow_balance:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.have_balence_in_financial_flow
+    description: Flag indicating whether a balance exists in the financial flow for the payment.
+  was_located_in_recent_scan:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.was_located_in_the_recent_scan
+    description: Flag indicating whether the payment was found in the most recent reconciliation scan.
+  has_duplicate_id_house:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.theres_a_duplicate_id_house
+    description: Flag indicating whether the property identifier appears duplicated in the payment sheet.
+  transfer_type:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.tipo_de_repasse
+    description: Transfer type label for the 3P partner payment in the Rede workflow.
+  transfer_model:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.modelo_repasse
+    description: Transfer model applied to the 3P payment, such as Monopoly or standard repasse.
+  aux:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.aux
+    description: Auxiliary label or note used by Fintech Operations on the 3P payment row.
+  partner_fee:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.partner_fee
+    description: Partner fee amount in Brazilian reais paid on the 3P payment record.
+  financial_flow_balance:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.balance_of_the_financial_flow
+    description: Financial-flow balance amount in Brazilian reais associated with the payment row.
+  month:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.month
+    description: Calendar month number recorded for the 3P partner payment period.
+  year:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.year
+    description: Calendar year recorded for the 3P partner payment period.
+  dt_paid_in:
+    lineage:
+      - datalake_gsheets_raw.for_sale_rede_payment.paid_in
+    description: Date when the 3P partner payment was recognized or paid in the reconciliation sheet.

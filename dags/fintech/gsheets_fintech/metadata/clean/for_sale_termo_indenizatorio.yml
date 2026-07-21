@@ -1,0 +1,94 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_termo_indenizatorio
+description: >
+  Google Sheets workbook for For Sale indemnity terms (termo indenizatório)
+  curated by Fintech Operations on the Recon tab. One row per property-offer
+  indemnity payment with tax, loss, and brokerage context used in For Sale
+  financial reconciliation and broker payment validation.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.id_imovel
+    description: Property listing identifier associated with the indemnity term row.
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.offer
+    description: For Sale offer identifier linked to the indemnity term payment.
+  term_link:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.link_do_termo
+    description: URL or reference link to the signed indemnity term document.
+  aux_recon:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.aux_recon
+    description: Auxiliary reconciliation label or flag used by Fintech Operations.
+  amount_per_property:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.valor_por_imovel
+    description: Indemnity payment amount in Brazilian reais allocated per property.
+  net_amount_per_term:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.valor_liquido_por_termo
+    description: Net indemnity amount in Brazilian reais after taxes and deductions per term.
+  gross_amount_per_term:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.valor_bruto_por_termo
+    description: Gross indemnity amount in Brazilian reais before taxes per term.
+  tax_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.valor_do_imposto
+    description: Tax amount in Brazilian reais withheld or calculated on the indemnity term.
+  amount_after_loss:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.valor_apos_perda
+    description: Indemnity amount in Brazilian reais after applying the configured loss rate.
+  sale_price_agreed:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.sale_price_agreed
+    description: Agreed sale price in Brazilian reais recorded for the related For Sale offer.
+  brokerage_fee:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.brokerage_fee
+    description: Brokerage fee rate or percentage applied to the related For Sale transaction.
+  brokerage_fee_value_5a:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.brokerage_fee_value_5a
+    description: QuintoAndar brokerage fee value in Brazilian reais for the indemnity context.
+  fee_5a:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.fee_5a
+    description: QuintoAndar fee rate used in the indemnity term reconciliation row.
+  fee_5a_value:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.fee_5a_value
+    description: QuintoAndar fee amount in Brazilian reais for the indemnity term row.
+  partner_fee:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.partner_fee
+    description: Partner fee rate applied on the demand side of the indemnity reconciliation.
+  partner_fee_value:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.partner_fee_value
+    description: Partner fee amount in Brazilian reais attributed in the indemnity term row.
+  tax_rate:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.imposto
+    description: Tax rate percentage applied to calculate tax on the indemnity term amount.
+  loss_rate:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.da_perda
+    description: Loss rate percentage applied before recognizing the indemnity payment amount.
+  dt_term_signed:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.data_de_assinatura
+    description: Date when the indemnity term was signed by the parties.
+  dt_indemnity_payment:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.data_de_pagamento
+    description: Date when the indemnity payment was made or recognized for the offer.
+  dt_eligible:
+    lineage:
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio.data_apto
+    description: Date when the offer became eligible for indemnity term reconciliation.
