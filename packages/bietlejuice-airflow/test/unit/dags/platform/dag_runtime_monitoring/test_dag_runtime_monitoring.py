@@ -152,10 +152,11 @@ class TestResolveConfig:
     def test_defaults_applied_when_missing(self):
         merged = _resolve_config({"critical_dags": ["a"]})
         assert merged["critical_dags"] == ["a"]
-        assert merged["percentile"] == 90
-        assert merged["min_history_runs"] == 3
-        assert merged["lookback_days"] == 7
-        assert merged["min_alert_duration_minutes"] == 60
+        assert merged["percentile"] == 99
+        assert merged["min_history_runs"] == 15
+        assert merged["lookback_days"] == 30
+        assert merged["min_alert_duration_minutes"] == 90
+        assert merged["factor"] == 1.5
 
     def test_none_uses_all_defaults(self):
         assert _resolve_config(None)["critical_dags"] == []
