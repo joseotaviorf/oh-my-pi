@@ -79,7 +79,9 @@ class Tables:
     source_zap_imoveis_houses_v2 = "vespucio_sources_delta.source_zap_imoveis_house_v2"
 
     registry_step_v2 = "vespucio_pipeline_delta.registry_step"
-    normalization_step_v2 = "vespucio_pipeline_delta.normalization_step"
+    address_normalization_step_v2 = "vespucio_pipeline_delta.address_normalization_step"
+    image_normalization_step_v2 = "vespucio_pipeline_delta.image_normalization_step"
+    general_normalization_step_v2 = "vespucio_pipeline_delta.general_normalization_step"
     address_enrich_step_v2 = "vespucio_pipeline_delta.address_enrich_step"
 
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"

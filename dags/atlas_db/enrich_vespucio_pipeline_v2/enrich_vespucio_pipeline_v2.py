@@ -238,19 +238,37 @@ registry_step_task = create_task(
     ],
 )
 
-normalization_step_task = create_task(
-    entry_point="core_v2_normalization_step",
+address_normalization_step_task = create_task(
+    entry_point="core_v2_address_normalization_step",
     parameters=[
         f"--input_registry={Tables.registry_step_v2}",
         "--overwrite_schema",
-        f"--output_normalized={Tables.normalization_step_v2}",
+        f"--output_address_normalized={Tables.address_normalization_step_v2}",
+    ],
+)
+
+general_normalization_step_task = create_task(
+    entry_point="core_v2_general_normalization_step",
+    parameters=[
+        f"--input_registry={Tables.registry_step_v2}",
+        "--overwrite_schema",
+        f"--output_general_normalized={Tables.general_normalization_step_v2}",
+    ],
+)
+
+image_normalization_step_task = create_task(
+    entry_point="core_v2_image_normalization_step",
+    parameters=[
+        f"--input_registry={Tables.registry_step_v2}",
+        "--overwrite_schema",
+        f"--output_image_normalized={Tables.image_normalization_step_v2}",
     ],
 )
 
 address_enrich_step_task = create_task(
     entry_point="core_v2_address_enrich_step",
     parameters=[
-        f"--input_normalized={Tables.normalization_step_v2}",
+        f"--input_address_normalized={Tables.address_normalization_step_v2}",
         f"--input_geocode_cache={Tables.geocode_step_cache}",
         f"--input_address_details_hasher_link={Tables.address_details_hasher_link}",
         f"--input_staged_parsed_complements={Tables.staged_parsed_complements}",
@@ -270,6 +288,12 @@ DatasetAdder.attach_dataset_to_task(vespucio_v2_pipeline_complete_task)
 
 execute_job_cluster_task >> source_tasks
 source_tasks >> registry_step_task
-registry_step_task >> normalization_step_task
-normalization_step_task >> address_enrich_step_task
-address_enrich_step_task >> vespucio_v2_pipeline_complete_task
+registry_step_task >> address_normalization_step_task
+registry_step_task >> general_normalization_step_task
+registry_step_task >> image_normalization_step_task
+address_normalization_step_task >> address_enrich_step_task
+[
+    address_enrich_step_task,
+    general_normalization_step_task,
+    image_normalization_step_task,
+] >> vespucio_v2_pipeline_complete_task
