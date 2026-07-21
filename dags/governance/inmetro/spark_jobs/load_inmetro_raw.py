@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from functools import reduce
 
-from pyspark.sql.functions import input_file_name, regexp_extract, struct, to_json
+from pyspark.sql.functions import lit, struct, to_json
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -46,13 +46,26 @@ def _build_inmetro_glob_path(inmetro_bucket, target_date):
     return f"{inmetro_bucket}/*/*/*/{bucket_directory}/{target_date}"
 
 
-def _build_inmetro_path_pattern(inmetro_bucket, target_date):
-    """Regex mirroring _build_inmetro_glob_path; captures repo/database/table."""
-    return rf"{inmetro_bucket}/([^/]+)/([^/]+)/([^/]+)/{bucket_directory}/{target_date}"
+def _normalize_s3_uri(uri):
+    """Normalize s3a:// → s3:// so config URIs match Hadoop FileStatus paths."""
+    uri = uri.rstrip("/")
+    if uri.startswith("s3a://"):
+        return "s3://" + uri[len("s3a://") :]
+    return uri
+
+
+def _glob_status(glob_path):
+    """Returns Hadoop FileStatus matches for glob_path as a Python list."""
+    sc = spark.sparkContext
+    hadoop_path = sc._jvm.org.apache.hadoop.fs.Path(glob_path)
+    file_system = hadoop_path.getFileSystem(sc._jsc.hadoopConfiguration())
+    statuses = file_system.globStatus(hadoop_path)
+    return list(statuses) if statuses is not None else []
 
 
 def _path_has_objects(glob_path):
     """Checks S3 object existence via Hadoop FileSystem globStatus — no data is read."""
+    # Keep existence checks on the JVM array (len) — do not materialize via list().
     sc = spark.sparkContext
     hadoop_path = sc._jvm.org.apache.hadoop.fs.Path(glob_path)
     file_system = hadoop_path.getFileSystem(sc._jsc.hadoopConfiguration())
@@ -60,32 +73,95 @@ def _path_has_objects(glob_path):
     return statuses is not None and len(statuses) > 0
 
 
-def _load_single_date(
-    target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket
-):
-    file_path = _build_inmetro_glob_path(inmetro_bucket, target_date)
-    path_attributes_pattern = _build_inmetro_path_pattern(inmetro_bucket, target_date)
+def _parse_inmetro_date_prefix(path, inmetro_bucket, target_date):
+    """Parse {bucket}/{repo}/{database}/{table}/{bucket_directory}/{date}[/...] .
 
-    df = spark.read.format("json").load(file_path)
+    Pure Python path parsing — no Spark Analyzer / function-name resolution.
+    Returns (repo, database, table) or None if the path does not match.
+    """
+    path = _normalize_s3_uri(path)
+    bucket = _normalize_s3_uri(inmetro_bucket)
+    prefix = bucket + "/"
+    if not path.startswith(prefix):
+        return None
+
+    parts = path[len(prefix) :].split("/")
+    if len(parts) < 5:
+        return None
+
+    repo, database, table, directory, date_part = parts[:5]
+    if directory != bucket_directory or date_part != target_date:
+        return None
+
+    return repo, database, table
+
+
+def _list_inmetro_date_prefixes(inmetro_bucket, target_date):
+    """Enumerate distinct producer date-prefixes via Hadoop globStatus.
+
+    Returns a list of (repo, database, table, prefix_path) tuples. prefix_path is
+    the exact directory spark.read should load for that producer.
+    """
+    # Match objects under the date dir (/*), same shape as the existence check.
+    statuses = _glob_status(
+        f"{_build_inmetro_glob_path(inmetro_bucket, target_date)}/*"
+    )
+    bucket = _normalize_s3_uri(inmetro_bucket)
+    results = []
+    seen = set()
+
+    for status in statuses:
+        path_str = status.getPath().toString()
+        parsed = _parse_inmetro_date_prefix(path_str, inmetro_bucket, target_date)
+        if parsed is None or parsed in seen:
+            continue
+        seen.add(parsed)
+        repo, database, table = parsed
+        prefix_path = (
+            f"{bucket}/{repo}/{database}/{table}/{bucket_directory}/{target_date}"
+        )
+        results.append((repo, database, table, prefix_path))
+
+    return results
+
+
+def _load_single_prefix(
+    prefix_path, repo, database, table, serialize_columns_from_directory
+):
+    """Read one producer prefix and attach path metadata via Literal columns only."""
+    df = spark.read.format("json").load(prefix_path)
 
     if serialize_columns_from_directory:
         df = df.withColumn(
             "inmetro_info", to_json(struct([df[x] for x in df.columns]))
         ).select("inmetro_info")
 
-    df = (
-        df.withColumn(
-            "repo",
-            regexp_extract(input_file_name(), path_attributes_pattern, 1),
-        )
-        .withColumn(
-            "database",
-            regexp_extract(input_file_name(), path_attributes_pattern, 2),
-        )
-        .withColumn(
-            "table", regexp_extract(input_file_name(), path_attributes_pattern, 3)
-        )
+    return (
+        df.withColumn("repo", lit(repo))
+        .withColumn("database", lit(database))
+        .withColumn("table", lit(table))
     )
+
+
+def _load_single_date(
+    target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket
+):
+    prefixes = _list_inmetro_date_prefixes(inmetro_bucket, target_date)
+    if not prefixes:
+        raise RuntimeError(
+            f"No parseable producer prefixes under "
+            f"{_build_inmetro_glob_path(inmetro_bucket, target_date)}"
+        )
+
+    prefix_dfs = [
+        _load_single_prefix(
+            prefix_path, repo, database, table, serialize_columns_from_directory
+        )
+        for repo, database, table, prefix_path in prefixes
+    ]
+    # Producer suites may differ in nested JSON shape; union by name with
+    # missing columns as null — intended to match single-glob JSON read.
+    df = reduce(lambda a, b: a.unionByName(b, allowMissingColumns=True), prefix_dfs)
 
     df = (
         SparkDataFrameService()

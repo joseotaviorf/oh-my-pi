@@ -1,4 +1,3 @@
-import re
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
@@ -25,8 +24,9 @@ sys.modules["bietlejuice.base.validation.spark_args"] = MagicMock()
 import dags.governance.inmetro.spark_jobs.load_inmetro_raw as load_inmetro_raw  # noqa: E402, I001
 from dags.governance.inmetro.spark_jobs.load_inmetro_raw import (  # noqa: E402, I001
     _build_inmetro_glob_path,
-    _build_inmetro_path_pattern,
     _generate_date_range,
+    _list_inmetro_date_prefixes,
+    _parse_inmetro_date_prefix,
 )
 
 
@@ -69,38 +69,240 @@ class TestBuildInmetroGlobPath(unittest.TestCase):
         self.assertEqual(result, "s3://bucket/*/*/*/validation/2024-06-09")
 
 
-class TestBuildInmetroPathPattern(unittest.TestCase):
+class TestParseInmetroDatePrefix(unittest.TestCase):
     def setUp(self):
         load_inmetro_raw.bucket_directory = "validation"
 
-    def test_pattern_extracts_repo_database_table_in_order(self):
-        pattern = _build_inmetro_path_pattern("s3://bucket", "2024-06-09")
-        file_path = "s3://bucket/bietlejuice/hr_system/workers/validation/2024-06-09/result.json"
-        match = re.match(pattern, file_path)
-        self.assertIsNotNone(match)
-        self.assertEqual(match.group(1), "bietlejuice")
-        self.assertEqual(match.group(2), "hr_system")
-        self.assertEqual(match.group(3), "workers")
-
-    def test_pattern_matches_non_bietlejuice_repo(self):
-        pattern = _build_inmetro_path_pattern("s3://bucket", "2024-06-09")
-        file_path = (
-            "s3://bucket/wonka/some_db/some_table/validation/2024-06-09/result.json"
+    def test_extracts_repo_database_table_in_order(self):
+        path = "s3://bucket/bietlejuice/hr_system/workers/validation/2024-06-09"
+        self.assertEqual(
+            _parse_inmetro_date_prefix(path, "s3://bucket", "2024-06-09"),
+            ("bietlejuice", "hr_system", "workers"),
         )
-        match = re.match(pattern, file_path)
-        self.assertIsNotNone(match)
-        self.assertEqual(match.group(1), "wonka")
 
-    def test_pattern_tolerates_hyphens_and_dots_in_database_or_table(self):
-        pattern = _build_inmetro_path_pattern("s3://bucket", "2024-06-09")
-        file_path = (
-            "s3://bucket/bietlejuice/hr-system.v2/workers-details/"
-            "validation/2024-06-09/result.json"
+    def test_tolerates_trailing_slash_and_nested_file(self):
+        path = (
+            "s3://bucket/bietlejuice/hr_system/workers/validation/"
+            "2024-06-09/result.json"
         )
-        match = re.match(pattern, file_path)
-        self.assertIsNotNone(match)
-        self.assertEqual(match.group(2), "hr-system.v2")
-        self.assertEqual(match.group(3), "workers-details")
+        self.assertEqual(
+            _parse_inmetro_date_prefix(path, "s3://bucket", "2024-06-09"),
+            ("bietlejuice", "hr_system", "workers"),
+        )
+
+    def test_matches_non_bietlejuice_repo(self):
+        path = "s3://bucket/wonka/some_db/some_table/validation/2024-06-09"
+        self.assertEqual(
+            _parse_inmetro_date_prefix(path, "s3://bucket", "2024-06-09"),
+            ("wonka", "some_db", "some_table"),
+        )
+
+    def test_tolerates_hyphens_and_dots_in_database_or_table(self):
+        path = (
+            "s3://bucket/bietlejuice/hr-system.v2/workers-details/validation/2024-06-09"
+        )
+        self.assertEqual(
+            _parse_inmetro_date_prefix(path, "s3://bucket", "2024-06-09"),
+            ("bietlejuice", "hr-system.v2", "workers-details"),
+        )
+
+    def test_rejects_wrong_bucket_directory(self):
+        path = "s3://bucket/bietlejuice/hr_system/workers/profile/2024-06-09"
+        self.assertIsNone(_parse_inmetro_date_prefix(path, "s3://bucket", "2024-06-09"))
+
+    def test_rejects_wrong_date(self):
+        path = "s3://bucket/bietlejuice/hr_system/workers/validation/2024-06-10"
+        self.assertIsNone(_parse_inmetro_date_prefix(path, "s3://bucket", "2024-06-09"))
+
+    def test_rejects_path_outside_bucket(self):
+        path = "s3://other/bietlejuice/hr_system/workers/validation/2024-06-09"
+        self.assertIsNone(_parse_inmetro_date_prefix(path, "s3://bucket", "2024-06-09"))
+
+    def test_accepts_s3a_path_when_bucket_is_s3(self):
+        path = "s3a://bucket/bietlejuice/hr_system/workers/validation/2024-06-09"
+        self.assertEqual(
+            _parse_inmetro_date_prefix(path, "s3://bucket", "2024-06-09"),
+            ("bietlejuice", "hr_system", "workers"),
+        )
+
+    def test_accepts_s3_path_when_bucket_is_s3a(self):
+        path = "s3://bucket/bietlejuice/hr_system/workers/validation/2024-06-09"
+        self.assertEqual(
+            _parse_inmetro_date_prefix(path, "s3a://bucket", "2024-06-09"),
+            ("bietlejuice", "hr_system", "workers"),
+        )
+
+
+class TestListInmetroDatePrefixes(unittest.TestCase):
+    def setUp(self):
+        load_inmetro_raw.bucket_directory = "validation"
+
+    def _status(self, path):
+        status = MagicMock()
+        status.getPath.return_value.toString.return_value = path
+        return status
+
+    def test_globs_objects_under_date_directory(self):
+        with patch.object(
+            load_inmetro_raw, "_glob_status", return_value=[]
+        ) as mock_glob:
+            _list_inmetro_date_prefixes("s3://bucket", "2024-06-09")
+        mock_glob.assert_called_once_with("s3://bucket/*/*/*/validation/2024-06-09/*")
+
+    def test_returns_distinct_prefixes_with_reconstructed_paths(self):
+        statuses = [
+            self._status(
+                "s3://bucket/bietlejuice/hr_system/workers/validation/"
+                "2024-06-09/result.json"
+            ),
+            self._status(
+                "s3a://bucket/bietlejuice/hr_system/workers/validation/"
+                "2024-06-09/other.json"
+            ),
+            self._status(
+                "s3a://bucket/wonka/db_a/tbl_a/validation/2024-06-09/result.json"
+            ),
+        ]
+        with patch.object(load_inmetro_raw, "_glob_status", return_value=statuses):
+            result = _list_inmetro_date_prefixes("s3://bucket", "2024-06-09")
+
+        self.assertEqual(
+            result,
+            [
+                (
+                    "bietlejuice",
+                    "hr_system",
+                    "workers",
+                    "s3://bucket/bietlejuice/hr_system/workers/validation/2024-06-09",
+                ),
+                (
+                    "wonka",
+                    "db_a",
+                    "tbl_a",
+                    "s3://bucket/wonka/db_a/tbl_a/validation/2024-06-09",
+                ),
+            ],
+        )
+
+    def test_empty_glob_returns_empty_list(self):
+        with patch.object(load_inmetro_raw, "_glob_status", return_value=[]):
+            self.assertEqual(
+                _list_inmetro_date_prefixes("s3://bucket", "2024-06-09"), []
+            )
+
+
+class TestLoadSingleDateUsesLiterals(unittest.TestCase):
+    """Hot path must attach repo/database/table via lit(), not name-resolved fns."""
+
+    def setUp(self):
+        load_inmetro_raw.bucket_directory = "validation"
+
+    def test_load_single_date_calls_lit_not_regexp_extract(self):
+        prefixes = [
+            (
+                "bietlejuice",
+                "hr_system",
+                "workers",
+                "s3://bucket/bietlejuice/hr_system/workers/validation/2024-06-09",
+            )
+        ]
+        mock_df = MagicMock()
+        mock_df.withColumn.return_value = mock_df
+        mock_df.select.return_value = mock_df
+        mock_df.unionByName.return_value = mock_df
+        mock_df.columns = ["col_a"]
+
+        mock_spark_svc = MagicMock()
+        mock_spark_svc.input.return_value = mock_spark_svc
+        mock_spark_svc.create_year_month_day_columns_from_date.return_value = (
+            mock_spark_svc
+        )
+        mock_spark_svc.optimize_partitions_by_partition_columns.return_value = (
+            mock_spark_svc
+        )
+        mock_spark_svc.output.return_value = mock_df
+
+        with (
+            patch.object(
+                load_inmetro_raw, "_list_inmetro_date_prefixes", return_value=prefixes
+            ),
+            patch.object(load_inmetro_raw.spark, "read") as mock_read,
+            patch.object(load_inmetro_raw, "lit") as mock_lit,
+            patch.object(
+                load_inmetro_raw, "SparkDataFrameService", return_value=mock_spark_svc
+            ),
+        ):
+            mock_read.format.return_value.load.return_value = mock_df
+            mock_lit.side_effect = lambda value: f"lit({value})"
+
+            load_inmetro_raw._load_single_date(
+                "2024-06-09", False, ["year", "month", "day"], "s3://bucket"
+            )
+
+        mock_read.format.return_value.load.assert_called_once_with(prefixes[0][3])
+        mock_lit.assert_any_call("bietlejuice")
+        mock_lit.assert_any_call("hr_system")
+        mock_lit.assert_any_call("workers")
+        self.assertEqual(mock_lit.call_count, 3)
+
+    def test_load_single_date_unions_prefixes_with_allow_missing_columns(self):
+        prefixes = [
+            (
+                "bietlejuice",
+                "db_a",
+                "tbl_a",
+                "s3://bucket/bietlejuice/db_a/tbl_a/validation/2024-06-09",
+            ),
+            (
+                "wonka",
+                "db_b",
+                "tbl_b",
+                "s3://bucket/wonka/db_b/tbl_b/validation/2024-06-09",
+            ),
+        ]
+        df_a = MagicMock(name="df_a")
+        df_b = MagicMock(name="df_b")
+        df_a.withColumn.return_value = df_a
+        df_b.withColumn.return_value = df_b
+        df_union = MagicMock(name="df_union")
+        df_a.unionByName.return_value = df_union
+
+        mock_spark_svc = MagicMock()
+        mock_spark_svc.input.return_value = mock_spark_svc
+        mock_spark_svc.create_year_month_day_columns_from_date.return_value = (
+            mock_spark_svc
+        )
+        mock_spark_svc.optimize_partitions_by_partition_columns.return_value = (
+            mock_spark_svc
+        )
+        mock_spark_svc.output.return_value = df_union
+
+        with (
+            patch.object(
+                load_inmetro_raw, "_list_inmetro_date_prefixes", return_value=prefixes
+            ),
+            patch.object(load_inmetro_raw.spark, "read") as mock_read,
+            patch.object(load_inmetro_raw, "lit", side_effect=lambda v: v),
+            patch.object(
+                load_inmetro_raw, "SparkDataFrameService", return_value=mock_spark_svc
+            ),
+        ):
+            mock_read.format.return_value.load.side_effect = [df_a, df_b]
+            load_inmetro_raw._load_single_date(
+                "2024-06-09", False, ["year", "month", "day"], "s3://bucket"
+            )
+
+        df_a.unionByName.assert_called_once_with(df_b, allowMissingColumns=True)
+
+    def test_load_single_date_raises_when_no_prefixes(self):
+        with patch.object(
+            load_inmetro_raw, "_list_inmetro_date_prefixes", return_value=[]
+        ):
+            with self.assertRaises(RuntimeError) as ctx:
+                load_inmetro_raw._load_single_date(
+                    "2024-06-09", False, ["year"], "s3://bucket"
+                )
+        self.assertIn("No parseable producer prefixes", str(ctx.exception))
 
 
 class TestGetInmetroDataErrorBranches(unittest.TestCase):
