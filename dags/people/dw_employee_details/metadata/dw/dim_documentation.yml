@@ -24,9 +24,16 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_people.person_number
   marital_status:
-    description: |
-      Marital status of the employee at this period.
-      Human-readable meaning from foundation_lookup_value (MAR_STATUS, PTB).
+    description: Marital status of the employee in this documentation period, as registered in PIN (e.g. 'Solteiro', 'Uniao Estavel'). NULL when not registered.
+    categories:
+      "Solteiro": Employee is single / never married.
+      "Casado(a)": Employee is married.
+      "Uniao Estavel": Employee is in a stable union / domestic partnership.
+      "Divorciado(a)": Employee is divorced.
+      "Desquitado(a) / Separado(a)": Employee is legally separated under Brazilian historical desquite or equivalent separation.
+      "Legalmente separado": Employee is legally separated.
+      "Viúvo(a)": Employee is widowed.
+      "Outros": Marital status falls outside the standard labels above.
     lineage:
       - datalake_pin_core_clean.foundation_lookup_value.meaning
       - datalake_pin_core_clean.people_legislative.marital_status

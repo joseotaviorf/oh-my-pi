@@ -29,8 +29,6 @@ all_change_dates AS (
         pl.dt_effective_started AS change_date
     FROM
         datalake_pin_core_clean.people_legislative AS pl
-    WHERE
-        pl.legislation_code = 'BR'
     UNION
     SELECT
         pl.id_person,
@@ -38,8 +36,7 @@ all_change_dates AS (
     FROM
         datalake_pin_core_clean.people_legislative AS pl
     WHERE
-        pl.legislation_code = 'BR'
-        AND pl.dt_effective_ended < DATE('9999-12-31')
+        pl.dt_effective_ended < DATE('9999-12-31')
     UNION
     SELECT
         pn.id_person,
@@ -133,6 +130,9 @@ legal_names AS (
                 OR pn.dt_effective_ended = DATE('9999-12-31')
             )
 ),
+-- Prefer BR when a person has multiple legislations so Brazilian CTPS / electoral
+-- attributes stay on the BR row; otherwise use the latest non-BR legislative row
+-- (AR/MX/PT marital status). Labels resolve via MAR_STATUS lookup in PTB.
 legislative_info AS (
     SELECT
         pr.id_person,
@@ -148,6 +148,10 @@ legislative_info AS (
                 pr.id_person,
                 pr.dt_valid_from
             ORDER BY
+                CASE
+                    WHEN pl.legislation_code = 'BR' THEN 0
+                    ELSE 1
+                END,
                 pl.dt_effective_started DESC
         ) AS rn
     FROM
@@ -155,7 +159,6 @@ legislative_info AS (
     INNER JOIN
         datalake_pin_core_clean.people_legislative AS pl
             ON pr.id_person = pl.id_person
-            AND pl.legislation_code = 'BR'
             AND pl.dt_effective_started <= pr.dt_valid_from
             AND (
                 pl.dt_effective_ended >= pr.dt_valid_from
