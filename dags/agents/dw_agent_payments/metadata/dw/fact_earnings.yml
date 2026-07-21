@@ -1,174 +1,173 @@
 database_name: dw_agent_payments
 table_name: fact_earnings
-description: Fact table projecting Big Agent earnings with contract, sales flow, receiver, and tier context from enrich_big_agent_incentives.
+description: |
+  Fact table of Big Agent earnings projected from enrich_big_agent_incentives earnings,
+  resolved to person, company, cart, contract, sales flow, tier, and partner tier surrogate
+  keys. One row per earning updated within the load window, with invalidation context,
+  revenue share attributes, and calculation flags.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_earning:
     lineage:
-    - datalake_big_agent.earnings.id_earning
-    description: Primary identifier of the earning record in Big Agent.
+      - datalake_big_agent.earnings.id
+    description: Surrogate key of the earning. Primary key of this fact table.
+  sk_replacement_earning:
+    lineage:
+      - datalake_big_agent.earnings.id_replacement_earning
+    description: Surrogate key of the earning that replaced this record when it was invalidated; null when not replaced.
   sk_earning_source:
     lineage:
-    - datalake_big_agent.earnings.id_earning_source
-    description: Identifier of the earning source that originated this earning.
-  sk_revenue_share:
-    lineage:
-    - datalake_big_agent.earnings.id_revenue_share
-    description: Revenue share identifier linked to the earning calculation.
+      - datalake_big_agent.earnings.id_earning_source
+    description: Surrogate key of the earning source linked to this earning.
   sk_contract:
     lineage:
-    - datalake_big_agent.earnings.id_contract
-    description: EBDB contract identifier when the earning source external domain type is RENT_CONTRACT.
+      - datalake_big_agent.earnings.id_contract
+    description: Surrogate key of the EBDB contract when the earning source domain is a rent contract.
   sk_sales_flow:
     lineage:
-    - datalake_big_agent.earnings.id_sales_flow
-    description: Sales flow identifier when the earning source external domain type is SALES_FLOW.
+      - datalake_big_agent.earnings.id_sales_flow
+    description: Surrogate key of the sales flow when the earning source domain is a sales flow.
   sk_author:
     lineage:
-    - datalake_big_agent.earnings.id_author
-    description: Author identifier from the earning payload when author_role is not SYSTEM; otherwise null.
-  uuid_cart:
+      - datalake_big_agent.earnings.id_author
+      - datalake_person.person_sks.sk_person
+    description: Surrogate key of the earning author, resolved from the Person data model when the author is not the system actor.
+  sk_invalidation_author:
     lineage:
-    - datalake_big_agent.earnings.uuid_cart
-    description: Cart UUID from the earning source external cart UUID when a matching cart exists.
-  sk_business_unit:
+      - datalake_big_agent.earnings.id_invalidation_author
+      - datalake_person.person_sks.sk_person
+    description: Surrogate key of the person who invalidated the earning, resolved from the Person data model when the invalidation author is not the system actor.
+  sk_tier:
     lineage:
-    - datalake_big_agent.earnings.id_business_unit
-    description: Hub business unit from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  uuid_company:
+      - datalake_big_agent.earnings.id_tier
+    description: Surrogate key of the tier configuration applied to this earning.
+  sk_partner_tier:
     lineage:
-    - datalake_big_agent.earnings.uuid_company
-    description: Company receiver UUID when external_receiver_type is COMPANY; otherwise null.
-  uuid_person:
+      - datalake_big_agent.earnings.id_partner_tier
+    description: Surrogate key of the partner tier assignment linked to this earning.
+  sk_person:
     lineage:
-    - datalake_big_agent.earnings.uuid_person
-    description: Agent receiver person UUID when external_receiver_type is AGENT; otherwise null.
-  business_context:
+      - datalake_person.person_sks.sk_person
+      - datalake_big_agent.earnings.uuid_person
+    description: Surrogate key of the partner person, resolved from the Person data model when the external partner type is PERSON.
+  sk_company:
     lineage:
-    - datalake_big_agent.earnings.business_context
-    description: Business context derived from external domain type as RENT for RENT_CONTRACT or SALE for SALES_FLOW.
-  domain_type:
+      - datalake_company.company_sks.sk_company
+      - datalake_big_agent.earnings.uuid_company
+    description: Surrogate key of the partner company, resolved from the Company data model when the external partner type is COMPANY.
+  sk_cart:
     lineage:
-    - datalake_big_agent.earnings.domain_type
-    description: External domain type discriminator from the earning source (for example RENT_CONTRACT or SALES_FLOW).
+      - datalake_cart_system_clean.cart.id
+      - datalake_big_agent.earnings.uuid_cart
+    description: Surrogate key of the cart linked to the earning source, when a matching cart exists.
   incentive_system:
     lineage:
-    - datalake_big_agent.earnings.incentive_system
-    description: Incentive system label that produced this earning (for example DEMAND_CONVERSION_FS).
-  calculated_from:
-    lineage:
-    - datalake_big_agent.earnings.calculated_from
-    description: Basis used to calculate the earning (amount or percentage).
-  currency:
-    lineage:
-    - datalake_big_agent.earnings.currency
-    description: Currency code applied to monetary fields on the earning.
-  external_receiver_type:
-    lineage:
-    - datalake_big_agent.earnings.external_receiver_type
-    description: Type discriminator for the external receiver.
-  earning_status:
-    lineage:
-    - datalake_big_agent.earnings.earning_status
-    description: Processing status of the earning record.
-  earning_status_reason:
-    lineage:
-    - datalake_big_agent.earnings.earning_status_reason
-    description: Business reason attached to the earning status when applicable.
+      - datalake_big_agent.earnings.incentive_system
+    description: Incentive system label applied to this earning.
   invalidation_reason:
     lineage:
-    - datalake_big_agent.earnings.invalidation_reason
-    description: Business reason attached to the earning invalidation when applicable.
-  earning_source_status:
+      - datalake_big_agent.earnings.invalidation_reason
+    description: Business reason code for earning invalidation when the earning was invalidated.
+  invalidation_description:
     lineage:
-    - datalake_big_agent.earnings.earning_source_status
-    description: Processing status of the parent earning source.
-  earning_source_status_reason:
+      - datalake_big_agent.earnings.invalidation_description
+    description: Free-text description of the earning invalidation when provided.
+  unresolved_earning_reason:
     lineage:
-    - datalake_big_agent.earnings.earning_source_status_reason
-    description: Failure or rejection reason on the earning source when status indicates an error.
-  revenue_share_relation_type:
-    lineage:
-    - datalake_big_agent.earnings.revenue_share_relation_type
-    description: Relation type of the revenue share linked to the earning (for example TIER).
+      - datalake_big_agent.earnings.unresolved_earning_reason
+    description: Reason code when the earning could not be fully resolved at calculation time.
   revenue_share_type:
     lineage:
-    - datalake_big_agent.earnings.revenue_share_type
-    description: Type of the revenue share linked to the earning.
-  base_amount:
+      - datalake_big_agent.earnings.revenue_share_type
+    description: Revenue share type discriminator applied to this earning.
+  partner_tier_name:
     lineage:
-    - datalake_big_agent.earnings.base_amount
-    description: Base monetary amount from the earning source used as calculation input, rounded to two decimal places.
-  revenue_share_total_amount:
+      - datalake_big_agent.earnings.tier_name
+    description: Display name of the partner tier at the time of earning calculation.
+  calculation_base_amount:
     lineage:
-    - datalake_big_agent.earnings.revenue_share_total_amount
-    description: Total revenue share amount configured on the earning source, rounded to two decimal places.
+      - datalake_big_agent.earnings.calculation_base_amount
+    description: Base monetary amount used as input for the earning calculation.
   revenue_amount:
     lineage:
-    - datalake_big_agent.earnings.revenue_amount
-    description: Revenue amount calculated for this earning, rounded to two decimal places.
+      - datalake_big_agent.earnings.revenue_amount
+    description: Revenue amount attributed to this earning after calculation.
   revenue_percentage:
     lineage:
-    - datalake_big_agent.earnings.revenue_percentage
-    description: Revenue percentage calculated for this earning (brokerage share component), rounded to two decimal places.
-  incentive_engine_external_condition_type:
+      - datalake_big_agent.earnings.revenue_percentage
+    description: Revenue percentage applied to the calculation base for this earning.
+  has_unresolved_earning:
     lineage:
-    - datalake_big_agent.earnings.incentive_engine_external_condition_type
-    description: External condition type from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  tier_name:
+      - datalake_big_agent.earnings.id_unresolved_earning
+    description: True when the earning has a linked unresolved earning id at calculation time.
+  is_rent_contract:
     lineage:
-    - datalake_big_agent.earnings.tier_name
-    description: Display name of the tier linked through the revenue share when relation type is TIER; otherwise null.
-  tier_priority:
+      - datalake_big_agent.earnings.domain_type
+    description: True when the earning source external domain type is RENT_CONTRACT.
+  is_sales_flow:
     lineage:
-    - datalake_big_agent.earnings.tier_priority
-    description: Priority order of the tier linked through the revenue share when relation type is TIER; otherwise null.
-  classifier_min_score:
+      - datalake_big_agent.earnings.domain_type
+    description: True when the earning source external domain type is SALES_FLOW.
+  is_calculated:
     lineage:
-    - datalake_big_agent.earnings.classifier_min_score
-    description: Minimum classifier score from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  classifier_resume:
+      - datalake_big_agent.earnings.is_calculated
+    description: True when the earning status is CALCULATED.
+  is_invalid:
     lineage:
-    - datalake_big_agent.earnings.classifier_resume
-    description: Array summary of classifier points rules from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  qualifier_min_score:
+      - datalake_big_agent.earnings.is_invalid
+    description: True when the earning status is INVALID.
+  is_invalid_for_recalculation_reason:
     lineage:
-    - datalake_big_agent.earnings.qualifier_min_score
-    description: Minimum qualifier score from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  qualifier_resume:
+      - datalake_big_agent.earnings.invalidation_reason
+    description: True when the earning was invalidated with reason RECALCULATED.
+  is_invalid_for_amount_wrong_reason:
     lineage:
-    - datalake_big_agent.earnings.qualifier_resume
-    description: Array summary of qualifier points rules from the linked tier rule when revenue share relation type is TIER; otherwise null.
+      - datalake_big_agent.earnings.invalidation_reason
+    description: True when the earning was invalidated with reason WRONG_REVENUE_AMOUNT.
+  is_replaced:
+    lineage:
+      - datalake_big_agent.earnings.id_replacement_earning
+    description: True when a replacement earning id is present for this record.
+  is_manual_calculation:
+    lineage:
+      - datalake_big_agent.earnings.earning_status_reason
+    description: True when the earning status reason is MANUAL_CALCULATION.
   is_authored_by_system:
     lineage:
-    - datalake_big_agent.earnings.is_authored_by_system
-    description: True when author_role is SYSTEM.
-  ts_created:
+      - datalake_big_agent.earnings.is_authored_by_system
+    description: True when the earning author is the system actor rather than a person.
+  dt_payment_due:
     lineage:
-    - datalake_big_agent.earnings.ts_created
-    description: Timestamp when the earning was created in Big Agent.
+      - datalake_big_agent.earnings.dt_payment_due
+    description: Date when payment for this earning is due.
+  ts_unresolved_earning_solved:
+    lineage:
+      - datalake_big_agent.earnings.ts_unresolved_earning_solved
+    description: Timestamp when the unresolved earning condition was resolved, when applicable.
   ts_invalidated:
     lineage:
-    - datalake_big_agent.earnings.ts_invalidated
-    description: Timestamp when the earning was invalidated in Big Agent.
+      - datalake_big_agent.earnings.ts_invalidated
+    description: Timestamp when the earning was invalidated.
+  ts_created:
+    lineage:
+      - datalake_big_agent.earnings.ts_created
+    description: Timestamp when the earning was created in Big Agent.
   ts_updated:
     lineage:
-    - datalake_big_agent.earnings.ts_updated
+      - datalake_big_agent.earnings.ts_updated
     description: Timestamp when the earning was last updated in Big Agent.
-  dt_load:
-    lineage:
-    - datalake_big_agent.earnings.dt_load
-    description: Load reference date derived from the earning creation timestamp.
+  ts_load:
+    description: Timestamp when this DW row was materialized.
   year:
     lineage:
-    - datalake_big_agent.earnings.year
-    description: Partition year derived from ts_created.
+      - datalake_big_agent.earnings.year
+    description: Partition year derived from the earning update timestamp.
   month:
     lineage:
-    - datalake_big_agent.earnings.month
-    description: Partition month derived from ts_created.
+      - datalake_big_agent.earnings.month
+    description: Partition month derived from the earning update timestamp.
   day:
     lineage:
-    - datalake_big_agent.earnings.day
-    description: Partition day derived from ts_created.
+      - datalake_big_agent.earnings.day
+    description: Partition day derived from the earning update timestamp.

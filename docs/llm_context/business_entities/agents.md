@@ -11,6 +11,28 @@
 
 > ⚠ **Two orthogonal axes — always pin down both before querying.** (1) **Operation type** = `profile` (what work the agent physically does); (2) **Business function** = which part of the deal the agent owns (what they earn for). Most tables mix everything unless filtered. Affiliation (`1P`/`3P`) is a third, independent axis.
 
+### ⚠⚠ Layer priority — **always start with DW**
+
+**Default rule for every analyst query in this domain: use `dw_*` tables first.** Enrich (`datalake_*`) and clean (`datalake_*_clean`) are upstream implementation layers — query them **only** when the DW table does not exist yet, or when you need a specific column intentionally not projected into the DW.
+
+| Layer | Prefix | When to use |
+|-------|--------|-------------|
+| **DW (default)** | `dw_*` | **Always** — dashboards, KPIs, ad-hoc analysis, joins to other DW entities |
+| Enrich | `datalake_*` | Fallback — field missing from DW, pipeline debugging, pre-DW exploratory work |
+| Clean / raw | `datalake_*_clean`, `datalake_*_raw` | Engineering / lineage only — never the first choice for business questions |
+
+**DW tables available today in this domain:**
+
+| Topic | DW table(s) | Enrich fallback (only if needed) |
+|-------|-------------|----------------------------------|
+| BigAgent earnings & tiers | `dw_agent_payments.fact_earnings`, `dim_earning_sources`, `dim_tier`, `fact_partner_tier` | `datalake_big_agent.earnings`, `partner_tier`, `tier_rule` |
+| CIQ Compra de Carteira | `dw_ciq.fact_ciq_listing_purchase`, `fact_listing_purchase_duplicity` | `datalake_ciq.ciq_listing_purchase`, `listing_purchase_duplicity` |
+| Daily agent state (new ID system) | `dw_agent.fact_agent_daily`, `dim_agent` | `datalake_agent_accreditation.agent` |
+| Legacy `sk_agent ↔ id_user` bridge | `dw_public.dim_agent` | — |
+| Visits | `dw_visit.fact_visits`, `fact_visit_schedules` | see [`visits.md`](visits.md) |
+
+> Topics **without a DW table yet** (enrich is the only option): hub allocation (`member_hub_allocation`), monthly reports (`agent_status_by_month`, `agent_new_agent_activation_metrics`), For-Sale BigAgent vs Nazaré reconciliation (`agent_revenue_share`), For-Rent broker share (`brokerage_share_history`), PFA/PPA (`preferred_property_agent_relation_history`), tier performance EAV (`agent_performance`).
+
 ### Operation type (`profile`)
 
 `Visita` (property visits — most common; usually what "agente" means), `Vistoria` (inspections), `VistoriaQuarteirizada` (outsourced visits/inspections), `SessaoFotos` (photographers), `CheckUpLar` (repairs). Default scope for CIQ/activation/brokerage questions is `Visita`, but confirm.
@@ -42,7 +64,7 @@ QuintoAndar is **mid-migration** from legacy agent services to the new Agent Dom
 >
 > Some tables are still legacy, some are already on the new system — **check which ID system a table uses before joining it to another.** When in doubt, bridge through a table that carries both `sk_agent` and `sk_agent_data` (e.g. `dw_agent.fact_agent_daily`).
 
-DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datalake_agent_reports`**, **`datalake_hub_services`**, **`datalake_agent_payments`**, **`datalake_big_agent`**, **`datalake_ebdb_agents`**, **`datalake_tiers`**, **`datalake_ciq`**, **`dw_ciq`**, **`datalake_brokerage`**, and the (stale) **`dw_agent`** star schema.
+DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datalake_agent_reports`**, **`datalake_hub_services`**, **`datalake_agent_payments`**, **`datalake_big_agent`**, **`dw_agent_payments`**, **`datalake_ebdb_agents`**, **`datalake_tiers`**, **`datalake_ciq`**, **`dw_ciq`**, **`datalake_brokerage`**, and the (stale) **`dw_agent`** star schema.
 
 ---
 
@@ -65,7 +87,7 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | **CIQ (function)** | **Supply-acquisition function** — agent who registers/brings the property | Capability `SUPPLY_ACQUISITION` / `SUPPLY_CONVERSION_CONSULTANCY`; `revenue_role = SUPPLY`, `ciq_percentage`. Distinct from the CIQ *program* (next row). |
 | **PPA (Preferred Property Agent)** | Agent fixed to a listing (agent brought the supply) | `preferred_property_agent_relation_history`. |
 | **PFA (Preferred Fixed Agent)** | Agent fixed to a lead (usually first-visit; see `origin`) | Same table; reason in `origin`. |
-| **BIG_AGENT** | Newer brokerage/earnings model | `revenue_source = 'BIG_AGENT'`. |
+| **BIG_AGENT** | Newer brokerage/earnings model | `revenue_source = 'BIG_AGENT'` in `agent_revenue_share`; analyst DW in `dw_agent_payments.fact_earnings`. |
 | **Nazaré** | Legacy per-offer brokerage / payment system | `revenue_source = 'NAZARE'`. |
 | **VBBA / VCBA** | Visits Booked / Completed Booked **By Agent** | `sk_author_creator = sk_user_agent` in `dw_visit.fact_visit_schedules` (+ `is_completed = 1` for VCBA). |
 | **Hub / Business Unit** | Regional agent grouping | `hub_name`, `id_business_unit` in `member_hub_allocation`. |
@@ -73,8 +95,8 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | **Capability / capacidade** | Fine-grained permission | `capability.type + status` (raw source `datalake_ebdb_clean.capability`); for booleans use `agent.is_allow_*`. Prefer over legacy subtype jargon. |
 | **Primeira listagem / first listing** | ⚠ "any first listing" vs "valid first listing" (dedup-gated) | Valid first listing gated by `datalake_listing_deduplication.valid_first_listing`; used for CIQ payment eligibility and activation. Default to valid for CIQ/activation, confirm. |
 | **Valid First Listing** | A first listing that survives property **deduplication** — a re-listed / duplicated property does NOT count again | Custom QuintoAndar concept; lives in `datalake_listing_deduplication`. ⚠ Metric definition still evolving — see schema section. |
-| **Compra de Carteira / CIQ listing purchase** | CIQ_FULL rent **listing-purchase** — eligibility, initial vs final pricing, portfolio loss | Analyst table: `dw_ciq.fact_ciq_listing_purchase`; base enrich: `datalake_ciq.ciq_listing_purchase`; final pricing: `datalake_ciq.listing_purchase_pricing`. Grain: house × listing version × partner × CIQ user. |
-| **Perda de carteira / portfolio loss** | Relist still on market >90 days without a signed rent contract | `is_portfolio_loss = true` on `dw_ciq.fact_ciq_listing_purchase` only (not on enrich). |
+| **Compra de Carteira / CIQ listing purchase** | CIQ_FULL rent **listing-purchase** — eligibility, initial vs final pricing, portfolio loss | **DW:** `dw_ciq.fact_ciq_listing_purchase`. Enrich fallback: `datalake_ciq.ciq_listing_purchase` (initial pricing only). |
+| **Perda de carteira / portfolio loss** | Relist still on market >90 days without a signed rent contract | **`dw_ciq.fact_ciq_listing_purchase.is_portfolio_loss`** only — not on enrich. |
 | **Initial pricing segment** | Transition-rule speculation before duplicity / previous-paid overrides | `initial_pricing_type` / `initial_pricing_type_reason` on `datalake_ciq.ciq_listing_purchase` only. |
 | **Final pricing segment** | Category after previous-paid and paid-similar-house rules | `pricing_type` / `pricing_type_reason` on `listing_purchase_pricing` / fact (not the enrich base columns). |
 | **Re-Listing (rent version category)** | New rent listing cycle after a prior rental ended | `listing_category = 'Re-Listing'` on purchase rows (from `datalake_ebdb_listing.house_listing`). See [`house_and_listing.md`](house_and_listing.md). |
@@ -83,42 +105,46 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 
 ## Where to query what
 
-| You need… | Schema / table |
-|-----------|----------------|
-| Canonical agent identity, status, capability flags | `datalake_agent_accreditation.agent` |
-| Fine-grained capabilities (per type, business context) | `datalake_ebdb_clean.capability` (+ `demand_visit_management_capability_settings` for business_context/passive-lead). Boolean rollups on `datalake_agent_accreditation.agent.is_allow_*`. |
-| Prospect onboarding ops queue (CRECI / contract / signup / EN) | `datalake_agent_accreditation.prospect_step_validation` |
-| Sign-up funnel blocking events (Amplitude) | `datalake_agent_accreditation.signup_profile_conflict` |
-| Agent geo-region assignment history | `datalake_agent_accreditation.agent_major_region_code` |
-| Agent status + CIQ (monthly snapshot) | `datalake_agent_reports.agent_status_by_month` |
-| New-agent activation funnel (monthly cohort) | `datalake_agent_reports.agent_new_agent_activation_metrics` |
-| Per-agent support tickets (monthly) | `datalake_agent_reports.agent_support_tickets_by_month` |
-| Agent hub assignment, NE, region (daily) | `datalake_hub_services.member_hub_allocation` |
-| For-Sale agent revenue share, BigAgent vs Nazaré | `datalake_agent_payments.agent_revenue_share` |
-| For-Rent contract broker share (revision history) | `datalake_big_agent.brokerage_share_history` |
-| Per-offer brokerage fee (Nazaré legacy) | `datalake_brokerage.partner_brokerage` |
-| CIQ rent commission / listing-purchase (base enrich) | `datalake_ciq.ciq_listing_purchase` (`initial_pricing_type*`; no final payment/eligibility) |
-| CIQ Compra de Carteira — analyst fact (final pricing + **portfolio loss**) | `dw_ciq.fact_ciq_listing_purchase` |
-| Listing-purchase final pricing / acquisition / payment | `datalake_ciq.listing_purchase_pricing` (join on `id_listing_purchase` / `sk_listing_purchase`) |
-| Listing-purchase duplicity peer detail (enrich) | `datalake_ciq.listing_purchase_duplicity` |
-| Listing-purchase duplicity peer detail (DW) | `dw_ciq.fact_listing_purchase_duplicity` (join fact on `sk_listing_duplicity`) |
-| Valid first listing (dedup-gated) for CIQ / activation | `datalake_listing_deduplication.valid_first_listing` |
-| **CIQ** first-listing validation for tiers (15-day rule, invalidation) | `datalake_tiers.ciq_first_listing` |
-| Property dedup analysis / duplicate detection | `datalake_listing_deduplication.listing_deduplication` |
-| Performance metrics for tiering (EAV) | `datalake_tiers.agent_performance` |
-| PFA/PPA relation per listing | `datalake_ebdb_agents.preferred_property_agent_relation_history` |
-| PFA program eligibility | `datalake_ebdb_agents.preferred_property_agent_program_eligibility` |
-| 3P agent type + contract history | `datalake_ebdb_agents.agent_3p_history` |
-| Daily per-agent state snapshot (status, capabilities, profile) — **reliable** | `dw_agent.fact_agent_daily` (NEW ID system; carries legacy `sk_agent_data`) |
-| Legacy `sk_agent ↔ id_user` bridge (DW ↔ operational) | `dw_public.dim_agent` (⚠ LEGACY `sk_agent` — see identity-migration warning) |
-| Visit funnel / completion metrics | `dw_visit.fact_visits` (see [`visits.md`](visits.md)) |
-| ⚠ Historical visit-agent performance (STALE) | `dw_agent.fact_visit_agent_performance`, `datalake_visit_agent_performance.*` (pipeline stopped 2025-09-21) |
+> **Routing rule:** pick the **DW** row first. Use the enrich/clean fallback column only when the DW table is missing the column you need or does not exist for that topic.
+
+| You need… | **Start here (DW)** | Fallback (enrich/clean — only when DW is insufficient) |
+|-----------|---------------------|--------------------------------------------------------|
+| BigAgent earnings, tiers, partner assignments | **`dw_agent_payments.fact_earnings`**, `dim_earning_sources`, `dim_tier`, `fact_partner_tier` | `datalake_big_agent.earnings`, `partner_tier`, `tier_rule` |
+| BigAgent earning-source calculation audit trail | **`dw_agent_payments.fact_earning_calculation_log`** | `datalake_big_agent_clean.earning_sources_aud` |
+| CIQ Compra de Carteira (pricing, portfolio loss, eligibility) | **`dw_ciq.fact_ciq_listing_purchase`** | `datalake_ciq.ciq_listing_purchase` (initial pricing only), `listing_purchase_pricing` |
+| CIQ listing-purchase duplicity peers | **`dw_ciq.fact_listing_purchase_duplicity`** | `datalake_ciq.listing_purchase_duplicity` |
+| Daily per-agent state snapshot (status, capabilities, profile) | **`dw_agent.fact_agent_daily`** | `datalake_agent_accreditation.agent` (identity only; no daily history) |
+| Agent dimension (new ID system) | **`dw_agent.dim_agent`** | `datalake_agent_accreditation.agent` |
+| Legacy `sk_agent ↔ id_user` bridge | **`dw_public.dim_agent`** | — |
+| Visit funnel / completion metrics | **`dw_visit.fact_visits`**, `fact_visit_schedules` | see [`visits.md`](visits.md) |
+| Canonical agent identity, capability flags (no DW daily grain) | — | `datalake_agent_accreditation.agent` |
+| Fine-grained capabilities (per type, business context) | — | `datalake_ebdb_clean.capability` (+ `demand_visit_management_capability_settings`). Boolean rollups: `agent.is_allow_*`. |
+| Prospect onboarding ops queue (CRECI / contract / signup / EN) | — | `datalake_agent_accreditation.prospect_step_validation` |
+| Sign-up funnel blocking events (Amplitude) | — | `datalake_agent_accreditation.signup_profile_conflict` |
+| Agent geo-region assignment history | — | `datalake_agent_accreditation.agent_major_region_code` |
+| Agent status + CIQ (monthly snapshot) | — | `datalake_agent_reports.agent_status_by_month` |
+| New-agent activation funnel (monthly cohort) | — | `datalake_agent_reports.agent_new_agent_activation_metrics` |
+| Per-agent support tickets (monthly) | — | `datalake_agent_reports.agent_support_tickets_by_month` |
+| Agent hub assignment, NE, region (daily) | — | `datalake_hub_services.member_hub_allocation` |
+| For-Sale agent revenue share, BigAgent vs Nazaré reconciliation | — | `datalake_agent_payments.agent_revenue_share` |
+| For-Rent contract broker share (revision history) | — | `datalake_big_agent.brokerage_share_history` |
+| Per-offer brokerage fee (Nazaré legacy) | — | `datalake_brokerage.partner_brokerage` |
+| Valid first listing (dedup-gated) for CIQ / activation | — | `datalake_listing_deduplication.valid_first_listing` |
+| CIQ first-listing validation for tiers (15-day rule) | — | `datalake_tiers.ciq_first_listing` |
+| Property dedup analysis / duplicate detection | — | `datalake_listing_deduplication.listing_deduplication` |
+| Performance metrics for tiering (EAV) | — | `datalake_tiers.agent_performance` |
+| PFA/PPA relation per listing | — | `datalake_ebdb_agents.preferred_property_agent_relation_history` |
+| PFA program eligibility | — | `datalake_ebdb_agents.preferred_property_agent_program_eligibility` |
+| 3P agent type + contract history | — | `datalake_ebdb_agents.agent_3p_history` |
+| ⚠ Historical visit-agent performance (STALE) | — | `dw_agent.fact_visit_agent_performance`, `datalake_visit_agent_performance.*` (pipeline stopped 2025-09-21) |
 
 ---
 
 ## `datalake_agent_accreditation`
 
 **Purpose:** unified agent identity, capabilities, and accreditation/prospect funnel. Hub node for the domain.
+
+> ⚠ **DW first for daily state:** use **`dw_agent.fact_agent_daily`** / **`dw_agent.dim_agent`** for per-day capability and status questions. Use enrich `agent` here for canonical `id_agent` identity, CRECI, and capability flags when you do not need daily history.
 
 **Pipeline:** `enrich_agent` DAG (full reload for most tables; `signup_profile_conflict` is incremental, partitioned `year/month/day`). Published 2026-06-19 (ADR: Instant Accreditation), consolidating EBDB + Hub Services + Amplitude.
 
@@ -220,6 +246,8 @@ Grain: **one row per `(id_user, dt_reference)`**. Replaces the deprecated `agent
 
 ## `datalake_agent_payments` / `datalake_big_agent` (earnings & brokerage)
 
+> ⚠ **DW first:** for BigAgent earnings and tier questions, start at **`dw_agent_payments`** (see next section). The enrich tables below are reconciliation sources, rent-contract share history, or fallbacks for columns not projected into the DW.
+
 Two distinct earning concepts — **do not conflate**:
 
 ### `datalake_agent_payments.agent_revenue_share` — For-Sale revenue share
@@ -236,7 +264,7 @@ Grain: **one row per `(id_user, id_house, id_offer, business_context, revenue_so
 | Share breakdown | `brokerage_percentage` (base demand fee), `tqc_percentage` (TQC bonus), `ciq_percentage` (CIQ supply), `has_tqc_revenue_share` |
 | Timing | `dt_created`, `dt_updated` |
 
-- `BIG_AGENT` ← `datalake_big_agent.earnings` (status `CALCULATED`; `DEMAND_CONVERSION_FS`, `DEMAND_ACQUISITION_FS`, `SUPPLY_ACQUISITION_FS`).
+- `BIG_AGENT` ← `dw_agent_payments.fact_earnings` (preferred) or enrich `datalake_big_agent.earnings` (fallback for unreconciled detail keys).
 - `NAZARE` ← `datalake_nazare_clean.revenue_share_by_participant` (non-invalidated).
 
 > **Double-count trap:** always filter `revenue_source` before any `SUM`/percentage — the table UNIONs both systems for the same offer. `id_offer`/`id_house` may be NULL when the BigAgent→offer join chain is missing.
@@ -251,6 +279,102 @@ Grain: **one row per `(id_revision, id_contract)`**. Columns: `id_revision`, `id
 - Fallback (legacy contracts with no BigAgent earning source): `datalake_ebdb_clean.contract_aud`.
 
 > **Revision granularity:** apply `ROW_NUMBER()`/`LAST_VALUE` to get the current share per contract — this is NOT one row per contract. The EBDB `contract.agent_brokerage_share` column is removed; do not read it.
+
+---
+
+## `dw_agent_payments` (Big Agent Incentives DW)
+
+**Purpose:** Kimball DW projection of the Big Agent Incentives Engine — **the default entry point for all BigAgent earnings and tier analysis.** **Pipeline:** `dw_agent_payments` DAG, incremental MERGE, partitioned `year/month/day`.
+
+> ⚠ **Name collision:** `datalake_agent_payments` (enrich — For-Sale `agent_revenue_share` reconciliation) ≠ **`dw_agent_payments`** (DW — BigAgent earnings star schema). They are different layers and scopes.
+
+**Upstream:** enrich `datalake_big_agent.*` and clean `datalake_big_agent_clean.*`. Person/company/cart keys are pre-resolved through **`datalake_person.person_sks`**, **`datalake_company.company_sks`**, and **`datalake_cart_system_clean.cart`** — prefer joining other DW entities through these `sk_*` columns rather than re-deriving from enrich.
+
+### Layer routing (DW default)
+
+| Need | **Use (DW)** | Enrich fallback (only if column missing) |
+|------|--------------|------------------------------------------|
+| Earnings KPIs, dashboards, agent/tier joins | **`fact_earnings`** | `datalake_big_agent.earnings` |
+| Earning source status / failure context | **`dim_earning_sources`** | `datalake_big_agent_clean.earning_sources` |
+| Tier score rules | **`dim_tier`** | `datalake_big_agent.tier_rule` |
+| Partner tier assignments | **`fact_partner_tier`** | `datalake_big_agent.partner_tier` |
+| Calculation status audit trail | **`fact_earning_calculation_log`** | `earning_sources_aud` |
+| Revenue share / invalidation / unresolved-earning **record ids** | join enrich on `sk_earning = id_earning` | `datalake_big_agent.earnings` |
+| For-Sale BigAgent vs Nazaré reconciliation per offer | — (no DW) | `datalake_agent_payments.agent_revenue_share` |
+
+### Star schema
+
+```
+dim_earning_sources ──┐
+dim_tier ─────────────┼──► fact_earnings ◄── fact_partner_tier
+                      │
+fact_earning_calculation_log (operational; joins on sk_earning_source)
+```
+
+### `fact_earnings`
+
+Grain: **one row per `sk_earning`** (BigAgent earning id), incremental on `ts_updated`. Excludes `invalidation_reason = 'PRODUCT_TESTING'`.
+
+| Topic | Fields / notes |
+|-------|----------------|
+| Keys | `sk_earning` (PK), `sk_replacement_earning`, `sk_earning_source` |
+| Domain context | `sk_contract`, `sk_sales_flow` — natural contract/sales-flow ids from the earning source (not full EBDB/sales DW dims) |
+| Actor keys | `sk_author`, `sk_invalidation_author` — resolved to **`sk_person`** via `person_sks` (`id_author` / `id_invalidation_author` matched on `uuid_person`); null when the actor is SYSTEM |
+| Receiver keys | `sk_person`, `sk_company` — partner receiver resolved from enrich `uuid_person` / `uuid_company` |
+| Tier context | `sk_tier`, `sk_partner_tier`, `partner_tier_name`, `incentive_system`, `revenue_share_type` |
+| Cart | `sk_cart` — resolved from `uuid_cart` when a matching cart exists |
+| Amounts | `calculation_base_amount`, `revenue_amount`, `revenue_percentage` |
+| Invalidation | `invalidation_reason`, `invalidation_description`, `ts_invalidated`, `is_invalid`, `is_invalid_for_recalculation_reason` (`RECALCULATED`), `is_invalid_for_amount_wrong_reason` (`WRONG_REVENUE_AMOUNT`), `is_replaced` |
+| Unresolved queue | `has_unresolved_earning` (derived from `id_unresolved_earning IS NOT NULL`), `unresolved_earning_reason`, `ts_unresolved_earning_solved` — **no `sk_unresolved_earning` in the fact** |
+| Flags | `is_calculated`, `is_rent_contract`, `is_sales_flow`, `is_manual_calculation`, `is_authored_by_system` |
+| Timing | `dt_payment_due`, `ts_created`, `ts_updated`, `ts_load` |
+
+> **Intentionally not in the fact:** `sk_revenue_share`, `sk_incentive_engine`, `sk_earning_invalidation` — operational lineage keys kept in enrich `datalake_big_agent.earnings`; join back when you need revenue-share or invalidation-record detail.
+
+> **Author keys:** do not treat `sk_author` / `sk_invalidation_author` as raw BigAgent author ids — they are **person surrogate keys** (`sk_person`). Bridge to `id_user` through `datalake_person.person_sks`.
+
+### `dim_earning_sources`
+
+Grain: **one row per `sk_earning_source`**, incremental on `ts_updated`. Projects clean `earning_sources` with contract/sales-flow/cart resolution.
+
+| Topic | Fields |
+|-------|--------|
+| Keys | `sk_earning_source` (PK), `sk_contract`, `sk_sales_flow`, `sk_cart`, `uuid_cart` |
+| Context | `domain_type` (`RENT_CONTRACT` / `SALES_FLOW`), `currency`, `status`, `failure_reason` |
+| Amounts | `base_amount`, `revenue_share_total_amount` |
+| Timing | `dt_competence`, `ts_occurred`, `ts_created`, `ts_updated` |
+
+### `dim_tier`
+
+Grain: **one row per `sk_tier`**, incremental on `ts_updated`. Projects enrich `datalake_big_agent.tier_rule` — classifier/qualifier score rules expanded per incentive operation (CS, FL_FR, CCV, FL_FS, TQC).
+
+| Topic | Fields |
+|-------|--------|
+| Keys | `sk_tier` (PK), `sk_business_unit` (hub id when incentive engine condition type is HUB) |
+| Classification | `incentive_system`, `incentive_engine_external_condition_type`, `tier_name`, `tier_priority` |
+| Score rules | `classifier_min_score`, `qualifier_min_score`, `classifier_resume`, `qualifier_resume`, plus per-operation max/min/multiplier columns |
+
+### `fact_partner_tier`
+
+Grain: **one row per `sk_partner_tier`** (partner tier assignment), incremental on `ts_updated`.
+
+| Topic | Fields |
+|-------|--------|
+| Keys | `sk_partner_tier` (PK), `sk_new_partner_tier`, `sk_tier`, `sk_person`, `sk_company`, `sk_overwritten_by` |
+| Context | `incentive_system`, `tier_name`, `overwritten_reason` |
+| Validity | `is_valid`, `is_overwritten`, `is_overwritten_by_ops`, `dt_validity_started`, `dt_validity_ended`, `ts_overwritten` |
+
+> Join `fact_earnings.sk_partner_tier` → `fact_partner_tier.sk_partner_tier` for the assignment valid at earning time; `partner_tier_name` on the fact is a denormalized snapshot.
+
+### `fact_earning_calculation_log`
+
+Grain: **one row per `(sk_earning_source, incentive_system, ts_started)`** — audit trail of `incentive_systems_calculation_status` changes from `earning_sources_aud`. Operational/debugging table, not a business KPI source.
+
+| Topic | Fields |
+|-------|--------|
+| Keys | `sk_calculation_log` (PK), `sk_earning_source` |
+| Status | `incentive_system`, `calculation_status`, `is_current_status` |
+| Validity window | `ts_started`, `ts_ended` (SCD-style; `ts_ended` is `LEAD(ts_started) - 1 day`) |
 
 ---
 
@@ -334,16 +458,18 @@ Grain: **one row per `id_house`** — address-normalized dedup analysis over the
 
 **Purpose:** CIQ_FULL **rent listing-purchase** — which houses qualify for Compra de Carteira, Robin Hood payment state, commercial pricing (initial speculation → final after anti-repurchase rules), and **portfolio loss** (relist published >90 days without renting).
 
-**Pipelines:** `enrich_ciq_listing_purchase` → `datalake_ciq.ciq_listing_purchase` → `listing_purchase_duplicity` → `listing_purchase_pricing`; `dw_ciq_listing_purchase` → `dw_ciq.fact_ciq_listing_purchase` (+ `fact_listing_purchase_duplicity`).
+> ⚠ **DW first:** analyst queries **must** start at **`dw_ciq.fact_ciq_listing_purchase`**. Use `datalake_ciq.ciq_listing_purchase` only for `initial_pricing_type*` (pre-override speculation) or pipeline debugging.
+
+**Pipelines:** `enrich_ciq_listing_purchase` → `datalake_ciq.*` → **`dw_ciq_listing_purchase`** → `dw_ciq.fact_ciq_listing_purchase` (+ `fact_listing_purchase_duplicity`).
 
 **Grain (enrich & fact):** one row per **house listing version** in CIQ context (house × `sk_house_listing` × partner × CIQ user × consultant type), not one row per house.
 
-| You need… | Where |
-|-----------|--------|
-| Base capture + **initial** pricing segment | `datalake_ciq.ciq_listing_purchase` (`initial_pricing_type` / `initial_pricing_type_reason`) |
-| **Final** pricing, acquisition bucket, payment, eligibility | `datalake_ciq.listing_purchase_pricing` or **`dw_ciq.fact_ciq_listing_purchase`** |
-| Dashboards / OKRs / portfolio loss flag | **`dw_ciq.fact_ciq_listing_purchase`** |
-| Similar-house / Atlas duplicity peer rows | `datalake_ciq.listing_purchase_duplicity` or `dw_ciq.fact_listing_purchase_duplicity` via `sk_listing_duplicity` |
+| You need… | **Start here (DW)** | Enrich fallback |
+|-----------|---------------------|-----------------|
+| Dashboards / OKRs / portfolio loss / final pricing / payment | **`dw_ciq.fact_ciq_listing_purchase`** | — |
+| Similar-house / Atlas duplicity peer rows | **`dw_ciq.fact_listing_purchase_duplicity`** | `datalake_ciq.listing_purchase_duplicity` |
+| **Initial** pricing segment (pre-override speculation) | — | `datalake_ciq.ciq_listing_purchase` (`initial_pricing_type*`) |
+| Final pricing, acquisition, payment, eligibility | **`dw_ciq.fact_ciq_listing_purchase`** | `datalake_ciq.listing_purchase_pricing` |
 
 ### Initial vs final pricing (do not conflate)
 
@@ -387,7 +513,7 @@ Grain: **one row per `id_house`** — address-normalized dedup analysis over the
 
 ## `dw_agent` (Agent-Domain star schema)
 
-**Purpose:** DW projection of the new Agent Domain accreditation layer. **Pipeline:** `dw_agent_accreditation` DAG. Built on the **new** ID system (`sk_agent`), but carries `sk_agent_data` for legacy bridging — see the identity-migration warning above.
+**Purpose:** DW projection of the new Agent Domain accreditation layer — **prefer `fact_agent_daily` over enrich `agent` for any per-day state question.** **Pipeline:** `dw_agent_accreditation` DAG. Built on the **new** ID system (`sk_agent`), but carries `sk_agent_data` for legacy bridging — see the identity-migration warning above.
 
 > ⚠ Do not confuse `dw_agent` (new) with `dw_public.dim_agent` (legacy). Both have a column named `sk_agent`; the values are from different ID systems.
 
@@ -419,6 +545,9 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 - **Hub → hub services:** `agent.id_user = member_hub_allocation.id_user` (1:N per day; filter `is_active = true`).
 - **Hub → PFA:** `agent.id_agent = preferred_property_agent_relation_history.id_related_agent` (1:N per listing).
 - **Hub → revenue:** `agent.id_user = agent_revenue_share.id_user` (filter `revenue_source` first).
+- **Hub → BigAgent earnings (DW):** `datalake_person.person_sks.id_user = agent.id_user` → `person_sks.sk_person = dw_agent_payments.fact_earnings.sk_person` (receiver) or `.sk_author` (author).
+- **Earnings fact → dimensions:** `fact_earnings.sk_earning_source` → `dim_earning_sources.sk_earning_source`; `sk_tier` → `dim_tier.sk_tier`; `sk_partner_tier` → `fact_partner_tier.sk_partner_tier`.
+- **Earnings enrich detail:** `fact_earnings.sk_earning` = `datalake_big_agent.earnings.id_earning` for revenue-share / invalidation / unresolved-earning keys not projected in the fact.
 - **Hub → Compra de Carteira:** `agent.id_partner = fact_ciq_listing_purchase.sk_partner` and/or `agent.id_user = fact_ciq_listing_purchase.sk_user` (grain is listing-version × partner, not one row per agent).
 - **Identity bridge (legacy):** `dw_public.dim_agent.id_user = agent.id_user`; bridge legacy `sk_agent ↔ id_user` through `dw_public.dim_agent`. ⚠ This `sk_agent` is the **legacy** star-schema key — NOT the same as `dw_agent.*.sk_agent` (new). To cross legacy↔new, bridge through a table carrying both `sk_agent` and `sk_agent_data` (e.g. `dw_agent.fact_agent_daily`). See the identity-migration warning.
 - **Visits:** agents link to `dw_visit.fact_visits` / `fact_visit_schedules` via `sk_agent`; see [`visits.md`](visits.md).
@@ -430,11 +559,14 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 
 **Do:**
 
+- **Always start with `dw_*` tables** when a DW projection exists for the topic (earnings → `dw_agent_payments`, Compra de Carteira → `dw_ciq`, daily agent state → `dw_agent`, visits → `dw_visit`). Drop to enrich/clean only for missing columns or topics without DW coverage.
 - Confirm **both axes** before scoping: **operation type** (`profile`: `Visita`/`Vistoria`/…) and **business function** (demand/conversion vs demand-acquisition/TQC vs supply-acquisition/CIQ). Most tables mix everything.
 - Confirm what "active agent", "activation", and "first listing" mean — each maps to a different table/filter (see Synonyms).
 - Translate legacy jargon ("Demand Agent", "CIQ-Only", "Independent Agent") to capability/`agent_type_segment` filters, not literal column values.
-- Use `datalake_agent_accreditation.agent` as the canonical `id_agent` source; bridge `sk_agent ↔ id_user` via `dw_public.dim_agent`.
+- Use `datalake_agent_accreditation.agent` for canonical `id_agent` identity; for **daily state** prefer **`dw_agent.fact_agent_daily`**; bridge `sk_agent ↔ id_user` via `dw_public.dim_agent`.
 - Filter `revenue_source` in `agent_revenue_share` before any aggregation.
+- For **BigAgent earnings**, **always** query **`dw_agent_payments.fact_earnings`** first; join enrich `datalake_big_agent.earnings` only for `id_revenue_share`, `id_incentive_engine`, or `id_earning_invalidation`.
+- Resolve earning authors through **`sk_person`** (`sk_author`, `sk_invalidation_author`) — bridge to `id_user` via `datalake_person.person_sks`, not via raw BigAgent author ids.
 - Apply `ROW_NUMBER()`/`LAST_VALUE` on `brokerage_share_history` to get the current share per contract.
 - Filter `ts_relation_ended IS NULL` (active PFA) and `ts_status_ended IS NULL` (current eligibility).
 - Filter daily tables by integer `year = X AND month = X AND day = X`, not `dt_reference BETWEEN` (scans all partitions).
@@ -445,8 +577,12 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 
 **Don't:**
 
+- **Query enrich or clean when a DW table covers the same topic** — e.g. do not use `datalake_big_agent.earnings` for earnings KPIs (`dw_agent_payments.fact_earnings`), `datalake_ciq.ciq_listing_purchase` for portfolio loss (`dw_ciq.fact_ciq_listing_purchase`), or `datalake_agent_accreditation.agent` for daily capability history (`dw_agent.fact_agent_daily`).
 - **Mix the two ID systems.** `sk_agent`/`id_agent` (new Agent Domain) ≠ `sk_agent_data`/`id_agent_data` (legacy `dadosAgent`). The column `sk_agent` exists in both `dw_public.dim_agent` (legacy) and `dw_agent.*` (new) with different value spaces — never join them directly; bridge through a table carrying both keys (`dw_agent.fact_agent_daily`).
 - Confuse **`agent_revenue_share`** (For-Sale revenue share, BigAgent vs Nazaré reconciliation) with **`brokerage_share_history`** (For-Rent contract broker share) — different scopes, grains, and DAGs.
+- Confuse **`datalake_agent_payments`** (enrich reconciliation) with **`dw_agent_payments`** (BigAgent earnings DW) — same domain word, different layer and grain.
+- Expect `sk_revenue_share`, `sk_incentive_engine`, or `sk_unresolved_earning` on **`dw_agent_payments.fact_earnings`** — use enrich `datalake_big_agent.earnings` or the `has_unresolved_earning` flag instead.
+- Treat `sk_author` / `sk_invalidation_author` as BigAgent operational ids — they are **`sk_person`** values resolved through `person_sks`.
 - Use `datalake_hub_services.agent_hub_alocation` (deprecated, typo `alocation`) or `agent_hub_relation` (deprecated) — use `member_hub_allocation` with `is_active = true`.
 - Read EBDB `contract.agent_brokerage_share` (removed) or `dw_public.dim_agent.rede_partner` (deprecated).
 - Use `dw_agent.fact_visit_agent_performance` or any `datalake_visit_agent_performance.*` for current data — pipeline stopped **2025-09-21**; historical only, no confirmed replacement as of 2026-06.
@@ -494,6 +630,24 @@ WHERE ars.year = 2026 AND ars.month = 6
 GROUP BY 1, 2          -- never SUM without grouping/filtering revenue_source
 ORDER BY 1, 2;
 ```
+
+### BigAgent earnings by incentive system (DW)
+
+```sql
+SELECT
+    fe.incentive_system,
+    fe.is_calculated,
+    fe.is_invalid,
+    COUNT(*)              AS earnings,
+    SUM(fe.revenue_amount) AS total_revenue
+FROM dw_agent_payments.fact_earnings AS fe
+WHERE fe.year = 2026
+  AND fe.month = 6
+GROUP BY 1, 2, 3
+ORDER BY 1, 2, 3;
+```
+
+> Filter `has_unresolved_earning = false` for fully resolved earnings. Join **`dw_agent_payments.dim_earning_sources`** on `sk_earning_source` for source status — only join enrich `datalake_big_agent.earnings` when you need revenue-share or invalidation-record ids not in the fact.
 
 ### CIQ portfolio loss (Compra de Carteira)
 

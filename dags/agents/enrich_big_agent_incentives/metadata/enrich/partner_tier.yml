@@ -38,6 +38,10 @@ columns:
     lineage:
       - datalake_big_agent_clean.partner_tier.incentive_system
     description: Incentive system label applied to this partner tier assignment.
+  tier_name:
+    lineage:
+      - datalake_big_agent_clean.tier.name
+    description: Display name of the tier linked to this partner assignment.
   overwritten_reason:
     lineage:
       - datalake_big_agent_clean.partner_tier.overwritten_reason

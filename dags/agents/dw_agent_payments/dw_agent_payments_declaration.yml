@@ -11,6 +11,24 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: agent_payments
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    fact_earnings:
+      merge_on: [sk_earning]
+      z_order_by: [ts_created]
+    fact_partner_tier:
+      merge_on: [sk_partner_tier]
+      z_order_by: [ts_updated]
+    fact_earning_calculation_log:
+      merge_on: [sk_calculation_log]
+      z_order_by: [ts_updated]
+    dim_tier:
+      merge_on: [sk_tier]
+      z_order_by: [ts_updated]
+    dim_earning_sources:
+      merge_on: [sk_earning_source]
+      z_order_by: [ts_created]

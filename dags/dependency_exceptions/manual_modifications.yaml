@@ -26,6 +26,9 @@ bietlejuice.enrich_cyber_legal:
 bietlejuice.dw_accounts_receivable:
   remove:
     - bietlejuice.dw_losses:load-dw-losses-fact-delay:first-run-of-day
+bietlejuice.dw_agent_payments:
+  remove:
+    - bietlejuice.cart_system:load-clean-cart:first-run-of-day
 bietlejuice.dw_braze_events_user_dispatch:
   remove:
     - bietlejuice.braze_details:load-clean-canvas-details-indica-ai:first-run-of-day

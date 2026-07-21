@@ -255,10 +255,10 @@ columns:
     lineage:
       - datalake_big_agent_clean.tier.ts_created
     description: Timestamp of the tier creation.
-  dt_load:
+  ts_updated:
     lineage:
-      - datalake_big_agent_clean.tier.ts_created
-    description: Load reference date derived from the tier creation timestamp.
+      - datalake_big_agent_clean.tier.ts_updated
+    description: Timestamp when the tier was last updated in Big Agent.
   year:
     lineage:
       - datalake_big_agent_clean.tier.ts_created

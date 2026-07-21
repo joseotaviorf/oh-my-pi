@@ -11,24 +11,27 @@ workflow:
   layer: enrich
   custom_schema: big_agent
   default_extraction_type: incremental
-  default_partitions: [dt_load]
+  default_partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
-  inner_dependencies:
-    earnings:
-      - tier_rule
   tables_customization:
-    earnings:
-      merge_on: [id_earning, id_earning_source]
-      z_order_by: [id_earning_source, id_earning]
-    tier_rule:
-      merge_on: [id_tier]
-      z_order_by: [id_tier, id_business_unit]
     brokerage_share_history:
       merge_on: [id_revision, id_contract]
       z_order_by: [id_contract, ts_revision]
+      partitions: [dt_load]
+    earnings:
+      merge_on: [id_earning, id_earning_source]
+      z_order_by: [id_earning_source, id_earning]
     partner_tier:
       merge_on: [id_partner_tier]
-      partitions: [year, month, day]
       z_order_by: [id_partner_tier, ts_updated]
+    revenue_share:
+      merge_on: [id_revenue_share]
+      z_order_by: [id_revenue_share, ts_created]
+    tier_rule:
+      merge_on: [id_tier]
+      z_order_by: [id_tier, id_business_unit]
+    unresolved_earnings:
+      merge_on: [id_unresolved_earning]
+      z_order_by: [ts_created]

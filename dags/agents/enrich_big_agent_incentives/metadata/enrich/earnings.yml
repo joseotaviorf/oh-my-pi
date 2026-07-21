@@ -1,12 +1,11 @@
 database_name: datalake_big_agent
 table_name: earnings
 description: |
-  Enriched Big Agent earnings from new_earnings joined to earning sources, revenue share,
-  invalidations, cart, tier rule configuration, and author context (EBDB user match). One row
-  per earning updated within the load window, with contract or sales flow context, receiver
-  and author details, monetary amounts rounded to two decimals, and tier classifier or
-  qualifier rules when the revenue share relation type is TIER. Partitioned by earning
-  creation date.
+  Enriched Big Agent earnings from new_earnings joined to earning sources, earning
+  invalidations, revenue share, unresolved earnings, and partner tier assignment. One row
+  per calculated earning updated within the load window, with contract or sales flow
+  context, receiver identifiers, tier and revenue share classification, and monetary
+  amounts rounded to two decimals.
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
 columns:
@@ -14,6 +13,18 @@ columns:
     lineage:
       - datalake_big_agent_clean.new_earnings.id
     description: Primary identifier of the earning record in Big Agent.
+  id_unresolved_earning:
+    lineage:
+      - datalake_big_agent.unresolved_earnings.id_unresolved_earning
+    description: Identifier of the unresolved earning queue item that first triggered this earning's calculation, when one exists.
+  id_earning_invalidation:
+    lineage:
+      - datalake_big_agent_clean.earning_invalidations.id
+    description: Identifier of the invalidation record for this earning, when the earning was invalidated.
+  id_replacement_earning:
+    lineage:
+      - datalake_big_agent_clean.earning_invalidations.id_replaced_by
+    description: Identifier of the earning that replaced this one after invalidation, when applicable.
   id_earning_source:
     lineage:
       - datalake_big_agent_clean.new_earnings.id_earning_source
@@ -32,32 +43,32 @@ columns:
       - datalake_big_agent_clean.earning_sources.id_external_domain
       - datalake_big_agent_clean.earning_sources.external_domain_type
     description: Sales flow identifier when the earning source external domain type is SALES_FLOW.
+  id_invalidation_author:
+    lineage:
+      - datalake_big_agent_clean.earning_invalidations.author
+    description: Person identifier extracted from the invalidation author JSON when the actor type is PERSON; otherwise null.
   id_author:
     lineage:
       - datalake_big_agent_clean.new_earnings.id_author
       - datalake_big_agent_clean.new_earnings.author_role
     description: Author identifier from the earning payload when author_role is not SYSTEM; otherwise null.
-  id_user_author:
+  id_tier:
     lineage:
-      - datalake_ebdb_user.user.id
-      - datalake_big_agent_clean.new_earnings.id_author
-      - datalake_big_agent_clean.new_earnings.author_role
-    description: EBDB user id for the author when author_role is not SYSTEM and uuid_person matches id_author; otherwise null.
-  uuid_person_author:
+      - datalake_big_agent.partner_tier.id_tier
+      - datalake_big_agent.revenue_share.id_tier
+    description: Tier identifier, preferring the agent's current partner tier assignment and falling back to the tier linked through revenue share.
+  id_partner_tier:
     lineage:
-      - datalake_ebdb_user.user.uuid_person
-      - datalake_big_agent_clean.new_earnings.id_author
-      - datalake_big_agent_clean.new_earnings.author_role
-    description: Person UUID for the author from EBDB user when author_role is not SYSTEM; otherwise null.
+      - datalake_big_agent.partner_tier.id_partner_tier
+    description: Identifier of the partner tier assignment valid for the agent receiver at the earning creation date.
+  id_incentive_engine:
+    lineage:
+      - datalake_big_agent.revenue_share.id_incentive_engine
+    description: Incentive engine identifier linked to the earning through revenue share, when the relation type is INCENTIVE_ENGINE.
   uuid_cart:
     lineage:
       - datalake_big_agent_clean.earning_sources.uuid_external_cart
-    description: Cart UUID from the earning source external cart UUID when a matching cart exists.
-  id_business_unit:
-    lineage:
-      - datalake_big_agent.tier_rule.id_business_unit
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: Hub business unit from the linked tier rule when revenue share relation type is TIER; otherwise null.
+    description: Cart UUID from the earning source external cart when a matching cart exists.
   uuid_company:
     lineage:
       - datalake_big_agent_clean.new_earnings.id_external_receiver
@@ -104,26 +115,30 @@ columns:
     lineage:
       - datalake_big_agent_clean.earning_invalidations.reason
     description: Business reason attached to the earning invalidation when applicable.
-  earning_source_status:
+  invalidation_description:
     lineage:
-      - datalake_big_agent_clean.earning_sources.status
-    description: Processing status of the parent earning source.
-  earning_source_status_reason:
+      - datalake_big_agent_clean.earning_invalidations.invalidation_description
+    description: Free-text description explaining the earning invalidation when applicable.
+  unresolved_earning_reason:
     lineage:
-      - datalake_big_agent_clean.earning_sources.failure_reason
-    description: Failure or rejection reason on the earning source when status indicates an error.
-  revenue_share_relation_type:
+      - datalake_big_agent.unresolved_earnings.reason
+    description: Business reason from the linked unresolved earning queue item that preceded this earning's calculation.
+  revenue_share_type:
     lineage:
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: Relation type of the revenue share linked to the earning (for example TIER).
-  base_amount:
+      - datalake_big_agent.revenue_share.revenue_share_type
+    description: Revenue share type configured on the linked revenue share record (for example TIER, CRCC, FIFTY).
+  tier_name:
     lineage:
-      - datalake_big_agent_clean.earning_sources.base_amount
-    description: Base monetary amount from the earning source used as calculation input, rounded to two decimal places.
-  revenue_share_total_amount:
+      - datalake_big_agent.partner_tier.tier_name
+    description: Display name of the tier assigned to the agent receiver at the earning creation date.
+  calculation_base_amount:
     lineage:
       - datalake_big_agent_clean.earning_sources.revenue_share_total_amount
-    description: Total revenue share amount configured on the earning source, rounded to two decimal places.
+      - datalake_big_agent_clean.earning_sources.base_amount
+      - datalake_big_agent_clean.new_earnings.calculated_from
+    description: |
+      Monetary base used to calculate the earning. Built by choosing revenue_share_total_amount
+      when calculated_from is REVENUE_SHARE_TOTAL_AMOUNT, otherwise base_amount.
   revenue_amount:
     lineage:
       - datalake_big_agent_clean.new_earnings.revenue_amount
@@ -132,41 +147,6 @@ columns:
     lineage:
       - datalake_big_agent_clean.new_earnings.revenue_percentage
     description: Revenue percentage calculated for this earning (brokerage share component), rounded to two decimal places.
-  incentive_engine_external_condition_type:
-    lineage:
-      - datalake_big_agent.tier_rule.incentive_engine_external_condition_type
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: External condition type from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  tier_name:
-    lineage:
-      - datalake_big_agent.tier_rule.tier_name
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: Display name of the tier linked through the revenue share when relation type is TIER; otherwise null.
-  tier_priority:
-    lineage:
-      - datalake_big_agent.tier_rule.tier_priority
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: Priority order of the tier linked through the revenue share when relation type is TIER; otherwise null.
-  classifier_min_score:
-    lineage:
-      - datalake_big_agent.tier_rule.classifier_min_score
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: Minimum classifier score from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  classifier_resume:
-    lineage:
-      - datalake_big_agent.tier_rule.classifier_resume
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: Array summary of classifier points rules from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  qualifier_min_score:
-    lineage:
-      - datalake_big_agent.tier_rule.qualifier_min_score
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: Minimum qualifier score from the linked tier rule when revenue share relation type is TIER; otherwise null.
-  qualifier_resume:
-    lineage:
-      - datalake_big_agent.tier_rule.qualifier_resume
-      - datalake_big_agent_clean.revenue_share.relation_type
-    description: Array summary of qualifier points rules from the linked tier rule when revenue share relation type is TIER; otherwise null.
   author_role:
     lineage:
       - datalake_big_agent_clean.new_earnings.author_role
@@ -183,6 +163,27 @@ columns:
     lineage:
       - datalake_big_agent_clean.new_earnings.author_role
     description: True when author_role is SYSTEM.
+  is_manual_calculation:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.reason
+    description: True when the earning status reason is MANUAL_CALCULATION.
+  is_invalid:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.status
+      - datalake_big_agent_clean.earning_invalidations.id
+    description: True when the earning status is INVALIDATED or an invalidation record exists for the earning.
+  is_calculated:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.status
+    description: True when the earning status is CALCULATED.
+  dt_payment_due:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.dt_payment_due
+    description: Date when the payment for this earning is due.
+  ts_unresolved_earning_solved:
+    lineage:
+      - datalake_big_agent.unresolved_earnings.ts_solved
+    description: Timestamp when the linked unresolved earning queue item was marked solved.
   ts_created:
     lineage:
       - datalake_big_agent_clean.new_earnings.ts_created
@@ -195,10 +196,6 @@ columns:
     lineage:
       - datalake_big_agent_clean.new_earnings.ts_updated
     description: Timestamp when the earning was last updated in Big Agent.
-  dt_load:
-    lineage:
-      - datalake_big_agent_clean.new_earnings.ts_created
-    description: Load reference date derived from the earning creation timestamp.
   year:
     lineage:
       - datalake_big_agent_clean.new_earnings.ts_created

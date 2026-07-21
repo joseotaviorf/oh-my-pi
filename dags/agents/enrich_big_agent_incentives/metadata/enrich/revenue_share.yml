@@ -1,0 +1,141 @@
+database_name: datalake_big_agent
+table_name: revenue_share
+description: |
+  Enriched Big Agent revenue share configuration joined to its invalidation record and
+  region/amount conditions. One row per revenue share updated within the load window or
+  with a new invalidation record, with relation type (tier, incentive engine, or incentive
+  system configuration), condition-derived amount bounds, and invalidation context.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_revenue_share:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.id
+    description: Primary identifier of the revenue share configuration in Big Agent.
+  id_replacement_revenue_share:
+    lineage:
+      - datalake_big_agent_clean.revenue_share_invalidations.id_replaced_by
+    description: Identifier of the revenue share that replaced this one after invalidation, when applicable.
+  id_invalidation_author:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.id_invalidated_by
+      - datalake_big_agent_clean.revenue_share_invalidations.author
+    description: |
+      Person identifier of the invalidation author, preferring the direct id_invalidated_by
+      column and falling back to the author JSON on the invalidation record.
+  id_tier:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.id_relation
+      - datalake_big_agent_clean.revenue_share.relation_type
+    description: Tier identifier when the revenue share relation type is TIER; otherwise null.
+  id_incentive_engine:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.id_relation
+      - datalake_big_agent_clean.revenue_share.relation_type
+    description: Incentive engine identifier when the revenue share relation type is INCENTIVE_ENGINE; otherwise null.
+  id_region:
+    lineage:
+      - datalake_big_agent_clean.revenue_share_condition.value
+      - datalake_big_agent_clean.revenue_share_condition.condition_type
+    description: Property city region identifier extracted from the PROPERTY_CITY_REGION_ID condition on the revenue share, when configured.
+  id_author:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.author
+    description: Author identifier extracted from the revenue share author JSON.
+  author_role:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.author
+    description: Role of the author extracted from the revenue share author JSON.
+  relation_type:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.relation_type
+    description: Entity type the revenue share is linked to (for example TIER, INCENTIVE_ENGINE, INCENTIVE_SYSTEM_CONFIGURATION).
+  revenue_share_type:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.relation_type
+      - datalake_big_agent_clean.revenue_share.type
+      - datalake_big_agent_clean.revenue_share_condition.condition_type
+    description: |
+      Business classification of the revenue share. Built as TIER when relation_type is TIER; the
+      configured type when relation_type is INCENTIVE_ENGINE or INCENTIVE_SYSTEM_CONFIGURATION and
+      type is set; otherwise CRCC or FIFTY when the corresponding condition is present, falling
+      back to the raw type value.
+  revenue_share_value:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.value
+    description: Configured revenue share value (percentage or fixed amount depending on type).
+  status:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.status
+    description: Processing status of the revenue share configuration (for example ACTIVE or INVALIDATED).
+  invalidation_reason:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.invalidation_reason
+      - datalake_big_agent_clean.revenue_share_invalidations.reason
+    description: |
+      Business reason for invalidation, preferring the direct invalidation_reason column and
+      falling back to the reason on the invalidation record.
+  minimum_base_amount:
+    lineage:
+      - datalake_big_agent_clean.revenue_share_condition.value
+      - datalake_big_agent_clean.revenue_share_condition.condition_type
+    description: Minimum base amount required for the revenue share to apply, from the MIN_BASE_AMOUNT condition when configured.
+  maximum_base_amount:
+    lineage:
+      - datalake_big_agent_clean.revenue_share_condition.value
+      - datalake_big_agent_clean.revenue_share_condition.condition_type
+    description: Maximum base amount allowed for the revenue share to apply, from the MAX_BASE_AMOUNT condition when configured.
+  is_crcc_share_condition:
+    lineage:
+      - datalake_big_agent_clean.revenue_share_condition.value
+      - datalake_big_agent_clean.revenue_share_condition.condition_type
+    description: True when the revenue share has a CRCC condition configured.
+  is_fifty_share_condition:
+    lineage:
+      - datalake_big_agent_clean.revenue_share_condition.value
+      - datalake_big_agent_clean.revenue_share_condition.condition_type
+    description: True when the revenue share has a FIFTY condition configured.
+  is_active:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.status
+    description: True when the revenue share status is ACTIVE.
+  is_invalid:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.status
+    description: True when the revenue share status is INVALIDATED.
+  is_invalidated_by_ops:
+    lineage:
+      - datalake_big_agent_clean.revenue_share_invalidations.author
+    description: True when the invalidation author role is OPS; false when missing or a different role.
+  dt_validity_start:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.dt_validity_start
+    description: First date when this revenue share configuration is valid.
+  dt_validity_end:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.dt_validity_end
+    description: Last date when this revenue share configuration is valid.
+  ts_invalidation:
+    lineage:
+      - datalake_big_agent_clean.revenue_share_invalidations.ts_created
+    description: Timestamp when the invalidation record was created for this revenue share.
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.ts_created
+    description: Timestamp when the revenue share configuration was created in Big Agent.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.ts_updated
+    description: Timestamp when the revenue share configuration was last updated in Big Agent.
+  year:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.ts_created
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.ts_created
+    description: Partition day derived from ts_created.

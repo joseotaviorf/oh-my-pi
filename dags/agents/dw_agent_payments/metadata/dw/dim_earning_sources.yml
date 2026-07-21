@@ -1,0 +1,91 @@
+database_name: dw_agent_payments
+table_name: dim_earning_sources
+description: |
+  Dimension of Big Agent earning sources projected directly from the clean earning_sources
+  table, resolved to the cart system. One row per earning source updated within the load
+  window, with contract or sales flow context, processing status, and configured base and
+  revenue share amounts used as calculation inputs for fact_earnings.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  sk_earning_source:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.id
+    description: Surrogate key of the earning source. Primary key of this dimension.
+  sk_contract:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.id_external_domain
+      - datalake_big_agent_clean.earning_sources.external_domain_type
+    description: Surrogate key of the EBDB contract when the earning source external domain type is RENT_CONTRACT.
+  sk_sales_flow:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.id_external_domain
+      - datalake_big_agent_clean.earning_sources.external_domain_type
+    description: Surrogate key of the sales flow when the earning source external domain type is SALES_FLOW.
+  sk_cart:
+    lineage:
+      - datalake_cart_system_clean.cart.id
+      - datalake_big_agent_clean.earning_sources.uuid_external_cart
+    description: Surrogate key of the cart linked to the earning source, when a matching cart exists.
+  uuid_cart:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.uuid_external_cart
+    description: Cart UUID from the earning source external cart when a matching cart exists.
+  domain_type:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.external_domain_type
+    description: External domain type discriminator from the earning source (for example RENT_CONTRACT or SALES_FLOW).
+  currency:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.currency
+    description: Currency code applied to monetary fields on the earning source.
+  status:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.status
+    description: Processing status of the earning source.
+  failure_reason:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.failure_reason
+    description: Failure or rejection reason on the earning source when status indicates an error.
+  base_amount:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.base_amount
+    description: Base monetary amount used as calculation input for earnings on this source.
+  revenue_share_total_amount:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.revenue_share_total_amount
+    description: Total revenue share amount configured on the earning source.
+  dt_competence:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.dt_competence
+    description: Competence date of the earning source used for financial period allocation.
+  dt_partition:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_created
+    description: Load partition date derived from the earning source creation timestamp.
+  ts_occurred:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_occurred
+    description: Timestamp when the underlying business event that generated the earning source occurred.
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_created
+    description: Timestamp when the earning source was created in Big Agent.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_updated
+    description: Timestamp when the earning source was last updated in Big Agent.
+  ts_load:
+    description: Timestamp when this DW row was materialized.
+  year:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_created
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.ts_created
+    description: Partition day derived from ts_created.

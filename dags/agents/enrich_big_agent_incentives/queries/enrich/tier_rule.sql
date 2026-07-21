@@ -10,7 +10,8 @@ WITH tier AS (
         tier.priority AS tier_priority,
         IF(sr_classifier.min_score = '0E-18', 0, CAST(sr_classifier.min_score AS INTEGER)) AS classifier_min_score,
         IF(sr_qualifier.min_score = '0E-18', 0, CAST(sr_qualifier.min_score AS INTEGER)) AS qualifier_min_score,
-        tier.ts_created
+        tier.ts_created,
+        tier.ts_updated
     FROM
         datalake_big_agent_clean.tier
     LEFT JOIN
@@ -131,7 +132,7 @@ SELECT
     tq.qualifier_multiplier_fl_sale,
     tq.qualifier_multiplier_tqc,
     tier.ts_created,
-    DATE(tier.ts_created) AS dt_load,
+    tier.ts_updated,
     YEAR(tier.ts_created) AS year,
     MONTH(tier.ts_created) AS month,
     DAY(tier.ts_created) AS day

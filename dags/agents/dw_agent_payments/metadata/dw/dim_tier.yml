@@ -1,5 +1,5 @@
 database_name: dw_agent_payments
-table_name: dim_agent_tier
+table_name: dim_tier
 description: |
   Dimension of Big Agent incentive tiers projected from enrich tier_rule.
   Each row is one tier configuration with classifier and qualifier score rules
@@ -171,3 +171,21 @@ columns:
     lineage:
       - datalake_big_agent.tier_rule.ts_created
     description: Timestamp when the tier was created in Big Agent.
+  ts_updated:
+    lineage:
+      - datalake_big_agent.tier_rule.ts_updated
+    description: Timestamp when the tier was last updated in Big Agent.
+  ts_load:
+    description: Timestamp when this DW row was materialized.
+  year:
+    lineage:
+      - datalake_big_agent.tier_rule.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+      - datalake_big_agent.tier_rule.ts_created
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_big_agent.tier_rule.ts_created
+    description: Partition day derived from ts_created.

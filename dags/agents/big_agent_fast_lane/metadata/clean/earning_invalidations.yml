@@ -19,10 +19,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.earning_invalidations.replaced_by
     description: Identifier of the new earning that replaces the invalidated one, if any.
-  author:
+  id_author:
     lineage:
       - datalake_big_agent_raw.earning_invalidations.author
-    description: Actor metadata responsible for the invalidation.
+    description: Author identifier extracted from the author JSON payload.
   reason:
     lineage:
       - datalake_big_agent_raw.earning_invalidations.reason
@@ -31,6 +31,22 @@ columns:
     lineage:
       - datalake_big_agent_raw.earning_invalidations.description
     description: Free-text description with additional details about the invalidation.
+  author:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.author
+    description: Actor metadata responsible for the invalidation.
+  author_role:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.author
+    description: Author role parsed from the author JSON payload.
+  author_channel:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.author
+    description: Author channel parsed from the author JSON payload.
+  author_on_behalf_of_role:
+    lineage:
+      - datalake_big_agent_raw.earning_invalidations.author
+    description: On-behalf-of role parsed from the author JSON payload.
   ts_invalidated:
     lineage:
       - datalake_big_agent_raw.earning_invalidations.invalidated_at

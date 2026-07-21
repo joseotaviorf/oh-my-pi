@@ -39,6 +39,13 @@ SELECT
     qualifier_multiplier_ccv,
     qualifier_multiplier_fl_sale,
     qualifier_multiplier_tqc,
-    ts_created
-FROM
+    ts_created,
+    ts_updated,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM 
     datalake_big_agent.tier_rule
+WHERE
+    DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

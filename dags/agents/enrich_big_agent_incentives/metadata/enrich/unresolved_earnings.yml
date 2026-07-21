@@ -1,0 +1,73 @@
+database_name: datalake_big_agent
+table_name: unresolved_earnings
+description: |
+  Enriched Big Agent unresolved earnings matched to the new earning that eventually
+  originated from the same earning source and receiver. One row per unresolved earning
+  updated within the load window; is_first_solved_by_earning flags the earliest solved
+  record per matched earning, used downstream to link an earning to its unresolved history.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  id_unresolved_earning:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.id
+    description: Primary identifier of the unresolved earning record in Big Agent.
+  id_earning:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id
+    description: Identifier of the new earning matched to this unresolved earning by earning source, receiver, incentive system, and timing.
+  id_earning_source:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.id_earning_source
+    description: Identifier of the earning source linked to this unresolved earning queue item.
+  id_external_receiver:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.id_external_receiver
+    description: Identifier of the external receiver (agent or company) associated with the unresolved earning.
+  external_receiver_type:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.external_receiver_type
+    description: Type discriminator for the external receiver associated with the unresolved earning.
+  incentive_system:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.incentive_system
+    description: Incentive system label under which the unresolved earning was evaluated.
+  reason:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.reason
+    description: Business reason explaining why the earning remained unresolved in the Big Agent queue.
+  is_solved:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.ts_solved
+    description: True when ts_solved is populated, indicating the unresolved earning was cleared.
+  is_first_solved_by_earning:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.ts_solved
+      - datalake_big_agent_clean.unresolved_earnings.ts_created
+    description: |
+      True for the earliest solved unresolved earning per matched new earning, ordered by
+      ts_solved then ts_created; false for later solved duplicates and for records not yet solved.
+  ts_solved:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.ts_solved
+    description: Timestamp when the unresolved earning was marked solved in Big Agent; null while still open.
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.ts_created
+    description: Timestamp when the unresolved earning was created in Big Agent.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.ts_updated
+    description: Timestamp when the unresolved earning was last updated in Big Agent.
+  year:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.ts_created
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_big_agent_clean.unresolved_earnings.ts_created
+    description: Partition day derived from ts_created.

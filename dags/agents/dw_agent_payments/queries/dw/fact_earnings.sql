@@ -1,45 +1,61 @@
 SELECT
-    id_earning AS sk_earning,
-    id_earning_source AS sk_earning_source,
-    id_revenue_share AS sk_revenue_share,
-    id_contract AS sk_contract,
-    id_sales_flow AS sk_sales_flow,
-    id_author AS sk_author,
-    uuid_cart,
-    id_business_unit AS sk_business_unit,
-    uuid_company,
-    uuid_person,
-    business_context,
-    domain_type,
-    incentive_system,
-    calculated_from,
-    currency,
-    external_receiver_type,
-    earning_status,
-    earning_status_reason,
-    invalidation_reason,
-    earning_source_status,
-    earning_source_status_reason,
-    revenue_share_relation_type,
-    revenue_share_type,
-    base_amount,
-    revenue_share_total_amount,
-    revenue_amount,
-    revenue_percentage,
-    incentive_engine_external_condition_type,
-    tier_name,
-    tier_priority,
-    classifier_min_score,
-    classifier_resume,
-    qualifier_min_score,
-    qualifier_resume,
-    is_authored_by_system,
-    ts_created,
-    ts_invalidated,
-    ts_updated,
-    dt_load,
-    year,
-    month,
-    day
+    e.id_earning AS sk_earning,
+    e.id_replacement_earning AS sk_replacement_earning,
+    e.id_earning_source AS sk_earning_source,
+    e.id_contract AS sk_contract,
+    e.id_sales_flow AS sk_sales_flow,
+    author.sk_person AS sk_author,
+    invalidation_author.sk_person AS sk_invalidation_author,
+    e.id_tier AS sk_tier,
+    e.id_partner_tier AS sk_partner_tier,
+    person.sk_person AS sk_person,
+    company.sk_company AS sk_company,
+    cart.id AS sk_cart,
+    e.incentive_system,
+    e.invalidation_reason,
+    e.invalidation_description,
+    e.unresolved_earning_reason,
+    e.revenue_share_type,
+    e.tier_name AS partner_tier_name,
+    e.calculation_base_amount,
+    e.revenue_amount,
+    e.revenue_percentage,
+    e.id_unresolved_earning IS NOT NULL AS has_unresolved_earning,
+    e.domain_type = 'RENT_CONTRACT' AS is_rent_contract,
+    e.domain_type = 'SALES_FLOW' AS is_sales_flow,
+    e.is_calculated,
+    e.is_invalid,
+    e.invalidation_reason = 'RECALCULATED' AS is_invalid_for_recalculation_reason,
+    e.invalidation_reason = 'WRONG_REVENUE_AMOUNT' AS is_invalid_for_amount_wrong_reason,
+    e.id_replacement_earning IS NOT NULL AS is_replaced,
+    e.earning_status_reason = "MANUAL_CALCULATION" AS is_manual_calculation,
+    e.is_authored_by_system,
+    e.dt_payment_due,
+    e.ts_unresolved_earning_solved,
+    e.ts_invalidated,
+    e.ts_created,
+    e.ts_updated,
+    NOW() AS ts_load,
+    e.year,
+    e.month,
+    e.day
 FROM
-    datalake_big_agent.earnings
+    datalake_big_agent.earnings AS e
+LEFT JOIN
+    datalake_person.person_sks AS person
+        ON e.uuid_person = person.uuid_person
+LEFT JOIN
+    datalake_person.person_sks AS author
+        ON e.id_author = author.uuid_person
+LEFT JOIN
+    datalake_person.person_sks AS invalidation_author
+        ON e.id_invalidation_author = invalidation_author.uuid_person
+LEFT JOIN
+    datalake_company.company_sks AS company
+        ON e.uuid_company = company.uuid_company
+LEFT JOIN
+    datalake_cart_system_clean.cart AS cart
+        ON e.uuid_cart = cart.uuid_cart
+WHERE
+    e.invalidation_reason <> "PRODUCT_TESTING"
+    AND DATE(e.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

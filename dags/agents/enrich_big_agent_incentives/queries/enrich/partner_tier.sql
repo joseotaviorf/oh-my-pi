@@ -39,6 +39,7 @@ SELECT
     IF(pt.partner_external_type = "COMPANY", pt.id_partner_external, NULL) AS uuid_company,
     overwritten.id_author AS uuid_overwritten_by,
     pt.incentive_system,
+    tier.name AS tier_name,
     COALESCE(pt.overwritten_reason, overwritten.reason) AS overwritten_reason,
     pt.status = 'ACTIVE' AS is_valid,
     pt.status = 'INVALIDATED' AND overwritten.id_replaced_by IS NOT NULL AS is_overwritten,
@@ -48,9 +49,9 @@ SELECT
     overwritten.ts_created AS ts_overwritten,
     pt.ts_created,
     pt.ts_updated,
-    pt.year,
-    pt.month,
-    pt.day    
+    YEAR(pt.ts_created) AS year,
+    MONTH(pt.ts_created) AS month,
+    DAY(pt.ts_created) AS day
 FROM
     partner_tier_updated AS updated
 JOIN
@@ -59,3 +60,6 @@ JOIN
 LEFT JOIN
     overwritten_info AS overwritten
         ON overwritten.id_partner_tier = updated.id_partner_tier
+LEFT JOIN
+    datalake_big_agent_clean.tier AS tier
+        ON tier.id = pt.id_tier

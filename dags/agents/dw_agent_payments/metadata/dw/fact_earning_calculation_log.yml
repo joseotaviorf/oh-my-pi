@@ -1,0 +1,58 @@
+database_name: dw_agent_payments
+table_name: fact_earning_calculation_log
+description: |
+  Fact table tracking the daily history of Big Agent incentive system calculation status per
+  earning source, exploded from the incentive_systems_calculation_status map on
+  earning_sources_aud. One row per earning source, incentive system, and status change day,
+  with ts_started and ts_ended defining the validity window of that status value.
+domain: Agents
+owner: gustavo.rompe@quintoandar.com.br
+columns:
+  sk_calculation_log:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.id
+      - datalake_big_agent_clean.earning_sources_aud.incentive_systems_calculation_status
+      - datalake_big_agent_clean.earning_sources_aud.ts_updated
+    description: |
+      Surrogate key hashing earning source id, incentive system key, and update timestamp.
+      Primary key of this fact table.
+  sk_earning_source:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.id
+    description: Surrogate key of the earning source whose calculation status changed.
+  incentive_system:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.incentive_systems_calculation_status
+    description: Incentive system key from the calculation status map (for example DEMAND_CONVERSION_FS).
+  calculation_status:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.incentive_systems_calculation_status
+    description: Calculation status value recorded for the incentive system at ts_started.
+  is_current_status:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.ts_updated
+    description: True for the most recent calculation status per earning source and incentive system, ordered by ts_updated; false for superseded historical statuses.
+  ts_started:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.ts_updated
+    description: Timestamp when this calculation status started being in effect for the earning source and incentive system.
+  ts_ended:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.ts_updated
+    description: |
+      Timestamp when this calculation status stopped being in effect, one day before the next
+      recorded update for the same earning source and incentive system; null for the current status.
+  ts_load:
+    description: Timestamp when this DW row was materialized.
+  year:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.ts_updated
+    description: Partition year derived from ts_updated.
+  month:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.ts_updated
+    description: Partition month derived from ts_updated.
+  day:
+    lineage:
+      - datalake_big_agent_clean.earning_sources_aud.ts_updated
+    description: Partition day derived from ts_updated.

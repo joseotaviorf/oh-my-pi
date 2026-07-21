@@ -1,16 +1,13 @@
 ---
-table_name: dw_agent_payments.dim_agent_tier
+table_name: dw_agent_payments.fact_earning_calculation_log
 alert_channel: "#agents-data-alarms"
 table_level_validations:
   has_size:
     greater_than: 0
     severity_level: Error
 column_level_validations:
-  sk_tier:
+  sk_calculation_log:
     is_complete:
       severity_level: Error
     is_unique:
-      severity_level: Error
-  ts_created:
-    is_complete:
       severity_level: Error

@@ -55,6 +55,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.new_earnings.revenue_percentage
     description: Percentage used in calculation when applicable.
+  dt_payment_due:
+    lineage:
+      - datalake_big_agent_raw.new_earnings.payment_due_date
+    description: Date when payment for this earning is due.
   status:
     lineage:
       - datalake_big_agent_raw.new_earnings.status
