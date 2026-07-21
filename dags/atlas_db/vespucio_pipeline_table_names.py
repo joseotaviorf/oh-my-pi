@@ -85,6 +85,7 @@ class Tables:
     address_enrich_step_v2 = "vespucio_pipeline_delta.address_enrich_step"
 
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
+
     classifieds_house_id = "vespucio_classifieds.classifieds_house_id"
     classified_v2_compounds = "vespucio_classifieds.classifieds_v2"
     classified_logging_table = "vespucio_classifieds.classifieds_publish_log"

@@ -228,6 +228,24 @@ zordominium_tasks = [
     ),
 ]
 
+IL_SQS_URL = config_service.get_config("sqs_url_internal_linking")
+
+condominium_by_region_exporter = create_task(
+    entry_point="plugins_condominium_by_region_exporter",
+    parameters=[
+        f"--sqs_queue_url={IL_SQS_URL}",
+    ],
+    task_id="condominium_by_region_exporter",
+)
+
+condominium_individual_exporter = create_task(
+    entry_point="plugins_condominium_individual_exporter",
+    parameters=[
+        f"--sqs_queue_url={IL_SQS_URL}",
+    ],
+    task_id="condominium_individual_exporter",
+)
+
 classifieds_tasks = [
     create_task(
         entry_point="plugins_classifieds_house_id",
@@ -279,6 +297,9 @@ property_search_indexer_task >> compound_indexer_task
 join_plugins >> classifieds_tasks[0]
 join_plugins >> zordominium_tasks[0]
 chain(*zordominium_tasks)
+
+zordominium_tasks[1] >> condominium_by_region_exporter
+zordominium_tasks[0] >> condominium_individual_exporter
 
 zordominium_tasks[0] >> classifieds_tasks[1]
 chain(*classifieds_tasks)
