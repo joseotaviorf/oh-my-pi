@@ -24,6 +24,23 @@ build-ci-container-base:
 	@echo ""
 	@echo "-> Image ready: bi-etl-ejuice-ci:base-latest"
 
+.PHONY: build-ci-container-astro
+## Builds the ci-astro image locally (linux/amd64 smoke-test only).
+## ECR publish is CI-only via .woodpecker/containers.yml (amd64).
+## Requires GITHUB_TOKEN for private Git deps (BuildKit secret), same as build-devcontainer.
+build-ci-container-astro:
+	@echo "Building CI Astro image (linux/amd64)"
+	@echo "=========="
+	@echo ""
+	@DOCKER_BUILDKIT=1 docker build \
+	  --target ci-astro \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t bi-etl-ejuice-ci:astro-latest \
+	  -f .container/Dockerfile \
+	  .
+	@echo ""
+	@echo "-> Image ready: bi-etl-ejuice-ci:astro-latest"
+
 .PHONY: build-ci-container-jdk
 ## Builds the ci-jdk image: ci-base + openjdk-17-jre-headless.
 ## Used by test CI steps (PySpark needs a JVM).
@@ -44,9 +61,9 @@ build-ci-container-jdk:
 	@echo "-> Image ready: bi-etl-ejuice-ci:jdk-latest"
 
 .PHONY: build-ci-containers
-## Builds both CI images (ci-base + ci-jdk) in one go.
+## Builds CI images (ci-base + ci-astro + ci-jdk) in one go.
 ## Requires GITHUB_TOKEN for private Git deps (same as build-devcontainer).
-build-ci-containers: build-ci-container-base build-ci-container-jdk
+build-ci-containers: build-ci-container-base build-ci-container-astro build-ci-container-jdk
 
 ###############################################################################
 ######################### ECR publish (local) #################################
@@ -59,6 +76,8 @@ build-ci-containers: build-ci-container-base build-ci-container-jdk
 #   make publish-ci-jdk           # push ci-jdk  (amd64)
 #   make publish-devcontainer     # push devcontainer (arm64)
 #   make publish-containers       # push all three
+#
+# ci-astro is published only by .woodpecker/containers.yml (not from local).
 #
 # SHA: first 7 chars of HEAD, used for the immutable tag.
 # ENV: tag prefix (default: prod).

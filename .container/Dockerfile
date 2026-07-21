@@ -9,6 +9,10 @@
 #                      (core + airflow + compiler).
 #                      Used by lint, validation, and release CI steps.
 #
+#   ci-astro         — ci-base + Astro CLI (pinned ASTRO_CLI_VERSION).
+#                      Used by .woodpecker/development.yml Astro DAG deploy steps.
+#                      linux/amd64 only (Woodpecker CI runners).
+#
 #   ci-jdk           — ci-base + openjdk-17-jre-headless +
 #                      dbr-16-4 venv at /opt/bietlejuice/venvs/dbr-16-4.
 #                      Used by test CI steps (PySpark needs a JVM).
@@ -35,11 +39,13 @@
 #
 # Build locally:
 #   make build-ci-container-base   # → bi-etl-ejuice-ci:base-latest
+#   make build-ci-container-astro  # → bi-etl-ejuice-ci:astro-latest
 #   make build-ci-container-jdk    # → bi-etl-ejuice-ci:jdk-latest
 #   make build-devcontainer        # → bi-etl-ejuice:devcontainer-latest
 #
-# All targets are multi-arch (amd64 + arm64). Use PLATFORM=linux/arm64 with
-# the Makefile targets for cross-arch local builds.
+# ci-base / ci-jdk / devcontainer are multi-arch (amd64 + arm64). ci-astro is
+# linux/amd64 only. Use PLATFORM=linux/arm64 with Makefile targets for
+# cross-arch local builds of the multi-arch targets.
 
 ARG UV_VERSION=0.11.7
 ARG ASTRO_CLI_VERSION=1.42.0
@@ -91,6 +97,23 @@ COPY packages/bietlejuice-runtime/pyproject.toml /tmp/workspace/packages/bietlej
 # Read GITHUB_TOKEN from BuildKit /run/secrets/ (local) or /kaniko/run/secrets/ (CI plugin staging).
 RUN --mount=type=secret,id=GITHUB_TOKEN,required=false \
   ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && uv sync --python 3.12 --no-editable; rm -rf /root/.cache/uv; find /opt/bietlejuice/venvs -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true; find /opt/bietlejuice/venvs -name '*.pyc' -delete 2>/dev/null || true; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
+
+###############################################################################
+# Target: ci-astro — ci-base + Astro CLI (Woodpecker development.yml DAG deploy)
+# linux/amd64 only — CI runners; do not build/publish arm64 for this target.
+###############################################################################
+FROM ci-base AS ci-astro
+
+ARG ASTRO_CLI_VERSION
+
+# Same tarball install as .devcontainer/install_devcontainer_tools.sh (astro only).
+# Hardcoded amd64: this image is never published for arm64.
+RUN apt-get update -qq \
+  && apt-get install -y --no-install-recommends curl ca-certificates \
+  && curl -fsSL "https://github.com/astronomer/astro-cli/releases/download/v${ASTRO_CLI_VERSION}/astro_${ASTRO_CLI_VERSION}_linux_amd64.tar.gz" \
+    | tar -xz -C /usr/local/bin astro \
+  && rm -rf /var/lib/apt/lists/* \
+  && astro version
 
 ###############################################################################
 # Target: ci-jdk — ci-base + JRE for PySpark + dbr-16-4 venv
