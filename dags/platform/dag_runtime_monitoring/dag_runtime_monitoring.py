@@ -72,9 +72,9 @@ _EXECUTE_JOB_CLUSTER_TASK_PREFIX = "execute-job-cluster"
 # Config fallbacks used when a key is missing from prod_conf.yml / forno_conf.yml.
 _DEFAULT_CONFIG = {
     "critical_dags": [],
-    "lookback_days": 7,
-    "min_history_runs": 3,
-    "percentile": 90,
+    "lookback_days": 30,
+    "min_history_runs": 15,
+    "percentile": 99,
     "factor": 1.5,
     # Absolute floor: only alert on runs that have been executing at least this long,
     # so quick DAGs never page no matter how large their relative swing.
@@ -199,6 +199,19 @@ def _percentile(values: list, pct: float) -> float:
     return float(ordered[low] + (ordered[high] - ordered[low]) * (rank - low))
 
 
+def _trim_iqr(values: list, *, k: float = 1.5) -> list:
+    """Remove outliers outside Tukey fences (Q1 - k*IQR, Q3 + k*IQR)."""
+    if len(values) < 4:
+        return list(values)
+    ordered = sorted(values)
+    q1 = _percentile(ordered, 25)
+    q3 = _percentile(ordered, 75)
+    iqr = q3 - q1
+    lo = q1 - k * iqr
+    hi = q3 + k * iqr
+    return [v for v in ordered if lo <= v <= hi]
+
+
 def _evaluate_runtime(
     elapsed_s: float,
     history_durations_s: list,
@@ -221,7 +234,7 @@ def _evaluate_runtime(
         return None
     if elapsed_s < min_elapsed_s:
         return None
-    baseline = _percentile(history_durations_s, percentile)
+    baseline = _percentile(_trim_iqr(history_durations_s), percentile)
     if baseline <= 0:
         # A non-positive baseline (e.g. runs that all finish in ~0s) makes the relative
         # threshold meaningless — every positive elapsed time would flag. Skip instead.
