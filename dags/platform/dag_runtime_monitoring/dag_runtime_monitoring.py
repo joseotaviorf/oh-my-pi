@@ -68,6 +68,17 @@ _JIRA_MESSAGE_MAX = 130
 _JIRA_DESCRIPTION_MAX = 15000
 # Job-cluster bootstrap task (and ``execute-job-cluster-N`` multi-cluster variants).
 _EXECUTE_JOB_CLUSTER_TASK_PREFIX = "execute-job-cluster"
+_ACCESSORY_TASK_PREFIXES = (
+    "optimize",
+    "data-quality",
+    "sync",
+    "register",
+    "job-cluster-finished",
+    "terminate-emr-cluster",
+)
+_NOT_ACCESSORY_SQL = " AND ".join(
+    f"ti2.task_id NOT LIKE '{p}%'" for p in _ACCESSORY_TASK_PREFIXES
+)
 
 # Config fallbacks used when a key is missing from prod_conf.yml / forno_conf.yml.
 _DEFAULT_CONFIG = {
@@ -112,7 +123,13 @@ _RUNNING_QUERY = text(
         r.run_id,
         r.start_date,
         MIN(ti.start_date) AS work_start,
-        COUNT(ti.task_id) > 0 AS has_execute_job_cluster
+        COUNT(ti.task_id) > 0 AS has_execute_job_cluster,
+        EXISTS (
+            SELECT 1 FROM task_instance AS ti2
+            WHERE ti2.dag_id = r.dag_id AND ti2.run_id = r.run_id
+              AND ti2.state IN ('running', 'queued', 'scheduled', 'up_for_retry', 'up_for_reschedule')
+              AND {_NOT_ACCESSORY_SQL}
+        ) AS has_real_work_running
     FROM running AS r
     LEFT JOIN task_instance AS ti
         ON ti.dag_id = r.dag_id
@@ -131,7 +148,12 @@ _HISTORY_QUERY = text(
         dr.dag_id,
         EXTRACT(
             EPOCH FROM (
-                dr.end_date - COALESCE(MIN(ti.start_date), dr.start_date)
+                COALESCE(
+                    (SELECT MAX(ti2.end_date) FROM task_instance AS ti2
+                     WHERE ti2.dag_id = dr.dag_id AND ti2.run_id = dr.run_id
+                       AND {_NOT_ACCESSORY_SQL}),
+                    dr.end_date
+                ) - COALESCE(MIN(ti.start_date), dr.start_date)
             )
         ) AS duration_s
     FROM dag_run AS dr
@@ -281,6 +303,8 @@ def _effective_work_start(row) -> datetime | None:
     ``start_date`` (skip while that is still null). Legacy DAGs without that task
     keep ``dag_run.start_date``.
     """
+    if not getattr(row, "has_real_work_running", True):
+        return None
     has_ejc = bool(getattr(row, "has_execute_job_cluster", False))
     work_start = getattr(row, "work_start", None)
     if has_ejc:
