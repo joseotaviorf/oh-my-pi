@@ -19,16 +19,16 @@ workflow:
   tables_customization:
     fact_earnings:
       merge_on: [sk_earning]
-      z_order_by: [ts_created]
+      z_order_by: [sk_contract, sk_sales_flow, sk_person]
     fact_partner_tier:
       merge_on: [sk_partner_tier]
-      z_order_by: [ts_updated]
+      z_order_by: [sk_person, sk_tier]
     fact_earning_calculation_log:
       merge_on: [sk_calculation_log]
-      z_order_by: [ts_updated]
+      z_order_by: [incentive_system]
     dim_tier:
       merge_on: [sk_tier]
-      z_order_by: [ts_updated]
+      z_order_by: [sk_tier, incentive_system]
     dim_earning_sources:
       merge_on: [sk_earning_source]
-      z_order_by: [ts_created]
+      z_order_by: [sk_contract, sk_sales_flow, domain_type]
