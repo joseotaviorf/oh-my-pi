@@ -1,29 +1,20 @@
 cluster:
-  type: consolidation_xl_compute_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_xl_compute_fleet_cluster
   custom_configurations:
-    driver_node_type_id: r7g.2xlarge
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: emr_7_12_consolidation_xl_compute_fleet_cluster
-    custom_configurations:
-      task_nodes:
-        instance_types:
-        - c6g.8xlarge
-        - c7g.8xlarge
-        target_on_demand: 0
-        target_spot: 1
-        allocation_strategy: price-capacity-optimized
-        bid_price_percentage: 100
-      core_nodes:
-        target_on_demand: 2
-        target_spot: 0
-        instance_types:
-        - c6g.8xlarge
-        - c7g.8xlarge
+    task_nodes:
+      instance_types:
+      - c6g.8xlarge
+      - c7g.8xlarge
+      target_on_demand: 0
+      target_spot: 1
+      allocation_strategy: price-capacity-optimized
+      bid_price_percentage: 100
+    core_nodes:
+      target_on_demand: 2
+      target_spot: 0
+      instance_types:
+      - c6g.8xlarge
+      - c7g.8xlarge
