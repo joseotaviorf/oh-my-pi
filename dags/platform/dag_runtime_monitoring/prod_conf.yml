@@ -22,8 +22,13 @@ dag_runtime_monitoring:
   percentile: 99
   factor: 1.5
   min_alert_duration_minutes: 90
-  # Soft-launch: empty = no JiraOps paging; all anomalies go to Google Chat only.
-  critical_dags: []
+  critical_dags:
+    - bietlejuice.dw_customer_support
+    - bietlejuice.dw_offboarding
+    - bietlejuice.dw_repairs
+    - bietlejuice.dw_listing
+    - bietlejuice.dw_bpo_performance
+    - bietlejuice.dw_supply
   # To enable on-call paging, replace `critical_dags: []` above with this list:
   # critical_dags:
   #   - bietlejuice.ebdb_location
