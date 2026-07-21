@@ -32,3 +32,5 @@ workflow:
       z_order_by: [id_contact]
     lead_intent:
       clean_z_order_by: [id_contact]
+    supply_rejection:
+      clean_z_order_by: [id_lead]

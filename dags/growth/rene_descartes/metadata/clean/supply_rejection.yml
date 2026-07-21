@@ -1,0 +1,52 @@
+database_name: datalake_rene_descartes_clean
+table_name: supply_rejection
+owner: marcio.gomes@quintoandar.com.br
+domain: Growth
+description: >
+  Clean supply-rejection event table from Rene Descartes, with one row per final discard applied during
+  supply lead validation or acquisition-opportunity qualification. It links each rejection to its lead and
+  records the funnel stage, reason, source, rule mode, and application time for Growth supply operations
+  to analyse funnel quality and discard patterns.
+columns:
+  id_rejection:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.id_rejection
+    description: "Unique sequential identifier for the supply rejection event in Rene Descartes."
+  id_lead:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.lead_id
+    description: "Identifier of the supply lead or lead-validation cycle to which the rejection applies."
+  id_activity:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.activity_id
+    description: "Identifier of the supply activity where an Inside Sales operator or AI applied the rejection; null for events without an activity."
+  supply_source:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.supply_source
+    description: "Source classification for the supply lead, such as 1P, used to segment rejection events by acquisition origin."
+  business_context:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.business_context
+    description: "Business context for which the rejection applies, such as RENT; it can be empty for lead-stage rejections."
+  funnel_step:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.funnel_step
+    description: "Supply journey stage where the discard was applied, such as lead or prospect."
+  discard_reason:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.discard_reason
+    description: "Specific reason code explaining why the lead or opportunity was discarded at the recorded funnel stage."
+  discard_rule:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.discard_rule
+    description: "Rule mode that applied the discard, distinguishing manual operator decisions from automatic system rules."
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_raw.supply_rejection.ts_created
+    description: "UTC timestamp when the rejection event was applied in the Rene Descartes service."
+  year:
+    description: "Partition column: year extracted from ts_created."
+  month:
+    description: "Partition column: month extracted from ts_created."
+  day:
+    description: "Partition column: day extracted from ts_created."
