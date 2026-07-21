@@ -30,7 +30,7 @@ SELECT
     value AS calculation_status,
     ROW_NUMBER() OVER(PARTITION BY id_earning_source, key ORDER BY ts_updated DESC) = 1 AS is_current_status,
     ts_updated AS ts_started,
-    LEAD(ts_updated) OVER(PARTITION BY id_earning_source, key ORDER BY ts_updated) - INTERVAL 1 DAY AS ts_ended,
+    LEAD(ts_updated) OVER(PARTITION BY id_earning_source, key ORDER BY ts_updated) AS ts_ended,
     NOW() AS ts_load,
     YEAR(ts_updated) AS year,
     MONTH(ts_updated) AS month,

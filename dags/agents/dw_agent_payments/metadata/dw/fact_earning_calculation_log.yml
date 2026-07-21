@@ -40,8 +40,8 @@ columns:
     lineage:
       - datalake_big_agent_clean.earning_sources_aud.ts_updated
     description: |
-      Timestamp when this calculation status stopped being in effect, one day before the next
-      recorded update for the same earning source and incentive system; null for the current status.
+      Timestamp when the next calculation status update took effect for the same earning source
+      and incentive system; null for the current status.
   ts_load:
     description: Timestamp when this DW row was materialized.
   year:
