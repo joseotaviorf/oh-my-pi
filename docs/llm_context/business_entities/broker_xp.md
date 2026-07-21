@@ -435,6 +435,12 @@ Mixing the two without splitting hides which effect (server default vs ranking) 
 
 - `dim_broker_regions` is the bridge: one row per `(broker_product, region)` token from the partner's declared `region_list`. JOIN to a region dimension via `sk_region`.
 
+### Alias (product 40) — B2B conversational AI agent for partner agencies
+
+- Agencies with product 40 (Alias) appear in `dim_broker` with `is_alias_broker = TRUE` and `is_alias_active` (WhatsApp phone verified). `alias_crm_platform` is a convenience flag on `dim_broker`; detailed CRM config lives in `dw_alias.dim_alias_crm_integration`.
+- `dim_broker_products` carries one row per Alias enrollment with `business_context = 'ALIAS'` and `crm_platform` (NULL for Rede rows).
+- Lead funnel, conversational AI performance, inventory ingestion, and portfolio listings: [`alias.md`](./alias.md). Join path: `dim_broker.sk_broker = dw_alias.<fact_or_dim>.sk_broker` (VARCHAR, no CAST).
+
 ## Dos and Don'ts
 
 **Do:**
