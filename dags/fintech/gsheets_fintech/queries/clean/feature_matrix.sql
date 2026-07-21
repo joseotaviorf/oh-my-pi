@@ -10,7 +10,7 @@ SELECT
     CAST(reparos_bpo_front AS STRING) AS repairs_bpo_front_scope,
     CAST(csi AS STRING) AS csi_team_scope,
     CAST(ra AS STRING) AS ra_team_scope,
-    CAST(mediacao AS STRING) AS mediation_team_scope,
+    CAST(mediacao_ AS STRING) AS mediation_team_scope,
     CAST(spoc AS STRING) AS spoc_team_scope,
     CAST(ferramenta AS STRING) AS tool_system_name,
     CAST(tipo_de_tarefa_feature AS STRING) AS task_feature_type,

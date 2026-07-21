@@ -55,7 +55,7 @@ columns:
     description: Scope flag indicating whether the RA team uses this feature.
   mediation_team_scope:
     lineage:
-      - datalake_gsheets_raw.feature_matrix.mediacao
+      - datalake_gsheets_raw.feature_matrix.mediacao_
     description: Scope flag indicating whether the Mediation team uses this feature.
   spoc_team_scope:
     lineage:
