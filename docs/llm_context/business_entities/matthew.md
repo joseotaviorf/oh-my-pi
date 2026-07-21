@@ -25,6 +25,8 @@ Historical rollout timeline: the **V2-vs-V3 A/B test started on 2026-05-15**; on
 
 Identify the version with `matthew_version` (`'V4'`, `'V3'`, `'V2'`, `'V1.5'`, `'V1'`, future numeric versions, or NULL). Versioned entrypoints matching `collectionsagentv<number>input` are detected dynamically; the historical rollout name `collectionsagentv1input` maps to V3.
 
+**Model (LLM) vs version (architecture).** `matthew_version` is the *agent architecture* generation (V2 graph, V3/V4 MCP). `matthew_model` (in `fact_ai_agents_interaction`) is the *underlying LLM* the collections agent calls (e.g. `openai/gpt-4o-2024-11-20`, `openai/gpt-5.4-mini-2026-03-17`) — there is one model per session. The collections-agent planner (ReactPlanner) is the only place Matthew calls an LLM, so `matthew_model` is "the Matthew model". Use `matthew_model` — not `matthew_version` — as the dimension for **cost / latency / LLM-efficiency model comparisons** (e.g. gpt-4o vs gpt-5.4-mini). These figures live in `fact_ai_agents_interaction` as **additive counters** (`n_agent_messages`, `n_llm_calls`, `total_llm_cost`, `total_collections_agent_cost`, `total_message_latency_sum`, `collections_agent_latency_sum`, `collections_agent_llm_latency_sum`, `flag_session_had_timeout`), sourced from `datalake_ai_collections_quintoandar.matthew_llm_metrics`.
+
 In `dw_collection_ai_agents.fact_ai_agents_interaction`, the **business-signal columns are unified across generations**: each unified column is populated with the V3-or-later MCP value when the session has MCP activity and falls back to the V2 observation value otherwise — so metrics like negotiation rate or proposal count can be computed with a single column regardless of version.
 
 The Matthew session lifecycle:
@@ -59,6 +61,11 @@ Not all sessions reach negotiation. Many resolve via debt visualization, payment
 - **DebtRetrieverTool / UserDebtClassifierTool / V1.5** → Matthew V1.5 entrypoint. `matthew_version = 'V1.5'`.
 - **DebtFinderTool / V1** → legacy V1 entrypoint. `matthew_version = 'V1'`.
 - **id_external** → Langfuse session ID; the engineering team uses it to debug specific conversations. Always include it in analytical exports for traceability.
+- **matthew_model (the LLM / "the Matthew model")** → the underlying LLM the collections agent calls (e.g. `openai/gpt-4o-2024-11-20`, `openai/gpt-5.4-mini-2026-03-17`). One per session; column `matthew_model` in `fact_ai_agents_interaction`. This is the comparison dimension for cost/latency/efficiency — **not** `matthew_version` (that is the agent architecture generation V2/V3/V4).
+- **LLM call / planner call** → one collections-agent LLM invocation (a `CollectionsAgentV<N> - ReactPlanner` planner step, which drives exactly one LLM generation). Counted per session by `n_llm_calls`. "LLM calls" and "planner calls" are the same thing.
+- **Agent message** → a message/turn (Langfuse trace) in which the collections agent called the LLM at least once. Counted per session by `n_agent_messages`. This is the denominator for "per message" metrics.
+- **Collections-agent cost** → USD cost of the collections-agent LLM calls only (`total_collections_agent_cost`), excluding host-side moderator + answer-processor LLM cost. `total_llm_cost` is the all-in session LLM cost (agent + host-side).
+- **Timeout** → a message whose collections-agent-input observation was recorded with `level = 'ERROR'` (the agent exceeded its time budget, ~90s). Session flag: `flag_session_had_timeout = 1`.
 
 ## Tables
 
@@ -68,6 +75,7 @@ Not all sessions reach negotiation. Many resolve via debt visualization, payment
 | Pre-joined wide table: sessions + V2/V3+-unified business signals + V3+-only MCP signals + messages + user wallet context and 2-day post-session recovery | `dw_collection_ai_agents.fact_ai_agents_interaction` (`f`) — analytical OBT, **default starting point**. Already filters `flag_session_with_trace = TRUE`. |
 | Granular V2 milestones plus versioned-input and ReactPlanner detection at session grain | `datalake_ai_collections_quintoandar.observation` (`o`) — one row per Langfuse session. JOIN via `o.id_langfuse_session = s.id_external`; use `flag_collections_agent_input` and `collections_agent_version` for generic version detection. |
 | Granular V3+ MCP activity (per-tool call/error counts like `n_financial_context_calls`, `n_create_negotiation_errors`, contract-level negotiation breakdowns) at session grain | `datalake_ai_collections_quintoandar.matthew_mcp_observations` (`mo`) — one row per Langfuse session with MCP activity. JOIN via `mo.id_langfuse_session = s.id_external`. |
+| Per-session LLM model, cost, latency and call-volume counters (for comparing Matthew across LLM models) | `datalake_ai_collections_quintoandar.matthew_llm_metrics` (`llm`) — one row per Langfuse session. Already joined into `fact_ai_agents_interaction` (columns `matthew_model`, `n_agent_messages`, `n_llm_calls`, `total_llm_cost`, `total_collections_agent_cost`, `total_message_latency_sum`, `collections_agent_latency_sum`, `collections_agent_llm_latency_sum`, `flag_session_had_timeout`) — **prefer the fact**. JOIN standalone via `llm.id_langfuse_session = s.id_external`. |
 | Individual V3+ MCP tool requests and their downstream service calls (debugging grain) | `datalake_ai_collections_quintoandar.mcp_tool_logs` — one row per downstream service call inside an MCP tool request. Engineering-oriented; prefer the session-grain tables for analytics. |
 | Full agglutinated conversation text per session for LLM analysis or regex theme filtering (e.g. `boleto`, `IR`) | `datalake_ai_collections_quintoandar.messages` (`m`) — one row per Matthew session. JOIN via `m.id_sauron_session = s.id_sauron_session`. Includes both `'Matthew in Whatsapp'` and `'Matthew in Chat'` only. |
 | User wallet snapshot at any reference date (delay, overdue amount, active/ended contract counts) | `dw_collection_ai_agents.fact_user_wallet_timeline` (`fuwt`) — daily user-grain snapshot. Used to enrich Matthew sessions with delinquency context. |
@@ -82,6 +90,15 @@ Not all sessions reach negotiation. Many resolve via debt visualization, payment
 - **`ai_agent_source` (observation-based) vs `ai_agent_source_legacy` (score-based)**: the **observation-based** `ai_agent_source` is the **correct, deterministic** view. Use it for current metrics. The score-based `ai_agent_source_legacy` is non-deterministic, suffers from incomplete eval coverage, and **does not encode V3 or later versions**, but is the **only** way to reproduce historical escalation rate / volume metrics that pre-date the observation logic — use it explicitly for back-comparable trends.
 - **`is_matthew_in_session` is observation-only and strictly narrower than `ai_agent_source`**: historical `bot = 'matthew'` (WhatsApp) sessions without recorded traces can have `ai_agent_source = 'Matthew in Whatsapp'` and `is_matthew_in_session = FALSE` simultaneously. For the canonical "Matthew was involved" question use `ai_agent_source <> 'Wall-e'`.
 - **`messages` only includes Matthew sessions** (`ai_agent_source IN ('Matthew in Chat', 'Matthew in Whatsapp')` with trace) — do not assume it covers Wall-E-only sessions.
+- **LLM cost/latency are stored as ADDITIVE COUNTERS, not averages — compute every average as `SUM(numerator) / SUM(denominator)`, never `AVG(...)` of a per-session average.** `matthew_llm_metrics` / `fact_ai_agents_interaction` deliberately expose only sums and counts (`n_agent_messages`, `n_llm_calls`, `total_llm_cost`, `total_collections_agent_cost`, `total_message_latency_sum`, `collections_agent_latency_sum`, `collections_agent_llm_latency_sum`) precisely so that averaging across a group of sessions is correct. Every headline average is derivable:
+  - **avg LLM calls per message** = `SUM(n_llm_calls) / SUM(n_agent_messages)`
+  - **avg collections-agent cost per message** = `SUM(total_collections_agent_cost) / SUM(n_agent_messages)`
+  - **avg collections-agent cost per LLM call** = `SUM(total_collections_agent_cost) / SUM(n_llm_calls)`
+  - **avg total latency per message** (s) = `SUM(total_message_latency_sum) / SUM(n_agent_messages)`
+  - **avg collections-agent latency per message** (s) = `SUM(collections_agent_latency_sum) / SUM(n_agent_messages)`
+  - **avg collections-agent latency per LLM call** (s) = `SUM(collections_agent_llm_latency_sum) / SUM(n_llm_calls)`
+  - **timeout rate** = `AVG(flag_session_had_timeout)` (this one is a per-session 0/1 flag, so a plain average over sessions is correct).
+  Always wrap the denominators with `NULLIF(..., 0)`. Latency numerators are scoped to **agent messages** (turns where the collections agent ran), matching the `n_agent_messages` denominator.
 - **Always include `id_external`** (Langfuse session ID) in analytical exports; engineering uses it to drill into specific traces.
 
 ## Key Metrics
@@ -98,6 +115,7 @@ Not all sessions reach negotiation. Many resolve via debt visualization, payment
 - **Agent-version comparison** — group any version-agnostic metric by `matthew_version`. Use the 2026-05-15 to 2026-05-25 experiment context for historical V2-vs-V3 analysis and the relevant V4 test window for V3-vs-V4 analysis. Avoid V3+-only MCP detail columns when one side is V2.
 - **Data-quality cross-checks (V3+)** — `flag_empty_invoices_mismatch` (agent saw only empty invoices but the wallet snapshot has invoices) and `flag_no_contracts_mismatch` (agent concluded "no contracts" but the wallet shows contracts). High rates signal data-acquisition problems on the agent side.
 - **In-domain coverage** — share of escalations where the conversation is genuinely within Matthew's scope (Pillars B and C) vs out-of-scope (NON_TENANT_PROFILE, CREDIT_GUARANTEE, CONTRACT_TERMINATION, REIMBURSEMENT_*, NON_RECURRING_FINANCE, SERVICE_BILLS, PROPERTY_OPERATIONS, CONTRACT_CHANGES). Requires LLM-based classification on `full_conversation`.
+- **LLM cost / latency / efficiency by model** — compare `matthew_model` groups using the additive counters, always as `SUM(numerator)/SUM(denominator)` (see the averages rule under Critical rules): avg LLM calls per message, cost per message, cost per LLM call, latency per message (total and collections-agent), latency per LLM call, and timeout rate. Also useful in absolute terms: `SUM(total_llm_cost)` (all-in spend) and `SUM(total_collections_agent_cost)` (agent-only spend) per model. See Golden Query 6.
 
 ### Escalation analysis pillars
 
@@ -143,7 +161,7 @@ When investigating escalations, decompose hierarchically:
 
 - `datalake_langfuse_clean.traces.id_session = s.id_external`.
 - `datalake_langfuse_clean.observations.id_trace = traces.id_trace`.
-- `datalake_ai_collections_quintoandar.observation` (V2 signals plus generic version detection) and `datalake_ai_collections_quintoandar.matthew_mcp_observations` (V3+ MCP signals) already aggregate the relevant Matthew activity per session — prefer them over raw Langfuse tables for session-grain analysis. Both join via `id_langfuse_session = s.id_external`.
+- `datalake_ai_collections_quintoandar.observation` (V2 signals plus generic version detection), `datalake_ai_collections_quintoandar.matthew_mcp_observations` (V3+ MCP signals) and `datalake_ai_collections_quintoandar.matthew_llm_metrics` (LLM model / cost / latency / call counters) already aggregate the relevant Matthew activity per session — prefer them over raw Langfuse tables for session-grain analysis. All join via `id_langfuse_session = s.id_external`. `matthew_llm_metrics` cost/latency come from the observation `GENERATION` rows (`cost_details.total`, `latency`), since trace-level `total_cost`/`latency` are not populated.
 
 ## Dos and Don'ts
 
@@ -157,6 +175,7 @@ When investigating escalations, decompose hierarchically:
 - For outbound analyses (WhatsApp only), filter `is_notification_reply = 1` and use `notif_text_extracted` / `notif_template_extracted` to attribute the campaign.
 - For thematic conversation breakdowns (e.g. boleto, IR, alegação), apply `LOWER(full_conversation) LIKE '%term%'` regex on `datalake_ai_collections_quintoandar.messages` or on the OBT.
 - For Pillar A escalation analysis, combine the three data-failure flags with OR (`flag_fetch_financial_data_error = 1 OR flag_empty_invoices_mismatch = 1 OR flag_no_contracts_mismatch = 1`).
+- For LLM cost/latency/efficiency comparisons, group by `matthew_model` (the LLM) and compute every average as `SUM(numerator)/SUM(denominator)` from the additive counters (see Golden Query 6).
 
 **Don't:**
 - Don't analyse Matthew sessions on `bot = 'matthew'` alone — that excludes Matthew running inside Wall-E (`'Matthew in Chat'`). Use `ai_agent_source <> 'Wall-e'` instead.
@@ -169,6 +188,8 @@ When investigating escalations, decompose hierarchically:
 - Don't use `matthew_version` as a filter for "Matthew was involved" — it is observation-derived only and excludes WhatsApp-without-traces sessions (NULL version). Use `ai_agent_source <> 'Wall-e'`.
 - Don't assume `messages.full_conversation` is available for Wall-E-only sessions — `messages` is filtered to `ai_agent_source IN ('Matthew in Chat', 'Matthew in Whatsapp')` only.
 - Don't try to explain Pillars B and C from observations alone — they require LLM analysis on `full_conversation` against the out-of-scope category list.
+- Don't average the LLM cost/latency metrics as `AVG(per_session_value)` — the tables store additive counters exactly so you compute `SUM(numerator)/SUM(denominator)`; averaging pre-averaged per-session values biases the result. (The only plain average is `timeout_rate = AVG(flag_session_had_timeout)`, a per-session 0/1 flag.)
+- Don't use `matthew_version` as the model-comparison dimension for cost/latency — that is the architecture generation. Use `matthew_model` (the LLM). A single version can run different models (e.g. V4 model tests).
 
 ## Golden Queries
 
@@ -298,6 +319,37 @@ WHERE matthew_version IN ('V2', 'V3', 'V4')
   AND dt_session_created < DATE '{end_date}'
 GROUP BY 1
 ORDER BY 1
+```
+
+### Query 6 — LLM cost / latency / efficiency by model
+
+Compares Matthew across LLM models using the additive counters. **Every average is `SUM(numerator)/SUM(denominator)`** so the comparison stays correct across the whole group of sessions (never `AVG` of a per-session average). Group by `matthew_model`; add `matthew_version` if you also want to separate architecture generations.
+
+```sql
+SELECT
+    matthew_model,
+    COUNT(DISTINCT id_session) AS n_sessions,
+    SUM(n_agent_messages) AS n_agent_messages,
+    SUM(n_llm_calls) AS n_llm_calls,
+    -- efficiency
+    CAST(SUM(n_llm_calls) AS DOUBLE) / NULLIF(SUM(n_agent_messages), 0) AS avg_llm_calls_per_message,
+    -- cost (USD)
+    SUM(total_llm_cost) AS total_llm_cost,
+    SUM(total_collections_agent_cost) AS total_collections_agent_cost,
+    SUM(total_collections_agent_cost) / NULLIF(SUM(n_agent_messages), 0) AS avg_collections_agent_cost_per_message,
+    SUM(total_collections_agent_cost) / NULLIF(SUM(n_llm_calls), 0) AS avg_collections_agent_cost_per_llm_call,
+    -- latency (seconds)
+    SUM(total_message_latency_sum) / NULLIF(SUM(n_agent_messages), 0) AS avg_total_latency_per_message,
+    SUM(collections_agent_latency_sum) / NULLIF(SUM(n_agent_messages), 0) AS avg_collections_agent_latency_per_message,
+    SUM(collections_agent_llm_latency_sum) / NULLIF(SUM(n_llm_calls), 0) AS avg_collections_agent_latency_per_llm_call,
+    -- reliability
+    AVG(CAST(flag_session_had_timeout AS DOUBLE)) AS timeout_rate
+FROM dw_collection_ai_agents.fact_ai_agents_interaction
+WHERE matthew_model IS NOT NULL
+  AND dt_session_created >= DATE '{start_date}'
+  AND dt_session_created < DATE '{end_date}'
+GROUP BY 1
+ORDER BY n_sessions DESC
 ```
 
 ## DataHub catalog

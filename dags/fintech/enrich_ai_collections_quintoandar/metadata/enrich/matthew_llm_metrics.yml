@@ -1,0 +1,70 @@
+database_name: datalake_ai_collections_quintoandar
+table_name: matthew_llm_metrics
+description: Per-session LLM cost, latency and call-volume counters for Matthew (collections AI agent) sessions, derived from Langfuse observations. The collections-agent planner (ReactPlanner) is the only place Matthew calls an LLM, so its GENERATION calls define "the Matthew model", cost and latency; host-side calls (moderator, answer processor) are excluded from the collections-agent figures. Stores additive per-session counters (counts and sums). One row per Langfuse session (id_langfuse_session).
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_langfuse_session:
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+    description: "Langfuse session identifier, joining back to enrich_ai_collections_quintoandar.sessions.id_external."
+  matthew_model:
+    lineage:
+      - datalake_langfuse_clean.observations.provided_model_name
+    description: "LLM model used by the collections agent in the session (e.g. openai/gpt-4o-2024-11-20, openai/gpt-5.4-mini-2026-03-17). There is one model per session; the first is taken deterministically. This is the primary dimension for comparing Matthew across models. Distinct from matthew_version (the agent architecture generation V2/V3/V4). NULL when no collections-agent LLM call was recorded."
+  n_agent_messages:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.id_parent_observation
+    description: "Number of messages (Langfuse traces) in the session in which the collections agent called the LLM at least once."
+  n_llm_calls:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.id_parent_observation
+    description: "Total number of collections-agent LLM calls in the session (each CollectionsAgentV<N> - ReactPlanner observation drives exactly one GENERATION)."
+  total_llm_cost:
+    lineage:
+      - datalake_langfuse_clean.observations.cost_details
+    description: "Total cost in USD of all LLM (GENERATION) calls in the session, including host-side calls (moderator guardrail, answer processor) as well as the collections agent. Aggregated from observation GENERATION cost_details.total because trace-level total_cost is not populated."
+  total_collections_agent_cost:
+    lineage:
+      - datalake_langfuse_clean.observations.cost_details
+      - datalake_langfuse_clean.observations.id_parent_observation
+    description: "Total cost in USD of the collections-agent LLM calls in the session (the GENERATION children of CollectionsAgentV<N> - ReactPlanner observations). Excludes host-side moderator and answer-processor LLM cost."
+  total_message_latency_sum:
+    lineage:
+      - datalake_langfuse_clean.observations.latency
+    description: "Sum in seconds of the total message wall-clock latency across the session's agent messages, where a message's total latency is the /v3/messages root span latency (the maximum observation latency in the trace)."
+  collections_agent_latency_sum:
+    lineage:
+      - datalake_langfuse_clean.observations.latency
+    description: "Sum in seconds of the collections-agent total latency across the session's agent messages, where the per-message value is the latency of the CollectionsAgentV<N>Input observation (total time spent inside the collections agent for that message)."
+  collections_agent_llm_latency_sum:
+    lineage:
+      - datalake_langfuse_clean.observations.latency
+      - datalake_langfuse_clean.observations.id_parent_observation
+    description: "Sum in seconds of the collections-agent LLM call latency across the session (sum of the planner GENERATION latencies)."
+  flag_session_had_timeout:
+    lineage:
+      - datalake_langfuse_clean.observations.level
+    description: "1 if any message in the session had its collections-agent-input observation recorded with level = 'ERROR' (a collections-agent timeout), else 0."
+  ts_ref:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Timestamp of the session's latest tracked observation (maximum of observation end/start timestamps). Source of the year/month/day partition columns, exposed as a full timestamp for date filtering and ordering."
+  year:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Table partition calendar year from the maximum of observation end/start timestamps aggregated per Langfuse session."
+  month:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Table partition calendar month from the maximum of observation end/start timestamps aggregated per Langfuse session."
+  day:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Table partition calendar day from the maximum of observation end/start timestamps aggregated per Langfuse session."

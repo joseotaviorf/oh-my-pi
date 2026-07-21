@@ -32,6 +32,10 @@ workflow:
       merge_on: [id_langfuse_session]
       partitions: [year, month, day]
       z_order_by: [id_langfuse_session]
+    matthew_llm_metrics:
+      merge_on: [id_langfuse_session]
+      partitions: [year, month, day]
+      z_order_by: [id_langfuse_session]
   inner_dependencies:
     sessions:
       - observation

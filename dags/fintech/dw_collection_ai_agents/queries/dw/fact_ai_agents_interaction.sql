@@ -127,6 +127,16 @@ SELECT
         ELSE 0
     END AS flag_no_contracts_mismatch,
     COALESCE(o.has_prorated_rent_error, 0) AS flag_has_prorated_rent,
+    -- LLM model, cost, latency and call-volume counters
+    llm.matthew_model,
+    llm.n_agent_messages,
+    llm.n_llm_calls,
+    llm.total_llm_cost,
+    llm.total_collections_agent_cost,
+    llm.total_message_latency_sum,
+    llm.collections_agent_latency_sum,
+    llm.collections_agent_llm_latency_sum,
+    COALESCE(llm.flag_session_had_timeout, 0) AS flag_session_had_timeout,
     COALESCE(o.is_notification_reply, 0) AS is_notification_reply,
     COALESCE(o.flag_escalation_attempted, 0) AS flag_escalation_attempted,
     o.matthew_declared_escalation_reason,
@@ -162,4 +172,7 @@ LEFT JOIN
 LEFT JOIN
     datalake_ai_collections_quintoandar.messages AS msg
         ON msg.id_external = s.id_external
+LEFT JOIN
+    datalake_ai_collections_quintoandar.matthew_llm_metrics AS llm
+        ON llm.id_langfuse_session = s.id_external
 WHERE s.flag_session_with_trace

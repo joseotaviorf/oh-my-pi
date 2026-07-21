@@ -288,6 +288,42 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_mcp_observations.ts_last_mcp_call
     description: "V3 onward. Timestamp of the latest MCP tool request in the session. NULL for V2 sessions."
+  matthew_model:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.matthew_model
+    description: "LLM model used by the collections agent in the session (e.g. openai/gpt-4o-2024-11-20, openai/gpt-5.4-mini-2026-03-17). One model per session. Primary dimension for comparing Matthew across models. Distinct from matthew_version (agent architecture generation). NULL when no collections-agent LLM call was recorded."
+  n_agent_messages:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.n_agent_messages
+    description: "Number of messages (Langfuse traces) in the session in which the collections agent called the LLM at least once."
+  n_llm_calls:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.n_llm_calls
+    description: "Total number of collections-agent LLM calls in the session."
+  total_llm_cost:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.total_llm_cost
+    description: "Total cost in USD of all LLM calls in the session (collections agent plus host-side moderator and answer processor)."
+  total_collections_agent_cost:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.total_collections_agent_cost
+    description: "Total cost in USD of the collections-agent LLM calls in the session (excludes host-side moderator and answer-processor LLM cost)."
+  total_message_latency_sum:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.total_message_latency_sum
+    description: "Sum in seconds of total message wall-clock latency across the session's agent messages."
+  collections_agent_latency_sum:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.collections_agent_latency_sum
+    description: "Sum in seconds of collections-agent total latency across the session's agent messages (time spent inside the collections agent per message)."
+  collections_agent_llm_latency_sum:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.collections_agent_llm_latency_sum
+    description: "Sum in seconds of collections-agent LLM call latency across the session."
+  flag_session_had_timeout:
+    lineage:
+      - datalake_ai_collections_quintoandar.matthew_llm_metrics.flag_session_had_timeout
+    description: "1 if any message in the session had a collections-agent timeout (collections-agent-input observation with level = 'ERROR'), else 0."
   full_conversation:
     lineage:
       - datalake_ai_collections_quintoandar.messages.full_conversation
