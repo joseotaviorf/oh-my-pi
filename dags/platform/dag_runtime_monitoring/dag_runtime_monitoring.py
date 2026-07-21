@@ -99,12 +99,13 @@ _REAL_RUN_FILTER_DR = (
 _RUNNING_QUERY = text(
     f"""
     WITH running AS (
-        SELECT dag_id, run_id, start_date
-        FROM dag_run
-        WHERE state = 'running'
-          AND start_date IS NOT NULL
-          AND dag_id != :self_dag_id
-          AND {_REAL_RUN_FILTER}
+        SELECT dr.dag_id, dr.run_id, dr.start_date
+        FROM dag_run AS dr
+        INNER JOIN dag AS d ON d.dag_id = dr.dag_id AND d.is_active = TRUE
+        WHERE dr.state = 'running'
+          AND dr.start_date IS NOT NULL
+          AND dr.dag_id != :self_dag_id
+          AND {_REAL_RUN_FILTER_DR}
     )
     SELECT
         r.dag_id,
