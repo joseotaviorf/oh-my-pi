@@ -11,7 +11,7 @@ domain: Fintech
 columns:
   pay_internal_analysts_scope:
     lineage:
-      - datalake_gsheets_raw.feature_matrix.pay_analistas_internos_celula_serfin_em_cx
+      - datalake_gsheets_raw.feature_matrix.pay_analistas_internos_celula_de_serfin_em_cx
     description: Scope flag for Pay internal analysts (SerFin cell in CX) for the feature row.
   pay_bpo_back_scope:
     lineage:

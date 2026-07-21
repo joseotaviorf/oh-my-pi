@@ -1,5 +1,5 @@
 SELECT
-    CAST(pay_analistas_internos_celula_serfin_em_cx AS STRING) AS pay_internal_analysts_scope,
+    CAST(pay_analistas_internos_celula_de_serfin_em_cx AS STRING) AS pay_internal_analysts_scope,
     CAST(pay_bpo_back AS STRING) AS pay_bpo_back_scope,
     CAST(pay_bpo_front AS STRING) AS pay_bpo_front_scope,
     CAST(off_bpo_back AS STRING) AS offboarding_bpo_back_scope,

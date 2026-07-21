@@ -29,10 +29,10 @@ columns:
     lineage:
       - datalake_gsheets_raw.manual_payment.data_de_vencimento
     description: Due date of the utility invoice to be paid manually.
-  cnab_generation_timestamp:
+  payment_record_date:
     lineage:
-      - datalake_gsheets_raw.manual_payment.data_cnab
-    description: Timestamp recorded for CNAB-related processing of the manual payment case.
+      - datalake_gsheets_raw.manual_payment.data
+    description: Date when the manual payment was recorded in the Google Sheets workflow.
   request_id:
     lineage:
       - datalake_gsheets_raw.manual_payment.solicitacao
@@ -49,14 +49,14 @@ columns:
     lineage:
       - datalake_gsheets_raw.manual_payment.ticket_da_tratativa
     description: Support ticket identifier for the manual payment tratativa.
+  botcity_execution_id:
+    lineage:
+      - datalake_gsheets_raw.manual_payment.id_da_botcity
+    description: BotCity RPA execution identifier for the automated manual-payment workflow.
   processing_time_seconds:
     lineage:
       - datalake_gsheets_raw.manual_payment.temp_med_s
     description: Average processing time in seconds recorded for the manual payment workflow.
-  sheet_row_index:
-    lineage:
-      - datalake_gsheets_raw.manual_payment.row
-    description: Row index of the request within the Google Sheets source tab.
   formatted_invoice_value:
     lineage:
       - datalake_gsheets_raw.manual_payment.format_inv_amount
@@ -107,12 +107,32 @@ columns:
     description: Billing charge type applied to the manual payment (tenant, landlord, etc.).
   execution_status:
     lineage:
-      - datalake_gsheets_raw.manual_payment.status
-    description: Processing status of the manual payment request in the Fintech workflow.
+      - datalake_gsheets_raw.manual_payment.status_do_pagamento
+    description: Payment processing status of the manual payment request in the Fintech workflow.
   internal_notes:
     lineage:
       - datalake_gsheets_raw.manual_payment.observacao
     description: Free-text operational notes captured for the manual payment request.
+  accounting_system_log:
+    lineage:
+      - datalake_gsheets_raw.manual_payment.lancamentos_sr_barriga
+    description: Accounting postings log reference from the Sr. Barriga system.
+  barcode_bank_validation_status:
+    lineage:
+      - datalake_gsheets_raw.manual_payment.validacao_banco_do_codigo_de_barras
+    description: Result of the barcode bank-code validation rule applied in the Google Sheet.
+  barcode_length_validation_status:
+    lineage:
+      - datalake_gsheets_raw.manual_payment.validacao_tamanho_do_codigo_de_barras
+    description: Result of the barcode length validation rule applied in the Google Sheet.
+  duplicate_validation_status:
+    lineage:
+      - datalake_gsheets_raw.manual_payment.validacao_duplicidade
+    description: Result of the duplicate-payment validation rule applied in the Google Sheet.
+  final_check_status:
+    lineage:
+      - datalake_gsheets_raw.manual_payment.check_final
+    description: Overall final validation status for the manual payment row in the Google Sheet.
   tenant_charge_start_date:
     lineage:
       - datalake_gsheets_raw.manual_payment.data_de_inicio_da_cobranca_ao_iq
@@ -129,23 +149,3 @@ columns:
     lineage:
       - datalake_gsheets_raw.manual_payment.data_final_da_cobranca_ao_pp
     description: End date of the billing period charged to the landlord (proprietário).
-  accounting_system_log:
-    lineage:
-      - datalake_gsheets_raw.manual_payment.lancamentos_sr_barriga
-    description: Accounting postings log reference from the Sr. Barriga system.
-  cnab_file_id:
-    lineage:
-      - datalake_gsheets_raw.manual_payment.cnab
-    description: CNAB file identifier or reference linked to the manual payment case.
-  botcity_execution_id:
-    lineage:
-      - datalake_gsheets_raw.manual_payment.id_da_botcity
-    description: BotCity RPA execution identifier for the automated manual-payment workflow.
-  suggested_action:
-    lineage:
-      - datalake_gsheets_raw.manual_payment.acao_sugerida
-    description: Suggested operational action for handling the manual payment case.
-  action_justification:
-    lineage:
-      - datalake_gsheets_raw.manual_payment.detalhe_justificativa
-    description: Detail or justification supporting the suggested action.
