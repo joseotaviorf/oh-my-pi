@@ -29,7 +29,7 @@ workflow:
       vacuum_lite: true
       table_properties:
         "delta.enableDeletionVectors": "false"
-    dim_event_definition:
+    dim_termination:
       has_hive_sync: true
       vacuum_retention_hours: 168
       vacuum_lite: true

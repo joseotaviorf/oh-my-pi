@@ -1,18 +1,19 @@
 database_name: dw_employee_details
-table_name: dim_event_definition
+table_name: dim_termination
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
   Lookup dimension for assignment-termination events represented in
   fact_assignment_snapshots. Each row is one currently valid action-reason pair
   that closes an employee or contractor assignment through termination,
-  resignation, death, or global transfer.
+  resignation, transfer, and related closure events.
 
-  action_name and action_name_ptb classify the high-level closure type:
-  voluntary resignation, involuntary termination, death, or global transfer.
-  reason_name and reason_name_ptb provide the detailed cause and may repeat
-  under multiple actions. Do not infer voluntary or involuntary status from
-  reason_name alone; use action_name for that classification.
+  termination_type is the canonical voluntary or involuntary classification.
+  action_name and action_name_ptb (both genuinely bilingual) and reason_name_ptb
+  are detail labels for exit-cause analysis and may repeat under multiple actions;
+  classify voluntary versus involuntary with termination_type, not with the label
+  columns. The reason label is Portuguese-only (reason_name_ptb): PIN does not
+  provide a genuine English reason for termination events.
 
   Join via sk_termination_event_definition from fact_assignment_snapshots.
   Grain: one row per currently valid assignment-termination action-reason pair.
@@ -25,10 +26,10 @@ columns:
       - datalake_people.event_definition.id_event_definition
   action_name:
     description: |
-      High-level assignment-closure classification in the PIN US label set.
-      Use for voluntary versus involuntary versus death versus transfer
-      classification. The same reason_name may appear under more than one
-      action_name.
+      High-level assignment-closure movement label in the PIN US label set
+      (e.g. Termination, Resignation, Global Transfer). Detail label for
+      exit analysis; classify voluntary versus involuntary with termination_type.
+      The same reason_name may appear under more than one action_name.
     lineage:
       - datalake_people.event_definition.action_name
     categories:
@@ -36,53 +37,11 @@ columns:
       "Global Transfer": Assignment closed because the employee moved between company entities; this is not a company exit.
       "Resignation": Employee-initiated voluntary termination.
       "Termination": Company-initiated involuntary termination.
-  reason_name:
-    description: |
-      Detailed termination reason in the PIN US label set. Labels may be in
-      Portuguese or Spanish as provided by PIN, not only English. Use for
-      exit-cause detail after classifying with action_name. Do not infer
-      voluntary or involuntary status from this column alone.
-    lineage:
-      - datalake_people.event_definition.reason_name
-    categories:
-      "Acordo Judicial": Assignment ended through a court-mediated settlement agreement.
-      "Acordo Mútuo": Assignment ended through a mutual agreement between employee and company.
-      "Aposentadoria Por Idade": Assignment ended because the employee retired upon reaching retirement age.
-      "Demissão Sem Justa Causa com Aviso Indenizado": Company-initiated dismissal without cause with notice period paid in lieu.
-      "Demissão Sem Justa Causa com Aviso Trabalhado": Company-initiated dismissal without cause with notice period worked.
-      "Desligamento Benvi PT": PIN-provided classification label; specific business semantics are not defined in source data.
-      "Despido Sin Justa Causa - Preaviso Pago ": Spanish label for dismissal without just cause with notice paid.
-      "Dispensa Ant. do Contrato Determinado (Incl. Jovem Aprendiz)": Company-initiated early termination of a fixed-term contract including young apprentice programs.
-      "Dispensa Ant. do Contrato de Experiência": Company-initiated early termination of a probation or trial contract.
-      "Dispensa por Justa Causa": Company-initiated termination with just cause.
-      "Dridco": PIN-provided classification label; specific business semantics are not defined in source data.
-      "Efetivação Aprendiz": Apprentice converted to a permanent employment relationship as part of assignment closure.
-      "Efetivação EOR": Assignment closed due to employer-of-record conversion.
-      "Efetivação Estágio": Intern converted to a permanent employment relationship as part of assignment closure.
-      "Falecimento": Assignment ended due to employee death.
-      "Fin del contrato de duración determinada": Spanish label for natural end of a fixed-duration contract.
-      "Go Live - Internacionalização": Assignment closed as part of internationalization go-live transition.
-      "Internal Recruitment": Employee moved internally; assignment closed in favor of a new internal role.
-      "Movimentação Internacional": Assignment closed due to international mobility or expatriation.
-      "Pedido Ant. do Contrato Determinado": Employee-initiated early termination of a fixed-term contract.
-      "Pedido Ant. do Contrato de Experiência": Employee-initiated early termination of a probation or trial contract.
-      "Pedido Ant. do Contrato de Jovem Aprendiz": Employee-initiated early termination of a young apprentice contract.
-      "Pedido com Aviso Trabalhado": Employee-initiated resignation with notice period worked.
-      "Pedido com desconto do Aviso Trabalhado": Employee-initiated resignation with notice-period discount applied.
-      "Pedido com dispensa do Aviso Trabalhado": Employee-initiated resignation with notice period waived.
-      "Reorganization": Assignment closed due to organizational restructuring.
-      "Repatriado": Employee repatriated from an international assignment.
-      "Rescisão do Contrato de Estágio": Internship contract terminated.
-      "Terminación Con Causa Justa": Spanish label for termination with just cause.
-      "Terminación Sin Justa Causa": Spanish label for termination without just cause.
-      "Término do Contrato Determinado (Incl. Jovem Aprendiz)": Natural end of a fixed-term contract including young apprentice programs.
-      "Término do Contrato Experiência": Natural end of a probation or trial contract.
-      "vago": PIN-provided placeholder classification; no specific reason label was supplied in source data.
   action_name_ptb:
     description: |
-      High-level assignment-closure classification in Portuguese. Prefer for
-      local HR reports. Use action_name_ptb, not reason_name_ptb, for
-      voluntary versus involuntary classification.
+      High-level assignment-closure movement label in Portuguese. Prefer for
+      local HR reports as a detail label; classify voluntary versus involuntary
+      with termination_type.
     lineage:
       - datalake_people.event_definition.action_name_ptb
     categories:
@@ -94,7 +53,8 @@ columns:
     description: |
       Detailed termination reason in Portuguese. Prefer for local turnover and
       exit analysis. May repeat under multiple action_name_ptb values. Do not
-      infer voluntary or involuntary status from this column alone.
+      infer voluntary or involuntary status from this column alone; use
+      termination_type.
     lineage:
       - datalake_people.event_definition.reason_name_ptb
     categories:
@@ -131,5 +91,18 @@ columns:
       "Término do Contrato Determinado (Incl. Jovem Aprendiz)": Término natural de contrato por prazo determinado, incluindo jovem aprendiz.
       "Término do Contrato Experiência": Término natural de contrato de experiência.
       "vago": Classificação placeholder fornecida pelo PIN; nenhum motivo específico foi informado na origem.
+  termination_type:
+    description: |
+      Voluntary or involuntary classification of this event definition, derived
+      from the action alone (not the reason). Use it to label which action_name
+      values are voluntary versus involuntary. NULL for global transfers and
+      expatriate movements. Note: fact_assignment_snapshots.termination_type may
+      additionally be 'pending' for real exits whose closing event is unmapped —
+      that assignment-level resolution does not exist at this catalog grain.
+    lineage:
+      - datalake_people.event_definition.termination_type
+    categories:
+      "voluntary": Employee-initiated exit (Resignation action).
+      "involuntary": Company-initiated exit.
   ts_load:
     description: ETL load timestamp. For technical use only.

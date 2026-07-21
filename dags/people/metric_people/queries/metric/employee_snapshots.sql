@@ -77,6 +77,7 @@ SELECT
     fas.employment_status AS status,
     ev_term.reason_name_ptb AS termination_reason_name,
     ev_term.action_name_ptb AS termination_category,
+    fas.termination_type,
     mh.manager_assignment_number,
     man_emp.name AS manager_name,
     man_emp.work_email AS manager_work_email,
@@ -299,9 +300,6 @@ SELECT
     fas.is_transfer_termination,
     fas.is_effectivation_hire,
     fas.is_effectivation_termination,
-    fas.is_turnover_new_hire,
-    fas.is_turnover_termination,
-    fas.is_eligible_to_turnover,
     fas.is_primary_assignment_for_snapshot,
     fas.is_current_for_employee AS is_current,
     fas.is_current_for_employee,
@@ -331,7 +329,7 @@ LEFT JOIN
     dw_employee_details.dim_documentation AS doc
         ON doc.sk_documentation_version = fas.sk_documentation_version
 LEFT JOIN
-    dw_employee_details.dim_event_definition AS ev_term
+    dw_employee_details.dim_termination AS ev_term
         ON ev_term.sk_event_definition = fas.sk_termination_event_definition
 LEFT JOIN
     dw_employee_details.dim_management_hierarchy AS mh

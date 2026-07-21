@@ -14,6 +14,13 @@ Organization (`dw_organization`) is the People DW schema for organizational refe
 
 For the full business-facing schema guide, see `dags/people/dw_organization/docs/dw_organization.md`.
 
+## Known Limitations
+
+PIN went live on **2024-03-01**; cost center, business unit, job, and employee-to-organization attributes may be inconsistent before that date because the source system was not yet live.
+
+- For every organizational metric or descriptive statistic — including `MIN`, `MAX`, `AVG`, `SUM`, counts, median, percentiles, rates, distributions, trends, and period comparisons — use only records on or after `2024-03-01`. The requested analysis period must start on or after this date; never mix pre-go-live records into an aggregate.
+- If a question requires any pre-go-live period, explain the PIN source-system limitation and direct the user to **People Insights** or **Enterprise Engineering** instead of approximating the result.
+
 ## TARS pilot scope (restricted audience)
 
 **Status:** pilot — validate in Trino before broader publication. Access is limited to users who already have People analytical authorization.
@@ -75,6 +82,7 @@ For the full business-facing schema guide, see `dags/people/dw_organization/docs
 - `owner_l1_name` / `owner_l2_name` / `owner_l3_name` describe the cost center unit's leadership — all employees in the same cost center share the same L owners, but may have different personal L1/L2/L3 in `dim_management_hierarchy`.
 - Job compensation bands are in `dw_compensation`, not in `dim_job`.
 - When an employee transfers business units, PIN creates a new assignment — do not expect BU changes on the same `assignment_number`.
+- **Data floor: 2024-03-01 (PIN go-live).** All organizational metrics and descriptive statistics (`MIN`, `MAX`, `AVG`, counts, percentiles, rates, distributions, and trends) must use only records from this date forward. See Known Limitations.
 
 ## Key Metrics
 
@@ -110,6 +118,7 @@ For the full business-facing schema guide, see `dags/people/dw_organization/docs
 - Look for salary ranges in `dim_job` — use `dw_compensation`.
 - Assume fixed attributes (`structure`, `brand`, etc.) change independently of the cost center code — they are derived from the code and stable within it.
 - Use deprecated People sources for new queries: `datalake_hr_system`, `datalake_employment`, `greenhouse` (v1), `enrich_employee`, `enrich_hr_system`, `enrich_pin`, or the legacy `dw_employee` DAG — prefer `datalake_pin_core_clean`, `datalake_people`, and `dw_*` schemas (see `people_domain.mdc`).
+- Include records before **2024-03-01** (PIN go-live) in any organizational metric or descriptive statistic, including `MIN`, `MAX`, `AVG`, counts, percentiles, rates, distributions, or trends; see Known Limitations.
 
 ## Golden Queries
 

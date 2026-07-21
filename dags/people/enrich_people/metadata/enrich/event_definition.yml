@@ -6,7 +6,7 @@ description: |
   Catalog of PIN HR action and action-reason (Motivo da ação) pairs with English and Portuguese labels.
   One row per id_action × id_reason.
   Covers every action-reason combination observed in PIN action occurrences, including an unknown-reason sentinel when the action-reason is missing.
-  Supplies event keys and labels for termination and compensation joins; identifier_mapping and compensation_versions look up id_event_definition here, and DW dim_termination_event_definition reads the current termination rows.
+  Supplies event keys and labels for termination and compensation joins; identifier_mapping and compensation_versions look up id_event_definition here, and DW dim_termination reads the current termination rows.
 
 columns:
   id_event_definition:

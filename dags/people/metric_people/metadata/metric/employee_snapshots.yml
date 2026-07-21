@@ -391,13 +391,23 @@ columns:
     description: Snapshot attribute for termination_reason_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
-      - dw_employee_details.dim_event_definition.reason_name_ptb
+      - dw_employee_details.dim_termination.reason_name_ptb
 
   termination_category:
-    description: Snapshot attribute for termination_category on the employee_snapshots wide metric table.
+    description: Portuguese movement label of the closing event (detail only); classify voluntary versus involuntary with termination_type, not this label.
     dimension: True
     lineage:
-      - dw_employee_details.dim_event_definition.action_name_ptb
+      - dw_employee_details.dim_termination.action_name_ptb
+
+  termination_type:
+    description: Classification of the closing action, constant across the assignment. Voluntary, involuntary, or pending for a real exit; NULL when the assignment is not a company exit (active, internal transfer, expatriate movement, or intern/apprentice effectivation).
+    dimension: True
+    categories:
+      "voluntary": Employee-initiated exit (resignation).
+      "involuntary": Company-initiated exit.
+      "pending": Real company exit awaiting classification; counted in turnover and expected to resolve to voluntary or involuntary.
+    lineage:
+      - dw_employee_details.fact_assignment_snapshots.termination_type
 
   manager_assignment_number:
     description: Snapshot attribute for manager_assignment_number on the employee_snapshots wide metric table.
@@ -953,24 +963,6 @@ columns:
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_effectivation_termination
-
-  is_turnover_new_hire:
-    description: TRUE on the employee's monthly closing snapshot (is_monthly_snapshot_for_employee) in the hire month for genuine company admissions (first hire or rehire) of effective workers, excluding internal transfer-ins and excluding interns and apprentices; intern/apprentice effectivations count (a newly effective employee). FALSE on other monthly snapshots; NULL on non-monthly-snapshot rows. Scoped for the turnover metric. Rehires count as new hires.
-    dimension: True
-    lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_turnover_new_hire
-
-  is_turnover_termination:
-    description: TRUE on the employee's monthly closing snapshot (is_monthly_snapshot_for_employee) in the termination month for real company exits (voluntary, involuntary, or layoff) of effective workers, excluding internal transfers and excluding interns and apprentices; FALSE on other monthly snapshots; NULL on non-monthly-snapshot rows. Scoped for the turnover metric.
-    dimension: True
-    lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_turnover_termination
-
-  is_eligible_to_turnover:
-    description: On the employee's monthly closing snapshot (is_monthly_snapshot_for_employee), TRUE for effective workers who were already in the company this month — the turnover-rate denominator base (excludes interns/apprentices and this month's new hires; includes internal transfer-ins and terminated employees); FALSE otherwise. NULL on non-monthly-snapshot rows.
-    dimension: True
-    lineage:
-      - dw_employee_details.fact_assignment_snapshots.is_eligible_to_turnover
 
   is_primary_assignment_for_snapshot:
     description: Snapshot attribute for is_primary_assignment_for_snapshot on the employee_snapshots wide metric table.

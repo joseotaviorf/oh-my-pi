@@ -133,7 +133,7 @@ employee_access AS (
         he.is_manager,
         he.dt_employee_hired,
         he.dt_terminated,
-        he.termination_category,
+        he.termination_type,
         he.employment_type,
         he.cpf,
         he.country,
@@ -212,12 +212,10 @@ SELECT
     CASE WHEN es.is_manager IS TRUE THEN 1 ELSE 0 END AS fl_lider,
     es.dt_employee_hired AS dt_inicio,
     es.dt_terminated AS dt_desligamento,
-    CASE
-        WHEN es.termination_category IS NULL THEN NULL
-        WHEN LOWER(es.termination_category) LIKE '%involunt%' THEN 'involuntario'
-        WHEN LOWER(es.termination_category) LIKE '%volunt%' THEN 'voluntario'
-        WHEN LOWER(es.termination_category) LIKE '%falec%' THEN 'falecimento'
-        ELSE LOWER(es.termination_category)
+    CASE es.termination_type
+        WHEN 'voluntary' THEN 'voluntario'
+        WHEN 'involuntary' THEN 'involuntario'
+        WHEN 'pending' THEN 'pendente'
     END AS motivo_desligamento,
     CASE LOWER(es.employment_type)
         WHEN 'young apprentice' THEN 'jovem aprendiz'

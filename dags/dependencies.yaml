@@ -4418,8 +4418,8 @@ bietlejuice.metric_people:
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-contact:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-documentation:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-employee:first-run-of-day
-  - bietlejuice.dw_employee_details:load-dw-employee-details-dim-event-definition:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-dim-management-hierarchy:first-run-of-day
+  - bietlejuice.dw_employee_details:load-dw-employee-details-dim-termination:first-run-of-day
   - bietlejuice.dw_employee_details:load-dw-employee-details-fact-assignment-snapshots:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-business-unit:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day

@@ -67,7 +67,7 @@ Closely related employee topics that live in sibling schemas, not in `dw_employe
 | `dim_contact` | Validity window: one record per employee per contact change | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_employee_details.dim_contact,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_employee_details/queries/dw/dim_contact.sql) |
 | `dim_documentation` | Validity window: one record per employee per document period | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_employee_details.dim_documentation,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_employee_details/queries/dw/dim_documentation.sql) |
 | `dim_emergency_contact` | Validity window: one record per emergency contact per employee | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_employee_details.dim_emergency_contact,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_employee_details/queries/dw/dim_emergency_contact.sql) |
-| `dim_event_definition` | Current state: one record per termination reason | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_employee_details.dim_event_definition,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_employee_details/queries/dw/dim_event_definition.sql) |
+| `dim_termination` | Current state: one record per termination reason | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_employee_details.dim_termination,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_employee_details/queries/dw/dim_termination.sql) |
 | `dim_job` | Validity window: one record per job per attribute-change period | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_employee_details.dim_job,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_employee_details/queries/dw/dim_job.sql) |
 | `dim_management_hierarchy` | Validity window: one record per assignment per hierarchy version | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_employee_details.dim_management_hierarchy,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_employee_details/queries/dw/dim_management_hierarchy.sql) |
 | `fact_assignment_snapshots` | Daily snapshot: one record per assignment per calendar day | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_employee_details.fact_assignment_snapshots,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_employee_details/queries/dw/fact_assignment_snapshots.sql) |
@@ -86,7 +86,7 @@ Closely related employee topics that live in sibling schemas, not in `dw_employe
 
 * **Daily workforce history** : `fact_assignment_snapshots` holds one row per assignment per calendar day; it is historical and continuous, not a single latest-version or monthly table. Always apply a date-scope filter to avoid unintended row multiplication.
 * **Org chain depth** : `dim_management_hierarchy` maps up to ten levels (L0 to L9), where L0 is always the CEO. For a given date, every person in the same area shares the same L1: the director, manager, analyst, and intern of a team will all have the same VP in `name_l1`. This makes it straightforward to filter or aggregate by any reporting chain without self-joins.
-* **Termination classification** : `dim_event_definition` stores two levels of termination detail: the action (voluntary or involuntary) and the reason (a finer label describing why). Both are available in English and Portuguese. Link via `sk_termination_event_definition` on the fact.
+* **Termination classification** : the fact carries `termination_type` — the canonical `voluntary` / `involuntary` classification, constant across every snapshot of an assignment and `NULL` while active or for internal transfers, expatriate movements, and unmapped events. `dim_termination` adds detail labels (action and reason) via `sk_termination_event_definition`; use those labels for exit-cause detail, not for the voluntary/involuntary split.
 * **Tenure** : Time at the company is pre-computed on the fact and available in two granularities: `days_employee_tenure` and `months_employee_tenure`. Both are employee-focused — anchored on `dt_employee_hired`, so they are preserved across internal transfers and reset on a genuine rehire. For scenarios where the focus is the current assignment rather than the employee's company history, `days_tenure_in_assignment` measures how long the person has been in their current role. All three are calculated relative to `dt_reference`, so they update automatically as the snapshot advances each day.
 * **Span of control** : `count_direct_report` holds the number of employees who report directly to a person; `count_indirect_report` holds the full count of people below them in the hierarchy. Both are pre-joined on the fact, making it straightforward to identify managers, measure team sizes, or filter for individual contributors without additional aggregations.
 * **Employee country** : `business_unit_country` on `fact_assignment_snapshots` is the main source for an employee's country — the country of the job/business unit the assignment belongs to (e.g. Brazil, Mexico, Portugal). It is distinct from `dim_contact.address_country` (country of residence) and `dim_documentation.birth_country` (country of birth); use those only when the question is explicitly about residence or birth.
@@ -106,10 +106,11 @@ Closely related employee topics that live in sibling schemas, not in `dw_employe
 * **`dim_job` versions can repeat visible attributes** : `sk_job_version` on `dim_job` and on the fact table is the same version key used by `dw_compensation.dim_job`, which also versions on compensation changes (salary table, salary range, targets). Since `dim_job` here excludes those columns, two consecutive versions can show identical title/family/band when only a compensation attribute changed upstream — this preserves the join to the fact and to `dw_compensation.dim_job` and is expected, not a data quality issue.
 * **Hire date semantics** : The fact table exposes two hire dates that serve different purposes. `dt_assignment_started` is the start date of the current assignment; it restarts on both internal transfers and rehires, since each opens a new assignment. `dt_employee_hired` is the hire date of the employee's current continuous employment cycle; it stays the same across internal transfers but resets on a genuine rehire — use it for company tenure. The flag `is_transfer_hire` indicates that the current contract began as the incoming side of a transfer from a previous one, meaning the person was already at the company before this assignment started.
 * **Internal transfers are not exits** : When a person moves between legal entities, the old assignment is closed by a Global Transfer event and a new assignment starts the next day. These closed assignments carry `is_transfer_termination = TRUE` and remain `is_active = TRUE` on the transfer date, so daily headcount does not dip on batch transfer dates. The incoming assignment carries `is_transfer_hire = TRUE`. Transfers are neither an exit nor an admission, so they are excluded from both sides.
-* **Ready-made turnover flags** : Two convenience flags encode the turnover business rules so analysts do not have to reassemble them. `is_turnover_termination = TRUE` marks real company exits (voluntary, involuntary, or layoff) by **effective workers** — it already excludes internal transfers and interns/apprentices, so prefer it over checking `sk_termination_event_definition` (which is also populated for transfers). `is_turnover_new_hire = TRUE` marks genuine company admissions (first hires and rehires) by **effective workers**, excluding the incoming side of transfers and interns/apprentices. Rehires and intern/apprentice effectivations count as new hires (a newly effective employee); transfers do not. Both are scoped to the employee's monthly closing snapshot (`is_monthly_snapshot_for_employee`) in the event month — one row per hire/leaver per month, and `NULL` on all other rows — so counting is a direct `COUNT(DISTINCT person_number)` per month with no extra snapshot filter.
-* **Effective workforce and turnover base** : `is_effective_worker = TRUE` marks permanent/effective employees (CLT) and is `FALSE` for interns (Estagiário) and young apprentices (Jovem Aprendiz), based on the job effective on `dt_reference`. An intern or apprentice who converts to an effective role does so under a new assignment, which carries `is_effective_worker = TRUE` (a given assignment's flag value does not change). `is_eligible_to_turnover = TRUE` is the ready-made turnover-rate denominator base: effective workers already in the company this month — interns/apprentices and this month's new hires excluded, while internal transfer-ins and terminated employees are included. Compute a turnover rate as leavers (`is_turnover_termination`) over the `is_eligible_to_turnover` base, deduped to employee grain (`is_monthly_snapshot_for_employee` or `is_primary_assignment_for_snapshot`).
-* **Intern/apprentice effectivation** : When an intern (Estagiário) or young apprentice (Jovem Aprendiz) is effectivated (converted to a permanent CLT role), PIN records it as the intern/apprentice assignment terminating and a new effective assignment starting — not a Global Transfer. `is_effectivation_hire = TRUE` marks the incoming effective assignment and `is_effectivation_termination = TRUE` marks the closed intern/apprentice assignment. Unlike a transfer (where the person was already an effective employee), an effectivation brings a **new** person into the effective workforce, so `is_effectivation_hire` **counts** as a new hire (`is_turnover_new_hire`); the intern-side `is_effectivation_termination` stays outside turnover, since interns are `is_effective_worker = FALSE`.
-* **Counting terminations** : The default way to count terminations is the turnover flag — `is_turnover_termination = TRUE` — which already excludes internal transfers and interns/apprentices. To include interns and apprentices in a termination count, drop the effective-worker restriction but filter out effectivation terminations (`is_effectivation_termination = FALSE`, alongside `is_transfer_termination = FALSE`): the closure of the intern/apprentice assignment in an effectivation is a conversion to a permanent role, not an exit from the company.
+* **Neutral fields, not pre-baked rates** : the fact exposes the building blocks for turnover and attrition — not a pre-computed rate. The official Turnover, New Hire Attrition, and 6/12-month Attrition formulas (numerators, average-headcount vs. cohort denominators, boundary rules, monthly aggregation) live in the TARS metric entity documents under `docs/llm_context/metric_entities/`; follow them for any official number rather than reassembling a rate here. The relevant neutral fields are `termination_type`, `is_reorganization_termination`, `is_effective_worker`, `is_active`, `dt_terminated`, `dt_employee_hired`, and the primary/monthly/current snapshot selectors.
+* **Effective workforce** : `is_effective_worker = TRUE` marks permanent/effective employees (CLT) and is `FALSE` for interns (Estagiário) and young apprentices (Jovem Aprendiz), based on the job effective on `dt_reference`. An intern or apprentice who converts to an effective role does so under a new assignment, which carries `is_effective_worker = TRUE` (a given assignment's flag value does not change). Official turnover and attrition scope to `is_effective_worker = TRUE`.
+* **Reorganization exits** : `is_reorganization_termination = TRUE` only on the terminated snapshots of a reorganization/layoff exit (from the People tracker); it is `FALSE` while the employee is active. Official turnover excludes reorganization exits by default (`is_reorganization_termination = FALSE`).
+* **Intern/apprentice effectivation** : When an intern (Estagiário) or young apprentice (Jovem Aprendiz) is effectivated (converted to a permanent CLT role), PIN records it as the intern/apprentice assignment terminating and a new effective assignment starting — not a Global Transfer. `is_effectivation_hire = TRUE` marks the incoming effective assignment and `is_effectivation_termination = TRUE` marks the closed intern/apprentice assignment. Unlike a transfer (where the person was already an effective employee), an effectivation brings a **new** person into the effective workforce; the intern-side `is_effectivation_termination` is not a real exit, since interns are `is_effective_worker = FALSE`.
+* **Counting terminations** : a real exit is a row with `termination_type IN ('voluntary', 'involuntary')` — this already excludes internal transfers, expatriate movements, and unmapped events (all `NULL`). Add `is_effective_worker = TRUE` and `is_reorganization_termination = FALSE` to match the official turnover universe. To include interns and apprentices in a broader termination count, drop the effective-worker restriction but keep `is_effectivation_termination = FALSE` so intern/apprentice conversions are not counted as exits.
 
 ## How to Use
 
@@ -144,9 +145,10 @@ SELECT
     hier.name_l1                           AS vp_name,
     hier.name_l2                           AS director_name,
     hier.name_l3                           AS manager_name,
-    -- Termination reason (null for active employees)
+    -- Termination classification and detail (null for active employees)
+    fact.termination_type,
     evt.action_name                        AS termination_action,
-    evt.reason_name                        AS termination_reason,
+    evt.reason_name_ptb                    AS termination_reason,
     -- Workforce metrics
     fact.days_employee_tenure,
     fact.is_manager,
@@ -170,7 +172,7 @@ LEFT JOIN
     dw_employee_details.dim_management_hierarchy AS hier
     ON fact.sk_hierarchy_version = hier.sk_hierarchy_version
 LEFT JOIN
-    dw_employee_details.dim_event_definition AS evt
+    dw_employee_details.dim_termination AS evt
     ON fact.sk_termination_event_definition = evt.sk_event_definition
 WHERE
     fact.is_current_for_employee = TRUE
@@ -188,16 +190,15 @@ SELECT
 FROM
     dw_employee_details.fact_assignment_snapshots AS fact
 INNER JOIN
-    dw_employee_details.dim_event_definition AS evt
-    ON fact.sk_termination_event_definition = evt.sk_event_definition
-INNER JOIN
     dw_employee_details.dim_management_hierarchy AS hier
     ON fact.sk_hierarchy_version = hier.sk_hierarchy_version
 WHERE
     fact.is_current_for_assignment = TRUE
     AND NOT fact.is_active
     AND YEAR(fact.dt_terminated) = 2026
-    AND evt.reason_name = '<voluntary_reason_label>'
+    AND fact.termination_type = 'voluntary'
+    AND fact.is_effective_worker = TRUE
+    AND fact.is_reorganization_termination = FALSE
     AND (
         hier.name_l1 ILIKE '%<manager_name>%'
         OR hier.name_l2 ILIKE '%<manager_name>%'
@@ -208,7 +209,7 @@ GROUP BY 1
 ORDER BY 1
 ```
 
-> **Tip:** Replace `<manager_name>` with the manager's name as it appears in `dim_management_hierarchy`. Check `dim_event_definition` to confirm the exact `reason_name` value for voluntary terminations before running in production.
+> **Tip:** Replace `<manager_name>` with the manager's name as it appears in `dim_management_hierarchy`. This example counts terminations, not the official turnover rate — for the rate, follow the metric entity documents under `docs/llm_context/metric_entities/`.
 
 ## Glossary
 
