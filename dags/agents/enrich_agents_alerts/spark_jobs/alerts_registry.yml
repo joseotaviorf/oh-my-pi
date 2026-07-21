@@ -19,7 +19,7 @@ alerts:
       For Rent hubs (TEAM_MANAGEMENT / ACCREDITATION_AND_TEAM_MANAGEMENT) without an
       ENABLED DEMAND_CONVERSION_FR incentive_engine covering the current 2-month cycle.
     channel: "#alerts_incentives_and_payments_1p"
-    cron: "0 12 * * 1"
+    cron: "0 12 * * *"
     threshold: 0
     severity: Error
     id_column: id_business_unit
@@ -90,7 +90,7 @@ alerts:
       For Sale hubs (TEAM_MANAGEMENT / ACCREDITATION_AND_TEAM_MANAGEMENT) without an
       ENABLED DEMAND_CONVERSION_FS incentive_engine covering the current 2-month cycle.
     channel: "#alerts_incentives_and_payments_1p"
-    cron: "0 12 * * 1"
+    cron: "0 12 * * *"
     threshold: 0
     severity: Error
     id_column: id_business_unit
