@@ -32,7 +32,7 @@ steps:
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       dockerfile: .container/Dockerfile
-      target: ci-jdk
+      target: devcontainer
       platforms:
         - linux/amd64
         - linux/arm64
@@ -43,13 +43,13 @@ steps:
       event: pull_request
       path:
         include: &container_dep_paths
-          - '.woodpecker/containers.yml'
-          - '.container/Dockerfile'
-          - 'pyproject.toml'
-          - 'uv.lock'
-          - 'packages/**/pyproject.toml'
-          - 'packages/**/uv.lock'
-          - 'packages/bietlejuice-runtime/hatch_build.py'
+          - ".woodpecker/containers.yml"
+          - ".container/Dockerfile"
+          - "pyproject.toml"
+          - "uv.lock"
+          - "packages/**/pyproject.toml"
+          - "packages/**/uv.lock"
+          - "packages/bietlejuice-runtime/hatch_build.py"
 
   publish-ci-base-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
@@ -64,7 +64,6 @@ steps:
         - prod-ci-base-${CI_COMMIT_SHA:0:7}
       platforms:
         - linux/amd64
-        - linux/arm64
       github_token:
         from_secret: github_token
     when:
@@ -88,7 +87,6 @@ steps:
         - prod-ci-jdk-${CI_COMMIT_SHA:0:7}
       platforms:
         - linux/amd64
-        - linux/arm64
       github_token:
         from_secret: github_token
     when:
@@ -135,21 +133,20 @@ steps:
         - prod-devcontainer-latest
         - prod-devcontainer-${CI_COMMIT_SHA:0:7}
       platforms:
-        - linux/amd64
         - linux/arm64
       github_token:
         from_secret: github_token
     when:
       - path:
           include: &container_devcontainer_paths
-            - '.woodpecker/containers.yml'
-            - '.container/Dockerfile'
-            - '.devcontainer/**'
-            - 'pyproject.toml'
-            - 'uv.lock'
-            - 'packages/**/pyproject.toml'
-            - 'packages/**/uv.lock'
-            - 'packages/bietlejuice-runtime/hatch_build.py'
+            - ".woodpecker/containers.yml"
+            - ".container/Dockerfile"
+            - ".devcontainer/**"
+            - "pyproject.toml"
+            - "uv.lock"
+            - "packages/**/pyproject.toml"
+            - "packages/**/uv.lock"
+            - "packages/bietlejuice-runtime/hatch_build.py"
         branch: [master]
         event: push
       - branch: [master]
