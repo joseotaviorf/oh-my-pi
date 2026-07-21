@@ -26,4 +26,6 @@ workflow:
     tickets_contract: {}
     cases_perspective: {}
     backlog_metrics_salesforce: {}
+    satisfaction_salesforce: {}
+
 

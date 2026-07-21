@@ -90,3 +90,8 @@ workflow:
     twilio_spoc:
       partitions: [year, month, day]
       extraction_type: full
+    satisfaction_salesforce:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [sk_answer_csat]
+      z_order_by: [sk_answer_csat]
