@@ -97,7 +97,7 @@ legacy_business_contexts AS (
         AND bc.is_last_update_by_date IS TRUE
         AND (
             new.id_agent_data IS NULL
-            OR bc.ts_revision_started < new.ts_revision_started
+            OR DATE(bc.ts_revision_started) < DATE(new.ts_revision_started)
         )
 ),
 business_contexts AS (
