@@ -27,7 +27,6 @@ dag_runtime_monitoring:
     - bietlejuice.dw_offboarding
     - bietlejuice.dw_repairs
     - bietlejuice.dw_listing
-    - bietlejuice.dw_bpo_performance
     - bietlejuice.dw_supply
   # To enable on-call paging, replace `critical_dags: []` above with this list:
   # critical_dags:
