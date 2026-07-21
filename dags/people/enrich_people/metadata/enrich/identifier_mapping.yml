@@ -41,6 +41,15 @@ columns:
       - datalake_pin_core_clean.all_assignments.action_code
       - datalake_pin_core_clean.action_occurrence.id_action
       - datalake_pin_core_clean.action_occurrence.id_action_reason
+  termination_type:
+    description: Classification of the assignment's closing action for turnover after the actual termination date is reached. Voluntary for resignations; involuntary for company-initiated terminations; pending for a real company exit whose closing action is not yet mapped (still counted as an exit, resolves to voluntary/involuntary later). NULL before a scheduled termination or when the assignment is not a company exit — still active, internal transfer, expatriate movement, or intern/apprentice effectivation. Treat any non-NULL value as a completed real exit.
+    categories:
+      "voluntary": Employee-initiated exit (resignation).
+      "involuntary": Company-initiated exit.
+      "pending": Real company exit awaiting classification; counted in turnover and expected to resolve to voluntary or involuntary.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.action_code
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
   employee_tmf_code:
     description: Registration code used to identify the employee in the TMF time-management system.
     lineage:
@@ -139,6 +148,10 @@ columns:
       - datalake_pin_core_clean.all_assignments.assignment_sequence
       - datalake_pin_core_clean.action_occurrence.id_action_reason
       - datalake_pin_core_clean.action_reason_base.action_reason_code
+  is_reorganization_termination:
+    description: True when the assignment is listed in the People layoff/reorganization tracker (assignment-level membership; every tracked row is a reorganization exit). The snapshot and fact tables expose the terminated-only view. Official turnover excludes reorganization exits by default.
+    lineage:
+      - datalake_gsheets_people_clean.layoffs.id_employee
   is_active_pin:
     description: Raw active status from Oracle HCM. On the termination date itself, Oracle still records TRUE; it only flips to FALSE the following day.
     lineage:

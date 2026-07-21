@@ -39,3 +39,41 @@ column_level_validations:
   ts_load:
     is_complete:
       severity_level: Error
+
+  termination_type_action_mapping_is_canonical:
+    custom:
+      # RESIGNATION->voluntary; TERMINATION/DEATH->involuntary; any other action->NULL.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.event_definition
+         WHERE NOT (
+           (action_code = 'RESIGNATION' AND termination_type = 'voluntary')
+           OR (action_code IN ('TERMINATION', 'DEATH') AND termination_type = 'involuntary')
+           OR (action_code NOT IN ('RESIGNATION', 'TERMINATION', 'DEATH') AND termination_type IS NULL)
+         )
+        ) = 0
+      severity_level: Warning
+  assignment_termination_events_are_exhaustively_mapped:
+    custom:
+      # Every assignment-termination event must use one of the five controlled closing
+      # actions; a new/unmapped action means the classification must be extended.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.event_definition
+         WHERE is_assignment_termination_event = TRUE
+           AND action_code NOT IN (
+             'RESIGNATION', 'TERMINATION', 'DEATH', 'GLB_TRANSFER', 'EXPATRIADO'
+           )
+        ) = 0
+      severity_level: Warning
+  assignment_termination_event_labels_are_valid:
+    custom:
+      # Assignment-termination events need non-null action and reason labels
+      # (reason may be the 'Unknown' sentinel, but never NULL).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.event_definition
+         WHERE is_assignment_termination_event = TRUE
+           AND (action_name IS NULL OR reason_name IS NULL)
+        ) = 0
+      severity_level: Warning

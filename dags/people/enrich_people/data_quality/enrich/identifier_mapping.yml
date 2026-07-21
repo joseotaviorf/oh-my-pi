@@ -74,6 +74,9 @@ column_level_validations:
   is_active:
     is_complete:
       severity_level: Warning
+  is_reorganization_termination:
+    is_complete:
+      severity_level: Warning
   dt_employee_hired:
     is_complete:
       severity_level: Warning
@@ -242,6 +245,69 @@ column_level_validations:
              'GLB_TRANSFER',
              'EXPATRIADO'
            )
+        ) = 0
+      severity_level: Warning
+  termination_type_allowed_values:
+    custom:
+      # Structural integrity: termination_type is nullable with only these non-null values.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping
+         WHERE termination_type IS NOT NULL
+           AND termination_type NOT IN ('voluntary', 'involuntary', 'pending')
+        ) = 0
+      severity_level: Warning
+  termination_type_pending_should_be_reclassified:
+    custom:
+      # 'pending' is a counted exit whose closing action is unmapped; flag it so the
+      # source event gets classified. Warning so the metric keeps shipping meanwhile.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping
+         WHERE termination_type = 'pending'
+        ) = 0
+      severity_level: Warning
+  genuine_exit_must_have_termination_type:
+    custom:
+      # Genuine exits (excluding transfer, expatriate, and effectivation closures) must be classified.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping AS im
+         WHERE im.dt_actual_termination IS NOT NULL
+           AND im.dt_actual_termination < CURRENT_DATE
+           AND COALESCE(im.is_transfer_termination, FALSE) = FALSE
+           AND COALESCE(im.is_effectivation_termination, FALSE) = FALSE
+           AND im.termination_type IS NULL
+           AND NOT EXISTS (
+             SELECT 1
+             FROM datalake_people.event_definition AS ed
+             WHERE ed.id_event_definition = im.id_termination_event_definition
+               AND ed.action_code = 'EXPATRIADO'
+           )
+        ) = 0
+      severity_level: Warning
+  genuine_exit_should_have_resolved_reason:
+    custom:
+      # Genuine exits should resolve to a termination event; a null id means the
+      # reason is unavailable and needs source correction. Warning, not blocking.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping
+         WHERE dt_actual_termination IS NOT NULL
+           AND dt_actual_termination < CURRENT_DATE
+           AND COALESCE(is_transfer_termination, FALSE) = FALSE
+           AND COALESCE(is_effectivation_termination, FALSE) = FALSE
+           AND id_termination_event_definition IS NULL
+        ) = 0
+      severity_level: Warning
+  termination_type_requires_termination_date:
+    custom:
+      # A non-null termination_type must belong to an assignment that actually closed.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping
+         WHERE termination_type IS NOT NULL
+           AND dt_actual_termination IS NULL
         ) = 0
       severity_level: Warning
   glb_transfer_missing_continuation:

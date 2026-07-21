@@ -355,6 +355,13 @@ termination_event_definitions AS (
             AND ed.id_reason = COALESCE(ao.id_action_reason, -1)
             AND ed.is_current = TRUE
 ),
+reorganization_assignments AS (
+    -- Every row in the layoffs source is a reorganization exit, so no value filter is needed.
+    SELECT DISTINCT
+        UPPER(TRIM(id_employee)) AS assignment_number_upper
+    FROM
+        datalake_gsheets_people_clean.layoffs
+),
 transfer_hire_assignments AS (
     -- The incoming side of an internal transfer: the assignment opened at assignment_sequence + 1
     -- after an assignment whose primary termination event is a GLB_TRANSFER — the same definition
@@ -434,6 +441,7 @@ SELECT
     tha.id_assignment IS NOT NULL AS is_transfer_hire,
     eha.id_assignment IS NOT NULL AS is_effectivation_hire,
     eta.id_assignment IS NOT NULL AS is_effectivation_termination,
+    ra.assignment_number_upper IS NOT NULL AS is_reorganization_termination,
     ROW_NUMBER() OVER (
         PARTITION BY
             ca.id_person
@@ -446,6 +454,18 @@ SELECT
     pp.dt_actual_termination,
     pp.dt_notified_termination,
     ted.id_event_definition AS id_termination_event_definition,
+    -- Exit classification: non-exits (active, scheduled, transfer, expatriate, effectivation) stay NULL;
+    -- real exits are voluntary/involuntary, or 'pending' when the closing action is unmapped.
+    CASE
+        WHEN pp.dt_actual_termination IS NULL
+            OR DATE('{load_start_date}') < pp.dt_actual_termination THEN CAST(NULL AS STRING)
+        WHEN eta.id_assignment IS NOT NULL THEN CAST(NULL AS STRING)
+        WHEN ted.action_code = 'GLB_TRANSFER' THEN CAST(NULL AS STRING)
+        WHEN ted.action_code = 'EXPATRIADO' THEN CAST(NULL AS STRING)
+        WHEN ted.action_code = 'RESIGNATION' THEN 'voluntary'
+        WHEN ted.action_code IN ('TERMINATION', 'DEATH') THEN 'involuntary'
+        ELSE 'pending'
+    END AS termination_type,
     NOW() AS ts_load
 FROM
     current_people AS cp
@@ -495,3 +515,6 @@ LEFT JOIN
 LEFT JOIN
     effectivation_termination_assignments AS eta
         ON eta.id_assignment = ca.id_assignment
+LEFT JOIN
+    reorganization_assignments AS ra
+        ON ra.assignment_number_upper = UPPER(ca.assignment_number)

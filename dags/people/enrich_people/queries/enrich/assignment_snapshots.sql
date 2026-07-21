@@ -275,24 +275,15 @@ assignment_snapshots_ranked AS (
         COALESCE(im.is_transfer_termination, FALSE) AS is_transfer_termination,
         COALESCE(im.is_effectivation_hire, FALSE) AS is_effectivation_hire,
         COALESCE(im.is_effectivation_termination, FALSE) AS is_effectivation_termination,
-        NOT COALESCE(im.is_transfer_hire, FALSE)
-            AND COALESCE(jwst.is_effective_worker, TRUE)
-            AND LAST_DAY(ad.dt_reference) = LAST_DAY(ad.dt_started)
-        AS is_new_hire,
-        ad.dt_terminated IS NOT NULL
-            AND NOT COALESCE(im.is_transfer_termination, FALSE)
-            AND COALESCE(jwst.is_effective_worker, TRUE)
-            AND LAST_DAY(ad.dt_reference) = LAST_DAY(ad.dt_terminated)
-            AND ad.dt_reference >= ad.dt_terminated
-        AS is_turnover,
-        ad.is_latest_date,
-        COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
         CASE
             WHEN ad.dt_terminated IS NOT NULL
-                AND ad.dt_reference >= ad.dt_terminated
-                AND lo.id_employee IS NOT NULL THEN TRUE
-            ELSE NULL
-        END AS is_reorganization_termination,
+                AND ad.dt_reference >= ad.dt_terminated THEN im.termination_type
+        END AS termination_type,
+        ad.is_latest_date,
+        COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
+        COALESCE(im.is_reorganization_termination, FALSE)
+            AND ad.dt_terminated IS NOT NULL
+            AND ad.dt_reference >= ad.dt_terminated AS is_reorganization_termination,
         (
             LAST_DAY(ad.dt_reference) = ad.dt_reference
             OR ad.is_latest_date
@@ -361,9 +352,6 @@ assignment_snapshots_ranked AS (
         primary_assignment_per_person_day AS pap
             ON pap.id_person = ad.id_person
             AND pap.dt_reference = ad.dt_reference
-    LEFT JOIN
-        datalake_gsheets_people_clean.layoffs AS lo
-            ON ad.assignment_number = UPPER(lo.id_employee)
     LEFT JOIN
         datalake_people.compensation_versions AS cv
             ON cv.assignment_number = ad.assignment_number
@@ -493,15 +481,7 @@ SELECT
     asr.is_transfer_termination,
     asr.is_effectivation_hire,
     asr.is_effectivation_termination,
-    CASE
-        WHEN msfe.id_assignment IS NOT NULL THEN asr.is_new_hire
-    END AS is_turnover_new_hire,
-    CASE
-        WHEN msfe.id_assignment IS NOT NULL THEN asr.is_turnover
-    END AS is_turnover_termination,
-    CASE
-        WHEN msfe.id_assignment IS NOT NULL THEN asr.is_effective_worker AND NOT asr.is_new_hire
-    END AS is_eligible_to_turnover,
+    asr.termination_type,
     asr.is_latest_date,
     asr.is_primary_assignment_for_snapshot,
     asr.is_reorganization_termination,

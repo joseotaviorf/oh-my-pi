@@ -105,6 +105,10 @@ deduplicated AS (
         END AS reason_name_ptb,
         at_ptb.description AS action_description_ptb,
         CASE
+            WHEN ab.action_code = 'RESIGNATION' THEN 'voluntary'
+            WHEN ab.action_code IN ('TERMINATION', 'DEATH') THEN 'involuntary'
+        END AS termination_type,
+        CASE
             WHEN ab.action_code IN (
                 'TERMINATION',
                 'RESIGNATION',
@@ -211,6 +215,7 @@ SELECT
     action_name_ptb,
     reason_name_ptb,
     action_description_ptb,
+    termination_type,
     is_assignment_termination_event,
     is_current,
     dt_valid_from,

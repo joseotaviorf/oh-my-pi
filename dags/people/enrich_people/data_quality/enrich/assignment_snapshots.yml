@@ -139,3 +139,16 @@ column_level_validations:
            AND dt_terminated < CURRENT_DATE()
         ) = 0
       severity_level: Warning
+  termination_type_only_on_terminated_snapshots:
+    custom:
+      # termination_type is exposed only when the assignment has reached its termination date.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.assignment_snapshots
+         WHERE termination_type IS NOT NULL
+           AND (
+             dt_terminated IS NULL
+             OR dt_reference < dt_terminated
+           )
+        ) = 0
+      severity_level: Warning
