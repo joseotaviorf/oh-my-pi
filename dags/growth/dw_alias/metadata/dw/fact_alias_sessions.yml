@@ -29,6 +29,10 @@ columns:
     lineage:
       - datalake_chatbot.sessions.id_sauron_session
     description: Sauron session ID from the chatbot sessions table.
+  broker_name:
+    lineage:
+      - core_brokers.brokers.broker_name
+    description: Display name of the broker agency. Sourced from core_brokers.brokers.
   status:
     lineage:
       - datalake_alias_clean.lead_sessions.status
@@ -137,6 +141,23 @@ columns:
       visit_intention_registered (visit tool returned success), escalated, visit_attempt_failed
       (visit tool called but did not succeed), schedule_visit_agent_called, inventory_searched,
       profile_identified, no_agent.
+  funnel_path:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+    description: |
+      Concatenated string of funnel stages reached in this session, in order.
+      Format: "Start → [Profiling] → [Inventory] → [Recommendations] → [Scheduling]
+               → [Visit attempt] → [Escalation] → <outcome>"
+      Only stages actually reached are included. Square brackets indicate optional nodes.
+      The terminal outcome label is derived directly from funnel_stage_deepest (not
+      recomputed from the has_* flags), so the two columns can never disagree on the
+      deepest stage reached. Only the label differs, using drop-off framing:
+        visit_intention_registered, escalated, visit_attempt_failed,
+        dropped_at_scheduling (= schedule_visit_agent_called), dropped_at_recommendations
+        (= inventory_searched), dropped_at_profiling (= profile_identified), no_agent.
+      Use for grouping sessions by their exact journey in Superset (GROUP BY funnel_path).
+      To get the deepest stage only, use funnel_stage_deepest instead.
   ts_profiling:
     lineage:
       - datalake_langfuse_clean.observations.ts_started

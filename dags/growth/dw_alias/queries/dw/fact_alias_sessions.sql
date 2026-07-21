@@ -52,6 +52,7 @@ SELECT
     COALESCE(cb.sk_broker, -1) AS sk_broker,
     ls.uuid_chat_session AS id_langfuse_session,
     cs.id_sauron_session,
+    cb.broker_name,
     ls.status,
     COALESCE(eb.origin_first, 'UNKNOWN') AS origin_first,
     cs.channel,
@@ -79,6 +80,32 @@ SELECT
     COALESCE(lsa.visit_registered_success, FALSE) AS visit_registered_success,
     COALESCE(lsa.escalation_registered_success, FALSE) AS escalation_registered_success,
     COALESCE(lsa.funnel_stage_deepest, 'no_agent') AS funnel_stage_deepest,
+    CONCAT_WS(' → ',
+        'Start',
+        CASE WHEN COALESCE(lsa.has_profiling, FALSE) THEN 'Profiling' END,
+        CASE WHEN COALESCE(lsa.has_inventory, FALSE) THEN 'Inventory' END,
+        CASE WHEN COALESCE(lsa.has_recommendations, FALSE) THEN 'Recommendations' END,
+        CASE WHEN COALESCE(lsa.has_scheduling, FALSE)
+              OR COALESCE(lsa.has_availability, FALSE)
+             THEN 'Scheduling' END,
+        CASE WHEN COALESCE(lsa.has_visit_registered, FALSE) THEN 'Visit attempt' END,
+        CASE WHEN COALESCE(lsa.has_escalation, FALSE) THEN 'Escalation' END,
+        -- Terminal node is derived from funnel_stage_deepest (not re-derived from the has_*
+        -- flags) so the two columns can never disagree on the deepest stage reached. Only the
+        -- label differs: funnel_stage_deepest names the stage, funnel_path frames non-terminal
+        -- stages as a drop-off. schedule_visit_agent_called/inventory_searched/profile_identified
+        -- map 1:1 to dropped_at_scheduling/dropped_at_recommendations/dropped_at_profiling;
+        -- "inventory_searched" is a legacy name for the recommendations-tool stage upstream.
+        CASE COALESCE(lsa.funnel_stage_deepest, 'no_agent')
+            WHEN 'visit_intention_registered'   THEN 'visit_intention_registered'
+            WHEN 'escalated'                    THEN 'escalated'
+            WHEN 'visit_attempt_failed'         THEN 'visit_attempt_failed'
+            WHEN 'schedule_visit_agent_called'  THEN 'dropped_at_scheduling'
+            WHEN 'inventory_searched'           THEN 'dropped_at_recommendations'
+            WHEN 'profile_identified'           THEN 'dropped_at_profiling'
+            ELSE 'no_agent'
+        END
+    ) AS funnel_path,
     lsa.ts_profiling,
     lsa.ts_inventory,
     lsa.ts_scheduling,
