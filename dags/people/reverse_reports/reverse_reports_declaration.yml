@@ -237,44 +237,44 @@ workflow:
         - "base_pin"
 
     # Former notebook: recencia_cargos_tech (Daily Pipeline) — DBP-1513.
-    # Governance: docs/tech_recencia_cargos_tech_exports.md
-    tech_recencia_cargos_ics_eng:
+    # Governance: docs/tech_job_tenure_exports.md
+    tech_job_tenure_ics_eng:
       extra_spark_job_arguments:
         - "1POpQr6-LYpzO4gDwl5AgVBSZMcwvxLw-3NvJuxv4GLg"
         - "recencia_cargos_ics_eng"
-    tech_recencia_cargos_ics_eng_mirror:
+    tech_job_tenure_ics_eng_mirror:
       extra_spark_job_arguments:
         - "1zMPCPFW9N1Gj8Z6zJ9Sq_6pG1LzcnhoGKjoEb-b0y30"
         - "recencia_cargos_ics_eng"
-    tech_recencia_cargos_ics_prod:
+    tech_job_tenure_ics_prod:
       extra_spark_job_arguments:
         - "1POpQr6-LYpzO4gDwl5AgVBSZMcwvxLw-3NvJuxv4GLg"
         - "recencia_cargos_ics_prod"
-    tech_recencia_cargos_ics_prod_mirror:
+    tech_job_tenure_ics_prod_mirror:
       extra_spark_job_arguments:
         - "1zMPCPFW9N1Gj8Z6zJ9Sq_6pG1LzcnhoGKjoEb-b0y30"
         - "recencia_cargos_ics_prod"
-    tech_ausencias_e_ferias_eng:
+    tech_absences_eng:
       extra_spark_job_arguments:
         - "1POpQr6-LYpzO4gDwl5AgVBSZMcwvxLw-3NvJuxv4GLg"
         - "ausencias_e_ferias"
-    tech_ausencias_e_ferias_eng_mirror:
+    tech_absences_eng_mirror:
       extra_spark_job_arguments:
         - "1zMPCPFW9N1Gj8Z6zJ9Sq_6pG1LzcnhoGKjoEb-b0y30"
         - "ausencias_e_ferias"
-    tech_ausencias_e_ferias_prod:
+    tech_absences_prod:
       extra_spark_job_arguments:
         - "1POpQr6-LYpzO4gDwl5AgVBSZMcwvxLw-3NvJuxv4GLg"
         - "ausencias_e_ferias_prod"
-    tech_ausencias_e_ferias_prod_mirror:
+    tech_absences_prod_mirror:
       extra_spark_job_arguments:
         - "1zMPCPFW9N1Gj8Z6zJ9Sq_6pG1LzcnhoGKjoEb-b0y30"
         - "ausencias_e_ferias_prod"
-    tech_recencia_cargos_tech_hrbps:
+    tech_band_tenure_hrbps:
       extra_spark_job_arguments:
         - "19bXBUPhld6tpfqmxt3OuRcUEvo3zgLh_nsx5pkKH5BY"
         - "tenures - tech"
-    tech_recencia_cargos_other_teams:
+    tech_job_tenure_other_teams:
       extra_spark_job_arguments:
         - "1aMS17Z7YSFhEQT6HiRtvGhFyx9Qxk7_znkdOm1hEYmM"
         - "recencia_cargos_other_verticals"

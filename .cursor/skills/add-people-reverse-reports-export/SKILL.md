@@ -258,6 +258,8 @@ After summary confirmation — [reference.md — Implementation checklist](refer
 
 Run skill **`databricks-emr-sql-lint`** after `.sql` edits.
 
+**Naming:** CTEs, internal aliases, and `table_name` must be English; Portuguese only in final export column aliases — see [reference.md — English identifiers](reference.md#english-identifiers-everywhere-except-sheet-headers).
+
 Ask: **"Implementação concluída. Gerar SQL de validação ou ir direto para o Airflow local (Forno)?"**
 
 ---

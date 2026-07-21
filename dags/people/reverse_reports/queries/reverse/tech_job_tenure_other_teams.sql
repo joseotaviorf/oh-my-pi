@@ -1,12 +1,12 @@
 -- Monthly job-tenure export for other vertical L1 scopes.
 WITH monthly_snapshots AS (
     SELECT
-        es.dt_month_reference AS fechamento,
-        LOWER(es.assignment_number) AS id_colaborador,
-        LOWER(es.name) AS nome,
+        es.dt_month_reference AS dt_month_end,
+        LOWER(es.assignment_number) AS assignment_number,
+        LOWER(es.name) AS employee_name,
         LOWER(es.work_email) AS email,
-        LOWER(es.job_name) AS cargo,
-        LOWER(es.country) AS pais,
+        LOWER(es.job_name) AS job_name,
+        LOWER(es.country) AS country,
         LOWER(es.email_l1) AS l1_e,
         LOWER(es.email_l2) AS l2_e,
         LOWER(es.email_l3) AS l3_e,
@@ -14,8 +14,8 @@ WITH monthly_snapshots AS (
         LOWER(es.email_l5) AS l5_e,
         LOWER(es.email_l6) AS l6_e,
         LOWER(es.email_l7) AS l7_e,
-        es.dt_hired AS data_entrada,
-        es.months_tenure_in_company AS tenure,
+        es.dt_employee_hired AS dt_hired,
+        es.months_employee_tenure AS tenure,
         LOWER(es.status) AS status
     FROM
         metric_people.employee_snapshots AS es
@@ -23,34 +23,34 @@ WITH monthly_snapshots AS (
         es.is_primary_assignment_for_snapshot = TRUE
         AND YEAR(es.dt_month_reference) >= 2025
 ),
-cargo_start_dates AS (
+job_start_dates AS (
     SELECT
-        id_colaborador,
-        cargo,
-        fechamento AS inicio_cargo,
+        assignment_number,
+        job_name,
+        dt_month_end AS role_start_date,
         ROW_NUMBER() OVER (
-            PARTITION BY id_colaborador, cargo
-            ORDER BY fechamento ASC
+            PARTITION BY assignment_number, job_name
+            ORDER BY dt_month_end ASC
         ) AS rn
     FROM
         monthly_snapshots
 ),
-cargo_true_start AS (
+job_true_start AS (
     SELECT
-        id_colaborador,
-        cargo,
-        inicio_cargo
+        assignment_number,
+        job_name,
+        role_start_date
     FROM
-        cargo_start_dates
+        job_start_dates
     WHERE
         rn = 1
 ),
-fotos_2025 AS (
+active_monthly_snapshots AS (
     SELECT
-        id_colaborador,
-        nome,
+        assignment_number,
+        employee_name,
         email,
-        cargo,
+        job_name,
         l1_e,
         l2_e,
         l3_e,
@@ -58,29 +58,29 @@ fotos_2025 AS (
         l5_e,
         l6_e,
         l7_e,
-        data_entrada,
+        dt_hired,
         tenure,
-        fechamento,
-        pais
+        dt_month_end,
+        country
     FROM
         monthly_snapshots
     WHERE
         status = 'active'
 )
 SELECT DISTINCT
-    f.fechamento,
-    f.id_colaborador,
-    f.nome,
+    f.dt_month_end AS fechamento,
+    f.assignment_number AS id_colaborador,
+    f.employee_name AS nome,
     f.email,
-    f.cargo,
-    f.pais,
-    s.inicio_cargo,
+    f.job_name AS cargo,
+    f.country AS pais,
+    s.role_start_date AS inicio_cargo,
     TIMESTAMPDIFF(
         MONTH,
-        DATE_TRUNC('MONTH', s.inicio_cargo),
-        DATE_TRUNC('MONTH', f.fechamento)
+        DATE_TRUNC('MONTH', s.role_start_date),
+        DATE_TRUNC('MONTH', f.dt_month_end)
     ) AS tempo_no_cargo_em_meses,
-    f.data_entrada AS dt_inicio_empresa,
+    f.dt_hired AS dt_inicio_empresa,
     f.tenure,
     f.l1_e,
     f.l2_e,
@@ -93,11 +93,11 @@ SELECT DISTINCT
     MONTH(DATE('{load_start_date}')) AS month,
     DAY(DATE('{load_start_date}')) AS day
 FROM
-    fotos_2025 AS f
+    active_monthly_snapshots AS f
 INNER JOIN
-    cargo_true_start AS s
-        ON f.id_colaborador = s.id_colaborador
-        AND f.cargo = s.cargo
+    job_true_start AS s
+        ON f.assignment_number = s.assignment_number
+        AND f.job_name = s.job_name
 WHERE
     f.l1_e IN (
         'marco.mordehachvili@quintoandar.com.br',
@@ -108,5 +108,5 @@ WHERE
         'jaime.macaya@quintoandar.com'
     )
 ORDER BY
-    f.nome ASC,
-    f.fechamento ASC
+    nome ASC,
+    fechamento ASC

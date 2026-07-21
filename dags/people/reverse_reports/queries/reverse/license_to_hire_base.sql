@@ -1,6 +1,6 @@
 -- License to Hire dashboard base: eligible employees and Degreed pathway completion.
 -- Exception: learning progress comes from enrich `datalake_learning.*` — no `dw_learning` yet (DBP-1736).
-WITH data_atualizacao AS (
+WITH load_timestamp AS (
     SELECT
         MAX(ac.ts_load) AS ts_load_max
     FROM
@@ -9,25 +9,25 @@ WITH data_atualizacao AS (
         ac.id_pathway IN ('QQRXj', 'k4PR7', 'L6Wb7', 'y08qk', 'pRNgy', 'RjgQ5')
         AND ac.learning_object_type = 'Pathway'
 ),
-base_funcionarios AS (
+eligible_employees AS (
     SELECT
-        es.person_number AS matricula,
-        es.name AS nome,
+        es.person_number AS person_number,
+        es.name AS employee_name,
         LOWER(es.work_email) AS email,
-        es.band AS banda,
-        es.job_name AS cargo,
-        es.dt_hired AS dt_inicio,
+        es.band AS band,
+        es.job_name AS job_name,
+        es.dt_employee_hired AS dt_hired,
         CASE
             WHEN es.is_manager IS TRUE THEN 1
             ELSE 0
-        END AS fl_lider,
+        END AS is_leader_flag,
         NULLIF(LOWER(es.vertical), '-1') AS vertical,
-        LOWER(es.manager_work_email) AS email_gestor,
+        LOWER(es.manager_work_email) AS manager_email,
         LOWER(es.hrbp_work_email) AS hrbp,
-        es.manager_name AS gestor,
-        LOWER(es.country) AS pais,
-        NULLIF(LOWER(es.product), '-1') AS marca_produto_dedicado,
-        es.months_tenure_in_company AS idade_empresa,
+        es.manager_name AS manager_name,
+        LOWER(es.country) AS country,
+        NULLIF(LOWER(es.product), '-1') AS dedicated_product_brand,
+        es.months_employee_tenure AS company_tenure_months,
         NULLIF(LOWER(es.structure), '-1') AS structure,
         NULLIF(es.owner_l1_name, '-1') AS l1_cc,
         NULLIF(es.owner_l2_name, '-1') AS l2_cc,
@@ -37,14 +37,14 @@ base_funcionarios AS (
             LOWER(es.cost_center_code),
             ' - ',
             SUBSTRING(LOWER(es.cost_center_name), 10)
-        ) AS centro_de_custo,
+        ) AS cost_center_label,
         CASE
             WHEN es.is_manager IS TRUE
                 OR LOWER(es.job_name) LIKE '%talent%'
                 OR LOWER(es.job_name) LIKE '%hrbp%'
                 THEN 'LIDER'
             ELSE 'IC'
-        END AS perfil_treinamento
+        END AS training_profile
     FROM
         metric_people.employee_snapshots AS es
     WHERE
@@ -57,12 +57,12 @@ base_funcionarios AS (
             OR LOWER(es.job_name) LIKE '%talent%'
         )
         AND (
-            es.months_tenure_in_company >= 5
+            es.months_employee_tenure >= 5
             OR es.is_manager IS TRUE
             OR LOWER(es.job_name) LIKE '%talent%'
         )
 ),
-trilhas_ranqueadas AS (
+ranked_pathways AS (
     SELECT
         im.work_email,
         ac.id_user,
@@ -74,8 +74,6 @@ trilhas_ranqueadas AS (
         MAX(ac.dt_completion) OVER (
             PARTITION BY im.work_email, ac.id_pathway
         ) AS last_completed_date,
-        -- Rank by corporate email (sheet grain), not Degreed id_user: multiple Degreed
-        -- accounts can share one work_email and would otherwise each get ranking = 1.
         ROW_NUMBER() OVER (
             PARTITION BY im.work_email
             ORDER BY
@@ -85,15 +83,15 @@ trilhas_ranqueadas AS (
                 END ASC,
                 ac.dt_completion ASC,
                 ac.pct_completed_required DESC
-        ) AS ranking_prioridade
+        ) AS priority_rank
     FROM
         datalake_learning.all_completions AS ac
     INNER JOIN
         datalake_learning.user_identifier_mapping AS im
             ON im.id_user = ac.id_user
     INNER JOIN
-        base_funcionarios AS f
-            ON f.email = im.work_email
+        eligible_employees AS ee
+            ON ee.email = im.work_email
     WHERE
         im.work_email IS NOT NULL
         AND ac.id_pathway IN ('QQRXj', 'k4PR7', 'L6Wb7', 'y08qk', 'pRNgy', 'RjgQ5')
@@ -103,41 +101,41 @@ trilhas_ranqueadas AS (
             OR ac.dt_completion IS NOT NULL
         )
         AND NOT (
-            f.perfil_treinamento = 'LIDER'
+            ee.training_profile = 'LIDER'
             AND ac.id_pathway IN ('y08qk', 'pRNgy', 'RjgQ5')
         )
 ),
-base_com_valores_default AS (
+employees_with_pathway_defaults AS (
     SELECT
-        f.matricula,
-        f.nome,
-        f.email,
-        f.banda,
-        f.cargo,
-        f.dt_inicio,
-        f.fl_lider,
-        f.vertical,
-        f.email_gestor,
-        f.hrbp,
-        f.gestor,
-        f.pais,
-        f.marca_produto_dedicado,
-        f.idade_empresa,
-        f.structure,
-        f.l1_cc,
-        f.l2_cc,
-        f.l3_cc,
-        f.team,
-        f.centro_de_custo,
-        f.perfil_treinamento,
+        ee.person_number,
+        ee.employee_name,
+        ee.email,
+        ee.band,
+        ee.job_name,
+        ee.dt_hired,
+        ee.is_leader_flag,
+        ee.vertical,
+        ee.manager_email,
+        ee.hrbp,
+        ee.manager_name,
+        ee.country,
+        ee.dedicated_product_brand,
+        ee.company_tenure_months,
+        ee.structure,
+        ee.l1_cc,
+        ee.l2_cc,
+        ee.l3_cc,
+        ee.team,
+        ee.cost_center_label,
+        ee.training_profile,
         COALESCE(
-            t.id_pathway,
+            rp.id_pathway,
             CASE
-                WHEN LOWER(f.pais) IN ('brasil', 'br', 'brazil')
-                    AND f.perfil_treinamento = 'LIDER' THEN 'QQRXj'
-                WHEN LOWER(f.pais) IN ('brasil', 'br', 'brazil')
-                    AND f.perfil_treinamento = 'IC' THEN 'y08qk'
-                WHEN LOWER(f.pais) IN (
+                WHEN LOWER(ee.country) IN ('brasil', 'br', 'brazil')
+                    AND ee.training_profile = 'LIDER' THEN 'QQRXj'
+                WHEN LOWER(ee.country) IN ('brasil', 'br', 'brazil')
+                    AND ee.training_profile = 'IC' THEN 'y08qk'
+                WHEN LOWER(ee.country) IN (
                         'mexico',
                         'méxico',
                         'argentina',
@@ -149,8 +147,8 @@ base_com_valores_default AS (
                         'panama',
                         'ecuador'
                     )
-                    AND f.perfil_treinamento = 'LIDER' THEN 'L6Wb7'
-                WHEN LOWER(f.pais) IN (
+                    AND ee.training_profile = 'LIDER' THEN 'L6Wb7'
+                WHEN LOWER(ee.country) IN (
                         'mexico',
                         'méxico',
                         'argentina',
@@ -162,71 +160,71 @@ base_com_valores_default AS (
                         'panama',
                         'ecuador'
                     )
-                    AND f.perfil_treinamento = 'IC' THEN 'RjgQ5'
-                WHEN LOWER(f.pais) IN ('portugal', 'pt')
-                    AND f.perfil_treinamento = 'LIDER' THEN 'k4PR7'
-                WHEN LOWER(f.pais) IN ('portugal', 'pt')
-                    AND f.perfil_treinamento = 'IC' THEN 'pRNgy'
+                    AND ee.training_profile = 'IC' THEN 'RjgQ5'
+                WHEN LOWER(ee.country) IN ('portugal', 'pt')
+                    AND ee.training_profile = 'LIDER' THEN 'k4PR7'
+                WHEN LOWER(ee.country) IN ('portugal', 'pt')
+                    AND ee.training_profile = 'IC' THEN 'pRNgy'
                 ELSE 'Revisar'
             END
         ) AS id_pathway_final,
-        COALESCE(t.pct_completed_required, 0) AS pct_completed_required_final,
-        t.first_completed_date,
-        t.last_completed_date
+        COALESCE(rp.pct_completed_required, 0) AS pct_completed_required_final,
+        rp.first_completed_date,
+        rp.last_completed_date
     FROM
-        base_funcionarios AS f
+        eligible_employees AS ee
     LEFT JOIN
-        trilhas_ranqueadas AS t
-            ON f.email = t.work_email
-            AND t.ranking_prioridade = 1
+        ranked_pathways AS rp
+            ON ee.email = rp.work_email
+            AND rp.priority_rank = 1
 )
 SELECT
     CASE
-        WHEN bcv.id_pathway_final = 'QQRXj' THEN 'License to hire | Líder de pessoas'
-        WHEN bcv.id_pathway_final = 'y08qk' THEN 'License to hire | Pessoas entrevistadoras'
-        WHEN bcv.id_pathway_final = 'L6Wb7' THEN 'License to hire | Liderazgo'
-        WHEN bcv.id_pathway_final = 'RjgQ5' THEN 'License to hire | Entrevistadores'
-        WHEN bcv.id_pathway_final = 'k4PR7' THEN 'License to Hire | Leaders'
-        WHEN bcv.id_pathway_final = 'pRNgy' THEN 'License to Hire | Interviewers'
+        WHEN ewp.id_pathway_final = 'QQRXj' THEN 'License to hire | Líder de pessoas'
+        WHEN ewp.id_pathway_final = 'y08qk' THEN 'License to hire | Pessoas entrevistadoras'
+        WHEN ewp.id_pathway_final = 'L6Wb7' THEN 'License to hire | Liderazgo'
+        WHEN ewp.id_pathway_final = 'RjgQ5' THEN 'License to hire | Entrevistadores'
+        WHEN ewp.id_pathway_final = 'k4PR7' THEN 'License to Hire | Leaders'
+        WHEN ewp.id_pathway_final = 'pRNgy' THEN 'License to Hire | Interviewers'
         ELSE 'Revisar - Sem Trilha Mapeada'
     END AS titulo_trilha,
-    bcv.id_pathway_final,
+    ewp.id_pathway_final,
     'Internal' AS tipo_trilha,
-    bcv.matricula,
-    bcv.nome,
-    bcv.email,
+    ewp.person_number AS matricula,
+    ewp.employee_name AS nome,
+    ewp.email,
     CONCAT(
-        FORMAT_STRING('%.2f', CAST(bcv.pct_completed_required_final AS DOUBLE)),
+        FORMAT_STRING('%.2f', CAST(ewp.pct_completed_required_final AS DOUBLE)),
         '%'
     ) AS pct_completed_required_final,
     CAST(NULL AS DATE) AS comecou_seguir,
-    DATE_FORMAT(bcv.first_completed_date, 'MM/dd/yyyy') AS first_completed_date,
-    DATE_FORMAT(bcv.last_completed_date, 'MM/dd/yyyy') AS last_completed_date,
-    bcv.banda,
-    bcv.cargo,
-    bcv.dt_inicio,
+    DATE_FORMAT(ewp.first_completed_date, 'MM/dd/yyyy') AS first_completed_date,
+    DATE_FORMAT(ewp.last_completed_date, 'MM/dd/yyyy') AS last_completed_date,
+    ewp.band AS banda,
+    ewp.job_name AS cargo,
+    ewp.dt_hired AS dt_inicio,
     CASE
-        WHEN bcv.perfil_treinamento = 'LIDER' THEN 'L'
+        WHEN ewp.training_profile = 'LIDER' THEN 'L'
         ELSE 'CI'
     END AS perfil_treinamento,
-    bcv.vertical,
-    bcv.email_gestor,
-    bcv.hrbp,
-    bcv.gestor,
-    UPPER(bcv.pais) AS pais,
-    bcv.marca_produto_dedicado,
-    bcv.idade_empresa,
-    bcv.structure,
-    bcv.l1_cc,
-    bcv.l2_cc,
-    bcv.l3_cc,
-    bcv.team,
-    bcv.centro_de_custo,
-    DATE(dt.ts_load_max) AS ts_load,
+    ewp.vertical,
+    ewp.manager_email AS email_gestor,
+    ewp.hrbp,
+    ewp.manager_name AS gestor,
+    UPPER(ewp.country) AS pais,
+    ewp.dedicated_product_brand AS marca_produto_dedicado,
+    ewp.company_tenure_months AS idade_empresa,
+    ewp.structure,
+    ewp.l1_cc,
+    ewp.l2_cc,
+    ewp.l3_cc,
+    ewp.team,
+    ewp.cost_center_label AS centro_de_custo,
+    DATE(lt.ts_load_max) AS ts_load,
     YEAR(DATE('{load_start_date}')) AS year,
     MONTH(DATE('{load_start_date}')) AS month,
     DAY(DATE('{load_start_date}')) AS day
 FROM
-    base_com_valores_default AS bcv
+    employees_with_pathway_defaults AS ewp
 CROSS JOIN
-    data_atualizacao AS dt
+    load_timestamp AS lt

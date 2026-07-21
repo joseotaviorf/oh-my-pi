@@ -1,8 +1,8 @@
--- Approved absences for Rafael Castro L1 roster (Product tab).
-WITH current_rafa_roster AS (
+-- Approved absences for Paulo Golgher L1 roster (Engineering tab).
+WITH current_paulo_roster AS (
     SELECT
         LOWER(es.assignment_number) AS assignment_number,
-        LOWER(es.name) AS nome,
+        LOWER(es.name) AS employee_name,
         LOWER(es.work_email) AS email
     FROM
         metric_people.employee_snapshots AS es
@@ -10,11 +10,11 @@ WITH current_rafa_roster AS (
         es.is_current_for_employee = TRUE
         AND es.is_primary_assignment_for_snapshot = TRUE
         AND LOWER(es.status) = 'active'
-        AND LOWER(es.email_l1) = 'rafael.castro@quintoandar.com.br'
+        AND LOWER(es.email_l1) = 'paulo.golgher@quintoandar.com.br'
 )
 SELECT DISTINCT
     far.assignment_number,
-    ce.nome,
+    ce.employee_name AS nome,
     ce.email,
     CASE
         WHEN dat.absence_type = 'Férias' THEN 'Vacation'
@@ -28,7 +28,7 @@ SELECT DISTINCT
 FROM
     dw_time.fact_absence_requests AS far
 INNER JOIN
-    current_rafa_roster AS ce
+    current_paulo_roster AS ce
         ON LOWER(far.assignment_number) = ce.assignment_number
 LEFT JOIN
     dw_time.dim_absence_type AS dat
@@ -40,5 +40,5 @@ WHERE
         OR far.dt_absence_ended >= DATE '2025-01-01'
     )
 ORDER BY
-    ce.nome ASC,
-    far.dt_absence_started ASC
+    nome ASC,
+    dt_absence_started ASC

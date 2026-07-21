@@ -85,6 +85,28 @@ In `reverse_reports_declaration.yml`, the only comment to add above a migration 
 
 For Oracle flexfield-style PIN headers, consider `column_mapping_mode: name` (see `organization_codex_pin_sync` in declaration).
 
+### English identifiers everywhere except sheet headers
+
+Pipeline SQL under `queries/reverse/` must use **English** for:
+
+- CTE names (`eligible_employees`, not `base_funcionarios`)
+- Internal column aliases in CTEs and intermediate `SELECT`s
+- Metastore `table_name` / SQL file base name (`tech_job_tenure_ics_eng`, not `tech_recencia_cargos_ics_eng`)
+
+**Portuguese is allowed only** in the **outermost** `SELECT` aliases that match the legacy Google Sheets / Looker contract (e.g. `AS fechamento`, `` AS `Número de Pessoa` ``). Map from English internal names at export time:
+
+```sql
+SELECT
+    ms.dt_month_end AS fechamento,
+    ms.employee_name AS nome
+FROM
+    monthly_snapshots AS ms
+```
+
+Do **not** propagate Portuguese names into CTEs, joins, or `GROUP BY` — even when the internal column will later be exported with a Portuguese header.
+
+String literals in `CASE` that mirror sheet values (e.g. `'ativo'`, `'Férias'`) are allowed when required by the contract.
+
 ---
 
 ## Governance narrative (`docs/{table_name}.md`)

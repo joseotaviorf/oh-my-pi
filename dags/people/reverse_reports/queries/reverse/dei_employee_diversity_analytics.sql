@@ -45,10 +45,10 @@ WITH base_rewards AS (
             END
         )
 ),
-base_comites AS (
+committee_by_person AS (
     SELECT
-        f.person_number AS matricula,
-        cm.committee_title AS comite
+        f.person_number AS person_number,
+        cm.committee_title AS committee_title
     FROM
         dw_performance.fact_performance_calibrations AS f
     LEFT JOIN
@@ -60,15 +60,15 @@ base_comites AS (
 snapshot_base AS (
     SELECT
         es.sk_employee,
-        LOWER(es.assignment_number) AS id_colaborador,
-        es.dt_month_reference AS fechamento,
+        LOWER(es.assignment_number) AS assignment_number,
+        es.dt_month_reference AS dt_month_end,
         es.person_number,
-        es.months_tenure_in_company AS tenure,
-        es.band AS banda,
+        es.months_employee_tenure AS tenure,
+        es.band AS band,
         LOWER(es.status) AS status,
-        LOWER(es.country) AS pais,
+        LOWER(es.country) AS country,
         NULLIF(LOWER(es.vertical), '-1') AS vertical,
-        NULLIF(LOWER(es.structure), '-1') AS diretoria,
+        NULLIF(LOWER(es.structure), '-1') AS directorate,
         LOWER(es.email_l1) AS l1_e,
         es.name_l2 AS l2_name,
         LOWER(es.hrbp_work_email) AS hrbp,
@@ -81,7 +81,7 @@ snapshot_base AS (
             WHEN es.is_leadership_team_member = TRUE THEN 'lt'
             ELSE NULL
         END AS fl_lt,
-        COALESCE(es.count_direct_report, 0) AS diretos,
+        COALESCE(es.count_direct_report, 0) AS direct_report_count,
         LOWER(COALESCE(es.ethnicity, '')) AS ethnicity,
         LOWER(COALESCE(es.gender_identity, '')) AS gender_identity,
         LOWER(COALESCE(es.sexual_orientation, '')) AS sexual_orientation,
@@ -101,7 +101,7 @@ snapshot_base AS (
 ),
 l1_index AS (
     SELECT
-        fechamento,
+        dt_month_end,
         l1_e,
         COUNT(*) AS index_count
     FROM
@@ -109,17 +109,17 @@ l1_index AS (
     WHERE
         l1_e IS NOT NULL
     GROUP BY
-        fechamento,
+        dt_month_end,
         l1_e
 ),
-et_names AS (
+executive_team_names AS (
     SELECT
-        fechamento,
+        dt_month_end,
         LOWER(work_email) AS work_email,
-        MAX(name) AS nome
+        MAX(name) AS employee_name
     FROM (
         SELECT
-            es.dt_month_reference AS fechamento,
+            es.dt_month_reference AS dt_month_end,
             es.work_email,
             es.name
         FROM
@@ -130,13 +130,13 @@ et_names AS (
             AND es.dt_month_reference >= DATE('2024-03-31')
     ) AS email_rows
     GROUP BY
-        fechamento,
+        dt_month_end,
         LOWER(work_email)
 ),
 disability_at_snapshot AS (
     SELECT
-        sb.id_colaborador,
-        sb.fechamento,
+        sb.assignment_number,
+        sb.dt_month_end,
         dis.category,
         dis.is_active
     FROM
@@ -145,22 +145,22 @@ disability_at_snapshot AS (
         dw_demographics.dim_employee_disability AS dis
             ON dis.sk_employee = sb.sk_employee
             AND dis.is_primary = TRUE
-            AND sb.fechamento >= dis.dt_valid_from
-            AND sb.fechamento <= dis.dt_valid_to
+            AND sb.dt_month_end >= dis.dt_valid_from
+            AND sb.dt_month_end <= dis.dt_valid_to
 ),
-base_dei AS (
+dei_enriched AS (
     SELECT
-        b.id_colaborador,
-        b.fechamento,
+        b.assignment_number,
+        b.dt_month_end,
         b.tenure,
-        b.banda,
+        b.band,
         b.status,
-        b.pais,
+        b.country,
         b.vertical,
-        b.diretoria,
+        b.directorate,
         CASE
             WHEN b.l1_e = 'rafael.castro@quintoandar.com.br' THEN 'rafael dantas de castro'
-            WHEN l.index_count >= 30 THEN et.nome
+            WHEN l.index_count >= 30 THEN et.employee_name
             ELSE NULL
         END AS ET,
         b.l1_e,
@@ -275,44 +275,44 @@ base_dei AS (
             WHEN d.is_active = TRUE OR b.has_medical_disability_record = TRUE THEN 'PwD'
             ELSE 'Non-PwD'
         END AS PwD,
-        b.diretos,
+        b.direct_report_count,
         b.person_number,
-        MIN(b.fechamento) OVER (PARTITION BY b.person_number) AS data_entrada
+        MIN(b.dt_month_end) OVER (PARTITION BY b.person_number) AS hire_month_end
     FROM
         snapshot_base AS b
     LEFT JOIN
         l1_index AS l
             ON b.l1_e = l.l1_e
-            AND b.fechamento = l.fechamento
+            AND b.dt_month_end = l.dt_month_end
     LEFT JOIN
-        et_names AS et
+        executive_team_names AS et
             ON b.l1_e = et.work_email
-            AND b.fechamento = et.fechamento
+            AND b.dt_month_end = et.dt_month_end
     LEFT JOIN
         disability_at_snapshot AS d
-            ON b.id_colaborador = d.id_colaborador
-            AND b.fechamento = d.fechamento
+            ON b.assignment_number = d.assignment_number
+            AND b.dt_month_end = d.dt_month_end
 ),
-base_with_lag AS (
+dei_with_lag AS (
     SELECT
-        bd.*,
-        LAG(bd.diretos) OVER (
-            PARTITION BY bd.person_number
-            ORDER BY bd.fechamento
-        ) AS prev_diretos
+        de.*,
+        LAG(de.direct_report_count) OVER (
+            PARTITION BY de.person_number
+            ORDER BY de.dt_month_end
+        ) AS prev_direct_report_count
     FROM
-        base_dei AS bd
+        dei_enriched AS de
 ),
-base_dei_ciclo AS (
+dei_with_cycle AS (
     SELECT
-        b.id_colaborador,
-        b.fechamento,
+        b.assignment_number,
+        b.dt_month_end,
         b.tenure,
-        b.banda,
+        b.band,
         b.status,
-        b.pais,
+        b.country,
         b.vertical,
-        b.diretoria,
+        b.directorate,
         b.ET,
         b.l1_e,
         b.L2,
@@ -334,48 +334,48 @@ base_dei_ciclo AS (
         b.URG,
         b.PwD,
         CASE
-            WHEN COALESCE(b.prev_diretos, 0) = 0
-                AND COALESCE(b.diretos, 0) > 0 THEN 1
+            WHEN COALESCE(b.prev_direct_report_count, 0) = 0
+                AND COALESCE(b.direct_report_count, 0) > 0 THEN 1
             ELSE 0
         END AS fl_virou_lider,
         CASE
-            WHEN b.fechamento = b.data_entrada THEN 1
+            WHEN b.dt_month_end = b.hire_month_end THEN 1
             ELSE 0
         END AS fl_new_hire,
         CONCAT(
-            YEAR(b.fechamento),
+            YEAR(b.dt_month_end),
             '/H',
             CASE
-                WHEN MONTH(b.fechamento) <= 6 THEN 1
+                WHEN MONTH(b.dt_month_end) <= 6 THEN 1
                 ELSE 2
             END
         ) AS ciclo,
         b.person_number
     FROM
-        base_with_lag AS b
+        dei_with_lag AS b
 ),
-base_dei_rewards AS (
+dei_with_rewards AS (
     SELECT
         d.*,
         COALESCE(r.fl_promocao, 0) AS fl_promocao,
         COALESCE(r.fl_merito, 0) AS fl_merito
     FROM
-        base_dei_ciclo AS d
+        dei_with_cycle AS d
     LEFT JOIN
         base_rewards AS r
-            ON d.id_colaborador = r.assignment_number
+            ON d.assignment_number = r.assignment_number
             AND d.ciclo = r.ciclo
 ),
-base_dei_final AS (
+dei_aggregated AS (
     SELECT
-        id_colaborador,
-        fechamento,
+        assignment_number,
+        dt_month_end,
         tenure,
-        banda,
+        band,
         status,
-        pais,
+        country,
         vertical,
-        diretoria,
+        directorate,
         ET,
         l1_e,
         L2,
@@ -401,16 +401,16 @@ base_dei_final AS (
         MAX(fl_merito) AS fl_merito,
         COUNT(*) AS qtd
     FROM
-        base_dei_rewards
+        dei_with_rewards
     GROUP BY
-        id_colaborador,
-        fechamento,
+        assignment_number,
+        dt_month_end,
         tenure,
-        banda,
+        band,
         status,
-        pais,
+        country,
         vertical,
-        diretoria,
+        directorate,
         ET,
         l1_e,
         L2,
@@ -434,51 +434,51 @@ base_dei_final AS (
         person_number
 )
 SELECT
-    bf.id_colaborador,
-    bf.fechamento,
-    bf.tenure,
-    bf.banda,
-    bf.status,
-    bf.pais,
-    bf.vertical,
-    bf.diretoria,
-    bf.ET,
-    bf.l1_e,
-    bf.L2,
-    bf.hrbp,
-    bf.email_gestor,
-    bf.pcd_laudo,
-    bf.fl_lider,
-    bf.disability_type,
-    bf.fl_trans,
-    bf.fl_neurodiversity,
-    bf.LT,
-    bf.modo,
-    bf.BIM,
-    bf.WOMEN,
-    bf.LGBT,
-    bf.URG,
-    bf.PwD,
-    bf.fl_virou_lider,
-    bf.fl_new_hire,
-    bf.ciclo,
-    bf.fl_promocao,
-    bf.fl_merito,
-    bf.qtd,
-    com.comite,
+    da.assignment_number AS id_colaborador,
+    da.dt_month_end AS fechamento,
+    da.tenure,
+    da.band AS banda,
+    da.status,
+    da.country AS pais,
+    da.vertical,
+    da.directorate AS diretoria,
+    da.ET,
+    da.l1_e,
+    da.L2,
+    da.hrbp,
+    da.email_gestor,
+    da.pcd_laudo,
+    da.fl_lider,
+    da.disability_type,
+    da.fl_trans,
+    da.fl_neurodiversity,
+    da.LT,
+    da.modo,
+    da.BIM,
+    da.WOMEN,
+    da.LGBT,
+    da.URG,
+    da.PwD,
+    da.fl_virou_lider,
+    da.fl_new_hire,
+    da.ciclo,
+    da.fl_promocao,
+    da.fl_merito,
+    da.qtd,
+    com.committee_title AS comite,
     YEAR(DATE('{load_start_date}')) AS year,
     MONTH(DATE('{load_start_date}')) AS month,
     DAY(DATE('{load_start_date}')) AS day
 FROM
-    base_dei_final AS bf
+    dei_aggregated AS da
 LEFT JOIN
-    base_comites AS com
-        ON bf.person_number = com.matricula
+    committee_by_person AS com
+        ON da.person_number = com.person_number
 ORDER BY
-    bf.fechamento,
-    bf.diretoria,
-    bf.vertical,
-    bf.pais,
-    bf.status,
-    bf.email_gestor,
-    bf.pcd_laudo
+    da.dt_month_end,
+    da.directorate,
+    da.vertical,
+    da.country,
+    da.status,
+    da.email_gestor,
+    da.pcd_laudo

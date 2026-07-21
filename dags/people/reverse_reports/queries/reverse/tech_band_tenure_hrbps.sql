@@ -1,13 +1,13 @@
 -- Current-month band tenure for Tech HRBPs (Paulo + Rafael L1 scopes).
 WITH monthly_snapshots AS (
     SELECT
-        es.dt_month_reference AS fechamento,
+        es.dt_month_reference AS dt_month_end,
         es.person_number,
-        LOWER(es.name) AS nome,
+        LOWER(es.name) AS employee_name,
         LOWER(es.work_email) AS email,
-        LOWER(es.job_name) AS cargo,
-        LOWER(CAST(es.band AS STRING)) AS banda,
-        LOWER(es.country) AS pais,
+        LOWER(es.job_name) AS job_name,
+        LOWER(CAST(es.band AS STRING)) AS band,
+        LOWER(es.country) AS country,
         LOWER(es.email_l1) AS l1_e,
         LOWER(es.email_l2) AS l2_e,
         LOWER(es.email_l3) AS l3_e,
@@ -15,8 +15,8 @@ WITH monthly_snapshots AS (
         LOWER(es.email_l5) AS l5_e,
         LOWER(es.email_l6) AS l6_e,
         LOWER(es.email_l7) AS l7_e,
-        es.dt_hired AS data_entrada,
-        es.months_tenure_in_company AS tempo_de_casa,
+        es.dt_employee_hired AS dt_hired,
+        es.months_employee_tenure AS company_tenure_months,
         LOWER(es.status) AS status,
         LOWER(es.business_unit_name) AS business_unit_name
     FROM
@@ -35,21 +35,21 @@ WITH monthly_snapshots AS (
 band_start_dates AS (
     SELECT
         person_number,
-        banda,
-        MIN(fechamento) AS inicio_banda
+        band,
+        MIN(dt_month_end) AS band_start_date
     FROM
         monthly_snapshots
     GROUP BY
         person_number,
-        banda
+        band
 ),
-fotos_2025 AS (
+active_monthly_snapshots AS (
     SELECT
         person_number,
-        nome,
+        employee_name,
         email,
-        cargo,
-        banda,
+        job_name,
+        band,
         l1_e,
         l2_e,
         l3_e,
@@ -57,10 +57,10 @@ fotos_2025 AS (
         l5_e,
         l6_e,
         l7_e,
-        data_entrada,
-        tempo_de_casa,
-        fechamento,
-        pais
+        dt_hired,
+        company_tenure_months,
+        dt_month_end,
+        country
     FROM
         monthly_snapshots
     WHERE
@@ -70,33 +70,33 @@ fotos_2025 AS (
             'rafael.castro@quintoandar.com.br'
         )
 ),
-base_fotos AS (
+monthly_band_tenure AS (
     SELECT
-        f.fechamento,
+        f.dt_month_end,
         f.person_number,
-        f.nome,
+        f.employee_name,
         f.email,
-        f.cargo,
-        f.banda,
-        f.pais,
-        s.inicio_banda,
+        f.job_name,
+        f.band,
+        f.country,
+        s.band_start_date,
         CASE
             WHEN (
-                f.pais IN ('argentina', 'mexico')
-                AND s.inicio_banda <= DATE '2024-10-01'
+                f.country IN ('argentina', 'mexico')
+                AND s.band_start_date <= DATE '2024-10-01'
             ) THEN TIMESTAMPDIFF(
                 MONTH,
                 DATE_TRUNC('MONTH', DATE '2024-10-01'),
-                DATE_TRUNC('MONTH', f.fechamento)
+                DATE_TRUNC('MONTH', f.dt_month_end)
             )
             ELSE TIMESTAMPDIFF(
                 MONTH,
-                DATE_TRUNC('MONTH', s.inicio_banda),
-                DATE_TRUNC('MONTH', f.fechamento)
+                DATE_TRUNC('MONTH', s.band_start_date),
+                DATE_TRUNC('MONTH', f.dt_month_end)
             )
-        END AS tempo_na_banda_em_meses,
-        f.data_entrada AS dt_inicio_empresa,
-        f.tempo_de_casa,
+        END AS months_in_band,
+        f.dt_hired AS dt_company_start,
+        f.company_tenure_months,
         f.l1_e,
         f.l2_e,
         f.l3_e,
@@ -105,30 +105,30 @@ base_fotos AS (
         f.l6_e,
         f.l7_e
     FROM
-        fotos_2025 AS f
+        active_monthly_snapshots AS f
     INNER JOIN
         band_start_dates AS s
             ON f.person_number = s.person_number
-            AND f.banda = s.banda
+            AND f.band = s.band
 ),
-latest_fechamento AS (
+latest_month_end AS (
     SELECT
-        MAX(fechamento) AS fechamento
+        MAX(dt_month_end) AS dt_month_end
     FROM
-        base_fotos
+        monthly_band_tenure
 )
 SELECT DISTINCT
-    bf.fechamento,
+    bf.dt_month_end AS fechamento,
     bf.person_number,
-    bf.nome,
+    bf.employee_name AS nome,
     bf.email,
-    bf.cargo,
-    bf.banda,
-    bf.pais,
-    bf.inicio_banda,
-    bf.tempo_na_banda_em_meses,
-    bf.dt_inicio_empresa,
-    bf.tempo_de_casa,
+    bf.job_name AS cargo,
+    bf.band AS banda,
+    bf.country AS pais,
+    bf.band_start_date AS inicio_banda,
+    bf.months_in_band AS tempo_na_banda_em_meses,
+    bf.dt_company_start AS dt_inicio_empresa,
+    bf.company_tenure_months AS tempo_de_casa,
     bf.l1_e,
     bf.l2_e,
     bf.l3_e,
@@ -140,10 +140,10 @@ SELECT DISTINCT
     MONTH(DATE('{load_start_date}')) AS month,
     DAY(DATE('{load_start_date}')) AS day
 FROM
-    base_fotos AS bf
+    monthly_band_tenure AS bf
 INNER JOIN
-    latest_fechamento AS lf
-        ON bf.fechamento = lf.fechamento
+    latest_month_end AS lf
+        ON bf.dt_month_end = lf.dt_month_end
 ORDER BY
-    bf.nome ASC,
-    bf.fechamento ASC
+    nome ASC,
+    fechamento ASC
