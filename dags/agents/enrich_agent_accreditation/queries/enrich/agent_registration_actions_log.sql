@@ -52,23 +52,22 @@ WITH agent_accreditation AS (
 ),
 business_context AS (
     SELECT 
-        bc.id_agent,
+        bc.id_agent_data AS id_agent,
         bc.business_context,
+        ROW_NUMBER() OVER (
+            PARTITION BY bc.id_agent_data, DATE(bc.ts_revision_started)
+            ORDER BY bc.ts_revision_started, COALESCE(bc.ts_revision_ended, DATE('{load_end_date}')) DESC
+        ) = 1 AS is_last_update_by_date,
         bc.ts_revision_started,
         DATE(bc.ts_revision_started) AS dt_revision_started,
         DATE(
             COALESCE(
-                bc.ts_revision_ended - INTERVAL 1 DAY, 
+                bc.ts_revision_ended, 
                 '{load_end_date}'
             )
         ) AS dt_revision_ended
     FROM 
         datalake_agent_accreditation.business_context AS bc
-    QUALIFY
-        1 = ROW_NUMBER() OVER (
-            PARTITION BY bc.id_agent, DATE(bc.ts_revision_started)
-            ORDER BY bc.ts_revision_started, COALESCE(bc.ts_revision_ended, DATE('{load_end_date}')) DESC
-        )
 ),
 other_actions AS (
     SELECT
@@ -94,6 +93,7 @@ other_actions AS (
         business_context AS bc
     WHERE
         bc.dt_revision_started BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND bc.is_last_update_by_date IS TRUE
 ),
 actions AS (
     SELECT /*+ RANGE_JOIN(act2, 1500) */ 
@@ -148,6 +148,7 @@ actions AS (
         business_context AS bc -- context interval
             ON bc.id_agent = ac.id_agent
             AND ac.dt_revision BETWEEN bc.dt_revision_started AND bc.dt_revision_ended
+            AND bc.is_last_update_by_date IS TRUE
     LEFT JOIN
         datalake_agent_accreditation.agent_profile AS ap -- profile interval
             ON ap.id_agent = ac.id_agent
@@ -189,19 +190,41 @@ union_actions AS (
     SELECT * FROM actions
     UNION ALL
     SELECT * FROM business_profile_actions
+),
+actions_log AS (
+    SELECT 
+        XXHASH64(a.id_agent, a.action, a.dt_revision) AS id_action_log,
+        CASE 
+            WHEN a.action = "Accreditation" THEN 0
+            WHEN a.action = "First activation after accreditation" THEN 1
+            WHEN a.action = "De-accreditation" THEN 2
+            WHEN a.action = "Re-accreditation" THEN 3
+            WHEN a.action = "Business Context Update" THEN 4
+            WHEN a.action = "Performance Profile Update" THEN 5
+            WHEN a.action = "Record Updated" THEN 6
+            WHEN a.action = "Record Removed" THEN 7     
+        END AS id_action,
+        a.id_agent,
+        a.id_user,
+        a.id_work_contract,
+        a.creci_number,
+        a.uuid_company,
+        a.agent_profile,
+        a.visit_agent_type,
+        a.business_context,
+        a.action,
+        a.is_active,
+        ROW_NUMBER() OVER (PARTITION BY a.id_agent, a.action, a.dt_revision ORDER BY a.ts_revision DESC) = 1 AS is_last_revision_by_date,
+        a.ts_revision,
+        a.dt_revision AS dt_action
+    FROM 
+        union_actions AS a
+    WHERE 
+        a.action IS NOT NULL 
 )
 SELECT 
-    XXHASH64(a.id_agent, a.action, a.dt_revision) AS id_action_log,
-    CASE 
-        WHEN a.action = "Accreditation" THEN 0
-        WHEN a.action = "First activation after accreditation" THEN 1
-        WHEN a.action = "De-accreditation" THEN 2
-        WHEN a.action = "Re-accreditation" THEN 3
-        WHEN a.action = "Business Context Update" THEN 4
-        WHEN a.action = "Performance Profile Update" THEN 5
-        WHEN a.action = "Record Updated" THEN 6
-        WHEN a.action = "Record Removed" THEN 7     
-    END AS id_action,
+    id_action_log,  
+    id_action,
     a.id_agent,
     a.id_user,
     a.id_work_contract,
@@ -213,10 +236,8 @@ SELECT
     a.action,
     a.is_active,
     a.ts_revision,
-    a.dt_revision AS dt_action
-FROM 
-    union_actions AS a
-WHERE 
-    a.action IS NOT NULL 
-QUALIFY
-    1 = ROW_NUMBER() OVER (PARTITION BY id_action_log ORDER BY a.ts_revision DESC)
+    dt_action
+FROM
+    actions_log AS a
+WHERE
+    a.is_last_revision_by_date IS TRUE

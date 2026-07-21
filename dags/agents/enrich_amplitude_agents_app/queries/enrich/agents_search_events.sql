@@ -80,7 +80,7 @@ business_context AS (
         datalake_agent_accreditation.business_context AS bc
     JOIN 
         datalake_quintoandar.aux_date AS ax
-            ON ax.date BETWEEN DATE(bc.ts_revision_started) AND DATE(bc.ts_revision_ended)
+            ON ax.date BETWEEN DATE(bc.ts_revision_started) AND DATE(COALESCE(bc.ts_revision_ended, '{load_end_date}'))
     WHERE 
         ax.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY

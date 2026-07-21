@@ -44,7 +44,8 @@ daily_agent_work_contract AS (
     SELECT 
         ad.date AS dt_reference,
         awc.id_agent,
-        awc.id_work_contract
+        awc.id_work_contract,
+        ROW_NUMBER() OVER(PARTITION BY awc.id_agent, ad.date ORDER BY awc.ts_started DESC) = 1 AS is_last_update_by_date
     FROM
         agent_work_contract AS awc
     JOIN
@@ -53,16 +54,15 @@ daily_agent_work_contract AS (
     WHERE 
         awc.rev_type <> 2
         AND ad.date BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
-    QUALIFY
-        1 = ROW_NUMBER() OVER(PARTITION BY awc.id_agent, ad.date ORDER BY awc.ts_started DESC)
 ),
 -- A few percentage of agents has two business lines at the same period. 
 -- But for the OPS team these cases should be ignored
 daily_agent_business_context AS (
     SELECT 
         ad.date AS dt_reference,
-        abch.id_agent,
-        abch.business_context AS agent_business_context
+        abch.id_agent_data AS id_agent,
+        abch.business_context AS agent_business_context,
+        ROW_NUMBER() OVER(PARTITION BY abch.id_agent_data, ad.date ORDER BY abch.ts_revision_started DESC) = 1 AS is_last_update_by_date
     FROM
         datalake_agent_accreditation.business_context AS abch
     JOIN
@@ -70,8 +70,6 @@ daily_agent_business_context AS (
             ON ad.date BETWEEN abch.ts_revision_started AND COALESCE(abch.ts_revision_ended, '{load_end_date}' + INTERVAL 21 DAYS)
     WHERE 
         ad.date BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
-    QUALIFY
-        1 = ROW_NUMBER() OVER(PARTITION BY abch.id_agent, ad.date ORDER BY abch.ts_revision_started DESC)
 ),
 agents_region AS (
     SELECT 
@@ -87,7 +85,8 @@ daily_agents_region AS (
     SELECT 
         ad.date AS dt_reference,
         ag.id_agent,
-        ag.id_region
+        ag.id_region,
+        ROW_NUMBER() OVER(PARTITION BY ag.id_agent, ad.date ORDER BY ag.ts_started DESC) = 1 AS is_last_update_by_date
     FROM
         agents_region AS ag
     JOIN
@@ -96,22 +95,19 @@ daily_agents_region AS (
     WHERE 
         ag.rev_type <> 2
         AND ad.date BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
-    QUALIFY
-        1 = ROW_NUMBER() OVER(PARTITION BY ag.id_agent, ad.date ORDER BY ag.ts_started DESC)
 ),
 daily_agent_region_group AS (
     SELECT
         arg.dadosagente_id AS id_agent,
         arg.area,
         arg.area_deprecated,
+        ROW_NUMBER() OVER(PARTITION BY arg.dadosagente_id, DATE(arg.dt) ORDER BY arg.dt DESC) = 1 AS is_last_update_by_date,
         ROW_NUMBER() OVER (PARTITION BY arg.dadosagente_id ORDER BY arg.dt DESC) = 1 AS is_last_updated,
         arg.dt AS dt_reference
     FROM
         datalake_agenda_allocation.agent_region_group AS arg
     WHERE
         arg.dt BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
-    QUALIFY
-        1 = ROW_NUMBER() OVER(PARTITION BY arg.dadosagente_id, DATE(arg.dt) ORDER BY arg.dt DESC)
 )
 SELECT
     ash.id_agent,
@@ -168,6 +164,7 @@ LEFT JOIN
     daily_agent_region_group AS arg
         ON arg.id_agent = ash.id_agent
         AND arg.dt_reference = d.date
+        AND arg.is_last_update_by_date IS TRUE
 LEFT JOIN 
     daily_agent_region_group AS arg_future
         ON arg_future.id_agent = ash.id_agent
@@ -180,14 +177,17 @@ LEFT JOIN
     daily_agent_business_context AS abc
         ON abc.id_agent = ash.id_agent
         AND abc.dt_reference = d.date
+        AND abc.is_last_update_by_date IS TRUE
 LEFT JOIN 
     daily_agent_work_contract AS acr
         ON acr.id_agent = ash.id_agent 
         AND acr.dt_reference = d.date
+        AND acr.is_last_update_by_date IS TRUE
 LEFT JOIN 
     daily_agents_region AS ar 
         ON ar.id_agent = ash.id_agent
         AND ar.dt_reference = d.date
+        AND ar.is_last_update_by_date IS TRUE
 LEFT JOIN 
     datalake_ebdb_clean.mask_weekly_hour AS mwh
         ON mwh.id_work_contract  = acr.id_work_contract 

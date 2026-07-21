@@ -19,7 +19,7 @@ columns:
       - datalake_ebdb_agent_events.capability_settings.ts_started
     description: |
       Unique identifier for the business context revision interval, generated with XXHASH64
-      from agent (or agent data) id, business context, and interval start timestamp.
+      from person UUID, agent id, business context, and interval start date.
   id_agent:
     lineage:
       - datalake_ebdb_clean.agent.id
@@ -35,6 +35,11 @@ columns:
       - datalake_ebdb_clean.user.id
       - datalake_ebdb_clean.agent_external_reference.value
     description: Application user identifier linked to the agent via the Dados Agente / user mapping.
+  uuid_person:
+    lineage:
+      - datalake_person.person_sks.uuid_person
+      - datalake_ebdb_clean.agent.uuid_person
+    description: Person UUID linking the agent business context interval to the canonical person entity.
   business_context:
     lineage:
       - datalake_ebdb_clean.agent_data_business_contexts_served_aud.business_context
@@ -59,5 +64,5 @@ columns:
       - datalake_ebdb_agent_events.capability_settings.ts_started
     description: |
       End of the business context validity window: day before the next revision start
-      for the same user and agent across Agent Domain and legacy rows, or the load end
-      date when this is the latest interval.
+      for the same user and agent across Agent Domain and legacy rows; null for the
+      latest open-ended interval.

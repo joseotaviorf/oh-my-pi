@@ -88,7 +88,7 @@ business_context AS (
         id_agent_data,
         business_context,
         ts_revision_started,
-        ts_revision_ended
+        COALESCE(ts_revision_ended, TIMESTAMP('{load_end_date}')) AS ts_revision_ended
     FROM
         datalake_agent_accreditation.business_context
     GROUP BY 1, 2, 3, 4 -- the same id_agent_data can have multiple rows by id_agent, so we need to group by them

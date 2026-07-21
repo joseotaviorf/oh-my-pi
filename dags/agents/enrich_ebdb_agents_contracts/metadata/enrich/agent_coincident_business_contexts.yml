@@ -12,7 +12,7 @@ owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_data:
     lineage:
-      - datalake_agent_accreditation.business_context.id_agent
+      - datalake_agent_accreditation.business_context.id_agent_data
     description: Key of the agent, also known as "Dados Agente ID"
   ts_agent_business_context_started:
     lineage:

@@ -1,6 +1,6 @@
 WITH business_context_changes_aux AS (
     SELECT
-        id_agent AS id_agent_data,
+        id_agent_data,
         CASE
             WHEN business_context = 'SALE' THEN TRUE
             ELSE NULL
@@ -14,7 +14,7 @@ WITH business_context_changes_aux AS (
         datalake_agent_accreditation.business_context
     UNION ALL
     SELECT
-        id_agent AS id_agent_data,
+        id_agent_data,
         CASE
             WHEN business_context = 'SALE' THEN FALSE
             ELSE NULL
