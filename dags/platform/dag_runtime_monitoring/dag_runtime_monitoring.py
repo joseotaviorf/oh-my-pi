@@ -78,7 +78,7 @@ _DEFAULT_CONFIG = {
     "factor": 1.5,
     # Absolute floor: only alert on runs that have been executing at least this long,
     # so quick DAGs never page no matter how large their relative swing.
-    "min_alert_duration_minutes": 60,
+    "min_alert_duration_minutes": 90,
 }
 
 # Only "real" automatic runs count — scheduled, dataset-triggered, or mediator-triggered.

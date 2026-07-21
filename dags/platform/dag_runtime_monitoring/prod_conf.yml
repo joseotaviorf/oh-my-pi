@@ -21,7 +21,7 @@ dag_runtime_monitoring:
   min_history_runs: 15
   percentile: 99
   factor: 1.5
-  min_alert_duration_minutes: 60
+  min_alert_duration_minutes: 90
   # Soft-launch: empty = no JiraOps paging; all anomalies go to Google Chat only.
   critical_dags: []
   # To enable on-call paging, replace `critical_dags: []` above with this list:
