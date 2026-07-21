@@ -1,0 +1,627 @@
+dag:
+  name: pin
+  schedule_interval: 0 0 * * *
+  owner: Data People
+  callback_by_task: False
+  dag_documentation:
+    dag_purpose: Unified PIN ingestion from Oracle HCM via Oracle Integration Cloud (OIC) and SFTP. Downloads, decrypts, parses,
+      and loads encrypted files into incoming and raw layers for all PIN modules (core, absence, compensation, goal, hr_review,
+      performance, questionnaires, talent). EMR step_concurrency_level caps concurrent OIC/SFTP access.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  max_tables_per_cluster: 99999
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  spark_session_configs:
+    udfs:
+    - SF_FORMAT_PROPER_NOUN
+  load_spark_job: load_pin_raw
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ data_interval_start | ds }}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  default_table_privileges:
+    people-team:
+    - ALL PRIVILEGES
+  tables_customization:
+    anc_absence_types_f:
+      clean_table_name: type
+      custom_schema: pin_absence
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_absence
+        date_column_to_partition: last_update_date
+    anc_absence_types_f_tl:
+      clean_table_name: type_translation
+      custom_schema: pin_absence
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_absence
+        date_column_to_partition: last_update_date
+    anc_per_abs_entries:
+      clean_table_name: person_entry
+      custom_schema: pin_absence
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_absence
+        date_column_to_partition: last_update_date
+    cmp_salary:
+      clean_table_name: salary
+      custom_schema: pin_compensation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_compensation
+        date_column_to_partition: last_update_date
+    cmp_salary_bases:
+      clean_table_name: salary_bases
+      custom_schema: pin_compensation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_compensation
+        date_column_to_partition: last_update_date
+    pay_element_entries_f:
+      clean_table_name: element_entry
+      custom_schema: pin_compensation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_compensation
+        date_column_to_partition: last_update_date
+    pay_element_entry_values_f:
+      clean_table_name: element_entry_value
+      custom_schema: pin_compensation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_compensation
+        date_column_to_partition: last_update_date
+    pay_element_types_f:
+      clean_table_name: element_type
+      custom_schema: pin_compensation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_compensation
+        date_column_to_partition: last_update_date
+    pay_input_values_f:
+      clean_table_name: element_input_value
+      custom_schema: pin_compensation
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_compensation
+        date_column_to_partition: last_update_date
+    fnd_lookup_values:
+      clean_table_name: foundation_lookup_value
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    fnd_setid_sets:
+      clean_table_name: set_identifiers
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    hr_all_organization_units_f:
+      clean_table_name: all_organization_units
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    hr_lookups:
+      clean_table_name: lookup
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    hr_organization_v:
+      clean_table_name: hr_organization
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_action_occurrences:
+      clean_table_name: action_occurrence
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_action_reasons_b:
+      clean_table_name: action_reason_base
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_action_reasons_tl:
+      clean_table_name: action_reason_translation
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_actions_b:
+      clean_table_name: action_base
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_actions_tl:
+      clean_table_name: action_translation
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_addresses_f:
+      clean_table_name: address
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_all_assignments_m:
+      clean_table_name: all_assignments
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_all_people_f:
+      clean_table_name: all_people
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_asg_responsibilities:
+      clean_table_name: assignment_responsibility
+      custom_schema: pin_core
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_assignment_extra_info_m:
+      clean_table_name: assignment_extra_info
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_assignment_supervisors_f:
+      clean_table_name: assignment_supervisor
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_disabilities_f:
+      clean_table_name: disability
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_email_addresses:
+      clean_table_name: email_address
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_phones:
+      clean_table_name: phone
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_ethnicities:
+      clean_table_name: ethnicity
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_ext_app_identifiers:
+      clean_table_name: external_application_identifier
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_religions:
+      clean_table_name: religion
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_grades_f:
+      clean_table_name: grade
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_grades_f_tl:
+      clean_table_name: grade_translation
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_grade_ladders_f:
+      clean_table_name: grade_ladder
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_grade_ladders_f_tl:
+      clean_table_name: grade_ladder_translation
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_job_family_f_tl:
+      clean_table_name: job_family_translation
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_job_leg_f:
+      clean_table_name: job_legislative
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_jobs_f:
+      clean_table_name: job
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_jobs_f_tl:
+      clean_table_name: job_translation
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_people_legislative_f:
+      clean_table_name: people_legislative
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_people_extra_info_f:
+      clean_table_name: people_extra_info
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_periods_of_service:
+      clean_table_name: periods_of_service
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_person_names_f:
+      clean_table_name: person_name
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_persons:
+      clean_table_name: person
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_rate_values_f:
+      clean_table_name: rate_values
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_rates_f:
+      clean_table_name: rates
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_valid_grades_f:
+      clean_table_name: valid_grades
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    per_national_identifiers:
+      clean_table_name: national_identifiers
+      custom_schema: pin_core
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_core
+        date_column_to_partition: last_update_date
+    hrg_goal_plan_goals:
+      clean_table_name: goal_plan_to_goal
+      custom_schema: pin_goal
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_goal
+        date_column_to_partition: last_update_date
+    hrg_goal_plans_tl:
+      clean_table_name: goal_plan_translation
+      custom_schema: pin_goal
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_goal
+        date_column_to_partition: last_update_date
+    hrg_goals:
+      clean_table_name: goal
+      custom_schema: pin_goal
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_goal
+        date_column_to_partition: last_update_date
+    hrr_dashboards:
+      clean_table_name: dashboard
+      custom_schema: pin_hr_review
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_hr_review
+        date_column_to_partition: last_update_date
+    hrr_dashboard_tmpls_tl:
+      clean_table_name: dashboard_template_translation
+      custom_schema: pin_hr_review
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_hr_review
+        date_column_to_partition: last_update_date
+    hrr_meetings:
+      clean_table_name: meeting
+      custom_schema: pin_hr_review
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_hr_review
+        date_column_to_partition: last_update_date
+    hra_check_in_meetings:
+      clean_table_name: check_in_meeting
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hra_discussion_topics:
+      clean_table_name: discussion_topic
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hra_eval_items:
+      clean_table_name: evaluation_item
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hra_eval_participants:
+      clean_table_name: evaluation_participant
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hra_eval_ratings:
+      clean_table_name: evaluation_rating
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hra_eval_sections:
+      clean_table_name: evaluation_section
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hra_evaluations:
+      clean_table_name: evaluation
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hra_section_defns_tl:
+      clean_table_name: section_definition_translation
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hra_tmpl_sections:
+      clean_table_name: template_section
+      custom_schema: pin_performance
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_performance
+        date_column_to_partition: last_update_date
+    hrq_qstn_responses:
+      clean_table_name: question_response
+      custom_schema: pin_questionnaires
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_questionnaires
+        date_column_to_partition: last_update_date
+    hrq_qstnr_participants:
+      clean_table_name: questionnaire_participant
+      custom_schema: pin_questionnaires
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_questionnaires
+        date_column_to_partition: last_update_date
+    hrq_qstnr_responses:
+      clean_table_name: questionnaire_response
+      custom_schema: pin_questionnaires
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_questionnaires
+        date_column_to_partition: last_update_date
+    hrt_notes:
+      clean_table_name: note
+      custom_schema: pin_talent
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_talent
+        date_column_to_partition: last_update_date
+    hrt_profiles_b:
+      clean_table_name: profile_base
+      custom_schema: pin_talent
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_talent
+        date_column_to_partition: last_update_date
+    hrt_rating_levels_b:
+      clean_table_name: rating_level_base
+      custom_schema: pin_talent
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_talent
+        date_column_to_partition: last_update_date
+    hrt_rating_levels_tl:
+      clean_table_name: rating_level_translation
+      custom_schema: pin_talent
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_talent
+        date_column_to_partition: last_update_date
+    hrt_rating_models_b:
+      clean_table_name: rating_model_base
+      custom_schema: pin_talent
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_talent
+        date_column_to_partition: last_update_date
+    hrt_rating_models_tl:
+      clean_table_name: rating_model_translation
+      custom_schema: pin_talent
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_talent
+        date_column_to_partition: last_update_date
+    hrt_review_periods_b:
+      clean_table_name: review_period_base
+      custom_schema: pin_talent
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_talent
+        date_column_to_partition: last_update_date
+    hrt_review_periods_tl:
+      clean_table_name: review_period_translation
+      custom_schema: pin_talent
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+      - raw_custom_schema: pin_talent
+        date_column_to_partition: last_update_date

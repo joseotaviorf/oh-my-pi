@@ -465,13 +465,7 @@ expected_times_to_finish:
   bietlejuice.owner_fees: 09:19
   bietlejuice.payable_accounts_transactions: 07:42
   bietlejuice.person: 01:29
-  bietlejuice.pin_absence: 07:32
-  bietlejuice.pin_core: 07:21
-  bietlejuice.pin_goal: 07:31
-  bietlejuice.pin_hr_review: 07:29
-  bietlejuice.pin_performance: 07:21
-  bietlejuice.pin_questionnaires: 07:28
-  bietlejuice.pin_talent: 07:21
+  bietlejuice.pin: 07:32
   bietlejuice.pixar: 07:22
   bietlejuice.property_tax: 07:19
   bietlejuice.quinto_messenger: 04:25
