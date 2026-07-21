@@ -117,10 +117,18 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
             (load >> register_table >> sync_metadata >> last_task_after_groups)
         if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
-            load >> data_quality
+            # Default: DQ parallel with add-default-row. Opt-in:
+            # serialize_dq_after_default_row waits for last_task_in_group (sk=-1 MERGE).
+            dq_upstream = (
+                last_task_in_group if self._serialize_dq_after_default_row() else load
+            )
+            dq_upstream >> data_quality
             if last_task_after_groups is not None:
                 data_quality >> last_task_after_groups
         return load, last_task_in_group
+
+    def _serialize_dq_after_default_row(self) -> bool:
+        return bool(self.workflow_args.get("serialize_dq_after_default_row", False))
 
     def _check_include_add_default_row_task(self, table: TableAttributes) -> bool:
         return (

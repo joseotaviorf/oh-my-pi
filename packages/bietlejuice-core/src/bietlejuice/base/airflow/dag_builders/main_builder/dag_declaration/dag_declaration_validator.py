@@ -144,6 +144,11 @@ class DAGDeclarationValidator(Validator):
                     },
                 },
                 "has_hive_sync": {"type": "boolean", "empty": False, "required": False},
+                "serialize_dq_after_default_row": {
+                    "type": "boolean",
+                    "empty": False,
+                    "required": False,
+                },
                 "sync": {
                     "type": "list",
                     "empty": False,

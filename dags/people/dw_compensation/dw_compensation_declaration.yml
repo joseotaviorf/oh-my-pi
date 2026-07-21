@@ -11,6 +11,7 @@ workflow:
   bucket_config_name: people_bucket
   custom_schema: compensation
   has_hive_sync: false
+  serialize_dq_after_default_row: true
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
