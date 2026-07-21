@@ -140,7 +140,7 @@ columns:
       Deepest funnel stage reached in this session. Priority order (deepest to shallowest):
       visit_intention_registered (visit tool returned success), escalated, visit_attempt_failed
       (visit tool called but did not succeed), schedule_visit_agent_called, inventory_searched,
-      profile_identified, no_agent.
+      inventory_agent_called, profile_identified, no_agent.
   funnel_path:
     lineage:
       - datalake_langfuse_clean.observations.name
@@ -155,7 +155,8 @@ columns:
       deepest stage reached. Only the label differs, using drop-off framing:
         visit_intention_registered, escalated, visit_attempt_failed,
         dropped_at_scheduling (= schedule_visit_agent_called), dropped_at_recommendations
-        (= inventory_searched), dropped_at_profiling (= profile_identified), no_agent.
+        (= inventory_searched), dropped_at_inventory (= inventory_agent_called),
+        dropped_at_profiling (= profile_identified), no_agent.
       Use for grouping sessions by their exact journey in Superset (GROUP BY funnel_path).
       To get the deepest stage only, use funnel_stage_deepest instead.
   ts_profiling:

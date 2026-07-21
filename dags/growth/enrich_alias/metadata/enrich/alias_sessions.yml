@@ -59,7 +59,12 @@ columns:
       sub-agents called. Priority order (deepest first):
       visit_intention_registered (visit tool returned success) → escalated →
       visit_attempt_failed (visit tool called but unsuccessful) →
-      schedule_visit_agent_called → inventory_searched → profile_identified → no_agent.
+      schedule_visit_agent_called → inventory_searched → inventory_agent_called →
+      profile_identified → no_agent. inventory_searched is a legacy name for the
+      recommendations-tool stage (alias_get_recommendations_by_company); it predates
+      inventory_agent_called (alias_inventory_agentV1), which was previously missing
+      from this priority chain entirely — sessions where only the inventory agent was
+      called were misclassified as no_agent despite has_inventory being TRUE.
       Uses visit_registered_success (confirmed success) rather than has_visit_registered
       (tool merely called) as the top priority criterion — avoids classifying failed visit
       attempts as conversions. Allows segmenting sessions by conversation maturity without

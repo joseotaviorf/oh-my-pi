@@ -97,12 +97,13 @@ SELECT
         -- map 1:1 to dropped_at_scheduling/dropped_at_recommendations/dropped_at_profiling;
         -- "inventory_searched" is a legacy name for the recommendations-tool stage upstream.
         CASE COALESCE(lsa.funnel_stage_deepest, 'no_agent')
-            WHEN 'visit_intention_registered'   THEN 'visit_intention_registered'
-            WHEN 'escalated'                    THEN 'escalated'
-            WHEN 'visit_attempt_failed'         THEN 'visit_attempt_failed'
-            WHEN 'schedule_visit_agent_called'  THEN 'dropped_at_scheduling'
-            WHEN 'inventory_searched'           THEN 'dropped_at_recommendations'
-            WHEN 'profile_identified'           THEN 'dropped_at_profiling'
+            WHEN 'visit_intention_registered'  THEN 'visit_intention_registered'
+            WHEN 'escalated'                   THEN 'escalated'
+            WHEN 'visit_attempt_failed'        THEN 'visit_attempt_failed'
+            WHEN 'schedule_visit_agent_called' THEN 'dropped_at_scheduling'
+            WHEN 'inventory_searched'          THEN 'dropped_at_recommendations'
+            WHEN 'inventory_agent_called'      THEN 'dropped_at_inventory'
+            WHEN 'profile_identified'          THEN 'dropped_at_profiling'
             ELSE 'no_agent'
         END
     ) AS funnel_path,

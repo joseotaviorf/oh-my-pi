@@ -108,6 +108,8 @@ SELECT
             THEN 'schedule_visit_agent_called'
         WHEN MAX(CASE WHEN tw.obs_name = 'alias_get_recommendations_by_company' THEN 1 ELSE 0 END) = 1
             THEN 'inventory_searched'
+        WHEN MAX(CASE WHEN tw.obs_name = 'alias_inventory_agentV1' THEN 1 ELSE 0 END) = 1
+            THEN 'inventory_agent_called'
         WHEN MAX(CASE WHEN tw.obs_name = 'alias_profile_agentV1' THEN 1 ELSE 0 END) = 1
             THEN 'profile_identified'
         ELSE 'no_agent'

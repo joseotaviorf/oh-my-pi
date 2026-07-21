@@ -33,6 +33,7 @@ column_level_validations:
       values:
         - 'no_agent'
         - 'profile_identified'
+        - 'inventory_agent_called'
         - 'inventory_searched'
         - 'schedule_visit_agent_called'
         - 'visit_attempt_failed'
