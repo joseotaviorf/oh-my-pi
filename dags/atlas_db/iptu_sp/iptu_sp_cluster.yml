@@ -1,9 +1,0 @@
-cluster:
-  type: consolidation_s_general_cluster
-  custom_libraries:
-  - pypi:
-      package: openpyxl
-  custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200
-    num_workers: 3

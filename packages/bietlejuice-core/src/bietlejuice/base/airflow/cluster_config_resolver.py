@@ -17,7 +17,9 @@ from bietlejuice.services.configuration_service import ConfigurationService
 # DAGs opted out of generated validation.cluster and cluster-diff checks
 # (e.g. custom Spark jobs without cluster_validation write support yet, or prod
 # already matches its consolidation preset).
-CLUSTER_VALIDATION_EXCLUDED_DAGS = frozenset({"reverse_kyc", "enrich_search"})
+CLUSTER_VALIDATION_EXCLUDED_DAGS = frozenset(
+    {"reverse_kyc", "enrich_search", "enrich_tars"}
+)
 
 
 def merge_cluster_configuration(

@@ -1,7 +1,0 @@
-dag:
-  name: dw_country
-  owner: Data ForRent
-workflow:
-  type: query_delta
-  layer: dw
-  custom_schema: public

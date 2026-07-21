@@ -1,4 +1,0 @@
----
-queue_url: 'https://sqs.us-east-1.amazonaws.com/632540934959/ProdRiskAndMortgageCustomerSatisfaction'
-database_name: reverse_dsat_report
-tables: [sale_dsat_report]

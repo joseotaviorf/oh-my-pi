@@ -11,7 +11,6 @@ _JOB_PATHS = [
     "dags/atlas_db/clustering_image_model/spark_jobs/load_clustering_image_model_raw.py",
     "dags/atlas_db/iptu_bh/spark_jobs/load_iptu_bh_raw.py",
     "dags/atlas_db/iptu_poa/spark_jobs/load_iptu_poa_raw.py",
-    "dags/atlas_db/iptu_sp/spark_jobs/load_iptu_sp_raw.py",
     "dags/atlas_db/itbi_bh/spark_jobs/load_itbi_bh_raw.py",
     "dags/atlas_db/itbi_sp/spark_jobs/load_itbi_sp_raw.py",
 ]

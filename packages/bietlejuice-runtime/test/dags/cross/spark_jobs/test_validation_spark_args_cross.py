@@ -9,7 +9,6 @@ _REPO_ROOT = Path(__file__).resolve().parents[6]
 _JOB_PATHS = [
     "dags/cross/base/spark_jobs/load_mongo_raw.py",
     "dags/cross/base/spark_jobs/load_growth_intel_crawler_raw.py",
-    "dags/cross/kong/spark_jobs/load_kong_raw.py",
     "dags/cross/request_logging/spark_jobs/fetch_data.py",
     "dags/cross/reverse_birdie_access/spark_jobs/load_into_birdie_api.py",
 ]

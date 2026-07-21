@@ -1,9 +1,0 @@
-dag:
-  name: dw_revenue_lines
-  schedule_start_date: 2022,03,29
-  owner: Data Fintech
-workflow:
-  type: query_delta
-  layer: dw
-  custom_schema: revenue_lines
-  has_load_to_redshift_task: false

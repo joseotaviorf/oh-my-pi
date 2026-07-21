@@ -22,14 +22,9 @@ _JOB_PATHS = [
     "dags/fintech/itau_statements/spark_jobs/load_raw.py",
     "dags/fintech/meetcall/spark_jobs/load_meetcall_raw.py",
     "dags/fintech/nexxera/spark_jobs/load_csv_into_datalake.py",
-    "dags/fintech/paschoalotto/spark_jobs/load_paschoalotto_raw.py",
-    "dags/fintech/paschoalotto_report/spark_jobs/load_paschoalotto_report_raw.py",
     "dags/fintech/payable_accounts_transactions/spark_jobs/load_sheets_into_datalake.py",
     "dags/fintech/sap_4hana/spark_jobs/load_raw.py",
-    "dags/fintech/velo_neurotech/spark_jobs/load_incremental_data_into_datalake_raw.py",
-    "dags/fintech/velo_neurotech_pj/spark_jobs/load_incremental_data_into_datalake_raw.py",
     "dags/fintech/velo_zendesk/spark_jobs/add_partitions_to_raw_tables.py",
-    "dags/fintech/webhelp/spark_jobs/load_webhelp_raw.py",
 ]
 
 
