@@ -11,6 +11,7 @@ import logging
 import os
 import re
 from datetime import datetime, timedelta
+from urllib.parse import parse_qs, urlparse
 from zoneinfo import ZoneInfo
 
 import pendulum
@@ -71,6 +72,19 @@ def _parse_rfc3339(datetime_str: str) -> datetime:
         return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%f%z")
     except ValueError:
         return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S%z")
+
+
+def _resolve_now_sp(load_start_date: str | None) -> datetime:
+    """Return the notification anchor time (09:00 SP) for production runs or backtests."""
+    if not load_start_date:
+        return datetime.now(tz=SP_TZ)
+    try:
+        parsed = datetime.strptime(load_start_date.strip(), "%Y-%m-%d")
+    except ValueError as exc:
+        raise ValueError(
+            f"Invalid load_start_date '{load_start_date}'; expected YYYY-MM-DD"
+        ) from exc
+    return parsed.replace(hour=9, minute=0, second=0, microsecond=0, tzinfo=SP_TZ)
 
 
 def _clean_dag_owner(raw_owners: str) -> str:
@@ -225,7 +239,9 @@ def _get_user_display(account_id: str, jira_ops_auth: HTTPBasicAuth) -> dict:
 
 
 def _get_oncall_recipients(
-    cloud_id: str, jira_ops_auth: HTTPBasicAuth
+    cloud_id: str,
+    jira_ops_auth: HTTPBasicAuth,
+    now_sp: datetime | None = None,
 ) -> tuple[list[dict], int]:
     """
     Determine the on-call engineer(s) for the previous shift.
@@ -235,8 +251,9 @@ def _get_oncall_recipients(
     - periods_length_exception: 1 = exception day (Sunday/holiday), 2 = normal day
     """
     days = 1
-    today = datetime.now(tz=SP_TZ).strftime("%Y-%m-%d")
-    shift_date = (datetime.now(tz=SP_TZ) - timedelta(days=days)).strftime("%Y-%m-%d")
+    anchor = now_sp or datetime.now(tz=SP_TZ)
+    today = anchor.strftime("%Y-%m-%d")
+    shift_date = (anchor - timedelta(days=days)).strftime("%Y-%m-%d")
     logger.info("today=%s, shift_date=%s", today, shift_date)
 
     timeline = _get_schedule_timeline(cloud_id, jira_ops_auth, shift_date)
@@ -280,16 +297,126 @@ def _get_oncall_recipients(
     return recipients, periods_length_exception
 
 
+def _is_voice_sent_notification(log_text: str) -> bool:
+    """Return True when a Jira Ops log entry records a sent voice notification."""
+    if re.search(r"->\s*Sent\b", log_text) is None:
+        return False
+    channel_match = re.search(r"\[(email|sms|voice)\]", log_text, re.IGNORECASE)
+    if channel_match:
+        return channel_match.group(1).lower() == "voice"
+    if "notification" not in log_text.lower():
+        return False
+    relaxed_match = re.search(r"\[?(email|sms|voice)\]?", log_text, re.IGNORECASE)
+    return relaxed_match is not None and relaxed_match.group(1).lower() == "voice"
+
+
+def _next_page_after(next_link: str | None) -> str | None:
+    """Extract the ``after`` cursor from a Jira Ops paginated response link."""
+    if not next_link:
+        return None
+    after_values = parse_qs(urlparse(next_link).query).get("after")
+    return after_values[0] if after_values else None
+
+
+def _fetch_alert_ids_in_window(
+    cloud_id: str,
+    jira_ops_auth: HTTPBasicAuth,
+    jql_query: str,
+    start_ts_ms: int,
+    end_ts_ms: int,
+) -> list[str]:
+    """List all alert IDs in the time window, following Jira Ops offset pagination.
+
+    ``start_ts_ms`` and ``end_ts_ms`` are Unix epoch milliseconds (Jira Ops API format).
+    """
+    alert_ids: list[str] = []
+    offset = 0
+    page_size = 100
+    alerts_url = f"{JIRA_OPS_API_BASE}/{cloud_id}/v1/alerts"
+    headers = {"Accept": "application/json"}
+
+    while True:
+        resp = requests.get(
+            alerts_url,
+            params={
+                "query": jql_query,
+                "from": start_ts_ms,
+                "to": end_ts_ms,
+                "size": page_size,
+                "offset": offset,
+            },
+            headers=headers,
+            auth=jira_ops_auth,
+        )
+        if resp.status_code != 200:
+            logger.warning(
+                "Alerts API returned %s at offset %d — stopping pagination",
+                resp.status_code,
+                offset,
+            )
+            break
+
+        batch = resp.json().get("values", [])
+        alert_ids.extend(alert_id for item in batch if (alert_id := item.get("id")))
+
+        if len(batch) < page_size:
+            break
+        offset += len(batch)
+
+    return alert_ids
+
+
+def _alert_had_voice_call(
+    cloud_id: str,
+    jira_ops_auth: HTTPBasicAuth,
+    alert_id: str,
+) -> bool:
+    """Return True when the alert generated at least one sent voice notification."""
+    after: str | None = None
+    logs_url = f"{JIRA_OPS_API_BASE}/{cloud_id}/v1/alerts/{alert_id}/logs"
+    headers = {"Accept": "application/json"}
+
+    while True:
+        params: dict[str, int | str] = {"size": 100}
+        if after is not None:
+            params["after"] = after
+
+        log_resp = requests.get(
+            logs_url,
+            params=params,
+            headers=headers,
+            auth=jira_ops_auth,
+        )
+        if log_resp.status_code != 200:
+            return False
+
+        payload = log_resp.json() or {}
+        for entry in payload.get("values", []):
+            if _is_voice_sent_notification(entry.get("log", "")):
+                return True
+
+        links = payload.get("links") or {}
+        after = _next_page_after(links.get("next"))
+        if after is None:
+            break
+
+    return False
+
+
 def _count_voice_wakeups(
-    cloud_id: str, jira_ops_auth: HTTPBasicAuth, periods_length_exception: int
+    cloud_id: str,
+    jira_ops_auth: HTTPBasicAuth,
+    periods_length_exception: int,
+    now_sp: datetime | None = None,
 ) -> int:
-    """Count on-call voice alerts (wakeups) for the shift time window.
+    """Count distinct alerts that triggered a voice call (acordamentos) in the shift window.
 
     Normal day: shift ran D-1 21:00 → D 09:00 SP. Query window: D-1 21:00 → D noon.
     Exception day (Sunday/holiday): shift ran D 09:00 → 21:00 SP. Query window: 09:00 → noon.
     Both windows are expressed as SP-local timestamps to match the worker environment.
+    Retries on the same alert count once; separate alerts (e.g. from different DAGs) count separately.
     """
-    now = datetime.now(tz=SP_TZ)
+    now = now_sp or datetime.now(tz=SP_TZ)
     if periods_length_exception != 1:
         start_dt = (now - timedelta(days=1)).replace(
             hour=21, minute=0, second=0, microsecond=0
@@ -299,11 +426,11 @@ def _count_voice_wakeups(
         start_dt = now.replace(hour=9, minute=0, second=0, microsecond=0)
         end_dt = now.replace(hour=12, minute=0, second=0, microsecond=0)
 
-    start_ts = int(start_dt.timestamp())
-    end_ts = int(end_dt.timestamp())
+    start_ts_ms = int(start_dt.timestamp() * 1000)
+    end_ts_ms = int(end_dt.timestamp() * 1000)
     jql_query = (
         f'responders: "Data Engineering"'
-        f" AND createdAt > {start_ts} AND createdAt < {end_ts}"
+        f" AND createdAt > {start_ts_ms} AND createdAt < {end_ts_ms}"
     )
 
     logger.info(
@@ -312,48 +439,22 @@ def _count_voice_wakeups(
         end_dt.strftime("%Y-%m-%dT%H:%M"),
     )
 
-    resp = requests.get(
-        f"{JIRA_OPS_API_BASE}/{cloud_id}/v1/alerts",
-        params={"query": jql_query, "limit": 100},
-        headers={"Accept": "application/json"},
-        auth=jira_ops_auth,
+    alert_ids = _fetch_alert_ids_in_window(
+        cloud_id, jira_ops_auth, jql_query, start_ts_ms, end_ts_ms
     )
-    if resp.status_code != 200:
-        logger.warning("Alerts API returned %s — assuming 0 wakeups", resp.status_code)
-        return 0
-
-    alert_ids = [a["id"] for a in resp.json().get("values", []) if a.get("id")]
     if not alert_ids:
         logger.info("No alerts found in window")
         return 0
-    if len(alert_ids) == 100:
-        logger.warning(
-            "Received exactly 100 alerts — result may be truncated; wakeup count could be understated."
-        )
 
-    voice_wakeups: set[str] = set()
-    for alert_id in alert_ids:
-        log_resp = requests.get(
-            f"{JIRA_OPS_API_BASE}/{cloud_id}/v1/alerts/{alert_id}/logs",
-            params={"limit": 100},
-            headers={"Accept": "application/json"},
-            auth=jira_ops_auth,
-        )
-        if log_resp.status_code != 200:
-            continue
-        for entry in log_resp.json().get("values", []):
-            log_text = entry.get("log", "")
-            status_match = re.search(r"->\s*(\w+)", log_text)
-            channel_match = re.search(r"\[(email|sms|voice)\]", log_text, re.IGNORECASE)
-            if (
-                status_match
-                and status_match.group(1) == "Sent"
-                and channel_match
-                and channel_match.group(1).lower() == "voice"
-            ):
-                voice_wakeups.add(alert_id)
+    logger.info("Found %d alerts in window", len(alert_ids))
 
-    return len(voice_wakeups)
+    wakeup_count = sum(
+        1
+        for alert_id in alert_ids
+        if _alert_had_voice_call(cloud_id, jira_ops_auth, alert_id)
+    )
+    logger.info("%d alerts with voice calls", wakeup_count)
+    return wakeup_count
 
 
 def _is_gchat_webhook(url: str) -> bool:
@@ -430,7 +531,7 @@ def _environment_suffix() -> str:
 
 
 @provide_session
-def notify_dag_rotation(session=None, **_):
+def notify_dag_rotation(session=None, **context):
     """
     Post on-call rotation notification.
 
@@ -442,7 +543,19 @@ def notify_dag_rotation(session=None, **_):
     5. Count voice wakeups from Jira Ops alerts.
     6. POST summary payload to notification-hub (DAG_Rotation space).
     7. Optionally POST to iam-alerts space for Cyber Security issues (best-effort, non-fatal).
+
+    DAG run conf (optional):
+    - load_start_date: YYYY-MM-DD — simulate the 09:00 SP notification for a past date (backtests).
     """
+    dag_run = context.get("dag_run")
+    dag_run_conf = dag_run.conf if dag_run and dag_run.conf else {}
+    load_start_date = dag_run_conf.get("load_start_date")
+    now_sp = _resolve_now_sp(load_start_date)
+    if load_start_date:
+        logger.info(
+            "Using load_start_date=%s (09:00 America/Sao_Paulo)", load_start_date
+        )
+
     config = ConfigurationService()
     webhook_keys = config.get_config("notification_webhooks_keys")
 
@@ -456,7 +569,6 @@ def notify_dag_rotation(session=None, **_):
     jira_auth = HTTPBasicAuth(jira_secret["username"], jira_secret["token"])
     jira_ops_auth = HTTPBasicAuth(jira_ops_secret["username"], jira_ops_secret["token"])
 
-    now_sp = datetime.now(tz=SP_TZ)
     dt_start = (now_sp - timedelta(days=1)).strftime("%Y-%m-%d")
     dt_end = now_sp.strftime("%Y-%m-%d")
     logger.info(
@@ -476,7 +588,7 @@ def notify_dag_rotation(session=None, **_):
     issues = _resolve_issue_owners(issues, dag_owner_map, jira_auth)
 
     recipients, periods_length_exception = _get_oncall_recipients(
-        cloud_id, jira_ops_auth
+        cloud_id, jira_ops_auth, now_sp=now_sp
     )
 
     if not recipients:
@@ -484,7 +596,7 @@ def notify_dag_rotation(session=None, **_):
         return
 
     wakeup_count = _count_voice_wakeups(
-        cloud_id, jira_ops_auth, periods_length_exception
+        cloud_id, jira_ops_auth, periods_length_exception, now_sp=now_sp
     )
     logger.info("Voice wakeups: %d", wakeup_count)
 
