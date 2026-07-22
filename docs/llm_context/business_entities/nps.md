@@ -19,6 +19,7 @@ Each NPS answer may include a **justification** — free-text feedback explainin
 ## Related Metric Entities
 
 - NPS FR
+- Offboard Human vs Digital Metrics
 
 ## Synonyms
 

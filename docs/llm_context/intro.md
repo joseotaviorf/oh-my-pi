@@ -140,6 +140,8 @@ Official, named metrics. Each builds on one or more business entities (linked at
 - `metric_entities/escalation_rate_walle.md` — % Escalation Rate (Wall-E): official escalation rate for Wall-E chatbot sessions (`COUNT_IF(is_escalated AND bot = 'wall-e') / COUNT_IF(bot = 'wall-e')`), exclusive to the Wall-E bot (taxa de escalonamento do Wall-E). Builds on `business_entities/chatbot_sessions.md`.
 
 - `metric_entities/escalation_error_rate_walle.md` — % Escalation Error Rate (Wall-E): share of escalated Wall-E sessions that landed in a different support queue than the one first routed to (`first_queue != last_queue`), restricted to a curated whitelist of eleven front-facing queues (Escalation Error Rate / taxa de erro de escalonamento do Wall-E). Builds on `business_entities/chatbot_sessions.md`.
+- `metric_entities/offboard_human_vs_digital_metrics.md` — Offboard Human vs Digital Metrics: official For Rent offboarding (U&J) TF channel shares (% digital / % human support / % SPOC) and segmented NPS plus response volumes (13 metrics). Builds on `business_entities/termination.md`, `business_entities/nps.md`, and `business_entities/ticket.md`.
+
 
 ## Company-Wide Glossary
 

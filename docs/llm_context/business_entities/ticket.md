@@ -25,6 +25,7 @@ Tickets are split into two operational categories:
 - Journey PC
 - [Customer Contacts Front](../metric_entities/customer_contacts_front.md) — Front Office DSat, Resolution Rate, and Recontato D0/D4.
 - [Cases Perspective](../metric_entities/cases_perspective.md) — Post Contract Back Office SLA, DSAT, Resolution Rate, and Inbound/Outbound Volume.
+- Offboard Human vs Digital Metrics
 
 ## Synonyms
 

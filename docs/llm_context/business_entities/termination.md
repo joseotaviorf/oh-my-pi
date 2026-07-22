@@ -25,6 +25,10 @@ The lifecycle typically includes:
 
 Not all terminations follow every step. Some are canceled before completion, some skip the inspection (opt-out), and some are resolved quickly through early agreements.
 
+## Related Metric Entities
+
+- Offboard Human vs Digital Metrics
+
 ## Glossary and Synonyms
 
 - **Rescisão**, **distrato**, **cancelamento de contrato** → `termination`
