@@ -18,7 +18,7 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  tier_uuid:
+  uuid_tier:
     is_complete:
       severity_level: Error
   tier_name:

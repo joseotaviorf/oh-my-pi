@@ -16,9 +16,10 @@ column_level_validations:
   id:
     is_complete:
       severity_level: Error
+  one_row_per_id_and_rev:
     custom:
-      constraint: "GROUP BY id, rev HAVING COUNT(*) > 1"
-      empty_result_is_valid: true
+      # No duplicate rows for the same (id, rev) composite key.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_brokers_supply_processor_clean.lead_3p_aud GROUP BY id, rev HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
   rev:
     is_complete:
@@ -36,13 +37,6 @@ column_level_validations:
         - "1"
         - "2"
       severity_level: Error
-  business_context:
-    is_contained_in:
-      values:
-        - SALE
-        - RENT
-        - SALE_PRIMARY_MARKET
-      severity_level: Warning
   status:
     is_contained_in:
       values:

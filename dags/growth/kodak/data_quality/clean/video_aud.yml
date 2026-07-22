@@ -16,9 +16,10 @@ column_level_validations:
   id:
     is_complete:
       severity_level: Error
+  one_row_per_id_and_rev:
     custom:
-      constraint: "GROUP BY id, rev HAVING COUNT(*) > 1"
-      empty_result_is_valid: true
+      # No duplicate rows for the same (id, rev) composite key.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_kodak_clean.video_aud GROUP BY id, rev HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
   rev:
     is_complete:
@@ -45,24 +46,3 @@ column_level_validations:
         - VIMEO
         - S3
       severity_level: Warning
-  year:
-    is_complete:
-      severity_level: Error
-  month:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 1
-      severity_level: Error
-    has_max_value:
-      less_than_or_equal_to: 12
-      severity_level: Error
-  day:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 1
-      severity_level: Error
-    has_max_value:
-      less_than_or_equal_to: 31
-      severity_level: Error

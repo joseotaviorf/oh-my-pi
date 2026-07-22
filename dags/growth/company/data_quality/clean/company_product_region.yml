@@ -24,7 +24,7 @@ column_level_validations:
   id_product:
     is_complete:
       severity_level: Error
-  region_external_id:
+  id_region:
     is_complete:
       severity_level: Error
   purpose:

@@ -16,9 +16,10 @@ column_level_validations:
   id_company:
     is_complete:
       severity_level: Error
+  one_row_per_id_company_and_id_document:
     custom:
-      constraint: "GROUP BY id_company, id_document HAVING COUNT(*) > 1"
-      empty_result_is_valid: true
+      # No duplicate rows for the same (id_company, id_document) composite key.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_company_clean.company_document GROUP BY id_company, id_document HAVING COUNT(*) > 1)) = 0"
       severity_level: Error
   id_document:
     is_complete:

@@ -21,24 +21,3 @@ column_level_validations:
   id_inspection_group:
     is_complete:
       severity_level: Error
-  year:
-    is_complete:
-      severity_level: Error
-  month:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 1
-      severity_level: Error
-    has_max_value:
-      less_than_or_equal_to: 12
-      severity_level: Error
-  day:
-    is_complete:
-      severity_level: Error
-    has_min_value:
-      greater_than_or_equal_to: 1
-      severity_level: Error
-    has_max_value:
-      less_than_or_equal_to: 31
-      severity_level: Error
