@@ -51,6 +51,7 @@ columns:
     categories:
       DOWNLOAD_PENDING: 'Image download from source URL pending'
       INITIAL_PROCESS_PENDING: 'Initial processing and validation pending'
+      CASA_MINEIRA_PENDING: 'Legacy CasaMineira anti-fraud analysis pending (deprecated pipeline step)'
       IMAGE_QUALITY_ANALYZER_PENDING: 'AI quality analysis pending'
       RESTB_VISION_PENDING: 'RestB.ai vision analysis pending'
       RESTB_PROPERTY_PENDING: 'RestB.ai property analysis pending'
@@ -70,6 +71,7 @@ columns:
       EXTENSION_NOT_SUPPORTED: 'Image file extension is not supported by the pipeline'
       EMPTY_IMAGE: 'Image file exists but contains no valid image data'
       IMPROPER_ENCODING: 'Image encoding is invalid or corrupted'
+      BODY_TOO_LARGE: 'Downloaded image exceeds the maximum allowed size limit'
       UNABLE_TO_ACCESS_EXTERNAL_URL: 'Unable to access external URL for download, typically due to domain blocking'
   description:
     lineage:

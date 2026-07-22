@@ -1,0 +1,88 @@
+---
+table_name: datalake_kodak_clean.image_inspection
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  url:
+    is_complete:
+      severity_level: Error
+  status:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - DOWNLOAD_PENDING
+        - INITIAL_PROCESS_PENDING
+        - CASA_MINEIRA_PENDING
+        - IMAGE_QUALITY_ANALYZER_PENDING
+        - RESTB_VISION_PENDING
+        - RESTB_PROPERTY_PENDING
+        - UPLOAD_PENDING
+        - WATERMARK_REMOVAL_PENDING
+        - NOISE_DETECTION_PENDING
+        - COMPLETED
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  house_place:
+    is_contained_in:
+      values:
+        - INTERNAL
+        - EXTERNAL
+        - VIEW
+        - NOT_PROPERTY
+        - UNDEFINED
+      severity_level: Warning
+  photo_invalid_source_reason:
+    is_contained_in:
+      values:
+        - INVALID_URL
+        - EMPTY_BODY
+        - IMAGE_NOT_FOUND
+        - READER_NOT_FOUND
+        - EXTENSION_NOT_SUPPORTED
+        - EMPTY_IMAGE
+        - IMPROPER_ENCODING
+        - BODY_TOO_LARGE
+        - UNABLE_TO_ACCESS_EXTERNAL_URL
+      severity_level: Warning
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 31
+      severity_level: Error

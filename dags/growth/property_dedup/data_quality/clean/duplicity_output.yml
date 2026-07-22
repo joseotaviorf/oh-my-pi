@@ -1,0 +1,83 @@
+---
+table_name: datalake_property_dedup_clean.duplicity_output
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  action_type:
+    is_contained_in:
+      values:
+        - BLOCK
+        - ALERT
+        - ALLOW
+      severity_level: Warning
+  duplicity_reason:
+    is_contained_in:
+      values:
+        - DUPLICATE_PUBLISHED_HOUSE_DIFFERENT_CONTEXT_SAME_OWNER
+        - DUPLICATE_THIRD_PARTY_PUBLISHED
+        - DUPLICATE_FIRST_PARTY_PUBLISHED
+        - DUPLICATE_THIRD_PARTY_SUSPENDED
+        - DUPLICATE_FIRST_PARTY_SUSPENDED
+        - DUPLICATE_UNPUBLISHED_HOUSE
+        - DUPLICATE_UNPUBLISHED_HOUSE_UNSAFE_REASONS
+        - DUPLICATE_UNPUBLISHED_HOUSE_SAFE_REASONS_AVAILABLE_AFTER_UNPUBLISHED
+        - DUPLICATE_UNPUBLISHED_HOUSE_SAFE_REASONS_AVAILABLE_BEFORE_UNPUBLISHED
+        - DUPLICATE_HOUSE_NOT_RECENT_EDITING_STATUS
+        - DUPLICATE_HOUSE_RECENT_EDITING_STATUS
+        - DUPLICATE_3P_HYBRID_CONTEXT_AFTER_PUBLISH_STATUS
+        - DUPLICATE_3P_RENT_AFTER_PUBLISH_STATUS
+        - DUPLICATE_3P_SALE_AFTER_PUBLISH_STATUS
+        - DUPLICATE_DIFFERENT_OWNER_AFTER_PUBLISH_STATUS
+        - DUPLICATE_SAME_OWNER_AFTER_PUBLISH_STATUS
+        - DUPLICATE_3P_BEFORE_PUBLISH_STATUS
+        - DUPLICATE_DIFFERENT_OWNER_BEFORE_PUBLISH_STATUS
+        - DUPLICATE_SAME_OWNER_BEFORE_PUBLISH_STATUS
+        - DUPLICATE_FIRST_PARTY_RECENT_EDITING_UPDATE
+        - DUPLICATE_FIRST_PARTY_RECENT_UNPUBLISHED_UPDATE
+        - DUPLICATE_THIRD_PARTY_RECENT_EDITING_UPDATE
+        - DUPLICATE_THIRD_PARTY_RECENT_UNPUBLISHED_UPDATE
+        - PROPERTY_NOT_DUPLICATED
+        - DUPLICITY_OVERRIDDEN
+      severity_level: Warning
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 31
+      severity_level: Error

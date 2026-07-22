@@ -39,6 +39,8 @@ columns:
       EXTENSION_NOT_SUPPORTED: 'File extension or format not supported by Kodak'
       EMPTY_IMAGE: 'Image file exists but contains no visual content'
       IMPROPER_ENCODING: 'Image file corrupted or improperly encoded'
+      BODY_TOO_LARGE: 'Downloaded image exceeds the maximum allowed size limit'
+      UNABLE_TO_ACCESS_EXTERNAL_URL: 'External URL could not be accessed, typically blocked by a firewall or domain restriction'
   ts_created:
     lineage:
       - datalake_kodak_raw.photo_invalid_source.created_at

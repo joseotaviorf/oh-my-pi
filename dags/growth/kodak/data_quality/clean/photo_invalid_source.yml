@@ -1,0 +1,75 @@
+---
+table_name: datalake_kodak_clean.photo_invalid_source
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_external_domain:
+    is_complete:
+      severity_level: Error
+  external_domain:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - HOUSE
+        - BUILDING_VENTURE
+        - LEAD3P
+        - ATLAS
+      severity_level: Error
+  source_url:
+    is_complete:
+      severity_level: Error
+  reason:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - INVALID_URL
+        - EMPTY_BODY
+        - IMAGE_NOT_FOUND
+        - READER_NOT_FOUND
+        - EXTENSION_NOT_SUPPORTED
+        - EMPTY_IMAGE
+        - IMPROPER_ENCODING
+        - BODY_TOO_LARGE
+        - UNABLE_TO_ACCESS_EXTERNAL_URL
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 31
+      severity_level: Error
