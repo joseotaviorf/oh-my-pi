@@ -18,6 +18,10 @@ columns:
     lineage:
       - datalake_company_raw.company_product.status
     description: 'Status of the company-product relationship. Used to track the if the product is active or inactive.'
+    categories:
+      ACTIVE: Product is active for the company.
+      PENDING_COMPLETION: Product registration is in progress.
+      INACTIVE: Product is inactive for the company.
   product_settings:
     lineage:
       - datalake_company_raw.company_product.product_settings

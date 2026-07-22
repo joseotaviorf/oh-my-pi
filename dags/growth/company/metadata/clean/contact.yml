@@ -36,6 +36,9 @@ columns:
       **Allowed Values:**
       - 'EMAIL': Email addresses (example: email@example.com)
       - 'PHONE': Phone numbers (example: +5511999999999)
+    categories:
+      PHONE: Company contact phone number.
+      EMAIL: Company contact email address.
   name:
     lineage:
       - datalake_company_raw.contact.name

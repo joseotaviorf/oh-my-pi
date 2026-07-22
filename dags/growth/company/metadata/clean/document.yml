@@ -60,6 +60,10 @@ columns:
       - 'REJECTED': Failed validation (invalid number, fake document, etc.)
       - 'EXPIRED': Previously valid document has expired (license renewal needed)
       - 'REVALIDATION_REQUIRED': Periodic re-verification needed for compliance
+    categories:
+      PENDING: Document awaiting validation by the system.
+      VALID: Document validated and approved.
+      INVALID: Document invalid or rejected during validation.
   document_type:
     lineage:
       - datalake_company_raw.document.document_type
@@ -77,6 +81,11 @@ columns:
       - CRECI: Broker licensing verification, property listing authorization
       - CPF: Individual identity verification, personal tax compliance
       - RFC: Mexican market expansion, international partner compliance
+    categories:
+      CNPJ: Brazilian corporate tax ID (Cadastro Nacional da Pessoa Jurídica).
+      CRECI: Brazilian real estate broker license (Conselho Regional de Corretores de Imóveis).
+      CPF: Brazilian individual tax ID (Cadastro de Pessoa Física).
+      RFC: Mexican tax ID (Registro Federal de Contribuyentes).
   attachment_path:
     lineage:
       - datalake_company_raw.document.attachment_path
@@ -130,6 +139,9 @@ columns:
       - 'ACTIVE': Current, valid document available for business operations
       - 'ARCHIVED': Superseded by newer version but kept for historical records
       - 'DELETED': Marked for deletion but preserved for audit compliance
+    categories:
+      ACTIVE: Document is active and valid.
+      INACTIVE: Document is inactive or revoked.
   version:
     lineage:
       - datalake_company_raw.document.version

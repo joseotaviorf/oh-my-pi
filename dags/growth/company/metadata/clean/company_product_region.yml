@@ -31,7 +31,10 @@ columns:
     lineage:
       - datalake_company_raw.company_product_region.purpose
     description: |
-      Purpose of the region coverage for the company.
+      Purpose of the region coverage for the company. Enum values: GENERAL_OPERATION_AREA (company operates broadly in this region) or AGENT_OPERATION_AREA (specific agent coverage area).
+    categories:
+      GENERAL_OPERATION_AREA: Company general operating area for the product.
+      AGENT_OPERATION_AREA: Agent-specific operating area for the company.
   version:
     lineage:
       - datalake_company_raw.company_product_region.version

@@ -1,0 +1,55 @@
+---
+table_name: datalake_company_clean.company_product
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id_company:
+    is_complete:
+      severity_level: Error
+    custom:
+      constraint: "GROUP BY id_company, id_product HAVING COUNT(*) > 1"
+      empty_result_is_valid: true
+      severity_level: Error
+  id_product:
+    is_complete:
+      severity_level: Error
+  status:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - ACTIVE
+        - PENDING_COMPLETION
+        - INACTIVE
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 31
+      severity_level: Error

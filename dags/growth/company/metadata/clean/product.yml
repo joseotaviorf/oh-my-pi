@@ -67,6 +67,9 @@ columns:
       - Product retirement: ACTIVE → DEPRECATED → INACTIVE (graceful sunset)
       - Quality control: BETA status for controlled partner testing and feedback
       - Emergency disable: ACTIVE → INACTIVE for critical issues or compliance
+    categories:
+      ACTIVE: Product is active and available to the company.
+      INACTIVE: Product is inactive or disabled.
   business_segment:
     lineage:
       - datalake_company_raw.product.business_segment
@@ -81,6 +84,22 @@ columns:
       - 'MARKETING_SOLUTIONS': Lead generation, digital marketing, CRM tools
       - 'ANALYTICS_SERVICES': Business intelligence, market insights, reporting
       - 'PLATFORM_SERVICES': Core infrastructure, APIs, shared technology
+    categories:
+      REDE_RENT: QuintoAndar partner network rental segment.
+      REDE_SALE: QuintoAndar partner network sales segment.
+      QUINTOANDAR: Core QuintoAndar platform product.
+      RENTALGUARANTEE: Rental guarantee product for landlords.
+      LEGAL_PERSON_RENTAL_GUARANTEE: Rental guarantee for legal-entity tenants.
+      PP_MULTI: QuintoAndar multi-property product.
+      CIQ: QuintoAndar Independent Broker (direct brokerage model).
+      ASP: Property Services Agent.
+      AUTONOMOUS_BROKERAGE_AGENT: Credentialed autonomous brokerage agent.
+      PRO_ACQUIRER_AGENT: Professional buyer-side agent.
+      PRO_ACQUIRER_MANAGER_AGENT: Professional buyer-side manager agent.
+      INTEGRATION_PARTNER: Technology integration partner with the platform.
+      INSPECTOR: Property inspection service provider.
+      PHOTOGRAPHER: Property photography service provider.
+      ALIAS: Alias product — third-party partner property acquisition.
   version:
     lineage:
       - datalake_company_raw.product.version

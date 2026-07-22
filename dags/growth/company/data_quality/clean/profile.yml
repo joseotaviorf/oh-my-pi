@@ -1,0 +1,76 @@
+---
+table_name: datalake_company_clean.profile
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  profile_name:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - realtor
+        - ciq
+        - property_inspector
+        - photographer
+        - affiliated_member
+        - company_owner
+        - company_admin
+        - property_owner
+        - property_owner_prospect
+        - customer
+        - tenant
+        - tenant_prospect
+        - buyer_prospect
+        - contract_person
+        - legal_person_tenant
+        - photographer_agent
+        - third_party_agent
+        - partner_agent
+        - company_member
+        - beneficial_owner
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 31
+      severity_level: Error

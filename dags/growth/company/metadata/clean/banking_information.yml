@@ -81,6 +81,9 @@ columns:
       - 'SETTLEMENT': Transaction clearing, marketplace settlement, refund processing
       - 'RESERVE': Emergency funds, compliance reserves, risk management
       - 'INTERNATIONAL': Cross-border payments, currency exchange, global operations
+    categories:
+      CONTA_CORRENTE: Company checking account.
+      CONTA_POUPANCA: Company savings account.
   version:
     lineage:
       - datalake_company_raw.banking_information.version

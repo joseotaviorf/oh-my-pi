@@ -118,6 +118,9 @@ columns:
       **Workflow:** Tracks document through verification process
       **Business Impact:** Affects user permissions and account status
       **Integration:** Used by verification services and compliance systems.
+    categories:
+      not_validated: Document has not yet been submitted for verification.
+      validated: Document has been successfully verified and accepted.
   document_name:
     lineage:
     - datalake_person_raw.identity_document.document_name

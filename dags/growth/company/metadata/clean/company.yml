@@ -19,7 +19,7 @@ columns:
       - datalake_company_raw.company.id
     description: |
       Primary key (BIGSERIAL). Auto-incrementing unique identifier for internal database operations and foreign key references.
-      Used by: banking_information, revenue_share, company_address, company_document, company_product relationships.
+      Used by: banking_information, revenue_share, company_address, company_document, company_product relationships. Foreign key → banking_information.id_company, revenue_share.id_company, company_address.id_company, company_document.id_company, company_product.id_company.
   id_parent:
     lineage:
       - datalake_company_raw.company.parent_id
@@ -53,6 +53,9 @@ columns:
       ENUM VALUES:
       - 'HEADQUARTERS': Independent parent company with potential subsidiaries
       - 'BRANCH': Subsidiary or branch office linked to a headquarters company
+    categories:
+      HEADQUARTERS: Company headquarters (main office).
+      BRANCH: Branch office subordinate to headquarters.
   status:
     lineage:
       - datalake_company_raw.company.status
@@ -68,6 +71,9 @@ columns:
       - INACTIVE companies are excluded from business operations but maintain historical data
       - Status changes trigger cascading updates to related entities (members, products)
       - Financial data preserved for compliance regardless of status
+    categories:
+      ACTIVE: Company is active and operational on the platform.
+      INACTIVE: Company is inactive or deactivated on the platform.
   version:
     lineage:
       - datalake_company_raw.company.version

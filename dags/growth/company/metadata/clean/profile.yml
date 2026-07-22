@@ -48,6 +48,27 @@ columns:
       - property_owner_prospect: Property submission, portfolio tracking, landlord services
       - legal_person_tenant: Corporate lease management, legal document access, compliance
       - contract_person: Contract preparation, legal process management, document handling
+    categories:
+      realtor: Credentialed real estate broker on the platform.
+      ciq: QuintoAndar Independent Broker.
+      property_inspector: Property inspector.
+      photographer: Property photographer.
+      affiliated_member: Affiliated member of a partner company.
+      company_owner: Owner or partner of a partner company.
+      company_admin: Administrator of a partner company.
+      property_owner: Property owner registered on the platform.
+      property_owner_prospect: Property owner in prospecting phase.
+      customer: QuintoAndar services consumer.
+      tenant: Tenant with an active lease contract.
+      tenant_prospect: Tenant prospecting a property to rent.
+      buyer_prospect: Buyer prospecting a property to purchase.
+      contract_person: Individual linked to an active contract.
+      legal_person_tenant: Legal-entity tenant.
+      photographer_agent: Agent coordinating photography services.
+      third_party_agent: Third-party partner company agent.
+      partner_agent: QuintoAndar partner network company agent.
+      company_member: Standard member of a partner company.
+      beneficial_owner: Ultimate beneficial owner or real partner of the company.
   version:
     lineage:
       - datalake_company_raw.profile.version
