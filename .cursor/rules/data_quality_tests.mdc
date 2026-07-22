@@ -109,6 +109,29 @@ Defined under `column_level_validations` as `{column_name}: {validation_name}: {
 | `has_max_value` | Maximum numeric value | Range params |
 | `has_mean_value` | Mean within bounds | Range params |
 
+Use **range parameter keys** only (`greater_than_or_equal_to`, `less_than_or_equal_to`, etc.). **Do not** use `min_value:` or `max_value:` — Inmetro's `RangeCheckBuilder` ignores them and fails at suite build time on EMR (`ValueError: provide at least 1 and at most 2 parameters for range parameters`).
+
+```yaml
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 31
+      severity_level: Error
+```
+
 ### String Bounds
 
 | Validation | Purpose | Parameters |
@@ -309,6 +332,7 @@ column_level_validations:
 - [ ] `custom` checks for referential integrity or cross-table rules use a **descriptive key name** (e.g. `matching_sk_x_fact_and_dimension`), not the FK column name
 - [ ] `is_contained_in` used only when nulls are not allowed (otherwise use `custom`)
 - [ ] No column-level check targets a doubly-nested column (`ArrayType(StructType(...nested array/map...))`) — Deequ throws `WrongColumnTypeException` and crashes the entire run; use table-level `custom` SQL instead
+- [ ] `has_min_value` / `has_max_value` use range params (`greater_than_or_equal_to`, `less_than_or_equal_to`, …) — never `min_value` / `max_value`
 
 ## Pre-merge: run custom constraints against Trino
 

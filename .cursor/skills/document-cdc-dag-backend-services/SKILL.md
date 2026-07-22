@@ -345,19 +345,19 @@ column_level_validations:
     is_complete:
       severity_level: Error
     has_min_value:
-      min_value: 1
+      greater_than_or_equal_to: 1
       severity_level: Error
     has_max_value:
-      max_value: 12
+      less_than_or_equal_to: 12
       severity_level: Error
   day:
     is_complete:
       severity_level: Error
     has_min_value:
-      min_value: 1
+      greater_than_or_equal_to: 1
       severity_level: Error
     has_max_value:
-      max_value: 31
+      less_than_or_equal_to: 31
       severity_level: Error
 ```
 
@@ -371,8 +371,8 @@ column_level_validations:
 | Enum, NOT NULL | `is_contained_in` with exact values | Error |
 | Enum, nullable | `is_contained_in` with exact values | Warning |
 | Partition `year` | `is_complete` | Error |
-| Partition `month` | `is_complete` + `has_min_value: 1` + `has_max_value: 12` | Error |
-| Partition `day` | `is_complete` + `has_min_value: 1` + `has_max_value: 31` | Error |
+| Partition `month` | `is_complete` + `has_min_value` (`greater_than_or_equal_to: 1`) + `has_max_value` (`less_than_or_equal_to: 12`) | Error |
+| Partition `day` | `is_complete` + `has_min_value` (`greater_than_or_equal_to: 1`) + `has_max_value` (`less_than_or_equal_to: 31`) | Error |
 
 ### `is_contained_in` value format
 

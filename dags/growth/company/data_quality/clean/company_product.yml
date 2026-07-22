@@ -39,17 +39,17 @@ column_level_validations:
     is_complete:
       severity_level: Error
     has_min_value:
-      min_value: 1
+      greater_than_or_equal_to: 1
       severity_level: Error
     has_max_value:
-      max_value: 12
+      less_than_or_equal_to: 12
       severity_level: Error
   day:
     is_complete:
       severity_level: Error
     has_min_value:
-      min_value: 1
+      greater_than_or_equal_to: 1
       severity_level: Error
     has_max_value:
-      max_value: 31
+      less_than_or_equal_to: 31
       severity_level: Error
