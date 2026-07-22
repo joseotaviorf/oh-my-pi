@@ -64,15 +64,15 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.policy_report.type
   proposal_elected_income_sum:
-    description: "Sum of the elected income of a proposal. This column stores the calculated value by the income engine for the proposal elected income."
+    description: "Sum of the elected income of all tenants in a proposal, recalculated from each tenant electedIncome."
     lineage:
-      - datalake_sorting_hat_clean.policy_report.result.elected_income_sum
+      - datalake_sorting_hat_clean.policy_report.raw_data.tenants.aggregated_structured_results.electedIncome
   proposal_declared_income_sum:
-    description: "Sum of the declared income of a proposal. This column stores the calculated value by the income engine for the proposal declared income."
+    description: "Sum of the declared income of all tenants in a proposal, recalculated from each tenant declaredIncome."
     lineage:
-      - datalake_sorting_hat_clean.policy_report.result.declared_income_sum
+      - datalake_sorting_hat_clean.policy_report.raw_data.tenants.aggregated_structured_results.declaredIncome
   number_of_tenants:
-    description: "Number of tenants in a proposal."
+    description: "Number of tenants in a proposal, counted from exploded tenants with a valid analysis_machine_id."
     lineage:
       - datalake_sorting_hat_clean.policy_report.raw_data.tenants
   version:

@@ -3,21 +3,13 @@ WITH get_policy_report_income_engine_data AS (
     id AS id_policy_report,
     id_external AS id_proposal,
     type AS policy_name,
-    GET_JSON_OBJECT(result, '$.elected_income_sum') AS proposal_elected_income_sum,
-    GET_JSON_OBJECT(result, '$.declared_income_sum') AS proposal_declared_income_sum,
     GET_JSON_OBJECT(result, '$.has_exception') AS proposal_has_exception,
-    ARRAY_SIZE(
-      FROM_JSON(
-        GET_JSON_OBJECT(raw_data, '$.tenants'),
-        'ARRAY<STRING>'
-      )
-    ) AS number_of_tenants,
     raw_data,
     version,
     ts_created,
     ts_updated
   FROM
-    datalake_sorting_hat_clean.policy_report -- Filtering only the income engine data
+    datalake_sorting_hat_clean.policy_report
   WHERE
     type = 'TENANT_INCOME'
 ),
@@ -74,6 +66,19 @@ get_tenants_data AS (
     GET_JSON_OBJECT(extract_json.aggregated_structured_results, '$.internalDebtsOnDefault') AS tenant_internal_debts_on_default
   FROM
     extract_json_tenants_data
+),
+proposal_income_sums AS (
+  SELECT
+    id,
+    COUNT(*) AS number_of_tenants,
+    SUM(COALESCE(CAST(tenant_elected_income AS DECIMAL(10, 2)), 0)) AS proposal_elected_income_sum,
+    SUM(COALESCE(CAST(tenant_declared_income AS DECIMAL(10, 2)), 0)) AS proposal_declared_income_sum
+  FROM
+    get_tenants_data
+  WHERE
+    id_analysis_machine IS NOT NULL
+  GROUP BY
+    id
 )
 
 SELECT
@@ -90,12 +95,12 @@ SELECT
   CAST(GET_JSON_OBJECT(td.tenant_boavista_scpc_query_count, '$.id') AS INTEGER) AS id_boavista_scpc_query_count,
   CAST(GET_JSON_OBJECT(td.tenant_crivo_income_report, '$.id') AS INTEGER) AS id_crivo_income_report,
   ied.policy_name,
-  CAST(ied.proposal_elected_income_sum AS DECIMAL(10, 2)) AS proposal_elected_income_sum,
-  CAST(ied.proposal_declared_income_sum AS DECIMAL(10, 2)) AS proposal_declared_income_sum,
-  CAST(ied.number_of_tenants AS INTEGER) AS number_of_tenants,
+  pis.proposal_elected_income_sum,
+  pis.proposal_declared_income_sum,
+  CAST(pis.number_of_tenants AS INTEGER) AS number_of_tenants,
   CAST(ied.version AS INTEGER) AS version,
   CAST(td.tenant_changes AS INTEGER) AS tenant_changes,
-  CAST(td.tenant_bureau_income as DECIMAL(10, 2)) AS tenant_bureau_income,
+  CAST(td.tenant_bureau_income AS DECIMAL(10, 2)) AS tenant_bureau_income,
   CAST(td.tenant_elected_income AS DECIMAL(10, 2)) AS tenant_elected_income,
   CAST(td.tenant_income_changes AS INTEGER) AS tenant_income_changes,
   CAST(td.tenant_internal_debts AS DECIMAL(10, 2)) AS tenant_internal_debts,
@@ -142,3 +147,8 @@ FROM
 INNER JOIN
   get_tenants_data AS td
     ON ied.id_policy_report = td.id
+INNER JOIN
+  proposal_income_sums AS pis
+    ON ied.id_policy_report = pis.id
+WHERE
+  td.id_analysis_machine IS NOT NULL
