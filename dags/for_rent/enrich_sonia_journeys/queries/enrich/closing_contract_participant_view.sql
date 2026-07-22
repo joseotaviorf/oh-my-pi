@@ -84,6 +84,7 @@ SELECT
     ))
     -- Gate 1+2: all contracts (registered and unregistered alike), binning_value < threshold
     OR (binning_value < CASE
+        WHEN ts_created >= TIMESTAMP '2026-07-22 20:00:00' THEN 50
         WHEN ts_created >= TIMESTAMP '2026-07-21 10:00:00' THEN 15
         WHEN ts_created >= TIMESTAMP '2026-07-16 13:00:00' THEN 5
         ELSE 0
