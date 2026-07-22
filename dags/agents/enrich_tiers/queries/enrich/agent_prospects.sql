@@ -6,6 +6,7 @@ WITH prospect_daily_results AS (
         pdr.event_name,
         pdr.business_context,
         pdr.referral_type,
+        ROW_NUMBER() OVER(PARTITION BY COALESCE(pdr.id_rent_flow, pdr.id_sale_flow), pdr.event_type, pdr.business_context ORDER BY pdr.ts_event ASC) = 1 AS is_first_event,
         pdr.ts_event,
         DATE(pdr.ts_event) AS dt_event,
         pdr.year,
@@ -13,8 +14,6 @@ WITH prospect_daily_results AS (
         pdr.day
     FROM
         datalake_demand_flows.prospect_daily_results AS pdr
-    QUALIFY
-        1 = ROW_NUMBER() OVER(PARTITION BY COALESCE(pdr.id_rent_flow, pdr.id_sale_flow), pdr.event_type, pdr.business_context ORDER BY pdr.ts_event ASC)
 )
 SELECT
     pdr.id_agent,
@@ -37,3 +36,4 @@ WHERE
     AND pdr.id_agent IS NOT NULL
     AND pdr.event_name in ("USER FIRST ACTIVATION", "USER RECOVERY", "USER RECOVERY IN OTHER CITY GROUP")
     AND pdr.referral_type <> 'Rede'
+    AND pdr.is_first_event IS TRUE
