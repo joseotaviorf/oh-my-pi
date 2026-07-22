@@ -23,7 +23,7 @@ departments AS (
   FROM
     datalake_gsheets_clean.department_control
 ),
-incoming_tickets AS (
+incoming_tickets_ranked AS (
   SELECT
     id_ticket,
     id_problem_ticket,
@@ -67,13 +67,62 @@ incoming_tickets AS (
     ts_updated - INTERVAL 3 HOUR AS ts_updated,
     year,
     month,
-    day
+    day,
+    ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) AS rn
   FROM
     datalake_zendesk.tickets_current AS t
   WHERE
     ts_updated >= DATE('{load_start_date}') - INTERVAL 1 MONTH
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
+),
+incoming_tickets AS (
+  SELECT
+    id_ticket,
+    id_problem_ticket,
+    id_user_main,
+    id_contract,
+    id_call,
+    id_session,
+    id_house,
+    id_group,
+    first_id_group,
+    last_id_group,
+    first_ticket_queue,
+    last_ticket_queue,
+    ticket_queue,
+    contact_ticket,
+    task_sid_twilio,
+    twilio_task,
+    tags,
+    type,
+    description,
+    status,
+    analyst_email,
+    first_analyst_email,
+    last_analyst_email,
+    channel,
+    request_type,
+    client_type,
+    step_tag,
+    customer_type_tag,
+    contact_theme_tag,
+    contact_motivation_tag,
+    contact_theme_detail_tag,
+    custom_fields_map,
+    custom_fields,
+    reopens,
+    replies,
+    ts_budget,
+    ts_created,
+    ts_solved,
+    ts_closed,
+    ts_updated,
+    year,
+    month,
+    day
+  FROM
+    incoming_tickets_ranked
+  WHERE
+    rn = 1
 ),
 -- The following CTEs are needed because a single call/chat can create multiple tickets.
 chat_tickets AS (
@@ -230,6 +279,8 @@ unique_tickets AS (
       WHEN COALESCE(ca1.origin, ca2.origin) IS NOT NULL THEN CONCAT('call ', COALESCE(ca1.origin, ca2.origin))
       WHEN ch.origin = 'in app' THEN 'chat in app'
       WHEN ch.origin = 'whatsapp' THEN ch.origin
+      -- Fallback: quando o registro Twilio do chat nao casa, recupera a origem whatsapp pela tag do Zendesk
+      WHEN ut.channel = 'chat' AND t.tags LIKE '%whatsapp%' THEN 'whatsapp'
       ELSE "n/a"
     END AS ticket_origin,
     ut.channel,
@@ -314,37 +365,52 @@ twilio_attr AS (
     FROM
       tickets_per_task
   ), 
-  ticket_twilio_data AS (
+  resolved_ticket_attr AS (
+  -- For chat/call the Twilio record is authoritative, but when it does not match
+  -- (missing twilio_task or record outside the load window) fall back to the ticket's
+  -- own Zendesk attribution instead of losing queue/analyst entirely.
   SELECT DISTINCT
     ta.id_ticket,
-    CASE WHEN tp.channel IN ('call', 'chat') 
-      THEN ta.first_analyst_email
-      ELSE tp.first_analyst_email
-    END as first_analyst_email,
-    CASE WHEN tp.channel IN ('call', 'chat') 
-      THEN ta.last_analyst_email
-      ELSE tp.last_analyst_email
-    END as last_analyst_email,
     CASE WHEN tp.channel IN ('call', 'chat')
-      THEN ta.first_queue
+      THEN COALESCE(ta.first_analyst_email, tp.first_analyst_email)
+      ELSE tp.first_analyst_email
+    END AS first_analyst_email,
+    CASE WHEN tp.channel IN ('call', 'chat')
+      THEN COALESCE(ta.last_analyst_email, tp.last_analyst_email)
+      ELSE tp.last_analyst_email
+    END AS last_analyst_email,
+    CASE WHEN tp.channel IN ('call', 'chat')
+      THEN COALESCE(ta.first_queue, tp.first_ticket_queue)
       ELSE tp.first_ticket_queue
     END AS first_queue,
     CASE WHEN tp.channel IN ('call', 'chat')
-      THEN ta.last_queue
+      THEN COALESCE(ta.last_queue, tp.last_ticket_queue)
       ELSE tp.last_ticket_queue
     END AS last_queue,
+    ta.ts_created_twilio
+  FROM
+    twilio_attr AS ta
+  LEFT JOIN
+    tickets_per_task AS tp
+      ON ta.id_ticket = tp.id_ticket
+),
+  ticket_twilio_data AS (
+  SELECT DISTINCT
+    ra.id_ticket,
+    ra.first_analyst_email,
+    ra.last_analyst_email,
+    ra.first_queue,
+    ra.last_queue,
     LOWER(NULLIF(NULLIF(dc.front_or_back, '-'), '')) AS front_or_back,
     dc.journey_step,
     dc.team,
     dc.area,
-    ta.ts_created_twilio
+    ra.ts_created_twilio
   FROM
-    twilio_attr AS ta
-  LEFT JOIN tickets_per_task as tp
-ON ta.id_ticket = tp.id_ticket
+    resolved_ticket_attr AS ra
   LEFT JOIN
     departments AS dc
-      ON dc.department = ta.last_queue
+      ON dc.department = ra.last_queue
 ),
 tickets AS (
   SELECT
@@ -664,89 +730,153 @@ ticket_metrics AS (
     datalake_gsheets_clean.ticket_rate_classification AS tr
       ON t.contact_theme_detail_tag = tr.micro_taxonomy
         AND t.contact_theme_tag = tr.macro_taxonomy
+),
+final_ranked AS (
+  SELECT
+    tc.id_ticket,
+    tc.id_problem_ticket,
+    tc.id_user_main,
+    tc.id_house,
+    tc.id_contract,
+    tc.id_call,
+    tc.id_session,
+    tc.id_sss_session,
+    tc.id_twilio,
+    tc.first_queue,
+    tc.last_queue,
+    tc.first_analyst_email,
+    tc.last_analyst_email,
+    tc.front_or_back,
+    tc.journey_step,
+    tc.team,
+    tc.area,
+    tc.status,
+    tc.channel,
+    tc.direction,
+    tc.ticket_origin,
+    tc.tags,
+    tc.type,
+    tc.description,
+    tc.request_type,
+    tc.client_type,
+    tc.step_tag,
+    tc.customer_type_tag,
+    tc.contact_theme_tag,
+    tc.contact_motivation_tag,
+    tc.contact_theme_detail_tag,
+    tc.custom_fields,
+    tc.reopens,
+    tc.replies,
+    tc.back_ticket_list,
+    tc.total_backoffice_minutes_time,
+    tc.sla_target,
+    tc.days_elapsed_business,
+    tc.days_elapsed_calendar,
+    tc.days_off,
+    CASE
+      WHEN tc.sub_journey IN ('Contract to Entrance', 'Listing & Search', 'Offboarding', 'Onboarding', 'Visits to Offer')
+        THEN 'FOR RENT'
+      WHEN tc.sub_journey = 'For Sale' THEN 'FOR SALE'
+      WHEN tc.sub_journey = 'Partners' THEN 'PARTNERS'
+      ELSE NULL
+    END AS context,
+    CASE
+      WHEN tc.is_ticket_rate AND tc.sub_journey = 'Ongoing' THEN
+        CASE
+          WHEN tc.front_or_back = 'front' THEN 15
+          WHEN tc.front_or_back = 'back' THEN 30
+        END
+      WHEN tc.is_ticket_rate AND tc.sub_journey IN (
+        'Contract to Entrance', 'For Sale',
+        'Listing & Search', 'Offboarding',
+        'Onboarding', 'Partners', 'Visits to Offer'
+      ) THEN
+        CASE
+          WHEN tc.front_or_back = 'front' THEN 1
+          WHEN tc.front_or_back = 'back' THEN 2
+        END
+      ELSE NULL
+    END AS ticket_rate_weight,
+    tc.has_open_back_ticket,
+    tc.is_backlog_in_time,
+    tc.is_back_ticket,
+    tc.is_closed_by_merge,
+    tc.is_call_answered,
+    tc.is_ticket_rate,
+    tc.ts_budget,
+    tc.ts_created,
+    tc.ts_created_twilio,
+    tc.ts_sla_started,
+    tc.ts_solved,
+    tc.ts_closed,
+    tc.ts_updated,
+    tc.year,
+    tc.month,
+    tc.day,
+    ROW_NUMBER() OVER(PARTITION BY tc.id_ticket ORDER BY tc.ts_updated DESC) AS rn
+  FROM
+    ticket_metrics AS tc
 )
 SELECT
-  tc.id_ticket,
-  tc.id_problem_ticket,
-  tc.id_user_main,
-  tc.id_house,
-  tc.id_contract,
-  tc.id_call,
-  tc.id_session,
-  tc.id_sss_session,
-  tc.id_twilio,
-  tc.first_queue,
-  tc.last_queue,
-  tc.first_analyst_email,
-  tc.last_analyst_email,
-  tc.front_or_back,
-  tc.journey_step,
-  tc.team,
-  tc.area,
-  tc.status,
-  tc.channel,
-  tc.direction,
-  tc.ticket_origin,
-  tc.tags,
-  tc.type,
-  tc.description,
-  tc.request_type,
-  tc.client_type,
-  tc.step_tag,
-  tc.customer_type_tag,
-  tc.contact_theme_tag,
-  tc.contact_motivation_tag,
-  tc.contact_theme_detail_tag,
-  tc.custom_fields,
-  tc.reopens,
-  tc.replies,
-  tc.back_ticket_list,
-  tc.total_backoffice_minutes_time,
-  tc.sla_target,
-  tc.days_elapsed_business,
-  tc.days_elapsed_calendar,
-  tc.days_off,
-  CASE
-    WHEN tc.sub_journey IN ('Contract to Entrance', 'Listing & Search', 'Offboarding', 'Onboarding', 'Visits to Offer')
-      THEN 'FOR RENT'
-    WHEN tc.sub_journey = 'For Sale' THEN 'FOR SALE'
-    WHEN tc.sub_journey = 'Partners' THEN 'PARTNERS'
-    ELSE NULL
-  END AS context,
-  CASE
-    WHEN tc.is_ticket_rate AND tc.sub_journey = 'Ongoing' THEN
-      CASE
-        WHEN tc.front_or_back = 'front' THEN 15
-        WHEN tc.front_or_back = 'back' THEN 30
-      END
-    WHEN tc.is_ticket_rate AND tc.sub_journey IN (
-      'Contract to Entrance', 'For Sale',
-      'Listing & Search', 'Offboarding',
-      'Onboarding', 'Partners', 'Visits to Offer'
-    ) THEN
-      CASE
-        WHEN tc.front_or_back = 'front' THEN 1
-        WHEN tc.front_or_back = 'back' THEN 2
-      END
-    ELSE NULL
-  END AS ticket_rate_weight,
-  tc.has_open_back_ticket,
-  tc.is_backlog_in_time,
-  tc.is_back_ticket,
-  tc.is_closed_by_merge,
-  tc.is_call_answered,
-  tc.is_ticket_rate,
-  tc.ts_budget,
-  tc.ts_created,
-  tc.ts_created_twilio,
-  tc.ts_sla_started,
-  tc.ts_solved,
-  tc.ts_closed,
-  tc.ts_updated,
-  tc.year,
-  tc.month,
-  tc.day
+  id_ticket,
+  id_problem_ticket,
+  id_user_main,
+  id_house,
+  id_contract,
+  id_call,
+  id_session,
+  id_sss_session,
+  id_twilio,
+  first_queue,
+  last_queue,
+  first_analyst_email,
+  last_analyst_email,
+  front_or_back,
+  journey_step,
+  team,
+  area,
+  status,
+  channel,
+  direction,
+  ticket_origin,
+  tags,
+  type,
+  description,
+  request_type,
+  client_type,
+  step_tag,
+  customer_type_tag,
+  contact_theme_tag,
+  contact_motivation_tag,
+  contact_theme_detail_tag,
+  custom_fields,
+  reopens,
+  replies,
+  back_ticket_list,
+  total_backoffice_minutes_time,
+  sla_target,
+  days_elapsed_business,
+  days_elapsed_calendar,
+  days_off,
+  context,
+  ticket_rate_weight,
+  has_open_back_ticket,
+  is_backlog_in_time,
+  is_back_ticket,
+  is_closed_by_merge,
+  is_call_answered,
+  is_ticket_rate,
+  ts_budget,
+  ts_created,
+  ts_created_twilio,
+  ts_sla_started,
+  ts_solved,
+  ts_closed,
+  ts_updated,
+  year,
+  month,
+  day
 FROM
-  ticket_metrics AS tc
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
+  final_ranked
+WHERE
+  rn = 1
