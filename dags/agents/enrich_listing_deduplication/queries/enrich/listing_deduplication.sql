@@ -264,8 +264,7 @@ supply_source_info_by_context AS (
     MAX(CASE WHEN business_context = 'SALE' THEN supply_source ELSE NULL END) AS supply_source_sale
   FROM
     datalake_supply_flows.conversion_lookup
-  GROUP BY
-    id_house
+  GROUP BY ALL
 ),
 supply_source_info AS (
   SELECT

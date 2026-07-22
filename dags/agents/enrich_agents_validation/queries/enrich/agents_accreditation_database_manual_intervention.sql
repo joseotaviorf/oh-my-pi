@@ -1,23 +1,13 @@
-WITH last_type_ranked AS (
-  SELECT
-    id_agent_data,
-    types,
-    rev_type,
-    rev,
-    ROW_NUMBER() OVER (PARTITION BY id_agent_data, types ORDER BY rev DESC) AS rn
-  FROM
-    datalake_ebdb_clean.agent_data_types_aud
-),
-last_type AS (
+WITH last_type AS (
   SELECT
     id_agent_data,
     types,
     rev_type,
     rev
   FROM
-    last_type_ranked
-  WHERE
-    rn = 1
+    datalake_ebdb_clean.agent_data_types_aud
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_agent_data, types ORDER BY rev DESC) = 1
 ),
 divergent_results AS (
   SELECT

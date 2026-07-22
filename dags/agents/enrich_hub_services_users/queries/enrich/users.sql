@@ -1,4 +1,4 @@
-WITH users_base AS (
+WITH users AS (
     SELECT
         u.id,
         COALESCE(um.id_user, u.id_external) AS id_external,
@@ -9,30 +9,14 @@ WITH users_base AS (
         u.ts_updated,
         u.year,
         u.month,
-        u.day,
-        MAX(u.ts_updated) OVER (PARTITION BY u.id) AS max_ts_updated
+        u.day
     FROM
         datalake_hub_services_clean.users AS u
     LEFT JOIN
         datalake_ebdb_user.user_merge AS um
             ON ARRAY_CONTAINS(um.predecessor_user_list, u.id_external)
-),
-users AS (
-    SELECT
-        id,
-        id_external,
-        name,
-        email,
-        phone_number,
-        ts_created,
-        ts_updated,
-        year,
-        month,
-        day
-    FROM
-        users_base
-    WHERE
-        ts_updated = max_ts_updated
+    QUALIFY
+        u.ts_updated = FIRST(u.ts_updated) OVER (PARTITION BY u.id ORDER BY u.ts_updated DESC)
 )
 SELECT
     u.id AS id_user,

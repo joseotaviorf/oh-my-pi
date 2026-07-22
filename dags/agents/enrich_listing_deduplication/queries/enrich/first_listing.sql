@@ -5,18 +5,16 @@ WITH house_listing_consultant AS (
         hlc.consultant_type,
         hlc.business_context,
         hlc.is_last_ciq_on_listing,
-        CAST(
-            CASE
-                WHEN hlc.business_context = 'RENT' THEN COALESCE(
-                    hlc.ts_enrollment_started,
-                    FIRST(hlc.ts_listing_version_start) OVER (
-                        PARTITION BY hlc.id_house, hlc.business_context, COALESCE(hlc.id_user, -1), hlc.consultant_type
-                        ORDER BY hlc.ts_listing_version_start ASC
-                    )
+        CASE
+            WHEN hlc.business_context = 'RENT' THEN COALESCE(
+                hlc.ts_enrollment_started,
+                FIRST(hlc.ts_listing_version_start) OVER (
+                    PARTITION BY hlc.id_house, hlc.business_context, COALESCE(hlc.id_user, -1), hlc.consultant_type
+                    ORDER BY hlc.ts_listing_version_start ASC
                 )
-                ELSE hlc.ts_enrollment_started
-            END AS TIMESTAMP
-        ) AS ts_enrollment_started
+            )
+            ELSE hlc.ts_enrollment_started
+        END AS ts_enrollment_started
     FROM
         datalake_big_agent.house_listing_consultant AS hlc
     WHERE
@@ -36,14 +34,12 @@ unpublished AS (
     WHERE
         status = 'UNPUBLISHED'
         AND mod_status = 1
-    GROUP BY
-        lbc_aud.id_house,
-        lbc_aud.business_context
+    GROUP BY ALL
 ),
 first_listing AS (
     SELECT
         hlc.id_house,
-        CAST(COALESCE(hlc.id_user, -1) AS BIGINT) AS id_user,
+        COALESCE(hlc.id_user, -1) AS id_user,
         hlc.consultant_type,
         lbc.status,
         lbc.business_context,
@@ -123,17 +119,7 @@ house_first_listing AS (
     WHERE
         fcs.id_house IS NULL
         OR fcs.ts_contract_signed = cfl.ts_contract_signed
-    GROUP BY
-        cfl.id_house,
-        cfl.id_user,
-        cfl.consultant_type,
-        cfl.business_context,
-        cfl.status,
-        cfl.ts_first_listing IS NOT NULL,
-        cfl.ts_first_listing,
-        cfl.ts_first_unpublished,
-        cfl.ts_contract_signed,
-        cfl.ts_enrollment_started
+    GROUP BY ALL
 ),
 deduped_house_first_listing AS (
     SELECT

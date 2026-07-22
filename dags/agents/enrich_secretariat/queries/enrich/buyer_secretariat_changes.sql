@@ -13,16 +13,12 @@ WITH users_5a AS (
         AND TRY_CAST(SUBSTRING(main_phone,6,9) AS INT) NOT IN (111111111,222222222,333333333,444444444,555555555,666666666,777777777,888888888,999999999)
         AND TRY_CAST(SUBSTRING(main_phone,6,8) AS INT) NOT IN (11111111,22222222,33333333,44444444,55555555,66666666,77777777,88888888,99999999)
 ),
-visitor_ranked AS (
+visitor AS (
     SELECT
         v.id,
         COALESCE(v.id_external, u_email.id_user,u_phone.id_user) AS id_external,
         COALESCE(v.email, u_email.email, u_phone.email) AS visitor_email,
-        visitor_name,
-        ROW_NUMBER() OVER (
-            PARTITION BY COALESCE(v.id_external, u_email.id_user,u_phone.id_user), v.id
-            ORDER BY version DESC
-        ) AS rn
+        visitor_name
     FROM
         datalake_hub_services_clean.visitor AS v
     LEFT JOIN
@@ -33,17 +29,8 @@ visitor_ranked AS (
         users_5a AS u_phone
             ON COALESCE(v.id_external, 0) = 0
             AND TRIM(u_phone.main_phone) = TRIM(REPLACE(phone_number,'+',''))
-),
-visitor AS (
-    SELECT
-        id,
-        id_external,
-        visitor_email,
-        visitor_name
-    FROM
-        visitor_ranked
-    WHERE
-        rn = 1
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY COALESCE(v.id_external, u_email.id_user,u_phone.id_user), v.id ORDER BY version DESC) = 1
 ),
 leads AS (
     SELECT

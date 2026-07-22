@@ -81,27 +81,8 @@ daily_status AS (
         activation_history AS ah
             ON ad.id_agent = ah.id_agent
             AND ad.dt_ref >= ah.dt_started
-            AND ad.dt_ref < COALESCE(ah.dt_ended, DATE '{load_end_date}' + INTERVAL 1 DAY)
-    GROUP BY
-        ad.id_agent_daily,
-        ad.id_agent,
-        ad.id_agent_data,
-        ad.id_partner,
-        ad.id_user,
-        ad.uuid_company,
-        ad.uuid_agent,
-        ad.uuid_person,
-        ad.creci,
-        ad.creci_uf,
-        ad.affiliation_type,
-        ad.profile,
-        ad.is_1p_partnership,
-        ad.is_3p_partnership,
-        ad.ts_created,
-        ad.dt_ref,
-        ad.year,
-        ad.month,
-        ad.day
+            AND ad.dt_ref < COALESCE(ah.dt_ended, CURRENT_DATE+1)
+    GROUP BY ALL
 ),
 visit_demand_history AS (
     WITH visit_demand_history_ranked AS (
