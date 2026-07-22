@@ -13,6 +13,7 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
+  custom_schema: security_data_gateway
   load_spark_job: load_security_data_gateway_findings_raw
   spark_job_arguments:
     - "{environment}"
