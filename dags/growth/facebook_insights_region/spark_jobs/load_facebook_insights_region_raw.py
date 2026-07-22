@@ -33,6 +33,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def save_to_datalake(
     dataframe,
     environment,
@@ -157,8 +161,7 @@ def facebook_insights_request(account_id, table_name, start_date, end_date, brea
         list: List of dictionaries containing Facebook insights data
     """
 
-    base_dbutils = BaseDBUtils()
-    dbutils = base_dbutils.get_dbutils()
+    BaseDBUtils()
 
     params = {
         "level": "ad",
@@ -188,7 +191,9 @@ def facebook_insights_request(account_id, table_name, start_date, end_date, brea
         },
     }
 
-    configs = json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.FACEBOOK))
+    configs = json.loads(
+        get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.FACEBOOK)
+    )
 
     FacebookAdsApi.init(access_token=configs["auth"]["access_token"])
 

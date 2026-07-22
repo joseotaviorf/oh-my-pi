@@ -35,6 +35,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def __convert_excel_numeric_date(excel_date):
     if excel_date is not None and excel_date.isnumeric():
         numeric_date = int(excel_date)
@@ -80,7 +84,7 @@ def __get_auth(dbutils):
     @return: dict and str
     """
     credentials = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.GSHEETS_CREDENTIALS)
+        get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.GSHEETS_CREDENTIALS)
     )
     scope = credentials.pop("scope")
 

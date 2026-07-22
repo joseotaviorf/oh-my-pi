@@ -34,6 +34,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(job_name)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def workspace_mapping_key(workspace_list: list) -> dict:
     """
     Creates a mapping dict to get API Key for each Workspace.
@@ -62,7 +66,7 @@ def get_api_token(workspace_api_token):
         dbutils = base_dbutils.get_dbutils()
 
     api_token_object = json.loads(
-        dbutils.secrets.get(scope=scope, key=workspace_api_token)
+        get_dbutils().secrets.get(scope=scope, key=workspace_api_token)
     )
 
     return api_token_object["api_token"]

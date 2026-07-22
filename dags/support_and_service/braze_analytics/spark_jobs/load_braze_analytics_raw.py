@@ -29,6 +29,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment")
@@ -69,7 +73,7 @@ if __name__ == "__main__":
     filesystem_path = datalake_info["db_raw_path"]
     database_name = datalake_info["db_raw_databricks"]
 
-    api_token = dbutils.secrets.get(
+    api_token = get_dbutils().secrets.get(
         scope="quintoandar", key=getattr(APIEnum, f"BRAZE_{app_group.upper()}")
     )
     instance = "US-03"

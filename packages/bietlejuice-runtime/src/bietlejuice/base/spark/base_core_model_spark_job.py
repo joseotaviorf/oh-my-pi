@@ -15,6 +15,8 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark.base_spark import BaseDBUtils
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
 from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
     DataFrameDeltaTableLoaderPipeline,
 )
@@ -132,6 +134,13 @@ class BaseCoreModelSparkJob(ABC):
             "m=initialize_spark_session, msg=Initializing Spark session with Delta Lake and S3 support"
         )
 
+        if RuntimeDetector.is_emr():
+            spark = create_emr_spark_session(self.job_name)
+            self.logger.info(
+                "m=initialize_spark_session, msg=Spark session initialized via EMR factory"
+            )
+            return spark
+
         try:
             spark = (
                 SparkSession.builder.appName(self.job_name)
@@ -172,7 +181,6 @@ class BaseCoreModelSparkJob(ABC):
                 "m=initialize_spark_session, msg=Falling back to basic Spark session"
             )
 
-            # Fall back to basic Spark session
             return SparkSession.builder.appName(self.job_name).getOrCreate()
 
     def setup_table_privileges(self, args: Any) -> TablePrivileges:

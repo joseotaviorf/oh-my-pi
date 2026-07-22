@@ -36,8 +36,14 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def _get_conn_config(dbutils, dbutils_secret_key):
-    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
+    conn_config_json = get_dbutils().secrets.get(
+        scope="quintoandar", key=dbutils_secret_key
+    )
 
     return json.loads(conn_config_json)
 

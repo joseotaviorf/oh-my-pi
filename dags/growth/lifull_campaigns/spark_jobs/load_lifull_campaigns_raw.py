@@ -33,6 +33,10 @@ JOB_NAME = "load_lifull_campaigns_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 class TLSAdapter(requests.adapters.HTTPAdapter):
     """
     Solution used to solve an SLL error during API requests.
@@ -199,7 +203,7 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     credentials = json.loads(
-        dbutils.secrets.get("quintoandar", APIEnum.LIFULL_CAMPAIGNS)
+        get_dbutils().secrets.get("quintoandar", APIEnum.LIFULL_CAMPAIGNS)
     )
 
     """

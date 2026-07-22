@@ -7,7 +7,7 @@ from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, spark
+from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
@@ -45,6 +45,8 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
+    spark_client = SparkClient(JOB_NAME)
+    spark = spark_client.conn
     logger.info(f"[EXECUTION LOGGING] -  args={args}")
     logger.info(
         f"[EXECUTION LOGGING] -  env={args.environment}, bucket={args.bucket}, schema={args.schema}, table={args.table_name}"
@@ -121,7 +123,6 @@ def main():
         )
     )
 
-    spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_service.create_database(write_database_name)
     logger.info(

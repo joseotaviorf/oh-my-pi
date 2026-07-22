@@ -26,6 +26,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def _parse_arguments():
     """
     This method aims to get the arguments passed from the dag.
@@ -143,7 +147,7 @@ if __name__ == "__main__":
     day = str(execution_date.day).zfill(2)
 
     proxy_path_date = f"s3://5a-ss-{table_name_proxy}-{args.env}/year={year_proxy}/month={month_proxy}/day={day}/"
-    paths_bucket = dbutils.fs.ls(proxy_path_date)
+    paths_bucket = get_dbutils().fs.ls(proxy_path_date)
     hour_list = [hour.name for hour in paths_bucket]
 
     max_cores = int(multiprocessing.cpu_count() * 0.6)

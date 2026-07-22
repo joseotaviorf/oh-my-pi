@@ -33,6 +33,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def extend_incremental_params(params: dict, execution_date: str) -> dict:
     """
     Function to parse and add incremental param in the current params.
@@ -148,7 +152,7 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     api_token = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.AIRTABLE)
+        get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.AIRTABLE)
     )
 
     airtable_client = AirtableClient(api_token=api_token["auth_token"])

@@ -8,3 +8,12 @@ cluster:
     spark_conf:
       spark.driver.maxResultSize: '0'
     spark_version: 13.3.x-scala2.12
+validation:
+  cluster:
+    type: emr_7_12_consolidation_m_memory_single_node_fleet_cluster
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      spark_conf:
+        spark.driver.maxResultSize: '0'
+  allow_custom_spark_job: true

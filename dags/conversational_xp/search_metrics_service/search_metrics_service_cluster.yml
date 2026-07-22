@@ -7,3 +7,10 @@ cluster:
   custom_configurations:
     spark_conf:
       spark.metrics.namespace: data_products.search
+validation:
+  cluster:
+    type: emr_7_12_consolidation_m_memory_single_node_fleet_cluster
+    custom_configurations:
+      spark_conf:
+        spark.metrics.namespace: data_products.search
+  allow_custom_spark_job: true

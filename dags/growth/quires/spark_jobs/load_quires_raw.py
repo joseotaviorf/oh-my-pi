@@ -30,6 +30,12 @@ JOB_NAME = "load_quires_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 spark_client = SparkClient()
 
 
@@ -47,13 +53,11 @@ def api_request(api_url, table_name, start_date, end_date, cursor=None):
     Returns:
         API response (dict format)
     """
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
+    BaseDBUtils()
 
     headers = {
         "X-API-Key": json.loads(
-            dbutils.secrets.get(scope="quintoandar", key=APIEnum.QUIRES)
+            get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.QUIRES)
         )["token"],
         "Content-Type": "application/json",
         "Accept": "application/json",

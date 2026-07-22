@@ -34,6 +34,10 @@ JOB_NAME = "load_hr_system_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 class Ingestion:
     def __init__(self, args, url, token) -> None:
         self.environment = args.environment
@@ -192,7 +196,7 @@ class Ingestion:
 
     def clear_directory(self, layer):
         if self.has_dt_effective == True:
-            dbutils.fs.rm(
+            get_dbutils().fs.rm(
                 f"s3://{self.datalake_bucket}/{layer}/{self.source}/{self.table_name}/",
                 True,
             )
@@ -240,7 +244,7 @@ def get_conn_config() -> tuple[str, str]:
     if base_dbutils.get_dbutils() is not None:
         global dbutils
         dbutils = base_dbutils.get_dbutils()
-    json_credentials = dbutils.secrets.get(
+    json_credentials = get_dbutils().secrets.get(
         scope=DATABRICKS_SCOPE, key=APIEnum.HR_SYSTEM
     )
     credentials = json.loads(json_credentials)

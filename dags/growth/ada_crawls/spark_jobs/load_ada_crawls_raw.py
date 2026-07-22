@@ -31,6 +31,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def get_most_recent_crawl(
     crawl_bucket_path: str, load_start_date: str, load_end_date: str
 ) -> Optional[str]:
@@ -45,7 +49,7 @@ def get_most_recent_crawl(
       Returns:
         most_recent_crawl (str): The most recent crawl folder within the date range, or None if not found.
     """
-    folder_items = dbutils.fs.ls(crawl_bucket_path)
+    folder_items = get_dbutils().fs.ls(crawl_bucket_path)
     date_pattern = r"^\d{4}-\d{2}-\d{2}$"
 
     load_start_date = datetime.strptime(load_start_date, "%Y-%m-%d")
@@ -54,7 +58,7 @@ def get_most_recent_crawl(
     most_recent_crawl = None
 
     for item in folder_items:
-        if item.isDir:
+        if item.isDir():
             folder_name = item.name.strip("/")
             if re.match(date_pattern, folder_name):
                 crawl_date = datetime.strptime(folder_name, "%Y-%m-%d")
@@ -112,7 +116,7 @@ def get_issues_dataframe(
       Returns:
         df (DataFrame): The DataFrame with the data from the CSV files inside the issues_reports/ folder.
     """
-    report_file_list = dbutils.fs.ls(most_recent_crawl_issues_path)
+    report_file_list = get_dbutils().fs.ls(most_recent_crawl_issues_path)
 
     if not report_file_list:
         raise FileNotFoundError(
@@ -208,7 +212,7 @@ def has_required_items(path: str) -> bool:
         bool: True if the path has the required items, False otherwise.
     """
     try:
-        contents = [content.name for content in dbutils.fs.ls(path)]
+        contents = [content.name for content in get_dbutils().fs.ls(path)]
         return "issues_reports/" in contents and "internal_all.csv" in contents
     except:
         return False
@@ -240,8 +244,8 @@ def get_dataframe_for_most_recent_crawl(
 
     device_folders = [
         item
-        for item in dbutils.fs.ls(most_recent_crawl.path)
-        if item.isDir
+        for item in get_dbutils().fs.ls(most_recent_crawl.path)
+        if item.isDir()
         and not item.name.startswith(".")
         and has_required_items(item.path)
     ]
@@ -442,10 +446,7 @@ def main():
             """)
 
     base_dbutils = BaseDBUtils()
-
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
-    else:
+    if base_dbutils.get_dbutils() is None:
         raise RuntimeError("""
             m=main, msg=Failed to initialize dbutils or find its object.
             """)
@@ -457,7 +458,7 @@ def main():
     )
     gchat_webhook = None
     try:
-        gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
+        gchat_webhook = get_dbutils().secrets.get(scope="quintoandar", key=webhook_key)
     except Exception as e:
         logger.warning(
             f"m=main, msg=Could not get GChat webhook for no-crawl notification; notifications will be skipped. error={e}"

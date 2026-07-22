@@ -14,15 +14,19 @@ from argparse import ArgumentParser
 from pyspark.sql.functions import col, dayofmonth, explode, month, to_timestamp, year
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, spark
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
 )
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 
 # Job configuration
 JOB_NAME = "Load Comms Manager Rules"
+
+spark_client = SparkClient(JOB_NAME)
+spark = spark_client.conn
 
 
 def collect_all_files(path, file_extension=".json"):

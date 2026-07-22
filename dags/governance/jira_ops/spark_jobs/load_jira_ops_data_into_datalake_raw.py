@@ -25,6 +25,11 @@ JOB_NAME = "load_jira_ops_data_into_datalake_raw"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -76,7 +81,9 @@ if __name__ == "__main__":
     else:
         api_enum_value = APIEnum.JIRA_OPS
 
-    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=api_enum_value)
+    json_credentials = get_dbutils().secrets.get(
+        scope=DATABRICKS_SCOPE, key=api_enum_value
+    )
     credentials = json.loads(json_credentials)
 
     if credentials.get("cloud_id") and params.get("cloud_id"):

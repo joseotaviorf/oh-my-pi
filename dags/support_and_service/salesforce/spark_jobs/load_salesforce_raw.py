@@ -29,6 +29,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def parse_arguments():
     """
     Parse the arguments passed to the job.
@@ -81,18 +85,13 @@ def parse_arguments():
 
 
 def get_access_token(endpoint, env):
-    # Initializing clients
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
-
     if env == "forno":
         api_credentials = json.loads(
-            dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE_FORNO)
+            get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE_FORNO)
         )
     elif env == "prod":
         api_credentials = json.loads(
-            dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE)
+            get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE)
         )
 
     req_url = f"{endpoint}/services/oauth2/token"

@@ -25,6 +25,12 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_google_analytics_classified_raw"
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 base_dbutils = BaseDBUtils()
 
 if __name__ == "__main__":
@@ -54,7 +60,9 @@ if __name__ == "__main__":
     source_database_name = config_service.get_config("source_database_name")
     source_table_name = config_service.get_config("source_table_name")
 
-    credentials_json = dbutils.secrets.get("quintoandar", APIEnum.CLASSIFIEDS_BIGQUERY)
+    credentials_json = get_dbutils().secrets.get(
+        "quintoandar", APIEnum.CLASSIFIEDS_BIGQUERY
+    )
 
     credentials_dict = json.loads(credentials_json)
     credentials_b64 = base64.b64encode(credentials_json.encode("utf-8")).decode("utf-8")

@@ -25,6 +25,10 @@ JOB_NAME = "load_amplitude_new_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def bucket_from_location(transient_location):
     """Bucket name from an s3 location, e.g. "s3://my-bucket/" -> "my-bucket"."""
     return transient_location.split("//", 1)[1].split("/", 1)[0]
@@ -100,9 +104,9 @@ def main():
     transient_location = config_service.get_config("transient_location")
     transient_data_schema = config_service.get_config("transient_data_schema")
     transient_expected_cols = config_service.get_config("transient_expected_cols")
-
-    dbutils = BaseDBUtils().get_dbutils()
-    all_keys = json.loads(dbutils.secrets.get("quintoandar", APIEnum.AMPLITUDE) or "[]")
+    all_keys = json.loads(
+        get_dbutils().secrets.get("quintoandar", APIEnum.AMPLITUDE) or "[]"
+    )
     app_ids = extract_app_ids(all_keys)
 
     transient_bucket = bucket_from_location(transient_location)

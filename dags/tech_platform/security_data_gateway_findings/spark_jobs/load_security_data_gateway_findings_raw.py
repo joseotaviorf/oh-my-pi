@@ -25,6 +25,11 @@ from bietlejuice.loaders.delta_loader import DeltaLoader
 
 JOB_NAME = "load_security_data_gateway_findings_raw"
 
+
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 TABLE_NAME = "security_findings"
 DATABASE_NAME = "datalake_security_data_gateway_raw"
 
@@ -272,12 +277,10 @@ class LoadSecurityDataGatewayFindingsRawJob(BaseCoreModelSparkJob):
             "kafka_api_secret_secret"
         )
 
-        base_dbutils = BaseDBUtils()
-        dbutils = base_dbutils.get_dbutils()
-        kafka_api_key = dbutils.secrets.get(
+        kafka_api_key = get_dbutils().secrets.get(
             scope="quintoandar", key=kafka_api_key_secret
         )
-        kafka_api_secret = dbutils.secrets.get(
+        kafka_api_secret = get_dbutils().secrets.get(
             scope="quintoandar", key=kafka_api_secret_secret
         )
 

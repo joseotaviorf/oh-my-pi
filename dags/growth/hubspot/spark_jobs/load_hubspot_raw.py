@@ -41,6 +41,12 @@ JOB_NAME = "load_hubspot_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 spark_client = SparkClient()
 
 
@@ -175,7 +181,9 @@ def get_token():
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    json_credentials = dbutils.secrets.get(scope="quintoandar", key=APIEnum.HUBSPOT)
+    json_credentials = get_dbutils().secrets.get(
+        scope="quintoandar", key=APIEnum.HUBSPOT
+    )
 
     return json.loads(json_credentials)["token"]
 

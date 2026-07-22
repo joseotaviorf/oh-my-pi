@@ -34,6 +34,11 @@ API_VERSION = "v1"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
+
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -72,7 +77,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    credentials_str = dbutils.secrets.get(
+    credentials_str = get_dbutils().secrets.get(
         scope="quintoandar", key=APIEnum.GOOGLE_SEARCH_CONSOLE
     )
     credentials = json.loads(credentials_str)

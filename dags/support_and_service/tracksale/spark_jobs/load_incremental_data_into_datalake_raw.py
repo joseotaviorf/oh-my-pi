@@ -39,6 +39,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def get_api_response(token, table_name, params):
 
     tracksale_client = TracksaleClient(api_token=token)
@@ -93,7 +97,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    json_credentials = dbutils.secrets.get(
+    json_credentials = get_dbutils().secrets.get(
         scope=DATABRICKS_SCOPE, key=APIEnum.TRACKSALE
     )
     credentials = json.loads(json_credentials)

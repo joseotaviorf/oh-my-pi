@@ -25,6 +25,10 @@ JOB_NAME = "load_emlio_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def explode_json_column(df, column, json_schema):
 
     JSON_TYPE_NAMES = ["array", "struct"]
@@ -137,8 +141,10 @@ if __name__ == "__main__":
 
     base_dbutils = BaseDBUtils()
     dbutils = base_dbutils.get_dbutils()
-    kafka_api_key = dbutils.secrets.get(scope="quintoandar", key="EMLIO_KAFKA_API_KEY")
-    kafka_api_secret = dbutils.secrets.get(
+    kafka_api_key = get_dbutils().secrets.get(
+        scope="quintoandar", key="EMLIO_KAFKA_API_KEY"
+    )
+    kafka_api_secret = get_dbutils().secrets.get(
         scope="quintoandar", key="EMLIO_KAFKA_API_SECRET"
     )
 

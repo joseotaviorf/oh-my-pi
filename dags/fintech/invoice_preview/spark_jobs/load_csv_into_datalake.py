@@ -40,6 +40,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def _file_timestamp(path):
     return int(path.split("/")[-1].split("-")[0])
 
@@ -239,7 +243,7 @@ if __name__ == "__main__":
         else:
             key = GchatWebhooksEnum.AE_ALERTS_FORNO
 
-        gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=key)
+        gchat_webhook = get_dbutils().secrets.get(scope="quintoandar", key=key)
         messages = __build_warning_messages(
             environment=environment,
             s3_path_prefix=f"s3://{source_root_path}",

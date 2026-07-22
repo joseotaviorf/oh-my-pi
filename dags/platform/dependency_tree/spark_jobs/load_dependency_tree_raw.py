@@ -26,13 +26,17 @@ DEPENDENCIES_S3_PATH = "astronomer/dags/dags/dependencies.yaml"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def _fetch_dependencies_file(dbutils):
     config_service = ConfigurationService(JOB_NAME)
     artifacts_bucket = config_service.get_config("artifacts_bucket")
     s3_path = f"{artifacts_bucket}/{DEPENDENCIES_S3_PATH}"
 
     logger.info(f"m=_fetch_dependencies_file, msg=Reading from {s3_path}")
-    content = dbutils.fs.head(s3_path, 1024 * 1024)
+    content = get_dbutils().fs.head(s3_path, 1024 * 1024)
 
     data = yaml.safe_load(content)
     return pd.json_normalize(data or {})

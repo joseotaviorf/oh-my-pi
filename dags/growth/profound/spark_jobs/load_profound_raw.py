@@ -27,6 +27,10 @@ CATEGORY_ID = "92504126-efe7-4f21-b17a-344f300a685d"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def get_profound_data(
     profound_client: Client,
     metrics: list[str],
@@ -107,7 +111,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    credentials = dbutils.secrets.get(scope="quintoandar", key=APIEnum.PROFOUND)
+    credentials = get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.PROFOUND)
 
     profound_client = Client(
         api_key=credentials,

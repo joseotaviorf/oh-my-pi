@@ -22,6 +22,10 @@ JOB_NAME = "load_criteo_campaigns_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -51,7 +55,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    credentials_str = dbutils.secrets.get(scope="quintoandar", key=APIEnum.CRITEO)
+    credentials_str = get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.CRITEO)
     credentials = json.loads(credentials_str)
 
     criteo_client = CriteoClient(

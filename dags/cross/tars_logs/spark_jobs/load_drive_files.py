@@ -35,6 +35,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = logging.getLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def _build_drive_client(credentials: dict):
     sa_creds = ServiceAccountCredentials.from_json_keyfile_dict(
         credentials, _DRIVE_SCOPES
@@ -44,7 +48,7 @@ def _build_drive_client(credentials: dict):
 
 def _get_auth(dbutils) -> dict:
     credentials = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.GSHEETS_CREDENTIALS)
+        get_dbutils().secrets.get(scope="quintoandar", key=APIEnum.GSHEETS_CREDENTIALS)
     )
     credentials.pop("scope", None)
     return credentials

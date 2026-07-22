@@ -27,6 +27,11 @@ QUERIES_METABASE_DATALAKE_PATH = QUERIES_DATALAKE_PATH + "metabase"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -67,7 +72,9 @@ if __name__ == "__main__":
 
     partition_cols = list(partitions.keys())
 
-    conn_config = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.METABASE)
+    conn_config = get_dbutils().secrets.get(
+        scope="quintoandar", key=DatabaseEnum.METABASE
+    )
     conn_config_json = json.loads(conn_config)
     spark_client = SparkClient()
 

@@ -29,6 +29,11 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 LOGGER = QuintoAndarLogger(__name__)
 
+
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 DATABRICKS_SECRET_SCOPE = "quintoandar"
 
 SECRET_KEY_IRU_CREDENTIALS = "IRU_API_CREDENTIALS"
@@ -92,7 +97,11 @@ def _validate_iru_request_url(url: str) -> str:
 def _get_secret(dbutils, key: str, env_key: str | None = None) -> str:
     try:
         if dbutils is not None:
-            return dbutils.secrets.get(scope=DATABRICKS_SECRET_SCOPE, key=key).strip()
+            return (
+                get_dbutils()
+                .secrets.get(scope=DATABRICKS_SECRET_SCOPE, key=key)
+                .strip()
+            )
     except Exception:
         pass
     env_key = env_key or key

@@ -10,21 +10,26 @@ from pyspark.sql.functions import (
     explode,
     from_json,
     input_file_name,
+    udf,
 )
 from pyspark.sql.types import ArrayType, MapType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.spark import SparkTableStorageFormat, spark
+from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
 )
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "openapi_load"
+
+spark_client = SparkClient(JOB_NAME)
+spark = spark_client.conn
 logger = QuintoAndarLogger(JOB_NAME)
 paths_schema = MapType(
     StringType(),
@@ -132,7 +137,7 @@ def main():
         m=__main__, environment={args.env}, dag_name={JOB_NAME}
         datalake_bucket={args.datalake_bucket}, execution_date={args.execution_date},
         schema={args.schema}, table_name={args.table_name},
-        msg=Starting spark job...
+        msg=Starting job...
         """
     )
 

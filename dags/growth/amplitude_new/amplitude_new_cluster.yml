@@ -12,6 +12,24 @@ cluster:
       spark.driver.maxResultSize: '0'
       spark.databricks.delta.optimizeWrite.enabled: 'true'
     driver_node_type_id: r7g.xlarge
-    # NVMe local SSD (proven on amplitude_optimization twin) — clean shuffle was EBS-bound.
     node_type_id: r7gd.8xlarge
     num_workers: 6
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xl_memory_fleet_cluster
+    custom_configurations:
+      core_nodes:
+        target_on_demand: 2
+        target_spot: 0
+        instance_types:
+        - r6gd.8xlarge
+      task_nodes:
+        instance_types:
+        - r6gd.8xlarge
+        target_on_demand: 4
+        target_spot: 0
+      aws_attributes:
+        ebs_volume_size: 500
+      spark_conf:
+        spark.driver.maxResultSize: '0'
+  allow_custom_spark_job: true

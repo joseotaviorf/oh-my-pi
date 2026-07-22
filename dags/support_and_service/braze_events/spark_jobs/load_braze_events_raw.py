@@ -29,6 +29,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_dbutils():
+    return BaseDBUtils().get_dbutils()
+
+
 def get_events_from_app_group(app_group_path, dbutils):
     data_export_folders = base_dbutils.discover_directories_in_path(
         app_group_path, dbutils

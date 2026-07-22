@@ -9,3 +9,10 @@ cluster:
       spark.sql.legacy.json.allowEmptyString.enabled: 'true'
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     driver_node_type_id: r7g.xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_xs_memory_fleet_cluster
+    custom_configurations:
+      spark_conf:
+        spark.sql.legacy.json.allowEmptyString.enabled: 'true'
+  allow_custom_spark_job: true
