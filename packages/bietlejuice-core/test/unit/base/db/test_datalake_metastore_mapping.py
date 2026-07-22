@@ -1,4 +1,5 @@
 from bietlejuice.base.db.datalake_metastore_mapping import DatalakeMetastoreMapping
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
 class TestDatalakeMetastoreMapping:
@@ -127,6 +128,88 @@ class TestDatalakeMetastoreMapping:
     def test_get_schema_from_database_for_other(self):
         # arrange
         database = "other"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema is None
+
+    def test_enrich_governed_schema_drops_datalake_prefix(self):
+        # arrange: a schema following the new naming convention (no datalake_ prefix)
+        source = "ops_finance"
+        datalake_bucket = "bucket-forno"
+
+        # act
+        db_name = DatalakeMetastoreMapping(
+            source, datalake_bucket
+        ).get_full_database_name(LayerEnum.ENRICH)
+
+        # assert
+        assert db_name == "ops_finance"
+
+    def test_governed_schema_only_affects_name_not_path(self):
+        # arrange
+        source = "ops_finance"
+        datalake_bucket = "bucket-forno"
+
+        # act
+        db_path = DatalakeMetastoreMapping(
+            source, datalake_bucket
+        ).get_full_database_path(LayerEnum.ENRICH)
+
+        # assert: the S3 path never carried the datalake_ prefix, so it is unchanged
+        assert db_path == "s3a://bucket-forno/enrich/ops_finance/"
+
+    def test_enrich_non_governed_schema_keeps_datalake_prefix(self):
+        # arrange: a regular schema is untouched
+        source = "some_domain"
+        datalake_bucket = "bucket-forno"
+
+        # act
+        db_name = DatalakeMetastoreMapping(
+            source, datalake_bucket
+        ).get_full_database_name(LayerEnum.ENRICH)
+
+        # assert
+        assert db_name == "datalake_some_domain"
+
+    def test_get_schema_from_database_for_governed_enrich(self):
+        # arrange: prefixless governed name (enrich)
+        database = "ops_finance"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "ops_finance"
+
+    def test_get_schema_from_database_for_governed_with_layer_suffix(self):
+        # arrange: prefixless governed name with a layer suffix
+        database = "ops_finance_clean"
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(database)
+
+        # assert
+        assert schema == "ops_finance"
+
+    def test_get_schema_from_database_roundtrips_governed_name(self):
+        # arrange: the reverse must invert get_full_database_name for governed schemas
+        source = "ops_finance"
+        db_name = DatalakeMetastoreMapping(
+            source, "bucket-forno"
+        ).get_full_database_name(LayerEnum.ENRICH)
+
+        # act
+        schema = DatalakeMetastoreMapping.get_schema_from_database(db_name)
+
+        # assert
+        assert schema == source
+
+    def test_get_schema_from_database_non_governed_prefixless_still_none(self):
+        # arrange: a prefixless, non-governed name is still unrecoverable (unchanged behavior)
+        database = "random_thing"
 
         # act
         schema = DatalakeMetastoreMapping.get_schema_from_database(database)

@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.db.datalake_metastore_mapping import apply_naming_convention
 from bietlejuice.base.paths import DAG_PACKAGES_ROOT, DATALAKE_METADATA_PATH
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -276,9 +277,11 @@ class DAGMetadataService:
         if layer == "dw":
             return f"dw_{target_db_name}"
         elif layer == "enrich":
-            return f"datalake_{target_db_name}"
+            return apply_naming_convention(target_db_name, f"datalake_{target_db_name}")
         elif layer in {"clean", "raw"}:
-            return f"datalake_{target_db_name}_{layer}"
+            return apply_naming_convention(
+                target_db_name, f"datalake_{target_db_name}_{layer}"
+            )
         else:
             return None
 

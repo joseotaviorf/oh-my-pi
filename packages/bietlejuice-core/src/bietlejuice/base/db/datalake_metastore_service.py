@@ -1,5 +1,6 @@
 from deprecated import deprecated
 
+from bietlejuice.base.db.datalake_metastore_mapping import apply_naming_convention
 from bietlejuice.base.pipeline import EnvironmentEnum
 
 
@@ -34,6 +35,16 @@ class DatalakeMetastoreService:
             "db_clean_athena": f"datalake_{source}_clean{schema_suffix}",
             "db_enrich_athena": f"datalake_{source}{schema_suffix}",
             "db_clean_staging_athena": f"datalake_{source}_clean_staging{schema_suffix}",
+        }
+
+        # Governed schemas under the new naming convention drop the datalake_ prefix.
+        spark_db_infos = {
+            key: apply_naming_convention(source, name)
+            for key, name in spark_db_infos.items()
+        }
+        athena_db_infos = {
+            key: apply_naming_convention(source, name)
+            for key, name in athena_db_infos.items()
         }
 
         s3_infos = {

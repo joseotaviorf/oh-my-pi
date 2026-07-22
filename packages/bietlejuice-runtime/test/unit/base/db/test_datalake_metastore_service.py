@@ -59,3 +59,23 @@ class TestDatalakeMetastoreService:
             "db_enrich_path": "s3://5a-datalake-prod/enrich/_my_src_/",
         }
         assert actual_db_info_dict == expected
+
+    def test_get_db_info_governed_schema_drops_datalake_prefix(self):
+        # arrange: a schema following the new naming convention (no datalake_ prefix)
+        env = "forno"
+        source = "ops_finance"
+        datalake_bucket = "5a-datalake-forno"
+
+        # act
+        db_info_dict = DatalakeMetastoreService.get_db_info(
+            env, source, datalake_bucket
+        )
+
+        # assert: names drop the prefix; the S3 path is unchanged (never carried it)
+        assert db_info_dict["db_enrich_databricks"] == "ops_finance"
+        assert db_info_dict["db_enrich_athena"] == "ops_finance"
+        assert db_info_dict["db_clean_databricks"] == "ops_finance_clean"
+        assert (
+            db_info_dict["db_enrich_path"]
+            == "s3://5a-datalake-forno/enrich/ops_finance/"
+        )

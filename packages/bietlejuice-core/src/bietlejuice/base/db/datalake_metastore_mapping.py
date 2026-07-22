@@ -3,6 +3,28 @@ import re
 from bietlejuice.base.db.metastore_mapping import MetastoreMapping
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
+DATALAKE_PREFIX = "datalake_"
+
+# Governed schemas that follow the new naming convention: the database name drops
+# the historical ``datalake_`` prefix (e.g. ``ops_finance`` instead of
+# ``datalake_ops_finance``). New governed schemas provisioned under this convention
+# should be added here.
+SCHEMAS_WITHOUT_DATALAKE_PREFIX = frozenset(
+    {
+        "ops_finance",
+    }
+)
+
+
+def apply_naming_convention(source: str, database_name: str) -> str:
+    """Drops the ``datalake_`` prefix for governed schemas that follow the new
+    naming convention. No-op for every other schema/name."""
+    if source in SCHEMAS_WITHOUT_DATALAKE_PREFIX and database_name.startswith(
+        DATALAKE_PREFIX
+    ):
+        return database_name[len(DATALAKE_PREFIX) :]
+    return database_name
+
 
 class DatalakeMetastoreMapping(MetastoreMapping):
     """Datalake properties mapping for Hive Metastore."""
@@ -13,7 +35,7 @@ class DatalakeMetastoreMapping(MetastoreMapping):
 
     def get_full_database_name(self, layer: LayerEnum = None) -> str:
         """Following the pattern according to the layer and the source (given in the constructor), returns the full database name used in Spark."""
-        return {
+        database_name = {
             "transactional": f"datalake_{self.source}_transactional",
             "raw": f"datalake_{self.source}_raw",
             "clean": f"datalake_{self.source}_clean",
@@ -22,6 +44,30 @@ class DatalakeMetastoreMapping(MetastoreMapping):
             "enrich": f"datalake_{self.source}",
             "wonka": "wonka",
         }[layer.value]
+
+        return apply_naming_convention(self.source, database_name)
+
+    @classmethod
+    def get_schema_from_database(cls, database_name: str) -> str:
+        """Recover the source schema from a database name.
+
+        Extends the base regex (which only matches ``datalake_``/``core_`` prefixes) so
+        governed schemas under the new naming convention — which have no ``datalake_``
+        prefix (see ``SCHEMAS_WITHOUT_DATALAKE_PREFIX``) — are recovered too, keeping this
+        the inverse of ``get_full_database_name``.
+        """
+        schema = super().get_schema_from_database(database_name)
+        if schema is not None:
+            return schema
+        # No prefix matched: try the governed schemas, stripping the optional layer suffix
+        # (e.g. ops_finance / ops_finance_clean -> ops_finance). Exact matches win.
+        for governed in SCHEMAS_WITHOUT_DATALAKE_PREFIX:
+            if database_name == governed:
+                return governed
+        for governed in SCHEMAS_WITHOUT_DATALAKE_PREFIX:
+            if database_name.startswith(f"{governed}_"):
+                return governed
+        return None
 
     def get_full_database_path(self, layer: LayerEnum = None):
         """Following the pattern according to the layer, source and bucket (given in the constructor), returns the full file path."""
