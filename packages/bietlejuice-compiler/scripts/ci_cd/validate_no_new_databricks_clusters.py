@@ -63,14 +63,17 @@ class ClusterClassification:
     spark_version: str
 
 
-def load_exceptions(path: Path = EXCEPTIONS_PATH) -> Tuple[Set[str], Set[str]]:
-    """Return (dag_names, repo_relative_paths) from the exceptions YAML."""
+def load_exceptions(
+    path: Path = EXCEPTIONS_PATH,
+) -> Tuple[Set[str], Set[str], Set[str]]:
+    """Return (dag_names, repo_relative_paths, path_prefixes) from exceptions YAML."""
     if not path.exists():
-        return set(), set()
+        return set(), set(), set()
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     entries = data.get("exceptions") or []
     dag_names: Set[str] = set()
     paths: Set[str] = set()
+    path_prefixes: Set[str] = set()
     for entry in entries:
         if not isinstance(entry, dict):
             continue
@@ -80,7 +83,10 @@ def load_exceptions(path: Path = EXCEPTIONS_PATH) -> Tuple[Set[str], Set[str]]:
         rel = entry.get("path")
         if rel:
             paths.add(str(rel).strip().rstrip("/"))
-    return dag_names, paths
+        prefix = entry.get("path_prefix")
+        if prefix:
+            path_prefixes.add(str(prefix).strip().rstrip("/"))
+    return dag_names, paths, path_prefixes
 
 
 def is_excepted(
@@ -88,10 +94,17 @@ def is_excepted(
     dag_root: str,
     dag_names: Set[str],
     paths: Set[str],
+    path_prefixes: Set[str],
 ) -> bool:
     if dag_name in dag_names:
         return True
-    return dag_root.rstrip("/") in paths
+    normalized_root = dag_root.rstrip("/")
+    if normalized_root in paths:
+        return True
+    return any(
+        normalized_root == prefix or normalized_root.startswith(f"{prefix}/")
+        for prefix in path_prefixes
+    )
 
 
 def extract_prod_cluster(
@@ -266,8 +279,11 @@ def evaluate_dag(
     config_service: ConfigurationService,
     dag_exceptions: Set[str],
     path_exceptions: Set[str],
+    path_prefix_exceptions: Set[str],
 ) -> Optional[Violation]:
-    if is_excepted(dag_name, dag_root, dag_exceptions, path_exceptions):
+    if is_excepted(
+        dag_name, dag_root, dag_exceptions, path_exceptions, path_prefix_exceptions
+    ):
         return None
 
     head_cluster = resolve_prod_cluster_on_disk(dag_root, dag_name)
@@ -317,7 +333,7 @@ def collect_violations(branch: str) -> List[Violation]:
     git_service = GitService()
     from_ref = resolve_diff_from_ref(branch)
     changed = git_service.get_modified_files_from_diff(from_ref, "HEAD")
-    dag_exceptions, path_exceptions = load_exceptions()
+    dag_exceptions, path_exceptions, path_prefix_exceptions = load_exceptions()
 
     violations: List[Violation] = []
     for dag_root, dag_name in affected_dag_roots(changed):
@@ -329,6 +345,7 @@ def collect_violations(branch: str) -> List[Violation]:
             config_service,
             dag_exceptions,
             path_exceptions,
+            path_prefix_exceptions,
         )
         if violation is not None:
             violations.append(violation)

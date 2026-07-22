@@ -25,9 +25,10 @@ class TestLoadExceptions:
     def test_empty_file(self, tmp_path):
         path = tmp_path / "exceptions.yml"
         path.write_text("exceptions: []\n", encoding="utf-8")
-        dag_names, paths = load_exceptions(path)
+        dag_names, paths, path_prefixes = load_exceptions(path)
         assert dag_names == set()
         assert paths == set()
+        assert path_prefixes == set()
 
     def test_dag_and_path_entries(self, tmp_path):
         path = tmp_path / "exceptions.yml"
@@ -45,25 +46,58 @@ class TestLoadExceptions:
                             "reason": "x",
                             "approved_by": "b@quintoandar.com.br",
                         },
+                        {
+                            "path_prefix": "dags/luigijr",
+                            "reason": "luigi jr",
+                            "approved_by": "c@quintoandar.com.br",
+                        },
                     ]
                 }
             ),
             encoding="utf-8",
         )
-        dag_names, paths = load_exceptions(path)
+        dag_names, paths, path_prefixes = load_exceptions(path)
         assert dag_names == {"enrich_databricks_query_history"}
         assert paths == {"dags/platform/foo"}
+        assert path_prefixes == {"dags/luigijr"}
 
 
 class TestIsExcepted:
     def test_by_dag_name(self):
-        assert is_excepted("my_dag", "dags/x/my_dag", {"my_dag"}, set()) is True
+        assert is_excepted("my_dag", "dags/x/my_dag", {"my_dag"}, set(), set()) is True
 
     def test_by_path(self):
-        assert is_excepted("my_dag", "dags/x/my_dag", set(), {"dags/x/my_dag"}) is True
+        assert (
+            is_excepted("my_dag", "dags/x/my_dag", set(), {"dags/x/my_dag"}, set())
+            is True
+        )
+
+    def test_by_path_prefix(self):
+        assert (
+            is_excepted(
+                "gsheets_luigijr_foo",
+                "dags/luigijr/gsheets_luigijr_foo",
+                set(),
+                set(),
+                {"dags/luigijr"},
+            )
+            is True
+        )
+
+    def test_path_prefix_does_not_match_other_domains(self):
+        assert (
+            is_excepted(
+                "my_dag",
+                "dags/growth/my_dag",
+                set(),
+                set(),
+                {"dags/luigijr"},
+            )
+            is False
+        )
 
     def test_not_listed(self):
-        assert is_excepted("my_dag", "dags/x/my_dag", set(), set()) is False
+        assert is_excepted("my_dag", "dags/x/my_dag", set(), set(), set()) is False
 
 
 class TestExtractProdCluster:
