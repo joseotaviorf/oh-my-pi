@@ -196,12 +196,30 @@ fall back to `.session.yml`.
 Step logs land under `emr/logs/cli/` so `--follow-logs` and S3 fetch work. **Never** submit to
 fleet `bietlejuice.*` clusters (their LogUri is `emr/logs/dags/...`).
 
+**Instance profile (JobFlowRole) by domain:**
+
+| Domain (`dags/<domain>`) | JobFlowRole | Domain tag |
+|---|---|---|
+| `people` | `emr-people-prod` | `people` |
+| everything else | `emr-prod` | `default` |
+
+People DAGs must not reuse a default `emr-prod` validation cluster — the skill skips mismatched
+`Domain` tags and creates a new cluster with `emr-people-prod`.
+
 Resolution order (`resolve_validation_emr_cluster`):
-1. `--new-emr-session` → create fresh migration-emr-cli cluster
-2. `--emr-cluster` if `WAITING`/`RUNNING`
-3. `.session.yml` `emr_cluster_id` if tagged `migration-validation` and reusable
-4. Any active cluster tagged `Purpose=migration-validation`
-5. `migration-emr-cli create-cluster` (default when no session cluster exists)
+1. `--new-emr-session` → create fresh migration-emr-cli cluster (correct JobFlowRole for domain)
+2. `--emr-cluster` if `WAITING`/`RUNNING` **and** `Domain` tag matches
+3. `.session.yml` `emr_cluster_id` if tagged `migration-validation`, Domain matches, reusable
+4. **All** active clusters tagged `Purpose=migration-validation` with matching Domain
+5. `migration-emr-cli create-cluster --job-flow-role <role>` (default when no matching session cluster)
+
+**Explicit `--emr-cluster` + Domain mismatch fails hard** (raises) — it is never silently discarded
+in favor of creating another cluster. Purpose tag may be skipped for an explicit id, but Domain /
+JobFlowRole isolation is always enforced. Omit `--emr-cluster` or use `--new-emr-session` when
+you want auto-create.
+
+Describe failures for Domain tags are treated as **non-match** (never invent `Domain=default`).
+Each async job records `emr_cluster_id` so mixed-domain batches poll the correct cluster.
 
 ```bash
 # New migration validation session (recommended at Phase 4 start)

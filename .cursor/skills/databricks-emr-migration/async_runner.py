@@ -393,6 +393,7 @@ def _run_emr_task(
             errors.append(f"emr: {emr_error}")
         else:
             job.emr_step_id = step_id or ""
+            job.emr_cluster_id = emr_cluster_id
             job.emr_submitted_at = _utc_now_iso()
             update_job(manifest, job, emr_env=config.emr_env)
     except Exception as exc:
@@ -621,6 +622,7 @@ def _submit_single_job_coupled(
                 errors.append(f"emr: {emr_error}")
             else:
                 job.emr_step_id = step_id or ""
+                job.emr_cluster_id = emr_cluster_id
                 job.emr_submitted_at = _utc_now_iso()
                 if job.status == "baseline_done":
                     job.status = "running"
@@ -684,6 +686,7 @@ def run_submit(config: SubmitConfig) -> RunManifest:
         emr_env=config.emr_env,
         new_session=config.new_emr_session,
         allow_create=config.allow_create_emr,
+        domain=config.domain,
     )
 
     dag_manifest = build_manifest_for_dag(config)
@@ -723,6 +726,7 @@ def run_submit(config: SubmitConfig) -> RunManifest:
         job = ensure_job_uris(manifest, job, stager=stager)
         job.submitted_at = _utc_now_iso()
         job.status = "submitted"
+        job.emr_cluster_id = config.emr_cluster_id
         update_job(manifest, job, emr_env=config.emr_env)
 
     parallel_jobs: List[ValidationJob] = []

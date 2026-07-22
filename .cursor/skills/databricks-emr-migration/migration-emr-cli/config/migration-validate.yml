@@ -1,5 +1,8 @@
 # EMR settings for DAG migration validation (persistent cluster + submit-step).
 # Use: EMR_SETTINGS_FILE=.cursor/skills/databricks-emr-migration/migration-emr-cli/config/migration-validate.yml
+#
+# Default JobFlowRole is emr-prod. For dags/people the skill overrides to
+# emr-people-prod via create-cluster --job-flow-role (see cluster_bootstrap.py).
 
 region: us-east-1
 release_label: emr-7.12.0

@@ -349,6 +349,7 @@ def _run_phase4(
         emr_env=args.emr_env,
         new_session=args.new_emr_session,
         allow_create=not args.no_create_emr,
+        domain=args.domain,
     )
     phase4 = EMRValidation(
         emr_cluster_id=emr_cluster_id,

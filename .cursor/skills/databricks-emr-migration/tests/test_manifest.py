@@ -41,11 +41,40 @@ class TestManifest(unittest.TestCase):
             run_id="xyz",
             load_start_date="2026-06-04",
             load_end_date="2026-06-05",
-            jobs=[ValidationJob("fintech", "dag", "dw", "dim_x")],
+            jobs=[
+                ValidationJob(
+                    "people",
+                    "dag",
+                    "dw",
+                    "dim_x",
+                    emr_cluster_id="j-PEOPLE",
+                )
+            ],
         )
         restored = manifest_from_dict(manifest_to_dict(manifest))
         self.assertEqual(restored.run_id, "xyz")
         self.assertEqual(restored.jobs[0].table, "dim_x")
+        self.assertEqual(restored.jobs[0].emr_cluster_id, "j-PEOPLE")
+
+    def test_manifest_from_dict_ignores_unknown_job_fields(self) -> None:
+        restored = manifest_from_dict(
+            {
+                "run_id": "abc",
+                "load_start_date": "2026-06-04",
+                "load_end_date": "2026-06-05",
+                "jobs": [
+                    {
+                        "domain": "fintech",
+                        "dag": "dag",
+                        "layer": "dw",
+                        "table": "t1",
+                        "legacy_field": "ignore-me",
+                    }
+                ],
+            }
+        )
+        self.assertEqual(restored.jobs[0].emr_cluster_id, "")
+        self.assertEqual(restored.jobs[0].table, "t1")
 
     def test_reset_stale_jobs(self) -> None:
         manifest = RunManifest(

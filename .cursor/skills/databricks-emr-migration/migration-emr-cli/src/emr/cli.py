@@ -251,6 +251,14 @@ def cmd_transient(
         "Override use_spot from settings: SPOT for core nodes (master stays ON_DEMAND)."
     ),
 )
+@click.option(
+    "--job-flow-role",
+    default=None,
+    help=(
+        "Override EC2 instance profile / JobFlowRole from settings "
+        "(e.g. emr-people-prod for dags/people)."
+    ),
+)
 def cmd_create_cluster(
     ctx: click.Context,
     job_flow_name: str,
@@ -261,6 +269,7 @@ def cmd_create_cluster(
     bootstrap_script_uri: str | None,
     bootstrap_script_args: tuple[str, ...],
     use_spot: bool | None,
+    job_flow_role: str | None,
 ) -> None:
     """Persistent cluster; idle auto-termination uses ``idle_timeout_sec`` in the env YAML only."""
     settings_path = str(ctx.obj["settings_path"])
@@ -278,6 +287,7 @@ def cmd_create_cluster(
                 list(bootstrap_script_args) if bootstrap_script_args else None
             ),
             use_spot=use_spot,
+            job_flow_role=job_flow_role,
         )
         resolve_local_uris_in_cfg(cfg)
         validate_persistent_cluster(cfg)

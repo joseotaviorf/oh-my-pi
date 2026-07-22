@@ -3,10 +3,29 @@ from unittest.mock import MagicMock, patch
 
 from manifest import RunManifest, ValidationJob
 from models import TableBaseline
-from poller import WatchConfig, _compare_job, _job_timed_out, run_watch
+from poller import WatchConfig, _compare_job, _emr_cluster_for_job, _job_timed_out, run_watch
 
 
 class TestPoller(unittest.TestCase):
+    def test_emr_cluster_for_job_prefers_job_id(self) -> None:
+        job = ValidationJob(
+            "people",
+            "dag",
+            "dw",
+            "t",
+            emr_cluster_id="j-PEOPLE",
+        )
+        manifest = RunManifest(
+            run_id="abc",
+            load_start_date="2026-06-04",
+            load_end_date="2026-06-05",
+            emr_cluster_id="j-DEFAULT",
+            jobs=[job],
+        )
+        self.assertEqual(_emr_cluster_for_job(job, manifest), "j-PEOPLE")
+        job.emr_cluster_id = ""
+        self.assertEqual(_emr_cluster_for_job(job, manifest), "j-DEFAULT")
+
     def test_job_timed_out(self) -> None:
         job = ValidationJob(
             "fintech",

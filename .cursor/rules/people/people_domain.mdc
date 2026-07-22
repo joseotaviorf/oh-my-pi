@@ -449,6 +449,10 @@ A DW dimension may version on one **grain** (e.g. `all_people.dt_effective_start
 
 All SQL under `dags/people/**` must run on **Databricks DBR 16.4** and **EMR Spark 3.5** (see `emr_compatibility.mdc` and **`databricks-emr-sql-lint`** skill).
 
+**EMR migration validation** (`databricks-emr-migration`): create/reuse the validation cluster with
+instance profile **`emr-people-prod`** (not `emr-prod`). The skill sets this automatically when
+`--domain people`.
+
 | Avoid | Prefer |
 |-------|--------|
 | `QUALIFY` | Ranked CTE with `ROW_NUMBER() … AS rn`, then `WHERE rn = 1` (or join with `AND alias.rn = 1`) |

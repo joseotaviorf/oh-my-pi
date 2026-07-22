@@ -39,6 +39,11 @@ RESULTS_FILE = SKILL_DIR / "validation_results.json"
 WATCHERS_DIR = SKILL_DIR / "watchers"
 
 
+def _emr_cluster_for_job(job: ValidationJob, manifest: RunManifest) -> str:
+    """Prefer per-job cluster id so mixed-domain batches poll the correct EMR cluster."""
+    return (job.emr_cluster_id or manifest.emr_cluster_id or "").strip()
+
+
 def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
@@ -498,7 +503,7 @@ def run_watch(config: WatchConfig) -> Tuple[RunManifest, Dict[str, List[Validati
                 job,
                 config,
                 start_time,
-                cluster_id=manifest.emr_cluster_id,
+                cluster_id=_emr_cluster_for_job(job, manifest) or None,
             )
             if manual_reason:
                 late = _try_compare_job(
@@ -521,7 +526,7 @@ def run_watch(config: WatchConfig) -> Tuple[RunManifest, Dict[str, List[Validati
                     _mark_job_emr_failure(
                         job,
                         manual_reason,
-                        cluster_id=manifest.emr_cluster_id,
+                        cluster_id=_emr_cluster_for_job(job, manifest) or None,
                         emr_env=config.emr_env,
                     )
                     update_job(manifest, job, emr_env=config.emr_env)

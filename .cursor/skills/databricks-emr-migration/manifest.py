@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import threading
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
@@ -53,6 +53,8 @@ def _prefer_job(current: ValidationJob, candidate: ValidationJob) -> ValidationJ
     if candidate.emr_done_at and not current.emr_done_at:
         return candidate
     if candidate.emr_step_id and not current.emr_step_id:
+        return candidate
+    if candidate.emr_cluster_id and not current.emr_cluster_id:
         return candidate
     if candidate.verdict and not current.verdict:
         return candidate
@@ -109,6 +111,7 @@ class ValidationJob:
     baseline_s3_uri: str = ""
     emr_s3_uri: str = ""
     emr_step_id: str = ""
+    emr_cluster_id: str = ""
     error: Optional[str] = None
     verdict: str = ""
     submitted_at: str = ""
@@ -182,7 +185,11 @@ class RunManifest:
 
 
 def manifest_from_dict(data: dict[str, Any]) -> RunManifest:
-    jobs = [ValidationJob(**item) for item in data.get("jobs", [])]
+    job_fields = {f.name for f in fields(ValidationJob)}
+    jobs = [
+        ValidationJob(**{k: v for k, v in item.items() if k in job_fields})
+        for item in data.get("jobs", [])
+    ]
     return RunManifest(
         run_id=data["run_id"],
         load_start_date=data["load_start_date"],

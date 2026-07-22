@@ -304,6 +304,7 @@ def merge_base_config(
     bootstrap_script_uri: str | None = None,
     bootstrap_script_args: Sequence[str] | None = None,
     use_spot: bool | None = None,
+    job_flow_role: str | None = None,
 ) -> dict[str, Any]:
     """Load YAML settings plus shared CLI overrides (tags, instances, bootstrap)."""
     cfg = load_settings_file(config_path)
@@ -324,6 +325,11 @@ def merge_base_config(
         cfg["core_instance_count"] = _validate_core_instance_count(core_instance_count)
     if use_spot is not None:
         cfg["use_spot"] = bool(use_spot)
+    if job_flow_role is not None:
+        role = job_flow_role.strip()
+        if not role:
+            raise ValueError("job_flow_role must be a non-empty string")
+        cfg["job_flow_role"] = role
     if bootstrap_script_uri is not None:
         cfg["bootstrap_script_uri"] = cli_emr_script_uri(
             bootstrap_script_uri, field="bootstrap_script_uri"
@@ -359,6 +365,7 @@ def merge_runtime_config(
     bootstrap_script_args: Sequence[str] | None = None,
     job_script_args: Sequence[str] | None = None,
     use_spot: bool | None = None,
+    job_flow_role: str | None = None,
 ) -> dict[str, Any]:
     """Load settings from YAML, then apply per-run CLI fields (do not appear in the YAML file)."""
     cfg = merge_base_config(
@@ -367,6 +374,7 @@ def merge_runtime_config(
         tags=tags,
         master_instance_type=master_instance_type,
         core_instance_type=core_instance_type,
+        job_flow_role=job_flow_role,
         core_instance_count=core_instance_count,
         bootstrap_script_uri=bootstrap_script_uri,
         bootstrap_script_args=bootstrap_script_args,

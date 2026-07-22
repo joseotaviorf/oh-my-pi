@@ -28,6 +28,14 @@ SESSION_FILE = SKILL_DIR / ".session.yml"
 REUSABLE_EMR_STATES = {"WAITING", "RUNNING"}
 DEAD_EMR_STATES = {"TERMINATED", "TERMINATING"}
 
+# EC2 instance profile (JobFlowRole) overrides for domain-scoped buckets/secrets.
+# DAGs under dags/people require emr-people-prod (not the default emr-prod).
+DEFAULT_JOB_FLOW_ROLE = "emr-prod"
+DOMAIN_JOB_FLOW_ROLES = {
+    "people": "emr-people-prod",
+}
+DEFAULT_DOMAIN_TAG = "default"
+
 CLUSTER_GONE_ERROR_MARKERS = (
     "terminat",
     "not in a valid state",
@@ -35,6 +43,46 @@ CLUSTER_GONE_ERROR_MARKERS = (
     "invalid cluster",
     "cannot add steps",
 )
+
+
+def job_flow_role_for_domain(domain: Optional[str]) -> str:
+    """Return the EMR JobFlowRole (instance profile) for a DAG domain folder."""
+    if not domain:
+        return DEFAULT_JOB_FLOW_ROLE
+    return DOMAIN_JOB_FLOW_ROLES.get(str(domain).strip().lower(), DEFAULT_JOB_FLOW_ROLE)
+
+
+def domain_tag_for_domain(domain: Optional[str]) -> str:
+    """Return the Domain EMR tag value used to reuse validation clusters safely."""
+    if not domain:
+        return DEFAULT_DOMAIN_TAG
+    normalized = str(domain).strip().lower()
+    if normalized in DOMAIN_JOB_FLOW_ROLES:
+        return normalized
+    return DEFAULT_DOMAIN_TAG
+
+
+def cluster_domain_tag(cluster_id: str, region: str = "us-east-1") -> Optional[str]:
+    """Read Domain tag from an EMR cluster.
+
+    Missing ``Domain`` tag means the default profile. Describe failures return
+    ``None`` so callers treat the cluster as unknown (never invent a match).
+    """
+    del region
+    try:
+        tags = describe_cluster_json(cluster_id).get("tags") or {}
+    except RuntimeError as exc:
+        logger.warning("Could not describe EMR cluster %s for Domain tag: %s", cluster_id, exc)
+        return None
+    return str(tags.get("Domain") or DEFAULT_DOMAIN_TAG)
+
+
+def cluster_matches_domain(cluster_id: str, domain: Optional[str], region: str = "us-east-1") -> bool:
+    """True when the cluster Domain tag matches the profile required by ``domain``."""
+    actual = cluster_domain_tag(cluster_id, region=region)
+    if actual is None:
+        return False
+    return actual == domain_tag_for_domain(domain)
 
 
 def load_session() -> Dict[str, Any]:
@@ -212,24 +260,48 @@ def is_migration_validation_cluster(cluster_id: str, region: str = "us-east-1") 
     return tags.get("Purpose") == "migration-validation"
 
 
-def find_emr_cluster_by_tag(tag_value: str = "migration-validation", region: str = "us-east-1") -> Optional[str]:
+def find_emr_clusters_by_tag(
+    tag_value: str = "migration-validation",
+    region: str = "us-east-1",
+) -> List[str]:
+    """Return all active cluster ids tagged ``Purpose=<tag_value>``."""
     del region
     clusters = list_clusters_json(tag_key="Purpose", tag_value=tag_value)
-    if clusters:
-        return str(clusters[0].get("id"))
-    return None
+    return [str(cluster["id"]) for cluster in clusters if cluster.get("id")]
 
 
-def create_emr_cluster(emr_env: str = "prod") -> str:
+def find_emr_cluster_by_tag(
+    tag_value: str = "migration-validation",
+    region: str = "us-east-1",
+) -> Optional[str]:
+    """Return the first active cluster id tagged ``Purpose=<tag_value>`` (legacy)."""
+    ids = find_emr_clusters_by_tag(tag_value=tag_value, region=region)
+    return ids[0] if ids else None
+
+
+def create_emr_cluster(emr_env: str = "prod", *, domain: Optional[str] = None) -> str:
+    role = job_flow_role_for_domain(domain)
+    domain_tag = domain_tag_for_domain(domain)
+    logger.info(
+        "Creating migration-validation EMR cluster (Domain=%s, JobFlowRole=%s)",
+        domain_tag,
+        role,
+    )
     returncode, output = run_emr_cli(
         [
             "create-cluster",
             "--name",
-            f"migration-validation-{int(time.time())}",
+            f"migration-validation-{domain_tag}-{int(time.time())}",
+            "--job-flow-role",
+            role,
             "--tag",
             "Purpose=migration-validation",
             "--tag",
             "Owner=emr-migration-validate",
+            "--tag",
+            f"Domain={domain_tag}",
+            "--tag",
+            f"JobFlowRole={role}",
         ],
         emr_env=emr_env,
     )
@@ -273,10 +345,17 @@ def _wait_for_emr_cluster(
     raise TimeoutError(f"Timed out waiting for EMR cluster {cluster_id}")
 
 
-def _save_validation_session(cluster_id: str, emr_env: str) -> None:
+def _save_validation_session(
+    cluster_id: str,
+    emr_env: str,
+    *,
+    domain: Optional[str] = None,
+) -> None:
     session = load_session()
     session["emr_cluster_id"] = cluster_id
     session["emr_env"] = emr_env
+    session["emr_domain"] = domain_tag_for_domain(domain)
+    session["emr_job_flow_role"] = job_flow_role_for_domain(domain)
     save_session(session)
 
 
@@ -287,17 +366,23 @@ def resolve_validation_emr_cluster(
     new_session: bool = False,
     allow_create: bool = True,
     region: str = "us-east-1",
+    domain: Optional[str] = None,
 ) -> str:
     """Dedicated emr-cli cluster for Phase 4 (LogUri under ``cli/`` — never fleet DAG clusters).
 
     Resolution order:
     1. ``--new-emr-session`` → always create a new migration-validation cluster
-    2. Explicit ``--emr-cluster`` if still WAITING/RUNNING
-    3. ``.session.yml`` ``emr_cluster_id`` if tagged ``migration-validation`` and reusable
-    4. Tagged ``Purpose=migration-validation`` cluster from a prior emr-cli create
-    5. Create new cluster via ``emr-cli create-cluster``
+    2. Explicit ``--emr-cluster`` if still WAITING/RUNNING and Domain tag matches
+       (Domain mismatch fails hard — never silently discard an explicit override)
+    3. ``.session.yml`` ``emr_cluster_id`` if tagged ``migration-validation``, Domain matches, reusable
+    4. All tagged ``Purpose=migration-validation`` clusters (Domain match)
+    5. Create new cluster via ``emr-cli create-cluster`` with domain JobFlowRole
+
+    For ``dags/people``, JobFlowRole is ``emr-people-prod``; otherwise ``emr-prod``.
     """
     ensure_aws_credentials(emr_env, region=region)
+    expected_domain = domain_tag_for_domain(domain)
+    expected_role = job_flow_role_for_domain(domain)
 
     if new_session:
         session = load_session()
@@ -314,29 +399,61 @@ def resolve_validation_emr_cluster(
         session = load_session()
         if session.get("emr_cluster_id"):
             candidates.append(str(session["emr_cluster_id"]))
-        tagged = find_emr_cluster_by_tag(region=region)
-        if tagged:
-            candidates.append(tagged)
+        candidates.extend(find_emr_clusters_by_tag(region=region))
 
         seen: Set[str] = set()
         for cluster_id in candidates:
             if not cluster_id or cluster_id in seen:
                 continue
             seen.add(cluster_id)
-            if emr_cluster_id and cluster_id == emr_cluster_id:
-                pass  # explicit override — allow without tag check
+            is_explicit = bool(emr_cluster_id and cluster_id == emr_cluster_id)
+            if is_explicit:
+                pass  # allow without Purpose tag check; Domain still enforced below
             elif not is_migration_validation_cluster(cluster_id, region):
                 logger.info(
                     "Skipped %s — not a migration-validation emr-cli cluster",
                     cluster_id,
                 )
                 continue
+            if not cluster_matches_domain(cluster_id, domain, region):
+                actual_domain = cluster_domain_tag(cluster_id, region)
+                actual_label = (
+                    actual_domain if actual_domain is not None else "unknown"
+                )
+                if is_explicit:
+                    raise RuntimeError(
+                        f"Explicit --emr-cluster {cluster_id} has Domain={actual_label} "
+                        f"but this run requires Domain={expected_domain} "
+                        f"(JobFlowRole={expected_role}). Pass a matching cluster, "
+                        "omit --emr-cluster to auto-resolve, or use --new-emr-session."
+                    )
+                logger.info(
+                    "Skipped %s — Domain tag %s != expected %s (JobFlowRole %s)",
+                    cluster_id,
+                    actual_label,
+                    expected_domain,
+                    expected_role,
+                )
+                continue
             reusable, state = is_emr_cluster_reusable(cluster_id, region)
             if reusable:
-                _save_validation_session(cluster_id, emr_env)
-                logger.info("Using validation EMR cluster %s (%s)", cluster_id, state)
+                _save_validation_session(cluster_id, emr_env, domain=domain)
+                logger.info(
+                    "Using validation EMR cluster %s (%s, Domain=%s, JobFlowRole=%s)",
+                    cluster_id,
+                    state,
+                    expected_domain,
+                    expected_role,
+                )
                 return cluster_id
-            logger.info("Skipped validation EMR cluster %s (%s)", cluster_id, state)
+            if is_explicit:
+                logger.warning(
+                    "Explicit --emr-cluster %s is not reusable (%s) — continuing resolution",
+                    cluster_id,
+                    state,
+                )
+            else:
+                logger.info("Skipped validation EMR cluster %s (%s)", cluster_id, state)
 
     if not allow_create:
         raise RuntimeError(
@@ -345,10 +462,13 @@ def resolve_validation_emr_cluster(
         )
 
     logger.info(
-        "Creating dedicated emr-cli validation cluster (step logs under emr/logs/cli/)"
+        "Creating dedicated emr-cli validation cluster "
+        "(Domain=%s, JobFlowRole=%s, step logs under emr/logs/cli/)",
+        expected_domain,
+        expected_role,
     )
-    cluster_id = create_emr_cluster(emr_env)
-    _save_validation_session(cluster_id, emr_env)
+    cluster_id = create_emr_cluster(emr_env, domain=domain)
+    _save_validation_session(cluster_id, emr_env, domain=domain)
     return cluster_id
 
 
@@ -358,6 +478,7 @@ def resolve_emr_cluster(
     allow_create: bool = True,
     region: str = "us-east-1",
     exclude: Optional[Set[str]] = None,
+    domain: Optional[str] = None,
 ) -> str:
     """Backward-compatible alias — always uses dedicated validation cluster resolution."""
     del exclude  # fleet failover removed; only dedicated clusters
@@ -366,6 +487,7 @@ def resolve_emr_cluster(
         emr_env,
         allow_create=allow_create,
         region=region,
+        domain=domain,
     )
 
 
@@ -374,6 +496,7 @@ def failover_emr_cluster(
     emr_env: str = "prod",
     allow_create: bool = True,
     region: str = "us-east-1",
+    domain: Optional[str] = None,
 ) -> str:
     """Replace a dead validation cluster with a new emr-cli cluster (never fleet)."""
     logger.warning("Failover: validation cluster %s is gone or terminating", dead_cluster_id)
@@ -384,4 +507,5 @@ def failover_emr_cluster(
         new_session=True,
         allow_create=allow_create,
         region=region,
+        domain=domain,
     )

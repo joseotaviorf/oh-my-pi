@@ -329,6 +329,19 @@ def test_validate_persistent_cluster_ok(tmp_path: Path) -> None:
     validate_persistent_cluster(cfg)
 
 
+def test_merge_base_config_job_flow_role_override(tmp_path: Path) -> None:
+    p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
+    from emr.config import merge_base_config
+
+    cfg = merge_base_config(
+        config_path=p,
+        name="people-cluster",
+        job_flow_role="emr-people-prod",
+    )
+    assert cfg["job_flow_role"] == "emr-people-prod"
+    validate_persistent_cluster(cfg)
+
+
 def test_validate_step_submit_ok(tmp_path: Path) -> None:
     p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
     from emr.config import merge_step_submit_config

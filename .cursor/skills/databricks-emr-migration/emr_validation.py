@@ -97,6 +97,7 @@ class EMRValidation:
             self.emr_cluster_id,
             emr_env=self.emr_env,
             allow_create=self.allow_create_emr,
+            domain=self.domain,
         )
         logger.info("Switched to EMR cluster %s (was %s)", self.emr_cluster_id, state)
 
@@ -192,6 +193,7 @@ class EMRValidation:
                 self.emr_cluster_id,
                 emr_env=self.emr_env,
                 allow_create=self.allow_create_emr,
+                domain=self.domain,
             )
             return self._run_emr_step_once(
                 layer, table_name, sql_s3_uri, result_s3_uri, order_by

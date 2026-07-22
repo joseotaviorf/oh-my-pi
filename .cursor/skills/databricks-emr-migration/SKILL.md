@@ -264,6 +264,10 @@ Session state: `.cursor/skills/databricks-emr-migration/.session.yml`
   prompting, or session fallback — the agent must collect the id from the user first.
 - **EMR:** dedicated `migration-emr-cli` cluster tagged `Purpose=migration-validation` (never fleet DAG clusters).
   Created/reused automatically by compare. Use `--new-emr-session` for a fresh cluster.
+  - **`dags/people`:** JobFlowRole / instance profile **`emr-people-prod`** (tagged `Domain=people`).
+  - **Other domains:** JobFlowRole **`emr-prod`** (tagged `Domain=default`).
+  - Reuse only matches clusters whose `Domain` tag matches the DAG domain — never mix people and non-people profiles.
+  - Explicit `--emr-cluster` with a Domain mismatch **fails** (does not silently create another cluster).
 
 ### Validation window
 
@@ -425,6 +429,7 @@ EMR_ENVIRONMENT=prod dist/migration-emr-cli terminate \
 Use this before ending any migration turn. **All boxes must be checked or explicitly marked blocked.**
 
 - [ ] Bootstrap: auth OK; user provided Databricks `--cluster`; d-1 dates set
+- [ ] EMR cluster: people DAGs use `emr-people-prod` (`Domain=people`); others use `emr-prod`
 - [ ] Lint: all SQL files scanned; rewrites applied
 - [ ] Compare: submit + watch **finished** (not crashed, not stale detached)
 - [ ] Fix → revalidate: **syntax FAILs** addressed; parity FAILs flagged (Blocked DAGs documented)
