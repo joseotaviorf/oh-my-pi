@@ -39,12 +39,13 @@
 
 ### Business function (the three that matter most)
 
-These are the functions business teams mean by "demand agent", "TQC", and "CIQ". One agent can hold several at once; they are NOT mutually exclusive and are separate from `profile`.
+These are the functions business teams mean by "demand agent", "TQC" / "TQA", and "CIQ". One agent can hold several at once; they are NOT mutually exclusive and are separate from `profile`.
 
 | Function | Also called | What they own | Capability (`capability.type`) | Earns (in `agent_revenue_share`) |
 |---|---|---|---|---|
 | **Demand / conversion** | demand agent, visit agent | Conduct the visit **and convert** the deal | `DEMAND_VISIT_MANAGEMENT` (RENT/SALE) | `revenue_role = DEMAND`, `brokerage_percentage`; BigAgent `DEMAND_CONVERSION_*` |
-| **Demand acquisition** | **TQC** (Trás Quem Compra) | Bring / qualify the buyer lead | `DEMAND_ACQUISITION` | `tqc_percentage`, `has_tqc_revenue_share = true` (bonus on the `DEMAND` row); BigAgent `DEMAND_ACQUISITION_*` |
+| **Demand acquisition (Sale)** | **TQC** (Traz Quem Compra) | Bring / qualify the **buyer** lead (For-Sale) | `DEMAND_ACQUISITION` (rows in `agent_lead_referral` with `business_context = 'SALE'`) | `tqc_percentage`, `has_tqc_revenue_share = true` (bonus on the `DEMAND` row); BigAgent `DEMAND_ACQUISITION_*` |
+| **Demand acquisition (Rent)** | **TQA** (Traz Quem Aluga) | Bring / qualify the **tenant** lead (For-Rent) — rent counterpart of TQC | `DEMAND_ACQUISITION` (rows in `agent_lead_referral` with `business_context = 'RENT'`) | Same capability as TQC; splits from TQC only by `business_context = 'RENT'` on `agent_lead_referral` |
 | **Supply acquisition** | **CIQ** | Register / bring the property (supply) | `SUPPLY_ACQUISITION`, `SUPPLY_CONVERSION_CONSULTANCY` | `revenue_role = SUPPLY`, `ciq_percentage`; BigAgent `SUPPLY_ACQUISITION_*` |
 
 > "CIQ" is overloaded — it is both the affiliation **program** (Corretor Integrado QuintoAndar, `1P`) and this **supply-acquisition function**. Confirm which the user means. Likewise "demand agent" usually means the conversion function, but a TQC-only agent also acquires demand without converting.
@@ -83,7 +84,8 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | **Independent Agent / agente independente** | Agent with both acquisition and demand | `DEMAND_ACQUISITION ENABLED` AND `affiliation_type = '1P'` AND `is_passive_lead_receiver = false`; or `is_independent_agent` in activation metrics. |
 | **Ativação / activation** | ⚠ No single definition | `is_activated` in `agent_new_agent_activation_metrics` (first commercial event ≤60 days of registration), or first visit/listing/TQC/deal. Always confirm. |
 | **Agente ativo / active agent** | ⚠ Ambiguous | account-available (`is_agent_active` in `dim_agent`), has-visits (`fact_visit_schedules`), operationally-eligible (combine flags), or app-active (Amplitude). Always confirm. |
-| **TQC (Trás Quem Compra)** | **Demand-acquisition function** — agent who brings/qualifies the buyer lead | Capability `DEMAND_ACQUISITION`; `id_user_agent_lead_referral` in `datalake_sale_offer_flows.offer_specialists`; `tqc_percentage` / `has_tqc_revenue_share` in `agent_revenue_share`. |
+| **TQC (Traz Quem Compra)** | **Demand-acquisition function on Sale** — agent who brings/qualifies the buyer lead | Capability `DEMAND_ACQUISITION`; source `datalake_ebdb_clean.agent_lead_referral` with `business_context = 'SALE'`; `id_user_agent_lead_referral` in `datalake_sale_offer_flows.offer_specialists`; `tqc_percentage` / `has_tqc_revenue_share` in `agent_revenue_share`. |
+| **TQA (Traz Quem Aluga)** | **Demand-acquisition function on Rent** — agent who brings/qualifies the tenant lead. Rent counterpart of TQC. | Capability `DEMAND_ACQUISITION`; source `datalake_ebdb_clean.agent_lead_referral` with `business_context = 'RENT'`. |
 | **CIQ (function)** | **Supply-acquisition function** — agent who registers/brings the property | Capability `SUPPLY_ACQUISITION` / `SUPPLY_CONVERSION_CONSULTANCY`; `revenue_role = SUPPLY`, `ciq_percentage`. Distinct from the CIQ *program* (next row). |
 | **PPA (Preferred Property Agent)** | Agent fixed to a listing (agent brought the supply) | `preferred_property_agent_relation_history`. |
 | **PFA (Preferred Fixed Agent)** | Agent fixed to a lead (usually first-visit; see `origin`) | Same table; reason in `origin`. |
