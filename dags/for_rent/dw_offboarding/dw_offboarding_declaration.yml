@@ -5,6 +5,10 @@ dag:
   documentation:
     dag_purpose: |
       Dag for the purpose of consulting information related to terminations.
+      obt_offboarding used to be built here too; it now lives in the dedicated
+      dw_offboarding_obt DAG, which is triggered only after fact_terminations and
+      dim_termination finish here, avoiding stale (d-1) OBT reads caused by the two
+      DAGs racing without an explicit ordering.
 
 workflow:
   type: query_delta
@@ -20,10 +24,6 @@ workflow:
       z_order_by: [sk_termination]
       merge_on: [sk_termination]
     fact_house_listing_terminations:
-      z_order_by: [sk_termination]
-      extraction_type: full
-      partitions: []
-    obt_offboarding:
       z_order_by: [sk_termination]
       extraction_type: full
       partitions: []

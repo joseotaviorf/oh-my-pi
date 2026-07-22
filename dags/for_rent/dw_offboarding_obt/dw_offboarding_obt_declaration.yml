@@ -1,0 +1,28 @@
+dag:
+  name: dw_offboarding_obt
+  schedule_start_date: 2026, 7, 22
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Loads dw_offboarding.obt_offboarding in a dedicated DAG, decoupled from
+      dw_offboarding. obt_offboarding used to live inside the dw_offboarding DAG
+      alongside fact_terminations, dim_termination, and fact_house_listing_terminations,
+      with no inner_dependencies between them. Since obt_offboarding reads from
+      fact_terminations and dim_termination, running as a sibling task in the same
+      DAG (rather than a declared downstream dependency) caused frequent races: the
+      OBT task could finish before fact_terminations/dim_termination finished
+      reprocessing, leaving obt_offboarding stale by one day (d-1 not reflected).
+      This DAG is triggered only after the dw_offboarding DAG's fact_terminations
+      and dim_termination datasets (plus every other upstream source obt_offboarding
+      reads from) have completed, guaranteeing obt_offboarding always builds from
+      fully updated dependencies.
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: offboarding
+  default_extraction_type: full
+  default_partitions: []
+  tables_customization:
+    obt_offboarding:
+      z_order_by: [sk_termination]
