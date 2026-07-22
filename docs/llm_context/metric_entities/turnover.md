@@ -61,7 +61,7 @@ All on `dw_employee_details.fact_assignment_snapshots`, and **always** filtered 
 - `is_monthly_snapshot_for_employee` — **required on every fact read** for turnover/attrition. Selects the official month-closing row (one per employee per `dt_month_reference`); mirrors legacy `base_fotografias`.
 - `dt_month_reference` — last calendar day of the snapshot month; use it to pin EOM actives and to bucket monthly counts.
 - `termination_type` — `voluntary`, `involuntary`, `pending`, or `NULL`. **Any non-NULL value is a real company exit** and counts in turnover; slice by value for the voluntary/involuntary breakdown. `pending` is a real exit whose closing action is not yet mapped (counted; it later resolves to voluntary/involuntary). `NULL` means "not a company exit" (still active, internal transfer, expatriate movement, or intern/apprentice effectivation). Involuntary exits include the rare case of death.
-- `is_effective_worker` — `TRUE` for permanent/effective employees; `FALSE` for Interns and Young Apprentices.
+- `is_effective_worker` — `TRUE` for permanent/effective employees; `FALSE` for Interns and Young Apprentices. Stable for the life of each assignment.
 - `is_reorganization_termination` — `TRUE` only on the terminated snapshots of a layoff/reorganization exit; `FALSE` otherwise.
 - `dt_terminated`, `dt_reference`, `dt_employee_hired` — the termination date, the snapshot date, and the company-tenure anchor (read on the monthly closing row).
 - `is_active` — `TRUE` while employed on the monthly closing `dt_reference`; the model treats the termination date itself as inactive.
@@ -135,6 +135,10 @@ fact_assignment_snapshots.sk_job_version → dw_employee_details.dim_job.sk_job_
 **Deeper methodology / official dashboards** — direct the user to the People Insights Confluence page on Turnover: [https://quintoandar.atlassian.net/wiki/spaces/PEOPLEANA/pages/5687574537/Turnover](https://quintoandar.atlassian.net/wiki/spaces/PEOPLEANA/pages/5687574537/Turnover).
 
 ## Dos and Don'ts
+
+**Presentation:**
+
+- Report turnover and attrition percentages with exactly **2 decimal places** (e.g. `12.34%`). Golden queries use `ROUND(..., 2)` — match that precision in any derived rate.
 
 **Do:**
 

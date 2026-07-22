@@ -382,6 +382,35 @@ transfer_hire_assignments AS (
     WHERE
         ted.action_code = 'GLB_TRANSFER'
 ),
+intern_or_apprentice_assignments AS (
+    -- Sticky: any SCD version with PIN employee_category 103/901, or any resolvable intern/apprentice job family.
+    SELECT DISTINCT
+        id_assignment
+    FROM
+        datalake_pin_core_clean.all_assignments
+    WHERE
+        assignment_type IN ('E', 'C')
+        AND employee_category IN ('103', '901')
+    UNION
+    SELECT DISTINCT
+        aa.id_assignment
+    FROM
+        datalake_pin_core_clean.all_assignments AS aa
+    INNER JOIN
+        datalake_pin_core_clean.job AS j
+            ON j.id_job = aa.id_job
+            AND aa.dt_effective_started < j.dt_effective_ended
+            AND aa.dt_effective_ended > j.dt_effective_started
+    INNER JOIN
+        datalake_pin_core_clean.job_family_translation AS jft
+            ON jft.id_job_family = j.id_job_family
+            AND j.dt_effective_started < jft.dt_effective_ended
+            AND j.dt_effective_ended > jft.dt_effective_started
+    WHERE
+        aa.assignment_type IN ('E', 'C')
+        AND aa.id_job IS NOT NULL
+        AND jft.job_family_name IN ('Jovem Aprendiz', 'Estagiario')
+),
 period_continuous_employment_cycles AS (
     SELECT
         id_person,
@@ -441,6 +470,7 @@ SELECT
     tha.id_assignment IS NOT NULL AS is_transfer_hire,
     eha.id_assignment IS NOT NULL AS is_effectivation_hire,
     eta.id_assignment IS NOT NULL AS is_effectivation_termination,
+    ioa.id_assignment IS NULL AS is_effective_worker,
     ra.assignment_number_upper IS NOT NULL AS is_reorganization_termination,
     ROW_NUMBER() OVER (
         PARTITION BY
@@ -515,6 +545,9 @@ LEFT JOIN
 LEFT JOIN
     effectivation_termination_assignments AS eta
         ON eta.id_assignment = ca.id_assignment
+LEFT JOIN
+    intern_or_apprentice_assignments AS ioa
+        ON ioa.id_assignment = ca.id_assignment
 LEFT JOIN
     reorganization_assignments AS ra
         ON ra.assignment_number_upper = UPPER(ca.assignment_number)

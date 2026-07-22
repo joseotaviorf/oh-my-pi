@@ -162,9 +162,9 @@ columns:
   is_active:
     description: True when the employee is active, False when inactive.
   is_effective_worker:
-    description: True when the assignment's job on the reference date is a permanent/effective role (CLT); False for interns (Estagiário) and young apprentices (Jovem Aprendiz).
+    description: True when the assignment belongs to the effective workforce (permanent/CLT). False for interns and young apprentices. Constant across all snapshot dates for the same assignment.
     lineage:
-      - datalake_people.job_with_salary_table.is_effective_worker
+      - datalake_people.identifier_mapping.is_effective_worker
   has_emergency_contact:
     description: True when the employee has at least one emergency contact on file for this date.
     lineage:

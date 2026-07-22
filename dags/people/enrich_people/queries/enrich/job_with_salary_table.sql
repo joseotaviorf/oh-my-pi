@@ -510,7 +510,7 @@ SELECT
     salary_range_max,
     has_clock_in,
     is_active,
-    COALESCE(job_family, '') NOT IN ('Jovem Aprendiz', 'Estagiario') AS is_effective_worker,
+    COALESCE(job_family, '') NOT IN ('Jovem Aprendiz', 'Estagiario') AS is_effective_job,
     CASE
         WHEN DATE('{load_start_date}') >= dt_valid_from
             AND (

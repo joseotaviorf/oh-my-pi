@@ -269,7 +269,7 @@ assignment_snapshots_ranked AS (
                 AND NOT COALESCE(im.is_transfer_termination, FALSE) THEN FALSE
             ELSE TRUE
         END AS is_active,
-        COALESCE(jwst.is_effective_worker, TRUE) AS is_effective_worker,
+        im.is_effective_worker,
         pei.id_person IS NOT NULL AS has_emergency_contact,
         COALESCE(im.is_transfer_hire, FALSE) AS is_transfer_hire,
         COALESCE(im.is_transfer_termination, FALSE) AS is_transfer_termination,
