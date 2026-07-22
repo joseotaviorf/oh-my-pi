@@ -1,0 +1,7 @@
+---
+table_name: datalake_agents_validation.partners_missing_incentive_cycle_metrics
+alert_channel: "#alerts_big_agent"
+table_level_validations:
+  has_size:
+    equal_to: 1
+    severity_level: Error

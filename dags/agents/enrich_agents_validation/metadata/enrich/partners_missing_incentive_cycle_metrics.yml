@@ -1,0 +1,24 @@
+---
+database_name: datalake_agents_validation
+table_name: partners_missing_incentive_cycle_metrics
+description: |
+  Validation table that identifies autonomous brokerage agents with an active DEMAND_VISIT_MANAGEMENT
+  capability in Brazil who are missing a valid partner tier for their business context (RENT or SALE)
+  and either have no active partner metrics for the current incentive cycle or fewer than five metric
+  records. Consumed by the enrich_agents_validation data quality alert to notify the Big Agent squad
+  when partners are not properly enrolled in the incentive cycle metrics pipeline.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_user:
+    description: EBDB user identifier of the agent missing incentive cycle metrics or partner tier.
+    lineage:
+      - datalake_ebdb_clean.user.id
+  uuid_person:
+    description: Person UUID used as the external partner identifier in Big Agent partner tier and metrics tables.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  business_context:
+    description: Agent capability business context (RENT or SALE) for which partner tier and metrics are expected.
+    lineage:
+      - datalake_agent_accreditation.agent_capability.business_context
