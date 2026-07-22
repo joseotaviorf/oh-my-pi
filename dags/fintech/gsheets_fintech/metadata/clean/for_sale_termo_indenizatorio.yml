@@ -74,11 +74,11 @@ columns:
     description: Partner fee amount in Brazilian reais attributed in the indemnity term row.
   tax_rate:
     lineage:
-      - datalake_gsheets_raw.for_sale_termo_indenizatorio.imposto
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio._imposto
     description: Tax rate percentage applied to calculate tax on the indemnity term amount.
   loss_rate:
     lineage:
-      - datalake_gsheets_raw.for_sale_termo_indenizatorio.da_perda
+      - datalake_gsheets_raw.for_sale_termo_indenizatorio._da_perda
     description: Loss rate percentage applied before recognizing the indemnity payment amount.
   dt_term_signed:
     lineage:

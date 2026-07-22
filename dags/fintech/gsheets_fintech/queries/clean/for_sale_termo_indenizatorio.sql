@@ -10,8 +10,8 @@ WITH parsed AS (
         valor_liquido_por_termo,
         valor_bruto_por_termo,
         valor_do_imposto,
-        imposto,
-        da_perda,
+        _imposto,
+        _da_perda,
         valor_apos_perda,
         sale_price_agreed,
         brokerage_fee,
@@ -155,7 +155,7 @@ SELECT
     CAST(
         NULLIF(
             REPLACE(
-                REGEXP_REPLACE(NULLIF(imposto, ''), '[^0-9,.-]', ''),
+                REGEXP_REPLACE(NULLIF(_imposto, ''), '[^0-9,.-]', ''),
                 ',',
                 '.'
             ),
@@ -165,7 +165,7 @@ SELECT
     CAST(
         NULLIF(
             REPLACE(
-                REGEXP_REPLACE(NULLIF(da_perda, ''), '[^0-9,.-]', ''),
+                REGEXP_REPLACE(NULLIF(_da_perda, ''), '[^0-9,.-]', ''),
                 ',',
                 '.'
             ),
