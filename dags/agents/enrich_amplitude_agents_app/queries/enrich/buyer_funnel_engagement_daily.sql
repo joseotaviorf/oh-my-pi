@@ -120,4 +120,9 @@ WHERE
         'consorcio.cta_clicked',
         'consorcio.specialist_form_viewed'
     )
-GROUP BY ALL
+GROUP BY
+    evt.id_amplitude,
+    MAKE_DATE(evt.year, evt.month, evt.day),
+    evt.year,
+    evt.month,
+    evt.day

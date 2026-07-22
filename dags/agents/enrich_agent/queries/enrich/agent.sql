@@ -5,7 +5,8 @@ WITH agent_external_reference AS (
         FIRST(aer.value) FILTER(WHERE aer.type = 'PARTNER_ID') AS id_partner
     FROM
         datalake_ebdb_clean.agent_external_reference AS aer
-    GROUP BY ALL
+    GROUP BY
+        aer.id_agent
 ),
 main_user AS (
     WITH main_user_ranked AS (
@@ -52,7 +53,19 @@ agent AS (
     LEFT JOIN
         main_user AS mu
             ON mu.uuid_person = a.uuid_person
-    GROUP BY ALL
+    GROUP BY
+        a.id,
+        a.uuid_agent,
+        a.uuid_person,
+        aer.id_agent_data,
+        aer.id_partner,
+        mu.id_user,
+        a.affiliation_type,
+        a.status,
+        COALESCE(a.affiliation_type = 'AUTONOMOUS', FALSE),
+        COALESCE(a.affiliation_type = 'COMPANY_MANAGED', FALSE),
+        a.ts_created,
+        a.ts_updated
 ),
 agent_product AS (
     WITH agent_product_ranked AS (

@@ -117,7 +117,7 @@ region_list AS (
     SELECT
         arh.ts_slot,
         arh.id_agent,
-        CAST(collect_list(arh.id_region) AS string) AS regions
+        CAST(array_sort(collect_list(arh.id_region)) AS string) AS regions
     FROM
         region_records_union AS arh
     GROUP BY

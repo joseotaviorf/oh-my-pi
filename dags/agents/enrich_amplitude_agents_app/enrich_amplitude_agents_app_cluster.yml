@@ -13,3 +13,7 @@ cluster:
       spark.databricks.delta.targetFileSize: 134217728
     num_workers: 3
     driver_node_type_id: r7g.2xlarge
+validation:
+  cluster:
+    type: emr_7_12_consolidation_l_memory_fleet_cluster
+  allow_custom_spark_job: true
