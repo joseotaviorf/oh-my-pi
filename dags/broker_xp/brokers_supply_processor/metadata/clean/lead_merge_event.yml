@@ -64,12 +64,22 @@ columns:
       Identity criterion that triggered the merge (STRING, Not Nullable). Possible values are
       ID_BY_REAL_ESTATE (cnpj + idByRealEstate matched), LEAD_HASH (cnpj + leadHash matched), and
       BOTH (both criteria matched simultaneously).
+    categories:
+      ID_BY_REAL_ESTATE: Match identified by the partner real estate agency ID.
+      LEAD_HASH: Match by lead hash (combined attributes).
+      BOTH: Match by both criteria simultaneously.
   source:
     lineage:
       - datalake_brokers_supply_processor_raw.lead_merge_event.source
     description: >
       Processing flow that triggered the merge (STRING, Not Nullable, max length 40). Known values
       include HOUSE_CREATE (HouseCreateUseCase upsert path) and UPSERT_ONE (HouseDeduplicateUseCase).
+    categories:
+      HOUSE_CREATE: Event triggered when a new property is created.
+      HOUSE_UPDATE: Event triggered when an existing property is updated.
+      UPSERT_ONE: Individual upsert operation via API.
+      REPROCESS_AND_REANALYZE_LEAD_IMAGES: Reprocessing with lead image reanalysis.
+      REPROCESS_LEAD_IGNORING_STATUS_REASONS: Reprocessing ignoring status restrictions.
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_raw.lead_merge_event.created_at

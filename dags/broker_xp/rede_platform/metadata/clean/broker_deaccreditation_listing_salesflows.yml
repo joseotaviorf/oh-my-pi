@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_rede_platform_raw.broker_deaccreditation_listing_salesflows.id
   uuid_process:
-    description: The UUID of the deaccreditation process this record belongs to.
+    description: Foreign key → broker_deaccreditation_process.uuid_process. Groups all per-listing outcomes under a single deaccreditation run.
     lineage:
       - datalake_rede_platform_raw.broker_deaccreditation_listing_salesflows.process_uuid
   id_house:

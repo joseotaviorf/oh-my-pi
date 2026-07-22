@@ -22,9 +22,14 @@ columns:
     lineage:
       - datalake_rede_platform_raw.broker_deaccreditation_process.product_uuid
   status:
-    description: The current status of the process. Possible values are IN_PROGRESS (async phase where workers are processing messages between domains), COMPLETED (all expected operations finished successfully), COMPLETED_WITH_PENDING (most operations completed but some items failed), FAILED (critical failure that prevented process completion).
+    description: Lifecycle status of the deaccreditation orchestration process, tracking the async parallel pipelines (listing churn, lead suspension, user disenrollment) from initiation to terminal state.
     lineage:
       - datalake_rede_platform_raw.broker_deaccreditation_process.status
+    categories:
+      IN_PROGRESS: Async phase where workers are processing messages between domains.
+      COMPLETED: All expected operations finished successfully.
+      COMPLETED_WITH_PENDING: Most operations completed but some items could not be processed.
+      FAILED: Critical failure that prevented process completion.
   ts_created:
     description: The timestamp when the process was created.
     lineage:

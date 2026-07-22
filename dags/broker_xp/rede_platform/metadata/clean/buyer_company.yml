@@ -6,7 +6,7 @@ domain: Broker XP
 description: This table contains the history of buyer company relations in the Rede Platform service. Partitioned by year, month, and day — always filter on these columns for partition pruning.
 columns:
   id:
-    description: The unique identifier for the buyer company.
+    description: Primary key — unique identifier for the buyer company relation row.
     lineage:
       - datalake_rede_platform_raw.buyer_company.id
   id_buyer_company_event:
@@ -22,9 +22,13 @@ columns:
     lineage:
       - datalake_rede_platform_raw.buyer_company.company_uuid
   type:
-    description: The type of the buyer company relation.
+    description: The type of the buyer company relation — whether the demand is attributed to QuintoAndar directly or to a Rede brokerage partner.
     lineage:
       - datalake_rede_platform_raw.buyer_company.type
+    categories:
+      "1P": Demand attributed directly to QuintoAndar (first-party).
+      "3P": Demand attributed to a Rede brokerage partner (third-party).
+      "": Unclassified relation; captured when the event does not map to a known type (UNKNOWN).
   is_active:
     description: Whether the buyer company relation is active.
     lineage:

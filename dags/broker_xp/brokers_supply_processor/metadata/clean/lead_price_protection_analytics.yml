@@ -34,6 +34,10 @@ columns:
     description: >
       Business context where protection was evaluated (STRING, Not Nullable). Typically SALE or RENT
       from the BSP BusinessContext enum.
+    categories:
+      SALE: Secondary market property sale (resale).
+      RENT: Residential or commercial property rental.
+      SALE_PRIMARY_MARKET: Primary market property sale (new development).
   main_price:
     lineage:
       - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.main_price
@@ -54,6 +58,9 @@ columns:
       (brokerage price matches the last BSP sync) and EXTERNAL_CHANGE_WITHIN_WINDOW (external Main
       change detected inside the protection window). The source schema also documents
       EXTERNAL_CHANGE_HIGHER_PRICE as a possible value.
+    categories:
+      SYNC_SAME_PRICE: Price synchronized to the same protected value.
+      EXTERNAL_CHANGE_WITHIN_WINDOW: External change detected within the price protection window.
   occurrence_count:
     lineage:
       - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.occurrence_count

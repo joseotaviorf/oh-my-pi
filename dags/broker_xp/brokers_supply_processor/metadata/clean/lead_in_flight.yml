@@ -42,6 +42,10 @@ columns:
       Current processing status of the in-flight lead within the deduplication workflow
       (STRING, Not Nullable, Enum). Indicates whether the lead is pending evaluation,
       being processed, approved, or rejected within its duplicate group.
+    categories:
+      QUEUED: Lead waiting in the async processing queue.
+      PROCESSING: Lead actively being processed by the pipeline.
+      APPROVED_WAITING: Lead approved and awaiting final confirmation.
   has_3p_access_control:
     description: >
       Boolean flag indicating that this record is subject to 3P Partners access control policies

@@ -8,19 +8,24 @@ columns:
   id:
     lineage:
       - datalake_signup_raw.user_registration_history.id
-    description: The unique identifier for the user registration history.
+    description: Primary key (BIGSERIAL) — unique identifier for each user registration history record (BIGINT, Not Nullable).
   uuid_person_requester:
     lineage:
       - datalake_signup_raw.user_registration_history.requester_person_uuid
-    description: The unique identifier for the requester person.
+    description: The unique identifier for the requester person. Foreign key → Person service person UUID. Nullable since migration V2025_07_08.
   uuid_person_target:
     lineage:
       - datalake_signup_raw.user_registration_history.target_person_uuid
-    description: The unique identifier for the target person.
+    description: The unique identifier for the target person. Foreign key → Person service person UUID. The person affected by the action.
   operation:
     lineage:
       - datalake_signup_raw.user_registration_history.operation
-    description: The operation performed on the user registration history.
+    description: The operation performed on the user registration history. Corresponds to the UserRegistrationOperation enum.
+    categories:
+      ENROLLMENT: User enrolled or activated on the registration platform.
+      DISENROLLMENT: User unenrolled or deactivated on the registration platform.
+      REGISTRATION_COMPLETENESS: Registration completeness verification or update.
+      USER_DRAFT: User draft created before registration completion.
   reason:
     lineage:
       - datalake_signup_raw.user_registration_history.reason
@@ -32,7 +37,7 @@ columns:
   channel:
     lineage:
       - datalake_signup_raw.user_registration_history.channel
-    description: The channel used for the operation.
+    description: The channel used for the operation. Originating system or interface (e.g. API, worker, backoffice). No formal enum defined in signup.md.
   ts_executed:
     lineage:
       - datalake_signup_raw.user_registration_history.executed_at

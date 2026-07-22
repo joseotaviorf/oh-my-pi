@@ -1,0 +1,76 @@
+---
+table_name: datalake_brokers_supply_processor_clean.lead_price_protection_analytics
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id_lead_price_protection_analytics:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_lead:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - SALE
+        - RENT
+        - SALE_PRIMARY_MARKET
+      severity_level: Error
+  main_price:
+    is_complete:
+      severity_level: Error
+  brokerage_price:
+    is_complete:
+      severity_level: Error
+  protection_reason:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - SYNC_SAME_PRICE
+        - EXTERNAL_CHANGE_WITHIN_WINDOW
+      severity_level: Error
+  occurrence_count:
+    is_complete:
+      severity_level: Error
+  ts_first_occurred:
+    is_complete:
+      severity_level: Error
+  ts_last_occurred:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 31
+      severity_level: Error

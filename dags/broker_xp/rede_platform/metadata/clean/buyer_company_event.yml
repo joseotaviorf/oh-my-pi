@@ -6,7 +6,7 @@ domain: Broker XP
 description: This table contains the events of buyer company relations consolidated in the Rede Platform service.
 columns:
   id:
-    description: The unique identifier for the buyer company event.
+    description: Primary key — unique identifier for the buyer company event row.
     lineage:
       - datalake_rede_platform_raw.buyer_company_event.id
   id_event_entity:
@@ -34,9 +34,12 @@ columns:
     lineage:
       - datalake_rede_platform_raw.buyer_company_event.event_type
   trigger_actor:
-    description: The actor that triggered the event.
+    description: The actor that triggered the buyer company classification event, indicating whether the demand originated from the buyer or the listing side.
     lineage:
       - datalake_rede_platform_raw.buyer_company_event.trigger_actor
+    categories:
+      DEMAND: Event originated from the buyer/demand side (e.g. visit confirmed, offer sent).
+      SUPPLY: Event originated from the listing/supply side (e.g. agent referral).
   ts_event:
     description: The timestamp of the event.
     lineage:

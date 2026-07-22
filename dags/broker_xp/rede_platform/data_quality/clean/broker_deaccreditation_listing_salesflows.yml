@@ -1,0 +1,47 @@
+---
+table_name: datalake_rede_platform_clean.broker_deaccreditation_listing_salesflows
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  uuid_process:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 31
+      severity_level: Error

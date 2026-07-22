@@ -33,6 +33,9 @@ columns:
     description: >
       Current status of the owner phone refresh workflow (STRING, Not Nullable, max length 20).
       Domain-specific values are defined in brokers-supply-processor (e.g. pending and terminal states).
+    categories:
+      SUCCESS: Owner phone update completed successfully.
+      FAILURE: Owner phone update failed.
   ts_created:
     lineage:
       - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.created_at

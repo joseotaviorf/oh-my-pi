@@ -35,6 +35,11 @@ columns:
     description: >
       String indicating the type of operation performed (STRING, Not Nullable).
       Enables classification and filtering of tracked changes.
+    categories:
+      MERGE_UPDATE: Update resulting from lead merge.
+      HOUSE_ENRICHMENT: Property data enrichment by the pipeline.
+      ADDRESS_REGION_NORMALIZATION: Lead address and region normalization.
+      LEAD_DISCARDED: Lead marked as discarded by the system.
   metadata:
     lineage:
       - datalake_brokers_supply_processor_raw.lead_update_operation_history.metadata

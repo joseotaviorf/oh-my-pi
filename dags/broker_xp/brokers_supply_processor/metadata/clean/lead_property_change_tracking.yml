@@ -65,12 +65,18 @@ columns:
     description: >
       Actor that made the most recent sale price change on Main (STRING, Nullable). Possible values
       are BSP (change originated from BSP sync) and EXTERNAL (change detected from Main outside BSP).
+    categories:
+      BSP: Price change originated by the BSP (Brokers Supply Processor) system.
+      EXTERNAL: Price change originated by an external source outside BSP.
   last_rent_price_change_source:
     lineage:
       - datalake_brokers_supply_processor_raw.lead_property_change_tracking.last_rent_price_change_source
     description: >
       Actor that made the most recent rent price change on Main (STRING, Nullable). Possible values
       are BSP (change originated from BSP sync) and EXTERNAL (change detected from Main outside BSP).
+    categories:
+      BSP: Price change originated by the BSP (Brokers Supply Processor) system.
+      EXTERNAL: Price change originated by an external source outside BSP.
   ts_sale_price_external_change:
     lineage:
       - datalake_brokers_supply_processor_raw.lead_property_change_tracking.sale_price_external_change_at

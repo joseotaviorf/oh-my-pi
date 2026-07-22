@@ -72,6 +72,10 @@ columns:
       SALE: Property is being evaluated for sale on QuintoAndar platform. Applies sale-specific pricing, legal, and market validation rules.
       RENT: Property is being evaluated for rental on QuintoAndar platform. Applies rental-specific eligibility criteria and tenant protection rules.
       Single leads can have multiple contexts evaluated simultaneously. Each context may have different approval outcomes.
+    categories:
+      SALE: Secondary market property sale (resale).
+      RENT: Residential or commercial property rental.
+      SALE_PRIMARY_MARKET: Primary market property sale (new development).
     lineage:
       - datalake_brokers_supply_processor_raw.business_context_detail.business_context
   status:
@@ -87,6 +91,16 @@ columns:
       DUPLICATE: Lead identified as duplicate and removed from processing.
       Status progression indicates funnel conversion. CONVERTED status is the ultimate success metric.
       Rejected leads should be analyzed via status_reason for filter optimization.
+    categories:
+      RECEIVED: Lead received and awaiting initial processing.
+      WAITING: Lead waiting for system or partner action.
+      NOT_CONVERTED: Lead processed without business conversion.
+      CONVERTED: Lead converted into a business opportunity.
+      PROCESSING: Lead actively being processed by the system.
+      REGISTERED: Lead registered in the partner database.
+      UNPUBLISHED: Lead removed from the publishing platform.
+      DISCARDED: Lead discarded due to quality or duplicate criteria.
+      SUSPENDED: Lead temporarily suspended due to operational restrictions.
     lineage:
       - datalake_brokers_supply_processor_raw.business_context_detail.status
   status_reason:

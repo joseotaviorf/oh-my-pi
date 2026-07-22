@@ -1,0 +1,79 @@
+---
+table_name: datalake_brokers_supply_processor_clean.lead_merge_event
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id_lead_merge_event:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  uuid_existing_lead:
+    is_complete:
+      severity_level: Error
+  cnpj:
+    is_complete:
+      severity_level: Error
+  match_criterion:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - ID_BY_REAL_ESTATE
+        - LEAD_HASH
+        - BOTH
+      severity_level: Error
+  existing_contexts:
+    is_complete:
+      severity_level: Error
+  incoming_contexts:
+    is_complete:
+      severity_level: Error
+  new_contexts:
+    is_complete:
+      severity_level: Error
+  source:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - HOUSE_CREATE
+        - HOUSE_UPDATE
+        - UPSERT_ONE
+        - REPROCESS_AND_REANALYZE_LEAD_IMAGES
+        - REPROCESS_LEAD_IGNORING_STATUS_REASONS
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      min_value: 1
+      severity_level: Error
+    has_max_value:
+      max_value: 31
+      severity_level: Error
