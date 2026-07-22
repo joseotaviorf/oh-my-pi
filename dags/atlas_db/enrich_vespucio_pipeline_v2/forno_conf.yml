@@ -1,10 +1,11 @@
 dag_documentation:
   dag_purpose:
     "Vespúcio v2 is the next generation of the Vespúcio pipeline: a simplified registry →
-    normalization → address-enrichment chain that replaces the legacy staged/extract/cluster
+    normalization → address/image-enrichment chain that replaces the legacy staged/extract/cluster
     steps with a single incremental registry of external listings/houses. This DAG orchestrates
     core_v2_registry_step, core_v2_address_normalization_step, core_v2_general_normalization_step,
-    core_v2_image_normalization_step and core_v2_address_enrich_step. For more
+    core_v2_image_normalization_step, core_v2_address_enrich_step,
+    sources_kodak_atlas_images_job and core_v2_image_enrich_step. For more
     information, see the GitHub [Vespucio Repository](https://github.com/quintoandar/vespucio)"
 callback_by_task_failure: True
 callback_by_task_success: False

@@ -279,6 +279,28 @@ address_enrich_step_task = create_task(
     ],
 )
 
+kodak_atlas_images_task = create_task(
+    entry_point="sources_kodak_atlas_images_job",
+    parameters=[
+        f"--output_table={Tables.source_kodak_atlas_images_v2}",
+        f"--input_kodak_photo={Tables.kodak_photo}",
+        f"--input_extracted_houses_images={Tables.extract_step_houses_images}",
+        f"--input_clustered_houses={Tables.cluster_step_houses}",
+    ],
+    task_id="kodak_atlas_images",
+)
+
+image_enrich_step_task = create_task(
+    entry_point="core_v2_image_enrich_step",
+    parameters=[
+        f"--input_image_normalized={Tables.image_normalization_step_v2}",
+        f"--input_source_kodak_atlas_images={Tables.source_kodak_atlas_images_v2}",
+        "--overwrite_schema",
+        f"--output_image_enrich={Tables.image_enrich_step_v2}",
+        "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
+    ],
+)
+
 vespucio_v2_pipeline_complete_task = DummyOperator(
     task_id="vespucio-v2-pipeline-complete",
     dag=dag,
@@ -287,13 +309,15 @@ DatasetAdder.attach_dataset_to_task(vespucio_v2_pipeline_complete_task)
 
 
 execute_job_cluster_task >> source_tasks
+execute_job_cluster_task >> kodak_atlas_images_task
 source_tasks >> registry_step_task
 registry_step_task >> address_normalization_step_task
 registry_step_task >> general_normalization_step_task
 registry_step_task >> image_normalization_step_task
 address_normalization_step_task >> address_enrich_step_task
+[image_normalization_step_task, kodak_atlas_images_task] >> image_enrich_step_task
 [
     address_enrich_step_task,
     general_normalization_step_task,
-    image_normalization_step_task,
+    image_enrich_step_task,
 ] >> vespucio_v2_pipeline_complete_task
