@@ -8,6 +8,7 @@ from bietlejuice.base.sst.core.api.request import get_request
 from bietlejuice.base.sst.core.utils.common import (
     build_partition_filter,
     default_args,
+    retrieve_spark_session,
     validate_and_write,
 )
 from bietlejuice.base.sst.domains.salesforce.api.calls import (
@@ -82,6 +83,7 @@ def pipeline_api_raw(cfg):
     logger.info(
         f"m=pipeline_api_raw, msg=Starting API_V2 for {job_name=}\t {cfg.api_entity}"
     )
+    spark = retrieve_spark_session(job_name=job_name)
 
     logger.info("m=pipeline_api_raw, msg=Retrieving Token and Headers")
     access_token = retrieve_token(endpoint=cfg.endpoint, env=cfg.env)

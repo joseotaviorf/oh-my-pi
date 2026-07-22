@@ -1,0 +1,30 @@
+webhook_salesforce_api_v2: WEBHOOK_SALESFORCE_CDC_FORNO # TODO: Change to WEBHOOK_SALESFORCE_API_V2_FORNO
+
+salesforce_endpoint: "https://quintoandar--fornov1.sandbox.my.salesforce.com"
+
+dag_documentation:
+  dag_purpose:
+    "Salesforce API_v2 ingestion DAG. Runs daily and, for each mapped Salesforce
+    object, pulls the incremental snapshot from the Salesforce REST API into the
+    raw layer (salesforce/api_v2) and then maintains an SCD Type 2 history table in
+    the clean layer (salesforce/api_v2_clean). Consumed downstream via clean-layer
+    dataset events."
+
+datalake_bucket: "5a-datalake-forno"
+
+objects_config:
+  task_v2:
+    api_entity: "Task"
+  case_milestone_v2:
+    api_entity: "CaseMilestone"
+  record_type_v2:
+    api_entity: "RecordType"
+  case_feed_v2:
+    api_entity: "CaseFeed"
+
+
+cluster:
+  type: emr_7_12_small_general_2xlarge_2_workers_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
