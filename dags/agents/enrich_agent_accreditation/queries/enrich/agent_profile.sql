@@ -16,31 +16,20 @@ WITH agent_type AS (
             ON u.id = aud.rev
     WHERE
         DATE(u.ts_revision) <= DATE('{load_end_date}')
-),
-profile_interval AS (
-    SELECT
-        XXHASH64(ag.id_agent, ag.types, ag.ts_revision_started) AS id_agent_profile,
-        ag.id_agent,
-        ag.types AS profile,
-        ROW_NUMBER() OVER (
-            PARTITION BY id_agent_profile
-            ORDER BY ag.ts_revision_started, COALESCE(ag.ts_revision_ended, ag.ts_updated) DESC
-        ) = 1 AS is_last_update,
-        ag.ts_revision_started,
-        ag.ts_revision_ended
-    FROM
-        agent_type AS ag
-    WHERE
-        ag.rev_type <> 2
-        AND DATE(ag.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
-    id_agent_profile,
-    id_agent,
-    profile,
-    ts_revision_started,
-    ts_revision_ended
+    XXHASH64(ag.id_agent, ag.types, ag.ts_revision_started) AS id_agent_profile,
+    ag.id_agent,
+    ag.types AS profile,
+    ag.ts_revision_started,
+    ag.ts_revision_ended
 FROM
-    profile_interval
+    agent_type AS ag
 WHERE
-    is_last_update IS TRUE
+    ag.rev_type <> 2
+    AND DATE(ag.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    1 = ROW_NUMBER() OVER (
+        PARTITION BY id_agent_profile
+        ORDER BY ag.ts_revision_started, COALESCE(ag.ts_revision_ended, ag.ts_updated) DESC
+    )

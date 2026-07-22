@@ -10,24 +10,13 @@ WITH partner_agencies_aux AS (
             NULLIF(GET_JSON_OBJECT(properties, '$.estado'), ''),
             NULLIF(GET_JSON_OBJECT(properties, '$.state'), '')
         ) AS partner_state,
-        ROW_NUMBER() OVER (PARTITION BY REPLACE(UPPER(extracted_3p_tag), ' ', '') ORDER BY ts_updated DESC) = 1 AS is_last_update,
+        ROW_NUMBER() OVER(PARTITION BY id_company ORDER BY ts_updated DESC) = 1 AS is_most_recent_row,
         ts_updated
     FROM
         datalake_hubspot_clean.company
-    WHERE
-        extracted_3p_tag IS NOT NULL
-),
-extracted_3p_tag_filtered AS (
-    SELECT
-        id_company_hubspot,
-        extracted_3p_tag,
-        partner_state,
-        ROW_NUMBER() OVER(PARTITION BY id_company_hubspot ORDER BY ts_updated DESC) = 1 AS is_most_recent_row,
-        ts_updated
-    FROM
-        partner_agencies_aux AS paa
-    WHERE
-        is_last_update IS TRUE
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY REPLACE(UPPER(extracted_3p_tag), ' ', '') ORDER BY ts_updated DESC) = 1
+        AND extracted_3p_tag IS NOT NULL
 ),
 partner_agencies AS (
     SELECT
@@ -37,9 +26,9 @@ partner_agencies AS (
         paa.partner_state,
         paa.ts_updated
     FROM
-        extracted_3p_tag_filtered AS paa
+        partner_agencies_aux AS paa
     LEFT JOIN
-        extracted_3p_tag_filtered AS current_paa
+        partner_agencies_aux AS current_paa
             ON paa.id_company_hubspot = current_paa.id_company_hubspot
             AND current_paa.is_most_recent_row
 ),
