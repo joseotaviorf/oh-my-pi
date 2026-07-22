@@ -23,6 +23,11 @@ Apply the **`databricks-emr-sql-lint`** skill (`.cursor/skills/databricks-emr-sq
 - `DATEDIFF(unit, start, end)` — the 3-argument form
 - Variant accessor `column:key`, `column:["k"]`, `column:a:b.c`
 
+🟠 **Performance** — identical results, but silently degrades on EMR Spark 3.5 (Databricks-only optimizer hints that EMR ignores):
+
+- `RANGE_JOIN` hint (`/*+ RANGE_JOIN(t, binSize) */`) — a `BETWEEN` range join degrades to a nested-loop/cartesian join on 1-2 tasks (job idle-but-slow). Rewrite to an equi-join + running window (see `RECIPES.md` §8).
+- `SKEW` hint (`/*+ SKEW(...) */`) — remove it and rely on AQE skew-join handling.
+
 🟡 **Attention** — works but watch out:
 
 - `DATE_FORMAT(ts, fmt)` with pattern letters whose semantics changed in Spark 3.0 (`u`, `U`, `L`, `F`, `c`)

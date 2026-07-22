@@ -342,9 +342,78 @@ State explicitly in the lint report that the MCP could not be consulted (per `da
 
 ---
 
+## 8. `RANGE_JOIN` / `SKEW` optimizer hints → equi-join + window (🟠 performance)
+
+**Why:** `RANGE_JOIN` and `SKEW` are **Databricks-only optimizer hints**. They do not exist in Apache Spark, so EMR Spark 3.5 **silently ignores** them (they are just hint comments). Results stay identical — but a range predicate join (`ON b BETWEEN a.lo AND a.hi`) that Databricks optimizes via the `RANGE_JOIN` bin strategy degrades on EMR to a **`BroadcastNestedLoopJoin` / `CartesianProduct`**: O(N×M), poorly parallelized (often 1-2 tasks), so a job that runs in minutes on Databricks can run for hours on EMR while the cluster sits nearly idle. This is a **performance cliff, not a correctness or parse error** — which is why it is 🟠, not 🔴.
+
+**Recipe:** eliminate the range (`BETWEEN` / `>=` … `<=`) join. The most common shape in this repo is *"count rows from a small calendar/reference table that fall in a per-row range"*. When one side is an exploded per-day (or per-unit) sequence that already covers every point in the range, replace the range join with:
+
+1. An **equi-join** of each exploded point against the reference table (`ON ref.point = exploded.point`), producing a 0/1 flag.
+2. A **running-window aggregate** (`SUM(flag) OVER (PARTITION BY key ORDER BY point)`) that reproduces the "count within `[start, point]`" the range join computed.
+
+This turns O(N×M) into a shuffle + sort (equi-join + window) that scales across the whole cluster.
+
+**Before** (from `dags/support_and_service/enrich_customer_demand/queries/enrich/backlog_metrics.sql`):
+
+```sql
+days_off AS (
+  SELECT /*+ RANGE_JOIN(eb, 150) */
+    id_task,
+    dt_interval,
+    COUNT(1) AS days_off
+  FROM
+    exploded_backlog AS eb
+  INNER JOIN
+    weekends_and_holidays AS nw
+      ON nw.dt_non_working BETWEEN DATE(eb.ts_started) AND eb.dt_interval
+  GROUP BY 1,2
+)
+```
+
+**After:**
+
+```sql
+marked_backlog AS (
+  SELECT
+    eb.id_task,
+    eb.dt_interval,
+    CASE
+      WHEN nw.dt_non_working IS NOT NULL THEN 1
+      ELSE 0
+    END AS is_non_working
+  FROM
+    exploded_backlog AS eb
+  LEFT JOIN
+    weekends_and_holidays AS nw
+      ON nw.dt_non_working = eb.dt_interval
+),
+days_off AS (
+  SELECT
+    id_task,
+    dt_interval,
+    SUM(is_non_working) OVER (
+      PARTITION BY id_task
+      ORDER BY dt_interval
+    ) AS days_off
+  FROM
+    marked_backlog
+)
+```
+
+**Why it is equivalent:** `exploded_backlog` is `EXPLODE(SEQUENCE(DATE(ts_started), …))`, so it already contains **every** day in `[ts_started, dt_interval]`. Flagging each day that is non-working and taking a cumulative `SUM` ordered by day yields exactly the count of non-working days in `[ts_started, dt_interval]` — the same number the `BETWEEN` join produced. The outer query's `LEFT JOIN days_off … COALESCE(days_off, 0)` behaves identically (the old `INNER JOIN` dropped zero-count rows; those become `0` via `COALESCE` either way).
+
+**Caveats:**
+
+- Only valid when the exploded side is **contiguous and complete** over the range (a `SEQUENCE`/calendar spine). If the join range is not covered by discrete equi-join keys, this rewrite does not apply — instead pre-bucket both sides into a coarse key and equi-join on the bucket, then filter the residual range in a `WHERE` (manual binning, the OSS equivalent of what `RANGE_JOIN` automates).
+- The default window frame (`RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`) is what you want here; it matches `ROWS` because `dt_interval` is unique per `id_task`.
+- `SKEW` hints have no OSS equivalent — rely on AQE skew-join handling instead (`spark.sql.adaptive.enabled` / `spark.sql.adaptive.skewJoin.enabled`, on by default in Spark 3.5). Just remove the hint; do not try to emulate it in SQL.
+- Do **not** merely delete the `RANGE_JOIN` hint and keep the `BETWEEN` join — that leaves the cartesian join in place. The join itself must change.
+
+---
+
 ## After applying any rewrite
 
-1. Re-run the seven critical Greps from `SKILL.md` Step 1 on the file.
-2. If all return empty: `✅ EMR-compatible — all critical constructs eliminated.`
+1. Re-run the Greps from `SKILL.md` Step 1 on the file (critical + 🟠 performance patterns).
+2. If all return empty: `✅ EMR-compatible — all critical and performance constructs eliminated.`
 3. Otherwise: re-emit the lint table with the remaining items.
 4. Preserve all `{load_start_date}` / `{load_end_date}` placeholders and `{{ }}` literal-brace escapes (see `databricks_conventions.mdc` §"Literal Braces").

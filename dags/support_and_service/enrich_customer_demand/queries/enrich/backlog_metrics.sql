@@ -31,17 +31,41 @@ exploded_backlog AS (
   FROM
     datalake_customer_demand.base_tasks
 ),
-days_off AS (
-  SELECT /*+ RANGE_JOIN(eb, 150) */
-    id_task,
-    dt_interval,
-    COUNT(1) AS days_off
+-- EMR-safe replacement for the Databricks-only RANGE_JOIN hint: the previous
+-- BETWEEN range join degraded to a nested-loop/cartesian join on EMR Spark 3.5
+-- (hint silently ignored), running on 1-2 tasks. Here we equi-join each exploded
+-- day against the non-working calendar, then take a running count ordered by day.
+-- Since exploded_backlog holds every day in [ts_started, dt_interval], the
+-- cumulative SUM equals the count of non-working days in that range - identical
+-- semantics, but fully parallelizable on both Databricks and EMR.
+-- Partition and join include ts_started because base_tasks can emit the same
+-- id_task twice (CRM UNION ALL Zendesk tickets) with different start dates.
+marked_backlog AS (
+  SELECT
+    eb.id_task,
+    eb.ts_started,
+    eb.dt_interval,
+    CASE
+      WHEN nw.dt_non_working IS NOT NULL THEN 1
+      ELSE 0
+    END AS is_non_working
   FROM
     exploded_backlog AS eb
-  INNER JOIN
+  LEFT JOIN
     weekends_and_holidays AS nw
-      ON nw.dt_non_working BETWEEN DATE(eb.ts_started) AND eb.dt_interval
-  GROUP BY 1,2
+      ON nw.dt_non_working = eb.dt_interval
+),
+days_off AS (
+  SELECT
+    id_task,
+    ts_started,
+    dt_interval,
+    SUM(is_non_working) OVER (
+      PARTITION BY id_task, ts_started
+      ORDER BY dt_interval
+    ) AS days_off
+  FROM
+    marked_backlog
 )
 SELECT
   eb.id_agent,
@@ -66,6 +90,7 @@ FROM
 LEFT JOIN
   days_off AS do
     ON eb.id_task = do.id_task
+    AND eb.ts_started = do.ts_started
     AND eb.dt_interval = do.dt_interval
 WHERE
     eb.dt_interval IS NOT NULL

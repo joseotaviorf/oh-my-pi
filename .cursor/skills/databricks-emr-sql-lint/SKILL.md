@@ -1,6 +1,6 @@
 ---
 name: databricks-emr-sql-lint
-description: Lints SQL files under bi-etl-ejuice dags/ for Databricks-only constructs that break or change behavior on EMR Spark 3.5. Operates in dual-runtime mode (queries must run on both Databricks DBR 16.4 and EMR Spark 3.5). Auto-invokes when editing or creating any .sql file in dags/. Detects QUALIFY, GROUP BY ALL, IFF, DECODE, DATEDIFF 3-arg, variant access (column:key), and legacy DATE_FORMAT pattern letters; reports findings with severity, line numbers, snippets, and dual-runtime-safe rewrite suggestions; uses the database MCP to inspect column types before suggesting variant rewrites; never rewrites automatically (lint-only) unless the user explicitly asks. Use when modifying any .sql file in dags/, when the user mentions EMR migration, Spark 3.5 compatibility, dual-runtime, or asks "is this query EMR-compatible?".
+description: Lints SQL files under bi-etl-ejuice dags/ for Databricks-only constructs that break, change behavior, or silently degrade performance on EMR Spark 3.5. Operates in dual-runtime mode (queries must run on both Databricks DBR 16.4 and EMR Spark 3.5). Auto-invokes when editing or creating any .sql file in dags/. Detects QUALIFY, GROUP BY ALL, IFF, DECODE, DATEDIFF 3-arg, variant access (column:key), legacy DATE_FORMAT pattern letters, and Databricks-only optimizer hints (RANGE_JOIN, SKEW) that EMR ignores and silently turn into nested-loop/cartesian joins; reports findings with severity (critical / performance / attention), line numbers, snippets, and dual-runtime-safe rewrite suggestions; uses the database MCP to inspect column types before suggesting variant rewrites; never rewrites automatically (lint-only) unless the user explicitly asks. Use when modifying any .sql file in dags/, when the user mentions EMR migration, Spark 3.5 compatibility, dual-runtime, a query that is fast on Databricks but slow on EMR, or asks "is this query EMR-compatible?".
 disable-model-invocation: false
 ---
 
@@ -36,7 +36,14 @@ Run these patterns with the Grep tool (case-insensitive, scoped to the edited fi
 | `\bDECODE\s*\(` | 🔴 critical | `DECODE()` function (Oracle/Databricks) |
 | `\bDATEDIFF\s*\(\s*['"]?(YEAR\|QUARTER\|MONTH\|WEEK\|DAY\|HOUR\|MINUTE\|SECOND\|MILLISECOND\|MICROSECOND)\b` | 🔴 critical | `DATEDIFF(unit, start, end)` 3-arg form |
 | `[a-zA-Z_]\w*:\[?["']?[a-zA-Z_]` | 🔴 critical | Variant access `column:key`, `column:["k"]`, `column:a:b.c` |
+| `/\*\+[^*]*\bRANGE_JOIN\b` | 🟠 performance | Databricks-only `RANGE_JOIN` optimizer hint |
+| `/\*\+[^*]*\bSKEW\b` | 🟠 performance | Databricks-only `SKEW` optimizer hint |
 | `\bDATE_FORMAT\s*\([^)]*['"][^'"]*[uULFcE]` | 🟡 attention | `DATE_FORMAT` with pattern letters changed since Spark 3.0 |
+
+**Severity legend:**
+- 🔴 **critical** — errors (`ParseException`) or *changes results* on EMR Spark 3.5. Must be rewritten before running on EMR.
+- 🟠 **performance** — **identical results** on both runtimes, but the construct is a Databricks-only optimizer hint that EMR Spark 3.5 **silently ignores**, causing a severe slowdown (e.g. a `RANGE_JOIN` `BETWEEN` join degrades to a nested-loop/cartesian join running on 1-2 tasks). No parse error, no wrong data — just a performance cliff. Rewrite to an equi-join + window (see `RECIPES.md` §8).
+- 🟡 **attention** — works, but subtle semantic differences to verify.
 
 ### Step 2 — Filter false positives
 
@@ -47,6 +54,8 @@ Variant access regex (`[a-zA-Z_]\w*:[\["a-zA-Z_]`) is noisy. Discard matches tha
 - A timestamp/time literal (`'12:30:00'`, `'2026-04-24T14:30'`) — never matches because the pattern requires `[a-zA-Z_]` immediately before the `:`, but double-check when the literal is unquoted.
 
 When in doubt, keep the match and let the report show it; the engineer can dismiss false positives.
+
+**Exception — optimizer hints are NOT comments for this lint.** The 🟠 performance patterns (`RANGE_JOIN`, `SKEW`) live inside Spark hint blocks `/*+ ... */`, which look like block comments but are semantically significant. Do **not** discard a `RANGE_JOIN` / `SKEW` match just because it sits inside `/*+ ... */` — that is exactly where it belongs. Only discard these when they appear inside a string literal or a *plain* comment (`-- ...` or `/* ... */` without the leading `+`).
 
 ### Step 3 — Resolve variant column types via Database MCP
 
@@ -60,7 +69,7 @@ For every variant access match, the rewrite depends on the column's Spark type. 
    - **MAP<STRING, _>** → suggest bracket notation `col['key']`.
 4. **Fallback** if the MCP is unavailable, errors, or the table cannot be located: surface the finding with severity `🔴 critical` and the suggestion `-- TODO: confirm column type before EMR migration; default rewrite is GET_JSON_OBJECT(col, '$.path') if STRING JSON`. State explicitly in the report that the MCP could not be consulted (per `database_schema_mcp_priority.mdc`).
 
-For all other critical patterns (QUALIFY, GROUP BY ALL, IFF, DECODE, DATEDIFF 3-arg), no schema lookup is needed — apply the recipe from `RECIPES.md` directly.
+For all other critical patterns (QUALIFY, GROUP BY ALL, IFF, DECODE, DATEDIFF 3-arg) and the 🟠 performance hints (RANGE_JOIN, SKEW), no schema lookup is needed — apply the recipe from `RECIPES.md` directly.
 
 ### Step 4 — Report
 
@@ -73,6 +82,7 @@ Output **one markdown table** at the end of the agent's reply for this turn (aft
 |-----|------------------|------|--------------------------------------|--------------------------------------------------------------|
 | 🔴  | QUALIFY          | 42   | `QUALIFY ROW_NUMBER() OVER (...) = 1`| Wrap as CTE with `rn`; filter `WHERE rn = 1` outside. See RECIPES.md §1. |
 | 🔴  | variant access   | 7    | `event_properties:id_house`          | `GET_JSON_OBJECT(event_properties, '$.id_house')` — column is STRING (DataHub). |
+| 🟠  | RANGE_JOIN hint  | 35   | `SELECT /*+ RANGE_JOIN(eb, 150) */`  | Hint ignored on EMR → BETWEEN join becomes nested-loop/cartesian. Equi-join + running window. See RECIPES.md §8. |
 | 🟡  | DATE_FORMAT 'u'  | 88   | `DATE_FORMAT(ts, 'u')`               | `u` changed semantics in Spark 3.0; use `'E'` for day-of-week or `'EEEE'` for full name. |
 ```
 
@@ -87,10 +97,12 @@ If the user says "reescreve", "fix the lint", "make this EMR-compatible", or sim
 
 1. Apply the recipes from `RECIPES.md` deterministically.
 2. Preserve `sql_conventions.mdc` style (UPPERCASE keywords, snake_case columns, joins on new lines, no `SELECT *`, CTEs over subqueries).
-3. After edits, re-run Step 1 (Grep) on the file to verify no critical pattern remains.
+3. After edits, re-run Step 1 (Grep) on the file to verify no critical or performance pattern remains.
 4. Report final state:
-   - `✅ EMR-compatible — all critical constructs eliminated.` if Step 1 returns empty.
+   - `✅ EMR-compatible — all critical and performance constructs eliminated.` if Step 1 returns empty.
    - Otherwise, repeat the table with what's left.
+
+> A 🟠 performance rewrite must be **behavior-preserving**: results are already identical across runtimes, so the only goal is restoring parallelism. State the equivalence assumption explicitly (e.g. "cumulative window equals the `BETWEEN` count because the exploded rows cover every day in the range") so a reviewer can confirm it.
 
 ## Out of scope (do NOT report or touch)
 

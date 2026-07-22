@@ -125,6 +125,21 @@ This list exists to suppress false-positive noise and to give the rewriter a voc
 - `LATERAL` correlated subqueries — Spark 3.4+
 - `VALUES (...)` table constructor — ANSI
 
+## Optimizer hints
+
+**Safe** — recognized by both Databricks and Apache Spark 3.5 (a hint the engine doesn't apply is simply ignored, with no behavioral or performance cliff):
+
+- `/*+ BROADCAST(t) */` / `BROADCASTJOIN` / `MAPJOIN` — Spark
+- `/*+ MERGE(t) */` / `SHUFFLE_MERGE` / `SHUFFLE_HASH` / `SHUFFLE_REPLICATE_NL` — Spark join-strategy hints
+- `/*+ COALESCE(n) */` / `REPARTITION(...)` / `REPARTITION_BY_RANGE(...)` / `REBALANCE(...)` — Spark 3.x partitioning hints
+
+**NOT safe — Databricks-only (see RECIPES §8, severity 🟠 performance):**
+
+- `/*+ RANGE_JOIN(t, binSize) */` — Delta/Photon range-join optimization. Ignored on EMR → `BETWEEN` join becomes nested-loop/cartesian.
+- `/*+ SKEW('t' [, cols [, values]]) */` — Databricks skew hint. Ignored on EMR; rely on AQE skew-join handling instead.
+
+These two are the only hints the linter flags; all hints above are allow-listed.
+
 ## Note on `DECODE`
 
 There are **two** functions named `DECODE` in Spark / Databricks:
