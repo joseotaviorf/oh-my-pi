@@ -71,7 +71,6 @@ SF_RAW_SCHEMA_COLS = {
         "FirstInteractionDate__c",
         "DelayMessage__c",
         "CaseCriticality__c",
-        "CaseAccount__c",
         "Answer__c",
         "TaskCreatedDate__c",
         "Observation__c",
