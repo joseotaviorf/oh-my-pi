@@ -1,15 +1,38 @@
 WITH 
-  assessment AS (
+  ranked_assessment AS (
     SELECT
         a.id_assessment,
         a.id_previous_assessment,
         a.id_inspection,
         a.dt_owner_limit_revision,
-        a.dt_tenant_limit_revision
+        a.dt_tenant_limit_revision,
+        ROW_NUMBER() OVER(PARTITION BY a.id_inspection ORDER BY a.ts_updated DESC) AS rn
     FROM
         datalake_inspection_services_clean.assessment AS a
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY a.id_inspection ORDER BY a.ts_updated DESC) = 1
+  ),
+  assessment AS (
+    SELECT
+        id_assessment,
+        id_previous_assessment,
+        id_inspection,
+        dt_owner_limit_revision,
+        dt_tenant_limit_revision
+    FROM
+        ranked_assessment
+    WHERE
+        rn = 1
+  ),
+  ranked_review_response as (
+    SELECT
+      id_inspection,
+      reviewer_type,
+      is_approved,
+      ts_approved,
+      ROW_NUMBER() OVER (PARTITION BY id_inspection, reviewer_type ORDER BY ts_approved DESC) AS rn
+    FROM
+      datalake_inspections.reviewer
+    WHERE
+      approval_type = 'REVIEW'
   ),
   last_review_response as (
     SELECT
@@ -18,11 +41,21 @@ WITH
       is_approved,
       ts_approved
     FROM
+      ranked_review_response
+    WHERE
+      rn = 1
+  ),
+  ranked_budget_approval_response as (
+    SELECT
+      id_inspection,
+      reviewer_type,
+      is_approved,
+      ts_approved,
+      ROW_NUMBER() OVER (PARTITION BY id_inspection, reviewer_type ORDER BY ts_approved DESC) AS rn
+    FROM
       datalake_inspections.reviewer
     WHERE
-      approval_type = 'REVIEW'
-    QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY id_inspection, reviewer_type ORDER BY ts_approved DESC) = 1
+      approval_type = 'BUDGET_APPROVAL'
   ),
   last_budget_approval_response as (
     SELECT
@@ -31,11 +64,9 @@ WITH
       is_approved,
       ts_approved
     FROM
-      datalake_inspections.reviewer
+      ranked_budget_approval_response
     WHERE
-      approval_type = 'BUDGET_APPROVAL'
-    QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY id_inspection, reviewer_type ORDER BY ts_approved DESC) = 1
+      rn = 1
   ),
   reviewer_approvals AS (
     SELECT
@@ -120,7 +151,7 @@ WITH
       CAST(i.has_agreement AS BOOLEAN) AS has_agreement, -- not used yet
       b.is_early_both_agree AS has_early_agreement,
       CAST(i.has_late_agreement AS BOOLEAN) AS has_late_agreement, -- not used yet
-      COALESCE(c.has_compulsory_agreement, FALSE) AS has_compulsory_agreement,
+      IF(b.is_early_both_agree, FALSE, COALESCE(c.has_compulsory_agreement, FALSE)) AS has_compulsory_agreement,
       u.has_owner_approved_review,
       u.has_tenant_approved_review,
       u.has_owner_approved_budget_approval,
