@@ -54,7 +54,9 @@ workflow:
     image_inspection_group_result: {}
     image_inspection_refine_history: {}
     group_analysis: {}
-    photo: {}
+    photo:
+      raw_z_order_by: [id]
+      clean_z_order_by: [id]
     photo_invalid_source: {}
     photosphere:
       clean_table_name: photo_sphere

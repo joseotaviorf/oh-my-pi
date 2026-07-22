@@ -31,6 +31,18 @@ columns:
     lineage:
       - datalake_kodak_raw.photo.path
     description: 'S3 object key/path where the photo file is stored in QuintoAndar cloud storage. Used for generating public URLs and accessing the actual image file.'
+  year:
+    lineage:
+      - datalake_kodak_raw.photo.year
+    description: 'Year partition key from CDC landing date for optimized data organization and incremental load filtering.'
+  month:
+    lineage:
+      - datalake_kodak_raw.photo.month
+    description: 'Month partition key from CDC landing date for optimized data organization and incremental load filtering.'
+  day:
+    lineage:
+      - datalake_kodak_raw.photo.day
+    description: 'Day partition key from CDC landing date for optimized data organization and incremental load filtering.'
   op_cdc:
     lineage:
       - datalake_kodak_raw.photo.op_cdc
