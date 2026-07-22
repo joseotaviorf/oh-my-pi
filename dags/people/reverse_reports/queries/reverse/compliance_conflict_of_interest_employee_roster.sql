@@ -21,7 +21,7 @@ WITH
             CASE
                 WHEN LOWER(es.status) = 'terminated'
                     AND es.dt_terminated <= DATE('{load_start_date}')
-                THEN es.termination_reason_name
+                THEN es.termination_category
             END AS motivo_desligamento,
             ROW_NUMBER() OVER (
                 PARTITION BY
