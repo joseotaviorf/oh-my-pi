@@ -74,13 +74,13 @@ SELECT
   COUNT(1) AS daily_backlog,
   SUM(
     CASE
-      WHEN DATEDIFF(DATE(eb.dt_interval), DATE(ts_started)) - COALESCE(do.days_off, 0) <= sla_target THEN 1
+      WHEN DATEDIFF(DATE(eb.dt_interval), DATE(eb.ts_started)) - COALESCE(do.days_off, 0) <= eb.sla_target THEN 1
       ELSE 0
     END
   ) AS backlog_in_time,
   SUM(
     CASE
-      WHEN DATEDIFF(DATE(eb.dt_interval), DATE(ts_started)) - COALESCE(do.days_off, 0) > sla_target THEN 1
+      WHEN DATEDIFF(DATE(eb.dt_interval), DATE(eb.ts_started)) - COALESCE(do.days_off, 0) > eb.sla_target THEN 1
       ELSE 0
     END
   ) AS backlog_not_in_time,
@@ -95,8 +95,8 @@ LEFT JOIN
 WHERE
     eb.dt_interval IS NOT NULL
     AND (
-      dt_final IS NULL
-      OR eb.dt_interval <> dt_final
+      eb.dt_final IS NULL
+      OR eb.dt_interval <> eb.dt_final
     )
     AND eb.type IS NOT NULL
 GROUP BY 1,2,3,7
