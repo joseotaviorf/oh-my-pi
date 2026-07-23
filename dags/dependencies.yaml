@@ -4741,6 +4741,8 @@ bietlejuice.reverse_rent_listings_report_load:
   - bietlejuice.enrich_sale_ongoing_listings:load-enrich-ongoing-listings-daily-info:first-run-of-day
   - bietlejuice.enrich_similarity_score:load-enrich-house-metrics-score:first-run-of-day
 bietlejuice.reverse_reports:
+  - bietlejuice.degreed:load-clean-contents:first-run-of-day
+  - bietlejuice.degreed:load-clean-pathway-details:first-run-of-day
   - bietlejuice.dw_compensation:load-dw-compensation-dim-event-definition:first-run-of-day
   - bietlejuice.dw_compensation:load-dw-compensation-dim-job:first-run-of-day
   - bietlejuice.dw_compensation:load-dw-compensation-fact-compensations:first-run-of-day
@@ -4761,6 +4763,9 @@ bietlejuice.reverse_reports:
   - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-fact-vacation-balances:first-run-of-day
   - bietlejuice.enrich_learning:load-enrich-all-completions:first-run-of-day
+  - bietlejuice.enrich_learning:load-enrich-lesson-contents:first-run-of-day
+  - bietlejuice.enrich_learning:load-enrich-lessons:first-run-of-day
+  - bietlejuice.enrich_learning:load-enrich-sections:first-run-of-day
   - bietlejuice.enrich_learning:load-enrich-user-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-codex-pin-sync-drift:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day

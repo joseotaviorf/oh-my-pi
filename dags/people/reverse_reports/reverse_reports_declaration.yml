@@ -290,3 +290,17 @@ workflow:
       extra_spark_job_arguments:
         - "1RO7I-zXLLNKhpIiSxBumbFxtog84xGvvzktEpJNpKO8"
         - "base_dash (Não apagar)"
+
+    # Former notebook: dash_blitz_degreed (Daily Pipeline).
+    blitz_regulatory_training_sections:
+      extra_spark_job_arguments:
+        - "1JOWWPbAqzXce0uIHM9PJAVgwNsCPmGZedYCE_e2ARCQ"
+        - "blitz_database"
+    blitz_regulatory_training_contents:
+      extra_spark_job_arguments:
+        - "1JOWWPbAqzXce0uIHM9PJAVgwNsCPmGZedYCE_e2ARCQ"
+        - "database_content"
+    blitz_regulatory_training_pathway_completions:
+      extra_spark_job_arguments:
+        - "1RNvYAYC2KlpigkQ5Xz9nmjuaoIOf5GHbmUX-AG9M8bE"
+        - "certificados_base"
