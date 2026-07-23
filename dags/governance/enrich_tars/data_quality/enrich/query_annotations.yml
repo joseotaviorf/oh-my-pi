@@ -1,0 +1,60 @@
+---
+table_name: datalake_tars.query_annotations
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: ts_started
+  incremental_date_mask: yyyy-MM-dd
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -30
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id_query:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_session:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+  reconcile_with_trino_query_complete:
+    custom:
+      # Output row count must stay within 5% of Tars-source queries in trino_query_complete.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             ABS(
+               (SELECT COUNT(*) FROM datalake_tars.query_annotations)
+               - (
+                 SELECT COUNT(*)
+                 FROM data_platform_metrics.trino_query_complete
+                 WHERE LOWER(source) LIKE 'tars%'
+               )
+             ) AS diff,
+             (
+               SELECT COUNT(*)
+               FROM data_platform_metrics.trino_query_complete
+               WHERE LOWER(source) LIKE 'tars%'
+             ) AS src_cnt
+         ) AS reconciliation
+         WHERE reconciliation.src_cnt > 0
+           AND reconciliation.diff * 1.0 / reconciliation.src_cnt > 0.05
+        ) = 0
+      severity_level: Error
