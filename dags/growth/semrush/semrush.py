@@ -37,7 +37,7 @@ SOURCE = "semrush"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 4, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
-CLUSTER_DESCRIPTION = "databricks_16_4_max_io-memory_cluster"
+CLUSTER_DESCRIPTION = "consolidation_xl_memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
 partition_cols = config_service.get_config("clean_partition_cols")
@@ -58,6 +58,7 @@ raw_spark_job_file = (
 
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
+cluster_configuration["num_workers"] = 4
 default_libraries = config_service.get_config("default_libraries")
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
 cluster_configuration["single_user_name"] = (

@@ -1,3 +1,6 @@
 cluster:
-  type: databricks_16_4_small_general_fleet_2xlarge_single_node
+  type: consolidation_m_general_single_node_cluster
   databricks_conn_id: databricks_new_env
+  custom_configurations:
+    aws_attributes:
+      ebs_volume_size: 200

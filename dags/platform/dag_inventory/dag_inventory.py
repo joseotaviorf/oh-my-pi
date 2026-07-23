@@ -55,7 +55,10 @@ dag_declaration = {
         "default_partitions": ["year", "month", "day"],
         "tables_customization": {"dag": {}, "table": {}},
     },
-    "cluster": {"type": "databricks_16_4_med_general_cluster"},
+    "cluster": {
+        "type": "consolidation_s_general_cluster",
+        "custom_configurations": {"num_workers": 3},
+    },
 }
 factory = FactoryDispatcher(layer=LayerEnum.RAW).get_factory(
     dag_args=dag_declaration["dag"],

@@ -49,9 +49,10 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 DAI_CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_16_4_min_memory_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("consolidation_s_memory_cluster")
 
 
+CLUSTER_DESCRIPTION["num_workers"] = 3
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (

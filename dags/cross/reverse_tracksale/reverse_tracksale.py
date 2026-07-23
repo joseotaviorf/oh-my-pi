@@ -44,11 +44,10 @@ REVERSE_SPARK_JOB_PATH = (
 )
 
 
-CLUSTER_DESCRIPTION = config_service.get_config(
-    "databricks_12_2_med_2xlarge_general_cluster"
-)
+CLUSTER_DESCRIPTION = config_service.get_config("consolidation_m_general_cluster")
 
 
+CLUSTER_DESCRIPTION["num_workers"] = 3
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (

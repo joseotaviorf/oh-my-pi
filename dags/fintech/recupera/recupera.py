@@ -38,10 +38,9 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
-CLUSTER_DESCRIPTION = config_service.get_config(
-    "databricks_12_2_med_4xlarge_general_cluster"
-)
+CLUSTER_DESCRIPTION = config_service.get_config("consolidation_xl_general_cluster")
 
+CLUSTER_DESCRIPTION["num_workers"] = 3
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
