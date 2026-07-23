@@ -14,3 +14,24 @@ column_level_validations:
       # No duplicate rows for the same (id_grade_ladder, dt_effective_started).
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.grade_ladder GROUP BY id_grade_ladder, dt_effective_started HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
+  grade_ladder_versions_must_abut:
+    custom:
+      # Adjacent SCD versions for id_grade_ladder must abut after PIN go-live.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            id_grade_ladder,
+            dt_effective_started,
+            COALESCE(dt_effective_ended, DATE('9999-12-31')) AS dt_effective_ended,
+            LEAD(dt_effective_started) OVER (
+              PARTITION BY id_grade_ladder
+              ORDER BY dt_effective_started
+            ) AS next_started
+          FROM datalake_pin_core_clean.grade_ladder
+          WHERE COALESCE(dt_effective_ended, DATE('9999-12-31')) >= DATE('2024-03-01')
+        ) versions
+        WHERE next_started IS NOT NULL
+          AND DATE_ADD(dt_effective_ended, 1) != next_started
+          AND next_started >= DATE('2024-03-01')
+        ) = 0
+      severity_level: Warning
