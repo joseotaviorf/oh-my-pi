@@ -30,9 +30,9 @@ SELECT
         0
     ) AS ts_kafka,
     CURRENT_TIMESTAMP() AS ts_load,
-    raw.year,
-    raw.month,
-    raw.day
+    YEAR(TIMESTAMP_MILLIS(raw.timestamp)) AS year,
+    MONTH(TIMESTAMP_MILLIS(raw.timestamp)) AS month,
+    DAY(TIMESTAMP_MILLIS(raw.timestamp)) AS day
 FROM
     datalake_cdp_raw.events_api AS raw
 WHERE

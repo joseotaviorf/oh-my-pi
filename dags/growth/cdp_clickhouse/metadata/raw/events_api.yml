@@ -47,10 +47,10 @@ columns:
   contract_id:
     description: Native contract identifier from events_api when present.
   year:
-    description: UTC year partition derived from ClickHouse timestamp_dt at export.
+    description: UTC year partition derived from ClickHouse _ingested_at at export.
   month:
-    description: UTC month partition derived from ClickHouse timestamp_dt at export.
+    description: UTC month partition derived from ClickHouse _ingested_at at export.
   day:
-    description: UTC day partition derived from ClickHouse timestamp_dt at export.
+    description: UTC day partition derived from ClickHouse _ingested_at at export.
   hour:
-    description: UTC hour partition derived from ClickHouse timestamp_dt at export.
+    description: UTC hour partition derived from ClickHouse _ingested_at at export.

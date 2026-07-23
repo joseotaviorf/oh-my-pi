@@ -27,6 +27,14 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def _iter_ingest_hours(start_time: datetime, end_time: datetime):
+    """Yield UTC hour buckets for [start_time, end_time) based on _ingested_at."""
+    current = start_time.replace(minute=0, second=0, microsecond=0)
+    while current < end_time:
+        yield current
+        current += timedelta(hours=1)
+
+
 def trigger_insert_into_clickhouse_procedure(
     database_name: str,
     table_name: str,
@@ -59,10 +67,10 @@ def trigger_insert_into_clickhouse_procedure(
     )
     SELECT
         *,
-        toYear({clickhouse_partition_column})       AS year,
-        toMonth({clickhouse_partition_column})      AS month,
-        toDayOfMonth({clickhouse_partition_column}) AS day,
-        toHour({clickhouse_partition_column})       AS hour
+        toYear({clickhouse_incremental_column})       AS year,
+        toMonth({clickhouse_incremental_column})      AS month,
+        toDayOfMonth({clickhouse_incremental_column}) AS day,
+        toHour({clickhouse_incremental_column})       AS hour
     FROM {database_name}.{table_name} FINAL
     WHERE
         {clickhouse_incremental_column} >= '{start_time}'::TIMESTAMP
@@ -212,6 +220,7 @@ if __name__ == "__main__":
     logger.info("loading data from s3...")
     start_time = datetime.strptime(load_start_date, "%Y-%m-%d %H:%M:%S")
     end_time = datetime.strptime(load_end_date, "%Y-%m-%d %H:%M:%S")
+    ingest_hours = list(_iter_ingest_hours(start_time, end_time))
 
     spark_client = SparkClient()
     spark = spark_client.conn
@@ -227,10 +236,7 @@ if __name__ == "__main__":
             f"data.parquet"
         )
         for event_type in event_types
-        for dt in (
-            start_time + timedelta(hours=i)
-            for i in range(int((end_time - start_time).total_seconds() // 3600))
-        )
+        for dt in ingest_hours
     ]
 
     source_paths_filtered = [

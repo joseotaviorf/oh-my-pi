@@ -7,12 +7,15 @@ dag:
   documentation:
     dag_purpose: |
       Incrementally ingests CDP events from the ClickHouse events_api table every 30
-      minutes (UTC). Each run filters by _ingested_at and exports matching rows:
-      ClickHouse writes Parquet to the processed-data bucket partitioned by event
-      timestamp_dt (year/month/day/hour), Spark loads raw Delta partitions with
-      replaceWhere, then builds transactional_events, user_tracking_events and
-      comms_events in clean by filtering egw_event_type. Overlapping runs are safe
-      because only affected event-time raw partitions are overwritten.
+      minutes (UTC). Each run exports rows newly ingested in the load window
+      (_ingested_at) whose event timestamp_dt falls between load_start_date minus 1
+      day and load_end_date plus 3 hours. The timestamp_dt predicate uses the table
+      sort key for partition pruning; _ingested_at limits rows per run. ClickHouse
+      writes Parquet partitioned by _ingested_at (year/month/day/hour). Spark loads
+      the matching ingest-hour range from S3 into raw Delta partitions with replaceWhere,
+      then builds transactional_events, user_tracking_events and comms_events in clean
+      by filtering egw_event_type. Clean tables partition by event timestamp (year/month/day).
+      Overlapping runs are safe because only affected ingest-time raw partitions are overwritten.
 
 workflow:
   layer: raw
@@ -23,8 +26,8 @@ workflow:
   default_partitions: [year, month, day, hour]
   execution_timeout_hours: 2
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=6)).strftime('%Y-%m-%d %H:%M:%S'), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, (data_interval_end + macros.timedelta(hours=4)).strftime('%Y-%m-%d %H:%M:%S'), 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, (data_interval_end - macros.timedelta(hours=2)).strftime('%Y-%m-%d %H:%M:%S'), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, (data_interval_end + macros.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'), 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
