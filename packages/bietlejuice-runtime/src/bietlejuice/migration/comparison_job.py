@@ -253,16 +253,16 @@ def split_s3_uri(uri: str) -> Tuple[str, str]:
     return parsed.netloc, parsed.path.lstrip("/")
 
 
-def read_s3_json(uri: str) -> Dict[str, Any]:
+def read_s3_json(uri: str, s3_client=None) -> Dict[str, Any]:
     bucket, key = split_s3_uri(uri)
-    client = boto3.client("s3")
+    client = s3_client or boto3.client("s3")
     response = client.get_object(Bucket=bucket, Key=key)
     return json.loads(response["Body"].read().decode("utf-8"))
 
 
-def write_s3_json(uri: str, payload: Dict[str, Any]) -> None:
+def write_s3_json(uri: str, payload: Dict[str, Any], s3_client=None) -> None:
     bucket, key = split_s3_uri(uri)
-    client = boto3.client("s3")
+    client = s3_client or boto3.client("s3")
     client.put_object(
         Bucket=bucket,
         Key=key,
@@ -271,8 +271,8 @@ def write_s3_json(uri: str, payload: Dict[str, Any]) -> None:
     )
 
 
-def list_s3_jsons(bucket: str, prefix: str) -> List[str]:
-    client = boto3.client("s3")
+def list_s3_jsons(bucket: str, prefix: str, s3_client=None) -> List[str]:
+    client = s3_client or boto3.client("s3")
     keys: List[str] = []
     paginator = client.get_paginator("list_objects_v2")
     for page in paginator.paginate(Bucket=bucket, Prefix=prefix):

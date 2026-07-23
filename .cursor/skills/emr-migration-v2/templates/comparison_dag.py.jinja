@@ -5,9 +5,13 @@ Run ID: {{ run_id }}
 Scope: {{ domain }}/{{ dag_name }}
 """
 
+from urllib.parse import urlparse
+
 from airflow import DAG, Dataset
 from airflow.operators.python import PythonOperator
 from datetime import datetime
+
+from bietlejuice.services.configuration_service import ConfigurationService
 
 DAG_ID = "migration_compare_{{ scope_id }}"
 RUN_ID = "{{ run_id }}"
@@ -21,6 +25,10 @@ TABLES = [
     {% for table in table_names %}"{{ table }}",
     {% endfor %}
 ]
+
+_CONFIG = ConfigurationService("{{ dag_name }}")
+ARTIFACTS_URI = _CONFIG.get_config("artifacts_bucket")
+ARTIFACTS_BUCKET = urlparse(ARTIFACTS_URI).netloc or ARTIFACTS_URI
 
 default_args = {
     "owner": "data-platform",
@@ -36,10 +44,28 @@ with DAG(
     tags=["migration", "comparison", "validation"],
 ) as dag:
 
+    def _get_s3_client():
+        import boto3
+        from airflow.models import Variable
+
+        role_arn = Variable.get("DATASET_EVENTS_ASSUME_ROLE_ARN", default_var=None)
+        if not role_arn:
+            return boto3.client("s3")
+        sts = boto3.client("sts")
+        creds = sts.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName="migration-s3-compare",
+            DurationSeconds=3600,
+        )["Credentials"]
+        return boto3.Session(
+            aws_access_key_id=creds["AccessKeyId"],
+            aws_secret_access_key=creds["SecretAccessKey"],
+            aws_session_token=creds["SessionToken"],
+        ).client("s3")
+
     def run_comparison(**context):
         """Read metrics from S3, compare, write verdict."""
         import json
-        import boto3
         from bietlejuice.migration.comparison_job import (
             compare_table,
             list_s3_jsons,
@@ -47,27 +73,25 @@ with DAG(
             write_s3_json,
         )
 
-        from airflow.models import Variable
-
-        artifacts_uri = Variable.get("artifacts_bucket")
-        bucket = artifacts_uri.replace("s3://", "").strip("/")
+        s3 = _get_s3_client()
+        bucket = ARTIFACTS_BUCKET
 
         twin_prefix = f"{RUN_PREFIX}/twin/{DOMAIN}/{DAG_NAME}/"
         emr_prefix = f"{RUN_PREFIX}/emr/{DOMAIN}/{DAG_NAME}/"
         verdict_prefix = f"{RUN_PREFIX}/verdicts/{DOMAIN}/{DAG_NAME}/"
 
-        twin_keys = list_s3_jsons(bucket, twin_prefix)
-        emr_keys = list_s3_jsons(bucket, emr_prefix)
+        twin_keys = list_s3_jsons(bucket, twin_prefix, s3_client=s3)
+        emr_keys = list_s3_jsons(bucket, emr_prefix, s3_client=s3)
 
         twin_by_table = {}
         for key in twin_keys:
-            metric = read_s3_json(f"s3://{bucket}/{key}")
+            metric = read_s3_json(f"{ARTIFACTS_URI}/{key}", s3_client=s3)
             table_name = metric.get("table_name", key.split("/")[-1].replace(".json", ""))
             twin_by_table[table_name] = metric
 
         emr_by_table = {}
         for key in emr_keys:
-            metric = read_s3_json(f"s3://{bucket}/{key}")
+            metric = read_s3_json(f"{ARTIFACTS_URI}/{key}", s3_client=s3)
             table_name = metric.get("table_name", key.split("/")[-1].replace(".json", ""))
             emr_by_table[table_name] = metric
 
@@ -95,8 +119,8 @@ with DAG(
                         f"run_id mismatch: expected {RUN_ID}, got {metric_run_id} ({label})"
                     )
             verdict = compare_table(twin_m, emr_m)
-            verdict_uri = f"s3://{bucket}/{verdict_prefix}{table_name}.json"
-            write_s3_json(verdict_uri, verdict)
+            verdict_uri = f"{ARTIFACTS_URI}/{verdict_prefix}{table_name}.json"
+            write_s3_json(verdict_uri, verdict, s3_client=s3)
 
             v = verdict["verdict"]
             verdicts[table_name] = v
@@ -119,8 +143,8 @@ with DAG(
             "overall_verdict": "FAIL" if failed else ("WARN" if warned else "PASS"),
             "pr_gate_eligible": failed == 0,
         }
-        summary_uri = f"s3://{bucket}/{verdict_prefix}summary.json"
-        write_s3_json(summary_uri, summary)
+        summary_uri = f"{ARTIFACTS_URI}/{verdict_prefix}summary.json"
+        write_s3_json(summary_uri, summary, s3_client=s3)
 
         context["ti"].xcom_push(key="overall_verdict", value=summary["overall_verdict"])
         context["ti"].xcom_push(key="pr_gate_eligible", value=summary["pr_gate_eligible"])
