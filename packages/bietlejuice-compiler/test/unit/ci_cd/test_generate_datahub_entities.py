@@ -1,16 +1,20 @@
 """Unit tests for the DataHub entity generate script's pure helpers.
 
-Covers the three behaviors that protect the manual audit from CI regressions:
+Covers the behaviors that protect the manual audit from CI regressions:
   * description extraction (full MD body minus assets/glossary/golden-query sections)
   * deterministic per-query stable URNs (index 0 == legacy value)
   * multi-golden-query stable-URN enforcement over both YAML forms
   * description injection that survives a YAML round-trip without mangling SQL blocks
+  * golden-query completeness validation (regression: Cases Perspective incident,
+    9 golden queries in the Markdown but only 2 reached DataHub because the LLM
+    response was truncated and nothing detected the mismatch)
 """
 
 import tempfile
 import unittest
 import uuid
 from pathlib import Path
+from unittest import mock
 
 import yaml
 
@@ -436,6 +440,202 @@ class EnforceStableUrnsTest(unittest.TestCase):
         self.assertEqual(urn, g._stable_urn_for_query("demo", 0))
 
 
+class ExtractGoldenQuerySqlsTest(unittest.TestCase):
+    """``_extract_golden_query_sqls`` is the read-side of the SQL-injection fix: it
+    must return the exact same count, in the exact same order, as
+    ``_count_expected_golden_queries`` — that invariant is what lets
+    ``_inject_golden_query_sqls`` do positional injection safely."""
+
+    def test_plural_section_returns_sqls_in_order(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n## Golden Queries\n\n"
+            "### Query 1 — demo\n\n```sql\nSELECT 1\n```\n\n"
+            "### Query 2 — demo\n\n```sql\nSELECT 2\nFROM t\n```\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(
+            g._extract_golden_query_sqls(md_path), ["SELECT 1", "SELECT 2\nFROM t"]
+        )
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_singular_heading_with_h3_subqueries_returns_all_three(self) -> None:
+        """Same shape as agents.md (Bugbot regression): one singular heading with
+        two extra H3 sub-queries must yield 3 SQL texts, not 1."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n"
+            "## Golden query: Active agents per hub (latest day)\n\n"
+            "```sql\nSELECT 1\n```\n\n"
+            "### Reconciliation: BigAgent vs Nazaré revenue share\n\n"
+            "```sql\nSELECT 2\n```\n\n"
+            "### CIQ portfolio loss (Compra de Carteira)\n\n"
+            "```sql\nSELECT 3\n```\n\n"
+            "## DataHub Catalog\n\n- urn:li:dataProduct:demo\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(
+            g._extract_golden_query_sqls(md_path), ["SELECT 1", "SELECT 2", "SELECT 3"]
+        )
+        self.assertEqual(len(g._extract_golden_query_sqls(md_path)), 3)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_absent_returns_empty_list(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n## Overview\n\nNo queries yet.\n", encoding="utf-8"
+        )
+        self.assertEqual(g._extract_golden_query_sqls(md_path), [])
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_count_matches_count_expected_golden_queries(self) -> None:
+        """Invariant relied on by _inject_golden_query_sqls's positional injection."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        queries = "\n\n".join(
+            f"### Query {i} — demo\n\n```sql\nSELECT {i}\n```" for i in range(1, 6)
+        )
+        md_path.write_text(
+            f"# Demo\n\n## Golden Queries\n\n{queries}\n", encoding="utf-8"
+        )
+        self.assertEqual(
+            len(g._extract_golden_query_sqls(md_path)),
+            g._count_expected_golden_queries(md_path),
+        )
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+
+class InjectGoldenQuerySqlsTest(unittest.TestCase):
+    """``_inject_golden_query_sqls`` overwrites the LLM's placeholder ``sql:`` with
+    the real Markdown text — this is the fix that makes query-text truncation
+    structurally impossible (the SQL never round-trips through the LLM)."""
+
+    def test_plural_list_placeholder_replaced_by_position(self) -> None:
+        yaml_content = (
+            "spec_version: 1\n"
+            "golden_queries:\n"
+            '  - stable_urn: "TBD"\n'
+            "    name: Q1\n"
+            '    sql: "(injected by CI from Markdown)"\n'
+            '  - stable_urn: "TBD"\n'
+            "    name: Q2\n"
+            '    sql: "(injected by CI from Markdown)"\n'
+        )
+        out = g._inject_golden_query_sqls(
+            yaml_content, ["SELECT 1", "SELECT 2\nFROM t"]
+        )
+        parsed = yaml.safe_load(out)
+        self.assertEqual(parsed["golden_queries"][0]["sql"].strip(), "SELECT 1")
+        self.assertEqual(parsed["golden_queries"][1]["sql"].strip(), "SELECT 2\nFROM t")
+        # Names/other keys must survive untouched.
+        self.assertEqual(parsed["golden_queries"][0]["name"], "Q1")
+        self.assertEqual(parsed["golden_queries"][1]["name"], "Q2")
+
+    def test_singular_form_placeholder_replaced(self) -> None:
+        yaml_content = (
+            "spec_version: 1\n"
+            "golden_query:\n"
+            '  stable_urn: "TBD"\n'
+            "  name: Q1\n"
+            '  sql: "(injected by CI from Markdown)"\n'
+        )
+        out = g._inject_golden_query_sqls(yaml_content, ["SELECT 1"])
+        parsed = yaml.safe_load(out)
+        self.assertEqual(parsed["golden_query"]["sql"].strip(), "SELECT 1")
+
+    def test_replaces_llm_authored_block_scalar_too(self) -> None:
+        """The LLM might ignore the placeholder instruction and emit a real (but
+        wrong/incomplete) ``sql: |`` block anyway — injection must still overwrite
+        it, not just the single-line placeholder form."""
+        yaml_content = (
+            "spec_version: 1\n"
+            "golden_query:\n"
+            '  stable_urn: "TBD"\n'
+            "  sql: |\n"
+            "    SELECT this_is_wrong_or_truncat\n"
+        )
+        out = g._inject_golden_query_sqls(
+            yaml_content, ["SELECT the_real_full_query\nFROM t"]
+        )
+        parsed = yaml.safe_load(out)
+        self.assertEqual(
+            parsed["golden_query"]["sql"].strip(), "SELECT the_real_full_query\nFROM t"
+        )
+
+    def test_preserves_special_characters_and_multiline_sql(self) -> None:
+        """Literal block scalars need no escaping — colons, quotes, and comments in
+        real SQL must round-trip exactly."""
+        real_sql = (
+            "SELECT a:b, 'quoted', x -- a comment\nFROM t\nWHERE y = 1 AND z <> 2"
+        )
+        yaml_content = (
+            "spec_version: 1\n"
+            "golden_queries:\n"
+            '  - stable_urn: "TBD"\n'
+            '    sql: "(injected by CI from Markdown)"\n'
+        )
+        out = g._inject_golden_query_sqls(yaml_content, [real_sql])
+        parsed = yaml.safe_load(out)
+        self.assertEqual(parsed["golden_queries"][0]["sql"].strip(), real_sql)
+
+    def test_count_mismatch_falls_back_to_llm_authored_content(self) -> None:
+        """If the LLM dropped an entire golden-query entry, the count of 'sql:' keys
+        in the YAML won't match len(sqls) — injection must be a no-op (the existing
+        completeness check catches the drop instead of this function silently
+        mis-attaching SQL to the wrong query)."""
+        yaml_content = (
+            "spec_version: 1\n"
+            "golden_queries:\n"
+            '  - stable_urn: "TBD"\n'
+            '    sql: "(injected by CI from Markdown)"\n'
+        )
+        out = g._inject_golden_query_sqls(yaml_content, ["SELECT 1", "SELECT 2"])
+        self.assertEqual(out, yaml_content)
+
+    def test_no_expected_sqls_is_a_noop(self) -> None:
+        yaml_content = "spec_version: 1\nproduct_display_name: Demo\n"
+        out = g._inject_golden_query_sqls(yaml_content, [])
+        self.assertEqual(out, yaml_content)
+
+    def test_end_to_end_matches_markdown_source_for_many_queries(self) -> None:
+        """Regression: even with 9 golden queries (Cases Perspective shape) and only
+        placeholders from the LLM, every published SQL text must exactly match the
+        Markdown source after injection — the fix that makes the original incident
+        (9 declared, 2 delivered) structurally impossible for the SQL text itself."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        queries_md = "\n\n".join(
+            f"### Query {i} — demo\n\n```sql\nSELECT {i} FROM table_{i}\n```"
+            for i in range(1, 10)
+        )
+        md_path.write_text(
+            f"# Demo\n\n## Golden Queries\n\n{queries_md}\n", encoding="utf-8"
+        )
+
+        llm_output = "spec_version: 1\ngolden_queries:\n" + "".join(
+            f'  - stable_urn: "TBD"\n    name: Query {i}\n'
+            '    sql: "(injected by CI from Markdown)"\n'
+            for i in range(1, 10)
+        )
+        sqls = g._extract_golden_query_sqls(md_path)
+        self.assertEqual(len(sqls), 9)
+        out = g._inject_golden_query_sqls(llm_output, sqls)
+        parsed = yaml.safe_load(out)
+        self.assertEqual(len(parsed["golden_queries"]), 9)
+        for i, query in enumerate(parsed["golden_queries"], start=1):
+            self.assertEqual(query["sql"].strip(), f"SELECT {i} FROM table_{i}")
+
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+
 class InjectDescriptionTest(unittest.TestCase):
     _YAML = (
         "spec_version: 1\n"
@@ -637,6 +837,213 @@ class MbrTest(unittest.TestCase):
     def test_inject_mbr_anchors_after_data_product_type(self) -> None:
         out = g._inject_mbr("data_product_type: metric\n", ["Support MBR"])
         self.assertRegex(out, r"data_product_type: metric\nmbr:\n")
+
+
+class GoldenQueryCompletenessTest(unittest.TestCase):
+    """Regression coverage for the Cases Perspective incident.
+
+    PR #26285 added a metric entity Markdown with 9 golden queries; the LLM
+    response was silently truncated and only 2 reached the generated YAML
+    (and therefore DataHub). ``main()`` had no check comparing the Markdown's
+    declared query count against the YAML's, so the partial publish was
+    reported as a success. These tests pin the counting helpers that now
+    detect that mismatch.
+    """
+
+    def _metric_md_with_queries(self, n: int) -> Path:
+        queries = "\n\n".join(
+            f"### Query {i} — demo\n\n```sql\nSELECT {i}\n```" for i in range(1, n + 1)
+        )
+        body = (
+            f"# Demo\n\n## Golden Queries\n\n{queries}\n\n"
+            "## DataHub Catalog\n\n- urn:li:dataProduct:demo\n"
+        )
+        metric_dir = Path(tempfile.mkdtemp()) / "metric_entities"
+        metric_dir.mkdir()
+        md_path = metric_dir / "demo.md"
+        md_path.write_text(body, encoding="utf-8")
+        return md_path
+
+    def test_count_expected_golden_queries_plural_subheadings(self) -> None:
+        md_path = self._metric_md_with_queries(9)
+        self.assertEqual(g._count_expected_golden_queries(md_path), 9)
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_count_expected_golden_queries_singular_domain_headings(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n"
+            "## Golden query: Query A\n\n```sql\nSELECT 1\n```\n\n"
+            "## Golden query: Query B\n\n```sql\nSELECT 2\n```\n\n"
+            "## DataHub Catalog\n\n- urn:li:dataProduct:demo\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(g._count_expected_golden_queries(md_path), 2)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_count_expected_golden_queries_singular_heading_with_h3_subqueries(
+        self,
+    ) -> None:
+        """Regression (Bugbot, PR #26537): agents.md has one
+        '## Golden query: {Name}' H2 that itself contains two extra queries as H3
+        sub-sections ("### Reconciliation ..." / "### CIQ portfolio loss ...").
+        Counting the singular heading as a hard '1' undercounts real queries and
+        would let a truncated LLM response (only the first query emitted) pass the
+        completeness check."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n"
+            "## Golden query: Active agents per hub (latest day)\n\n"
+            "```sql\nSELECT 1\n```\n\n"
+            "### Reconciliation: BigAgent vs Nazaré revenue share\n\n"
+            "```sql\nSELECT 2\n```\n\n"
+            "### CIQ portfolio loss (Compra de Carteira)\n\n"
+            "```sql\nSELECT 3\n```\n\n"
+            "## DataHub Catalog\n\n- urn:li:dataProduct:demo\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(g._count_expected_golden_queries(md_path), 3)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_count_expected_golden_queries_ignores_non_query_subheadings(self) -> None:
+        """Regression: Cases Perspective's Golden Queries section ends with a
+        '### Validation' sub-heading after Query 9 — that must not be counted
+        as a 10th query."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n## Golden Queries\n\n"
+            "### Query 1 — demo\n\n```sql\nSELECT 1\n```\n\n"
+            "### Query 2 — demo\n\n```sql\nSELECT 2\n```\n\n"
+            "### Validation\n\nRun both queries and compare totals.\n\n"
+            "## Superset Golden Assets\n\n- n/a\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(g._count_expected_golden_queries(md_path), 2)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_count_expected_golden_queries_handles_non_numbered_headings(self) -> None:
+        """Real docs (e.g. visits.md, losses.md) use ### headings with no 'Query'
+        word at all — numbered ('### 1. ...') or a bare descriptive title. Counting
+        must work regardless of heading text, by counting ```sql fences instead."""
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n## Golden queries\n\n"
+            "### 1. Some descriptive title\n\n```sql\nSELECT 1\n```\n\n"
+            "### Another title with no numbering\n\n```sql\nSELECT 2\n```\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(g._count_expected_golden_queries(md_path), 2)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_count_expected_golden_queries_absent_returns_zero(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        md_path = tmp_dir / "demo.md"
+        md_path.write_text(
+            "# Demo\n\n## Overview\n\nNo queries yet.\n", encoding="utf-8"
+        )
+        self.assertEqual(g._count_expected_golden_queries(md_path), 0)
+        md_path.unlink()
+        tmp_dir.rmdir()
+
+    def test_count_golden_queries_in_yaml_plural(self) -> None:
+        yaml_content = (
+            "spec_version: 1\n"
+            "golden_queries:\n"
+            '  - stable_urn: "TBD"\n'
+            "    name: Q1\n"
+            '  - stable_urn: "TBD"\n'
+            "    name: Q2\n"
+        )
+        self.assertEqual(g._count_golden_queries_in_yaml(yaml_content), 2)
+
+    def test_count_golden_queries_in_yaml_singular(self) -> None:
+        yaml_content = 'spec_version: 1\ngolden_query:\n  stable_urn: "TBD"\n'
+        self.assertEqual(g._count_golden_queries_in_yaml(yaml_content), 1)
+
+    def test_count_golden_queries_in_yaml_none(self) -> None:
+        self.assertEqual(g._count_golden_queries_in_yaml("spec_version: 1\n"), 0)
+
+    def test_regression_truncated_llm_output_detected_as_incomplete(self) -> None:
+        """Pins the exact Cases Perspective shape: 9 declared, 2 delivered."""
+        md_path = self._metric_md_with_queries(9)
+        truncated_yaml = (
+            "spec_version: 1\n"
+            "golden_queries:\n"
+            '  - stable_urn: "TBD"\n'
+            "    name: Query 1\n"
+            '  - stable_urn: "TBD"\n'
+            "    name: Query 2\n"
+        )
+        expected = g._count_expected_golden_queries(md_path)
+        actual = g._count_golden_queries_in_yaml(truncated_yaml)
+        self.assertEqual(expected, 9)
+        self.assertEqual(actual, 2)
+        self.assertLess(actual, expected)
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_complete_output_is_not_flagged(self) -> None:
+        md_path = self._metric_md_with_queries(2)
+        complete_yaml = (
+            "spec_version: 1\n"
+            "golden_queries:\n"
+            '  - stable_urn: "TBD"\n'
+            '  - stable_urn: "TBD"\n'
+        )
+        expected = g._count_expected_golden_queries(md_path)
+        actual = g._count_golden_queries_in_yaml(complete_yaml)
+        self.assertEqual(expected, actual)
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+
+class CallLlmTruncationTest(unittest.TestCase):
+    """Regression: a LiteLLM response with ``finish_reason: length`` means the
+
+    model ran out of output tokens mid-YAML (exactly what happened for Cases
+    Perspective's 9 large SQL golden queries). ``_call_llm`` must raise instead
+    of returning the truncated content as if it were a complete response.
+    """
+
+    def _mock_response(self, finish_reason: str, content: str = "spec_version: 1\n"):
+        response = mock.MagicMock()
+        response.raise_for_status.return_value = None
+        response.json.return_value = {
+            "choices": [
+                {"finish_reason": finish_reason, "message": {"content": content}}
+            ]
+        }
+        return response
+
+    @mock.patch("scripts.ci_cd.generate_and_push_datahub_entities.requests.post")
+    def test_raises_when_finish_reason_is_length(self, mock_post) -> None:
+        mock_post.return_value = self._mock_response("length")
+        with self.assertRaises(ValueError):
+            g._call_llm([], "model", "http://litellm", "key", max_tokens=16000)
+
+    @mock.patch("scripts.ci_cd.generate_and_push_datahub_entities.requests.post")
+    def test_passes_through_on_normal_completion(self, mock_post) -> None:
+        mock_post.return_value = self._mock_response(
+            "stop", "spec_version: 1\nkind: x\n"
+        )
+        result = g._call_llm([], "model", "http://litellm", "key", max_tokens=16000)
+        self.assertEqual(result, "spec_version: 1\nkind: x\n")
+
+    @mock.patch("scripts.ci_cd.generate_and_push_datahub_entities.requests.post")
+    def test_max_tokens_forwarded_in_payload(self, mock_post) -> None:
+        mock_post.return_value = self._mock_response("stop")
+        g._call_llm([], "model", "http://litellm", "key", max_tokens=16000)
+        _, kwargs = mock_post.call_args
+        self.assertEqual(kwargs["json"]["max_tokens"], 16000)
 
 
 if __name__ == "__main__":

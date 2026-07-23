@@ -214,6 +214,11 @@ URNs in backticks. Omit this section when no Superset asset exists for this metr
 - Focus on traps specific to the official metric (formula-level, not schema-level).
 
 **Golden Queries:**
+- **Hard cap: never write more than 10 golden queries**, regardless of how many
+  component/reconciliation queries Step 2 surfaces. If more than 10 are warranted, keep
+  the 10 most valuable/representative and tell the user which ones were deferred (they
+  are candidates for a follow-up doc). This is enforced at generation time — it's a
+  different gate from the token-based review in Step 3b, which still runs afterward.
 - **One canonical query** that produces the official metric number.
 - **Trino SQL dialect** — TARS runs on Trino. No Spark-only constructs (`QUALIFY`, `GROUP BY ALL`, `IFF`, 3-arg `DATEDIFF`, variant `col:key`).
 - Reference the component CTE pattern from the business entity explicitly in a comment — do not re-teach it, just note where it comes from.
@@ -225,6 +230,75 @@ URNs in backticks. Omit this section when no Superset asset exists for this metr
 - Include Superset URNs in backticks: `` `urn:li:dataset:(urn:li:dataPlatform:superset,{id},PROD)` ``.
 - Include every `` `schema.table` `` and Superset URN in backticks so CI can extract them deterministically.
 - Omit the section when the metric has no Trino table and no Superset asset.
+
+---
+
+## Step 3b — DataHub token-overflow risk check (mandatory)
+
+`## Golden Queries` is converted to DataHub YAML by a single LLM call with a fixed
+`max_tokens` ceiling (`LITELLM_MAX_TOKENS`, default 16000, in
+`packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py`).
+A metric with many and/or very large SQL golden queries can exceed that ceiling and
+get a truncated response — CI now hard-fails on a declared-vs-generated mismatch
+(see the Cases Perspective incident: 9 golden queries declared, only 2 published),
+but catch the risk here, before the PR even exists.
+
+Run the same credential-free counting logic CI uses, against the file you just wrote —
+measuring the **Golden Queries section** specifically (not the whole file: prose sections
+like Overview/Scope don't feed the same LLM call and would make the signal noisy):
+
+```bash
+uv run --directory packages/bietlejuice-compiler python -c "
+import sys; sys.path.insert(0, 'scripts/ci_cd')
+import generate_and_push_datahub_entities as g
+from pathlib import Path
+md_path = Path('../../docs/llm_context/metric_entities/{metric_slug}.md')
+lines = md_path.read_text().splitlines()
+in_section, section_bytes = False, 0
+for line in lines:
+    if g._GOLDEN_QUERY_SINGULAR_HEADING_RE.match(line) or g._GOLDEN_QUERY_SECTION_HEADING_RE.match(line):
+        in_section = True; continue
+    if in_section and line.startswith('## '):
+        in_section = False; continue
+    if in_section:
+        section_bytes += len(line) + 1
+print('golden_queries=', g._count_expected_golden_queries(md_path))
+print('golden_queries_section_bytes=', section_bytes)
+"
+```
+
+Reference point: the entity that actually truncated, Cases Perspective (a metric doc), was
+9 golden queries at ~34KB of section text at the time of the incident. A typical metric doc
+has exactly one canonical query and is nowhere near this (single digits of KB) — treat this
+check as most relevant when a metric legitimately needs several component/reconciliation
+queries. Don't calibrate against byte counts of other specific existing docs — they get
+edited over time and any number pinned here would go stale.
+
+Note this check is now a secondary defense, not the primary one: `_inject_golden_query_sqls`
+in `generate_and_push_datahub_entities.py` extracts golden-query SQL directly from the
+Markdown and injects it into the YAML deterministically after LLM generation — the LLM only
+emits a placeholder for `sql:`, not the SQL text itself. This removes most of the original
+truncation vector (reproducing large SQL blocks). Residual risk comes from what the LLM
+still authors: `name`/`description`/`subjects` per golden query, so
+`golden_queries_section_bytes` is now a rougher proxy than before, but still worth checking
+when a metric legitimately has several component queries.
+
+Flag the metric as **at risk of LLM truncation** during the `push-datahub-business-context`
+Woodpecker step when any of these hold:
+- `golden_queries_section_bytes` > ~8,000 (roughly 2,000 tokens) — this is the primary,
+  token-based signal and applies regardless of query count
+- `golden_queries` > 10 — should never happen when authored through this skill (Step 3
+  enforces a hard cap of 10); if you see this on review, the doc was likely hand-edited
+  after generation
+- the golden query's ` ```sql ` block is unusually large (roughly 40+ lines)
+
+When at risk, say so explicitly in your final response to the user and recommend one of:
+- Raising `LITELLM_MAX_TOKENS` for the CI run that will publish this metric, or
+- Splitting the Golden Queries section (fewer queries per PR / a follow-up PR for the rest).
+
+This is a **heads-up, not a hard blocker** — CI already fails hard on an actual
+declared-vs-generated mismatch, so don't refuse to finish the doc solely on this signal;
+just make sure the user knows before opening the PR.
 
 ---
 
@@ -269,6 +343,7 @@ Before presenting to the user, verify:
 - [ ] Dos and Don'ts are specific to this metric's formula — no generic schema-level advice
 - [ ] Golden Query uses **Trino SQL dialect** (no `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-arg `DATEDIFF`, variant `col:key`)
 - [ ] Golden Query validates column names against governance YAMLs and Trino
+- [ ] DataHub token-overflow risk check run (Step 3b); user warned if at risk
 - [ ] Golden Query references the business entity component pattern in a comment instead of duplicating it
 - [ ] Metric registered in `docs/llm_context/intro.md` under "Available metric entities"
 - [ ] Back-link added to "Related Metric Entities" in the related business entity file(s)

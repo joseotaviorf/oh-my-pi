@@ -61,7 +61,7 @@ Read the full Markdown file. Map sections to YAML fields using the extraction ta
 | `golden_queries[].name` | Golden query heading | See Step 5 |
 | `golden_queries[].description` | First sentence below each query heading | One sentence + ` Source: docs/llm_context/{subdir}/{entity}.md` |
 | `golden_queries[].subjects` | SQL `FROM` / `JOIN` clauses in that query | Extract `schema.table` pairs; map to `- schema: ...\n  table: ...` |
-| `golden_queries[].sql` | SQL code block under the golden-query section | Verbatim SQL, preserve indentation; Trino dialect |
+| `golden_queries[].sql` | SQL code block under the golden-query section | **Do NOT hand-author.** CI overwrites it with the exact SQL from the Markdown, by position, after generation (same pattern as `product_description`). Emit a short placeholder, e.g. `sql: "(injected by CI from Markdown)"` — see Step 5. |
 | `glossary_terms.parent_node_urn` | `domain_urn` | `urn:li:glossaryNode:{domain}` (the part after `urn:li:domain:`) |
 | `documentation_link.label` | Entity kind + filename | `"Business entity documentation ({entity}.md)"` or `"Metric entity documentation ({entity}.md)"` |
 | `documentation_link.url` | Filename + directory | `https://github.com/quintoandar/bi-etl-ejuice/blob/master/docs/llm_context/{subdir}/{entity}.md` |
@@ -228,8 +228,17 @@ For each query (in document order):
 
 1. **`name`**: heading text (H2 suffix or H3 title), e.g. `"AR recovery rate (C&E / Neotribe-style)"` or `"Query 1 — Contracts signed in a period"`.
 2. **`description`**: first prose sentence under the heading (before the SQL block) + ` Source: docs/llm_context/{subdir}/{entity}.md`.
-3. **`sql`**: verbatim SQL from that query's code block. Preserve indentation. Must use Trino SQL dialect (no `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-arg `DATEDIFF`).
-4. **`subjects`**: parse `FROM` and `JOIN` clauses in that query's SQL to extract `schema.table` pairs. For metric queries whose final SELECT reads from a CTE only, include subjects from inner CTEs or rely on the loader's product-level subject pool fallback.
+3. **`sql`**: **do NOT reproduce the query text.** CI extracts the exact fenced ```sql block
+   from the Markdown and injects it by position after generation (`_inject_golden_query_sqls`
+   in `generate_and_push_datahub_entities.py`) — the same "LLM emits a placeholder, CI injects
+   the real value" pattern already used for `product_description`, `owners:`, and `mbr:`. This
+   is what makes a truncated/paraphrased query text structurally impossible: the SQL never
+   round-trips through the LLM. Emit `sql: "(injected by CI from Markdown)"` and move on — you
+   may still read the query's SQL from the Markdown to inform `subjects` below.
+4. **`subjects`**: parse `FROM` and `JOIN` clauses in that query's SQL (read from the Markdown,
+   not reproduced) to extract `schema.table` pairs. For metric queries whose final SELECT reads
+   from a CTE only, include subjects from inner CTEs or rely on the loader's product-level
+   subject pool fallback.
 5. **`stable_urn`**: always `"TBD"` — CI assigns the real deterministic URN per query
    (`uuid5(slug)` for query 0, `uuid5(slug:N)` for the rest). Do NOT invent a UUID.
 
@@ -272,8 +281,7 @@ golden_queries:
     subjects:
       - schema: ...
         table: ...
-    sql: |
-      ...
+    sql: "(injected by CI from Markdown)"
 glossary_terms:
   parent_node_urn: urn:li:glossaryNode:{domain}
   terms:
@@ -320,7 +328,10 @@ Before presenting the YAML to the user:
 - [ ] Metric: `datasets` lists Trino `schema`/`table` reference tables **and** Superset `urn:` entries when declared in MD
 - [ ] `domain_urn` matches what the user provided (not inferred)
 - [ ] `stable_urn` is `"TBD"` on every golden query (CI assigns)
-- [ ] All golden-query SQL is valid Trino (no Spark-only constructs)
+- [ ] `sql:` is a short placeholder on every golden query (e.g. `"(injected by CI from Markdown)"`)
+  — do NOT hand-author the query text; CI injects the exact Markdown SQL by position after
+  generation (Trino-dialect validity is checked at authoring time by the
+  `create-business-entity-doc` / `create-metric-entity-doc` skills, not here)
 - [ ] Each glossary term has `id` (snake_case), `name`, and `description` populated
 - [ ] `documentation_link.url` points to the correct `{subdir}/{entity}.md` path
 - [ ] `structured_property.qualified_name` is `br.com.quintoandar.datahub.data_product.golden_query`

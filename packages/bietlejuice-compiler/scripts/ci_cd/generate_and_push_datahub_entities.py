@@ -28,6 +28,10 @@ Required env vars:
 Optional:
     LITELLM_MODEL        — override the default model "openai/gpt-5.3-codex"
     LITELLM_BASE_URL     — override the default proxy URL
+    LITELLM_MAX_TOKENS   — override the default output token ceiling (16000);
+                            raise this for entities with many/large golden
+                            queries to avoid mid-YAML truncation (see
+                            _count_expected_golden_queries)
     DATAHUB_CI_YAML_DIR  — override ephemeral YAML output directory
 
 Usage in CI (auto-detects changed MDs via git diff):
@@ -109,9 +113,33 @@ _STABLE_URN_LINE_RE = re.compile(
     r"^(\s*(?:-\s+)?stable_urn:\s*)(?:urn:li:query:[^\s]+|\S+)\s*(?:#[^\n]*)?$",
     re.MULTILINE,
 )
+# Golden-query headings in the source Markdown, used to detect incomplete LLM
+# output (see _count_expected_golden_queries / _count_golden_queries_in_yaml).
+_GOLDEN_QUERY_SINGULAR_HEADING_RE = re.compile(r"^## Golden [Qq]uery:\s*\S", re.M)
+_GOLDEN_QUERY_SECTION_HEADING_RE = re.compile(r"^## Golden [Qq]uer(y|ies)\b")
+# Sub-heading naming within a "## Golden Queries" section is inconsistent across
+# the ~50 existing entity docs ("### Query 1 — ...", "### 1. ...", or a bare
+# descriptive title with no numbering) and some entities append trailing
+# non-query sub-sections (e.g. "### Validation") — so heading text can't
+# reliably identify a query. Every query, regardless of heading style, has
+# exactly one fenced ```sql block (see gold-standard reference and every
+# existing doc); count those instead.
+_SQL_FENCE_OPEN_RE = re.compile(r"^```sql\s*$", re.I)
+_SQL_FENCE_CLOSE_RE = re.compile(r"^```\s*$")
+# Matches a ``sql:`` key at any indentation (top-level, or nested inside a
+# ``golden_query:`` mapping / ``golden_queries:`` list item) — used to locate and
+# overwrite each golden query's SQL text with the raw Markdown source (see
+# _inject_golden_query_sqls). Captures the key's own leading whitespace so the
+# caller can tell where its value block ends (any subsequent line indented no
+# more than this key).
+_SQL_KEY_LINE_RE = re.compile(r"^([ \t]*)sql:")
 
 _DEFAULT_MODEL = "openai/gpt-5.3-codex"
 _DEFAULT_BASE_URL = "https://litellm.apps.shared-prd.habitat.zone/v1"
+# Generous ceiling so entities with many/large golden queries (e.g. 9 full SQL
+# blocks) don't get silently truncated mid-YAML by the model's own default cap.
+# Override per-run with LITELLM_MAX_TOKENS if an entity still needs more.
+_DEFAULT_MAX_TOKENS = 16000
 
 # Markdown ``## `` sections that must NOT be folded into the Data Product description.
 # Aligned with docs/llm_context/{business,metric}_entities/_TEMPLATE.md:
@@ -262,6 +290,153 @@ def _extract_related_data_products(md_path: Path) -> list[str]:
             seen.add(product_id)
             ids.append(product_id)
     return ids
+
+
+def _count_expected_golden_queries(md_path: Path) -> int:
+    """Count golden queries declared in the source Markdown.
+
+    A golden-query zone is opened by either heading style — a repeated
+    ``## Golden query: {Name}`` (domain docs, one H2 per query) or the plural
+    ``## Golden Queries`` H2 (metric docs, and most domain docs) — and stays open
+    across any H3 sub-headings until the next H2. Every query, regardless of
+    heading style, has exactly one fenced ```sql block, so count those rather than
+    relying on heading text (inconsistent across ~50 existing docs — numbered,
+    unnumbered, or a bare title — and some entities append a trailing non-query
+    sub-section like "### Validation"). Returns 0 when no golden queries section
+    is present (entity legitimately has none yet).
+
+    A single ``## Golden query: {Name}`` heading can itself contain more than one
+    query as H3 sub-sections (e.g. ``agents.md``: "Active agents per hub" plus two
+    "### Reconciliation ..." / "### CIQ portfolio loss ..." sub-queries under it) —
+    treating the heading as a hard count of 1 undercounts those and lets a
+    truncated LLM response that emits only the first query pass the completeness
+    check below.
+
+    Used by ``main()`` to catch a truncated/incomplete LLM response before it gets
+    published: the Cases Perspective incident had 9 queries here but only 2 reached
+    DataHub with nothing detecting the gap.
+    """
+    lines = md_path.read_text().splitlines()
+
+    in_section = False
+    count = 0
+    for line in lines:
+        if _GOLDEN_QUERY_SINGULAR_HEADING_RE.match(
+            line
+        ) or _GOLDEN_QUERY_SECTION_HEADING_RE.match(line):
+            in_section = True
+            continue
+        if in_section and line.startswith("## "):
+            in_section = False
+            continue
+        if in_section and _SQL_FENCE_OPEN_RE.match(line.strip()):
+            count += 1
+    return count
+
+
+def _count_golden_queries_in_yaml(yaml_content: str) -> int:
+    """Count ``stable_urn:`` placeholders — one per golden query — in generated YAML."""
+    return len(_STABLE_URN_LINE_RE.findall(yaml_content))
+
+
+def _extract_golden_query_sqls(md_path: Path) -> list[str]:
+    """Extract the raw SQL text of every golden query, in document order.
+
+    Reuses the exact same golden-query-zone boundary logic as
+    ``_count_expected_golden_queries`` (any golden heading opens a zone that stays
+    open across H3 sub-headings until the next H2) — same count, same order — but
+    captures the full text of each fenced ```sql block instead of just counting
+    fence-open lines.
+
+    This is the single source of truth injected into each generated
+    ``golden_query(ies)[i].sql`` by ``_inject_golden_query_sqls``: the LLM is asked
+    for a short placeholder instead of reproducing the (potentially large) query
+    text, so the query text itself can never be truncated or paraphrased.
+    """
+    lines = md_path.read_text().splitlines()
+    in_section = False
+    in_fence = False
+    current: list[str] = []
+    sqls: list[str] = []
+    for line in lines:
+        if _GOLDEN_QUERY_SINGULAR_HEADING_RE.match(
+            line
+        ) or _GOLDEN_QUERY_SECTION_HEADING_RE.match(line):
+            in_section = True
+            continue
+        if in_section and line.startswith("## "):
+            in_section = False
+            continue
+        if in_section and not in_fence and _SQL_FENCE_OPEN_RE.match(line.strip()):
+            in_fence = True
+            current = []
+            continue
+        if in_fence and _SQL_FENCE_CLOSE_RE.match(line.strip()):
+            in_fence = False
+            sqls.append("\n".join(current).strip())
+            continue
+        if in_fence:
+            current.append(line)
+    return sqls
+
+
+def _inject_golden_query_sqls(yaml_content: str, sqls: list[str]) -> str:
+    """Overwrite every ``sql:`` value in document order with the raw SQL text
+    extracted from the source Markdown (see ``_extract_golden_query_sqls``).
+
+    The LLM is instructed (see ``_build_entity_rules``) to emit a short placeholder
+    for ``sql:`` instead of reproducing the query text — that text is exactly what
+    used to balloon LLM output tokens and risk truncation (the Cases Perspective
+    incident). CI is the single source of truth for the actual SQL, so once this
+    injection runs, the query text itself cannot be truncated, paraphrased, or
+    otherwise altered by the LLM.
+
+    Falls back to the LLM-authored content (with a warning) when the number of
+    ``sql:`` keys found in the YAML doesn't match ``len(sqls)`` — a structural
+    mismatch means the LLM didn't emit one golden query object per Markdown query
+    (e.g. it dropped an entire entry), so blind position-based injection would
+    silently attach the wrong SQL to the wrong query. That case is still caught
+    by the existing ``_count_expected_golden_queries`` vs
+    ``_count_golden_queries_in_yaml`` completeness check right after this call.
+    """
+    if not sqls:
+        return yaml_content
+
+    lines = yaml_content.split("\n")
+    sql_line_idxs = [i for i, line in enumerate(lines) if _SQL_KEY_LINE_RE.match(line)]
+    if len(sql_line_idxs) != len(sqls):
+        print(
+            f"   WARN: found {len(sql_line_idxs)} 'sql:' key(s) in the generated YAML "
+            f"but {len(sqls)} golden querie(s) in the Markdown; keeping LLM-authored "
+            "SQL text (position-based injection needs a 1:1 match).",
+            file=sys.stderr,
+        )
+        return yaml_content
+
+    # Walk back-to-front so replacing one block never shifts the line indices of
+    # the ones still to be processed.
+    for sql_idx, line_idx in reversed(list(enumerate(sql_line_idxs))):
+        key_line = lines[line_idx]
+        indent_match = _SQL_KEY_LINE_RE.match(key_line)
+        indent = indent_match.group(1) if indent_match else ""
+
+        end = line_idx + 1
+        while end < len(lines):
+            candidate = lines[end]
+            if candidate.strip() == "":
+                end += 1
+                continue
+            candidate_indent = candidate[
+                : len(candidate) - len(candidate.lstrip(" \t"))
+            ]
+            if len(candidate_indent) <= len(indent):
+                break
+            end += 1
+
+        block = _as_yaml_literal_block("sql", sqls[sql_idx], indent=indent)
+        lines[line_idx:end] = block.rstrip("\n").split("\n")
+
+    return "\n".join(lines)
 
 
 def _extract_owners(md_path: Path) -> dict[str, list[str]]:
@@ -642,14 +817,20 @@ def _extract_description_from_md(md_path: Path) -> str:
     return re.sub(r"\n{3,}", "\n\n", content)
 
 
-def _as_yaml_literal_block(key: str, value: str) -> str:
-    """Render ``key: |`` literal block scalar with every line indented two spaces.
+def _as_yaml_literal_block(key: str, value: str, indent: str = "") -> str:
+    """Render ``key: |`` literal block scalar with every line indented two spaces
+    past ``indent`` (the key's own indentation — ``""`` for a top-level key like
+    ``product_description``, ``"    "`` for a nested key like a golden query's
+    ``sql:`` inside a ``golden_queries:`` list item).
 
     Literal blocks need no escaping (markdown ``#``, ``:``, quotes, etc. are all safe),
-    so this round-trips arbitrary MD content without mangling — unlike ``yaml.dump``.
+    so this round-trips arbitrary MD/SQL content without mangling — unlike ``yaml.dump``.
     """
-    indented = "\n".join((f"  {ln}" if ln else "") for ln in value.split("\n"))
-    return f"{key}: |\n{indented}\n"
+    content_indent = f"{indent}  "
+    indented = "\n".join(
+        (f"{content_indent}{ln}" if ln else "") for ln in value.split("\n")
+    )
+    return f"{indent}{key}: |\n{indented}\n"
 
 
 def _inject_description(yaml_content: str, description: str) -> str:
@@ -747,6 +928,11 @@ LIVE DATAHUB DOMAIN CATALOG ({domain_count} domains):
   with `###` sub-headings; metric docs use `## Golden Queries`. For EACH query set
   `stable_urn: "TBD"` — CI assigns the real deterministic URN per query.
   Do NOT generate UUIDs yourself.
+- Do NOT hand-author each golden query's `sql:` text — CI overwrites it with the exact
+  SQL from that query's fenced ```sql block in the Markdown, injected by position after
+  generation (same pattern as `product_description`). Emit a short one-line placeholder
+  instead, e.g. `sql: "(injected by CI from Markdown)"`. This keeps your response small
+  even for entities with many/large golden queries — you never need to reproduce SQL text.
 - Glossary term `id` values must match existing DataHub term slugs when the term
   already exists; the loader resolves by display name as fallback.
 - Do NOT hand-author `product_description`. CI overwrites it with the full Markdown body
@@ -895,8 +1081,14 @@ _LLM_MAX_ATTEMPTS = 3
 _LLM_RETRYABLE_STATUS = frozenset({429, 502, 503, 504})
 
 
-def _call_llm(messages: list[dict], model: str, base_url: str, api_key: str) -> str:
-    payload = {"model": model, "messages": messages}
+def _call_llm(
+    messages: list[dict],
+    model: str,
+    base_url: str,
+    api_key: str,
+    max_tokens: int = _DEFAULT_MAX_TOKENS,
+) -> str:
+    payload = {"model": model, "messages": messages, "max_tokens": max_tokens}
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
@@ -945,6 +1137,15 @@ def _call_llm(messages: list[dict], model: str, base_url: str, api_key: str) -> 
     choices = body.get("choices") or []
     if not choices:
         raise ValueError(f"LiteLLM response contained no choices. Raw: {body}")
+
+    finish_reason = choices[0].get("finish_reason")
+    if finish_reason == "length":
+        raise ValueError(
+            "LiteLLM response was truncated (finish_reason='length') before "
+            f"completing the YAML — max_tokens={max_tokens} was too low for this "
+            "entity (e.g. too many/too large golden queries). Increase "
+            "LITELLM_MAX_TOKENS or split the entity's Golden Queries and retry."
+        )
 
     content = (choices[0].get("message") or {}).get("content")
     if isinstance(content, str) and content.strip():
@@ -1004,6 +1205,9 @@ def main(argv: list[str] | None = None) -> int:
 
     model = os.environ.get("LITELLM_MODEL", _DEFAULT_MODEL).strip()
     base_url = os.environ.get("LITELLM_BASE_URL", _DEFAULT_BASE_URL).strip()
+    max_tokens = int(
+        os.environ.get("LITELLM_MAX_TOKENS", "").strip() or _DEFAULT_MAX_TOKENS
+    )
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     datahub_url = os.environ.get("DATAHUB_GRAPHQL_URL", "").strip()
     datahub_token = os.environ.get("DATAHUB_TOKEN", "").strip()
@@ -1048,7 +1252,7 @@ def main(argv: list[str] | None = None) -> int:
 
         try:
             messages = _build_messages(md_path, domains=domains)
-            raw = _call_llm(messages, model, base_url, api_key)
+            raw = _call_llm(messages, model, base_url, api_key, max_tokens=max_tokens)
         except Exception as err:
             print(f"   ERROR: LLM call failed — {err}", file=sys.stderr)
             failed.append(entity_slug)
@@ -1065,6 +1269,24 @@ def main(argv: list[str] | None = None) -> int:
             continue
 
         yaml_content = _enforce_stable_urns(yaml_content, entity_slug)
+        yaml_content = _inject_golden_query_sqls(
+            yaml_content, _extract_golden_query_sqls(md_path)
+        )
+
+        expected_gq = _count_expected_golden_queries(md_path)
+        actual_gq = _count_golden_queries_in_yaml(yaml_content)
+        if expected_gq and actual_gq < expected_gq:
+            print(
+                f"   ERROR: Markdown declares {expected_gq} golden querie(s) but "
+                f"the generated YAML only has {actual_gq} — LLM output is likely "
+                "incomplete/truncated. Refusing to publish partial data. Re-run, "
+                "or raise LITELLM_MAX_TOKENS if this entity has many/large "
+                "golden queries.",
+                file=sys.stderr,
+            )
+            failed.append(entity_slug)
+            continue
+
         yaml_content = _inject_description(
             yaml_content, _extract_description_from_md(md_path)
         )

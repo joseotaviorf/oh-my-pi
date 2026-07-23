@@ -191,6 +191,11 @@ Create `docs/llm_context/business_entities/{entity_name}.md` following this stru
 - This section is checked before every SQL generation — make it count.
 
 **Golden Queries:**
+- **Hard cap: never write more than 10 golden queries**, regardless of how many candidate
+  patterns Step 2 surfaces. If more than 10 are warranted, keep the 10 most
+  valuable/representative patterns and tell the user which ones were deferred (they are
+  candidates for a follow-up doc). This is enforced at generation time — it's a different
+  gate from the token-based review in Step 3b, which still runs afterward.
 - 2-4 validated query patterns that cover the most common analytical needs.
 - All queries must use **Trino SQL dialect** (the consumer is TARS, which generates Trino queries for Superset/DBeaver). No Spark-only constructs like `QUALIFY` or `GROUP BY ALL`.
 - Validate that all table and column names exist in governance metadata or DW SQL files discovered in Step 2.
@@ -199,6 +204,75 @@ Create `docs/llm_context/business_entities/{entity_name}.md` following this stru
 - If an OBT exists, include a query using it.
 - `SELECT *` is acceptable for brevity; note that production queries should select specific columns.
 - For every table used, locate its corresponding .yml metadata file in the metadata folder within the DAG directory, and use it as the source of truth to validate the available columns.
+
+---
+
+## Step 3b — DataHub token-overflow risk check (mandatory)
+
+`## Golden Queries` is converted to DataHub YAML by a single LLM call with a fixed
+`max_tokens` ceiling (`LITELLM_MAX_TOKENS`, default 16000, in
+`packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_datahub_entities.py`).
+An entity with many and/or very large SQL golden queries can exceed that ceiling and
+get a truncated response — CI now hard-fails on a declared-vs-generated mismatch
+(see the Cases Perspective incident: 9 golden queries declared, only 2 published),
+but catch the risk here, before the PR even exists.
+
+Run the same credential-free counting logic CI uses, against the file you just wrote —
+measuring the **Golden Queries section** specifically (not the whole file: prose sections
+like Overview/Tables don't feed the same LLM call and would make the signal noisy):
+
+```bash
+uv run --directory packages/bietlejuice-compiler python -c "
+import sys; sys.path.insert(0, 'scripts/ci_cd')
+import generate_and_push_datahub_entities as g
+from pathlib import Path
+md_path = Path('../../docs/llm_context/business_entities/{entity_name}.md')
+lines = md_path.read_text().splitlines()
+in_section, section_bytes = False, 0
+for line in lines:
+    if g._GOLDEN_QUERY_SINGULAR_HEADING_RE.match(line) or g._GOLDEN_QUERY_SECTION_HEADING_RE.match(line):
+        in_section = True; continue
+    if in_section and line.startswith('## '):
+        in_section = False; continue
+    if in_section:
+        section_bytes += len(line) + 1
+print('golden_queries=', g._count_expected_golden_queries(md_path))
+print('golden_queries_section_bytes=', section_bytes)
+"
+```
+
+Don't calibrate against hardcoded byte counts of specific existing docs — they get edited
+over time and any number pinned here would go stale. Instead: the entity that actually
+truncated, Cases Perspective, was 9 golden queries at ~34KB of Markdown section text at
+the time of the incident. If you're unsure whether the current doc is in a comparable risk
+band, run the same `section_bytes` snippet above against one or two similarly-scoped
+existing docs in `docs/llm_context/business_entities/` for a live comparison point.
+
+Note this check is now a secondary defense, not the primary one: `_inject_golden_query_sqls`
+in `generate_and_push_datahub_entities.py` extracts golden-query SQL directly from the
+Markdown and injects it into the YAML deterministically after LLM generation — the LLM
+only emits a placeholder for `sql:`, not the SQL text itself. This removes most of the
+original truncation vector (reproducing large SQL blocks). Residual risk comes from what
+the LLM still authors: `name`/`description`/`subjects` per golden query, plus the Glossary
+and Tables sections — so `golden_queries_section_bytes` is now a rougher proxy than before,
+but still worth checking when a doc has an unusually large Glossary or many golden queries.
+
+Flag the entity as **at risk of LLM truncation** during the `push-datahub-business-context`
+Woodpecker step when any of these hold:
+- `golden_queries_section_bytes` > ~8,000 (roughly 2,000 tokens) — this is the primary,
+  token-based signal and applies regardless of query count
+- `golden_queries` > 10 — should never happen when authored through this skill (Step 3
+  enforces a hard cap of 10); if you see this on review, the doc was likely hand-edited
+  after generation
+- any single golden query's ` ```sql ` block is unusually large (roughly 40+ lines)
+
+When at risk, say so explicitly in your final response to the user and recommend one of:
+- Raising `LITELLM_MAX_TOKENS` for the CI run that will publish this entity, or
+- Splitting the Golden Queries section (fewer queries per PR / a follow-up PR for the rest).
+
+This is a **heads-up, not a hard blocker** — CI already fails hard on an actual
+declared-vs-generated mismatch, so don't refuse to finish the doc solely on this signal;
+just make sure the user knows before opening the PR.
 
 ---
 
@@ -231,6 +305,7 @@ Before presenting to the user, verify:
 - [ ] Every Do/Don't references a specific table, column, or filter
 - [ ] Golden Queries are syntactically valid and cover common needs
 - [ ] Golden Queries use Trino SQL dialect (no Spark-only constructs like `QUALIFY`, `GROUP BY ALL`)
+- [ ] DataHub token-overflow risk check run (Step 3b); user warned if at risk
 - [ ] Entity is registered in `intro.md`
 - [ ] Related entity docs updated with cross-references (if applicable)
 - [ ] Critical rules section present when CAST, Dedup, or mandatory filters apply
