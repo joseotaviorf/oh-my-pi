@@ -7,7 +7,7 @@
 | 1 | id_entity        | any      | Primary identifier of the entity (e.g. id_offer, id_visit, id from source table). |
 | 2 | id_house         | BIGINT   | House ID if the entity is linked to a property; NULL otherwise. |
 | 3 | id_contract      | BIGINT   | Contract ID if the entity is linked to a contract; NULL otherwise. For SALE entities (business_context = 'SALE'), always NULL. |
-| 4 | id_user          | BIGINT   | User ID for this row; one row per (id_entity, id_user, persona). |
+| 4 | id_user          | BIGINT   | **Main user ID** (`datalake_ebdb_clean.user.id` / EBDB `Usuario.id`) for this persona on this row. See [id_user — Main user ID (mandatory)](#id_user--main-user-id-mandatory). |
 | 5 | entity           | STRING   | Entity type name: with prefix if context-specific (see naming table below). |
 | 6 | persona          | STRING   | Role of id_user: OWNER, TENANT_PROSPECT, BUYER_PROSPECT, AGENT_BROKER, AGENT_PHOTOGRAPHER, etc. |
 | 7 | business_context | STRING   | 'RENT', 'SALE', or NULL. |
@@ -19,6 +19,36 @@
 Unique key: **(id_entity, id_user, persona)**. The same id_entity can appear in N rows (one per persona).
 
 **id_contract and SALE:** Entities in the SALE context are not linked to an EBDB contract in this model; the view must output `NULL AS id_contract` for SALE entities. Do not join to core_contract or other sources to populate id_contract when business_context is SALE.
+
+## id_user — Main user ID (mandatory)
+
+`id_user` **must** be the numeric user identifier from QuintoAndar's **Main** database — `datalake_ebdb_clean.user.id` (EBDB `Usuario.id`). The entities table is consumed by Datazord `/user-context`, CDP persona, and Mora initiative; all of them resolve users through this key.
+
+**Valid sources for `id_user`:**
+
+- Columns that already store Main user ids: `id_owner`, `id_tenant`, `id_buyer`, `id_visitor`, `id_agent`, `house.id_user`, `core_*.id_user`, etc. — when they reference EBDB `Usuario.id`.
+- `user.id` after joining `datalake_ebdb_clean.user` (or a core model that exposes the same id).
+
+**Invalid — never use as `id_user`:**
+
+- `uuid_person` / `person_uuid` / `id_person` — person-level UUID; join `user` on `uuid_person` and output `user.id` instead.
+- `id_external` or any external id from a third-party tool (Trato Feito, Retsuko, CRM, etc.).
+- `id_anonymous`, session ids, or other non-user keys.
+- Any identifier that cannot be joined to `datalake_ebdb_clean.user.id`.
+
+**When the source only has `uuid_person`:**
+
+```sql
+LEFT JOIN
+    datalake_ebdb_clean.user AS u
+        ON u.uuid_person = source.uuid_person
+-- ...
+SELECT
+    u.id AS id_user,
+    ...
+```
+
+**When the source has both `uuid_person` and `id_user` columns:** always use `user.id` as the `id_user`; as already mentioned, if you have `uuid_person` only, a join with `datalake_ebdb_clean.user.uuid_person` must be done in order to get the `datalake_ebdb_clean.user.id`; validate with the user if names are ambiguous.
 
 **Columns that exist only in entities.sql (not in the view):**
 
@@ -80,14 +110,14 @@ The distinction between `_PROSPECT` and non-`_PROSPECT` depends on **where the e
 
 The agent **must** determine the entity's position in the funnel and select the correct variant. If the user says "buyer" for a pre-CCV entity (e.g. diligence), automatically correct to BUYER_PROSPECT and explain why. Same for "tenant"/"inquilino" on pre-contract entities.
 
-For each persona, map the corresponding id in the source (id_owner → OWNER, id_buyer → BUYER_PROSPECT, etc.) and output one row per (id_entity, id_user, persona) via UNION ALL. If the source does not expose that id directly, derive it from related entities (contract, house) via joins, and document with a `-- TODO` comment in the query.
+For each persona, map the corresponding **Main user id** in the source (`id_owner` → OWNER, `id_buyer` → BUYER_PROSPECT, etc.) and output one row per (id_entity, id_user, persona) via UNION ALL. The value in `id_user` must always resolve to `datalake_ebdb_clean.user.id` — see [id_user — Main user ID (mandatory)](#id_user--main-user-id-mandatory). If the source does not expose a Main user id directly, derive it from related entities (contract, house, sales_flow) or join `user` on `uuid_person`; if still unresolved, add a `-- TODO` and inform the user that this approach is wrong and you must contact the CDP team in order to understand what can be done about it. **Reject** mappings that would use `uuid_person`, external ids, or third-party user keys as `id_user`.
 
 ---
 
 ## Query generation: avoid assuming unknowns
 
 - **is_active:** Often based on a `status` column; if the source has no clear status or the mapping is unclear, add a `-- TODO` comment and a placeholder (e.g. `NULL AS is_active` or a `CASE` with a comment).
-- **id_user / persona:** If the source has no explicit column per persona, add a `-- TODO` comment and suggest deriving from contract/house.
+- **id_user / persona:** `id_user` must be Main `user.id` (see [id_user — Main user ID (mandatory)](#id_user--main-user-id-mandatory)). If the source has no Main user id per persona, add a `-- TODO` and suggest joining contract/house/sales_flow or `datalake_ebdb_clean.user` on `uuid_person`. Never output `uuid_person`, `id_external`, or tool-specific ids as `id_user`.
 - **Source without 30-min cadence:** When cadence detection (see 1.4) determines the source DAG does not run every 30 minutes, add a comment at the top of the query: `-- Source: <dag_name> runs at <schedule>; entity is not updated every 30 mins. Revisit if 30-min cadence is needed.`
 
 ---

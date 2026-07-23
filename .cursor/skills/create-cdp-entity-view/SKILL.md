@@ -54,7 +54,7 @@ After this context, say you'll guide them step by step and move to Step 1.
 | 2 | **Business context** | Ask whether this entity is only for RENT, only for SALE, for both, or not defined yet. RENT-only → `FR_` prefix; SALE-only → `FS_` prefix; both/unknown → no prefix. See [reference.md — Entity name and business_context](reference.md#entity-name-column-entity-and-business_context). |
 | 3 | **Source table** | Ask if the user knows which source table (and DAG) to use. Validate using the DAG's `layer` field in its declaration YAML (see 1.3). |
 | 4 | **Cadence check** | After the source is confirmed, **automatically** detect whether the source DAG supports 30-min cadence by reading its declaration YAML. Do **not** ask the user about fast_lane — infer it from `schedule_interval` and `dependencies.yaml`. See 1.4 for the algorithm. |
-| 5 | **Personas** | Ask which personas this entity has (give examples: OWNER, TENANT_PROSPECT, AGENT_BROKER). Tell the user they can answer in any language — you translate to canonical UPPERCASE. **After collecting, validate against the lifecycle rules** in [reference.md — Personas](reference.md#personas-canonical-list-and-rules): if the user says "buyer" for a pre-CCV entity (e.g. diligence), auto-correct to BUYER_PROSPECT and explain why. Same for "tenant"/"inquilino" on pre-contract entities → TENANT_PROSPECT. **Then, resolve `id_user` for each persona:** search the source table(s) confirmed in item 3 to find which column maps to `id_user` per persona (e.g. `id_seller` → OWNER, `id_buyer` → BUYER_PROSPECT). If a column is not directly available in the main table, identify the join path (e.g. `diligence.id_sales_flow → sales_flow.id_buyer`). Present the complete persona → source column mapping to the user and confirm before moving on. If any mapping cannot be resolved, add a `-- TODO` and inform the user. |
+| 5 | **Personas** | Ask which personas this entity has (give examples: OWNER, TENANT_PROSPECT, AGENT_BROKER). Tell the user they can answer in any language — you translate to canonical UPPERCASE. **After collecting, validate against the lifecycle rules** in [reference.md — Personas](reference.md#personas-canonical-list-and-rules): if the user says "buyer" for a pre-CCV entity (e.g. diligence), auto-correct to BUYER_PROSPECT and explain why. Same for "tenant"/"inquilino" on pre-contract entities → TENANT_PROSPECT. **Then, resolve `id_user` for each persona** (see [reference.md — id_user](reference.md#id_user--main-user-id-mandatory)): find which source column maps to each persona (e.g. `id_seller` → OWNER, `id_buyer` → BUYER_PROSPECT). The value **must** be Main `user.id` (`datalake_ebdb_clean.user.id`) — **not** `uuid_person`, external ids, or ids from third-party tools. If the source only has `uuid_person`, plan a join to `user` to get `user.id`. If a column is not directly available, identify the join path (e.g. `diligence.id_sales_flow → sales_flow.id_buyer`). Present the complete persona → Main user id mapping to the user and confirm before moving on. **Reject** invalid identifiers; if mapping cannot be resolved, add a `-- TODO` and inform the user that it is necessary to contact the CDP team in order to understand what must be done about it. |
 | 6 | **Properties (JSON)** | Explain that properties are used as labels for agents (chatbots) and should be aligned with product + Conv XP. Ask which fields to include (e.g. status, when, what). If they include status, note that label-rules mapping will be handled in Datazord step (3.6). |
 
 **Rules:** Do not assume. If ambiguous, ask one clarifying question.
@@ -107,6 +107,7 @@ Every entity view must output exactly **11 columns** in order. See [reference.md
 
 Key rules:
 - **Unique key:** `(id_entity, id_user, persona)`. One entity → N rows (one per persona).
+- **`id_user` = Main user id:** must be `datalake_ebdb_clean.user.id` (EBDB `Usuario.id`). Never `uuid_person`, external ids, or third-party tool user keys. See [reference.md — id_user](reference.md#id_user--main-user-id-mandatory).
 - **SALE entities:** `id_contract` must be **NULL** — do not join/derive it.
 - `sk_entity` and `ts_inactive` do **not** exist in the view — they are generated in `entities.sql`. The view only outputs the 11 columns. However, both **require lineage updates** in entities.yml (see 3.5).
 
@@ -122,19 +123,20 @@ Key rules:
 - Pattern: CTE(s) building a **base** with all source columns; then `SELECT ... id_user, entity, persona, ...` per persona with `UNION ALL`. The final output must have exactly the 11 columns in order.
 - Follow SQL conventions (UPPERCASE keywords, snake_case, no `SELECT *`, partition/date filters when applicable). Prefer `layer: core` sources over `layer: raw` (clean) when a core model exists (see 1.3).
 - **SALE entities:** `id_contract` = NULL; do not join/derive.
+- **`id_user`:** every persona row must output Main `user.id` (BIGINT). Join `datalake_ebdb_clean.user` when the source has `uuid_person` instead of `id`. See [reference.md — id_user](reference.md#id_user--main-user-id-mandatory). Example: `photo_session.sql` uses `u.id` from `user` and `uu.id` for the photographer.
 - **Source without 30-min cadence:** if cadence detection (1.4) determined the source does not run every 30 min, add comment at top: `-- Source: <dag_name> runs at <schedule>; entity is not updated every 30 mins. Revisit if 30-min cadence is needed.`
 
 **Do not assume what you don't know.** Use inline TODO comments for unknowns:
 
 - **is_active:** if unclear which statuses mean "in progress", add `-- TODO: define is_active; confirm which values mean active vs finished` and use `NULL AS is_active` or a placeholder CASE.
-- **id_user / persona:** if the source has no explicit id per persona, add `-- TODO: id_owner not in source; consider joining to house/contract` and inform the user.
+- **id_user / persona:** if the source has no Main user id per persona, add `-- TODO: resolve id_user via join to user/contract/house` and inform the user. **Never** cast `uuid_person`, `id_external`, or tool-specific ids as `id_user`.
 
 **Do not add QUALIFY / ROW_NUMBER deduplication by default.** To decide whether it is needed, read the source DAG's declaration YAML and check the `clean_primary_keys` (or `raw_primary_keys`) field for the relevant table under `tables_customization`. If the primary key is declared and it is a single stable column (e.g. `["id"]` or `["id_diligence"]`), the clean table is already unique — do not add QUALIFY. If the primary key is composite (e.g. `["id", "rev"]`), the table may have multiple revisions per entity and QUALIFY may be appropriate. If the declaration does not declare primary keys at all or you have doubts, proceed without QUALIFY but add a comment and inform the user: `-- TODO: could not confirm uniqueness from declaration; review if QUALIFY ROW_NUMBER() deduplication is needed.`
 
 ### 3.2 Governance metadata
 
 - Path: `dags/growth/enrich_entities_views/metadata/enrich/<entity_name>.yml`.
-- Required: `database_name: datalake_entities_views`, `table_name: <entity_name>`, `description` (≥10 chars), `domain: Growth`, `owner: your.email@quintoandar.com.br` (placeholder). Each column needs a `description` and `lineage` where applicable — follow `governance_metadata.mdc` rules. Follow existing examples (e.g. `photo_session.yml`, `listing.yml`).
+- Required: `database_name: datalake_entities_views`, `table_name: <entity_name>`, `description` (≥10 chars), `domain: Growth`, `owner: your.email@quintoandar.com.br` (placeholder). Each column needs a `description` and `lineage` where applicable — follow `governance_metadata.mdc` rules. For `id_user`, state that it is the Main user id (`datalake_ebdb_clean.user.id`) for the persona. Follow existing examples (e.g. `photo_session.yml`, `listing.yml`).
 
 ### 3.3 Wire into entities.sql
 
@@ -187,6 +189,7 @@ After bi-etl-ejuice files are done, enable the new business type in Datazord. Se
 - [ ] Duplicate check done first; entity does not already exist.
 - [ ] Entity name is normalized (no double prefix like `FS_FS_`).
 - [ ] Query outputs exactly the 11 columns in order; unique key `(id_entity, id_user, persona)`.
+- [ ] `id_user` is Main `user.id` for every persona row — not `uuid_person`, external id, or third-party user key.
 - [ ] SALE-only entities: `id_contract` is NULL in the view and in entities.sql.
 - [ ] Metadata: lineage for all columns; description ≥10 chars; owner placeholder set.
 - [ ] entities.sql: new CTE + UNION ALL in `base`. `{sk_entity}` replicated from existing pattern.

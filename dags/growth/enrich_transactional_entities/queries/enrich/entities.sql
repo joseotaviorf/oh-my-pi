@@ -525,6 +525,7 @@ house_draft AS (
     FROM
         datalake_entities_views.house_draft
 ),
+/***
 collections_segment AS (
     SELECT
         id_entity,
@@ -543,6 +544,7 @@ collections_segment AS (
     WHERE
         id_user IS NOT NULL
 ),
+***/
 reservation AS (
     WITH reservation_base AS (
         SELECT
@@ -1009,6 +1011,7 @@ base AS (
         ts_updated
     FROM
         house_draft
+/***
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
@@ -1025,6 +1028,7 @@ base AS (
         ts_updated
     FROM
         collections_segment
+***/
 )
 SELECT
     b.sk_entity,
@@ -1054,5 +1058,5 @@ LEFT JOIN
     datalake_ebdb_clean.user AS u
         ON CAST(u.id AS STRING) = b.id_user
 WHERE
-    b.id_user IS NOT NULL
+    COALESCE(b.id_user, '') <> ''
     AND b.persona IS NOT NULL
