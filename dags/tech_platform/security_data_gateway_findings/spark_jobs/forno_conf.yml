@@ -5,6 +5,6 @@ kafka_consumer_group: security-data-gateway-bi-etl-ejuice-forno
 kafka_api_key_secret: SECURITY_DATA_GATEWAY_KAFKA_API_KEY
 kafka_api_secret_secret: SECURITY_DATA_GATEWAY_KAFKA_API_SECRET
 path_prefix: s3://
-checkpoints_path_suffix: /raw/security_findings/checkpoints
-load_path_suffix: /raw/security_findings/security_findings
+checkpoints_path_suffix: /raw/security_data_gateway/checkpoints
+load_path_suffix: /raw/security_data_gateway/security_findings
 data_security_uc_group: forno-data-security
