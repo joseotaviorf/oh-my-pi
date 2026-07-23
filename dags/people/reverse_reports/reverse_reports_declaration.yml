@@ -236,6 +236,12 @@ workflow:
         - "1PEy7dd54tor157fVI_UK7J3t4SLIDKtgk92x6dHJbmg"
         - "base_pin"
 
+    # Former notebook: team_formation_update (Daily Pipeline).
+    tech_team_formation:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "1uyWQMdfjN1AiQ-h5xU6TWKPQO9eiVGPkFck3wHL17AI"
+        - "Full Base 5A"
     # Former notebook: recencia_cargos_tech (Daily Pipeline) — DBP-1513.
     # Governance: docs/tech_job_tenure_exports.md
     tech_job_tenure_ics_eng:
