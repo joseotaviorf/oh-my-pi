@@ -107,6 +107,7 @@ def get_query_file_paths(mode, input, domain=None):
             if status in GitService.UPSERT_STATUS_CODES
         ]
     result = list(metadata_file_service.filter_query_files(files))
+    result = [(f, s) for f, s in result if not f.startswith("dags/platform/migration_")]
     if domain:
         domain_prefix = f"dags/{domain}/"
         result = [(f, s) for f, s in result if f.startswith(domain_prefix)]

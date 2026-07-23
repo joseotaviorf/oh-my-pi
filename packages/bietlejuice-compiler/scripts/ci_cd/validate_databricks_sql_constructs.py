@@ -119,7 +119,9 @@ def get_changed_sql_files(branch: str) -> List[Path]:
     return [
         Path(filepath)
         for filepath, status in diff.items()
-        if filepath.endswith(".sql") and status in git_service.UPSERT_STATUS_CODES
+        if filepath.endswith(".sql")
+        and status in git_service.UPSERT_STATUS_CODES
+        and not filepath.startswith("dags/platform/migration_")
     ]
 
 

@@ -1,0 +1,32 @@
+{
+  "run_id": "7556876c-8ef6-4c1f-996e-cdc719a400d8",
+  "scope_id": "fintech__enrich_velo",
+  "domain": "fintech",
+  "dag_name": "enrich_velo",
+  "tables": [
+    "broker",
+    "house",
+    "house_legacy",
+    "junk",
+    "neurotech_rating",
+    "occurrence",
+    "omie_bank_account",
+    "omie_client",
+    "payment",
+    "payment_contracts",
+    "payment_legacy",
+    "propose",
+    "propose_company",
+    "propose_legacy",
+    "propose_person",
+    "propose_person_legacy",
+    "propose_values",
+    "propose_values_legacy",
+    "transaction_category",
+    "transaction_entries",
+    "user"
+  ],
+  "transpiled_count": 8,
+  "skipped_count": 13,
+  "failed_count": 0
+}

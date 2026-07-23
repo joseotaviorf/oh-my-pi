@@ -205,6 +205,8 @@ def affected_dag_roots(changed_files: Dict[str, str]) -> List[Tuple[str, str]]:
     for path, status in changed_files.items():
         if status not in RELEVANT_STATUSES:
             continue
+        if path.startswith("dags/platform/migration_"):
+            continue
         parsed = dag_root_and_name(path)
         if parsed is None:
             continue

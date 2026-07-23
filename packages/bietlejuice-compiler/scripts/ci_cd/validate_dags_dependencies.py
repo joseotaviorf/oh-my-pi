@@ -121,6 +121,8 @@ class CrossDAGDependenciesValidator:
                 file_path=file_path
             )
             if not table_name:
+                if self._is_migration_dag(dag_name):
+                    continue
                 self.register_into_invalid_list(dag_name)
                 self.log_msg(
                     msg=f"dag={dag_name}, query_file={file_path}, msg=File skipped. Error parsing file path because the query path is non-standard."
@@ -341,6 +343,10 @@ class CrossDAGDependenciesValidator:
             and table in self.all_spark_job_tables_by_dag[dag]
         )
 
+    @staticmethod
+    def _is_migration_dag(dag_name: str) -> bool:
+        return dag_name.startswith("migration_")
+
     def validate_dags(self, dags):
         """
         Verifies if the DAG is valid and in opposite case register it on the
@@ -350,6 +356,8 @@ class CrossDAGDependenciesValidator:
         :type dags: list[str]
         """
         for dag in dags:
+            if self._is_migration_dag(dag):
+                continue
             if not self.dag_file_exists(dag):
                 self.register_into_invalid_list(dag)
 
@@ -361,6 +369,8 @@ class CrossDAGDependenciesValidator:
         :type tables_by_dag: dict
         """
         for dag in tables_by_dag:
+            if self._is_migration_dag(dag):
+                continue
             if not self.dag_file_exists(dag):
                 self.register_into_invalid_list(dag)
             else:
