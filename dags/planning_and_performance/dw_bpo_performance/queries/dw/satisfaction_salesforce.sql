@@ -26,7 +26,7 @@ csat AS (
     FROM dw_satisfaction_rating.fact_answer as fa
     LEFT JOIN dw_satisfaction_rating.dim_answer as da on da.sk_answer = fa.sk_answer
     LEFT JOIN datalake_salesforce_clean.events_case_member as member_csat on member_csat.account__c = fa.sk_account
-        AND type__c IN ('Owner','Tenant','Landlord')   
+        AND type__c IN ('Owner','Tenant','Landlord') AND fa.sk_case = member_csat.case__c 
     WHERE satisfaction_score IS NOT NULL AND sk_case IS NOT NULL
     AND fa.ts_submitted BETWEEN DATE('{load_start_date}') - INTERVAL 3 DAYS AND DATE('{load_end_date}') 
 ),
@@ -57,7 +57,7 @@ events_case as (
         last_modified_date,
         repair_contestation_responsibility_approved__c,
         TRY_CAST(fr_case_reopen_count__c AS INTEGER) AS reopen_count,
-        ROW_NUMBER() OVER (PARTITION BY c.case_number ORDER BY c.last_modified_date DESC) as rn_case
+        ROW_NUMBER() OVER (PARTITION BY c.id_record ORDER BY c.last_modified_date DESC) as rn_case
     FROM datalake_salesforce_clean.events_case as c
     LEFT JOIN fact_request as fr on fr.sk_case = c.id_record 
     WHERE id_record IN (SELECT DISTINCT sk_case FROM csat)
