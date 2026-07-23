@@ -75,7 +75,8 @@ def _build_context(dag):
 def _upload_sql(**context):
     import boto3
 
-    artifacts_bucket = Variable.get("artifacts_bucket")
+    artifacts_uri = Variable.get("artifacts_bucket")
+    artifacts_bucket = artifacts_uri.replace("s3://", "").strip("/")
     sql_dir = DAG_DIR / "queries" / SQL_DIR_NAME
     s3 = boto3.client("s3")
     for table in TABLES:
@@ -114,7 +115,8 @@ with DAG(
         outlets=[Dataset(DATASET_URI)],
     )
 
-    artifacts_bucket = Variable.get("artifacts_bucket")
+    artifacts_uri = Variable.get("artifacts_bucket")
+    artifacts_bucket = artifacts_uri.replace("s3://", "").strip("/")
     capture_tasks = []
     {% for table in table_names %}
     capture_tasks.append(
