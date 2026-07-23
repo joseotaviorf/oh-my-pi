@@ -27,5 +27,9 @@ workflow:
     cases_perspective: {}
     backlog_metrics_salesforce: {}
     satisfaction_salesforce: {}
+    fcr_metric: {}
+    customer_contacts_session: {}
+    segments_perspective: {}
+
 
 
