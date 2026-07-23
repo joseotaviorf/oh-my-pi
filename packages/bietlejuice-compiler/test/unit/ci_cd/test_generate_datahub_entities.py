@@ -1046,5 +1046,56 @@ class CallLlmTruncationTest(unittest.TestCase):
         self.assertEqual(kwargs["json"]["max_tokens"], 16000)
 
 
+class ChangedMdsSkipsDeletedFilesTest(unittest.TestCase):
+    """Regression: pipeline 85577 (push-datahub-business-context on the PR that
+    removed the golden-query-completeness-fixture entity) crashed with a bare
+    ``FileNotFoundError`` mislabeled as "LLM call failed". ``git diff --name-only``
+    lists deleted paths too, and DataHub publish has no delete/archive path — a
+    deleted MD must be skipped, not passed to ``_build_messages`` where it 404s.
+    """
+
+    def test_deleted_md_is_skipped_kept_md_is_returned(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            md_dir = repo_root / "docs" / "llm_context" / "metric_entities"
+            md_dir.mkdir(parents=True)
+            kept = md_dir / "kept.md"
+            kept.write_text("# Kept\n")
+            # deleted.md is intentionally never created on disk — it only exists in
+            # the git-diff output, mirroring a file removed by the triggering push.
+            changed_files = [
+                "docs/llm_context/metric_entities/deleted.md",
+                "docs/llm_context/metric_entities/kept.md",
+            ]
+
+            with (
+                mock.patch.object(g, "_REPO_ROOT", repo_root),
+                mock.patch.object(
+                    g, "_MD_PREFIXES", ("docs/llm_context/metric_entities/",)
+                ),
+                mock.patch.object(g, "_git_changed_files", return_value=changed_files),
+            ):
+                result = g._changed_mds()
+
+        self.assertEqual(result, [kept])
+
+    def test_all_deleted_returns_empty_list_not_a_crash(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            (repo_root / "docs" / "llm_context" / "metric_entities").mkdir(parents=True)
+            changed_files = ["docs/llm_context/metric_entities/deleted_only.md"]
+
+            with (
+                mock.patch.object(g, "_REPO_ROOT", repo_root),
+                mock.patch.object(
+                    g, "_MD_PREFIXES", ("docs/llm_context/metric_entities/",)
+                ),
+                mock.patch.object(g, "_git_changed_files", return_value=changed_files),
+            ):
+                result = g._changed_mds()
+
+        self.assertEqual(result, [])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -733,13 +733,32 @@ def _git_changed_files() -> list[str]:
 
 
 def _changed_mds() -> list[Path]:
-    changed = [
+    """MDs changed in the current CI commit that still exist on disk.
+
+    ``git diff --name-only`` also lists files *deleted* in this push. Deletion isn't
+    a supported DataHub sync operation (there is no archive/soft-delete path here —
+    see .woodpecker/datahub.yml), so trying to process a deleted path would crash
+    later with a bare ``FileNotFoundError`` when building the LLM prompt (mislabeled
+    as "LLM call failed"). Skip those with an explicit message instead of failing the
+    whole run.
+    """
+    candidates = [
         _REPO_ROOT / f
         for f in _git_changed_files()
         if f.startswith(_MD_PREFIXES)
         and f.endswith(".md")
         and not Path(f).name.startswith("_")
     ]
+    changed: list[Path] = []
+    for p in candidates:
+        if not p.exists():
+            print(
+                f"SKIP: {p.name} was deleted in this push — DataHub publish has no "
+                "delete/archive path; if the entity should be removed from DataHub, "
+                "do that manually."
+            )
+            continue
+        changed.append(p)
     _check_no_slug_collisions(changed)
     return changed
 
