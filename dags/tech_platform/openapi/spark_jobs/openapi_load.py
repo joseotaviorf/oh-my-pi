@@ -27,9 +27,7 @@ from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipel
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "openapi_load"
-
-spark_client = SparkClient(JOB_NAME)
-spark = spark_client.conn
+spark = SparkClient(app_name=JOB_NAME).conn
 logger = QuintoAndarLogger(JOB_NAME)
 paths_schema = MapType(
     StringType(),

@@ -45,7 +45,7 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    spark_client = SparkClient(JOB_NAME)
+    spark_client = SparkClient(app_name=JOB_NAME)
     spark = spark_client.conn
     logger.info(f"[EXECUTION LOGGING] -  args={args}")
     logger.info(

@@ -25,8 +25,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 # Job configuration
 JOB_NAME = "Load Comms Manager Rules"
 
-spark_client = SparkClient(JOB_NAME)
-spark = spark_client.conn
+spark = SparkClient(app_name=JOB_NAME).conn
 
 
 def collect_all_files(path, file_extension=".json"):
