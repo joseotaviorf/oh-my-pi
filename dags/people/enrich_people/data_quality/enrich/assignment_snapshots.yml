@@ -154,22 +154,16 @@ column_level_validations:
       severity_level: Warning
   assignment_must_have_full_job_coverage:
     custom:
-      # Hire-to-termination snapshots with id_job set but no job_with_salary_table version on dt_reference — escalate to People Systems to fix PIN / job effective dating.
+      # id_job set but sk_job_version = MD5('') (job SCD miss). Single-table to avoid Deequ id_job crash.
       constraint: |-
         (SELECT COUNT(*)
          FROM datalake_people.assignment_snapshots AS asn
          WHERE asn.id_job IS NOT NULL
+           AND asn.sk_job_version = MD5('')
            AND asn.dt_reference >= asn.dt_assignment_started
            AND (
              asn.dt_terminated IS NULL
              OR asn.dt_reference <= asn.dt_terminated
-           )
-           AND NOT EXISTS (
-             SELECT 1
-             FROM datalake_people.job_with_salary_table AS jwst
-             WHERE jwst.id_job = asn.id_job
-               AND asn.dt_reference >= jwst.dt_valid_from
-               AND asn.dt_reference <= COALESCE(jwst.dt_valid_to, DATE('9999-12-31'))
            )
         ) = 0
       severity_level: Warning
