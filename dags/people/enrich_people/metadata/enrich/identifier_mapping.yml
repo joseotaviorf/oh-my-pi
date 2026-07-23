@@ -135,21 +135,21 @@ columns:
       - datalake_pin_core_clean.all_assignments.action_code
       - datalake_pin_core_clean.all_assignments.assignment_sequence
   is_effectivation_hire:
-    description: True when the assignment was opened as an intern/apprentice effectivation (efetivação) — a HIRE_ADD_WORK_RELATION whose action reason is EFETIVA_ESTAG, continuing the intern/apprentice assignment; the person moves from intern/apprentice into the effective workforce, so it counts as a new effective hire (unlike an internal transfer, where the person was already an effective employee).
+    description: True when this assignment opened as an intern/apprentice effectivation (efetivação) hire recorded in PIN — the incoming side of the conversion. The destination role may still be intern/apprentice or effective; use with is_effective_worker when counting new effective hires.
     lineage:
       - datalake_pin_core_clean.all_assignments.action_code
       - datalake_pin_core_clean.all_assignments.assignment_sequence
       - datalake_pin_core_clean.action_occurrence.id_action_reason
       - datalake_pin_core_clean.action_reason_base.action_reason_code
   is_effectivation_termination:
-    description: True when the assignment was closed as the outgoing side of an intern/apprentice effectivation (efetivação) — the intern/apprentice assignment immediately preceding an effectivation hire, not a real company exit.
+    description: True when this assignment closed as the outgoing side of an intern/apprentice effectivation (efetivação) recorded in PIN — the intern/apprentice assignment immediately before an effectivation hire, not a real company exit.
     lineage:
       - datalake_pin_core_clean.all_assignments.action_code
       - datalake_pin_core_clean.all_assignments.assignment_sequence
       - datalake_pin_core_clean.action_occurrence.id_action_reason
       - datalake_pin_core_clean.action_reason_base.action_reason_code
   is_effective_worker:
-    description: True when the assignment belongs to the effective workforce (permanent/CLT). False for interns and young apprentices. Stable for the life of the assignment — once False, remains False.
+    description: True when the assignment belongs to the effective workforce for turnover and headcount. False for interns and young apprentices based on the latest classifiable PIN job family, or the latest employee category when job family is null; True when both are null.
     lineage:
       - datalake_pin_core_clean.all_assignments.employee_category
       - datalake_pin_core_clean.all_assignments.id_job

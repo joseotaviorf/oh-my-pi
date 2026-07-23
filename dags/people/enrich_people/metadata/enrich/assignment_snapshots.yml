@@ -162,7 +162,7 @@ columns:
   is_active:
     description: True when the employee is active, False when inactive.
   is_effective_worker:
-    description: True when the assignment belongs to the effective workforce (permanent/CLT). False for interns and young apprentices. Constant across all snapshot dates for the same assignment.
+    description: True when the assignment belongs to the effective workforce for turnover and headcount. False for interns and young apprentices; inherited from identifier_mapping for the assignment.
     lineage:
       - datalake_people.identifier_mapping.is_effective_worker
   has_emergency_contact:
@@ -178,11 +178,11 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.is_transfer_termination
   is_effectivation_hire:
-    description: True when this assignment was opened as an intern/apprentice effectivation (efetivação); the person moves from intern/apprentice into the effective workforce, so it counts as a new hire (a new effective employee), unlike an internal transfer.
+    description: True when this assignment opened as an intern/apprentice effectivation (efetivação) hire recorded in PIN. Inherited from identifier_mapping; use with is_effective_worker when counting new effective hires.
     lineage:
       - datalake_people.identifier_mapping.is_effectivation_hire
   is_effectivation_termination:
-    description: True when this assignment was closed as the intern/apprentice side of an effectivation (efetivação) rather than a real exit; the person continues as an effective worker under the new assignment.
+    description: True when this assignment closed as the outgoing side of an intern/apprentice effectivation (efetivação) recorded in PIN, not a real company exit. Inherited from identifier_mapping.
     lineage:
       - datalake_people.identifier_mapping.is_effectivation_termination
   termination_type:

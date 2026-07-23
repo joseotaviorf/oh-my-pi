@@ -333,3 +333,188 @@ column_level_validations:
             )
         )) = 0
       severity_level: Warning
+  assignment_has_mixed_job_family_buckets:
+    custom:
+      # Warn when an E/C assignment has more than one job-family bucket in PIN history since go-live
+      # (Estagiario, Jovem Aprendiz, other). Estagiario↔JA counts as mixed.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             history.id_assignment
+           FROM (
+             SELECT
+               aa.id_assignment,
+               CASE
+                 WHEN jft.job_family_name = 'Estagiario' THEN 'Estagiario'
+                 WHEN jft.job_family_name = 'Jovem Aprendiz' THEN 'Jovem Aprendiz'
+                 WHEN jft.job_family_name IS NOT NULL THEN 'other'
+               END AS job_family_bucket
+             FROM datalake_pin_core_clean.all_assignments AS aa
+             INNER JOIN datalake_people.identifier_mapping AS im
+               ON im.id_assignment = aa.id_assignment
+              AND im.is_valid_assignment = TRUE
+             LEFT JOIN datalake_pin_core_clean.job AS j
+               ON j.id_job = aa.id_job
+              AND aa.dt_effective_started < j.dt_effective_ended
+              AND aa.dt_effective_ended > j.dt_effective_started
+             LEFT JOIN datalake_pin_core_clean.job_family_translation AS jft
+               ON jft.id_job_family = j.id_job_family
+              AND j.dt_effective_started < jft.dt_effective_ended
+              AND j.dt_effective_ended > jft.dt_effective_started
+             WHERE aa.assignment_type IN ('E', 'C')
+               AND aa.dt_effective_ended >= DATE('2024-03-01')
+           ) AS history
+           WHERE history.job_family_bucket IS NOT NULL
+           GROUP BY history.id_assignment
+           HAVING COUNT(DISTINCT history.job_family_bucket) > 1
+         ) AS violations
+        ) = 0
+      severity_level: Warning
+  assignment_has_mixed_employee_category_buckets:
+    custom:
+      # Warn when an E/C assignment has more than one employee_category bucket in PIN history since go-live
+      # (103, 901, other). 103↔901 counts as mixed.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+             history.id_assignment
+           FROM (
+             SELECT
+               aa.id_assignment,
+               CASE
+                 WHEN aa.employee_category = '103' THEN '103'
+                 WHEN aa.employee_category = '901' THEN '901'
+                 WHEN aa.employee_category IS NOT NULL THEN 'other'
+               END AS category_bucket
+             FROM datalake_pin_core_clean.all_assignments AS aa
+             INNER JOIN datalake_people.identifier_mapping AS im
+               ON im.id_assignment = aa.id_assignment
+              AND im.is_valid_assignment = TRUE
+             WHERE aa.assignment_type IN ('E', 'C')
+               AND aa.dt_effective_ended >= DATE('2024-03-01')
+           ) AS history
+           WHERE history.category_bucket IS NOT NULL
+           GROUP BY history.id_assignment
+           HAVING COUNT(DISTINCT history.category_bucket) > 1
+         ) AS violations
+        ) = 0
+      severity_level: Warning
+  assignment_category_and_job_family_bucket_sets_disagree:
+    custom:
+      # Warn when assignment-level intern/apprentice vs other bucket sets disagree between category and job family.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           WITH category_flags AS (
+             SELECT
+               aa.id_assignment,
+               MAX(
+                 CASE
+                   WHEN aa.employee_category IN ('103', '901') THEN 1
+                   ELSE 0
+                 END
+               ) AS has_intern_category,
+               MAX(
+                 CASE
+                   WHEN aa.employee_category IS NOT NULL
+                    AND aa.employee_category NOT IN ('103', '901') THEN 1
+                   ELSE 0
+                 END
+               ) AS has_other_category
+             FROM datalake_pin_core_clean.all_assignments AS aa
+             INNER JOIN datalake_people.identifier_mapping AS im
+               ON im.id_assignment = aa.id_assignment
+              AND im.is_valid_assignment = TRUE
+             WHERE aa.assignment_type IN ('E', 'C')
+               AND aa.dt_effective_ended >= DATE('2024-03-01')
+             GROUP BY aa.id_assignment
+           ),
+           job_family_flags AS (
+             SELECT
+               aa.id_assignment,
+               MAX(
+                 CASE
+                   WHEN jft.job_family_name IN ('Estagiario', 'Jovem Aprendiz') THEN 1
+                   ELSE 0
+                 END
+               ) AS has_intern_job_family,
+               MAX(
+                 CASE
+                   WHEN jft.job_family_name IS NOT NULL
+                    AND jft.job_family_name NOT IN ('Estagiario', 'Jovem Aprendiz') THEN 1
+                   ELSE 0
+                 END
+               ) AS has_other_job_family
+             FROM datalake_pin_core_clean.all_assignments AS aa
+             INNER JOIN datalake_people.identifier_mapping AS im
+               ON im.id_assignment = aa.id_assignment
+              AND im.is_valid_assignment = TRUE
+             LEFT JOIN datalake_pin_core_clean.job AS j
+               ON j.id_job = aa.id_job
+              AND aa.dt_effective_started < j.dt_effective_ended
+              AND aa.dt_effective_ended > j.dt_effective_started
+             LEFT JOIN datalake_pin_core_clean.job_family_translation AS jft
+               ON jft.id_job_family = j.id_job_family
+              AND j.dt_effective_started < jft.dt_effective_ended
+              AND j.dt_effective_ended > jft.dt_effective_started
+             WHERE aa.assignment_type IN ('E', 'C')
+               AND aa.dt_effective_ended >= DATE('2024-03-01')
+             GROUP BY aa.id_assignment
+           )
+           SELECT
+             category_flags.id_assignment
+           FROM category_flags
+           INNER JOIN job_family_flags
+             ON job_family_flags.id_assignment = category_flags.id_assignment
+           WHERE (
+               category_flags.has_intern_category = 1
+               AND job_family_flags.has_intern_job_family = 0
+               AND job_family_flags.has_other_job_family = 1
+             )
+             OR (
+               job_family_flags.has_intern_job_family = 1
+               AND category_flags.has_intern_category = 0
+               AND category_flags.has_other_category = 1
+             )
+         ) AS violations
+        ) = 0
+      severity_level: Warning
+  effectivation_hire_termination_pair_must_be_one_to_one_consecutive:
+    custom:
+      # Warn when PIN-coded effectivation hire/termination flags are not a one-to-one consecutive pair since go-live.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT im_hire.id_assignment
+           FROM datalake_people.identifier_mapping AS im_hire
+           INNER JOIN datalake_pin_core_clean.all_assignments AS aa_hire
+             ON aa_hire.id_assignment = im_hire.id_assignment
+           LEFT JOIN datalake_pin_core_clean.all_assignments AS aa_prev
+             ON aa_prev.id_person = aa_hire.id_person
+            AND aa_prev.assignment_sequence = aa_hire.assignment_sequence - 1
+            AND aa_prev.assignment_type IN ('E', 'C')
+           LEFT JOIN datalake_people.identifier_mapping AS im_prev
+             ON im_prev.id_assignment = aa_prev.id_assignment
+           WHERE im_hire.is_effectivation_hire = TRUE
+             AND COALESCE(im_hire.dt_started, aa_hire.dt_effective_started) >= DATE('2024-03-01')
+             AND COALESCE(im_prev.is_effectivation_termination, FALSE) = FALSE
+           UNION
+           SELECT im_term.id_assignment
+           FROM datalake_people.identifier_mapping AS im_term
+           INNER JOIN datalake_pin_core_clean.all_assignments AS aa_term
+             ON aa_term.id_assignment = im_term.id_assignment
+           LEFT JOIN datalake_pin_core_clean.all_assignments AS aa_next
+             ON aa_next.id_person = aa_term.id_person
+            AND aa_next.assignment_sequence = aa_term.assignment_sequence + 1
+            AND aa_next.assignment_type IN ('E', 'C')
+           LEFT JOIN datalake_people.identifier_mapping AS im_next
+             ON im_next.id_assignment = aa_next.id_assignment
+           WHERE im_term.is_effectivation_termination = TRUE
+             AND COALESCE(im_term.dt_actual_termination, im_term.dt_started, aa_term.dt_effective_started)
+               >= DATE('2024-03-01')
+             AND COALESCE(im_next.is_effectivation_hire, FALSE) = FALSE
+         ) AS violations
+        ) = 0
+      severity_level: Warning

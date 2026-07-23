@@ -899,7 +899,7 @@ columns:
       - dw_employee_details.fact_assignment_snapshots.is_active
 
   is_effective_worker:
-    description: True when the employee holds a permanent/effective role (CLT); False for interns and young apprentices. Use to scope headcount and turnover to the effective workforce.
+    description: True when the assignment is in the official effective workforce (excludes interns and young apprentices). Filter is_effective_worker = TRUE for official turnover and headcount.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_effective_worker
@@ -953,13 +953,13 @@ columns:
       - dw_employee_details.fact_assignment_snapshots.is_transfer_termination
 
   is_effectivation_hire:
-    description: True when the assignment began as an intern/apprentice effectivation (efetivação); the person enters the effective workforce for the first time, so it counts as a new hire (unlike an internal transfer, which does not).
+    description: True when the assignment began as an intern/apprentice effectivation (efetivação). Effectivation is a PIN conversion event and does not always land on a permanent CLT role; use is_effective_worker when counting new effective hires.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_effectivation_hire
 
   is_effectivation_termination:
-    description: True when the assignment closed as the intern/apprentice side of an effectivation (efetivação) rather than a real exit; the person continues as an effective worker under the new assignment.
+    description: True when the assignment closed as the intern/apprentice side of an effectivation (efetivação), not a real company exit.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_effectivation_termination
