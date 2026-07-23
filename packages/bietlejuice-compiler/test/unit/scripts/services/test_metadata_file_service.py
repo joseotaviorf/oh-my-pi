@@ -22,13 +22,21 @@ def _validate(database_name: str, custom_schema: str, layer: str = "enrich"):
 
 
 class TestValidateDatabaseNameGovernedSchema:
-    def test_governed_schema_uses_pure_name(self):
-        # ops_finance is governed -> enrich expects the prefixless name (Bug B convention)
-        _validate("ops_finance", "ops_finance")  # no exception
+    @pytest.mark.parametrize(
+        "schema",
+        ("ops_finance", "ops_ss", "forrent_postcontract"),
+    )
+    def test_governed_schema_uses_pure_name(self, schema):
+        # governed Luigi materialization schemas -> enrich expects the prefixless name
+        _validate(schema, schema)  # no exception
 
-    def test_governed_schema_rejects_datalake_prefix(self):
+    @pytest.mark.parametrize(
+        "schema",
+        ("ops_finance", "ops_ss", "forrent_postcontract"),
+    )
+    def test_governed_schema_rejects_datalake_prefix(self, schema):
         with pytest.raises(DatabaseNameMismatchException):
-            _validate("datalake_ops_finance", "ops_finance")
+            _validate(f"datalake_{schema}", schema)
 
     def test_regular_schema_keeps_datalake_prefix(self):
         # non-governed schema is unaffected by the naming convention

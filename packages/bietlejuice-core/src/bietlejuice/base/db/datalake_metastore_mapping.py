@@ -12,6 +12,9 @@ DATALAKE_PREFIX = "datalake_"
 SCHEMAS_WITHOUT_DATALAKE_PREFIX = frozenset(
     {
         "ops_finance",
+        # Luigi materialization governed domains (enrich layer, prefixless naming).
+        "ops_ss",
+        "forrent_postcontract",
     }
 )
 

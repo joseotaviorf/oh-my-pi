@@ -1,3 +1,5 @@
+import pytest
+
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.spark.base_spark import BaseSparkContext
 
@@ -60,10 +62,13 @@ class TestDatalakeMetastoreService:
         }
         assert actual_db_info_dict == expected
 
-    def test_get_db_info_governed_schema_drops_datalake_prefix(self):
+    @pytest.mark.parametrize(
+        "source",
+        ("ops_finance", "ops_ss", "forrent_postcontract"),
+    )
+    def test_get_db_info_governed_schema_drops_datalake_prefix(self, source):
         # arrange: a schema following the new naming convention (no datalake_ prefix)
         env = "forno"
-        source = "ops_finance"
         datalake_bucket = "5a-datalake-forno"
 
         # act
@@ -72,10 +77,9 @@ class TestDatalakeMetastoreService:
         )
 
         # assert: names drop the prefix; the S3 path is unchanged (never carried it)
-        assert db_info_dict["db_enrich_databricks"] == "ops_finance"
-        assert db_info_dict["db_enrich_athena"] == "ops_finance"
-        assert db_info_dict["db_clean_databricks"] == "ops_finance_clean"
+        assert db_info_dict["db_enrich_databricks"] == source
+        assert db_info_dict["db_enrich_athena"] == source
+        assert db_info_dict["db_clean_databricks"] == f"{source}_clean"
         assert (
-            db_info_dict["db_enrich_path"]
-            == "s3://5a-datalake-forno/enrich/ops_finance/"
+            db_info_dict["db_enrich_path"] == f"s3://5a-datalake-forno/enrich/{source}/"
         )
