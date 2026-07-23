@@ -48,7 +48,7 @@ BIETLEJUICE_REPO_PATH = CONFIG_SERVICE.get_config(
     "databricks_bietlejuice_repo_path"
 )
 METRIC_CAPTURE_JOB = (
-    f"{BIETLEJUICE_REPO_PATH}/spark_jobs/platform"
+    f"{BIETLEJUICE_REPO_PATH}/spark_jobs"
     f"/migration_assets/metric_capture_job.py"
 )
 ARTIFACTS_URI = CONFIG_SERVICE.get_config("artifacts_bucket")
@@ -142,9 +142,9 @@ with DAG(
             task_id="capture_{{ table }}",
             job_parameters=[
                 "--sql-s3-uri",
-                f"{ARTIFACTS_URI}/{RUN_PREFIX}/sql/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{{ table }}.sql",
+                f"{ARTIFACTS_URI}/{RUN_PREFIX}/sql/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{{ table }}",
                 "--result-s3-uri",
-                f"{ARTIFACTS_URI}/{RUN_PREFIX}/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{{ table }}.json",
+                f"{ARTIFACTS_URI}/{RUN_PREFIX}/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{{ table }}",
                 "--run-id", RUN_ID,
                 "--runtime", "databricks",
                 "--domain", DOMAIN,

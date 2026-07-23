@@ -245,9 +245,20 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    sql_uri = (
+        args.sql_s3_uri
+        if args.sql_s3_uri.endswith(".sql")
+        else f"{args.sql_s3_uri}.sql"
+    )
+    result_uri = (
+        args.result_s3_uri
+        if args.result_s3_uri.endswith(".json")
+        else f"{args.result_s3_uri}.json"
+    )
+
     spark = create_spark_session(args.runtime)
     try:
-        sql = read_s3_text(args.sql_s3_uri)
+        sql = read_s3_text(sql_uri)
         payload = capture_metrics(spark, sql, skip_profile=args.skip_profile)
         payload.update(
             {
@@ -259,7 +270,7 @@ def main() -> None:
                 "version": 1,
             }
         )
-        write_s3_json(args.result_s3_uri, payload)
+        write_s3_json(result_uri, payload)
         if payload.get("error"):
             print(f"WARNING: capture error recorded: {payload['error']}")
             print("Continuing so comparison DAG can emit a FAIL verdict.")
