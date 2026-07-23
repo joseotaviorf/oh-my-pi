@@ -5,7 +5,9 @@ from airflow.models.baseoperator import BaseOperator
 from airflow.utils.task_group import TaskGroup
 
 from bietlejuice.base.airflow.optimize_delta_tables_cli import (
-    encode_tables_json_for_emr_cli,
+    assert_optimize_batches_partition_tables,
+    build_and_validate_emr_tables_cli_arg,
+    chunk_table_attributes_for_emr_limit,
 )
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.pipeline import LayerEnum
@@ -30,6 +32,11 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
     reduce storage costs.
     - OPTIMIZE (optional): This command rewrites the data in the Delta table to optimize its layout. It's important to run it to
     improve query performance.
+
+    On EMR, table configs are base64-encoded into a single spark-submit arg subject to AWS's
+    10,280-character limit. When the payload is too large, tasks are auto-batched into a
+    sequential TaskGroup (unless ``workflow.max_tables_per_optimize_tasks`` overrides).
+    Each batch is validated at DAG parse time (length + round-trip decode).
     """
 
     def create_task(
@@ -70,6 +77,9 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         declaration, tables are split into batches on both Databricks and EMR,
         linked with ``batch_n >> batch_n+1`` so Airflow runs them strictly in order.
 
+        On EMR, when that key is unset and the encoded tables config would exceed the
+        AWS arg limit, batch size is computed automatically with the same chaining.
+
         ``optimize_parallelism`` on ``workflow`` overrides the caller ``parallelism``
         (ThreadPool size inside the optimize Spark job; S3 markers are written on the
         main thread after each table completes).
@@ -85,8 +95,12 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             return task, task
 
         parallelism = self._resolve_optimize_parallelism(parallelism)
-        batch_size = self._max_tables_per_optimize_tasks()
-        if batch_size is None:
+        chunks = self._resolve_optimize_chunks(table_attributes)
+        if self.dag_execution_context.use_airflow_emr:
+            assert_optimize_batches_partition_tables(table_attributes, chunks)
+
+        num_batches = len(chunks)
+        if num_batches == 1:
             task = self._create_single_optimize_task(
                 table_attributes,
                 parallelism=parallelism,
@@ -95,9 +109,6 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 num_batches=1,
             )
             return task, task
-
-        chunks = _chunk_table_attributes(table_attributes, batch_size)
-        num_batches = len(chunks)
 
         group_id = self._build_optimize_task_group_id(
             table_attributes, optimize_delta_table_local_id
@@ -111,7 +122,7 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                     chunk,
                     parallelism=parallelism,
                     optimize_delta_table_local_id=optimize_delta_table_local_id,
-                    batch_index=batch_index if num_batches > 1 else None,
+                    batch_index=batch_index,
                     num_batches=num_batches,
                 )
                 for batch_index, chunk in enumerate(chunks, start=1)
@@ -126,6 +137,16 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         if value is None:
             return None
         return int(value)
+
+    def _resolve_optimize_chunks(self, table_attributes: list) -> List[List]:
+        explicit_batch_size = self._max_tables_per_optimize_tasks()
+        if explicit_batch_size is not None:
+            return _chunk_table_attributes(table_attributes, explicit_batch_size)
+        if self.dag_execution_context.use_airflow_emr:
+            return chunk_table_attributes_for_emr_limit(
+                table_attributes, self._build_tables_config
+            )
+        return [table_attributes]
 
     def _resolve_optimize_parallelism(self, parallelism: int) -> int:
         value = self.dag_execution_context.workflow_args.get("optimize_parallelism")
@@ -149,9 +170,10 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             num_batches,
         )
         tables_config = self._build_tables_config(table_attributes)
-        tables_json = json.dumps(tables_config, separators=(",", ":"))
         if self.dag_execution_context.use_airflow_emr:
-            tables_json = encode_tables_json_for_emr_cli(tables_json)
+            tables_json = build_and_validate_emr_tables_cli_arg(tables_config)
+        else:
+            tables_json = json.dumps(tables_config, separators=(",", ":"))
         layer_value = table_attributes[0].layer.value if table_attributes else "raw"
         parameters = [
             layer_value,

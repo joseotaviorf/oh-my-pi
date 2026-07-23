@@ -138,3 +138,31 @@ it directly.
 - `maxPartitionBytes`/AQE cluster defaults apply to every EMR Spark job, not
   just maintenance — they reduce small-file counts at the source, which is
   strictly additive to whatever cadence `OPTIMIZE` ends up running on.
+
+## EMR optimize arg limit and auto-batching
+
+EMR `AddJobFlowSteps` rejects any single `HadoopJarStep.Args` element longer
+than **10,280 characters**. The optimize Spark job passes its per-table config
+as one base64-encoded CLI argument (`B64:…`).
+
+When that payload would exceed the limit (e.g. DAGs with dozens of clean
+tables such as `pin`), `OptimizeDeltaTableTaskCreator` **auto-batches** on EMR:
+it greedily packs tables (in declaration order) into sequential Airflow tasks
+inside a `TaskGroup`, each with its own EMR step and a validated arg under the
+limit. Per-table payload sizes vary, so equal-sized fixed batches are not used
+for auto-batching — a failing size-2 boundary can disappear at size 3.
+
+Integrity checks run at **DAG parse time** for every EMR batch:
+
+- Chunking is table-atomic (`TableAttributes` list items, never JSON slices).
+- Each arg is length-checked and round-trip decoded before the task is created.
+- Batches partition the full table set exactly once (no loss, duplication, or
+  reordering).
+
+Optional override: `workflow.max_tables_per_optimize_tasks` (integer ≥ 1).
+When set, it wins over auto-computed batch size on both Databricks and EMR.
+If an explicit batch is still too large for EMR, DAG parsing fails with a
+clear `ValueError` instead of an opaque `AddJobFlowSteps` rejection.
+
+Related code: `bietlejuice.base.airflow.optimize_delta_tables_cli`,
+`bietlejuice.base.airflow.task_creators.optimize_delta_table_task_creator`.

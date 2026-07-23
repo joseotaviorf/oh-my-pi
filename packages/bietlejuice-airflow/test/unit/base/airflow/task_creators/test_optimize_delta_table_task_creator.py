@@ -6,6 +6,8 @@ from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
 from bietlejuice.base.airflow.optimize_delta_tables_cli import (
+    EMR_HADOOP_JAR_STEP_ARG_MAX_LENGTH,
+    EMR_TABLES_B64_PREFIX,
     decode_tables_config_from_cli,
 )
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
@@ -42,6 +44,25 @@ def _table(name: str, layer: LayerEnum = LayerEnum.RAW) -> TableAttributes:
         layer=layer,
         table_name=name,
     )
+
+
+def _pin_like_clean_table(name: str, schema: str = "pin_core") -> TableAttributes:
+    customization = {"vacuum_retention_hours": 168, "vacuum_lite": True}
+    return TableAttributes(
+        dag_args={"name": "pin"},
+        workflow_args={
+            "custom_schema": schema,
+            "vacuum_retention_hours": 168,
+            "vacuum_lite": True,
+        },
+        layer=LayerEnum.CLEAN,
+        table_name=name,
+        table_customization=customization,
+    )
+
+
+def _pin_like_clean_tables(count: int) -> list:
+    return [_pin_like_clean_table(f"table_{i}") for i in range(count)]
 
 
 @pytest.fixture
@@ -203,6 +224,51 @@ class TestOptimizeDeltaTableTaskCreator:
         assert head is tail
         mock_create_spark.assert_called_once()
         assert mock_create_spark.call_args[0][2][2] == 16
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_auto_batches_large_table_set_without_declaration_override(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        task_ids = []
+        tables_params = []
+
+        def make_op(spark_job_name, task_id, parameters):
+            task_ids.append(task_id)
+            tables_params.append(parameters[1])
+            return EmptyOperator(task_id=task_id, dag=dag_execution_context.dag)
+
+        mock_create_spark.side_effect = make_op
+
+        tables = _pin_like_clean_tables(74)
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        head, tail = creator.create_optimize_tasks(tables, parallelism=16)
+
+        assert mock_create_spark.call_count > 1
+        assert head is not tail
+        assert "batch-1" in head.task_id
+        assert isinstance(head.task_group, TaskGroup)
+
+        decoded_keys = []
+        for tables_param in tables_params:
+            assert tables_param.startswith(EMR_TABLES_B64_PREFIX)
+            assert len(tables_param) <= EMR_HADOOP_JAR_STEP_ARG_MAX_LENGTH
+            decoded_keys.extend(decode_tables_config_from_cli(tables_param).keys())
+        assert decoded_keys == [table.table_name for table in tables]
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_emr_explicit_batch_override_raises_when_batch_exceeds_limit(
+        self, mock_create_spark, dag_execution_context
+    ):
+        dag_execution_context.use_airflow_emr = True
+        dag_execution_context.workflow_args["max_tables_per_optimize_tasks"] = 74
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-clean-all-batch-1", dag=dag_execution_context.dag
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        with pytest.raises(ValueError, match="exceeds EMR AddJobFlowSteps arg limit"):
+            creator.create_optimize_tasks(_pin_like_clean_tables(74))
 
     @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
     def test_single_batch_no_batch_suffix(
