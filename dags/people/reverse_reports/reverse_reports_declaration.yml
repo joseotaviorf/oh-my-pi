@@ -145,6 +145,16 @@ workflow:
       extra_spark_job_arguments:
         - "16u0I2lV6dDzhslWyVw6S62N-M7XrIHgnWpy05awQPcQ"
         - "base_dei_v2"
+    # Former notebook: HUB_PwD (Daily Pipeline).
+    hub_pwd_employee_roster:
+      extra_spark_job_arguments:
+        - "1cC-q_8VHBEfkLnB4tSq5plLQudCLfNiFmGxRCy-9kDM"
+        - "base_completa"
+    # Former notebook: HUB_PwD (Daily Pipeline).
+    hub_pwd_ta_requisitions:
+      extra_spark_job_arguments:
+        - "1cC-q_8VHBEfkLnB4tSq5plLQudCLfNiFmGxRCy-9kDM"
+        - "base_ta"
 
     # --- people_reports notebook migration (Tier-1 validated) ---
     # Former notebook view: base_wfa
