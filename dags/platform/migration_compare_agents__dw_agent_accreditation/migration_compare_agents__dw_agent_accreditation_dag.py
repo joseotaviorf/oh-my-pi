@@ -115,8 +115,12 @@ with DAG(
         if not all_tables:
             raise RuntimeError("No metric files found for either runtime")
 
-        summary_key = f"{verdict_prefix}summary.json"
-        s3.delete_object(Bucket=bucket, Key=summary_key)
+        summary_uri = f"{ARTIFACTS_URI}/{verdict_prefix}summary.json"
+        write_s3_json(
+            summary_uri,
+            {"version": 1, "run_id": RUN_ID, "status": "in_progress"},
+            s3_client=s3,
+        )
 
         verdicts = {}
         passed = warned = failed = 0
