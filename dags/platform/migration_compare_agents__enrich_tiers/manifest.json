@@ -1,0 +1,18 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__enrich_tiers",
+  "domain": "agents",
+  "dag_name": "enrich_tiers",
+  "tables": [
+    "agent_allocation",
+    "agent_offers",
+    "agent_performance",
+    "agent_prospects",
+    "ciq_first_listing",
+    "metric_events",
+    "metric_period"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 5,
+  "failed_count": 0
+}

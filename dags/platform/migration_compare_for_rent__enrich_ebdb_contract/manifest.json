@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__enrich_ebdb_contract",
+  "domain": "for_rent",
+  "dag_name": "enrich_ebdb_contract",
+  "tables": [
+    "contract",
+    "contract_b2b",
+    "contract_declined_relisting",
+    "contract_house",
+    "contract_person",
+    "ongoing_contracts"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 4,
+  "failed_count": 0
+}

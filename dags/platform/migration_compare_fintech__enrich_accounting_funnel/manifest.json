@@ -1,0 +1,21 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_accounting_funnel",
+  "domain": "fintech",
+  "dag_name": "enrich_accounting_funnel",
+  "tables": [
+    "accounts_payable",
+    "cap_union_invoice",
+    "erp_gateway_stages_status",
+    "for_rent_brokerage_transfer",
+    "for_rent_contract_adm_fee",
+    "for_rent_contract_brokerage",
+    "invoice_all",
+    "ledger",
+    "monopoly_invoice_issuance",
+    "payment_platforms"
+  ],
+  "transpiled_count": 5,
+  "skipped_count": 5,
+  "failed_count": 0
+}

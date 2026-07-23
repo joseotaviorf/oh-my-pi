@@ -1,0 +1,19 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__enrich_mission_control",
+  "domain": "for_rent",
+  "dag_name": "enrich_mission_control",
+  "tables": [
+    "contract",
+    "contract_person",
+    "onboarding",
+    "onboarding_action",
+    "onboarding_bill",
+    "onboarding_task",
+    "onboarding_task_types",
+    "user"
+  ],
+  "transpiled_count": 8,
+  "skipped_count": 0,
+  "failed_count": 0
+}

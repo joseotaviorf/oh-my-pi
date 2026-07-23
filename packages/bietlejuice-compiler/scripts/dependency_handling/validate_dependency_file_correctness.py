@@ -18,18 +18,28 @@ _DAG_ID_PREFIX = "bietlejuice."
 # correctness. Mirrors the path-prefix exception used by
 # validate_no_new_databricks_clusters (databricks_cluster_exceptions.yml).
 _LUIGIJR_DOMAIN_DIR = "luigijr"
+_MIGRATION_DAG_PREFIXES = ("migration_twin_", "migration_emr_", "migration_compare_")
 
 
-def luigijr_dag_ids(dags_root: str = DAG_PACKAGES_ROOT) -> "frozenset[str]":
-    """Return the dependency-file keys (``bietlejuice.<dag>``) for DAGs under dags/luigijr/."""
+def _ignored_dag_ids(dags_root: str = DAG_PACKAGES_ROOT) -> "frozenset[str]":
+    """Return dependency-file keys to skip: luigijr + emr-migration-v2 DAGs."""
+    ids: set[str] = set()
     luigijr_dir = os.path.join(dags_root, _LUIGIJR_DOMAIN_DIR)
-    if not os.path.isdir(luigijr_dir):
-        return frozenset()
-    return frozenset(
-        f"{_DAG_ID_PREFIX}{name}"
-        for name in os.listdir(luigijr_dir)
-        if os.path.isdir(os.path.join(luigijr_dir, name))
-    )
+    if os.path.isdir(luigijr_dir):
+        ids.update(
+            f"{_DAG_ID_PREFIX}{name}"
+            for name in os.listdir(luigijr_dir)
+            if os.path.isdir(os.path.join(luigijr_dir, name))
+        )
+    platform_dir = os.path.join(dags_root, "platform")
+    if os.path.isdir(platform_dir):
+        ids.update(
+            f"{_DAG_ID_PREFIX}{name}"
+            for name in os.listdir(platform_dir)
+            if os.path.isdir(os.path.join(platform_dir, name))
+            and name.startswith(_MIGRATION_DAG_PREFIXES)
+        )
+    return frozenset(ids)
 
 
 def main():
@@ -37,11 +47,11 @@ def main():
     expected_dependencies_file = generate_dependencies()
     print("Expected dependency file generated. Comparing with existing file...")
     existing_dependencies_file = BietlejuiceDependencyHelper.read_dependencies()
-    ignored_dags = luigijr_dag_ids()
+    ignored_dags = _ignored_dag_ids()
     if ignored_dags:
         print(
-            f"Skipping {len(ignored_dags)} Luigi Jr DAG(s) under 'dags/{_LUIGIJR_DOMAIN_DIR}/' "
-            "(isolated domain, not tracked in the shared dependencies.yaml)."
+            f"Skipping {len(ignored_dags)} DAG(s) "
+            "(Luigi Jr + EMR migration validation DAGs, not tracked in dependencies.yaml)."
         )
     differences = compare_dependencies(
         expected_dependencies_file, existing_dependencies_file, ignored_dags

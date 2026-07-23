@@ -1,0 +1,12 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_transactional_entities",
+  "domain": "growth",
+  "dag_name": "enrich_transactional_entities",
+  "tables": [
+    "entities"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 1,
+  "failed_count": 0
+}

@@ -1,0 +1,14 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "support_and_service__enrich_zendesk",
+  "domain": "support_and_service",
+  "dag_name": "enrich_zendesk",
+  "tables": [
+    "ticket_metrics",
+    "tickets",
+    "tickets_current"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 0,
+  "failed_count": 0
+}

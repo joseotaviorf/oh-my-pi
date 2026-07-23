@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "support_and_service__enrich_crm",
+  "domain": "support_and_service",
+  "dag_name": "enrich_crm",
+  "tables": [
+    "task_status_histories",
+    "task_titles",
+    "tasks",
+    "tasks_actions",
+    "workflows_transitions",
+    "workgroups"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 5,
+  "failed_count": 0
+}

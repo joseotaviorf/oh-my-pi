@@ -1,0 +1,41 @@
+SELECT
+  p.id,
+  p.id_house,
+  id_flow,
+  id_tenant,
+  p.id_state AS id_house_state,
+  p.id_region AS id_house_region,
+  COALESCE(ch.country_code, 'Undefined') AS country_code,
+  owner_type,
+  dt_contract_started,
+  dt_contract_ended,
+  current_condo_fee,
+  current_iptu_twelth,
+  current_rent,
+  house_address_neighborhood,
+  house_address_zipcode,
+  house_address_city,
+  house_address_complement,
+  house_address_street,
+  house_address_number,
+  house_type,
+  lat,
+  lng,
+  owner_data_email,
+  owner_data_gender,
+  owner_data_name,
+  owner_data_phone_number,
+  status,
+  tenant_data_email,
+  tenant_data_gender,
+  tenant_data_name,
+  tenant_data_phone_number,
+  contract_observations,
+  COALESCE(owner_type = 'B2B', FALSE) AS is_owner_b2b,
+  p.ts_created,
+  p.ts_updated
+FROM
+  datalake_ebdb_clean.portability AS p
+LEFT JOIN
+    datalake_ebdb_country.house AS ch
+        ON ch.id_house = p.id_house

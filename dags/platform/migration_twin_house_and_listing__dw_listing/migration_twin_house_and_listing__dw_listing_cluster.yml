@@ -1,0 +1,13 @@
+cluster:
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  custom_configurations:
+    aws_attributes:
+      ebs_volume_size: 200
+    data_security_mode: USER_ISOLATION
+    driver_node_type_id: r7g.xlarge
+    num_workers: 3
+    runtime_engine: PHOTON
+  databricks_conn_id: databricks_new_env
+  type: consolidation_xs_memory_cluster

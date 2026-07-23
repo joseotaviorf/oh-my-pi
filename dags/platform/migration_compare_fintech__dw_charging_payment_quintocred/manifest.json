@@ -1,0 +1,22 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__dw_charging_payment_quintocred",
+  "domain": "fintech",
+  "dag_name": "dw_charging_payment_quintocred",
+  "tables": [
+    "fact_accounting_funnel",
+    "fact_bad_debt",
+    "fact_charging_payment",
+    "fact_delinquecy",
+    "fact_direct_billing",
+    "fact_payment_delinquency",
+    "fact_payment_full",
+    "fact_propose_timeline",
+    "fact_renewal",
+    "fact_renewal_base",
+    "fact_theoretical_payment_delinquency"
+  ],
+  "transpiled_count": 7,
+  "skipped_count": 4,
+  "failed_count": 0
+}

@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__dw_credit_evers",
+  "domain": "fintech",
+  "dag_name": "dw_credit_evers",
+  "tables": [
+    "fact_credit_invoices",
+    "fact_ever",
+    "fact_ever_clean",
+    "fact_ever_full"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 4,
+  "failed_count": 0
+}

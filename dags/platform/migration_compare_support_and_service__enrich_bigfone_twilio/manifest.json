@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "support_and_service__enrich_bigfone_twilio",
+  "domain": "support_and_service",
+  "dag_name": "enrich_bigfone_twilio",
+  "tables": [
+    "call_agents",
+    "call_flex_events",
+    "call_flex_reservations",
+    "call_ivr_events",
+    "call_ivr_paths",
+    "inbound_call_locations"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 5,
+  "failed_count": 0
+}

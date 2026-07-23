@@ -1,0 +1,31 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "support_and_service__dw_customer_support",
+  "domain": "support_and_service",
+  "dag_name": "dw_customer_support",
+  "tables": [
+    "dim_analyst",
+    "dim_channel",
+    "dim_chatbot",
+    "dim_department",
+    "dim_ra_ticket",
+    "dim_taxonomy",
+    "dim_ticket",
+    "dim_zendesk_user",
+    "fact_analysts_performance",
+    "fact_backlog_metrics_tasks",
+    "fact_chat_messages",
+    "fact_chat_metrics",
+    "fact_customer_contacts",
+    "fact_ivr_interactions",
+    "fact_sessions_chatbot",
+    "fact_single_door_events",
+    "fact_task_metrics",
+    "fact_ticket_events",
+    "fact_tickets",
+    "fact_tickets_backlog"
+  ],
+  "transpiled_count": 5,
+  "skipped_count": 15,
+  "failed_count": 0
+}

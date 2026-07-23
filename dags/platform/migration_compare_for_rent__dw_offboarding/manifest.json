@@ -1,0 +1,14 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__dw_offboarding",
+  "domain": "for_rent",
+  "dag_name": "dw_offboarding",
+  "tables": [
+    "dim_termination",
+    "fact_house_listing_terminations",
+    "fact_terminations"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 3,
+  "failed_count": 0
+}

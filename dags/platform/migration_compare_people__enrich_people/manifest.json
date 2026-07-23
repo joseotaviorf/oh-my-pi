@@ -1,0 +1,23 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "people__enrich_people",
+  "domain": "people",
+  "dag_name": "enrich_people",
+  "tables": [
+    "assignment_snapshots",
+    "assignment_termination",
+    "business_unit",
+    "codex_history_base",
+    "codex_log",
+    "codex_pin_sync_drift",
+    "compensation_versions",
+    "cost_center_history",
+    "event_definition",
+    "identifier_mapping",
+    "job_with_salary_table",
+    "management_hierarchy"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 12,
+  "failed_count": 0
+}

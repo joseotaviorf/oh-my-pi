@@ -1,0 +1,21 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__enrich_pro_owners",
+  "domain": "for_rent",
+  "dag_name": "enrich_pro_owners",
+  "tables": [
+    "daily_owner_category",
+    "daily_owner_houses_quantity_history",
+    "house_b2b_history",
+    "owner_category",
+    "owner_houses_quantity_history",
+    "pp_multi_assessor",
+    "pp_multi_assessor_history",
+    "pp_multi_fee_changes",
+    "pro_owner_history",
+    "tracking_weekly_changes"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 7,
+  "failed_count": 0
+}

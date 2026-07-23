@@ -8,10 +8,9 @@ Scope: {{ domain }}/{{ dag_name }}
 import os
 from datetime import datetime
 from pathlib import Path
-
-import yaml
 from urllib.parse import urlparse
 
+import yaml
 from airflow import DAG, Dataset
 from airflow.operators.python import PythonOperator
 
@@ -112,8 +111,9 @@ with DAG(
     schedule=None,
     start_date=datetime(2026, 1, 1),
     catchup=False,
+    max_active_runs=1,
     tags=["migration", "twin", "validation"],
-    default_args={"owner": "data-platform", "retries": 1},
+    default_args={"owner": "data-platform", "retries": 0},
 ) as dag:
     ctx = _build_context(dag)
 
@@ -151,7 +151,7 @@ with DAG(
                 "--dag-name", SOURCE_DAG_NAME,
                 "--table-name", "{{ table }}",
             ],
-            execution_timeout_hours=2,
+            execution_timeout_hours=0.5,
         )
     )
     {% endfor %}

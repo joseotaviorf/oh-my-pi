@@ -1,0 +1,20 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__dw_collection_recovery_quintocred",
+  "domain": "fintech",
+  "dag_name": "dw_collection_recovery_quintocred",
+  "tables": [
+    "bridge_map_debt_negotiation",
+    "dim_wallet_distribution",
+    "fact_collection",
+    "fact_contract_payment_signature_timeline",
+    "fact_debt",
+    "fact_negotiation",
+    "fact_negotiation_installment",
+    "fact_portfolio_timeline",
+    "fact_proposal_signature_payment_timeline"
+  ],
+  "transpiled_count": 6,
+  "skipped_count": 3,
+  "failed_count": 0
+}

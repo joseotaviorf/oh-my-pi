@@ -1,0 +1,20 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__dw_supply",
+  "domain": "growth",
+  "dag_name": "dw_supply",
+  "tables": [
+    "dim_acquisition_lead",
+    "dim_affiliate_tracking",
+    "dim_funnel_step",
+    "dim_supply_discards",
+    "dim_supply_operation_flow",
+    "dim_supply_recovery_flow",
+    "dim_supply_user_path",
+    "fact_supply_events",
+    "obt_supply"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 6,
+  "failed_count": 0
+}

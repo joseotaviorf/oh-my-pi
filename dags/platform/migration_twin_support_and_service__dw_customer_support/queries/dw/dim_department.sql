@@ -1,0 +1,16 @@
+SELECT
+  MD5(department) AS sk_department,
+  department,
+  NULLIF(board,'-') AS board,
+  NULLIF(team,'-') AS team,
+  NULLIF(journey_step,'-') AS journey_step,
+  channel,
+  LOWER(front_or_back) AS front_or_back,
+  area,
+  concentrix_area_name,
+  concentrix_area = 'Sim' AS is_concentrix,
+  active_department = 'Sim' AS is_active,
+  is_partner,
+  NOW() AS ts_load
+FROM
+  datalake_gsheets_clean.department_control

@@ -1,0 +1,13 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__enrich_agents_validation",
+  "domain": "agents",
+  "dag_name": "enrich_agents_validation",
+  "tables": [
+    "agents_accreditation_database_manual_intervention",
+    "partners_missing_incentive_cycle_metrics"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 1,
+  "failed_count": 0
+}

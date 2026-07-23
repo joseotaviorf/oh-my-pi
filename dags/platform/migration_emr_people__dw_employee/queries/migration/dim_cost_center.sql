@@ -1,0 +1,60 @@
+WITH active_department_responsibility_ranked AS (
+  SELECT
+    id_department,
+    id_assignment,
+    ROW_NUMBER() OVER (
+      PARTITION BY id_department
+      ORDER BY
+        dt_started DESC NULLS LAST,
+        dt_ended DESC NULLS LAST,
+        ts_load DESC,
+        id_assignment DESC
+    ) AS rn
+  FROM
+    datalake_hr_system_clean.areas_of_responsibility
+  WHERE
+    active_status = 'A'
+    AND id_template IS NOT NULL
+),
+active_department_responsibility AS (
+  SELECT
+    id_department,
+    id_assignment
+  FROM
+    active_department_responsibility_ranked
+  WHERE
+    rn = 1
+)
+SELECT
+  o.id_organization AS sk_cost_center,
+  e.id_period_of_service AS sk_business_partner_assignment,
+  e.id_person AS sk_business_partner,
+  o.name AS cost_center_name,
+  o.codigo_dff AS cost_center_code,
+  COALESCE(o.business, '-1') AS business,
+  COALESCE(o.product, '-1') AS product,
+  COALESCE(o.brand, '-1') AS brand,
+  COALESCE(o.vertical, '-1') AS vertical,
+  COALESCE(o.structure, '-1') AS structure,
+  COALESCE(o.team, '-1') AS team,
+  COALESCE(o.chapter, '-1') AS chapter,
+  COALESCE(o.line, '-1') AS line,
+  COALESCE(o.owner_leadership_layer_1_name, '-1') AS owner_leadership_layer_1_name,
+  COALESCE(o.owner_leadership_layer_2_name, '-1') AS owner_leadership_layer_2_name,
+  COALESCE(o.owner_leadership_layer_3_name, '-1') AS owner_leadership_layer_3_name,
+  COALESCE(o.headcount_type, '-1') AS headcount_type,
+  o.status = 'A' AS is_active,
+  o.dt_effective_start,
+  o.dt_effective_end,
+  o.ts_created,
+  NOW () AS ts_load
+FROM
+  datalake_hr_system_clean.organizations AS o
+LEFT JOIN
+  active_department_responsibility AS r
+    ON o.id_organization = r.id_department
+LEFT JOIN
+  datalake_people.identifier_mapping AS e
+    ON e.id_assignment = r.id_assignment
+WHERE
+  o.classification_code = 'DEPARTMENT'

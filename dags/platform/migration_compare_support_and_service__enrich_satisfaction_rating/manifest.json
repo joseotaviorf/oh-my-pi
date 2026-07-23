@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "support_and_service__enrich_satisfaction_rating",
+  "domain": "support_and_service",
+  "dag_name": "enrich_satisfaction_rating",
+  "tables": [
+    "bigfone_surveys",
+    "chat_fup_surveys",
+    "gsheets_surveys",
+    "satisfaction_answers",
+    "survicate_surveys",
+    "zendesk_surveys"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 4,
+  "failed_count": 0
+}

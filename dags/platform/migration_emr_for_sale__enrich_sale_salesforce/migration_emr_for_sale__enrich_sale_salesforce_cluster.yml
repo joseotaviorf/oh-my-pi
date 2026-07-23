@@ -1,0 +1,2 @@
+cluster:
+  type: emr_7_12_consolidation_xs_general_cluster

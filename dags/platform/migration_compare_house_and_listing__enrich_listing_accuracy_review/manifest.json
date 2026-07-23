@@ -1,0 +1,13 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "house_and_listing__enrich_listing_accuracy_review",
+  "domain": "house_and_listing",
+  "dag_name": "enrich_listing_accuracy_review",
+  "tables": [
+    "listing_accuracy",
+    "listing_accuracy_history"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 0,
+  "failed_count": 0
+}

@@ -1,0 +1,20 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "broker_xp__dw_brokers",
+  "domain": "broker_xp",
+  "dag_name": "dw_brokers",
+  "tables": [
+    "dim_broker",
+    "dim_broker_account_manager_history",
+    "dim_broker_integrator_partner_history",
+    "dim_broker_products",
+    "dim_broker_profile_history",
+    "dim_broker_regions",
+    "dim_broker_status_history",
+    "dim_broker_tier_history",
+    "dim_company_3p_partners"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 9,
+  "failed_count": 0
+}

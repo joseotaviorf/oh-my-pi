@@ -1,0 +1,7 @@
+cluster:
+  custom_configurations:
+    driver_node_type_id: r7g.xlarge
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static
+  databricks_conn_id: databricks_new_env
+  type: consolidation_l_general_cluster

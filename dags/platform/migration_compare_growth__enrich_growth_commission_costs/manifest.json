@@ -1,0 +1,12 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_growth_commission_costs",
+  "domain": "growth",
+  "dag_name": "enrich_growth_commission_costs",
+  "tables": [
+    "ciq_costs"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 1,
+  "failed_count": 0
+}

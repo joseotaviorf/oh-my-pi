@@ -1,0 +1,13 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "support_and_service__enrich_crm_tasks_flows",
+  "domain": "support_and_service",
+  "dag_name": "enrich_crm_tasks_flows",
+  "tables": [
+    "tasks_actions_resolutions_flow",
+    "tasks_users_resolutions_flow"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 1,
+  "failed_count": 0
+}

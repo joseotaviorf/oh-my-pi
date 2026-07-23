@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__dw_contract",
+  "domain": "for_rent",
+  "dag_name": "dw_contract",
+  "tables": [
+    "dim_contract",
+    "dim_contract_person",
+    "fact_contract_people",
+    "fact_contracts"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 4,
+  "failed_count": 0
+}

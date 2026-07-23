@@ -1,0 +1,11 @@
+cluster:
+  custom_configurations:
+    data_security_mode: SINGLE_USER
+    num_workers: 4
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
+    spark_version: 16.4.x-scala2.12
+  databricks_conn_id: databricks_new
+  type: consolidation_l_memory_cluster

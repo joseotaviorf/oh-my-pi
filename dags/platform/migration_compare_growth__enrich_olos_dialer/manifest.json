@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_olos_dialer",
+  "domain": "growth",
+  "dag_name": "enrich_olos_dialer",
+  "tables": [
+    "outbound_contact_attempts",
+    "outbound_last_contact",
+    "outbound_mailing",
+    "reprocessing_events",
+    "reprocessing_mailing"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 2,
+  "failed_count": 0
+}

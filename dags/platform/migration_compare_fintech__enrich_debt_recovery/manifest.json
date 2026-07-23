@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_debt_recovery",
+  "domain": "fintech",
+  "dag_name": "enrich_debt_recovery",
+  "tables": [
+    "billing",
+    "debt",
+    "installment",
+    "negotiation",
+    "segmentation_distribution"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 3,
+  "failed_count": 0
+}

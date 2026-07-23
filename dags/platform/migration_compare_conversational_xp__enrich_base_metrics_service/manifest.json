@@ -1,0 +1,25 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "conversational_xp__enrich_base_metrics_service",
+  "domain": "conversational_xp",
+  "dag_name": "enrich_base_metrics_service",
+  "tables": [
+    "experiment_config",
+    "experiment_config_processed",
+    "global_metrics",
+    "house_publication_dates",
+    "lpv_global_metrics",
+    "recs_global_metrics",
+    "recs_impressions",
+    "recs_impressions_processed",
+    "rent_flow_past_30_days",
+    "rent_outlier_users_past_30_days",
+    "sale_flow_past_30_days",
+    "sale_outlier_users_past_30_days",
+    "search_impressions",
+    "tof_global_metrics"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 14,
+  "failed_count": 0
+}

@@ -1,0 +1,21 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__metric_fintech__collections_segmentation",
+  "domain": "fintech",
+  "dag_name": "metric_fintech__collections_segmentation",
+  "tables": [
+    "daily_recovery_chargehub_audiences",
+    "daily_recovery_hyper_segmentation",
+    "daily_recovery_macro_segmentation",
+    "daily_recovery_pipe_to_pipe_chargehub_audiences",
+    "daily_recovery_pipe_to_pipe_hyper_segmentation",
+    "daily_recovery_pipe_to_pipe_macro_segmentation",
+    "daily_recovery_pipe_to_pipe_segmentation",
+    "daily_recovery_pipe_to_pipe_segmentation_clustered",
+    "daily_recovery_segmentation",
+    "daily_recovery_segmentation_clustered"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 9,
+  "failed_count": 0
+}

@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_sap",
+  "domain": "fintech",
+  "dag_name": "enrich_sap",
+  "tables": [
+    "4hana_journal_entries",
+    "4hana_journal_entries_bank_account",
+    "ledger",
+    "ledger_new_template"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 3,
+  "failed_count": 0
+}

@@ -1,0 +1,12 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "house_and_listing__dw_sale_ongoing_listings",
+  "domain": "house_and_listing",
+  "dag_name": "dw_sale_ongoing_listings",
+  "tables": [
+    "fact_daily_ongoing_listing"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 0,
+  "failed_count": 0
+}

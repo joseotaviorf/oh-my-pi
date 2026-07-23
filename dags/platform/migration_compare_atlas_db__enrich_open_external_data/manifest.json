@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "atlas_db__enrich_open_external_data",
+  "domain": "atlas_db",
+  "dag_name": "enrich_open_external_data",
+  "tables": [
+    "iptu_sp_residential_properties",
+    "itbi_all_residential_transactions",
+    "itbi_bh_residential_transactions",
+    "itbi_sp_residential_transactions"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 4,
+  "failed_count": 0
+}

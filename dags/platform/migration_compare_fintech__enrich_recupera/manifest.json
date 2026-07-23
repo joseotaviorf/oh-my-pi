@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_recupera",
+  "domain": "fintech",
+  "dag_name": "enrich_recupera",
+  "tables": [
+    "changes_debts_distribution",
+    "collection",
+    "contract_advisory_distribution",
+    "installment",
+    "negotiation",
+    "snapshot_daily_debts"
+  ],
+  "transpiled_count": 5,
+  "skipped_count": 1,
+  "failed_count": 0
+}

@@ -1,0 +1,19 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_sale__enrich_visit",
+  "domain": "for_sale",
+  "dag_name": "enrich_visit",
+  "tables": [
+    "post_visit_agent_unified",
+    "post_visit_demand",
+    "visit_cancellation_unified",
+    "visit_fitting",
+    "visit_origin_unified",
+    "visit_schedules",
+    "visit_status_events",
+    "visits"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 7,
+  "failed_count": 0
+}

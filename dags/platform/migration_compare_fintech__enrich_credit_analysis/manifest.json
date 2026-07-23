@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_credit_analysis",
+  "domain": "fintech",
+  "dag_name": "enrich_credit_analysis",
+  "tables": [
+    "credit_analysis",
+    "credit_analysis_proposals",
+    "credit_engine",
+    "credit_engine_analysis_request",
+    "credit_engine_checklist",
+    "early_credit_analysis"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 4,
+  "failed_count": 0
+}

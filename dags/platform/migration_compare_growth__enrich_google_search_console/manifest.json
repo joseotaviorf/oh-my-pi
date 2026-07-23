@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_google_search_console",
+  "domain": "growth",
+  "dag_name": "enrich_google_search_console",
+  "tables": [
+    "gsc_keyword_attributes",
+    "gsc_keyword_region_attributes",
+    "gsc_keywords",
+    "keyword_clusters",
+    "seo_gsc_data"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 4,
+  "failed_count": 0
+}

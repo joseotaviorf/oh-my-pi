@@ -1,0 +1,22 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "governance__enrich_superset",
+  "domain": "governance",
+  "dag_name": "enrich_superset",
+  "tables": [
+    "ab_user",
+    "dashboards",
+    "dataset_executions",
+    "lake_tables_usage",
+    "slices",
+    "sql_metrics",
+    "table_columns",
+    "table_schema",
+    "tables",
+    "tag",
+    "tagged_object"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 10,
+  "failed_count": 0
+}

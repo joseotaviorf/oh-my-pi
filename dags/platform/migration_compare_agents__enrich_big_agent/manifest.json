@@ -1,0 +1,14 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__enrich_big_agent",
+  "domain": "agents",
+  "dag_name": "enrich_big_agent",
+  "tables": [
+    "agent_enrollment",
+    "house_consultant_history",
+    "house_listing_consultant"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 2,
+  "failed_count": 0
+}

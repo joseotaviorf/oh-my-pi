@@ -1,0 +1,6 @@
+cluster:
+  custom_configurations:
+    aws_attributes:
+      ebs_volume_size: 200
+  databricks_conn_id: databricks_new_env
+  type: consolidation_xs_memory_cluster

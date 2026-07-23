@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_ebdb_user",
+  "domain": "growth",
+  "dag_name": "enrich_ebdb_user",
+  "tables": [
+    "affiliate_data",
+    "agent_data",
+    "user",
+    "user_doorman",
+    "user_revision_entity",
+    "user_sales_rep"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 5,
+  "failed_count": 0
+}

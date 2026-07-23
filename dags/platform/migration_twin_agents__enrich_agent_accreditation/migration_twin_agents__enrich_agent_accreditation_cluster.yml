@@ -1,0 +1,3 @@
+cluster:
+  databricks_conn_id: databricks_new_env
+  type: consolidation_s_memory_cluster

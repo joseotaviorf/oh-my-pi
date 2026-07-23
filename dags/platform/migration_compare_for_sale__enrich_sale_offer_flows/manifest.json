@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_sale__enrich_sale_offer_flows",
+  "domain": "for_sale",
+  "dag_name": "enrich_sale_offer_flows",
+  "tables": [
+    "offer_specialists",
+    "sale_offer_flows",
+    "sale_offer_status",
+    "sale_offer_users",
+    "sale_offer_users_info"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 2,
+  "failed_count": 0
+}

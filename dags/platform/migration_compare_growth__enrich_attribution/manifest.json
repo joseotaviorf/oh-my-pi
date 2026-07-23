@@ -1,0 +1,13 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_attribution",
+  "domain": "growth",
+  "dag_name": "enrich_attribution",
+  "tables": [
+    "online_attribution",
+    "tracking_by_device"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 0,
+  "failed_count": 0
+}

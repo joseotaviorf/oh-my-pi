@@ -1,0 +1,24 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "support_and_service__enrich_survicate",
+  "domain": "support_and_service",
+  "dag_name": "enrich_survicate",
+  "tables": [
+    "inspections_surveys",
+    "keys_surveys",
+    "lockbox_surveys",
+    "photo_surveys",
+    "question_answer_choices",
+    "repairs_surveys",
+    "response_content",
+    "salesforce_surveys",
+    "scheduling_surveys",
+    "single_station_surveys",
+    "survey_questions",
+    "survey_responses",
+    "zendesk_email_surveys"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 12,
+  "failed_count": 0
+}

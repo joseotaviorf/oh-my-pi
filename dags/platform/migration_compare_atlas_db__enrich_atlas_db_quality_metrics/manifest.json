@@ -1,0 +1,12 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "atlas_db__enrich_atlas_db_quality_metrics",
+  "domain": "atlas_db",
+  "dag_name": "enrich_atlas_db_quality_metrics",
+  "tables": [
+    "quality_metrics"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 0,
+  "failed_count": 0
+}

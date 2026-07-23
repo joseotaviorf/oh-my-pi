@@ -1,0 +1,10 @@
+cluster:
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  custom_configurations:
+    data_security_mode: USER_ISOLATION
+    driver_node_type_id: r7g.2xlarge
+    num_workers: 5
+  databricks_conn_id: databricks_new_env
+  type: consolidation_m_general_cluster

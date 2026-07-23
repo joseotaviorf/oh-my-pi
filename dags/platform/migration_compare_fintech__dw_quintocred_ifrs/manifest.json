@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__dw_quintocred_ifrs",
+  "domain": "fintech",
+  "dag_name": "dw_quintocred_ifrs",
+  "tables": [
+    "quintocred_aging_occurrence",
+    "quintocred_aging_recurring_payment_no_renewal",
+    "quintocred_aging_recurring_payment_renewal",
+    "quintocred_ifrs_occurrence",
+    "quintocred_ifrs_recurring_payment"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 3,
+  "failed_count": 0
+}

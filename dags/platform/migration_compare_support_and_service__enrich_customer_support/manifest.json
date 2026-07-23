@@ -1,0 +1,21 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "support_and_service__enrich_customer_support",
+  "domain": "support_and_service",
+  "dag_name": "enrich_customer_support",
+  "tables": [
+    "calls",
+    "chat_aht",
+    "chats",
+    "email",
+    "ivr_interactions",
+    "sla_journey",
+    "sla_theme",
+    "sla_theme_detail",
+    "tickets",
+    "tickets_backlog"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 7,
+  "failed_count": 0
+}

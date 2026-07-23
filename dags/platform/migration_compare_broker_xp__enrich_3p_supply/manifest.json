@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "broker_xp__enrich_3p_supply",
+  "domain": "broker_xp",
+  "dag_name": "enrich_3p_supply",
+  "tables": [
+    "broker_lead_relationship",
+    "lead_3p",
+    "lead_3p_reason_changes",
+    "lead_3p_status_changes",
+    "listing_draft_status"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 4,
+  "failed_count": 0
+}

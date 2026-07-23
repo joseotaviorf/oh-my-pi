@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "conversational_xp__enrich_concierge_health_metrics",
+  "domain": "conversational_xp",
+  "dag_name": "enrich_concierge_health_metrics",
+  "tables": [
+    "concierge_demand",
+    "concierge_direct_vb",
+    "concierge_indirect_vb",
+    "concierge_messages",
+    "concierge_prospects_aux",
+    "tof_and_concierge_demand"
+  ],
+  "transpiled_count": 4,
+  "skipped_count": 2,
+  "failed_count": 0
+}

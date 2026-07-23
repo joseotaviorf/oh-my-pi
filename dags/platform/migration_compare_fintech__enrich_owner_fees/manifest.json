@@ -1,0 +1,13 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_owner_fees",
+  "domain": "fintech",
+  "dag_name": "enrich_owner_fees",
+  "tables": [
+    "contract",
+    "contract_brokerage_fee"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 1,
+  "failed_count": 0
+}

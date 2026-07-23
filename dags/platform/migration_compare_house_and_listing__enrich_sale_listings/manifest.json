@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "house_and_listing__enrich_sale_listings",
+  "domain": "house_and_listing",
+  "dag_name": "enrich_sale_listings",
+  "tables": [
+    "sale_listing",
+    "sale_listing_price_changes",
+    "sale_listing_status",
+    "sale_status_version_order"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 2,
+  "failed_count": 0
+}

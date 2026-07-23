@@ -1,0 +1,9 @@
+cluster:
+  custom_configurations:
+    aws_attributes:
+      availability: ON_DEMAND
+    data_security_mode: USER_ISOLATION
+    driver_node_type_id: r7g.xlarge
+    runtime_engine: PHOTON
+  databricks_conn_id: databricks_new_env
+  type: consolidation_m_general_cluster

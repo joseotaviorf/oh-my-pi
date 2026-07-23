@@ -1,0 +1,7 @@
+cluster:
+  custom_configurations:
+    data_security_mode: USER_ISOLATION
+    driver_node_type_id: r7g.2xlarge
+    runtime_engine: PHOTON
+  databricks_conn_id: databricks_new_env
+  type: consolidation_l_general_cluster

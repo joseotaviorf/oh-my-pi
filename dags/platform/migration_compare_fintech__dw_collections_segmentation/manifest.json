@@ -1,0 +1,14 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__dw_collections_segmentation",
+  "domain": "fintech",
+  "dag_name": "dw_collections_segmentation",
+  "tables": [
+    "fact_contract_features_timeline",
+    "fact_contract_wallet_timeline",
+    "fact_invoice_wallet_timeline"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 1,
+  "failed_count": 0
+}

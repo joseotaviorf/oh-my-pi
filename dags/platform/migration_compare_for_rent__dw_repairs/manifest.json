@@ -1,0 +1,13 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__dw_repairs",
+  "domain": "for_rent",
+  "dag_name": "dw_repairs",
+  "tables": [
+    "dim_ongoing_repairs",
+    "fact_ongoing_repairs"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 0,
+  "failed_count": 0
+}

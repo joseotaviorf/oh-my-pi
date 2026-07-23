@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "house_and_listing__dw_listing",
+  "domain": "house_and_listing",
+  "dag_name": "dw_listing",
+  "tables": [
+    "dim_condo",
+    "dim_house_listing",
+    "fact_house_listing_daily_available_hours",
+    "fact_house_listing_daily_infos",
+    "fact_house_listing_status",
+    "fact_house_listings"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 5,
+  "failed_count": 0
+}

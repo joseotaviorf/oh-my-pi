@@ -1,0 +1,14 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_sale__enrich_sale_flows",
+  "domain": "for_sale",
+  "dag_name": "enrich_sale_flows",
+  "tables": [
+    "house_address_data",
+    "house_offers",
+    "sale_flow"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 2,
+  "failed_count": 0
+}

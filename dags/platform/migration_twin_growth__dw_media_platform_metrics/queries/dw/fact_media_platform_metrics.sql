@@ -1,0 +1,105 @@
+WITH 
+manual_costs AS (
+  SELECT 
+      NULL AS sk_campaign,
+      NULL AS sk_adset,
+      NULL AS sk_ad,
+      id_region AS sk_region,
+      BIGINT(DATE_FORMAT(dt_cost, 'yyyyMMdd')) AS sk_cost_date,
+      bk_sharing_rules,
+      naming_convention_sufix,
+      'manual_costs' AS origin,
+      'BR' AS country_code,
+      utm_campaign,
+      utm_term,
+      utm_content,
+      clicks,
+      NULL AS conversions,
+      impressions,
+      total_cost,
+      dt_cost,
+      year,
+      month,
+      day,
+      NOW() AS ts_load
+  FROM datalake_growth_media_platform.manual_costs
+),
+automated_costs AS (
+  SELECT
+    id_campaign AS sk_campaign,
+    id_adset AS sk_adset,
+    id_ad AS sk_ad, 
+    id_region AS sk_region,
+    BIGINT(DATE_FORMAT(dt_cost, 'yyyyMMdd')) AS sk_cost_date,
+    CASE WHEN ms.funnel_side = 'Supply' AND ms.campaign_business_context = 'Hybrid'
+      THEN MD5(CONCAT(CAST(sk_cost_date AS STRING), '_', 's051s', LOWER(ms.funnel_side))) ELSE NULL END AS bk_sharing_rules,
+    ms.naming_convention_sufix,
+    origin,
+    country_code,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    clicks,
+    conversions,
+    impressions,
+    total_cost,
+    dt_cost,
+    year,
+    month,
+    day,
+    NOW() AS ts_load
+  FROM 
+    datalake_growth_media_platform.consolidated_metrics cs
+    LEFT JOIN 
+      datalake_growth_taxonomy.media_setup ms 
+        ON ms.naming_convention_sufix = cs.naming_convention_sufix
+  WHERE 
+      CAST(dt_cost AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+)
+SELECT
+  sk_campaign,
+  sk_adset,
+  sk_ad,
+  sk_region,
+  sk_cost_date,
+  bk_sharing_rules,
+  naming_convention_sufix,
+  origin,
+  country_code,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  clicks,
+  conversions,
+  impressions,
+  total_cost,
+  dt_cost,
+  year,
+  month,
+  day,
+  ts_load
+FROM automated_costs
+UNION ALL 
+SELECT
+  sk_campaign,
+  sk_adset,
+  sk_ad,
+  sk_region,
+  sk_cost_date,
+  bk_sharing_rules,
+  naming_convention_sufix,
+  origin,
+  country_code,
+  utm_campaign,
+  utm_term,
+  utm_content,
+  clicks,
+  conversions,
+  impressions,
+  total_cost,
+  dt_cost,
+  year,
+  month,
+  day,
+  ts_load
+FROM manual_costs

@@ -1,0 +1,52 @@
+SELECT
+  id_meeting,
+  id_hubspot_owner,
+  ids_attachments,
+  ids_associated_tickets,
+  ids_associated_contacts,
+  ids_associated_companies,
+  ids_associated_deals,
+  meeting_title,
+  meeting_body,
+  internal_meeting_notes,
+  meeting_external_url,
+  meeting_location,
+  meeting_outcome,
+  activity_type,
+  ts_meeting_start,
+  ts_meeting_end,
+  ts_meeting,
+  ts_created,
+  ts_updated,
+  year,
+  month,
+  day
+FROM (
+  SELECT
+    id_meeting,
+    id_hubspot_owner,
+    ids_attachments,
+    ids_associated_tickets,
+    ids_associated_contacts,
+    ids_associated_companies,
+    ids_associated_deals,
+    meeting_title,
+    meeting_body,
+    internal_meeting_notes,
+    meeting_external_url,
+    meeting_location,
+    meeting_outcome,
+    activity_type,
+    ts_meeting_start,
+    ts_meeting_end,
+    ts_meeting,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day,
+    ROW_NUMBER() OVER (PARTITION BY id_meeting ORDER BY ts_updated DESC) AS _w
+  FROM datalake_hubspot.meeting_history
+) AS _t
+WHERE
+  _w = 1

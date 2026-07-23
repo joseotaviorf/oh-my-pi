@@ -1,0 +1,12 @@
+cluster:
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  custom_configurations:
+    data_security_mode: SINGLE_USER
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
+  databricks_conn_id: databricks_new_env
+  type: consolidation_xs_memory_cluster

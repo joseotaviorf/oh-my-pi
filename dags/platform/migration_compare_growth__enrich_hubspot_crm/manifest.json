@@ -1,0 +1,29 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_hubspot_crm",
+  "domain": "growth",
+  "dag_name": "enrich_hubspot_crm",
+  "tables": [
+    "company",
+    "company_contact",
+    "company_history",
+    "company_members",
+    "company_status",
+    "contact",
+    "contact_history",
+    "contact_status",
+    "deal",
+    "deal_history",
+    "deal_stage",
+    "pipeline",
+    "pipeline_history",
+    "stage",
+    "stage_history",
+    "ticket",
+    "ticket_history",
+    "ticket_stage"
+  ],
+  "transpiled_count": 14,
+  "skipped_count": 4,
+  "failed_count": 0
+}

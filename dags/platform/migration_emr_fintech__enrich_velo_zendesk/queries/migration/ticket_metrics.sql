@@ -1,0 +1,233 @@
+WITH last_extracted AS (
+  SELECT
+    id_ticket,
+    group_stations,
+    assignee_stations,
+    minutes_reply_calendar,
+    minutes_reply_business,
+    minutes_first_resolution_business,
+    minutes_first_resolution_calendar,
+    minutes_requester_wait_business,
+    minutes_requester_wait_calendar,
+    minutes_agent_wait_business,
+    minutes_agent_wait_calendar,
+    minutes_on_hold_business,
+    minutes_on_hold_calendar,
+    minutes_full_resolution_business,
+    minutes_full_resolution_calendar,
+    reopens,
+    replies,
+    dt_extracted,
+    ts_initially_assigned,
+    ts_assigned,
+    ts_solved,
+    ts_created
+  FROM (
+    SELECT
+      tm.id_ticket,
+      tm.group_stations,
+      tm.assignee_stations,
+      tm.minutes_reply_calendar,
+      tm.minutes_reply_business,
+      tm.minutes_first_resolution_business,
+      tm.minutes_first_resolution_calendar,
+      tm.minutes_requester_wait_business,
+      tm.minutes_requester_wait_calendar,
+      tm.minutes_agent_wait_business,
+      tm.minutes_agent_wait_calendar,
+      tm.minutes_on_hold_business,
+      tm.minutes_on_hold_calendar,
+      tm.minutes_full_resolution_business,
+      tm.minutes_full_resolution_calendar,
+      tm.reopens,
+      tm.replies,
+      tm.dt_extracted,
+      tm.ts_initially_assigned,
+      tm.ts_assigned,
+      tm.ts_solved,
+      tm.ts_created,
+      ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY dt_extracted DESC) AS _w
+    FROM datalake_velo_zendesk_clean.ticket_metrics AS tm
+  ) AS _t
+  WHERE
+    _w = 1
+), base_overdue_amount AS (
+  SELECT
+    le.id_ticket,
+    t.id_assignee,
+    t.id_group,
+    t.id_requester,
+    t.id_submitter,
+    cf.id_propose,
+    CASE
+      WHEN cf.request_type = 'receber_em_2_dias'
+      THEN 'inadimplência_2_dias_sem_juros_e_multa'
+      WHEN cf.request_type = 'receber_em_15_dias'
+      THEN 'inadimplência_15_dias_com_juros_e_multa'
+      WHEN cf.request_type = 'com_acionamento'
+      THEN 'cancelamento_de_contrato_com_acionamento_de_garantia'
+      ELSE cf.request_type
+    END AS request_type,
+    t.ticket_via,
+    t.status,
+    le.group_stations,
+    le.assignee_stations,
+    DATEDIFF(TO_DATE(cf.dt_due_original), TO_DATE(CAST(le.ts_created AS DATE))) AS waiting_period_creation,
+    DATEDIFF(TO_DATE(cf.dt_due_original), TO_DATE(CAST(le.ts_solved AS DATE))) AS waiting_period_resolution,
+    le.minutes_reply_calendar,
+    le.minutes_reply_business,
+    le.minutes_first_resolution_business,
+    le.minutes_first_resolution_calendar,
+    le.minutes_requester_wait_business,
+    le.minutes_requester_wait_calendar,
+    le.minutes_agent_wait_business,
+    le.minutes_agent_wait_calendar,
+    le.minutes_on_hold_business,
+    le.minutes_on_hold_calendar,
+    le.minutes_full_resolution_business,
+    le.minutes_full_resolution_calendar,
+    le.reopens,
+    le.replies,
+    CAST(REGEXP_REPLACE(
+      REGEXP_REPLACE(
+        SPLIT(
+          SPLIT(IF(cf.overdue_amount LIKE '% 90 %', NULL, cf.overdue_amount), '\\\\+')[0],
+          '#'
+        )[0],
+        '[a-zA-Zóòôöõúùûüíìîïéèêëáàâãäç~!@$%^&*()_-|\\=?;:<>.]',
+        ''
+      ),
+      ',',
+      '.'
+    ) AS FLOAT) AS overdue_amount_1,
+    CAST(REGEXP_REPLACE(
+      REGEXP_REPLACE(
+        SPLIT(SPLIT(cf.overdue_amount, '\\\\+')[1], '#')[0],
+        '[a-zA-Zóòôöõúùûüíìîïéèêëáàâãäç~!@$%^&*()_-|\\=?;:<>.]',
+        ''
+      ),
+      ',',
+      '.'
+    ) AS FLOAT) AS overdue_amount_2,
+    CAST(REGEXP_REPLACE(
+      REGEXP_REPLACE(
+        SPLIT(SPLIT(cf.overdue_amount, '\\\\+')[2], '#')[0],
+        '[a-zA-Zóòôöõúùûüíìîïéèêëáàâãäç~!@$%^&*()_-|\\=?;:<>.]',
+        ''
+      ),
+      ',',
+      '.'
+    ) AS FLOAT) AS overdue_amount_3,
+    cf.exception_value,
+    (
+      le.minutes_full_resolution_calendar / 60.000
+    ) / 24.000 AS leadtime_calendar_days,
+    (
+      le.minutes_full_resolution_business / 60.000
+    ) / 10.000 AS leadtime_business_days,
+    (
+      le.minutes_reply_calendar / 60.000
+    ) / 24.000 AS interval_first_response,
+    DATE_TRUNC('MONTH', FROM_UTC_TIMESTAMP(CAST(le.ts_solved AS TIMESTAMP), 'Brazil/East')) AS first_day_of_month,
+    le.minutes_requester_wait_calendar / 60.000 / 24.000 AS broker_waiting_analyst,
+    le.minutes_agent_wait_calendar / 60.000 / 24.000 AS analyst_waiting_broker,
+    ROW_NUMBER() OVER (PARTITION BY cf.id_propose ORDER BY le.ts_created) AS ticket_order,
+    le.dt_extracted,
+    cf.dt_request_return,
+    cf.dt_submission,
+    cf.dt_due_original,
+    cf.dt_started,
+    cf.dt_payment_scheduled,
+    cf.dt_payment_forwarded,
+    cf.dt_first_call,
+    cf.dt_second_call,
+    cf.dt_third_call,
+    cf.dt_first_whatsapp,
+    cf.dt_second_whatsapp,
+    cf.dt_third_whatsapp,
+    le.ts_created,
+    t.ts_created_local,
+    t.ts_updated,
+    FROM_UTC_TIMESTAMP(CAST(t.ts_updated AS TIMESTAMP), 'Brazil/East') AS ts_updated_local,
+    le.ts_initially_assigned,
+    FROM_UTC_TIMESTAMP(CAST(le.ts_initially_assigned AS TIMESTAMP), 'Brazil/East') AS ts_initially_assigned_local,
+    le.ts_assigned,
+    le.ts_solved,
+    FROM_UTC_TIMESTAMP(CAST(le.ts_solved AS TIMESTAMP), 'Brazil/East') AS ts_solved_local,
+    t.ts_load
+  FROM datalake_velo_zendesk_clean.tickets AS t
+  LEFT JOIN datalake_velo_zendesk.custom_fields AS cf
+    ON t.id_ticket = cf.id_ticket
+  LEFT JOIN last_extracted AS le
+    ON le.id_ticket = t.id_ticket
+)
+SELECT
+  id_ticket,
+  id_assignee,
+  id_group,
+  id_requester,
+  id_submitter,
+  id_propose,
+  request_type,
+  ticket_via,
+  status,
+  group_stations,
+  assignee_stations,
+  waiting_period_creation,
+  waiting_period_resolution,
+  minutes_reply_calendar,
+  minutes_reply_business,
+  minutes_first_resolution_business,
+  minutes_first_resolution_calendar,
+  minutes_requester_wait_business,
+  minutes_requester_wait_calendar,
+  minutes_agent_wait_business,
+  minutes_agent_wait_calendar,
+  minutes_on_hold_business,
+  minutes_on_hold_calendar,
+  minutes_full_resolution_business,
+  minutes_full_resolution_calendar,
+  reopens,
+  replies,
+  ROUND(
+    COALESCE(overdue_amount_1, 0) + COALESCE(overdue_amount_2, 0) + COALESCE(overdue_amount_3, 0),
+    2
+  ) AS overdue_amount,
+  exception_value,
+  leadtime_calendar_days,
+  leadtime_business_days,
+  interval_first_response,
+  first_day_of_month,
+  broker_waiting_analyst,
+  analyst_waiting_broker,
+  ticket_order,
+  CASE
+    WHEN COALESCE(overdue_amount_1, 0) + COALESCE(overdue_amount_2, 0) + COALESCE(overdue_amount_3, 0) > 0
+    AND NOT dt_payment_scheduled IS NULL
+    THEN TRUE
+    ELSE FALSE
+  END AS has_payment_forwarded,
+  dt_extracted,
+  dt_request_return,
+  dt_submission,
+  dt_due_original,
+  dt_started,
+  dt_payment_scheduled,
+  dt_payment_forwarded,
+  dt_first_call,
+  dt_second_call,
+  dt_third_call,
+  dt_first_whatsapp,
+  dt_second_whatsapp,
+  dt_third_whatsapp,
+  ts_created,
+  ts_created_local,
+  ts_updated,
+  ts_updated_local,
+  ts_initially_assigned,
+  ts_initially_assigned_local,
+  ts_assigned,
+  ts_solved,
+  ts_solved_local,
+  ts_load
+FROM base_overdue_amount

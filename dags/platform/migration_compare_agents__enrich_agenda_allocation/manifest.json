@@ -1,0 +1,18 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__enrich_agenda_allocation",
+  "domain": "agents",
+  "dag_name": "enrich_agenda_allocation",
+  "tables": [
+    "agenda_hourly_allocations",
+    "agent_region_group",
+    "agents_slots",
+    "agents_slots_hourly",
+    "agents_specific_weekly_schedule",
+    "agents_weekly_schedule_history",
+    "slots_base_time"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 5,
+  "failed_count": 0
+}

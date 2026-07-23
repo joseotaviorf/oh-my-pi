@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "governance__enrich_pipeline",
+  "domain": "governance",
+  "dag_name": "enrich_pipeline",
+  "tables": [
+    "dag",
+    "dag_run",
+    "dag_sla_information",
+    "line",
+    "table"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 2,
+  "failed_count": 0
+}

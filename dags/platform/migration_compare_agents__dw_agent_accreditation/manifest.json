@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__dw_agent_accreditation",
+  "domain": "agents",
+  "dag_name": "dw_agent_accreditation",
+  "tables": [
+    "dim_agent",
+    "dim_prospect_agent",
+    "fact_agent_daily",
+    "fact_qualification_step"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 4,
+  "failed_count": 0
+}

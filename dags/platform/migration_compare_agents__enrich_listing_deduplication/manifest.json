@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__enrich_listing_deduplication",
+  "domain": "agents",
+  "dag_name": "enrich_listing_deduplication",
+  "tables": [
+    "atlas_house_deduplication",
+    "first_listing",
+    "listing_deduplication",
+    "valid_first_listing"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 3,
+  "failed_count": 0
+}

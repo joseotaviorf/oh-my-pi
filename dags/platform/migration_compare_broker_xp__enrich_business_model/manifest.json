@@ -1,0 +1,12 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "broker_xp__enrich_business_model",
+  "domain": "broker_xp",
+  "dag_name": "enrich_business_model",
+  "tables": [
+    "visit_business_model"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 0,
+  "failed_count": 0
+}

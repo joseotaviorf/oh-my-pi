@@ -1,0 +1,19 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__enrich_agent",
+  "domain": "agents",
+  "dag_name": "enrich_agent",
+  "tables": [
+    "agent",
+    "agent_daily",
+    "agent_event_log",
+    "contract_process",
+    "prospect_agent",
+    "prospect_step_validation",
+    "qualification_step",
+    "signup_profile_conflict"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 8,
+  "failed_count": 0
+}

@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_invoice",
+  "domain": "fintech",
+  "dag_name": "enrich_invoice",
+  "tables": [
+    "credit_invoice_original_due_date",
+    "fraud",
+    "invoice_all",
+    "invoice_entries",
+    "invoice_revenues"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 4,
+  "failed_count": 0
+}

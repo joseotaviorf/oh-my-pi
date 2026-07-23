@@ -1,0 +1,12 @@
+cluster:
+  custom_configurations:
+    aws_attributes:
+      ebs_volume_size: 200
+    data_security_mode: USER_ISOLATION
+    driver_node_type_id: r7g.xlarge
+    num_workers: 3
+    spark_conf:
+      spark.sql.broadcastTimeout: 1200
+      spark.sql.sources.partitionOverwriteMode: static
+  databricks_conn_id: databricks_new_env
+  type: consolidation_l_general_cluster

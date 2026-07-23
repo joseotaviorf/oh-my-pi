@@ -1,0 +1,14 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_arquivo_confidencial",
+  "domain": "fintech",
+  "dag_name": "enrich_arquivo_confidencial",
+  "tables": [
+    "provider_consumption_daily",
+    "scr",
+    "scr_pivot"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 2,
+  "failed_count": 0
+}

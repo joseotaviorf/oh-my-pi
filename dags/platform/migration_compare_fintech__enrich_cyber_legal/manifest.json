@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_cyber_legal",
+  "domain": "fintech",
+  "dag_name": "enrich_cyber_legal",
+  "tables": [
+    "alerts",
+    "evictions_base",
+    "expenses",
+    "process",
+    "process_stages"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 2,
+  "failed_count": 0
+}

@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "people__dw_compensation",
+  "domain": "people",
+  "dag_name": "dw_compensation",
+  "tables": [
+    "dim_event_definition",
+    "dim_job",
+    "dim_plr_parameters",
+    "fact_compensations",
+    "fact_plr_monthly",
+    "fact_salary_table_targets"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 6,
+  "failed_count": 0
+}

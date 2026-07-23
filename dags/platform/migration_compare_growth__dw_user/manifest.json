@@ -1,0 +1,18 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__dw_user",
+  "domain": "growth",
+  "dag_name": "dw_user",
+  "tables": [
+    "dim_owner",
+    "dim_owner_category",
+    "dim_partner",
+    "dim_partner_agent",
+    "dim_user",
+    "dim_user_doorman",
+    "dim_user_sales_rep"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 7,
+  "failed_count": 0
+}

@@ -1,0 +1,12 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "tech_platform__enrich_crowdstrike",
+  "domain": "tech_platform",
+  "dag_name": "enrich_crowdstrike",
+  "tables": [
+    "managed_devices"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 0,
+  "failed_count": 0
+}

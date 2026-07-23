@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_velo_zendesk",
+  "domain": "fintech",
+  "dag_name": "enrich_velo_zendesk",
+  "tables": [
+    "custom_fields",
+    "ticket_audits",
+    "ticket_details",
+    "ticket_metrics"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 2,
+  "failed_count": 0
+}

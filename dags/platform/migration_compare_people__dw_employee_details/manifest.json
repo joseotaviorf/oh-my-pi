@@ -1,0 +1,19 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "people__dw_employee_details",
+  "domain": "people",
+  "dag_name": "dw_employee_details",
+  "tables": [
+    "dim_contact",
+    "dim_documentation",
+    "dim_emergency_contact",
+    "dim_employee",
+    "dim_job",
+    "dim_management_hierarchy",
+    "dim_termination",
+    "fact_assignment_snapshots"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 8,
+  "failed_count": 0
+}

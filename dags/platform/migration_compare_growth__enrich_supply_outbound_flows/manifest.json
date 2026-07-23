@@ -1,0 +1,12 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_supply_outbound_flows",
+  "domain": "growth",
+  "dag_name": "enrich_supply_outbound_flows",
+  "tables": [
+    "supply_outbound_contacts"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 0,
+  "failed_count": 0
+}

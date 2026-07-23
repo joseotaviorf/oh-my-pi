@@ -1,0 +1,15 @@
+cluster:
+  custom_configurations:
+    autoscale:
+      max_workers: 8
+      min_workers: 5
+    data_security_mode: SINGLE_USER
+    node_type_id: r7gd.4xlarge
+    runtime_engine: PHOTON
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
+    spark_version: 16.4.x-scala2.12
+  databricks_conn_id: databricks_new_env
+  type: consolidation_l_memory_cluster

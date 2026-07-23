@@ -1,0 +1,20 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_supply_acquisition",
+  "domain": "growth",
+  "dag_name": "enrich_supply_acquisition",
+  "tables": [
+    "acquisition_tracking",
+    "conversion_lookup",
+    "landing_3p",
+    "leads_1p",
+    "leads_3p",
+    "leads_ciq",
+    "prospects_1p",
+    "prospects_3p",
+    "prospects_ciq"
+  ],
+  "transpiled_count": 3,
+  "skipped_count": 6,
+  "failed_count": 0
+}

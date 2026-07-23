@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_supply_leads",
+  "domain": "growth",
+  "dag_name": "enrich_supply_leads",
+  "tables": [
+    "inbound_attribution",
+    "lead_origin",
+    "lead_origin_cdp",
+    "leads_sks",
+    "recovered_region_leads"
+  ],
+  "transpiled_count": 4,
+  "skipped_count": 1,
+  "failed_count": 0
+}

@@ -1,0 +1,6 @@
+cluster:
+  custom_configurations:
+    aws_attributes:
+      availability: ON_DEMAND
+  databricks_conn_id: databricks_new_env
+  type: consolidation_m_memory_single_node_cluster

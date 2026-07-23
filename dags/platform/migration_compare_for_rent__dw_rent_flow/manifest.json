@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__dw_rent_flow",
+  "domain": "for_rent",
+  "dag_name": "dw_rent_flow",
+  "tables": [
+    "dim_rent_flow_taxonomy",
+    "dim_rent_flow_type",
+    "fact_listing_rent_flows",
+    "fact_rent_flows"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 3,
+  "failed_count": 0
+}

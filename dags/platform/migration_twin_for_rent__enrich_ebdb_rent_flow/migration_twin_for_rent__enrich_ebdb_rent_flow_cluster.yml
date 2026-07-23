@@ -1,0 +1,5 @@
+cluster:
+  custom_configurations:
+    driver_node_type_id: r7g.xlarge
+  databricks_conn_id: databricks_new_env
+  type: consolidation_m_memory_cluster

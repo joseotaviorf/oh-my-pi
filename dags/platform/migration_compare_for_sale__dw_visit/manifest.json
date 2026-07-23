@@ -1,0 +1,25 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_sale__dw_visit",
+  "domain": "for_sale",
+  "dag_name": "dw_visit",
+  "tables": [
+    "dim_author_type",
+    "dim_business_context",
+    "dim_cancellation_type",
+    "dim_event_type",
+    "dim_post_visit_demand",
+    "dim_visit",
+    "dim_visit_funnel",
+    "dim_visit_model",
+    "dim_visit_schedule",
+    "dim_visit_status",
+    "fact_visit_attempt_cycle",
+    "fact_visit_events",
+    "fact_visit_schedules",
+    "fact_visits"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 14,
+  "failed_count": 0
+}

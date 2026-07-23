@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "people__enrich_performance",
+  "domain": "people",
+  "dag_name": "enrich_performance",
+  "tables": [
+    "goal",
+    "performa_calibration_evaluation",
+    "performa_calibration_extra_info",
+    "performance_evaluation",
+    "talent_review"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 5,
+  "failed_count": 0
+}

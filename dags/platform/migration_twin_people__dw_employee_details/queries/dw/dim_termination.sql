@@ -1,0 +1,13 @@
+SELECT
+    ed.id_event_definition AS sk_event_definition,
+    ed.action_name,
+    ed.action_name_ptb,
+    ed.reason_name_ptb,
+    ed.termination_type,
+    NOW() AS ts_load
+FROM
+    datalake_people.event_definition AS ed
+WHERE
+    ed.is_current = TRUE
+    AND ed.id_event_definition IS NOT NULL
+    AND ed.is_assignment_termination_event = TRUE

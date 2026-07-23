@@ -1,0 +1,15 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__enrich_hub_services",
+  "domain": "agents",
+  "dag_name": "enrich_hub_services",
+  "tables": [
+    "business_unit",
+    "member_hub_allocation",
+    "member_profile",
+    "profile"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 2,
+  "failed_count": 0
+}

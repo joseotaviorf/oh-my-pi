@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "agents__enrich_amplitude_agents_app",
+  "domain": "agents",
+  "dag_name": "enrich_amplitude_agents_app",
+  "tables": [
+    "agents_native_events",
+    "agents_search_events",
+    "agents_sign_up_events",
+    "broker_app_events",
+    "buyer_funnel_engagement_daily"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 5,
+  "failed_count": 0
+}

@@ -1,0 +1,14 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__enrich_listing_jobs",
+  "domain": "for_rent",
+  "dag_name": "enrich_listing_jobs",
+  "tables": [
+    "house_photo_job_tasks",
+    "listing_quality_sla",
+    "listing_quality_tasks"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 3,
+  "failed_count": 0
+}

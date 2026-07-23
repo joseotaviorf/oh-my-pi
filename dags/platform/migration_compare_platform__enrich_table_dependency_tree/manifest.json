@@ -1,0 +1,12 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "platform__enrich_table_dependency_tree",
+  "domain": "platform",
+  "dag_name": "enrich_table_dependency_tree",
+  "tables": [
+    "bietlejuice_table_dependencies"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 0,
+  "failed_count": 0
+}

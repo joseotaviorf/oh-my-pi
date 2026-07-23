@@ -1,0 +1,14 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_prospect_status",
+  "domain": "growth",
+  "dag_name": "enrich_prospect_status",
+  "tables": [
+    "buyer_prospect_status",
+    "conversion_events",
+    "tenant_prospect_status"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 1,
+  "failed_count": 0
+}

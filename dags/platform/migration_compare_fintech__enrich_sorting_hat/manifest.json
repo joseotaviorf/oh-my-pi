@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_sorting_hat",
+  "domain": "fintech",
+  "dag_name": "enrich_sorting_hat",
+  "tables": [
+    "early_credit_analysis",
+    "policy_report",
+    "policy_report_credit_policy",
+    "policy_report_proponents",
+    "policy_report_tenant_income"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 4,
+  "failed_count": 0
+}

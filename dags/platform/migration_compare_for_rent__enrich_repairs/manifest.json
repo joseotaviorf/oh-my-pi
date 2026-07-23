@@ -1,0 +1,13 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__enrich_repairs",
+  "domain": "for_rent",
+  "dag_name": "enrich_repairs",
+  "tables": [
+    "ongoing_repair_tickets",
+    "repair_tickets"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 0,
+  "failed_count": 0
+}

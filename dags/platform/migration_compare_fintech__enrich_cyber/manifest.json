@@ -1,0 +1,27 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_cyber",
+  "domain": "fintech",
+  "dag_name": "enrich_cyber",
+  "tables": [
+    "agencies",
+    "agency_decision_tree",
+    "agency_timeline",
+    "collection",
+    "contract_agency_distribution",
+    "contracts",
+    "debt_negotiated",
+    "debt_negotiation_mapping",
+    "delayed_portfolio_base",
+    "historical_tree_timeline",
+    "installment",
+    "negotiation",
+    "queue_decision_tree",
+    "queue_timeline",
+    "queue_timeline_2",
+    "users"
+  ],
+  "transpiled_count": 12,
+  "skipped_count": 4,
+  "failed_count": 0
+}

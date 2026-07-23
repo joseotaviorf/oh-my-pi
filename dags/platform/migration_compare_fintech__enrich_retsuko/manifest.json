@@ -1,0 +1,19 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_retsuko",
+  "domain": "fintech",
+  "dag_name": "enrich_retsuko",
+  "tables": [
+    "bill",
+    "bill_items",
+    "debt_forgiveness",
+    "entry",
+    "invoice",
+    "invoice_entry",
+    "invoice_info",
+    "monthly_closing_checks"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 6,
+  "failed_count": 0
+}

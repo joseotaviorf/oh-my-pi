@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_expected_contribution_margin",
+  "domain": "growth",
+  "dag_name": "enrich_expected_contribution_margin",
+  "tables": [
+    "contract_survival_curve",
+    "expected_contribution_margin",
+    "fr_ecm_by_events",
+    "fs_ecm_by_events",
+    "house_survival_curve",
+    "observed_contribution_margin"
+  ],
+  "transpiled_count": 4,
+  "skipped_count": 2,
+  "failed_count": 0
+}

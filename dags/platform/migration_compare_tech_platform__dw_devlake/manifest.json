@@ -1,0 +1,16 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "tech_platform__dw_devlake",
+  "domain": "tech_platform",
+  "dag_name": "dw_devlake",
+  "tables": [
+    "bridge_pr_team",
+    "dim_repo",
+    "dim_team",
+    "dim_user",
+    "fact_pull_requests"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 4,
+  "failed_count": 0
+}

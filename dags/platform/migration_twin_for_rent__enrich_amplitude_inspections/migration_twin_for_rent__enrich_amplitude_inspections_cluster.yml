@@ -1,0 +1,12 @@
+cluster:
+  custom_configurations:
+    aws_attributes:
+      ebs_volume_size: 200
+    data_security_mode: SINGLE_USER
+    driver_node_type_id: r7g.large
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
+  databricks_conn_id: databricks_new_env
+  type: consolidation_s_memory_cluster

@@ -1,0 +1,17 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "conversational_xp__enrich_find_health_metrics",
+  "domain": "conversational_xp",
+  "dag_name": "enrich_find_health_metrics",
+  "tables": [
+    "metric_recs_click_through_rate",
+    "metric_recs_conversion",
+    "metric_recs_listing_page_viewed",
+    "metric_search_click_through_rate",
+    "metric_search_conversion",
+    "metric_search_listing_page_viewed"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 4,
+  "failed_count": 0
+}

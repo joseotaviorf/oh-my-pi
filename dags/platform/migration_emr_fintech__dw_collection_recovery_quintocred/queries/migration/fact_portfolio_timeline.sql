@@ -1,0 +1,174 @@
+WITH collection_recovery_team AS (
+  SELECT
+    dt_month_paid,
+    document,
+    team,
+    original_value,
+    paid_amount
+  FROM (
+    SELECT
+      CAST(DATE_TRUNC('MONTH', FNI.dt_paid) AS DATE) AS dt_month_paid,
+      FN.sk_debtor AS document,
+      CASE
+        WHEN fn.id_operator IN ('ARIANE', 'BKARINE', 'BRUNAQ', 'DBRASSAN', 'EVELYNT', 'GSLIMA', 'HLIMA', 'IGNUNES', 'JMOURA', 'MORGANAK', 'MSANTOS', 'THIFANYM', 'ANARPACH', 'ANDERSAN', 'ANDREMAC', 'CRISBENE', 'ELAINEC', 'ELIANEM', 'EMILISIL', 'ERICAROD', 'EVERTONB', 'JCARVALH', 'LOUIZY', 'JUBITTEN', 'PAOLAP', 'ADACHI', 'DANILOP', 'ISABELES', 'JANAINAA', 'JENNIFEP', 'KATHLEN', 'MARIAVS', 'NADJA', 'RAYLENE', 'TANIAL', 'THAYANEC', 'KAMILAS', 'LYRYANY', 'ANDRELMA', 'LOUIZYTH', 'CRISTBEN', 'ELAINICO', 'ELIANESM', 'ISABELEC', 'LARISSAF', 'LETICIAP', 'LUCASGOM', 'AMANARDI', 'TALITAPE')
+        THEN 'TIME INTERNO'
+        WHEN FN.ID_OPERATOR = 'IAFWS'
+        THEN 'IAF'
+        WHEN FN.ID_OPERATOR = 'BRBOTS'
+        THEN 'BRBOTS'
+        WHEN FN.ID_OPERATOR IN ('DIGTECH', 'DIGITECH')
+        THEN 'DIGTECH'
+        ELSE 'TIME NAO LOCALIZADO'
+      END AS team,
+      ROUND(SUM(FNI.MAIN_AMOUNT), 2) AS original_value,
+      ROUND(SUM(FNI.paid_amount), 2) AS paid_amount,
+      ROW_NUMBER() OVER (PARTITION BY CAST(DATE_TRUNC('MONTH', FNI.dt_paid) AS DATE), FN.sk_debtor ORDER BY ROUND(SUM(FNI.MAIN_AMOUNT), 2) DESC) AS _w
+    FROM dw_collection_recovery_quintocred.fact_negotiation_installment AS FNI
+    LEFT JOIN dw_collection_recovery_quintocred.fact_negotiation AS FN
+      ON FNI.sk_negotiation = FN.sk_negotiation
+    WHERE
+      FNI.dt_paid >= '2023-08-01' AND FN.creditor = 'IQ QuintoCred'
+    GROUP BY
+      dt_month_paid,
+      document,
+      team
+    HAVING
+      team <> 'TIME NAO LOCALIZADO'
+  ) AS _t
+  WHERE
+    _w = 1
+), distinct_contract_customer AS (
+  SELECT DISTINCT
+    id_contract,
+    id_customer
+  FROM datalake_recupera_clean.contracts
+), operational_records AS (
+  SELECT
+    id_customer,
+    distributor,
+    ts_customer_status_last_update,
+    dt_snapshot
+  FROM (
+    SELECT DISTINCT
+      id_customer,
+      distributor_code AS distributor,
+      ts_customer_status_last_update,
+      MAKE_DATE(year, month, day) AS dt_snapshot,
+      ROW_NUMBER() OVER (PARTITION BY id_customer, MAKE_DATE(year, month, day) ORDER BY ts_last_update DESC) AS _w,
+      year,
+      month,
+      day,
+      ts_last_update
+    FROM datalake_recupera_clean.operational_records
+    WHERE
+      id_creditor IN ('3', '5') /* filter quintocred */
+      AND MAKE_DATE(year, month, day) BETWEEN DATE_TRUNC('MONTH', CURRENT_DATE - INTERVAL '48' MONTH) AND CURRENT_DATE - INTERVAL '1' DAY
+  ) AS _t
+  WHERE
+    _w = 1
+), responsible_for_contract AS (
+  SELECT
+    id_contract,
+    distributor,
+    dt_snapshot
+  FROM (
+    SELECT DISTINCT
+      c.id_contract,
+      ors.distributor,
+      ors.dt_snapshot,
+      ROW_NUMBER() OVER (PARTITION BY c.id_contract, ors.dt_snapshot ORDER BY ors.ts_customer_status_last_update DESC) AS _w,
+      ors.ts_customer_status_last_update
+    FROM operational_records AS ors
+    LEFT JOIN distinct_contract_customer AS c
+      ON ors.id_customer = c.id_customer
+  ) AS _t
+  WHERE
+    _w = 1
+)
+SELECT DISTINCT
+  cw.id_propose AS sk_propose,
+  cw.name,
+  cw.document,
+  cw.mob,
+  cw.type_description_array,
+  cw.major_type,
+  cw.monthly_major_type,
+  rc.distributor,
+  rt.team AS team_negotiation,
+  dt.team AS team_distribution,
+  cw.lead_time_major_type,
+  cw.lead_time_propose,
+  CASE
+    WHEN cw.lead_time_major_type <= 30
+    THEN '1)001-030'
+    WHEN cw.lead_time_major_type <= 60
+    THEN '2)031-060'
+    WHEN cw.lead_time_major_type <= 90
+    THEN '3)061-090'
+    WHEN cw.lead_time_major_type <= 120
+    THEN '4)091-120'
+    WHEN cw.lead_time_major_type <= 150
+    THEN '5)121-150'
+    WHEN cw.lead_time_major_type <= 180
+    THEN '6)151-180'
+    WHEN cw.lead_time_major_type <= 210
+    THEN '7)181-210'
+    WHEN cw.lead_time_major_type <= 240
+    THEN '8)211-240'
+    WHEN cw.lead_time_major_type <= 270
+    THEN '9)241-270'
+    WHEN cw.lead_time_major_type <= 300
+    THEN '10)271-300'
+    WHEN cw.lead_time_major_type <= 330
+    THEN '11)301-330'
+    WHEN cw.lead_time_major_type <= 360
+    THEN '12)331-360'
+    ELSE '13)>360'
+  END AS major_type_aging_range,
+  CASE
+    WHEN cw.lead_time_propose <= 30
+    THEN '1)001-030'
+    WHEN cw.lead_time_propose <= 60
+    THEN '2)031-060'
+    WHEN cw.lead_time_propose <= 90
+    THEN '3)061-090'
+    WHEN cw.lead_time_propose <= 120
+    THEN '4)091-120'
+    WHEN cw.lead_time_propose <= 150
+    THEN '5)121-150'
+    WHEN cw.lead_time_propose <= 180
+    THEN '6)151-180'
+    WHEN cw.lead_time_propose <= 210
+    THEN '7)181-210'
+    WHEN cw.lead_time_propose <= 240
+    THEN '8)211-240'
+    WHEN cw.lead_time_propose <= 270
+    THEN '9)241-270'
+    WHEN cw.lead_time_propose <= 300
+    THEN '10)271-300'
+    WHEN cw.lead_time_propose <= 330
+    THEN '11)301-330'
+    WHEN cw.lead_time_propose <= 360
+    THEN '12)331-360'
+    ELSE '13)>360'
+  END AS propose_aging_range,
+  cw.is_finished_array,
+  cw.has_active_day_eviction,
+  cw.has_active_month_eviction,
+  cw.dt_ended_propose,
+  cw.dt_base,
+  cw.dt_min_major_type,
+  cw.dt_min_propose,
+  cw.dt_paid_array
+FROM datalake_collections_quintocred.collections_wallet AS cw
+LEFT JOIN collection_recovery_team AS rt
+  ON rt.document = cw.document
+  AND rt.dt_month_paid = CAST(DATE_TRUNC('MONTH', cw.dt_base) AS DATE)
+LEFT JOIN dw_collection_recovery_quintocred.dim_wallet_distribution AS dt
+  ON dt.document = cw.document
+  AND cw.dt_base >= dt.dt_start_interval
+  AND (
+    cw.dt_base <= dt.dt_end_interval OR dt.dt_end_interval IS NULL
+  )
+LEFT JOIN responsible_for_contract AS rc
+  ON cw.id_propose = rc.id_contract AND cw.dt_base = rc.dt_snapshot

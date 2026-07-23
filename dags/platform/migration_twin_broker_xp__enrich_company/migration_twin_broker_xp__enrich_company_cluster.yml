@@ -1,0 +1,6 @@
+cluster:
+  custom_configurations:
+    data_security_mode: USER_ISOLATION
+    driver_node_type_id: r7g.xlarge
+  databricks_conn_id: databricks_new_env
+  type: consolidation_xs_memory_cluster

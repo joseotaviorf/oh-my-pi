@@ -1,0 +1,23 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "growth__enrich_atlas_pricing_report",
+  "domain": "growth",
+  "dag_name": "enrich_atlas_pricing_report",
+  "tables": [
+    "house_condo_metrics",
+    "house_listing_views_metrics",
+    "new_pricing_report_engagement",
+    "new_pricing_report_listing_price_history",
+    "new_pricing_report_new_rent_price_published",
+    "new_pricing_report_region",
+    "on_market_house_listings",
+    "region_metrics",
+    "similar_listings",
+    "status_history_house_listing",
+    "status_history_house_negotiation",
+    "status_history_house_price_change"
+  ],
+  "transpiled_count": 9,
+  "skipped_count": 3,
+  "failed_count": 0
+}

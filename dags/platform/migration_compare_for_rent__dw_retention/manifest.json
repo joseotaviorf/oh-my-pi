@@ -1,0 +1,18 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__dw_retention",
+  "domain": "for_rent",
+  "dag_name": "dw_retention",
+  "tables": [
+    "dim_nps_answer",
+    "dim_nps_respondent",
+    "dim_termination",
+    "fact_contract_termination",
+    "fact_nps",
+    "fact_ongoing_terminations_snapshots",
+    "fact_owner_retention"
+  ],
+  "transpiled_count": 2,
+  "skipped_count": 5,
+  "failed_count": 0
+}

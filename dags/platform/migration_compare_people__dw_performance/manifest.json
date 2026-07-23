@@ -1,0 +1,25 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "people__dw_performance",
+  "domain": "people",
+  "dag_name": "dw_performance",
+  "tables": [
+    "dim_committee_meeting",
+    "dim_cycle_period",
+    "dim_performance_calibration",
+    "dim_performance_evaluation",
+    "dim_performance_variation",
+    "dim_talent_rating",
+    "dim_talent_variation",
+    "fact_continuous_management",
+    "fact_goal_achievements",
+    "fact_peer_evaluations",
+    "fact_performance_calibrations",
+    "fact_performance_evaluations",
+    "fact_smoke_detectors",
+    "fact_talent_reviews"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 14,
+  "failed_count": 0
+}

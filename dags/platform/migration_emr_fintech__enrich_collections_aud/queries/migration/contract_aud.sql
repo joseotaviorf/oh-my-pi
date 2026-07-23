@@ -1,0 +1,108 @@
+WITH terminations AS (
+  SELECT
+    id_contract,
+    status,
+    dt_vacancy,
+    dt_termination_finished
+  FROM (
+    SELECT
+      id_contract,
+      status,
+      dt_vacancy,
+      IF(status = 'DONE', CAST(ts_updated AS DATE), NULL) AS dt_termination_finished,
+      ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_created DESC) AS _w,
+      ts_created
+    FROM datalake_terminator_clean.termination
+  ) AS _t
+  WHERE
+    _w = 1
+), contract_analyst_annulment_date AS (
+  SELECT
+    id_contract,
+    id_house,
+    rev,
+    row_number,
+    mod_dt_termination,
+    dt_termination,
+    dt_previous_termination,
+    ts_revision,
+    ts_analyst_annulment_input
+  FROM (
+    SELECT
+      c_aud.id_contract,
+      c_aud.id_house,
+      c_aud.rev,
+      ROW_NUMBER() OVER (PARTITION BY c_aud.id_contract ORDER BY ure.ts_revision) AS row_number,
+      c_aud.mod_dt_termination,
+      c_aud.dt_termination,
+      LAG(c_aud.dt_termination) OVER (PARTITION BY c_aud.id_contract ORDER BY c_aud.rev) AS dt_previous_termination,
+      FROM_UNIXTIME(ure.ts_revision / 1000) AS ts_revision,
+      COALESCE(FROM_UNIXTIME(ure.ts_revision / 1000), c_aud.dt_termination) AS ts_analyst_annulment_input,
+      ROW_NUMBER() OVER (PARTITION BY c_aud.id_contract ORDER BY FROM_UNIXTIME(ure.ts_revision / 1000)) AS _w
+    FROM datalake_ebdb_clean.contract_aud AS c_aud
+    INNER JOIN datalake_ebdb_clean.user_revision_entity AS ure
+      ON ure.id = c_aud.rev
+    WHERE
+      c_aud.mod_dt_termination
+  ) AS _t
+  WHERE
+    _w = 1
+), get_contract_by_month AS (
+  SELECT
+    id,
+    imovel_id AS id_house,
+    garantia AS guarantee_type,
+    status,
+    CASE
+      WHEN op_cdc = 'c'
+      THEN 'CREATE'
+      WHEN op_cdc = 'r'
+      THEN 'READ'
+      WHEN op_cdc = 'u'
+      THEN 'UPDATE'
+      WHEN op_cdc = 'd'
+      THEN 'DELETE'
+    END AS log_type,
+    dataRescisao AS dt_termination,
+    dataInicio AS dt_started,
+    dataAssinado AS ts_signature,
+    ts_database_transaction,
+    ts_cdc_transaction,
+    year,
+    month,
+    day
+  FROM datalake_ebdb_transactional.contrato
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+)
+SELECT
+  c.id AS id_contract,
+  ch.country_code,
+  h.city,
+  c.guarantee_type AS guarantee,
+  c.status,
+  c.log_type,
+  c.dt_termination AS dt_termination_original,
+  IF(
+    t.status = 'DONE' AND c.dt_termination > CAST('2020-01-07' AS DATE),
+    t.dt_vacancy,
+    c.dt_termination
+  ) AS dt_annulment,
+  c.dt_started,
+  c.ts_signature,
+  CAST(aad.ts_analyst_annulment_input AS TIMESTAMP) AS ts_analyst_annulment_input,
+  c.ts_database_transaction,
+  c.ts_cdc_transaction,
+  c.year,
+  c.month,
+  c.day,
+  NOW() AS ts_load
+FROM get_contract_by_month AS c
+INNER JOIN datalake_ebdb_country.house AS ch
+  ON ch.id_house = c.id_house
+LEFT JOIN terminations AS t
+  ON t.id_contract = c.id
+LEFT JOIN contract_analyst_annulment_date AS aad
+  ON aad.id_contract = c.id
+LEFT JOIN datalake_ebdb_listing.house AS h
+  ON h.id = c.id_house

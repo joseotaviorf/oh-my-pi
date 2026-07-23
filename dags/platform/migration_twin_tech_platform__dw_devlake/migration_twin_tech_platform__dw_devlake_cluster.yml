@@ -1,0 +1,5 @@
+cluster:
+  custom_configurations:
+    runtime_engine: PHOTON
+  databricks_conn_id: databricks_new
+  type: consolidation_m_memory_single_node_cluster

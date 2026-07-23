@@ -1,0 +1,22 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_revenue_lines",
+  "domain": "fintech",
+  "dag_name": "enrich_revenue_lines",
+  "tables": [
+    "brokerage_fee",
+    "brokerage_finance",
+    "credit_card_payment",
+    "fire_insurance",
+    "late_payments",
+    "long_term_rental_anticipation",
+    "management_fee",
+    "month_rental_anticipation",
+    "rental_guarantee",
+    "reservation",
+    "service_fee"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 10,
+  "failed_count": 0
+}

@@ -1,0 +1,19 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "fintech__enrich_collections_quintoandar",
+  "domain": "fintech",
+  "dag_name": "enrich_collections_quintoandar",
+  "tables": [
+    "collection_events",
+    "debt_negotiated",
+    "delinquency_app_events",
+    "installment",
+    "invoice_portfolio",
+    "negotiation",
+    "operators",
+    "overdue_portfolio_timeline"
+  ],
+  "transpiled_count": 6,
+  "skipped_count": 2,
+  "failed_count": 0
+}

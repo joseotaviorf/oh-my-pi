@@ -1,0 +1,45 @@
+SELECT
+  id_account, /* Dimensions */
+  id_campaign,
+  id_adset,
+  id_ad,
+  LOWER(REGEXP_REPLACE(account_name, '[^a-zA-Z0-9]+', '_')) AS account_name,
+  'facebook' AS origin,
+  'ads_insights_by_region' AS report_type,
+  campaign_name AS utm_campaign,
+  adset_name AS utm_term,
+  ad_name AS utm_content,
+  country_code, /* Regions */
+  REGEXP_REPLACE(region, '\\(.*?\\)', '') AS state,
+  CASE
+    WHEN region = 'Minas Gerais'
+    THEN 'Belo Horizonte'
+    WHEN region = 'Rio de Janeiro (state)'
+    THEN 'Rio de Janeiro'
+    WHEN region = 'Rio Grande do Sul'
+    THEN 'Porto Alegre'
+    WHEN region = 'São Paulo (state)'
+    THEN 'São Paulo'
+    WHEN region = 'Bahia'
+    THEN 'Salvador'
+    WHEN region = 'Santa Catarina'
+    THEN 'Florianópolis'
+    WHEN region = 'Goiás'
+    THEN 'Goiânia'
+    WHEN region = 'Paraná'
+    THEN 'Curitiba'
+    WHEN region IN ('Distrito Federal', 'Federal District')
+    THEN 'Brasília'
+    ELSE CAST(NULL AS STRING)
+  END AS city, /* not available in the table */
+  clicks, /* Metrics */
+  CAST(NULL AS BIGINT) AS conversions,
+  impressions,
+  spend AS total_cost,
+  dt_start AS dt_cost, /* Date Reference */
+  YEAR(TO_DATE(dt_start)) AS year,
+  MONTH(TO_DATE(dt_start)) AS month,
+  DAY(TO_DATE(dt_start)) AS day
+FROM datalake_growth_facebook_insights.facebook_insights_region
+WHERE
+  CAST(dt_start AS DATE) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)

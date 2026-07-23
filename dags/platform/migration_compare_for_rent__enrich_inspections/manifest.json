@@ -1,0 +1,29 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "for_rent__enrich_inspections",
+  "domain": "for_rent",
+  "dag_name": "enrich_inspections",
+  "tables": [
+    "appointment_inspection",
+    "automatic_discounts",
+    "inspection_booking",
+    "inspection_status_change",
+    "inspector_reports",
+    "item",
+    "item_group",
+    "item_issue",
+    "item_media",
+    "item_review",
+    "main_inspection_booking",
+    "repair_exempted",
+    "repair_request",
+    "report_approval",
+    "report_approvals",
+    "report_review_media",
+    "reviewer",
+    "room"
+  ],
+  "transpiled_count": 9,
+  "skipped_count": 9,
+  "failed_count": 0
+}

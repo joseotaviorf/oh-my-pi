@@ -1,0 +1,13 @@
+{
+  "run_id": "4b35a737-1a52-4bf6-a58e-a079d7eae3f3",
+  "scope_id": "people__dw_demographics",
+  "domain": "people",
+  "dag_name": "dw_demographics",
+  "tables": [
+    "dim_employee_demographic",
+    "dim_employee_disability"
+  ],
+  "transpiled_count": 0,
+  "skipped_count": 2,
+  "failed_count": 0
+}
