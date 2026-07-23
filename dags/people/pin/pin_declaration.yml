@@ -10,8 +10,6 @@ dag:
       for all PIN modules (core, absence, compensation, goal, hr_review, performance,
       questionnaires, talent). EMR step_concurrency_level caps concurrent OIC/SFTP access.
 
-      Cutover note: split pin_* DAGs remain in the repo with schedule_interval null until
-      a follow-up PR deletes them. Do not re-enable pin_* schedules alongside this DAG.
 workflow:
   layer: raw
   type: custom_ingestion
