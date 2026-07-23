@@ -139,23 +139,35 @@ it directly.
   just maintenance — they reduce small-file counts at the source, which is
   strictly additive to whatever cadence `OPTIMIZE` ends up running on.
 
-## EMR optimize arg limit and auto-batching
+## EMR optimize HadoopJarStep budget and auto-batching
 
-EMR `AddJobFlowSteps` rejects any single `HadoopJarStep.Args` element longer
-than **10,280 characters**. The optimize Spark job passes its per-table config
-as one base64-encoded CLI argument (`B64:…`).
+EMR `AddJobFlowSteps` enforces two constraints on each step's `HadoopJarStep`
+([AWS docs](https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html) /
+[boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/emr/client/add_job_flow_steps.html)):
 
-When that payload would exceed the limit (e.g. DAGs with dozens of clean
-tables such as `pin`), `OptimizeDeltaTableTaskCreator` **auto-batches** on EMR:
-it greedily packs tables (in declaration order) into sequential Airflow tasks
-inside a `TaskGroup`, each with its own EMR step and a validated arg under the
-limit. Per-table payload sizes vary, so equal-sized fixed batches are not used
-for auto-batching — a failing size-2 boundary can disappear at size 3.
+1. **Total**: all string values in the `HadoopJarStep` object (`Jar`, `MainClass`,
+   every `Args` element, property keys/values) combined ≤ **10,240**.
+2. **Per field**: each of those strings ≤ **10,280**.
 
-Integrity checks run at **DAG parse time** for every EMR batch:
+The optimize Spark job passes its per-table config as one base64-encoded CLI
+argument (`B64:…`), but the budget also includes `spark-submit`, `--conf` flags,
+the script URI, layer/parallelism, and maintenance CLI flags. Exceeding the
+**total** budget surfaces as:
+
+`Size of step parameter length exceeded the maximum allowed.`
+
+When the full optimize step would exceed that budget (e.g. DAGs with dozens of
+clean tables such as `pin`), `OptimizeDeltaTableTaskCreator` **auto-batches**
+on EMR only: it greedily packs tables (in declaration order) into sequential
+Airflow tasks inside a `TaskGroup`, validating each batch against the **full**
+HadoopJarStep (not the tables arg alone). Per-table payload sizes vary, so
+equal-sized fixed batches are not used for auto-batching.
+
+Integrity checks run at **DAG parse time** for every EMR optimize batch:
 
 - Chunking is table-atomic (`TableAttributes` list items, never JSON slices).
-- Each arg is length-checked and round-trip decoded before the task is created.
+- Each batch is checked for full-step fit and round-trip decoded before the
+  task is created.
 - Batches partition the full table set exactly once (no loss, duplication, or
   reordering).
 

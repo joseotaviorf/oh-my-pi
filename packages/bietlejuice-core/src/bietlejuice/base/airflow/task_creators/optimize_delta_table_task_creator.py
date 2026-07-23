@@ -1,5 +1,6 @@
 import json
-from typing import List, Optional, Tuple, Union
+from os import path
+from typing import Callable, List, Optional, Tuple, Union
 
 from airflow.models.baseoperator import BaseOperator
 from airflow.utils.task_group import TaskGroup
@@ -8,6 +9,7 @@ from bietlejuice.base.airflow.optimize_delta_tables_cli import (
     assert_optimize_batches_partition_tables,
     build_and_validate_emr_tables_cli_arg,
     chunk_table_attributes_for_emr_limit,
+    make_optimize_emr_step_validator,
 )
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.pipeline import LayerEnum
@@ -33,10 +35,13 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
     - OPTIMIZE (optional): This command rewrites the data in the Delta table to optimize its layout. It's important to run it to
     improve query performance.
 
-    On EMR, table configs are base64-encoded into a single spark-submit arg subject to AWS's
-    10,280-character limit. When the payload is too large, tasks are auto-batched into a
-    sequential TaskGroup (unless ``workflow.max_tables_per_optimize_tasks`` overrides).
-    Each batch is validated at DAG parse time (length + round-trip decode).
+    On EMR, table configs are base64-encoded into a single spark-submit arg. AWS
+    AddJobFlowSteps limits the total of all ``HadoopJarStep`` string values to
+    10,240 (and each field to 10,280). Optimize auto-batches when the full
+    spark-submit step (prefix + tables B64 + job params) would exceed that
+    budget — not only when the tables arg alone is too large. Override with
+    ``workflow.max_tables_per_optimize_tasks``. Each batch is validated at DAG
+    parse time (full-step fit + round-trip decode).
     """
 
     def create_task(
@@ -95,7 +100,11 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             return task, task
 
         parallelism = self._resolve_optimize_parallelism(parallelism)
-        chunks = self._resolve_optimize_chunks(table_attributes)
+        chunks = self._resolve_optimize_chunks(
+            table_attributes,
+            parallelism=parallelism,
+            optimize_delta_table_local_id=optimize_delta_table_local_id,
+        )
         if self.dag_execution_context.use_airflow_emr:
             assert_optimize_batches_partition_tables(table_attributes, chunks)
 
@@ -138,13 +147,33 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             return None
         return int(value)
 
-    def _resolve_optimize_chunks(self, table_attributes: list) -> List[List]:
+    def _resolve_optimize_chunks(
+        self,
+        table_attributes: list,
+        *,
+        parallelism: int,
+        optimize_delta_table_local_id: Optional[int],
+    ) -> List[List]:
         explicit_batch_size = self._max_tables_per_optimize_tasks()
+        validate_step_fit = self._make_emr_optimize_step_validator(
+            table_attributes=table_attributes,
+            parallelism=parallelism,
+            optimize_delta_table_local_id=optimize_delta_table_local_id,
+        )
         if explicit_batch_size is not None:
-            return _chunk_table_attributes(table_attributes, explicit_batch_size)
+            chunks = _chunk_table_attributes(table_attributes, explicit_batch_size)
+            if self.dag_execution_context.use_airflow_emr:
+                for chunk in chunks:
+                    build_and_validate_emr_tables_cli_arg(
+                        self._build_tables_config(chunk),
+                        validate_step_fit=validate_step_fit,
+                    )
+            return chunks
         if self.dag_execution_context.use_airflow_emr:
             return chunk_table_attributes_for_emr_limit(
-                table_attributes, self._build_tables_config
+                table_attributes,
+                self._build_tables_config,
+                validate_step_fit,
             )
         return [table_attributes]
 
@@ -153,6 +182,84 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         if value is None:
             return parallelism
         return int(value)
+
+    def _worst_case_emr_optimize_task_id(
+        self,
+        table_attributes: list,
+        optimize_delta_table_local_id: Optional[int],
+    ) -> str:
+        """Longest task id any optimize batch may emit (OpenLineage parentJobName budget)."""
+        if not table_attributes:
+            return self._build_task_id(
+                [], optimize_delta_table_local_id, batch_index=None, num_batches=1
+            )
+
+        layer = table_attributes[0].layer.value
+        max_batch_index = len(table_attributes)
+        slug_bases = [
+            StringFormatter.slugify(f"optimize-{layer}-all"),
+            *(
+                StringFormatter.slugify(f"optimize-{layer}-{table.table_name}")
+                for table in table_attributes
+            ),
+        ]
+        longest_base = max(slug_bases, key=len)
+        task_id = f"{longest_base}-batch-{max_batch_index}"
+        if optimize_delta_table_local_id:
+            task_id = f"{task_id}-{optimize_delta_table_local_id}"
+        return task_id
+
+    def _make_emr_optimize_step_validator(
+        self,
+        *,
+        table_attributes: list,
+        parallelism: int,
+        optimize_delta_table_local_id: Optional[int],
+        task_id: Optional[str] = None,
+    ) -> Callable[[str], None]:
+        """Build a validator for the full optimize EMR HadoopJarStep (not tables-only)."""
+        tables_config = self._build_tables_config(table_attributes)
+        include_load_dates = any(
+            cfg.get("apply_partition_filter") for cfg in tables_config.values()
+        )
+        layer_value = table_attributes[0].layer.value if table_attributes else "raw"
+        budget_task_id = task_id or self._worst_case_emr_optimize_task_id(
+            table_attributes, optimize_delta_table_local_id
+        )
+        spark_job_path = path.join(
+            self.dag_execution_context.base_spark_jobs_path,
+            "optimize_delta_table.py",
+        )
+        return make_optimize_emr_step_validator(
+            script_uri=spark_job_path,
+            layer_value=layer_value,
+            parallelism=parallelism,
+            include_load_dates=include_load_dates,
+            load_start_date=self.dag_execution_context.load_start_date,
+            load_end_date=self.dag_execution_context.load_end_date,
+            maintenance_cli_args=self._build_maintenance_state_cli_args(),
+            task_id=budget_task_id,
+            dag_id=self.dag_execution_context.dag.dag_id,
+        )
+
+    def _build_optimize_job_parameters(
+        self,
+        *,
+        layer_value: str,
+        tables_json: str,
+        parallelism: int,
+        include_load_dates: bool,
+    ) -> list:
+        parameters = [layer_value, tables_json, parallelism]
+        if include_load_dates:
+            parameters += [
+                "--load-start-date",
+                self.dag_execution_context.load_start_date,
+                "--load-end-date",
+                self.dag_execution_context.load_end_date,
+            ]
+        parameters += self._build_maintenance_state_cli_args()
+        return parameters
 
     def _create_single_optimize_task(
         self,
@@ -170,24 +277,29 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             num_batches,
         )
         tables_config = self._build_tables_config(table_attributes)
+        include_load_dates = any(
+            cfg.get("apply_partition_filter") for cfg in tables_config.values()
+        )
+        layer_value = table_attributes[0].layer.value if table_attributes else "raw"
         if self.dag_execution_context.use_airflow_emr:
-            tables_json = build_and_validate_emr_tables_cli_arg(tables_config)
+            validate_step_fit = self._make_emr_optimize_step_validator(
+                table_attributes=table_attributes,
+                parallelism=parallelism,
+                optimize_delta_table_local_id=optimize_delta_table_local_id,
+                task_id=task_id,
+            )
+            tables_json = build_and_validate_emr_tables_cli_arg(
+                tables_config,
+                validate_step_fit=validate_step_fit,
+            )
         else:
             tables_json = json.dumps(tables_config, separators=(",", ":"))
-        layer_value = table_attributes[0].layer.value if table_attributes else "raw"
-        parameters = [
-            layer_value,
-            tables_json,
-            parallelism,
-        ]
-        if any(cfg.get("apply_partition_filter") for cfg in tables_config.values()):
-            parameters += [
-                "--load-start-date",
-                self.dag_execution_context.load_start_date,
-                "--load-end-date",
-                self.dag_execution_context.load_end_date,
-            ]
-        parameters += self._build_maintenance_state_cli_args()
+        parameters = self._build_optimize_job_parameters(
+            layer_value=layer_value,
+            tables_json=tables_json,
+            parallelism=parallelism,
+            include_load_dates=include_load_dates,
+        )
         return self._create_spark_job_task(spark_job_name, task_id, parameters)
 
     def _build_maintenance_state_cli_args(self) -> list:

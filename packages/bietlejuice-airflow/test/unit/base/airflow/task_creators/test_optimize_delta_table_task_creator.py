@@ -6,7 +6,6 @@ from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
 from bietlejuice.base.airflow.optimize_delta_tables_cli import (
-    EMR_HADOOP_JAR_STEP_ARG_MAX_LENGTH,
     EMR_TABLES_B64_PREFIX,
     decode_tables_config_from_cli,
 )
@@ -252,7 +251,6 @@ class TestOptimizeDeltaTableTaskCreator:
         decoded_keys = []
         for tables_param in tables_params:
             assert tables_param.startswith(EMR_TABLES_B64_PREFIX)
-            assert len(tables_param) <= EMR_HADOOP_JAR_STEP_ARG_MAX_LENGTH
             decoded_keys.extend(decode_tables_config_from_cli(tables_param).keys())
         assert decoded_keys == [table.table_name for table in tables]
 
@@ -267,7 +265,7 @@ class TestOptimizeDeltaTableTaskCreator:
         )
 
         creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
-        with pytest.raises(ValueError, match="exceeds EMR AddJobFlowSteps arg limit"):
+        with pytest.raises(ValueError, match="does not fit EMR AddJobFlowSteps"):
             creator.create_optimize_tasks(_pin_like_clean_tables(74))
 
     @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
@@ -320,6 +318,88 @@ class TestOptimizeDeltaTableTaskCreator:
         creator.create_optimize_tasks([_table("t1", LayerEnum.CLEAN)], parallelism=16)
 
         assert mock_create_spark.call_args[0][2][2] == 4
+
+    def test_worst_case_emr_task_id_uses_longest_table_slug(
+        self, dag_execution_context
+    ):
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        long_name = "employee_compensation_history_monthly_snapshot_detail"
+        tables = [_table("x"), _table(long_name, LayerEnum.CLEAN)]
+
+        worst = creator._worst_case_emr_optimize_task_id(tables, None)
+        outdated = creator._build_task_id(
+            tables, None, batch_index=len(tables), num_batches=len(tables)
+        )
+
+        assert len(worst) > len(outdated)
+        assert long_name.replace("_", "-") in worst
+        assert "-batch-2" in worst
+        assert "all" not in worst
+
+    @patch.object(
+        OptimizeDeltaTableTaskCreator,
+        "_build_maintenance_state_cli_args",
+        return_value=[
+            "--environment",
+            "forno",
+            "--dag-name",
+            "test_dag",
+            "--maintenance-date",
+            TEST_MAINTENANCE_DATE,
+        ],
+    )
+    def test_emr_budget_prefers_longest_table_slug_over_all_task_id(
+        self, _mock_maintenance_args, dag_execution_context
+    ):
+        """Regression: OpenLineage parentJobName must not be sized with optimize-*-all."""
+        from bietlejuice.base.airflow.optimize_delta_tables_cli import (
+            validate_emr_optimize_tables_config,
+        )
+
+        dag_execution_context.use_airflow_emr = True
+        long_name = "a" * 140
+        tables = [
+            _pin_like_clean_table(long_name),
+            _pin_like_clean_table("small_tail"),
+        ]
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        worst_id = creator._worst_case_emr_optimize_task_id(tables, None)
+        short_id = creator._build_task_id(
+            tables, None, batch_index=len(tables), num_batches=len(tables)
+        )
+        assert len(worst_id) > len(short_id)
+
+        short_validator = creator._make_emr_optimize_step_validator(
+            table_attributes=tables,
+            parallelism=16,
+            optimize_delta_table_local_id=None,
+            task_id=short_id,
+        )
+        long_validator = creator._make_emr_optimize_step_validator(
+            table_attributes=tables,
+            parallelism=16,
+            optimize_delta_table_local_id=None,
+            task_id=worst_id,
+        )
+
+        padding = None
+        for candidate in range(0, 12_000, 50):
+            chunk_config = creator._build_tables_config([tables[0]])
+            chunk_config[long_name]["padding"] = "x" * candidate
+            try:
+                validate_emr_optimize_tables_config(chunk_config, short_validator)
+            except ValueError:
+                continue
+            try:
+                validate_emr_optimize_tables_config(chunk_config, long_validator)
+            except ValueError:
+                padding = candidate
+                break
+
+        assert padding is not None, (
+            "expected a payload that fits the short all-slug task id but not "
+            "the longest single-table slug"
+        )
 
     def test_chain_optimize_tasks_sequentially_links_in_order(
         self, dag_execution_context
