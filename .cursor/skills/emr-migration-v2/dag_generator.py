@@ -25,7 +25,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
 PLATFORM_DAG_DIR = REPO_ROOT / "dags" / "platform"
 
-_EMR_DEFAULT_CLUSTER_TYPE = "emr_7_12_min_general_2_workers_cluster"
+_EMR_DEFAULT_CLUSTER_TYPE = "emr_7_12_consolidation_s_memory_cluster"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from models import DagTranspileReport
@@ -64,6 +64,8 @@ def _build_emr_cluster_yaml(source_cluster: Dict[str, Any]) -> Dict[str, Any]:
     source_type = source_cluster.get("cluster", {}).get("type", "")
     if source_type.startswith("emr_"):
         emr_type = source_type
+    elif source_type.startswith("consolidation_"):
+        emr_type = f"emr_7_12_{source_type}"
     else:
         emr_type = _EMR_DEFAULT_CLUSTER_TYPE
     return {"cluster": {"type": emr_type}}
