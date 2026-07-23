@@ -11,9 +11,9 @@ cluster:
         - r7g.8xlarge
         - r6i.8xlarge
     spark_conf:
-      spark.executor.memory: 48g
-      spark.executor.memoryOverhead: 4g
-      spark.executor.cores: '4'
+      spark.executor.memory: 96g
+      spark.executor.memoryOverhead: 8g
+      spark.executor.cores: '2'
       spark.dynamicAllocation.maxExecutors: '8'
-      spark.sql.shuffle.partitions: '64'
+      spark.sql.shuffle.partitions: '200'
       spark.sql.execution.arrow.maxRecordsPerBatch: '10000'
