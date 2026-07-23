@@ -20,6 +20,7 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
+  has_hive_sync: false
   custom_schema: cdp
   load_spark_job: load_cdp_clickhouse
   default_extraction_type: incremental
