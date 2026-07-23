@@ -149,9 +149,9 @@ WITH
       b.owner_amount_payment,
       b.tenant_amount_payment,
       CAST(i.has_agreement AS BOOLEAN) AS has_agreement, -- not used yet
-      b.is_early_both_agree AS has_early_agreement,
+      IF(COALESCE(c.has_compulsory_agreement, FALSE), FALSE, b.is_early_both_agree) AS has_early_agreement,
       CAST(i.has_late_agreement AS BOOLEAN) AS has_late_agreement, -- not used yet
-      IF(b.is_early_both_agree, FALSE, COALESCE(c.has_compulsory_agreement, FALSE)) AS has_compulsory_agreement,
+      COALESCE(c.has_compulsory_agreement, FALSE) AS has_compulsory_agreement,
       u.has_owner_approved_review,
       u.has_tenant_approved_review,
       u.has_owner_approved_budget_approval,
