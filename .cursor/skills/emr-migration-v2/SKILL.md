@@ -117,6 +117,64 @@ Verdict values:
 
 The aggregate `summary.json` has `pr_gate_eligible: true` when zero FAILs.
 
+## Results command
+
+After the comparison DAGs have run, use `results.py` to fetch verdicts from S3 and
+create PRs that replace original SQL with transpiled versions.
+
+### Invocation
+
+```bash
+# Single DAG
+uv run --no-project --with boto3,pyyaml python \
+  .cursor/skills/emr-migration-v2/results.py \
+  --scope fintech/enrich_velo \
+  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
+
+# Multiple DAGs
+uv run --no-project --with boto3,pyyaml python \
+  .cursor/skills/emr-migration-v2/results.py \
+  --scope fintech/enrich_velo,fintech/enrich_docx \
+  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
+
+# Dry run (print verdicts only)
+uv run --no-project --with boto3,pyyaml python \
+  .cursor/skills/emr-migration-v2/results.py \
+  --scope fintech/enrich_velo \
+  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br \
+  --dry-run
+
+# With assume role (cross-account S3)
+uv run --no-project --with boto3,pyyaml python \
+  .cursor/skills/emr-migration-v2/results.py \
+  --scope fintech/enrich_velo \
+  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br \
+  --assume-role-arn arn:aws:iam::123456789:role/MyRole
+```
+
+### What it does
+
+1. Reads `manifest.json` from each comparison DAG directory to get the run ID
+2. Downloads `summary.json` and per-table verdict JSONs from S3
+3. Partitions tables by verdict:
+   - **Validated** (PASS/WARN) — transpiled SQL produces equivalent results
+   - **Needs review** (FAIL) — transpiled SQL diverges from baseline
+4. For each group, creates a branch and PR:
+   - Copies transpiled SQL from `migration_emr_{scope}/queries/migration/` into the
+     source DAG's `queries/{layer}/`, replacing the original
+   - PR body includes a validation results table (counts, schema, nulls, checksums)
+     and S3 artifact references
+
+### PRs created
+
+| PR | Content | Tone |
+|----|---------|------|
+| `emr-migration/validated/{slug}` | PASS/WARN tables | Safe to merge — validated equivalent |
+| `emr-migration/needs-review/{slug}` | FAIL tables | Recommendation — needs manual review |
+
+Both PRs contain the transpiled SQL. The validated PR is merge-ready; the needs-review
+PR includes detailed issue breakdowns for each failing table.
+
 ## Key files
 
 | File | Purpose |
@@ -127,6 +185,7 @@ The aggregate `summary.json` has `pr_gate_eligible: true` when zero FAILs.
 | `packages/bietlejuice-runtime/src/bietlejuice/migration/comparison_job.py` | Comparison + verdict |
 | `.cursor/skills/emr-migration-v2/transpile.py` | Transpilation orchestrator |
 | `.cursor/skills/emr-migration-v2/dag_generator.py` | DAG template renderer |
+| `.cursor/skills/emr-migration-v2/results.py` | Fetch verdicts + create PRs |
 | `.cursor/skills/emr-migration-v2/models.py` | Shared dataclasses |
 | `.cursor/skills/emr-migration-v2/s3_paths.py` | S3 path conventions |
 | `.cursor/skills/emr-migration-v2/templates/` | Jinja templates for the three DAGs |
