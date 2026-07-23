@@ -883,7 +883,7 @@ SELECT 1 AS team_order, last_team_adjusted, ref_month, inbound_volume FROM opera
 ORDER BY team_order, last_team_adjusted, ref_month
 ```
 
-### Query 9 — Outbound Volume by Operation (`last_team_adjusted`) with Post Contract consolidated row
+### Query 9 — Outbound Volume by Operation (`last_team_adjusted`) with Post Contract consolidated record
 
 ```sql
 WITH scoped AS (
