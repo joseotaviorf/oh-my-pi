@@ -147,6 +147,8 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/offboard_human_vs_digital_metrics.md` — Offboard Human vs Digital Metrics: official For Rent offboarding (U&J) TF channel shares (% digital / % human support / % SPOC) and segmented NPS plus response volumes (13 metrics). Builds on `business_entities/termination.md`, `business_entities/nps.md`, and `business_entities/ticket.md`.
 
+- `metric_entities/er2rr.md` — ER2RR (Ended Rental to Re-Rental, 4w/8w/12w): official ended-rental-to-new-contract conversion rate, read by 28-day (4w) maturation cohort month and shared across the 4w/8w/12w horizons (ER2RR / landlord retention rate / re-rental rate). Builds on `business_entities/termination.md`.
+
 
 ## Company-Wide Glossary
 
