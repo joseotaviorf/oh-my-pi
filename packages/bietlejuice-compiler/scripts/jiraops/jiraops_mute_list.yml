@@ -37,6 +37,7 @@ DAG:
     - bietlejuice.partner_payment
     - bietlejuice.partner_payment_fast_lane
     - bietlejuice.payable_accounts_transactions
+    - bietlejuice.profound
     - bietlejuice.quires
     - bietlejuice.reverse_demand_classifieds_ranking
     - bietlejuice.reverse_sale_listings_report
