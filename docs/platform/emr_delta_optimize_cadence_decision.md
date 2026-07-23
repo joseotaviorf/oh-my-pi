@@ -160,8 +160,11 @@ When the full optimize step would exceed that budget (e.g. DAGs with dozens of
 clean tables such as `pin`), `OptimizeDeltaTableTaskCreator` **auto-batches**
 on EMR only: it greedily packs tables (in declaration order) into sequential
 Airflow tasks inside a `TaskGroup`, validating each batch against the **full**
-HadoopJarStep (not the tables arg alone). Per-table payload sizes vary, so
-equal-sized fixed batches are not used for auto-batching.
+HadoopJarStep (not the tables arg alone). Validation uses a **conservative
+budget** below the AWS hard limit (384-character slack) and includes cluster
+forwarded `spark_conf` such as `spark.serializer` that live EMR steps append
+at submit time. Per-table payload sizes vary, so equal-sized fixed batches are
+not used for auto-batching.
 
 Integrity checks run at **DAG parse time** for every EMR optimize batch:
 

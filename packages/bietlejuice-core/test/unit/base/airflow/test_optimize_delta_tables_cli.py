@@ -3,19 +3,25 @@ import json
 import pytest
 
 from bietlejuice.base.airflow.optimize_delta_tables_cli import (
+    EMR_COMMAND_RUNNER_JAR,
     EMR_HADOOP_JAR_STEP_ARG_MAX_LENGTH,
     EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH,
+    EMR_OPTIMIZE_HADOOP_JAR_STEP_TOTAL_MAX_LENGTH,
+    EMR_OPTIMIZE_STEP_BUDGET_SLACK_CHARS,
     EMR_OPTIMIZE_STEP_RESERVED_ARGS_TOTAL_LENGTH,
     EMR_TABLES_B64_PREFIX,
     _all_fixed_batches_fit_emr_limit,
     assert_optimize_batches_partition_tables,
     build_and_validate_emr_tables_cli_arg,
+    build_optimize_emr_hadoop_jar_step_args,
     chunk_table_attributes_for_emr_limit,
     decode_tables_config_from_cli,
     encode_tables_json_for_emr_cli,
+    make_optimize_emr_step_validator,
     make_reserved_overhead_emr_step_validator,
     max_tables_per_emr_optimize_batch,
     validate_emr_hadoop_jar_step,
+    validate_emr_optimize_hadoop_jar_step,
 )
 
 
@@ -209,12 +215,8 @@ def test_max_tables_per_emr_optimize_batch_reduces_pin_like_74_table_set():
 
 def test_chunking_accounts_for_spark_submit_overhead_not_tables_alone():
     """Tables arg under per-field budget can still overflow total HadoopJarStep."""
-    from bietlejuice.base.airflow.optimize_delta_tables_cli import (
-        EMR_COMMAND_RUNNER_JAR,
-    )
-
     max_encoded = (
-        EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH
+        EMR_OPTIMIZE_HADOOP_JAR_STEP_TOTAL_MAX_LENGTH
         - EMR_OPTIMIZE_STEP_RESERVED_ARGS_TOTAL_LENGTH
         - len(EMR_COMMAND_RUNNER_JAR)
     )
@@ -249,11 +251,46 @@ def test_chunking_accounts_for_spark_submit_overhead_not_tables_alone():
     assert_optimize_batches_partition_tables(tables, chunks)
 
 
-def test_make_optimize_emr_step_validator_rejects_when_full_step_over_budget():
-    from bietlejuice.base.airflow.optimize_delta_tables_cli import (
-        make_optimize_emr_step_validator,
+def test_build_optimize_emr_hadoop_jar_step_args_budgets_forwarded_cluster_serializer():
+    args = build_optimize_emr_hadoop_jar_step_args(
+        script_uri="s3://bucket/optimize_delta_table.py",
+        job_parameters=["clean", "B64:x", "16"],
+        task_id="optimize-clean-all-batch-1-1",
+        dag_id="bietlejuice.pin",
+    )
+    flat = " ".join(args)
+    assert "spark.serializer=org.apache.spark.serializer.KryoSerializer" in flat
+    assert (
+        "spark.openlineage.parentJobName=bietlejuice.pin.optimize-clean-all-batch-1-1"
+        in flat
     )
 
+
+def test_validate_emr_optimize_hadoop_jar_step_uses_conservative_total_budget():
+    assert (
+        EMR_OPTIMIZE_HADOOP_JAR_STEP_TOTAL_MAX_LENGTH
+        == EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH
+        - EMR_OPTIMIZE_STEP_BUDGET_SLACK_CHARS
+    )
+
+    args = [
+        "a"
+        * (EMR_OPTIMIZE_HADOOP_JAR_STEP_TOTAL_MAX_LENGTH - len(EMR_COMMAND_RUNNER_JAR))
+    ]
+    validate_emr_optimize_hadoop_jar_step(args=args)
+    with pytest.raises(ValueError, match="total string budget"):
+        validate_emr_optimize_hadoop_jar_step(
+            args=[args[0] + "x"],
+        )
+
+    # Generic validator still allows the AWS hard limit.
+    validate_emr_hadoop_jar_step(
+        jar=EMR_COMMAND_RUNNER_JAR,
+        args=[args[0] + "x"],
+    )
+
+
+def test_make_optimize_emr_step_validator_rejects_when_full_step_over_budget():
     padding = _padding_for_encoded_length("t", 10_000)
     payload = {
         "t": {

@@ -24,6 +24,16 @@ EMR_HADOOP_JAR_STEP_ARG_MAX_LENGTH = EMR_HADOOP_JAR_STEP_ARG_ELEMENT_MAX_LENGTH
 # See: https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html
 EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH = 10240
 
+# Optimize batching validates below the AWS hard limit so near-limit steps that
+# still fit in unit tests do not fail at runtime (cluster-forwarded spark_conf,
+# OpenLineage parentJobName drift, script URI length, etc.).
+EMR_OPTIMIZE_STEP_BUDGET_SLACK_CHARS = 384
+
+# Effective HadoopJarStep total budget used by optimize parse-time validation.
+EMR_OPTIMIZE_HADOOP_JAR_STEP_TOTAL_MAX_LENGTH = (
+    EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH - EMR_OPTIMIZE_STEP_BUDGET_SLACK_CHARS
+)
+
 # Default Jar used by QuintoAndar EMR spark-submit steps (emr_plugin).
 EMR_COMMAND_RUNNER_JAR = "command-runner.jar"
 
@@ -46,13 +56,22 @@ _EMR_OPTIMIZE_BASELINE_SPARK_CONFS: tuple[str, ...] = (
     "spark.yarn.appMasterEnv.SPARK_RUNTIME=emr",
     "--conf",
     "spark.driverEnv.SPARK_RUNTIME=emr",
-    "--conf",
-    "spark.openlineage.parentJobNamespace=airflow",
 )
 
-# Conservative fallback when script URI / OpenLineage task id are unknown at
-# unit-test time. Prefer :func:`build_optimize_emr_hadoop_jar_step_args`.
-EMR_OPTIMIZE_STEP_RESERVED_ARGS_TOTAL_LENGTH = 900
+# Cluster spark_conf keys forwarded to spark-submit by
+# ``EmrJobClusterEngine._build_emr_extra_spark_submit_args`` (see
+# ``_EMR_STEP_SPARK_CONF_KEYS``). Budget with conservative values so optimize
+# batching stays under the live EMR step size without importing the engine.
+_EMR_OPTIMIZE_FORWARDED_SPARK_CONF_ARGS: tuple[str, ...] = (
+    "--conf",
+    "spark.serializer=org.apache.spark.serializer.KryoSerializer",
+)
+
+# Prod-like script URI used to size the reserved spark-submit overhead estimate.
+_EMR_OPTIMIZE_BUDGET_SCRIPT_URI = (
+    "s3://5a-databricks/github-repos/bi-etl-ejuice/spark_jobs/base/"
+    "optimize_delta_table.py"
+)
 
 
 def encode_tables_json_for_emr_cli(tables_json: str) -> str:
@@ -94,15 +113,16 @@ def validate_emr_hadoop_jar_step(
     args: Sequence[str],
     main_class: str = "",
     properties: Sequence[tuple[str, str]] = (),
+    total_max_length: int = EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH,
 ) -> None:
     """Validate EMR HadoopJarStep against AWS per-field and total string budgets."""
     total = hadoop_jar_step_string_values_total(
         jar=jar, args=args, main_class=main_class, properties=properties
     )
-    if total > EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH:
+    if total > total_max_length:
         raise ValueError(
             "EMR HadoopJarStep exceeds AddJobFlowSteps total string budget "
-            f"({total} > {EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH})"
+            f"({total} > {total_max_length})"
         )
     for field_name, value in (
         ("Jar", jar),
@@ -121,7 +141,24 @@ def validate_emr_hadoop_jar_step(
 
 # Backward-compatible name used by optimize task creator wiring.
 def validate_emr_hadoop_jar_step_args(args: Sequence[str]) -> None:
-    validate_emr_hadoop_jar_step(args=args)
+    validate_emr_optimize_hadoop_jar_step(args=args)
+
+
+def validate_emr_optimize_hadoop_jar_step(
+    *,
+    jar: str = EMR_COMMAND_RUNNER_JAR,
+    args: Sequence[str],
+    main_class: str = "",
+    properties: Sequence[tuple[str, str]] = (),
+) -> None:
+    """Validate optimize EMR steps against the conservative total budget."""
+    validate_emr_hadoop_jar_step(
+        jar=jar,
+        args=args,
+        main_class=main_class,
+        properties=properties,
+        total_max_length=EMR_OPTIMIZE_HADOOP_JAR_STEP_TOTAL_MAX_LENGTH,
+    )
 
 
 def build_optimize_emr_hadoop_jar_step_args(
@@ -142,6 +179,8 @@ def build_optimize_emr_hadoop_jar_step_args(
     openlineage_job = [
         "--conf",
         f"spark.openlineage.parentJobName={dag_id}.{task_id}",
+        "--conf",
+        "spark.openlineage.parentJobNamespace=airflow",
     ]
     return [
         EMR_SPARK_SUBMIT_BIN,
@@ -150,11 +189,39 @@ def build_optimize_emr_hadoop_jar_step_args(
         "--deploy-mode",
         deploy_mode,
         *_EMR_OPTIMIZE_BASELINE_SPARK_CONFS,
-        *openlineage_job,
+        *_EMR_OPTIMIZE_FORWARDED_SPARK_CONF_ARGS,
         *extra_spark_args,
+        *openlineage_job,
         script_uri,
         *[str(parameter) for parameter in job_parameters],
     ]
+
+
+def _compute_optimize_reserved_args_total_length() -> int:
+    args = build_optimize_emr_hadoop_jar_step_args(
+        script_uri=_EMR_OPTIMIZE_BUDGET_SCRIPT_URI,
+        job_parameters=[
+            "clean",
+            "",
+            "16",
+            "--environment",
+            "prod",
+            "--dag-name",
+            "pin",
+            "--maintenance-date",
+            "2026-01-01",
+        ],
+        task_id="optimize-clean-all-batch-99-9",
+        dag_id="bietlejuice.pin",
+    )
+    return sum(len(str(arg)) for arg in args)
+
+
+# Conservative fallback when script URI / OpenLineage task id are unknown at
+# unit-test time. Prefer :func:`build_optimize_emr_hadoop_jar_step_args`.
+EMR_OPTIMIZE_STEP_RESERVED_ARGS_TOTAL_LENGTH = (
+    _compute_optimize_reserved_args_total_length()
+)
 
 
 def make_optimize_emr_step_validator(
@@ -191,7 +258,7 @@ def make_optimize_emr_step_validator(
             deploy_mode=deploy_mode,
             extra_spark_args=extra_spark_args,
         )
-        validate_emr_hadoop_jar_step(args=step_args)
+        validate_emr_optimize_hadoop_jar_step(args=step_args)
 
     return validate_step_fit
 
@@ -211,10 +278,10 @@ def make_reserved_overhead_emr_step_validator(
         total = (
             len(EMR_COMMAND_RUNNER_JAR) + reserved_args_total + len(encoded_tables_arg)
         )
-        if total > EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH:
+        if total > EMR_OPTIMIZE_HADOOP_JAR_STEP_TOTAL_MAX_LENGTH:
             raise ValueError(
                 "EMR HadoopJarStep exceeds AddJobFlowSteps total string budget "
-                f"({total} > {EMR_HADOOP_JAR_STEP_ARGS_TOTAL_MAX_LENGTH})"
+                f"({total} > {EMR_OPTIMIZE_HADOOP_JAR_STEP_TOTAL_MAX_LENGTH})"
             )
 
     return validate_step_fit
