@@ -1,10 +1,6 @@
 dag:
   name: pin
-  # Temporarily unscheduled while Forno EMR failures are investigated (SECHUB-18972).
-  # Active ingestion is the eight pin_* Databricks DAGs. Keep this DAG paused in Airflow
-  # and do not re-enable the schedule until EMR is healthy — both families write the same
-  # datalake_pin_* tables / OIC-SFTP endpoints.
-  schedule_interval: null
+  schedule_interval: 0 0 * * *
   owner: Data People
   callback_by_task: False
   dag_documentation:
@@ -14,9 +10,8 @@ dag:
       for all PIN modules (core, absence, compensation, goal, hr_review, performance,
       questionnaires, talent). EMR step_concurrency_level caps concurrent OIC/SFTP access.
 
-      TEMPORARILY DISABLED (schedule_interval null + pause in Airflow) until SECHUB-18972
-      is resolved. Production ingestion runs on the split pin_* Databricks DAGs meanwhile.
-      Do not run this DAG alongside pin_* — they share the same lake tables and OIC/SFTP.
+      Cutover note: split pin_* DAGs remain in the repo with schedule_interval null until
+      a follow-up PR deletes them. Do not re-enable pin_* schedules alongside this DAG.
 workflow:
   layer: raw
   type: custom_ingestion

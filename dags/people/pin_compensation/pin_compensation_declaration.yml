@@ -2,7 +2,8 @@ dag:
   name: pin_compensation
   owner: Data People
   callback_by_task: False
-  schedule_interval: 30 0 * * *
+  # Unscheduled during unified pin cutover; deletion follows in a stacked PR.
+  schedule_interval: null
   dag_documentation:
     dag_purpose: |
       This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).
