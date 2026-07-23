@@ -5,6 +5,8 @@ Run ID: 43daf4e5-4dc4-48cb-81b1-bcc1edb3ef69
 Scope: fintech/enrich_velo
 """
 
+import sys
+from pathlib import Path
 from urllib.parse import urlparse
 
 from airflow import DAG, Dataset
@@ -12,6 +14,10 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 
 from bietlejuice.services.configuration_service import ConfigurationService
+
+_PLATFORM_DIR = str(Path(__file__).resolve().parent.parent)
+if _PLATFORM_DIR not in sys.path:
+    sys.path.insert(0, _PLATFORM_DIR)
 
 DAG_ID = "migration_compare_fintech__enrich_velo"
 RUN_ID = "43daf4e5-4dc4-48cb-81b1-bcc1edb3ef69"
@@ -86,7 +92,7 @@ with DAG(
     def run_comparison(**context):
         """Read metrics from S3, compare, write verdict."""
         import json
-        from bietlejuice.migration.comparison_job import (
+        from migration_assets.comparison import (
             compare_table,
             list_s3_jsons,
             read_s3_json,

@@ -68,8 +68,8 @@ BIETLEJUICE_REPO_PATH = CONFIG_SERVICE.get_config(
     "databricks_bietlejuice_repo_path"
 )
 METRIC_CAPTURE_JOB = (
-    f"{BIETLEJUICE_REPO_PATH}/packages/bietlejuice-runtime"
-    f"/src/bietlejuice/migration/metric_capture_job.py"
+    f"{BIETLEJUICE_REPO_PATH}/spark_jobs/platform"
+    f"/migration_assets/metric_capture_job.py"
 )
 ARTIFACTS_URI = CONFIG_SERVICE.get_config("artifacts_bucket")
 ARTIFACTS_BUCKET = urlparse(ARTIFACTS_URI).netloc or ARTIFACTS_URI
