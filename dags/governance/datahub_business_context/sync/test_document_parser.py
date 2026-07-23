@@ -1,10 +1,10 @@
 """Regression tests for document_parser — DataHub rich-text export artifacts.
 
 The fixture below is the exact Ownership/Glossary shape DataHub's "Create
-Document" editor produced for a real Context Document (see
-docs/llm_context/metric_entities/metric_entity_property_integrity.md before
-the markdown_sanitizer fix): role headings and bullet items glued onto a
-single physical line, with redundant ``***_..._***`` emphasis.
+Document" editor produced for a real Context Document (Property Integrity
+metric entity, before the markdown_sanitizer fix): role headings and bullet
+items glued onto a single physical line, with redundant ``***_..._***``
+emphasis.
 """
 
 from __future__ import annotations

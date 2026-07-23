@@ -125,6 +125,8 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/funnel_conversions_supply.md` — Supply Funnel Conversions: cohort-based conversion rates between all stages of the supply acquisition funnel (L2P, P2Q, Q2O, O2L) plus non-adjacent transitions (P2O, P2L, Lead to Listing). Supports both RENT and SALE verticals with week-0 velocity variants. Builds on `business_entities/supply.md`.
 
+- `metric_entities/supply_quality_score.md` — Quality Pub & Quality 4Ws: official For Rent pricing-lever scores measuring listing attractiveness at publication (day zero) and after a 28-day cohort window, averaged per listing from `sandbox.listing_scores` on First Listing 1P supply in Brazil from `2025-08-01` (Quality Pub / Quality 4Ws / qualidade de supply / pricing levers). Builds on `business_entities/supply.md` and `business_entities/pricing.md`.
+
 - `metric_entities/journey_pc.md` — Journey PC (post-contract journey mix): share of For Rent client slots (contract × role) in each support-interaction category — % Seamless / % Digital / % Human Support clients — by month, journey stage (onboarding/ongoing; offboarding excluded) and IQ/PP, plus interaction-volume metrics (% clientes seamless/digital/human sup. / tamanho do universo por etapa). Population counterpart to the NPS Seamless family in `metric_entities/nps_fr.md`. Builds on `business_entities/ticket.md` and `business_entities/chatbot_sessions.md`.
 
 - `metric_entities/turnover.md` — Turnover: official monthly workforce attrition indicator (Monthly Terminations / Average Monthly Headcount), with New Hire Attrition (< 90 days), early-tenure attrition (6/12-month), and Voluntary/Involuntary segmentation via `termination_type` (turnover / rotatividade / NH attrition). Regrettable Turnover / VRTO are not available on TARS. Builds on `business_entities/employee_details.md`.
@@ -140,6 +142,9 @@ Official, named metrics. Each builds on one or more business entities (linked at
 - `metric_entities/escalation_rate_walle.md` — % Escalation Rate (Wall-E): official escalation rate for Wall-E chatbot sessions (`COUNT_IF(is_escalated AND bot = 'wall-e') / COUNT_IF(bot = 'wall-e')`), exclusive to the Wall-E bot (taxa de escalonamento do Wall-E). Builds on `business_entities/chatbot_sessions.md`.
 
 - `metric_entities/escalation_error_rate_walle.md` — % Escalation Error Rate (Wall-E): share of escalated Wall-E sessions that landed in a different support queue than the one first routed to (`first_queue != last_queue`), restricted to a curated whitelist of eleven front-facing queues (Escalation Error Rate / taxa de erro de escalonamento do Wall-E). Builds on `business_entities/chatbot_sessions.md`.
+
+- `metric_entities/property_integrity.md` — Property Integrity: official For Rent offboarding-quality metrics on `dw_offboarding.obt_offboarding` — **% Offb. W/o Mediation**, **% Without Repairs**, **% Both Agree**, **% Compulsory/Band-Aid 2**, and **% SPOC Roll Out** (integridade do imóvel / qualidade do offboarding / mediação / reparos). Builds on `business_entities/termination.md`, `business_entities/inspection.md`, and `business_entities/repairs.md`.
+
 - `metric_entities/offboard_human_vs_digital_metrics.md` — Offboard Human vs Digital Metrics: official For Rent offboarding (U&J) TF channel shares (% digital / % human support / % SPOC) and segmented NPS plus response volumes (13 metrics). Builds on `business_entities/termination.md`, `business_entities/nps.md`, and `business_entities/ticket.md`.
 
 
