@@ -7,6 +7,7 @@ import yaml
 from sqlglot import exp, parse_one
 from yamale import yamale
 
+from bietlejuice.base.db.datalake_metastore_mapping import apply_naming_convention
 from bietlejuice.services.file_service import FileService
 from dags import DAG_PACKAGES_ROOT
 from scripts.services.metadata_file_info import MetadataFileInfo
@@ -176,7 +177,12 @@ class MetadataFileService:
         formula = _DB_NAME_FORMULA.get(layer)
         if formula is None:
             return
-        expected_db = formula.format(schema=schema)
+        # Governed schemas drop the historical datalake_ prefix (e.g. ops_finance
+        # instead of datalake_ops_finance). Apply the same naming convention the
+        # metastore mapping uses (get_full_database_name / get_db_info) so this
+        # validator's expected name matches what the DAG actually writes. No-op for
+        # every schema not in SCHEMAS_WITHOUT_DATALAKE_PREFIX.
+        expected_db = apply_naming_convention(schema, formula.format(schema=schema))
         if declared_db != expected_db:
             raise DatabaseNameMismatchException(
                 file_path, declared_db, expected_db, dag_name, layer, schema
