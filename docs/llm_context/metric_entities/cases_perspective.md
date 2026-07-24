@@ -968,27 +968,8 @@ The following metrics were validated against the official Post Contract Back sou
 
 Confirmed for the validated period: DSAT Back used `first_csat_ts_response`, detractor scores 1/2, and distinct `case_number`; Resolution Rate Back used `first_csat_ts_response` and `resolution_survey`, with no dependency on `first_csat_score`; Inbound Volume used `ts_started`; Outbound Volume used `ts_solved`; SLA Back used `ts_solved`, `is_ticket_solved_within_sla`, and distinct solved cases; the Post Contract row was recalculated directly (never obtained by averaging operation rows); all six mandatory `last_team` exclusions were applied; `Payment FR - Dados Bancários` remained under Dados Bancários; and `Payment FR - Aluguel`, `Payment FR - Condomínio Geral`, `Payment FR - Reembolso de Condomínio`, and `Payment FR - PP Multi` were included in Payments Ativo Back.
 
-**Before publishing a change to this document to DataHub**, test it in a new TARS conversation, instructing TARS to use this file as the mandatory context source, and compare: numerator, denominator, final rate/volume, monthly breakdown, `last_team_adjusted` operation breakdown, metric-specific temporal anchor, canonical scope filters, mandatory team-level exclusions, and the Post Contract consolidated result calculated directly from the scoped population.
-
 **Mandatory regression tests whenever this document changes**: (1) one complete closed month for every metric; (2) the full Aug/2025–Jul/2026 validation window when scope or mappings change; (3) Post Contract consolidated results; (4) all five validated operations; (5) numerator and denominator for every rate metric; (6) one period with no results; (7) confirmation that excluded teams never contribute to operation rows or Post Contract; (8) confirmation that `Payment_FR_GeneralCondominium`, if present, remains separate until formally classified by the Data Steward.
 
 **A document revision must not be promoted if it changes any previously validated result without an approved business-rule change.**
 
-## Superset Golden Assets
 
-Fields below still need to be filled before or during publication to DataHub — the official dashboard/chart reference must be used as the canonical comparison source for future regression tests.
-
-| Asset | Value |
-| :---- | :---- |
-| Official dashboard name | `<fill>` |
-| Official dashboard URL or URN | `<fill>` |
-| DSAT Back chart name / URL / URN | `<fill>` |
-| Resolution Rate Back chart name / URL / URN | `<fill>` |
-| SLA Back chart name / URL / URN | `<fill>` |
-| Inbound Volume chart name / URL / URN | `<fill>` |
-| Outbound Volume chart name / URL / URN | `<fill>` |
-| Official business owner | `<fill>` |
-| Technical owner | `<fill>` |
-| Last validation period | Aug/2025–Jul/2026 |
-| Last validation status | DSAT, Resolution Rate, SLA, Inbound and Outbound validated |
-| Last validation date | `<fill>` |

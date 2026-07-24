@@ -151,6 +151,8 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/inspection_sla.md` — Inspection SLA (SLA - VT): official onboarding/offboarding inspection SLA compliance rate on `sandbox.booking_resolution` (SLA de Vistoria / Produtividade de Vistoria). Builds on `business_entities/inspection.md`.
 
+- `metric_entities/backlog_out_of_sla_back.md` — % Fora Prazo Back / Backlog Out of SLA Rate: official BPO Performance Back Office backlog-out-of-SLA rate, combining a Zendesk snapshot (`fact_backlog_metrics_tasks`) and a Salesforce snapshot (`events_case`-derived) at a single monthly instant, with a known Zendesk zero-contribution bug from 2026-06-25 onward and a documented Onboarding/Offboarding "Out of SLA" residual (backlog fora do prazo / % fora prazo back / BPO Performance). Builds on `business_entities/ticket.md` and `business_entities/department.md`.
+
 
 ## Company-Wide Glossary
 

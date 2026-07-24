@@ -26,6 +26,7 @@ Tickets are split into two operational categories:
 - [Customer Contacts Front](../metric_entities/customer_contacts_front.md) — Front Office DSat, Resolution Rate, and Recontato D0/D4.
 - [Cases Perspective](../metric_entities/cases_perspective.md) — Post Contract Back Office SLA, DSAT, Resolution Rate, and Inbound/Outbound Volume.
 - Offboard Human vs Digital Metrics
+- [Backlog Out of SLA](../metric_entities/backlog_out_of_sla_back.md) — BPO Performance Back Office backlog-out-of-SLA rate (% Fora Prazo Back), Zendesk side sourced from `fact_backlog_metrics_tasks`.
 
 ## Synonyms
 
