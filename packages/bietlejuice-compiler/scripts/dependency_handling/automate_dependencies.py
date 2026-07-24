@@ -14,6 +14,9 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
 from bietlejuice.base.dependencies.file_dependency_generator import (
     FileDependencyGenerator,
 )
+from bietlejuice.base.dependencies.ignored_dag_ids import (
+    filter_ignored_dag_dependencies,
+)
 from dags import DAG_PACKAGES_ROOT
 
 DAGS_CROSS_DEPENDENCIES_FILE_PATH = os.path.join(
@@ -54,7 +57,7 @@ def generate_dependencies():
 
     dependencies = dependency_generator.generate_dependencies(manual_modifications)
 
-    return dependencies
+    return filter_ignored_dag_dependencies(dependencies)
 
 
 def write_to_yml(table_dependencies: dict):
