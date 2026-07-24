@@ -1,0 +1,12 @@
+dag:
+  name: enrich_luigijr_teste_materialized_postcontract
+  schedule_interval: 0 8 * * *
+  owner: ForRent PostContract
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:gustavo.akashi
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: forrent_postcontract
