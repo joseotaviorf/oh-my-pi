@@ -14,7 +14,10 @@
 new rental contract within a fixed post-termination window. The cohort starts at
 **ERC (Ended Rental Confirmed)** — the exit inspection date that marks a rental as
 effectively terminated — and the metric measures what share of that ERC cohort has a
-next contract (`sk_next_contract`) signed by a given number of weeks after ERC.
+next contract (`sk_next_contract`) signed by a given number of weeks after ERC. It
+can be reported at **monthly or weekly cadence** — same definition and same shared-
+cohort logic either way, only the calendar grouping granularity changes (see Cohort
+window definition for monthly, Weekly cohort window definition for weekly).
 
 **Exists exclusively for For Rent Brazil.** (Confirmed with the Data Steward —
 consistent with the `country_code != 'MX'` canonical filter below, which already
@@ -133,6 +136,41 @@ formula above. Precedent (2026-07-23, data as-of that date, MTD cutoff requested
 (rather than the full-month `2026-07-03`). Confirm the exact MTD window with the
 Data Steward per request — it is not a fixed offset, it depends on the requested
 as-of date.
+
+### Weekly cohort window definition
+
+Same metric, **weekly cadence** instead of monthly — same denominator/cohort logic
+(anchored to the 4w/28-day window; 8w/12w reuse it, only the numerator threshold
+changes). QuintoAndar's week convention is **Monday–Sunday** (`day_of_week(...) = 1`
+on Monday; Trino's `date_trunc('week', date)` returns that Monday).
+
+Because weeks are a fixed 7 days (unlike months), the formula is symmetric — no
+`+1 month / -29 days` asymmetry:
+
+```
+window_start(W) = mature_week_monday - 28 days
+window_end(W)   = mature_week_monday - 22 days   -- i.e. window_start + 6 days
+```
+
+where `mature_week_monday` is the Monday of the week being reported (the week in
+which the 28-day maturation window lands — same "maturation cohort, not calendar
+occurrence" principle as the monthly view).
+
+**Validated 2026-07-24** against a value the Data Steward tested independently in
+another session: week of **13/07/26** (Monday) matures the ERC week **15/06–21/06**
+(`2026-07-13 - 28 = 2026-06-15`; `2026-07-13 - 22 = 2026-06-21`) → denominator
+**2.680**, numerator (4w) **1.125** — exact match.
+
+| Semana de maturação (2ª-feira) | ERC de | ERC até |
+| :--- | :--- | :--- |
+| 04/05/26 | 06/04/26 | 12/04/26 |
+| 11/05/26 | 13/04/26 | 19/04/26 |
+| 18/05/26 | 20/04/26 | 26/04/26 |
+| 13/07/26 | 15/06/26 | 21/06/26 |
+
+**MTD (partial current week):** same principle as the monthly MTD — cap
+`window_end(W)` at the ERC date whose N-day window has actually had time to mature
+given the as-of date, rather than the full 7-day window.
 
 ### Canonical Filter
 
@@ -315,3 +353,58 @@ retroactively from this table — re-pull on the date you need a pinned number:
 signatures land. Junho/26's 12w window doesn't close until ~25/08/26; Julho/26 MTD's
 8w/12w windows barely started. Re-pull on the day you need a stable number and record
 the as-of date alongside it.
+
+### Golden Query — weekly cadence
+
+Same structure as the monthly query — only `cohort_window` changes to a fixed
+7-day `cohort_week` (Monday-anchored), reusing the same `termination_base` /
+`erc_events` CTEs above:
+
+```sql
+cohort_week AS (
+    -- One row per candidate mature week (Monday), with its 4w maturation window.
+    SELECT
+        wk AS mature_week_start,
+        date_add('day', -28, wk) AS window_start,
+        date_add('day', -22, wk) AS window_end
+    FROM (
+        SELECT dt AS wk
+        FROM UNNEST(SEQUENCE(DATE '2025-01-06', DATE '2027-01-04', INTERVAL '7' DAY)) AS t(dt)
+        -- start date must be a Monday; adjust the range as needed
+    )
+)
+
+SELECT
+    CAST(cw.mature_week_start AS VARCHAR) AS semana_maturacao,
+    COUNT(DISTINCT e.sk_house_listing) AS denominador,
+    COUNT(DISTINCT e.sk_house_listing) FILTER (
+        WHERE e.cs_dt IS NOT NULL AND e.cs_dt <= date_add('day', 28, e.erc_dt)
+    ) AS numerator_4w,
+    COUNT(DISTINCT e.sk_house_listing) FILTER (
+        WHERE e.cs_dt IS NOT NULL AND e.cs_dt <= date_add('day', 56, e.erc_dt)
+    ) AS numerator_8w,
+    COUNT(DISTINCT e.sk_house_listing) FILTER (
+        WHERE e.cs_dt IS NOT NULL AND e.cs_dt <= date_add('day', 84, e.erc_dt)
+    ) AS numerator_12w
+FROM cohort_week AS cw
+JOIN erc_events AS e ON e.erc_dt BETWEEN cw.window_start AND cw.window_end
+GROUP BY 1, cw.mature_week_start
+ORDER BY cw.mature_week_start
+```
+
+**Reference values, weekly cadence** (Trino, data as-of 2026-07-24). 4w confirmed
+exact for the 13/07/26 week; 8w/12w for recent weeks are shown for completeness but
+are **far from matured** (a week's 8w/12w number needs 8–12 weeks of real elapsed
+time, not just a Monday label, to stop climbing):
+
+| Semana maturação | ERC de–até | Denominador | Num. 4w | ER2RR 4w | Num. 8w | ER2RR 8w¹ | Num. 12w | ER2RR 12w¹ |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 22/06/26 | 25/05–31/05 | 2.644 | 1.165 | 44.1% | 1.396 | 52.8% | 1.404 | 53.1% |
+| 29/06/26 | 01/06–07/06 | 3.038 | 1.424 | 46.9% | 1.665 | 54.8% | 1.665 | 54.8% |
+| 06/07/26 | 08/06–14/06 | 3.299 | 1.396 | 42.3% | 1.586 | 48.1% | 1.586 | 48.1% |
+| **13/07/26** | **15/06–21/06** | **2.680** | **1.125** | **42.0%** | 1.230 | 45.9%¹ | 1.230 | 45.9%¹ |
+
+¹ Not remotely matured as of 2026-07-24 — the 13/07/26 week's 8w window doesn't close
+until ~16/08/26 and its 12w window until ~13/09/26. Treat weekly 8w/12w numbers for
+any week matured in the last ~2 months as provisional; only 4w is reliably matured
+week-to-week at this granularity.
