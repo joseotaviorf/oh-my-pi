@@ -4,5 +4,6 @@ cluster:
       ebs_volume_size: 200
     driver_node_type_id: r7g.large
     num_workers: 3
+    cluster_name: mig_twin_for_rent__enrich_ongoing_terminations_snapshot
   databricks_conn_id: databricks_new_env
   type: consolidation_s_general_cluster

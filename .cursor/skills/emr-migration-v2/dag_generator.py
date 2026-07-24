@@ -51,12 +51,16 @@ def _read_source_cluster(domain: str, dag_name: str) -> Dict[str, Any]:
     return {}
 
 
-def _build_twin_cluster_yaml(source_cluster: Dict[str, Any]) -> Dict[str, Any]:
+def _build_twin_cluster_yaml(
+    source_cluster: Dict[str, Any], scope_id: str
+) -> Dict[str, Any]:
     cluster = source_cluster.get("cluster", {})
     if not cluster.get("type"):
         cluster["type"] = "consolidation_xs_memory_cluster"
     if not cluster.get("databricks_conn_id"):
         cluster["databricks_conn_id"] = "databricks_new_env"
+    custom = cluster.setdefault("custom_configurations", {})
+    custom["cluster_name"] = f"mig_twin_{scope_id}"[:96]
     return {"cluster": cluster}
 
 
@@ -136,7 +140,7 @@ def generate_dags(
         created_paths.append(str(dag_dir))
 
     twin_dag_id = f"migration_twin_{scope_id}"
-    twin_cluster = _build_twin_cluster_yaml(source_cluster)
+    twin_cluster = _build_twin_cluster_yaml(source_cluster, scope_id)
     twin_cluster_path = out_root / twin_dag_id / f"{twin_dag_id}_cluster.yml"
     twin_cluster_path.write_text(
         yaml.dump(twin_cluster, default_flow_style=False), encoding="utf-8"

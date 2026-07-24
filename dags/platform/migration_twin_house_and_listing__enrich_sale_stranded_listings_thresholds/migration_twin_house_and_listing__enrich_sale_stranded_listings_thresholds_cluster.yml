@@ -8,5 +8,6 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
         }}
     spark_version: 16.4.x-scala2.12
+    cluster_name: mig_twin_house_and_listing__enrich_sale_stranded_listings_thresholds
   databricks_conn_id: databricks_new_env
   type: consolidation_l_general_cluster

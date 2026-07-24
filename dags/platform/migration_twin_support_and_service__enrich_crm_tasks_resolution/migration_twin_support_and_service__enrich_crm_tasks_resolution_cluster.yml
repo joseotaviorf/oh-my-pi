@@ -2,5 +2,6 @@ cluster:
   custom_configurations:
     driver_node_type_id: r7g.xlarge
     runtime_engine: PHOTON
+    cluster_name: mig_twin_support_and_service__enrich_crm_tasks_resolution
   databricks_conn_id: databricks_new_env
   type: consolidation_m_general_cluster

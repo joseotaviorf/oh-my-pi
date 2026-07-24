@@ -2,5 +2,6 @@ cluster:
   custom_configurations:
     aws_attributes:
       availability: ON_DEMAND
+    cluster_name: mig_twin_support_and_service__enrich_satisfaction_rating
   databricks_conn_id: databricks_new_env
   type: consolidation_m_memory_single_node_cluster

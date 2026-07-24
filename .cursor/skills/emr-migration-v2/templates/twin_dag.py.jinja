@@ -122,51 +122,59 @@ with DAG(
         python_callable=_upload_sql,
     )
 
-    execute_cluster = ctx.job_cluster_engine.create_execute_cluster_task(
-        config_service=CONFIG_SERVICE,
-        minimum_cluster_runtime_version=None,
-        execute_job_cluster_local_id=None,
-    )
-
     end = PythonOperator(
         task_id="end",
         python_callable=lambda **kw: None,
         outlets=[Dataset(DATASET_URI)],
     )
 
-    capture_tasks = []
-    {% for table in table_names %}
-    capture_tasks.append(
-        ctx.job_cluster_engine.create_spark_python_task(
-            spark_job_path=METRIC_CAPTURE_JOB,
-            task_id="capture_{{ table }}",
-            job_parameters=[
-                "--sql-s3-uri",
-                f"{ARTIFACTS_URI}/{RUN_PREFIX}/sql/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{{ table }}",
-                "--result-s3-uri",
-                f"{ARTIFACTS_URI}/{RUN_PREFIX}/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{{ table }}",
-                "--run-id", RUN_ID,
-                "--runtime", "databricks",
-                "--domain", DOMAIN,
-                "--dag-name", SOURCE_DAG_NAME,
-                "--table-name", "{{ table }}",
-            ],
-            execution_timeout_hours=0.5,
+    MAX_TASKS_PER_CLUSTER = 100
+    batches = [
+        TABLES[i : i + MAX_TASKS_PER_CLUSTER]
+        for i in range(0, len(TABLES), MAX_TASKS_PER_CLUSTER)
+    ]
+
+    for batch_idx, batch_tables in enumerate(batches):
+        local_id = None if batch_idx == 0 else batch_idx + 1
+
+        batch_execute = ctx.job_cluster_engine.create_execute_cluster_task(
+            config_service=CONFIG_SERVICE,
+            minimum_cluster_runtime_version=None,
+            execute_job_cluster_local_id=local_id,
         )
-    )
-    {% endfor %}
 
-    cluster_completion = get_job_cluster_completion_sink(
-        ctx, execute_cluster, end
-    )
-    attach_emr_job_cluster_finished_work_prerequisites(
-        ctx, job_cluster_finished_task=end, work_completion_tasks=capture_tasks
-    )
+        batch_captures = []
+        for table in batch_tables:
+            batch_captures.append(
+                ctx.job_cluster_engine.create_spark_python_task(
+                    spark_job_path=METRIC_CAPTURE_JOB,
+                    task_id=f"capture_{table}",
+                    job_parameters=[
+                        "--sql-s3-uri",
+                        f"{ARTIFACTS_URI}/{RUN_PREFIX}/sql/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{table}",
+                        "--result-s3-uri",
+                        f"{ARTIFACTS_URI}/{RUN_PREFIX}/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{table}",
+                        "--run-id", RUN_ID,
+                        "--runtime", "databricks",
+                        "--domain", DOMAIN,
+                        "--dag-name", SOURCE_DAG_NAME,
+                        "--table-name", table,
+                    ],
+                    execution_timeout_hours=0.5,
+                )
+            )
 
-    upload_sql >> execute_cluster >> capture_tasks >> cluster_completion
-    attach_emr_terminate_cluster_work_prerequisites(
-        ctx,
-        cluster_completion,
-        execute_job_cluster_task=execute_cluster,
-        job_cluster_finished_task=end,
-    )
+        batch_completion = get_job_cluster_completion_sink(
+            ctx, batch_execute, end, local_id
+        )
+        attach_emr_job_cluster_finished_work_prerequisites(
+            ctx, job_cluster_finished_task=end, work_completion_tasks=batch_captures
+        )
+
+        upload_sql >> batch_execute >> batch_captures >> batch_completion
+        attach_emr_terminate_cluster_work_prerequisites(
+            ctx,
+            batch_completion,
+            execute_job_cluster_task=batch_execute,
+            job_cluster_finished_task=end,
+        )

@@ -11,5 +11,6 @@ cluster:
       spark.driver.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
       spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
     spark_version: 16.4.x-scala2.12
+    cluster_name: mig_twin_growth__amplitude_subpartitioned
   databricks_conn_id: databricks_new
   type: consolidation_l_general_cluster

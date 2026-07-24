@@ -5,5 +5,6 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
         }}
+    cluster_name: mig_twin_growth__enrich_growth_manual_media_platform_metrics
   databricks_conn_id: databricks_new_env
   type: consolidation_xs_general_cluster

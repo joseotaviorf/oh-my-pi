@@ -11,5 +11,6 @@ cluster:
     runtime_engine: PHOTON
     spark_conf:
       spark.metrics.namespace: data_products.enrich_base_metrics_service
+    cluster_name: mig_twin_conversational_xp__enrich_base_metrics_service
   databricks_conn_id: databricks_new_env
   type: consolidation_xl_general_cluster

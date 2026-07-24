@@ -5,5 +5,6 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
         }}
+    cluster_name: mig_twin_house_and_listing__enrich_sale_ongoing_listings
   databricks_conn_id: databricks_new_env
   type: consolidation_s_memory_cluster
