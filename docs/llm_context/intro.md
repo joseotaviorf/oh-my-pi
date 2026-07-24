@@ -149,6 +149,8 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/er2rr.md` — ER2RR (Ended Rental to Re-Rental, 4w/8w/12w): official ended-rental-to-new-contract conversion rate, read by 28-day (4w) maturation cohort month and shared across the 4w/8w/12w horizons (ER2RR / landlord retention rate / re-rental rate). Builds on `business_entities/termination.md`.
 
+- `metric_entities/inspection_sla.md` — Inspection SLA (SLA - VT): official onboarding/offboarding inspection SLA compliance rate on `sandbox.booking_resolution` (SLA de Vistoria / Produtividade de Vistoria). Builds on `business_entities/inspection.md`.
+
 
 ## Company-Wide Glossary
 

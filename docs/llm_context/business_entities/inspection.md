@@ -33,6 +33,10 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 
 **Important distinction**: "Inspection" (vistoria) is a technical property assessment. "Visit" (visita) is when a prospective tenant views the property before renting. They are completely different entities.
 
+## Related Metric Entities
+
+- [Inspection SLA](../metric_entities/inspection_sla.md) — official onboarding/offboarding inspection SLA compliance rate.
+
 ## Glossary and Synonyms
 
 - **Vistoria**, **inspeção** → `inspection`
@@ -91,7 +95,7 @@ Most inspection-related metrics are anchored to the **Termination** entity, not 
 **Inspection-only metrics (not tied to termination):**
 - Report access rate — percentage of inspections where landlord and/or tenant accessed the report (`fact_report_inspections.has_tenant_access_review`, `fact_report_inspections.has_owner_access_review`)
 - Inspection volume per month (filter by `inspection_type` and `status`)
-- SLA compliance: time between scheduling and execution (`fact_inspection.ldt_hours_execution`, `fact_inspection.is_sla_execution`)
+- SLA compliance: time between scheduling and execution (`fact_inspection.ldt_hours_execution`, `fact_inspection.is_sla_execution`) — this is a simpler, generic SLA signal. For the **official** SLA number (stage-specific thresholds — calendar days for onboarding vs. business days for offboarding — dedup/rank logic, and eviction segmentation, on the canonical `sandbox.booking_resolution` table), see [Inspection SLA](../metric_entities/inspection_sla.md).
 
 **Kirk / automatic laudo metrics:**
 - Kirk adoption rate — `COUNT_IF(is_automated_ar) / COUNT(*)` from `dw_offboarding.obt_offboarding` 
