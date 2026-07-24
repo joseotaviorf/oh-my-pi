@@ -187,7 +187,7 @@ WITH
         SELECT
             es.person_number,
             es.name,
-            es.dt_hired,
+            es.dt_employee_hired AS dt_hired,
             es.country,
             es.name_l1,
             es.name_l2,

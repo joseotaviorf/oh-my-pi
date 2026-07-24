@@ -16,7 +16,7 @@ WITH cost_center_label AS (
 SELECT DISTINCT
     COALESCE(LOWER(es.name), '') AS `Employees name`,
     COALESCE(LOWER(es.work_email), '') AS Email,
-    COALESCE(CAST(es.dt_original_hire AS STRING), '') AS Admission,
+    COALESCE(CAST(es.dt_employee_hired AS STRING), '') AS Admission,
     COALESCE(LOWER(es.manager_name), '') AS Manager,
     COALESCE(LOWER(es.assignment_number), '') AS assignment_number,
     COALESCE(LOWER(CAST(es.band AS STRING)), '') AS Department,
