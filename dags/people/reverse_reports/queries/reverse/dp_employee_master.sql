@@ -12,7 +12,7 @@ SELECT
         WHEN LOWER(es.status) = 'terminated' THEN 'desligado'
         ELSE LOWER(es.status)
     END AS status,
-    mh.name_l1 AS gestor,
+    es.manager_name AS gestor,
     es.job_name AS cargo,
     es.job_family AS classe_cargo,
     es.band AS banda,

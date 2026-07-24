@@ -10,7 +10,7 @@ SELECT
         ELSE LOWER(es.status)
     END AS status,
     es.band AS banda,
-    mh.name_l1 AS gestor,
+    es.manager_name AS gestor,
     es.job_name AS cargo,
     LOWER(es.cost_center_code) AS numero_centro_de_custo,
     CONCAT(

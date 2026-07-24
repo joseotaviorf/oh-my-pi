@@ -2,165 +2,165 @@ database_name: dw_employee_details
 table_name: dim_management_hierarchy
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: |-
-  This table outlines the reporting structure within the organization, detailing the hierarchical relationships between employees and their managers. Each hierarchy starts on the employee (L1 to L9 depending on depth), goes through their direct manager and upward chain, until it reaches the CEO at L0. The CEO is always L0; the employee themselves can be at any level from L1 to L9. The direct manager may appear at any L level (L1 through L9) depending on the employee's position in the org. For a given team and point in time, the same manager will always have the same L number across all employees in that team.
-  Grain: one record per assignment per hierarchy version (period when the chain is valid). Rows with identical hierarchy attributes and sequential validity dates are consolidated into a single record with merged date range.
-  The hierarchy shows up to 10 levels (L0 to L9), ordered from the CEO (L0) down to the employee (L1 to L9). Only hierarchies where the CEO (person in the highest band) is L0 are considered valid.
-  dt_valid_to uses 9999-12-31 for current records per domain convention.
+description: |
+  Reporting chain for each workforce assignment, with the direct manager and the people at each organizational layer from the CEO (L0) down to the employee (L1–L9).
+  One row per assignment_number × hierarchy version: a new version opens when the reporting chain changes; consecutive identical periods are merged. Current versions use dt_valid_to = 9999-12-31.
+  Covers assignments that form a valid CEO-linked chain (CEO at L0).
+  Use manager_assignment_number for the employee's immediate supervisor; use assignment_number_lN / name_lN / email_lN to slice or filter by a fixed depth from the CEO. The employee sits at hierarchy_level; the direct manager sits one layer above and may be any of L1–L9 depending on org depth. Filter is_current = TRUE for the live chain.
 columns:
   sk_hierarchy_version:
-    description: Deterministic surrogate key for the hierarchy version. Generated as MD5 hash of assignment_number + dt_valid_from + dt_valid_to.
+    description: Unique key for the assignment hierarchy version (e.g. 'a1b2c3d4e5f6789012345678901234ab').
     lineage:
       - datalake_people.management_hierarchy.sk_hierarchy_version
   assignment_number:
-    description: Assignment number (employee code) whose managerial chain is tracked in this record.
+    description: Main business identifier of the assignment whose reporting chain is represented in this record (e.g. 'E123456'). Links hierarchy versions to workforce assignments.
     lineage:
       - datalake_people.management_hierarchy.assignment_number
   manager_assignment_number:
-    description: Assignment number of the direct manager for this assignment in the valid hierarchy version. Empty when there is no direct manager in the chain.
+    description: Assignment number of the employee's direct manager (immediate supervisor) in this hierarchy version (e.g. 'E654321'). Empty when the assignment has no direct manager in the chain (e.g. CEO).
     lineage:
       - datalake_people.management_hierarchy.manager_assignment_number
   hierarchy_level:
-    description: Hierarchy level label of the assignment in the chain (L0 to L9), where L0 is the top-level manager.
+    description: Organizational layer label of this assignment in the reporting chain, from L0 (CEO) to L9 (deepest supported depth) (e.g. 'L5').
     lineage:
       - datalake_people.management_hierarchy.hierarchy_level
   hierarchy_depth:
-    description: Numeric depth of the assignment in the hierarchy chain (0 to 9), where 0 represents the top-level manager.
+    description: Numeric organizational depth of this assignment in the reporting chain, from 0 (CEO) to 9 (e.g. 5).
     lineage:
       - datalake_people.management_hierarchy.hierarchy_depth
   assignment_number_l0:
-    description: Assignment number of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    description: Assignment number of the person at organizational layer 0 (CEO / top of the chain) in this assignment's reporting chain (the top of every valid reporting chain) (e.g. 'E123456').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l0
   name_l0:
-    description: Full name of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    description: Full name of the person at organizational layer 0 (CEO / top of the chain) in this assignment's reporting chain (the top of every valid reporting chain) (e.g. 'Gabriel Braga Vieira').
     lineage:
       - datalake_people.management_hierarchy.name_l0
   email_l0:
-    description: Work e-mail of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    description: Work email of the person at organizational layer 0 (CEO / top of the chain) in this assignment's reporting chain (the top of every valid reporting chain) (e.g. 'name.last_name@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l0
   assignment_number_l1:
-    description: Assignment number of the manager L1 (Layer 1, one level below L0).
+    description: Assignment number of the person at organizational layer 1 (L1), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L0 in the same chain) (e.g. 'E100001'). Distinct from manager_assignment_number, which holds the direct manager regardless of layer.
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l1
   name_l1:
-    description: Full name of the manager L1 (Layer 1, one level below L0).
+    description: Full name of the person at organizational layer 1 (L1), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L0 in the same chain) (e.g. 'Example Name L1'). Distinct from the direct manager identity, which is held in manager_assignment_number.
     lineage:
       - datalake_people.management_hierarchy.name_l1
   email_l1:
-    description: Work e-mail of the manager L1 (Layer 1, one level below L0).
+    description: Work email of the person at organizational layer 1 (L1), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L0 in the same chain) (e.g. 'name.l1@quintoandar.com.br'). Distinct from the direct manager identity, which is held in manager_assignment_number.
     lineage:
       - datalake_people.management_hierarchy.email_l1
   assignment_number_l2:
-    description: Assignment number of the manager L2 (Layer 2, one level below L1).
+    description: Assignment number of the person at organizational layer 2 (L2), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L1 in the same chain) (e.g. 'E100002').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l2
   name_l2:
-    description: Full name of the manager L2 (Layer 2, one level below L1).
+    description: Full name of the person at organizational layer 2 (L2), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L1 in the same chain) (e.g. 'Example Name L2').
     lineage:
       - datalake_people.management_hierarchy.name_l2
   email_l2:
-    description: Work e-mail of the manager L2 (Layer 2, one level below L1).
+    description: Work email of the person at organizational layer 2 (L2), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L1 in the same chain) (e.g. 'name.l2@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l2
   assignment_number_l3:
-    description: Assignment number of the manager L3 (Layer 3, one level below L2).
+    description: Assignment number of the person at organizational layer 3 (L3), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L2 in the same chain) (e.g. 'E100003').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l3
   name_l3:
-    description: Full name of the manager L3 (Layer 3, one level below L2).
+    description: Full name of the person at organizational layer 3 (L3), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L2 in the same chain) (e.g. 'Example Name L3').
     lineage:
       - datalake_people.management_hierarchy.name_l3
   email_l3:
-    description: Work e-mail of the manager L3 (Layer 3, one level below L2).
+    description: Work email of the person at organizational layer 3 (L3), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L2 in the same chain) (e.g. 'name.l3@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l3
   assignment_number_l4:
-    description: Assignment number of the manager L4 (Layer 4, one level below L3).
+    description: Assignment number of the person at organizational layer 4 (L4), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L3 in the same chain) (e.g. 'E100004').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l4
   name_l4:
-    description: Full name of the manager L4 (Layer 4, one level below L3).
+    description: Full name of the person at organizational layer 4 (L4), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L3 in the same chain) (e.g. 'Example Name L4').
     lineage:
       - datalake_people.management_hierarchy.name_l4
   email_l4:
-    description: Work e-mail of the manager L4 (Layer 4, one level below L3).
+    description: Work email of the person at organizational layer 4 (L4), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L3 in the same chain) (e.g. 'name.l4@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l4
   assignment_number_l5:
-    description: Assignment number of the manager L5 (Layer 5, one level below L4).
+    description: Assignment number of the person at organizational layer 5 (L5), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L4 in the same chain) (e.g. 'E100005').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l5
   name_l5:
-    description: Full name of the manager L5 (Layer 5, one level below L4).
+    description: Full name of the person at organizational layer 5 (L5), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L4 in the same chain) (e.g. 'Example Name L5').
     lineage:
       - datalake_people.management_hierarchy.name_l5
   email_l5:
-    description: Work e-mail of the manager L5 (Layer 5, one level below L4).
+    description: Work email of the person at organizational layer 5 (L5), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L4 in the same chain) (e.g. 'name.l5@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l5
   assignment_number_l6:
-    description: Assignment number of the manager L6 (Layer 6, one level below L5).
+    description: Assignment number of the person at organizational layer 6 (L6), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L5 in the same chain) (e.g. 'E100006').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l6
   name_l6:
-    description: Full name of the manager L6 (Layer 6, one level below L5).
+    description: Full name of the person at organizational layer 6 (L6), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L5 in the same chain) (e.g. 'Example Name L6').
     lineage:
       - datalake_people.management_hierarchy.name_l6
   email_l6:
-    description: Work e-mail of the manager L6 (Layer 6, one level below L5).
+    description: Work email of the person at organizational layer 6 (L6), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L5 in the same chain) (e.g. 'name.l6@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l6
   assignment_number_l7:
-    description: Assignment number of the manager L7 (Layer 7, one level below L6).
+    description: Assignment number of the person at organizational layer 7 (L7), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L6 in the same chain) (e.g. 'E100007').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l7
   name_l7:
-    description: Full name of the manager L7 (Layer 7, one level below L6).
+    description: Full name of the person at organizational layer 7 (L7), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L6 in the same chain) (e.g. 'Example Name L7').
     lineage:
       - datalake_people.management_hierarchy.name_l7
   email_l7:
-    description: Work e-mail of the manager L7 (Layer 7, one level below L6).
+    description: Work email of the person at organizational layer 7 (L7), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L6 in the same chain) (e.g. 'name.l7@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l7
   assignment_number_l8:
-    description: Assignment number of the manager L8 (Layer 8, one level below L7).
+    description: Assignment number of the person at organizational layer 8 (L8), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L7 in the same chain) (e.g. 'E100008').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l8
   name_l8:
-    description: Full name of the manager L8 (Layer 8, one level below L7).
+    description: Full name of the person at organizational layer 8 (L8), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L7 in the same chain) (e.g. 'Example Name L8').
     lineage:
       - datalake_people.management_hierarchy.name_l8
   email_l8:
-    description: Work e-mail of the manager L8 (Layer 8, one level below L7).
+    description: Work email of the person at organizational layer 8 (L8), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L7 in the same chain) (e.g. 'name.l8@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l8
   assignment_number_l9:
-    description: Assignment number of the manager L9 (Layer 9, one level below L8).
+    description: Assignment number of the person at organizational layer 9 (L9), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L8 in the same chain) (e.g. 'E100009').
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l9
   name_l9:
-    description: Full name of the manager L9 (Layer 9, one level below L8).
+    description: Full name of the person at organizational layer 9 (L9), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L8 in the same chain) (e.g. 'Example Name L9').
     lineage:
       - datalake_people.management_hierarchy.name_l9
   email_l9:
-    description: Work e-mail of the manager L9 (Layer 9, one level below L8).
+    description: Work email of the person at organizational layer 9 (L9), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L8 in the same chain) (e.g. 'name.l9@quintoandar.com.br').
     lineage:
       - datalake_people.management_hierarchy.email_l9
   is_current:
-    description: TRUE if this is the most recent valid hierarchy version for the assignment.
+    description: True when this is the live hierarchy version for the assignment. Filter for the current reporting chain.
     lineage:
       - datalake_people.management_hierarchy.is_current
   dt_valid_from:
-    description: Date when this hierarchy version became effective.
+    description: Date when this hierarchy version became effective (e.g. 2024-03-15).
     lineage:
       - datalake_people.management_hierarchy.dt_valid_from
   dt_valid_to:
-    description: End date of this hierarchy version. Records with 9999-12-31 indicate the latest valid version for the assignment.
+    description: Date when this hierarchy version stopped being effective (e.g. 2024-08-01). 9999-12-31 while the version is current.
     lineage:
       - datalake_people.management_hierarchy.dt_valid_to
   ts_load:
-    description: Timestamp when the record was loaded into the dimension.
+    description: Timestamp when the record was loaded into the dimension (e.g. 2024-08-01 14:30:00).
     lineage:
       - datalake_people.management_hierarchy.ts_load

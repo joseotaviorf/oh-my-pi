@@ -410,199 +410,199 @@ columns:
       - dw_employee_details.fact_assignment_snapshots.termination_type
 
   manager_assignment_number:
-    description: Snapshot attribute for manager_assignment_number on the employee_snapshots wide metric table.
+    description: Assignment number of the employee's direct manager (immediate supervisor) on the snapshot date (e.g. 'E654321').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.manager_assignment_number
 
   manager_name:
-    description: Name of the direct manager on the employee_snapshots wide metric table.
+    description: Full name of the employee's direct manager (immediate supervisor) on the snapshot date (e.g. 'Maria Silva').
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.name
 
   manager_work_email:
-    description: Work email of the direct manager on the employee_snapshots wide metric table.
+    description: Work email of the employee's direct manager (immediate supervisor) on the snapshot date (e.g. 'name.last_name@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.work_email
 
   assignment_number_l0:
-    description: Snapshot attribute for assignment_number_l0 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 0 (CEO / top of the chain) in this assignment's reporting chain (top of every valid reporting chain) (e.g. 'E100000').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l0
 
   assignment_number_l1:
-    description: Snapshot attribute for assignment_number_l1 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 1 (L1), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L0) (e.g. 'E100001'). Distinct from manager_assignment_number, which holds the direct manager.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l1
 
   assignment_number_l2:
-    description: Snapshot attribute for assignment_number_l2 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 2 (L2), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L1) (e.g. 'E100002').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l2
 
   assignment_number_l3:
-    description: Snapshot attribute for assignment_number_l3 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 3 (L3), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L2) (e.g. 'E100003').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l3
 
   assignment_number_l4:
-    description: Snapshot attribute for assignment_number_l4 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 4 (L4), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L3) (e.g. 'E100004').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l4
 
   assignment_number_l5:
-    description: Snapshot attribute for assignment_number_l5 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 5 (L5), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L4) (e.g. 'E100005').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l5
 
   assignment_number_l6:
-    description: Snapshot attribute for assignment_number_l6 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 6 (L6), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L5) (e.g. 'E100006').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l6
 
   assignment_number_l7:
-    description: Snapshot attribute for assignment_number_l7 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 7 (L7), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L6) (e.g. 'E100007').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l7
 
   assignment_number_l8:
-    description: Snapshot attribute for assignment_number_l8 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 8 (L8), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L7) (e.g. 'E100008').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l8
 
   assignment_number_l9:
-    description: Snapshot attribute for assignment_number_l9 on the employee_snapshots wide metric table.
+    description: Assignment number of the person at organizational layer 9 (L9), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L8) (e.g. 'E100009').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l9
 
   name_l0:
-    description: Snapshot attribute for name_l0 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 0 (CEO / top of the chain) in this assignment's reporting chain (top of every valid reporting chain) (e.g. 'Example Name L0').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l0
 
   name_l1:
-    description: Snapshot attribute for name_l1 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 1 (L1), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L0) (e.g. 'Example Name L1'). Distinct from manager_name, which holds the direct manager.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l1
 
   name_l2:
-    description: Snapshot attribute for name_l2 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 2 (L2), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L1) (e.g. 'Example Name L2').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l2
 
   name_l3:
-    description: Snapshot attribute for name_l3 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 3 (L3), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L2) (e.g. 'Example Name L3').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l3
 
   name_l4:
-    description: Snapshot attribute for name_l4 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 4 (L4), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L3) (e.g. 'Example Name L4').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l4
 
   name_l5:
-    description: Snapshot attribute for name_l5 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 5 (L5), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L4) (e.g. 'Example Name L5').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l5
 
   name_l6:
-    description: Snapshot attribute for name_l6 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 6 (L6), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L5) (e.g. 'Example Name L6').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l6
 
   name_l7:
-    description: Snapshot attribute for name_l7 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 7 (L7), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L6) (e.g. 'Example Name L7').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l7
 
   name_l8:
-    description: Snapshot attribute for name_l8 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 8 (L8), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L7) (e.g. 'Example Name L8').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l8
 
   name_l9:
-    description: Snapshot attribute for name_l9 on the employee_snapshots wide metric table.
+    description: Full name of the person at organizational layer 9 (L9), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L8) (e.g. 'Example Name L9').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l9
 
   email_l0:
-    description: Snapshot attribute for email_l0 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 0 (CEO / top of the chain) in this assignment's reporting chain (top of every valid reporting chain) (e.g. 'name.l0@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l0
 
   email_l1:
-    description: Snapshot attribute for email_l1 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 1 (L1), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L0) (e.g. 'name.l1@quintoandar.com.br'). Distinct from manager_work_email, which holds the direct manager.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l1
 
   email_l2:
-    description: Snapshot attribute for email_l2 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 2 (L2), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L1) (e.g. 'name.l2@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l2
 
   email_l3:
-    description: Snapshot attribute for email_l3 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 3 (L3), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L2) (e.g. 'name.l3@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l3
 
   email_l4:
-    description: Snapshot attribute for email_l4 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 4 (L4), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L3) (e.g. 'name.l4@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l4
 
   email_l5:
-    description: Snapshot attribute for email_l5 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 5 (L5), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L4) (e.g. 'name.l5@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l5
 
   email_l6:
-    description: Snapshot attribute for email_l6 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 6 (L6), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L5) (e.g. 'name.l6@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l6
 
   email_l7:
-    description: Snapshot attribute for email_l7 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 7 (L7), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L6) (e.g. 'name.l7@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l7
 
   email_l8:
-    description: Snapshot attribute for email_l8 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 8 (L8), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L7) (e.g. 'name.l8@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l8
 
   email_l9:
-    description: Snapshot attribute for email_l9 on the employee_snapshots wide metric table.
+    description: Work email of the person at organizational layer 9 (L9), counted downward from the CEO at L0 in this assignment's reporting chain (one layer below L8) (e.g. 'name.l9@quintoandar.com.br').
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l9
@@ -911,7 +911,7 @@ columns:
       - dw_employee_details.fact_assignment_snapshots.is_reorganization_termination
 
   manager_is_active:
-    description: Snapshot attribute for manager_is_active on the employee_snapshots wide metric table.
+    description: True when the employee's direct manager has an active assignment on the snapshot date.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_active

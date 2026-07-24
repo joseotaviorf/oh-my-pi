@@ -2,15 +2,14 @@ database_name: datalake_people
 table_name: management_hierarchy
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: |-
-  This table outlines the reporting structure within the organization, detailing the hierarchical relationships between employees and their managers. Each hierarchy starts on the employee (L1 to L9 depending on depth), goes through their direct manager and upward chain, until it reaches the CEO at L0. The CEO is always L0; the employee themselves can be at any level from L1 to L9. The direct manager may appear at any L level (L1 through L9) depending on the employee's position in the org. For a given team and point in time, the same manager will always have the same L number across all employees in that team.
-  Grain: one record per assignment per hierarchy version (period when the chain is valid). Rows with identical hierarchy attributes and sequential validity dates are consolidated into a single record with merged date range.
-  The hierarchy shows up to 10 levels (L0 to L9), ordered from the CEO (L0) down to the employee (L1 to L9). Only hierarchies where the CEO (person in the highest band) is L0 are considered valid.
-  Only assignments with assignment_type in ('C', 'E') are included; assignment_type 'P' is excluded.
-  Employees flagged is_user_test in identifier_mapping remain excluded from the base population; managers in the LINE_MANAGER chain are not excluded by that flag so mis-scoped open ID_ONDA1 identifiers do not drop entire subtrees from valid CEO-linked hierarchies.
+description: |
+  Reporting chain for each workforce assignment, with the direct manager identity and denormalized people at each organizational layer from the CEO (L0) down to the employee (L1–L9).
+  One row per assignment_number × hierarchy version: a new version opens when the reporting chain changes; consecutive identical periods are merged.
+  Covers assignments that form a valid CEO-linked chain.
+  Guarantees a stable L number for the same manager across a team at a point in time. manager_assignment_number / name_manager identify the immediate supervisor; *_lN columns identify the person at fixed depth N from the CEO (the employee sits at hierarchy_level; the direct manager sits one layer above and may be any of L1–L9).
 columns:
   sk_hierarchy_version:
-    description: Deterministic surrogate key for the hierarchy version. Generated as MD5 hash of assignment_number + dt_valid_from + dt_valid_to.
+    description: Unique key for the assignment hierarchy version. Stable for a given assignment_number and validity window.
     lineage:
       - datalake_people.identifier_mapping.assignment_number
       - datalake_pin_core_clean.assignment_supervisor.dt_effective_started
@@ -20,194 +19,194 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number:
-    description: Person number (Oracle HCM person identifier) of the employee whose managerial chain is tracked in this record.
+    description: Main business identifier of the employee in PIN whose reporting chain is tracked in this record.
     lineage:
       - datalake_people.identifier_mapping.person_number
   manager_assignment_number:
-    description: Assignment number of the direct manager. Derived from manager_struct_path[SIZE-2]. NULL when employee is CEO (no manager).
+    description: Assignment number of the employee's direct manager (immediate supervisor). NULL when the assignment has no manager in the chain (e.g. CEO).
     lineage:
       - datalake_pin_core_clean.assignment_supervisor.id_manager_assignment
       - datalake_people.identifier_mapping.assignment_number
   hierarchy_depth:
-    description: Numeric level in the org chart (0=CEO, 1=L1, ..., 9=L9). Derived from SIZE(manager_struct_path) - 1.
+    description: Numeric organizational depth of this assignment in the reporting chain, from 0 (CEO) to 9. The employee sits at this depth; the direct manager sits at depth - 1.
     lineage:
       - datalake_pin_core_clean.assignment_supervisor.id_manager_assignment
       - datalake_people.identifier_mapping.assignment_number
   hierarchy_level:
-    description: Employee level in the org chart (L0 to L9). Derived from 'L' || (SIZE(manager_struct_path) - 1).
+    description: Organizational layer label of this assignment in the reporting chain (L0 to L9). Matches hierarchy_depth as L{depth}.
     lineage:
       - datalake_pin_core_clean.assignment_supervisor.id_manager_assignment
       - datalake_people.identifier_mapping.assignment_number
   person_number_manager:
-    description: Person number (Oracle HCM person identifier) of the direct manager.
+    description: Person number of the employee's direct manager (immediate supervisor).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_manager:
-    description: Full name of the direct manager.
+    description: Full name of the employee's direct manager (immediate supervisor).
     lineage:
       - datalake_people.identifier_mapping.name
   email_manager:
-    description: Work e-mail of the direct manager.
+    description: Work email of the employee's direct manager (immediate supervisor).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l0:
-    description: Assignment number of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    description: Assignment number of the person at organizational layer 0 (CEO / top of the chain) (top of every valid reporting chain).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l0:
-    description: Person number (Oracle HCM person identifier) of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    description: Person number of the person at organizational layer 0 (CEO / top of the chain) (top of every valid reporting chain).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l0:
-    description: Full name of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    description: Full name of the person at organizational layer 0 (CEO / top of the chain) (top of every valid reporting chain).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l0:
-    description: Work e-mail of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
+    description: Work email of the person at organizational layer 0 (CEO / top of the chain) (top of every valid reporting chain).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l1:
-    description: Assignment number of the manager L1 (Layer 1, one level below L0).
+    description: Assignment number of the person at organizational layer 1 (L1), counted downward from the CEO at L0 (one layer below L0). Distinct from manager_assignment_number (direct manager).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l1:
-    description: Person number (Oracle HCM person identifier) of the manager L1 (Layer 1, one level below L0).
+    description: Person number of the person at organizational layer 1 (L1), counted downward from the CEO at L0 (one layer below L0). Distinct from person_number_manager (direct manager).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l1:
-    description: Full name of the manager L1 (Layer 1, one level below L0).
+    description: Full name of the person at organizational layer 1 (L1), counted downward from the CEO at L0 (one layer below L0). Distinct from name_manager (direct manager).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l1:
-    description: Work e-mail of the manager L1 (Layer 1, one level below L0).
+    description: Work email of the person at organizational layer 1 (L1), counted downward from the CEO at L0 (one layer below L0). Distinct from email_manager (direct manager).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l2:
-    description: Assignment number of the manager L2 (Layer 2, one level below L1).
+    description: Assignment number of the person at organizational layer 2 (L2), counted downward from the CEO at L0 (one layer below L1).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l2:
-    description: Person number (Oracle HCM person identifier) of the manager L2 (Layer 2, one level below L1).
+    description: Person number of the person at organizational layer 2 (L2), counted downward from the CEO at L0 (one layer below L1).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l2:
-    description: Full name of the manager L2 (Layer 2, one level below L1).
+    description: Full name of the person at organizational layer 2 (L2), counted downward from the CEO at L0 (one layer below L1).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l2:
-    description: Work e-mail of the manager L2 (Layer 2, one level below L1).
+    description: Work email of the person at organizational layer 2 (L2), counted downward from the CEO at L0 (one layer below L1).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l3:
-    description: Assignment number of the manager L3 (Layer 3, one level below L2).
+    description: Assignment number of the person at organizational layer 3 (L3), counted downward from the CEO at L0 (one layer below L2).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l3:
-    description: Person number (Oracle HCM person identifier) of the manager L3 (Layer 3, one level below L2).
+    description: Person number of the person at organizational layer 3 (L3), counted downward from the CEO at L0 (one layer below L2).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l3:
-    description: Full name of the manager L3 (Layer 3, one level below L2).
+    description: Full name of the person at organizational layer 3 (L3), counted downward from the CEO at L0 (one layer below L2).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l3:
-    description: Work e-mail of the manager L3 (Layer 3, one level below L2).
+    description: Work email of the person at organizational layer 3 (L3), counted downward from the CEO at L0 (one layer below L2).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l4:
-    description: Assignment number of the manager L4 (Layer 4, one level below L3).
+    description: Assignment number of the person at organizational layer 4 (L4), counted downward from the CEO at L0 (one layer below L3).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l4:
-    description: Person number (Oracle HCM person identifier) of the manager L4 (Layer 4, one level below L3).
+    description: Person number of the person at organizational layer 4 (L4), counted downward from the CEO at L0 (one layer below L3).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l4:
-    description: Full name of the manager L4 (Layer 4, one level below L3).
+    description: Full name of the person at organizational layer 4 (L4), counted downward from the CEO at L0 (one layer below L3).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l4:
-    description: Work e-mail of the manager L4 (Layer 4, one level below L3).
+    description: Work email of the person at organizational layer 4 (L4), counted downward from the CEO at L0 (one layer below L3).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l5:
-    description: Assignment number of the manager L5 (Layer 5, one level below L4).
+    description: Assignment number of the person at organizational layer 5 (L5), counted downward from the CEO at L0 (one layer below L4).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l5:
-    description: Person number (Oracle HCM person identifier) of the manager L5 (Layer 5, one level below L4).
+    description: Person number of the person at organizational layer 5 (L5), counted downward from the CEO at L0 (one layer below L4).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l5:
-    description: Full name of the manager L5 (Layer 5, one level below L4).
+    description: Full name of the person at organizational layer 5 (L5), counted downward from the CEO at L0 (one layer below L4).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l5:
-    description: Work e-mail of the manager L5 (Layer 5, one level below L4).
+    description: Work email of the person at organizational layer 5 (L5), counted downward from the CEO at L0 (one layer below L4).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l6:
-    description: Assignment number of the manager L6 (Layer 6, one level below L5).
+    description: Assignment number of the person at organizational layer 6 (L6), counted downward from the CEO at L0 (one layer below L5).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l6:
-    description: Person number (Oracle HCM person identifier) of the manager L6 (Layer 6, one level below L5).
+    description: Person number of the person at organizational layer 6 (L6), counted downward from the CEO at L0 (one layer below L5).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l6:
-    description: Full name of the manager L6 (Layer 6, one level below L5).
+    description: Full name of the person at organizational layer 6 (L6), counted downward from the CEO at L0 (one layer below L5).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l6:
-    description: Work e-mail of the manager L6 (Layer 6, one level below L5).
+    description: Work email of the person at organizational layer 6 (L6), counted downward from the CEO at L0 (one layer below L5).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l7:
-    description: Assignment number of the manager L7 (Layer 7, one level below L6).
+    description: Assignment number of the person at organizational layer 7 (L7), counted downward from the CEO at L0 (one layer below L6).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l7:
-    description: Person number (Oracle HCM person identifier) of the manager L7 (Layer 7, one level below L6).
+    description: Person number of the person at organizational layer 7 (L7), counted downward from the CEO at L0 (one layer below L6).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l7:
-    description: Full name of the manager L7 (Layer 7, one level below L6).
+    description: Full name of the person at organizational layer 7 (L7), counted downward from the CEO at L0 (one layer below L6).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l7:
-    description: Work e-mail of the manager L7 (Layer 7, one level below L6).
+    description: Work email of the person at organizational layer 7 (L7), counted downward from the CEO at L0 (one layer below L6).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l8:
-    description: Assignment number of the manager L8 (Layer 8, one level below L7).
+    description: Assignment number of the person at organizational layer 8 (L8), counted downward from the CEO at L0 (one layer below L7).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l8:
-    description: Person number (Oracle HCM person identifier) of the manager L8 (Layer 8, one level below L7).
+    description: Person number of the person at organizational layer 8 (L8), counted downward from the CEO at L0 (one layer below L7).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l8:
-    description: Full name of the manager L8 (Layer 8, one level below L7).
+    description: Full name of the person at organizational layer 8 (L8), counted downward from the CEO at L0 (one layer below L7).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l8:
-    description: Work e-mail of the manager L8 (Layer 8, one level below L7).
+    description: Work email of the person at organizational layer 8 (L8), counted downward from the CEO at L0 (one layer below L7).
     lineage:
       - datalake_people.identifier_mapping.work_email
   assignment_number_l9:
-    description: Assignment number of the manager L9 (Layer 9, one level below L8).
+    description: Assignment number of the person at organizational layer 9 (L9), counted downward from the CEO at L0 (one layer below L8).
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   person_number_l9:
-    description: Person number (Oracle HCM person identifier) of the manager L9 (Layer 9, one level below L8).
+    description: Person number of the person at organizational layer 9 (L9), counted downward from the CEO at L0 (one layer below L8).
     lineage:
       - datalake_people.identifier_mapping.person_number
   name_l9:
-    description: Full name of the manager L9 (Layer 9, one level below L8).
+    description: Full name of the person at organizational layer 9 (L9), counted downward from the CEO at L0 (one layer below L8).
     lineage:
       - datalake_people.identifier_mapping.name
   email_l9:
-    description: Work e-mail of the manager L9 (Layer 9, one level below L8).
+    description: Work email of the person at organizational layer 9 (L9), counted downward from the CEO at L0 (one layer below L8).
     lineage:
       - datalake_people.identifier_mapping.work_email
   version:
