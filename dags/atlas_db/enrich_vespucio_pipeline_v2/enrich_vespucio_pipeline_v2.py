@@ -301,6 +301,37 @@ image_enrich_step_task = create_task(
     ],
 )
 
+address_grouping_step_task = create_task(
+    entry_point="core_v2_address_grouping_step",
+    parameters=[
+        f"--input_enriched={Tables.address_enrich_step_v2}",
+        f"--input_general_normalized={Tables.general_normalization_step_v2}",
+        "--overwrite_schema",
+        f"--output_match_anchors={Tables.match_anchors_v2}",
+    ],
+)
+
+image_grouping_step_task = create_task(
+    entry_point="core_v2_image_grouping_step",
+    parameters=[
+        f"--input_source_clustering_image_model={Tables.source_clustering_image_model}",
+        "--overwrite_schema",
+        f"--output_match_pairs={Tables.match_pairs_v2}",
+    ],
+)
+
+resolve_groups_step_task = create_task(
+    entry_point="core_v2_resolve_groups_step",
+    parameters=[
+        f"--input_enriched={Tables.address_enrich_step_v2}",
+        f"--input_match_anchors={Tables.match_anchors_v2}",
+        f"--input_match_pairs={Tables.match_pairs_v2}",
+        "--overwrite_schema",
+        f"--output_artifact_groups={Tables.artifact_groups}",
+        f"--output_group_merges={Tables.group_merges}",
+    ],
+)
+
 vespucio_v2_pipeline_complete_task = DummyOperator(
     task_id="vespucio-v2-pipeline-complete",
     dag=dag,
@@ -319,5 +350,10 @@ address_normalization_step_task >> address_enrich_step_task
 [
     address_enrich_step_task,
     general_normalization_step_task,
-    image_enrich_step_task,
-] >> vespucio_v2_pipeline_complete_task
+] >> address_grouping_step_task
+image_enrich_step_task >> image_grouping_step_task
+[
+    address_grouping_step_task,
+    image_grouping_step_task,
+] >> resolve_groups_step_task
+resolve_groups_step_task >> vespucio_v2_pipeline_complete_task
