@@ -3,7 +3,8 @@ WITH session_base AS (
         id_session,
         user,
         session_source,
-        business_domain,
+        business_domain_normalized,
+        is_synthetic_session,
         is_success,
         response_category,
         ts_started,
@@ -11,32 +12,49 @@ WITH session_base AS (
         urn_count,
         data_product_count,
         dataset_count,
-        depth_tier,
-        year,
-        month,
-        day
+        depth_tier
     FROM
         datalake_tars.query_annotations
     WHERE
         MAKE_DATE(year, month, day) BETWEEN "{load_start_date}"
         AND "{load_end_date}"
 ),
--- Derive first user / source per session (all queries in a session share these)
 session_identity AS (
     SELECT
         id_session,
         MIN(user) AS user,
         MIN(session_source) AS session_source,
-        MIN(business_domain) AS dominant_business_domain,
+        MAX(is_synthetic_session) AS is_synthetic_session,
         MIN(ts_started) AS ts_session_start,
-        MAX(ts_ended) AS ts_session_end,
-        MIN(year) AS year,
-        MIN(month) AS month,
-        MIN(day) AS day
+        MAX(ts_ended) AS ts_session_end
     FROM
         session_base
     GROUP BY
         id_session
+),
+domain_counts AS (
+    SELECT
+        id_session,
+        business_domain_normalized,
+        COUNT(*) AS domain_query_count,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_session
+            ORDER BY COUNT(*) DESC, business_domain_normalized
+        ) AS domain_rank
+    FROM
+        session_base
+    GROUP BY
+        id_session,
+        business_domain_normalized
+),
+dominant_domain AS (
+    SELECT
+        id_session,
+        business_domain_normalized AS dominant_business_domain
+    FROM
+        domain_counts
+    WHERE
+        domain_rank = 1
 ),
 session_agg AS (
     SELECT
@@ -60,7 +78,8 @@ SELECT
     si.id_session,
     si.user,
     si.session_source,
-    si.dominant_business_domain,
+    si.is_synthetic_session,
+    dd.dominant_business_domain,
     sa.query_count,
     sa.data_query_count,
     sa.debug_count,
@@ -79,11 +98,14 @@ SELECT
     si.ts_session_start,
     si.ts_session_end,
     DATE(si.ts_session_start) AS dt_session,
-    si.year,
-    si.month,
-    si.day
+    YEAR(DATE(si.ts_session_start)) AS year,
+    MONTH(DATE(si.ts_session_start)) AS month,
+    DAY(DATE(si.ts_session_start)) AS day
 FROM
     session_identity AS si
 INNER JOIN
     session_agg AS sa
         ON si.id_session = sa.id_session
+INNER JOIN
+    dominant_domain AS dd
+        ON si.id_session = dd.id_session

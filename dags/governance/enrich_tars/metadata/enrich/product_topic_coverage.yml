@@ -4,12 +4,12 @@ table_name: product_topic_coverage
 owner: aurelio.nogueira@quintoandar.com.br
 domain: Data Ops & Governance
 description: >
-  Daily snapshot of DataHub Data Product × Tars business-domain coverage. Each row represents
-  one product-topic combination observed in the load window, with actual usage counts and a
-  flag indicating whether the combination is an expected match (based on domain heuristics).
-  Rows with is_used=false and expected_domain_match=true identify catalog gaps where
-  a relevant Data Product exists in DataHub but Tars never referenced it for queries in
-  that business domain.
+  Daily snapshot of DataHub Data Product × Tars business-domain coverage over a trailing
+  28-day window ending on load_end_date. Each row represents one product-topic combination,
+  with actual usage counts and a flag indicating whether the combination is an expected match
+  (based on domain heuristics). Rows with is_used=false and expected_domain_match=true
+  identify catalog gaps where a relevant Data Product exists in DataHub but Tars never
+  referenced it for queries in that business domain.
 columns:
   product_slug:
     lineage:
@@ -48,7 +48,7 @@ columns:
       - datalake_tars.datahub_product_glossary.datahub_domain
     description: True when the DataHub domain of the product is heuristically expected to answer questions for this Tars business domain.
   dt_reference:
-    description: The load_start_date of the incremental window this snapshot covers.
+    description: Snapshot date (load_end_date) for the trailing 28-day coverage window.
   year:
     description: Partition year derived from load_start_date.
   month:

@@ -21,10 +21,14 @@ columns:
     lineage:
       - datalake_tars.query_annotations.session_source
     description: Client that triggered the session (claude, cursor, unknown).
+  is_synthetic_session:
+    lineage:
+      - datalake_tars.query_annotations.is_synthetic_session
+    description: True when the session was synthesized for a single untagged query (no-session-* id).
   dominant_business_domain:
     lineage:
-      - datalake_tars.query_annotations.business_domain
-    description: Most frequently observed business_domain across queries in the session.
+      - datalake_tars.query_annotations.business_domain_normalized
+    description: Most frequently observed normalized business domain across queries in the session.
   query_count:
     lineage:
       - datalake_tars.query_annotations.id_query

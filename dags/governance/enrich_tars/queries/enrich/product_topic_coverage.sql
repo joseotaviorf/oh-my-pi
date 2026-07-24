@@ -13,14 +13,14 @@ WITH products AS (
 ),
 topics AS (
     SELECT DISTINCT
-        business_domain
+        business_domain_normalized AS business_domain
     FROM
         datalake_tars.query_annotations
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN "{load_start_date}"
+        MAKE_DATE(year, month, day) BETWEEN DATE_SUB("{load_end_date}", 27)
         AND "{load_end_date}"
-        AND business_domain IS NOT NULL
-        AND business_domain != 'unknown'
+        AND business_domain_normalized IS NOT NULL
+        AND business_domain_normalized != 'unknown'
 ),
 usage AS (
     SELECT
@@ -32,7 +32,7 @@ usage AS (
     FROM
         datalake_tars.datahub_asset_usage
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN "{load_start_date}"
+        MAKE_DATE(year, month, day) BETWEEN DATE_SUB("{load_end_date}", 27)
         AND "{load_end_date}"
         AND asset_type = 'dataProduct'
     GROUP BY
@@ -78,10 +78,10 @@ SELECT
     COALESCE(u.queries, 0) AS queries,
     u.product_slug IS NOT NULL AS is_used,
     dtm.expected_datahub_domain IS NOT NULL AS expected_domain_match,
-    DATE("{load_start_date}") AS dt_reference,
-    YEAR(DATE("{load_start_date}")) AS year,
-    MONTH(DATE("{load_start_date}")) AS month,
-    DAY(DATE("{load_start_date}")) AS day
+    DATE("{load_end_date}") AS dt_reference,
+    YEAR(DATE("{load_end_date}")) AS year,
+    MONTH(DATE("{load_end_date}")) AS month,
+    DAY(DATE("{load_end_date}")) AS day
 FROM
     cross_joined AS cj
 LEFT JOIN

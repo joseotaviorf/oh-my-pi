@@ -18,6 +18,10 @@ columns:
     lineage:
       - data_platform_metrics.trino_query_complete.query
     description: Tars conversation session identifier extracted from the tars JSON comment. Queries without a comment use a synthetic id.
+  is_synthetic_session:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: True when the session id was synthesized for a query without a parseable Tars annotation (no-session-* prefix).
   session_source:
     lineage:
       - data_platform_metrics.trino_query_complete.query
@@ -37,11 +41,19 @@ columns:
   business_domain:
     lineage:
       - data_platform_metrics.trino_query_complete.query
-    description: Business domain of the session as classified by Tars (e.g. For Rent, Fintech, Growth).
+    description: Raw business domain of the session as classified by Tars (free text; may contain aliases and typos).
+  business_domain_normalized:
+    lineage:
+      - data_platform_metrics.trino_query_complete.query
+    description: Canonical business domain mapped from business_domain for dashboard grouping (For Rent, Fintech, Growth, etc.).
   query_state:
     lineage:
       - data_platform_metrics.trino_query_complete.query_state
     description: Trino query execution state (FINISHED, FAILED, etc.).
+  error_name:
+    lineage:
+      - data_platform_metrics.trino_query_complete.error_name
+    description: Trino error name when query_state is FAILED; null for successful queries.
   is_success:
     lineage:
       - data_platform_metrics.trino_query_complete.query_state

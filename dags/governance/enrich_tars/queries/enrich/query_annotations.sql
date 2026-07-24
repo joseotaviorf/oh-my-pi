@@ -3,6 +3,7 @@ WITH tars_raw AS (
         query_id AS id_query,
         query,
         query_state,
+        error_name,
         execution_time,
         execution_start_time AS ts_started,
         end_time AS ts_ended,
@@ -21,6 +22,7 @@ parsed AS (
     SELECT
         id_query,
         query_state,
+        error_name,
         execution_time,
         ts_started,
         ts_ended,
@@ -36,7 +38,8 @@ annotated AS (
     SELECT
         id_query,
         query_state,
-        execution_time / 1000.0 AS execution_time_sec,
+        error_name,
+        CAST(execution_time AS DOUBLE) AS execution_time_sec,
         ts_started,
         ts_ended,
         user,
@@ -65,12 +68,67 @@ enriched AS (
     SELECT
         id_query,
         id_session,
+        id_session LIKE 'no-session-%' AS is_synthetic_session,
         COALESCE(session_source, 'unknown') AS session_source,
         COALESCE(user, 'unknown') AS user,
         user_question,
         COALESCE(response_category, 'unknown') AS response_category,
         COALESCE(business_domain, 'unknown') AS business_domain,
+        CASE
+            WHEN business_domain IS NULL OR TRIM(business_domain) = '' THEN 'unknown'
+            WHEN LOWER(TRIM(business_domain)) IN (
+                'for rent',
+                'for rent / for sale',
+                'for rent, for sale',
+                'nps for rent'
+            ) THEN 'For Rent'
+            WHEN LOWER(TRIM(business_domain)) IN (
+                'for sale',
+                'for sale vc chat segmentation',
+                'for_sale_visits'
+            ) THEN 'For Sale'
+            WHEN LOWER(TRIM(business_domain)) IN (
+                'fintech',
+                'fintech credit',
+                'credito',
+                'collections',
+                'collections ai',
+                'closing',
+                'lending lra',
+                'accounting',
+                'accounting-recon'
+            ) THEN 'Fintech'
+            WHEN LOWER(TRIM(business_domain)) IN ('growth', 'supply', 'leads') THEN 'Growth'
+            WHEN LOWER(TRIM(business_domain)) IN (
+                'conversational',
+                'conversacional',
+                'chatbot',
+                'support_ai'
+            ) THEN 'Conversational'
+            WHEN LOWER(TRIM(business_domain)) = 'agents' THEN 'Agents'
+            WHEN LOWER(TRIM(business_domain)) IN (
+                'support and services',
+                'customer_service',
+                'customer_support_bpo',
+                'concierge',
+                'concierge reprocessamento',
+                'concierge reprocessing'
+            ) THEN 'Support and Services'
+            WHEN business_domain IN (
+                'For Rent',
+                'For Sale',
+                'Fintech',
+                'Growth',
+                'Conversational',
+                'Agents',
+                'Other',
+                'Single Station',
+                'Supply'
+            ) THEN business_domain
+            ELSE 'Other'
+        END AS business_domain_normalized,
         query_state,
+        error_name,
         query_state = 'FINISHED' AS is_success,
         execution_time_sec,
         ts_started,
@@ -128,12 +186,15 @@ enriched AS (
 SELECT
     id_query,
     id_session,
+    is_synthetic_session,
     session_source,
     user,
     user_question,
     response_category,
     business_domain,
+    business_domain_normalized,
     query_state,
+    error_name,
     is_success,
     execution_time_sec,
     has_tars_comment,
