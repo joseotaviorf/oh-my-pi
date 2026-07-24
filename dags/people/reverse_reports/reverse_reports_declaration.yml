@@ -314,3 +314,9 @@ workflow:
       extra_spark_job_arguments:
         - "1RNvYAYC2KlpigkQ5Xz9nmjuaoIOf5GHbmUX-AG9M8bE"
         - "certificados_base"
+
+    # Former notebook view: leiturinha_desligados
+    leiturinha_terminated_roster:
+      extra_spark_job_arguments:
+        - "1QgICpSG4yJa1-zyvnSyTi0S8GPHf6Xg0hg0rgzg5v3Q"
+        - "leiturinha_desligados"
