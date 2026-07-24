@@ -1,25 +1,29 @@
-"""Fetch migration comparison verdicts from S3 and create a PR per DAG scope.
+"""Fetch migration comparison verdicts from S3 and create PRs grouped by domain.
 
-Reads summary.json for each DAG scope, creates one PR with all transpiled
-SQL (both PASS and FAIL tables). The PR title shows the DAG-level verdict
-(PASS only when all tables pass). The body marks each table's status.
+Reads summary.json for each DAG scope, groups results by domain (business line),
+and creates separate PRs for passed and failed DAGs within each domain.
 
 Usage:
+  # Auto-discover all scopes, group by domain:
+  uv run --no-project --with boto3,pyyaml,sqlglot python \
+    .cursor/skills/emr-migration-v2/results.py \
+    --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
+
+  # Filter to specific domains:
+  uv run --no-project --with boto3,pyyaml,sqlglot python \
+    .cursor/skills/emr-migration-v2/results.py \
+    --domain growth,fintech \
+    --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
+
+  # Single scope (legacy, one PR):
   uv run --no-project --with boto3,pyyaml,sqlglot python \
     .cursor/skills/emr-migration-v2/results.py \
     --scope fintech/enrich_velo \
     --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
 
-  # Multiple DAGs:
+  # Dry run (print verdicts and grouping, no PRs):
   uv run --no-project --with boto3,pyyaml,sqlglot python \
     .cursor/skills/emr-migration-v2/results.py \
-    --scope fintech/enrich_velo,fintech/enrich_docx \
-    --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
-
-  # Dry run (just print verdicts, no branches/PRs):
-  uv run --no-project --with boto3,pyyaml,sqlglot python \
-    .cursor/skills/emr-migration-v2/results.py \
-    --scope fintech/enrich_velo \
     --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br \
     --dry-run
 """
@@ -41,6 +45,7 @@ import boto3
 import sqlglot
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+PLATFORM_DAG_DIR = REPO_ROOT / "dags" / "platform"
 
 _TEMPLATE_PARAMS = [
     "load_start_date",
@@ -177,6 +182,35 @@ def _gh(*args: str) -> str:
     return result.stdout.strip()
 
 
+# ---------------------------------------------------------------------------
+# Scope discovery
+# ---------------------------------------------------------------------------
+
+
+def discover_compare_scopes(
+    platform_dir: Path = PLATFORM_DAG_DIR,
+) -> List[Tuple[str, str]]:
+    """Scan migration_compare_* directories for manifests, return (domain, dag_name) pairs."""
+    prefix = "migration_compare_"
+    scopes: List[Tuple[str, str]] = []
+    for d in sorted(platform_dir.iterdir()):
+        if not d.is_dir() or not d.name.startswith(prefix):
+            continue
+        manifest = d / "manifest.json"
+        if not manifest.exists():
+            continue
+        scope_id = d.name.removeprefix(prefix)
+        parts = scope_id.split("__", 1)
+        if len(parts) == 2:
+            scopes.append((parts[0], parts[1]))
+    return scopes
+
+
+# ---------------------------------------------------------------------------
+# Verdict fetching
+# ---------------------------------------------------------------------------
+
+
 def fetch_verdicts(
     scopes: List[Tuple[str, str]],
     artifacts_bucket: str,
@@ -190,7 +224,7 @@ def fetch_verdicts(
     for domain, dag_name in scopes:
         scope_id = f"{domain}__{dag_name}"
         scope_label = f"{domain}/{dag_name}"
-        compare_dir = REPO_ROOT / "dags" / "platform" / f"migration_compare_{scope_id}"
+        compare_dir = PLATFORM_DAG_DIR / f"migration_compare_{scope_id}"
         manifest_path = compare_dir / "manifest.json"
         if not manifest_path.exists():
             print(
@@ -242,9 +276,7 @@ def fetch_verdicts(
                 pass
 
             transpiled_sql_path = (
-                REPO_ROOT
-                / "dags"
-                / "platform"
+                PLATFORM_DAG_DIR
                 / f"migration_emr_{scope_id}"
                 / "queries"
                 / "migration"
@@ -277,6 +309,11 @@ def fetch_verdicts(
     return all_verdicts, skipped
 
 
+# ---------------------------------------------------------------------------
+# Verdict classification
+# ---------------------------------------------------------------------------
+
+
 def _dag_verdict(verdicts: List[TableVerdict]) -> str:
     if any(v.syntax_error for v in verdicts):
         return "FAIL"
@@ -287,6 +324,33 @@ def _dag_verdict(verdicts: List[TableVerdict]) -> str:
     if any(v.verdict == "WARN" for v in verdicts):
         return "WARN"
     return "PASS"
+
+
+def group_verdicts_by_domain(
+    verdicts: List[TableVerdict],
+) -> Dict[str, Dict[str, List[TableVerdict]]]:
+    """Group verdicts by domain, split into 'passed' and 'failed' categories.
+
+    A DAG is 'passed' when _dag_verdict returns PASS or WARN.
+    A DAG is 'failed' when _dag_verdict returns FAIL.
+    Returns {domain: {"passed": [...], "failed": [...]}}, omitting empty categories.
+    """
+    by_dag: Dict[Tuple[str, str], List[TableVerdict]] = {}
+    for v in verdicts:
+        by_dag.setdefault((v.scope_domain, v.scope_dag_name), []).append(v)
+
+    result: Dict[str, Dict[str, List[TableVerdict]]] = {}
+    for (domain, dag_name), dag_verdicts in sorted(by_dag.items()):
+        dv = _dag_verdict(dag_verdicts)
+        category = "failed" if dv == "FAIL" else "passed"
+        result.setdefault(domain, {}).setdefault(category, []).extend(dag_verdicts)
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Reporting
+# ---------------------------------------------------------------------------
 
 
 def print_report(verdicts: List[TableVerdict]) -> None:
@@ -328,6 +392,42 @@ def print_report(verdicts: List[TableVerdict]) -> None:
             print(f"    [{status}] {v.table_name}: {v.verdict}{extra_str}")
 
     print(f"{'=' * 72}\n")
+
+
+def _print_grouping_summary(
+    grouped: Dict[str, Dict[str, List[TableVerdict]]],
+) -> None:
+    print(f"\n{'=' * 72}")
+    print("PR GROUPING PLAN")
+    print(f"{'=' * 72}")
+
+    total_prs = 0
+    for domain in sorted(grouped):
+        categories = grouped[domain]
+        for category in ("passed", "failed"):
+            if category not in categories:
+                continue
+            cat_verdicts = categories[category]
+            dag_count = len(
+                set((v.scope_domain, v.scope_dag_name) for v in cat_verdicts)
+            )
+            table_count = len(cat_verdicts)
+            tag = "PASSED" if category == "passed" else "REVIEW NEEDED"
+            branch = f"emr-migration/transpile/{domain}-{category}"
+            print(
+                f"  [{tag:>13}] {domain} — "
+                f"{dag_count} DAG(s), {table_count} table(s) — "
+                f"branch: {branch}"
+            )
+            total_prs += 1
+
+    print(f"\nTotal PRs to create: {total_prs}")
+    print(f"{'=' * 72}\n")
+
+
+# ---------------------------------------------------------------------------
+# PR body
+# ---------------------------------------------------------------------------
 
 
 def _build_pr_body(
@@ -468,13 +568,16 @@ def _build_pr_body(
     return "\n".join(lines)
 
 
+# ---------------------------------------------------------------------------
+# SQL copy
+# ---------------------------------------------------------------------------
+
+
 def _copy_transpiled_sql(verdicts: List[TableVerdict]) -> List[str]:
     copied: List[str] = []
     for v in verdicts:
         transpiled_path = (
-            REPO_ROOT
-            / "dags"
-            / "platform"
+            PLATFORM_DAG_DIR
             / f"migration_emr_{v.scope_id}"
             / "queries"
             / "migration"
@@ -508,6 +611,11 @@ def _copy_transpiled_sql(verdicts: List[TableVerdict]) -> List[str]:
     return copied
 
 
+# ---------------------------------------------------------------------------
+# PR creation — core (no stash handling)
+# ---------------------------------------------------------------------------
+
+
 def _scope_label(scopes: List[Tuple[str, str]]) -> str:
     if len(scopes) == 1:
         return f"{scopes[0][0]}/{scopes[0][1]}"
@@ -524,6 +632,64 @@ def _branch_slug(scopes: List[Tuple[str, str]]) -> str:
     return "-".join(f"{d}-{n}" for d, n in sorted(scopes))[:60]
 
 
+def _create_single_pr(
+    branch_name: str,
+    pr_title: str,
+    verdicts: List[TableVerdict],
+    artifacts_bucket: str,
+) -> Optional[str]:
+    """Create one PR on the given branch. Caller handles stash/restore."""
+    existing = _git("branch", "--list", branch_name, check=False).strip()
+    if existing:
+        _git("branch", "-D", branch_name)
+    _git("checkout", "-b", branch_name, "origin/master")
+
+    copied = _copy_transpiled_sql(verdicts)
+    if not copied:
+        print(f"No files copied for {branch_name}, skipping", file=sys.stderr)
+        return None
+
+    for f in copied:
+        _git("add", f)
+
+    _git("commit", "-m", pr_title)
+
+    body = _build_pr_body(verdicts, artifacts_bucket)
+    body_file = REPO_ROOT / ".git" / "pr_body.md"
+    body_file.write_text(body, encoding="utf-8")
+
+    _git("push", "-u", "--force-with-lease", "origin", branch_name)
+
+    try:
+        pr_url = _gh(
+            "pr",
+            "create",
+            "--title",
+            pr_title,
+            "--body-file",
+            str(body_file),
+        )
+    except GitError:
+        _gh(
+            "pr",
+            "edit",
+            branch_name,
+            "--title",
+            pr_title,
+            "--body-file",
+            str(body_file),
+        )
+        pr_url = _gh("pr", "view", branch_name, "--json", "url", "-q", ".url")
+
+    body_file.unlink(missing_ok=True)
+    return pr_url
+
+
+# ---------------------------------------------------------------------------
+# PR creation — single scope (backward compatible)
+# ---------------------------------------------------------------------------
+
+
 def create_pr(
     verdicts: List[TableVerdict],
     artifacts_bucket: str,
@@ -537,6 +703,7 @@ def create_pr(
     dag_v = _dag_verdict(verdicts)
 
     branch_name = f"emr-migration/transpile/{slug}"
+    pr_title = f"feat(emr-migration): transpiled queries for {label} [{dag_v}]"
 
     _git("fetch", "origin", "master")
     current_branch = _git("branch", "--show-current")
@@ -549,67 +716,169 @@ def create_pr(
             _git("checkout", "master", check=False)
             current_branch = "master"
 
-        existing = _git("branch", "--list", branch_name, check=False).strip()
-        if existing:
-            _git("branch", "-D", branch_name)
-        _git("checkout", "-b", branch_name, "origin/master")
-
-        copied = _copy_transpiled_sql(verdicts)
-        if not copied:
-            print("No files copied for PR, skipping", file=sys.stderr)
-            return None
-
-        for f in copied:
-            _git("add", f)
-
-        commit_msg = f"feat(emr-migration): transpiled queries for {label} [{dag_v}]"
-        _git("commit", "-m", commit_msg)
-
-        pr_title = f"feat(emr-migration): transpiled queries for {label} [{dag_v}]"
-        body = _build_pr_body(verdicts, artifacts_bucket)
-        body_file = REPO_ROOT / ".git" / "pr_body.md"
-        body_file.write_text(body, encoding="utf-8")
-
-        _git("push", "-u", "--force-with-lease", "origin", branch_name)
-
-        try:
-            pr_url = _gh(
-                "pr",
-                "create",
-                "--title",
-                pr_title,
-                "--body-file",
-                str(body_file),
-            )
-        except GitError:
-            _gh(
-                "pr",
-                "edit",
-                branch_name,
-                "--title",
-                pr_title,
-                "--body-file",
-                str(body_file),
-            )
-            pr_url = _gh("pr", "view", branch_name, "--json", "url", "-q", ".url")
-
-        body_file.unlink(missing_ok=True)
-        return pr_url
-
+        return _create_single_pr(branch_name, pr_title, verdicts, artifacts_bucket)
     finally:
         _git("checkout", current_branch, check=False)
         if created_stash:
             _git("stash", "pop", check=False)
 
 
+# ---------------------------------------------------------------------------
+# PR creation — grouped by domain
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class GroupedPrResult:
+    domain: str
+    category: str
+    dag_count: int
+    table_count: int
+    pr_url: Optional[str] = None
+    error: Optional[str] = None
+
+
+def create_grouped_prs(
+    grouped: Dict[str, Dict[str, List[TableVerdict]]],
+    artifacts_bucket: str,
+) -> List[GroupedPrResult]:
+    """Create one PR per domain/category group. Returns results for each."""
+    results: List[GroupedPrResult] = []
+
+    _git("fetch", "origin", "master")
+    original_ref = _git("rev-parse", "HEAD")
+
+    stash_result = _git("stash", "-u", check=False)
+    created_stash = "No local changes to save" not in stash_result
+
+    try:
+        for domain in sorted(grouped):
+            categories = grouped[domain]
+            for category in ("passed", "failed"):
+                if category not in categories:
+                    continue
+
+                cat_verdicts = categories[category]
+                dag_count = len(
+                    set((v.scope_domain, v.scope_dag_name) for v in cat_verdicts)
+                )
+                table_count = len(cat_verdicts)
+
+                branch_name = f"emr-migration/transpile/{domain}-{category}"
+                tag = "PASSED" if category == "passed" else "REVIEW NEEDED"
+                pr_title = (
+                    f"feat(emr-migration): transpiled queries for "
+                    f"{domain} ({dag_count} DAGs) [{tag}]"
+                )
+
+                print(
+                    f"\n  [{category.upper():>6}] {domain} — "
+                    f"{dag_count} DAG(s), {table_count} table(s)..."
+                )
+
+                try:
+                    _git("checkout", "origin/master", check=False)
+                    pr_url = _create_single_pr(
+                        branch_name, pr_title, cat_verdicts, artifacts_bucket
+                    )
+                    if pr_url:
+                        print(f"         PR: {pr_url}")
+                    results.append(
+                        GroupedPrResult(
+                            domain=domain,
+                            category=category,
+                            dag_count=dag_count,
+                            table_count=table_count,
+                            pr_url=pr_url,
+                        )
+                    )
+                except Exception as exc:
+                    _git("checkout", ".", check=False)
+                    _git("clean", "-fd", check=False)
+                    print(
+                        f"         ERROR: {exc}",
+                        file=sys.stderr,
+                    )
+                    results.append(
+                        GroupedPrResult(
+                            domain=domain,
+                            category=category,
+                            dag_count=dag_count,
+                            table_count=table_count,
+                            error=str(exc),
+                        )
+                    )
+
+    finally:
+        _git("checkout", original_ref, check=False)
+        if created_stash:
+            _git("stash", "pop", check=False)
+
+    return results
+
+
+def _print_pr_summary(results: List[GroupedPrResult]) -> None:
+    print(f"\n{'=' * 72}")
+    print("PR CREATION SUMMARY")
+    print(f"{'=' * 72}")
+
+    for r in results:
+        tag = "PASSED" if r.category == "passed" else "FAILED"
+        if r.pr_url:
+            status = r.pr_url
+        elif r.error:
+            status = f"ERROR: {r.error}"
+        else:
+            status = "SKIPPED (no files to copy)"
+        print(
+            f"  [{tag:>6}] {r.domain} — "
+            f"{r.dag_count} DAG(s), {r.table_count} table(s) — "
+            f"{status}"
+        )
+
+    created = sum(1 for r in results if r.pr_url)
+    errored = sum(1 for r in results if r.error)
+    skipped = sum(1 for r in results if not r.pr_url and not r.error)
+    print(f"\nCreated: {created} | Errors: {errored} | Skipped: {skipped}")
+    print(f"{'=' * 72}\n")
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+
+def _parse_scopes(scope_str: str) -> List[Tuple[str, str]]:
+    seen = set()
+    scopes: List[Tuple[str, str]] = []
+    for spec in scope_str.split(","):
+        parts = spec.strip().split("/")
+        if len(parts) != 2:
+            print(f"Invalid scope: {spec}", file=sys.stderr)
+            sys.exit(1)
+        key = (parts[0], parts[1])
+        if key not in seen:
+            seen.add(key)
+            scopes.append(key)
+    return scopes
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fetch migration verdicts from S3 and create a PR"
+        description="Fetch migration verdicts from S3 and create PRs"
     )
     parser.add_argument(
         "--scope",
-        required=True,
-        help="Comma-separated domain/dag_name list",
+        default=None,
+        help=(
+            "Comma-separated domain/dag_name list. "
+            "If omitted, auto-discovers all scopes with compare results"
+        ),
+    )
+    parser.add_argument(
+        "--domain",
+        default=None,
+        help="Comma-separated domain filter (e.g., --domain growth,fintech)",
     )
     parser.add_argument(
         "--artifacts-bucket",
@@ -624,21 +893,31 @@ def main() -> None:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Print verdicts without creating branches or PRs",
+        help="Print verdicts and grouping without creating branches or PRs",
     )
     args = parser.parse_args()
 
-    seen = set()
-    scopes: List[Tuple[str, str]] = []
-    for spec in args.scope.split(","):
-        parts = spec.strip().split("/")
-        if len(parts) != 2:
-            print(f"Invalid scope: {spec}", file=sys.stderr)
+    if args.scope is not None:
+        scope_str = args.scope.strip()
+        if not scope_str:
+            print("ERROR: --scope provided but empty", file=sys.stderr)
             sys.exit(1)
-        key = (parts[0], parts[1])
-        if key not in seen:
-            seen.add(key)
-            scopes.append(key)
+        scopes = _parse_scopes(scope_str)
+        use_grouping = False
+    else:
+        print("Discovering scopes from dags/platform/...")
+        scopes = discover_compare_scopes()
+        print(f"Found {len(scopes)} scope(s) with compare manifests")
+        use_grouping = True
+
+    if args.domain:
+        include_domains = set(d.strip() for d in args.domain.split(","))
+        scopes = [(d, n) for d, n in scopes if d in include_domains]
+        print(f"Filtered to {len(scopes)} scope(s) in domain(s): {args.domain}")
+
+    if not scopes:
+        print("No scopes to process.")
+        sys.exit(1)
 
     s3_client = _get_s3_client(args.assume_role_arn)
     verdicts, skipped_scopes = fetch_verdicts(scopes, args.artifacts_bucket, s3_client)
@@ -656,24 +935,37 @@ def main() -> None:
 
     print_report(verdicts)
 
+    grouped = group_verdicts_by_domain(verdicts)
+
     if args.dry_run:
-        dag_v = _dag_verdict(verdicts)
-        print(f"Dry run: {len(verdicts)} tables, DAG verdict: {dag_v}")
+        if use_grouping:
+            _print_grouping_summary(grouped)
+        else:
+            dag_v = _dag_verdict(verdicts)
+            print(f"Dry run: {len(verdicts)} tables, DAG verdict: {dag_v}")
         sys.exit(0)
 
     errors = 0
 
-    print(f"\nCreating PR ({len(verdicts)} tables)...")
-    try:
-        url = create_pr(verdicts, args.artifacts_bucket)
-        if url:
-            print(f"  PR: {url}")
-        else:
-            print("  WARNING: no PR created", file=sys.stderr)
+    if use_grouping:
+        total_prs = sum(len(categories) for categories in grouped.values())
+        print(f"\nCreating {total_prs} PR(s) grouped by domain...")
+        results = create_grouped_prs(grouped, args.artifacts_bucket)
+        _print_pr_summary(results)
+        errors += sum(1 for r in results if r.error)
+        errors += sum(1 for r in results if not r.pr_url and not r.error)
+    else:
+        print(f"\nCreating PR ({len(verdicts)} tables)...")
+        try:
+            url = create_pr(verdicts, args.artifacts_bucket)
+            if url:
+                print(f"  PR: {url}")
+            else:
+                print("  WARNING: no PR created", file=sys.stderr)
+                errors += 1
+        except GitError as exc:
+            print(f"  ERROR creating PR: {exc}", file=sys.stderr)
             errors += 1
-    except GitError as exc:
-        print(f"  ERROR creating PR: {exc}", file=sys.stderr)
-        errors += 1
 
     if skipped_scopes:
         errors += 1
