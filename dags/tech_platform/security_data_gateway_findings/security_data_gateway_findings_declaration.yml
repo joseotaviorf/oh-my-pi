@@ -31,3 +31,13 @@ workflow:
         - day
       z_order_by:
         - resource_id
+      clean_table_name: security_findings
+      clean_partitions:
+        - year
+        - month
+        - day
+      clean_z_order_by:
+        - id_resource
+      merge_on:
+        - source
+        - id_resource

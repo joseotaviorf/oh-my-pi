@@ -1,0 +1,90 @@
+---
+database_name: datalake_security_data_gateway_clean
+table_name: security_findings
+domain: Tech Platform
+owner: evandro.souza@quintoandar.com
+description: |
+  Clean, current-state snapshot of PII findings produced by the Security Data Gateway
+  pipeline. One row per classified Google Drive file, keyed on (source, id_resource) and
+  fully derived from datalake_security_data_gateway_raw.security_findings on a full reload
+  each run (newest classification wins upstream). Identifiers and the classification
+  timestamp are normalized to naming conventions; the PII detections array and the
+  source_metadata / source_raw_payload documents are preserved verbatim from raw for
+  downstream analysis. Consumed by the Cyber Security squad for Drive PII exposure
+  reporting and enrich/DW modeling.
+
+columns:
+  id_resource:
+    description: "Unique identifier of the classified resource (Google Drive file ID). Part of the (source, id_resource) grain."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.resource_id
+
+  source:
+    description: "Identifier for the upstream ingestion source (e.g. 'drive_historical_backfill'). Part of the (source, id_resource) grain."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.source
+
+  event_type:
+    description: "Type of finding event emitted by the Security Data Gateway."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.event_type
+
+  resource_type:
+    description: "Type of the classified resource (e.g. Drive file type)."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.resource_type
+
+  resource_name:
+    description: "Human-readable name of the resource (file name). Nullable when absent at source."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.resource_name
+
+  location:
+    description: "Path/location of the resource within the source system (e.g. 'My Drive/Legal'). Nullable."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.location
+
+  actor_email:
+    description: "Email of the actor associated with the classified resource (typically the file owner). Nullable when the owner email is absent."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.actor_email
+
+  risk_level:
+    description: "Overall risk classification for the finding. Enum: LOW, MEDIUM, HIGH, CRITICAL."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.risk_level
+
+  ts_classified:
+    description: "UTC timestamp when the Security Data Gateway classified the resource; drives the year/month/day partitioning."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.classified_at
+
+  pii_types_detected:
+    description: "Array of PII detections; each element carries pii_type (e.g. CPF, RG, full_name) and confidence_score (0.0-1.0). Deduped by type upstream (highest confidence)."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.pii_types_detected
+
+  source_metadata:
+    description: "JSON string with source-specific context: mime_type, sharing_state, ou_path, lane (MY_DRIVE|SHARED_DRIVES), batch_id, and optional parent_drive_id. Query via get_json_object."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.source_metadata
+
+  source_raw_payload:
+    description: "Verbatim copy of the upstream ClassificationResultEvent JSON, preserved from raw for full-fidelity downstream inspection."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.source_raw_payload
+
+  year:
+    description: "Year partition column derived from ts_classified."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.year
+
+  month:
+    description: "Month partition column derived from ts_classified."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.month
+
+  day:
+    description: "Day partition column derived from ts_classified."
+    lineage:
+      - datalake_security_data_gateway_raw.security_findings.day
