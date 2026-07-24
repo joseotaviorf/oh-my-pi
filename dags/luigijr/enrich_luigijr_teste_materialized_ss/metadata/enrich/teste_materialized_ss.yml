@@ -1,0 +1,10 @@
+database_name: ops_ss
+table_name: teste_materialized_ss
+owner: gustavo.akashi@quintoandar.com.br
+domain: Support and Services
+description: Table `teste_materialized_ss` materialized on a schedule by Luigi from a user-provided SQL query (Ops SS domain).
+columns:
+  id:
+    description: Column `id` produced by the scheduled materialization query.
+  nome:
+    description: Column `nome` produced by the scheduled materialization query.
