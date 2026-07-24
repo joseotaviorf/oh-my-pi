@@ -223,8 +223,21 @@ def filter_scopes(
     *,
     include_domains: list[str] | None = None,
     exclude_domains: list[str] | None = None,
+    include_scope_ids: list[str] | None = None,
 ) -> list[MigrationScope]:
     filtered = scopes
+    if include_scope_ids:
+        id_set = set(include_scope_ids)
+        matched = {s.scope_id for s in filtered} & id_set
+        unmatched = id_set - matched
+        if unmatched:
+            print(
+                f"ERROR: {len(unmatched)} scope ID(s) not found: "
+                f"{', '.join(sorted(unmatched))}",
+                file=sys.stderr,
+            )
+            raise SystemExit(2)
+        filtered = [s for s in filtered if s.scope_id in id_set]
     if include_domains:
         include_set = set(include_domains)
         filtered = [s for s in filtered if s.scope_id.split("__")[0] in include_set]
@@ -670,6 +683,10 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--exclude-scopes",
         help="Comma-separated domain names to exclude",
     )
+    parser.add_argument(
+        "--scope-ids",
+        help="Comma-separated exact scope IDs to include (e.g. growth__amplitude_subpartitioned)",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--save-inventory", action="store_true")
     parser.add_argument("--verbose", action="store_true")
@@ -689,7 +706,20 @@ async def async_main(args: argparse.Namespace) -> int:
 
     include = args.scopes.split(",") if args.scopes else None
     exclude = args.exclude_scopes.split(",") if args.exclude_scopes else None
-    scopes = filter_scopes(scopes, include_domains=include, exclude_domains=exclude)
+    scope_ids = None
+    if args.scope_ids:
+        scope_ids = [s.strip() for s in args.scope_ids.split(",") if s.strip()]
+        if not scope_ids:
+            print(
+                "ERROR: --scope-ids provided but contains no valid IDs", file=sys.stderr
+            )
+            return 2
+    scopes = filter_scopes(
+        scopes,
+        include_domains=include,
+        exclude_domains=exclude,
+        include_scope_ids=scope_ids,
+    )
     if not scopes:
         print("No scopes matched the filters.", file=sys.stderr)
         return 2
