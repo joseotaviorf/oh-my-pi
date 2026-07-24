@@ -5,7 +5,9 @@ domain: People
 description: |
   Reporting chain for each workforce assignment, with the direct manager identity and denormalized people at each organizational layer from the CEO (L0) down to the employee (L1–L9).
   One row per assignment_number × hierarchy version: a new version opens when the reporting chain changes; consecutive identical periods are merged.
-  Covers assignments that form a valid CEO-linked chain.
+  Covers assignments that form a valid CEO-linked chain (CEO at L0; hierarchy depth up to L9).
+  Only assignments with assignment_type in ('C', 'E') are included; assignment_type 'P' is excluded.
+  Employees flagged is_user_test in identifier_mapping are excluded from hierarchy edges as both employees and managers so synthetic accounts do not break CEO-valid chains.
   Guarantees a stable L number for the same manager across a team at a point in time. manager_assignment_number / name_manager identify the immediate supervisor; *_lN columns identify the person at fixed depth N from the CEO (the employee sits at hierarchy_level; the direct manager sits one layer above and may be any of L1–L9).
 columns:
   sk_hierarchy_version:

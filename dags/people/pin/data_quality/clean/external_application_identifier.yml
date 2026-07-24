@@ -14,3 +14,20 @@ column_level_validations:
       # id_external_identifier + object_version_number should be unique
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.external_application_identifier GROUP BY id_external_identifier, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
+  short_person_open_onda1_must_be_known_test_user:
+    custom:
+      # Mirrors enrich is_user_test (open ID_ONDA1 + person_number length < 6). Allowlist {1,2,3}
+      # are known short-person synthetics; if this fires, investigate the new synthetic and add
+      # only if intentional. Six-digit ONDA1 (Systems PIN access) is out of scope.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.external_application_identifier AS eai
+         INNER JOIN datalake_pin_core_clean.all_people AS ap
+             ON ap.id_person = eai.id_person
+             AND ap.dt_effective_ended = DATE('9999-12-31')
+         WHERE eai.type_external_identifier = 'ID_ONDA1'
+           AND eai.dt_ended = DATE('9999-12-31')
+           AND LENGTH(CAST(ap.person_number AS STRING)) < 6
+           AND CAST(ap.person_number AS STRING) NOT IN ('1', '2', '3')
+        ) = 0
+      severity_level: Warning

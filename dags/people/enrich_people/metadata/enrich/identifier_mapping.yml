@@ -115,14 +115,16 @@ columns:
     lineage:
       - datalake_pin_core_clean.email_address.email_address
   is_user_test:
-    description: Boolean flag indicating if the employee is a test user (has an ID_ONDA1 identifier).
+    description: True when the person is a test user and should not be included in official datasets. Synthetic accounts are those with an open ID_ONDA1 identifier and a person_number shorter than 6 digits; real employees who keep ID_ONDA1 for PIN Systems access remain false.
     lineage:
       - datalake_pin_core_clean.external_application_identifier.id_person
+      - datalake_pin_core_clean.all_people.person_number
   is_valid_assignment:
     description: True when the assignment is eligible for snapshots and reporting (employment or contractor assignment, not a test user).
     lineage:
       - datalake_pin_core_clean.all_assignments.assignment_type
       - datalake_pin_core_clean.external_application_identifier.type_external_identifier
+      - datalake_pin_core_clean.all_people.person_number
   is_active:
     description: True when the employee is active, False when inactive.
   is_transfer_termination:

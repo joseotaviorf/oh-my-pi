@@ -85,14 +85,20 @@ personal_emails_ranked AS (
 personal_emails AS (
     SELECT id_person, email_address FROM personal_emails_ranked WHERE rn = 1
 ),
+-- True test users have open ID_ONDA1 and lack a valid 6-digit person_number.
+-- Real people keep open ID_ONDA1 for PIN Systems privileges; they stay is_user_test = false.
 test_users AS (
     SELECT
-        id_person
+        eai.id_person
     FROM
-        datalake_pin_core_clean.external_application_identifier
+        datalake_pin_core_clean.external_application_identifier AS eai
+    INNER JOIN
+        current_people AS cp
+            ON cp.id_person = eai.id_person
     WHERE
-        type_external_identifier = 'ID_ONDA1'
-        AND dt_ended = DATE('9999-12-31')
+        eai.type_external_identifier = 'ID_ONDA1'
+        AND eai.dt_ended = DATE('9999-12-31')
+        AND LENGTH(CAST(cp.person_number AS STRING)) < 6
 ),
 person_tmf_ranked AS (
     SELECT

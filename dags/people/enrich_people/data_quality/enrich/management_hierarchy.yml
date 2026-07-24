@@ -64,3 +64,96 @@ column_level_validations:
   ts_load:
     is_complete:
       severity_level: Warning
+
+  assignments_are_ceo_reachable_every_day:
+    custom:
+      # C/E non-test assignments must have a management_hierarchy version covering every day
+      # from PIN go-live (2024-03-01) through today or termination. The enrich table only keeps
+      # CEO-valid chains (L0 = max-band CEO), so a covering row means CEO-reachable that day.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+               im.assignment_number,
+               explode(
+                   sequence(
+                       GREATEST(DATE('2024-03-01'), im.dt_started),
+                       LEAST(
+                           CURRENT_DATE(),
+                           COALESCE(NULLIF(im.dt_actual_termination, DATE('9999-12-31')), CURRENT_DATE())
+                       )
+                   )
+               ) AS dt_day
+           FROM datalake_people.identifier_mapping AS im
+           WHERE im.assignment_type IN ('C', 'E')
+             AND NOT im.is_user_test
+             AND GREATEST(DATE('2024-03-01'), im.dt_started) <= LEAST(
+                   CURRENT_DATE(),
+                   COALESCE(NULLIF(im.dt_actual_termination, DATE('9999-12-31')), CURRENT_DATE())
+                 )
+         ) AS days
+         LEFT JOIN datalake_people.management_hierarchy AS mh
+             ON mh.assignment_number = days.assignment_number
+             AND mh.dt_valid_from <= days.dt_day
+             AND mh.dt_valid_to >= days.dt_day
+         WHERE mh.sk_hierarchy_version IS NULL
+        ) = 0
+      severity_level: Warning
+
+  current_hierarchy_l0_matches_ceo:
+    custom:
+      # Since PIN go-live (2024-03-01): every non-test, non-CEO hierarchy version overlapping
+      # go-live→today must have L0 equal to a depth-0 CEO whose validity overlaps the same window.
+      # Test users are out of scope (employee and L0); residual failures are real non-CEO roots
+      # (typically null LINE_MANAGER upstream).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.management_hierarchy AS mh
+         INNER JOIN datalake_people.identifier_mapping AS im
+             ON im.assignment_number = mh.assignment_number
+             AND NOT im.is_user_test
+         LEFT JOIN datalake_people.identifier_mapping AS im_l0
+             ON im_l0.assignment_number = mh.assignment_number_l0
+         WHERE mh.hierarchy_depth > 0
+           AND mh.dt_valid_to >= DATE('2024-03-01')
+           AND mh.dt_valid_from <= CURRENT_DATE()
+           AND NOT COALESCE(im_l0.is_user_test, FALSE)
+           AND NOT EXISTS (
+             SELECT 1
+             FROM datalake_people.management_hierarchy AS ceo
+             WHERE ceo.hierarchy_depth = 0
+               AND ceo.assignment_number = mh.assignment_number_l0
+               AND ceo.dt_valid_to >= GREATEST(mh.dt_valid_from, DATE('2024-03-01'))
+               AND ceo.dt_valid_from <= LEAST(mh.dt_valid_to, CURRENT_DATE())
+           )
+        ) = 0
+      severity_level: Warning
+
+  current_hierarchy_path_has_no_duplicates:
+    custom:
+      # Current L0–L9 path must not repeat an assignment number.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT
+               filter(
+                   array(
+                       NULLIF(mh.assignment_number_l0, ''),
+                       NULLIF(mh.assignment_number_l1, ''),
+                       NULLIF(mh.assignment_number_l2, ''),
+                       NULLIF(mh.assignment_number_l3, ''),
+                       NULLIF(mh.assignment_number_l4, ''),
+                       NULLIF(mh.assignment_number_l5, ''),
+                       NULLIF(mh.assignment_number_l6, ''),
+                       NULLIF(mh.assignment_number_l7, ''),
+                       NULLIF(mh.assignment_number_l8, ''),
+                       NULLIF(mh.assignment_number_l9, '')
+                   ),
+                   x -> x IS NOT NULL
+               ) AS path_nodes
+           FROM datalake_people.management_hierarchy AS mh
+           WHERE mh.is_current = TRUE
+         ) AS paths
+         WHERE size(path_nodes) > size(array_distinct(path_nodes))
+        ) = 0
+      severity_level: Warning
