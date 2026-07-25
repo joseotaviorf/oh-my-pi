@@ -91,9 +91,9 @@ WITH alerts_updated AS (
     id_alert,
     TRUE AS is_out_of_rotation,
     MIN(ts_log) FILTER(WHERE
-      log RLIKE '(?i)^Will close alert automatically.*Auto-Close out-of-rotation time' IS TRUE) AS ts_out_of_rotation_identified,
+      log RLIKE '(?i)^Will close alert automatically.*Auto-Close out-of-rotation time') AS ts_out_of_rotation_identified,
     MIN(ts_log) FILTER(WHERE
-      log RLIKE '(?i)^Alert closed via system.*Auto-Close out-of-rotation time' IS TRUE) AS ts_out_of_rotation_closed
+      log RLIKE '(?i)^Alert closed via system.*Auto-Close out-of-rotation time') AS ts_out_of_rotation_closed
   FROM alert_log
   WHERE
     log LIKE '%[Auto-Close out-of-rotation time]%'

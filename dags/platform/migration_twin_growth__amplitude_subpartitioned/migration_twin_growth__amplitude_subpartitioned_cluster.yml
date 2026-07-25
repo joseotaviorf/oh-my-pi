@@ -2,6 +2,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 500
+    cluster_name: mig_twin_growth__amplitude_subpartitioned
     data_security_mode: SINGLE_USER
     driver_node_type_id: c7g.4xlarge
     num_workers: 3
@@ -11,6 +12,5 @@ cluster:
       spark.driver.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
       spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
     spark_version: 16.4.x-scala2.12
-    cluster_name: mig_twin_growth__amplitude_subpartitioned
   databricks_conn_id: databricks_new
   type: consolidation_l_general_cluster

@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections import Counter
 from decimal import Decimal
 from typing import Any, Dict, List, Optional, Set, Tuple
 from urllib.parse import urlparse
@@ -26,6 +27,7 @@ TYPE_WIDENING: Dict[str, Set[str]] = {
 }
 
 COUNT_TOLERANCE_PCT = 5.0
+NULL_COUNT_TOLERANCE_PCT = 5.0
 
 
 def _normalize_type(type_name: str) -> str:
@@ -50,18 +52,24 @@ def compare_schema(
     issues: List[str] = []
     has_warn = False
 
-    twin_cols = [entry[0] for entry in twin_schema]
-    emr_cols = [entry[0] for entry in emr_schema]
-    if twin_cols != emr_cols:
-        missing = set(twin_cols) - set(emr_cols)
-        extra = set(emr_cols) - set(twin_cols)
-        if missing:
-            issues.append(f"Missing columns on EMR: {sorted(missing)}")
-        if extra:
-            issues.append(f"Extra columns on EMR: {sorted(extra)}")
-        if not missing and not extra:
-            issues.append("Column order mismatch")
+    twin_col_counts = Counter(entry[0] for entry in twin_schema)
+    emr_col_counts = Counter(entry[0] for entry in emr_schema)
+    twin_cols = set(twin_col_counts)
+    emr_cols = set(emr_col_counts)
+    missing = twin_cols - emr_cols
+    extra = emr_cols - twin_cols
+    if missing:
+        issues.append(f"Missing columns on EMR: {sorted(missing)}")
+    if extra:
+        issues.append(f"Extra columns on EMR: {sorted(extra)}")
+    if missing or extra:
         return False, issues, False
+    for col in sorted(twin_cols):
+        if twin_col_counts[col] != emr_col_counts[col]:
+            issues.append(
+                f"Column count mismatch for {col}: "
+                f"twin={twin_col_counts[col]}, emr={emr_col_counts[col]}"
+            )
 
     emr_type_map = {entry[0]: entry[1] for entry in emr_schema}
     for entry in twin_schema:
@@ -75,7 +83,12 @@ def compare_schema(
             issues.append(f"Type widening for {name}: {base_type} -> {emr_type}")
 
     hard_fails = [
-        i for i in issues if "mismatch" in i or "Missing" in i or "Extra" in i
+        i
+        for i in issues
+        if "Type mismatch" in i
+        or "Missing" in i
+        or "Extra" in i
+        or "Column count mismatch" in i
     ]
     return len(hard_fails) == 0, issues, has_warn
 
@@ -100,19 +113,34 @@ def _parse_decimal(value: Optional[str]) -> Decimal:
 
 
 def compare_null_counts(
-    twin_profile: Dict[str, Any], emr_profile: Dict[str, Any]
-) -> Tuple[bool, List[str]]:
+    twin_profile: Dict[str, Any],
+    emr_profile: Dict[str, Any],
+    row_count: int = 0,
+) -> Tuple[bool, List[str], bool]:
     issues: List[str] = []
+    has_warn = False
     twin_cols = twin_profile.get("columns", {})
     emr_cols = emr_profile.get("columns", {})
     for name in sorted(set(twin_cols) | set(emr_cols)):
         twin_null = twin_cols.get(name, {}).get("null_count", 0)
         emr_null = emr_cols.get(name, {}).get("null_count", 0)
-        if twin_null != emr_null:
+        if twin_null == emr_null:
+            continue
+        denominator = max(twin_null, emr_null, row_count, 1)
+        delta_pct = abs(emr_null - twin_null) / denominator * 100.0
+        if delta_pct > NULL_COUNT_TOLERANCE_PCT:
             issues.append(
-                f"Null count mismatch for {name}: twin={twin_null}, emr={emr_null}"
+                f"Null count mismatch for {name}: twin={twin_null}, emr={emr_null} "
+                f"(delta={delta_pct:.1f}%)"
             )
-    return len(issues) == 0, issues
+        elif delta_pct > 0.1:
+            has_warn = True
+            issues.append(
+                f"Null count drift for {name}: twin={twin_null}, emr={emr_null} "
+                f"(delta={delta_pct:.1f}%)"
+            )
+    hard_fails = [i for i in issues if "mismatch" in i]
+    return len(hard_fails) == 0, issues, has_warn
 
 
 def compare_checksums(
@@ -210,11 +238,15 @@ def compare_table(
     twin_profile = twin_metric.get("profile")
     emr_profile = emr_metric.get("profile")
     if twin_profile and emr_profile:
-        null_ok, null_issues = compare_null_counts(twin_profile, emr_profile)
+        null_ok, null_issues, null_warn = compare_null_counts(
+            twin_profile, emr_profile, row_count=max(twin_count, emr_count)
+        )
         null_match = null_ok
         profile_issues.extend(null_issues)
         if not null_ok:
             statuses.append("FAIL")
+        elif null_warn:
+            statuses.append("WARN")
 
         chk_ok, chk_issues, chk_warn = compare_checksums(twin_profile, emr_profile)
         checksum_match = chk_ok

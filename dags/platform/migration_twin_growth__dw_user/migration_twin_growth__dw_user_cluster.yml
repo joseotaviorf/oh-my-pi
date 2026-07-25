@@ -5,6 +5,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    cluster_name: mig_twin_growth__dw_user
     data_security_mode: USER_ISOLATION
     driver_node_type_id: m7g.xlarge
     num_workers: 3

@@ -123,8 +123,21 @@ WITH contracts_table AS (
     dt_month_start <> DATE_FORMAT(CURRENT_DATE, 'yyyy-MM-01')
 ), final_table AS (
   SELECT
-    *
-    EXCEPT (tax_rate, losses),
+    id_rent_flow,
+    id_house,
+    id_tenant_prospect,
+    id_contract,
+    contract_start_month,
+    dt_termination,
+    contract_lifetime,
+    dt_month_start,
+    accrual_year_month,
+    net_revenue_pre_taxes,
+    gross_revenue,
+    pre_rental_costs,
+    onboarding_costs,
+    ongoing_costs,
+    offboarding_costs,
     COALESCE(tax_rate, -8.0) AS tax_rate,
     COALESCE(losses, 0.) AS losses
   FROM revenue_table

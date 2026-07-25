@@ -7,21 +7,15 @@ def run_prefix(run_id: str) -> str:
     return f"emr-migration/runs/{run_id}"
 
 
-def twin_metric_key(
-    run_id: str, domain: str, dag_name: str, table_name: str
-) -> str:
+def twin_metric_key(run_id: str, domain: str, dag_name: str, table_name: str) -> str:
     return f"{run_prefix(run_id)}/twin/{domain}/{dag_name}/{table_name}.json"
 
 
-def emr_metric_key(
-    run_id: str, domain: str, dag_name: str, table_name: str
-) -> str:
+def emr_metric_key(run_id: str, domain: str, dag_name: str, table_name: str) -> str:
     return f"{run_prefix(run_id)}/emr/{domain}/{dag_name}/{table_name}.json"
 
 
-def verdict_key(
-    run_id: str, domain: str, dag_name: str, table_name: str
-) -> str:
+def verdict_key(run_id: str, domain: str, dag_name: str, table_name: str) -> str:
     return f"{run_prefix(run_id)}/verdicts/{domain}/{dag_name}/{table_name}.json"
 
 

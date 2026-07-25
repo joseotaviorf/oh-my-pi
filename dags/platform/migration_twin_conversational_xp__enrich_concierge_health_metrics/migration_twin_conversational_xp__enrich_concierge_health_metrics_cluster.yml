@@ -3,7 +3,7 @@ cluster:
     group_name: data-products
     permission_level: CAN_MANAGE
   custom_configurations:
-    driver_node_type_id: r7g.large
     cluster_name: mig_twin_conversational_xp__enrich_concierge_health_metrics
+    driver_node_type_id: r7g.large
   databricks_conn_id: databricks_new_env
   type: consolidation_s_general_cluster

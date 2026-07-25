@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_for_sale__enrich_sale_crawlers_listings
     data_security_mode: SINGLE_USER
     init_scripts:
     - s3:

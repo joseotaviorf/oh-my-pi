@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_fintech__dw_charging_payment_quintocred
     driver_node_type_id: r7g.2xlarge
     spark_conf:
       spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true

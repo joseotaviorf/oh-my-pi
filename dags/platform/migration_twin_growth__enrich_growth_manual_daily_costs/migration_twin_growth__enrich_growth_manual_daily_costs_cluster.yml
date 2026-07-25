@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_growth__enrich_growth_manual_daily_costs
     data_security_mode: SINGLE_USER
     driver_node_type_id: r7g.large
     single_user_name: '{{ var.value.databricks_single_user_name }}'

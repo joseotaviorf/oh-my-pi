@@ -2,7 +2,7 @@ cluster:
   access_control_list:
     group_name: data-products
     permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new_env
-  type: consolidation_s_general_cluster
   custom_configurations:
     cluster_name: mig_twin_conversational_xp__enrich_find_health_metrics
+  databricks_conn_id: databricks_new_env
+  type: consolidation_s_general_cluster

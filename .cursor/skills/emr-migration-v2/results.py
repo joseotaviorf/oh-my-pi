@@ -632,6 +632,33 @@ def _branch_slug(scopes: List[Tuple[str, str]]) -> str:
     return "-".join(f"{d}-{n}" for d, n in sorted(scopes))[:60]
 
 
+def _clean_index_lock() -> None:
+    lock = REPO_ROOT / ".git" / "index.lock"
+    if not lock.exists():
+        return
+    try:
+        result = subprocess.run(["lsof", str(lock)], capture_output=True, text=True)
+        if result.returncode == 0 and result.stdout.strip():
+            print(
+                "WARNING: index.lock held by another process, not removing",
+                file=sys.stderr,
+            )
+            return
+    except FileNotFoundError:
+        pass
+    lock.unlink()
+
+
+def _pr_exists(branch_name: str) -> bool:
+    result = subprocess.run(
+        ["gh", "pr", "view", branch_name, "--json", "url"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0
+
+
 def _create_single_pr(
     branch_name: str,
     pr_title: str,
@@ -639,6 +666,8 @@ def _create_single_pr(
     artifacts_bucket: str,
 ) -> Optional[str]:
     """Create one PR on the given branch. Caller handles stash/restore."""
+    _clean_index_lock()
+
     existing = _git("branch", "--list", branch_name, check=False).strip()
     if existing:
         _git("branch", "-D", branch_name)
@@ -652,6 +681,11 @@ def _create_single_pr(
     for f in copied:
         _git("add", f)
 
+    status = _git("status", "--porcelain")
+    if not status.strip():
+        print(f"No changes vs master for {branch_name}, skipping", file=sys.stderr)
+        return None
+
     _git("commit", "-m", pr_title)
 
     body = _build_pr_body(verdicts, artifacts_bucket)
@@ -660,16 +694,7 @@ def _create_single_pr(
 
     _git("push", "-u", "--force-with-lease", "origin", branch_name)
 
-    try:
-        pr_url = _gh(
-            "pr",
-            "create",
-            "--title",
-            pr_title,
-            "--body-file",
-            str(body_file),
-        )
-    except GitError:
+    if _pr_exists(branch_name):
         _gh(
             "pr",
             "edit",
@@ -680,6 +705,27 @@ def _create_single_pr(
             str(body_file),
         )
         pr_url = _gh("pr", "view", branch_name, "--json", "url", "-q", ".url")
+    else:
+        try:
+            pr_url = _gh(
+                "pr",
+                "create",
+                "--title",
+                pr_title,
+                "--body-file",
+                str(body_file),
+            )
+        except GitError:
+            _gh(
+                "pr",
+                "edit",
+                branch_name,
+                "--title",
+                pr_title,
+                "--body-file",
+                str(body_file),
+            )
+            pr_url = _gh("pr", "view", branch_name, "--json", "url", "-q", ".url")
 
     body_file.unlink(missing_ok=True)
     return pr_url
@@ -793,8 +839,9 @@ def create_grouped_prs(
                         )
                     )
                 except Exception as exc:
+                    _clean_index_lock()
                     _git("checkout", ".", check=False)
-                    _git("clean", "-fd", check=False)
+                    _git("clean", "-fd", "--", "dags/", check=False)
                     print(
                         f"         ERROR: {exc}",
                         file=sys.stderr,

@@ -1,3 +1,5 @@
 cluster:
+  custom_configurations:
+    cluster_name: mig_twin_for_sale__legalops_custom
   databricks_conn_id: databricks_new
   type: consolidation_m_general_single_node_cluster

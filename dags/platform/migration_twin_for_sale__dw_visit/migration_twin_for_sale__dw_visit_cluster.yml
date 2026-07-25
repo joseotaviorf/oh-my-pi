@@ -3,6 +3,7 @@ cluster:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_configurations:
+    cluster_name: mig_twin_for_sale__dw_visit
     data_security_mode: USER_ISOLATION
     driver_node_type_id: r7g.2xlarge
     num_workers: 3

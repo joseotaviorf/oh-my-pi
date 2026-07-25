@@ -95,7 +95,7 @@ WITH deduplicate_trato_feito_negotiation AS (
 ), tf_fix_debt_and_discount AS (
   SELECT
     i.*
-    EXCEPT (i.debts_fee_amount, i.discount_amount),
+    EXCEPT (debts_fee_amount, discount_amount),
     i.debts_fee_amount AS debts_fee_amount_original,
     CASE
       WHEN NOT f.id_negotiation_external IS NULL

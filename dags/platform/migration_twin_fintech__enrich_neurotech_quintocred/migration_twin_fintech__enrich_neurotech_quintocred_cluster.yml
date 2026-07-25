@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_fintech__enrich_neurotech_quintocred
     driver_node_type_id: m7g.xlarge
     spark_version: 13.3.x-scala2.12
   databricks_conn_id: databricks_new_env

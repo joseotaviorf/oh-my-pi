@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_agents__enrich_ebdb_work_contract
     data_security_mode: USER_ISOLATION
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     spark_conf:

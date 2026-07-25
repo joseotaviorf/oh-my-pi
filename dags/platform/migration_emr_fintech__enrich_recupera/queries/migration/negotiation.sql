@@ -7,7 +7,7 @@ WITH carta_campanha AS (
   FROM datalake_recupera_clean.historical_records
   WHERE
     historical_code = 'ACORDO'
-    AND LOWER(occurence_description) RLIKE '.*carta campanha.*' IS TRUE
+    AND (LOWER(occurence_description) RLIKE '.*carta campanha.*') IS TRUE
 ), first_installment AS (
   SELECT
     id_customer,

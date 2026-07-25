@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_for_sale__dw_datamarts_for_sale
     init_scripts:
     - s3:
         destination: '{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh'

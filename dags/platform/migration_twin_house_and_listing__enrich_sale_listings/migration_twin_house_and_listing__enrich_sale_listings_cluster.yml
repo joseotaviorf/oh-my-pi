@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_house_and_listing__enrich_sale_listings
     driver_node_type_id: r7g.2xlarge
     num_workers: 3
   databricks_conn_id: databricks_new_env

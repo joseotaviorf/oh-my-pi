@@ -2,6 +2,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    cluster_name: mig_twin_growth__enrich_supply_conversion
     num_workers: 3
     runtime_engine: PHOTON
   databricks_conn_id: databricks_new_env

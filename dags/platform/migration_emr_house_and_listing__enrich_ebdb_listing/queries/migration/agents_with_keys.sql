@@ -54,7 +54,7 @@ WITH key_location_aud AS (
     is_keys_with_agent_eligible,
     ts_revision
   FROM new
-), old AS (
+), old_attrib AS (
   SELECT
     MD5(CAST(hakt.id AS STRING)) AS id,
     hakt.id_agent,
@@ -77,7 +77,7 @@ WITH key_location_aud AS (
     ON hakt.rev = ure.id
   WHERE
     CAST(FROM_UNIXTIME(ure.ts_revision / 1000) AS DATE) < '2025-06-17'
-), new AS (
+), new_attrib AS (
   SELECT
     MD5(CAST(heh.id AS STRING)) AS id,
     user.id_agent,
@@ -104,7 +104,7 @@ WITH key_location_aud AS (
     status,
     ts_revision,
     ts_revision_unix
-  FROM old
+  FROM old_attrib
   UNION ALL
   SELECT
     id,
@@ -115,7 +115,7 @@ WITH key_location_aud AS (
     status,
     ts_revision,
     ts_revision_unix
-  FROM new
+  FROM new_attrib
 ), merged_key_status /* Associate each revision with its corresponding listing version */ /* Criterea being closer to listing version start or end date */ AS (
   SELECT
     id,

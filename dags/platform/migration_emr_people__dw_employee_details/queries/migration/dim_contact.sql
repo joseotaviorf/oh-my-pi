@@ -1,5 +1,6 @@
--- Mailing address on the current contact version resolves as of load_start_date so address
--- SCD updates without a new all_people version are reflected; historical versions use dt_valid_from.
+-- Mailing address and personal email (H1) on the current contact version resolve as of
+-- load_start_date so SCD updates without a new all_people version are reflected; historical
+-- versions use dt_valid_from (dt_address_referenced).
 -- When all_people.id_mailing_address is null or points to an address row missing at the reference
 -- date, fall back to the HOME row in person_address_usage (DBP-1562).
 WITH
@@ -95,13 +96,16 @@ personal_email_ranked AS (
                 ea.dt_started DESC
         ) AS rn
     FROM
-        contact_versions_deduped AS cv
+        contact_versions_with_address_ref AS cv
     INNER JOIN
         datalake_pin_core_clean.email_address AS ea
             ON cv.id_person = ea.id_person
             AND ea.email_type = 'H1'
-            AND ea.dt_started <= cv.dt_effective_started
-            AND (ea.dt_ended >= cv.dt_effective_started OR ea.dt_ended = DATE('9999-12-31'))
+            AND ea.dt_started <= cv.dt_address_referenced
+            AND (
+                ea.dt_ended >= cv.dt_address_referenced
+                OR ea.dt_ended = DATE('9999-12-31')
+            )
 ),
 personal_email_at_version AS (
     SELECT

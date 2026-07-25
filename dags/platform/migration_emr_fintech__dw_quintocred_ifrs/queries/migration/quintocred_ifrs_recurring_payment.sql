@@ -446,7 +446,7 @@ WITH payment AS (
     ON p.sk_propose_values = vp.sk_propose_values
   WHERE
     paid_amount > 0
-), omie_assinatura AS (
+), _omie_assinatura_2 AS (
   SELECT
     *
   FROM base_omie_ifrs
@@ -724,7 +724,7 @@ WITH payment AS (
     AND status.desc_lvl_1 = 'SUCCESS'
     AND NOT pr.dt_contract_started IS NULL
     AND cr.sk_payment IS NULL
-), rn AS (
+), _rn_dedup_2 AS (
   SELECT
     *,
     ROW_NUMBER() OVER (PARTITION BY sk_transaction ORDER BY dt_due) AS rn
@@ -756,7 +756,7 @@ WITH payment AS (
     valor_pacote,
     CAST('false' AS BOOLEAN) AS is_delinquency_renovacao,
     CAST('false' AS BOOLEAN) AS is_perdao_divida
-  FROM rn
+  FROM _rn_dedup_2
   WHERE
     rn = 1
 ), cpf_cnpj_person AS (
@@ -904,7 +904,7 @@ WITH payment AS (
 ), base_unificada AS (
   SELECT
     *
-  FROM omie_assinatura
+  FROM _omie_assinatura_2
   WHERE
     provisional_group IN ('Assinatura', 'Taxa de Ativação', 'Taxa de ativação')
   UNION
@@ -962,7 +962,7 @@ WITH payment AS (
   FROM deduplicao
   WHERE
     rn = 1
-), sap AS (
+), _sap_2 AS (
   SELECT
     id_finance_entity AS id_fatura,
     id_finance_entity_entry AS id_contract,
@@ -973,7 +973,7 @@ WITH payment AS (
       account_number = '113009' OR account_name IN ('Duplicatas a Receber VELO')
     )
     AND debit = 0
-), cpf_cnpj_person AS (
+), _cpf_cnpj_person_2 AS (
   SELECT
     sk_propose,
     document,
@@ -1032,12 +1032,12 @@ WITH payment AS (
     ON imob.sk_broker = c.id
   LEFT JOIN dw_velo.fact_velo_propose AS fp
     ON fp.sk_propose = e.propose
-  LEFT JOIN sap
+  LEFT JOIN _sap_2 AS sap
     ON sap.id_fatura = CAST(i.id AS STRING)
     AND sap.id_contract = CAST(fp.sk_propose AS STRING)
   LEFT JOIN dw_velo.dim_velo_propose_values AS vp
     ON fp.sk_propose_values = vp.sk_propose_values
-  LEFT JOIN cpf_cnpj_person AS doc
+  LEFT JOIN _cpf_cnpj_person_2 AS doc
     ON doc.sk_propose = fp.sk_propose AND rn = 1
   WHERE
     NOT CONCAT(b.status, i.status) IN ('WRITTEN_DOWNCANCELED')

@@ -668,12 +668,12 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Max DAGs in flight (pairs = max-parallel / 2, default 32)",
     )
     parser.add_argument("--poll-interval", type=float, default=30.0)
-    parser.add_argument("--timeout", type=int, default=3600)
+    parser.add_argument("--timeout", type=int, default=14400)
     parser.add_argument(
         "--compare-timeout",
         type=int,
-        default=7200,
-        help="Timeout for compare DAG monitor in seconds (default 7200)",
+        default=14400,
+        help="Timeout for compare DAG monitor in seconds (default 14400)",
     )
     parser.add_argument(
         "--scopes",

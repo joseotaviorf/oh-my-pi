@@ -1,6 +1,7 @@
 cluster:
   custom_configurations:
     autotermination_minutes: 20
+    cluster_name: mig_twin_fintech__enrich_collections_quintoandar
     data_security_mode: SINGLE_USER
     num_workers: 3
     single_user_name: '{{ var.value.databricks_single_user_name }}'

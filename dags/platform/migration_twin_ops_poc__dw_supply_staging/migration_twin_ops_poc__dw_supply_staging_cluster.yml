@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_ops_poc__dw_supply_staging
     data_security_mode: USER_ISOLATION
     num_workers: 4
     single_user_name: '{{ var.value.databricks_single_user_name }}'

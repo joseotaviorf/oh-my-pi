@@ -18,7 +18,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_waiting_new_docs_date AS (
+), propose_waiting_new_docs_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
@@ -28,7 +28,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_evaluation_started_date AS (
+), propose_evaluation_started_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_evaluation_started
@@ -39,7 +39,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_rejected_date AS (
+), propose_rejected_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
@@ -49,7 +49,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_sign_started_date AS (
+), propose_sign_started_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
@@ -59,7 +59,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_signed_date AS (
+), propose_signed_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_signed
@@ -69,7 +69,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_paid_date AS (
+), propose_paid_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
@@ -79,7 +79,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_activation_date AS (
+), propose_activation_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
@@ -89,7 +89,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_secured_date AS (
+), propose_secured_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
@@ -99,7 +99,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_activation_analysis_date AS (
+), propose_activation_analysis_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
@@ -109,7 +109,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 1 /* alteration by the system */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), propose_secure_pending_date AS (
+), propose_secure_pending_date_legacy AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
@@ -155,25 +155,25 @@ WITH propose_canceled_date AS (
     ON pcd.id_propose = p.id
   LEFT JOIN propose_started_date AS sd
     ON sd.id_propose = p.id
-  LEFT JOIN propose_waiting_new_docs_date AS wndd
+  LEFT JOIN propose_waiting_new_docs_date_legacy AS wndd
     ON wndd.id_propose = p.id
-  LEFT JOIN propose_evaluation_started_date AS esd
+  LEFT JOIN propose_evaluation_started_date_legacy AS esd
     ON esd.id_propose = p.id
-  LEFT JOIN propose_rejected_date AS rd
+  LEFT JOIN propose_rejected_date_legacy AS rd
     ON rd.id_propose = p.id
-  LEFT JOIN propose_sign_started_date AS ssd
+  LEFT JOIN propose_sign_started_date_legacy AS ssd
     ON ssd.id_propose = p.id
-  LEFT JOIN propose_paid_date AS pd
+  LEFT JOIN propose_paid_date_legacy AS pd
     ON pd.id_propose = p.id
-  LEFT JOIN propose_signed_date AS psd
+  LEFT JOIN propose_signed_date_legacy AS psd
     ON psd.id_propose = p.id
-  LEFT JOIN propose_activation_date AS ad
+  LEFT JOIN propose_activation_date_legacy AS ad
     ON ad.id_propose = p.id
-  LEFT JOIN propose_secured_date AS sed
+  LEFT JOIN propose_secured_date_legacy AS sed
     ON sed.id_propose = p.id
-  LEFT JOIN propose_activation_analysis_date AS aad
+  LEFT JOIN propose_activation_analysis_date_legacy AS aad
     ON aad.id_propose = p.id
-  LEFT JOIN propose_secure_pending_date AS spd
+  LEFT JOIN propose_secure_pending_date_legacy AS spd
     ON spd.id_propose = p.id
 ), propose_history_ignore_list AS (
   SELECT
@@ -279,7 +279,7 @@ WITH propose_canceled_date AS (
     AND ps.name IN ('Contrato Cancelado', 'Proposta Cancelada') /* there are proposes that have ts_updated for cancellation history but are reopen */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_history AS (
+), cte_propose_history_wndd AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_waiting_new_docs
@@ -289,7 +289,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_wndd AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_waiting_new_docs
@@ -304,10 +304,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_waiting_new_docs, a.ts_waiting_new_docs) AS ts_waiting_new_docs
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_wndd AS a
+  FULL OUTER JOIN cte_propose_history_wndd AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_esd AS (
   SELECT
     id_propose,
     MIN(ts_updated) AS ts_evaluation_started
@@ -316,7 +316,7 @@ WITH propose_canceled_date AS (
     NOT value IN ('Rascunho', 'Proposta Cancelada') AND id_history_type = 5
   GROUP BY
     1
-), cte_propose_aud AS (
+), cte_propose_aud_esd AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_evaluation_started
@@ -333,10 +333,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_evaluation_started, a.ts_evaluation_started) AS ts_evaluation_started
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_esd AS a
+  FULL OUTER JOIN cte_propose_history_esd AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_rd AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_rejected
@@ -346,7 +346,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_rd AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_rejected
@@ -361,10 +361,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_rejected, a.ts_rejected) AS ts_rejected
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_rd AS a
+  FULL OUTER JOIN cte_propose_history_rd AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_ssd AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_sign_started
@@ -374,7 +374,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_ssd AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_sign_started
@@ -389,10 +389,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_sign_started, a.ts_sign_started) AS ts_sign_started
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_ssd AS a
+  FULL OUTER JOIN cte_propose_history_ssd AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_psd AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_signed
@@ -402,7 +402,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_psd AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_signed
@@ -417,10 +417,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_signed, a.ts_signed) AS ts_signed
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_psd AS a
+  FULL OUTER JOIN cte_propose_history_psd AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_pd AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_paid
@@ -430,7 +430,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_pd AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_paid
@@ -445,10 +445,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_paid, a.ts_paid) AS ts_paid
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_pd AS a
+  FULL OUTER JOIN cte_propose_history_pd AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_ad AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation
@@ -458,7 +458,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_ad AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_activation
@@ -473,10 +473,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_activation, a.ts_activation) AS ts_activation
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_ad AS a
+  FULL OUTER JOIN cte_propose_history_ad AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_sed AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secured
@@ -485,7 +485,7 @@ WITH propose_canceled_date AS (
     value = 'Contrato aprovado' AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_sed AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_secured
@@ -500,10 +500,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_secured, a.ts_secured) AS ts_secured
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_sed AS a
+  FULL OUTER JOIN cte_propose_history_sed AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_aad AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_activation_analysis
@@ -513,7 +513,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_aad AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_activation_analysis
@@ -528,10 +528,10 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_activation_analysis, a.ts_activation_analysis) AS ts_activation_analysis
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_aad AS a
+  FULL OUTER JOIN cte_propose_history_aad AS ph
     ON ph.id_propose = a.id_propose
-), cte_propose_history AS (
+), cte_propose_history_spd AS (
   SELECT
     id_propose,
     MIN(CAST(ts_updated AS TIMESTAMP)) AS ts_secure_pending
@@ -541,7 +541,7 @@ WITH propose_canceled_date AS (
     AND id_history_type = 5 /* Status update type */
   GROUP BY
     1 /* some proposes can have multiple same status */
-), cte_propose_aud AS (
+), cte_propose_aud_spd AS (
   SELECT
     p.id AS id_propose,
     MIN(r.ts_created) AS ts_secure_pending
@@ -556,8 +556,8 @@ WITH propose_canceled_date AS (
   SELECT
     COALESCE(ph.id_propose, a.id_propose) AS id_propose,
     COALESCE(ph.ts_secure_pending, a.ts_secure_pending) AS ts_secure_pending
-  FROM cte_propose_aud AS a
-  FULL OUTER JOIN cte_propose_history AS ph
+  FROM cte_propose_aud_spd AS a
+  FULL OUTER JOIN cte_propose_history_spd AS ph
     ON ph.id_propose = a.id_propose
 ), cte_values AS (
   SELECT

@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_for_rent__dw_offboarding
     driver_node_type_id: r7g.xlarge
     num_workers: 3
   databricks_conn_id: databricks_new_env

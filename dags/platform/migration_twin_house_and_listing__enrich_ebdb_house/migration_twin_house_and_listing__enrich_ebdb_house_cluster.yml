@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_house_and_listing__enrich_ebdb_house
     data_security_mode: SINGLE_USER
     driver_node_type_id: r7g.large
     single_user_name: '{{ var.value.databricks_single_user_name }}'

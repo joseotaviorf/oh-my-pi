@@ -5,5 +5,6 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    cluster_name: mig_twin_support_and_service__metric_ss__tickets
   databricks_conn_id: databricks_new
   type: consolidation_s_memory_cluster

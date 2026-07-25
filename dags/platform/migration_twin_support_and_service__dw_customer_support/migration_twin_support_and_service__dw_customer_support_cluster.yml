@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_support_and_service__dw_customer_support
     data_security_mode: USER_ISOLATION
     num_workers: 4
     single_user_name: '{{ var.value.databricks_single_user_name }}'

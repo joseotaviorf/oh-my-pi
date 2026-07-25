@@ -2,6 +2,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    cluster_name: mig_twin_growth__enrich_demand_conversion_events
     data_security_mode: USER_ISOLATION
     runtime_engine: PHOTON
   databricks_conn_id: databricks_new_env

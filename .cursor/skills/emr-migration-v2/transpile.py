@@ -14,6 +14,11 @@ Usage (from repo root):
     .cursor/skills/emr-migration-v2/transpile.py \
     --scope fintech/enrich_velo --generate-dags
 
+  # Generate DAGs from already-validated SQL (skip re-transpilation):
+  uv run --directory packages/bietlejuice-compiler python \
+    .cursor/skills/emr-migration-v2/transpile.py \
+    --scope fintech/enrich_velo --generate-dags --skip-transpile
+
   # Multiple DAGs:
   uv run --directory packages/bietlejuice-compiler python \
     .cursor/skills/emr-migration-v2/transpile.py \
@@ -23,24 +28,22 @@ Usage (from repo root):
 from __future__ import annotations
 
 import argparse
-import json
-import os
 import sys
 import uuid
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT / "packages" / "bietlejuice-compiler" / "src"))
+
+from dag_generator import generate_dags
+from models import DagTranspileReport, MigrationScope, TableTranspileResult
 
 from bietlejuice.transpiler.databricks_to_spark import (
     DatabricksToSparkTranspiler,
     needs_transpilation,
 )
 from bietlejuice.transpiler.syntax_validator import validate_spark_syntax
-
-from dag_generator import generate_dags
-from models import DagTranspileReport, MigrationScope, TableTranspileResult
 
 
 def discover_sql_files(domain: str, dag_name: str) -> List[Tuple[str, str, str]]:
@@ -61,7 +64,9 @@ def discover_sql_files(domain: str, dag_name: str) -> List[Tuple[str, str, str]]
     return results
 
 
-def transpile_dag(scope: MigrationScope, run_id: str) -> DagTranspileReport:
+def transpile_dag(
+    scope: MigrationScope, run_id: str, force_all: bool = False
+) -> DagTranspileReport:
     """Transpile all SQL files for a single DAG scope."""
     report = DagTranspileReport(scope=scope, run_id=run_id)
     transpiler = DatabricksToSparkTranspiler()
@@ -81,7 +86,7 @@ def transpile_dag(scope: MigrationScope, run_id: str) -> DagTranspileReport:
         )
 
         findings = needs_transpilation(original_sql)
-        if not findings:
+        if not findings and not force_all:
             table_result.needs_transpile = False
             table_result.transpiled = original_sql
             table_result.syntax_valid = True
@@ -106,6 +111,49 @@ def transpile_dag(scope: MigrationScope, run_id: str) -> DagTranspileReport:
 
         table_result.transpiled = result.transpiled
         table_result.syntax_valid = True
+        report.tables.append(table_result)
+
+    return report
+
+
+def load_existing_report(
+    scope: MigrationScope, run_id: str, output_base: Path
+) -> DagTranspileReport:
+    """Build a report from already-transpiled SQL on disk (skip re-transpilation)."""
+    report = DagTranspileReport(scope=scope, run_id=run_id)
+    emr_queries = (
+        output_base / f"migration_emr_{scope.scope_id}" / "queries" / "migration"
+    )
+    if not emr_queries.exists():
+        return report
+
+    original_files = {
+        name: (name, layer, path)
+        for name, layer, path in discover_sql_files(scope.domain, scope.dag_name)
+    }
+
+    for sql_file in sorted(emr_queries.glob("*.sql")):
+        table_name = sql_file.stem
+        transpiled_sql = sql_file.read_text(encoding="utf-8")
+
+        orig = original_files.get(table_name)
+        if orig:
+            _, layer, original_path = orig
+        else:
+            layer = "migration"
+            original_path = str(sql_file)
+
+        orig_sql = Path(original_path).read_text(encoding="utf-8") if orig else None
+        needs_transpile = orig_sql != transpiled_sql if orig_sql else True
+
+        table_result = TableTranspileResult(
+            table_name=table_name,
+            layer=layer,
+            original_path=original_path if orig else str(sql_file),
+            needs_transpile=needs_transpile,
+            transpiled=transpiled_sql,
+            syntax_valid=True,
+        )
         report.tables.append(table_result)
 
     return report
@@ -160,7 +208,22 @@ def main() -> None:
         action="store_true",
         help="Generate the three validation DAGs (twin/emr/comparison) after transpilation",
     )
+    parser.add_argument(
+        "--skip-transpile",
+        action="store_true",
+        help="Skip mechanical transpilation; read existing SQL from migration_emr_* dirs. "
+        "Use after validate+fix to avoid overwriting fixed SQL.",
+    )
+    parser.add_argument(
+        "--force-all",
+        action="store_true",
+        help="Transpile ALL SQL files through SQLGlot, even those without detected "
+        "Databricks-only constructs. Catches constructs the detector misses.",
+    )
     args = parser.parse_args()
+
+    if args.skip_transpile and not args.generate_dags:
+        parser.error("--skip-transpile requires --generate-dags")
 
     run_id = args.run_id or str(uuid.uuid4())
     scopes = MigrationScope.parse_list(args.scope)
@@ -170,7 +233,14 @@ def main() -> None:
 
     all_reports = []
     for scope in scopes:
-        report = transpile_dag(scope, run_id)
+        if args.skip_transpile:
+            report = load_existing_report(scope, run_id, output_base)
+            print(
+                f"\nLoaded {len(report.tables)} existing SQL file(s) for "
+                f"{scope.domain}/{scope.dag_name} (skipping transpilation)"
+            )
+        else:
+            report = transpile_dag(scope, run_id, force_all=args.force_all)
         print_report(report)
 
         if report.failed > 0:
@@ -192,7 +262,7 @@ def main() -> None:
                 )
             else:
                 created = generate_dags(report, output_base=output_base)
-                print(f"Generated DAGs:")
+                print("Generated DAGs:")
                 for path in created:
                     print(f"  {path}")
         else:

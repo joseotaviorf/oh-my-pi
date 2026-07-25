@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_tech_platform__dw_devlake
     runtime_engine: PHOTON
   databricks_conn_id: databricks_new
   type: consolidation_m_memory_single_node_cluster

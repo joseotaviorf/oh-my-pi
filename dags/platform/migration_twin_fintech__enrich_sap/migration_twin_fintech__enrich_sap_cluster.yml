@@ -3,6 +3,7 @@ cluster:
     autoscale:
       max_workers: 8
       min_workers: 5
+    cluster_name: mig_twin_fintech__enrich_sap
     data_security_mode: SINGLE_USER
     node_type_id: r7gd.4xlarge
     runtime_engine: PHOTON

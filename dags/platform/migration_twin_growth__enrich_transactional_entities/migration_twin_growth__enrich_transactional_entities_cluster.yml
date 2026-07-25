@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_growth__enrich_transactional_entities
     custom_tags:
     - key: dag_id
       value: '{{ dag.dag_id }}'

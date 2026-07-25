@@ -3,6 +3,7 @@ cluster:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_configurations:
+    cluster_name: mig_twin_fintech__dw_velo
     driver_node_type_id: r7g.2xlarge
   databricks_conn_id: databricks_new_env
   type: consolidation_xs_memory_cluster

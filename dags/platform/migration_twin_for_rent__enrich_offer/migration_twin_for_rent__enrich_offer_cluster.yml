@@ -2,6 +2,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       availability: ON_DEMAND
+    cluster_name: mig_twin_for_rent__enrich_offer
     data_security_mode: USER_ISOLATION
     driver_node_type_id: r7g.xlarge
     runtime_engine: PHOTON

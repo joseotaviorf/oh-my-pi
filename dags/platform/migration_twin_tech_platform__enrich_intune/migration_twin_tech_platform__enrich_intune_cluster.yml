@@ -3,6 +3,7 @@ cluster:
     group_name: auditlogs
     permission_level: CAN_MANAGE
   custom_configurations:
+    cluster_name: mig_twin_tech_platform__enrich_intune
     runtime_engine: PHOTON
   databricks_conn_id: databricks_new_env
   type: consolidation_s_memory_single_node_cluster

@@ -2,6 +2,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    cluster_name: mig_twin_support_and_service__enrich_ss_logic_model
     driver_node_type_id: r7g.2xlarge
     num_workers: 3
     runtime_engine: PHOTON

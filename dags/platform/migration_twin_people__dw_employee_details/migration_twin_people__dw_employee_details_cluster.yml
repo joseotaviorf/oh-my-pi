@@ -5,6 +5,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
+    cluster_name: mig_twin_people__dw_employee_details
     core_nodes:
       instance_types:
       - r6g.xlarge

@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_for_rent__enrich_ebdb_contract
     driver_node_type_id: r7g.xlarge
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static

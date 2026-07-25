@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_fintech__dw_recon_quintocred
     data_security_mode: SINGLE_USER
     driver_node_type_id: r7g.xlarge
     single_user_name: '{{ var.value.databricks_single_user_name }}'

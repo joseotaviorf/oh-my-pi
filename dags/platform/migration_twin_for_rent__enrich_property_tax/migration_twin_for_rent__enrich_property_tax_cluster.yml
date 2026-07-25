@@ -3,6 +3,7 @@ cluster:
     autoscale:
       max_workers: 2
       min_workers: 1
+    cluster_name: mig_twin_for_rent__enrich_property_tax
     data_security_mode: SINGLE_USER
     driver_node_type_id: m7g.xlarge
     single_user_name: '{{ var.value.databricks_single_user_name }}'

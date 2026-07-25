@@ -8,74 +8,146 @@ description: >
 
 # EMR Migration v2
 
-Transpiles Databricks-only SQL constructs to EMR Spark 3.5 using SQLGlot, applies
-repo conventions via LLM, validates syntax, and generates three validation DAGs.
+End-to-end pipeline: transpile Databricks SQL → validate on real clusters →
+fix failures → generate validation DAGs → trigger → compare results → create PRs.
 
-## Invocation
+## End-to-end runbook
 
+### Phase 1 — Transpile
+
+Converts Databricks-only SQL to Spark 3.5 using SQLGlot. Only files with
+Databricks-only constructs are transpiled; clean SQL passes through unchanged.
+
+```bash
+# Single DAG:
+uv run --directory packages/bietlejuice-compiler python \
+  .cursor/skills/emr-migration-v2/transpile.py \
+  --scope fintech/enrich_velo
+
+# Multiple DAGs:
+uv run --directory packages/bietlejuice-compiler python \
+  .cursor/skills/emr-migration-v2/transpile.py \
+  --scope fintech/enrich_velo,agents/enrich_agent
+
+# Transpile + generate DAGs in one step:
+uv run --directory packages/bietlejuice-compiler python \
+  .cursor/skills/emr-migration-v2/transpile.py \
+  --scope fintech/enrich_velo --generate-dags
 ```
-# Single DAG
-migrate fintech/enrich_docx
 
-# Multiple DAGs (comma-separated list)
-migrate fintech/enrich_docx,agents/enrich_agent,growth/enrich_attribution
+Output: transpiled SQL under `dags/platform/migration_emr_{scope_id}/queries/migration/`.
 
-# Entire domain
-migrate --domain fintech
+### Phase 2 — Validate + fix (loop)
+
+Validates transpiled SQL through the full chain: SQLGlot parse → Databricks
+EXPLAIN → EMR EXPLAIN. Failing files are fixed by the IDE (you/Cursor/Claude Code).
+
+```bash
+# Step 1: validate (writes .git/validation_report.json)
+uv run --no-project --with sqlglot,requests,boto3 python \
+  .cursor/skills/emr-migration-v2/validate_transpiled_sql.py \
+  --databricks-cluster-id 0724-123456-abcdef \
+  --emr-cluster-id j-XXXXX
+
+# Step 2: inspect failures
+uv run --no-project python \
+  .cursor/skills/emr-migration-v2/fix_from_report.py
+
+# Step 3: ask the IDE to fix
+#   "fix the failing SQL files from the validation report"
+
+# Step 4: re-validate → repeat until 0 failures
 ```
 
-## Workflow
+Alternative — batch fix via Anthropic API (no IDE needed):
+```bash
+ANTHROPIC_API_KEY=sk-ant-... \
+uv run --no-project --with sqlglot,requests,boto3,anthropic python \
+  .cursor/skills/emr-migration-v2/validate_transpiled_sql.py \
+  --fix --fix-retries 3 \
+  --databricks-cluster-id 0724-123456-abcdef \
+  --emr-cluster-id j-XXXXX
+```
 
-### 1. Discover SQL files
+### Phase 3 — Generate DAGs
 
-Parse the scope argument. For each DAG in the scope:
-- Find SQL files under `dags/{domain}/{dag_name}/queries/{layer}/*.sql`
-- Validate the DAG path exists
+After validation+fix, generate DAGs **without re-running** mechanical transpilation
+(which would overwrite your fixes):
 
-### 2. Detect & transpile (only Databricks-only constructs)
+```bash
+uv run --directory packages/bietlejuice-compiler python \
+  .cursor/skills/emr-migration-v2/transpile.py \
+  --scope fintech/enrich_velo --generate-dags --skip-transpile
+```
 
-For each SQL file, check for Databricks-only constructs using `needs_transpilation()`.
-**Only files with detected constructs are transpiled.** Clean SQL passes through unchanged.
+Use `--skip-transpile` whenever Phase 2 has already validated/fixed the SQL.
+Omit it only if you're running transpile + DAG generation in a single step
+(Phase 1 shortcut: `--generate-dags` without `--skip-transpile`).
 
-Detected constructs (from `emr_compatibility.mdc`):
+Creates three DAGs per scope under `dags/platform/`:
+
+| DAG | Runtime | Purpose |
+|-----|---------|---------|
+| `migration_twin_{scope_id}` | Databricks | Run ORIGINAL queries → capture metrics → S3 |
+| `migration_emr_{scope_id}` | EMR | Run TRANSPILED queries → capture metrics → S3 |
+| `migration_compare_{scope_id}` | Databricks | Compare twin vs emr metrics → verdict → S3 |
+
+Then regenerate DAG files:
+```bash
+make create-dag-files
+```
+
+### Phase 4 — Trigger + compare
+
+Deploy to Forno, then trigger via Airflow API:
+
+```bash
+uv run python .cursor/skills/emr-migration-v2/trigger_migration_dags.py \
+  --max-parallel 32
+```
+
+Triggers twin + emr DAG pairs in batches. Compare DAGs fire automatically
+via Airflow Datasets when both twin and emr complete.
+
+### Phase 5 — Results + PRs
+
+Fetch comparison verdicts from S3 and create grouped PRs:
+
+```bash
+# Auto-discover all scopes, group PRs by domain:
+uv run --no-project --with boto3,pyyaml,sqlglot python \
+  .cursor/skills/emr-migration-v2/results.py \
+  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
+
+# Filter to specific domains:
+uv run --no-project --with boto3,pyyaml,sqlglot python \
+  .cursor/skills/emr-migration-v2/results.py \
+  --domain growth,fintech \
+  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
+
+# Dry run (print verdicts and grouping, no PRs):
+uv run --no-project --with boto3,pyyaml,sqlglot python \
+  .cursor/skills/emr-migration-v2/results.py \
+  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br \
+  --dry-run
+```
+
+Creates one PR per domain/verdict category (passed vs review-needed).
+
+---
+
+## Reference
+
+### Detected constructs (transpiled automatically)
+
 - `QUALIFY` → CTE + WHERE with ROW_NUMBER
 - `IFF(cond, a, b)` → `IF(cond, a, b)`
 - `DECODE(expr, k1, v1, ...)` → CASE WHEN
 - `DATEDIFF(unit, start, end)` 3-arg → `DATEDIFF(end, start)` 2-arg
-- `column:key` variant access → appropriate STRUCT/MAP/JSON rewrite
+- `column:key` variant access → STRUCT/MAP/JSON rewrite
 - `col::TYPE` → `CAST(col AS TYPE)`
 - `SELECT * EXCEPT(...)` → explicit column list
-
-**Transpilation pipeline:**
-
-1. **SQLGlot** (`databricks` → `spark` dialect) handles mechanical rewrites
-2. **LLM convention enforcement** — review transpiled SQL against:
-   - `.cursor/rules/sql_conventions.mdc` (UPPERCASE keywords, snake_case, CTEs, formatting)
-   - `.cursor/rules/emr_compatibility.mdc` (dual-runtime safety)
-   - `.cursor/skills/databricks-emr-sql-lint/RECIPES.md` (specific rewrite patterns)
-3. **Syntax validation** — `validate_spark_syntax()` parses with SQLGlot in Spark dialect
-4. On syntax failure: retry LLM fix once, then mark table as FAIL
-
-### 3. Generate three DAGs
-
-Using `dag_generator.py`, render Jinja templates into `dags/platform/`:
-
-| DAG | Runtime | Purpose |
-|-----|---------|---------|
-| `migration_twin_{scope_id}` | Databricks | Run ORIGINAL queries, capture count + schema + profile → S3 |
-| `migration_emr_{scope_id}` | EMR | Run TRANSPILED queries, capture count + schema + profile → S3 |
-| `migration_compare_{scope_id}` | Databricks (minimal) | Compare metrics, write verdict → S3 |
-
-Profile includes **null counts** and **xxhash64 checksums** per column.
-
-The Comparison DAG is triggered by Airflow Datasets from both Twin and EMR DAGs.
-
-### 4. Report
-
-Print transpilation summary per table:
-- `[+]` PASS — transpiled and syntax-validated
-- `[-]` SKIP — already dual-runtime compatible (no constructs found)
-- `[!]` FAIL — transpilation or syntax validation failed
+- `RANGE_JOIN` / `SKEW` hints → stripped
 
 ## S3 output structure
 
@@ -117,63 +189,12 @@ Verdict values:
 
 The aggregate `summary.json` has `pr_gate_eligible: true` when zero FAILs.
 
-## Results command
-
-After the comparison DAGs have run, use `results.py` to fetch verdicts from S3 and
-create PRs that replace original SQL with transpiled versions.
-
-### Invocation
-
-```bash
-# Single DAG
-uv run --no-project --with boto3,pyyaml python \
-  .cursor/skills/emr-migration-v2/results.py \
-  --scope fintech/enrich_velo \
-  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
-
-# Multiple DAGs
-uv run --no-project --with boto3,pyyaml python \
-  .cursor/skills/emr-migration-v2/results.py \
-  --scope fintech/enrich_velo,fintech/enrich_docx \
-  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
-
-# Dry run (print verdicts only)
-uv run --no-project --with boto3,pyyaml python \
-  .cursor/skills/emr-migration-v2/results.py \
-  --scope fintech/enrich_velo \
-  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br \
-  --dry-run
-
-# With assume role (cross-account S3)
-uv run --no-project --with boto3,pyyaml python \
-  .cursor/skills/emr-migration-v2/results.py \
-  --scope fintech/enrich_velo \
-  --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br \
-  --assume-role-arn arn:aws:iam::123456789:role/MyRole
-```
-
-### What it does
-
-1. Reads `manifest.json` from each comparison DAG directory to get the run ID
-2. Downloads `summary.json` and per-table verdict JSONs from S3
-3. Partitions tables by verdict:
-   - **Validated** (PASS/WARN) — transpiled SQL produces equivalent results
-   - **Needs review** (FAIL) — transpiled SQL diverges from baseline
-4. For each group, creates a branch and PR:
-   - Copies transpiled SQL from `migration_emr_{scope}/queries/migration/` into the
-     source DAG's `queries/{layer}/`, replacing the original
-   - PR body includes a validation results table (counts, schema, nulls, checksums)
-     and S3 artifact references
-
-### PRs created
+### PRs created by results.py
 
 | PR | Content | Tone |
 |----|---------|------|
-| `emr-migration/validated/{slug}` | PASS/WARN tables | Safe to merge — validated equivalent |
-| `emr-migration/needs-review/{slug}` | FAIL tables | Recommendation — needs manual review |
-
-Both PRs contain the transpiled SQL. The validated PR is merge-ready; the needs-review
-PR includes detailed issue breakdowns for each failing table.
+| `emr-migration/transpile/{domain}-passed` | PASS/WARN tables | Safe to merge — validated equivalent |
+| `emr-migration/transpile/{domain}-failed` | FAIL tables | Needs manual review |
 
 ## Key files
 

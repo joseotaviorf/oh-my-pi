@@ -6,7 +6,7 @@ Scope: {{ domain }}/{{ dag_name }}
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -43,12 +43,9 @@ DAG_DIR = Path(__file__).resolve().parent
 ENV = os.environ.get("ENVIRONMENT")
 CONFIG_SERVICE = ConfigurationService(SOURCE_DAG_NAME)
 BUCKET = CONFIG_SERVICE.get_config("datalake_bucket")
-BIETLEJUICE_REPO_PATH = CONFIG_SERVICE.get_config(
-    "databricks_bietlejuice_repo_path"
-)
+BIETLEJUICE_REPO_PATH = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_path")
 METRIC_CAPTURE_JOB = (
-    f"{BIETLEJUICE_REPO_PATH}/spark_jobs"
-    f"/migration_assets/metric_capture_job.py"
+    f"{BIETLEJUICE_REPO_PATH}/spark_jobs/migration_assets/metric_capture_job.py"
 )
 ARTIFACTS_URI = CONFIG_SERVICE.get_config("artifacts_bucket")
 ARTIFACTS_BUCKET = urlparse(ARTIFACTS_URI).netloc or ARTIFACTS_URI
@@ -66,9 +63,7 @@ def _build_context(dag):
         dag_args={},
         workflow_args={},
         cluster_args=CLUSTER_ARGS,
-        databricks_conn_id=CLUSTER_ARGS.get(
-            "databricks_conn_id", "databricks_new_env"
-        ),
+        databricks_conn_id=CLUSTER_ARGS.get("databricks_conn_id", "databricks_new_env"),
     )
     attach_job_cluster_engine_to_context(ctx, CONFIG_SERVICE)
     return ctx
@@ -99,10 +94,7 @@ def _upload_sql(**context):
     s3 = _get_s3_client()
     for table in TABLES:
         local_path = str(sql_dir / f"{table}.sql")
-        s3_key = (
-            f"{RUN_PREFIX}/sql/{RUNTIME}/{DOMAIN}"
-            f"/{SOURCE_DAG_NAME}/{table}.sql"
-        )
+        s3_key = f"{RUN_PREFIX}/sql/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{table}.sql"
         s3.upload_file(local_path, ARTIFACTS_BUCKET, s3_key)
 
 
@@ -114,6 +106,7 @@ with DAG(
     max_active_runs=1,
     tags=["migration", "twin", "validation"],
     default_args={"owner": "data-platform", "retries": 0},
+    dagrun_timeout=timedelta(hours=4),
 ) as dag:
     ctx = _build_context(dag)
 
@@ -154,13 +147,18 @@ with DAG(
                         f"{ARTIFACTS_URI}/{RUN_PREFIX}/sql/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{table}",
                         "--result-s3-uri",
                         f"{ARTIFACTS_URI}/{RUN_PREFIX}/{RUNTIME}/{DOMAIN}/{SOURCE_DAG_NAME}/{table}",
-                        "--run-id", RUN_ID,
-                        "--runtime", "databricks",
-                        "--domain", DOMAIN,
-                        "--dag-name", SOURCE_DAG_NAME,
-                        "--table-name", table,
+                        "--run-id",
+                        RUN_ID,
+                        "--runtime",
+                        "databricks",
+                        "--domain",
+                        DOMAIN,
+                        "--dag-name",
+                        SOURCE_DAG_NAME,
+                        "--table-name",
+                        table,
                     ],
-                    execution_timeout_hours=0.5,
+                    execution_timeout_hours=2,
                 )
             )
 

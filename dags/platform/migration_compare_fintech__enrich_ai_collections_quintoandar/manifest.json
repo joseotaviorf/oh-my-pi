@@ -1,0 +1,17 @@
+{
+  "run_id": "03c62042-3e72-4dee-a98b-735452df845f",
+  "scope_id": "fintech__enrich_ai_collections_quintoandar",
+  "domain": "fintech",
+  "dag_name": "enrich_ai_collections_quintoandar",
+  "tables": [
+    "matthew_llm_metrics",
+    "matthew_mcp_observations",
+    "mcp_tool_logs",
+    "messages",
+    "observation",
+    "sessions"
+  ],
+  "transpiled_count": 1,
+  "skipped_count": 5,
+  "failed_count": 0
+}

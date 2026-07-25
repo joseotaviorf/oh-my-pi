@@ -5,6 +5,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    cluster_name: mig_twin_for_rent__dw_rent_demand_events
     data_security_mode: USER_ISOLATION
     driver_node_type_id: r7g.xlarge
     num_workers: 3

@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_for_rent__enrich_listing_jobs
     driver_node_type_id: r7g.xlarge
   databricks_conn_id: databricks_new_env
   type: consolidation_xs_memory_cluster

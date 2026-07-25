@@ -5,6 +5,7 @@ cluster:
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
+    cluster_name: mig_twin_for_rent__metric_rent__contracts
     data_security_mode: USER_ISOLATION
   databricks_conn_id: databricks_new
   type: consolidation_l_memory_single_node_cluster

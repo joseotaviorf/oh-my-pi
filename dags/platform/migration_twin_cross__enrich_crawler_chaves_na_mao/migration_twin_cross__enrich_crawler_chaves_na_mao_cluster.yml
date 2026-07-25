@@ -1,5 +1,6 @@
 cluster:
   custom_configurations:
+    cluster_name: mig_twin_cross__enrich_crawler_chaves_na_mao
     data_security_mode: SINGLE_USER
     num_workers: 4
     single_user_name: '{{ var.value.databricks_single_user_name }}'

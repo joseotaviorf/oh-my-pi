@@ -3,6 +3,7 @@ cluster:
     group_name: auditlogs
     permission_level: CAN_MANAGE
   custom_configurations:
+    cluster_name: mig_twin_tech_platform__enrich_access_logs
     data_security_mode: SINGLE_USER
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     spark_conf:

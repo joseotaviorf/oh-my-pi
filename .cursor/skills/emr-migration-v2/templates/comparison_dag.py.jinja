@@ -6,7 +6,7 @@ Scope: {{ domain }}/{{ dag_name }}
 """
 
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -49,6 +49,7 @@ with DAG(
     catchup=False,
     max_active_runs=1,
     tags=["migration", "comparison", "validation"],
+    dagrun_timeout=timedelta(hours=4),
 ) as dag:
 
     def _get_s3_client():
@@ -72,7 +73,6 @@ with DAG(
 
     def run_comparison(**context):
         """Read metrics from S3, compare, write verdict."""
-        import json
         from migration_assets.comparison import (
             compare_table,
             list_s3_jsons,
@@ -93,21 +93,33 @@ with DAG(
         twin_by_table = {}
         for key in twin_keys:
             metric = read_s3_json(f"{ARTIFACTS_URI}/{key}", s3_client=s3)
-            table_name = metric.get("table_name", key.split("/")[-1].replace(".json", ""))
+            table_name = metric.get(
+                "table_name", key.split("/")[-1].replace(".json", "")
+            )
             twin_by_table[table_name] = metric
 
         emr_by_table = {}
         for key in emr_keys:
             metric = read_s3_json(f"{ARTIFACTS_URI}/{key}", s3_client=s3)
-            table_name = metric.get("table_name", key.split("/")[-1].replace(".json", ""))
+            table_name = metric.get(
+                "table_name", key.split("/")[-1].replace(".json", "")
+            )
             emr_by_table[table_name] = metric
 
-        all_tables = TABLES if TABLES else sorted(set(twin_by_table.keys()) | set(emr_by_table.keys()))
+        all_tables = (
+            TABLES
+            if TABLES
+            else sorted(set(twin_by_table.keys()) | set(emr_by_table.keys()))
+        )
         if not all_tables:
             raise RuntimeError("No metric files found for either runtime")
 
         summary_uri = f"{ARTIFACTS_URI}/{verdict_prefix}summary.json"
-        write_s3_json(summary_uri, {"version": 1, "run_id": RUN_ID, "status": "in_progress"}, s3_client=s3)
+        write_s3_json(
+            summary_uri,
+            {"version": 1, "run_id": RUN_ID, "status": "in_progress"},
+            s3_client=s3,
+        )
 
         verdicts = {}
         passed = warned = failed = 0
@@ -115,11 +127,19 @@ with DAG(
         for table_name in all_tables:
             twin_m = twin_by_table.get(
                 table_name,
-                {"table_name": table_name, "error": "Missing twin metric", "run_id": RUN_ID},
+                {
+                    "table_name": table_name,
+                    "error": "Missing twin metric",
+                    "run_id": RUN_ID,
+                },
             )
             emr_m = emr_by_table.get(
                 table_name,
-                {"table_name": table_name, "error": "Missing EMR metric", "run_id": RUN_ID},
+                {
+                    "table_name": table_name,
+                    "error": "Missing EMR metric",
+                    "run_id": RUN_ID,
+                },
             )
 
             for label, metric in [("twin", twin_m), ("emr", emr_m)]:
@@ -157,7 +177,9 @@ with DAG(
         write_s3_json(summary_uri, summary, s3_client=s3)
 
         context["ti"].xcom_push(key="overall_verdict", value=summary["overall_verdict"])
-        context["ti"].xcom_push(key="pr_gate_eligible", value=summary["pr_gate_eligible"])
+        context["ti"].xcom_push(
+            key="pr_gate_eligible", value=summary["pr_gate_eligible"]
+        )
 
     compare_all = PythonOperator(
         task_id="compare_all",

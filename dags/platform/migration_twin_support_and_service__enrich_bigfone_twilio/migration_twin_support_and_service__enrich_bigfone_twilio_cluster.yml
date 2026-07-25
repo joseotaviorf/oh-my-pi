@@ -1,3 +1,5 @@
 cluster:
+  custom_configurations:
+    cluster_name: mig_twin_support_and_service__enrich_bigfone_twilio
   databricks_conn_id: databricks_new_env
   type: consolidation_l_general_single_node_cluster

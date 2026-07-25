@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -18,7 +18,7 @@ class MigrationScope:
         return f"{self.domain}__{self.dag_name}"
 
     @classmethod
-    def parse(cls, spec: str) -> "MigrationScope":
+    def parse(cls, spec: str) -> MigrationScope:
         parts = spec.strip().split("/")
         if len(parts) != 2:
             raise ValueError(
@@ -27,7 +27,7 @@ class MigrationScope:
         return cls(domain=parts[0], dag_name=parts[1])
 
     @classmethod
-    def parse_list(cls, specs: str) -> List["MigrationScope"]:
+    def parse_list(cls, specs: str) -> List[MigrationScope]:
         return [cls.parse(s) for s in specs.split(",") if s.strip()]
 
 
