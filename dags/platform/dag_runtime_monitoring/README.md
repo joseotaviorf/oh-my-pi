@@ -1,31 +1,59 @@
 # dag_runtime_monitoring
 
-Every 30 minutes this DAG inspects every currently-running DAG and flags any whose
-elapsed time is anomalous **relative to that same DAG's own recent successful runs**
-(P`percentile` of successful-run durations over the last `lookback_days` × `factor` — no hardcoded per-DAG
-thresholds) **and** only once the run has been executing for at least
-`min_alert_duration_minutes` (absolute floor, so quick DAGs never alert).
+Every 30 minutes this DAG:
+
+1. Inspects every currently-running DAG and flags any whose elapsed time is anomalous
+   **relative to that same DAG's own recent successful runs** (P`percentile` of
+   successful-run durations over the last `lookback_days` × `factor` — no hardcoded
+   per-DAG thresholds) **and** only once the run has been executing for at least
+   `min_alert_duration_minutes` (absolute floor, so quick DAGs never alert).
+2. Flags DAGs that **should have started by now** (SLA start / missing-run guard)
+   based on each DAG's own historical first-start offset within the daily cycle
+   (anchored at `sla_cycle_anchor_local_time`, default 20:55 America/Sao_Paulo),
+   with dependency-based root-cause suppression so one stalled root produces one
+   alert instead of hundreds of downstream noise. Missing-run findings are
+   **Chat-only** (no JiraOps).
 
 **Every anomaly goes to Google Chat** and is tracked to closure (ledger Variable
 `DAG_RUNTIME_MONITORING_ALERTED_RUNS`: initial alert, 30-min updates, ✅/❌ close).
 
-When `critical_dags` is non-empty, findings that are **in the list** or that
+When `critical_dags` is non-empty, *slow* findings that are **in the list** or that
 **transitively block** one (via `dependencies.yaml`) **also** page JiraOps once.
 
 - **Empty `critical_dags`** (prod soft-launch): Chat only; nothing pages Jira.
-- **Critical / blocking critical** → Chat **+** JiraOps.
-- **Neither** → Chat only.
+- **Critical / blocking critical** (slow tier only) → Chat **+** JiraOps.
+- **Neither / missing-run** → Chat only.
 
-**Elapsed clock:** when a run has an `execute-job-cluster` / `execute-job-cluster-N`
+**Elapsed clock (slowness):** when a run has an `execute-job-cluster` / `execute-job-cluster-N`
 task, both live elapsed and the historical baseline start from that task’s earliest
 `start_date` (sensor / pre-cluster wait is excluded). Runs still waiting for that task
 to start are not evaluated. DAGs without that task keep full `dag_run` wall time.
 Metadata lookups join `task_instance` only for the filtered candidate `dag_run` rows
 (never a full-table aggregate of every `execute-job-cluster*` TI).
 
+**SLA candidates:** active, unpaused DAGs with a real schedule (dataset or cron).
+Excluded by default: `migration_*` prefixes, `__validation` suffixes, and this DAG
+itself. Manual-only (`schedule_interval` null) DAGs are skipped. Wonka/`quintoml.*`
+stay in (same scope as the slowness check).
+
+**Root selection (missing-run).** Of the DAGs past their due time, only the *roots*
+are alerted on. A **confirmed** root has no late upstream and every upstream that was
+expected to run this cycle already succeeded. Upstreams outside the candidate set
+(paused, deactivated, excluded) can never succeed this cycle, so they do not block —
+otherwise their dependents would be permanently unalertable.
+
+If nothing is confirmed but DAGs *are* late — e.g. the true root has too little
+history to have a baseline — the monitor falls back to the **tops of the late
+subgraph** and marks the alert `Attribution: unconfirmed root (N DAG(s) late this
+cycle)`. A lower-confidence root beats going silent during a real cascade, which is
+the failure mode the 2026-07-14 postmortem describes.
+
 Real alerts are only delivered when `environment == prod`. Config lives in
 `prod_conf.yml` / `forno_conf.yml` (`lookback_days`, `min_history_runs`, `percentile`,
-`factor`, `min_alert_duration_minutes`, `critical_dags`).
+`factor`, `min_alert_duration_minutes`, `critical_dags`). SLA keys
+(`sla_enabled`, `sla_lookback_days`, `sla_min_history_cycles`, `sla_percentile`,
+`sla_grace_minutes`, `sla_cycle_anchor_local_time`, `sla_exclude_dag_prefixes`,
+`sla_exclude_dag_suffixes`) fall back to module defaults when omitted.
 
 ## Downstream DW impact
 
@@ -43,10 +71,21 @@ downstream IDs matching `bietlejuice.dw_*`.
 - If the YAML cannot be read **or** inverted (invalid upstream shapes) on the
   **initial** alert, messages still send with `• Impacted DW: none` — the
   monitor cycle never fails on a dependency-parse error.
+- For **missing-run detection**, the same load failure is **fail-closed**: no new
+  SLA roots are opened that cycle (an empty upstream map would otherwise treat
+  every late DAG as a root). Existing SLA ledger entries are still followed up.
+- Missing-run roots also include `Also waiting downstream: N DAG(s)` (other late
+  DAGs transitively downstream of the root within the late set) and a Trigger deep link.
+- `sla_enabled: false` stops new missing-run alerts **and** drops any open SLA
+  ledger entries without further Chat updates. Paused / inactive / excluded DAGs
+  are likewise dropped from the SLA ledger on the next cycle (no more “still
+  missing” churn until rollover).
+- A bad `sla_cycle_anchor_local_time` falls back to `20:55` so the whole monitor
+  (including slowness) keeps running.
 
-Alert text is multiline (🐌 + owner from Airflow `dag.owners` with fallback to
-serialized DAG `default_args.owner`, elapsed/baseline, run id, DW impact). Payloads
-are hard-capped before send: Google Chat `text` ≤ 4096 chars; JiraOps/Opsgenie
+Alert text is multiline (🐌/⏰ + owner from Airflow `dag.owners` with fallback to
+serialized DAG `default_args.owner`, elapsed/baseline or SLA due-by, run id, DW impact).
+Payloads are hard-capped before send: Google Chat `text` ≤ 4096 chars; JiraOps/Opsgenie
 `message` ≤ 130 and `description` ≤ 15000.
 
 Freshness tracks DAG deploys: after `make dependencies-file` is committed and the
@@ -61,11 +100,13 @@ exercise the full detect → route → deliver path without waiting for a real s
 
 | conf key | meaning | default |
 |---|---|---|
-| `simulate` | Skip the DB and fabricate one critical + one standard finding. | `false` |
-| `simulate_dags` | Explicit dag_ids to fabricate findings for. | one critical + one standard |
+| `simulate` | Skip the DB and fabricate findings. | `false` |
+| `simulate_missing_runs` | With `simulate`, fabricate SLA missing-run findings instead of slow ones. | `false` |
+| `simulate_dags` | Explicit dag_ids to fabricate findings for. | one critical + one standard (slow); or one missing-run id |
+| `simulate_state` | Follow-up phase: `running` / `success` / `failed` (slow) or `running` / `started` (missing-run). | initial |
 | `dry_run` | Log the routing decision but send nothing. | `true` for a bare `simulate`; `false` once `force_send` is set (explicit value always wins) |
 | `force_send` | Override the `environment == prod` gate so delivery happens in Forno/local. | `false` |
-| `test_webhook` | Send standard-tier gchat to this throwaway webhook instead of the configured one. | — |
+| `test_webhook` | Send gchat to this throwaway webhook instead of the configured one. | — |
 | `test_responder_team_id` | Route critical JiraOps alerts to this **test** team (adds a `test` tag + `[TEST]` prefix). | — |
 | `only_dags` | Restrict real (non-simulated) evaluation to these dag_ids. | — |
 | `critical_dags` | Replace YAML `critical_dags` for this run only (string or list). | YAML value |
@@ -97,7 +138,13 @@ curl -s -u admin:admin -X POST \
   -d '{"conf": {"simulate": true, "dry_run": true}}'
 ```
 
-Read the task log and confirm the `[critical]` / `[standard]` routing lines:
+Missing-run path:
+
+```bash
+-d '{"conf": {"simulate": true, "simulate_missing_runs": true, "dry_run": true}}'
+```
+
+Read the task log and confirm the `[critical]` / `[standard]` / `[missing_run]` routing lines:
 
 ```bash
 curl -s -u admin:admin \
@@ -125,19 +172,21 @@ from the UI (*Trigger DAG w/ config*) with that conf — `JIRA_OPS_ONCALL_APIKEY
 set there; you supply the test webhook + test team id. Omitting `test_responder_team_id`
 downgrades the critical alert to log-only (the standard/gchat alert still delivers).
 
-### 4. Test against real running DAGs (no simulation)
+### 4. Test against real running DAGs / real SLA history (no simulation)
 
-Trigger with `only_dags` to evaluate specific DAGs currently running, dry-run first:
+Trigger with `only_dags` to evaluate specific DAGs, dry-run first:
 
 ```bash
--d '{"conf": {"only_dags": ["bietlejuice.ebdb_location"], "dry_run": true}}'
+-d '{"conf": {"only_dags": ["bietlejuice.enrich_region"], "dry_run": true}}'
 ```
 
 A manual Forno run like the above also satisfies the "Forno run before merge" constraint.
+Use it after deploy to sanity-check computed `due_at` values in the task log before
+enabling Chat delivery in prod.
 
 ## Unit tests
 
 ```bash
-uv run --directory packages/bietlejuice-airflow \
+uv run --python 3.12 --directory packages/bietlejuice-airflow \
   pytest test/unit/dags/platform/dag_runtime_monitoring -q
 ```

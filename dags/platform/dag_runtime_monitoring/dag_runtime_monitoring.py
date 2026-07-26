@@ -3,24 +3,32 @@ airflow parsing enforcement
 
 Note: this line above forces Airflow to parse this file for implemented DAGs.
 
-Runtime-anomaly monitor. Every 30 minutes it inspects every currently-running DAG
-run and flags any whose elapsed time is anomalous *relative to that same DAG's own
-recent successful runs* (P<percentile> of durations over the last <lookback_days>,
-times a factor, and only past an absolute min-duration floor) — no hardcoded per-DAG
-time thresholds.
+Runtime-anomaly monitor. Every 30 minutes it:
+
+1. Inspects every currently-running DAG run and flags any whose elapsed time is
+   anomalous *relative to that same DAG's own recent successful runs*
+   (P<percentile> of durations over the last <lookback_days>, times a factor, and
+   only past an absolute min-duration floor) — no hardcoded per-DAG time thresholds.
+2. Flags DAGs that *should have started by now* (SLA start / missing-run guard)
+   based on each DAG's own historical first-start offset within the daily cycle,
+   with dependency-based root-cause suppression so one stalled root produces one
+   alert instead of hundreds of downstream noise.
 
 Alerting is tiered by ``critical_dags`` (soft-launch: empty list → Chat only):
-  * Every over-baseline DAG is reported to Google Chat and **tracked to closure**
-    (threaded updates while running, final message on success/failure).
-  * Additionally, DAGs in ``critical_dags`` **or** that transitively block one
+  * Every over-baseline / missing-run DAG is reported to Google Chat and **tracked
+    to closure** (threaded updates while running/missing, final message on resolve).
+  * Additionally, *slow* DAGs in ``critical_dags`` **or** that transitively block one
     (via ``dependencies.yaml``) also open a JiraOps on-caller alert once.
+  * Missing-run findings are Chat-only (no JiraOps), by design.
 
-Elapsed time and historical baselines are anchored on the earliest
-``execute-job-cluster*`` task start when that task exists for the run (so sensor /
-pre-cluster wait is excluded). DAGs without that task keep full ``dag_run`` wall time.
+Elapsed time and historical baselines for the slowness check are anchored on the
+earliest ``execute-job-cluster*`` task start when that task exists for the run
+(so sensor / pre-cluster wait is excluded). DAGs without that task keep full
+``dag_run`` wall time.
 
 Both alert paths include the transitive list of downstream ``bietlejuice.dw_*`` DAGs
-impacted by the slow run, computed each cycle from the deployed ``dependencies.yaml``.
+impacted by the slow / missing run, computed each cycle from the deployed
+``dependencies.yaml``.
 
 Real alerts are only sent when ``environment == prod`` (or a force_send test); otherwise
 the DAG logs what it *would* send (so Forno/local runs still exercise the queries).
@@ -33,10 +41,13 @@ import math
 import os
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
+from typing import Iterable
+from urllib.parse import quote
 
 import pendulum
 import requests
 from airflow import DAG
+from airflow.configuration import conf
 from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from airflow.utils.db import provide_session
@@ -52,10 +63,14 @@ from bietlejuice.services.configuration_service import ConfigurationService
 DAG_NAME = "dag_runtime_monitoring"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+AIRFLOW_URL = conf.get("webserver", "base_url")
 
 # Airflow Variables.
 JIRA_OPS_VARIABLE = "JIRA_OPS_ONCALL_APIKEY"
 DEDUP_VARIABLE_KEY = "DAG_RUNTIME_MONITORING_ALERTED_RUNS"
+_KIND_SLOW = "slow"
+_KIND_MISSING_RUN = "missing_run"
+_SLA_RUN_ID_PREFIX = "sla::"
 
 # Cap the DW blast-radius list in Chat / JiraOps messages.
 _IMPACTED_DW_LIST_LIMIT = 25
@@ -90,6 +105,16 @@ _DEFAULT_CONFIG = {
     # Absolute floor: only alert on runs that have been executing at least this long,
     # so quick DAGs never page no matter how large their relative swing.
     "min_alert_duration_minutes": 90,
+    # SLA start / missing-run guard (Chat-only).
+    "sla_enabled": True,
+    "sla_lookback_days": 14,
+    "sla_min_history_cycles": 10,
+    "sla_percentile": 90,
+    "sla_grace_minutes": 60,
+    # Matches reset_datasets schedule_interval="55 20 * * *" (America/Sao_Paulo).
+    "sla_cycle_anchor_local_time": "20:55",
+    "sla_exclude_dag_prefixes": ["migration_"],
+    "sla_exclude_dag_suffixes": ["__validation"],
 }
 
 # Only "real" automatic runs count — scheduled, dataset-triggered, or mediator-triggered.
@@ -197,6 +222,50 @@ _OWNERS_QUERY = text(
     SELECT dag_id, owners
     FROM dag
     WHERE dag_id IN :dag_ids
+    """
+).bindparams(bindparam("dag_ids", expanding=True))
+
+# SLA start guard — dag / dag_run only (no task_instance; see #26399).
+# schedule_interval NULL / 'null' = manual-only (excluded). Dataset DAGs store "Dataset".
+_SLA_CANDIDATES_QUERY = text(
+    """
+    SELECT
+        d.dag_id,
+        d.schedule_interval
+    FROM dag AS d
+    WHERE d.is_active = TRUE
+      AND d.is_paused = FALSE
+      AND d.dag_id != :self_dag_id
+      AND d.schedule_interval IS NOT NULL
+      AND CAST(d.schedule_interval AS TEXT) != 'null'
+    """
+)
+
+_SLA_HISTORY_QUERY = text(
+    f"""
+    SELECT
+        dr.dag_id,
+        dr.start_date,
+        dr.state
+    FROM dag_run AS dr
+    WHERE dr.start_date IS NOT NULL
+      AND dr.start_date >= :since
+      AND {_REAL_RUN_FILTER_DR}
+      AND dr.dag_id IN :dag_ids
+    """
+).bindparams(bindparam("dag_ids", expanding=True))
+
+_SLA_STARTED_QUERY = text(
+    f"""
+    SELECT
+        dr.dag_id,
+        MIN(dr.start_date) AS first_start
+    FROM dag_run AS dr
+    WHERE dr.start_date IS NOT NULL
+      AND dr.start_date >= :cycle_start
+      AND {_REAL_RUN_FILTER_DR}
+      AND dr.dag_id IN :dag_ids
+    GROUP BY dr.dag_id
     """
 ).bindparams(bindparam("dag_ids", expanding=True))
 
@@ -375,8 +444,378 @@ def _evaluate_all(
     return findings
 
 
+# --------------------------------------------------------------------------- #
+# SLA start / missing-run helpers
+# --------------------------------------------------------------------------- #
+_DEFAULT_SLA_ANCHOR_HHMM = "20:55"
+
+
+def _parse_anchor_hhmm(hhmm: str) -> tuple[int, int]:
+    """Parse ``HH:MM`` into ``(hour, minute)``. Raises ``ValueError`` on bad input."""
+    hour_s, minute_s = str(hhmm).strip().split(":", 1)
+    hour, minute = int(hour_s), int(minute_s)
+    if not (0 <= hour <= 23 and 0 <= minute <= 59):
+        raise ValueError(f"hour/minute out of range: {hour}:{minute}")
+    return hour, minute
+
+
+def _resolve_anchor_hhmm(
+    hhmm: str | None, *, default: str = _DEFAULT_SLA_ANCHOR_HHMM
+) -> str:
+    """Validate config ``HH:MM``; fall back to ``default`` on bad / empty values.
+
+    Keeps a bad ``sla_cycle_anchor_local_time`` from crashing the whole monitor
+    (slowness detection included).
+    """
+    candidate = str(hhmm).strip() if hhmm is not None else default
+    if not candidate:
+        candidate = default
+    try:
+        hour, minute = _parse_anchor_hhmm(candidate)
+        return f"{hour:02d}:{minute:02d}"
+    except (TypeError, ValueError) as exc:
+        print(
+            f"⚠️  Invalid sla_cycle_anchor_local_time={hhmm!r}; "
+            f"using {default!r} ({exc})"
+        )
+        return default
+
+
+def _cycle_anchor(
+    moment: datetime,
+    *,
+    hhmm: str = _DEFAULT_SLA_ANCHOR_HHMM,
+    tz=LOCAL_TZ,
+) -> datetime:
+    """Most recent daily cycle anchor at or before ``moment`` (UTC-aware).
+
+    Anchors the orchestration day at ``hhmm`` in ``tz`` (default 20:55 America/Sao_Paulo,
+    matching ``reset_datasets``) so offsets stay monotonic across local/UTC midnight.
+    """
+    local = pendulum.instance(moment).in_timezone(tz)
+    hour, minute = _parse_anchor_hhmm(hhmm)
+    candidate = local.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    if local < candidate:
+        candidate = candidate.subtract(days=1)
+    return candidate.in_timezone("UTC")
+
+
+def _offset_minutes(start: datetime, *, hhmm: str = _DEFAULT_SLA_ANCHOR_HHMM) -> float:
+    """Minutes from the cycle anchor that contains ``start`` to ``start``."""
+    anchor = _cycle_anchor(start, hhmm=hhmm)
+    start_utc = pendulum.instance(start).in_timezone("UTC")
+    return (start_utc - anchor).total_seconds() / 60.0
+
+
+def _sla_run_id(cycle_anchor: datetime) -> str:
+    return f"{_SLA_RUN_ID_PREFIX}{cycle_anchor.isoformat()}"
+
+
+def _is_sla_entry(entry: dict) -> bool:
+    return entry.get("kind") == _KIND_MISSING_RUN or str(
+        entry.get("run_id") or ""
+    ).startswith(_SLA_RUN_ID_PREFIX)
+
+
+def _matches_exclude_prefix(dag_id: str, prefix: str) -> bool:
+    if not prefix:
+        return False
+    if dag_id.startswith(prefix):
+        return True
+    return any(part.startswith(prefix) for part in dag_id.split("."))
+
+
+def _is_sla_candidate(dag_id: str, schedule_interval, config: dict) -> bool:
+    """True when a DAG row is eligible for the missing-run guard."""
+    if dag_id == DAG_ID:
+        return False
+    if schedule_interval is None or str(schedule_interval).strip().lower() == "null":
+        return False
+    for prefix in config.get("sla_exclude_dag_prefixes") or []:
+        if _matches_exclude_prefix(dag_id, prefix):
+            return False
+    for suffix in config.get("sla_exclude_dag_suffixes") or []:
+        if suffix and dag_id.endswith(suffix):
+            return False
+    return True
+
+
+def _expected_offset_minutes(
+    offsets: list,
+    *,
+    percentile: float,
+    min_history: int,
+) -> float | None:
+    """P-percentile of IQR-trimmed offsets, or None when history is too thin."""
+    if len(offsets) < min_history:
+        return None
+    trimmed = _trim_iqr(offsets)
+    if not trimmed:
+        return None
+    return _percentile(trimmed, percentile)
+
+
+def _first_starts_by_cycle(
+    history_rows: Iterable,
+    *,
+    hhmm: str,
+) -> dict:
+    """Map ``dag_id → {cycle_anchor_iso → earliest start_date}`` from history rows."""
+    by_dag: dict = {}
+    for row in history_rows:
+        start = getattr(row, "start_date", None)
+        if start is None:
+            continue
+        dag_id = row.dag_id
+        anchor = _cycle_anchor(start, hhmm=hhmm)
+        key = anchor.isoformat()
+        per_dag = by_dag.setdefault(dag_id, {})
+        prev = per_dag.get(key)
+        if prev is None or start < prev:
+            per_dag[key] = start
+    return by_dag
+
+
+def _offsets_by_dag(first_starts: dict, *, hhmm: str) -> dict:
+    """Map ``dag_id → [offset_minutes, ...]`` from per-cycle first starts."""
+    offsets: dict = {}
+    for dag_id, cycles in first_starts.items():
+        offsets[dag_id] = [
+            _offset_minutes(start, hhmm=hhmm) for start in cycles.values()
+        ]
+    return offsets
+
+
+def _build_upstream_index(dependencies: dict | None) -> dict:
+    """``dag_id → {direct upstream dag_ids}`` from ``dependencies.yaml``."""
+    if not isinstance(dependencies, dict):
+        return {}
+    index: dict = {}
+    for dependent_dag, upstreams in dependencies.items():
+        if upstreams is None:
+            continue
+        try:
+            unique = BietlejuiceDependencyHelper.find_unique_dependencies_in_dependency_object(
+                upstreams
+            )
+        except (ValueError, TypeError):
+            continue
+        upstream_dags = {
+            dep.split(":")[0]
+            for dep in unique
+            if isinstance(dep, str) and dep.split(":")[0]
+        }
+        upstream_dags.discard(dependent_dag)
+        if upstream_dags:
+            index[dependent_dag] = upstream_dags
+    return index
+
+
+def _load_upstream_index_safe() -> dict | None:
+    """Load ``dependencies.yaml`` and invert to an upstream index.
+
+    Returns ``None`` when the graph is unavailable so SLA detection can fail closed
+    (skip opening new missing-run alerts) instead of treating every late DAG as a
+    root with an empty upstream map. A successfully loaded empty file still returns
+    ``{}``.
+    """
+    try:
+        deps = BietlejuiceDependencyHelper.read_dependencies()
+        if not isinstance(deps, dict):
+            return None
+        return _build_upstream_index(deps)
+    except Exception as exc:  # noqa: BLE001 — operational guard
+        print(f"⚠️  Failed to load/index dependencies.yaml for SLA upstreams: {exc}")
+        return None
+
+
+def _select_sla_roots(
+    late_dag_ids: set,
+    *,
+    upstream_index: dict,
+    succeeded_this_cycle: set,
+    expected_this_cycle: set | None = None,
+) -> tuple[list, int, bool]:
+    """Return (root dag_ids sorted, suppressed_count, used_fallback).
+
+    A *confirmed* root is a late DAG where no upstream is itself late and every
+    upstream that was expected to run this cycle already succeeded. Upstreams outside
+    ``expected_this_cycle`` (paused, inactive, or excluded from the guard) cannot be
+    waited on, so they never block — otherwise their dependents would be permanently
+    unalertable.
+
+    When nothing is confirmed but DAGs *are* late, fall back to the topological tops
+    of the late set (no upstream is itself late) and flag it. Reporting a
+    lower-confidence root beats going silent on a real cascade, which is the failure
+    mode the 2026-07-14 postmortem describes.
+    """
+    tops = [
+        dag_id
+        for dag_id in sorted(late_dag_ids)
+        if not any(
+            upstream in late_dag_ids
+            for upstream in (upstream_index.get(dag_id) or set())
+        )
+    ]
+    confirmed = [
+        dag_id
+        for dag_id in tops
+        if not any(
+            upstream not in succeeded_this_cycle
+            and (expected_this_cycle is None or upstream in expected_this_cycle)
+            for upstream in (upstream_index.get(dag_id) or set())
+        )
+    ]
+    roots = confirmed or tops
+    return roots, len(late_dag_ids) - len(roots), not confirmed and bool(tops)
+
+
+def _also_waiting_count(
+    root_dag_id: str,
+    late_dag_ids: set,
+    downstream_index: dict | None,
+) -> int:
+    """How many other late DAGs sit transitively downstream of ``root_dag_id``."""
+    if not late_dag_ids:
+        return 0
+    index = downstream_index if downstream_index is not None else {}
+    downstream = set(
+        BietlejuiceDependencyHelper.find_downstream_dags(
+            root_dag_id, downstream_index=index
+        )
+    )
+    return len((late_dag_ids & downstream) - {root_dag_id})
+
+
+def _evaluate_sla_missing_runs(
+    candidate_dag_ids: list,
+    history_rows: list,
+    *,
+    now: datetime,
+    config: dict,
+    upstream_index: dict,
+    downstream_index: dict | None,
+    expected_dag_ids: set | None = None,
+) -> list:
+    """Build ``missing_run`` findings for late roots past their due_at.
+
+    ``candidate_dag_ids`` are the DAGs evaluated for lateness; ``expected_dag_ids``
+    is the full eligible universe used to decide which upstreams can be waited on.
+    They differ only under the ``only_dags`` debug filter, where narrowing the
+    evaluation must not make active upstreams look unexpected.
+
+    Returns findings with ``kind=_KIND_MISSING_RUN``. Empty when SLA is disabled or
+    nothing is past due.
+    """
+    if not config.get("sla_enabled", True) or not candidate_dag_ids:
+        return []
+
+    hhmm = _resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time"))
+    percentile = float(config.get("sla_percentile", 90))
+    min_history = int(config.get("sla_min_history_cycles", 10))
+    grace_minutes = float(config.get("sla_grace_minutes", 60))
+    lookback_label = int(config.get("sla_lookback_days", 14))
+
+    cycle_start = _cycle_anchor(now, hhmm=hhmm)
+    cycle_key = cycle_start.isoformat()
+    first_starts = _first_starts_by_cycle(history_rows, hhmm=hhmm)
+    offsets_by_dag = _offsets_by_dag(first_starts, hhmm=hhmm)
+
+    succeeded_this_cycle = {
+        row.dag_id
+        for row in history_rows
+        if getattr(row, "state", None) == "success"
+        and getattr(row, "start_date", None) is not None
+        and _cycle_anchor(row.start_date, hhmm=hhmm).isoformat() == cycle_key
+    }
+    started_this_cycle = {
+        dag_id for dag_id, cycles in first_starts.items() if cycle_key in cycles
+    }
+
+    late: dict = {}
+    for dag_id in candidate_dag_ids:
+        if dag_id in started_this_cycle:
+            continue
+        expected = _expected_offset_minutes(
+            offsets_by_dag.get(dag_id, []),
+            percentile=percentile,
+            min_history=min_history,
+        )
+        if expected is None:
+            continue
+        due_at = cycle_start + timedelta(minutes=expected + grace_minutes)
+        if now <= due_at:
+            continue
+        late[dag_id] = {
+            "expected_offset_minutes": expected,
+            "due_at": due_at,
+            "history_count": len(offsets_by_dag.get(dag_id, [])),
+        }
+
+    if not late:
+        return []
+
+    late_ids = set(late)
+    roots, suppressed_count, used_fallback = _select_sla_roots(
+        late_ids,
+        upstream_index=upstream_index,
+        succeeded_this_cycle=succeeded_this_cycle,
+        expected_this_cycle=(
+            set(expected_dag_ids)
+            if expected_dag_ids is not None
+            else set(candidate_dag_ids)
+        ),
+    )
+    print(
+        f"⏰ SLA missing-run: {len(late_ids)} late DAG(s), "
+        f"{len(roots)} root(s){' (unconfirmed)' if used_fallback else ''}, "
+        f"{suppressed_count} suppressed."
+    )
+
+    findings = []
+    for dag_id in roots:
+        meta = late[dag_id]
+        due_at = meta["due_at"]
+        late_by_s = (now - due_at).total_seconds()
+        expected_start = cycle_start + timedelta(
+            minutes=meta["expected_offset_minutes"]
+        )
+        findings.append(
+            {
+                "kind": _KIND_MISSING_RUN,
+                "dag_id": dag_id,
+                "run_id": _sla_run_id(cycle_start),
+                "tier": "standard",
+                "cycle_anchor": cycle_key,
+                "due_at": due_at.isoformat(),
+                "expected_start": expected_start.isoformat(),
+                "expected_offset_minutes": meta["expected_offset_minutes"],
+                "grace_minutes": grace_minutes,
+                "late_by_s": late_by_s,
+                "elapsed_s": late_by_s,  # reused by shared entry helpers where needed
+                "percentile": percentile,
+                "history_count": meta["history_count"],
+                "lookback_days": lookback_label,
+                "also_waiting_count": _also_waiting_count(
+                    dag_id, late_ids, downstream_index
+                ),
+                "late_count": len(late_ids),
+                "root_is_fallback": used_fallback,
+            }
+        )
+    return findings
+
+
+def _trigger_url(dag_id: str) -> str:
+    return f"{AIRFLOW_URL}/dags/{quote(dag_id, safe='')}/trigger"
+
+
 def _build_alert_text(finding: dict) -> str:
-    """JiraOps description — same multiline layout as the Chat initial alert."""
+    """JiraOps / log description — dispatches by finding kind."""
+    if finding.get("kind") == _KIND_MISSING_RUN:
+        return _missing_run_initial_text(
+            _entry_from_finding(finding), finding.get("late_by_s", 0)
+        )
     return _slowness_body(
         finding,
         finding["elapsed_s"],
@@ -395,21 +834,43 @@ def _thread_key(dag_id: str, run_id: str) -> str:
 def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dict:
     """Build the ledger entry (tracking snapshot) for a newly-alerted run."""
     impacted = list(finding.get("impacted_dw_dags") or [])
-    return {
+    kind = finding.get("kind") or _KIND_SLOW
+    entry = {
+        "kind": kind,
         "dag_id": finding["dag_id"],
         "run_id": finding["run_id"],
-        "tier": finding["tier"],
+        "tier": finding.get("tier") or "standard",
         "first_alert_ts": first_alert_ts,
-        "baseline_s": finding["baseline_s"],
-        "threshold_s": finding["threshold_s"],
-        "percentile": finding["percentile"],
-        "history_count": finding["history_count"],
+        "percentile": finding.get("percentile"),
+        "history_count": finding.get("history_count"),
         "impacted_dw_dags": impacted,
         "impacted_dw_count": finding.get("impacted_dw_count", len(impacted)),
-        # ISO start used for elapsed (execute-job-cluster or dag_run); follow-ups reuse it.
-        "work_start_date": finding.get("work_start_date"),
         "owner": finding.get("owner") or _UNKNOWN_OWNER,
     }
+    if kind == _KIND_MISSING_RUN:
+        entry.update(
+            {
+                "cycle_anchor": finding.get("cycle_anchor"),
+                "due_at": finding.get("due_at"),
+                "expected_start": finding.get("expected_start"),
+                "expected_offset_minutes": finding.get("expected_offset_minutes"),
+                "grace_minutes": finding.get("grace_minutes"),
+                "lookback_days": finding.get("lookback_days"),
+                "also_waiting_count": finding.get("also_waiting_count", 0),
+                "late_count": finding.get("late_count", 0),
+                "root_is_fallback": bool(finding.get("root_is_fallback")),
+            }
+        )
+    else:
+        entry.update(
+            {
+                "baseline_s": finding.get("baseline_s"),
+                "threshold_s": finding.get("threshold_s"),
+                # ISO start used for elapsed (execute-job-cluster or dag_run); follow-ups reuse it.
+                "work_start_date": finding.get("work_start_date"),
+            }
+        )
+    return entry
 
 
 def _over_pct(elapsed_s: float, baseline_s: float | None) -> int | None:
@@ -485,7 +946,60 @@ def _slowness_body(
     return "\n".join(lines)
 
 
+def _format_utc_hhmm(value) -> str:
+    """Render a datetime / ISO string as ``HH:MM UTC``."""
+    dt = _parse_iso_datetime(value)
+    if dt is None:
+        return "unknown"
+    return pendulum.instance(dt).in_timezone("UTC").format("HH:mm") + " UTC"
+
+
+def _missing_run_body(
+    entry: dict,
+    late_by_s: float,
+    *,
+    headline: str,
+    include_details: bool = True,
+    footer: str | None = None,
+) -> str:
+    """Shared multiline layout for missing-run (SLA) alerts."""
+    lines = [headline, f"• Owner: {_owner_label(entry)}"]
+    if include_details:
+        expected = _format_utc_hhmm(entry.get("expected_start"))
+        grace = entry.get("grace_minutes")
+        pct = entry.get("percentile")
+        history = entry.get("history_count")
+        lookback = entry.get("lookback_days")
+        lines.append(
+            f"• Expected by: {_format_utc_hhmm(entry.get('due_at'))} "
+            f"(P{pct} start {expected} + {grace:g}m grace, {history} cycles / {lookback}d)"
+        )
+        lines.append(f"• Late by: {_format_duration(late_by_s)}")
+        lines.append(_format_impacted_dw_line(entry.get("impacted_dw_dags") or []))
+        also_waiting = entry.get("also_waiting_count") or 0
+        if also_waiting:
+            lines.append(f"• Also waiting downstream: {also_waiting} DAG(s)")
+        if entry.get("root_is_fallback"):
+            # No late DAG had all its expected upstreams confirmed successful, so this
+            # is the top of the late subgraph rather than a confirmed root.
+            lines.append(
+                f"• Attribution: unconfirmed root "
+                f"({entry.get('late_count') or 0} DAG(s) late this cycle)"
+            )
+        lines.append(f"• Trigger: {_trigger_url(entry['dag_id'])}")
+    else:
+        lines.append(f"• Late by: {_format_duration(late_by_s)}")
+        also_waiting = entry.get("also_waiting_count")
+        if isinstance(also_waiting, int) and also_waiting > 0:
+            lines.append(f"• Also waiting downstream: {also_waiting} DAG(s)")
+    if footer:
+        lines.append(footer)
+    return "\n".join(lines)
+
+
 def _initial_text(entry: dict, elapsed_s: float) -> str:
+    if _is_sla_entry(entry):
+        return _missing_run_initial_text(entry, elapsed_s)
     return _slowness_body(
         entry,
         elapsed_s,
@@ -496,9 +1010,23 @@ def _initial_text(entry: dict, elapsed_s: float) -> str:
     )
 
 
+def _missing_run_initial_text(entry: dict, late_by_s: float) -> str:
+    return _missing_run_body(
+        entry,
+        late_by_s,
+        headline=f"⏰ *{entry['dag_id']}* has not started",
+        include_details=True,
+        footer="Tracking until it starts.",
+    )
+
+
 def _update_text(
     entry: dict, elapsed_s: float, *, impacted_dw_count: int | None = None
 ) -> str:
+    if _is_sla_entry(entry):
+        return _missing_run_update_text(
+            entry, elapsed_s, also_waiting=entry.get("also_waiting_count")
+        )
     count = (
         impacted_dw_count
         if impacted_dw_count is not None
@@ -509,6 +1037,19 @@ def _update_text(
         elapsed_s,
         headline=f"🐌 *{entry['dag_id']}* still running",
         blocking_count=count if isinstance(count, int) else None,
+    )
+
+
+def _missing_run_update_text(
+    entry: dict, late_by_s: float, *, also_waiting: int | None = None
+) -> str:
+    if also_waiting is not None:
+        entry = {**entry, "also_waiting_count": also_waiting}
+    return _missing_run_body(
+        entry,
+        late_by_s,
+        headline=f"⏰ *{entry['dag_id']}* still has not started",
+        include_details=False,
     )
 
 
@@ -524,6 +1065,22 @@ def _failed_text(entry: dict, duration_s: float | None) -> str:
     dur = _format_duration(duration_s) if duration_s is not None else "unknown time"
     return (
         f"❌ *{entry['dag_id']}* run FAILED after {dur} (was flagged as slow).\n"
+        f"• Owner: {_owner_label(entry)}"
+    )
+
+
+def _missing_run_started_text(
+    entry: dict, *, started_at: datetime | None, late_by_s: float | None
+) -> str:
+    started = _format_utc_hhmm(started_at) if started_at is not None else "unknown"
+    late = (
+        _format_duration(late_by_s)
+        if late_by_s is not None and late_by_s >= 0
+        else "unknown time"
+    )
+    return (
+        f"✅ *{entry['dag_id']}* started at {started} "
+        f"(was {late} past SLA).\n"
         f"• Owner: {_owner_label(entry)}"
     )
 
@@ -799,6 +1356,35 @@ def _fetch_run_states(session, entries: list) -> dict:
     }
 
 
+def _fetch_sla_candidates(session, config: dict) -> list:
+    """Active, scheduled DAG ids eligible for the missing-run guard."""
+    rows = session.execute(_SLA_CANDIDATES_QUERY, {"self_dag_id": DAG_ID}).fetchall()
+    return [
+        row.dag_id
+        for row in rows
+        if _is_sla_candidate(row.dag_id, row.schedule_interval, config)
+    ]
+
+
+def _fetch_sla_history(session, dag_ids: list, since: datetime) -> list:
+    if not dag_ids:
+        return []
+    return session.execute(
+        _SLA_HISTORY_QUERY, {"dag_ids": list(dag_ids), "since": since}
+    ).fetchall()
+
+
+def _fetch_sla_started(session, dag_ids: list, cycle_start: datetime) -> dict:
+    """Map ``dag_id → first automatic start_date`` in the current cycle."""
+    if not dag_ids:
+        return {}
+    rows = session.execute(
+        _SLA_STARTED_QUERY,
+        {"dag_ids": list(dag_ids), "cycle_start": cycle_start},
+    ).fetchall()
+    return {row.dag_id: row.first_start for row in rows}
+
+
 # --------------------------------------------------------------------------- #
 # On-demand test mode (driven by dag_run.conf on a manual trigger)
 # --------------------------------------------------------------------------- #
@@ -833,6 +1419,7 @@ def _parse_test_options(conf: dict | None) -> dict:
         "simulate": simulate,
         "simulate_dags": _as_str_list(conf.get("simulate_dags")),
         "simulate_state": conf.get("simulate_state") or None,
+        "simulate_missing_runs": bool(conf.get("simulate_missing_runs", False)),
         "dry_run": bool(conf.get("dry_run", simulate and not force_send)),
         "force_send": force_send,
         "test_webhook": conf.get("test_webhook"),
@@ -856,6 +1443,7 @@ def _synthetic_findings(config: dict, dag_ids: list | None = None) -> list:
     elapsed_s = 3600.0  # 60m
     return [
         {
+            "kind": _KIND_SLOW,
             "elapsed_s": elapsed_s,
             "baseline_s": baseline_s,
             "threshold_s": baseline_s * config["factor"],
@@ -865,6 +1453,42 @@ def _synthetic_findings(config: dict, dag_ids: list | None = None) -> list:
             "history_count": config["min_history_runs"],
             "percentile": config["percentile"],
             "tier": "critical" if dag_id in critical else "standard",
+        }
+        for dag_id in dag_ids
+    ]
+
+
+def _synthetic_missing_run_findings(config: dict, dag_ids: list | None = None) -> list:
+    """Fabricate ``missing_run`` findings for simulate_missing_runs mode."""
+    if not dag_ids:
+        dag_ids = ["bietlejuice.__simulated_missing__"]
+    hhmm = _resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time"))
+    now = datetime.now(timezone.utc)
+    cycle_start = _cycle_anchor(now, hhmm=hhmm)
+    expected_offset = 240.0
+    grace = float(config.get("sla_grace_minutes", 60))
+    due_at = cycle_start + timedelta(minutes=expected_offset + grace)
+    expected_start = cycle_start + timedelta(minutes=expected_offset)
+    late_by_s = max((now - due_at).total_seconds(), 3600.0)
+    return [
+        {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": dag_id,
+            "run_id": _sla_run_id(cycle_start),
+            "tier": "standard",
+            "cycle_anchor": cycle_start.isoformat(),
+            "due_at": due_at.isoformat(),
+            "expected_start": expected_start.isoformat(),
+            "expected_offset_minutes": expected_offset,
+            "grace_minutes": grace,
+            "late_by_s": late_by_s,
+            "elapsed_s": late_by_s,
+            "percentile": config.get("sla_percentile", 90),
+            "history_count": config.get("sla_min_history_cycles", 10),
+            "lookback_days": config.get("sla_lookback_days", 14),
+            "also_waiting_count": 3,
+            "late_count": 4,
+            "root_is_fallback": False,
         }
         for dag_id in dag_ids
     ]
@@ -893,23 +1517,31 @@ def _normalize_ledger(raw: dict, critical_dags=None) -> dict:
 
     Partial/operator-edited dict entries (``{}`` or missing ``dag_id``/``run_id``) are
     repaired from the run_key so ``_fetch_run_states`` never KeyErrors on a bad Variable.
+    ``kind`` defaults to ``slow`` so pre-SLA ledger entries keep the slowness follow-up path.
     """
     critical = set(critical_dags or ())
     ledger = {}
     for run_key, value in raw.items():
         dag_id, _, run_id = run_key.partition("|")
         default_tier = "critical" if dag_id in critical else "standard"
+        default_kind = (
+            _KIND_MISSING_RUN
+            if str(run_id).startswith(_SLA_RUN_ID_PREFIX)
+            else _KIND_SLOW
+        )
         if isinstance(value, dict):
             entry = dict(value)
             entry.setdefault("dag_id", dag_id)
             entry.setdefault("run_id", run_id)
             entry.setdefault("tier", default_tier)
+            entry.setdefault("kind", default_kind)
             ledger[run_key] = entry
         else:
             ledger[run_key] = {
                 "dag_id": dag_id,
                 "run_id": run_id,
                 "tier": default_tier,
+                "kind": default_kind,
                 "first_alert_ts": value if isinstance(value, str) else None,
             }
     return ledger
@@ -949,9 +1581,14 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         f"lookback_days={config['lookback_days']}, "
         f"min_history_runs={config['min_history_runs']}, "
         f"min_alert_duration_minutes={config['min_alert_duration_minutes']}, "
+        f"sla_enabled={config.get('sla_enabled')}, "
+        f"sla_lookback_days={config.get('sla_lookback_days')}, "
+        f"sla_grace_minutes={config.get('sla_grace_minutes')}, "
         f"webhook_configured={'yes' if webhook_url else 'no'}, "
         # test_webhook value redacted so a throwaway URL never lands in logs
-        f"test={{simulate:{opts['simulate']}, dry_run:{opts['dry_run']}, "
+        f"test={{simulate:{opts['simulate']}, "
+        f"simulate_missing_runs:{opts['simulate_missing_runs']}, "
+        f"dry_run:{opts['dry_run']}, "
         f"force_send:{opts['force_send']}, test_webhook:{'yes' if opts['test_webhook'] else 'no'}, "
         f"test_team:{'yes' if opts['test_responder_team_id'] else 'no'}, "
         f"only_dags:{len(opts['only_dags']) if opts['only_dags'] else 0}, "
@@ -972,7 +1609,41 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     # --- Simulate: fabricate findings and post a chosen lifecycle phase (no DB / ledger).
     # simulate_state drives which message to emit for the SAME synthetic thread, so a few
     # manual triggers walk the whole lifecycle: (unset)=initial → running → success/failed.
+    # simulate_missing_runs switches the synthetic findings to the SLA missing-run shape.
     if opts["simulate"]:
+        if opts["simulate_missing_runs"]:
+            findings = _synthetic_missing_run_findings(config, opts["simulate_dags"])
+            _enrich_findings_with_dw_impact(findings, downstream_index)
+            _attach_owners(
+                findings,
+                _fetch_dag_owners(session, {f["dag_id"] for f in findings}),
+            )
+            state = opts["simulate_state"]
+            print(
+                f"🧪 simulate missing-run mode ({state or 'initial'}): "
+                f"fabricated {len(findings)} synthetic finding(s)."
+            )
+            for f in findings:
+                print(f"   • [missing_run] {_build_alert_text(f)}")
+            if opts["dry_run"] or not deliver:
+                print("ℹ️  Not delivering (simulate dry-run / gate). Logging only.")
+                return
+            if not state:
+                for finding in findings:
+                    _deliver_initial(finding, gchat_dest, jira_team, is_test)
+                return
+            ledger = {}
+            for finding in findings:
+                key = _run_key(finding["dag_id"], finding["run_id"])
+                ledger[key] = _entry_from_finding(finding)
+            if state == "started":
+                started = {f["dag_id"]: now - timedelta(minutes=5) for f in findings}
+                _apply_sla_follow_up(ledger, started, gchat_dest, now, config)
+            else:
+                # "running" / anything else → still-missing update
+                _apply_sla_follow_up(ledger, {}, gchat_dest, now, config)
+            return
+
         findings = _synthetic_findings(config, opts["simulate_dags"])
         _enrich_findings_with_dw_impact(findings, downstream_index)
         _assign_alert_tiers(findings, config["critical_dags"], downstream_index)
@@ -1026,22 +1697,44 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
             session, {row.dag_id for row in running_rows}, since
         )
         findings = _evaluate_all(running_rows, durations_by_dag, now, config)
-    _enrich_findings_with_dw_impact(findings, downstream_index)
     _assign_alert_tiers(findings, config["critical_dags"], downstream_index)
 
+    # Resolved once per cycle: missing-run detection needs the eligible set, and
+    # follow-up needs it to stop tracking DAGs that left it (paused/deactivated).
+    sla_enabled = config.get("sla_enabled", True)
+    sla_candidates = _fetch_sla_candidates(session, config) if sla_enabled else []
+    sla_findings = (
+        _collect_sla_findings(
+            session,
+            config,
+            now,
+            downstream_index,
+            candidates=sla_candidates,
+            only_dags=opts["only_dags"],
+        )
+        if sla_enabled
+        else []
+    )
+
+    all_findings = findings + sla_findings
+    _enrich_findings_with_dw_impact(all_findings, downstream_index)
     ledger = _normalize_ledger(
         _load_dedup_state(), critical_dags=config["critical_dags"]
     )
     owners_by_dag = _fetch_dag_owners(
         session,
-        {f["dag_id"] for f in findings} | {e["dag_id"] for e in ledger.values()},
+        {f["dag_id"] for f in all_findings} | {e["dag_id"] for e in ledger.values()},
     )
-    _attach_owners(findings, owners_by_dag)
+    _attach_owners(all_findings, owners_by_dag)
     _backfill_ledger_owners(ledger, owners_by_dag)
     for f in findings:
         print(f"   • [{f['tier']}] {_build_alert_text(f)}")
+    for f in sla_findings:
+        print(f"   • [missing_run] {_build_alert_text(f)}")
     print(
-        f"⏱️ {len(findings)} anomalous run(s); tracking {len(ledger)} run(s) for follow-up."
+        f"⏱️ {len(findings)} anomalous run(s); "
+        f"⏰ {len(sla_findings)} missing-run root(s); "
+        f"tracking {len(ledger)} run(s) for follow-up."
     )
 
     if opts["dry_run"] or not deliver:
@@ -1059,20 +1752,29 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     # built from the earlier running snapshot — without this, step 2 would re-open the
     # same run (fresh gchat / Jira page) in the same cycle after closure.
     already_tracked = set(ledger)
-    _follow_up_tracked_runs(session, ledger, gchat_dest, now, downstream_index)
+    _follow_up_tracked_runs(
+        session,
+        ledger,
+        gchat_dest,
+        now,
+        downstream_index,
+        config,
+        sla_candidates=sla_candidates,
+    )
 
     # 2) Open new incidents for anomalies not yet tracked (and not just closed above).
-    for finding in findings:
+    for finding in all_findings:
         key = _run_key(finding["dag_id"], finding["run_id"])
         if key in ledger or key in already_tracked:
             continue
         entry = _entry_from_finding(finding, first_alert_ts=now.isoformat())
-        # Every anomaly goes to Chat (lifecycle). Critical tier also pages JiraOps.
+        # Every anomaly goes to Chat (lifecycle). Critical *slow* tier also pages JiraOps.
+        # Missing-run findings are Chat-only.
         # Gate ledger on *all* required deliveries: if Chat succeeds but Jira fails,
         # do not track yet — otherwise later cycles skip the finding and on-call is
         # never paged despite _send_jira_alert's "retry next cycle" log.
         jira_ok = True
-        if finding["tier"] == "critical":
+        if finding.get("kind") != _KIND_MISSING_RUN and finding["tier"] == "critical":
             if is_test and not jira_team:
                 print(
                     f"⚠️  Refusing to page real on-call from a test trigger for "
@@ -1085,7 +1787,9 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
                 )
         chat_ok = _post_gchat(
             gchat_dest,
-            _initial_text(entry, finding["elapsed_s"]),
+            _initial_text(
+                entry, finding.get("elapsed_s") or finding.get("late_by_s") or 0
+            ),
             _thread_key(finding["dag_id"], finding["run_id"]),
         )
         if jira_ok and chat_ok:
@@ -1094,12 +1798,62 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     _save_ledger(ledger)
 
 
+def _collect_sla_findings(
+    session,
+    config: dict,
+    now: datetime,
+    downstream_index: dict | None,
+    *,
+    candidates: list,
+    only_dags: list | None = None,
+) -> list:
+    """Evaluate missing-run roots for this cycle from pre-resolved ``candidates``."""
+    # ``only_dags`` scopes which DAGs we evaluate, never which upstreams count as
+    # expected — otherwise a scoped run would confirm roots that are still blocked.
+    eligible = set(candidates)
+    if only_dags:
+        wanted = set(only_dags)
+        candidates = [dag_id for dag_id in candidates if dag_id in wanted]
+    if not candidates:
+        print("⏰ SLA missing-run: no eligible candidates.")
+        return []
+
+    # Include upstreams of candidates so root suppression can see their success state.
+    upstream_index = _load_upstream_index_safe()
+    if upstream_index is None:
+        print(
+            "⚠️  Skipping SLA missing-run detection: "
+            "upstream dependency graph unavailable (fail closed)."
+        )
+        return []
+
+    needed = set(candidates)
+    for dag_id in candidates:
+        needed.update(upstream_index.get(dag_id) or set())
+
+    since = now - timedelta(days=int(config.get("sla_lookback_days", 14)) + 1)
+    history_rows = _fetch_sla_history(session, list(needed), since)
+    print(
+        f"⏰ SLA missing-run: {len(candidates)} candidate(s), "
+        f"{len(needed)} dag(s) in history scope, {len(history_rows)} history row(s)."
+    )
+    return _evaluate_sla_missing_runs(
+        candidates,
+        history_rows,
+        now=now,
+        config=config,
+        upstream_index=upstream_index,
+        downstream_index=downstream_index,
+        expected_dag_ids=eligible,
+    )
+
+
 def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
     """Send the initial alert for one finding (used by simulate mode).
 
-    Chat always; JiraOps additionally for critical tier (when test team is set).
+    Chat always; JiraOps additionally for critical *slow* tier (when test team is set).
     """
-    if finding["tier"] == "critical":
+    if finding.get("kind") != _KIND_MISSING_RUN and finding["tier"] == "critical":
         if is_test and not jira_team:
             print(
                 f"⚠️  Refusing to page real on-call from a test trigger for "
@@ -1111,19 +1865,66 @@ def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
     entry = _entry_from_finding(finding)
     _post_gchat(
         gchat_dest,
-        _initial_text(entry, finding["elapsed_s"]),
+        _initial_text(entry, finding.get("elapsed_s") or finding.get("late_by_s") or 0),
         _thread_key(finding["dag_id"], finding["run_id"]),
     )
 
 
 def _follow_up_tracked_runs(
-    session, ledger: dict, gchat_dest, now: datetime, downstream_index: dict | None
+    session,
+    ledger: dict,
+    gchat_dest,
+    now: datetime,
+    downstream_index: dict | None,
+    config: dict,
+    *,
+    sla_candidates: list | None = None,
 ) -> None:
     """Fetch the current state of tracked runs and apply follow-up messaging."""
     if not ledger:
         return
-    states = _fetch_run_states(session, list(ledger.values()))
-    _apply_follow_up(ledger, states, gchat_dest, now, downstream_index)
+    slow_entries = [e for e in ledger.values() if not _is_sla_entry(e)]
+    if slow_entries:
+        states = _fetch_run_states(session, slow_entries)
+        _apply_follow_up(ledger, states, gchat_dest, now, downstream_index)
+    if not any(_is_sla_entry(e) for e in ledger.values()):
+        return
+
+    # A DAG that is no longer eligible (paused, deactivated, newly excluded) or a
+    # disabled guard must stop the Chat churn now, rather than at cycle rollover.
+    if not config.get("sla_enabled", True):
+        _drop_sla_entries(ledger, reason="sla_enabled=false")
+        return
+    eligible = set(sla_candidates or [])
+    _drop_sla_entries(
+        ledger,
+        reason="no longer an SLA candidate (paused, inactive, or excluded)",
+        keep_dag_ids=eligible,
+    )
+    sla_entries = [e for e in ledger.values() if _is_sla_entry(e)]
+    if not sla_entries:
+        return
+
+    hhmm = _resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time"))
+    started = _fetch_sla_started(
+        session,
+        [e["dag_id"] for e in sla_entries],
+        _cycle_anchor(now, hhmm=hhmm),
+    )
+    _apply_sla_follow_up(ledger, started, gchat_dest, now, config)
+
+
+def _drop_sla_entries(
+    ledger: dict, *, reason: str, keep_dag_ids: set | None = None
+) -> None:
+    """Stop tracking SLA entries (all of them, or those outside ``keep_dag_ids``)."""
+    for key, entry in list(ledger.items()):
+        if not _is_sla_entry(entry):
+            continue
+        if keep_dag_ids is not None and entry["dag_id"] in keep_dag_ids:
+            continue
+        print(f"ℹ️  Dropping SLA tracking for {entry['dag_id']}: {reason}.")
+        del ledger[key]
 
 
 def _apply_follow_up(
@@ -1133,7 +1934,7 @@ def _apply_follow_up(
     now: datetime,
     downstream_index: dict | None = None,
 ) -> None:
-    """For each tracked run, post an update (still running) or a closing message
+    """For each tracked *slow* run, post an update (still running) or a closing message
     (terminal), and drop terminal/vanished runs from the ledger. Mutates ledger in place.
 
     Every tracked run gets Chat follow-ups (critical tier also had an initial JiraOps
@@ -1144,8 +1945,12 @@ def _apply_follow_up(
 
     Elapsed / terminal duration prefer ledger ``work_start_date`` (or joined
     ``work_start``) so Chat follow-ups stay aligned with the job-cluster clock.
+
+    SLA (``missing_run``) entries are ignored here — see ``_apply_sla_follow_up``.
     """
     for key, entry in list(ledger.items()):
+        if _is_sla_entry(entry):
+            continue
         row = states.get((entry["dag_id"], entry["run_id"]))
         if row is None:
             del ledger[key]  # run row gone → stop tracking
@@ -1179,6 +1984,59 @@ def _apply_follow_up(
             )
 
 
+def _apply_sla_follow_up(
+    ledger: dict,
+    started_by_dag: dict,
+    gchat_dest,
+    now: datetime,
+    config: dict,
+) -> None:
+    """Follow up tracked missing-run entries; mutate ledger in place.
+
+    * Cycle rollover → drop silently (alerts never span cycles).
+    * DAG started this cycle → closing ✅ message, then drop (gated on delivery).
+    * Still missing → threaded update.
+    """
+    hhmm = _resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time"))
+    current_anchor = _cycle_anchor(now, hhmm=hhmm).isoformat()
+    for key, entry in list(ledger.items()):
+        if not _is_sla_entry(entry):
+            continue
+        entry_anchor = entry.get("cycle_anchor")
+        if entry_anchor and entry_anchor != current_anchor:
+            del ledger[key]
+            continue
+
+        started_at = started_by_dag.get(entry["dag_id"])
+        if started_at is not None:
+            due_at = _parse_iso_datetime(entry.get("due_at"))
+            late_by_s = (
+                (started_at - due_at).total_seconds() if due_at is not None else None
+            )
+            if not _post_gchat(
+                gchat_dest,
+                _missing_run_started_text(
+                    entry, started_at=started_at, late_by_s=late_by_s
+                ),
+                _thread_key(entry["dag_id"], entry["run_id"]),
+            ):
+                continue
+            del ledger[key]
+            continue
+
+        due_at = _parse_iso_datetime(entry.get("due_at"))
+        late_by_s = (now - due_at).total_seconds() if due_at is not None else 0.0
+        # The originally-late set is only known via the ledger snapshot, so the
+        # blast-radius count is carried forward rather than recomputed.
+        _post_gchat(
+            gchat_dest,
+            _missing_run_update_text(
+                entry, late_by_s, also_waiting=entry.get("also_waiting_count")
+            ),
+            _thread_key(entry["dag_id"], entry["run_id"]),
+        )
+
+
 with DAG(
     dag_id=DAG_ID,
     default_args={
@@ -1187,13 +2045,14 @@ with DAG(
     },
     description=(
         "Every 30 min, flags running DAGs whose elapsed time is anomalous vs their own "
-        "recent successful runs (relative P-percentile baseline, no hardcoded thresholds). "
-        "Every anomaly goes to Google Chat (tracked to closure); DAGs in critical_dags "
-        "or that block them also page JiraOps on-caller."
+        "recent successful runs, and DAGs that have not started by their historical SLA "
+        "window (missing-run guard with dependency root suppression). "
+        "Every anomaly goes to Google Chat (tracked to closure); slow DAGs in "
+        "critical_dags or that block them also page JiraOps on-caller."
     ),
     schedule="*/30 * * * *",
     catchup=False,
-    tags=["monitoring", "platform", "runtime-anomaly"],
+    tags=["monitoring", "platform", "runtime-anomaly", "sla"],
 ) as dag:
     PythonOperator(
         task_id="monitor_dag_runtimes",

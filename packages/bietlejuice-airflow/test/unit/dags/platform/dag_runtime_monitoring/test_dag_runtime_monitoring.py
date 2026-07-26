@@ -13,36 +13,57 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _IMPACTED_DW_LIST_LIMIT,
     _JIRA_DESCRIPTION_MAX,
     _JIRA_MESSAGE_MAX,
+    _KIND_MISSING_RUN,
+    _KIND_SLOW,
     _RUNNING_QUERY,
+    _SLA_CANDIDATES_QUERY,
+    _SLA_HISTORY_QUERY,
     DAG_ID,
     DEDUP_VARIABLE_KEY,
     JIRA_OPS_VARIABLE,
+    _also_waiting_count,
+    _apply_sla_follow_up,
     _as_str_list,
     _assign_alert_tiers,
     _build_alert_text,
+    _build_upstream_index,
+    _collect_sla_findings,
+    _cycle_anchor,
     _effective_work_start,
     _enrich_findings_with_dw_impact,
     _entry_from_finding,
     _evaluate_all,
     _evaluate_runtime,
+    _evaluate_sla_missing_runs,
+    _expected_offset_minutes,
     _failed_text,
     _fetch_dag_owners,
     _fetch_run_states,
     _follow_up_clock_start,
+    _follow_up_tracked_runs,
     _format_duration,
     _format_impacted_dw_line,
     _impacts_critical,
     _initial_text,
+    _is_sla_candidate,
     _live_impacted_dw_count,
     _load_dedup_state,
     _load_downstream_index_safe,
+    _load_upstream_index_safe,
+    _missing_run_initial_text,
+    _missing_run_started_text,
     _normalize_ledger,
+    _offset_minutes,
     _parse_test_options,
     _percentile,
     _post_gchat,
+    _resolve_anchor_hhmm,
     _resolve_config,
     _resolved_text,
+    _select_sla_roots,
+    _sla_run_id,
     _synthetic_findings,
+    _synthetic_missing_run_findings,
     _truncate_text,
     _update_text,
     dag,
@@ -157,6 +178,14 @@ class TestResolveConfig:
         assert merged["lookback_days"] == 30
         assert merged["min_alert_duration_minutes"] == 90
         assert merged["factor"] == 1.5
+        assert merged["sla_enabled"] is True
+        assert merged["sla_lookback_days"] == 14
+        assert merged["sla_min_history_cycles"] == 10
+        assert merged["sla_percentile"] == 90
+        assert merged["sla_grace_minutes"] == 60
+        assert merged["sla_cycle_anchor_local_time"] == "20:55"
+        assert merged["sla_exclude_dag_prefixes"] == ["migration_"]
+        assert merged["sla_exclude_dag_suffixes"] == ["__validation"]
 
     def test_none_uses_all_defaults(self):
         assert _resolve_config(None)["critical_dags"] == []
@@ -1561,6 +1590,7 @@ class TestParseTestOptions:
             "simulate": False,
             "simulate_dags": None,
             "simulate_state": None,
+            "simulate_missing_runs": False,
             "dry_run": False,
             "force_send": False,
             "test_webhook": None,
@@ -1597,6 +1627,14 @@ class TestParseTestOptions:
         assert opts["only_dags"] == ["bietlejuice.x"]
         assert opts["simulate_dags"] == ["bietlejuice.y"]
         assert opts["critical_dags"] == ["bietlejuice.z"]
+
+    def test_simulate_missing_runs_flag(self):
+        assert (
+            _parse_test_options({"simulate": True, "simulate_missing_runs": True})[
+                "simulate_missing_runs"
+            ]
+            is True
+        )
 
 
 @mock.patch(f"{_MODULE}._post_gchat", return_value=True)
@@ -1687,6 +1725,7 @@ def test_entry_from_finding_snapshots_baseline():
     entry = _entry_from_finding(finding, first_alert_ts="ts")
     assert entry["baseline_s"] == 600.0
     assert entry["tier"] == "standard"
+    assert entry["kind"] == "slow"
     assert entry["first_alert_ts"] == "ts"
     assert entry["owner"] == "Data Platform"
     assert entry["impacted_dw_dags"] == ["bietlejuice.dw_impacted"]
@@ -1705,3 +1744,730 @@ def test_update_text_falls_back_to_ledger_when_live_count_unavailable():
     entry["impacted_dw_count"] = 2
     text = _update_text(entry, 5400, impacted_dw_count=None)
     assert "• Still blocking 2 dw_* DAG(s)" in text
+
+
+# --------------------------------------------------------------------------- #
+# SLA start / missing-run guard
+# --------------------------------------------------------------------------- #
+_SLA_CONFIG = {
+    **_CONFIG,
+    "sla_enabled": True,
+    "sla_lookback_days": 14,
+    "sla_min_history_cycles": 10,
+    "sla_percentile": 90,
+    "sla_grace_minutes": 60,
+    "sla_cycle_anchor_local_time": "20:55",
+    "sla_exclude_dag_prefixes": ["migration_"],
+    "sla_exclude_dag_suffixes": ["__validation"],
+}
+
+
+class TestCycleAnchor:
+    def test_before_anchor_uses_previous_day(self):
+        # 03:45 UTC on Jul 25 = 00:45 BRT — still after 20:55 BRT Jul 24.
+        moment = datetime(2026, 7, 25, 3, 45, tzinfo=timezone.utc)
+        anchor = _cycle_anchor(moment, hhmm="20:55")
+        assert anchor == datetime(2026, 7, 24, 23, 55, tzinfo=timezone.utc)
+
+    def test_after_anchor_same_local_day(self):
+        # 01:00 UTC Jul 25 = 22:00 BRT Jul 24 — after 20:55 BRT Jul 24.
+        moment = datetime(2026, 7, 25, 1, 0, tzinfo=timezone.utc)
+        anchor = _cycle_anchor(moment, hhmm="20:55")
+        assert anchor == datetime(2026, 7, 24, 23, 55, tzinfo=timezone.utc)
+
+    def test_exactly_at_anchor(self):
+        moment = datetime(2026, 7, 24, 23, 55, tzinfo=timezone.utc)
+        assert _cycle_anchor(moment, hhmm="20:55") == moment
+
+    def test_offset_no_midnight_wrap(self):
+        # Start at 03:45 UTC Jul 25 → ~230 minutes after 23:55 UTC Jul 24.
+        start = datetime(2026, 7, 25, 3, 45, tzinfo=timezone.utc)
+        offset = _offset_minutes(start, hhmm="20:55")
+        assert offset == pytest.approx(230.0)
+
+
+class TestExpectedOffsetMinutes:
+    def test_insufficient_history_returns_none(self):
+        assert (
+            _expected_offset_minutes([10.0] * 5, percentile=90, min_history=10) is None
+        )
+
+    def test_percentile_with_iqr_trim(self):
+        # 10 normal values at 200, one huge outlier at 2000 — trimmed out.
+        offsets = [200.0] * 10 + [2000.0]
+        expected = _expected_offset_minutes(offsets, percentile=90, min_history=10)
+        assert expected == pytest.approx(200.0)
+
+
+class TestIsSlaCandidate:
+    def test_excludes_self(self):
+        assert _is_sla_candidate(DAG_ID, "Dataset", _SLA_CONFIG) is False
+
+    def test_excludes_null_schedule(self):
+        assert _is_sla_candidate("bietlejuice.x", None, _SLA_CONFIG) is False
+        assert _is_sla_candidate("bietlejuice.x", "null", _SLA_CONFIG) is False
+
+    def test_excludes_migration_prefix(self):
+        assert (
+            _is_sla_candidate(
+                "migration_compare_people__enrich_pin", "Dataset", _SLA_CONFIG
+            )
+            is False
+        )
+        assert (
+            _is_sla_candidate("bietlejuice.migration_emr_foo", "0 1 * * *", _SLA_CONFIG)
+            is False
+        )
+
+    def test_excludes_validation_suffix(self):
+        assert (
+            _is_sla_candidate(
+                "bietlejuice.ada_crawls__validation", "Dataset", _SLA_CONFIG
+            )
+            is False
+        )
+
+    def test_keeps_regular_dataset_dag(self):
+        assert (
+            _is_sla_candidate("bietlejuice.enrich_region", "Dataset", _SLA_CONFIG)
+            is True
+        )
+
+
+class TestSelectSlaRoots:
+    def test_enrich_region_shaped_fixture(self):
+        # core_region + gsheets succeeded; enrich_region late; dw_region late downstream.
+        late = {
+            "bietlejuice.enrich_region",
+            "bietlejuice.dw_region",
+            "bietlejuice.dw_user",
+        }
+        upstream = {
+            "bietlejuice.enrich_region": {
+                "bietlejuice.core_region",
+                "bietlejuice.gsheets_for_rent",
+            },
+            "bietlejuice.dw_region": {"bietlejuice.enrich_region"},
+            "bietlejuice.dw_user": {
+                "bietlejuice.enrich_region",
+                "bietlejuice.dw_region",
+            },
+        }
+        succeeded = {"bietlejuice.core_region", "bietlejuice.gsheets_for_rent"}
+        roots, suppressed, used_fallback = _select_sla_roots(
+            late, upstream_index=upstream, succeeded_this_cycle=succeeded
+        )
+        assert roots == ["bietlejuice.enrich_region"]
+        assert suppressed == 2
+        assert used_fallback is False
+
+    def test_prefers_confirmed_root_over_late_descendants(self):
+        # Two independent late DAGs; only one has all upstreams confirmed.
+        late = {"bietlejuice.enrich_region", "bietlejuice.enrich_other"}
+        upstream = {
+            "bietlejuice.enrich_region": {"bietlejuice.core_region"},
+            "bietlejuice.enrich_other": {"bietlejuice.core_other"},
+        }
+        roots, suppressed, used_fallback = _select_sla_roots(
+            late,
+            upstream_index=upstream,
+            succeeded_this_cycle={"bietlejuice.core_region"},
+        )
+        assert roots == ["bietlejuice.enrich_region"]
+        assert suppressed == 1
+        assert used_fallback is False
+
+    def test_non_candidate_upstream_does_not_block(self):
+        # A paused / excluded upstream can never succeed this cycle, so requiring it
+        # would make enrich_region permanently unalertable.
+        late = {"bietlejuice.enrich_region"}
+        upstream = {
+            "bietlejuice.enrich_region": {
+                "bietlejuice.core_region",
+                "bietlejuice.paused_upstream",
+            }
+        }
+        roots, suppressed, used_fallback = _select_sla_roots(
+            late,
+            upstream_index=upstream,
+            succeeded_this_cycle={"bietlejuice.core_region"},
+            expected_this_cycle={
+                "bietlejuice.enrich_region",
+                "bietlejuice.core_region",
+            },
+        )
+        assert roots == ["bietlejuice.enrich_region"]
+        assert used_fallback is False
+        assert suppressed == 0
+
+    def test_falls_back_to_late_set_tops_instead_of_going_silent(self):
+        # No late DAG has all expected upstreams confirmed (the true root is invisible:
+        # thin history). Reporting the top of the late subgraph beats zero alerts.
+        late = {"bietlejuice.enrich_region", "bietlejuice.dw_region"}
+        upstream = {
+            "bietlejuice.enrich_region": {"bietlejuice.core_region"},
+            "bietlejuice.dw_region": {"bietlejuice.enrich_region"},
+        }
+        roots, suppressed, used_fallback = _select_sla_roots(
+            late,
+            upstream_index=upstream,
+            succeeded_this_cycle=set(),
+            expected_this_cycle={
+                "bietlejuice.enrich_region",
+                "bietlejuice.dw_region",
+                "bietlejuice.core_region",
+            },
+        )
+        assert roots == ["bietlejuice.enrich_region"]
+        assert suppressed == 1
+        assert used_fallback is True
+
+
+class TestEvaluateSlaMissingRuns:
+    def _history_for_offsets(self, dag_id, offsets_minutes, hhmm="20:55"):
+        """Build history rows: first starts at each offset for the last N cycles."""
+        rows = []
+        # Pick a fixed "now" deep into a cycle so due_at can fire.
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        current_anchor = _cycle_anchor(now, hhmm=hhmm)
+        for i, offset in enumerate(offsets_minutes):
+            # Place history in prior cycles (not the current one).
+            anchor = current_anchor - timedelta(days=i + 1)
+            start = anchor + timedelta(minutes=offset)
+            rows.append(
+                SimpleNamespace(dag_id=dag_id, start_date=start, state="success")
+            )
+        return now, rows
+
+    def test_alerts_root_past_due(self):
+        now, history = self._history_for_offsets(
+            "bietlejuice.enrich_region", [230.0] * 12
+        )
+        # Upstream succeeded this cycle.
+        cycle = _cycle_anchor(now, hhmm="20:55")
+        history.extend(
+            [
+                SimpleNamespace(
+                    dag_id="bietlejuice.core_region",
+                    start_date=cycle + timedelta(minutes=100),
+                    state="success",
+                ),
+                SimpleNamespace(
+                    dag_id="bietlejuice.gsheets_for_rent",
+                    start_date=cycle + timedelta(minutes=80),
+                    state="success",
+                ),
+            ]
+        )
+        upstream = {
+            "bietlejuice.enrich_region": {
+                "bietlejuice.core_region",
+                "bietlejuice.gsheets_for_rent",
+            }
+        }
+        findings = _evaluate_sla_missing_runs(
+            ["bietlejuice.enrich_region"],
+            history,
+            now=now,
+            config=_SLA_CONFIG,
+            upstream_index=upstream,
+            downstream_index={},
+        )
+        assert len(findings) == 1
+        f = findings[0]
+        assert f["kind"] == _KIND_MISSING_RUN
+        assert f["dag_id"] == "bietlejuice.enrich_region"
+        assert f["tier"] == "standard"
+        assert f["run_id"].startswith("sla::")
+        assert f["late_by_s"] > 0
+
+    def test_expected_upstream_outside_candidates_blocks_confirmation(self):
+        now, history = self._history_for_offsets(
+            "bietlejuice.enrich_region", [230.0] * 12
+        )
+        upstream = {"bietlejuice.enrich_region": {"bietlejuice.core_region"}}
+        # The upstream is eligible this cycle but has not succeeded, and it is not
+        # among the evaluated candidates (as happens under only_dags).
+        findings = _evaluate_sla_missing_runs(
+            ["bietlejuice.enrich_region"],
+            history,
+            now=now,
+            config=_SLA_CONFIG,
+            upstream_index=upstream,
+            downstream_index={},
+            expected_dag_ids={
+                "bietlejuice.enrich_region",
+                "bietlejuice.core_region",
+            },
+        )
+        assert len(findings) == 1
+        assert findings[0]["root_is_fallback"] is True
+
+    def test_skips_when_already_started(self):
+        now, history = self._history_for_offsets(
+            "bietlejuice.enrich_region", [230.0] * 12
+        )
+        cycle = _cycle_anchor(now, hhmm="20:55")
+        history.append(
+            SimpleNamespace(
+                dag_id="bietlejuice.enrich_region",
+                start_date=cycle + timedelta(minutes=200),
+                state="running",
+            )
+        )
+        findings = _evaluate_sla_missing_runs(
+            ["bietlejuice.enrich_region"],
+            history,
+            now=now,
+            config=_SLA_CONFIG,
+            upstream_index={},
+            downstream_index={},
+        )
+        assert findings == []
+
+    def test_skips_when_disabled(self):
+        now, history = self._history_for_offsets(
+            "bietlejuice.enrich_region", [230.0] * 12
+        )
+        config = {**_SLA_CONFIG, "sla_enabled": False}
+        assert (
+            _evaluate_sla_missing_runs(
+                ["bietlejuice.enrich_region"],
+                history,
+                now=now,
+                config=config,
+                upstream_index={},
+                downstream_index={},
+            )
+            == []
+        )
+
+    def test_grace_keeps_within_window_quiet(self):
+        # expected ~230m, grace 60 → due at ~290m into cycle.
+        # now at 250m into cycle → not yet due.
+        hhmm = "20:55"
+        now = datetime(2026, 7, 25, 3, 45, tzinfo=timezone.utc)  # ~230m into cycle
+        cycle = _cycle_anchor(now, hhmm=hhmm)
+        history = []
+        for i in range(12):
+            anchor = cycle - timedelta(days=i + 1)
+            history.append(
+                SimpleNamespace(
+                    dag_id="bietlejuice.enrich_region",
+                    start_date=anchor + timedelta(minutes=230),
+                    state="success",
+                )
+            )
+        findings = _evaluate_sla_missing_runs(
+            ["bietlejuice.enrich_region"],
+            history,
+            now=now,
+            config=_SLA_CONFIG,
+            upstream_index={},
+            downstream_index={},
+        )
+        assert findings == []
+
+
+class TestSlaMessagesAndLedger:
+    def test_missing_run_initial_text(self):
+        entry = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": "bietlejuice.enrich_region",
+            "run_id": "sla::2026-07-24T23:55:00+00:00",
+            "owner": "Data ForRent",
+            "due_at": "2026-07-25T04:45:00+00:00",
+            "expected_start": "2026-07-25T03:45:00+00:00",
+            "grace_minutes": 60,
+            "percentile": 90,
+            "history_count": 14,
+            "lookback_days": 14,
+            "impacted_dw_dags": ["bietlejuice.dw_region"],
+            "also_waiting_count": 319,
+        }
+        text = _missing_run_initial_text(entry, 4320)
+        assert "has not started" in text
+        assert "Data ForRent" in text
+        assert "Late by: 1h12m" in text
+        assert "Also waiting downstream: 319 DAG(s)" in text
+        assert "Trigger:" in text
+        assert "Tracking until it starts." in text
+        assert "Attribution" not in text
+
+    def test_missing_run_initial_text_flags_unconfirmed_root(self):
+        entry = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": "bietlejuice.enrich_region",
+            "run_id": "sla::2026-07-24T23:55:00+00:00",
+            "owner": "Data ForRent",
+            "due_at": "2026-07-25T04:45:00+00:00",
+            "expected_start": "2026-07-25T03:45:00+00:00",
+            "grace_minutes": 60,
+            "percentile": 90,
+            "history_count": 14,
+            "lookback_days": 14,
+            "impacted_dw_dags": [],
+            "also_waiting_count": 0,
+            "late_count": 12,
+            "root_is_fallback": True,
+        }
+        text = _missing_run_initial_text(entry, 4320)
+        assert "Attribution: unconfirmed root (12 DAG(s) late this cycle)" in text
+
+    def test_missing_run_started_text(self):
+        entry = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": "bietlejuice.enrich_region",
+            "owner": "Data ForRent",
+        }
+        text = _missing_run_started_text(
+            entry,
+            started_at=datetime(2026, 7, 25, 12, 33, tzinfo=timezone.utc),
+            late_by_s=28080,
+        )
+        assert "started at 12:33 UTC" in text
+        assert "was flagged" not in text
+
+    def test_normalize_ledger_defaults_kind(self):
+        raw = {
+            "bietlejuice.x|run_1": "2026-07-25T00:00:00+00:00",
+            "bietlejuice.y|sla::2026-07-24T23:55:00+00:00": {},
+        }
+        ledger = _normalize_ledger(raw)
+        assert ledger["bietlejuice.x|run_1"]["kind"] == _KIND_SLOW
+        assert (
+            ledger["bietlejuice.y|sla::2026-07-24T23:55:00+00:00"]["kind"]
+            == _KIND_MISSING_RUN
+        )
+
+    def test_entry_from_missing_run_finding(self):
+        finding = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": "bietlejuice.enrich_region",
+            "run_id": _sla_run_id(datetime(2026, 7, 24, 23, 55, tzinfo=timezone.utc)),
+            "tier": "standard",
+            "cycle_anchor": "2026-07-24T23:55:00+00:00",
+            "due_at": "2026-07-25T04:45:00+00:00",
+            "expected_start": "2026-07-25T03:45:00+00:00",
+            "expected_offset_minutes": 230.0,
+            "grace_minutes": 60,
+            "percentile": 90,
+            "history_count": 14,
+            "lookback_days": 14,
+            "also_waiting_count": 5,
+            "late_count": 6,
+            "root_is_fallback": True,
+            "impacted_dw_dags": [],
+            "owner": "Data ForRent",
+        }
+        entry = _entry_from_finding(finding, first_alert_ts="ts")
+        assert entry["kind"] == _KIND_MISSING_RUN
+        assert entry["cycle_anchor"] == "2026-07-24T23:55:00+00:00"
+        assert entry["late_count"] == 6
+        assert entry["root_is_fallback"] is True
+        assert "baseline_s" not in entry
+
+    def test_cycle_rollover_drops_sla_entry(self):
+        old_anchor = "2026-07-23T23:55:00+00:00"
+        key = f"bietlejuice.enrich_region|sla::{old_anchor}"
+        ledger = {
+            key: {
+                "kind": _KIND_MISSING_RUN,
+                "dag_id": "bietlejuice.enrich_region",
+                "run_id": f"sla::{old_anchor}",
+                "cycle_anchor": old_anchor,
+                "due_at": "2026-07-24T04:45:00+00:00",
+                "owner": "Data ForRent",
+            }
+        }
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        with mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post:
+            _apply_sla_follow_up(ledger, {}, None, now, _SLA_CONFIG)
+        assert key not in ledger
+        post.assert_not_called()
+
+    def test_started_closes_sla_entry(self):
+        anchor = "2026-07-24T23:55:00+00:00"
+        key = f"bietlejuice.enrich_region|sla::{anchor}"
+        ledger = {
+            key: {
+                "kind": _KIND_MISSING_RUN,
+                "dag_id": "bietlejuice.enrich_region",
+                "run_id": f"sla::{anchor}",
+                "cycle_anchor": anchor,
+                "due_at": "2026-07-25T04:45:00+00:00",
+                "owner": "Data ForRent",
+            }
+        }
+        now = datetime(2026, 7, 25, 12, 33, tzinfo=timezone.utc)
+        started = {
+            "bietlejuice.enrich_region": datetime(
+                2026, 7, 25, 12, 33, tzinfo=timezone.utc
+            )
+        }
+        with mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post:
+            _apply_sla_follow_up(ledger, started, "http://hook", now, _SLA_CONFIG)
+        assert key not in ledger
+        assert post.call_count == 1
+        assert "started at" in post.call_args.args[1]
+
+    def test_queries_are_task_instance_free(self):
+        assert "task_instance" not in str(_SLA_CANDIDATES_QUERY)
+        assert "task_instance" not in str(_SLA_HISTORY_QUERY)
+
+    def test_synthetic_missing_run_findings(self):
+        findings = _synthetic_missing_run_findings(
+            _SLA_CONFIG, ["bietlejuice.__simulated_missing__"]
+        )
+        assert findings[0]["kind"] == _KIND_MISSING_RUN
+        assert findings[0]["tier"] == "standard"
+
+
+class TestAlsoWaitingAndUpstreamIndex:
+    def test_also_waiting_counts_late_downstream(self):
+        late = {
+            "bietlejuice.enrich_region",
+            "bietlejuice.dw_region",
+            "bietlejuice.dw_user",
+            "bietlejuice.unrelated",
+        }
+        downstream_index = {
+            "bietlejuice.enrich_region": {"bietlejuice.dw_region"},
+            "bietlejuice.dw_region": {"bietlejuice.dw_user"},
+        }
+        assert (
+            _also_waiting_count("bietlejuice.enrich_region", late, downstream_index)
+            == 2
+        )
+
+    def test_build_upstream_index_flattens_any_all(self):
+        deps = {
+            "bietlejuice.enrich_region": {
+                "any": [
+                    {
+                        "all": [
+                            "bietlejuice.core_region:load-core-region:first-run-of-day",
+                            "bietlejuice.gsheets_for_rent:done-clean-auxiliary-region:first-run-of-day",
+                        ]
+                    },
+                    {
+                        "any": [
+                            "bietlejuice.core_region:load-core-region:reprocessing",
+                        ]
+                    },
+                ]
+            }
+        }
+        index = _build_upstream_index(deps)
+        assert index["bietlejuice.enrich_region"] == {
+            "bietlejuice.core_region",
+            "bietlejuice.gsheets_for_rent",
+        }
+
+
+class TestResolveAnchorHhmm:
+    def test_valid_passthrough(self):
+        assert _resolve_anchor_hhmm("20:55") == "20:55"
+        assert _resolve_anchor_hhmm("9:05") == "09:05"
+
+    def test_invalid_falls_back(self):
+        assert _resolve_anchor_hhmm("not-a-time") == "20:55"
+        assert _resolve_anchor_hhmm("25:99") == "20:55"
+        assert _resolve_anchor_hhmm("") == "20:55"
+        assert _resolve_anchor_hhmm(None) == "20:55"
+
+
+class TestLoadUpstreamIndexSafe:
+    def test_returns_none_on_read_failure(self):
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            side_effect=RuntimeError("boom"),
+        ):
+            assert _load_upstream_index_safe() is None
+
+    def test_returns_none_when_deps_not_a_dict(self):
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            return_value=["not", "a", "dict"],
+        ):
+            assert _load_upstream_index_safe() is None
+
+    def test_returns_empty_dict_for_empty_deps(self):
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            return_value={},
+        ):
+            assert _load_upstream_index_safe() == {}
+
+
+class TestCollectSlaFindingsFailClosed:
+    def test_skips_when_upstream_index_unavailable(self):
+        with (
+            mock.patch(f"{_MODULE}._load_upstream_index_safe", return_value=None),
+            mock.patch(f"{_MODULE}._fetch_sla_history") as history,
+            mock.patch(f"{_MODULE}._evaluate_sla_missing_runs") as evaluate,
+        ):
+            assert (
+                _collect_sla_findings(
+                    mock.Mock(),
+                    _SLA_CONFIG,
+                    datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc),
+                    {},
+                    candidates=["bietlejuice.enrich_region"],
+                )
+                == []
+            )
+            history.assert_not_called()
+            evaluate.assert_not_called()
+
+    def test_only_dags_narrows_evaluation_but_not_expected_upstreams(self):
+        candidates = [
+            "bietlejuice.enrich_region",
+            "bietlejuice.clean_region",
+            "bietlejuice.dw_region",
+        ]
+        with (
+            mock.patch(f"{_MODULE}._load_upstream_index_safe", return_value={}),
+            mock.patch(f"{_MODULE}._fetch_sla_history", return_value=[]),
+            mock.patch(
+                f"{_MODULE}._evaluate_sla_missing_runs", return_value=[]
+            ) as evaluate,
+        ):
+            _collect_sla_findings(
+                mock.Mock(),
+                _SLA_CONFIG,
+                datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc),
+                {},
+                candidates=list(candidates),
+                only_dags=["bietlejuice.dw_region"],
+            )
+        args, kwargs = evaluate.call_args
+        assert args[0] == ["bietlejuice.dw_region"]
+        assert kwargs["expected_dag_ids"] == set(candidates)
+
+
+class TestFollowUpTrackedRunsSlaGuards:
+    def _sla_ledger(self):
+        anchor = "2026-07-24T23:55:00+00:00"
+        key = f"bietlejuice.enrich_region|sla::{anchor}"
+        return key, {
+            key: {
+                "kind": _KIND_MISSING_RUN,
+                "dag_id": "bietlejuice.enrich_region",
+                "run_id": f"sla::{anchor}",
+                "cycle_anchor": anchor,
+                "due_at": "2026-07-25T04:45:00+00:00",
+                "owner": "Data ForRent",
+            }
+        }
+
+    def test_sla_disabled_drops_ledger_without_chat(self):
+        key, ledger = self._sla_ledger()
+        config = {**_SLA_CONFIG, "sla_enabled": False}
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        with (
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post,
+            mock.patch(f"{_MODULE}._fetch_sla_started") as started,
+        ):
+            _follow_up_tracked_runs(
+                mock.Mock(),
+                ledger,
+                "http://hook",
+                now,
+                {},
+                config,
+                sla_candidates=["bietlejuice.enrich_region"],
+            )
+        assert key not in ledger
+        post.assert_not_called()
+        started.assert_not_called()
+
+    def test_paused_or_ineligible_dag_drops_without_chat(self):
+        key, ledger = self._sla_ledger()
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        with (
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post,
+            mock.patch(f"{_MODULE}._fetch_sla_started") as started,
+        ):
+            _follow_up_tracked_runs(
+                mock.Mock(),
+                ledger,
+                "http://hook",
+                now,
+                {},
+                _SLA_CONFIG,
+                sla_candidates=[],
+            )
+        assert key not in ledger
+        post.assert_not_called()
+        started.assert_not_called()
+
+    def test_eligible_dag_still_gets_follow_up(self):
+        key, ledger = self._sla_ledger()
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        with (
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post,
+            mock.patch(f"{_MODULE}._fetch_sla_started", return_value={}),
+        ):
+            _follow_up_tracked_runs(
+                mock.Mock(),
+                ledger,
+                "http://hook",
+                now,
+                {},
+                _SLA_CONFIG,
+                sla_candidates=["bietlejuice.enrich_region"],
+            )
+        assert key in ledger
+        assert post.call_count == 1
+
+
+class TestMonitorEnrichesSlaFindings:
+    def test_production_path_enriches_sla_findings(self):
+        sla_finding = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": "bietlejuice.enrich_region",
+            "run_id": "sla::2026-07-24T23:55:00+00:00",
+            "tier": "standard",
+            "late_by_s": 100.0,
+            "elapsed_s": 100.0,
+            "due_at": "2026-07-25T04:45:00+00:00",
+            "expected_start": "2026-07-25T03:45:00+00:00",
+            "grace_minutes": 60,
+            "percentile": 90,
+            "history_count": 14,
+            "lookback_days": 14,
+            "also_waiting_count": 0,
+        }
+        enrich_calls = []
+
+        def _capture_enrich(findings, _index):
+            enrich_calls.append([dict(f) for f in findings])
+            for f in findings:
+                f["impacted_dw_dags"] = ["bietlejuice.dw_region"]
+                f["impacted_dw_count"] = 1
+
+        with (
+            mock.patch(f"{_MODULE}.ConfigurationService") as mock_cfg,
+            mock.patch(f"{_MODULE}.Variable") as mock_var,
+            mock.patch(f"{_MODULE}._load_downstream_index_safe", return_value={}),
+            mock.patch(f"{_MODULE}._fetch_running_runs", return_value=[]),
+            mock.patch(
+                f"{_MODULE}._collect_sla_findings", return_value=[dict(sla_finding)]
+            ),
+            mock.patch(
+                f"{_MODULE}._enrich_findings_with_dw_impact",
+                side_effect=_capture_enrich,
+            ),
+            mock.patch(f"{_MODULE}._fetch_run_states", return_value={}),
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True),
+            mock.patch(f"{_MODULE}._send_jira_alert", return_value=True),
+        ):
+            mock_cfg.return_value.get_config.side_effect = _config_get
+            mock_var.get.side_effect = _variable_get_factory(environment="forno")
+            monitor_dag_runtimes(session=_db_session(), run_conf={})
+
+        assert any(
+            calls and calls[0].get("kind") == _KIND_MISSING_RUN
+            for calls in enrich_calls
+        )
