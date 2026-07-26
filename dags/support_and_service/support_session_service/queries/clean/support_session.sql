@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     id,
     public_id,
     status,
