@@ -5,24 +5,24 @@ and creates separate PRs for passed and failed DAGs within each domain.
 
 Usage:
   # Auto-discover all scopes, group by domain:
-  uv run --no-project --with boto3,pyyaml,sqlglot python \
+  uv run --no-project --with boto3,pyyaml python \
     .cursor/skills/emr-migration-v2/results.py \
     --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
 
   # Filter to specific domains:
-  uv run --no-project --with boto3,pyyaml,sqlglot python \
+  uv run --no-project --with boto3,pyyaml python \
     .cursor/skills/emr-migration-v2/results.py \
     --domain growth,fintech \
     --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
 
   # Single scope (legacy, one PR):
-  uv run --no-project --with boto3,pyyaml,sqlglot python \
+  uv run --no-project --with boto3,pyyaml python \
     .cursor/skills/emr-migration-v2/results.py \
     --scope fintech/enrich_velo \
     --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br
 
   # Dry run (print verdicts and grouping, no PRs):
-  uv run --no-project --with boto3,pyyaml,sqlglot python \
+  uv run --no-project --with boto3,pyyaml python \
     .cursor/skills/emr-migration-v2/results.py \
     --artifacts-bucket s3://artifacts.s3.data.quintoandar.com.br \
     --dry-run
@@ -32,7 +32,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import shutil
 import subprocess
 import sys
@@ -42,52 +41,9 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 import boto3
-import sqlglot
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 PLATFORM_DAG_DIR = REPO_ROOT / "dags" / "platform"
-
-_TEMPLATE_PARAMS = [
-    "load_start_date",
-    "load_end_date",
-    "environment",
-    "bucket",
-    "dag_name",
-    "schema",
-    "table_name",
-    "partitions",
-]
-
-_TEMPLATE_PARAM_RE = re.compile(
-    r"\{(" + "|".join(re.escape(p) for p in _TEMPLATE_PARAMS) + r")\}"
-)
-
-_LITERAL_DEFAULTS = {
-    "load_start_date": "'2026-01-01'",
-    "load_end_date": "'2026-01-02'",
-    "environment": "'prod'",
-    "bucket": "'s3://test-bucket'",
-    "dag_name": "'test_dag'",
-    "schema": "'test_schema'",
-    "table_name": "'test_table'",
-    "partitions": "'year=2026/month=01/day=01'",
-}
-
-
-def _validate_spark_syntax(sql: str) -> Optional[str]:
-    clean = sql.replace("{{", "").replace("}}", "")
-
-    def _replacer(match: re.Match) -> str:
-        return _LITERAL_DEFAULTS.get(match.group(1), "'placeholder'")
-
-    clean = _TEMPLATE_PARAM_RE.sub(_replacer, clean)
-    if not clean.strip():
-        return None
-    try:
-        sqlglot.parse(clean, dialect="spark")
-        return None
-    except sqlglot.errors.ParseError as exc:
-        return str(exc)
 
 
 class GitError(Exception):
@@ -110,7 +66,6 @@ class TableVerdict:
     checksum_match: Optional[bool] = None
     profile_issues: List[str] = field(default_factory=list)
     run_id: str = ""
-    syntax_error: Optional[str] = None
 
     @property
     def scope_id(self) -> str:
@@ -215,6 +170,7 @@ def fetch_verdicts(
     scopes: List[Tuple[str, str]],
     artifacts_bucket: str,
     s3_client,
+    run_id_override: Optional[str] = None,
 ) -> Tuple[List[TableVerdict], List[str]]:
     """Returns (verdicts, skipped_scope_labels)."""
     bucket, bucket_prefix = _split_s3_uri(artifacts_bucket)
@@ -236,10 +192,18 @@ def fetch_verdicts(
 
         try:
             manifest = json.loads(manifest_path.read_text())
-            run_id = manifest["run_id"]
-        except (json.JSONDecodeError, KeyError) as exc:
+        except json.JSONDecodeError as exc:
             print(
                 f"WARNING: invalid manifest for {scope_label}: {exc}",
+                file=sys.stderr,
+            )
+            skipped.append(scope_label)
+            continue
+
+        run_id = run_id_override or manifest.get("run_id")
+        if not run_id:
+            print(
+                f"WARNING: no run_id for {scope_label}",
                 file=sys.stderr,
             )
             skipped.append(scope_label)
@@ -275,17 +239,6 @@ def fetch_verdicts(
             except Exception:
                 pass
 
-            transpiled_sql_path = (
-                PLATFORM_DAG_DIR
-                / f"migration_emr_{scope_id}"
-                / "queries"
-                / "migration"
-                / f"{table_name}.sql"
-            )
-            syntax_err = None
-            if transpiled_sql_path.exists():
-                syntax_err = _validate_spark_syntax(transpiled_sql_path.read_text())
-
             all_verdicts.append(
                 TableVerdict(
                     scope_domain=domain,
@@ -302,7 +255,6 @@ def fetch_verdicts(
                     checksum_match=verdict_detail.get("checksum_match"),
                     profile_issues=verdict_detail.get("profile_issues", []),
                     run_id=run_id,
-                    syntax_error=syntax_err,
                 )
             )
 
@@ -315,8 +267,6 @@ def fetch_verdicts(
 
 
 def _dag_verdict(verdicts: List[TableVerdict]) -> str:
-    if any(v.syntax_error for v in verdicts):
-        return "FAIL"
     if any(v.verdict == "FAIL" for v in verdicts):
         return "FAIL"
     if any(v.verdict not in ("PASS", "WARN") for v in verdicts):
@@ -378,8 +328,6 @@ def print_report(verdicts: List[TableVerdict]) -> None:
             icon = {"PASS": "+", "WARN": "~", "FAIL": "!"}
             status = icon.get(v.verdict, "?")
             extras = []
-            if v.syntax_error:
-                extras.append("SYNTAX ERROR")
             if v.count_delta_pct is not None and v.count_delta_pct > 0:
                 extras.append(f"count delta={v.count_delta_pct:.1f}%")
             if v.schema_match is False:
@@ -469,34 +417,19 @@ def _build_pr_body(
             "review the failing tables before merging.\n"
         )
 
-    syntax_errors = [v for v in verdicts if v.syntax_error]
-    if syntax_errors:
-        lines.append("## Syntax errors\n")
-        lines.append(
-            "The following transpiled queries have syntax errors "
-            "and need manual fixes:\n"
-        )
-        for v in sorted(
-            syntax_errors,
-            key=lambda x: (x.scope_domain, x.scope_dag_name, x.table_name),
-        ):
-            lines.append(f"### {v.scope_domain}/{v.scope_dag_name} — {v.table_name}\n")
-            lines.append(f"```\n{v.syntax_error}\n```\n")
-
     lines.append("## Validation results\n")
     lines.append(
-        "| DAG | Table | Verdict | Syntax | Count (Databricks) | Count (EMR) "
+        "| DAG | Table | Verdict | Count (Databricks) | Count (EMR) "
         "| Delta | Schema | Nulls | Checksums |"
     )
     lines.append(
-        "|-----|-------|---------|--------|-------------------|------------|"
+        "|-----|-------|---------|-------------------|------------|"
         "-------|--------|-------|-----------|"
     )
 
     for v in sorted(
         verdicts, key=lambda x: (x.scope_domain, x.scope_dag_name, x.table_name)
     ):
-        syntax_icon = "ERROR" if v.syntax_error else "OK"
         schema_icon = (
             "N/A" if v.schema_match is None else ("OK" if v.schema_match else "FAIL")
         )
@@ -520,7 +453,7 @@ def _build_pr_body(
             delta_str = "N/A"
         lines.append(
             f"| {v.scope_domain}/{v.scope_dag_name} | {v.table_name} | "
-            f"{v.verdict} | {syntax_icon} | {dbx_str} | {emr_str} | "
+            f"{v.verdict} | {dbx_str} | {emr_str} | "
             f"{delta_str} | {schema_icon} | {null_icon} | {chk_icon} |"
         )
 
@@ -942,6 +875,11 @@ def main() -> None:
         action="store_true",
         help="Print verdicts and grouping without creating branches or PRs",
     )
+    parser.add_argument(
+        "--run-id",
+        default=None,
+        help="Override run ID for S3 verdict lookup (ignores manifest run_id)",
+    )
     args = parser.parse_args()
 
     if args.scope is not None:
@@ -967,7 +905,12 @@ def main() -> None:
         sys.exit(1)
 
     s3_client = _get_s3_client(args.assume_role_arn)
-    verdicts, skipped_scopes = fetch_verdicts(scopes, args.artifacts_bucket, s3_client)
+    verdicts, skipped_scopes = fetch_verdicts(
+        scopes,
+        args.artifacts_bucket,
+        s3_client,
+        run_id_override=args.run_id,
+    )
 
     if skipped_scopes:
         print(

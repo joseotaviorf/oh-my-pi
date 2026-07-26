@@ -27,43 +27,49 @@ WITH zendesk_tickets AS (
 ), bigfone_analysts AS (
   SELECT DISTINCT
     COALESCE(
-      GET_JSON_OBJECT(metadata, event_data.WorkerSid),
-      GET_JSON_OBJECT(metadata, event_data.TaskAttributes.worker_sid)
+      GET_JSON_OBJECT(metadata, '$.event_data.WorkerSid'),
+      GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.worker_sid')
     ) AS id_agent,
-    LOWER(GET_JSON_OBJECT(metadata, event_data.WorkerName)) AS email,
-    GET_JSON_OBJECT(metadata, event_data.WorkerAttributes.full_name) AS name,
+    LOWER(GET_JSON_OBJECT(metadata, '$.event_data.WorkerName')) AS email,
+    GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.full_name') AS name,
     CASE
-      WHEN GET_JSON_OBJECT(metadata, event_data.WorkerAttributes.location) IS NULL
-      AND GET_JSON_OBJECT(metadata, event_data.WorkerName) LIKE '%ext%'
+      WHEN GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location') IS NULL
+      AND GET_JSON_OBJECT(metadata, '$.event_data.WorkerName') LIKE '%ext%'
       THEN LOWER(
         SPLIT(
-          REPLACE(SPLIT(GET_JSON_OBJECT(metadata, event_data.WorkerName), '@')[0], '.', ' '),
+          REPLACE(SPLIT(GET_JSON_OBJECT(metadata, '$.event_data.WorkerName'), '@')[0], '.', ' '),
           ' '
         )[2]
       )
-      WHEN GET_JSON_OBJECT(metadata, event_data.WorkerAttributes.location) IS NULL
-      AND NOT GET_JSON_OBJECT(metadata, event_data.WorkerName) LIKE '%ext%'
+      WHEN GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location') IS NULL
+      AND NOT GET_JSON_OBJECT(metadata, '$.event_data.WorkerName') LIKE '%ext%'
       THEN LOWER(
         SPLIT(
-          REPLACE(SPLIT(GET_JSON_OBJECT(metadata, event_data.WorkerName), '@')[1], '.', ' '),
+          REPLACE(SPLIT(GET_JSON_OBJECT(metadata, '$.event_data.WorkerName'), '@')[1], '.', ' '),
           ' '
         )[0]
       )
-      ELSE LOWER(GET_JSON_OBJECT(metadata, event_data.WorkerAttributes.location))
+      ELSE LOWER(GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location'))
     END AS organization,
     ts_created
   FROM datalake_bigfone_clean.event
 ), quinto_messenger_analysts AS (
   SELECT DISTINCT
-    GET_JSON_OBJECT(assigned_to, worker_sid) AS id_agent,
-    LOWER(GET_JSON_OBJECT(assigned_to, worker_name)) AS email,
+    GET_JSON_OBJECT(assigned_to, '$.worker_sid') AS id_agent,
+    LOWER(GET_JSON_OBJECT(assigned_to, '$.worker_name')) AS email,
     CASE
-      WHEN GET_JSON_OBJECT(assigned_to, worker_name) LIKE '%ext%'
+      WHEN GET_JSON_OBJECT(assigned_to, '$.worker_name') LIKE '%ext%'
       THEN LOWER(
-        SPLIT(REPLACE(SPLIT(GET_JSON_OBJECT(assigned_to, worker_name), '@')[0], '.', ' '), ' ')[2]
+        SPLIT(
+          REPLACE(SPLIT(GET_JSON_OBJECT(assigned_to, '$.worker_name'), '@')[0], '.', ' '),
+          ' '
+        )[2]
       )
       ELSE LOWER(
-        SPLIT(REPLACE(SPLIT(GET_JSON_OBJECT(assigned_to, worker_name), '@')[1], '.', ' '), ' ')[0]
+        SPLIT(
+          REPLACE(SPLIT(GET_JSON_OBJECT(assigned_to, '$.worker_name'), '@')[1], '.', ' '),
+          ' '
+        )[0]
       )
     END AS organization,
     ts_created

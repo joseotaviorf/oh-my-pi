@@ -78,7 +78,7 @@ WITH tickets AS (
     FROM datalake_rental_guarantee_platform_clean.delinquency AS d
     LEFT JOIN datalake_robin_hood_clean.accounting_entry AS ae
       ON d.id = (
-        GET_JSON_OBJECT(metadata, delinquency)
+        GET_JSON_OBJECT(metadata, '$.delinquency')
       )
     LEFT JOIN datalake_robin_hood_clean.accounting_entry_balance AS aeb
       ON ae.id = aeb.id_accounting_entry

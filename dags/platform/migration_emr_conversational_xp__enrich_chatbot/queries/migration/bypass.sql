@@ -29,7 +29,7 @@ WITH pre_bot_actions AS (
   INNER JOIN datalake_langfuse_clean.observations AS o
     ON o.id_trace = t.id_trace
     AND o.ts_started >= CAST('{load_start_date}' AS DATE)
-    AND GET_JSON_OBJECT(o.output, should_route) = 'true'
+    AND GET_JSON_OBJECT(o.output, '$.should_route') = 'true'
   WHERE
     t.ts_created >= CAST('{load_start_date}' AS DATE)
   GROUP BY

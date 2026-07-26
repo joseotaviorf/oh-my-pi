@@ -279,7 +279,7 @@ FROM (
     DATEDIFF(
       TO_DATE(
         TO_TIMESTAMP(
-          CAST(GET_JSON_OBJECT(rt.custom_fields, ARRAY('[Data] Data do first reply ')) AS STRING),
+          CAST(GET_JSON_OBJECT(rt.custom_fields, '$["[Data] Data do first reply "]') AS STRING),
           'dd/MM/yy HH'
         )
       ),
@@ -346,11 +346,11 @@ FROM (
     rt.ts_initially_assigned_local,
     rt.ts_last_assigned_local,
     TO_TIMESTAMP(
-      CAST(GET_JSON_OBJECT(rt.custom_fields, ARRAY('[Data] Data Primeiro FUP Manual Realizado')) AS STRING),
+      CAST(GET_JSON_OBJECT(rt.custom_fields, '$["[Data] Data Primeiro FUP Manual Realizado"]') AS STRING),
       'dd/MM/yy HH'
     ) AS ts_measurement,
     TO_TIMESTAMP(
-      CAST(GET_JSON_OBJECT(rt.custom_fields, ARRAY('[Data] Data do first reply ')) AS STRING),
+      CAST(GET_JSON_OBJECT(rt.custom_fields, '$["[Data] Data do first reply "]') AS STRING),
       'dd/MM/yy HH'
     ) AS ts_first_reply_milestone,
     CAST(DATE_ADD(

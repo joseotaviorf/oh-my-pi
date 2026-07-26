@@ -9,7 +9,7 @@ WITH deduplicate_payment AS (
       ts_updated,
       type,
       id_installment,
-      GET_JSON_OBJECT(metadata, our_number) AS our_number,
+      GET_JSON_OBJECT(metadata, '$.our_number') AS our_number,
       ROW_NUMBER() OVER (PARTITION BY id_installment ORDER BY ts_created DESC) AS _w,
       ts_created
     FROM datalake_trato_feito_clean.payment
@@ -20,7 +20,7 @@ WITH deduplicate_payment AS (
   SELECT DISTINCT
     id_installment,
     id AS id_installment_charge,
-    GET_JSON_OBJECT(metadata, our - number) AS our_number
+    GET_JSON_OBJECT(metadata, '$.our-number') AS our_number
   FROM datalake_trato_feito_clean.installment_charges
 ), cte_pay AS (
   SELECT

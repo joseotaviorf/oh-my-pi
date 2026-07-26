@@ -2,36 +2,36 @@ SELECT
   CAST(id_communication AS BIGINT),
   TRANSFORM(
     FROM_JSON(
-      GET_JSON_OBJECT(associations, tickets.results),
+      GET_JSON_OBJECT(associations, '$.tickets.results'),
       'array<struct<id:string, type:string>>'
     ).id,
     x -> CAST(x AS BIGINT)
   ) AS ids_associated_tickets,
   TRANSFORM(
     FROM_JSON(
-      GET_JSON_OBJECT(associations, contacts.results),
+      GET_JSON_OBJECT(associations, '$.contacts.results'),
       'array<struct<id:string, type:string>>'
     ).id,
     x -> CAST(x AS BIGINT)
   ) AS ids_associated_contacts,
   TRANSFORM(
     FROM_JSON(
-      GET_JSON_OBJECT(associations, companies.results),
+      GET_JSON_OBJECT(associations, '$.companies.results'),
       'array<struct<id:string, type:string>>'
     ).id,
     x -> CAST(x AS BIGINT)
   ) AS ids_associated_companies,
   TRANSFORM(
     FROM_JSON(
-      GET_JSON_OBJECT(associations, deals.results),
+      GET_JSON_OBJECT(associations, '$.deals.results'),
       'array<struct<id:string, type:string>>'
     ).id,
     x -> CAST(x AS BIGINT)
   ) AS ids_associated_deals,
-  NULLIF(GET_JSON_OBJECT(properties, hs_communication_channel_type), '') AS communication_channel_type,
-  NULLIF(GET_JSON_OBJECT(properties, hs_communication_logged_from), '') AS communication_logged_from,
-  NULLIF(GET_JSON_OBJECT(properties, hs_communication_body), '') AS communication_body,
-  CAST(NULLIF(GET_JSON_OBJECT(properties, hs_timestamp), '') AS TIMESTAMP) AS ts_communication,
+  NULLIF(GET_JSON_OBJECT(properties, '$.hs_communication_channel_type'), '') AS communication_channel_type,
+  NULLIF(GET_JSON_OBJECT(properties, '$.hs_communication_logged_from'), '') AS communication_logged_from,
+  NULLIF(GET_JSON_OBJECT(properties, '$.hs_communication_body'), '') AS communication_body,
+  CAST(NULLIF(GET_JSON_OBJECT(properties, '$.hs_timestamp'), '') AS TIMESTAMP) AS ts_communication,
   ts_created,
   ts_updated,
   year,
@@ -39,6 +39,4 @@ SELECT
   day
 FROM datalake_hubspot_clean.communication
 WHERE
-  year = STRUCT(year AS year)
-  AND month = STRUCT(month AS month)
-  AND day = STRUCT(day AS day)
+  year = {year} AND month = {month} AND day = {day}

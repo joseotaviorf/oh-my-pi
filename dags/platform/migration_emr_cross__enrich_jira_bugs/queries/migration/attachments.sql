@@ -2,11 +2,11 @@ WITH issues AS (
   SELECT
     id,
     key AS id_issue,
-    GET_JSON_OBJECT(fields, attachment) AS attachment,
+    GET_JSON_OBJECT(fields, '$.attachment') AS attachment,
     MAKE_DATE(year, month, day) AS ts_updated
   FROM datalake_jira_clean.issues
   WHERE
-    CAST(GET_JSON_OBJECT(fields, project.id) AS INT) = 10400
+    CAST(GET_JSON_OBJECT(fields, '$.project.id') AS INT) = 10400
     AND MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
 ), exploded_attachments AS (
   SELECT

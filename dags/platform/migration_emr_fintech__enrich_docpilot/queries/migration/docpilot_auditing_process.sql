@@ -11,46 +11,24 @@ WITH get_docpilot_annotations AS (
     task_completion.result,
     EXPLODE(
       FROM_JSON(
-        GET_JSON_OBJECT(task_completion.result, "$"),
-        "ARRAY<
-          STRUCT<
-            from_name: STRING,
-            type: STRING,
-            value: STRUCT<
-              choices: ARRAY<STRING>,
-              text: ARRAY<STRING>
-            >
-          >
-        >"
+        GET_JSON_OBJECT(task_completion.result, '$'),
+        'ARRAY<\n          STRUCT<\n            from_name: STRING,\n            type: STRING,\n            value: STRUCT<\n              choices: ARRAY<STRING>,\n              text: ARRAY<STRING>\n            >\n          >\n        >'
       )
     ) AS input_answer,
     FROM_JSON(
       task.data,
-      'STRUCT<
-      document_1: STRING,
-      document_2: STRING,
-      document_3: STRING,
-      document_4: STRING,
-      document_5: STRING,
-      document_6: STRING,
-      document_7: STRING,
-      document_8: STRING,
-      document_9: STRING,
-      document_10: STRING
-    >'
+      'STRUCT<\n      document_1: STRING,\n      document_2: STRING,\n      document_3: STRING,\n      document_4: STRING,\n      document_5: STRING,\n      document_6: STRING,\n      document_7: STRING,\n      document_8: STRING,\n      document_9: STRING,\n      document_10: STRING\n    >'
     ) AS extracted_data,
     task_completion.ts_updated
-  FROM
-    datalake_quinturk_clean.project
-      INNER JOIN datalake_quinturk_clean.task
-        ON project.id = task.id_project
-      INNER JOIN datalake_quinturk_clean.task_completion
-        ON task_completion.id_task = task.id
+  FROM datalake_quinturk_clean.project
+  INNER JOIN datalake_quinturk_clean.task
+    ON project.id = task.id_project
+  INNER JOIN datalake_quinturk_clean.task_completion
+    ON task_completion.id_task = task.id
   WHERE
-    title LIKE "%[DocPilot] Auditoria%"
-),
-extract_input_value AS (
-SELECT
+    title LIKE '%[DocPilot] Auditoria%'
+), extract_input_value AS (
+  SELECT
     id_task,
     id_project,
     id_proposal,
@@ -69,25 +47,19 @@ SELECT
     extracted_data.document_8 AS document_8_path,
     extracted_data.document_9 AS document_9_path,
     extracted_data.document_10 AS document_10_path,
-    REGEXP_REPLACE(
-      GET_JSON_OBJECT(TO_JSON(input_answer), "$.from_name"), '[A-Za-z_]+$', ""
-    ) AS document_name,
-    REGEXP_REPLACE(
-      GET_JSON_OBJECT(TO_JSON(input_answer), "$.from_name"), '^document_[0-9]+_', ""
-    ) AS field_type,
+    REGEXP_REPLACE(GET_JSON_OBJECT(TO_JSON(input_answer), '$.from_name'), '[A-Za-z_]+$', '') AS document_name,
+    REGEXP_REPLACE(GET_JSON_OBJECT(TO_JSON(input_answer), '$.from_name'), '^document_[0-9]+_', '') AS field_type,
     REPLACE(
       COALESCE(
-        GET_JSON_OBJECT(TO_JSON(input_answer), "$.value.choices[0]"),
-        GET_JSON_OBJECT(TO_JSON(input_answer), "$.value.text[0]")
+        GET_JSON_OBJECT(TO_JSON(input_answer), '$.value.choices[0]'),
+        GET_JSON_OBJECT(TO_JSON(input_answer), '$.value.text[0]')
       ),
       ' ',
       ''
     ) AS input_value,
     ts_updated
-  FROM
-    get_docpilot_annotations
-),
-get_input_value AS (
+  FROM get_docpilot_annotations
+), get_input_value AS (
   SELECT
     id_task,
     id_project,
@@ -99,85 +71,57 @@ get_input_value AS (
     lead_time,
     document_name,
     CASE
-      WHEN document_name = 'document_1' THEN document_1_path
-      WHEN document_name = 'document_2' THEN document_2_path
-      WHEN document_name = 'document_3' THEN document_3_path
-      WHEN document_name = 'document_4' THEN document_4_path
-      WHEN document_name = 'document_5' THEN document_5_path
-      WHEN document_name = 'document_6' THEN document_6_path
-      WHEN document_name = 'document_7' THEN document_7_path
-      WHEN document_name = 'document_8' THEN document_8_path
-      WHEN document_name = 'document_9' THEN document_9_path
-      WHEN document_name = 'document_10' THEN document_10_path
+      WHEN document_name = 'document_1'
+      THEN document_1_path
+      WHEN document_name = 'document_2'
+      THEN document_2_path
+      WHEN document_name = 'document_3'
+      THEN document_3_path
+      WHEN document_name = 'document_4'
+      THEN document_4_path
+      WHEN document_name = 'document_5'
+      THEN document_5_path
+      WHEN document_name = 'document_6'
+      THEN document_6_path
+      WHEN document_name = 'document_7'
+      THEN document_7_path
+      WHEN document_name = 'document_8'
+      THEN document_8_path
+      WHEN document_name = 'document_9'
+      THEN document_9_path
+      WHEN document_name = 'document_10'
+      THEN document_10_path
     END AS document_path,
     CASE
-      WHEN
-        field_type = 'type'
-        AND input_value = 'BANK_STATEMENT'
-      THEN
-        'BANK_STATEMENT'
-      WHEN
-        field_type = 'type'
-        AND input_value = 'PAYSLIP'
-      THEN
-        'PAYSLIP'
-      WHEN
-        field_type = 'type'
-        AND input_value = 'INSS'
-      THEN
-        'INSS'
-      WHEN
-        field_type = 'type'
-        AND input_value = 'OTHER'
-      THEN
-        'OTHER'
+      WHEN field_type = 'type' AND input_value = 'BANK_STATEMENT'
+      THEN 'BANK_STATEMENT'
+      WHEN field_type = 'type' AND input_value = 'PAYSLIP'
+      THEN 'PAYSLIP'
+      WHEN field_type = 'type' AND input_value = 'INSS'
+      THEN 'INSS'
+      WHEN field_type = 'type' AND input_value = 'OTHER'
+      THEN 'OTHER'
     END AS document_type,
-    CASE
-      WHEN field_type = 'net' THEN input_value
-    END AS net_income,
-    CASE
-      WHEN field_type = 'gross' THEN input_value
-    END AS gross_income,
-    CASE
-      WHEN field_type = 'commited' THEN input_value
-    END AS committed_income,
-    CASE
-      WHEN field_type = 'advance_salary' THEN input_value
-    END AS advance_salary,
-    CASE
-      WHEN field_type = 'month' THEN input_value
-    END AS reference_month,
-    CASE
-      WHEN field_type = 'date_start' THEN input_value
-    END AS date_start,
-    CASE
-      WHEN field_type = 'date_end' THEN input_value
-    END AS date_end,
-    CASE
-      WHEN field_type = 'date_start_partial' THEN input_value
-    END AS date_start_partial,
-    CASE
-      WHEN field_type = 'date_end_partial' THEN input_value
-    END AS date_end_partial,
-    IF(
-      field_type = 'fraud'
-      AND input_value = TRUE,
-      TRUE,
-      FALSE
-    ) AS is_fraud,
+    CASE WHEN field_type = 'net' THEN input_value END AS net_income,
+    CASE WHEN field_type = 'gross' THEN input_value END AS gross_income,
+    CASE WHEN field_type = 'commited' THEN input_value END AS committed_income,
+    CASE WHEN field_type = 'advance_salary' THEN input_value END AS advance_salary,
+    CASE WHEN field_type = 'month' THEN input_value END AS reference_month,
+    CASE WHEN field_type = 'date_start' THEN input_value END AS date_start,
+    CASE WHEN field_type = 'date_end' THEN input_value END AS date_end,
+    CASE WHEN field_type = 'date_start_partial' THEN input_value END AS date_start_partial,
+    CASE WHEN field_type = 'date_end_partial' THEN input_value END AS date_end_partial,
+    IF(field_type = 'fraud' AND input_value = TRUE, TRUE, FALSE) AS is_fraud,
     IF(
       (
-        field_type = 'is_partial'
-        AND LOWER(TRIM(input_value)) LIKE '%sim%'
+        field_type = 'is_partial' AND LOWER(TRIM(input_value)) LIKE '%sim%'
       ),
       TRUE,
       FALSE
     ) AS is_partial,
     ts_updated
-  FROM
-    extract_input_value
-),
-get_documents_annotation AS (
+  FROM extract_input_value
+), get_documents_annotation AS (
   SELECT
     id_task,
     id_project,
@@ -193,19 +137,19 @@ get_documents_annotation AS (
     SPLIT(MAX(gross_income), ';') AS gross_income,
     SPLIT(MAX(committed_income), ';') AS committed_income,
     SPLIT(MAX(advance_salary), ';') AS advance_salary,
-    TO_DATE(MAX(date_start) , 'dd/MM/yyyy') AS bank_statement_start_date,
+    TO_DATE(MAX(date_start), 'dd/MM/yyyy') AS bank_statement_start_date,
     MAX(date_end) AS bank_statement_end_date,
     MAX(date_start_partial) AS bank_statement_date_start_partial,
     MAX(date_end_partial) AS bank_statement_date_end_partial,
     CASE
-      WHEN MAX(document_type) = 'PAYSLIP' THEN SPLIT(MAX(reference_month), ';')
+      WHEN MAX(document_type) = 'PAYSLIP'
+      THEN SPLIT(MAX(reference_month), ';')
       ELSE ARRAY(0)
     END AS payslip_reference_period,
     MAX(is_partial) AS is_partial,
     is_fraud,
     ts_updated
-  FROM
-    get_input_value
+  FROM get_input_value
   GROUP BY
     id_task,
     id_project,
@@ -223,44 +167,38 @@ get_documents_annotation AS (
     id_proposal,
     document_path,
     ts_updated,
-    posexplode(net_income) AS (position, net_income)
-  FROM
-    get_documents_annotation
+    POSEXPLODE(net_income) AS (position, net_income)
+  FROM get_documents_annotation
 ), gross_income_view AS (
   SELECT
     id_proposal,
     document_path,
     ts_updated,
-    posexplode(gross_income) AS (position, gross_income)
-  FROM
-    get_documents_annotation
+    POSEXPLODE(gross_income) AS (position, gross_income)
+  FROM get_documents_annotation
 ), committed_income_view AS (
   SELECT
     id_proposal,
     document_path,
     ts_updated,
-    posexplode(committed_income) AS (position, committed_income)
-  FROM
-    get_documents_annotation
+    POSEXPLODE(committed_income) AS (position, committed_income)
+  FROM get_documents_annotation
 ), advance_salary_view AS (
   SELECT
     id_proposal,
     document_path,
     ts_updated,
-    posexplode(advance_salary) AS (position, advance_salary)
-  FROM
-    get_documents_annotation
+    POSEXPLODE(advance_salary) AS (position, advance_salary)
+  FROM get_documents_annotation
 ), payslip_reference_period__view AS (
   SELECT
     id_proposal,
     document_path,
     ts_updated,
-    posexplode(payslip_reference_period) AS (position, payslip_reference_period)
-  FROM
-    get_documents_annotation
-),
-get_payslip_data AS (
-SELECT
+    POSEXPLODE(payslip_reference_period) AS (position, payslip_reference_period)
+  FROM get_documents_annotation
+), get_payslip_data AS (
+  SELECT
     g.id_task,
     g.id_project,
     g.id_proposal,
@@ -285,32 +223,31 @@ SELECT
     g.is_fraud,
     g.is_partial,
     g.ts_updated
-  FROM
-    get_documents_annotation g
-  LEFT JOIN net_income_view n
-      ON g.id_proposal = n.id_proposal
-      AND g.document_path = n.document_path
-      AND g.ts_updated = n.ts_updated
-  LEFT JOIN gross_income_view gr
-      ON g.id_proposal = gr.id_proposal
-      AND g.document_path = gr.document_path
-      AND gr.position = n.position
-      and gr.ts_updated = g.ts_updated
-  LEFT JOIN committed_income_view c
-      ON g.id_proposal = c.id_proposal
-      AND g.document_path = c.document_path
-      AND c.position = n.position
-      and c.ts_updated = g.ts_updated
-  LEFT JOIN advance_salary_view a
-      ON g.id_proposal = a.id_proposal
-      AND g.document_path = a.document_path
-      AND a.position = n.position
-      and a.ts_updated = g.ts_updated
-  LEFT JOIN payslip_reference_period__view pr
-      ON g.id_proposal = pr.id_proposal
-      AND g.document_path = pr.document_path
-      AND pr.position = n.position
-      and pr.ts_updated = g.ts_updated
+  FROM get_documents_annotation AS g
+  LEFT JOIN net_income_view AS n
+    ON g.id_proposal = n.id_proposal
+    AND g.document_path = n.document_path
+    AND g.ts_updated = n.ts_updated
+  LEFT JOIN gross_income_view AS gr
+    ON g.id_proposal = gr.id_proposal
+    AND g.document_path = gr.document_path
+    AND gr.position = n.position
+    AND gr.ts_updated = g.ts_updated
+  LEFT JOIN committed_income_view AS c
+    ON g.id_proposal = c.id_proposal
+    AND g.document_path = c.document_path
+    AND c.position = n.position
+    AND c.ts_updated = g.ts_updated
+  LEFT JOIN advance_salary_view AS a
+    ON g.id_proposal = a.id_proposal
+    AND g.document_path = a.document_path
+    AND a.position = n.position
+    AND a.ts_updated = g.ts_updated
+  LEFT JOIN payslip_reference_period__view AS pr
+    ON g.id_proposal = pr.id_proposal
+    AND g.document_path = pr.document_path
+    AND pr.position = n.position
+    AND pr.ts_updated = g.ts_updated
   WHERE
     document_type = 'PAYSLIP'
 ), get_bank_statement_data AS (
@@ -339,35 +276,34 @@ SELECT
     g.is_fraud,
     g.is_partial,
     g.ts_updated
-  FROM
-    get_documents_annotation g
-  LEFT JOIN net_income_view n
-      ON g.id_proposal = n.id_proposal
-      AND g.document_path = n.document_path
-      AND n.ts_updated = g.ts_updated
-  LEFT JOIN gross_income_view gr
-      ON g.id_proposal = gr.id_proposal
-      AND g.document_path = gr.document_path
-      AND gr.position = n.position
-      and gr.ts_updated = g.ts_updated
-  LEFT JOIN committed_income_view c
-      ON g.id_proposal = c.id_proposal
-      AND g.document_path = c.document_path
-      AND c.position = n.position
-      and c.ts_updated = g.ts_updated
-  LEFT JOIN advance_salary_view a
-      ON g.id_proposal = a.id_proposal
-      AND g.document_path = a.document_path
-      AND a.position = n.position
-      and a.ts_updated = g.ts_updated
-  LEFT JOIN payslip_reference_period__view pr
+  FROM get_documents_annotation AS g
+  LEFT JOIN net_income_view AS n
+    ON g.id_proposal = n.id_proposal
+    AND g.document_path = n.document_path
+    AND n.ts_updated = g.ts_updated
+  LEFT JOIN gross_income_view AS gr
+    ON g.id_proposal = gr.id_proposal
+    AND g.document_path = gr.document_path
+    AND gr.position = n.position
+    AND gr.ts_updated = g.ts_updated
+  LEFT JOIN committed_income_view AS c
+    ON g.id_proposal = c.id_proposal
+    AND g.document_path = c.document_path
+    AND c.position = n.position
+    AND c.ts_updated = g.ts_updated
+  LEFT JOIN advance_salary_view AS a
+    ON g.id_proposal = a.id_proposal
+    AND g.document_path = a.document_path
+    AND a.position = n.position
+    AND a.ts_updated = g.ts_updated
+  LEFT JOIN payslip_reference_period__view AS pr
     ON g.id_proposal = pr.id_proposal
     AND g.document_path = pr.document_path
     AND pr.position = n.position
-    and pr.ts_updated = g.ts_updated
+    AND pr.ts_updated = g.ts_updated
   WHERE
     document_type = 'BANK_STATEMENT'
-    ), union_documents AS (
+), union_documents AS (
   SELECT
     id_task,
     id_project,
@@ -382,35 +318,23 @@ SELECT
     position,
     bank_statement_reference_period,
     CASE
-      WHEN net_income LIKE '%,%' THEN REGEXP_REPLACE(
-        REGEXP_REPLACE(net_income, '\\.', ''),
-        ',',
-        '.'
-      )
+      WHEN net_income LIKE '%,%'
+      THEN REGEXP_REPLACE(REGEXP_REPLACE(net_income, '\\.', ''), ',', '.')
       ELSE net_income
     END AS net_income,
     CASE
-      WHEN gross_income LIKE '%,%' THEN REGEXP_REPLACE(
-        REGEXP_REPLACE(gross_income, '\\.', ''),
-        ',',
-        '.'
-      )
+      WHEN gross_income LIKE '%,%'
+      THEN REGEXP_REPLACE(REGEXP_REPLACE(gross_income, '\\.', ''), ',', '.')
       ELSE gross_income
     END AS gross_income,
     CASE
-      WHEN committed_income LIKE '%,%' THEN REGEXP_REPLACE(
-        REGEXP_REPLACE(committed_income, '\\.', ''),
-        ',',
-        '.'
-      )
+      WHEN committed_income LIKE '%,%'
+      THEN REGEXP_REPLACE(REGEXP_REPLACE(committed_income, '\\.', ''), ',', '.')
       ELSE committed_income
     END AS committed_income,
     CASE
-      WHEN advance_salary LIKE '%,%' THEN REGEXP_REPLACE(
-        REGEXP_REPLACE(advance_salary, '\\.', ''),
-        ',',
-        '.'
-      )
+      WHEN advance_salary LIKE '%,%'
+      THEN REGEXP_REPLACE(REGEXP_REPLACE(advance_salary, '\\.', ''), ',', '.')
       ELSE advance_salary
     END AS advance_salary,
     payslip_reference_period,
@@ -421,8 +345,7 @@ SELECT
     is_fraud,
     is_partial,
     ts_updated
-  FROM
-    get_payslip_data
+  FROM get_payslip_data
   UNION ALL
   SELECT
     id_task,
@@ -438,35 +361,23 @@ SELECT
     position,
     bank_statement_reference_period,
     CASE
-      WHEN net_income LIKE '%,%' THEN REGEXP_REPLACE(
-        REGEXP_REPLACE(net_income, '\\.', ''),
-        ',',
-        '.'
-      )
+      WHEN net_income LIKE '%,%'
+      THEN REGEXP_REPLACE(REGEXP_REPLACE(net_income, '\\.', ''), ',', '.')
       ELSE net_income
     END AS net_income,
     CASE
-      WHEN gross_income LIKE '%,%' THEN REGEXP_REPLACE(
-        REGEXP_REPLACE(gross_income, '\\.', ''),
-        ',',
-        '.'
-      )
+      WHEN gross_income LIKE '%,%'
+      THEN REGEXP_REPLACE(REGEXP_REPLACE(gross_income, '\\.', ''), ',', '.')
       ELSE gross_income
     END AS gross_income,
     CASE
-      WHEN committed_income LIKE '%,%' THEN REGEXP_REPLACE(
-        REGEXP_REPLACE(committed_income, '\\.', ''),
-        ',',
-        '.'
-      )
+      WHEN committed_income LIKE '%,%'
+      THEN REGEXP_REPLACE(REGEXP_REPLACE(committed_income, '\\.', ''), ',', '.')
       ELSE committed_income
     END AS committed_income,
     CASE
-      WHEN advance_salary LIKE '%,%' THEN REGEXP_REPLACE(
-        REGEXP_REPLACE(advance_salary, '\\.', ''),
-        ',',
-        '.'
-      )
+      WHEN advance_salary LIKE '%,%'
+      THEN REGEXP_REPLACE(REGEXP_REPLACE(advance_salary, '\\.', ''), ',', '.')
       ELSE advance_salary
     END AS advance_salary,
     payslip_reference_period,
@@ -477,39 +388,62 @@ SELECT
     is_fraud,
     is_partial,
     ts_updated
-  FROM
-    get_bank_statement_data
-), _ranked AS (
-  SELECT
-    *,
-    ROW_NUMBER() OVER (PARTITION BY id_task, document_name, position ORDER BY ts_updated DESC) AS _rn
-  FROM union_documents
+  FROM get_bank_statement_data
 )
-SELECT DISTINCT
-  CAST(id_task AS INT) AS id_task,
-  CAST(id_project AS INT) AS id_project,
-  CAST(id_proposal AS INT) AS id_proposal,
-  CAST(id_completed_by AS INT) AS id_completed_by,
+SELECT
+  id_task,
+  id_project,
+  id_proposal,
+  id_completed_by,
   proponent_cpf,
-  LOWER(proponent_name) AS proponent_name,
+  proponent_name,
   lead_time,
   document_name,
   document_path,
   document_type,
-  CAST(net_income AS DECIMAL(10, 2)) AS net_income,
-  CAST(gross_income AS DECIMAL(10, 2)) AS gross_income,
-  CAST(committed_income AS DECIMAL(10, 2)) AS committed_income,
-  CAST(advance_salary AS DECIMAL(10, 2)) AS advance_salary,
-  TO_DATE(payslip_reference_period, 'MM/yyyy') AS payslip_reference_period,
-  TO_DATE(bank_statement_start_date, 'dd/MM/yyyy') AS bank_statement_start_date,
-  TO_DATE(bank_statement_end_date, 'dd/MM/yyyy') AS bank_statement_end_date,
-  TO_DATE(bank_statement_date_start_partial, 'dd/MM/yyyy') AS bank_statement_date_start_partial,
-  TO_DATE(bank_statement_date_end_partial, 'dd/MM/yyyy') AS bank_statement_date_end_partial,
+  net_income,
+  gross_income,
+  committed_income,
+  advance_salary,
+  payslip_reference_period,
+  bank_statement_start_date,
+  bank_statement_end_date,
+  bank_statement_date_start_partial,
+  bank_statement_date_end_partial,
   bank_statement_reference_period,
   is_fraud,
   is_partial,
   ts_updated,
-  CURRENT_TIMESTAMP() AS ts_load
-FROM
-  _ranked
-WHERE _rn = 1
+  ts_load
+FROM (
+  SELECT DISTINCT
+    CAST(id_task AS INT) AS id_task,
+    CAST(id_project AS INT) AS id_project,
+    CAST(id_proposal AS INT) AS id_proposal,
+    CAST(id_completed_by AS INT) AS id_completed_by,
+    proponent_cpf,
+    LOWER(proponent_name) AS proponent_name,
+    lead_time,
+    document_name,
+    document_path,
+    document_type,
+    CAST(net_income AS DECIMAL(10, 2)) AS net_income,
+    CAST(gross_income AS DECIMAL(10, 2)) AS gross_income,
+    CAST(committed_income AS DECIMAL(10, 2)) AS committed_income,
+    CAST(advance_salary AS DECIMAL(10, 2)) AS advance_salary,
+    TO_DATE(payslip_reference_period, 'MM/yyyy') AS payslip_reference_period,
+    TO_DATE(bank_statement_start_date, 'dd/MM/yyyy') AS bank_statement_start_date,
+    TO_DATE(bank_statement_end_date, 'dd/MM/yyyy') AS bank_statement_end_date,
+    TO_DATE(bank_statement_date_start_partial, 'dd/MM/yyyy') AS bank_statement_date_start_partial,
+    TO_DATE(bank_statement_date_end_partial, 'dd/MM/yyyy') AS bank_statement_date_end_partial,
+    bank_statement_reference_period,
+    is_fraud,
+    is_partial,
+    ts_updated,
+    NOW() AS ts_load,
+    ROW_NUMBER() OVER (PARTITION BY CAST(id_task AS INT), document_name, position ORDER BY ts_updated DESC) AS _w,
+    position
+  FROM union_documents
+) AS _t
+WHERE
+  _w = 1

@@ -132,19 +132,19 @@ WITH ToF AS (
       tc.ts_created - INTERVAL '3' HOUR AS ts_created_local,
       tc.reply_time_min_calendar AS minutes_first_reply_time_calendar,
       CASE
-        WHEN CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Conclusão na Análise de Contestação')) AS STRING) LIKE '%intermediação%'
+        WHEN CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Conclusão na Análise de Contestação"]') AS STRING) LIKE '%intermediação%'
         THEN 'Intermediação'
-        WHEN CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Conclusão na Análise de Contestação')) AS STRING) LIKE '%específicos%'
+        WHEN CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Conclusão na Análise de Contestação"]') AS STRING) LIKE '%específicos%'
         THEN 'Reparos especifícos'
-        ELSE CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Conclusão na Análise de Contestação')) AS STRING)
+        ELSE CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Conclusão na Análise de Contestação"]') AS STRING)
       END AS resolution_notation,
       CAST(tc.ts_solved - INTERVAL '3' HOUR AS DATE) AS dt_solved,
       dt_max_comm1_an2,
       dt_max_fin_comm_an2,
       dt_max_fin_tsk_an2,
       COALESCE(
-        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Tipo de Cliente [PRE-SAIDA]')) AS STRING),
-        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Tipo de Cliente')) AS STRING)
+        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Tipo de Cliente [PRE-SAIDA]"]') AS STRING),
+        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Tipo de Cliente"]') AS STRING)
       ) AS client_type,
       ROW_NUMBER() OVER (PARTITION BY tsk.id_contract ORDER BY IF(NOT tc.ts_solved IS NULL, 0, 1) ASC, tc.ts_created ASC) AS _w,
       tc.ts_created,
@@ -155,8 +155,8 @@ WITH ToF AS (
     WHERE
       tc.group_name IN ('Análise de Vistorias II - Reativa [SO] ')
       AND COALESCE(
-        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Tipo de Cliente [PRE-SAIDA]')) AS STRING),
-        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Tipo de Cliente')) AS STRING)
+        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Tipo de Cliente [PRE-SAIDA]"]') AS STRING),
+        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Tipo de Cliente"]') AS STRING)
       ) LIKE '%proprietário%'
       AND tc.tags LIKE '%ticket_ativo%'
       AND NOT tc.tags LIKE '%não_consegue_comentar_no_laudo%'
@@ -185,8 +185,8 @@ WITH ToF AS (
     WHERE
       tc.group_name IN ('Offboarding Reparos [OFF] [POS] [BACK]')
       AND COALESCE(
-        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Tipo de Cliente [PRE-SAIDA]')) AS STRING),
-        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Tipo de Cliente')) AS STRING)
+        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Tipo de Cliente [PRE-SAIDA]"]') AS STRING),
+        CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Tipo de Cliente"]') AS STRING)
       ) LIKE '%proprietário%'
       AND NOT tc.tags LIKE '%closed_by_merge%'
       AND (

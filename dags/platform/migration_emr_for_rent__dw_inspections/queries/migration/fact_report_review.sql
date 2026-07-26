@@ -13,7 +13,7 @@ WITH repair_exempted AS (
     FROM datalake_inspections.repair_exempted AS re
   ) AS _t
   WHERE
-    re.ts_granted = _w
+    ts_granted = _w
 )
 SELECT
   r.id_assessment AS sk_assessment,

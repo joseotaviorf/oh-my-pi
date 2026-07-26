@@ -50,26 +50,26 @@ WITH zendesk_email AS (
 ), csat AS (
   SELECT
     id_ticket,
-    GET_JSON_OBJECT(satisfaction_rating, comment) AS csat_comment,
-    GET_JSON_OBJECT(satisfaction_rating, reason) AS score_reason,
+    GET_JSON_OBJECT(satisfaction_rating, '$.comment') AS csat_comment,
+    GET_JSON_OBJECT(satisfaction_rating, '$.reason') AS score_reason,
     CASE
-      WHEN GET_JSON_OBJECT(satisfaction_rating, score) = 'bad'
+      WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'bad'
       THEN 1
-      WHEN GET_JSON_OBJECT(satisfaction_rating, score) = 'good'
+      WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'good'
       THEN 5
       ELSE NULL
     END AS csat_score,
-    GET_JSON_OBJECT(satisfaction_rating, score) IN ('good', 'bad') AS is_answered,
+    GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad') AS is_answered,
     CASE
-      WHEN GET_JSON_OBJECT(satisfaction_rating, score) IN ('good')
+      WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good')
       THEN TRUE
-      WHEN GET_JSON_OBJECT(satisfaction_rating, score) IN ('bad')
+      WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad')
       THEN FALSE
     END AS is_solved,
     ts_updated AS ts_response
   FROM datalake_zendesk_clean.tickets
   WHERE
-    GET_JSON_OBJECT(satisfaction_rating, score) IN ('good', 'bad')
+    GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad')
   UNION ALL
   SELECT
     id_ticket,

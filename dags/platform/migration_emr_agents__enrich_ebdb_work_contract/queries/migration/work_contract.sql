@@ -9,19 +9,25 @@ WITH partner_agencies_aux AS (
     SELECT
       id_company AS id_company_hubspot,
       NULLIF(
-        REGEXP_EXTRACT(GET_JSON_OBJECT(properties, tag_imobiliarias), '\\[3(?i:p)(?i:BH)?\\-(.+?)\\]'),
+        REGEXP_EXTRACT(
+          GET_JSON_OBJECT(properties, '$.tag_imobiliarias'),
+          '\\[3(?i:p)(?i:BH)?\\-(.+?)\\]'
+        ),
         ''
       ) AS extracted_3p_tag,
       COALESCE(
-        NULLIF(GET_JSON_OBJECT(properties, estado), ''),
-        NULLIF(GET_JSON_OBJECT(properties, state), '')
+        NULLIF(GET_JSON_OBJECT(properties, '$.estado'), ''),
+        NULLIF(GET_JSON_OBJECT(properties, '$.state'), '')
       ) AS partner_state,
       ROW_NUMBER() OVER (PARTITION BY id_company ORDER BY ts_updated DESC) = 1 AS is_most_recent_row,
       ts_updated,
       ROW_NUMBER() OVER (PARTITION BY REPLACE(
         UPPER(
           NULLIF(
-            REGEXP_EXTRACT(GET_JSON_OBJECT(properties, tag_imobiliarias), '\\[3(?i:p)(?i:BH)?\\-(.+?)\\]'),
+            REGEXP_EXTRACT(
+              GET_JSON_OBJECT(properties, '$.tag_imobiliarias'),
+              '\\[3(?i:p)(?i:BH)?\\-(.+?)\\]'
+            ),
             ''
           )
         ),

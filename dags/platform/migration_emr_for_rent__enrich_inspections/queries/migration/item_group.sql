@@ -11,7 +11,7 @@ WITH item_group_type AS (
     FROM datalake_inspection_services_clean.item_group_type AS igt
   ) AS _t
   WHERE
-    igt.ts_updated = _w
+    ts_updated = _w
 )
 SELECT
   id_item_group,

@@ -1,8 +1,8 @@
 WITH extracted AS (
   SELECT
     hl.id AS id_lead,
-    CAST(GET_JSON_OBJECT(amd.house_info, forRent) AS BOOLEAN) AS is_for_rent,
-    CAST(GET_JSON_OBJECT(amd.house_info, forSale) AS BOOLEAN) AS is_for_sale
+    CAST(GET_JSON_OBJECT(amd.house_info, '$.forRent') AS BOOLEAN) AS is_for_rent,
+    CAST(GET_JSON_OBJECT(amd.house_info, '$.forSale') AS BOOLEAN) AS is_for_sale
   FROM datalake_rene_descartes_clean.house_lead AS hl
   LEFT JOIN datalake_rene_descartes_clean.acquisition_misc_data AS amd
     ON hl.id_acquisition = amd.id

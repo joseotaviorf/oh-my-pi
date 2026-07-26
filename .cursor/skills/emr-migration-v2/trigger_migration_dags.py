@@ -687,6 +687,11 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--scope-ids",
         help="Comma-separated exact scope IDs to include (e.g. growth__amplitude_subpartitioned)",
     )
+    parser.add_argument(
+        "--compare-only",
+        action="store_true",
+        help="Skip twin/emr, force-trigger all compare DAGs and monitor them",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--save-inventory", action="store_true")
     parser.add_argument("--verbose", action="store_true")
@@ -696,6 +701,104 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=DAGS_PLATFORM_DIR,
     )
     return parser.parse_args(argv)
+
+
+async def _run_compare_only(
+    client: AirflowRestClient,
+    scopes: list[MigrationScope],
+    outcomes: list[ScopeOutcome],
+    printer: EventPrinter,
+    tracker: ProgressTracker,
+    args: argparse.Namespace,
+) -> int:
+    print(f"Compare-only mode: force-triggering {len(scopes)} compare DAGs...")
+
+    triggered = 0
+    for o in outcomes:
+        dag_id = o.scope.compare_dag_id
+        o.twin = DagOutcome(dag_id=o.scope.twin_dag_id, status=DagStatus.SUCCESS)
+        o.emr = DagOutcome(dag_id=o.scope.emr_dag_id, status=DagStatus.SUCCESS)
+        try:
+            await asyncio.to_thread(client.ensure_dag_unpaused, dag_id)
+            payload = await asyncio.to_thread(client.trigger_dag_run, dag_id, {})
+            o.compare.dag_run_id = payload.get("dag_run_id")
+            o.compare.status = DagStatus.TRIGGERED
+            await printer.emit_event("TRIGGER", dag_id, f"run={o.compare.dag_run_id}")
+            triggered += 1
+        except Exception as exc:
+            o.compare.status = DagStatus.FAILED
+            o.compare.error = f"trigger failed: {exc}"
+            await printer.emit_event(
+                "ERROR", dag_id, o.compare.error, stream=printer.stderr
+            )
+
+    print(f"Triggered {triggered}/{len(scopes)} compare DAGs. Monitoring...")
+
+    stop_progress = asyncio.Event()
+    progress_task = asyncio.create_task(
+        progress_logger(tracker, printer, interval=60.0, stop_event=stop_progress)
+    )
+
+    pending = {
+        o.scope.scope_id: o for o in outcomes if o.compare.status == DagStatus.TRIGGERED
+    }
+    started_at = time.monotonic()
+
+    while pending:
+        elapsed = time.monotonic() - started_at
+        if elapsed >= args.compare_timeout:
+            for scope_id, o in pending.items():
+                o.compare.status = DagStatus.FAILED
+                o.compare.error = "timeout"
+                await printer.emit_event("TIMEOUT", o.scope.compare_dag_id)
+            break
+
+        for scope_id in list(pending.keys()):
+            o = pending[scope_id]
+            try:
+                run = await asyncio.to_thread(
+                    client.get_dag_run,
+                    o.scope.compare_dag_id,
+                    o.compare.dag_run_id,
+                )
+            except Exception:
+                continue
+
+            state = run.get("state", "unknown")
+
+            if state in TERMINAL_STATES:
+                o.compare.duration_seconds = time.monotonic() - started_at
+                if state == "success":
+                    o.compare.status = DagStatus.SUCCESS
+                    await tracker.mark_compare(True)
+                    await printer.emit_event(
+                        "SUCCESS",
+                        o.scope.compare_dag_id,
+                        _format_duration(o.compare.duration_seconds),
+                    )
+                else:
+                    o.compare.status = DagStatus.FAILED
+                    o.compare.error = state
+                    await tracker.mark_compare(False)
+                    await printer.emit_event(
+                        "FAILED",
+                        o.scope.compare_dag_id,
+                        state,
+                        stream=printer.stderr,
+                    )
+                del pending[scope_id]
+
+        await asyncio.sleep(args.poll_interval)
+
+    stop_progress.set()
+    await progress_task
+
+    print_summary(outcomes)
+
+    cmp_fail = sum(1 for o in outcomes if o.compare.status == DagStatus.FAILED)
+    cmp_ok = sum(1 for o in outcomes if o.compare.status == DagStatus.SUCCESS)
+    print(f"\nCompare-only results: {cmp_ok} passed, {cmp_fail} failed")
+    return 1 if cmp_fail else 0
 
 
 async def async_main(args: argparse.Namespace) -> int:
@@ -743,6 +846,10 @@ async def async_main(args: argparse.Namespace) -> int:
     client = _build_client(args)
     printer = EventPrinter()
     tracker = ProgressTracker(total_scopes=len(scopes))
+    outcomes = [ScopeOutcome(scope=s) for s in scopes]
+
+    if args.compare_only:
+        return await _run_compare_only(client, scopes, outcomes, printer, tracker, args)
 
     print("Unpausing compare DAGs so Datasets can trigger them...")
     unpaused_count = 0
@@ -760,7 +867,6 @@ async def async_main(args: argparse.Namespace) -> int:
             )
     print(f"Unpaused {unpaused_count} compare DAGs.")
 
-    outcomes = [ScopeOutcome(scope=s) for s in scopes]
     semaphore = asyncio.Semaphore(max_parallel_pairs)
 
     stop_progress = asyncio.Event()

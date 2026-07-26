@@ -38,9 +38,9 @@ WITH pp_multi_cluster AS (
   LEFT JOIN pp_multi_cluster AS pmc
     ON ohqh.id_owner = pmc.id_owner
   WHERE
-    ohqh.year = STRUCT(year AS year)
-    AND ohqh.month = STRUCT(month AS month)
-    AND ohqh.day = STRUCT(day AS day)
+    ohqh.year = {year}
+    AND ohqh.month = {month}
+    AND ohqh.day = {day}
 ), owner_house_category_changes AS (
   SELECT
     id_owner,
@@ -83,9 +83,9 @@ SELECT
   ohc.cluster_pp_multi,
   COALESCE(oc.owner_category, 0) = COALESCE(cc.last_category, 0) AS is_current_category,
   ohc.dt_houses_owned AS dt_owner_category,
-  STRUCT(year AS year) AS year,
-  STRUCT(month AS month) AS month,
-  STRUCT(day AS day) AS day
+  {year} AS year,
+  {month} AS month,
+  {day} AS day
 FROM owner_house_category AS ohc
 LEFT JOIN owner_category AS oc
   ON ohc.id_owner = oc.id_owner

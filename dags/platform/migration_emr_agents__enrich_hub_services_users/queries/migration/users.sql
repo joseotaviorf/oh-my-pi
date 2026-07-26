@@ -28,7 +28,7 @@ WITH users AS (
       ON ARRAY_CONTAINS(um.predecessor_user_list, u.id_external)
   ) AS _t
   WHERE
-    u.ts_updated = _w
+    ts_updated = _w
 )
 SELECT
   u.id AS id_user,

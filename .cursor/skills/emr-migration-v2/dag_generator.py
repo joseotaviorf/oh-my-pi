@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import shutil
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -120,6 +121,7 @@ def generate_dags(
         "twin_dataset_uri": twin_dataset_uri(scope_id),
         "emr_dataset_uri": emr_dataset_uri(scope_id),
         "run_prefix": run_prefix(run_id),
+        "reference_date": (date.today() - timedelta(days=1)).isoformat(),
     }
 
     dag_specs = [

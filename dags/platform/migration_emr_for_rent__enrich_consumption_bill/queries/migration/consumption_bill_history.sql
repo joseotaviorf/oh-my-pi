@@ -17,7 +17,7 @@ WITH consumption_bill_aud AS (
       ON aud.rev = ure.id
   ) AS _t
   WHERE
-    _w = ure.ts_revision
+    _w = ts_revision
 ), combined_status AS (
   SELECT
     id_house,

@@ -1,13 +1,13 @@
 WITH last_method_change AS (
   SELECT
     soa.id AS id_offer,
-    GET_JSON_OBJECT(soa.original_message, paymentOptions.paymentMethod) AS payment_method_original,
-    GET_JSON_OBJECT(soa.updated_message, paymentOptions.paymentMethod) AS payment_method_updated,
+    GET_JSON_OBJECT(soa.original_message, '$.paymentOptions.paymentMethod') AS payment_method_original,
+    GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod') AS payment_method_updated,
     ROW_NUMBER() OVER (PARTITION BY soa.id ORDER BY MAX(soa.ts_updated) DESC) AS ROW,
     CAST(MAX(soa.ts_updated) AS DATE) AS dt_payment_method_change
   FROM datalake_firestore_clean.sale_offer AS soa
   WHERE
-    GET_JSON_OBJECT(soa.original_message, paymentOptions.paymentMethod) <> GET_JSON_OBJECT(soa.updated_message, paymentOptions.paymentMethod)
+    GET_JSON_OBJECT(soa.original_message, '$.paymentOptions.paymentMethod') <> GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod')
   GROUP BY
     1,
     2,

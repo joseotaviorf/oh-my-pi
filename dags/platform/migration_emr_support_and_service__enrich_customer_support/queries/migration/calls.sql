@@ -1,7 +1,7 @@
 WITH sss_and_sauron_call_sessions AS (
   SELECT
     id AS id_session,
-    GET_JSON_OBJECT(user_data, user_id) AS id_user,
+    GET_JSON_OBJECT(user_data, '$.user_id') AS id_user,
     public_id AS id_sss_session,
     source_identity
   FROM datalake_sauron_clean.session
@@ -11,7 +11,7 @@ WITH sss_and_sauron_call_sessions AS (
   UNION
   SELECT
     id AS id_session,
-    GET_JSON_OBJECT(user_data, user_id) AS id_user,
+    GET_JSON_OBJECT(user_data, '$.user_id') AS id_user,
     public_id AS id_sss_session,
     source_identity
   FROM datalake_support_session_service_clean.support_session

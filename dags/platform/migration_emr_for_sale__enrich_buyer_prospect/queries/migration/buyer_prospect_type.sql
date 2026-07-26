@@ -48,7 +48,7 @@ WITH bp_status AS (
       ON bps.id_demand_prospect_conversion_event = ce.id_demand_prospect_conversion_event
   ) AS _t
   WHERE
-    bps.ts_status_started = _w
+    ts_status_started = _w
 )
 SELECT
   id_buyer_prospect_type,
@@ -104,4 +104,4 @@ FROM (
     AND bp_status.status = 'ACTIVE'
 ) AS _t
 WHERE
-  slpc.change_number = _w
+  change_number = _w

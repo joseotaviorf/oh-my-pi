@@ -668,13 +668,11 @@ def main() -> None:
         sys.exit(0)
 
     # --- EMR setup (submit async — runs in parallel with Databricks EXPLAIN) ---
-    emr_results: Optional[dict[str, Any]] = None
     emr_created_cluster: Optional[str] = None
     emr_run_prefix: Optional[str] = None
     emr_proc: Optional[subprocess.Popen] = None
     emr_stdout_path: Optional[Path] = None
     emr_stderr_path: Optional[Path] = None
-    emr_failed = False
     use_emr = args.emr_validate or args.emr_cluster_id
     if use_emr:
         run_id = f"{os.getpid()}_{int(time.time())}"
@@ -698,8 +696,61 @@ def main() -> None:
         print("  EMR step submitted (running in background)")
 
     # --- Phase 1: local SQLGlot + Databricks EXPLAIN (runs while EMR works) ---
+    # Wrap in try/finally to guarantee EMR cluster termination on abort/error
+    try:
+        _run_validation(
+            sql_files,
+            explainer,
+            emr_proc,
+            emr_run_prefix,
+            emr_stdout_path,
+            emr_stderr_path,
+            args,
+        )
+    finally:
+        if emr_created_cluster:
+            print(f"\n  Terminating EMR cluster {emr_created_cluster}...")
+            subprocess.run(
+                [
+                    "uv",
+                    "run",
+                    "--directory",
+                    str(EMR_CLI_DIR),
+                    "emr-cli",
+                    "terminate",
+                    "--cluster-id",
+                    emr_created_cluster,
+                ],
+                capture_output=True,
+                text=True,
+                cwd=str(REPO_ROOT),
+            )
+        if emr_run_prefix:
+            try:
+                cleaned = _clear_s3_prefix(S3_SYNTAX_TEST_BUCKET, emr_run_prefix + "/")
+                if cleaned:
+                    print(f"  Cleaned up {cleaned} S3 objects from run")
+            except Exception as exc:
+                print(
+                    f"  WARNING: S3 cleanup failed ({exc}), "
+                    f"clean manually: aws s3 rm --recursive "
+                    f"s3://{S3_SYNTAX_TEST_BUCKET}/{emr_run_prefix}/",
+                    file=sys.stderr,
+                )
+
+
+def _run_validation(
+    sql_files,
+    explainer,
+    emr_proc,
+    emr_run_prefix,
+    emr_stdout_path,
+    emr_stderr_path,
+    args,
+):
     print("\n--- SQLGlot + Databricks EXPLAIN validation ---\n")
 
+    emr_failed = False
     stats: Counter[str] = Counter()
     failures_by_domain: dict[str, list[dict[str, Any]]] = defaultdict(list)
     fixed_files: list[tuple[Path, str]] = []
@@ -975,37 +1026,6 @@ def main() -> None:
     }
     report_path.write_text(json.dumps(full_report, indent=2))
     print(f"\nFull report: {report_path}")
-
-    if emr_created_cluster:
-        print(f"\n  Terminating EMR cluster {emr_created_cluster}...")
-        subprocess.run(
-            [
-                "uv",
-                "run",
-                "--directory",
-                str(EMR_CLI_DIR),
-                "emr-cli",
-                "terminate",
-                "--cluster-id",
-                emr_created_cluster,
-            ],
-            capture_output=True,
-            text=True,
-            cwd=str(REPO_ROOT),
-        )
-
-    if emr_run_prefix:
-        try:
-            cleaned = _clear_s3_prefix(S3_SYNTAX_TEST_BUCKET, emr_run_prefix + "/")
-            if cleaned:
-                print(f"  Cleaned up {cleaned} S3 objects from run")
-        except Exception as exc:
-            print(
-                f"  WARNING: S3 cleanup failed ({exc}), "
-                f"clean manually: aws s3 rm --recursive "
-                f"s3://{S3_SYNTAX_TEST_BUCKET}/{emr_run_prefix}/",
-                file=sys.stderr,
-            )
 
     if stats["fail"] or stats["fixed_local"] or emr_failed:
         sys.exit(1)

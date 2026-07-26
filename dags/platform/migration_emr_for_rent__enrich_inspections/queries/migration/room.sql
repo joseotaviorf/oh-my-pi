@@ -11,7 +11,7 @@ WITH room_type AS (
     FROM datalake_inspection_services_clean.room_type AS rt
   ) AS _t
   WHERE
-    rt.ts_updated = _w
+    ts_updated = _w
 )
 SELECT
   r.id_room,

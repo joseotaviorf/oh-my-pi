@@ -42,7 +42,7 @@ WITH filter_type_tenant AS (
     FROM datalake_inspection_services_clean.inspection_aud AS ia
   ) AS _t
   WHERE
-    ia.ts_updated = _w
+    ts_updated = _w
 ), review_events AS (
   SELECT
     ia.id_inspection,

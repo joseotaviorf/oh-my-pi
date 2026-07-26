@@ -18,8 +18,8 @@ WITH concierge_indirect_vb AS (
   JOIN dw_visit.fact_visits AS fv
     ON dv.sk_visit = fv.sk_visit
   WHERE
-    GET_JSON_OBJECT(event_properties, recset_showcase) = 'CONCIERGE_WHATSAPP'
-    AND dv.dt_created BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    GET_JSON_OBJECT(event_properties, '$.recset_showcase') = 'CONCIERGE_WHATSAPP'
+    AND dv.dt_created BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 )
 SELECT
   id_user,

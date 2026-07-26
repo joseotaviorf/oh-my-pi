@@ -246,7 +246,7 @@ WITH resend_events AS (
 ), id_document_processed AS (
   SELECT
     document_id AS id,
-    GET_JSON_OBJECT(attributes, fullName) AS name,
+    GET_JSON_OBJECT(attributes, '$.fullName') AS name,
     id_folder,
     document_ts_updated AS ts_updated
   FROM filtered_documents
@@ -271,10 +271,10 @@ WITH resend_events AS (
 ), income_document_processed AS (
   SELECT
     document_id AS id,
-    GET_JSON_OBJECT(attributes, incomeNature.bankStatements) AS statements_json_str,
-    GET_JSON_OBJECT(attributes, incomeNature.payslips) AS payslips_json_str,
-    GET_JSON_OBJECT(reference_properties, proposalId) AS id_proposal,
-    GET_JSON_OBJECT(reference_properties, proposalProponentId) AS id_proponent,
+    GET_JSON_OBJECT(attributes, '$.incomeNature.bankStatements') AS statements_json_str,
+    GET_JSON_OBJECT(attributes, '$.incomeNature.payslips') AS payslips_json_str,
+    GET_JSON_OBJECT(reference_properties, '$.proposalId') AS id_proposal,
+    GET_JSON_OBJECT(reference_properties, '$.proposalProponentId') AS id_proponent,
     id_folder,
     id_context_external,
     document_ts_updated AS ts_updated

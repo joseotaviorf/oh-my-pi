@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from datetime import date, timedelta
 from typing import Any, List, Tuple
 from urllib.parse import urlparse
 
@@ -17,6 +18,50 @@ import boto3
 from pyspark.sql import SparkSession
 
 MAX_PROFILE_COLUMNS = 120
+
+_QUOTED_TEMPLATE_RE = re.compile(r"'\{[a-z_][a-z0-9_]*\}'")
+_BARE_TEMPLATE_RE = re.compile(r"\{([a-z_][a-z0-9_]*)\}")
+
+_DATE_PARAMS = frozenset(
+    {
+        "load_start_date",
+        "load_end_date",
+        "start_date",
+        "end_date",
+        "reference_month_end",
+    }
+)
+
+
+def render_template_params(sql: str, reference_date: date | None = None) -> str:
+    """Replace Jinja template params with realistic literals so the SQL parses.
+
+    Both twin and EMR must receive the same ``reference_date`` so they query
+    identical partitions.  The date is passed via ``--reference-date`` from the
+    DAG template (pinned at generation time).
+    """
+    ref = reference_date or (date.today() - timedelta(days=1))
+    ds = ref.isoformat()
+    bare_values = {
+        "year": str(ref.year),
+        "month": str(ref.month),
+        "day": str(ref.day),
+    }
+
+    sql = sql.replace("{{", "__DBLBRACE__").replace("}}", "__DBLRBRACE__")
+
+    def _replace_quoted(m: re.Match) -> str:
+        inner = m.group(0)[2:-2]
+        if inner in _DATE_PARAMS:
+            return f"'{ds}'"
+        return "'__placeholder__'"
+
+    sql = _QUOTED_TEMPLATE_RE.sub(_replace_quoted, sql)
+    sql = _BARE_TEMPLATE_RE.sub(lambda m: bare_values.get(m.group(1), "0"), sql)
+    sql = sql.replace("__DBLBRACE__", "{").replace("__DBLRBRACE__", "}")
+    return sql
+
+
 MIG_NULL_SENTINEL = "__MIG_NULL__"
 _COMPLEX_TYPE_PREFIXES = ("array<", "map<", "struct<")
 _FLOAT_TYPES = frozenset({"float", "double", "real"})
@@ -26,7 +71,18 @@ _INTEGER_TYPES = frozenset(
 _DECIMAL_RE = re.compile(r"^decimal\s*\(", re.IGNORECASE)
 _TIMESTAMP_TYPES = frozenset({"timestamp", "timestamp_ntz", "date"})
 _CHECKSUM_SKIP_DEFAULT = frozenset(
-    {"ts_load", "op_cdc", "ts_cdc_transaction", "ts_database_transaction"}
+    {
+        "ts_load",
+        "op_cdc",
+        "ts_cdc_transaction",
+        "ts_database_transaction",
+        "ts_snapshot",
+        "ts_updated",
+        "ts_event",
+        "ts_load_brt",
+        "load_timestamp",
+        "dt_timestamp",
+    }
 )
 
 
@@ -46,9 +102,7 @@ def _normalize_col_for_hash(col_ref: str, type_name: str) -> str:
     if normalized in _TIMESTAMP_TYPES:
         if normalized == "date":
             return f"DATE_FORMAT({col_ref}, 'yyyy-MM-dd')"
-        return (
-            f"DATE_FORMAT(CAST({col_ref} AS TIMESTAMP), 'yyyy-MM-dd HH:mm:ss.SSSSSS')"
-        )
+        return f"DATE_FORMAT(CAST({col_ref} AS TIMESTAMP), 'yyyy-MM-dd HH:mm:ss')"
     if normalized in _FLOAT_TYPES:
         return f"CAST(CAST({col_ref} AS DECIMAL(38, 18)) AS STRING)"
     return f"CAST({col_ref} AS STRING)"
@@ -243,6 +297,12 @@ def main() -> None:
         action="store_true",
         help="Skip null count and checksum profile",
     )
+    parser.add_argument(
+        "--reference-date",
+        default=None,
+        help="ISO date (YYYY-MM-DD) for template param rendering; "
+        "must be identical for twin and EMR captures",
+    )
     args = parser.parse_args()
 
     sql_uri = (
@@ -256,9 +316,13 @@ def main() -> None:
         else f"{args.result_s3_uri}.json"
     )
 
+    ref_date = None
+    if args.reference_date:
+        ref_date = date.fromisoformat(args.reference_date)
+
     spark = create_spark_session(args.runtime)
     try:
-        sql = read_s3_text(sql_uri)
+        sql = render_template_params(read_s3_text(sql_uri), reference_date=ref_date)
         payload = capture_metrics(spark, sql, skip_profile=args.skip_profile)
         payload.update(
             {

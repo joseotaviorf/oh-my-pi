@@ -14,20 +14,8 @@ import sqlglot
 from sqlglot import exp, transpile
 from sqlglot.errors import ParseError
 
-TEMPLATE_PARAMS = [
-    "load_start_date",
-    "load_end_date",
-    "environment",
-    "bucket",
-    "dag_name",
-    "schema",
-    "table_name",
-    "partitions",
-]
-
-_TEMPLATE_PARAM_RE = re.compile(
-    r"\{(" + "|".join(re.escape(p) for p in TEMPLATE_PARAMS) + r")\}"
-)
+_TEMPLATE_RE = re.compile(r"\{([a-z_][a-z0-9_]*)\}")
+_GET_JSON_OBJECT_RE = re.compile(r"\bGET_JSON_OBJECT\b", re.IGNORECASE)
 
 CRITICAL_PATTERN = re.compile(
     r"\bQUALIFY\b"
@@ -107,15 +95,52 @@ class DatabricksToSparkTranspiler:
 
     def _protect_template_params(self, sql: str) -> str:
         sql = sql.replace("{{", "__DBLBRACE__").replace("}}", "__DBLRBRACE__")
-        sql = _TEMPLATE_PARAM_RE.sub(r"__TMPL_\1__", sql)
+        sql = _TEMPLATE_RE.sub(lambda m: f"__TMPL_{m.group(1).upper()}__", sql)
         return sql
 
     def _restore_template_params(self, sql: str) -> str:
-        sql = re.sub(r"__TMPL_(\w+)__", r"{\1}", sql)
+        sql = re.sub(
+            r"__TMPL_([A-Z0-9_]+)__", lambda m: "{" + m.group(1).lower() + "}", sql
+        )
         sql = sql.replace("__DBLBRACE__", "{{").replace("__DBLRBRACE__", "}}")
         return sql
 
-    def transpile_sql(self, sql: str) -> TranspileResult:
+    def _protect_json_paths(self, sql: str) -> str:
+        return _GET_JSON_OBJECT_RE.sub("__PROTECTED_GJO__", sql)
+
+    def _restore_json_paths(self, sql: str) -> str:
+        return sql.replace("__PROTECTED_GJO__", "GET_JSON_OBJECT")
+
+    def _fix_qualify_outer_refs(self, tree: sqlglot.Expression) -> sqlglot.Expression:
+        """Strip leaked inner-alias qualifiers from QUALIFY-generated _t wrappers."""
+        for select in tree.find_all(exp.Select):
+            from_clause = select.args.get("from")
+            if not from_clause:
+                continue
+            sq = from_clause.this
+            if not isinstance(sq, exp.Subquery) or sq.alias != "_t":
+                continue
+            joins = select.args.get("joins")
+            if joins:
+                continue
+            where = select.args.get("where")
+            if not where:
+                continue
+            for col in where.find_all(exp.Column):
+                if not col.table or col.table == "_t":
+                    continue
+                parent = col.parent
+                in_nested = False
+                while parent is not where:
+                    if isinstance(parent, exp.Subquery):
+                        in_nested = True
+                        break
+                    parent = parent.parent
+                if not in_nested:
+                    col.set("table", None)
+        return tree
+
+    def transpile_sql(self, sql: str, *, force: bool = False) -> TranspileResult:
         result = TranspileResult(original=sql)
 
         if not sql.strip():
@@ -123,13 +148,14 @@ class DatabricksToSparkTranspiler:
             return result
 
         findings = needs_transpilation(sql)
-        if not findings:
+        if not findings and not force:
             result.transpiled = sql
             result.skipped = True
             return result
 
         result.construct_warnings = findings
         protected = self._protect_template_params(sql)
+        protected = self._protect_json_paths(protected)
 
         try:
             transpiled_parts = transpile(
@@ -154,6 +180,7 @@ class DatabricksToSparkTranspiler:
             for part in transpiled_parts:
                 tree = sqlglot.parse_one(part, dialect=self.TARGET_DIALECT)
                 tree = self._fix_datediff(tree)
+                tree = self._fix_qualify_outer_refs(tree)
                 fixed_parts.append(tree.sql(dialect=self.TARGET_DIALECT, pretty=True))
         except ParseError as e:
             result.error = f"Post-transpile parse error: {e}"
@@ -164,6 +191,7 @@ class DatabricksToSparkTranspiler:
 
         joined = ";\n".join(fixed_parts)
         joined = self._apply_post_processing(joined)
+        joined = self._restore_json_paths(joined)
         restored = self._restore_template_params(joined)
 
         if sql.endswith("\n") and not restored.endswith("\n"):
@@ -173,14 +201,16 @@ class DatabricksToSparkTranspiler:
         result.changed = restored != sql
         return result
 
-    def transpile_file(self, file_path: str, dry_run: bool = False) -> TranspileResult:
+    def transpile_file(
+        self, file_path: str, dry_run: bool = False, *, force: bool = False
+    ) -> TranspileResult:
         try:
             with open(file_path, encoding="utf-8") as f:
                 original = f.read()
         except FileNotFoundError:
             return TranspileResult(original="", error=f"File not found: {file_path}")
 
-        result = self.transpile_sql(original)
+        result = self.transpile_sql(original, force=force)
 
         if not dry_run and result.transpiled is not None and result.changed:
             with open(file_path, "w", encoding="utf-8") as f:

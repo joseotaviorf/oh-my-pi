@@ -5,7 +5,7 @@ WITH app_205027_referral_form_events AS (
     1 AS rule_num,
     'referral' AS rule,
     country AS user_country,
-    GET_JSON_OBJECT(user_properties, country) AS country_code,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     ts_event,
     utm_campaign,
     utm_medium,
@@ -28,7 +28,7 @@ WITH app_205027_referral_form_events AS (
     1 AS rule_num,
     'referral' AS rule,
     country AS user_country,
-    GET_JSON_OBJECT(user_properties, country) AS country_code,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     ts_event,
     utm_campaign,
     utm_medium,
@@ -51,7 +51,7 @@ WITH app_205027_referral_form_events AS (
     4 AS rule_num,
     'formfield' AS rule,
     country AS user_country,
-    GET_JSON_OBJECT(user_properties, country) AS country_code,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     ts_event,
     utm_campaign,
     utm_medium,
@@ -74,7 +74,7 @@ WITH app_205027_referral_form_events AS (
     4 AS rule_num,
     'formfield' AS rule,
     country AS user_country,
-    GET_JSON_OBJECT(user_properties, country) AS country_code,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     ts_event,
     utm_campaign,
     utm_medium,
@@ -97,7 +97,7 @@ WITH app_205027_referral_form_events AS (
     4 AS rule_num,
     'formfield' AS rule,
     country AS user_country,
-    GET_JSON_OBJECT(user_properties, country) AS country_code,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     ts_event,
     utm_campaign,
     utm_medium,
@@ -115,26 +115,26 @@ WITH app_205027_referral_form_events AS (
     AND year >= YEAR(TO_DATE(CURRENT_DATE - INTERVAL '2' YEAR))
 ), app_183047_intro_page_viewed_events AS (
   SELECT
-    CAST(GET_JSON_OBJECT(event_properties, lead_id) AS BIGINT) AS id_lead,
+    CAST(GET_JSON_OBJECT(event_properties, '$.lead_id') AS BIGINT) AS id_lead,
     id_device,
     5 AS rule_num,
     'opr' AS rule,
     country AS user_country,
-    GET_JSON_OBJECT(user_properties, country) AS country_code,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     ts_event,
     up_utm_campaign AS utm_campaign,
     up_utm_medium AS utm_medium,
     up_utm_source AS utm_source,
     up_utm_content AS utm_content,
     up_utm_term AS utm_term,
-    CAST(GET_JSON_OBJECT(user_properties, platform) AS STRING) AS platform,
-    CAST(GET_JSON_OBJECT(user_properties, referring_domain) AS STRING) AS referring_domain,
+    CAST(GET_JSON_OBJECT(user_properties, '$.platform') AS STRING) AS platform,
+    CAST(GET_JSON_OBJECT(user_properties, '$.referring_domain') AS STRING) AS referring_domain,
     region,
     city,
     uuid
   FROM datalake_amplitude_clean.183047_intro_page_viewed_events
   WHERE
-    NOT GET_JSON_OBJECT(event_properties, lead_id) IS NULL
+    NOT GET_JSON_OBJECT(event_properties, '$.lead_id') IS NULL
     AND year >= YEAR(TO_DATE(CURRENT_DATE - INTERVAL '2' YEAR))
 ), app_183047_property_details_page_viewed_events AS (
   SELECT

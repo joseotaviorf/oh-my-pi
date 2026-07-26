@@ -2,10 +2,10 @@ WITH criticidade AS (
   SELECT
     id_ticket,
     CASE
-      WHEN NOT CAST(GET_JSON_OBJECT(custom_fields, ARRAY('Nova criticidade')) AS STRING) IS NULL
-      THEN CAST(GET_JSON_OBJECT(custom_fields, ARRAY('Nova criticidade')) AS STRING)
-      WHEN NOT CAST(GET_JSON_OBJECT(custom_fields, ARRAY('Criticidade')) AS STRING) IS NULL
-      THEN CAST(GET_JSON_OBJECT(custom_fields, ARRAY('Criticidade')) AS STRING)
+      WHEN NOT CAST(GET_JSON_OBJECT(custom_fields, '$["Nova criticidade"]') AS STRING) IS NULL
+      THEN CAST(GET_JSON_OBJECT(custom_fields, '$["Nova criticidade"]') AS STRING)
+      WHEN NOT CAST(GET_JSON_OBJECT(custom_fields, '$["Criticidade"]') AS STRING) IS NULL
+      THEN CAST(GET_JSON_OBJECT(custom_fields, '$["Criticidade"]') AS STRING)
       WHEN tags RLIKE 'triagem_automatica_comum'
       AND tags RLIKE 'resolve_iq_pp_autosservico_prestadorpp'
       THEN 'comum_criticidade'
@@ -15,8 +15,8 @@ WITH criticidade AS (
       WHEN tags RLIKE 'triagem_automatica_emergencial'
       AND tags RLIKE 'resolve_iq_pp_autosservico_prestadorpp'
       THEN 'emergencial_criticidade'
-      WHEN NOT CAST(GET_JSON_OBJECT(custom_fields, ARRAY('Classificação do atendimento (Tags)')) AS STRING) IS NULL
-      THEN CAST(GET_JSON_OBJECT(custom_fields, ARRAY('Classificação do atendimento (Tags)')) AS STRING)
+      WHEN NOT CAST(GET_JSON_OBJECT(custom_fields, '$["Classificação do atendimento (Tags)"]') AS STRING) IS NULL
+      THEN CAST(GET_JSON_OBJECT(custom_fields, '$["Classificação do atendimento (Tags)"]') AS STRING)
     END AS criticidade
   FROM datalake_repairs.ongoing_repair_tickets
 ), status_fup AS (

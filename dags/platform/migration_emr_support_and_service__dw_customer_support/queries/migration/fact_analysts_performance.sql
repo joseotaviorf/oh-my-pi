@@ -183,7 +183,7 @@ WITH recontact_data AS (
     LEFT JOIN datalake_customer_support.tickets AS t
       ON zes.id_ticket = t.id_ticket
     LEFT JOIN datalake_sale_offer.sale_offer AS eso
-      ON eso.id_offer = GET_JSON_OBJECT(t.custom_fields, ARRAY('[RC] ID Offer do Imóvel'))
+      ON eso.id_offer = GET_JSON_OBJECT(t.custom_fields, '$["[RC] ID Offer do Imóvel"]')
     WHERE
       zes.id_survey = '2f81495a1a142887'
       AND t.channel = 'whatsapp'

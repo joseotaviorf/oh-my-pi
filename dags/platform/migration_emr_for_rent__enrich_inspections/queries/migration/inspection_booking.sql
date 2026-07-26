@@ -8,7 +8,7 @@ WITH last_inspection_update AS (
     FROM datalake_inspection_services_clean.inspection_aud AS ia
   ) AS _t
   WHERE
-    ia.ts_updated = _w
+    ts_updated = _w
 ), last_appointment_update AS (
   SELECT
     *
@@ -19,7 +19,7 @@ WITH last_inspection_update AS (
     FROM datalake_inspection_services_clean.appointment AS a
   ) AS _t
   WHERE
-    a.ts_created = _w
+    ts_created = _w
 ), union_inspection_history AS (
   SELECT
     i.id_inspection,
@@ -30,15 +30,15 @@ WITH last_inspection_update AS (
     NULL AS id_appointment,
     i.id_contract,
     i.id_client_side,
-    GET_JSON_OBJECT(i.house, id) AS id_house,
-    GET_JSON_OBJECT(i.house, cityId) AS id_city,
-    LOWER(GET_JSON_OBJECT(i.house, city)) AS city_name,
-    GET_JSON_OBJECT(i.house, countryCode) AS country_code,
+    GET_JSON_OBJECT(i.house, '$.id') AS id_house,
+    GET_JSON_OBJECT(i.house, '$.cityId') AS id_city,
+    LOWER(GET_JSON_OBJECT(i.house, '$.city')) AS city_name,
+    GET_JSON_OBJECT(i.house, '$.countryCode') AS country_code,
     i.type AS inspection_type,
     'IS' AS source,
     i.status,
     CASE
-      WHEN GET_JSON_OBJECT(i.schedule, observation) = 'Local das chaves: Proprietário acompanha'
+      WHEN GET_JSON_OBJECT(i.schedule, '$.observation') = 'Local das chaves: Proprietário acompanha'
       THEN TRUE
       ELSE FALSE
     END AS has_owner_accompanying,

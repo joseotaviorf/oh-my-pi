@@ -56,9 +56,7 @@ WITH tasks AS (
     *
   FROM prev_tasks_full
   WHERE
-    year = STRUCT(year AS year)
-    AND month = STRUCT(month AS month)
-    AND day = STRUCT(day AS day)
+    year = {year} AND month = {month} AND day = {day}
 ), prev_max_realized_by_user AS (
   SELECT
     id_task,

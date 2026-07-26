@@ -44,7 +44,9 @@ WITH max_video_revision_by_house AS (
       COLLECT_LIST(
         REPLACE(
           TRIM(
-            LOWER(CAST(GET_JSON_OBJECT(p.metadata, description) AS STRING) /* extract json */)
+            LOWER(
+              CAST(GET_JSON_OBJECT(p.metadata, '$.description') AS STRING) /* extract json */
+            )
           ),
           ' ',
           '-'

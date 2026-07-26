@@ -64,7 +64,7 @@ WITH amplitude_data AS (
       lbc.business_context = 'SALE'
   ) AS _t
   WHERE
-    _w IS DISTINCT FROM lbc.status
+    _w IS DISTINCT FROM status
 ), status_changes AS (
   SELECT
     sk_sale_listing,

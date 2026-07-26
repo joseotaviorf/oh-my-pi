@@ -44,71 +44,80 @@ WITH greenseer_uniques_ranked AS (
   SELECT
     g.id_session,
     COALESCE(
-      GET_JSON_OBJECT(g.memory, legacy.user_data.user.id),
-      GET_JSON_OBJECT(g.memory, basic.user.id)
+      GET_JSON_OBJECT(g.memory, '$.legacy.user_data.user.id'),
+      GET_JSON_OBJECT(g.memory, '$.basic.user.id')
     ) AS id_user,
-    GET_JSON_OBJECT(g.memory, basic.user.contract.deeplink.contract_id) AS id_contract,
+    GET_JSON_OBJECT(g.memory, '$.basic.user.contract.deeplink.contract_id') AS id_contract,
     g.id_pipeline,
     j.id_content,
     j.fired_response,
-    NULLIF(GET_JSON_OBJECT(g.memory, predictions.intents.before_reception.intent), '') AS before_reception,
-    NULLIF(GET_JSON_OBJECT(g.memory, predictions.intents.after_reception.intent), '') AS after_reception,
-    GET_JSON_OBJECT(g.memory, basic.session.context_message) AS context_message,
-    GET_JSON_OBJECT(g.memory, basic.session.created_by_hsm) AS created_by_hsm,
-    GET_JSON_OBJECT(g.memory, business_rules.tags.added) AS tags,
-    GET_JSON_OBJECT(g.memory, basic.flags) AS flags,
+    NULLIF(GET_JSON_OBJECT(g.memory, '$.predictions.intents.before_reception.intent'), '') AS before_reception,
+    NULLIF(GET_JSON_OBJECT(g.memory, '$.predictions.intents.after_reception.intent'), '') AS after_reception,
+    GET_JSON_OBJECT(g.memory, '$.basic.session.context_message') AS context_message,
+    GET_JSON_OBJECT(g.memory, '$.basic.session.created_by_hsm') AS created_by_hsm,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added') AS tags,
+    GET_JSON_OBJECT(g.memory, '$.basic.flags') AS flags,
     CAST(COALESCE(
-      GET_JSON_OBJECT(g.memory, business_rules.more_help_required.no_answer_needed.value),
-      GET_JSON_OBJECT(g.memory, business_rules.more_help_required.before_reception.value),
-      GET_JSON_OBJECT(g.memory, business_rules.more_help_required.confirm_bypass_hsm.value)
+      GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.no_answer_needed.value'),
+      GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.before_reception.value'),
+      GET_JSON_OBJECT(g.memory, '$.business_rules.more_help_required.confirm_bypass_hsm.value')
     ) AS BOOLEAN) AS more_help_required,
     CAST(COALESCE(
-      GET_JSON_OBJECT(g.memory, business_rules.problem_solved_required.after_reception.value),
-      GET_JSON_OBJECT(g.memory, business_rules.problem_solved_required.direct_answer.value)
+      GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.after_reception.value'),
+      GET_JSON_OBJECT(g.memory, '$.business_rules.problem_solved_required.direct_answer.value')
     ) AS BOOLEAN) AS problem_solved,
     COALESCE(
-      NULLIF(GET_JSON_OBJECT(g.memory, business_rules.menu_taxonomies.selected_taxonomy), ''),
-      NULLIF(GET_JSON_OBJECT(g.memory, business_rules.confused_class.selected_theme_detail), ''),
       NULLIF(
-        GET_JSON_OBJECT(g.memory, business_rules.menu_theme_details.selected_theme_detail),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_taxonomies.selected_taxonomy'),
         ''
       ),
-      NULLIF(GET_JSON_OBJECT(g.memory, business_rules.theme_details.predicted_theme_detail), '')
+      NULLIF(
+        GET_JSON_OBJECT(g.memory, '$.business_rules.confused_class.selected_theme_detail'),
+        ''
+      ),
+      NULLIF(
+        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_theme_details.selected_theme_detail'),
+        ''
+      ),
+      NULLIF(
+        GET_JSON_OBJECT(g.memory, '$.business_rules.theme_details.predicted_theme_detail'),
+        ''
+      )
     ) AS response_key,
     (
       COALESCE(
-        GET_JSON_OBJECT(g.memory, business_rules.menu_taxonomies.message),
-        GET_JSON_OBJECT(g.memory, business_rules.confused_class.message),
-        GET_JSON_OBJECT(g.memory, business_rules.menu_theme_details.message),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_taxonomies.message'),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.confused_class.message'),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.menu_theme_details.message'),
         ''
       ) <> ''
     ) AS is_menu_available,
     CASE
       WHEN CONTAINS(
-        GET_JSON_OBJECT(g.memory, business_rules.tags.added),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added'),
         'bot_menu_automatic_selection_intent'
       )
       THEN 'bot_automatic_selection_intent'
       WHEN CONTAINS(
-        GET_JSON_OBJECT(g.memory, business_rules.tags.added),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added'),
         'bot_menu_automatic_selection_taxonomy'
       )
       THEN 'bot_menu_automatic_selection_taxonomy'
       WHEN CONTAINS(
-        GET_JSON_OBJECT(g.memory, business_rules.tags.added),
+        GET_JSON_OBJECT(g.memory, '$.business_rules.tags.added'),
         'bot_automatic_selection_theme_detail'
       )
       THEN 'bot_menu_automatic_selection_taxonomy_v4'
       ELSE NULL
     END AS automatic_selection,
-    GET_JSON_OBJECT(g.memory, business_rules.journey_flow.retention_emma.emma_try) AS has_emma_try,
-    GET_JSON_OBJECT(g.memory, business_rules.journey_flow.retention_emma.has_retention_response) AS has_emma_response,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.emma_try') AS has_emma_try,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.has_retention_response') AS has_emma_response,
     CASE
       WHEN CONTAINS(g.current_state, 'RETENTION_EMMA')
       THEN 'has_emma_flow'
       ELSE NULL
     END AS has_emma_flow,
-    GET_JSON_OBJECT(g.memory, business_rules.journey_flow.retention_emma.fallback) AS has_fallback,
+    GET_JSON_OBJECT(g.memory, '$.business_rules.journey_flow.retention_emma.fallback') AS has_fallback,
     g.memory,
     g.current_state,
     g.ts_updated,
@@ -290,12 +299,12 @@ WITH greenseer_uniques_ranked AS (
     ON sr.id_session = gs.id_session
 ), surveys_fup AS (
   SELECT
-    GET_JSON_OBJECT(custom_attributes, id_origin) AS id_session,
+    GET_JSON_OBJECT(custom_attributes, '$.id_origin') AS id_session,
     id_survey,
     id_answer
   FROM datalake_satisfaction_rating.chat_fup_surveys
   WHERE
-    NOT GET_JSON_OBJECT(custom_attributes, id_origin) IS NULL
+    NOT GET_JSON_OBJECT(custom_attributes, '$.id_origin') IS NULL
 ), base_churn AS (
   SELECT DISTINCT
     g.id_user,
@@ -352,19 +361,19 @@ WITH greenseer_uniques_ranked AS (
       COALESCE(
         MAP_KEYS(
           FROM_JSON(
-            GET_JSON_OBJECT(memory, business_rules.menu_taxonomies.options),
+            GET_JSON_OBJECT(memory, '$.business_rules.menu_taxonomies.options'),
             'map<string, struct<name:string,class:string,score:double>>'
           )
         ),
         MAP_KEYS(
           FROM_JSON(
-            GET_JSON_OBJECT(memory, business_rules.menu_confused_class.options),
+            GET_JSON_OBJECT(memory, '$.business_rules.menu_confused_class.options'),
             'map<string, struct<name:string,class:string,score:double>>'
           )
         ),
         MAP_KEYS(
           FROM_JSON(
-            GET_JSON_OBJECT(memory, business_rules.menu_theme_details.options),
+            GET_JSON_OBJECT(memory, '$.business_rules.menu_theme_details.options'),
             'map<string, struct<name:string,class:string,score:double>>'
           )
         )
@@ -375,9 +384,9 @@ WITH greenseer_uniques_ranked AS (
         ELEMENT_AT(
           ARRAY(
             COALESCE(
-              GET_JSON_OBJECT(memory, business_rules.menu_taxonomies.raw_answers),
-              GET_JSON_OBJECT(memory, business_rules.menu_confused_class.raw_answers),
-              GET_JSON_OBJECT(memory, business_rules.menu_theme_details.raw_answers)
+              GET_JSON_OBJECT(memory, '$.business_rules.menu_taxonomies.raw_answers'),
+              GET_JSON_OBJECT(memory, '$.business_rules.menu_confused_class.raw_answers'),
+              GET_JSON_OBJECT(memory, '$.business_rules.menu_theme_details.raw_answers')
             )
           ),
           -1
@@ -435,45 +444,60 @@ WITH greenseer_uniques_ranked AS (
     gs.has_journey_flow_response,
     gs.has_fallback,
     CASE
-      WHEN GET_JSON_OBJECT(gs.memory, basic.session.number_interactions) IS NULL
+      WHEN GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions') IS NULL
       THEN 0
-      ELSE CAST(GET_JSON_OBJECT(gs.memory, basic.session.number_interactions) AS DECIMAL)
+      ELSE CAST(GET_JSON_OBJECT(gs.memory, '$.basic.session.number_interactions') AS DECIMAL)
     END AS number_chat_interactions,
-    GET_JSON_OBJECT(gs.memory, predictions.with_context) AS model_with_context,
-    GET_JSON_OBJECT(gs.memory, predictions.no_context) AS model_no_context,
-    GET_JSON_OBJECT(gs.memory, predictions.greeting) AS model_greeting,
-    GET_JSON_OBJECT(gs.memory, predictions.no_answer_needed) AS model_no_answer_needed,
+    GET_JSON_OBJECT(gs.memory, '$.predictions.with_context') AS model_with_context,
+    GET_JSON_OBJECT(gs.memory, '$.predictions.no_context') AS model_no_context,
+    GET_JSON_OBJECT(gs.memory, '$.predictions.greeting') AS model_greeting,
+    GET_JSON_OBJECT(gs.memory, '$.predictions.no_answer_needed') AS model_no_answer_needed,
     gs.before_reception,
     gs.after_reception,
-    GET_JSON_OBJECT(gs.memory, basic.session.last_hsm.type) AS last_hsm_type,
-    CAST(GET_JSON_OBJECT(gs.memory, basic.session.last_hsm.secs_since) AS FLOAT) AS secs_since_last_hsm,
+    GET_JSON_OBJECT(gs.memory, '$.basic.session.last_hsm.type') AS last_hsm_type,
+    CAST(GET_JSON_OBJECT(gs.memory, '$.basic.session.last_hsm.secs_since') AS FLOAT) AS secs_since_last_hsm,
     gs.automatic_selection,
     CASE WHEN gs.current_state LIKE '%CSAT%' THEN TRUE ELSE FALSE END AS has_questionnaire_sent,
     CASE
-      WHEN CONTAINS(GET_JSON_OBJECT(gs.memory, business_rules.tags.added), 'bot_bypass_triage_hsm') <> TRUE
+      WHEN CONTAINS(
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
+        'bot_bypass_triage_hsm'
+      ) <> TRUE
       AND CONTAINS(
-        GET_JSON_OBJECT(gs.memory, business_rules.tags.added),
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
         'bot_bypass_triage_partners'
       ) <> TRUE
-      OR CONTAINS(GET_JSON_OBJECT(gs.memory, business_rules.tags.added), 'bot_bypass_triage_hsm') IS NULL
+      OR CONTAINS(
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
+        'bot_bypass_triage_hsm'
+      ) IS NULL
       AND CONTAINS(
-        GET_JSON_OBJECT(gs.memory, business_rules.tags.added),
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
         'bot_bypass_triage_partners'
       ) <> TRUE
-      OR CONTAINS(GET_JSON_OBJECT(gs.memory, business_rules.tags.added), 'bot_bypass_triage_hsm') <> TRUE
+      OR CONTAINS(
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
+        'bot_bypass_triage_hsm'
+      ) <> TRUE
       AND CONTAINS(
-        GET_JSON_OBJECT(gs.memory, business_rules.tags.added),
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
         'bot_bypass_triage_partners'
       ) IS NULL
-      OR CONTAINS(GET_JSON_OBJECT(gs.memory, business_rules.tags.added), 'bot_bypass_triage_hsm') IS NULL
+      OR CONTAINS(
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
+        'bot_bypass_triage_hsm'
+      ) IS NULL
       AND CONTAINS(
-        GET_JSON_OBJECT(gs.memory, business_rules.tags.added),
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
         'bot_bypass_triage_partners'
       ) IS NULL
       THEN FALSE
-      WHEN CONTAINS(GET_JSON_OBJECT(gs.memory, business_rules.tags.added), 'bot_bypass_triage_hsm') = TRUE
+      WHEN CONTAINS(
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
+        'bot_bypass_triage_hsm'
+      ) = TRUE
       OR CONTAINS(
-        GET_JSON_OBJECT(gs.memory, business_rules.tags.added),
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.tags.added'),
         'bot_bypass_triage_partners'
       ) = TRUE
       THEN TRUE
@@ -481,7 +505,7 @@ WITH greenseer_uniques_ranked AS (
     END AS has_valid_hsm_bypass,
     SIZE(
       FROM_JSON(
-        GET_JSON_OBJECT(gs.memory, business_rules.context_detection_attempts),
+        GET_JSON_OBJECT(gs.memory, '$.business_rules.context_detection_attempts'),
         'array<map<string, map<string, double>>>'
       )
     ) AS context_identification_tentatives,

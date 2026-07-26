@@ -8,9 +8,9 @@ WITH task_resolution_ranking AS (
   FROM datalake_crm_tasks_resolution.tasks_resolution_history
   WHERE
     action_type IN ('RESOLVE', 'REALIZE', 'FINISH', 'DISCARD')
-    AND year = STRUCT(year AS year)
-    AND month = STRUCT(month AS month)
-    AND day = STRUCT(day AS day)
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}
 ), tasks_max_date AS (
   SELECT
     id,
@@ -58,6 +58,4 @@ LEFT JOIN task_resolution_ranking AS tr
   AND tr.id_workgroup = COALESCE(t.id_workgroup, -1)
   AND tr.ranking = 1
 WHERE
-  t.year = STRUCT(year AS year)
-  AND t.month = STRUCT(month AS month)
-  AND t.day = STRUCT(day AS day)
+  t.year = {year} AND t.month = {month} AND t.day = {day}

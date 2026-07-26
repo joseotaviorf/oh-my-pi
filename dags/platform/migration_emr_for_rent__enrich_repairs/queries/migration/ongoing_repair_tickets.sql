@@ -142,7 +142,7 @@ WITH ticket_history_base AS (
     FROM datalake_repairs_clean.repair_request AS rr
     WHERE
       (
-        NOT CAST(GET_JSON_OBJECT(rr.owner_approval, approved) AS STRING) IS NULL
+        NOT CAST(GET_JSON_OBJECT(rr.owner_approval, '$.approved') AS STRING) IS NULL
       )
       AND CAST(rr.ts_created AS DATE) >= CURRENT_DATE - INTERVAL '1' YEAR
       AND NOT rr.id_third_party_crm_ticket_external IS NULL
@@ -284,7 +284,7 @@ FROM (
   SELECT
     tc.id_ticket,
     REPLACE(
-      CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), ARRAY('Ticket do contato')) AS STRING),
+      CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Ticket do contato"]') AS STRING),
       '#',
       ''
     ) AS id_contact_ticket,

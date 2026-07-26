@@ -222,7 +222,7 @@ SELECT
   c.guarantee_type,
   c.type,
   c.status,
-  COALESCE(GET_JSON_OBJECT(c.contract_rent_model, rentalAdministrator), 'QUINTOANDAR') AS rental_administrator,
+  COALESCE(GET_JSON_OBJECT(c.contract_rent_model, '$.rentalAdministrator'), 'QUINTOANDAR') AS rental_administrator,
   c.paying_condo,
   c.responsible_for_condo,
   c.paying_iptu,

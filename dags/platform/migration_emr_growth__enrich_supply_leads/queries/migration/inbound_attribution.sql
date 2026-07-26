@@ -1,10 +1,10 @@
 WITH inbound_leads AS (
   SELECT
     hl.id_lead_ebdb,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, taskId) AS STRING) AS id_task,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, aiCoreSessionId) AS STRING) AS id_ai_core_session,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, origin) AS STRING) AS origin,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, ctwaClid) AS STRING) AS ctwa_clid,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.taskId') AS STRING) AS id_task,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.aiCoreSessionId') AS STRING) AS id_ai_core_session,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) AS origin,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.ctwaClid') AS STRING) AS ctwa_clid,
     REGEXP_EXTRACT(p.phone_number, '[0-9]+', 0) AS phone_number,
     amd.ts_created
   FROM datalake_rene_descartes_clean.house_lead AS hl
@@ -15,17 +15,17 @@ WITH inbound_leads AS (
   WHERE
     1 = 1
     AND CAST(amd.ts_created AS DATE) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
-    AND CAST(GET_JSON_OBJECT(amd.acquisition_campaign, origin) AS STRING) IN ('Inbound', 'OwnerConversionPWA', 'Isaias')
+    AND CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) IN ('Inbound', 'OwnerConversionPWA', 'Isaias')
 ), support_sessions AS (
   SELECT
     s.id AS id_session,
     s.source_environment,
     s.department,
     REGEXP_EXTRACT(COALESCE(s.user_phone, GET_JSON_OBJECT(s.user_data, '$.user_phone')), '[0-9]+', 0) AS phone_number,
-    GET_JSON_OBJECT(s.metadata, extra_params.ctwa_clid) AS ctwa_clid,
-    GET_JSON_OBJECT(s.metadata, extra_params.referral_source_id) AS id_source_ctwa,
-    GET_JSON_OBJECT(s.metadata, extra_params.referral_source_url) AS url_source_ctwa,
-    GET_JSON_OBJECT(s.metadata, extra_params.referral_source_type) AS type_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') AS ctwa_clid,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id') AS id_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url') AS url_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type') AS type_source_ctwa,
     s.ts_created,
     s.ts_updated
   FROM datalake_sauron_clean.session AS s
@@ -45,10 +45,10 @@ WITH inbound_leads AS (
     s.source_env AS source_environment,
     s.department,
     REGEXP_EXTRACT(COALESCE(s.user_phone, GET_JSON_OBJECT(s.user_data, '$.user_phone')), '[0-9]+', 0) AS phone_number,
-    GET_JSON_OBJECT(s.metadata, extra_params.ctwa_clid) AS ctwa_clid,
-    GET_JSON_OBJECT(s.metadata, extra_params.referral_source_id) AS id_source_ctwa,
-    GET_JSON_OBJECT(s.metadata, extra_params.referral_source_url) AS url_source_ctwa,
-    GET_JSON_OBJECT(s.metadata, extra_params.referral_source_type) AS type_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.ctwa_clid') AS ctwa_clid,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_id') AS id_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_url') AS url_source_ctwa,
+    GET_JSON_OBJECT(s.metadata, '$.extra_params.referral_source_type') AS type_source_ctwa,
     s.ts_created,
     s.ts_updated
   FROM datalake_support_session_service_clean.support_session AS s

@@ -61,7 +61,7 @@ WITH booking_status AS (
       b_aud.status = 'Cancelado' AND b_aud.mod_status = 1
   ) AS _t
   WHERE
-    _w = b_aud.REV
+    _w = REV
 ), canceled_date AS (
   SELECT
     mcd.id_booking,

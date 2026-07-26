@@ -22,7 +22,7 @@ WITH approval AS (
       r.mod_is_approved IS TRUE
   ) AS _t
   WHERE
-    r.ts_updated = _w
+    ts_updated = _w
 ), count_approval AS (
   SELECT
     id_assessment,

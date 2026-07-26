@@ -282,5 +282,5 @@ SELECT
   YEAR(TO_DATE(month_start)) AS year
 FROM aux
 WHERE
-  YEAR(TO_DATE(month_start)) = STRUCT(year AS year)
-  AND MONTH(TO_DATE(month_start)) = STRUCT(month AS month)
+  YEAR(TO_DATE(month_start)) = {year}
+  AND MONTH(TO_DATE(month_start)) = {month}

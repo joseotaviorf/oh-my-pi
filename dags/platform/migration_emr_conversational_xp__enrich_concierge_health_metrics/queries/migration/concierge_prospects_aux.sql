@@ -22,7 +22,7 @@ WITH prospects AS (
   WHERE
     p.event_name IN ('USER FIRST ACTIVATION', 'USER RECOVERY', 'USER RECOVERY IN OTHER CITY GROUP', 'USER CHURN') /* These events indicate activation of the user (i.e. started a flow with a VB or DO) and the churn. */
     AND p.flow_order = 1 /* Selecting the first event in that flow which is the combination of sk_prospect + sk_house. */
-    AND p.ts_event BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_120 AS days_past_120) * -1) AND CAST('{end_date}' AS DATE) /* We are going further back in time for the prospect events to ensure that at moment of concierge contact the user was not previously an active prospect. */
+    AND p.ts_event BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_120} * -1) AND CAST('{end_date}' AS DATE) /* We are going further back in time for the prospect events to ensure that at moment of concierge contact the user was not previously an active prospect. */
 )
 SELECT
   id_user,
@@ -65,7 +65,7 @@ FROM (
     )
     AND CAST(p.ts_prospect_event AS DATE) <= c.ts_concierge_contact
   WHERE
-    MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 ) AS _t
 WHERE
   _w = 1

@@ -27,48 +27,54 @@ WITH contract_revision AS (
     SELECT
       id_contract,
       TO_TIMESTAMP(
-        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, signatureDate), 'T', ' '), 'Z', ''),
+        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, '$.signatureDate'), 'T', ' '), 'Z', ''),
         'yyyy-MM-dd HH:mm:ss'
       ) AS ts_signature,
       TO_TIMESTAMP(
-        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, startCharge), 'T', ' '), 'Z', ''),
+        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, '$.startCharge'), 'T', ' '), 'Z', ''),
         'yyyy-MM-dd HH:mm:ss'
       ) AS ts_charge_started,
       TO_TIMESTAMP(
-        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, endCharge), 'T', ' '), 'Z', ''),
+        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, '$.endCharge'), 'T', ' '), 'Z', ''),
         'yyyy-MM-dd HH:mm:ss'
       ) AS ts_charge_ended,
       TO_TIMESTAMP(
-        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, startPeriod), 'T', ' '), 'Z', ''),
+        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, '$.startPeriod'), 'T', ' '), 'Z', ''),
         'yyyy-MM-dd HH:mm:ss'
       ) AS ts_start_period,
       TO_TIMESTAMP(
-        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, endPeriod), 'T', ' '), 'Z', ''),
+        REPLACE(REPLACE(GET_JSON_OBJECT(contract_data, '$.endPeriod'), 'T', ' '), 'Z', ''),
         'yyyy-MM-dd HH:mm:ss'
       ) AS ts_end_period,
-      GET_JSON_OBJECT(contract_data, country) AS country,
-      GET_JSON_OBJECT(contract_data, version) AS contract_version,
-      GET_JSON_OBJECT(contract_data, guarantee) AS guarantee,
-      GET_JSON_OBJECT(contract_data, rentalAdministrator) AS rental_administrator,
-      GET_JSON_OBJECT(contract_data, landlordLegalPerson) AS landlord_legal_person,
-      CAST(GET_JSON_OBJECT(contract_data, landlordTransferFundsDay) AS INT) AS landlord_transfer_funds_day,
-      CAST(GET_JSON_OBJECT(contract_data, rentalPaidInAdvance) AS BOOLEAN) AS is_rental_paid_in_advance,
-      CAST(GET_JSON_OBJECT(contract_data, condominiumAmount) AS DECIMAL(10, 2)) AS condominium_amount,
-      CAST(GET_JSON_OBJECT(contract_data, homeInsuranceAmount) AS DECIMAL(10, 2)) AS home_insurance_amount,
-      CAST(GET_JSON_OBJECT(contract_data, brokerageFee) AS DECIMAL(10, 2)) AS brokerage_fee,
-      CAST(GET_JSON_OBJECT(contract_data, tenantServiceFee) AS DOUBLE) AS tenant_service_fee,
-      CAST(GET_JSON_OBJECT(contract_data, administrationFee) AS DOUBLE) AS admin_fee,
-      GET_JSON_OBJECT(contract_data, brokerageFeeBaseOn) AS brokerage_based_fee,
-      CAST(GET_JSON_OBJECT(contract_data, admFeeMinimumAmount) AS DECIMAL(10, 2)) AS min_admin_fee,
+      GET_JSON_OBJECT(contract_data, '$.country') AS country,
+      GET_JSON_OBJECT(contract_data, '$.version') AS contract_version,
+      GET_JSON_OBJECT(contract_data, '$.guarantee') AS guarantee,
+      GET_JSON_OBJECT(contract_data, '$.rentalAdministrator') AS rental_administrator,
+      GET_JSON_OBJECT(contract_data, '$.landlordLegalPerson') AS landlord_legal_person,
+      CAST(GET_JSON_OBJECT(contract_data, '$.landlordTransferFundsDay') AS INT) AS landlord_transfer_funds_day,
+      CAST(GET_JSON_OBJECT(contract_data, '$.rentalPaidInAdvance') AS BOOLEAN) AS is_rental_paid_in_advance,
+      CAST(GET_JSON_OBJECT(contract_data, '$.condominiumAmount') AS DECIMAL(10, 2)) AS condominium_amount,
+      CAST(GET_JSON_OBJECT(contract_data, '$.homeInsuranceAmount') AS DECIMAL(10, 2)) AS home_insurance_amount,
+      CAST(GET_JSON_OBJECT(contract_data, '$.brokerageFee') AS DECIMAL(10, 2)) AS brokerage_fee,
+      CAST(GET_JSON_OBJECT(contract_data, '$.tenantServiceFee') AS DOUBLE) AS tenant_service_fee,
+      CAST(GET_JSON_OBJECT(contract_data, '$.administrationFee') AS DOUBLE) AS admin_fee,
+      GET_JSON_OBJECT(contract_data, '$.brokerageFeeBaseOn') AS brokerage_based_fee,
+      CAST(GET_JSON_OBJECT(contract_data, '$.admFeeMinimumAmount') AS DECIMAL(10, 2)) AS min_admin_fee,
       ELEMENT_AT(
         ARRAY_SORT(
-          FROM_JSON(GET_JSON_OBJECT(contract_data, rentals), 'ARRAY<STRUCT<since:INT, amount:DOUBLE>>')
+          FROM_JSON(
+            GET_JSON_OBJECT(contract_data, '$.rentals'),
+            'ARRAY<STRUCT<since:INT, amount:DOUBLE>>'
+          )
         ),
         -1
       ).amount AS last_rental,
       ELEMENT_AT(
         ARRAY_SORT(
-          FROM_JSON(GET_JSON_OBJECT(contract_data, iptus), 'ARRAY<STRUCT<since:INT, amount:DOUBLE>>')
+          FROM_JSON(
+            GET_JSON_OBJECT(contract_data, '$.iptus'),
+            'ARRAY<STRUCT<since:INT, amount:DOUBLE>>'
+          )
         ),
         -1
       ).amount AS last_iptu,

@@ -16,9 +16,9 @@ WITH rent_sale_flow AS (
     NOT id_tenant_prospect IS NULL
     AND NOT id_house IS NULL
     AND (
-      ts_booking_created BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
-      OR ts_direct_offer_submitted BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
-      OR ts_contract_signed BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+      ts_booking_created BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
+      OR ts_direct_offer_submitted BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
+      OR ts_contract_signed BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
     )
   GROUP BY ALL
   UNION ALL
@@ -36,33 +36,33 @@ WITH rent_sale_flow AS (
     NOT id_buyer IS NULL
     AND NOT id_house IS NULL
     AND (
-      ts_first_booking_created BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
-      OR ts_first_offer_submitted BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
-      OR dt_sale_agreement_signed BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+      ts_first_booking_created BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
+      OR ts_first_offer_submitted BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
+      OR dt_sale_agreement_signed BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
     )
   GROUP BY ALL
 ), recs_impressions_actions AS (
   SELECT
-    GET_JSON_OBJECT(ids, id_user) AS id_user,
-    GET_JSON_OBJECT(ids, id_house) AS id_house,
-    GET_JSON_OBJECT(dimensions, business_context) AS business_context,
-    GET_JSON_OBJECT(metrics, click) = '1' AS is_rec_click,
-    GET_JSON_OBJECT(metrics, direct_offer) = '1' AS has_direct_offer,
-    GET_JSON_OBJECT(metrics, offer) = '1' AS has_offer,
-    GET_JSON_OBJECT(metrics, visit_booked) = '1' AS has_visit_booked,
-    GET_JSON_OBJECT(metrics, contract_signed) = '1' AS has_contract_signed,
-    GET_JSON_OBJECT(timestamps, ts_recommendation) AS ts_recommendation,
-    GET_JSON_OBJECT(timestamps, ts_direct_offer) AS ts_direct_offer,
-    GET_JSON_OBJECT(timestamps, ts_offer) AS ts_offer,
-    GET_JSON_OBJECT(timestamps, ts_visit_booked) AS ts_visit_booked,
-    GET_JSON_OBJECT(timestamps, ts_contract_signed) AS ts_contract_signed
+    GET_JSON_OBJECT(ids, '$.id_user') AS id_user,
+    GET_JSON_OBJECT(ids, '$.id_house') AS id_house,
+    GET_JSON_OBJECT(dimensions, '$.business_context') AS business_context,
+    GET_JSON_OBJECT(metrics, '$.click') = '1' AS is_rec_click,
+    GET_JSON_OBJECT(metrics, '$.direct_offer') = '1' AS has_direct_offer,
+    GET_JSON_OBJECT(metrics, '$.offer') = '1' AS has_offer,
+    GET_JSON_OBJECT(metrics, '$.visit_booked') = '1' AS has_visit_booked,
+    GET_JSON_OBJECT(metrics, '$.contract_signed') = '1' AS has_contract_signed,
+    GET_JSON_OBJECT(timestamps, '$.ts_recommendation') AS ts_recommendation,
+    GET_JSON_OBJECT(timestamps, '$.ts_direct_offer') AS ts_direct_offer,
+    GET_JSON_OBJECT(timestamps, '$.ts_offer') AS ts_offer,
+    GET_JSON_OBJECT(timestamps, '$.ts_visit_booked') AS ts_visit_booked,
+    GET_JSON_OBJECT(timestamps, '$.ts_contract_signed') AS ts_contract_signed
   FROM datalake_search.recs_impressions_processed
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_45 AS days_past_45) * -1) AND CAST('{end_date}' AS DATE)
-    AND GET_JSON_OBJECT(metrics, click) = '1'
+    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_45} * -1) AND CAST('{end_date}' AS DATE)
+    AND GET_JSON_OBJECT(metrics, '$.click') = '1'
     AND (
-      GET_JSON_OBJECT(metrics, direct_offer) = '1'
-      OR GET_JSON_OBJECT(metrics, visit_booked) = '1'
+      GET_JSON_OBJECT(metrics, '$.direct_offer') = '1'
+      OR GET_JSON_OBJECT(metrics, '$.visit_booked') = '1'
     ) /* filter users who clicked on a recommendation and did VB or DO */
   GROUP BY ALL
 ), rent_sale_flow_recs AS (

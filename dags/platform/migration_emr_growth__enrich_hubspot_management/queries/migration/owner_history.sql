@@ -13,6 +13,4 @@ SELECT
   day
 FROM datalake_hubspot_clean.owner
 WHERE
-  year = STRUCT(year AS year)
-  AND month = STRUCT(month AS month)
-  AND day = STRUCT(day AS day)
+  year = {year} AND month = {month} AND day = {day}

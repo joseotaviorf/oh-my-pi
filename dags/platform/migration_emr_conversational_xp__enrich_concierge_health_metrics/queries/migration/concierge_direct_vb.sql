@@ -7,29 +7,29 @@ WITH recent_concierge_messages AS (
     ts_message_sent
   FROM datalake_search.concierge_messages
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 ), langfuse_traces AS (
   SELECT
     id_trace,
     id_session
   FROM datalake_langfuse_clean.traces
   WHERE
-    CAST(ts_created AS DATE) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    CAST(ts_created AS DATE) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 ), langfuse_observations AS (
   SELECT
     id_trace,
-    REGEXP_EXTRACT(GET_JSON_OBJECT(output, answer), 'Visit code ([A-Z0-9]+)') AS visit_code
+    REGEXP_EXTRACT(GET_JSON_OBJECT(output, '$.answer'), 'Visit code ([A-Z0-9]+)') AS visit_code
   FROM datalake_langfuse_clean.observations
   WHERE
     name IN ('schedule_visit_node', 'schedule_visit_v1')
-    AND CAST(ts_started AS DATE) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    AND CAST(ts_started AS DATE) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 ), request_logs AS (
   SELECT
     id_trace,
     visit_code
   FROM datalake_request_logging_clean.visits
   WHERE
-    CAST(ts_request AS DATE) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    CAST(ts_request AS DATE) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 ), concierge_direct_vb_code AS (
   /* This CTE retrieves the visit code from the Langfuse traces (messages exchanged between user and concierge) that evoked schedule_visit_node. This node confirms the schedule/reschedule of a visit. With introduction of app 1.5, the visit_code are migrated to the request logging table. */
   SELECT DISTINCT
@@ -105,7 +105,7 @@ FROM (
   WHERE
     vsl.channel IN ('CONVERSATIONAL - WHATSAPP_CONCIERGE', 'CONVERSATIONAL - NATIVE_CONCIERGE')
     AND vsl.event_type IN ('VISIT_SCHEDULED', 'VISIT_RESCHEDULED')
-    AND vsl.ts_created BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    AND vsl.ts_created BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 ) AS _t
 WHERE
   _w = 1 /* If in the same message session there are many concierge_flow_types prior to the creation/change of the visit, it ties the visit to the last message. */

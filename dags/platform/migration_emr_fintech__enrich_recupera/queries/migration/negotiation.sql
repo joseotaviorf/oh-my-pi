@@ -281,9 +281,9 @@ WITH carta_campanha AS (
     collesction_customer_situation
   FROM datalake_recupera_clean.operational_records
   WHERE
-    year /* Filter the most recent records from operational_records since this table is a stack snapshot */ = STRUCT(year AS year)
-    AND month = STRUCT(month AS month)
-    AND day = STRUCT(day AS day)
+    year /* Filter the most recent records from operational_records since this table is a stack snapshot */ = {year}
+    AND month = {month}
+    AND day = {day}
 )
 SELECT DISTINCT
   a.id_creditor,

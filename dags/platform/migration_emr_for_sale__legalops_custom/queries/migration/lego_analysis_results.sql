@@ -17,7 +17,7 @@ WITH base AS (
     ts_analysis_started,
     ts_analysis_end,
     FROM_JSON(
-      GET_JSON_OBJECT(full_analysis, validation_results),
+      GET_JSON_OBJECT(full_analysis, '$.validation_results'),
       'array<struct<rule_id:string,status:string,assessments:array<struct<validation_id:string,confidence:string,subsection:string,assessment_type:string,assessment_status:string,assessment_target:string,assessment_consolidated_status:string>>>>'
     ) AS validation_results
   FROM base

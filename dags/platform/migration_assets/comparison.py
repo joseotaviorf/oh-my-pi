@@ -112,7 +112,6 @@ def _parse_decimal(value: Optional[str]) -> Decimal:
 def compare_null_counts(
     twin_profile: Dict[str, Any],
     emr_profile: Dict[str, Any],
-    row_count: int = 0,
 ) -> Tuple[bool, List[str], bool]:
     issues: List[str] = []
     has_warn = False
@@ -123,7 +122,7 @@ def compare_null_counts(
         emr_null = emr_cols.get(name, {}).get("null_count", 0)
         if twin_null == emr_null:
             continue
-        denominator = max(twin_null, emr_null, row_count, 1)
+        denominator = max(twin_null, emr_null, 1)
         delta_pct = abs(emr_null - twin_null) / denominator * 100.0
         if delta_pct > NULL_COUNT_TOLERANCE_PCT:
             issues.append(
@@ -235,9 +234,7 @@ def compare_table(
     twin_profile = twin_metric.get("profile")
     emr_profile = emr_metric.get("profile")
     if twin_profile and emr_profile:
-        null_ok, null_issues, null_warn = compare_null_counts(
-            twin_profile, emr_profile, row_count=max(twin_count, emr_count)
-        )
+        null_ok, null_issues, null_warn = compare_null_counts(twin_profile, emr_profile)
         null_match = null_ok
         profile_issues.extend(null_issues)
         if not null_ok:

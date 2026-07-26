@@ -80,7 +80,11 @@ SELECT
   CASE WHEN NOT tr.session_user IS NULL THEN TRUE ELSE FALSE END AS is_trino_user,
   CAST(b.month_start AS DATE) AS dt_reference_month_start,
   CAST(b.month_end AS DATE) AS dt_reference_month_end,
-  CASE WHEN LOWER('{is_backfilled_dimension_proxy}') = 'true' THEN TRUE ELSE FALSE END AS is_backfilled_dimension_proxy,
+  CASE
+    WHEN LOWER('{is_backfilled_dimension_proxy}') = 'true'
+    THEN TRUE
+    ELSE FALSE
+  END AS is_backfilled_dimension_proxy,
   CURRENT_TIMESTAMP() AS ts_load,
   YEAR(TO_DATE(b.month_start)) AS year,
   MONTH(TO_DATE(b.month_start)) AS month,

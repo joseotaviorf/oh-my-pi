@@ -106,7 +106,7 @@ WITH lpv AS (
       lbc.business_context = 'SALE'
   ) AS _t
   WHERE
-    _w IS DISTINCT FROM lbc.status
+    _w IS DISTINCT FROM status
 ), status_changes AS (
   SELECT
     id_sale_listing,

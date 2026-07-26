@@ -1,26 +1,26 @@
 WITH reservations_events AS (
   SELECT
     COALESCE(
-      GET_JSON_OBJECT(metadata, event_data.TaskAttributes.call_sid),
-      GET_JSON_OBJECT(metadata, event_data.TaskAttributes.callSid)
+      GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.call_sid'),
+      GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.callSid')
     ) AS id_call,
-    GET_JSON_OBJECT(metadata, event_data.TaskSid) AS id_task,
-    GET_JSON_OBJECT(metadata, event_data.ReservationSid) AS id_reservation,
+    GET_JSON_OBJECT(metadata, '$.event_data.TaskSid') AS id_task,
+    GET_JSON_OBJECT(metadata, '$.event_data.ReservationSid') AS id_reservation,
     COALESCE(
-      GET_JSON_OBJECT(metadata, event_data.WorkerSid),
-      GET_JSON_OBJECT(metadata, event_data.TaskAttributes.worker_sid)
+      GET_JSON_OBJECT(metadata, '$.event_data.WorkerSid'),
+      GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.worker_sid')
     ) AS id_agent,
     CASE
       WHEN event = 'reservation.created'
-      THEN GET_JSON_OBJECT(metadata, event_data.TaskQueueSid)
+      THEN GET_JSON_OBJECT(metadata, '$.event_data.TaskQueueSid')
     END AS id_queue,
     CASE
       WHEN event = 'reservation.created'
-      THEN GET_JSON_OBJECT(metadata, event_data.TaskQueueName)
+      THEN GET_JSON_OBJECT(metadata, '$.event_data.TaskQueueName')
     END AS queue_name,
     event,
-    GET_JSON_OBJECT(metadata, created_at) AS ts_event,
-    GET_JSON_OBJECT(metadata, event_data.Timestamp) AS ts_event_unix,
+    GET_JSON_OBJECT(metadata, '$.created_at') AS ts_event,
+    GET_JSON_OBJECT(metadata, '$.event_data.Timestamp') AS ts_event_unix,
     year,
     month,
     day
@@ -28,14 +28,14 @@ WITH reservations_events AS (
   WHERE
     provider = 'twilio'
     AND (
-      GET_JSON_OBJECT(metadata, event_data.WorkflowName) = 'Assign to Anyone'
-      OR GET_JSON_OBJECT(metadata, event_data.WorkflowName) = 'Assign to Flex'
+      GET_JSON_OBJECT(metadata, '$.event_data.WorkflowName') = 'Assign to Anyone'
+      OR GET_JSON_OBJECT(metadata, '$.event_data.WorkflowName') = 'Assign to Flex'
     )
     AND event LIKE 'reservation.%'
-    AND NOT GET_JSON_OBJECT(metadata, event_data.ReservationSid) IS NULL
-    AND year = STRUCT(year AS year)
-    AND month = STRUCT(month AS month)
-    AND day = STRUCT(day AS day)
+    AND NOT GET_JSON_OBJECT(metadata, '$.event_data.ReservationSid') IS NULL
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}
   GROUP BY
     1,
     2,
@@ -51,15 +51,15 @@ WITH reservations_events AS (
     12
 ), tasks_events AS (
   SELECT
-    GET_JSON_OBJECT(metadata, event_data.TaskAttributes.call_sid) AS id_call,
-    GET_JSON_OBJECT(metadata, event_data.TaskSid) AS id_task,
+    GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.call_sid') AS id_call,
+    GET_JSON_OBJECT(metadata, '$.event_data.TaskSid') AS id_task,
     NULL AS id_reservation,
     NULL AS id_agent,
     NULL AS id_queue,
     NULL AS queue_name,
     event,
-    GET_JSON_OBJECT(metadata, created_at) AS ts_event,
-    GET_JSON_OBJECT(metadata, event_data.Timestamp) AS ts_event_unix,
+    GET_JSON_OBJECT(metadata, '$.created_at') AS ts_event,
+    GET_JSON_OBJECT(metadata, '$.event_data.Timestamp') AS ts_event_unix,
     year,
     month,
     day
@@ -67,15 +67,15 @@ WITH reservations_events AS (
   WHERE
     provider = 'twilio'
     AND (
-      GET_JSON_OBJECT(metadata, event_data.WorkflowName) = 'Assign to Anyone'
-      OR GET_JSON_OBJECT(metadata, event_data.WorkflowName) = 'Assign to Flex'
+      GET_JSON_OBJECT(metadata, '$.event_data.WorkflowName') = 'Assign to Anyone'
+      OR GET_JSON_OBJECT(metadata, '$.event_data.WorkflowName') = 'Assign to Flex'
     )
     AND (
       event = 'task.created' OR event = 'task.wrapup'
     )
-    AND year = STRUCT(year AS year)
-    AND month = STRUCT(month AS month)
-    AND day = STRUCT(day AS day)
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}
   GROUP BY
     1,
     2,

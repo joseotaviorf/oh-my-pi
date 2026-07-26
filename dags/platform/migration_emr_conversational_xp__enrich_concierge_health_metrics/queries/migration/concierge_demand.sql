@@ -24,7 +24,7 @@ WITH visits AS (
     day
   FROM datalake_search.concierge_direct_vb
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
   UNION ALL
   SELECT
     id_user,
@@ -51,7 +51,7 @@ WITH visits AS (
     day
   FROM datalake_search.concierge_indirect_vb
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    MAKE_DATE(year, month, day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 ), prospect_activation_events AS (
   SELECT
     p.sk_prospect,
@@ -73,7 +73,7 @@ WITH visits AS (
   WHERE
     p.event_name IN ('USER FIRST ACTIVATION', 'USER RECOVERY', 'USER RECOVERY IN OTHER CITY GROUP')
     AND p.flow_order = 1
-    AND p.ts_event BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    AND p.ts_event BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 ), concierge_demand_ranked AS (
   SELECT
     COALESCE(m.id_user, v.id_user) AS id_user,
@@ -144,8 +144,8 @@ WITH visits AS (
       v.visit_event_type = 'VISIT_SCHEDULED' OR v.days_msg2vb = 0
     )
   WHERE
-    MAKE_DATE(m.year, m.month, m.day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
-    OR MAKE_DATE(v.year, v.month, v.day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) AND CAST('{end_date}' AS DATE)
+    MAKE_DATE(m.year, m.month, m.day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
+    OR MAKE_DATE(v.year, v.month, v.day) BETWEEN DATE_ADD(CAST('{start_date}' AS DATE), {days_past_30} * -1) AND CAST('{end_date}' AS DATE)
 )
 SELECT
   id_user,

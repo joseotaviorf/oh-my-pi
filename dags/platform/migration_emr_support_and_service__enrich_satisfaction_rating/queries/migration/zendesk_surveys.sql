@@ -17,7 +17,7 @@ WITH zendesk_users_contact AS (
       CAST(zuc.ts_updated AS DATE) <= CAST('{load_end_date}' AS DATE)
   ) AS _t
   WHERE
-    zuc.id_user_main = _w
+    id_user_main = _w
 )
 SELECT DISTINCT
   sr.id_satisfaction_rating AS id_answer,
@@ -33,9 +33,9 @@ SELECT DISTINCT
   CASE WHEN sr.score = 'bad' THEN 1 WHEN sr.score = 'good' THEN 5 ELSE NULL END AS satisfaction_score,
   'satisfaction evaluation' AS score_description,
   sr.ts_created AS ts_submitted,
-  STRUCT(year AS year) AS year,
-  STRUCT(month AS month) AS month,
-  STRUCT(day AS day) AS day
+  {year} AS year,
+  {month} AS month,
+  {day} AS day
 FROM datalake_zendesk_clean.satisfaction_ratings AS sr
 LEFT JOIN datalake_zendesk.tickets_current AS tfm
   ON tfm.id_ticket = sr.id_ticket

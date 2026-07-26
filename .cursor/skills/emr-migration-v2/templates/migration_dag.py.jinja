@@ -31,6 +31,7 @@ DOMAIN = "{{ domain }}"
 SOURCE_DAG_NAME = "{{ dag_name }}"
 DATASET_URI = "{{ emr_dataset_uri }}"
 RUN_PREFIX = "{{ run_prefix }}"
+REFERENCE_DATE = "{{ reference_date }}"
 RUNTIME = "emr"
 SQL_DIR_NAME = "migration"
 
@@ -148,6 +149,8 @@ with DAG(
                 SOURCE_DAG_NAME,
                 "--table-name",
                 "{{ table }}",
+                "--reference-date",
+                REFERENCE_DATE,
             ],
             execution_timeout_hours=2,
         )

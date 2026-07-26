@@ -7,28 +7,26 @@ WITH cte_tasks AS (
     ) AS json_metadata
   FROM datalake_crm_clean.tasks
   WHERE
-    year = STRUCT(year AS year)
-    AND month = STRUCT(month AS month)
-    AND day = STRUCT(day AS day)
+    year = {year} AND month = {month} AND day = {day}
 )
 SELECT
-  GET_JSON_OBJECT(REPLACE(id, '$', ''), oid) AS id,
+  GET_JSON_OBJECT(REPLACE(id, '$', ''), '$.oid') AS id,
   json_metadata.fluxoLocacaoId AS id_rent_flow,
   id_origin,
   id_assignee,
-  COALESCE(json_metadata.imovelId, id_house, GET_JSON_OBJECT(json_metadata.imovel, id)) AS id_house,
+  COALESCE(json_metadata.imovelId, id_house, GET_JSON_OBJECT(json_metadata.imovel, '$.id')) AS id_house,
   COALESCE(
     id_owner,
     json_metadata.proprietarioId,
-    GET_JSON_OBJECT(json_metadata.house, proprietarioId),
-    GET_JSON_OBJECT(json_metadata.imovel, proprietarioId),
-    GET_JSON_OBJECT(GET_JSON_OBJECT(json_metadata.contrato, imovel), proprietarioId)
+    GET_JSON_OBJECT(json_metadata.house, '$.proprietarioId'),
+    GET_JSON_OBJECT(json_metadata.imovel, '$.proprietarioId'),
+    GET_JSON_OBJECT(GET_JSON_OBJECT(json_metadata.contrato, '$.imovel'), '$.proprietarioId')
   ) AS id_owner,
   id_opened_by,
   COALESCE(
     json_metadata.destinatarioId,
     id_receiver,
-    GET_JSON_OBJECT(json_metadata.destinatario, id)
+    GET_JSON_OBJECT(json_metadata.destinatario, '$.id')
   ) AS id_receiver,
   COALESCE(id_negotiation, json_metadata.negociacaoId) AS id_negotiation,
   COALESCE(id_tenant, json_metadata.inquilinoId) AS id_tenant,
@@ -38,8 +36,12 @@ SELECT
   json_metadata.estadoId AS id_state,
   CAST(version AS INT) AS version,
   CAST(score_factor AS INT) AS score_factor,
-  REPLACE(COALESCE(receiver_name, GET_JSON_OBJECT(json_metadata.destinatario, nome)), ',', '') AS receiver_name,
-  GET_JSON_OBJECT(json_metadata.destinatario, label) AS receiver_label,
+  REPLACE(
+    COALESCE(receiver_name, GET_JSON_OBJECT(json_metadata.destinatario, '$.nome')),
+    ',',
+    ''
+  ) AS receiver_name,
+  GET_JSON_OBJECT(json_metadata.destinatario, '$.label') AS receiver_label,
   COALESCE(task_comment, json_metadata.comentario) AS task_comment,
   score,
   COALESCE(origin, json_metadata.origem) AS origin,
@@ -51,21 +53,21 @@ SELECT
   json_metadata.assunto AS subject,
   tags,
   CAST(is_resolved AS BOOLEAN) AS is_resolved,
-  CAST(GET_JSON_OBJECT(REPLACE(completed_date_object, '$', ''), date) AS TIMESTAMP) AS ts_completed,
-  CAST(GET_JSON_OBJECT(REPLACE(silenced_until_date_object, '$', ''), date) AS TIMESTAMP) AS ts_silenced_until,
-  CAST(GET_JSON_OBJECT(REPLACE(start_date_object, '$', ''), date) AS TIMESTAMP) AS ts_start,
+  CAST(GET_JSON_OBJECT(REPLACE(completed_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_completed,
+  CAST(GET_JSON_OBJECT(REPLACE(silenced_until_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_silenced_until,
+  CAST(GET_JSON_OBJECT(REPLACE(start_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_start,
   CAST(COALESCE(dt_visit, json_metadata.dataVisita) AS DATE) AS dt_visit,
   CAST(COALESCE(
-    GET_JSON_OBJECT(REPLACE(created_date_object, '$', ''), date),
+    GET_JSON_OBJECT(REPLACE(created_date_object, '$', ''), '$.date'),
     json_metadata.dataCriacao
   ) AS TIMESTAMP) AS ts_created,
-  CAST(GET_JSON_OBJECT(REPLACE(origin_date_object, '$', ''), date) AS TIMESTAMP) AS ts_origin,
+  CAST(GET_JSON_OBJECT(REPLACE(origin_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_origin,
   FROM_UNIXTIME(COALESCE(unix_fup / 1000, CAST(json_metadata.dataFup AS DOUBLE) / 1000)) AS ts_fup,
   year,
   month,
   day
 FROM cte_tasks AS crm
 LEFT JOIN datalake_gsheets_clean.crm_tasks_to_remove AS ct /* removing tasks generated in a production bug in the instant refund flow. */
-  ON ct.id_task = GET_JSON_OBJECT(REPLACE(crm.id, '$', ''), oid)
+  ON ct.id_task = GET_JSON_OBJECT(REPLACE(crm.id, '$', ''), '$.oid')
 WHERE
   ct.id_task IS NULL

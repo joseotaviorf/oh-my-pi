@@ -23,30 +23,30 @@ WITH sessions_filtered AS (
 ), dit_custom_fields AS (
   SELECT
     dit.sk_ticket,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('[CC] Causa raíz')) AS STRING) AS ss_motivo_acionamento,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Nº do PIAE no JIRA ')) AS STRING) AS N_Jira_privacy,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('[CC] - Assunto do Contato')) AS STRING) AS ss_assunto_contato,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["[CC] Causa raíz"]') AS STRING) AS ss_motivo_acionamento,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Nº do PIAE no JIRA "]') AS STRING) AS N_Jira_privacy,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["[CC] - Assunto do Contato"]') AS STRING) AS ss_assunto_contato,
     REPLACE(
-      CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Ofensor do Processo')) AS STRING),
+      CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Ofensor do Processo"]') AS STRING),
       '_ofensor_sub',
       ''
     ) AS ss_ofensor_processo,
     REPLACE(
-      CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Área de negócio')) AS STRING),
+      CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Área de negócio"]') AS STRING),
       '_ofensor',
       ''
     ) AS ss_area_negocio,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('[CC] - Assunto do Contato')) AS STRING) AS ss_area_ofensora,
-    REPLACE(CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Áreas')) AS STRING), '_area_5a', '') AS ss_area,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Tarefa aberta corretamente?')) AS STRING) AS ss_tarefa_aberta_corretamente,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Intermitência Condo')) AS STRING) AS intermitencia_condo,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Tipo de Cliente')) AS STRING) AS tipo_de_cliente,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('[HUB] Jornada')) AS STRING) AS jornada_hub,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('[CSI] Cliente - Conta Comigo')) AS STRING) AS customer_type_csi,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["[CC] - Assunto do Contato"]') AS STRING) AS ss_area_ofensora,
+    REPLACE(CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Áreas"]') AS STRING), '_area_5a', '') AS ss_area,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Tarefa aberta corretamente?"]') AS STRING) AS ss_tarefa_aberta_corretamente,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Intermitência Condo"]') AS STRING) AS intermitencia_condo,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Tipo de Cliente"]') AS STRING) AS tipo_de_cliente,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["[HUB] Jornada"]') AS STRING) AS jornada_hub,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["[CSI] Cliente - Conta Comigo"]') AS STRING) AS customer_type_csi,
     CAST(SPLIT_PART(SPLIT_PART(dit.custom_fields, 'Data da viagem ":"', 2), '"', 1) AS DATE) AS dt_viagem_chaves, /* Ajuste na lógica de extração de data manual do string custom_fields */
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Tipo de Demanda')) AS STRING) AS tipo_de_demanda,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Tipo de processo')) AS STRING) AS tipo_de_processo,
-    CAST(GET_JSON_OBJECT(dit.custom_fields, ARRAY('Has CSAT')) AS STRING) AS has_csat
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Tipo de Demanda"]') AS STRING) AS tipo_de_demanda,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Tipo de processo"]') AS STRING) AS tipo_de_processo,
+    CAST(GET_JSON_OBJECT(dit.custom_fields, '$["Has CSAT"]') AS STRING) AS has_csat
   FROM dw_customer_support.dim_ticket AS dit
   WHERE
     CAST(ts_created AS DATE) >= CAST('2024-01-01' AS DATE)

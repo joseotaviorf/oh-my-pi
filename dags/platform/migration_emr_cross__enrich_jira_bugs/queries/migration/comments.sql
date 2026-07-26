@@ -6,7 +6,7 @@ WITH issues AS (
   FROM (
     SELECT
       key AS id_issue,
-      GET_JSON_OBJECT(fields, comment.comments) AS comments,
+      GET_JSON_OBJECT(fields, '$.comment.comments') AS comments,
       MAKE_DATE(year, month, day) AS ts_load,
       ROW_NUMBER() OVER (PARTITION BY key ORDER BY MAKE_DATE(year, month, day) DESC) AS _w,
       key,
@@ -15,7 +15,7 @@ WITH issues AS (
       day
     FROM datalake_jira_clean.issues
     WHERE
-      CAST(GET_JSON_OBJECT(fields, project.id) AS INT) = 10400
+      CAST(GET_JSON_OBJECT(fields, '$.project.id') AS INT) = 10400
       AND MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
   ) AS _t
   WHERE

@@ -1,9 +1,9 @@
 WITH company_product AS (
   SELECT
     cp.id_company,
-    MAX(GET_JSON_OBJECT(cp.product_settings, bankingInformationUUId)) AS uuid_banking_information,
-    MAX(GET_JSON_OBJECT(cp.product_settings, integratorPartnerUUId)) AS uuid_integrator_partner,
-    MAX(GET_JSON_OBJECT(cp.product_settings, revenueShareUUId)) AS uuid_revenue_share,
+    MAX(GET_JSON_OBJECT(cp.product_settings, '$.bankingInformationUUId')) AS uuid_banking_information,
+    MAX(GET_JSON_OBJECT(cp.product_settings, '$.integratorPartnerUUId')) AS uuid_integrator_partner,
+    MAX(GET_JSON_OBJECT(cp.product_settings, '$.revenueShareUUId')) AS uuid_revenue_share,
     MAX(cp.id_product) = 33 AS is_company_asp,
     MAX(cp.id_product) = 32 AS is_company_ciq,
     MAX(cp.id_product) = 28 AS is_company_legal_person_rental_guarantee,

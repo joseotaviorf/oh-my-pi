@@ -189,7 +189,7 @@ as well as apply logic to check which listings are stranded in each category.
       AND ol.month_start = t.month_start
   ) AS _t
   WHERE
-    _w >= ol.month_start
+    _w >= month_start
 ), apply_hierarchy AS (
   /*
 Since we have checked which strandeds each listing is in, we will now apply the hierarchy.

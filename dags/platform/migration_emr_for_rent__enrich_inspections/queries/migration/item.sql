@@ -15,7 +15,7 @@ WITH item_type AS (
     FROM datalake_inspection_services_clean.item_type AS it
   ) AS _t
   WHERE
-    it.ts_updated = _w
+    ts_updated = _w
 )
 SELECT
   id_item,

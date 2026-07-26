@@ -96,7 +96,7 @@ def transpile_dag(
         table_result.needs_transpile = True
         table_result.findings = findings
 
-        result = transpiler.transpile_sql(original_sql)
+        result = transpiler.transpile_sql(original_sql, force=force_all)
         if result.error:
             table_result.error = result.error
             report.tables.append(table_result)

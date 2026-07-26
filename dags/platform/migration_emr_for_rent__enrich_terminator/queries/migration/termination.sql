@@ -1,7 +1,7 @@
 WITH raw_data AS (
   SELECT
     *,
-    GET_JSON_OBJECT(rescheduling_history, entries) AS entries
+    GET_JSON_OBJECT(rescheduling_history, '$.entries') AS entries
   FROM datalake_terminator_clean.termination
 ), expanded_entries AS (
   SELECT
@@ -13,8 +13,8 @@ WITH raw_data AS (
 ), first_td_ranked AS (
   SELECT
     id AS id_termination,
-    TO_DATE(GET_JSON_OBJECT(entry, fromVacancyDate)) AS original_dt_termination,
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY TO_TIMESTAMP(GET_JSON_OBJECT(entry, rescheduledAt), 'dd/MM/yyyy HH:mm:ss') ASC) AS rn
+    TO_DATE(GET_JSON_OBJECT(entry, '$.fromVacancyDate')) AS original_dt_termination,
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY TO_TIMESTAMP(GET_JSON_OBJECT(entry, '$.rescheduledAt'), 'dd/MM/yyyy HH:mm:ss') ASC) AS rn
   FROM expanded_entries
 ), first_td AS (
   SELECT DISTINCT
@@ -50,8 +50,8 @@ WITH raw_data AS (
     tfn.discount_percentage AS fee_discount_percentage,
     tfn.discount_value AS fee_discount_value,
     COALESCE(tfn.final_amount, tf.tenant_amount) AS fee_final_amount,
-    GET_JSON_OBJECT(tf.tenant_payment_method, installments) AS fee_number_of_installments,
-    GET_JSON_OBJECT(tf.tenant_payment_method, paymentOption) AS fee_payment_option,
+    GET_JSON_OBJECT(tf.tenant_payment_method, '$.installments') AS fee_number_of_installments,
+    GET_JSON_OBJECT(tf.tenant_payment_method, '$.paymentOption') AS fee_payment_option,
     tfn.status AS fee_negotiation_status,
     CASE WHEN COALESCE(tfn.final_amount, tf.tenant_amount) > 0 THEN TRUE ELSE FALSE END AS has_early_termination_fee,
     tf.is_fee_prior_notice,
@@ -240,7 +240,7 @@ WITH raw_data AS (
     t.source,
     t.status,
     t.feedback,
-    GET_JSON_OBJECT(t.feedback, reason) AS reason,
+    GET_JSON_OBJECT(t.feedback, '$.reason') AS reason,
     t.rescheduling_history,
     tw.current_step AS workflow_current_step,
     ln.fee_negotiation_status,

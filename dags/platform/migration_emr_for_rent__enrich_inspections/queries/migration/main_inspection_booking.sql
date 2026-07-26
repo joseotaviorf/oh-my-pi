@@ -15,7 +15,7 @@ WITH main_inspection_aud_sync AS (
     FROM datalake_inspection_services_clean.inspection_aud AS ia
   ) AS _t
   WHERE
-    ia.ts_updated = _w
+    ts_updated = _w
 ), main_exception AS (
   SELECT DISTINCT
     i.id AS id_inspection

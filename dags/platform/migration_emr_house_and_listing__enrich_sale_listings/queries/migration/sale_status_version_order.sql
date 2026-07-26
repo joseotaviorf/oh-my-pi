@@ -26,7 +26,7 @@ WITH lbc_aud AS (
   WHERE
     status IS DISTINCT FROM previous_status
     OR (
-      NOT lbc_aud.mod_status_closing IS NULL
+      NOT mod_status_closing IS NULL
       AND status_closing IS DISTINCT FROM previous_status_closing
     )
 ), house_aud AS (

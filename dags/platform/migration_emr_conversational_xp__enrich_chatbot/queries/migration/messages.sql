@@ -239,7 +239,7 @@ WITH ai_messages AS (
       ON amc.id_session_key = m.id_session_key
   ) AS _t
   WHERE
-    _w > COALESCE(amc.total_messages, 0)
+    _w > COALESCE(total_messages, 0)
 ), messages_w_users AS (
   SELECT DISTINCT
     m.id_message,

@@ -1,5 +1,5 @@
 {
-  "run_id": "03c62042-3e72-4dee-a98b-735452df845f",
+  "run_id": "3eda59b6-f7c0-480d-b2d4-b04eabef7d51",
   "scope_id": "for_rent__enrich_heimdall",
   "domain": "for_rent",
   "dag_name": "enrich_heimdall",
@@ -9,7 +9,7 @@
     "expenses",
     "ongoing_refund_requests"
   ],
-  "transpiled_count": 0,
-  "skipped_count": 4,
+  "transpiled_count": 1,
+  "skipped_count": 3,
   "failed_count": 0
 }

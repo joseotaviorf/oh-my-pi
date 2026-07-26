@@ -1,15 +1,15 @@
 WITH issues AS (
   SELECT
     key,
-    GET_JSON_OBJECT(fields, comment.comments) AS comments,
-    GET_JSON_OBJECT(fields, attachment) AS attachment,
-    GET_JSON_OBJECT(fields, assignee) AS assignee,
-    GET_JSON_OBJECT(fields, reporter) AS reporter,
-    GET_JSON_OBJECT(fields, creator) AS creator,
+    GET_JSON_OBJECT(fields, '$.comment.comments') AS comments,
+    GET_JSON_OBJECT(fields, '$.attachment') AS attachment,
+    GET_JSON_OBJECT(fields, '$.assignee') AS assignee,
+    GET_JSON_OBJECT(fields, '$.reporter') AS reporter,
+    GET_JSON_OBJECT(fields, '$.creator') AS creator,
     MAKE_DATE(year, month, day) AS ts_updated
   FROM datalake_jira_clean.issues
   WHERE
-    CAST(GET_JSON_OBJECT(fields, project.id) AS INT) = 10400
+    CAST(GET_JSON_OBJECT(fields, '$.project.id') AS INT) = 10400
     AND MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
 ), comment_author AS (
   SELECT
@@ -54,12 +54,12 @@ WITH issues AS (
 ), union_account AS (
   /* Assignee */
   SELECT
-    GET_JSON_OBJECT(assignee, accountId) AS id_account,
-    GET_JSON_OBJECT(assignee, displayName) AS name,
-    GET_JSON_OBJECT(assignee, emailAddress) AS email,
-    GET_JSON_OBJECT(assignee, timeZone) AS time_zone,
-    GET_JSON_OBJECT(assignee, accountType) AS account_type,
-    CAST(GET_JSON_OBJECT(assignee, active) AS BOOLEAN) AS is_active,
+    GET_JSON_OBJECT(assignee, '$.accountId') AS id_account,
+    GET_JSON_OBJECT(assignee, '$.displayName') AS name,
+    GET_JSON_OBJECT(assignee, '$.emailAddress') AS email,
+    GET_JSON_OBJECT(assignee, '$.timeZone') AS time_zone,
+    GET_JSON_OBJECT(assignee, '$.accountType') AS account_type,
+    CAST(GET_JSON_OBJECT(assignee, '$.active') AS BOOLEAN) AS is_active,
     ts_updated
   FROM issues
   WHERE
@@ -67,12 +67,12 @@ WITH issues AS (
   UNION ALL
   /* Reporter */
   SELECT
-    GET_JSON_OBJECT(reporter, accountId) AS id_account,
-    GET_JSON_OBJECT(reporter, displayName) AS name,
-    GET_JSON_OBJECT(reporter, emailAddress) AS email,
-    GET_JSON_OBJECT(reporter, timeZone) AS time_zone,
-    GET_JSON_OBJECT(reporter, accountType) AS account_type,
-    CAST(GET_JSON_OBJECT(reporter, active) AS BOOLEAN) AS is_active,
+    GET_JSON_OBJECT(reporter, '$.accountId') AS id_account,
+    GET_JSON_OBJECT(reporter, '$.displayName') AS name,
+    GET_JSON_OBJECT(reporter, '$.emailAddress') AS email,
+    GET_JSON_OBJECT(reporter, '$.timeZone') AS time_zone,
+    GET_JSON_OBJECT(reporter, '$.accountType') AS account_type,
+    CAST(GET_JSON_OBJECT(reporter, '$.active') AS BOOLEAN) AS is_active,
     ts_updated
   FROM issues
   WHERE
@@ -80,12 +80,12 @@ WITH issues AS (
   UNION ALL
   /* Creator */
   SELECT
-    GET_JSON_OBJECT(creator, accountId) AS id_account,
-    GET_JSON_OBJECT(creator, displayName) AS name,
-    GET_JSON_OBJECT(creator, emailAddress) AS email,
-    GET_JSON_OBJECT(creator, timeZone) AS time_zone,
-    GET_JSON_OBJECT(creator, accountType) AS account_type,
-    CAST(GET_JSON_OBJECT(creator, active) AS BOOLEAN) AS is_active,
+    GET_JSON_OBJECT(creator, '$.accountId') AS id_account,
+    GET_JSON_OBJECT(creator, '$.displayName') AS name,
+    GET_JSON_OBJECT(creator, '$.emailAddress') AS email,
+    GET_JSON_OBJECT(creator, '$.timeZone') AS time_zone,
+    GET_JSON_OBJECT(creator, '$.accountType') AS account_type,
+    CAST(GET_JSON_OBJECT(creator, '$.active') AS BOOLEAN) AS is_active,
     ts_updated
   FROM issues
   WHERE

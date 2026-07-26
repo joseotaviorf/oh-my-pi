@@ -17,10 +17,10 @@ WITH wololo AS (
       'WOLOLO' AS source,
       'NSS' AS journey,
       IF(NOT attendance_info IS NULL, TRUE, FALSE) AS has_ops_info,
-      GET_JSON_OBJECT(attendance_info, team) AS team,
-      COALESCE(GET_JSON_OBJECT(attendance_info, company), sales_company) AS company,
-      GET_JSON_OBJECT(attendance_info, contactType) AS contact_type,
-      GET_JSON_OBJECT(attendance_info, contactChannel) AS contact_channel,
+      GET_JSON_OBJECT(attendance_info, '$.team') AS team,
+      COALESCE(GET_JSON_OBJECT(attendance_info, '$.company'), sales_company) AS company,
+      GET_JSON_OBJECT(attendance_info, '$.contactType') AS contact_type,
+      GET_JSON_OBJECT(attendance_info, '$.contactChannel') AS contact_channel,
       ts_created AS ts_register,
       ROW_NUMBER() OVER (PARTITION BY id_user ORDER BY IF(NOT attendance_info IS NULL, TRUE, FALSE), ts_created DESC) AS _w
     FROM datalake_wololo_clean.context_discard
@@ -153,8 +153,8 @@ and needs to be updated when the context of the CIQ create a new model to captur
       'BOB_AUD' AS source,
       'CIQ' AS journey,
       TRUE AS has_ops_info,
-      GET_JSON_OBJECT(d.attendance_info, team) AS team,
-      NULLIF(GET_JSON_OBJECT(d.attendance_info, company), '') AS company,
+      GET_JSON_OBJECT(d.attendance_info, '$.team') AS team,
+      NULLIF(GET_JSON_OBJECT(d.attendance_info, '$.company'), '') AS company,
       CAST(NULL AS STRING) AS contact_type,
       CAST(NULL AS STRING) AS contact_channel,
       d.ts_updated AS ts_register,
@@ -168,7 +168,7 @@ and needs to be updated when the context of the CIQ create a new model to captur
       )
     WHERE
       (
-        UPPER(GET_JSON_OBJECT(d.attendance_info, team)) = 'CIQ'
+        UPPER(GET_JSON_OBJECT(d.attendance_info, '$.team')) = 'CIQ'
       )
       AND MAKE_DATE(d.year, d.month, d.day) >= CAST('2023-08-01' AS DATE)
   ) AS _t

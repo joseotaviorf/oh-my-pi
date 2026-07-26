@@ -88,7 +88,7 @@ FROM (
   SELECT
     id_app,
     id_visit,
-    GET_JSON_OBJECT(user_properties, country) AS country_code,
+    GET_JSON_OBJECT(user_properties, '$.country') AS country_code,
     user_country,
     app_type,
     COALESCE(media_source, 'Unknown') AS media_source,

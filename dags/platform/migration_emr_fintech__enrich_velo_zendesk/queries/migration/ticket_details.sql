@@ -89,7 +89,7 @@ SELECT
   cf.exception_type,
   cf.payment_period,
   th.recipient,
-  CAST(GET_JSON_OBJECT(th.via, channel) AS STRING) AS ticket_via,
+  CAST(GET_JSON_OBJECT(th.via, '$.channel') AS STRING) AS ticket_via,
   th.type AS ticket_type,
   le.name,
   th.priority,

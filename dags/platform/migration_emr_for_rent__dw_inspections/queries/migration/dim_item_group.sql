@@ -29,9 +29,7 @@ WITH item_group_comments AS (
   LEFT JOIN datalake_inspections.item_issue AS ii
     ON ii.id_item = i.id_item
   WHERE
-    i.year = STRUCT(year AS year)
-    AND i.month = STRUCT(month AS month)
-    AND i.day = STRUCT(day AS day)
+    i.year = {year} AND i.month = {month} AND i.day = {day}
   GROUP BY
     1
 )

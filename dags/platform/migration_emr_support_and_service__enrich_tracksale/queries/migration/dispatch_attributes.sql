@@ -8,15 +8,15 @@ WITH dispatch_explode AS (
 )
 SELECT DISTINCT
   id,
-  GET_JSON_OBJECT(d.customers_explode, name) AS name,
-  GET_JSON_OBJECT(d.customers_explode, identification) AS identification,
-  LOWER(GET_JSON_OBJECT(d.customers_explode, email)) AS email,
-  GET_JSON_OBJECT(d.customers_explode, phone) AS phone,
-  GET_JSON_OBJECT(d.customers_explode, status) AS status,
-  GET_JSON_OBJECT(d.customers_explode, has_answered) AS has_answered,
-  GET_JSON_OBJECT(d.customers_explode, survey_opened) AS survey_opened,
+  GET_JSON_OBJECT(d.customers_explode, '$.name') AS name,
+  GET_JSON_OBJECT(d.customers_explode, '$.identification') AS identification,
+  LOWER(GET_JSON_OBJECT(d.customers_explode, '$.email')) AS email,
+  GET_JSON_OBJECT(d.customers_explode, '$.phone') AS phone,
+  GET_JSON_OBJECT(d.customers_explode, '$.status') AS status,
+  GET_JSON_OBJECT(d.customers_explode, '$.has_answered') AS has_answered,
+  GET_JSON_OBJECT(d.customers_explode, '$.survey_opened') AS survey_opened,
   FROM_UTC_TIMESTAMP(
-    CAST(FROM_UNIXTIME(GET_JSON_OBJECT(d.customers_explode, dispatch_time), 'yyyy-MM-dd hh:mm:ss') AS TIMESTAMP),
+    CAST(FROM_UNIXTIME(GET_JSON_OBJECT(d.customers_explode, '$.dispatch_time'), 'yyyy-MM-dd hh:mm:ss') AS TIMESTAMP),
     'America/Sao_Paulo'
   ) AS dispatch_time,
   ts_created,

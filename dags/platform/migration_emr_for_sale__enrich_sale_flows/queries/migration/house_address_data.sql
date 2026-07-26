@@ -20,12 +20,10 @@ WITH house AS (
       MAX(h.ts_updated) OVER (PARTITION BY h.id) AS _w
     FROM datalake_sales_flow_clean.house AS h
     WHERE
-      h.year <= STRUCT(year AS year)
-      AND h.month <= STRUCT(month AS month)
-      AND h.day <= STRUCT(day AS day)
+      h.year <= {year} AND h.month <= {month} AND h.day <= {day}
   ) AS _t
   WHERE
-    h.ts_updated = _w
+    ts_updated = _w
 )
 SELECT DISTINCT
   h.id AS id_house,
@@ -66,6 +64,4 @@ FROM datalake_sales_flow_clean.address_data AS ad
 JOIN house AS h
   ON h.id_address_data = ad.id
 WHERE
-  ad.year = STRUCT(year AS year)
-  AND ad.month = STRUCT(month AS month)
-  AND ad.day = STRUCT(day AS day)
+  ad.year = {year} AND ad.month = {month} AND ad.day = {day}

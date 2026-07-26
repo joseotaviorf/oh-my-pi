@@ -34,9 +34,7 @@ WITH actions AS (
     day
   FROM datalake_crm_tasks_resolution.tasks_resolution_history AS trh
   WHERE
-    year = STRUCT(year AS year)
-    AND month = STRUCT(month AS month)
-    AND day = STRUCT(day AS day)
+    year = {year} AND month = {month} AND day = {day}
 ), most_recent_completed_task_by_user AS (
   SELECT
     a.id_task,
