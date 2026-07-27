@@ -126,7 +126,7 @@ WITH union_surveys_answers AS (
         sscf.score_description,
         sscf.secondary_satisfaction_score,
         sscf.secondary_score_description,
-        NULL AS is_solved,
+        sscf.is_solved,
         sscf.custom_attributes,
         sscf.ts_submitted,
         sscf.year,

@@ -66,6 +66,10 @@ columns:
       - datalake_chat_fup_clean.surveys_answer.is_solved
   secondary_score_description:
     description: Human-readable label of the optional secondary rating prompt shown after the main CSAT question. Set to 'resolution survey' when the follow-up asks whether the customer's issue was resolved; NULL for rating-only responses.
+  is_solved:
+    description: Boolean flag indicating whether the customer's issue was marked as solved in the resolution follow-up survey. NULL for responses coming from the rating source, which has no resolution concept.
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.is_solved
   custom_attributes:
     description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
     lineage:

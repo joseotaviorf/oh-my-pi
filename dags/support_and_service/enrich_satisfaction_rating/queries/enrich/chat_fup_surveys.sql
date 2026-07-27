@@ -21,6 +21,7 @@ chat_fup_surveys AS (
         "satisfaction evaluation" AS score_description,
         NULL AS secondary_satisfaction_score,
         NULL AS secondary_score_description,
+        NULL AS is_solved,
         TO_JSON(NAMED_STRUCT('id_rating', r.id_rating, 'id_origin', r.id_origin, 'evaluated_tool', r.evaluated_tool, 'csat_version', r.csat_version)) AS custom_attributes,
         r.ts_created AS ts_submitted,
         r.year,
@@ -49,6 +50,7 @@ chat_fup_surveys AS (
           WHEN sa.is_solved IS FALSE THEN 1
         END AS secondary_satisfaction_score,
         "resolution survey" AS secondary_score_description,
+        sa.is_solved AS is_solved,
         TO_JSON(NAMED_STRUCT('id_survey', sa.id_survey, 'id_chat', ss.id_chat, "attendant_email", cc.attendant_email)) AS custom_attributes,
         sa.ts_created AS ts_submitted,
         YEAR(sa.ts_updated) AS year,
@@ -90,6 +92,7 @@ SELECT DISTINCT
     cfs.score_description,
     cfs.secondary_satisfaction_score,
     cfs.secondary_score_description,
+    cfs.is_solved,
     cfs.custom_attributes,
     cfs.ts_submitted,
     cfs.year,
