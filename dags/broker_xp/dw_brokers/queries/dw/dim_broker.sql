@@ -95,10 +95,7 @@ SELECT
   ab.ts_created AS ts_alias_registered,
   cb.ts_broker_created,
   cb.ts_broker_updated,
-  CURRENT_TIMESTAMP() AS ts_load,
-  YEAR(cb.ts_broker_updated) AS year,
-  MONTH(cb.ts_broker_updated) AS month,
-  DAY(cb.ts_broker_updated) AS day
+  CURRENT_TIMESTAMP() AS ts_load
 FROM
   core_brokers.brokers AS cb
 LEFT JOIN

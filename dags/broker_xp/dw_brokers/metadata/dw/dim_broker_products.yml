@@ -135,15 +135,3 @@ columns:
     description: Timestamp when the product row was last updated in core brokers.
   ts_load:
     description: Timestamp when this DW row was loaded by the ETL process.
-  year:
-    lineage:
-      - core_brokers.brokers_product.ts_updated
-    description: Partition year from product last update timestamp.
-  month:
-    lineage:
-      - core_brokers.brokers_product.ts_updated
-    description: Partition month from product last update timestamp.
-  day:
-    lineage:
-      - core_brokers.brokers_product.ts_updated
-    description: Partition day from product last update timestamp.

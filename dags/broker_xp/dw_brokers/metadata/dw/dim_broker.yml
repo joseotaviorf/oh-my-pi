@@ -241,15 +241,3 @@ columns:
       Timestamp when the broker company record was last updated in core brokers (exposed as ts_broker_updated in DW).
   ts_load:
     description: Timestamp when this DW row was loaded by the ETL process.
-  year:
-    lineage:
-      - core_brokers.brokers.ts_broker_updated
-    description: Partition year from broker last update timestamp (ts_broker_updated).
-  month:
-    lineage:
-      - core_brokers.brokers.ts_broker_updated
-    description: Partition month from broker last update timestamp (ts_broker_updated).
-  day:
-    lineage:
-      - core_brokers.brokers.ts_broker_updated
-    description: Partition day from broker last update timestamp (ts_broker_updated).

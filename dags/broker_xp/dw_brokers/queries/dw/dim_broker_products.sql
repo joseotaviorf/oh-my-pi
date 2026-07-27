@@ -28,10 +28,7 @@ SELECT
   TRUE AS has_3p_access_control,
   cbp.ts_product_created,
   cbp.ts_product_updated,
-  CURRENT_TIMESTAMP() AS ts_load,
-  YEAR(cbp.ts_product_updated) AS year,
-  MONTH(cbp.ts_product_updated) AS month,
-  DAY(cbp.ts_product_updated) AS day
+  CURRENT_TIMESTAMP() AS ts_load
 FROM
   core_brokers.brokers_product AS cbp
 LEFT JOIN datalake_alias_clean.crm_integrations AS aci

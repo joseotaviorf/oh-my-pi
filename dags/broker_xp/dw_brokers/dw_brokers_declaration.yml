@@ -35,10 +35,10 @@ workflow:
   default_extraction_type: full
   tables_customization:
     dim_broker:
-      partitions: [year, month, day]
+      partitions: []
       z_order_by: [sk_broker]
     dim_broker_products:
-      partitions: [year, month, day]
+      partitions: []
       z_order_by: [sk_broker_product]
     dim_broker_regions:
       partitions: []
