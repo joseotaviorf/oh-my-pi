@@ -1137,17 +1137,21 @@ create-dag-files: generate-query-manifests generate-metadata-manifests generate-
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name) --exclude-dir luigijr
 
 .PHONY: create-astro-dag-files
-## Astro "dev" deployment only: regenerate parse-time manifests and domain bundles.
+## Astro deployments (dev / forno / prod): regenerate parse-time manifests and domain bundles.
 ## Does NOT emit per-DAG *_dag.py / *_validation_dag.py stubs — those are excluded
 ## from the Astro upload anyway. Skips dags/luigijr/ (dedicated luigijr instances).
 ## Also bundles platform migration_{twin,emr,compare}_* Python DAGs (exec-passthrough).
-## Forno/prod continue to use `create-dag-files`; luigijr uses `create-luigijr-dag-files`.
+## Used by `.woodpecker/development.yml` and `.woodpecker/release.yml` (forno + prod).
+## Luigijr uses `create-luigijr-dag-files`. Local `make create-dag-files` still emits
+## per-DAG stubs for tests / local Airflow.
+## Pass INCLUDE_VALIDATION=1 to also emit prod-only _validation_bundle_*.py modules
+## (validation twin DAGs run on prod only; release.yml sets it for master/hotfix).
 create-astro-dag-files: generate-query-manifests generate-metadata-manifests generate-data-quality-manifests
 	@echo ""
 	@echo "Creating Astro domain + migration bundles + manifests (no per-DAG stubs; excluding luigijr)"
 	@echo "=========="
 	@echo ""
-	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py --bundle-domains --bundle-migrations --exclude-dir luigijr
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py --bundle-domains --bundle-migrations --exclude-dir luigijr $(if $(INCLUDE_VALIDATION),--include-validation,)
 
 .PHONY: create-luigijr-dag-files
 ## creates the DAG Python files for the luigijr sandbox ONLY (dags/luigijr/). Used by the

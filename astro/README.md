@@ -58,3 +58,15 @@ We stay on Runtime `-base` (build context is the monorepo root; non-base ONBUILD
 
 Local Airflow (`astro/docker-compose.override.yml`) bind-mounts repo-root `dags/` into `/usr/local/airflow/dags`.
 CI rsyncs the DAG bag into `astro/dags/` before `astro deploy --dags` — that path must be a **real directory** (not a symlink); the Astro CLI tar uses `filepath.Walk`, which does not follow symlinks and would silently upload an empty bundle.
+
+## Deployments (CI)
+
+| Branch | Pipeline | Astro target |
+|--------|----------|--------------|
+| `development` | [`.woodpecker/development.yml`](../.woodpecker/development.yml) (ungated) | Dev deployment (`kv:apps/dev/astronomer/creds/cicd_token`) |
+| `forno` | [`.woodpecker/release.yml`](../.woodpecker/release.yml) (after lint/tests/validations) | Forno deployment (`kv:apps/forno/...`) |
+| `master` / `hotfix/*` | same `release.yml` | Prod deployment (`kv:apps/prod/...`) |
+
+All three run `make create-astro-dag-files`, rsync a pruned DAG bag, and `astro deploy --dags` / `--image` from `astro/Dockerfile`. Spark/Databricks/EMR artifacts (wheels, init scripts, queries, etc.) still ship from `release.yml` via S3 — only the Airflow DAG-bag delivery moved off beethoven S3 sync.
+
+Validation twin DAGs run on **prod only**: `release.yml` passes `INCLUDE_VALIDATION=1` for `master` / `hotfix/*`, which adds `_astro_bundles/<domain>/_validation_bundle_*.py`. They are separate from the production `_bundle_*.py` modules because a bundle that fails to build one DAG registers none of them — a broken validation twin must not take its production DAGs down. Forno and dev never pass the flag, and each run cleans up stale validation bundles.
