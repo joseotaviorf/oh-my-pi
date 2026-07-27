@@ -28,6 +28,7 @@ Journey step (e.g., Offboarding)
 - [Customer Contacts Front](../metric_entities/customer_contacts_front.md) — Front Office DSat, Resolution Rate, and Recontato D0/D4, sliced by `front_or_back`/`last_department`/`last_team`.
 - [Cases Perspective](../metric_entities/cases_perspective.md) — Post Contract Back Office SLA/DSAT/Resolution Rate/Volume, scoped by `last_department` whitelist and mandatory `last_team` exclusions, broken down by `last_team_adjusted`.
 - [Backlog Out of SLA](../metric_entities/backlog_out_of_sla_back.md) — BPO Performance Back Office backlog-out-of-SLA rate (% Fora Prazo Back), scoped by a Zendesk `department` whitelist and a Salesforce `last_department` whitelist.
+- [Ticket Rate Front - Pós Contrato](../metric_entities/ticket_rate_front_pos.md) — Front Office interaction rate per active rental contract in seven Post Contract queues (`dim_department.department` whitelist).
 
 ## Synonyms
 

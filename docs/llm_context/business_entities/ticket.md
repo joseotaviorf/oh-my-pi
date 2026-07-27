@@ -28,6 +28,7 @@ Tickets are split into two operational categories:
 - Offboard Human vs Digital Metrics
 - [Backlog Out of SLA](../metric_entities/backlog_out_of_sla_back.md) — BPO Performance Back Office backlog-out-of-SLA rate (% Fora Prazo Back), Zendesk side sourced from `fact_backlog_metrics_tasks`.
 - [% Non Wall-E (POST)](../metric_entities/non_walle_post.md) — share of billable front-office chat contacts in the Post-contract journey that did not originate from Wall-E, classified by the session's first department within the 22-queue "Contatos Faturáveis" universe.
+- [Ticket Rate Front - Pós Contrato](../metric_entities/ticket_rate_front_pos.md) — ratio of deduplicated Front Office interactions (call + chat) in seven Post Contract queues to active For Rent contracts at month-end (`sandbox.summary_table_fr` `Ongoing Rental`, Brazil only).
 
 ## Synonyms
 
