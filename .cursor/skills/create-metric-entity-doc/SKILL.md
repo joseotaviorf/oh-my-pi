@@ -25,6 +25,7 @@ Metric entity docs are **calculation contracts** — they tell TARS (and analyst
 10. **Superset golden assets** — the reference assets for this metric: canonical Superset virtual datasets and/or the materialized Trino/Databricks `schema.table` tables they map to (e.g. `sandbox.nps_fr`). These are linked as reference assets on the DataHub Data Product Summary. Optional.
 11. **Ownership emails** — at least one **Data Owner** (accountable for the business definition, usually a manager/lead) and at least one **Data Steward** (`@quintoandar.com.br`, maintains this document day-to-day; defaults to the requester if not otherwise specified). The two roles may share the same email.
 12. **MBR membership** — does this metric feed one or more Monthly Business Reviews (MBRs)? If so, which one(s)? Optional — omit if the metric is not part of any MBR. A metric may belong to several MBRs.
+13. **Budget / OKR** — optional. Ask separately whether the metric has an official **Budget (Target)** (annual commitment, fixed for the fiscal year) and/or **OKR** (period challenge — quarter or semester — that may change across the year). For each that exists: source table, filter key / metric name in source, period grain (OKR only), PT-BR aliases, and scope caveats when comparing actuals vs Budget/OKR.
 
 Do NOT infer formula details from context — the whole point of this file is to be the definitive source of truth.
 
@@ -45,7 +46,7 @@ Before writing, verify the data model and calculation. Launch parallel explore s
 
 ## Step 3 — Write the metric entity file
 
-Create `docs/llm_context/metric_entities/{metric_slug}.md` following the template below exactly. Every section is required except **Superset Golden Assets** (optional when the metric has no Trino table and no Superset asset to link). Keep the file concise: thick on calculation, thin on schema.
+Create `docs/llm_context/metric_entities/{metric_slug}.md` following the template below exactly. Every section is required except **Targets and OKRs** and **Superset Golden Assets** (optional). Keep the file concise: thick on calculation, thin on schema.
 
 ### Template
 
@@ -133,6 +134,33 @@ AND {field_2} = '{value}'
 - {Anti-pattern — e.g. directly pooling the components}
 - {Don't hardcode weights/parameters}
 
+## Targets and OKRs
+
+<!--
+Optional — include ONLY when this metric has an official Budget and/or OKR lookup path.
+Omit the entire section when neither exists.
+
+Terminology (both optional within this section):
+  • Budget (Target) — annual commitment set at year start; fixed for the fiscal year.
+  • OKR — period challenge (quarter or semester), informed by trend indicators; may
+    change across periods within the year.
+-->
+
+**Budget (Target)** — {one line: what the annual commitment represents, or omit this block}.
+
+- **Source table:** `{schema}.{table}`
+- **Filter key / metric name:** `{exact name in source}`
+- **Aliases / search terms:** {PT-BR: orçamento, budget, target, …}
+- **Caveat:** {scope mismatch vs actuals, if any}
+
+**OKR** — {one line: what the period goal represents, or omit this block}.
+
+- **Source table:** `{schema}.{table}` (may differ from Budget)
+- **Filter key / metric name:** `{exact name in source}`
+- **Period grain:** {quarter / semester / month}
+- **Aliases / search terms:** {PT-BR: meta, OKR, …}
+- **Caveat:** {scope mismatch vs actuals, if any}
+
 ## Golden Queries
 
 {One sentence on what the query computes.} The component CTE reproduces the pattern already documented in the related business entity; what is exclusive to this metric is {the weighting / official aggregation layer}.
@@ -212,6 +240,12 @@ URNs in backticks. Omit this section when no Superset asset exists for this metr
 **Dos and Don'ts:**
 - Do NOT repeat generic dos/don'ts from the business entity.
 - Focus on traps specific to the official metric (formula-level, not schema-level).
+
+**Targets and OKRs:**
+- Optional. Omit the entire section when the metric has no official Budget or OKR source.
+- **Budget (Target)** = annual commitment fixed for the fiscal year; **OKR** = period challenge (quarter/semester) that may change across the year. Document only the sub-blocks that apply.
+- For each sub-block: source table, filter key, aliases, scope caveats — never duplicate the Calculation formula.
+- Folded into the DataHub `product_description` (not excluded like MBR or Golden Queries).
 
 **Golden Queries:**
 - **Hard cap: never write more than 10 golden queries**, regardless of how many
@@ -336,4 +370,5 @@ Before presenting to the user, verify:
 - [ ] DataHub token-overflow risk check run (Step 3b); user warned if at risk
 - [ ] Golden Query references the business entity component pattern in a comment instead of duplicating it
 - [ ] Back-link added to "Related Metric Entities" in the related business entity file(s)
+- [ ] Targets and OKRs omitted when no Budget/OKR source; Budget and OKR sub-blocks documented separately when both exist
 - [ ] Superset Golden Assets omitted if no canonical asset; Superset URNs and Trino tables in backticks when present

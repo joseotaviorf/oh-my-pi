@@ -257,6 +257,21 @@ SELECT 1
         ):
             self.assertNotIn(drop, self.desc)
 
+    def test_keeps_targets_and_okrs_section(self) -> None:
+        md_with_targets = self._METRIC_MD.replace(
+            "## Golden Queries",
+            "## Targets and OKRs\n\n"
+            "**OKR** — period goal.\n\n"
+            "- **Source table:** `datalake_gsheets_clean.target_service_kpis`\n"
+            "- **Filter key / metric name:** `SLA VT Onb + Off s/ Despejo`\n\n"
+            "## Golden Queries",
+        )
+        self.md_path.write_text(md_with_targets, encoding="utf-8")
+        desc = g._extract_description_from_md(self.md_path)
+        self.assertIn("## Targets and OKRs", desc)
+        self.assertIn("datalake_gsheets_clean.target_service_kpis", desc)
+        self.assertIn("SLA VT Onb + Off s/ Despejo", desc)
+
 
 class RelatedDataProductsTest(unittest.TestCase):
     def test_display_name_to_product_id(self) -> None:

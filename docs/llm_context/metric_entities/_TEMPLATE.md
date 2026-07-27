@@ -25,6 +25,9 @@ Rules:
     business entity(ies).
   • Golden Query must use Trino SQL dialect (TARS runs on Trino). No Spark-only
     constructs (QUALIFY, GROUP BY ALL, IFF, 3-arg DATEDIFF, variant `col:key`).
+  • Optional sections: MBR, Targets and OKRs (Budget and/or OKR lookup — see section
+    below; Budget = annual commitment fixed for the fiscal year; OKR = period
+    challenge that may change across quarters/semesters), Superset Golden Assets.
 -->
 
 ## Ownership
@@ -144,6 +147,37 @@ AND {field_2} = '{value}'
 
 - {Anti-pattern — e.g. directly pooling the components}
 - {Don't hardcode weights/parameters}
+
+## Targets and OKRs
+
+<!--
+Optional — include ONLY when this metric has an official Budget and/or OKR lookup path.
+Omit the entire section when neither exists.
+
+Terminology (both optional within this section):
+  • Budget (Target) — annual commitment set at year start; fixed for the fiscal year.
+  • OKR — period challenge (quarter or semester), informed by trend indicators; may
+    change across periods within the year.
+
+Document HOW to fetch each value (source table, filter key, aliases, scope caveats
+when comparing actuals vs Budget/OKR). Do NOT duplicate the calculation formula.
+Folded INTO the DataHub product_description (unlike MBR / Golden Queries).
+-->
+
+**Budget (Target)** — {one line: what the annual commitment represents for this metric, or omit this block}.
+
+- **Source table:** `{schema}.{table}`
+- **Filter key / metric name:** `{exact name in source}`
+- **Aliases / search terms:** {PT-BR: orçamento, budget, target, …}
+- **Caveat:** {scope mismatch vs actuals, if any}
+
+**OKR** — {one line: what the period goal represents, or omit this block}.
+
+- **Source table:** `{schema}.{table}` (may differ from Budget)
+- **Filter key / metric name:** `{exact name in source}`
+- **Period grain:** {quarter / semester / month — how the OKR is keyed in the source}
+- **Aliases / search terms:** {PT-BR: meta, OKR, …}
+- **Caveat:** {scope mismatch vs actuals, if any}
 
 ## Golden Queries
 

@@ -101,8 +101,11 @@ other DataHub features:
 | `## DataHub catalog` / `## DataHub Catalog` | tooling pointer only |
 | `## Related Business Entities` | upstream data products SP (metric only) |
 
-Everything else — Overview, Scope, Calculation, Dos and Don'ts, Relationships, per-schema
-field guides, etc. — IS the description, verbatim from the MD.
+`## Targets and OKRs` is **not** excluded — Budget/OKR lookup guidance remains in
+`product_description` (narrative only; no dedicated YAML field).
+
+Everything else — Overview, Scope, Calculation, Dos and Don'ts, Targets and OKRs,
+Relationships, per-schema field guides, etc. — IS the description, verbatim from the MD.
 
 **Rule:** emit a one-line placeholder in the YAML; never condense or summarize:
 

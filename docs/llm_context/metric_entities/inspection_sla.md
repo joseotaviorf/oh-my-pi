@@ -32,6 +32,7 @@ lease lifecycle stage.
 ## Glossary and Synonyms
 
 - **SLA - VT**, **SLA de Vistoria**, **Inspection SLA**, **Produtividade de Vistoria** → Inspection SLA
+- **target de sla de vistoria**, **meta de SLA**, **target de sla de onb+off** → Inspection SLA
 
 ## Scope
 
@@ -96,21 +97,6 @@ AND (
 | `RANK_SLA` | Ranks inspections to pick the appropriate one for the SLA denominator/numerator (must equal 1). |
 | `category` | Categorizes the contract/termination context. Use `category = 'EVICTION'` to isolate "Despejo" cases. |
 
-### Targets (Metas)
-
-**Target Source Table:** `datalake_gsheets_clean.target_service_kpis`
-
-The target (meta) for this indicator is stored in a centralized table that contains
-targets for multiple metrics. To pull the specific target for Inspection SLA, filter
-the base using the correct metric name.
-
-- **Target Metric Name:** `SLA VT Onb + Off s/ Despejo`
-- **Aliases / Search terms:** target de sla de vistoria, target de sla de onb+off
-
-**Important caveat:** This official target **does not include eviction cases
-("Despejo")**. When comparing the actual calculated SLA against this target, filter
-out eviction cases from your actuals (e.g., excluding `category = 'EVICTION'`).
-
 ## Dos and Don'ts
 
 **Do:**
@@ -130,6 +116,19 @@ out eviction cases from your actuals (e.g., excluding `category = 'EVICTION'`).
   calculation.
 - Don't forget to rule out canceled contracts (`status_contract = 'CANCELED'`), as they
   skew the base.
+
+## Targets and OKRs
+
+**OKR** — period operational goal for Inspection SLA, stored in a centralized KPI
+targets table alongside other service metrics.
+
+- **Source table:** `datalake_gsheets_clean.target_service_kpis`
+- **Filter key / metric name:** `SLA VT Onb + Off s/ Despejo`
+- **Period grain:** monthly (filter by the reference period column in the source table)
+- **Aliases / search terms:** meta de SLA, target de sla de vistoria, target de sla de onb+off
+- **Caveat:** This official OKR **does not include eviction cases ("Despejo")**. When
+  comparing actual calculated SLA against this OKR, filter out eviction cases from
+  actuals (e.g., excluding `category = 'EVICTION'`).
 
 ## Golden Queries
 

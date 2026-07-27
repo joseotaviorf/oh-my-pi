@@ -149,6 +149,8 @@ _DEFAULT_MAX_TOKENS = 16000
 #   metric  — Related Business Entities → related_data_products SP; Glossary → glossary;
 #             Golden Queries → Query entities; DataHub Catalog → tooling pointer only;
 #             MBR → data_product.mbr structured property, not narrative content
+#   metric  — Targets and OKRs is intentionally NOT listed here: Budget/OKR lookup
+#             guidance stays in product_description (narrative content for downstream agents)
 EXCLUDE_HEADING_PATTERNS = [
     re.compile(r"^## Ownership$", re.I),
     re.compile(r"^## MBR$", re.I),
