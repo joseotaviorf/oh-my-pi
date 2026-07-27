@@ -39,12 +39,6 @@ class TableAttributes:
         )
         self.row_filter_function_name = self._get_row_filter_function_name()
 
-    @property
-    def workflow_args(self) -> dict:
-        """Read-only access to the workflow declaration args (``type``,
-        ``has_hive_sync``, ``sync``, ...)."""
-        return self._workflow_args
-
     @staticmethod
     def from_attributes(
         table: "TableAttributes",

@@ -23,8 +23,6 @@ message_schema = StructType(
         StructField("relative_file_path", StringType(), False),
         StructField("table_name", StringType(), False),
         StructField("intermediate_path", StringType(), False),
-        # Nullable: messages produced before this field existed won't carry it.
-        StructField("platforms", StringType(), True),
     ]
 )
 
@@ -40,9 +38,6 @@ def run_validation_job(params: dict):
     relative_file_path = params["relative_file_path"]
     table_name = params["table_name"]
     intermediate_path = params["intermediate_path"]
-    platforms = [
-        platform for platform in (params.get("platforms") or "").split(",") if platform
-    ]
 
     logger.info(
         f"m={JOB_NAME}, env={env}, inmetro_bucket={inmetro_bucket}, layer={layer.value}, "
@@ -57,7 +52,6 @@ def run_validation_job(params: dict):
         relative_file_path,
         table_name,
         intermediate_path,
-        platforms,
     )
     pipeline.run()
     logger.info(

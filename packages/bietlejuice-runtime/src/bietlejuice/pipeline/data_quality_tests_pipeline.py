@@ -145,7 +145,6 @@ class DataQualityTestsPipeline:
         relative_file_path: str,
         table_name: str,
         intermediate_path: str,
-        platforms=None,
     ):
         self.env = env
         self.execution_date = execution_date
@@ -154,9 +153,6 @@ class DataQualityTestsPipeline:
         self.relative_file_path = relative_file_path
         self.table_name = table_name
         self.intermediate_path = intermediate_path
-        # DataHub platforms the DQ results should be propagated to (resolved
-        # from the FQN by the task creator). Empty/None => propagator default.
-        self.platforms = platforms
         self.config_service = ConfigurationService()
         self.spark_client = InmetroSparkClient()
 
@@ -366,7 +362,6 @@ class DataQualityTestsPipeline:
             table_name=table_name,
             metadata_type=MetadataTypeEnum.QUALITY_METRICS,
             validation_results=validation_results,
-            platforms=self.platforms,
         ).run()
 
     def _publish_failed_validation_results_to_google_chat(
