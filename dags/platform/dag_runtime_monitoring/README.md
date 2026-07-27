@@ -48,6 +48,43 @@ subgraph** and marks the alert `Attribution: unconfirmed root (N DAG(s) late thi
 cycle)`. A lower-confidence root beats going silent during a real cascade, which is
 the failure mode the 2026-07-14 postmortem describes.
 
+**Dependency graph sources.** The upstream/downstream indexes are the **union** of
+`dependencies.yaml` and the live dataset-scheduling edges read from the metadata DB
+(`dag_schedule_dataset_reference ⨝ task_outlet_dataset_reference`) — the exact graph
+Airflow's own scheduler walks. The YAML is a static approximation that omits whole
+namespaces: every `quintoml.*` DAG appears there only as an upstream *value*, never as
+a dependent *key*, so without the live edges those DAGs have no upstreams at all and
+always alert as their own root. The union also lengthens DW blast radius, because paths
+that hop through a missing namespace (`bietlejuice.x → quintoml.y → bietlejuice.dw_z`)
+now resolve. Either source may fail on its own; only when **both** are unavailable does
+the graph count as missing (fail-closed for detection, ledger snapshot for follow-ups).
+
+**Dataset diagnostics (missing-run).** For each reported root the monitor reads that
+DAG's dataset trigger state and adds it to the alert. `dataset_dag_run_queue` rows are
+only consumed when a run is actually created, so a DAG that never ran still exposes its
+partial queue; the difference against its schedule references names the exact dataset
+whose update went missing. Two verdicts:
+
+- **Likely a dropped dataset event** — every condition is queued, or a missing dataset's
+  producer already delivered this cycle. This is the postmortem signature: Airflow
+  silently drops a dataset update that lands while the target DAG's `SerializedDagModel`
+  is stale and never retro-applies it, so the DAG sits at N-1/N forever. The alert links
+  the runbook and offers a trigger deep link pre-filled with
+  `{"run_type": "impact_downstream_dependents"}` — the only form that fans out to
+  dependents (a bare manual trigger resolves to `TEST_RUN` and emits nothing).
+- **Waiting on `<dag>`** — a producer genuinely has not delivered yet, so the plain
+  trigger link stays and the blocking upstream is named instead.
+
+Cron DAGs (no dataset schedule) keep the original message. A failure to read the dataset
+tables just drops these bullets; the alert still sends.
+
+**Closing on remediation.** A DAG counts as started this cycle when it has an automatic
+run **or** published a dataset event (`dataset_event.source_dag_id`). The manual recovery
+run above is invisible to the run-type filter but its emissions prove the chain moved,
+so the thread closes with `started at HH:MM` instead of re-firing every 30 minutes until
+rollover. Emission likewise counts as "upstream succeeded" for root confirmation. The P90
+**baseline** stays automatic-runs-only, so manual reruns never drift the expected offset.
+
 Real alerts are only delivered when `environment == prod`. Config lives in
 `prod_conf.yml` / `forno_conf.yml` (`lookback_days`, `min_history_runs`, `percentile`,
 `factor`, `min_alert_duration_minutes`, `critical_dags`). SLA keys
@@ -75,7 +112,8 @@ downstream IDs matching `bietlejuice.dw_*`.
   SLA roots are opened that cycle (an empty upstream map would otherwise treat
   every late DAG as a root). Existing SLA ledger entries are still followed up.
 - Missing-run roots also include `Also waiting downstream: N DAG(s)` (other late
-  DAGs transitively downstream of the root within the late set) and a Trigger deep link.
+  DAGs transitively downstream of the root within the late set), the dataset
+  diagnostics described above, and a Trigger deep link.
 - `sla_enabled: false` stops new missing-run alerts **and** drops any open SLA
   ledger entries without further Chat updates. Paused / inactive / excluded DAGs
   are likewise dropped from the SLA ledger on the next cycle (no more “still

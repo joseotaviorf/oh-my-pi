@@ -15,9 +15,12 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _JIRA_MESSAGE_MAX,
     _KIND_MISSING_RUN,
     _KIND_SLOW,
+    _MISSING_DATASET_LIST_LIMIT,
     _RUNNING_QUERY,
     _SLA_CANDIDATES_QUERY,
     _SLA_HISTORY_QUERY,
+    _VERDICT_DROPPED_EVENT,
+    _VERDICT_WAITING_UPSTREAM,
     DAG_ID,
     DEDUP_VARIABLE_KEY,
     JIRA_OPS_VARIABLE,
@@ -26,10 +29,14 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _as_str_list,
     _assign_alert_tiers,
     _build_alert_text,
+    _build_dataset_indexes,
+    _build_dataset_status,
     _build_upstream_index,
+    _classify_dataset_state,
     _collect_sla_findings,
     _cycle_anchor,
     _effective_work_start,
+    _enrich_findings_with_dataset_state,
     _enrich_findings_with_dw_impact,
     _entry_from_finding,
     _evaluate_all,
@@ -38,7 +45,9 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _expected_offset_minutes,
     _failed_text,
     _fetch_dag_owners,
+    _fetch_dataset_satisfaction,
     _fetch_run_states,
+    _fetch_sla_emitted,
     _follow_up_clock_start,
     _follow_up_tracked_runs,
     _format_duration,
@@ -65,6 +74,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _synthetic_findings,
     _synthetic_missing_run_findings,
     _truncate_text,
+    _union_indexes,
     _update_text,
     dag,
     monitor_dag_runtimes,
@@ -1186,6 +1196,7 @@ def test_follow_up_elapsed_uses_ledger_work_start_date(
 
 
 @_lifecycle_patches
+@mock.patch(f"{_MODULE}._fetch_dataset_edges", lambda *_args, **_kwargs: None)
 @mock.patch(
     f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
     side_effect=RuntimeError("deps unavailable"),
@@ -1193,8 +1204,10 @@ def test_follow_up_elapsed_uses_ledger_work_start_date(
 def test_tracked_running_keeps_ledger_impact_when_deps_unavailable(
     mock_deps, mock_post, mock_states, mock_running, mock_var, mock_cfg
 ):
-    # Regression: a later-cycle deps load failure must not wipe Still blocking N
+    # Regression: a later-cycle graph load failure must not wipe Still blocking N
     # by forcing live_count=0 over the ledger snapshot from the initial alert.
+    # Both graph sources must be down — the live dataset edges alone are enough to
+    # rebuild a downstream index when dependencies.yaml cannot be read.
     mock_cfg.return_value.get_config.side_effect = _config_get
     ledger = {f"{_STANDARD_DAG}|r2": dict(_ENTRY)}  # impacted_dw_count=2
     mock_var.get.side_effect = _variable_get_factory(ledger=json.dumps(ledger))
@@ -2471,3 +2484,611 @@ class TestMonitorEnrichesSlaFindings:
             calls and calls[0].get("kind") == _KIND_MISSING_RUN
             for calls in enrich_calls
         )
+
+
+# --------------------------------------------------------------------------- #
+# Live dataset dependency graph
+# --------------------------------------------------------------------------- #
+def _edge_row(dependent, upstream):
+    return SimpleNamespace(dependent_dag_id=dependent, upstream_dag_id=upstream)
+
+
+def _dataset_row(dag_id, uri, satisfied, producer=None):
+    return SimpleNamespace(
+        dag_id=dag_id, uri=uri, satisfied=satisfied, producer_dag_id=producer
+    )
+
+
+class TestUnionIndexes:
+    def test_all_sources_unavailable_returns_none(self):
+        assert _union_indexes(None, None) is None
+
+    def test_empty_but_available_source_returns_empty_dict(self):
+        assert _union_indexes({}, None) == {}
+
+    def test_merges_disjoint_and_overlapping_keys(self):
+        merged = _union_indexes(
+            {"a": {"x"}, "b": {"y"}},
+            {"a": {"z"}, "c": {"w"}},
+        )
+        assert merged == {"a": {"x", "z"}, "b": {"y"}, "c": {"w"}}
+
+    def test_does_not_mutate_inputs(self):
+        first = {"a": {"x"}}
+        _union_indexes(first, {"a": {"z"}})
+        assert first == {"a": {"x"}}
+
+
+class TestBuildDatasetIndexes:
+    def test_none_rows_yield_none_indexes(self):
+        assert _build_dataset_indexes(None) == (None, None)
+
+    def test_builds_both_directions(self):
+        upstream, downstream = _build_dataset_indexes(
+            [
+                _edge_row("quintoml.wonka.segmentation", "bietlejuice.dw_contract"),
+                _edge_row("bietlejuice.dw_z", "quintoml.wonka.segmentation"),
+            ]
+        )
+        assert upstream == {
+            "quintoml.wonka.segmentation": {"bietlejuice.dw_contract"},
+            "bietlejuice.dw_z": {"quintoml.wonka.segmentation"},
+        }
+        assert downstream == {
+            "bietlejuice.dw_contract": {"quintoml.wonka.segmentation"},
+            "quintoml.wonka.segmentation": {"bietlejuice.dw_z"},
+        }
+
+    def test_skips_self_edges_and_blanks(self):
+        upstream, downstream = _build_dataset_indexes(
+            [
+                _edge_row("bietlejuice.a", "bietlejuice.a"),
+                _edge_row("bietlejuice.b", None),
+                _edge_row(None, "bietlejuice.c"),
+            ]
+        )
+        assert upstream == {}
+        assert downstream == {}
+
+
+class TestGraphSourcesFailureModes:
+    def test_upstream_falls_back_to_live_graph_when_yaml_fails(self):
+        live = {"quintoml.wonka.segmentation": {"bietlejuice.dw_contract"}}
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            side_effect=RuntimeError("boom"),
+        ):
+            assert _load_upstream_index_safe(live) == live
+
+    def test_upstream_unions_both_sources(self):
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            return_value={"bietlejuice.dw_region": ["bietlejuice.enrich_region"]},
+        ):
+            merged = _load_upstream_index_safe(
+                {"bietlejuice.dw_region": {"quintoml.wonka.segmentation"}}
+            )
+        assert merged["bietlejuice.dw_region"] == {
+            "bietlejuice.enrich_region",
+            "quintoml.wonka.segmentation",
+        }
+
+    def test_upstream_none_only_when_both_sources_fail(self):
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            side_effect=RuntimeError("boom"),
+        ):
+            assert _load_upstream_index_safe(None) is None
+
+    def test_downstream_falls_back_to_live_graph_when_yaml_fails(self):
+        live = {"bietlejuice.dw_contract": {"quintoml.wonka.segmentation"}}
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            side_effect=RuntimeError("boom"),
+        ):
+            assert _load_downstream_index_safe(live) == live
+
+    def test_downstream_none_only_when_both_sources_fail(self):
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            side_effect=RuntimeError("boom"),
+        ):
+            assert _load_downstream_index_safe(None) is None
+
+    def test_downstream_ignores_non_mapping_yaml_but_keeps_live(self):
+        live = {"bietlejuice.dw_contract": {"quintoml.wonka.segmentation"}}
+        with mock.patch(
+            f"{_MODULE}.BietlejuiceDependencyHelper.read_dependencies",
+            return_value=["not", "a", "dict"],
+        ):
+            assert _load_downstream_index_safe(live) == live
+
+
+class TestLiveGraphUnblocksQuintomlSuppression:
+    """dependencies.yaml has no ``quintoml.*`` dependent keys, so those DAGs always
+    self-root; the live dataset edges are the only source that knows their upstreams."""
+
+    _QUINTOML = "quintoml.wonka.contract_collection_segmentation"
+    _UPSTREAM = "bietlejuice.dw_contract"
+
+    def _history(self, now):
+        cycle = _cycle_anchor(now, hhmm="20:55")
+        rows = []
+        for dag_id in (self._QUINTOML, self._UPSTREAM):
+            for i in range(12):
+                anchor = cycle - timedelta(days=i + 1)
+                rows.append(
+                    SimpleNamespace(
+                        dag_id=dag_id,
+                        start_date=anchor + timedelta(minutes=230),
+                        state="success",
+                    )
+                )
+        return rows
+
+    def _roots(self, upstream_index):
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        findings = _evaluate_sla_missing_runs(
+            [self._QUINTOML, self._UPSTREAM],
+            self._history(now),
+            now=now,
+            config=_SLA_CONFIG,
+            upstream_index=upstream_index,
+            downstream_index={},
+        )
+        return {f["dag_id"] for f in findings}
+
+    def test_yaml_only_graph_self_roots_the_quintoml_dag(self):
+        assert self._roots({}) == {self._QUINTOML, self._UPSTREAM}
+
+    def test_live_edge_folds_it_under_its_upstream(self):
+        upstream, _ = _build_dataset_indexes(
+            [_edge_row(self._QUINTOML, self._UPSTREAM)]
+        )
+        assert self._roots(upstream) == {self._UPSTREAM}
+
+
+# --------------------------------------------------------------------------- #
+# Dataset-satisfaction diagnostics
+# --------------------------------------------------------------------------- #
+class TestBuildDatasetStatus:
+    def test_groups_by_dag_and_uri_and_collects_producers(self):
+        status = _build_dataset_status(
+            [
+                _dataset_row("d", "uri-a", 1, "bietlejuice.p1"),
+                _dataset_row("d", "uri-a", 1, "bietlejuice.p2"),
+                _dataset_row("d", "uri-b", 0, "bietlejuice.p3"),
+                _dataset_row("other", "uri-c", 0, None),
+            ]
+        )
+        assert status["d"]["uri-a"] == {
+            "satisfied": True,
+            "producers": {"bietlejuice.p1", "bietlejuice.p2"},
+        }
+        assert status["d"]["uri-b"]["satisfied"] is False
+        assert status["other"]["uri-c"]["producers"] == set()
+
+    def test_ignores_rows_without_dag_or_uri(self):
+        assert (
+            _build_dataset_status(
+                [_dataset_row(None, "uri", 1), _dataset_row("d", None, 1)]
+            )
+            == {}
+        )
+
+
+class TestClassifyDatasetState:
+    def test_cron_dag_without_datasets_yields_nothing(self):
+        assert _classify_dataset_state(None, set()) == {}
+        assert _classify_dataset_state({}, set()) == {}
+
+    def test_all_satisfied_but_no_run_is_a_dropped_event(self):
+        datasets = {
+            "uri-a": {"satisfied": True, "producers": {"bietlejuice.p1"}},
+            "uri-b": {"satisfied": True, "producers": {"bietlejuice.p2"}},
+        }
+        result = _classify_dataset_state(datasets, set())
+        assert result["dataset_verdict"] == _VERDICT_DROPPED_EVENT
+        assert result["dataset_satisfied"] == 2
+        assert result["dataset_required"] == 2
+        assert result["dataset_missing"] == []
+        assert result["dataset_ready_missing"] == []
+
+    def test_thirteen_of_fourteen_with_succeeded_producer_is_a_dropped_event(self):
+        datasets = {
+            f"uri-{i}": {"satisfied": True, "producers": {f"bietlejuice.p{i}"}}
+            for i in range(13)
+        }
+        datasets["uri-missing"] = {
+            "satisfied": False,
+            "producers": {"bietlejuice.enrich_chatbot"},
+        }
+        result = _classify_dataset_state(datasets, {"bietlejuice.enrich_chatbot"})
+        assert result["dataset_verdict"] == _VERDICT_DROPPED_EVENT
+        assert result["dataset_satisfied"] == 13
+        assert result["dataset_required"] == 14
+        assert result["dataset_missing"] == ["uri-missing"]
+        assert result["dataset_ready_missing"] == ["uri-missing"]
+        assert result["dataset_blocking_dags"] == []
+
+    def test_missing_with_pending_producer_is_waiting_upstream(self):
+        datasets = {
+            "uri-a": {"satisfied": True, "producers": {"bietlejuice.p1"}},
+            "uri-b": {"satisfied": False, "producers": {"bietlejuice.slow_upstream"}},
+        }
+        result = _classify_dataset_state(datasets, {"bietlejuice.p1"})
+        assert result["dataset_verdict"] == _VERDICT_WAITING_UPSTREAM
+        assert result["dataset_blocking_dags"] == ["bietlejuice.slow_upstream"]
+        assert result["dataset_ready_missing"] == []
+
+    def test_any_producer_succeeding_is_enough(self):
+        # Airflow satisfies the condition on the first emission, not on all producers.
+        datasets = {
+            "uri-a": {
+                "satisfied": False,
+                "producers": {"bietlejuice.p1", "bietlejuice.p2"},
+            }
+        }
+        result = _classify_dataset_state(datasets, {"bietlejuice.p1"})
+        assert result["dataset_verdict"] == _VERDICT_DROPPED_EVENT
+
+    def test_missing_without_known_producer_is_waiting_with_no_blocker_named(self):
+        datasets = {"uri-a": {"satisfied": False, "producers": set()}}
+        result = _classify_dataset_state(datasets, set())
+        assert result["dataset_verdict"] == _VERDICT_WAITING_UPSTREAM
+        assert result["dataset_blocking_dags"] == []
+
+
+class TestEnrichFindingsWithDatasetState:
+    def test_attaches_per_finding_state(self):
+        findings = [
+            {"dag_id": "bietlejuice.a"},
+            {"dag_id": "bietlejuice.cron_only"},
+        ]
+        _enrich_findings_with_dataset_state(
+            findings,
+            {
+                "bietlejuice.a": {
+                    "uri-a": {"satisfied": False, "producers": {"bietlejuice.p1"}}
+                }
+            },
+            {"bietlejuice.p1"},
+        )
+        assert findings[0]["dataset_verdict"] == _VERDICT_DROPPED_EVENT
+        assert "dataset_verdict" not in findings[1]
+
+    def test_unavailable_status_leaves_findings_untouched(self):
+        findings = [{"dag_id": "bietlejuice.a"}]
+        _enrich_findings_with_dataset_state(findings, None, set())
+        assert findings == [{"dag_id": "bietlejuice.a"}]
+
+
+# --------------------------------------------------------------------------- #
+# Dataset-aware message rendering
+# --------------------------------------------------------------------------- #
+class TestMissingRunDatasetMessage:
+    _BASE = {
+        "kind": _KIND_MISSING_RUN,
+        "dag_id": "bietlejuice.enrich_chatbot",
+        "run_id": "sla::2026-07-24T23:55:00+00:00",
+        "owner": "Data Chatbot",
+        "due_at": "2026-07-25T04:45:00+00:00",
+        "expected_start": "2026-07-25T03:45:00+00:00",
+        "grace_minutes": 60,
+        "percentile": 90,
+        "history_count": 14,
+        "lookback_days": 14,
+    }
+
+    def test_dropped_event_names_missing_uri_and_offers_recovery_trigger(self):
+        entry = {
+            **self._BASE,
+            "dataset_required": 14,
+            "dataset_satisfied": 13,
+            "dataset_missing": ["internal_chat:messages:first-run-of-day"],
+            "dataset_ready_missing": ["internal_chat:messages:first-run-of-day"],
+            "dataset_verdict": _VERDICT_DROPPED_EVENT,
+        }
+        text = _missing_run_initial_text(entry, 3600)
+        assert "• Datasets: 13/14 satisfied" in text
+        assert "missing internal_chat:messages:first-run-of-day" in text
+        assert "producer already delivered, update never recorded" in text
+        assert "docs.google.com" in text
+        assert "Trigger (unblocks downstream)" in text
+        assert "conf=" in text
+        assert "impact_downstream_dependents" in text
+
+    def test_all_satisfied_dropped_event_uses_the_other_cause(self):
+        entry = {
+            **self._BASE,
+            "dataset_required": 19,
+            "dataset_satisfied": 19,
+            "dataset_missing": [],
+            "dataset_ready_missing": [],
+            "dataset_verdict": _VERDICT_DROPPED_EVENT,
+        }
+        text = _missing_run_initial_text(entry, 3600)
+        assert "• Datasets: 19/19 satisfied" in text
+        assert "missing" not in text.split("• Datasets")[1].split("\n")[0]
+        assert "all conditions met, no run created" in text
+
+    def test_waiting_upstream_names_blocker_and_keeps_plain_trigger(self):
+        entry = {
+            **self._BASE,
+            "dataset_required": 5,
+            "dataset_satisfied": 3,
+            "dataset_missing": ["uri-a", "uri-b"],
+            "dataset_ready_missing": [],
+            "dataset_blocking_dags": ["bietlejuice.slow_upstream"],
+            "dataset_verdict": _VERDICT_WAITING_UPSTREAM,
+        }
+        text = _missing_run_initial_text(entry, 3600)
+        assert "• Waiting on: bietlejuice.slow_upstream" in text
+        assert "• Trigger: " in text
+        assert "conf=" not in text
+        assert "dropped dataset event" not in text
+
+    def test_cron_dag_message_has_no_dataset_bullets(self):
+        text = _missing_run_initial_text(dict(self._BASE), 3600)
+        assert "• Datasets:" not in text
+        assert "• Trigger: " in text
+
+    def test_missing_uri_list_is_capped(self):
+        missing = [f"uri-{i}" for i in range(_MISSING_DATASET_LIST_LIMIT + 4)]
+        entry = {
+            **self._BASE,
+            "dataset_required": len(missing),
+            "dataset_satisfied": 0,
+            "dataset_missing": missing,
+            "dataset_ready_missing": [],
+            "dataset_blocking_dags": [],
+            "dataset_verdict": _VERDICT_WAITING_UPSTREAM,
+        }
+        text = _missing_run_initial_text(entry, 3600)
+        assert "… and 4 more" in text
+        assert f"uri-{_MISSING_DATASET_LIST_LIMIT + 3}" not in text
+
+    def test_entry_from_finding_carries_dataset_fields(self):
+        finding = {
+            **self._BASE,
+            "tier": "standard",
+            "dataset_required": 14,
+            "dataset_satisfied": 13,
+            "dataset_missing": ["uri-a"],
+            "dataset_ready_missing": ["uri-a"],
+            "dataset_blocking_dags": [],
+            "dataset_verdict": _VERDICT_DROPPED_EVENT,
+        }
+        entry = _entry_from_finding(finding)
+        assert entry["dataset_verdict"] == _VERDICT_DROPPED_EVENT
+        assert entry["dataset_missing"] == ["uri-a"]
+        assert entry["dataset_satisfied"] == 13
+
+
+# --------------------------------------------------------------------------- #
+# Closing the alert on real remediation (dataset emission)
+# --------------------------------------------------------------------------- #
+class TestEmissionClosesMissingRunAlerts:
+    _DAG = "bietlejuice.enrich_region"
+
+    def _history(self, now):
+        cycle = _cycle_anchor(now, hhmm="20:55")
+        return [
+            SimpleNamespace(
+                dag_id=self._DAG,
+                start_date=cycle - timedelta(days=i + 1) + timedelta(minutes=230),
+                state="success",
+            )
+            for i in range(12)
+        ]
+
+    def test_emission_suppresses_the_finding(self):
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        assert (
+            _evaluate_sla_missing_runs(
+                [self._DAG],
+                self._history(now),
+                now=now,
+                config=_SLA_CONFIG,
+                upstream_index={},
+                downstream_index={},
+                emitted_this_cycle={self._DAG},
+            )
+            == []
+        )
+
+    def test_without_emission_the_finding_still_fires(self):
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        findings = _evaluate_sla_missing_runs(
+            [self._DAG],
+            self._history(now),
+            now=now,
+            config=_SLA_CONFIG,
+            upstream_index={},
+            downstream_index={},
+            emitted_this_cycle=set(),
+        )
+        assert [f["dag_id"] for f in findings] == [self._DAG]
+
+    def test_upstream_emission_confirms_the_dependent_as_a_root(self):
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        findings = _evaluate_sla_missing_runs(
+            [self._DAG],
+            self._history(now),
+            now=now,
+            config=_SLA_CONFIG,
+            upstream_index={self._DAG: {"bietlejuice.core_region"}},
+            downstream_index={},
+            expected_dag_ids={self._DAG, "bietlejuice.core_region"},
+            emitted_this_cycle={"bietlejuice.core_region"},
+        )
+        assert len(findings) == 1
+        assert findings[0]["root_is_fallback"] is False
+
+    def _sla_ledger(self):
+        anchor = "2026-07-24T23:55:00+00:00"
+        key = f"{self._DAG}|sla::{anchor}"
+        return key, {
+            key: {
+                "kind": _KIND_MISSING_RUN,
+                "dag_id": self._DAG,
+                "run_id": f"sla::{anchor}",
+                "cycle_anchor": anchor,
+                "due_at": "2026-07-25T04:45:00+00:00",
+                "owner": "Data ForRent",
+            }
+        }
+
+    def test_follow_up_closes_the_thread_on_emission(self):
+        key, ledger = self._sla_ledger()
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        with (
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post,
+            mock.patch(f"{_MODULE}._fetch_sla_started", return_value={}),
+        ):
+            _follow_up_tracked_runs(
+                mock.Mock(),
+                ledger,
+                "http://hook",
+                now,
+                {},
+                _SLA_CONFIG,
+                sla_candidates=[self._DAG],
+                sla_emitted={self._DAG: now - timedelta(minutes=5)},
+            )
+        assert key not in ledger
+        assert "started at" in post.call_args.args[1]
+
+    def test_bare_manual_run_without_emission_does_not_close(self):
+        # A manual trigger with no run_type resolves to TEST_RUN: it is excluded from
+        # _SLA_STARTED_QUERY and emits nothing, so downstream stays blocked and the
+        # alert must keep repeating.
+        key, ledger = self._sla_ledger()
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        with (
+            mock.patch(f"{_MODULE}._post_gchat", return_value=True) as post,
+            mock.patch(f"{_MODULE}._fetch_sla_started", return_value={}),
+        ):
+            _follow_up_tracked_runs(
+                mock.Mock(),
+                ledger,
+                "http://hook",
+                now,
+                {},
+                _SLA_CONFIG,
+                sla_candidates=[self._DAG],
+                sla_emitted={},
+            )
+        assert key in ledger
+        assert "still has not started" in post.call_args.args[1]
+
+    def test_history_baseline_query_stays_manual_free(self):
+        # Emission only feeds "started this cycle"; the P90 baseline must keep using
+        # automatic runs only, or manual reruns would drift the expected offset.
+        assert "scheduled" in str(_SLA_HISTORY_QUERY)
+        assert "dataset_event" not in str(_SLA_HISTORY_QUERY)
+
+
+# --------------------------------------------------------------------------- #
+# Dataset-aware DB access
+# --------------------------------------------------------------------------- #
+class TestDatasetFetchers:
+    def test_satisfaction_returns_empty_for_no_dag_ids(self):
+        session = mock.Mock()
+        assert _fetch_dataset_satisfaction(session, []) == {}
+        session.execute.assert_not_called()
+
+    def test_satisfaction_returns_none_on_db_error(self):
+        session = mock.Mock()
+        session.execute.side_effect = RuntimeError("no such table")
+        assert _fetch_dataset_satisfaction(session, ["bietlejuice.a"]) is None
+
+    def test_satisfaction_builds_status(self):
+        session = mock.Mock()
+        session.execute.return_value.fetchall.return_value = [
+            _dataset_row("bietlejuice.a", "uri-a", 0, "bietlejuice.p1")
+        ]
+        status = _fetch_dataset_satisfaction(session, ["bietlejuice.a"])
+        assert status["bietlejuice.a"]["uri-a"]["producers"] == {"bietlejuice.p1"}
+
+    def test_emitted_degrades_to_empty_on_db_error(self):
+        session = mock.Mock()
+        session.execute.side_effect = RuntimeError("no such table")
+        assert (
+            _fetch_sla_emitted(
+                session, datetime(2026, 7, 24, 23, 55, tzinfo=timezone.utc)
+            )
+            == {}
+        )
+
+    def test_emitted_maps_dag_to_first_emit(self):
+        first_emit = datetime(2026, 7, 25, 4, 55, tzinfo=timezone.utc)
+        session = mock.Mock()
+        session.execute.return_value.fetchall.return_value = [
+            SimpleNamespace(dag_id="bietlejuice.a", first_emit=first_emit)
+        ]
+        assert _fetch_sla_emitted(
+            session, datetime(2026, 7, 24, 23, 55, tzinfo=timezone.utc)
+        ) == {"bietlejuice.a": first_emit}
+
+
+class TestCollectSlaFindingsDatasetWiring:
+    def test_passes_live_graph_and_emissions_through_and_enriches(self):
+        finding = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": "bietlejuice.enrich_chatbot",
+            "run_id": "sla::2026-07-24T23:55:00+00:00",
+        }
+        live_upstream = {"bietlejuice.enrich_chatbot": {"bietlejuice.clean_chatbot"}}
+        with (
+            mock.patch(
+                f"{_MODULE}._load_upstream_index_safe", return_value={}
+            ) as load_upstream,
+            mock.patch(f"{_MODULE}._fetch_sla_history", return_value=[]),
+            mock.patch(
+                f"{_MODULE}._evaluate_sla_missing_runs", return_value=[dict(finding)]
+            ) as evaluate,
+            mock.patch(
+                f"{_MODULE}._fetch_dataset_satisfaction",
+                return_value={
+                    "bietlejuice.enrich_chatbot": {
+                        "uri-a": {
+                            "satisfied": False,
+                            "producers": {"bietlejuice.clean_chatbot"},
+                        }
+                    }
+                },
+            ) as satisfaction,
+        ):
+            findings = _collect_sla_findings(
+                mock.Mock(),
+                _SLA_CONFIG,
+                datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc),
+                {},
+                candidates=["bietlejuice.enrich_chatbot"],
+                dataset_upstream_index=live_upstream,
+                emitted={"bietlejuice.clean_chatbot": datetime.now(timezone.utc)},
+            )
+        load_upstream.assert_called_once_with(live_upstream)
+        assert evaluate.call_args.kwargs["emitted_this_cycle"] == {
+            "bietlejuice.clean_chatbot"
+        }
+        satisfaction.assert_called_once_with(mock.ANY, ["bietlejuice.enrich_chatbot"])
+        # The producer only counts as succeeded because it emitted this cycle.
+        assert findings[0]["dataset_verdict"] == _VERDICT_DROPPED_EVENT
+
+    def test_no_satisfaction_query_when_nothing_is_late(self):
+        with (
+            mock.patch(f"{_MODULE}._load_upstream_index_safe", return_value={}),
+            mock.patch(f"{_MODULE}._fetch_sla_history", return_value=[]),
+            mock.patch(f"{_MODULE}._evaluate_sla_missing_runs", return_value=[]),
+            mock.patch(f"{_MODULE}._fetch_dataset_satisfaction") as satisfaction,
+        ):
+            _collect_sla_findings(
+                mock.Mock(),
+                _SLA_CONFIG,
+                datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc),
+                {},
+                candidates=["bietlejuice.enrich_chatbot"],
+            )
+        satisfaction.assert_not_called()

@@ -12,7 +12,15 @@ Runtime-anomaly monitor. Every 30 minutes it:
 2. Flags DAGs that *should have started by now* (SLA start / missing-run guard)
    based on each DAG's own historical first-start offset within the daily cycle,
    with dependency-based root-cause suppression so one stalled root produces one
-   alert instead of hundreds of downstream noise.
+   alert instead of hundreds of downstream noise. Each root carries its dataset
+   trigger state, which separates a dropped dataset event (the 2026-07-14
+   postmortem's stale-SerializedDagModel race) from a genuine wait on an upstream.
+
+The dependency graph is the union of the deployed ``dependencies.yaml`` and the live
+dataset-scheduling tables, so namespaces the YAML omits (``quintoml.*``) still suppress
+correctly. Missing-run alerts close when the DAG runs automatically *or* publishes a
+dataset event, which is how an operator's ``impact_downstream_dependents`` recovery
+run — invisible to the automatic-run filter — resolves the thread.
 
 Alerting is tiered by ``critical_dags`` (soft-launch: empty list → Chat only):
   * Every over-baseline / missing-run DAG is reported to Google Chat and **tracked
@@ -54,6 +62,7 @@ from airflow.utils.db import provide_session
 from sqlalchemy import bindparam, text
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
@@ -74,7 +83,28 @@ _SLA_RUN_ID_PREFIX = "sla::"
 
 # Cap the DW blast-radius list in Chat / JiraOps messages.
 _IMPACTED_DW_LIST_LIMIT = 25
+# Dataset URIs are long, so the missing-dataset list is capped much tighter.
+_MISSING_DATASET_LIST_LIMIT = 5
 _UNKNOWN_OWNER = "unknown"
+
+# Why a dataset-scheduled DAG has no run yet.
+#  * dropped_dataset_event — every dataset it waits on is queued, or missing while its
+#    producer already succeeded. Airflow silently drops a dataset update that lands
+#    while the target DAG's SerializedDagModel is stale and never retro-applies it, so
+#    the trigger condition stays permanently short (2026-07-14 postmortem).
+#  * waiting_upstream — at least one producer genuinely has not delivered yet.
+_VERDICT_DROPPED_EVENT = "dropped_dataset_event"
+_VERDICT_WAITING_UPSTREAM = "waiting_upstream"
+# Same runbook the check_dags_dataset_queue alert links to.
+_DATASET_QUEUE_RUNBOOK_URL = (
+    "https://docs.google.com/document/d/"
+    "1dfTMqxDFV00uElPONo8a85m5dhpqnfHeBKNn48Kdcb8/edit#heading=h.7mfa516ef9eo"
+)
+# A bare manual trigger resolves to TEST_RUN and emits no dataset events, leaving
+# downstream blocked; the recovery trigger must carry this conf to fan out.
+_IMPACT_DOWNSTREAM_CONF = json.dumps(
+    {"run_type": DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS.value}
+)
 # Channel payload limits (hard caps; truncate before send).
 # GChat incoming webhooks reject text > 4096 characters.
 _GCHAT_TEXT_MAX = 4096
@@ -268,6 +298,69 @@ _SLA_STARTED_QUERY = text(
     GROUP BY dr.dag_id
     """
 ).bindparams(bindparam("dag_ids", expanding=True))
+
+# Live dataset-scheduling graph, straight from the metadata DB — the exact edges
+# Airflow's own scheduler walks. dependencies.yaml is a static approximation that
+# omits whole namespaces (every quintoml.* DAG appears there only as an upstream
+# value, never as a dependent key), so those DAGs have no upstreams at all as far as
+# root suppression is concerned and always look like their own root.
+_DATASET_EDGES_QUERY = text(
+    """
+    SELECT DISTINCT
+        dsdr.dag_id AS dependent_dag_id,
+        todr.dag_id AS upstream_dag_id
+    FROM dag_schedule_dataset_reference AS dsdr
+    INNER JOIN task_outlet_dataset_reference AS todr
+        ON todr.dataset_id = dsdr.dataset_id
+    WHERE todr.dag_id != dsdr.dag_id
+    """
+)
+
+# Per-DAG dataset trigger state, scoped to the late set. A dataset_dag_run_queue row
+# means "this dataset is satisfied and pending for that DAG"; rows are only consumed
+# when a run is actually created, so a DAG that never ran still exposes its partial
+# queue — the difference against dag_schedule_dataset_reference names the dataset
+# whose update went missing. DISTINCT collapses the per-task duplicates that
+# task_outlet_dataset_reference produces when several tasks emit the same dataset.
+_DATASET_SATISFACTION_QUERY = text(
+    """
+    SELECT DISTINCT
+        dsdr.dag_id AS dag_id,
+        d.uri AS uri,
+        CASE WHEN ddrq.target_dag_id IS NULL THEN 0 ELSE 1 END AS satisfied,
+        todr.dag_id AS producer_dag_id
+    FROM dag_schedule_dataset_reference AS dsdr
+    INNER JOIN dataset AS d
+        ON d.id = dsdr.dataset_id
+    LEFT JOIN dataset_dag_run_queue AS ddrq
+        ON ddrq.dataset_id = dsdr.dataset_id
+       AND ddrq.target_dag_id = dsdr.dag_id
+    LEFT JOIN task_outlet_dataset_reference AS todr
+        ON todr.dataset_id = dsdr.dataset_id
+    WHERE dsdr.dag_id IN :dag_ids
+    """
+).bindparams(bindparam("dag_ids", expanding=True))
+
+# Outbound dataset emission for the current cycle. Manual runs are excluded from
+# _REAL_RUN_FILTER_DR by design, but a manual trigger is the sanctioned remediation
+# for a dropped dataset event — and only one carrying run_type=impact_downstream_
+# dependents actually unblocks the chain (a bare one resolves to TEST_RUN and emits
+# nothing). Emission is therefore the honest "it really started" signal.
+# Cheap despite the missing standalone timestamp index (Airflow only indexes
+# (dataset_id, timestamp)): reset_datasets truncates dataset_event at 20:55, the same
+# instant as the cycle anchor, so the table never holds more than one cycle. Not
+# filtered by dag_id either — one row per emitting DAG beats an IN list over ~1k ids.
+_SLA_EMITTED_QUERY = text(
+    """
+    SELECT
+        de.source_dag_id AS dag_id,
+        MIN(de.timestamp) AS first_emit
+    FROM dataset_event AS de
+    WHERE de.timestamp >= :cycle_start
+      AND de.source_dag_id IS NOT NULL
+    GROUP BY de.source_dag_id
+    """
+)
 
 # A DagRun in one of these states is finished; anything else is still in flight.
 _TERMINAL_STATES = {"success", "failed"}
@@ -586,6 +679,32 @@ def _offsets_by_dag(first_starts: dict, *, hhmm: str) -> dict:
     return offsets
 
 
+def _succeeded_this_cycle(
+    history_rows: Iterable,
+    *,
+    hhmm: str,
+    cycle_key: str,
+    emitted: Iterable | None = None,
+) -> set:
+    """DAG ids that delivered in the current cycle.
+
+    A successful automatic run counts, and so does any DAG that emitted a dataset
+    event this cycle — the latter picks up an operator's
+    ``run_type=impact_downstream_dependents`` recovery run, which ``_REAL_RUN_FILTER_DR``
+    deliberately excludes from history but which really did unblock its dependents.
+    """
+    succeeded = {
+        row.dag_id
+        for row in history_rows
+        if getattr(row, "state", None) == "success"
+        and getattr(row, "start_date", None) is not None
+        and _cycle_anchor(row.start_date, hhmm=hhmm).isoformat() == cycle_key
+    }
+    if emitted:
+        succeeded |= set(emitted)
+    return succeeded
+
+
 def _build_upstream_index(dependencies: dict | None) -> dict:
     """``dag_id → {direct upstream dag_ids}`` from ``dependencies.yaml``."""
     if not isinstance(dependencies, dict):
@@ -611,22 +730,129 @@ def _build_upstream_index(dependencies: dict | None) -> dict:
     return index
 
 
-def _load_upstream_index_safe() -> dict | None:
-    """Load ``dependencies.yaml`` and invert to an upstream index.
+def _union_indexes(*indexes) -> dict | None:
+    """Union ``dag_id → {dag_ids}`` graphs, skipping sources that failed (``None``).
 
-    Returns ``None`` when the graph is unavailable so SLA detection can fail closed
-    (skip opening new missing-run alerts) instead of treating every late DAG as a
-    root with an empty upstream map. A successfully loaded empty file still returns
+    Returns ``None`` only when *every* source failed, preserving the fail-closed
+    contract callers rely on. A source that loaded but is empty still counts as
+    available, so an empty dependencies.yaml yields ``{}`` rather than ``None``.
+    """
+    available = [index for index in indexes if index is not None]
+    if not available:
+        return None
+    merged: dict = {}
+    for index in available:
+        for key, values in index.items():
+            if values:
+                merged.setdefault(key, set()).update(values)
+    return merged
+
+
+def _build_dataset_indexes(rows) -> tuple:
+    """``(upstream_index, downstream_index)`` from live dataset-reference rows."""
+    if rows is None:
+        return None, None
+    upstream: dict = {}
+    downstream: dict = {}
+    for row in rows:
+        dependent = getattr(row, "dependent_dag_id", None)
+        producer = getattr(row, "upstream_dag_id", None)
+        if not dependent or not producer or dependent == producer:
+            continue
+        upstream.setdefault(dependent, set()).add(producer)
+        downstream.setdefault(producer, set()).add(dependent)
+    return upstream, downstream
+
+
+def _build_dataset_status(rows) -> dict:
+    """``dag_id → {uri: {"satisfied": bool, "producers": set}}`` from query rows."""
+    status: dict = {}
+    for row in rows:
+        dag_id = getattr(row, "dag_id", None)
+        uri = getattr(row, "uri", None)
+        if not dag_id or not uri:
+            continue
+        per_dag = status.setdefault(dag_id, {})
+        entry = per_dag.setdefault(uri, {"satisfied": False, "producers": set()})
+        if getattr(row, "satisfied", 0):
+            entry["satisfied"] = True
+        producer = getattr(row, "producer_dag_id", None)
+        if producer:
+            entry["producers"].add(producer)
+    return status
+
+
+def _classify_dataset_state(datasets: dict | None, succeeded_this_cycle: set) -> dict:
+    """Explain why a late dataset-scheduled DAG still has no run.
+
+    A dataset counts as *ready but unrecorded* when it has no queue row yet any of its
+    producers already delivered this cycle — the 2026-07-14 postmortem signature, where
+    ``enrich_chatbot`` sat at 13/14 forever because the final update landed while its
+    SerializedDagModel was stale. Any producer delivering is enough: Airflow satisfies
+    the condition on the first emission, it does not wait for all of them.
+
+    Returns ``{}`` for DAGs with no dataset schedule (cron), so callers can leave the
+    message untouched.
+    """
+    if not datasets:
+        return {}
+    required = len(datasets)
+    missing = sorted(uri for uri, meta in datasets.items() if not meta["satisfied"])
+    ready, blocking = [], set()
+    for uri in missing:
+        producers = datasets[uri]["producers"]
+        if producers & succeeded_this_cycle:
+            ready.append(uri)
+        else:
+            blocking.update(producers)
+    return {
+        "dataset_required": required,
+        "dataset_satisfied": required - len(missing),
+        "dataset_missing": missing,
+        "dataset_ready_missing": ready,
+        "dataset_blocking_dags": sorted(blocking),
+        "dataset_verdict": (
+            _VERDICT_DROPPED_EVENT
+            if not missing or ready
+            else _VERDICT_WAITING_UPSTREAM
+        ),
+    }
+
+
+def _enrich_findings_with_dataset_state(
+    findings: list, dataset_status: dict | None, succeeded_this_cycle: set
+) -> None:
+    """Attach dataset counts, missing URIs and the verdict to each finding in place."""
+    if not findings or not dataset_status:
+        return
+    for finding in findings:
+        finding.update(
+            _classify_dataset_state(
+                dataset_status.get(finding["dag_id"]), succeeded_this_cycle
+            )
+        )
+
+
+def _load_upstream_index_safe(
+    dataset_upstream_index: dict | None = None,
+) -> dict | None:
+    """Upstream index from ``dependencies.yaml``, unioned with the live dataset graph.
+
+    Returns ``None`` only when both sources are unavailable, so SLA detection can fail
+    closed (skip opening new missing-run alerts) instead of treating every late DAG as
+    a root with an empty upstream map. A successfully loaded empty file still returns
     ``{}``.
     """
+    yaml_index = None
     try:
         deps = BietlejuiceDependencyHelper.read_dependencies()
-        if not isinstance(deps, dict):
-            return None
-        return _build_upstream_index(deps)
+        if isinstance(deps, dict):
+            yaml_index = _build_upstream_index(deps)
+        else:
+            print("⚠️  dependencies.yaml did not parse to a mapping; ignoring it.")
     except Exception as exc:  # noqa: BLE001 — operational guard
         print(f"⚠️  Failed to load/index dependencies.yaml for SLA upstreams: {exc}")
-        return None
+    return _union_indexes(yaml_index, dataset_upstream_index)
 
 
 def _select_sla_roots(
@@ -696,6 +922,7 @@ def _evaluate_sla_missing_runs(
     upstream_index: dict,
     downstream_index: dict | None,
     expected_dag_ids: set | None = None,
+    emitted_this_cycle: Iterable | None = None,
 ) -> list:
     """Build ``missing_run`` findings for late roots past their due_at.
 
@@ -703,6 +930,11 @@ def _evaluate_sla_missing_runs(
     is the full eligible universe used to decide which upstreams can be waited on.
     They differ only under the ``only_dags`` debug filter, where narrowing the
     evaluation must not make active upstreams look unexpected.
+
+    ``emitted_this_cycle`` are DAGs that published a dataset event this cycle. They
+    count as started (so an operator's recovery run closes the alert instead of
+    re-firing every 30 minutes) and as succeeded (so their dependents can still be
+    confirmed as roots), neither of which ``_REAL_RUN_FILTER_DR`` can see.
 
     Returns findings with ``kind=_KIND_MISSING_RUN``. Empty when SLA is disabled or
     nothing is past due.
@@ -721,16 +953,13 @@ def _evaluate_sla_missing_runs(
     first_starts = _first_starts_by_cycle(history_rows, hhmm=hhmm)
     offsets_by_dag = _offsets_by_dag(first_starts, hhmm=hhmm)
 
-    succeeded_this_cycle = {
-        row.dag_id
-        for row in history_rows
-        if getattr(row, "state", None) == "success"
-        and getattr(row, "start_date", None) is not None
-        and _cycle_anchor(row.start_date, hhmm=hhmm).isoformat() == cycle_key
-    }
+    emitted = set(emitted_this_cycle or ())
+    succeeded_this_cycle = _succeeded_this_cycle(
+        history_rows, hhmm=hhmm, cycle_key=cycle_key, emitted=emitted
+    )
     started_this_cycle = {
         dag_id for dag_id, cycles in first_starts.items() if cycle_key in cycles
-    }
+    } | emitted
 
     late: dict = {}
     for dag_id in candidate_dag_ids:
@@ -806,8 +1035,12 @@ def _evaluate_sla_missing_runs(
     return findings
 
 
-def _trigger_url(dag_id: str) -> str:
-    return f"{AIRFLOW_URL}/dags/{quote(dag_id, safe='')}/trigger"
+def _trigger_url(dag_id: str, *, run_conf: str | None = None) -> str:
+    """Trigger deep link, optionally pre-filled with a ``dag_run.conf`` payload."""
+    url = f"{AIRFLOW_URL}/dags/{quote(dag_id, safe='')}/trigger"
+    if run_conf:
+        url = f"{url}?conf={quote(run_conf, safe='')}"
+    return url
 
 
 def _build_alert_text(finding: dict) -> str:
@@ -859,6 +1092,16 @@ def _entry_from_finding(finding: dict, first_alert_ts: str | None = None) -> dic
                 "also_waiting_count": finding.get("also_waiting_count", 0),
                 "late_count": finding.get("late_count", 0),
                 "root_is_fallback": bool(finding.get("root_is_fallback")),
+                "dataset_required": finding.get("dataset_required"),
+                "dataset_satisfied": finding.get("dataset_satisfied"),
+                "dataset_missing": list(finding.get("dataset_missing") or []),
+                "dataset_ready_missing": list(
+                    finding.get("dataset_ready_missing") or []
+                ),
+                "dataset_blocking_dags": list(
+                    finding.get("dataset_blocking_dags") or []
+                ),
+                "dataset_verdict": finding.get("dataset_verdict"),
             }
         )
     else:
@@ -905,6 +1148,14 @@ def _elapsed_bullet(entry: dict, elapsed_s: float) -> str:
     return f"• Elapsed: {_format_duration(elapsed_s)} — baseline unavailable"
 
 
+def _join_capped(items: list, limit: int) -> str:
+    """``"a, b … and N more"`` — comma list capped at ``limit`` with an overflow tail."""
+    shown = list(items)[:limit]
+    overflow = len(items) - len(shown)
+    suffix = f" … and {overflow} more" if overflow > 0 else ""
+    return f"{', '.join(shown)}{suffix}"
+
+
 def _format_impacted_dw_line(
     impacted_dw_dags: list | None, *, limit: int = _IMPACTED_DW_LIST_LIMIT
 ) -> str:
@@ -912,11 +1163,7 @@ def _format_impacted_dw_line(
     dags = list(impacted_dw_dags or [])
     if not dags:
         return "• Impacted DW: none"
-    shown = dags[:limit]
-    overflow = len(dags) - len(shown)
-    listed = ", ".join(shown)
-    suffix = f" … and {overflow} more" if overflow > 0 else ""
-    return f"• Impacted DW ({len(dags)}): {listed}{suffix}"
+    return f"• Impacted DW ({len(dags)}): {_join_capped(dags, limit)}"
 
 
 def _slowness_body(
@@ -954,6 +1201,53 @@ def _format_utc_hhmm(value) -> str:
     return pendulum.instance(dt).in_timezone("UTC").format("HH:mm") + " UTC"
 
 
+def _dataset_state_lines(entry: dict) -> list:
+    """Dataset-trigger bullets: how many conditions are met, and what that implies.
+
+    Empty for cron DAGs (no dataset schedule), which keeps their message as before.
+    """
+    required = entry.get("dataset_required")
+    if not required:
+        return []
+    satisfied = entry.get("dataset_satisfied") or 0
+    missing = list(entry.get("dataset_missing") or [])
+    verdict = entry.get("dataset_verdict")
+    counts = f"• Datasets: {satisfied}/{required} satisfied"
+    lines = [
+        f"{counts} — missing {_join_capped(missing, _MISSING_DATASET_LIST_LIMIT)}"
+        if missing
+        else counts
+    ]
+    if verdict == _VERDICT_DROPPED_EVENT:
+        cause = (
+            "producer already delivered, update never recorded"
+            if entry.get("dataset_ready_missing")
+            else "all conditions met, no run created"
+        )
+        lines.append(
+            f"• Likely a dropped dataset event ({cause}) — {_DATASET_QUEUE_RUNBOOK_URL}"
+        )
+    elif verdict == _VERDICT_WAITING_UPSTREAM:
+        blocking = list(entry.get("dataset_blocking_dags") or [])
+        if blocking:
+            lines.append(
+                f"• Waiting on: {_join_capped(blocking, _MISSING_DATASET_LIST_LIMIT)}"
+            )
+    return lines
+
+
+def _missing_run_trigger_line(entry: dict) -> str:
+    """Trigger bullet. Only a dropped event warrants the fan-out recovery trigger.
+
+    When the DAG is genuinely still waiting on a producer, running it now would
+    process incomplete inputs *and* emit downstream events, so the plain link stays.
+    """
+    if entry.get("dataset_verdict") == _VERDICT_DROPPED_EVENT:
+        url = _trigger_url(entry["dag_id"], run_conf=_IMPACT_DOWNSTREAM_CONF)
+        return f"• Trigger (unblocks downstream): {url}"
+    return f"• Trigger: {_trigger_url(entry['dag_id'])}"
+
+
 def _missing_run_body(
     entry: dict,
     late_by_s: float,
@@ -975,6 +1269,7 @@ def _missing_run_body(
             f"(P{pct} start {expected} + {grace:g}m grace, {history} cycles / {lookback}d)"
         )
         lines.append(f"• Late by: {_format_duration(late_by_s)}")
+        lines.extend(_dataset_state_lines(entry))
         lines.append(_format_impacted_dw_line(entry.get("impacted_dw_dags") or []))
         also_waiting = entry.get("also_waiting_count") or 0
         if also_waiting:
@@ -986,7 +1281,7 @@ def _missing_run_body(
                 f"• Attribution: unconfirmed root "
                 f"({entry.get('late_count') or 0} DAG(s) late this cycle)"
             )
-        lines.append(f"• Trigger: {_trigger_url(entry['dag_id'])}")
+        lines.append(_missing_run_trigger_line(entry))
     else:
         lines.append(f"• Late by: {_format_duration(late_by_s)}")
         also_waiting = entry.get("also_waiting_count")
@@ -1085,25 +1380,33 @@ def _missing_run_started_text(
     )
 
 
-def _load_downstream_index_safe() -> dict | None:
-    """Load deployed dependencies.yaml and invert to a downstream index.
+def _load_downstream_index_safe(
+    dataset_downstream_index: dict | None = None,
+) -> dict | None:
+    """Downstream index from dependencies.yaml, unioned with the live dataset graph.
 
     Never fail the monitor cycle on read/parse errors or invalid upstream shapes
     (e.g. ``{}`` / dicts without ``any``/``all``), which raise ``ValueError`` inside
     ``find_unique_dependencies_in_dependency_object``.
 
-    Returns ``None`` when the graph is unavailable so follow-ups can keep the
+    Returns ``None`` only when both sources are unavailable, so follow-ups can keep the
     ledger snapshot instead of treating a load failure as ``Impacted DW DAGs: none``.
     A successfully loaded empty file still returns ``{}``.
+
+    Adding the live edges makes DW blast radius *larger* than dependencies.yaml alone:
+    paths that hop through a namespace missing from the YAML (``bietlejuice.x →
+    quintoml.y → bietlejuice.dw_z``) resolve here for the first time.
     """
+    yaml_index = None
     try:
         deps = BietlejuiceDependencyHelper.read_dependencies()
-        if not isinstance(deps, dict):
-            return None
-        return BietlejuiceDependencyHelper.build_downstream_index(deps)
+        if isinstance(deps, dict):
+            yaml_index = BietlejuiceDependencyHelper.build_downstream_index(deps)
+        else:
+            print("⚠️  dependencies.yaml did not parse to a mapping; ignoring it.")
     except Exception as exc:  # noqa: BLE001 — operational guard; keep alerting alive
         print(f"⚠️  Failed to load/index dependencies.yaml for DW impact: {exc}")
-        return None
+    return _union_indexes(yaml_index, dataset_downstream_index)
 
 
 def _enrich_findings_with_dw_impact(
@@ -1385,6 +1688,41 @@ def _fetch_sla_started(session, dag_ids: list, cycle_start: datetime) -> dict:
     return {row.dag_id: row.first_start for row in rows}
 
 
+def _fetch_dataset_edges(session):
+    """Live dataset-scheduling edges, or ``None`` when they cannot be read."""
+    try:
+        return session.execute(_DATASET_EDGES_QUERY).fetchall()
+    except Exception as exc:  # noqa: BLE001 — operational guard; fall back to YAML
+        print(f"⚠️  Failed to read live dataset references: {exc}")
+        return None
+
+
+def _fetch_dataset_satisfaction(session, dag_ids: list) -> dict | None:
+    """Map ``dag_id → {uri: {...}}`` for the given DAGs, or ``None`` on failure."""
+    if not dag_ids:
+        return {}
+    try:
+        rows = session.execute(
+            _DATASET_SATISFACTION_QUERY, {"dag_ids": list(dag_ids)}
+        ).fetchall()
+    except Exception as exc:  # noqa: BLE001 — diagnostics only; never fail the alert
+        print(f"⚠️  Failed to read dataset trigger state: {exc}")
+        return None
+    return _build_dataset_status(rows)
+
+
+def _fetch_sla_emitted(session, cycle_start: datetime) -> dict:
+    """Map ``dag_id → first dataset-event timestamp`` published in the current cycle."""
+    try:
+        rows = session.execute(
+            _SLA_EMITTED_QUERY, {"cycle_start": cycle_start}
+        ).fetchall()
+    except Exception as exc:  # noqa: BLE001 — degrade to run-based detection only
+        print(f"⚠️  Failed to read dataset emissions for this cycle: {exc}")
+        return {}
+    return {row.dag_id: row.first_emit for row in rows}
+
+
 # --------------------------------------------------------------------------- #
 # On-demand test mode (driven by dag_run.conf on a manual trigger)
 # --------------------------------------------------------------------------- #
@@ -1489,6 +1827,16 @@ def _synthetic_missing_run_findings(config: dict, dag_ids: list | None = None) -
             "also_waiting_count": 3,
             "late_count": 4,
             "root_is_fallback": False,
+            # Mirrors the postmortem shape (13/14) so simulate exercises the
+            # dropped-event bullets and the recovery trigger link.
+            "dataset_required": 14,
+            "dataset_satisfied": 13,
+            "dataset_missing": ["internal_chat:simulated-dataset:first-run-of-day"],
+            "dataset_ready_missing": [
+                "internal_chat:simulated-dataset:first-run-of-day"
+            ],
+            "dataset_blocking_dags": [],
+            "dataset_verdict": _VERDICT_DROPPED_EVENT,
         }
         for dag_id in dag_ids
     ]
@@ -1604,7 +1952,11 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     deliver = (environment == "prod") or opts["force_send"]
     now = datetime.now(timezone.utc)
 
-    downstream_index = _load_downstream_index_safe()
+    # One read of the live dataset graph per cycle, feeding both index directions.
+    dataset_upstream_index, dataset_downstream_index = _build_dataset_indexes(
+        _fetch_dataset_edges(session)
+    )
+    downstream_index = _load_downstream_index_safe(dataset_downstream_index)
 
     # --- Simulate: fabricate findings and post a chosen lifecycle phase (no DB / ledger).
     # simulate_state drives which message to emit for the SAME synthetic thread, so a few
@@ -1703,6 +2055,19 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     # follow-up needs it to stop tracking DAGs that left it (paused/deactivated).
     sla_enabled = config.get("sla_enabled", True)
     sla_candidates = _fetch_sla_candidates(session, config) if sla_enabled else []
+    # Shared by detection (a recovery run must not keep alerting) and follow-up
+    # (it must close the thread), so it is read once.
+    sla_emitted = (
+        _fetch_sla_emitted(
+            session,
+            _cycle_anchor(
+                now,
+                hhmm=_resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time")),
+            ),
+        )
+        if sla_enabled
+        else {}
+    )
     sla_findings = (
         _collect_sla_findings(
             session,
@@ -1711,6 +2076,8 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
             downstream_index,
             candidates=sla_candidates,
             only_dags=opts["only_dags"],
+            dataset_upstream_index=dataset_upstream_index,
+            emitted=sla_emitted,
         )
         if sla_enabled
         else []
@@ -1760,6 +2127,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
         downstream_index,
         config,
         sla_candidates=sla_candidates,
+        sla_emitted=sla_emitted,
     )
 
     # 2) Open new incidents for anomalies not yet tracked (and not just closed above).
@@ -1806,6 +2174,8 @@ def _collect_sla_findings(
     *,
     candidates: list,
     only_dags: list | None = None,
+    dataset_upstream_index: dict | None = None,
+    emitted: dict | None = None,
 ) -> list:
     """Evaluate missing-run roots for this cycle from pre-resolved ``candidates``."""
     # ``only_dags`` scopes which DAGs we evaluate, never which upstreams count as
@@ -1819,7 +2189,7 @@ def _collect_sla_findings(
         return []
 
     # Include upstreams of candidates so root suppression can see their success state.
-    upstream_index = _load_upstream_index_safe()
+    upstream_index = _load_upstream_index_safe(dataset_upstream_index)
     if upstream_index is None:
         print(
             "⚠️  Skipping SLA missing-run detection: "
@@ -1837,7 +2207,8 @@ def _collect_sla_findings(
         f"⏰ SLA missing-run: {len(candidates)} candidate(s), "
         f"{len(needed)} dag(s) in history scope, {len(history_rows)} history row(s)."
     )
-    return _evaluate_sla_missing_runs(
+    emitted_ids = set(emitted or {})
+    findings = _evaluate_sla_missing_runs(
         candidates,
         history_rows,
         now=now,
@@ -1845,7 +2216,21 @@ def _collect_sla_findings(
         upstream_index=upstream_index,
         downstream_index=downstream_index,
         expected_dag_ids=eligible,
+        emitted_this_cycle=emitted_ids,
     )
+    if findings:
+        # Scoped to the reported roots, so this stays a handful of rows even though
+        # the candidate set is ~1k DAGs.
+        hhmm = _resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time"))
+        cycle_key = _cycle_anchor(now, hhmm=hhmm).isoformat()
+        _enrich_findings_with_dataset_state(
+            findings,
+            _fetch_dataset_satisfaction(session, [f["dag_id"] for f in findings]),
+            _succeeded_this_cycle(
+                history_rows, hhmm=hhmm, cycle_key=cycle_key, emitted=emitted_ids
+            ),
+        )
+    return findings
 
 
 def _deliver_initial(finding, gchat_dest, jira_team, is_test) -> None:
@@ -1879,6 +2264,7 @@ def _follow_up_tracked_runs(
     config: dict,
     *,
     sla_candidates: list | None = None,
+    sla_emitted: dict | None = None,
 ) -> None:
     """Fetch the current state of tracked runs and apply follow-up messaging."""
     if not ledger:
@@ -1906,11 +2292,19 @@ def _follow_up_tracked_runs(
         return
 
     hhmm = _resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time"))
+    tracked_dag_ids = [e["dag_id"] for e in sla_entries]
     started = _fetch_sla_started(
         session,
-        [e["dag_id"] for e in sla_entries],
+        tracked_dag_ids,
         _cycle_anchor(now, hhmm=hhmm),
     )
+    # An operator's impact_downstream_dependents run is invisible to _SLA_STARTED_QUERY
+    # (manual run types are filtered out), but its dataset emissions prove the chain
+    # moved — without this the alert would keep repeating after the fix.
+    for dag_id in tracked_dag_ids:
+        first_emit = (sla_emitted or {}).get(dag_id)
+        if first_emit is not None:
+            started.setdefault(dag_id, first_emit)
     _apply_sla_follow_up(ledger, started, gchat_dest, now, config)
 
 
