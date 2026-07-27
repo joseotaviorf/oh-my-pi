@@ -20,20 +20,32 @@ expand_interval AS (
         AND dt_end_interval IS NOT NULL
         AND dt_start_interval <= dt_end_interval
 ),
-contract_distribution AS (
+contract_distribution_ranked AS (
   SELECT
     c.id_contract_external AS id_contract,
     hcd.agency,
-    DATE(hcd.ts_distribution) AS dt_distribution
+    DATE(hcd.ts_distribution) AS dt_distribution,
+    ROW_NUMBER() OVER(PARTITION BY c.id_contract_external, hcd.ts_distribution ORDER BY hcd.ts_redistribution, hcd.id_contract DESC) AS rn
   FROM datalake_cyber_clean.history_contract_distribution AS hcd
   LEFT JOIN datalake_cyber_clean.contracts AS c
     ON hcd.id_contract = c.id_contract
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY c.id_contract_external, hcd.ts_distribution ORDER BY hcd.ts_redistribution, hcd.id_contract DESC) = 1
+),
+contract_distribution AS (
+  SELECT
+    id_contract,
+    agency,
+    dt_distribution
+  FROM contract_distribution_ranked
+  WHERE
+    rn = 1
 )
 SELECT
   ei.id_contract,
   ei.id_agency,
-  ei.main_agency_name,
+  CASE
+    WHEN ei.id_agency = 'G024' AND ei.dt_reference < DATE('2026-07-01') THEN 'BULGARELLI'
+    ELSE ei.main_agency_name
+  END AS main_agency_name,
   ei.juridical_agency,
   ei.conventional_agency,
   ei.agencies_name_group,
