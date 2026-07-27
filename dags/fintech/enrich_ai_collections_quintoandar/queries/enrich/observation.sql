@@ -69,22 +69,33 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'original_invoice_values_disagreement_helper' THEN 1 ELSE 0 END) AS flag_original_invoice_values_disagreement_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'ongoing_deal_renegotiation_request_helper' THEN 1 ELSE 0 END) AS flag_ongoing_deal_renegotiation_request_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_non_tenant' THEN 1 ELSE 0 END) AS flag_handle_non_tenant,
-    MAX(CASE WHEN LOWER(obs.name) IN ('escalate_to_human_for_collections', 'escalate_tool') THEN 1 ELSE 0 END) AS flag_escalation_attempted,
-    -- Escalation reason declared by Matthew when handing off to human support.
-    -- Tries three known JSON shapes in obs.output and returns the first non-null match.
     MAX(
         CASE
-            WHEN LOWER(obs.name) IN ('escalate_to_human_for_collections', 'escalate_tool') THEN COALESCE(
-                GET_JSON_OBJECT(obs.output, '$.last_bot_message.metadata.escalation_reason'),
-                GET_JSON_OBJECT(obs.output, '$.metadata.escalation_reason'),
-                GET_JSON_OBJECT(
-                    GET_JSON_OBJECT(obs.output, '$.values[0].artifact.metadata'),
-                    '$.escalation_reason'
-                )
+            WHEN GET_JSON_OBJECT(trc.output, '$.responses[0].response_type') = 'human_escalation'
+            THEN 1
+            ELSE 0
+        END
+    ) AS flag_escalation_attempted,
+    MAX(
+        CASE
+            WHEN GET_JSON_OBJECT(trc.output, '$.responses[0].response_type') = 'human_escalation'
+            THEN GET_JSON_OBJECT(
+                trc.output,
+                '$.responses[0].content.hybrid_content.metadata[0].escalation_reason'
             )
             ELSE NULL
         END
     ) AS matthew_declared_escalation_reason,
+    MAX(
+        CASE
+            WHEN GET_JSON_OBJECT(trc.output, '$.responses[0].response_type') = 'human_escalation'
+            THEN GET_JSON_OBJECT(
+                trc.output,
+                '$.responses[0].content.hybrid_content.metadata[0].queue_name'
+            )
+            ELSE NULL
+        END
+    ) AS matthew_declared_escalation_queue,
     MAX(
         CASE
             WHEN UPPER(obs.type) = 'TOOL'
@@ -142,8 +153,6 @@ WHERE
             'original_invoice_values_disagreement_helper',
             'ongoing_deal_renegotiation_request_helper',
             'handle_non_tenant',
-            'escalate_to_human_for_collections',
-            'escalate_tool',
             'handle_finance_fetch_error',
             'get_annual_tax_report_v1',
             'get_paid_invoices_annual_report_v1'

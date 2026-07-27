@@ -140,6 +140,7 @@ SELECT
     COALESCE(o.is_notification_reply, 0) AS is_notification_reply,
     COALESCE(o.flag_escalation_attempted, 0) AS flag_escalation_attempted,
     o.matthew_declared_escalation_reason,
+    o.matthew_declared_escalation_queue,
     o.ts_first_observation,
     o.ts_last_observation,
     -- V3+ MCP signals (NULL for V2 sessions)
