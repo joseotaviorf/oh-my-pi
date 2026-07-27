@@ -41,6 +41,14 @@ def parse_args():
         default="",
         help="partial path used in some DAGs off of our pattern",
     )
+    parser.add_argument(
+        "platforms",
+        type=str,
+        nargs="?",
+        default="",
+        help="Comma-separated DataHub platforms to propagate DQ to "
+        "(e.g. 'databricks,glue,trino'). Empty => metadata-propagator default.",
+    )
 
     return parser.parse_args()
 
@@ -152,6 +160,7 @@ def main() -> None:
             args.relative_file_path,
             args.table_name,
             args.intermediate_path,
+            [platform for platform in args.platforms.split(",") if platform],
         )
         pipeline.run()
     else:
