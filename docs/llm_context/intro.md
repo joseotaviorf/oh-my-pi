@@ -143,6 +143,8 @@ Official, named metrics. Each builds on one or more business entities (linked at
 
 - `metric_entities/escalation_error_rate_walle.md` — % Escalation Error Rate (Wall-E): share of escalated Wall-E sessions that landed in a different support queue than the one first routed to (`first_queue != last_queue`), restricted to a curated whitelist of eleven front-facing queues (Escalation Error Rate / taxa de erro de escalonamento do Wall-E). Builds on `business_entities/chatbot_sessions.md`.
 
+- `metric_entities/non_walle_post.md` — % Non Wall-E (POST): share of billable front-office chat contacts in the Post-contract journey that did not originate from the Wall-E chatbot, classified by the session's first department (`is_first_interaction`) within the 22-queue "Contatos Faturáveis" universe (Non Wall-E Post / Share Tickets Non Wall-E (Pós) / não Wall-E pós-contrato). Builds on `business_entities/ticket.md` and `business_entities/chatbot_sessions.md`.
+
 - `metric_entities/property_integrity.md` — Property Integrity: official For Rent offboarding-quality metrics on `dw_offboarding.obt_offboarding` — **% Offb. W/o Mediation**, **% Without Repairs**, **% Both Agree**, **% Compulsory/Band-Aid 2**, and **% SPOC Roll Out** (integridade do imóvel / qualidade do offboarding / mediação / reparos). Builds on `business_entities/termination.md`, `business_entities/inspection.md`, and `business_entities/repairs.md`.
 
 - `metric_entities/offboard_human_vs_digital_metrics.md` — Offboard Human vs Digital Metrics: official For Rent offboarding (U&J) TF channel shares (% digital / % human support / % SPOC) and segmented NPS plus response volumes (13 metrics). Builds on `business_entities/termination.md`, `business_entities/nps.md`, and `business_entities/ticket.md`.

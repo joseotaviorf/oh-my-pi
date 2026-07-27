@@ -96,6 +96,21 @@ AND (
 | `RANK_SLA` | Ranks inspections to pick the appropriate one for the SLA denominator/numerator (must equal 1). |
 | `category` | Categorizes the contract/termination context. Use `category = 'EVICTION'` to isolate "Despejo" cases. |
 
+### Targets (Metas)
+
+**Target Source Table:** `datalake_gsheets_clean.target_service_kpis`
+
+The target (meta) for this indicator is stored in a centralized table that contains
+targets for multiple metrics. To pull the specific target for Inspection SLA, filter
+the base using the correct metric name.
+
+- **Target Metric Name:** `SLA VT Onb + Off s/ Despejo`
+- **Aliases / Search terms:** target de sla de vistoria, target de sla de onb+off
+
+**Important caveat:** This official target **does not include eviction cases
+("Despejo")**. When comparing the actual calculated SLA against this target, filter
+out eviction cases from your actuals (e.g., excluding `category = 'EVICTION'`).
+
 ## Dos and Don'ts
 
 **Do:**

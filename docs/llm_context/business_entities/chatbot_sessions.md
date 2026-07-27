@@ -20,6 +20,7 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 - [Escalation Rate FR Offboarding](../metric_entities/escalation_rate_fr_offboarding.md) — official escalation rate for the For Rent offboarding agent (`ForRentOffboardingAgentV1`), per day, segmented by `sessions.is_escalated`.
 - [% Escalation Rate (Wall-E)](../metric_entities/escalation_rate_walle.md) — official escalation rate for Wall-E sessions, scoped with `bot = 'wall-e'`.
 - [% Escalation Error Rate (Wall-E)](../metric_entities/escalation_error_rate_walle.md) — official Wall-E escalation error rate, restricted to a curated front-facing queue whitelist.
+- [% Non Wall-E (POST)](../metric_entities/non_walle_post.md) — share of billable front-office chat contacts in the Post-contract journey that did not originate from Wall-E, joined via session key (`Sauron` → `SSS` fallback).
 
 ## Glossary and Synonyms
 
