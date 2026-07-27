@@ -36,7 +36,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _classify_dataset_state,
     _collect_sla_findings,
     _cycle_anchor,
-    _dataset_ready,
+    _dataset_blocked,
     _effective_work_start,
     _enrich_findings_with_dataset_state,
     _enrich_findings_with_dw_impact,
@@ -2685,15 +2685,22 @@ class TestBuildDatasetStatus:
 
 class TestClassifyDatasetState:
     def test_cron_dag_without_datasets_yields_nothing(self):
-        assert _classify_dataset_state(None, set()) == {}
-        assert _classify_dataset_state({}, set()) == {}
+        assert (
+            _classify_dataset_state(None, emitted_uris=set(), completed_dags=set())
+            == {}
+        )
+        assert (
+            _classify_dataset_state({}, emitted_uris=set(), completed_dags=set()) == {}
+        )
 
     def test_all_satisfied_but_no_run_is_a_dropped_event(self):
         datasets = {
             "uri-a": {"satisfied": True, "producers": {"bietlejuice.p1"}},
             "uri-b": {"satisfied": True, "producers": {"bietlejuice.p2"}},
         }
-        result = _classify_dataset_state(datasets, set())
+        result = _classify_dataset_state(
+            datasets, emitted_uris=set(), completed_dags=set()
+        )
         assert result["dataset_verdict"] == _VERDICT_DROPPED_EVENT
         assert result["dataset_satisfied"] == 2
         assert result["dataset_required"] == 2
@@ -2709,7 +2716,9 @@ class TestClassifyDatasetState:
             "satisfied": False,
             "producers": {"bietlejuice.enrich_chatbot"},
         }
-        result = _classify_dataset_state(datasets, {"bietlejuice.enrich_chatbot"})
+        result = _classify_dataset_state(
+            datasets, emitted_uris=set(), completed_dags={"bietlejuice.enrich_chatbot"}
+        )
         assert result["dataset_verdict"] == _VERDICT_DROPPED_EVENT
         assert result["dataset_satisfied"] == 13
         assert result["dataset_required"] == 14
@@ -2722,7 +2731,9 @@ class TestClassifyDatasetState:
             "uri-a": {"satisfied": True, "producers": {"bietlejuice.p1"}},
             "uri-b": {"satisfied": False, "producers": {"bietlejuice.slow_upstream"}},
         }
-        result = _classify_dataset_state(datasets, {"bietlejuice.p1"})
+        result = _classify_dataset_state(
+            datasets, emitted_uris=set(), completed_dags={"bietlejuice.p1"}
+        )
         assert result["dataset_verdict"] == _VERDICT_WAITING_UPSTREAM
         assert result["dataset_blocking_dags"] == ["bietlejuice.slow_upstream"]
         assert result["dataset_ready_missing"] == []
@@ -2735,12 +2746,16 @@ class TestClassifyDatasetState:
                 "producers": {"bietlejuice.p1", "bietlejuice.p2"},
             }
         }
-        result = _classify_dataset_state(datasets, {"bietlejuice.p1"})
+        result = _classify_dataset_state(
+            datasets, emitted_uris=set(), completed_dags={"bietlejuice.p1"}
+        )
         assert result["dataset_verdict"] == _VERDICT_DROPPED_EVENT
 
     def test_missing_without_known_producer_is_waiting_with_no_blocker_named(self):
         datasets = {"uri-a": {"satisfied": False, "producers": set()}}
-        result = _classify_dataset_state(datasets, set())
+        result = _classify_dataset_state(
+            datasets, emitted_uris=set(), completed_dags=set()
+        )
         assert result["dataset_verdict"] == _VERDICT_WAITING_UPSTREAM
         assert result["dataset_blocking_dags"] == []
 
@@ -2758,14 +2773,17 @@ class TestEnrichFindingsWithDatasetState:
                     "uri-a": {"satisfied": False, "producers": {"bietlejuice.p1"}}
                 }
             },
-            {"bietlejuice.p1"},
+            emitted_uris=set(),
+            completed_dags={"bietlejuice.p1"},
         )
         assert findings[0]["dataset_verdict"] == _VERDICT_DROPPED_EVENT
         assert "dataset_verdict" not in findings[1]
 
     def test_unavailable_status_leaves_findings_untouched(self):
         findings = [{"dag_id": "bietlejuice.a"}]
-        _enrich_findings_with_dataset_state(findings, None, set())
+        _enrich_findings_with_dataset_state(
+            findings, None, emitted_uris=set(), completed_dags=set()
+        )
         assert findings == [{"dag_id": "bietlejuice.a"}]
 
 
@@ -3207,19 +3225,29 @@ class TestQuotientExcludesReprocessing:
                 reprocessing=True,
             ): {"satisfied": False, "producers": set()},
         }
-        result = _classify_dataset_state(datasets, set())
+        result = _classify_dataset_state(
+            datasets, emitted_uris=set(), completed_dags=set()
+        )
         assert result["dataset_required"] == 4
         assert result["dataset_satisfied"] == 3
         assert result["dataset_missing"] == [blocker]
 
 
-class TestDatasetReady:
+def _blocked(datasets, *, emitted_uris=None, completed_dags=None):
+    return _dataset_blocked(
+        datasets,
+        emitted_uris=emitted_uris,
+        completed_dags=completed_dags or set(),
+    )
+
+
+class TestDatasetBlocked:
     def test_none_when_there_is_nothing_to_judge(self):
-        assert _dataset_ready(None) is None
-        assert _dataset_ready({}) is None
+        assert _blocked(None) is None
+        assert _blocked({}) is None
         # Reprocessing-only leaves no requirement, so still no opinion.
         assert (
-            _dataset_ready(
+            _blocked(
                 {
                     _uri("bietlejuice.p1", reprocessing=True): {
                         "satisfied": False,
@@ -3230,12 +3258,60 @@ class TestDatasetReady:
             is None
         )
 
-    def test_true_only_when_every_required_dataset_is_satisfied(self):
+    def test_not_blocked_when_every_required_dataset_is_satisfied(self):
         satisfied = {_uri("bietlejuice.p1"): {"satisfied": True, "producers": set()}}
-        assert _dataset_ready(satisfied) is True
-        partial = dict(satisfied)
-        partial[_uri("bietlejuice.p2")] = {"satisfied": False, "producers": set()}
-        assert _dataset_ready(partial) is False
+        assert _blocked(satisfied) is False
+
+    def test_blocked_while_the_upstream_is_still_working(self):
+        uri = _uri("bietlejuice.p2")
+        datasets = {
+            _uri("bietlejuice.p1"): {"satisfied": True, "producers": set()},
+            uri: {"satisfied": False, "producers": {"bietlejuice.p2"}},
+        }
+        assert _blocked(datasets) is True
+
+    def test_not_blocked_when_the_missing_dataset_already_fired(self):
+        """The dropped-event signature: the event exists, the queue row does not."""
+        uri = _uri("bietlejuice.p2")
+        datasets = {
+            _uri("bietlejuice.p1"): {"satisfied": True, "producers": set()},
+            uri: {"satisfied": False, "producers": {"bietlejuice.p2"}},
+        }
+        assert _blocked(datasets, emitted_uris={uri}) is False
+
+    def test_not_blocked_when_the_producer_finished_without_delivering(self):
+        datasets = {
+            _uri("bietlejuice.p2"): {
+                "satisfied": False,
+                "producers": {"bietlejuice.p2"},
+            }
+        }
+        assert (
+            _blocked(datasets, emitted_uris=set(), completed_dags={"bietlejuice.p2"})
+            is False
+        )
+
+    def test_a_mid_flight_producer_that_emitted_another_outlet_still_blocks(self):
+        """The 2026-07-25 avalanche: emitting one outlet is not finishing the run."""
+        waiting_on = _uri("bietlejuice.p2", "load-fact")
+        datasets = {waiting_on: {"satisfied": False, "producers": {"bietlejuice.p2"}}}
+        assert (
+            _blocked(
+                datasets,
+                emitted_uris={_uri("bietlejuice.p2", "load-dim")},
+                completed_dags=set(),
+            )
+            is True
+        )
+
+    def test_unreadable_event_table_falls_back_to_run_completion(self):
+        uri = _uri("bietlejuice.p2")
+        datasets = {uri: {"satisfied": False, "producers": {"bietlejuice.p2"}}}
+        assert _blocked(datasets, emitted_uris=None) is True
+        assert (
+            _blocked(datasets, emitted_uris=None, completed_dags={"bietlejuice.p2"})
+            is False
+        )
 
     def test_unsatisfied_reprocessing_twin_does_not_block(self):
         datasets = {
@@ -3245,7 +3321,7 @@ class TestDatasetReady:
                 "producers": set(),
             },
         }
-        assert _dataset_ready(datasets) is True
+        assert _blocked(datasets) is False
 
 
 class TestProducerRecoveredWithoutTaskOutletRows:
@@ -3404,6 +3480,35 @@ class TestReadinessGatedRoots:
         )
         assert roots == ["bietlejuice.dw_accounts_receivable"]
         assert used_fallback is True
+
+    def test_a_dropped_event_is_reported_not_suppressed(self):
+        """Prod 2026-07-26: every tick reported 0 roots while dozens stayed late.
+
+        Gating on "all datasets satisfied" also hid the DAGs stuck at N-1/N whose
+        producer had already delivered, which is the failure the guard exists for.
+        """
+        late = set(self._UPSTREAM)
+        roots, suppressed, _ = _select_sla_roots(
+            late,
+            upstream_index=self._UPSTREAM,
+            succeeded_this_cycle={"bietlejuice.dw_collection_recovery_quintoandar"},
+            dataset_status=self._status(False),
+            emitted_uris={_uri("bietlejuice.dw_collection_recovery_quintoandar")},
+        )
+        assert roots == sorted(self._UPSTREAM)
+        assert suppressed == 0
+
+    def test_a_producer_that_finished_without_delivering_is_reported(self):
+        late = set(self._UPSTREAM)
+        roots, _, _ = _select_sla_roots(
+            late,
+            upstream_index=self._UPSTREAM,
+            succeeded_this_cycle={"bietlejuice.dw_collection_recovery_quintoandar"},
+            dataset_status=self._status(False),
+            emitted_uris=set(),
+            completed_dags={"bietlejuice.dw_collection_recovery_quintoandar"},
+        )
+        assert roots == sorted(self._UPSTREAM)
 
 
 class TestMissingRunAlertCap:

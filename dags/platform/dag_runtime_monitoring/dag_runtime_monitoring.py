@@ -388,6 +388,19 @@ _SLA_EMITTED_QUERY = text(
     """
 )
 
+# The same one-cycle table, read at dataset granularity. Which *URIs* fired is what
+# separates a dropped event from an upstream that simply has not got there yet; the
+# source dag_id above cannot, because a producer emits its outlets progressively.
+_SLA_EMITTED_URIS_QUERY = text(
+    """
+    SELECT DISTINCT d.uri AS uri
+    FROM dataset_event AS de
+    INNER JOIN dataset AS d
+        ON d.id = de.dataset_id
+    WHERE de.timestamp >= :cycle_start
+    """
+)
+
 # A DagRun in one of these states is finished; anything else is still in flight.
 _TERMINAL_STATES = {"success", "failed"}
 
@@ -818,17 +831,43 @@ def _required_datasets(datasets: dict | None) -> dict:
     }
 
 
-def _dataset_ready(datasets: dict | None) -> bool | None:
-    """Whether a dataset-scheduled DAG already has everything it needs to start.
+def _dataset_blocked(
+    datasets: dict | None,
+    *,
+    emitted_uris: set | None,
+    completed_dags: set,
+) -> bool | None:
+    """Whether a late dataset-scheduled DAG is genuinely still waiting on an upstream.
+
+    ``True`` only when *every* dataset it is missing belongs to an upstream that has not
+    finished with it — the DAG will start on its own and must stay quiet. ``False`` when
+    it is ready, or when any missing dataset is already settled (``_dataset_settled``),
+    which means it is stuck and has to be reported.
+
+    That distinction is the whole point. Suppressing on "not every dataset satisfied"
+    also silences the dropped-event case, which is the failure this guard exists to
+    catch: a DAG sitting at 13/14 fails a plain readiness test, so the guard went to
+    zero roots on every tick while dozens of DAGs stayed late.
 
     ``None`` means "no opinion" — a cron DAG with no dataset schedule, or one whose
     trigger state could not be read — so callers fall back to DAG-level reasoning
-    instead of treating absence of evidence as evidence of readiness.
+    instead of treating absence of evidence as evidence of blockage.
     """
     required = _required_datasets(datasets)
     if not required:
         return None
-    return all(meta["satisfied"] for meta in required.values())
+    missing = [uri for uri, meta in required.items() if not meta["satisfied"]]
+    if not missing:
+        return False
+    return not any(
+        _dataset_settled(
+            uri,
+            required[uri]["producers"],
+            emitted_uris=emitted_uris,
+            completed_dags=completed_dags,
+        )
+        for uri in missing
+    )
 
 
 def _log_dataset_graph_coverage(upstream_index: dict | None) -> None:
@@ -914,14 +953,50 @@ def _build_dataset_status(rows) -> dict:
     return status
 
 
-def _classify_dataset_state(datasets: dict | None, succeeded_this_cycle: set) -> dict:
+def _dataset_settled(
+    uri: str,
+    producers: set,
+    *,
+    emitted_uris: set | None,
+    completed_dags: set,
+) -> bool:
+    """Whether waiting on a missing dataset is pointless — the upstream is done with it.
+
+    Two independent proofs, either of which means the DAG is stuck rather than pending:
+
+    * the dataset's own event fired this cycle, yet this DAG has no queue row for it —
+      Airflow dropped the update against a stale ``SerializedDagModel`` and never
+      retro-applies it (2026-07-14 postmortem, ``enrich_chatbot`` at 13/14 forever);
+    * the producing DAG finished a successful run this cycle and the dataset still never
+      arrived.
+
+    Completion is measured from real runs only and never from emissions. A producer that
+    has emitted one early outlet is still mid-flight, and counting that as delivered is
+    what promoted a whole downstream wavefront into alerts on 2026-07-25. The URI check
+    covers the case run history cannot see: an operator's
+    ``run_type=impact_downstream_dependents`` recovery run is excluded from history by
+    ``_REAL_RUN_FILTER_DR`` but does emit real events.
+
+    ``emitted_uris`` of ``None`` means the event table could not be read, so only the
+    completion proof applies.
+    """
+    if emitted_uris is not None and uri in emitted_uris:
+        return True
+    return bool(producers & completed_dags)
+
+
+def _classify_dataset_state(
+    datasets: dict | None,
+    *,
+    emitted_uris: set | None,
+    completed_dags: set,
+) -> dict:
     """Explain why a late dataset-scheduled DAG still has no run.
 
-    A dataset counts as *ready but unrecorded* when it has no queue row yet any of its
-    producers already delivered this cycle — the 2026-07-14 postmortem signature, where
-    ``enrich_chatbot`` sat at 13/14 forever because the final update landed while its
-    SerializedDagModel was stale. Any producer delivering is enough: Airflow satisfies
-    the condition on the first emission, it does not wait for all of them.
+    A dataset counts as *ready but unrecorded* when it is missing but its upstream is
+    already finished with it — see ``_dataset_settled``, which is the same test the root
+    gate applies, so the verdict in the message and the decision to send it can never
+    disagree.
 
     Only the required branch is counted (see ``_required_datasets``), so the quotient
     reflects what actually gates the next run rather than every URI the flattened
@@ -939,11 +1014,15 @@ def _classify_dataset_state(datasets: dict | None, succeeded_this_cycle: set) ->
     )
     ready, blocking = [], set()
     for uri in missing:
-        producers = required_datasets[uri]["producers"]
-        if producers & succeeded_this_cycle:
+        if _dataset_settled(
+            uri,
+            required_datasets[uri]["producers"],
+            emitted_uris=emitted_uris,
+            completed_dags=completed_dags,
+        ):
             ready.append(uri)
         else:
-            blocking.update(producers)
+            blocking.update(required_datasets[uri]["producers"])
     return {
         "dataset_required": required,
         "dataset_satisfied": required - len(missing),
@@ -959,7 +1038,11 @@ def _classify_dataset_state(datasets: dict | None, succeeded_this_cycle: set) ->
 
 
 def _enrich_findings_with_dataset_state(
-    findings: list, dataset_status: dict | None, succeeded_this_cycle: set
+    findings: list,
+    dataset_status: dict | None,
+    *,
+    emitted_uris: set | None,
+    completed_dags: set,
 ) -> None:
     """Attach dataset counts, missing URIs and the verdict to each finding in place."""
     if not findings or not dataset_status:
@@ -967,7 +1050,9 @@ def _enrich_findings_with_dataset_state(
     for finding in findings:
         finding.update(
             _classify_dataset_state(
-                dataset_status.get(finding["dag_id"]), succeeded_this_cycle
+                dataset_status.get(finding["dag_id"]),
+                emitted_uris=emitted_uris,
+                completed_dags=completed_dags,
             )
         )
 
@@ -1001,36 +1086,45 @@ def _select_sla_roots(
     succeeded_this_cycle: set,
     expected_this_cycle: set | None = None,
     dataset_status: dict | None = None,
+    emitted_uris: set | None = None,
+    completed_dags: set | None = None,
 ) -> tuple[list, int, bool]:
     """Return (root dag_ids sorted, suppressed_count, used_fallback).
 
-    A *confirmed* root is a late DAG that is ready to run — every dataset it requires is
-    satisfied — where no upstream is itself late and every upstream expected to run this
-    cycle already succeeded. Upstreams outside ``expected_this_cycle`` (paused, inactive,
-    or excluded from the guard) cannot be waited on, so they never block — otherwise
-    their dependents would be permanently unalertable.
+    A *confirmed* root is a late DAG that is not blocked on a dataset, where no upstream
+    is itself late and every upstream expected to run this cycle already succeeded.
+    Upstreams outside ``expected_this_cycle`` (paused, inactive, or excluded from the
+    guard) cannot be waited on, so they never block — otherwise their dependents would
+    be permanently unalertable.
 
-    Readiness is judged per dataset, not per DAG, because blocking is per dataset.
-    ``succeeded_this_cycle`` counts a producer as delivered the moment it emits *any*
-    outlet, so a mid-flight upstream would otherwise promote its whole downstream
+    Blockage is judged per dataset, not per DAG, because that is how Airflow gates a
+    run. ``succeeded_this_cycle`` counts a producer as delivered the moment it emits
+    *any* outlet, so a mid-flight upstream would otherwise promote its whole downstream
     wavefront into "confirmed" roots that start on their own minutes later — the
     2026-07-25 cascade, where dw_accounts_receivable alerted while still short the one
-    dataset its upstream was computing. A DAG known to be missing a required dataset is
-    therefore never a root, in the confirmed pass or the fallback.
+    dataset its upstream was computing. ``_dataset_blocked`` draws the line at whether
+    the upstream is *finished* with the specific dataset, so a DAG stuck on a dropped
+    event is still reported while one waiting on live work is not.
 
-    When nothing is confirmed but ready DAGs *are* late, fall back to the topological
-    tops of the late set (no upstream is itself late) and flag it. Reporting a
-    lower-confidence root beats going silent on a real cascade, which is the failure
+    When nothing is confirmed but unblocked DAGs *are* late, fall back to the
+    topological tops of the late set (no upstream is itself late) and flag it. Reporting
+    a lower-confidence root beats going silent on a real cascade, which is the failure
     mode the 2026-07-14 postmortem describes. The fallback still excludes DAGs we
-    positively know are unready: that is evidence, not absence of it. When the trigger
-    state could not be read at all, ``_dataset_ready`` returns ``None`` and every late
+    positively know are blocked: that is evidence, not absence of it. When the trigger
+    state could not be read at all, ``_dataset_blocked`` returns ``None`` and every late
     DAG stays eligible, preserving the fail-open behaviour.
     """
     status = dataset_status or {}
+    completed = completed_dags or set()
     tops = [
         dag_id
         for dag_id in sorted(late_dag_ids)
-        if _dataset_ready(status.get(dag_id)) is not False
+        if _dataset_blocked(
+            status.get(dag_id),
+            emitted_uris=emitted_uris,
+            completed_dags=completed,
+        )
+        is not True
         and not any(
             upstream in late_dag_ids
             for upstream in (upstream_index.get(dag_id) or set())
@@ -1099,6 +1193,7 @@ def _evaluate_sla_missing_runs(
     downstream_index: dict | None,
     expected_dag_ids: set | None = None,
     emitted_this_cycle: Iterable | None = None,
+    emitted_uris: set | None = None,
     fetch_dataset_status=None,
 ) -> list:
     """Build ``missing_run`` findings for late roots past their due_at.
@@ -1112,6 +1207,11 @@ def _evaluate_sla_missing_runs(
     count as started (so an operator's recovery run closes the alert instead of
     re-firing every 30 minutes) and as succeeded (so their dependents can still be
     confirmed as roots), neither of which ``_REAL_RUN_FILTER_DR`` can see.
+
+    ``emitted_uris`` are the dataset URIs whose event fired this cycle, at dataset
+    granularity rather than the DAG granularity of ``emitted_this_cycle``. Only the URI
+    tells a dropped event apart from an upstream that has not reached that outlet yet,
+    since producers emit progressively.
 
     ``fetch_dataset_status`` is called once with the late dag_ids and returns their
     dataset trigger state (or ``None`` when unreadable). It is a callable rather than
@@ -1137,9 +1237,14 @@ def _evaluate_sla_missing_runs(
     offsets_by_dag = _offsets_by_dag(first_starts, hhmm=hhmm)
 
     emitted = set(emitted_this_cycle or ())
-    succeeded_this_cycle = _succeeded_this_cycle(
-        history_rows, hhmm=hhmm, cycle_key=cycle_key, emitted=emitted
+    # Two sets, deliberately: completed_this_cycle is real runs that finished, and is
+    # what proves an upstream is done with a dataset. succeeded_this_cycle adds the
+    # emitters on top for root confirmation, where a recovery run does count as
+    # delivery. Conflating them is what caused the 2026-07-25 avalanche.
+    completed_this_cycle = _succeeded_this_cycle(
+        history_rows, hhmm=hhmm, cycle_key=cycle_key
     )
+    succeeded_this_cycle = completed_this_cycle | emitted
     started_this_cycle = {
         dag_id for dag_id, cycles in first_starts.items() if cycle_key in cycles
     } | emitted
@@ -1175,6 +1280,8 @@ def _evaluate_sla_missing_runs(
         late_ids,
         upstream_index=upstream_index,
         dataset_status=dataset_status,
+        emitted_uris=emitted_uris,
+        completed_dags=completed_this_cycle,
         succeeded_this_cycle=succeeded_this_cycle,
         expected_this_cycle=(
             set(expected_dag_ids)
@@ -1220,7 +1327,12 @@ def _evaluate_sla_missing_runs(
             }
         )
     findings = _apply_missing_run_cap(findings, config)
-    _enrich_findings_with_dataset_state(findings, dataset_status, succeeded_this_cycle)
+    _enrich_findings_with_dataset_state(
+        findings,
+        dataset_status,
+        emitted_uris=emitted_uris,
+        completed_dags=completed_this_cycle,
+    )
     return findings
 
 
@@ -1908,6 +2020,23 @@ def _fetch_dataset_satisfaction(session, dag_ids: list) -> dict | None:
     return status
 
 
+def _fetch_emitted_dataset_uris(session, cycle_start: datetime) -> set | None:
+    """Dataset URIs whose event fired this cycle, or ``None`` when unreadable.
+
+    ``None`` is distinct from the empty set: no events at all means nothing has been
+    produced, whereas a failed read means the dropped-event proof is simply unavailable
+    and callers must not treat its absence as evidence.
+    """
+    try:
+        rows = session.execute(
+            _SLA_EMITTED_URIS_QUERY, {"cycle_start": cycle_start}
+        ).fetchall()
+    except Exception as exc:  # noqa: BLE001 — degrade to run-completion evidence only
+        print(f"⚠️  Failed to read dataset events for this cycle: {exc}")
+        return None
+    return {row.uri for row in rows if getattr(row, "uri", None)}
+
+
 def _fetch_sla_emitted(session, cycle_start: datetime) -> dict:
     """Map ``dag_id → first dataset-event timestamp`` published in the current cycle."""
     try:
@@ -2253,18 +2382,14 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
     # follow-up needs it to stop tracking DAGs that left it (paused/deactivated).
     sla_enabled = config.get("sla_enabled", True)
     sla_candidates = _fetch_sla_candidates(session, config) if sla_enabled else []
+    sla_cycle_start = _cycle_anchor(
+        now, hhmm=_resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time"))
+    )
     # Shared by detection (a recovery run must not keep alerting) and follow-up
     # (it must close the thread), so it is read once.
-    sla_emitted = (
-        _fetch_sla_emitted(
-            session,
-            _cycle_anchor(
-                now,
-                hhmm=_resolve_anchor_hhmm(config.get("sla_cycle_anchor_local_time")),
-            ),
-        )
-        if sla_enabled
-        else {}
+    sla_emitted = _fetch_sla_emitted(session, sla_cycle_start) if sla_enabled else {}
+    sla_emitted_uris = (
+        _fetch_emitted_dataset_uris(session, sla_cycle_start) if sla_enabled else None
     )
     sla_findings = (
         _collect_sla_findings(
@@ -2276,6 +2401,7 @@ def monitor_dag_runtimes(session=None, run_conf=None, **context):
             only_dags=opts["only_dags"],
             dataset_upstream_index=dataset_upstream_index,
             emitted=sla_emitted,
+            emitted_uris=sla_emitted_uris,
         )
         if sla_enabled
         else []
@@ -2374,6 +2500,7 @@ def _collect_sla_findings(
     only_dags: list | None = None,
     dataset_upstream_index: dict | None = None,
     emitted: dict | None = None,
+    emitted_uris: set | None = None,
 ) -> list:
     """Evaluate missing-run roots for this cycle from pre-resolved ``candidates``."""
     # ``only_dags`` scopes which DAGs we evaluate, never which upstreams count as
@@ -2417,6 +2544,7 @@ def _collect_sla_findings(
         downstream_index=downstream_index,
         expected_dag_ids=eligible,
         emitted_this_cycle=emitted_ids,
+        emitted_uris=emitted_uris,
         fetch_dataset_status=lambda dag_ids: _fetch_dataset_satisfaction(
             session, dag_ids
         ),

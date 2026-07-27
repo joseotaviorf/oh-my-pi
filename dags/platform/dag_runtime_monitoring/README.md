@@ -37,22 +37,33 @@ itself. Manual-only (`schedule_interval` null) DAGs are skipped. Wonka/`quintoml
 stay in (same scope as the slowness check).
 
 **Root selection (missing-run).** Of the DAGs past their due time, only the *roots*
-are alerted on. A **confirmed** root is **ready to run** — every dataset it requires is
-satisfied — and has no late upstream, with every upstream expected to run this cycle
-already succeeded. Upstreams outside the candidate set (paused, deactivated, excluded)
-can never succeed this cycle, so they do not block — otherwise their dependents would be
-permanently unalertable.
+are alerted on. A **confirmed** root is **not blocked on a dataset** and has no late
+upstream, with every upstream expected to run this cycle already succeeded. Upstreams
+outside the candidate set (paused, deactivated, excluded) can never succeed this cycle,
+so they do not block — otherwise their dependents would be permanently unalertable.
 
-**The readiness gate.** A producer counts as delivered the moment it emits *any* outlet,
+**The blocked gate.** A producer counts as delivered the moment it emits *any* outlet,
 which is what lets a manual recovery run close its own alert. But blocking is per
 *dataset*, so a mid-flight upstream would otherwise mark itself delivered, leave the late
 set, and promote its entire downstream wavefront into "confirmed" roots that start on
 their own minutes later. That is the 2026-07-25 cascade, where `dw_accounts_receivable`
-alerted while still short the one dataset its upstream was computing. A DAG positively
-known to be missing a required dataset is therefore never a root — not in the confirmed
-pass, and not in the fallback below.
+alerted while still short the one dataset its upstream was computing.
 
-If nothing is confirmed but *ready* DAGs are still late — e.g. the true root has too
+The gate therefore asks whether the upstream is *finished with the specific dataset*,
+not whether every dataset is satisfied. A missing dataset is **settled** — and its DAG
+is reported, not suppressed — when either its own event fired this cycle (Airflow
+dropped the update; the queue row will never appear) or its producer completed a
+successful run without delivering it. Only a DAG whose every missing dataset is still
+being worked on is suppressed.
+
+Gating on plain satisfaction instead is what broke prod on 2026-07-26: a DAG stuck at
+13/14 fails that test, so the dropped-event case the guard exists for was silenced and
+every tick reported 0 roots while 13 → 38 DAGs sat late. Run completion is read from
+real runs only, never from emissions, which is what keeps the 2026-07-25 avalanche
+fixed; the URI check covers what run history cannot see, since a recovery run is
+excluded from history but does emit real events.
+
+If nothing is confirmed but *unblocked* DAGs are still late — e.g. the true root has too
 little history to have a baseline — the monitor falls back to the **tops of the late
 subgraph** and marks the alert `Attribution: unconfirmed root (N DAG(s) late this
 cycle)`. A lower-confidence root beats going silent during a real cascade, which is
@@ -65,7 +76,7 @@ cleanly and says "blocked", that is evidence and the DAG stays silent.
 `any(all(<first-run-of-day>), any(<reprocessing>))`, but `dag_schedule_dataset_reference`
 stores a flat dataset list and loses the AND/OR structure. Only the non-reprocessing
 branch gates a normal cycle, so the twins are excluded from both the satisfaction
-quotient and the readiness gate — counting them made a ready DAG read as
+quotient and the blocked gate — counting them made a ready DAG read as
 blocked (`dw_accounts_receivable` showed `3/7` while short exactly one real dataset, and
 now reads `3/4`). The twin is the dependency string with `:reprocessing` appended, and
 the dependency usually already carries its own `:first-run-of-day` variant (4373 of the
@@ -133,7 +144,7 @@ when omitted.
 
 `sla_max_missing_run_alerts` (default 25) caps how many roots one tick may report,
 keeping the latest and adding `Alert cap reached: N more late root(s) not reported` to
-the survivors. The readiness gate keeps a recovering cascade quiet on its own, so this
+the survivors. The blocked gate keeps a recovering cascade quiet on its own, so this
 only bites on the one path the gate cannot cover — an unreadable dataset trigger state,
 where the fallback deliberately opens up.
 
