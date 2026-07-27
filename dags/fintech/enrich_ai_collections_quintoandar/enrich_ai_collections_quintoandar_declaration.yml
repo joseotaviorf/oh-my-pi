@@ -14,6 +14,7 @@ workflow:
   custom_schema: ai_collections_quintoandar
   default_extraction_type: incremental
   default_partitions: [year, month, day]
+  execution_timeout_hours: 5
   tables_customization:
     sessions:
       merge_on: [id_external]

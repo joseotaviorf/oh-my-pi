@@ -7,6 +7,7 @@ workflow:
   layer: dw
   custom_schema: collection_ai_agents
   default_extraction_type: full
+  execution_timeout_hours: 5
   inner_dependencies:
     fact_ai_agents_interaction:
       - fact_user_wallet_timeline
