@@ -2,6 +2,7 @@ SELECT
     id,
     usuario_id AS id_user,
     regiao_id AS id_region,
+    development_typology_id AS id_development_typology,
     aluguel AS rent,
     andar AS floor,
     andaresPredio AS building_floors,

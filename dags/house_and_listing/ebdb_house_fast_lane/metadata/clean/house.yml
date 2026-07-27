@@ -564,3 +564,7 @@ columns:
     lineage:
       - datalake_ebdb_raw.imovel.ts_database_transaction
     description: Timestamp of the original database transaction in the source system.
+  id_development_typology:
+    lineage:
+      - datalake_ebdb_raw.imovel.development_typology_id
+    description: Foreign key referencing the DevelopmentTypology table. Populated for primary market listings only.
