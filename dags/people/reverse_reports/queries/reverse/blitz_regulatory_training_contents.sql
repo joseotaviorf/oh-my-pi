@@ -1,5 +1,6 @@
 -- Regulatory training content progress for the Blitz Looker dashboard.
 -- Exception: Degreed learning enrich/clean tables — no DW equivalent for completion grain (DBP-1454).
+-- Campaign window: 2026-04-16 through 2026-07-24; extended deadlines account for absences and new hires.
 
 WITH
     degreed_content AS (
@@ -144,7 +145,15 @@ WITH
     ),
     pathway_progress AS (
         SELECT
-            *,
+            id_user,
+            user_organization_email,
+            person_number,
+            standardized_training,
+            pathway_title,
+            id_pathway,
+            pct_completed_pathway,
+            completion_date_rank,
+            ts_load,
             ROW_NUMBER() OVER (
                 PARTITION BY id_user, standardized_training
                 ORDER BY
@@ -188,29 +197,147 @@ WITH
         FROM
             standardized_pathways
     ),
-    active_absences AS (
+    absence_enrichment AS (
         SELECT
-            person_number,
+            far.person_number,
             MAX(
                 CASE
-                    WHEN CURRENT_DATE BETWEEN dt_absence_started AND dt_absence_ended THEN 1
+                    WHEN CAST(far.dt_absence_started AS DATE) <= CURRENT_DATE
+                        AND (
+                            CAST(far.dt_absence_ended AS DATE) = DATE '9999-12-31'
+                            OR CAST(far.dt_absence_ended AS DATE) >= CURRENT_DATE
+                        )
+                        AND far.sk_absence_type NOT IN (
+                            300000004959159,
+                            300000004800984,
+                            300000135717548,
+                            300000135717583,
+                            300000004800949,
+                            300000004959264
+                        )
+                        THEN 1
                     ELSE 0
                 END
-            ) AS absence_ativo
+            ) AS absence_ativo,
+            MAX(
+                CASE
+                    WHEN far.dt_absence_started >= DATE '2026-04-16'
+                        THEN 1
+                    ELSE 0
+                END
+            ) AS entrou_licenca,
+            MAX(
+                CASE
+                    WHEN CAST(far.dt_absence_ended AS DATE) >= DATE '2026-04-16'
+                        AND CAST(far.dt_absence_ended AS DATE) < DATE '9999-12-31'
+                        THEN 1
+                    ELSE 0
+                END
+            ) AS voltou_licenca,
+            MAX(
+                CASE
+                    WHEN CAST(far.dt_absence_started AS DATE) <= CURRENT_DATE
+                        AND (
+                            CAST(far.dt_absence_ended AS DATE) = DATE '9999-12-31'
+                            OR CAST(far.dt_absence_ended AS DATE) >= CURRENT_DATE
+                        )
+                        AND far.sk_absence_type NOT IN (
+                            300000004959159,
+                            300000004800984,
+                            300000135717548,
+                            300000135717583,
+                            300000004800949,
+                            300000004959264
+                        )
+                        THEN dat.absence_type
+                END
+            ) AS absence_type_ativo,
+            ARRAY_JOIN(
+                ARRAY_AGG(DISTINCT dat.absence_type) FILTER (WHERE dat.absence_type IS NOT NULL),
+                ', '
+            ) AS absence_types,
+            SUM(
+                CASE
+                    WHEN CAST(far.dt_absence_started AS DATE) <= DATE '2026-07-24'
+                        AND CAST(
+                            COALESCE(
+                                NULLIF(CAST(far.dt_absence_ended AS DATE), DATE '9999-12-31'),
+                                DATE '2026-07-24'
+                            ) AS DATE
+                        ) >= DATE '2026-04-16'
+                        AND far.sk_absence_type NOT IN (
+                            300000004959159,
+                            300000004800984,
+                            300000135717548,
+                            300000135717583,
+                            300000004800949,
+                            300000004959264
+                        )
+                        THEN DATEDIFF(
+                            LEAST(
+                                CAST(
+                                    COALESCE(
+                                        NULLIF(CAST(far.dt_absence_ended AS DATE), DATE '9999-12-31'),
+                                        DATE '2026-07-24'
+                                    ) AS DATE
+                                ),
+                                DATE '2026-07-24'
+                            ),
+                            GREATEST(CAST(far.dt_absence_started AS DATE), DATE '2026-04-16')
+                        ) + 1
+                    ELSE 0
+                END
+            ) AS dias_afastado_janela,
+            CASE
+                WHEN MAX(
+                    CASE
+                        WHEN CAST(far.dt_absence_started AS DATE) <= DATE '2026-07-24'
+                            AND (
+                                far.dt_absence_ended IS NULL
+                                OR CAST(far.dt_absence_ended AS DATE) = DATE '9999-12-31'
+                            )
+                            AND far.sk_absence_type NOT IN (
+                                300000004959159,
+                                300000004800984,
+                                300000135717548,
+                                300000135717583,
+                                300000004800949,
+                                300000004959264
+                            )
+                            THEN 1
+                        ELSE 0
+                    END
+                ) = 1
+                    THEN NULL
+                ELSE DATE_ADD(
+                    MAX(
+                        CASE
+                            WHEN CAST(far.dt_absence_started AS DATE) <= DATE '2026-07-24'
+                                AND CAST(far.dt_absence_ended AS DATE) >= DATE '2026-04-16'
+                                AND CAST(far.dt_absence_ended AS DATE) < DATE '9999-12-31'
+                                AND far.sk_absence_type NOT IN (
+                                    300000004959159,
+                                    300000004800984,
+                                    300000135717548,
+                                    300000135717583,
+                                    300000004800949,
+                                    300000004959264
+                                )
+                                THEN CAST(far.dt_absence_ended AS DATE)
+                        END
+                    ),
+                    1
+                )
+            END AS dt_retorno
         FROM
-            dw_time.fact_absence_requests
+            dw_time.fact_absence_requests AS far
+        LEFT JOIN
+            dw_time.dim_absence_type AS dat
+                ON far.sk_absence_type = dat.sk_absence_type
         WHERE
-            sk_absence_type NOT IN (
-                300000004959159,
-                300000004800984,
-                300000135717548,
-                300000135717583,
-                300000004800949,
-                300000004959264
-            )
-            AND is_approved = TRUE
+            far.is_approved = TRUE
         GROUP BY
-            person_number
+            far.person_number
     ),
     employee_current AS (
         SELECT
@@ -247,58 +374,187 @@ WITH
         WHERE
             es.is_current = TRUE
             AND es.is_primary_assignment_for_snapshot = TRUE
+    ),
+    base_final AS (
+        SELECT
+            f.id_user AS degreed_user_id,
+            f.user_organization_email AS email,
+            f.person_number,
+            f.standardized_training AS treinamento_padronizado,
+            f.pathway_title AS pathway_title_escolhida,
+            f.pct_completed_pathway,
+            c.first_completion_date AS primeira_data_conclusao,
+            c.section_title,
+            c.id_section,
+            c.id_content,
+            c.lesson_title,
+            c.content_title,
+            c.content_type,
+            c.pct_completed_content,
+            bc.name AS nome,
+            bc.dt_hired AS dt_inicio,
+            LOWER(bc.country) AS pais,
+            bc.consolidated_business_unit_name AS empresa,
+            bc.name_l1 AS l1_gestor,
+            bc.name_l2 AS l2_gestor,
+            bc.name_l3 AS l3_gestor,
+            bc.manager_name AS gestor,
+            NULLIF(LOWER(bc.vertical), '-1') AS vertical,
+            NULLIF(LOWER(bc.structure), '-1') AS structure,
+            CASE
+                WHEN bc.is_manager IS TRUE THEN 1
+                ELSE 0
+            END AS fl_lider,
+            bc.band AS banda,
+            bc.access_list_no_employee,
+            COALESCE(a.absence_ativo, 0) AS absence_ativo,
+            COALESCE(a.entrou_licenca, 0) AS entrou_licenca,
+            COALESCE(a.voltou_licenca, 0) AS voltou_licenca,
+            a.absence_type_ativo,
+            a.absence_types,
+            COALESCE(a.dias_afastado_janela, 0) AS dias_afastado_janela,
+            a.dt_retorno,
+            CASE
+                WHEN CAST(bc.dt_hired AS DATE) BETWEEN DATE '2026-04-16' AND DATE '2026-07-24'
+                    THEN 1
+                ELSE 0
+            END AS fl_new_hire,
+            CASE
+                WHEN CAST(bc.dt_hired AS DATE) BETWEEN DATE '2026-04-16' AND DATE '2026-07-24'
+                    THEN LEAST(
+                        GREATEST(
+                            0,
+                            DATEDIFF(
+                                DATE_ADD(CAST(bc.dt_hired AS DATE), 90),
+                                DATE '2026-07-24'
+                            )
+                        ) + COALESCE(a.dias_afastado_janela, 0),
+                        90
+                    )
+                ELSE LEAST(COALESCE(a.dias_afastado_janela, 0), 90)
+            END AS dias_ganhos
+        FROM
+            primary_pathway AS f
+        LEFT JOIN
+            content_progress AS c
+                ON f.id_user = c.id_user
+                AND f.id_pathway = c.id_pathway
+        LEFT JOIN
+            employee_current AS bc
+                ON f.person_number = bc.person_number
+                AND bc.es_rn = 1
+        LEFT JOIN
+            absence_enrichment AS a
+                ON f.person_number = a.person_number
+        WHERE
+            LOWER(bc.status) = 'active'
+    ),
+    deadline_calc AS (
+        SELECT
+            degreed_user_id,
+            email,
+            person_number,
+            treinamento_padronizado,
+            pathway_title_escolhida,
+            pct_completed_pathway,
+            primeira_data_conclusao,
+            section_title,
+            id_section,
+            id_content,
+            lesson_title,
+            content_title,
+            content_type,
+            pct_completed_content,
+            nome,
+            dt_inicio,
+            pais,
+            empresa,
+            l1_gestor,
+            l2_gestor,
+            l3_gestor,
+            gestor,
+            vertical,
+            structure,
+            fl_lider,
+            banda,
+            access_list_no_employee,
+            absence_ativo,
+            entrou_licenca,
+            voltou_licenca,
+            absence_type_ativo,
+            absence_types,
+            dias_afastado_janela,
+            dt_retorno,
+            fl_new_hire,
+            dias_ganhos,
+            CASE
+                WHEN dias_ganhos > 0 THEN 1
+                ELSE 0
+            END AS fl_ganhou_dias,
+            CASE
+                WHEN dias_ganhos > 0
+                    AND COALESCE(pct_completed_pathway, 0) < 100.0
+                    THEN 1
+                ELSE 0
+            END AS fl_pendente_prazo_estendido,
+            CASE
+                WHEN dt_retorno > DATE '2026-07-24'
+                    THEN DATE_ADD(dt_retorno, CAST(dias_ganhos AS INT))
+                ELSE DATE_ADD(DATE '2026-07-24', CAST(dias_ganhos AS INT))
+            END AS data_limite_bruta
+        FROM
+            base_final
     )
 SELECT
-    f.id_user AS degreed_user_id,
-    f.user_organization_email AS email,
-    f.person_number,
-    f.standardized_training AS treinamento_padronizado,
-    f.pathway_title AS pathway_title_escolhida,
-    f.pct_completed_pathway,
-    c.first_completion_date AS primeira_data_conclusao,
-    c.section_title,
-    c.id_section,
-    c.id_content,
-    c.lesson_title,
-    c.content_title,
-    c.content_type,
-    c.pct_completed_content,
-    bc.name AS nome,
-    bc.dt_hired AS dt_inicio,
-    LOWER(bc.country) AS pais,
-    bc.consolidated_business_unit_name AS empresa,
-    bc.name_l1 AS l1_gestor,
-    bc.name_l2 AS l2_gestor,
-    bc.name_l3 AS l3_gestor,
-    bc.manager_name AS gestor,
-    NULLIF(LOWER(bc.vertical), '-1') AS vertical,
-    NULLIF(LOWER(bc.structure), '-1') AS structure,
-    CASE
-        WHEN bc.is_manager IS TRUE THEN 1
-        ELSE 0
-    END AS fl_lider,
-    bc.band AS banda,
-    bc.access_list_no_employee,
-    COALESCE(a.absence_ativo, 0) AS absence_ativo,
+    degreed_user_id,
+    email,
+    person_number,
+    treinamento_padronizado,
+    pathway_title_escolhida,
+    pct_completed_pathway,
+    primeira_data_conclusao,
+    section_title,
+    id_section,
+    id_content,
+    lesson_title,
+    content_title,
+    content_type,
+    pct_completed_content,
+    nome,
+    dt_inicio,
+    pais,
+    empresa,
+    l1_gestor,
+    l2_gestor,
+    l3_gestor,
+    gestor,
+    vertical,
+    structure,
+    fl_lider,
+    banda,
+    access_list_no_employee,
+    absence_ativo,
+    entrou_licenca,
+    voltou_licenca,
+    absence_type_ativo,
+    absence_types,
+    dias_afastado_janela,
+    dt_retorno,
+    fl_new_hire,
+    dias_ganhos,
+    fl_ganhou_dias,
+    fl_pendente_prazo_estendido,
+    data_limite_bruta,
+    CASE DAYOFWEEK(data_limite_bruta)
+        WHEN 7 THEN DATE_ADD(data_limite_bruta, 2)
+        WHEN 1 THEN DATE_ADD(data_limite_bruta, 1)
+        ELSE data_limite_bruta
+    END AS nova_data_limite,
     YEAR(DATE('{load_start_date}')) AS year,
     MONTH(DATE('{load_start_date}')) AS month,
     DAY(DATE('{load_start_date}')) AS day
 FROM
-    primary_pathway AS f
-LEFT JOIN
-    content_progress AS c
-        ON f.id_user = c.id_user
-        AND f.id_pathway = c.id_pathway
-LEFT JOIN
-    employee_current AS bc
-        ON f.person_number = bc.person_number
-        AND bc.es_rn = 1
-LEFT JOIN
-    active_absences AS a
-        ON f.person_number = a.person_number
-WHERE
-    LOWER(bc.status) = 'active'
-    AND (
-        a.absence_ativo = 0
-        OR a.absence_ativo IS NULL
-    )
+    deadline_calc
+ORDER BY
+    nome,
+    treinamento_padronizado ASC
