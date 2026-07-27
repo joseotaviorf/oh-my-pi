@@ -30,7 +30,7 @@ columns:
     description: Value from the Controle Receita sheet column 'Status Offer', standardized in the bypass revenue control clean table.
   is_dm_case:
     lineage:
-      - datalake_gsheets_raw.for_sale_bypass_revenue_control.o_caso_e_dm
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.o_caso_e_dm_
     description: Flag recorded in Controle Receita indicating whether the bypass deal is classified as a DM case by Fintech Operations.
   status:
     lineage:
@@ -198,7 +198,7 @@ columns:
     description: Value from the Controle Receita sheet column 'Valor Devido', standardized in the bypass revenue control clean table.
   brokerage_amount:
     lineage:
-      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_do_acordo_corretagem
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_do_acordo_corretagem_
     description: Value from the Controle Receita sheet column 'Valor do Acordo corretagem', standardized in the bypass revenue control clean table.
   dt_deal:
     lineage:
@@ -214,7 +214,7 @@ columns:
     description: Value from the Controle Receita sheet column 'Boleto', standardized in the bypass revenue control clean table.
   last_payment_month:
     lineage:
-      - datalake_gsheets_raw.for_sale_bypass_revenue_control.mes_do_ultimo_pagamento
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.mes_do_ultimo_pagamento_
     description: Value from the Controle Receita sheet column 'Mês do ultimo pagamento', standardized in the bypass revenue control clean table.
   installment_amount_1:
     lineage:

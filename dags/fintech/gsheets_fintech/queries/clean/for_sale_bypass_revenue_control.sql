@@ -5,7 +5,7 @@ WITH parsed AS (
         id_offer,
         data_de_envio_ao_escritorio,
         status_offer,
-        o_caso_e_dm,
+        o_caso_e_dm_,
         status,
         `1p_ou_3p`,
         escritorio,
@@ -47,11 +47,11 @@ WITH parsed AS (
         valor_da_transacao,
         taxa_corretagem_ideal_6,
         valor_devido,
-        valor_do_acordo_corretagem,
+        valor_do_acordo_corretagem_,
         data_acordo_termo_confissao_transito_em_julgado,
         a_vista_parcelado,
         boleto,
-        mes_do_ultimo_pagamento,
+        mes_do_ultimo_pagamento_,
         valor_a_vista_1a_parcela,
         valor_juros_e_multa_se_houver_1a_parcela,
         data_envio_boleto_1a_parcela,
@@ -211,7 +211,7 @@ SELECT
         )
     ) AS dt_sent_to_office,
     NULLIF(TRIM(status_offer), '') AS offer_status,
-    NULLIF(TRIM(o_caso_e_dm), '') AS is_dm_case,
+    NULLIF(TRIM(o_caso_e_dm_), '') AS is_dm_case,
     NULLIF(TRIM(status), '') AS status,
     NULLIF(TRIM(`1p_ou_3p`), '') AS partner_channel,
     NULLIF(TRIM(escritorio), '') AS office_name,
@@ -295,7 +295,7 @@ SELECT
     CAST(
         NULLIF(
             REPLACE(
-                REGEXP_REPLACE(NULLIF(valor_do_acordo_corretagem, ''), '[^0-9,.-]', ''),
+                REGEXP_REPLACE(NULLIF(valor_do_acordo_corretagem_, ''), '[^0-9,.-]', ''),
                 ',',
                 '.'
             ),
@@ -317,7 +317,7 @@ SELECT
     ) AS dt_deal,
     NULLIF(TRIM(a_vista_parcelado), '') AS installment_plan,
     NULLIF(TRIM(boleto), '') AS bank_slip_reference,
-    NULLIF(TRIM(mes_do_ultimo_pagamento), '') AS last_payment_month,
+    NULLIF(TRIM(mes_do_ultimo_pagamento_), '') AS last_payment_month,
     CAST(
         NULLIF(
             REPLACE(
