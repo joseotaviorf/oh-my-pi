@@ -10,8 +10,11 @@ dag:
       at ~12:00 BRT. This DAG ingests at 09:00 (~09:30 in the lake) the morning export
       of the same calendar day, and again at 15:00 (~15:30) the latest available batch
       for that day (afternoon export when ready on S3, otherwise morning fallback).
-      Stakeholders consume snapshots from datalake_invoice_preview_clean.invoice_preview
-      filtering by partition day and ts_load.
+      Stakeholders consume validation-ready snapshots from
+      datalake_invoice_preview.invoice_preview (enrich_invoice_preview DAG), which
+      applies sign convention, blocked rename, and latest ts_load per partition day.
+      The clean table datalake_invoice_preview_clean.invoice_preview remains the
+      raw-ingestion-aligned snapshot for pipeline debugging.
 workflow:
   layer: raw
   type: custom_ingestion

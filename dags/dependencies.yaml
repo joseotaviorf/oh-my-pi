@@ -2972,6 +2972,8 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
   - bietlejuice.retsuko_fast_lane:load-clean-account:first-run-of-day
   - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
+bietlejuice.enrich_invoice_preview:
+  - bietlejuice.invoice_preview:load-clean-invoice-preview
 bietlejuice.enrich_iru:
   - bietlejuice.iru:load-clean-managed-devices:first-run-of-day
 bietlejuice.enrich_jira:

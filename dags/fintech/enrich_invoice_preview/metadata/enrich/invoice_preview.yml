@@ -1,0 +1,117 @@
+---
+database_name: datalake_invoice_preview
+table_name: invoice_preview
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+description: |
+  Stakeholder-ready SeuBarriga invoice preview snapshot for Brazil. Applies the sign
+  convention used in SeuBarriga validation (negative amounts for Proprietario/Inquilino),
+  exposes blocked instead of is_blocked, derives payment_installment from payment
+  descriptions, and keeps only the latest ts_load per partition day. Refreshed after
+  each invoice_preview clean load (morning and afternoon slots).
+columns:
+  id_contract:
+    description: EBDB contract identifier for the rental contract associated with the preview billing line.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.id_contract
+  contract_version:
+    description: Contract version string exported by SeuBarriga for the preview row.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.contract_version
+  blocked:
+    description: Whether the contract is blocked from invoicing in the preview snapshot, aligned with SeuBarriga export naming.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.is_blocked
+  paid_from:
+    description: Payer or origin side of the preview billing line as exported by SeuBarriga.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.paid_from
+  paid_to:
+    description: Counterparty or destination side of the preview billing line as exported by SeuBarriga.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.paid_to
+  payment_description:
+    description: Human-readable description of the preview billing line as shown in SeuBarriga.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.payment_description
+  amount:
+    description: Signed monetary amount of the preview line; negative when paid_from is Proprietario or Inquilino.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.paid_amount
+      - datalake_invoice_preview_clean.invoice_preview.paid_from
+  item_category:
+    description: SeuBarriga item or category code for the preview entry, such as rent or utilities.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.item_category
+  year_month:
+    description: Accrual year-month of the preview entry as an integer in YYYYMM format.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.entry_accrual_year_month
+  dt_due:
+    description: Due date of the preview entry as exported by SeuBarriga.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.dt_due
+  dt_tenant_due:
+    description: Tenant invoice due date recorded in the preview snapshot.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.dt_tenant_due
+  dt_tenant_paid:
+    description: Tenant paid date recorded in the preview export when a payment date is available.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.dt_tenant_paid
+  tenant_status:
+    description: Preview status label for the tenant-side monthly invoice in SeuBarriga.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.tenant_status
+  dt_landlord_due:
+    description: Landlord invoice due date recorded in the preview snapshot.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.dt_landlord_due
+  dt_landlord_paid:
+    description: Landlord paid date recorded in the preview export when a payment date is available.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.dt_landlord_paid
+  landlord_status:
+    description: Preview status label for the landlord-side monthly invoice in SeuBarriga.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.landlord_status
+  payment_purpose:
+    description: Invoice purpose code exported by SeuBarriga for the preview billing line.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.payment_purpose
+  dt_tenant_invoice_created_at:
+    description: Date the tenant monthly invoice was created, when already present in the preview export.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.dt_tenant_invoice_created_at
+  dt_landlord_invoice_created_at:
+    description: Date the landlord monthly invoice was created, when already present in the preview export.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.dt_landlord_invoice_created_at
+  ts_load:
+    description: Timestamp of the clean snapshot load selected as the latest for the partition day.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.ts_load
+  invoice_accrual_year_month:
+    description: Accrual year-month parsed from the source invoice preview CSV filename.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.invoice_accrual_year_month
+  country:
+    description: Country code associated with the contract; only Brazil rows are materialized in this table.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.country
+  payment_installment:
+    description: Installment number parsed from payment_description when it contains parcela; defaults to 1 otherwise.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.payment_description
+  year:
+    description: Partition year of the calendar date when the preview snapshot was loaded into the datalake.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.year
+  month:
+    description: Partition month of the calendar date when the preview snapshot was loaded into the datalake.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.month
+  day:
+    description: Partition day of the calendar date when the preview snapshot was loaded into the datalake.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.day

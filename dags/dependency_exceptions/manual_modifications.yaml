@@ -17,6 +17,11 @@ bietlejuice.enrich_hightouch:
   remove:
     - bietlejuice.hightouch_logs:load-clean-audience-membership-trino:first-run-of-day
     - bietlejuice.hightouch_logs:load-clean-sync-runs-trino:first-run-of-day
+bietlejuice.enrich_invoice_preview:
+  add:
+    - bietlejuice.invoice_preview:load-clean-invoice-preview
+  remove:
+    - bietlejuice.invoice_preview:load-clean-invoice-preview:first-run-of-day
 bietlejuice.cyber_complement:
   add:
     - bietlejuice.cyber:load-raw-uda1:first-run-of-day
