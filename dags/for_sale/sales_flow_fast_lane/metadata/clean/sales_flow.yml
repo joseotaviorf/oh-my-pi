@@ -32,6 +32,10 @@ columns:
     description: External identifier linking this sales flow to a property visit recorded in another system.
     lineage:
       - datalake_sales_flow_raw.sales_flow.visit_external_id
+  id_fifty_agent_visit_external:
+    description: External identifier linking this sales flow to a property visit recorded in another system by a fifty Agent.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.fifty_agent_visit_external_id
   flow_step:
     description: High-level lifecycle marker used to tell at a glance whether the flow is ongoing, completed, or canceled. Values include PROPOSAL_ON_VALIDATION, PROPOSAL_ONGOING, PROPOSAL_ACCEPTED, POST_CCV, POST_CCV_HUB_CT, PURCHASE_SALE_COMPLETED, CANCELED_CCV, CANCELED_POST_ACCEPTED, CANCELED_ON_NEGOTIATION, and CANCELED_ON_VALIDATION. Can be null for older records created before this column existed.
     lineage:
