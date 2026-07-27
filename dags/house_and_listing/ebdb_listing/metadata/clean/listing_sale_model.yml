@@ -47,3 +47,19 @@ columns:
     lineage:
       - datalake_ebdb_raw.listingsalemodel.ts_database_transaction
     description: Timestamp of the original database transaction in the source system.
+  sale_type:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.saleType
+    description: Enum discriminator indicating the market type. PRIMARY for new builds, SECONDARY for resale. Defaults to SECONDARY.
+  unit_count:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.unitCount
+    description: Number of available units. Populated for PRIMARY market listings only.
+  min_price:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.minPrice
+    description: Minimum price of the typology range in BRL. Populated for PRIMARY market listings only.
+  max_price:
+    lineage:
+      - datalake_ebdb_raw.listingsalemodel.maxPrice
+    description: Maximum price of the typology range in BRL. Populated for PRIMARY market listings only.
