@@ -182,11 +182,17 @@ cluster:
             spot_bid_price_percent: 100
             first_on_demand: 1
             ebs_volume_size: 200
-    custom_libraries:  # Optional — for JDBC drivers, internal WHL packages, PyPI deps
+    custom_libraries:  # Optional — JDBC jars, internal WHL packages, PyPI deps
+        # On Databricks: applied via the libraries API.
+        # On EMR: emr_init_script.sh installs pypi / whl / jar / maven (direct
+        # artifact) from this list at bootstrap. maven has no transitive resolve —
+        # Sedona multi-JAR bundles still use sedona-init.sh.
         - jar: "{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
         - whl: "{artifacts_bucket}/my-package/my_package-1.0.0-py3-none-any.whl"
         - pypi:
             package: "google-auth==2.23.0"
+        - maven:
+            coordinates: "graphframes:graphframes:0.8.1-spark3.0-s_2.12"
     access_control_list:  # Optional
         group_name: "analytics-engineers"
         permission_level: "CAN_MANAGE"

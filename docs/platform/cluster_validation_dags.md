@@ -90,6 +90,19 @@ The compiler emits a second DAG: `bietlejuice.{dag_name}__validation`
 - Airflow tag: `cluster_validation`
 - Tasks use `retries=0` (fail fast; no Airflow task retries)
 
+### EMR `custom_libraries` parity
+
+On EMR there is no Databricks libraries API. [`emr_init_script.sh`](../../packages/bietlejuice-compiler/scripts/emr_init_script.sh) reads `{dag}_cluster.yml` from the Astronomer DAG bundle on S3 (using `AIRFLOW_DAG_ID`) and installs `cluster.custom_libraries` at bootstrap:
+
+| Type | EMR bootstrap behavior |
+| ---- | ---------------------- |
+| `pypi` | `pip install` (supports EMR-only `no_deps` / `only_binary`) |
+| `whl` | `aws s3 cp` + `pip install --no-deps` |
+| `jar` | `aws s3 cp` into Spark jars dirs (`/usr/lib/spark/jars` + PySpark jars) |
+| `maven` | Direct artifact only (no transitive Ivy resolve): S3 cache at `{artifacts_bucket}/jars/maven/<group>/<artifact>/<version>/…` then Maven Central (or optional `repo:`). Sedona multi-JAR bundles still use `sedona-init.sh`. |
+
+Validation DAGs (`*__validation`) also union `validation.cluster.custom_libraries` when present. Prod `custom_libraries` are inherited unless overridden.
+
 ## Write target naming
 
 | Prod | Validation (UC) |

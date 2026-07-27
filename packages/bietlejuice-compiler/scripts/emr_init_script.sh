@@ -20,6 +20,8 @@ REQUESTS_VERSION="${REQUESTS_VERSION:-2.32.5}"
 DATABRICKS_SDK_VERSION="${DATABRICKS_SDK_VERSION:-0.102.0}"
 CLUSTER_YAML_LOCAL="${TMP_DIR}/emr_dag_cluster.yml"
 CUSTOM_WHL_MANIFEST="${TMP_DIR}/emr_custom_whl_paths.txt"
+CUSTOM_JAR_MANIFEST="${TMP_DIR}/emr_custom_jar_paths.txt"
+EMR_CUSTOM_LIBRARIES_PY="${TMP_DIR}/emr_custom_libraries.py"
 DAGS_S3_PREFIX="astronomer/dags/dags/"
 
 # Normalize Airflow dag_id → DAG package folder name.
@@ -30,6 +32,36 @@ _emr_normalize_dag_folder() {
     local folder="${dag_id#bietlejuice.}"
     folder="${folder%__validation}"
     printf '%s' "${folder}"
+}
+
+# Resolve emr_custom_libraries.py for YAML parsing (sibling of this script locally,
+# or download from artifacts bucket on EMR bootstrap).
+# Must not write to stdout: extractors are invoked via command substitution
+# (uris="$(…)") and awscli progress would be parsed as library URIs.
+_emr_ensure_custom_libraries_py() {
+    if [ -f "${EMR_CUSTOM_LIBRARIES_PY}" ]; then
+        return 0
+    fi
+
+    local sibling
+    sibling="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)/emr_custom_libraries.py"
+    if [ -f "${sibling}" ]; then
+        cp "${sibling}" "${EMR_CUSTOM_LIBRARIES_PY}"
+        return 0
+    fi
+
+    if [ -z "${ARTIFACTS_BUCKET:-}" ]; then
+        echo "Error: ARTIFACTS_BUCKET unset; cannot locate emr_custom_libraries.py" >&2
+        return 1
+    fi
+
+    # Quiet progress: stdout would leak into uris="$( _emr_extract_* )" captures.
+    if ! aws s3 cp "${ARTIFACTS_BUCKET}/bi-etl-ejuice/emr_custom_libraries.py" \
+        "${EMR_CUSTOM_LIBRARIES_PY}" >/dev/null; then
+        echo "Error: failed to download emr_custom_libraries.py from ${ARTIFACTS_BUCKET}" >&2
+        return 1
+    fi
+    return 0
 }
 
 # Download {dag}_cluster.yml (or _declaration.yml) from the Astronomer DAG bundle on S3.
@@ -82,54 +114,15 @@ _emr_download_cluster_yaml() {
 
 # Parse custom_libraries pypi entries from a cluster/declaration YAML.
 # Prints TSV lines: package<TAB>no_deps(0|1)<TAB>only_binary(0|1).
-# Always reads cluster.custom_libraries; when IS_VALIDATION=1 also unions
+# Always reads cluster.custom_libraries; when is_validation=1 also unions
 # validation.cluster.custom_libraries. Optional EMR-only flags under pypi:
 #   no_deps: true       → pip --no-deps
 #   only_binary: true   → pip --only-binary=:all:
 _emr_extract_pypi_packages() {
     local cluster_yaml="$1"
     local is_validation="${2:-0}"
-    IS_VALIDATION="${is_validation}" python3 - "${cluster_yaml}" <<'PY'
-import os
-import sys
-
-import yaml
-
-path = sys.argv[1]
-is_validation = os.environ.get("IS_VALIDATION") == "1"
-with open(path, encoding="utf-8") as fh:
-    data = yaml.safe_load(fh) or {}
-
-entries = []
-
-
-def extract(libs):
-    if not isinstance(libs, list):
-        return
-    for item in libs:
-        if not isinstance(item, dict):
-            continue
-        pypi = item.get("pypi")
-        if isinstance(pypi, dict):
-            package = pypi.get("package")
-            if package:
-                no_deps = 1 if pypi.get("no_deps") in (True, "true", "True", 1, "1") else 0
-                only_binary = 1 if pypi.get("only_binary") in (True, "true", "True", 1, "1") else 0
-                entries.append((str(package).strip(), no_deps, only_binary))
-
-
-cluster = data.get("cluster") or {}
-extract(cluster.get("custom_libraries"))
-if is_validation:
-    validation_cluster = (data.get("validation") or {}).get("cluster") or {}
-    extract(validation_cluster.get("custom_libraries"))
-
-seen = set()
-for pkg, no_deps, only_binary in entries:
-    if pkg and pkg not in seen:
-        seen.add(pkg)
-        print(f"{pkg}\t{no_deps}\t{only_binary}")
-PY
+    _emr_ensure_custom_libraries_py || return 1
+    python3 "${EMR_CUSTOM_LIBRARIES_PY}" pypi "${cluster_yaml}" "${is_validation}"
 }
 
 # Install DAG-level custom_libraries PyPI packages (Databricks parity on EMR).
@@ -253,48 +246,33 @@ _emr_install_system_gnupg() {
 
 # Parse custom_libraries whl entries from a cluster/declaration YAML.
 # Prints one URI string per line (may contain {artifacts_bucket}). Always reads
-# cluster.custom_libraries; when IS_VALIDATION=1 also unions
+# cluster.custom_libraries; when is_validation=1 also unions
 # validation.cluster.custom_libraries.
 _emr_extract_whl_uris() {
     local cluster_yaml="$1"
     local is_validation="${2:-0}"
-    IS_VALIDATION="${is_validation}" python3 - "${cluster_yaml}" <<'PY'
-import os
-import sys
+    _emr_ensure_custom_libraries_py || return 1
+    python3 "${EMR_CUSTOM_LIBRARIES_PY}" whl "${cluster_yaml}" "${is_validation}"
+}
 
-import yaml
+# Parse custom_libraries jar entries from a cluster/declaration YAML.
+# Prints one URI string per line (may contain {artifacts_bucket}). Always reads
+# cluster.custom_libraries; when is_validation=1 also unions
+# validation.cluster.custom_libraries.
+_emr_extract_jar_uris() {
+    local cluster_yaml="$1"
+    local is_validation="${2:-0}"
+    _emr_ensure_custom_libraries_py || return 1
+    python3 "${EMR_CUSTOM_LIBRARIES_PY}" jar "${cluster_yaml}" "${is_validation}"
+}
 
-path = sys.argv[1]
-is_validation = os.environ.get("IS_VALIDATION") == "1"
-with open(path, encoding="utf-8") as fh:
-    data = yaml.safe_load(fh) or {}
-
-uris = []
-
-
-def extract(libs):
-    if not isinstance(libs, list):
-        return
-    for item in libs:
-        if not isinstance(item, dict):
-            continue
-        whl = item.get("whl")
-        if isinstance(whl, str) and whl.strip():
-            uris.append(whl.strip())
-
-
-cluster = data.get("cluster") or {}
-extract(cluster.get("custom_libraries"))
-if is_validation:
-    validation_cluster = (data.get("validation") or {}).get("cluster") or {}
-    extract(validation_cluster.get("custom_libraries"))
-
-seen = set()
-for uri in uris:
-    if uri and uri not in seen:
-        seen.add(uri)
-        print(uri)
-PY
+# Parse custom_libraries maven entries. Prints TSV:
+# coordinates<TAB>repo_or_empty<TAB>relative_path<TAB>jar_name
+_emr_extract_maven_coords() {
+    local cluster_yaml="$1"
+    local is_validation="${2:-0}"
+    _emr_ensure_custom_libraries_py || return 1
+    python3 "${EMR_CUSTOM_LIBRARIES_PY}" maven "${cluster_yaml}" "${is_validation}"
 }
 
 # Resolve {artifacts_bucket} / accept s3:// URIs; download custom whls early
@@ -358,6 +336,143 @@ EOF
     echo "END: Download custom_libraries whl"
 }
 
+# Resolve {artifacts_bucket} / accept s3:// URIs; download custom jars early
+# (awscli still intact) and write local paths to CUSTOM_JAR_MANIFEST.
+_emr_download_custom_jar_libraries() {
+    local cluster_yaml="$1"
+    local is_validation="${2:-0}"
+    local uris
+    local uri
+    local resolved
+    local basename
+    local local_path
+
+    echo "BEGIN: Download custom_libraries jar from cluster YAML"
+
+    rm -f "${CUSTOM_JAR_MANIFEST}"
+
+    if [ ! -f "${cluster_yaml}" ]; then
+        echo "  WARN: cluster YAML not present at ${cluster_yaml}; skipping"
+        echo "END: Download custom_libraries jar (skipped)"
+        return 0
+    fi
+
+    if ! uris="$(_emr_extract_jar_uris "${cluster_yaml}" "${is_validation}")"; then
+        echo "Error: failed to parse custom_libraries jar from ${cluster_yaml}"
+        exit 1
+    fi
+
+    if [ -z "${uris}" ]; then
+        echo "  No jar entries in custom_libraries; nothing to download"
+        echo "END: Download custom_libraries jar (none)"
+        return 0
+    fi
+
+    mkdir -p "${TMP_DIR}/jars"
+    : >"${CUSTOM_JAR_MANIFEST}"
+
+    while IFS= read -r uri; do
+        [ -z "${uri}" ] && continue
+        resolved="${uri//\{artifacts_bucket\}/${ARTIFACTS_BUCKET}}"
+        case "${resolved}" in
+            s3://*)
+                ;;
+            *)
+                echo "Error: custom_libraries jar must resolve to an s3:// URI (got: ${resolved})"
+                echo "  Original: ${uri}"
+                exit 1
+                ;;
+        esac
+        basename="$(basename "${resolved}")"
+        local_path="${TMP_DIR}/jars/${basename}"
+        echo "  Downloading ${resolved} -> ${local_path}"
+        if ! aws s3 cp "${resolved}" "${local_path}"; then
+            echo "Error: aws s3 cp of custom_libraries jar '${resolved}' failed."
+            exit 1
+        fi
+        printf '%s\n' "${local_path}" >>"${CUSTOM_JAR_MANIFEST}"
+    done <<EOF
+${uris}
+EOF
+
+    echo "END: Download custom_libraries jar"
+}
+
+# Resolve maven:coordinates to JARs (S3 artifacts cache first, then Maven Central
+# or optional repo URL). Appends local paths to CUSTOM_JAR_MANIFEST so install
+# reuses _emr_install_custom_jar_libraries. Call after _emr_download_custom_jar_libraries
+# (that function clears the manifest). Direct artifact only — no transitive Ivy resolve.
+_emr_download_custom_maven_libraries() {
+    local cluster_yaml="$1"
+    local is_validation="${2:-0}"
+    local rows
+    local coordinates
+    local repo
+    local relative
+    local jar_name
+    local s3_uri
+    local maven_url
+    local local_path
+    local repo_base
+
+    echo "BEGIN: Download custom_libraries maven from cluster YAML"
+
+    if [ ! -f "${cluster_yaml}" ]; then
+        echo "  WARN: cluster YAML not present at ${cluster_yaml}; skipping"
+        echo "END: Download custom_libraries maven (skipped)"
+        return 0
+    fi
+
+    if ! rows="$(_emr_extract_maven_coords "${cluster_yaml}" "${is_validation}")"; then
+        echo "Error: failed to parse custom_libraries maven from ${cluster_yaml}"
+        exit 1
+    fi
+
+    if [ -z "${rows}" ]; then
+        echo "  No maven entries in custom_libraries; nothing to download"
+        echo "END: Download custom_libraries maven (none)"
+        return 0
+    fi
+
+    mkdir -p "${TMP_DIR}/jars"
+    touch "${CUSTOM_JAR_MANIFEST}"
+
+    while IFS=$'\t' read -r coordinates repo relative jar_name; do
+        [ -z "${coordinates}" ] && continue
+        [ -z "${relative}" ] && continue
+        [ -z "${jar_name}" ] && continue
+        local_path="${TMP_DIR}/jars/${jar_name}"
+        s3_uri="${ARTIFACTS_BUCKET}/jars/maven/${relative}"
+        # "-" is the empty-repo sentinel from emr_custom_libraries.py (avoids bash
+        # read collapsing consecutive tabs when repo is blank).
+        if [ -z "${repo}" ] || [ "${repo}" = "-" ]; then
+            repo_base="https://repo1.maven.org/maven2"
+        else
+            repo_base="${repo}"
+        fi
+        repo_base="${repo_base%/}"
+        maven_url="${repo_base}/${relative}"
+
+        echo "  Resolving ${coordinates}"
+        if aws s3 cp "${s3_uri}" "${local_path}" 2>/dev/null; then
+            echo "    from S3 cache ${s3_uri}"
+        else
+            echo "    S3 miss; fetching ${maven_url}"
+            if ! curl -fsSL "${maven_url}" -o "${local_path}"; then
+                echo "Error: failed to download maven artifact '${coordinates}'"
+                echo "  Tried S3: ${s3_uri}"
+                echo "  Tried URL: ${maven_url}"
+                exit 1
+            fi
+        fi
+        printf '%s\n' "${local_path}" >>"${CUSTOM_JAR_MANIFEST}"
+    done <<EOF
+${rows}
+EOF
+
+    echo "END: Download custom_libraries maven"
+}
+
 # Install DAG-level custom_libraries wheels previously downloaded to CUSTOM_WHL_MANIFEST.
 # --no-deps: model/client wheels declare deps that are installed via pypi entries
 # (or already present). --ignore-requires-python: same as inmetro on EMR 3.9.
@@ -386,6 +501,44 @@ _emr_install_custom_whl_libraries() {
     done <"${CUSTOM_WHL_MANIFEST}"
 
     echo "END: Install custom_libraries whl"
+}
+
+# Install DAG-level custom_libraries jars previously downloaded to CUSTOM_JAR_MANIFEST
+# into every Spark jars directory (Databricks libraries API parity on EMR).
+_emr_install_custom_jar_libraries() {
+    local local_jar
+    local basename
+    local jdir
+
+    echo "BEGIN: Install custom_libraries jar into Spark classpath"
+
+    if [ ! -f "${CUSTOM_JAR_MANIFEST}" ]; then
+        echo "  No custom jar manifest; nothing to install"
+        echo "END: Install custom_libraries jar (none)"
+        return 0
+    fi
+
+    if [ -z "${SPARK_JARS_DIRS:-}" ]; then
+        echo "Error: SPARK_JARS_DIRS unset; cannot install custom_libraries jar"
+        exit 1
+    fi
+
+    while IFS= read -r local_jar; do
+        [ -z "${local_jar}" ] && continue
+        if [ ! -f "${local_jar}" ]; then
+            echo "Error: custom_libraries jar not found at ${local_jar}"
+            exit 1
+        fi
+        basename="$(basename "${local_jar}")"
+        for jdir in ${SPARK_JARS_DIRS}; do
+            sudo mkdir -p "${jdir}"
+            sudo cp "${local_jar}" "${jdir}/${basename}"
+            sudo chmod 644 "${jdir}/${basename}"
+        done
+        echo "  Installed ${basename}"
+    done <"${CUSTOM_JAR_MANIFEST}"
+
+    echo "END: Install custom_libraries jar"
 }
 
 echo "BEGIN: Install QuintoAndar internal libs"
@@ -429,11 +582,15 @@ else
     esac
     if [ "${SKIP_CUSTOM_LIBRARIES:-0}" = "1" ]; then
         echo "SKIP_CUSTOM_LIBRARIES=1; skipping DAG cluster YAML discovery"
-        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}"
+        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}" "${CUSTOM_JAR_MANIFEST}"
     elif [ -n "${AIRFLOW_DAG_ID}" ]; then
         echo "BEGIN: Download DAG cluster YAML for custom_libraries"
         EMR_DAG_FOLDER="$(_emr_normalize_dag_folder "${AIRFLOW_DAG_ID}")"
         echo "  airflow_dag_id=${AIRFLOW_DAG_ID} dag_folder=${EMR_DAG_FOLDER} is_validation=${EMR_IS_VALIDATION}"
+        # Fetch the YAML parser before any uris="$( _emr_extract_* )" so awscli
+        # progress cannot leak into library URI captures.
+        _emr_ensure_custom_libraries_py \
+            || echo "  WARN: emr_custom_libraries.py unavailable; custom_libraries parse may fail"
         _emr_download_cluster_yaml "${EMR_DAG_FOLDER}" "${CLUSTER_YAML_LOCAL}" \
             || rm -f "${CLUSTER_YAML_LOCAL}"
         echo "END: Download DAG cluster YAML for custom_libraries"
@@ -441,7 +598,7 @@ else
         # Drop any leftover from a prior bootstrap on this host so install cannot
         # pick up another DAG's custom_libraries via the fixed CLUSTER_YAML_LOCAL path.
         echo "WARN: AIRFLOW_DAG_ID not set; skipping custom_libraries discovery"
-        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}"
+        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}" "${CUSTOM_JAR_MANIFEST}"
     fi
 fi
 
@@ -460,14 +617,16 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
     aws s3 cp "${ARTIFACTS_BUCKET}/inmetro/inmetro-${INMETRO_VERSION}-py3-none-any.whl" \
         "${TMP_DIR}/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl"
 
-    # Custom whl downloads while awscli is still reliable (before heavy pip).
+    # Custom whl/jar/maven downloads while awscli is still reliable (before heavy pip).
     if [ "${SKIP_CUSTOM_LIBRARIES:-0}" = "1" ]; then
-        echo "SKIP_CUSTOM_LIBRARIES=1; skipping custom_libraries whl download"
-        rm -f "${CUSTOM_WHL_MANIFEST}"
+        echo "SKIP_CUSTOM_LIBRARIES=1; skipping custom_libraries whl/jar/maven download"
+        rm -f "${CUSTOM_WHL_MANIFEST}" "${CUSTOM_JAR_MANIFEST}"
     elif [ -n "${AIRFLOW_DAG_ID:-}" ]; then
         _emr_download_custom_whl_libraries "${CLUSTER_YAML_LOCAL}" "${EMR_IS_VALIDATION:-0}"
+        _emr_download_custom_jar_libraries "${CLUSTER_YAML_LOCAL}" "${EMR_IS_VALIDATION:-0}"
+        _emr_download_custom_maven_libraries "${CLUSTER_YAML_LOCAL}" "${EMR_IS_VALIDATION:-0}"
     else
-        rm -f "${CUSTOM_WHL_MANIFEST}"
+        rm -f "${CUSTOM_WHL_MANIFEST}" "${CUSTOM_JAR_MANIFEST}"
     fi
 
     # Pin urllib3 / requests for awscli before resolving the big stack.
@@ -587,15 +746,18 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         $PIP_EXEC install --no-cache-dir 'pandas>=2.0.0,<3'
     fi
 
-    # Databricks custom_libraries (pypi + whl) parity — after all aws s3 cp
-    # (JARs/default wheels). Extra pip resolver work can break python-dateutil /
-    # awscli; cluster YAML and custom whls were fetched early for that reason.
+    # Databricks custom_libraries (pypi + whl + jar + maven) parity — after all
+    # aws s3 cp (JARs/default wheels). Extra pip resolver work can break
+    # python-dateutil / awscli; cluster YAML and custom whls/jars/maven were
+    # fetched early for that reason.
     # Only install when this bootstrap discovered YAML for AIRFLOW_DAG_ID
     # (file/manifest were cleared when discovery was skipped).
     # SKIP_CUSTOM_LIBRARIES=1: wrappers that install pinned stacks themselves.
+    # Custom jars (including resolved maven artifacts) are copied into
+    # SPARK_JARS_DIRS after platform JARs below.
     if [ "${SKIP_CUSTOM_LIBRARIES:-0}" = "1" ]; then
         echo "SKIP_CUSTOM_LIBRARIES=1; skipping custom_libraries install"
-        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}"
+        rm -f "${CLUSTER_YAML_LOCAL}" "${CUSTOM_WHL_MANIFEST}" "${CUSTOM_JAR_MANIFEST}"
     elif [ -n "${AIRFLOW_DAG_ID:-}" ]; then
         _emr_install_custom_pypi_libraries "${CLUSTER_YAML_LOCAL}" "${EMR_IS_VALIDATION:-0}"
         _emr_install_custom_whl_libraries
@@ -635,6 +797,11 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
             echo "  WARN: ${jar} not downloaded, skipping"
         fi
     done
+
+    # DAG-level custom_libraries jar/maven: Databricks libraries API parity on EMR.
+    if [ "${SKIP_CUSTOM_LIBRARIES:-0}" != "1" ] && [ -n "${AIRFLOW_DAG_ID:-}" ]; then
+        _emr_install_custom_jar_libraries
+    fi
 fi
 
 echo "Validating installation..."
