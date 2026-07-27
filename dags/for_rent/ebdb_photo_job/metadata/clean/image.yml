@@ -65,3 +65,7 @@ columns:
     lineage:
       - datalake_ebdb_raw.imagem.criadoem
     description: Timestamp when the image record was originally created in the source system.
+  id_development:
+    lineage:
+      - datalake_ebdb_raw.imagem.development_id
+    description: Foreign key referencing the Development table. Populated for primary market listings only.
