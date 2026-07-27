@@ -13,6 +13,7 @@
 | Date | Description |
 |---|---|
 | 2026-05-08 | Created |
+| 2026-07-27 | `docs/llm_context/intro.md` removed — legacy file-based TARS entry point superseded by DataHub-first plugin TARS |
 
 ## Approvers
 

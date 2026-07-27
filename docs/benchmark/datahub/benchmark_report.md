@@ -1,5 +1,9 @@
 # TARS context pivot — ROI benchmark
 
+> **Historical artifact:** This report was generated on 2026-05-12 and reflects the
+> old file-based TARS flow that included `docs/llm_context/intro.md` (removed 2026-07).
+> The benchmark script is deprecated and no longer maintained.
+
 Generated: 2026-05-12T21:27:06Z
 
 Benchmark compares the **old file-based TARS flow** (read `intro.md` + entity MD + optional grep/YAML/SQL) against the **new DataHub MCP flow** (structured GraphQL calls returning only the facts the agent needs).

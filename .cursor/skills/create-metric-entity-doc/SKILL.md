@@ -302,17 +302,7 @@ just make sure the user knows before opening the PR.
 
 ---
 
-## Step 4 — Register the metric in intro.md
-
-Add the new metric to the "Available metric entities" list in `docs/llm_context/intro.md`:
-
-```markdown
-- `metric_entities/{metric_slug}.md` — {Official Metric Name}: {one-sentence description with key aliases}. Builds on `business_entities/{entity_slug}.md`.
-```
-
----
-
-## Step 5 — Add back-link in the related business entity
+## Step 4 — Add back-link in the related business entity
 
 Open the related business entity file(s) in `docs/llm_context/business_entities/` and add or update a **"Related Metric Entities"** section (or a bullet to an existing one) pointing back to this metric:
 
@@ -326,7 +316,7 @@ If the business entity already has a "Related Metric Entities" section, just add
 
 ---
 
-## Step 6 — Self-review checklist
+## Step 5 — Self-review checklist
 
 Before presenting to the user, verify:
 
@@ -345,6 +335,5 @@ Before presenting to the user, verify:
 - [ ] Golden Query validates column names against governance YAMLs and Trino
 - [ ] DataHub token-overflow risk check run (Step 3b); user warned if at risk
 - [ ] Golden Query references the business entity component pattern in a comment instead of duplicating it
-- [ ] Metric registered in `docs/llm_context/intro.md` under "Available metric entities"
 - [ ] Back-link added to "Related Metric Entities" in the related business entity file(s)
 - [ ] Superset Golden Assets omitted if no canonical asset; Superset URNs and Trino tables in backticks when present

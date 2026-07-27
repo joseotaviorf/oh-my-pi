@@ -102,7 +102,7 @@ Create `docs/llm_context/business_entities/{entity_name}.md` following this stru
 {- Domain jargon that analysts use but column names don't reflect}
 {- Key filter values that map to business concepts}
 
-{Do NOT include company-wide terms like IQ/PP — those live in intro.md.}
+{Do NOT include company-wide abbreviations (IQ, PP) — document only domain-specific terms.}
 
 ## Tables
 
@@ -165,7 +165,7 @@ Create `docs/llm_context/business_entities/{entity_name}.md` following this stru
 - Always use bullet list format (`- **term** → mapping`), not tables. Bullets are more expressive and allow inline filters and multi-mapping.
 - Merge entity synonyms (PT-BR names) with domain jargon into one list.
 - For jargon entries: include the definition AND the technical mapping (table, column, or filter).
-- Only include terms specific to this domain. Company-wide terms (IQ, PP) belong in `intro.md`.
+- Only include terms specific to this domain. Omit company-wide abbreviations (IQ, PP).
 
 **Tables:**
 - Use the "You need... / Use this table" format. Each row answers an analytical question.
@@ -276,17 +276,7 @@ just make sure the user knows before opening the PR.
 
 ---
 
-## Step 4 — Register the entity in intro.md
-
-Add the new entity to the "Available entities" list in `docs/llm_context/intro.md`:
-
-```markdown
-- `business_entities/{entity_name}.md` — {Short description} ({PT-BR synonym})
-```
-
----
-
-## Step 4b — Update related entity docs
+## Step 4 — Update related entity docs
 
 Check if any existing entity docs in `docs/llm_context/business_entities/` reference tables or concepts that overlap with the new entity. If so, add or update a "Relationships" sub-section in those docs pointing to the new entity.
 
@@ -306,7 +296,6 @@ Before presenting to the user, verify:
 - [ ] Golden Queries are syntactically valid and cover common needs
 - [ ] Golden Queries use Trino SQL dialect (no Spark-only constructs like `QUALIFY`, `GROUP BY ALL`)
 - [ ] DataHub token-overflow risk check run (Step 3b); user warned if at risk
-- [ ] Entity is registered in `intro.md`
 - [ ] Related entity docs updated with cross-references (if applicable)
 - [ ] Critical rules section present when CAST, Dedup, or mandatory filters apply
 - [ ] No information that doesn't fill a gap — if something is redundant, remove it

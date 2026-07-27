@@ -21,8 +21,7 @@ ROLE CONTRACT (this is what makes a metric entity different from a business enti
 
 Rules:
   • File name: lowercase_snake_case.md (e.g. nps_fr.md, gmv_fs.md).
-  • After creating: register the file under "Available metric entities" in
-    ../intro.md, and add a "Related Metric Entities" back-link from the related
+  • After creating: add a "Related Metric Entities" back-link from the related
     business entity(ies).
   • Golden Query must use Trino SQL dialect (TARS runs on Trino). No Spark-only
     constructs (QUALIFY, GROUP BY ALL, IFF, 3-arg DATEDIFF, variant `col:key`).
@@ -55,8 +54,10 @@ metadata, not narrative content.
 
 <!--
 Plain list of the business entity NAMES this metric draws its schema from — no
-paths, no descriptions (intro.md explains the cross-link sections and where to
-find each entity). One bullet per related entity.
+paths, no descriptions. Business entities live in ../business_entities/, metric
+entities in ../metric_entities/ (one file per entity). Add back-links in the
+related business entity's "Related Metric Entities" section. One bullet per
+related entity.
 -->
 
 - {Business Entity Name}

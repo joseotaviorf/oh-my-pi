@@ -1,5 +1,10 @@
 """Benchmark: TARS old flow (file reads) vs new flow (DataHub MCP GraphQL).
 
+TEMPORARILY DEPRECATED (2026-07): docs/llm_context/intro.md was removed, so the
+old-flow simulation still references a file that no longer exists. This script
+is kept as historical ROI evidence for docs/rfc/datahub/tars_pivot.md until it
+is updated to simulate the old flow using entity MD files only (no intro.md).
+
 Runs 5 representative questions through both flows, measures:
   - input_tokens  : bytes consumed ÷ 4 (industry-standard approximation)
   - files_or_calls: files opened (old) or GraphQL requests made (new)
