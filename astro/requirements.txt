@@ -1,0 +1,8 @@
+# Extra Python deps for the Astro image beyond packages/* and the Runtime freeze.
+# Installed by /usr/local/bin/install-python-dependencies (same helper as
+# Runtime non-base ONBUILD). Do not list apache-airflow here — the script rejects it.
+#
+# Vault secrets backend (AIRFLOW__SECRETS__BACKEND=VaultBackend) — same need as
+# beethoven/airflow/requirements.txt. Not included in astro-runtime-*-base.
+# Latest that supports apache-airflow>=2.11.0 (Runtime 13.8 / Airflow 2.11.2).
+apache-airflow-providers-hashicorp==4.7.1

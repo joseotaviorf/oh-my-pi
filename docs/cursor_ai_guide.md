@@ -541,17 +541,17 @@ make stop-local-environment   # stop containers without deleting
 make kill-local-environment   # delete all containers and volumes
 ```
 
-**To test a specific plugin branch**:
-
-```bash
-make run-local-environment branch=your-branch-name
-```
+**Plugins / operators** ship in-repo (`packages/bietlejuice-airflow-plugins`,
+`packages/bietlejuice-airflow-operators`) and are bind-mounted into local Airflow.
+Rebuild the image when their dependencies change (`make run-local-environment` /
+`make restart-local-environment`). There is no `branch=` clone of external plugin repos.
 
 **Setup checklist**:
 - `GITHUB_TOKEN`, `DATABRICKS_TOKEN`, `DATABRICKS_USERNAME` set and exported
+- `qli login` completed (Vault token for local variable resolution)
 - `make install` completed without errors
 - `make create-dag-files` completed without errors
-- Three Astro containers running (`webserver`, `scheduler`, `postgres`)
+- Four Astro containers running (`webserver`, `scheduler`, `triggerer`, `postgres`)
 - Airflow UI accessible at http://localhost:8080
 
 ---

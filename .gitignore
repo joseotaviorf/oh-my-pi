@@ -58,14 +58,18 @@ logs/
 # macOS
 .DS_Store
 
-# Local Astro environment
-local/astro/plugins/*
+# Local helpers (emr_monitor, S3 upload scripts) — Astro lives under astro/
 
 # Airflow DAG Builder generated files
 dags/**/*_dag.py
 !dags/platform/migration_twin_*/*_dag.py
 !dags/platform/migration_emr_*/*_dag.py
 !dags/platform/migration_compare_*/*_dag.py
+dags/**/.table_manifest
+dags/**/.metadata_manifest
+dags/**/.data_quality_manifest
+dags/_astro_bundles/
+astro/generated-dag-excludes.txt
 
 # Git worktrees (best-of-n runners, etc.)
 .worktrees/

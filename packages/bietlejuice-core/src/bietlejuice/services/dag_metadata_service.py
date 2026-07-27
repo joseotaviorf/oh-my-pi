@@ -1,6 +1,7 @@
 import glob
 import os
 import re
+from functools import lru_cache
 from typing import Dict, List, Optional, Set, Tuple
 
 from quintoandar_logger import QuintoAndarLogger
@@ -313,22 +314,42 @@ class DAGMetadataService:
 
         return files_found
 
+    METADATA_MANIFEST_FILENAME = ".metadata_manifest"
+
     @staticmethod
+    @lru_cache(maxsize=1024)
     def list_metadata_table_paths(dag_name: str, layer: str) -> Set[str]:
         """
         Returns set of relative paths (without ext) for tables that have metadata files.
         Used for batch existence checks to avoid per-table filesystem I/O.
+        Reads .metadata_manifest when present (avoids glob over many files).
         """
         dag_path = DAGPackagesPathService.get_dag_path(dag_name)
-        metadata_layer_path = os.path.join(dag_path, "metadata", layer)
         result = set()
+        if dag_path is None:
+            return result
+        metadata_layer_path = os.path.join(dag_path, "metadata", layer)
         if os.path.isdir(metadata_layer_path):
-            pattern = os.path.join(metadata_layer_path, "**", "*")
-            for file_path in glob.glob(pattern, recursive=True):
-                if os.path.isfile(file_path):
-                    rel = os.path.relpath(file_path, metadata_layer_path)
-                    name_without_ext = os.path.splitext(rel)[0]
-                    result.add(name_without_ext)
+            manifest_path = os.path.join(
+                metadata_layer_path, DAGMetadataService.METADATA_MANIFEST_FILENAME
+            )
+            if os.path.isfile(
+                manifest_path
+            ) and DAGPackagesPathService._manifest_is_fresh(
+                manifest_path, metadata_layer_path, recursive_dirs=True
+            ):
+                with open(manifest_path) as f:
+                    for line in f:
+                        name = line.strip()
+                        if name:
+                            result.add(os.path.normpath(name))
+            else:
+                pattern = os.path.join(metadata_layer_path, "**", "*")
+                for file_path in glob.glob(pattern, recursive=True):
+                    if os.path.isfile(file_path):
+                        rel = os.path.relpath(file_path, metadata_layer_path)
+                        name_without_ext = os.path.splitext(rel)[0]
+                        result.add(name_without_ext)
         legacy_path = os.path.join(DATALAKE_METADATA_PATH, dag_name, layer)
         if os.path.isdir(legacy_path):
             pattern = os.path.join(legacy_path, "**", "*")

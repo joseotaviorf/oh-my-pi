@@ -1,3 +1,0 @@
-databricks_cli==0.18.0
-Flask-Admin==2.0.2
-unicodecsv==0.14.1

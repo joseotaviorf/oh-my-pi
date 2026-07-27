@@ -75,6 +75,8 @@ Pick the **package** from the source path, then mirror under that package’s `t
 | `packages/bietlejuice-runtime/src/bietlejuice/` (qube, api, pipeline, most `base/`) | `packages/bietlejuice-runtime/test/unit/` |
 | `packages/bietlejuice-core/src/bietlejuice/` (services, some `base/airflow/dag_builders/`) | `packages/bietlejuice-core/test/unit/` |
 | `packages/bietlejuice-airflow/src/bietlejuice/` (task creators, task groups, datasets) | `packages/bietlejuice-airflow/test/unit/` |
+| `packages/bietlejuice-airflow-operators/src/` | `packages/bietlejuice-airflow-operators/test/` |
+| `packages/bietlejuice-airflow-plugins/src/` | `packages/bietlejuice-airflow-plugins/test/` |
 | `dags/{domain}/…/spark_jobs/load_*.py` | `packages/bietlejuice-runtime/test/dags/{domain}/…/spark_jobs/` |
 | `dags/core/core_{entity}/spark_jobs/` | `packages/bietlejuice-runtime/test/core_model_dags/unit/core/core_{entity}/spark_jobs/` |
 | `dags/{domain}/…/*.py` (Airflow DAG module, not a Spark job) | `packages/bietlejuice-airflow/test/unit/dags/{domain}/…/` |

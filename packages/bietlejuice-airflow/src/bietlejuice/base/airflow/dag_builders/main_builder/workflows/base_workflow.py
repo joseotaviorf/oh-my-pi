@@ -62,7 +62,7 @@ class BaseWorkflow(BuilderInterface):
             self.dag_id = f"bietlejuice.{self.dag_name}{self.VALIDATION_DAG_SUFFIX}"
         else:
             self.dag_id = f"bietlejuice.{self.dag_name}"
-        self.config_service = ConfigurationService(self.dag_name)
+        self.config_service = ConfigurationService(self._config_service_dag_name())
 
         self.workflow_args = workflow_args
         self.cluster_args = cluster_args
@@ -70,6 +70,10 @@ class BaseWorkflow(BuilderInterface):
 
         self._dq_cache = DataQualityLayerCache(self.dag_name)
         self.local_tz = timezone("America/Sao_Paulo")
+
+    def _config_service_dag_name(self) -> str:
+        """Cache key for ConfigurationService. Subclasses may redirect (e.g. Wonka)."""
+        return self.dag_name
 
     def get_date_param(self, dag_run, default_date, date_param_name) -> str:
         """Macro to get date parameter from dag_run conf. If not found, returns default_date."""

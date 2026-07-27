@@ -1,0 +1,56 @@
+# LOCAL DEV ONLY — not used by Astro "dev" deployment CI.
+# Makefile exports LOCAL_WORKSPACE_FOLDER (host path for DooD). Default .. = repo root from astro/.
+#
+# Vault secrets backend (variables only): same path forno uses
+# (apps/forno/astronomer/airflow/variables on vault-sandbox). Auth is the
+# developer's short-lived qli token (VAULT_TOKEN), injected by
+# `make run-local-environment` via astro/scripts/export_qli_vault_token.py.
+# connections_path is intentionally omitted so Databricks/AWS connections keep
+# using the personal token from local_connections.json (secrets backends
+# shadow the metastore).
+# The `:+` interpolation leaves AIRFLOW__SECRETS__BACKEND empty when
+# VAULT_TOKEN is unset/empty, so offline runs skip VaultBackend entirely
+# (no per-Variable.get error noise) and fall back to the metastore seed.
+x-vault-backend: &vault_backend
+  AIRFLOW__SECRETS__BACKEND: ${VAULT_TOKEN:+airflow.providers.hashicorp.secrets.vault.VaultBackend}
+  AIRFLOW__SECRETS__BACKEND_KWARGS: '{"url":"${VAULT_ADDR:-https://vault-sandbox.sre.quintoandar.com.br}","mount_point":"kv","variables_path":"apps/forno/astronomer/airflow/variables","connections_path":null,"auth_type":"token","token":"${VAULT_TOKEN:-}"}'
+  VAULT_ADDR: ${VAULT_ADDR:-https://vault-sandbox.sre.quintoandar.com.br}
+  VAULT_TOKEN: ${VAULT_TOKEN:-}
+
+services:
+  scheduler:
+    environment:
+      <<: *vault_backend
+      PYTHONPATH: /usr/local/bietlejuice/core-src:/usr/local/bietlejuice/airflow-src:/usr/local/bietlejuice/operators-src:/usr/local/bietlejuice/plugins-src:/usr/local/airflow
+    volumes:
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow-operators/src:/usr/local/bietlejuice/operators-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow-plugins/src:/usr/local/bietlejuice/plugins-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/dags:/usr/local/airflow/dags
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/astro/config:/usr/local/airflow/config
+  webserver:
+    environment:
+      <<: *vault_backend
+      PYTHONPATH: /usr/local/bietlejuice/core-src:/usr/local/bietlejuice/airflow-src:/usr/local/bietlejuice/operators-src:/usr/local/bietlejuice/plugins-src:/usr/local/airflow
+    volumes:
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow-operators/src:/usr/local/bietlejuice/operators-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow-plugins/src:/usr/local/bietlejuice/plugins-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/dags:/usr/local/airflow/dags
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/astro/config:/usr/local/airflow/config
+  triggerer:
+    environment:
+      <<: *vault_backend
+      PYTHONPATH: /usr/local/bietlejuice/core-src:/usr/local/bietlejuice/airflow-src:/usr/local/bietlejuice/operators-src:/usr/local/bietlejuice/plugins-src:/usr/local/airflow
+    volumes:
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow-operators/src:/usr/local/bietlejuice/operators-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-airflow-plugins/src:/usr/local/bietlejuice/plugins-src
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/dags:/usr/local/airflow/dags
+      - ${LOCAL_WORKSPACE_FOLDER:-..}/astro/config:/usr/local/airflow/config

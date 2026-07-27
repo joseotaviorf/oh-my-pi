@@ -12,6 +12,9 @@ from bietlejuice.base.paths import DAG_PACKAGES_ROOT, QUERIES_DATALAKE_PATH
 
 logger = QuintoAndarLogger("FileService")
 
+# Prefer libyaml (CSafeLoader) when the wheel ships it; fall back to pure-Python.
+_SAFE_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
 
 class FileService:
     @staticmethod
@@ -43,7 +46,7 @@ class FileService:
         try:
             with open(file_path) as stream:
                 try:
-                    response = yaml.safe_load(stream)
+                    response = yaml.load(stream, Loader=_SAFE_LOADER)
                 except yaml.YAMLError as ex:
                     logger.error(
                         f"m=get_dict_from_yaml_file, file_path={file_path}, msg=YAML content "

@@ -7,6 +7,7 @@ import pytest
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.wonka_workflow import (
     WonkaWorkflow,
 )
+from bietlejuice.services.configuration_service import WONKA_SHARED_CONFIG_DAG_NAME
 
 _WONKA_CLUSTER_PRESET = {
     "spark_version": "16.4.x-scala2.12",
@@ -141,13 +142,20 @@ class TestWonkaWorkflowClusterPresetSelection:
         with patch(
             "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow.ConfigurationService",
             return_value=config_service,
-        ):
-            return WonkaWorkflow(dag_args, workflow_args, cluster_args, None)
+        ) as mock_config_cls:
+            workflow = WonkaWorkflow(dag_args, workflow_args, cluster_args, None)
+            mock_config_cls.assert_called_once_with(WONKA_SHARED_CONFIG_DAG_NAME)
+            return workflow
 
     def test_loads_emr_preset_when_type_is_wonka_cluster_emr(self, config_presets):
         workflow = self._workflow({"type": "wonka_cluster_emr"}, config_presets)
         assert workflow.cluster_args["spark_version"] == "emr-7.12.0"
         assert workflow.cluster_args["spark_env_vars"]["SPARK_RUNTIME"] == "emr"
+
+    def test_config_service_uses_shared_wonka_sentinel(self, config_presets):
+        workflow = self._workflow({"type": "wonka_cluster"}, config_presets)
+        assert workflow._config_service_dag_name() == WONKA_SHARED_CONFIG_DAG_NAME
+        assert workflow.dag_name == "test-wonka"
 
     def test_loads_default_preset_when_type_omitted(self, config_presets):
         workflow = self._workflow({}, config_presets)
@@ -220,14 +228,16 @@ class TestWonkaWorkflowValidationRuntimeOverlay:
         with patch(
             "bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow.ConfigurationService",
             return_value=config_service,
-        ):
-            return WonkaWorkflow(
+        ) as mock_config_cls:
+            workflow = WonkaWorkflow(
                 dag_args,
                 workflow_args,
                 cluster_args,
                 None,
                 is_validation=True,
             )
+            mock_config_cls.assert_called_once_with(WONKA_SHARED_CONFIG_DAG_NAME)
+            return workflow
 
     def test_runtime_overlay_wins_over_consolidation_preset(self, config_presets):
         workflow = self._validation_workflow(

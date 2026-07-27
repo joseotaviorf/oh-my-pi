@@ -17,18 +17,20 @@ Each later branch includes everything from the ones before it.
 
 This section treats the **package split** and the **runtime / Databricks (multi-DBR) resolution** as one unit of work: the goal is a maintainable install and test model for **Airflow (modern)** and **Databricks (multiple DBR versions)** at the same time, without a single monolithic `bietlejuice/` tree or one lockfile that must satisfy every environment.
 
-### 1.1 Four packages
+### 1.1 Six packages
 
-The monolithic top-level `bietlejuice/` package is replaced by **four** packages under `packages/`, each with its own `pyproject.toml`, `src/bietlejuice/`, and tests (the old root `tests/` tree is removed; tests live next to the relevant package).
+The monolithic top-level `bietlejuice/` package is replaced by **six** packages under `packages/`, each with its own `pyproject.toml`, `src/` (or `src/bietlejuice/`), and tests (the old root `tests/` tree is removed; tests live next to the relevant package).
 
 | Package | Role |
 |--------|------|
 | **bietlejuice-core** | Shared libraries: config, validation, paths, and code used in more than one context. `quintoandar-logger` is integrated via `uv` git source for dev/CI; wheel metadata omits it where Databricks `pip` cannot resolve private indexes. |
-| **bietlejuice-airflow** | Airflow: DAG builder, operators, and anything that must import `apache-airflow` (currently aligned with **Airflow 2.11.0** / Astro Runtime 13.4.x). |
+| **bietlejuice-airflow** | Airflow: DAG builder and anything that must import `apache-airflow` (currently aligned with **Airflow 2.11.2** / Astro Runtime 13.8.x). |
+| **bietlejuice-airflow-operators** | Databricks / EMR Airflow operators (vendored; previously cloned from external plugin repos). |
+| **bietlejuice-airflow-plugins** | Airflow plugins (extra links, etc.). |
 | **bietlejuice-runtime** | Databricks/Spark: PySpark, Delta-adjacent stack, Qube jobs, UDFs, and code meant to run on clusters. The **published wheel** is intentionally not the same dependency graph as Airflow’s. |
-| **bietlejuice-compiler** | CI and local tooling: `create-dag-files`, SQL/Yaml validation, metadata and pipeline scripts. Declares **Airflow 2.11.0** as a real dependency so `airflow` imports work in `make create-dag-files` and similar steps. |
+| **bietlejuice-compiler** | CI and local tooling: `create-dag-files`, SQL/Yaml validation, metadata and pipeline scripts. Declares **Airflow 2.11.2** as a real dependency so `airflow` imports work in `make create-dag-files` and similar steps. |
 
-The **root** of the repository is not an installable Python package. A **root** `pyproject.toml` and **`uv.lock`** define a **uv workspace** for the three members that can share a resolver (see below). **bietlejuice-runtime is not a workspace member** (see multi-DBR).
+The **root** of the repository is not an installable Python package. A **root** `pyproject.toml` and **`uv.lock`** define a **uv workspace** for the five members that can share a resolver (see below). **bietlejuice-runtime is not a workspace member** (see multi-DBR).
 
 ### 1.2 Build, release, and path behavior
 
@@ -41,7 +43,7 @@ The **root** of the repository is not an installable Python package. A **root** 
 
 A **single** uv lockfile cannot satisfy **old DBR-bundled libraries** and **Apache Airflow 2.11** (used locally and in CI) at the same time. The fix is:
 
-- **Workspace (root `pyproject.toml`):** members are **bietlejuice-core**, **bietlejuice-airflow**, and **bietlejuice-compiler**. The root file documents **`[tool.uv] override-dependencies`**, `index-strategy`, and **`[tool.uv.sources]`** (e.g. `quintoandar-logger` from git) for those members.
+- **Workspace (root `pyproject.toml`):** members are **bietlejuice-core**, **bietlejuice-airflow**, **bietlejuice-airflow-operators**, **bietlejuice-airflow-plugins**, and **bietlejuice-compiler**. The root file documents **`[tool.uv] override-dependencies`**, `index-strategy`, and **`[tool.uv.sources]`** (e.g. `quintoandar-logger` from git) for those members.
 - **bietlejuice-runtime** is a **standalone** uv project: its own **`uv.lock`**, not listed under `[tool.uv.workspace] members`, so Databricks-specific pins do not fight the Airflow workspace.
 - **Per-DBR environments:** under `packages/bietlejuice-runtime/envs/` there are small **shim** projects (e.g. `dbr-12-2`, `dbr-13-3`, `dbr-16-4`), each with its own **`.venv`**, the **Python version** that matches that DBR, and dependencies aligned with what the cluster preinstalls. **`make sync-dbr DBR=12.2|13.3|16.4`** (default **16.4**) selects the corresponding env. **Unit tests and core model tests** for runtime run with the **dbr-16-4** interpreter and **`PYSPARK_PYTHON` / `PYSPARK_DRIVER_PYTHON`** set to that env’s binary so Spark workers do not pick an unrelated `python3` from `PATH`. CI **syncs dbr-16-4** in the test pipeline; a full **matrix** for 12.2/13.3 in CI is left as a follow-up.
 - **Published wheel `Requires-Dist`:** the runtime wheel is trimmed so cluster `pip` installs and DBR preloads do not pull conflicting or redundant packages (e.g. components that the cluster already provides, or that cannot be resolved the same way across all targets). **Relaxation** of floors in `bietlejuice-core` and runtime (e.g. PyYAML) and careful handling of internal client packages is part of making locks resolvable across **Airflow**, **DBR**, and legacy **QuintoAndar** libraries. Operational details of **psycopg2** on **ARM/Graviton** are documented in the relevant commit messages, not here.
@@ -63,18 +65,26 @@ A **single** uv lockfile cannot satisfy **old DBR-bundled libraries** and **Apac
 - **`UV_PROJECT_ENVIRONMENT=/home/vscode/.venv`** so the in-container venv is stable and does not overwrite or collide with a host **`.venv`** when switching between host and container.
 - **Post-create** script re-links editable workspace installs to **bind-mounted** source paths.
 - **Docker-outside-of-Docker (DooD)** feature is enabled so **Astro CLI** can run Docker from inside the devcontainer (see [Local Astro](#3-local-astronomer-astro-support)).
-- **Workspace** root **`uv.lock`** locks the **three** workspace members together.
+- **Workspace** root **`uv.lock`** locks the **five** workspace members together.
 - **IDE (VS Code–compatible, including Cursor):** see [Dev container and IDE settings](#10-dev-container-and-ide-settings).
 
 ---
 
 ## 3. Local Astronomer (Astro) support
 
-- **Base image** aligned with **Astronomer Astro Runtime 13.4.0** and **Airflow 2.11.0**, using the documented **`install-system-packages`** / **`install-python-dependencies`** flow (Airflow is **not** installed from `requirements.txt` — the image provides it).
-- **`make setup-bietlejuice`** runs **`uv export`** from **bietlejuice-airflow** (no dev) into **`local/astro/requirements.txt`**. The **bietlejuice** packages are **not** fully copied in; **`bietlejuice-core`** and **bietlejuice-airflow** **`src/`** are **bind-mounted** with **`PYTHONPATH`** pointing at fixed paths under the container, so Python merges the two implicit namespace trees. **Compiler** **`scripts/`** are mounted for operators that need them.
+- **Base image** aligned with **Astronomer Astro Runtime 13.8.0** and **Airflow 2.11.2**, built from **`astro/Dockerfile`** (repo-root context) — same image as the Astro "dev" deployment.
+- **`make run-local-environment`** builds **`bietlejuice-airflow:local`**, then runs **`astro dev start --image-name`** from **`astro/`**. Packages are installed in the image; **core / airflow / operators / plugins** `src/` plus **`dags/`** and compiler **`scripts/`** are **bind-mounted** with **`PYTHONPATH`** so live edits win over site-packages.
 - **Astro CLI** is used for `astro dev start` / `restart` / `stop` / `kill`. **`verbose=`** is supported on `run-local-environment` and `restart-local-environment`. **Health-check timeout** workarounds exist for **DooD** (webserver on `127.0.0.1` may not be reachable from inside the devcontainer the way `astro` expects; the Makefile verifies running containers and waits for `airflow db check`).
-- **Host** **`DATABRICKS_*`** (and `GITHUB_TOKEN`) are forwarded for consistent behavior with the host.
-- **Plugins** and **example DAG** import issues were fixed for the new runtime (paths, `datetime` / `APIEnum`, etc.).
+- **Host** **`DATABRICKS_*`** (and `GITHUB_TOKEN`) are forwarded for consistent behavior with the host. **`VAULT_TOKEN`** is loaded from `qli` (`astro/scripts/export_qli_vault_token.py`) so local Airflow resolves variables via the same forno Vault path as the forno Astronomer deployment. Connections stay local (personal Databricks token).
+
+### 3.1 Astro "dev" deployment (`.woodpecker/development.yml`)
+
+Isolated from forno/prod. On push to the **`development`** branch:
+
+- `make create-astro-dag-files` — regenerate parse-time manifests + **domain bundles** + **migration exec-passthrough bundles** (no per-DAG stubs).
+- Filtered rsync into `astro/dags/` then `astro deploy --dags` to the Astronomer "dev" deployment.
+
+Forno/prod continue to use **`make create-dag-files`** via `.woodpecker/release.yml` (unchanged until the follow-up CI PR).
 
 ---
 
@@ -83,11 +93,11 @@ A **single** uv lockfile cannot satisfy **old DBR-bundled libraries** and **Apac
 | Area | Behavior |
 |------|----------|
 | **`devcontainer-build`** | Builds the dev image with the BuildKit secret; tags **`bi-etl-ejuice-devcontainer:latest`**. |
-| **`setup-bietlejuice`** | **`uv export` → `local/astro/requirements.txt`**; does not copy the full `bietlejuice` tree (mounts + `PYTHONPATH` handle that). |
+| **`build-astro-local-image`** | Builds **`bietlejuice-airflow:local`** from **`astro/Dockerfile`** (repo-root context). |
 | **`build`** | `uv build` for **bietlejuice-core** and **bietlejuice-runtime** to **`dist/`**. |
 | **`install`** | `uv sync` for each project; for runtime uses **`env -u UV_PROJECT_ENVIRONMENT`** in devcontainer-friendly mode; also syncs **`envs/dbr-16-4`** for default test runs. |
 | **`sync-dbr`** | `DBR=12.2\|13.3\|16.4` selects `packages/bietlejuice-runtime/envs/dbr-…`. |
-| **`run-local-environment` / `restart-local-environment`** | Optional `verbose=`; `astro` with build secrets; DooD health-check note; post-start **`airflow db check`** wait. |
+| **`run-local-environment` / `restart-local-environment`** | Optional `verbose=`; build image then `astro` from **`astro/`** with `--image-name`; DooD health-check note; post-start **`airflow db check`** wait. |
 | **Lint** | `lint` / `check-style` / `fix-style` → per-package **ruff format** and **ruff check** on `src/` and `test/`. |
 | **`type-check`** | Per-package **`ty check src/`**. |
 | **SQL** | `lint-sql` / `check-sql` via **bietlejuice-compiler** + **sqlfluff** on `dags/`. |
@@ -110,7 +120,7 @@ A **single** uv lockfile cannot satisfy **old DBR-bundled libraries** and **Apac
 
 ## 6. uv: how the repo is wired
 
-- **Root workspace:** `bietlejuice-core`, `bietlejuice-airflow`, `bietlejuice-compiler` + **`uv.lock`**. **bietlejuice-runtime** is **outside** that member list with its **own lock**.
+- **Root workspace:** `bietlejuice-core`, `bietlejuice-airflow`, `bietlejuice-airflow-operators`, `bietlejuice-airflow-plugins`, `bietlejuice-compiler` + **`uv.lock`**. **bietlejuice-runtime** is **outside** that member list with its **own lock**.
 - **Rationale (short):** Airflow 2.11, multiple DBRs, and legacy internal packages cannot share one resolver graph without **overrides** and a **split** lock for runtime.
 - **Per-DBR venvs:** `packages/bietlejuice-runtime/envs/dbr-12-2|dbr-13-3|dbr-16-4` — one venv per DBR for **repro tests** and local parity; default **16.4** in **Makefile** and **CI** test setup.
 
@@ -144,7 +154,7 @@ A **single** uv lockfile cannot satisfy **old DBR-bundled libraries** and **Apac
 
 - **Interpreter:** fixed to **`/home/vscode/.venv/bin/python`**. **`remoteEnv`** forwards **GITHUB** / **DATABRICKS**-related variables and sets **`UV_PROJECT_ENVIRONMENT`**. **`postCreateCommand`** runs **`.devcontainer/post-create.sh`**.
 - **Editor stack:** extensions include **Python**, **Cursor Pyright** (`anysphere.cursorpyright`), **Ruff**, TOML, YAML, SQL tools, **SQLFluff LSP**.
-- **Analysis:** **`python.analysis.extraPaths` / `basedpyright.analysis.extraPaths`** list all four **`packages/*/src`**; venv resolution points at **`/home/vscode/.venv`**.
+- **Analysis:** **`python.analysis.extraPaths` / `basedpyright.analysis.extraPaths`** list all six **`packages/*/src`**; venv resolution points at **`/home/vscode/.venv`**.
 - **Tests:** pytest enabled with **`--import-mode=importlib`**, discovery from **`packages/`** so the Test view sees all package test trees.
 - **Formatting:** Ruff as default Python formatter, **format on save**.
 - **`python.languageServer`** is set to **None** so the primary analysis comes from **Cursor Pyright** without duplicating Pylance. This is **editor-specific** to Cursor; VS Code can use a similar pattern with the Pyright extension of choice.

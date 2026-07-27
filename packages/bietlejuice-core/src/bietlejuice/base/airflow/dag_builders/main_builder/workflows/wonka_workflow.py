@@ -20,6 +20,7 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.services.configuration_service import WONKA_SHARED_CONFIG_DAG_NAME
 
 logger = logging.getLogger("WonkaWorkflow")
 
@@ -56,6 +57,10 @@ class WonkaWorkflow(BaseWorkflow):
         }
     )
 
+    def _config_service_dag_name(self) -> str:
+        # All Wonka DAGs share one root conf load; real name stays in dag_args["name"].
+        return WONKA_SHARED_CONFIG_DAG_NAME
+
     def __init__(
         self, dag_args, workflow_args, cluster_args, dataset_dependencies, **kwargs
     ):
@@ -75,6 +80,8 @@ class WonkaWorkflow(BaseWorkflow):
 
         # Merge the cluster preset (wonka_cluster for prod, consolidation_* for validation)
         # with the DAG declaration `cluster:` block into `self.cluster_args`.
+        # _get_deep_updated_dict deep-copies; never write back into the shared
+        # ConfigurationService instance.
         cluster_config_key = self.cluster_args.get(
             "type", self._WONKA_DEFAULT_CLUSTER_CONFIG_KEY
         )

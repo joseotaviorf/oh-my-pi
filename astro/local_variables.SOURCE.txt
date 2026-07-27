@@ -1,0 +1,6 @@
+Offline fallback seed for local Airflow (astro/local_variables.json).
+Primary resolution is VaultBackend when VAULT_TOKEN is set
+(see astro/docker-compose.override.yml and make run-local-environment).
+
+Source: qli kv get -e forno apps/forno/astronomer/airflow/variables/<key>
+Regenerate: make refresh-local-variables

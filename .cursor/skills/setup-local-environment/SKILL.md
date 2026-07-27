@@ -39,8 +39,9 @@ astro version
 # Check Docker (required by Astro)
 docker info --format '{{.ServerVersion}}'
 
-# Check docker buildx (required for --build-secrets)
-docker buildx version
+# Check Docker BuildKit (required for GITHUB_TOKEN secret mounts on image builds)
+docker buildx version || docker info | grep -i buildkit
+export DOCKER_BUILDKIT=1
 
 # Check Colima resources (if using Colima instead of Docker Desktop)
 colima list
@@ -107,9 +108,11 @@ Where to get the tokens:
 make install
 ```
 
-This runs `uv sync` for each workspace package (`bietlejuice-core`, `bietlejuice-airflow`,
+This runs `uv sync` for each workspace package (`bietlejuice-core`,
+`bietlejuice-airflow`, `bietlejuice-airflow-operators`, `bietlejuice-airflow-plugins`,
 `bietlejuice-compiler`, `emr-cli`) and for the standalone `bietlejuice-runtime` plus its
-default `dbr-16-4` test env. uv resolves and caches all dependencies (runtime, test, lint),
+default `dbr-16-4` test env. (Devcontainer `post-create` runs root `uv sync`, which also
+pulls operators/plugins.) uv resolves and caches all dependencies (runtime, test, lint),
 including the internal QuintoAndar package index, and provisions a compatible Python
 interpreter automatically.
 
@@ -137,7 +140,10 @@ make create-dag-files
 ```
 
 This reads all `*_declaration.yml` files and generates the corresponding `*_dag.py` files
-under `dags/`. Must be run before starting Airflow — otherwise the UI will be empty.
+under `dags/`, **and** regenerates gitignored parse-time manifests (`.table_manifest`,
+`.metadata_manifest`, `.data_quality_manifest`). Must be run before starting Airflow —
+otherwise the UI will be empty. Astro "dev" CI uses `make create-astro-dag-files` instead
+(domain + migration bundles; no stubs).
 
 If the user only wants DAG files for a specific DAG:
 ```bash
@@ -153,32 +159,30 @@ export DOCKER_BUILDKIT=1
 make run-local-environment
 ```
 
-**`DOCKER_BUILDKIT=1` is required** — the Dockerfile uses `--build-secrets` which is only
-supported by BuildKit. Without it, the build fails with `unknown flag: --secret`.
+**`DOCKER_BUILDKIT=1` is required** — the image build uses BuildKit secrets for `GITHUB_TOKEN`.
 
 This runs, in order:
-1. `make setup-bietlejuice` — exports `local/astro/requirements.txt` via `uv export` and copies `dags/`, `bietlejuice/`, `scripts/` into `local/astro/`
-2. `make clone-local-airflow-plugins` — clones the `forno` branch of airflow-plugins
-3. `make clone-local-beethoven` — clones the `forno` branch of beethoven
-4. `astro dev start --no-cache --build-secrets id=GITHUB_TOKEN` — builds the Docker image and starts Airflow
-5. `make import-variables-and-connections` — seeds Airflow variables and connections
+1. Load `VAULT_TOKEN` from qli (`astro/scripts/export_qli_vault_token.py`) for VaultBackend
+2. `docker build -f astro/Dockerfile` from the **repo root** → tags `bietlejuice-airflow:local` (same Dockerfile as CI/prod; needs `packages/` in context)
+3. `astro dev start --image-name bietlejuice-airflow:local` from **`astro/`**
+4. Import pools, AWS connection (optional), variables seed, and Databricks connections
 
-Steps 2 and 3 each run `make normalize-local-astro-plugins` at the end, which flattens any
-`local/astro/plugins/plugins/*` into `local/astro/plugins/*` so Airflow can import top-level
-plugin packages such as `extra_link_plugin` (Airflow only adds the top-level `plugins/`
-directory to `sys.path`).
+Live bind-mounts (via `astro/docker-compose.override.yml`) overlay **core / airflow /
+operators / plugins** `src/`, compiler `scripts/`, and `dags/` so code edits are picked up
+without rebuild. Rebuild the image when `pyproject.toml` / lock / Dockerfile deps change
+(`make restart-local-environment` rebuilds).
 
-This step takes 3–8 minutes on first run (Docker image build). Inform the user.
+Variables resolve via **VaultBackend** (forno Vault path) when `qli login` has a fresh
+token; `make run-local-environment` injects `VAULT_TOKEN`. Offline fallback seed:
+`make refresh-local-variables` then the import step. Connections stay local (personal
+Databricks token) — `connections_path` is omitted from the local Vault kwargs.
+
+This step takes a few minutes on first run (Docker image build). Inform the user.
 
 **Health check timeout is not fatal**: The `astro dev start` command may report
 `The webserver health check timed out after 1m0s` — this does NOT mean the startup failed.
 The containers continue starting in the background. Verify with `astro dev ps` and check that
 all 4 containers (webserver, scheduler, triggerer, postgres) show `running`.
-
-**To use a specific plugin branch** (e.g. for testing a plugin change):
-```bash
-make run-local-environment branch=your-branch-name
-```
 
 Airflow UI will be available at: http://localhost:8080 (default credentials: `admin` / `admin`).
 Note: Astro may assign a different port (e.g. `6563`) on subsequent starts — check the startup
@@ -192,14 +196,14 @@ After startup, verify:
 
 ```bash
 # Check that Astro containers are running
-cd local/astro && astro dev ps
+cd astro && astro dev ps
 ```
 
 Expected: four containers running (`webserver`, `scheduler`, `triggerer`, `postgres`).
 
 If any container is not running or crashed, check logs:
 ```bash
-cd local/astro && astro dev logs
+cd astro && astro dev logs
 ```
 
 Common issues:
@@ -210,9 +214,9 @@ Common issues:
 | `GITHUB_TOKEN` build error | Token not exported in current shell | `source ~/.zshrc` and run `make run-local-environment` again |
 | Gunicorn zombie process (`ps aux` shows `<defunct>`) | Colima has insufficient resources (< 4 CPUs / 6 GB RAM) | `colima stop && colima start --cpu 4 --memory 6` then restart Astro |
 | Health check timeout after 1m0s | Normal on first start — containers are still booting | Not an error. Verify with `astro dev ps`; all 4 containers should show `running` |
-| Port 8080 already in use | Another service on 8080 | Stop the other service or change port in `local/astro/docker-compose.override.yml` |
-| Empty DAG list in UI | `create-dag-files` not run or failed | Re-run `make create-dag-files` then `make setup-bietlejuice` then `make restart-local-environment` |
-| Plugins import error | Plugin branch mismatch | Try `make run-local-environment branch=forno` |
+| Port 8080 already in use | Another service on 8080 | Stop the other service or change port in `astro/docker-compose.override.yml` |
+| Empty DAG list in UI | `create-dag-files` not run or failed | Re-run `make create-dag-files` then `make restart-local-environment` |
+| Import errors for `databricks_plugin` / `extra_link_plugin` | Image stale or mounts missing | Rebuild with `make restart-local-environment`; confirm `LOCAL_WORKSPACE_FOLDER` |
 | `uv sync` auth failure | `GITHUB_TOKEN` missing/invalid for private Git deps | `source ~/.zshrc`, confirm the token has `read:packages`, re-run `make install` |
 
 ---
@@ -229,8 +233,7 @@ make create-dag-files
 make restart-local-environment
 ```
 
-`make restart-local-environment` recopies DAGs/code and restarts the Astro containers without
-a full image rebuild.
+`make restart-local-environment` rebuilds `bietlejuice-airflow:local` and restarts the Astro containers.
 
 To fully stop without deleting:
 ```bash

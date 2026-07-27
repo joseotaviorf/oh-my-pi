@@ -1,4 +1,36 @@
+# Astro DAG bundle sync: changes under dags/ (or this file) on merge trigger the
+# Woodpecker DAG deploys — development → Astro "dev", forno → Astro "forno",
+# master/hotfix → Astro "prod".
+# (ci-astro steps use /bin/sh — keep scripts POSIX; no bash pipefail.)
+#
+# Syntax: every consumer of this file sets AIRFLOW__CORE__DAG_IGNORE_FILE_SYNTAX=glob
+# — the data_ai dev/forno/prod deployments (infrastructure
+# cloud/apps/astronomer/data_ai_platform/*/main.tf) and the local `astro/` project
+# (astro/Dockerfile). So the glob patterns below are the ones that take effect. The
+# luigijr / yellowbrick deployments do run Airflow's default regexp syntax, but they
+# never receive this file: their bags are staged from dags/luigijr only.
 cross/base/
 **/spark_jobs/
 **/tools/
 **/validation/
+# NOTE: deliberately NO `*_validation_dag.py` pattern here. Split validation twin
+# DAGs must stay active on prod — during the Astro cutover they arrive as per-DAG
+# stubs from the legacy `make create-dag-files` chain, and afterwards as prod-only
+# `_validation_bundle_*.py` bundles. Since every consumer is on glob syntax, adding
+# that pattern back would silently stop those DQ validation DAGs on prod. Local
+# Airflow parses the stubs too (they are gitignored generated files — `rm` them if
+# you want a lighter local bag); forno/dev never receive any.
+# Standalone emr-migration twin/emr/compare DAGs — where the pipeline generates
+# bundles they are parsed via _astro_bundles/platform_migration/_*_bundle_*.py
+# (exec-passthrough) instead of the ~714 individual files; on the legacy chain they
+# are intentionally not parsed at all (on-demand EMR validation twins). Files still
+# ship in the rsync payload for bundle exec and worker re-import; only the processor
+# skips the individual paths.
+platform/migration_twin_*/
+platform/migration_emr_*/
+platform/migration_compare_*/
+platform/migration_assets/
+# Defensive regexp equivalent: matches the same migration folders if a deployment
+# ever loses DAG_IGNORE_FILE_SYNTAX=glob. Inert under glob (parens are literal), so
+# it is safe to keep alongside the globs.
+platform/migration_(twin|emr|compare)_

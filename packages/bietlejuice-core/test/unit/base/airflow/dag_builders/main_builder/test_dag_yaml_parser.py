@@ -7,12 +7,38 @@ import pytest
 import bietlejuice.base.service.dag_packages_path_service as dag_packages_path_service
 from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser import (
     DAGYamlParser,
+    _parse_dag_declaration,
+    resolve_validation_block,
 )
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.file_service import FileService
 
 
+@pytest.mark.parametrize(
+    ("inline", "cluster_file", "expected"),
+    [
+        (None, None, None),
+        ({"cluster": {"type": "inline"}}, None, {"cluster": {"type": "inline"}}),
+        (None, {"cluster": {"type": "split"}}, {"cluster": {"type": "split"}}),
+        (
+            {"cluster": {"type": "inline"}},
+            {"cluster": {"type": "split"}},
+            {"cluster": {"type": "split"}},
+        ),
+    ],
+)
+def test_resolve_validation_block_precedence(inline, cluster_file, expected):
+    declaration = {"validation": inline} if inline is not None else {}
+    assert resolve_validation_block(declaration, cluster_file) == expected
+
+
 class TestDAGYAMLParser:
+    def setup_method(self):
+        _parse_dag_declaration.cache_clear()
+
+    def teardown_method(self):
+        _parse_dag_declaration.cache_clear()
+
     @mock.patch(
         "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser.DAGClusterValidator"
     )
@@ -157,6 +183,89 @@ class TestDAGYAMLParser:
 
         with pytest.raises(FileNotFoundError):
             dag_yaml_parser.dag_declaration()
+
+    @mock.patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser.DAGClusterValidator"
+    )
+    @mock.patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser.DAGDeclarationValidator"
+    )
+    @mock.patch.object(FileService, "get_dict_from_yaml_file")
+    @mock.patch.object(DAGPackagesPathService, "resolve_artifact_file_path")
+    @mock.patch.object(DAGPackagesPathService, "generate_artifact_file_path")
+    def test_dag_declaration_cache_is_shared_by_dag_name(
+        self,
+        mocked_generate_artifact_file_path,
+        mocked_resolve_artifact_file_path,
+        mocked_get_dict_from_yaml_file,
+        mocked_dag_declaration_validator,
+        mocked_dag_cluster_validator,
+    ):
+        decl_path = "dag/declaration/path.yml"
+        cluster_path = "dag/cluster/path.yml"
+        mocked_generate_artifact_file_path.side_effect = [
+            decl_path,
+            "dag/cluster/path",
+            decl_path,
+        ]
+        mocked_resolve_artifact_file_path.return_value = cluster_path
+        declaration = {"dag": {"a": 1}, "workflow": {"b": 2}}
+        cluster_file_body = {"cluster": {"type": "c"}}
+        mocked_get_dict_from_yaml_file.side_effect = [declaration, cluster_file_body]
+
+        DAGYamlParser("my_dag").dag_declaration()
+        DAGYamlParser("my_dag").dag_declaration()
+
+        assert mocked_generate_artifact_file_path.call_count == 3
+        assert mocked_resolve_artifact_file_path.call_count == 2
+        assert mocked_get_dict_from_yaml_file.call_count == 2
+        mocked_dag_declaration_validator().validate.assert_called_once()
+        mocked_dag_cluster_validator().validate_cluster.assert_called_once()
+
+    @mock.patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser._file_mtime_ns"
+    )
+    @mock.patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser.DAGClusterValidator"
+    )
+    @mock.patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser.DAGDeclarationValidator"
+    )
+    @mock.patch.object(FileService, "get_dict_from_yaml_file")
+    @mock.patch.object(DAGPackagesPathService, "resolve_artifact_file_path")
+    @mock.patch.object(DAGPackagesPathService, "generate_artifact_file_path")
+    def test_dag_declaration_cache_invalidates_when_mtime_changes(
+        self,
+        mocked_generate_artifact_file_path,
+        mocked_resolve_artifact_file_path,
+        mocked_get_dict_from_yaml_file,
+        _mocked_dag_declaration_validator,
+        _mocked_dag_cluster_validator,
+        mocked_file_mtime_ns,
+    ):
+        decl_path = "dag/declaration/path.yml"
+        cluster_path = "dag/cluster/path.yml"
+        mocked_generate_artifact_file_path.side_effect = [
+            decl_path,
+            "dag/cluster/path",
+            decl_path,
+            "dag/cluster/path",
+        ]
+        mocked_resolve_artifact_file_path.return_value = cluster_path
+        mocked_file_mtime_ns.side_effect = [1, 1, 2, 1]
+        mocked_get_dict_from_yaml_file.side_effect = [
+            {"dag": {"name": "before"}, "workflow": {}},
+            {"cluster": {"type": "c"}},
+            {"dag": {"name": "after"}, "workflow": {}},
+            {"cluster": {"type": "c"}},
+        ]
+
+        before = DAGYamlParser("my_dag").dag_declaration()
+        after = DAGYamlParser("my_dag").dag_declaration()
+
+        assert before["dag"]["name"] == "before"
+        assert after["dag"]["name"] == "after"
+        assert mocked_get_dict_from_yaml_file.call_count == 4
 
     def test_dag_declaration_loads_valid_yaml_from_disk(self, monkeypatch, tmp_path):
         """Integration: real YAML files, both validators, merged result."""

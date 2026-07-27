@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bietlejuice-airflow-operators"
+version = "0.1.0"
+description = "Databricks and EMR operators for bietlejuice Airflow DAGs"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    # apache-airflow and its providers are provided by the Astro runtime; keep
+    # them in `dev` only so image/export installs do not shadow Astronomer's
+    # customized provider stack.
+    "databricks-cli==0.18.0",
+    "requests>=2.32.3",
+    "six>=1.16.0",
+]
+
+[project.entry-points."airflow.plugins"]
+bietlejuice_databricks = "databricks_plugin:QuintoAndarDatabricksPlugin"
+bietlejuice_emr = "emr_plugin:QuintoAndarEmrPlugin"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/databricks_plugin", "src/emr_plugin"]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[dependency-groups]
+dev = [
+    "apache-airflow==2.11.2",
+    "apache-airflow-providers-amazon>=8.0.0",
+    "pytest==8.3.5",
+    "pytest-cov",
+    "pytest-testmon",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+pythonpath = ["src"]
+addopts = ["--import-mode=importlib", "--cov=databricks_plugin", "--cov=emr_plugin", "--cov-report=term-missing"]

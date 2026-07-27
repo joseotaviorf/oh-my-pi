@@ -1,8 +1,8 @@
 # bi-etl-ejuice — Agent Instructions
 
-QuintoAndar's central data-engineering monorepo: ~771 Airflow DAGs, Spark jobs, and the
-`bietlejuice` Python libraries. Analytical ETL with Kimball dimensional modeling,
-orchestrated in Airflow, executed on Databricks.
+QuintoAndar's central data-engineering monorepo: 834 DAG Builder DAGs, 871 Airflow DAGs
+total (37 legacy Python), Spark jobs, and the `bietlejuice` Python libraries. Analytical ETL
+with Kimball dimensional modeling, orchestrated in Airflow, executed on Databricks.
 
 **Stack:** Python · Apache Airflow · Databricks/Spark · PostgreSQL · Kimball dimensional
 modeling · managed with **[uv](https://docs.astral.sh/uv/)** · Ruff · pytest.
@@ -45,15 +45,20 @@ Exception: a skill that *intentionally* isolates a CLI tool may do so — but pr
 - **`dags/`** — pipelines by business domain + DAG name. A typical folder: `*_declaration.yml`
   (Airflow schedule/workflow; generates `*_dag.py`), `queries/<layer>/<table>.sql`,
   `metadata/<layer>/<table>.yml`, plus optional `data_quality/`, `spark_jobs/`, `schemas/`.
-- **`packages/`** — four installable `bietlejuice` projects: `bietlejuice-core` (shared
+- **`packages/`** — six installable `bietlejuice` projects: `bietlejuice-core` (shared
   config/validation/utils), `bietlejuice-airflow` (DAG builder, Airflow integration),
-  `bietlejuice-runtime` (Spark/Qube/UDFs, Databricks-side; standalone uv project with
-  per-DBR venvs), `bietlejuice-compiler` (`create-dag-files`, validation scripts, SQL tooling).
+  `bietlejuice-airflow-operators` (Databricks/EMR operators), `bietlejuice-airflow-plugins`
+  (Airflow plugins), `bietlejuice-runtime` (Spark/Qube/UDFs, Databricks-side; standalone uv
+  project with per-DBR venvs), `bietlejuice-compiler` (`create-dag-files`, validation scripts,
+  SQL tooling). Five of these are uv workspace members; runtime is standalone.
+- **`astro/`** — local + Astro "dev" Airflow project (same image as CI). Forno/prod still use
+  `make create-dag-files` (stubs + gitignored parse-time manifests). Astro "dev" uses
+  `make create-astro-dag-files` (domain + migration bundles; see `.woodpecker/development.yml`).
 - **`governance/`** — normative **policy-as-data** (CI-enforced): `pii_catalog/` (PII type catalog)
   and `pii_anonymization_controls/` (RAE registry). Owned by `@quintoandar/data-ops-governance`.
   Distinct from `dags/governance/` (pipelines) and `packages/*/src/bietlejuice/governance/` (Python code).
-- **`Makefile`** — all dev/CI targets (`install`, `create-dag-files`, `run-local-environment`,
-  `check-style`, `tests`, the `validate-*` governance checks, …).
+- **`Makefile`** — all dev/CI targets (`install`, `create-dag-files`, `create-astro-dag-files`,
+  `run-local-environment`, `check-style`, `tests`, the `validate-*` governance checks, …).
 
 ## Modeling rules (Kimball)
 

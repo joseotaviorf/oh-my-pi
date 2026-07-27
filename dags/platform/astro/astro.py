@@ -1,7 +1,8 @@
-from bietlejuice_plugin.transfer_data_plugin import QuintoAndarPostgresToS3Operator
-
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.factory_dispatcher import (
     FactoryDispatcher,
+)
+from bietlejuice.base.airflow.plugins.transfer_data_plugin import (
+    QuintoAndarPostgresToS3Operator,
 )
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService

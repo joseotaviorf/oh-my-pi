@@ -150,6 +150,12 @@ class TestDAGMetadataService:
 class TestListMetadataTablePaths:
     """Unit tests for DAGMetadataService.list_metadata_table_paths."""
 
+    @pytest.fixture(autouse=True)
+    def clear_list_metadata_cache(self):
+        DAGMetadataService.list_metadata_table_paths.cache_clear()
+        yield
+        DAGMetadataService.list_metadata_table_paths.cache_clear()
+
     @mock.patch("bietlejuice.services.dag_metadata_service.os.path.isdir")
     @mock.patch.object(DAGPackagesPathService, "get_dag_path")
     def test_returns_empty_set_when_both_dirs_absent(

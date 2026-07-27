@@ -1,5 +1,7 @@
 import pytest
+import yaml
 
+from bietlejuice.services import file_service
 from bietlejuice.services.file_service import FileService
 
 
@@ -8,6 +10,24 @@ class TestFileService:
         path = "classified_leads/metadata/clean"
         with pytest.raises(ValueError):
             FileService.get_table_info_from_path(path)
+
+    def test_get_dict_from_yaml_file_uses_safe_loader(self, tmp_path):
+        yaml_path = tmp_path / "sample.yml"
+        yaml_path.write_text("foo: bar\nlist:\n  - 1\n  - 2\n")
+        assert FileService.get_dict_from_yaml_file(str(yaml_path)) == {
+            "foo": "bar",
+            "list": [1, 2],
+        }
+        # Prefer CSafeLoader when libyaml is present (parse-time hot path).
+        assert file_service._SAFE_LOADER in (
+            getattr(yaml, "CSafeLoader", object()),
+            yaml.SafeLoader,
+        )
+
+    def test_get_dict_from_yaml_file_empty_returns_dict(self, tmp_path):
+        yaml_path = tmp_path / "empty.yml"
+        yaml_path.write_text("")
+        assert FileService.get_dict_from_yaml_file(str(yaml_path)) == {}
 
     def test_get_table_info_from_path_should_raise_when_too_many_levels(self):
         path = "level1/level2/level3/level4/level5/level6/level7"

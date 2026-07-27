@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bietlejuice-airflow-plugins"
+version = "0.1.0"
+description = "Airflow UI plugins for bietlejuice (extra links, etc.)"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    # apache-airflow is provided by the Astro runtime; keep it in `dev` only so
+    # image/export installs do not shadow Astronomer's customized Airflow.
+]
+
+[project.entry-points."airflow.plugins"]
+bietlejuice_extra_links = "extra_link_plugin.plugin:ExtraLinkPlugin"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/extra_link_plugin"]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[dependency-groups]
+dev = [
+    "apache-airflow==2.11.2",
+    "pytest==8.3.5",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+pythonpath = ["src"]
+addopts = ["--import-mode=importlib"]

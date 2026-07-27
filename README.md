@@ -29,11 +29,15 @@ Airflow DAGs, Spark jobs, and supporting libraries for QuintoAndar’s data plat
   - **`spark_jobs/`** — (optional) PySpark for custom Spark jobs
   - **`schemas/`** — (core model DAGs) JSON schema files
   - **`dags/qube/`** — Qube dimensions / measures / metrics: declarations here; Spark implementation lives under **`packages/`** (not the `queries/` + `metadata/` layout above)
-- **`packages/`** — Python code for **`bietlejuice`**, split into **four** installable projects so **Airflow** and **Databricks** can depend on different pins without one giant package:
+- **`packages/`** — Python code for **`bietlejuice`**, split into **six** installable projects so **Airflow** and **Databricks** can depend on different pins without one giant package:
   - **`bietlejuice-core`** — shared config, validation, and utilities
-  - **`bietlejuice-airflow`** — DAG builder, Airflow integration (Airflow 2.11.x / Astro Runtime 13.4.x)
+  - **`bietlejuice-airflow`** — DAG builder, Airflow integration (Airflow 2.11.x / Astro Runtime 13.8.x)
+  - **`bietlejuice-airflow-operators`** — Databricks / EMR Airflow operators
+  - **`bietlejuice-airflow-plugins`** — Airflow plugins (extra links, etc.)
   - **`bietlejuice-runtime`** — Spark, Qube, UDFs, Databricks-side code (separate `uv` lock; optional per-**DBR** venvs under `envs/`)
   - **`bietlejuice-compiler`** — `create-dag-files`, validation scripts, SQL tooling
+
+  Five packages are uv workspace members; **runtime** is standalone.
 
 **Tooling:** dependencies and tasks are managed with **[uv](https://docs.astral.sh/uv/)**; **Ruff** replaces Black/Flake8; tests run with **pytest** per package. CI uses **Woodpecker** (see `.woodpecker/`).
 
@@ -160,16 +164,16 @@ For all targets, see the root **`Makefile`**.
 
 ## Local Airflow (Astronomer Astro)
 
-The stack uses **Astro Runtime 13.4.x**-style images; **bietlejuice** **core** and **airflow** sources are **bind-mounted**; **`local/astro/requirements.txt`** is produced with **`uv export`** from **bietlejuice-airflow**.
+Local Airflow uses the **`astro/`** project and the same **`astro/Dockerfile`** as CI/prod. Packages are baked into the image; **core / airflow / operators / plugins** sources (plus `dags/` and compiler `scripts/`) are **bind-mounted** for live edit/parse feedback.
 
 Typical flow (repo root, **in the dev container or on the host** if Docker is available):
 
-1. `make setup-local-variables` (once) — if you still need to set tokens in your environment.
-2. `make create-dag-files` when declarations or the DAG builder change.
-3. `make run-local-environment` — optional `verbose=1` for more Astro logs.
-4. UI: **https://localhost:8080** (check Astro’s output for the exact URL/port).
+1. `make setup-local-variables` (once) — GitHub / Databricks tokens. Also run `qli login` so local Airflow can resolve variables via Vault (forno path).
+2. `make create-dag-files` when declarations or the DAG builder change (also regenerates gitignored parse-time manifests).
+3. `make run-local-environment` — builds `bietlejuice-airflow:local` from repo root, injects `VAULT_TOKEN` from qli, then `astro dev start --image-name` from `astro/`. Optional `verbose=1`. Offline fallback: `make refresh-local-variables` then the seed import.
+4. UI: **http://localhost:8080** (check Astro’s output for the exact URL/port).
 
-Install the [**Astro CLI**](https://www.astronomer.io/docs/astro/cli/install-cli/) where you run the commands (in many setups that is **inside the devcontainer**; on the host-only path, install it on the host). More context: [`local/README.md`](local/README.md) (some steps there may be legacy—prefer this README and the **Makefile**).
+Install the [**Astro CLI**](https://www.astronomer.io/docs/astro/cli/install-cli/) where you run the commands (in many setups that is **inside the devcontainer**; on the host-only path, install it on the host). More context: [`astro/README.md`](astro/README.md).
 
 ---
 

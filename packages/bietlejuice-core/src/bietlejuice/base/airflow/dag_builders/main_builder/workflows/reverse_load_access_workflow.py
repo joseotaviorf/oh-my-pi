@@ -99,16 +99,18 @@ class ReverseLoadAccessWorkflow(BaseWorkflow):
         It also returns a list of tables that have corresponding queries (not all of them do).
         """
 
+        # list_queries_files_in_composer returns a tuple (lru_cache-friendly);
+        # do not concatenate with a list via +.
         table_names_queries = DAGPackagesPathService.list_queries_files_in_composer(
             dag_name=self.dag_name, layer=LayerEnum.REVERSE.value
         )
-        table_names_customization = list(
-            self.workflow_args.get("tables_customization", []).keys()
-        )
+        table_names_customization = self.workflow_args.get(
+            "tables_customization", {}
+        ).keys()
 
         # There may be queries without their own customization
         # Or customization without queries (direct export)
-        table_names = set(table_names_queries + table_names_customization)
+        table_names = set(table_names_queries) | set(table_names_customization)
         return (
             [
                 TableAttributes(
@@ -116,7 +118,7 @@ class ReverseLoadAccessWorkflow(BaseWorkflow):
                 )
                 for table_name in table_names
             ],
-            table_names_queries,
+            list(table_names_queries),
         )
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):

@@ -1,0 +1,4 @@
+# System packages installed via /usr/local/bin/install-system-packages
+# (same helper as Astro Runtime non-base ONBUILD).
+git
+patch

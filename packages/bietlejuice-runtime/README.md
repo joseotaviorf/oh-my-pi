@@ -38,10 +38,11 @@ import.
 
 `bietlejuice-runtime` is a **standalone uv project** — it is *not* a member
 of the workspace defined in the repository's root `pyproject.toml`. The other
-three packages (`bietlejuice-core`, `bietlejuice-airflow`,
+five packages (`bietlejuice-core`, `bietlejuice-airflow`,
+`bietlejuice-airflow-operators`, `bietlejuice-airflow-plugins`,
 `bietlejuice-compiler`) share a single workspace lockfile because their
 dependencies are mutually compatible. Runtime cannot join them: `bietlejuice-airflow`
-needs the modern Airflow 2.11 / Astro Runtime 13.4 dep tree, while runtime
+needs the modern Airflow 2.11 / Astro Runtime 13.8 dep tree, while runtime
 needs to coexist with libraries DBR 12.2 / 13.3 / 16.4 ship from 2022/2023.
 A single universal lockfile cannot satisfy both worlds.
 

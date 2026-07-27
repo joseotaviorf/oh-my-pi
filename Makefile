@@ -186,74 +186,8 @@ endif
 ###############################################################################
 ###################### Local Airflow Docker environment #######################
 ###############################################################################
-branch ?= forno
 verbose ?=
-.PHONY: clone-local-airflow-plugins
-## Clones QuintoAndar's custom Airflow Plugins (https://github.com/quintoandar/airflow-plugins) into a local plugins folder.
-## May receive an optional `branch={branch}` argument to clone a specified branch. Defaults to `forno`.
-clone-local-airflow-plugins:
-	@echo "Cloning 'airflow-plugins' from branch '$(branch)'"
-	@echo "=========="
-	@echo ""
-	@rm -fR ./local/astro/plugins || true
-	@rm -fR ./local/astro/plugins_temp || true
-	@git clone -b $(branch) --quiet --depth 1 https://github.com/quintoandar/airflow-plugins.git ./local/astro/plugins_temp
-	@cp -Rf ./local/astro/plugins_temp/quintoandar_airflow_plugins/ ./local/astro/plugins
-	@rm -fR ./local/astro/plugins_temp
-	@rm -fR ./local/astro/plugins/databricks_plugin.py
-	@echo "Cloning succeeded at ./local/astro/plugins"
-	@$(MAKE) normalize-local-astro-plugins
-
-.PHONY: normalize-local-astro-plugins
-## Ensures every plugin package is a direct child of local/astro/plugins/. Some upstream
-## trees nest packages under local/astro/plugins/plugins/; Airflow only adds the top-level
-## plugins/ dir to sys.path, so imports like `import extra_link_plugin` would fail otherwise.
-normalize-local-astro-plugins:
-	@if [ -d ./local/astro/plugins/plugins ]; then \
-		for nested in ./local/astro/plugins/plugins/*; do \
-			[ -e "$$nested" ] || continue; \
-			bn=$$(basename "$$nested"); \
-			if [ ! -e "./local/astro/plugins/$$bn" ]; then \
-				echo "local-astro: moving plugins/plugins/$$bn -> plugins/$$bn"; \
-				mv "$$nested" "./local/astro/plugins/"; \
-			fi; \
-		done; \
-		rmdir ./local/astro/plugins/plugins 2>/dev/null || true; \
-	fi
-
-clone-local-beethoven:
-	@echo "Cloning 'beethoven' from branch '$(branch)'"
-	@echo "=========="
-	@echo ""
-	@mkdir -p ./local/astro/plugins
-	@rm -fR ./local/astro/plugins_temp || true
-	@git clone -b $(branch) --quiet --depth 1 https://github.com/quintoandar/beethoven.git ./local/astro/plugins_temp
-	@cp -Rf ./local/astro/plugins_temp/airflow/plugins/ ./local/astro/plugins
-	@rm -fR ./local/astro/plugins_temp
-	@if [ -d ./local/astro/plugins/plugins ]; then \
-	  cp -Rf ./local/astro/plugins/plugins/. ./local/astro/plugins/ && \
-	  rm -fR ./local/astro/plugins/plugins; \
-	fi
-	@echo "Cloning succeeded at ./local/astro/plugins"
-	@$(MAKE) normalize-local-astro-plugins
-
-.PHONY: setup-bietlejuice
-## Prepares the local Astro environment for a (re)build.
-## - Copies compiler scripts (needed at runtime by the Airflow workers).
-## - Regenerates local/astro/requirements.txt from the uv workspace lock,
-##   exporting only the transitive deps of bietlejuice-airflow (the packages
-##   themselves are bind-mounted live via docker-compose.override.yml).
-## Re-run whenever packages/*/pyproject.toml dependencies change.
-setup-bietlejuice:
-	@echo "Setup bietlejuice at local airflow deployment"
-	@echo "=========="
-	@uv export \
-	  --package bietlejuice-airflow \
-	  --no-dev \
-	  --no-hashes \
-	  --no-emit-package bietlejuice-airflow \
-	  --no-emit-package bietlejuice-core \
-	  -o local/astro/requirements.txt
+ASTRO_LOCAL_IMAGE ?= bietlejuice-airflow:local
 
 # resolve active shell rc file (zsh vs bash); caller may override via SHELL_RC env var.
 SHELL_RC_EXPR := $${SHELL_RC:-$$(if [ "$$(basename "$$SHELL")" = "zsh" ]; then echo "$$HOME/.zshrc"; else echo "$$HOME/.bashrc"; fi)}
@@ -278,10 +212,26 @@ define prompt_and_persist
 	fi
 endef
 
+# Build the Astro image from repo root (same Dockerfile as CI). Astro CLI cannot
+# build this Dockerfile from astro/ because COPY needs packages/ in context.
+define build_astro_local_image
+	echo "Building $(ASTRO_LOCAL_IMAGE) from repo root..."; \
+	if [ -z "$${GITHUB_TOKEN}" ]; then \
+	  echo "ERROR: GITHUB_TOKEN is required to build $(ASTRO_LOCAL_IMAGE)." >&2; \
+	  exit 1; \
+	fi; \
+	export DOCKER_BUILDKIT=1; \
+	docker build \
+	  -f astro/Dockerfile \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t $(ASTRO_LOCAL_IMAGE) \
+	  . $(if $(verbose),,--quiet)
+endef
+
 # wait up to 150s for the Astro scheduler container to answer `airflow db check`.
 define wait_for_scheduler
 	echo "Waiting for Airflow to finish initializing..."; \
-	SCHEDULER=$$(docker ps --filter "name=scheduler" --format "{{.Names}}" | grep -E "^astro_" | head -1); \
+	SCHEDULER=$$(docker ps --filter "name=scheduler" --format "{{.Names}}" | grep -E "bietlejuice_|astro_" | head -1); \
 	if [ -z "$$SCHEDULER" ]; then echo "ERROR: Scheduler container not found." >&2; exit 1; fi; \
 	i=0; \
 	while [ $$i -lt 30 ]; do \
@@ -313,37 +263,60 @@ setup-local-variables:
 .PHONY: import-local-pools
 import-local-pools:
 	@echo "Importing local Airflow pools"
-	@cd ./local/astro && bash import_local_pools.sh
+	@cd ./astro && bash import_local_pools.sh
 
 .PHONY: import-local-aws-connection
 import-local-aws-connection:
 	@echo "Importing local Airflow AWS connection"
 	@$(load_env_vars); \
-	cd ./local/astro && bash import_local_aws_connection.sh
+	cd ./astro && bash import_local_aws_connection.sh
 
 .PHONY: import-variables-and-connections
 import-variables-and-connections:
 	@echo "Import Variables and Connections"
 	@$(load_env_vars); \
-	cd ./local/astro; \
+	cd ./astro; \
 	sh import_conn_vars.sh
 
-branch ?= forno
+.PHONY: refresh-local-variables
+## Regenerates astro/local_variables.json from forno Vault via qli (offline fallback seed).
+## Primary local resolution is VaultBackend when VAULT_TOKEN is set (see run-local-environment).
+refresh-local-variables:
+	@python3 ./astro/scripts/refresh_local_variables.py
+
+# Load the developer's short-lived Vault token from qli's cache into the shell
+# so docker-compose.override.yml can inject VaultBackend kwargs. Soft-fail so
+# offline fallback (local_variables.json import) still works without Vault —
+# the override only enables VaultBackend when VAULT_TOKEN is non-empty.
+# Capture output before eval: `eval "$$(cmd)"` would discard cmd's exit status.
+define load_vault_token
+	if [ -f ./astro/scripts/export_qli_vault_token.py ]; then \
+	  vault_exports="$$(python3 ./astro/scripts/export_qli_vault_token.py)" && \
+	    eval "$$vault_exports" || \
+	    echo "WARNING: could not load Vault token (run: qli login -r -s vault). Falling back to local_variables.json seed." >&2; \
+	fi
+endef
+
+.PHONY: build-astro-local-image
+## Builds bietlejuice-airflow:local from repo root (astro/Dockerfile).
+build-astro-local-image:
+	@$(load_env_vars); \
+	$(build_astro_local_image)
+
 .PHONY: run-local-environment
-## runs a local Airflow environment containing both bi-etl-ejuice DAGs and QuintoAndar's custom Airflow Plugins.
-## May receive an optional `branch={branch}` argument to clone a specified branch of Airflow Plugins repo. Defaults to `forno`.
+## Starts local Airflow via astro/ using the production image (pre-built from repo root).
+## Injects VAULT_TOKEN from qli so Airflow resolves variables via VaultBackend (forno path).
 run-local-environment:
-	@make setup-bietlejuice
-	@make clone-local-airflow-plugins branch=$(branch)
-	@make clone-local-beethoven branch=$(branch)
-	@echo "Recreating local Airflow environment"
+	@echo "Starting local Airflow environment (astro/)"
 	@echo "=========="
 	@echo ""
 	@$(load_env_vars); \
+	$(load_vault_token); \
 	REPO_ROOT="$$(pwd)"; \
 	export LOCAL_WORKSPACE_FOLDER="$${LOCAL_WORKSPACE_FOLDER:-$$REPO_ROOT}"; \
-	cd ./local/astro; \
-	astro dev start --no-cache --build-secrets id=GITHUB_TOKEN $(if $(verbose),--verbosity debug,); \
+	$(build_astro_local_image); \
+	cd ./astro; \
+	astro dev start --image-name $(ASTRO_LOCAL_IMAGE) $(if $(verbose),--verbosity debug,); \
 	if [ $$? -ne 0 ]; then \
 	  echo ""; \
 	  echo "Note: astro dev start health check timed out."; \
@@ -362,11 +335,14 @@ run-local-environment:
 
 .PHONY: restart-local-environment
 restart-local-environment:
-	@echo "Restart local Airflow environment"
-	@make setup-bietlejuice
+	@echo "Restart local Airflow environment (astro/)"
 	@$(load_env_vars); \
-	cd ./local/astro; \
-	astro dev restart --no-cache --build-secrets id=GITHUB_TOKEN $(if $(verbose),--verbose,); \
+	$(load_vault_token); \
+	REPO_ROOT="$$(pwd)"; \
+	export LOCAL_WORKSPACE_FOLDER="$${LOCAL_WORKSPACE_FOLDER:-$$REPO_ROOT}"; \
+	$(build_astro_local_image); \
+	cd ./astro; \
+	astro dev restart --image-name $(ASTRO_LOCAL_IMAGE) $(if $(verbose),--verbose,); \
 	if [ $$? -ne 0 ]; then \
 	  echo ""; \
 	  echo "Note: astro dev restart health check timed out."; \
@@ -382,13 +358,13 @@ restart-local-environment:
 .PHONY: stop-local-environment
 stop-local-environment:
 	@echo "Stop local Airflow environment"
-	@cd ./local/astro; \
+	@cd ./astro; \
 	astro dev stop
 
 .PHONY: kill-local-environment
 kill-local-environment:
 	@echo "Delete local Airflow environment"
-	@cd ./local/astro; \
+	@cd ./astro; \
 	astro dev kill
 
 ###############################################################################
@@ -499,7 +475,8 @@ build:
 
 .PHONY: install
 ## install all package dependencies via uv
-## Workspace members (shared uv.lock): core, airflow, compiler, emr-cli — see root pyproject.toml.
+## Workspace members (shared uv.lock): core, airflow, operators, plugins, compiler,
+## emr-cli — see root pyproject.toml.
 ## Runtime is standalone (not a workspace member). Its venv holds broad-version deps for
 ## lint/type-check; DBR-pinned libs live under packages/bietlejuice-runtime/envs/.
 ## We sync envs/dbr-16-4 by default so `make unit-tests` works out of the box.
@@ -512,6 +489,8 @@ install:
 	@echo ""
 	@uv sync --directory packages/bietlejuice-core
 	@uv sync --directory packages/bietlejuice-airflow
+	@uv sync --directory packages/bietlejuice-airflow-operators
+	@uv sync --directory packages/bietlejuice-airflow-plugins
 	@uv sync --directory packages/bietlejuice-compiler
 	@uv sync --directory packages/emr-cli
 	@# `env -u UV_PROJECT_ENVIRONMENT` is a no-op locally but inside the devcontainer
@@ -552,6 +531,10 @@ RUFF_FORMAT_PATHS := \
 	packages/bietlejuice-core/test \
 	packages/bietlejuice-airflow/src \
 	packages/bietlejuice-airflow/test \
+	packages/bietlejuice-airflow-operators/src \
+	packages/bietlejuice-airflow-operators/test \
+	packages/bietlejuice-airflow-plugins/src \
+	packages/bietlejuice-airflow-plugins/test \
 	packages/bietlejuice-runtime/src \
 	packages/bietlejuice-runtime/test \
 	packages/bietlejuice-compiler/src \
@@ -684,6 +667,13 @@ unit-tests:
 	@uv sync
 	@uv run --directory packages/bietlejuice-core     pytest -W ignore::DeprecationWarning
 	@uv run --directory packages/bietlejuice-airflow  pytest -W ignore::DeprecationWarning
+	@uv run --directory packages/bietlejuice-airflow-operators pytest -W ignore::DeprecationWarning
+	@uv run --directory packages/bietlejuice-airflow-plugins pytest -W ignore::DeprecationWarning
+	@# Astro env guards (airflowignore dual-syntax, parse pre-warm, alias-batching patch).
+	@# Runs from the root workspace env (airflow comes in via bietlejuice-airflow).
+	@# The fork/parse test self-skips unless `make create-dag-files` has generated
+	@# the DAG stubs it parses (gitignored, so absent in CI's uv-sync-only step).
+	@uv run pytest astro/tests -W ignore::DeprecationWarning
 	@cd packages/bietlejuice-runtime && DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest test/unit -W ignore::DeprecationWarning
 	@uv run --directory packages/bietlejuice-compiler pytest -W ignore::DeprecationWarning
 	@uv run --directory packages/emr-cli pytest -W ignore::DeprecationWarning
@@ -1117,17 +1107,47 @@ run-domain-validation:
 ###################### Common commands ########################################
 ###############################################################################
 dag_name ?="*"
+
+.PHONY: generate-query-manifests
+## generates .table_manifest files for DAG query folders (avoids recursive glob at parse time)
+generate-query-manifests:
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/generate_query_manifests.py -d $(dag_name)
+
+.PHONY: generate-metadata-manifests
+## generates .metadata_manifest files for DAG metadata folders
+generate-metadata-manifests:
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/generate_metadata_manifests.py -d $(dag_name)
+
+.PHONY: generate-data-quality-manifests
+## generates .data_quality_manifest files for DAG data_quality folders
+generate-data-quality-manifests:
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/generate_data_quality_manifests.py -d $(dag_name)
+
 .PHONY: create-dag-files
 ## creates the DAG Python files from the DAG declaration YAML files, as of `{dag_name}_dag.py`.
 ## May receive an optional `dag_name={dag_name}` argument to create only the Python DAG file of the provided DAG.
 ## ALWAYS skips dags/luigijr/ — that sandbox is built/deployed only by `create-luigijr-dag-files`
 ## (dedicated Astro instance), so the normal forno/prod DAG bag never includes Luigi's DAGs.
-create-dag-files:
+## Also regenerates query/metadata/DQ manifests used at parse time.
+create-dag-files: generate-query-manifests generate-metadata-manifests generate-data-quality-manifests
 	@echo ""
 	@echo "Creating the DAGs' Python files (excluding the luigijr sandbox)"
 	@echo "=========="
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name) --exclude-dir luigijr
+
+.PHONY: create-astro-dag-files
+## Astro "dev" deployment only: regenerate parse-time manifests and domain bundles.
+## Does NOT emit per-DAG *_dag.py / *_validation_dag.py stubs — those are excluded
+## from the Astro upload anyway. Skips dags/luigijr/ (dedicated luigijr instances).
+## Also bundles platform migration_{twin,emr,compare}_* Python DAGs (exec-passthrough).
+## Forno/prod continue to use `create-dag-files`; luigijr uses `create-luigijr-dag-files`.
+create-astro-dag-files: generate-query-manifests generate-metadata-manifests generate-data-quality-manifests
+	@echo ""
+	@echo "Creating Astro domain + migration bundles + manifests (no per-DAG stubs; excluding luigijr)"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py --bundle-domains --bundle-migrations --exclude-dir luigijr
 
 .PHONY: create-luigijr-dag-files
 ## creates the DAG Python files for the luigijr sandbox ONLY (dags/luigijr/). Used by the

@@ -1,13 +1,16 @@
+import logging
+import os
 import re
 from functools import lru_cache
 from glob import glob
 from os import path, scandir
 from typing import Dict, Optional, Set
 
-import boto3
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
 
 from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT, DAG_PACKAGES_ROOT
+
+_LOG = logging.getLogger(__name__)
 
 
 class DataQualityLayerCache:
@@ -145,9 +148,11 @@ class DAGPackagesPathService:
     def clear_path_caches(cls) -> None:
         """Clear all process-scoped path caches in one call.
 
-        Both ``_line_folders_cache`` and the ``get_dag_path`` LRU cache are
-        intentionally process-scoped for parse-time performance. In the normal
-        Airflow 2.x parse flow (one subprocess per DAG file) they reset
+        Both ``_line_folders_cache`` and the ``get_dag_path``,
+        ``list_data_quality_table_paths_in_composer``,
+        ``list_queries_files_in_composer``, and DAG declaration parse caches
+        are intentionally process-scoped for parse-time performance. In the
+        normal Airflow 2.x parse flow (one subprocess per DAG file) they reset
         automatically on each parse cycle.
 
         Call this method from a long-running process (e.g. a DagBag reload in
@@ -156,16 +161,31 @@ class DAGPackagesPathService:
         """
         cls._line_folders_cache = None
         cls.get_dag_path.cache_clear()
+        cls.list_data_quality_table_paths_in_composer.cache_clear()
+        cls.list_queries_files_in_composer.cache_clear()
+
+        from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser import (
+            _parse_dag_declaration,
+        )
+
+        _parse_dag_declaration.cache_clear()
 
     @staticmethod
     def _find_dag_in_line_folders(dag_name):
         """
         Finds DAG folder by traversing between all lines folders.
 
+        Skips hidden/internal top-level entries (name starts with ``_``), matching
+        ``get_dag_domain_names``. Otherwise Astro domain-bundle dirs under
+        ``dags/_astro_bundles/<domain>/`` collide with DAGs named like their
+        domain (e.g. ``journey_optimizer/journey_optimizer``).
+
         :param dag_name: DAG name.
         :return: DAG folder path.
         """
         for line_folder in DAGPackagesPathService._get_line_folders():
+            if not line_folder.is_dir() or line_folder.name.startswith("_"):
+                continue
             dag_path = path.join(line_folder.path, dag_name)
             if path.isdir(dag_path):
                 return dag_path
@@ -192,6 +212,45 @@ class DAGPackagesPathService:
                 f"m=_read_file_content_from_filesystem, file_name={file_path},"
                 f" msg=File not found, error={e}"
             )
+
+    @staticmethod
+    def _manifest_is_fresh(
+        manifest_path: str, source_dir: str, recursive_dirs: bool = False
+    ) -> bool:
+        """
+        Return whether a manifest is newer than the directory structure it indexes.
+
+        We only need to detect add/remove/rename events, so directory mtimes are
+        enough and avoid a full file glob before using the manifest.
+        """
+        if os.environ.get("BIETLEJUICE_TRUST_MANIFESTS", "").strip() == "1":
+            return True
+
+        try:
+            manifest_mtime = path.getmtime(manifest_path)
+            dirs_to_check = [source_dir]
+            while dirs_to_check:
+                current_dir = dirs_to_check.pop()
+                if path.getmtime(current_dir) > manifest_mtime:
+                    _LOG.debug(
+                        "Ignoring stale manifest; falling back to filesystem scan: %s",
+                        manifest_path,
+                    )
+                    return False
+                if not recursive_dirs:
+                    continue
+                with scandir(current_dir) as entries:
+                    for entry in entries:
+                        if entry.is_dir():
+                            dirs_to_check.append(entry.path)
+        except FileNotFoundError:
+            _LOG.debug(
+                "Manifest or source directory disappeared; falling back to "
+                "filesystem scan: %s",
+                manifest_path,
+            )
+            return False
+        return True
 
     @staticmethod
     def _copy_file_from_s3_pyspark(bucket: str, sql_file_key: str):
@@ -237,6 +296,8 @@ class DAGPackagesPathService:
         """
         Read a file from the s3
         """
+        import boto3
+
         s3 = boto3.resource("s3")
         return s3.Object(bucket, sql_file_key).get()["Body"].read().decode("utf-8")
 
@@ -422,10 +483,13 @@ class DAGPackagesPathService:
 
         return config_content
 
+    QUERY_MANIFEST_FILENAME = ".table_manifest"
+
     @staticmethod
+    @lru_cache(maxsize=1024)
     def list_queries_files_in_composer(
         dag_name: str, layer: str, intermediate_path: str = ""
-    ) -> list:
+    ) -> tuple:
         """
         Lists all query files for a given DAG and layer.
 
@@ -434,7 +498,7 @@ class DAGPackagesPathService:
         :param dag_name: The DAG we want to list the D.Q. files.
         :param layer: the layer that the file is related to.
         :param intermediate_path: off intermediate path structure used in some DAGs
-        :return: list of queries files without file extension (only table names)
+        :return: tuple of queries files without file extension (only table names)
         """
         sql_files_folder = path.join(
             DAGPackagesPathService.get_dag_path(dag_name),
@@ -443,13 +507,23 @@ class DAGPackagesPathService:
             intermediate_path,
         )
 
+        manifest_path = path.join(
+            sql_files_folder, DAGPackagesPathService.QUERY_MANIFEST_FILENAME
+        )
+        if path.isfile(manifest_path) and DAGPackagesPathService._manifest_is_fresh(
+            manifest_path, sql_files_folder
+        ):
+            with open(manifest_path) as f:
+                table_names = [line.strip() for line in f if line.strip()]
+            return tuple(sorted(table_names))
+
         filename_regex = re.compile(r"([a-z0-9_-]+)\.sql")
         files = glob(f"{sql_files_folder}/*.sql")
         table_names = []
         for file_path in files:
             table_names.append(re.search(filename_regex, file_path).group(1))
 
-        return table_names
+        return tuple(table_names)
 
     @staticmethod
     def get_data_quality_file_content_in_spark_jobs(
@@ -558,16 +632,33 @@ class DAGPackagesPathService:
 
         return table_names
 
+    DATA_QUALITY_MANIFEST_FILENAME = ".data_quality_manifest"
+
     @staticmethod
+    @lru_cache(maxsize=1024)
     def list_data_quality_table_paths_in_composer(dag_name: str, layer: str) -> set:
         """
         Returns set of relative paths (without ext) for tables that have data quality files.
         Used for batch file-existence checks during DAG parse. Supports nested paths.
+        Reads .data_quality_manifest when present (avoids glob over many files).
         """
         dag_path = DAGPackagesPathService.get_dag_path(dag_name)
         data_quality_folder = path.join(dag_path, "data_quality", layer)
         if not path.isdir(data_quality_folder):
             return set()
+        manifest_path = path.join(
+            data_quality_folder, DAGPackagesPathService.DATA_QUALITY_MANIFEST_FILENAME
+        )
+        if path.isfile(manifest_path) and DAGPackagesPathService._manifest_is_fresh(
+            manifest_path, data_quality_folder, recursive_dirs=True
+        ):
+            result = set()
+            with open(manifest_path) as f:
+                for line in f:
+                    name = line.strip()
+                    if name:
+                        result.add(path.normpath(name))
+            return result
         files = glob(f"{data_quality_folder}/**/*.yml", recursive=True) + glob(
             f"{data_quality_folder}/**/*.yaml", recursive=True
         )

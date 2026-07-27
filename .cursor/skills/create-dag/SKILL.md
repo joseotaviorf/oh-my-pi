@@ -431,9 +431,11 @@ columns:
 make validate-dag-declaration-files dag_name={normalized_dag_name}
 make validate-metadata-files-content
 make validate-source-layer-policy CI_COMMIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+make create-dag-files dag_name={normalized_dag_name}
 ```
 
-Fix any errors before proceeding.
+`make create-dag-files` regenerates the DAG stub and parse-time manifests after the
+declaration / SQL / metadata exist. Fix any errors before proceeding.
 
 ## Step 6 — Optional: data quality
 

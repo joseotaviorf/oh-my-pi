@@ -65,6 +65,8 @@ dags_not_using_builder:
   - tech_platform/dw_devlake/validation/validate_structure.py
   - platform/notify_stale_dags/notify_stale_dags.py
   - platform/notify_airbyte_key_rotation/notify_airbyte_key_rotation.py
+  # Wonka Option-A parse-time registry factory — intentional non-Builder DAG.
+  - quintoml/wonka_registry_factory.py
   - governance/notify_dag_rotation/notify_dag_rotation.py
   # Standalone governance scripts — not Airflow DAG files; no DAG object to validate.
   - governance/datahub_business_context/datahub_curated_urns.py

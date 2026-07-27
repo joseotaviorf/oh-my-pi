@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import logging
 from abc import ABC, abstractmethod
 from collections import deque
@@ -211,7 +212,13 @@ class DatabricksJobClusterEngine(JobClusterEngine):
 
     def _get_cluster_configuration(self) -> dict:
         cluster_type = self._ctx.cluster_args.get("type")
-        cluster_configuration = self._config_service.get_config(cluster_type)
+        # Deep-copy: HierarchicalConf.get_config returns nested dicts by reference,
+        # and _deep_update mutates its source. Without a copy, shared presets
+        # (e.g. Wonka's single ConfigurationService) would accumulate per-DAG
+        # custom_configurations across builds in the same parse process.
+        cluster_configuration = copy.deepcopy(
+            self._config_service.get_config(cluster_type)
+        )
         return self._config_service._deep_update(
             cluster_configuration,
             self._ctx.cluster_args.get("custom_configurations", {}),

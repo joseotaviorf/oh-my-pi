@@ -6,6 +6,8 @@
 # partial: false ensures the merge base exists (see validations.yml).
 when:
   - event: pull_request
+    branch:
+      exclude: [development]
   - event: push
     branch: [master, hotfix/*, forno, forno-luigijr]
   - event: tag
@@ -43,6 +45,11 @@ steps:
             - "uv.lock"
             - "Makefile"
             - "packages/bietlejuice-runtime/envs/dbr-16-4/**"
+            # astro/tests guards (unit-tests-python runs them via make unit-tests)
+            - "astro/tests/**"
+            - "astro/config/**"
+            - "astro/parse-alias-batching.patch"
+            - "dags/.airflowignore"
           on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
@@ -65,6 +72,11 @@ steps:
             - "uv.lock"
             - "Makefile"
             - "packages/bietlejuice-runtime/envs/dbr-16-4/**"
+            # astro/tests guards (airflowignore dual-syntax, prewarm, alias patch)
+            - "astro/tests/**"
+            - "astro/config/**"
+            - "astro/parse-alias-batching.patch"
+            - "dags/.airflowignore"
           on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]

@@ -1,0 +1,15 @@
+.git
+.env
+airflow.cfg
+airflow.db
+airflow.db-journal
+logs/
+__pycache__/
+**/__pycache__/
+*.pyc
+.venv/
+.astro/config.yaml.lock
+# Real dir for `astro deploy --dags` (CLI tar does not follow symlinks).
+# Local Airflow uses docker-compose bind-mount of repo-root dags/; CI rsyncs the bag here.
+dags/*
+!dags/.gitkeep

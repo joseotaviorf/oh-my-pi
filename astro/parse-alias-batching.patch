@@ -1,0 +1,135 @@
+QuintoAndar downstream patch: batch DatasetAlias expansion while serializing a DAG.
+Verified against Apache Airflow 2.11.2 in Astro Runtime 13.8.0.
+
+To regenerate, copy the two installed Airflow modules from
+/usr/local/lib/python3.12/site-packages/airflow, edit the copies, and produce:
+  diff -u airflow/datasets/__init__.py{.orig,}
+  diff -u airflow/serialization/serialized_objects.py{.orig,}
+Normalize the paths to a/airflow/... and b/airflow/... so Dockerfile can apply
+the result from the site-packages directory with `patch -p1`.
+
+Caveat: the module-global cache is process-local and spans code under
+@internal_api_call. It is valid for this Airflow 2.11 direct-database runtime,
+but must be removed or redesigned before enabling AIP-44 internal API mode.
+
+--- a/airflow/datasets/__init__.py
++++ b/airflow/datasets/__init__.py
+@@ -17,6 +17,7 @@
+ 
+ from __future__ import annotations
+ 
++import contextlib
+ import os
+ import urllib.parse
+ import warnings
+@@ -137,6 +138,55 @@
+     if isinstance(value, Dataset):
+         return value.uri
+     return _sanitize_uri(str(value))
++
++
++# QuintoAndar: parse-time cache for DatasetAlias expansion (see serialize_dag).
++# When active, expand_alias_to_datasets is O(1) after a single bulk prefetch.
++_alias_expand_cache: dict[str, list[BaseDataset]] | None = None
++
++
++@contextlib.contextmanager
++def dataset_alias_expand_cache() -> Iterator[None]:
++    """Activate a process-local cache for expand_alias_to_datasets lookups."""
++    global _alias_expand_cache
++    previous = _alias_expand_cache
++    _alias_expand_cache = {}
++    try:
++        yield
++    finally:
++        _alias_expand_cache = previous
++
++
++@provide_session
++def prefetch_dataset_aliases(
++    names: Iterable[str], *, session: Session = NEW_SESSION
++) -> None:
++    """Bulk-load DatasetAlias rows into the active expand cache (one IN query)."""
++    global _alias_expand_cache
++    if _alias_expand_cache is None:
++        return
++
++    from sqlalchemy.orm import selectinload
++
++    from airflow.models.dataset import DatasetAliasModel
++
++    unique = {name for name in names if name and name not in _alias_expand_cache}
++    if not unique:
++        return
++
++    rows = session.scalars(
++        select(DatasetAliasModel)
++        .where(DatasetAliasModel.name.in_(unique))
++        .options(selectinload(DatasetAliasModel.datasets))
++    ).all()
++    found: set[str] = set()
++    for row in rows:
++        found.add(row.name)
++        _alias_expand_cache[row.name] = [
++            Dataset(uri=dataset.uri, extra=dataset.extra) for dataset in row.datasets
++        ]
++    for name in unique - found:
++        _alias_expand_cache[name] = []
+ 
+ 
+ @internal_api_call
+@@ -149,12 +199,20 @@
+ 
+     alias_name = alias.name if isinstance(alias, DatasetAlias) else alias
+ 
++    if _alias_expand_cache is not None and alias_name in _alias_expand_cache:
++        return list(_alias_expand_cache[alias_name])
++
+     dataset_alias_obj = session.scalar(
+         select(DatasetAliasModel).where(DatasetAliasModel.name == alias_name).limit(1)
+     )
+     if dataset_alias_obj:
+-        return [Dataset(uri=dataset.uri, extra=dataset.extra) for dataset in dataset_alias_obj.datasets]
+-    return []
++        result = [Dataset(uri=dataset.uri, extra=dataset.extra) for dataset in dataset_alias_obj.datasets]
++    else:
++        result = []
++
++    if _alias_expand_cache is not None:
++        _alias_expand_cache[alias_name] = list(result)
++    return result
+ 
+ 
+ class BaseDataset:
+--- a/airflow/serialization/serialized_objects.py
++++ b/airflow/serialization/serialized_objects.py
+@@ -1660,12 +1660,25 @@
+ 
+             serialized_dag["tasks"] = [cls.serialize(task) for _, task in dag.task_dict.items()]
+ 
+-            dag_deps = [
+-                dep
++            # QuintoAndar: bulk-prefetch DatasetAlias outlets so detect_dependencies
++            # does not issue one SELECT (+ relationship load) per task alias.
++            from airflow.datasets import dataset_alias_expand_cache, prefetch_dataset_aliases
++
++            alias_names = [
++                obj.name
+                 for task in dag.task_dict.values()
+-                for dep in SerializedBaseOperator.detect_dependencies(task)
++                for obj in (task.outlets or [])
++                if isinstance(obj, DatasetAlias)
+             ]
+-            dag_deps.extend(DependencyDetector.detect_dag_dependencies(dag))
++            with dataset_alias_expand_cache():
++                if alias_names:
++                    prefetch_dataset_aliases(alias_names)
++                dag_deps = [
++                    dep
++                    for task in dag.task_dict.values()
++                    for dep in SerializedBaseOperator.detect_dependencies(task)
++                ]
++                dag_deps.extend(DependencyDetector.detect_dag_dependencies(dag))
+             serialized_dag["dag_dependencies"] = [x.__dict__ for x in sorted(dag_deps)]
+             serialized_dag["_task_group"] = TaskGroupSerialization.serialize_task_group(dag.task_group)
+ 

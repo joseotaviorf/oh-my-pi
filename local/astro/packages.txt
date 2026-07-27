@@ -1,5 +1,0 @@
-build-essential
-python3-dev
-liblz4-dev
-git
-

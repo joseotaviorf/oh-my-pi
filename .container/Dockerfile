@@ -89,6 +89,8 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/workspace
 COPY pyproject.toml uv.lock /tmp/workspace/
 COPY packages/bietlejuice-core/pyproject.toml /tmp/workspace/packages/bietlejuice-core/pyproject.toml
 COPY packages/bietlejuice-airflow/pyproject.toml /tmp/workspace/packages/bietlejuice-airflow/pyproject.toml
+COPY packages/bietlejuice-airflow-operators/pyproject.toml /tmp/workspace/packages/bietlejuice-airflow-operators/pyproject.toml
+COPY packages/bietlejuice-airflow-plugins/pyproject.toml /tmp/workspace/packages/bietlejuice-airflow-plugins/pyproject.toml
 COPY packages/bietlejuice-compiler/pyproject.toml /tmp/workspace/packages/bietlejuice-compiler/pyproject.toml
 COPY packages/bietlejuice-runtime/pyproject.toml /tmp/workspace/packages/bietlejuice-runtime/pyproject.toml
 

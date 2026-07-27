@@ -166,11 +166,11 @@ class DAGClusterValidator(Validator):
         core_nodes = custom.get("core_nodes")
         task_nodes = custom.get("task_nodes")
         if core_nodes is not None or task_nodes is not None:
-            self._validate_emr_node_group(core_nodes, "core_nodes", min_count=0)
+            self._assert_emr_node_group(core_nodes, "core_nodes", min_count=0)
             core_is_fleet = self._is_emr_fleet_block(core_nodes)
             task_is_fleet = False
             if task_nodes is not None:
-                self._validate_emr_node_group(task_nodes, "task_nodes", min_count=0)
+                self._assert_emr_node_group(task_nodes, "task_nodes", min_count=0)
                 task_is_fleet = self._is_emr_fleet_block(task_nodes)
 
                 if core_nodes is not None and core_is_fleet != task_is_fleet:
@@ -229,7 +229,7 @@ class DAGClusterValidator(Validator):
                         "when 'task_nodes' uses instance fleets; use "
                         "task_nodes.target_on_demand/target_spot instead"
                     )
-                self._validate_task_availability(task_availability)
+                self._assert_task_availability(task_availability)
             return
 
         num_task_workers = custom.get("num_task_workers")
@@ -256,7 +256,7 @@ class DAGClusterValidator(Validator):
                 )
 
         if task_availability is not None:
-            self._validate_task_availability(task_availability)
+            self._assert_task_availability(task_availability)
 
         if num_task_workers is None or num_task_workers == 0:
             return
@@ -277,7 +277,7 @@ class DAGClusterValidator(Validator):
                 )
 
     @staticmethod
-    def _validate_task_availability(task_availability: str) -> None:
+    def _assert_task_availability(task_availability: str) -> None:
         if (
             not isinstance(task_availability, str)
             or task_availability not in _EMR_TASK_AVAILABILITY_VALUES
@@ -292,9 +292,7 @@ class DAGClusterValidator(Validator):
         return isinstance(block, dict) and "instance_types" in block
 
     @classmethod
-    def _validate_emr_node_group(
-        cls, block: dict, name: str, *, min_count: int
-    ) -> None:
+    def _assert_emr_node_group(cls, block: dict, name: str, *, min_count: int) -> None:
         if block is None:
             return
         if not isinstance(block, dict):
@@ -313,12 +311,12 @@ class DAGClusterValidator(Validator):
             )
 
         if cls._is_emr_fleet_block(block):
-            cls._validate_emr_fleet_block(block, name)
+            cls._assert_emr_fleet_block(block, name)
         else:
-            cls._validate_emr_group_block(block, name, min_count=min_count)
+            cls._assert_emr_group_block(block, name, min_count=min_count)
 
     @staticmethod
-    def _validate_emr_group_block(block: dict, name: str, *, min_count: int) -> None:
+    def _assert_emr_group_block(block: dict, name: str, *, min_count: int) -> None:
         instance_count = block.get("instance_count")
         if instance_count is not None:
             if not isinstance(instance_count, int) or isinstance(instance_count, bool):
@@ -340,7 +338,7 @@ class DAGClusterValidator(Validator):
                 )
 
     @staticmethod
-    def _validate_emr_fleet_block(block: dict, name: str) -> None:
+    def _assert_emr_fleet_block(block: dict, name: str) -> None:
         instance_types = block.get("instance_types")
         if not isinstance(instance_types, list) or not instance_types:
             raise AssertionError(

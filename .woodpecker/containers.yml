@@ -18,6 +18,8 @@
 # (which would match unrelated local tools under local/**).
 when:
   - event: pull_request
+    branch:
+      exclude: [development]
   - event: push
     branch: [master]
   - event: manual

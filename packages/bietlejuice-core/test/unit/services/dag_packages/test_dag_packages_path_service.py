@@ -9,12 +9,10 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 
 class TestDAGPackagesPathService:
     def setup_method(self):
-        DAGPackagesPathService._line_folders_cache = None
-        DAGPackagesPathService.get_dag_path.cache_clear()
+        DAGPackagesPathService.clear_path_caches()
 
     def teardown_method(self):
-        DAGPackagesPathService._line_folders_cache = None
-        DAGPackagesPathService.get_dag_path.cache_clear()
+        DAGPackagesPathService.clear_path_caches()
 
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.scandir")
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
@@ -24,7 +22,9 @@ class TestDAGPackagesPathService:
         # arrange
         dag_name = "my_dag"
         dir_mock = Mock()
+        dir_mock.name = "path1"
         dir_mock.path = "/path1"
+        dir_mock.is_dir.return_value = True
         mock_scandir.return_value = [dir_mock]
         mock_path_isdir.return_value = True
         expected_value = "/path1/my_dag"
@@ -49,6 +49,41 @@ class TestDAGPackagesPathService:
 
         # assert
         assert returned_value == expected_value
+
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.scandir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
+    def test_find_dag_skips_underscore_prefixed_line_folders(
+        self, mock_path_isdir, mock_scandir, dag_package_service
+    ):
+        """Astro bundle dirs must not shadow real domain/DAG packages.
+
+        ``dags/_astro_bundles/journey_optimizer/`` exists as a bundle container.
+        Looking up dag ``journey_optimizer`` must resolve
+        ``dags/journey_optimizer/journey_optimizer/``, not the bundle folder.
+        """
+        bundle_domain = Mock()
+        bundle_domain.name = "_astro_bundles"
+        bundle_domain.path = "/dags/_astro_bundles"
+        bundle_domain.is_dir.return_value = True
+
+        real_domain = Mock()
+        real_domain.name = "journey_optimizer"
+        real_domain.path = "/dags/journey_optimizer"
+        real_domain.is_dir.return_value = True
+
+        mock_scandir.return_value = [bundle_domain, real_domain]
+        mock_path_isdir.side_effect = lambda candidate: (
+            candidate == "/dags/journey_optimizer/journey_optimizer"
+        )
+
+        returned_value = dag_package_service._find_dag_in_line_folders(
+            "journey_optimizer"
+        )
+
+        assert returned_value == "/dags/journey_optimizer/journey_optimizer"
+        mock_path_isdir.assert_called_once_with(
+            "/dags/journey_optimizer/journey_optimizer"
+        )
 
     @pytest.mark.parametrize(
         "dag_name, is_migrated_mock, expected_return",
@@ -238,10 +273,10 @@ class TestDAGPackagesPathService:
     def test_list_data_quality_table_paths_strips_extensions(
         self, mock_get_dag_path, mock_glob, mock_isdir, mock_isfile
     ):
-        # arrange — both .yml and .yaml files exist
+        # arrange — both .yml and .yaml files exist; no manifest so we use glob
         mock_get_dag_path.return_value = "/dags/for_rent/my_dag"
         mock_isdir.return_value = True
-        mock_isfile.return_value = True
+        mock_isfile.side_effect = lambda p: ".data_quality_manifest" not in str(p)
 
         # act
         result = DAGPackagesPathService.list_data_quality_table_paths_in_composer(
@@ -255,16 +290,190 @@ class TestDAGPackagesPathService:
             name.endswith(".yml") or name.endswith(".yaml") for name in result
         )
 
+    @mock.patch(
+        "bietlejuice.base.service.dag_packages_path_service.DAGPackagesPathService._manifest_is_fresh"
+    )
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isfile")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_list_data_quality_table_paths_reads_manifest_when_present(
+        self, mock_get_dag_path, mock_isdir, mock_isfile, mock_manifest_is_fresh
+    ):
+        mock_get_dag_path.return_value = "/dags/my_dag"
+        mock_isdir.return_value = True
+        mock_isfile.return_value = True
+        mock_manifest_is_fresh.return_value = True
+        manifest_content = "table_a\ntable_b\nnested/table_c\n"
+        mock_file = mock.mock_open(read_data=manifest_content)
+        mock_file.return_value.__iter__ = lambda self: iter(
+            manifest_content.splitlines(keepends=True)
+        )
+        with mock.patch(
+            "bietlejuice.base.service.dag_packages_path_service.open", mock_file
+        ):
+            DAGPackagesPathService.list_data_quality_table_paths_in_composer.cache_clear()
+            result = DAGPackagesPathService.list_data_quality_table_paths_in_composer(
+                "my_dag", "clean"
+            )
+
+        assert "table_a" in result
+        assert "table_b" in result
+        assert path.normpath("nested/table_c") in result
+
+    @mock.patch(
+        "bietlejuice.base.service.dag_packages_path_service.DAGPackagesPathService._manifest_is_fresh"
+    )
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isfile")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_list_data_quality_table_paths_ignores_stale_manifest(
+        self,
+        mock_get_dag_path,
+        mock_isdir,
+        mock_isfile,
+        mock_glob,
+        mock_manifest_is_fresh,
+    ):
+        mock_get_dag_path.return_value = "/dags/my_dag"
+        mock_isdir.return_value = True
+        mock_isfile.return_value = True
+        mock_manifest_is_fresh.return_value = False
+        mock_glob.side_effect = lambda pattern, recursive=False: (
+            [
+                "/dags/my_dag/data_quality/clean/table_a.yml",
+                "/dags/my_dag/data_quality/clean/nested/table_b.yaml",
+            ]
+            if "**/*.yml" in pattern or "**/*.yaml" in pattern
+            else []
+        )
+
+        DAGPackagesPathService.list_data_quality_table_paths_in_composer.cache_clear()
+        result = DAGPackagesPathService.list_data_quality_table_paths_in_composer(
+            "my_dag", "clean"
+        )
+
+        assert path.normpath("table_a") in result
+        assert path.normpath(path.join("nested", "table_b")) in result
+
+    @mock.patch(
+        "bietlejuice.base.service.dag_packages_path_service.DAGPackagesPathService._manifest_is_fresh"
+    )
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isfile")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_list_queries_files_in_composer_uses_manifest_when_present(
+        self, mock_get_dag_path, mock_isfile, mock_manifest_is_fresh
+    ):
+        mock_get_dag_path.return_value = "/dags/growth/amplitude_subpartitioned"
+        mock_isfile.return_value = True
+        mock_manifest_is_fresh.return_value = True
+        manifest_content = "table_a\ntable_b\ntable_c\n"
+        mock_file = mock.mock_open(read_data=manifest_content)
+        mock_file.return_value.__iter__ = lambda self: iter(self.readlines())
+        with mock.patch(
+            "bietlejuice.base.service.dag_packages_path_service.open", mock_file
+        ):
+            DAGPackagesPathService.list_queries_files_in_composer.cache_clear()
+            result = DAGPackagesPathService.list_queries_files_in_composer(
+                "amplitude_subpartitioned", "clean"
+            )
+
+        assert result == ("table_a", "table_b", "table_c")
+
+    @mock.patch(
+        "bietlejuice.base.service.dag_packages_path_service.DAGPackagesPathService._manifest_is_fresh"
+    )
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isfile")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_list_queries_files_in_composer_ignores_stale_manifest(
+        self, mock_get_dag_path, mock_isfile, mock_glob, mock_manifest_is_fresh
+    ):
+        mock_get_dag_path.return_value = "/dags/growth/my_dag"
+        mock_isfile.return_value = True
+        mock_manifest_is_fresh.return_value = False
+        mock_glob.return_value = [
+            "/dags/growth/my_dag/queries/clean/foo.sql",
+            "/dags/growth/my_dag/queries/clean/bar.sql",
+        ]
+
+        DAGPackagesPathService.list_queries_files_in_composer.cache_clear()
+        result = DAGPackagesPathService.list_queries_files_in_composer(
+            "my_dag", "clean"
+        )
+
+        assert set(result) == {"bar", "foo"}
+
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.glob")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isfile")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_list_queries_files_in_composer_falls_back_to_glob_when_no_manifest(
+        self, mock_get_dag_path, mock_isfile, mock_glob
+    ):
+        mock_get_dag_path.return_value = "/dags/growth/my_dag"
+        mock_isfile.return_value = False
+        mock_glob.return_value = [
+            "/dags/growth/my_dag/queries/clean/foo.sql",
+            "/dags/growth/my_dag/queries/clean/bar.sql",
+        ]
+
+        result = DAGPackagesPathService.list_queries_files_in_composer(
+            "my_dag", "clean"
+        )
+
+        assert set(result) == {"bar", "foo"}
+
+    def test_manifest_is_fresh_trusts_deployed_bundle_without_stat(self):
+        with (
+            mock.patch.dict(
+                "os.environ", {"BIETLEJUICE_TRUST_MANIFESTS": "1"}, clear=False
+            ),
+            mock.patch(
+                "bietlejuice.base.service.dag_packages_path_service.path.getmtime"
+            ) as mock_getmtime,
+        ):
+            assert DAGPackagesPathService._manifest_is_fresh(
+                "/dags/my_dag/queries/clean/.table_manifest",
+                "/dags/my_dag/queries/clean",
+            )
+
+        mock_getmtime.assert_not_called()
+
+    def test_manifest_is_fresh_logs_stale_fallback(self, caplog):
+        with (
+            mock.patch.dict("os.environ", {}, clear=True),
+            mock.patch(
+                "bietlejuice.base.service.dag_packages_path_service.path.getmtime",
+                side_effect=[1.0, 2.0],
+            ),
+            caplog.at_level(
+                "DEBUG",
+                logger="bietlejuice.base.service.dag_packages_path_service",
+            ),
+        ):
+            assert not DAGPackagesPathService._manifest_is_fresh(
+                "/dags/my_dag/queries/clean/.table_manifest",
+                "/dags/my_dag/queries/clean",
+            )
+
+        assert "Ignoring stale manifest" in caplog.text
+
     # --- clear_path_caches tests ---
 
+    @mock.patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser._parse_dag_declaration"
+    )
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.scandir")
     @mock.patch.object(DAGPackagesPathService, "_find_dag_in_line_folders")
-    def test_clear_path_caches_resets_both_caches(self, mock_find, mock_scandir):
+    def test_clear_path_caches_resets_both_caches(
+        self, mock_find, mock_scandir, mock_parse_dag_declaration
+    ):
         # arrange — prime both caches
         dir_mock = Mock()
         dir_mock.path = "/dags/for_rent"
         mock_scandir.return_value = [dir_mock]
         mock_find.return_value = "/dags/for_rent/my_dag"
+        mock_parse_dag_declaration.cache_clear = Mock()
 
         DAGPackagesPathService._get_line_folders()
         DAGPackagesPathService.get_dag_path("my_dag")
@@ -279,6 +488,7 @@ class TestDAGPackagesPathService:
         # assert — each underlying call was made twice (prime + post-clear)
         assert mock_scandir.call_count == 2
         assert mock_find.call_count == 2
+        mock_parse_dag_declaration.cache_clear.assert_called_once()
 
     # NOTE: tests for get_query_file_content_in_spark_jobs that depend on
     # bietlejuice.base.spark.runtime_detector live in

@@ -3,6 +3,8 @@
 # setup runs only when at least one downstream step would run (union path).
 when:
   - event: pull_request
+    branch:
+      exclude: [development]
   - event: push
     branch: [master, hotfix/*, forno, forno-luigijr]
   - event: tag

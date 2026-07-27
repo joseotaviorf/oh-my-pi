@@ -82,6 +82,8 @@
         "python.analysis.extraPaths": [
           "${workspaceFolder}/packages/bietlejuice-core/src",
           "${workspaceFolder}/packages/bietlejuice-airflow/src",
+          "${workspaceFolder}/packages/bietlejuice-airflow-operators/src",
+          "${workspaceFolder}/packages/bietlejuice-airflow-plugins/src",
           "${workspaceFolder}/packages/bietlejuice-compiler/src",
           "${workspaceFolder}/packages/bietlejuice-runtime/src"
         ],

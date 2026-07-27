@@ -7,7 +7,7 @@
 # bietlejuice-runtime is INTENTIONALLY NOT a workspace member. It is a
 # standalone uv project (its own pyproject.toml + uv.lock + .venv) because
 # the libraries DBR 12.2 / 13.3 / 16.4 ship are far older than what
-# apache-airflow 2.11 (Astro Runtime 13.4) requires; a single workspace
+# apache-airflow 2.11 (Astro Runtime 13.8) requires; a single workspace
 # lockfile cannot satisfy both worlds. See packages/bietlejuice-runtime/README.md
 # for the full rationale and IDE setup.
 
@@ -22,6 +22,8 @@ dev = [
 members = [
     "packages/bietlejuice-core",
     "packages/bietlejuice-airflow",
+    "packages/bietlejuice-airflow-operators",
+    "packages/bietlejuice-airflow-plugins",
     "packages/bietlejuice-compiler",
 ]
 

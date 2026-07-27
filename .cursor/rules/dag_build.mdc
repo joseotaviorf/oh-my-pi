@@ -674,7 +674,7 @@ make clean
 ### Forno Environment
 1. Push to `forno` branch
 2. Watch `validate-dag-declaration-files` step in Woodpecker
-3. Watch `create-dag-files` step in Drone
+3. Watch `create-dag-files` step in Woodpecker
 4. Access Forno Airflow UI to verify
 
 ## Templates Available in Spark Jobs

@@ -1,0 +1,18 @@
+{
+  "AWS_DEFAULT_REGION": "us-east-1",
+  "DOC_MD_BASE_URL": "https://de1a6b4bd8430e163-tp.appspot.com/admin/airflow/chart?chart_id=3&iteration_no=0&dag_id=",
+  "WONKA_START_DATE": "2025-01-05",
+  "artifacts_bucket": "s3://artifacts.s3.forno.data.quintoandar.com.br",
+  "databricks_s3_bucket": "databricks.s3.forno.data.quintoandar.com.br",
+  "datalake_bucket": "datalake.s3.forno.data.quintoandar.com.br",
+  "dw_bucket": "dw.s3.forno.data.quintoandar.com.br",
+  "emr_instance_profile_arn": "emr-forno",
+  "emr_service_role": "EMR_DefaultRole_V2",
+  "emr_subnet_id": "subnet-0b0dd4939e90dab1a",
+  "environment": "forno",
+  "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+  "instance_profile_secret_arn_people": "arn:aws:iam::713278628093:instance-profile/databricks-people",
+  "instance_profile_secret_arn_reverse_listings_report": "arn:aws:iam::713278628093:instance-profile/databricks-reports-service",
+  "instance_profile_secret_arn_vespucio": "arn:aws:iam::713278628093:instance-profile/databricks-vespucio",
+  "spectrum_iam_role": "arn:aws:iam::713278628093:role/SpectrumAccess"
+}

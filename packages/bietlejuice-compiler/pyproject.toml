@@ -10,14 +10,14 @@ requires-python = ">=3.10,<3.13"
 dependencies = [
     "bietlejuice-airflow",
     # apache-airflow is in bietlejuice-airflow's `dev` group (kept out of the Astro
-    # runtime venv on purpose — the runtime ships its own customized 2.11.0+astro.4).
+    # runtime venv on purpose — the runtime ships its own customized 2.11.2+astro.4).
     # The compiler is a CI-only tool (never published as a wheel; runs only inside
     # `make create-dag-files` to scaffold DAG .py files for the Astro DAG bag), so it
     # can — and must — list apache-airflow as a real dependency. Without this, the
     # `create-dag-files` Woodpecker step fails with `ModuleNotFoundError: airflow`
     # because `uv run --project bietlejuice-compiler` does not pick up dev-group
     # deps from workspace members.
-    "apache-airflow==2.11.0",    # CI-only; matches Astro Runtime 13.4.0
+    "apache-airflow==2.11.2",    # CI-only; matches Astro Runtime 13.8.0
     # Most Airflow-constrained deps (boto3, PyYAML, requests, etc.) are inherited
     # from bietlejuice-airflow. Only script-specific additions are listed below.
     "botocore==1.37.3",          # airflow constraints-2-10

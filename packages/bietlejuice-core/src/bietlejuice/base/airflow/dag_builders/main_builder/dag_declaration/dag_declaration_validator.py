@@ -609,11 +609,11 @@ class DAGDeclarationValidator(Validator):
 
         workflow_type = dag_declaration.get("workflow", {}).get("type")
         if workflow_type == WorkflowEnum.API_INGESTION_WORKFLOW.value:
-            self._validate_api_ingestion_workflow(dag_declaration)
+            self._assert_api_ingestion_workflow(dag_declaration)
         if workflow_type == WorkflowEnum.QUERY_VIEW_WORKFLOW.value:
-            self._validate_query_view_workflow(dag_declaration)
+            self._assert_query_view_workflow(dag_declaration)
 
-    def _validate_query_view_workflow(self, dag_declaration: dict) -> None:
+    def _assert_query_view_workflow(self, dag_declaration: dict) -> None:
         workflow = dag_declaration.get("workflow", {})
         tables_customization = workflow.get("tables_customization", {})
 
@@ -621,7 +621,7 @@ class DAGDeclarationValidator(Validator):
             normalize_query_view_sync_config(workflow)
         except ValueError as exc:
             raise AssertionError(
-                "m=_validate_query_view_workflow, "
+                "m=_assert_query_view_workflow, "
                 f"msg=Invalid query_view sync configuration: {exc}"
             ) from exc
 
@@ -633,7 +633,7 @@ class DAGDeclarationValidator(Validator):
                 normalize_query_view_sync_config(workflow, table_config)
             except ValueError as exc:
                 raise AssertionError(
-                    "m=_validate_query_view_workflow, "
+                    "m=_assert_query_view_workflow, "
                     f"msg=Invalid query_view sync configuration for table "
                     f"'{table_name}': {exc}"
                 ) from exc
@@ -711,7 +711,7 @@ class DAGDeclarationValidator(Validator):
                 "msg=DAGs with load_spark_job require validation.allow_custom_spark_job: true"
             )
 
-    def _validate_api_ingestion_workflow(self, dag_declaration: dict) -> None:
+    def _assert_api_ingestion_workflow(self, dag_declaration: dict) -> None:
         """
         Validates specific requirements for api_ingestion workflow.
 
@@ -736,20 +736,20 @@ class DAGDeclarationValidator(Validator):
         api_base_url = workflow.get("api_base_url")
         if not api_base_url:
             raise AssertionError(
-                "m=_validate_api_ingestion_workflow, "
+                "m=_assert_api_ingestion_workflow, "
                 "msg='api_base_url' is required for api_ingestion workflow"
             )
 
         if isinstance(api_base_url, dict) and len(api_base_url) == 0:
             raise AssertionError(
-                "m=_validate_api_ingestion_workflow, "
+                "m=_assert_api_ingestion_workflow, "
                 "msg='api_base_url' dictionary must have at least one environment "
                 "(e.g., prod, forno)"
             )
 
         if not isinstance(api_base_url, (str, dict)):
             raise AssertionError(
-                "m=_validate_api_ingestion_workflow, "
+                "m=_assert_api_ingestion_workflow, "
                 "msg='api_base_url' must be either a string (for all environments) "
                 "or a dictionary with environment keys (e.g., prod, forno)"
             )
@@ -767,7 +767,7 @@ class DAGDeclarationValidator(Validator):
 
             if tables_without_auth:
                 raise AssertionError(
-                    "m=_validate_api_ingestion_workflow, "
+                    "m=_assert_api_ingestion_workflow, "
                     "msg='authentication' is required for api_ingestion workflow. "
                     "It must be defined at workflow level or for each table in tables_customization. "
                     f"Tables without authentication: {tables_without_auth}"
@@ -780,7 +780,7 @@ class DAGDeclarationValidator(Validator):
             endpoint_path = table_config.get("endpoint_path")
             if not endpoint_path:
                 raise AssertionError(
-                    f"m=_validate_api_ingestion_workflow, "
+                    f"m=_assert_api_ingestion_workflow, "
                     f"msg='endpoint_path' is required for table '{table_name}' "
                     f"in api_ingestion workflow"
                 )
@@ -789,17 +789,17 @@ class DAGDeclarationValidator(Validator):
             if id_expansion is not None:
                 if not isinstance(id_expansion, dict):
                     raise AssertionError(
-                        f"m=_validate_api_ingestion_workflow, "
+                        f"m=_assert_api_ingestion_workflow, "
                         f"msg='id_expansion' for table '{table_name}' must be a dict"
                     )
                 if not id_expansion.get("source_table"):
                     raise AssertionError(
-                        f"m=_validate_api_ingestion_workflow, "
+                        f"m=_assert_api_ingestion_workflow, "
                         f"msg='id_expansion.source_table' is required for table '{table_name}'"
                     )
                 if not id_expansion.get("id_field"):
                     raise AssertionError(
-                        f"m=_validate_api_ingestion_workflow, "
+                        f"m=_assert_api_ingestion_workflow, "
                         f"msg='id_expansion.id_field' is required for table '{table_name}'"
                     )
                 has_param = bool(id_expansion.get("param_name"))
@@ -808,7 +808,7 @@ class DAGDeclarationValidator(Validator):
                 mode_count = sum((has_param, has_path, has_json_body))
                 if mode_count != 1:
                     raise AssertionError(
-                        f"m=_validate_api_ingestion_workflow, "
+                        f"m=_assert_api_ingestion_workflow, "
                         f"msg='id_expansion' requires exactly one of 'param_name', "
                         f"'path_param', or 'json_body_field' for table '{table_name}'"
                     )
@@ -818,7 +818,7 @@ class DAGDeclarationValidator(Validator):
                     or not correlation_field.strip()
                 ):
                     raise AssertionError(
-                        f"m=_validate_api_ingestion_workflow, "
+                        f"m=_assert_api_ingestion_workflow, "
                         f"msg='id_expansion.correlation_field' for table '{table_name}' "
                         f"must be a non-empty string when set"
                     )
