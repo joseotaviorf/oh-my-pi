@@ -1,27 +1,7 @@
--- Matthew/Wall-e prod sessions with at least one observation in the incremental window.
-WITH touched_sessions AS (
-    SELECT DISTINCT
-        trc.id_session AS id_langfuse_session
-    FROM
-        datalake_langfuse_clean.observations AS obs
-    INNER JOIN
-        datalake_langfuse_clean.traces AS trc
-            ON trc.id_trace = obs.id_trace
-    INNER JOIN
-        datalake_chatbot.sessions AS cs
-            ON cs.id_langfuse_session = trc.id_session
-            AND cs.bot IN ('matthew', 'wall-e')
-    WHERE
-        MAKE_DATE(obs.year, obs.month, obs.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
-        AND obs.ts_started >= TIMESTAMP('{load_start_date}')
-        AND trc.environment = 'prod'
-        AND trc.id_session IS NOT NULL
-),
--- Re-aggregate the FULL history of every touched session, not just the incremental window,
--- so multi-day sessions are not undercounted when the merge (on id_langfuse_session) replaces
--- the row. Bounded by a reprocess lookback for partition pruning: sessions spanning more than
--- the lookback are the only remaining edge case.
-obs AS (
+-- Matthew/Wall-e prod observations in the incremental window, restricted to the names/types
+-- the metrics below consume. Sessions last at most one day, so a 1-day lookback captures each
+-- full session (including one that straddles midnight).
+WITH obs AS (
     SELECT
         trc.id_session AS id_langfuse_session,
         obs.id_trace,
@@ -40,11 +20,21 @@ obs AS (
         datalake_langfuse_clean.traces AS trc
             ON trc.id_trace = obs.id_trace
     INNER JOIN
-        touched_sessions AS ts
-            ON ts.id_langfuse_session = trc.id_session
+        datalake_chatbot.sessions AS cs
+            ON cs.id_langfuse_session = trc.id_session
+            AND cs.bot IN ('matthew', 'wall-e')
     WHERE
-        MAKE_DATE(obs.year, obs.month, obs.day) >= DATE('{load_start_date}') - INTERVAL 7 DAY
+        MAKE_DATE(obs.year, obs.month, obs.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
+        AND obs.ts_started >= TIMESTAMP('{load_start_date}')
         AND trc.environment = 'prod'
+        AND trc.id_session IS NOT NULL
+        AND (
+            obs.type = 'GENERATION'
+            OR LOWER(obs.name) = '/v3/messages'
+            OR LOWER(obs.name) = 'collectionsinput'
+            OR LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+input$'
+            OR LOWER(obs.name) RLIKE '^collectionsagentv[0-9]+ - reactplanner$'
+        )
 ),
 -- One row per collections-agent LLM call: the model, cost and latency come from the
 -- GENERATION child of each CollectionsAgentV<N> - ReactPlanner observation. The collections
