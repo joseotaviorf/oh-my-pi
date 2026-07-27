@@ -1,8 +1,7 @@
-# Path filters use Woodpecker `when.path`. Skipped steps count as success so upstream
-# step deps still pass. lint/tests/validations workflow-level when matches deploy
-# branches + tag (clone-only on tag where step filters are narrower). Release
-# workflow when uses the same push branches so feature-branch pushes do not deadlock
-# depends_on on v3.9 (optional: true requires Woodpecker 3.15+).
+# Path filters use Woodpecker `when.path`. lint/tests/validations workflow-level when
+# matches deploy branches + tag (clone-only on tag where step filters are narrower).
+# Release workflow when uses the same push branches so feature-branch pushes do not
+# deadlock depends_on on v3.9 (optional: true requires Woodpecker 3.15+).
 #
 # Layout: shared prerequisites, then the full prod block, then the full forno block
 # (each block in internal pipeline order — not interleaved by pipeline type).
@@ -26,12 +25,17 @@
 #
 #   Wheels (sequential): setup → make-package-python → prepare-release-* → export-releases-to-s3-*
 #   Init scripts (independent): plugins/s3 reads shell files from clone — no `depends_on`
-#   Astro (direct, forno + prod): setup → setup-astro → create-astro-dag-files;
-#            get-astro-credentials-{env} → deploy-astro-dags-{env} | deploy-astro-image-{env}
-#            (DAG + image are parallel — same shape as .woodpecker/development.yml;
-#             setup-astro depends_on setup to avoid parallel uv sync races on .venv.
+#   Astro (direct, forno + prod):
+#            setup → setup-astro → create-astro-dag-files runs when either
+#            *astro_dag_bundle_path or *astro_image_paths matches.
+#            deploy-astro-dags-{env}: DAG-only path; uploads domain bag.
+#            deploy-astro-image-{env}: depends on create-astro-dag-files + credentials;
+#            runs --image then --dags so IMAGEONLY finalize cannot leave an empty/replaced bag.
+#            (setup-astro depends_on setup to avoid parallel uv sync races on .venv.
 #             create-astro-dag-files is shared: it adds prod-only validation bundles
-#             via INCLUDE_VALIDATION=1 on master/hotfix, never on forno.)
+#             via INCLUDE_VALIDATION=1 on master/hotfix, never on forno.
+#             Dual-path pushes may double-upload DAGs; accepted — do not wire
+#             dags→image depends_on without optional: true / Woodpecker ≥3.15.)
 #   DAG artifacts / SST / metadata: setup → upload (reads dags/** or scripts from clone)
 #   Qube (independent): beethoven-s3-sync mirrors source tree — no `depends_on`
 #
@@ -339,7 +343,7 @@ steps:
   deploy-astro-image-prod:
     image: public.ecr.aws/docker/library/docker:24.0.9
     privileged: true
-    depends_on: [get-astro-credentials-prod]
+    depends_on: [create-astro-dag-files, get-astro-credentials-prod]
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
@@ -379,6 +383,34 @@ steps:
           --image-name bietlejuice-airflow:deploy \
           --image \
           -f
+        # IMAGEONLY finalize sends DagTarballVersion="" when DAG deploys are enabled on the
+        # deployment; Astronomer may mint a new DAG stamp and replace the live bag (forno
+        # 86540: 20:27:44 replaced 20:12:22 with no DAG upload). Re-upload the domain bag
+        # so the last finalize is a real --dags deploy.
+        cd /woodpecker/src/github.com/quintoandar/bi-etl-ejuice
+        # docker:24 image has no rsync by default
+        apk add --no-cache rsync findutils
+        rm -rf astro/dags
+        mkdir -p astro/dags
+        rsync -a --prune-empty-dirs \
+          --exclude-from=astro/generated-dag-excludes.txt \
+          --include='*/' \
+          --include='*_conf.yml' \
+          --include='*_declaration.yml' \
+          --include='*_cluster.yml' \
+          --include='.airflowignore' \
+          --include='queries/***' \
+          --include='data_quality/***' \
+          --include='metadata/***' \
+          --include='tables/***' \
+          --include='dependencies.yaml' \
+          --exclude='spark_jobs/***' \
+          --include='*.py' \
+          --exclude='*' \
+          dags/ astro/dags/
+        [ -n "$(find astro/dags -name '*.py' -print -quit)" ] || { echo "DAG bundle is empty — refusing to deploy after image" >&2; exit 1; }
+        cd astro
+        astro deploy "$ASTRO_DEPLOYMENT_ID" --workspace-id "$ASTRO_WORKSPACE_ID" --dags -f
     when:
       event: push
       branch: [master, hotfix/*]
@@ -608,16 +640,20 @@ steps:
 
   # Shared Astro DAG generation (forno + prod). Path anchors `*astro_dag_bundle_path`
   # and `*astro_image_paths` are defined once on get-astro-credentials-prod above.
-  # Image and DAG deploys run in parallel after per-env credentials.
+  # Must also run on image-only pushes: deploy-astro-image-* rsyncs the domain bag
+  # after --image (IMAGEONLY finalize can mint an empty DAG stamp — forno 86540).
   setup-astro:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-astro-latest
     pull: true
     commands:
       - uv sync
     when:
-      event: push
-      branch: [master, hotfix/*, forno]
-      path: *astro_dag_bundle_path
+      - event: push
+        branch: [master, hotfix/*, forno]
+        path: *astro_dag_bundle_path
+      - event: push
+        branch: [master, hotfix/*, forno]
+        path: *astro_image_paths
     # After shared `setup` so both uv syncs never race on the same workspace `.venv`.
     # Safe: `setup` has no path filter and always runs on push/tag.
     depends_on: [setup]
@@ -638,9 +674,12 @@ steps:
         esac
         make create-astro-dag-files INCLUDE_VALIDATION="$include_validation"
     when:
-      event: push
-      branch: [master, hotfix/*, forno]
-      path: *astro_dag_bundle_path
+      - event: push
+        branch: [master, hotfix/*, forno]
+        path: *astro_dag_bundle_path
+      - event: push
+        branch: [master, hotfix/*, forno]
+        path: *astro_image_paths
     depends_on: [setup-astro]
 
   # Single Vault fetch shared by forno DAG and image deploys.
@@ -715,10 +754,11 @@ steps:
 
   # Same shape as .woodpecker/development.yml / beethoven/.woodpecker/.02-deploy.yml
   # (DinD + astro deploy --image). Build from monorepo root with BuildKit GITHUB_TOKEN.
+  # After --image, always --dags so IMAGEONLY finalize cannot leave an empty/replaced bag.
   deploy-astro-image-forno:
     image: public.ecr.aws/docker/library/docker:24.0.9
     privileged: true
-    depends_on: [get-astro-credentials-forno]
+    depends_on: [create-astro-dag-files, get-astro-credentials-forno]
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
@@ -758,6 +798,34 @@ steps:
           --image-name bietlejuice-airflow:deploy \
           --image \
           -f
+        # IMAGEONLY finalize sends DagTarballVersion="" when DAG deploys are enabled on the
+        # deployment; Astronomer may mint a new DAG stamp and replace the live bag (forno
+        # 86540: 20:27:44 replaced 20:12:22 with no DAG upload). Re-upload the domain bag
+        # so the last finalize is a real --dags deploy.
+        cd /woodpecker/src/github.com/quintoandar/bi-etl-ejuice
+        # docker:24 image has no rsync by default
+        apk add --no-cache rsync findutils
+        rm -rf astro/dags
+        mkdir -p astro/dags
+        rsync -a --prune-empty-dirs \
+          --exclude-from=astro/generated-dag-excludes.txt \
+          --include='*/' \
+          --include='*_conf.yml' \
+          --include='*_declaration.yml' \
+          --include='*_cluster.yml' \
+          --include='.airflowignore' \
+          --include='queries/***' \
+          --include='data_quality/***' \
+          --include='metadata/***' \
+          --include='tables/***' \
+          --include='dependencies.yaml' \
+          --exclude='spark_jobs/***' \
+          --include='*.py' \
+          --exclude='*' \
+          dags/ astro/dags/
+        [ -n "$(find astro/dags -name '*.py' -print -quit)" ] || { echo "DAG bundle is empty — refusing to deploy after image" >&2; exit 1; }
+        cd astro
+        astro deploy "$ASTRO_DEPLOYMENT_ID" --workspace-id "$ASTRO_WORKSPACE_ID" --dags -f
     when:
       event: push
       branch: [forno]
