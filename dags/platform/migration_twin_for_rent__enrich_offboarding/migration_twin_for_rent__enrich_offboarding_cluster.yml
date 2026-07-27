@@ -1,5 +1,0 @@
-cluster:
-  custom_configurations:
-    cluster_name: mig_twin_for_rent__enrich_offboarding
-  databricks_conn_id: databricks_new_env
-  type: consolidation_s_memory_cluster

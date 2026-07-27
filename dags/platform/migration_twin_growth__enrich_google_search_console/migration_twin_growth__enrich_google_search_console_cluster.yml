@@ -1,8 +1,0 @@
-cluster:
-  custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200
-    cluster_name: mig_twin_growth__enrich_google_search_console
-    runtime_engine: PHOTON
-  databricks_conn_id: databricks_new_env
-  type: consolidation_xs_memory_cluster

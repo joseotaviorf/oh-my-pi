@@ -1,6 +1,0 @@
-cluster:
-  custom_configurations:
-    cluster_name: mig_twin_support_and_service__enrich_crm
-    num_workers: 3
-  databricks_conn_id: databricks_new_env
-  type: consolidation_s_memory_cluster

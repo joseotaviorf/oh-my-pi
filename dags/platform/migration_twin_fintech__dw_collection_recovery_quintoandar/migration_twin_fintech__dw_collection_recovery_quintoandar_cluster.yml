@@ -1,9 +1,0 @@
-cluster:
-  custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200
-    cluster_name: mig_twin_fintech__dw_collection_recovery_quintoandar
-    driver_node_type_id: r7g.2xlarge
-    num_workers: 3
-  databricks_conn_id: databricks_new_env
-  type: consolidation_l_memory_cluster

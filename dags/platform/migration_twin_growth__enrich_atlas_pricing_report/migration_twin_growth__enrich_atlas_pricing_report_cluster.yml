@@ -1,8 +1,0 @@
-cluster:
-  custom_configurations:
-    cluster_name: mig_twin_growth__enrich_atlas_pricing_report
-    data_security_mode: USER_ISOLATION
-    driver_node_type_id: r7g.2xlarge
-    runtime_engine: PHOTON
-  databricks_conn_id: databricks_new_env
-  type: consolidation_l_general_cluster

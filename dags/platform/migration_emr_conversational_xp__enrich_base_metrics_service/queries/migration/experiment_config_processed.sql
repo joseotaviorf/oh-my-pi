@@ -1,3 +1,0 @@
-/*
-Table with experiment names, dates and variants in usable manner to be used in other processes
-*/ SELECT experiment_name, config.begin_date, config.end_date, REGEXP_REPLACE(_variant_name, '"', '') AS variant_name, REGEXP_REPLACE(variants[_variant_name], '"', '') AS variant_standard_name FROM (SELECT *, EXPLODE(MAP_KEYS(STR_TO_MAP(REGEXP_REPLACE(config.variants, '\\|\\', ''), ',', ':'))) AS _variant_name, STR_TO_MAP(REGEXP_REPLACE(config.variants, '\\|\\', ''), ',', ':') AS variants FROM datalake_search.experiment_config WHERE (DATE_ADD(CAST('{start_date}' AS DATE), STRUCT(days_past_30 AS days_past_30) * -1) <= config.end_date OR config.end_date IS NULL) AND CAST('{end_date}' AS DATE) >= config.begin_date AND config.running IS TRUE)

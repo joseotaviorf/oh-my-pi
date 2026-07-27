@@ -1,9 +1,0 @@
-cluster:
-  custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200
-    cluster_name: mig_twin_for_sale__enrich_sale_offer
-    data_security_mode: USER_ISOLATION
-    runtime_engine: PHOTON
-  databricks_conn_id: databricks_new_env
-  type: consolidation_xs_memory_cluster

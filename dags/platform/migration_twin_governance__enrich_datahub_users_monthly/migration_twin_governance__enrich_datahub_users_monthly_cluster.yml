@@ -1,6 +1,0 @@
-cluster:
-  custom_configurations:
-    cluster_name: mig_twin_governance__enrich_datahub_users_monthly
-    num_workers: 3
-  databricks_conn_id: databricks_new_env
-  type: consolidation_s_general_cluster

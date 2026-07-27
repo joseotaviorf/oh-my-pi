@@ -1,9 +1,0 @@
-cluster:
-  custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200
-    cluster_name: mig_twin_fintech__enrich_velo
-    driver_node_type_id: r7g.2xlarge
-    spark_version: 13.3.x-scala2.12
-  databricks_conn_id: databricks_new_env
-  type: consolidation_s_memory_cluster

@@ -1,5 +1,0 @@
-cluster:
-  custom_configurations:
-    cluster_name: mig_twin_support_and_service__enrich_zendesk
-  databricks_conn_id: databricks_new_env
-  type: consolidation_xs_memory_cluster
