@@ -1,0 +1,442 @@
+database_name: datalake_debt_recovery
+table_name: invoice_wallet_timeline_trato_feito
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: |-
+  Daily timeline of tenant BR invoices for debt recovery wallet segmentation, built from Trato Feito (datalake_debt_recovery / datalake_trato_feito_clean) and Recupera without Cyber sources. Grain is one row per invoice, contract, and reference date, with bill-item composition from datalake_retsuko.bill_items. Each invoice is exploded into a daily timeline from begin date through payment (or load end if open).
+  Delay methodologies: T1 is delay from the nominal due date (ts_due). T2 applies deal delay contamination via dt_invoice_anchor and dt_created_negotiation_parent. T3 is the contract-level maximum of T2 on the reference date.
+columns:
+  sk_invoice_wallet_timeline:
+    description: Surrogate key of the invoice wallet timeline row, generated from invoice ID, contract
+      ID, and reference date (yyyyMMdd).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.id_invoice
+    - datalake_collections_quintoandar.invoice_portfolio.id_contract
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  sk_contract:
+    description: Contract identifier from invoice_portfolio.id_contract.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.id_contract
+  sk_invoice:
+    description: Invoice identifier from invoice_portfolio.id_invoice.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.id_invoice
+  sk_negotiation_parent:
+    description: Parent negotiation identifier associated with the invoice when it belongs to a deal hierarchy.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.id_negotiation_parent
+  sk_negotiation_child:
+    description: Child negotiation identifier for deal installments generated from a parent negotiation.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.id_negotiation_child
+  dt_reference:
+    description: Daily reference date of the invoice wallet snapshot. Timeline expands from invoice begin
+      date through payment date (or load end date if still open).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  is_child_negotiation:
+    description: Flag indicating the invoice is a child installment of a negotiation (deal) in invoice_portfolio.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  is_negative_eligible:
+    description: Flag indicating whether the invoice is eligible for negative listing / credit bureau
+      operations.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.is_negative_eligible
+  has_child:
+    description: Flag indicating the invoice has child negotiations derived from it.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.has_child
+  negotiation_promisse_payment_method:
+    description: Payment method promised in the negotiation (e.g. BOLETO, CREDIT-CARD) from invoice_portfolio.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.negotiation_promisse_payment_method
+  invoice_status:
+    description: Source invoice status from invoice_portfolio (paid, open, written-down, etc.).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+  payment_status:
+    description: "Payment status as of dt_reference: open until paid/written-down date is reached on the\
+      \ timeline; preserves not-payable and divergent-payment from source."
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  contract_status:
+    description: "Contract status at dt_reference: Ativo if not annulled yet, Finalizado otherwise."
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.dt_contract_annulled
+  invoice_type:
+    description: Invoice purpose/type from invoice_portfolio.purpose (e.g. monthly, onboarding, extra).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.purpose
+  recovery_channel:
+    description: Recovery channel assigned to the invoice in invoice_portfolio.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.recovery_channel
+  anchor_delay_from_deal:
+    description: Days between parent negotiation creation and the invoice anchor date (DATEDIFF(dt_created_negotiation_parent,
+      dt_invoice_anchor)). Used in T2 delay contamination.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+  recovery_channel_timeline:
+    description: Recovery channel as of dt_reference; null when the invoice was paid after the reference
+      date.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.recovery_channel
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  has_negotiation_in_contract:
+    description: Contract-level flag on dt_reference indicating at least one child-negotiation invoice
+      exists in the wallet.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  deal_status_on_delay:
+    description: "Deal delay classification: DEAL IN DELAY (child with T1 delay > 0), DEAL ON TIME. DELAY\
+      \ AT ANCHOR (child with T1 delay <= 0), or NOT-DEAL."
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+  is_invoice_overdue_t1:
+    description: True when invoice_delay_t1 > 0. T1 uses the nominal due date (ts_due), so future deal
+      installments can be not overdue (T1 < 0) even when they represent older negotiated debt.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+  is_invoice_overdue_t2:
+    description: True when invoice_delay_t2 > 0. T2 applies delay contamination that anchors ongoing deal
+      installments to the negotiated debt delay, so a deal can be overdue under T2 while T1 < 0. When
+      the contract has no multiple deal installments, T1 equals T2.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  is_invoice_overdue_t3:
+    description: True when contract_delay_t3 > 0. T3 is the contract-level maximum of invoice_delay_t2
+      on dt_reference (contract-wide delay contamination).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  delay_invoice_at_reference:
+    description: Days between dt_reference and the invoice nominal due date (DATEDIFF(dt_reference, dt_due)).
+      This is the raw T1 delay input.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+  net_rate_recovery:
+    description: Net recovery rate applied to written-down invoices when computing recovered_amount.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+  negotiation_installment_number:
+    description: Installment sequence number within the parent negotiation; used to filter credit-card
+      first installments out of the wallet base.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.negotiation_installment_number
+  due_amount:
+    description: Outstanding monetary amount due on the invoice from invoice_portfolio.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.due_amount
+  recovered_amount:
+    description: "Amount considered recovered as of dt_reference: full due amount for paid/written-down\
+      \ invoices (with net_rate_recovery for written-down), zero if still unpaid at reference."
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.due_amount
+    - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  has_bill_item_condominio:
+    description: True if the invoice has condominium (CONDOMINIO) bill items with positive balance.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_multa_recisoria:
+    description: True if the invoice has termination-fine (MULTA-RECISORIA) bill items with positive balance.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_acordo:
+    description: True if the invoice has agreement (ACORDO) bill items with positive balance.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_rental_core:
+    description: True if the invoice has rental-core (RENTAL-CORE) bill items with positive balance.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_reparos:
+    description: True if the invoice has repair (REPAROS) bill items with positive balance.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_multas_ongoing:
+    description: True if the invoice has ongoing-fine (MULTAS ONGOING) bill items with positive balance.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_utilidades:
+    description: True if the invoice has utilities (UTILIDADES) bill items with positive balance.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_outros:
+    description: True if the invoice has other (OUTROS) bill items with positive balance.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_condominio:
+    description: Positive balance amount of condominium bill items on the invoice.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_multa_recisoria:
+    description: Positive balance amount of termination-fine bill items on the invoice.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_acordo:
+    description: Positive balance amount of agreement bill items on the invoice.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_rental_core:
+    description: Positive balance amount of rental-core bill items on the invoice.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_reparos:
+    description: Positive balance amount of repair bill items on the invoice.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_multas_ongoing:
+    description: Positive balance amount of ongoing-fine bill items on the invoice.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_utilidades:
+    description: Positive balance amount of utilities bill items on the invoice.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_outros:
+    description: Positive balance amount of other bill items on the invoice.
+    lineage:
+    - datalake_retsuko.bill_items.id_invoice
+    - datalake_retsuko.bill_items.bill_item_cluster_name
+    - datalake_retsuko.bill_items.value_sign_bill_item
+  is_first_payment:
+    description: Flag from invoice_portfolio indicating the contract first-payment milestone.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.is_first_payment
+  is_first_invoice_contract:
+    description: Flag indicating this invoice is the first billed invoice of the contract (used for FPD
+      logic).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.is_first_invoice_contract
+  anchor_delay_contract:
+    description: Contract-level maximum of anchor_delay_from_deal among child-negotiation invoices on
+      dt_reference. Used as the contamination add-on in T2 when deals are in delay.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  invoice_delay_t1:
+    description: "Invoice delay under T1 methodology: equal to delay_invoice_at_reference (days from nominal\
+      \ due date). Future deal installments can be T1 < 0 even when they restructure older debt."
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+  invoice_delay_t2:
+    description: "Invoice delay under T2 methodology (delay contamination). For deal-in-delay children:\
+      \ T1 delay + anchor_delay_contract; for deal-on-time children: anchor_delay_from_deal; for original\
+      \ invoices on contracts with negotiations: T1 delay plus contamination when overdue. A deal can\
+      \ therefore show T2 > 0 while T1 < 0. Without multiple deal installments, T1 equals T2."
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  invoice_delay_t3:
+    description: "Invoice-level exposure of contract_delay_t3: the maximum invoice_delay_t2 across the\
+      \ contract on dt_reference (contract-wide T2 contamination)."
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  overdue_recovered_amount_t1:
+    description: Recovered amount attributed when the invoice is overdue under T1 (invoice_delay_t1 >
+      0).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.due_amount
+    - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  on_time_paid_amount_t1:
+    description: Recovered amount attributed when the invoice is on time under T1 (invoice_delay_t1 <=
+      0).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.due_amount
+    - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  overdue_recovered_amount_t2:
+    description: Recovered amount attributed when the invoice is overdue under T2 (invoice_delay_t2 >
+      0).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+    - datalake_collections_quintoandar.invoice_portfolio.due_amount
+    - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  on_time_paid_amount_t2:
+    description: Recovered amount attributed when the invoice is on time under T2 (invoice_delay_t2 <=
+      0).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+    - datalake_collections_quintoandar.invoice_portfolio.due_amount
+    - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  overdue_recovered_amount_t3:
+    description: Recovered amount attributed when the contract is overdue under T3 (contract_delay_t3
+      > 0).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+    - datalake_collections_quintoandar.invoice_portfolio.due_amount
+    - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  on_time_paid_amount_t3:
+    description: Recovered amount attributed when the contract is on time under T3 (contract_delay_t3
+      <= 0).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+    - datalake_collections_quintoandar.invoice_portfolio.due_amount
+    - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  contract_delay_t1:
+    description: Maximum invoice_delay_t1 across the contract on dt_reference (nominal due-date methodology).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+  contract_delay_t3:
+    description: Maximum invoice_delay_t2 across the contract on dt_reference (contract-level delay contamination).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+  contract_delay_t3_losses:
+    description: Maximum invoice_delay_t2 across open or written-down invoices of the contract on dt_reference,
+      used for loss-oriented delay views.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+    - datalake_collections_quintoandar.invoice_portfolio.invoice_status
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  order_invoice_wallet_risk:
+    description: Rank of the invoice within the contract wallet on dt_reference ordered by invoice_delay_t2
+      descending (risk / contamination view), then creation date and invoice id.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+    - datalake_collections_quintoandar.invoice_portfolio.is_child_negotiation
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+    - datalake_collections_quintoandar.invoice_portfolio.id_invoice
+  order_invoice_wallet:
+    description: Rank of the invoice within the contract wallet on dt_reference ordered by invoice_delay_t1
+      descending (nominal due-date view), then creation date and invoice id.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+    - datalake_collections_quintoandar.invoice_portfolio.id_invoice
+  dt_due:
+    description: Nominal due date of the invoice (DATE(ts_due) from invoice_portfolio). Basis for T1 delay.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_due
+  dt_invoice_anchor:
+    description: Anchor date used to measure delay contamination for the invoice in T2 methodology.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
+  dt_created_negotiation_parent:
+    description: Creation date of the parent negotiation associated with the invoice.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
+  dt_paid:
+    description: Invoice payment date (DATE(ts_paid) from invoice_portfolio).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  dt_paid_timeline:
+    description: Payment date as of dt_reference; null when the invoice was paid after the reference date.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  dt_created:
+    description: Invoice creation date (DATE(ts_created) from invoice_portfolio).
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+  dt_begin:
+    description: "Timeline start date for the invoice: earliest of creation and payment dates (LEAST(ts_created,\
+      \ COALESCE(ts_paid, ts_created)))."
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  dt_contract_start:
+    description: Start date of the rental contract associated with the invoice.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.dt_contract_start
+  dt_contract_annulled:
+    description: Contract annulment/end date from invoice_portfolio; drives contract_status.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.dt_contract_annulled
+  year:
+    description: Year partition/component extracted from dt_reference.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  month:
+    description: Month partition/component extracted from dt_reference.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  day:
+    description: Day partition/component extracted from dt_reference.
+    lineage:
+    - datalake_collections_quintoandar.invoice_portfolio.ts_created
+    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
+  ts_load:
+    description: Timestamp when the wallet timeline row was loaded into the warehouse.

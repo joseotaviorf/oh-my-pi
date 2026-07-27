@@ -10,6 +10,17 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
   inner_dependencies:
     negotiation:
       - installment
+    invoice_wallet_timeline_trato_feito:
+      - negotiation
+      - installment
+  tables_customization:
+    invoice_wallet_timeline_trato_feito:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      z_order_by: [dt_reference, sk_contract, sk_invoice]

@@ -1997,8 +1997,6 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.enrich_cyber:load-enrich-installment:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-negotiation:first-run-of-day
   - bietlejuice.enrich_cyber:load-enrich-users:first-run-of-day
-  - bietlejuice.enrich_debt_recovery:load-enrich-installment:first-run-of-day
-  - bietlejuice.enrich_debt_recovery:load-enrich-negotiation:first-run-of-day
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
   - bietlejuice.enrich_proposal:load-enrich-proposal:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
@@ -2340,7 +2338,14 @@ bietlejuice.enrich_date:
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays:first-run-of-day
 bietlejuice.enrich_debt_recovery:
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract:first-run-of-day
+  - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
+  - bietlejuice.enrich_retsuko:load-enrich-bill-items:first-run-of-day
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
+  - bietlejuice.recupera:load-clean-complementary-records-written-down:first-run-of-day
+  - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day
+  - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
   - bietlejuice.trato_feito:load-clean-accounting-installment:first-run-of-day
   - bietlejuice.trato_feito:load-clean-audience:first-run-of-day
   - bietlejuice.trato_feito:load-clean-bill:first-run-of-day
