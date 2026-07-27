@@ -380,9 +380,9 @@ FROM VALUES
 
     -- SENNA Rent
     (
-        "ab_beakman_search_services_senna_embedding_rent_experiment_v2",
+        "ab_beakman_search_services_senna_embedding_rent_experiment_v3",
         named_struct(
-            'begin_date', DATE('2026-07-08'),
+            'begin_date', DATE('2026-07-22'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -403,9 +403,9 @@ FROM VALUES
 
     -- SENNA Sale
     (
-        "ab_beakman_search_services_senna_embedding_sale_experiment_v2",
+        "ab_beakman_search_services_senna_embedding_sale_experiment_v3",
         named_struct(
-            'begin_date', DATE('2026-07-08'),
+            'begin_date', DATE('2026-07-22'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -426,9 +426,9 @@ FROM VALUES
 
     -- Dynamic Carousels Rent
     (
-        "ab_beakman_search_services_dynamic_carousels_rent_v2",
+        "ab_beakman_search_services_dynamic_carousels_rent_v4",
         named_struct(
-            'begin_date', DATE('2026-07-08'),
+            'begin_date', DATE('2026-07-23'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -449,9 +449,9 @@ FROM VALUES
 
     -- Dynamic Carousels Sale
     (
-        "ab_beakman_search_services_dynamic_carousels_sale_v2",
+        "ab_beakman_search_services_dynamic_carousels_sale_v4",
         named_struct(
-            'begin_date', DATE('2026-07-08'),
+            'begin_date', DATE('2026-07-23'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
