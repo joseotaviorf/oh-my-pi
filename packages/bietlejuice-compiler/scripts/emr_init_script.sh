@@ -473,9 +473,56 @@ EOF
     echo "END: Download custom_libraries maven"
 }
 
+# Install Requires-Dist from a downloaded custom wheel under EMR_CONSTRAINTS.
+# Keeps ``pip install --no-deps`` on the wheel itself (avoid upgrading EMR/PySpark)
+# while restoring Databricks libraries-API parity for client/model wheels that
+# omit explicit pypi: entries in *_cluster.yml.
+# --ignore-requires-python: EMR bootstrap pip is 3.9; transitive deps may declare >=3.10.
+_emr_install_whl_requires_dist() {
+    local local_whl="$1"
+    local reqs
+    local req
+    local -a uniq_reqs=()
+
+    _emr_ensure_custom_libraries_py || return 1
+
+    if [ -z "${EMR_CONSTRAINTS:-}" ] || [ ! -f "${EMR_CONSTRAINTS}" ]; then
+        echo "Error: EMR_CONSTRAINTS unset/missing; cannot install wheel Requires-Dist"
+        return 1
+    fi
+
+    if ! reqs="$(python3 "${EMR_CUSTOM_LIBRARIES_PY}" requires-dist "${local_whl}" "${EMR_CONSTRAINTS}")"; then
+        echo "Error: failed to parse Requires-Dist from ${local_whl}"
+        return 1
+    fi
+
+    while IFS= read -r req; do
+        [ -z "${req}" ] && continue
+        uniq_reqs+=("${req}")
+    done <<EOF
+${reqs}
+EOF
+
+    if [ "${#uniq_reqs[@]}" -eq 0 ]; then
+        echo "    No Requires-Dist entries"
+        return 0
+    fi
+
+    echo "    Installing Requires-Dist under constraints:"
+    for req in "${uniq_reqs[@]}"; do
+        echo "      ${req}"
+    done
+    if ! $PIP_EXEC install --no-cache-dir --ignore-requires-python -c "${EMR_CONSTRAINTS}" "${uniq_reqs[@]}"; then
+        echo "Error: pip install of Requires-Dist for '${local_whl}' failed."
+        return 1
+    fi
+}
+
 # Install DAG-level custom_libraries wheels previously downloaded to CUSTOM_WHL_MANIFEST.
-# --no-deps: model/client wheels declare deps that are installed via pypi entries
-# (or already present). --ignore-requires-python: same as inmetro on EMR 3.9.
+# Requires-Dist is installed first under EMR_CONSTRAINTS; the wheel itself uses
+# --no-deps (avoid upgrading EMR/PySpark). Explicit pypi: entries in YAML still
+# install earlier via _emr_install_custom_pypi_libraries.
+# --ignore-requires-python: same as inmetro on EMR 3.9.
 _emr_install_custom_whl_libraries() {
     local local_whl
 
@@ -493,7 +540,12 @@ _emr_install_custom_whl_libraries() {
             echo "Error: custom_libraries whl not found at ${local_whl}"
             exit 1
         fi
-        echo "  Installing ${local_whl}..."
+        echo "  Preparing deps for ${local_whl}..."
+        if ! _emr_install_whl_requires_dist "${local_whl}"; then
+            echo "Error: failed to install Requires-Dist for custom_libraries whl '${local_whl}'"
+            exit 1
+        fi
+        echo "  Installing ${local_whl} (--no-deps)..."
         if ! $PIP_EXEC install --no-cache-dir --no-deps --ignore-requires-python "${local_whl}"; then
             echo "Error: pip install of custom_libraries whl '${local_whl}' failed."
             exit 1
@@ -641,10 +693,13 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
 
     # Mirrors packages/bietlejuice-runtime [tool.uv].override-dependencies for pip (constraints
     # only narrow the solver; they cannot relax validations-engine's requests==2.28.1 pin).
+    # urllib3 is capped for EMR awscli/botocore — all -c "${EMR_CONSTRAINTS}" installs
+    # (bietlejuice deps, custom_libraries pypi, wheel Requires-Dist) must not upgrade it.
     EMR_CONSTRAINTS="${TMP_DIR}/emr-pip-constraints.txt"
     cat >"${EMR_CONSTRAINTS}" <<'EOF'
 requests>=2.32.3
 tenacity>=8.0.1
+urllib3>=1.25.4,<1.27
 EOF
 
     # validations-engine 2.0.0 declares requests==2.28.1; bietlejuice-core needs >=2.32.3.
@@ -763,8 +818,8 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         _emr_install_custom_whl_libraries
     fi
 
-    echo "Restoring python-dateutil for awscli compatibility..."
-    $PIP_EXEC install 'python-dateutil>=2.1,<=2.9.0'
+    echo "Restoring python-dateutil and urllib3 for awscli compatibility..."
+    $PIP_EXEC install 'python-dateutil>=2.1,<=2.9.0' 'urllib3>=1.25.4,<1.27'
 
     SPARK_JARS_DIRS="/usr/lib/spark/jars"
     PYSPARK_JARS=$(python3 -c "import pyspark; print(pyspark.__path__[0] + '/jars')" 2>/dev/null) \

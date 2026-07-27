@@ -1,6 +1,8 @@
 """Unit tests for emr_custom_libraries YAML extractors used by EMR bootstrap."""
 
+import email.message
 import sys
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -14,6 +16,8 @@ from emr_custom_libraries import (  # noqa: E402
     extract_maven_coords,
     extract_pypi_packages,
     extract_uris,
+    extract_wheel_requires_dist,
+    filter_requires_dist_for_emr_constraints,
     gav_to_maven_path,
     main,
     maven_relative_path,
@@ -442,3 +446,173 @@ class TestExtractMaven:
 def test_module_lives_next_to_emr_init_script():
     assert (_SCRIPTS_DIR / "emr_custom_libraries.py").is_file()
     assert (_SCRIPTS_DIR / "emr_init_script.sh").is_file()
+
+
+def test_emr_constraints_include_urllib3_cap_for_awscli():
+    """Requires-Dist and custom_libraries pypi install under EMR_CONSTRAINTS only."""
+    script = (_SCRIPTS_DIR / "emr_init_script.sh").read_text(encoding="utf-8")
+    marker = "cat >\"${EMR_CONSTRAINTS}\" <<'EOF'"
+    start = script.index(marker) + len(marker)
+    end = script.index("\nEOF\n", start)
+    block = script[start:end]
+    assert "urllib3>=1.25.4,<1.27" in block
+    assert "Restoring python-dateutil and urllib3 for awscli compatibility" in script
+
+
+def _write_fake_wheel(path: Path, *, requires_dist: list) -> Path:
+    """Build a minimal wheel zip with dist-info METADATA for Requires-Dist tests."""
+    msg = email.message.EmailMessage()
+    msg["Metadata-Version"] = "2.1"
+    msg["Name"] = "demo-client"
+    msg["Version"] = "0.1.0"
+    for req in requires_dist:
+        msg.add_header("Requires-Dist", req)
+    metadata = msg.as_string()
+    with zipfile.ZipFile(path, "w") as zf:
+        zf.writestr("demo_client-0.1.0.dist-info/METADATA", metadata)
+        zf.writestr("demo_client/__init__.py", "")
+    return path
+
+
+class TestExtractWheelRequiresDist:
+    def test_parses_and_dedupes_requires_dist(self, tmp_path: Path):
+        # arrange
+        whl = _write_fake_wheel(
+            tmp_path / "demo_client-0.1.0-py3-none-any.whl",
+            requires_dist=[
+                "requests>=2.28",
+                "urllib3<2",
+                "requests>=2.28",
+            ],
+        )
+
+        # act
+        reqs = extract_wheel_requires_dist(str(whl))
+
+        # assert
+        assert reqs == ["requests>=2.28", "urllib3<2"]
+
+    def test_skips_extra_markers_keeps_base_req(self, tmp_path: Path):
+        # arrange
+        whl = _write_fake_wheel(
+            tmp_path / "demo_client-0.1.0-py3-none-any.whl",
+            requires_dist=[
+                "gspread==5.5.0",
+                'pytest>=7; extra == "dev"',
+                'tomli>=2; python_version < "3.11"',
+            ],
+        )
+
+        # act
+        reqs = extract_wheel_requires_dist(str(whl))
+
+        # assert
+        assert reqs == ["gspread==5.5.0", "tomli>=2"]
+
+    def test_keeps_extra_not_equal_markers_as_default_runtime(self, tmp_path: Path):
+        # arrange — PEP 508: extra != "x" is required when no extra is requested
+        whl = _write_fake_wheel(
+            tmp_path / "demo_client-0.1.0-py3-none-any.whl",
+            requires_dist=[
+                "requests>=2.28",
+                'httpx>=0.27; extra != "async"',
+                'pytest>=7; extra == "dev"',
+            ],
+        )
+
+        # act
+        reqs = extract_wheel_requires_dist(str(whl))
+
+        # assert
+        assert reqs == ["requests>=2.28", "httpx>=0.27"]
+
+    def test_missing_metadata_returns_empty(self, tmp_path: Path):
+        # arrange
+        whl = tmp_path / "empty-0.0.1-py3-none-any.whl"
+        with zipfile.ZipFile(whl, "w") as zf:
+            zf.writestr("empty/__init__.py", "")
+
+        # act / assert
+        assert extract_wheel_requires_dist(str(whl)) == []
+
+    def test_cli_requires_dist_mode(self, tmp_path: Path, capsys):
+        # arrange
+        whl = _write_fake_wheel(
+            tmp_path / "demo_client-0.1.0-py3-none-any.whl",
+            requires_dist=["oauth2client==4.1.3"],
+        )
+
+        # act
+        rc = main(["requires-dist", str(whl)])
+
+        # assert
+        assert rc == 0
+        assert capsys.readouterr().out.strip() == "oauth2client==4.1.3"
+
+    def test_cli_requires_dist_missing_file(self, tmp_path: Path, capsys):
+        # act
+        rc = main(["requires-dist", str(tmp_path / "missing.whl")])
+
+        # assert
+        assert rc == 1
+        assert "wheel not found" in capsys.readouterr().err
+
+
+class TestFilterRequiresDistForEmrConstraints:
+    def test_skips_conflicting_pin_when_distribution_already_installed(
+        self, tmp_path: Path, monkeypatch
+    ):
+        # arrange
+        constraints = tmp_path / "constraints.txt"
+        constraints.write_text(
+            "requests>=2.32.3\nurllib3>=1.25.4,<1.27\n",
+            encoding="utf-8",
+        )
+
+        class _FakeDist:
+            def __init__(self, name: str):
+                self.metadata = {"Name": name}
+
+        monkeypatch.setattr(
+            "emr_custom_libraries.importlib.metadata.distributions",
+            lambda: [_FakeDist("requests")],
+        )
+
+        # act
+        kept, skipped = filter_requires_dist_for_emr_constraints(
+            ["requests ==2.32.2", "httpx>=0.27"],
+            str(constraints),
+        )
+
+        # assert
+        assert kept == ["httpx>=0.27"]
+        assert skipped == ["requests ==2.32.2"]
+
+    def test_cli_requires_dist_skips_conflicting_requests_pin(
+        self, tmp_path: Path, capsys, monkeypatch
+    ):
+        # arrange
+        whl = _write_fake_wheel(
+            tmp_path / "demo_client-0.1.0-py3-none-any.whl",
+            requires_dist=["requests ==2.32.2", "httpx>=0.27"],
+        )
+        constraints = tmp_path / "constraints.txt"
+        constraints.write_text("requests>=2.32.3\n", encoding="utf-8")
+
+        class _FakeDist:
+            def __init__(self, name: str):
+                self.metadata = {"Name": name}
+
+        monkeypatch.setattr(
+            "emr_custom_libraries.importlib.metadata.distributions",
+            lambda: [_FakeDist("requests")],
+        )
+
+        # act
+        rc = main(["requires-dist", str(whl), str(constraints)])
+
+        # assert
+        captured = capsys.readouterr()
+        assert rc == 0
+        assert captured.out.strip() == "httpx>=0.27"
+        assert "Skipping Requires-Dist requests ==2.32.2" in captured.err

@@ -3,10 +3,11 @@
 
 Used by emr_init_script.sh. Modes:
 
-  pypi  — TSV: package\\tno_deps(0|1)\\tonly_binary(0|1)
-  whl   — one URI per line (may contain {artifacts_bucket})
-  jar   — one URI per line (may contain {artifacts_bucket})
-  maven — TSV: coordinates\\trepo_or_empty\\trelative_path\\tjar_name
+  pypi          — TSV: package\\tno_deps(0|1)\\tonly_binary(0|1)
+  whl           — one URI per line (may contain {artifacts_bucket})
+  jar           — one URI per line (may contain {artifacts_bucket})
+  maven         — TSV: coordinates\\trepo_or_empty\\trelative_path\\tjar_name
+  requires-dist — one pip requirement per line from a local .whl METADATA
 
 Always reads cluster.custom_libraries. When is_validation is true (env
 IS_VALIDATION=1 or CLI arg 1/true), also unions validation.cluster.custom_libraries.
@@ -15,9 +16,13 @@ IS_VALIDATION=1 or CLI arg 1/true), also unions validation.cluster.custom_librar
 from __future__ import annotations
 
 import argparse
+import email.parser
+import importlib.metadata
 import os
+import re
 import sys
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+import zipfile
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 import yaml
 
@@ -155,27 +160,178 @@ def _parse_is_validation(raw: Optional[str]) -> bool:
     return str(raw).strip().lower() in {"1", "true", "yes"}
 
 
+def _should_skip_requires_dist_marker(marker: str) -> bool:
+    """Skip deps gated on a requested extra; keep default-runtime and env markers.
+
+    PEP 508: ``extra == "foo"`` applies only when that extra is requested;
+    ``extra != "foo"`` applies when it is not (default install). Bootstrap
+    installs wheels with no extra, so only ``extra==`` lines are skipped.
+    """
+    normalized = marker.strip().lower().replace(" ", "")
+    return "extra==" in normalized
+
+
+def _normalize_requires_dist(raw: str) -> Optional[str]:
+    """Turn a METADATA Requires-Dist value into a pip requirement, or None to skip."""
+    value = (raw or "").strip()
+    if not value:
+        return None
+    if ";" in value:
+        req, marker = value.split(";", 1)
+        if _should_skip_requires_dist_marker(marker):
+            return None
+        value = req.strip()
+    return value or None
+
+
+def extract_wheel_requires_dist(whl_path: str) -> List[str]:
+    """Return unique pip requirements from a wheel's METADATA ``Requires-Dist``.
+
+    Used by EMR bootstrap before ``pip install --no-deps`` on custom whls so
+    client/model wheels get their runtime deps under EMR_CONSTRAINTS. Extra-
+    gated requirements (``; extra == ...``) are skipped. Environment markers
+    other than extras are stripped and the base requirement is returned so the
+    bootstrap Python version can still install the dep (pip then resolves).
+    """
+    path = os.fspath(whl_path)
+    if not path.endswith(".whl") or not os.path.isfile(path):
+        raise FileNotFoundError(f"wheel not found: {path}")
+
+    requirements: List[str] = []
+    seen = set()
+    with zipfile.ZipFile(path) as zf:
+        metadata_name = next(
+            (
+                name
+                for name in zf.namelist()
+                if name.endswith(".dist-info/METADATA") and name.count("/") == 1
+            ),
+            None,
+        )
+        if metadata_name is None:
+            return []
+        raw = zf.read(metadata_name).decode("utf-8", errors="replace")
+
+    message = email.parser.Parser().parsestr(raw)
+    for header in message.get_all("Requires-Dist", failobj=[]):
+        req = _normalize_requires_dist(header)
+        if not req or req in seen:
+            continue
+        seen.add(req)
+        requirements.append(req)
+    return requirements
+
+
+def _normalized_project_name(name: str) -> str:
+    return name.lower().replace("-", "_").replace(".", "_")
+
+
+def _requirement_project_name(req: str) -> Optional[str]:
+    match = re.match(
+        r"^\s*([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)",
+        req,
+    )
+    return match.group(1) if match else None
+
+
+def _parse_constraint_package_names(constraints_path: str) -> Set[str]:
+    names: Set[str] = set()
+    with open(constraints_path, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            match = re.match(r"^([A-Za-z0-9][A-Za-z0-9._-]*)", line)
+            if match:
+                names.add(_normalized_project_name(match.group(1)))
+    return names
+
+
+def _is_distribution_installed(project_name: str) -> bool:
+    target = _normalized_project_name(project_name)
+    for dist in importlib.metadata.distributions():
+        dist_name = dist.metadata.get("Name") if dist.metadata else None
+        if dist_name and _normalized_project_name(dist_name) == target:
+            return True
+    return False
+
+
+def filter_requires_dist_for_emr_constraints(
+    requirements: List[str], constraints_path: str
+) -> Tuple[List[str], List[str]]:
+    """Drop wheel pins for packages bootstrap already installed under EMR_CONSTRAINTS.
+
+    Client wheels often pin exact versions (e.g. ``requests==2.32.2``) that conflict
+    with EMR floor pins (``requests>=2.32.3``). When the distribution is already
+    installed, pip only needs the remaining Requires-Dist entries.
+    """
+    if not os.path.isfile(constraints_path):
+        raise FileNotFoundError(f"constraints file not found: {constraints_path}")
+
+    constrained = _parse_constraint_package_names(constraints_path)
+    kept: List[str] = []
+    skipped: List[str] = []
+    for req in requirements:
+        name = _requirement_project_name(req)
+        if (
+            name
+            and _normalized_project_name(name) in constrained
+            and _is_distribution_installed(name)
+        ):
+            skipped.append(req)
+            continue
+        kept.append(req)
+    return kept, skipped
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         description="Extract custom_libraries entries for EMR bootstrap"
     )
     parser.add_argument(
         "mode",
-        choices=("pypi", "whl", "jar", "maven"),
+        choices=("pypi", "whl", "jar", "maven", "requires-dist"),
         help="Which custom_libraries type to emit",
     )
     parser.add_argument(
-        "cluster_yaml", help="Path to *_cluster.yml / *_declaration.yml"
+        "path",
+        help=(
+            "Path to *_cluster.yml / *_declaration.yml, or to a local .whl "
+            "when mode is requires-dist"
+        ),
     )
     parser.add_argument(
         "is_validation",
         nargs="?",
         default=None,
-        help="1/true to also union validation.cluster.custom_libraries",
+        help=(
+            "1/true to also union validation.cluster.custom_libraries; "
+            "for requires-dist mode, path to EMR pip constraints file"
+        ),
     )
     args = parser.parse_args(list(argv) if argv is not None else None)
 
-    data = _load_yaml(args.cluster_yaml)
+    if args.mode == "requires-dist":
+        try:
+            reqs = extract_wheel_requires_dist(args.path)
+            if args.is_validation and os.path.isfile(args.is_validation):
+                reqs, skipped = filter_requires_dist_for_emr_constraints(
+                    reqs, args.is_validation
+                )
+                for req in skipped:
+                    print(
+                        f"    Skipping Requires-Dist {req} "
+                        "(already installed under EMR_CONSTRAINTS)",
+                        file=sys.stderr,
+                    )
+            for req in reqs:
+                print(req)
+        except (OSError, zipfile.BadZipFile, ValueError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+        return 0
+
+    data = _load_yaml(args.path)
     is_validation = _parse_is_validation(args.is_validation)
 
     if args.mode == "pypi":

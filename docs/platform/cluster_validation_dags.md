@@ -96,12 +96,14 @@ On EMR there is no Databricks libraries API. [`emr_init_script.sh`](../../packag
 
 | Type | EMR bootstrap behavior |
 | ---- | ---------------------- |
-| `pypi` | `pip install` (supports EMR-only `no_deps` / `only_binary`) |
-| `whl` | `aws s3 cp` + `pip install --no-deps` |
+| `pypi` | `pip install` under EMR constraints (supports EMR-only `no_deps` / `only_binary`) |
+| `whl` | `aws s3 cp` → install wheel `Requires-Dist` under EMR constraints → `pip install --no-deps` on the wheel (keeps EMR/PySpark pins). Explicit `pypi:` entries in YAML are still installed first and remain useful for pins/extras. |
 | `jar` | `aws s3 cp` into Spark jars dirs (`/usr/lib/spark/jars` + PySpark jars) |
 | `maven` | Direct artifact only (no transitive Ivy resolve): S3 cache at `{artifacts_bucket}/jars/maven/<group>/<artifact>/<version>/…` then Maven Central (or optional `repo:`). Sedona multi-JAR bundles still use `sedona-init.sh`. |
 
 Validation DAGs (`*__validation`) also union `validation.cluster.custom_libraries` when present. Prod `custom_libraries` are inherited unless overridden.
+
+YAML helpers and METADATA parsing live in [`emr_custom_libraries.py`](../../packages/bietlejuice-compiler/scripts/emr_custom_libraries.py) (downloaded next to the init script on the cluster).
 
 ## Write target naming
 
