@@ -37,20 +37,45 @@ itself. Manual-only (`schedule_interval` null) DAGs are skipped. Wonka/`quintoml
 stay in (same scope as the slowness check).
 
 **Root selection (missing-run).** Of the DAGs past their due time, only the *roots*
-are alerted on. A **confirmed** root has no late upstream and every upstream that was
-expected to run this cycle already succeeded. Upstreams outside the candidate set
-(paused, deactivated, excluded) can never succeed this cycle, so they do not block —
-otherwise their dependents would be permanently unalertable.
+are alerted on. A **confirmed** root is **ready to run** — every dataset it requires is
+satisfied — and has no late upstream, with every upstream expected to run this cycle
+already succeeded. Upstreams outside the candidate set (paused, deactivated, excluded)
+can never succeed this cycle, so they do not block — otherwise their dependents would be
+permanently unalertable.
 
-If nothing is confirmed but DAGs *are* late — e.g. the true root has too little
-history to have a baseline — the monitor falls back to the **tops of the late
+**The readiness gate.** A producer counts as delivered the moment it emits *any* outlet,
+which is what lets a manual recovery run close its own alert. But blocking is per
+*dataset*, so a mid-flight upstream would otherwise mark itself delivered, leave the late
+set, and promote its entire downstream wavefront into "confirmed" roots that start on
+their own minutes later. That is the 2026-07-25 cascade, where `dw_accounts_receivable`
+alerted while still short the one dataset its upstream was computing. A DAG positively
+known to be missing a required dataset is therefore never a root — not in the confirmed
+pass, and not in the fallback below.
+
+If nothing is confirmed but *ready* DAGs are still late — e.g. the true root has too
+little history to have a baseline — the monitor falls back to the **tops of the late
 subgraph** and marks the alert `Attribution: unconfirmed root (N DAG(s) late this
 cycle)`. A lower-confidence root beats going silent during a real cascade, which is
-the failure mode the 2026-07-14 postmortem describes.
+the failure mode the 2026-07-14 postmortem describes. The fallback distinguishes
+*missing information* from *known blockage*: when the dataset trigger state cannot be
+read at all, every late DAG stays eligible and the guard fails open; when it reads
+cleanly and says "blocked", that is evidence and the DAG stays silent.
+
+**Required datasets.** `BietlejuiceDatasetService` schedules a DAG as
+`any(all(<first-run-of-day>), any(<reprocessing>))`, but `dag_schedule_dataset_reference`
+stores a flat dataset list and loses the AND/OR structure. Only the non-reprocessing
+branch gates a normal cycle, so the twins are excluded from both the satisfaction
+quotient and the readiness gate — counting them made a ready DAG read as
+blocked (`dw_accounts_receivable` showed `3/7` while short exactly one real dataset, and
+now reads `3/4`). The twin is the dependency string with `:reprocessing` appended, and
+the dependency usually already carries its own `:first-run-of-day` variant (4373 of the
+4450 declared in `dependencies.yaml`), so a twin is matched on the suffix rather than on
+a fixed segment count. A reprocessing-only schedule collapses to no requirement and is
+treated like a cron DAG.
 
 **Dependency graph sources.** The upstream/downstream indexes are the **union** of
 `dependencies.yaml` and the live dataset-scheduling edges read from the metadata DB
-(`dag_schedule_dataset_reference ⨝ task_outlet_dataset_reference`) — the exact graph
+(`dag_schedule_dataset_reference`, joined to `dataset`) — the exact graph
 Airflow's own scheduler walks. The YAML is a static approximation that omits whole
 namespaces: every `quintoml.*` DAG appears there only as an upstream *value*, never as
 a dependent *key*, so without the live edges those DAGs have no upstreams at all and
@@ -58,6 +83,19 @@ always alert as their own root. The union also lengthens DW blast radius, becaus
 that hop through a missing namespace (`bietlejuice.x → quintoml.y → bietlejuice.dw_z`)
 now resolve. Either source may fail on its own; only when **both** are unavailable does
 the graph count as missing (fail-closed for detection, ledger snapshot for follow-ups).
+
+**Producer attribution.** An edge needs a producer, and the obvious source —
+`task_outlet_dataset_reference` — only holds rows for *statically declared* outlets, so
+it is empty for DAGs that publish theirs dynamically. Inner-joining against it was worse
+than useless: the live graph came back with no edges at all and silently
+stopped suppressing anything, while every missing dataset went unattributed and the
+dropped-event verdict could never render. Every dataset URI starts with the producer's
+`<dag_id>`, so the producer is recovered from that prefix and unioned with whatever the
+reference table does have. Everything after the first separator is treated as opaque,
+because the rest varies: `<task_id>`, `<task_id>:first-run-of-day`, or either of those
+with `:reprocessing` appended. Both counts are logged every cycle (`🔗 Live dataset graph: N edge(s)…`
+and `🔗 Dataset trigger state: … M without a producer`) so an inert graph is visible
+directly instead of being inferred from alerts that never name a producer.
 
 **Dataset diagnostics (missing-run).** For each reported root the monitor reads that
 DAG's dataset trigger state and adds it to the alert. `dataset_dag_run_queue` rows are
@@ -90,7 +128,14 @@ Real alerts are only delivered when `environment == prod`. Config lives in
 `factor`, `min_alert_duration_minutes`, `critical_dags`). SLA keys
 (`sla_enabled`, `sla_lookback_days`, `sla_min_history_cycles`, `sla_percentile`,
 `sla_grace_minutes`, `sla_cycle_anchor_local_time`, `sla_exclude_dag_prefixes`,
-`sla_exclude_dag_suffixes`) fall back to module defaults when omitted.
+`sla_exclude_dag_suffixes`, `sla_max_missing_run_alerts`) fall back to module defaults
+when omitted.
+
+`sla_max_missing_run_alerts` (default 25) caps how many roots one tick may report,
+keeping the latest and adding `Alert cap reached: N more late root(s) not reported` to
+the survivors. The readiness gate keeps a recovering cascade quiet on its own, so this
+only bites on the one path the gate cannot cover — an unreadable dataset trigger state,
+where the fallback deliberately opens up.
 
 ## Downstream DW impact
 

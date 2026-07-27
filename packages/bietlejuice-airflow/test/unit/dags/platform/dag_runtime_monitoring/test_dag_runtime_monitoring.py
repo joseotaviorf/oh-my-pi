@@ -25,6 +25,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     DEDUP_VARIABLE_KEY,
     JIRA_OPS_VARIABLE,
     _also_waiting_count,
+    _apply_missing_run_cap,
     _apply_sla_follow_up,
     _as_str_list,
     _assign_alert_tiers,
@@ -35,6 +36,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _classify_dataset_state,
     _collect_sla_findings,
     _cycle_anchor,
+    _dataset_ready,
     _effective_work_start,
     _enrich_findings_with_dataset_state,
     _enrich_findings_with_dw_impact,
@@ -66,6 +68,8 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _parse_test_options,
     _percentile,
     _post_gchat,
+    _producer_from_uri,
+    _required_datasets,
     _resolve_anchor_hhmm,
     _resolve_config,
     _resolved_text,
@@ -2489,8 +2493,10 @@ class TestMonitorEnrichesSlaFindings:
 # --------------------------------------------------------------------------- #
 # Live dataset dependency graph
 # --------------------------------------------------------------------------- #
-def _edge_row(dependent, upstream):
-    return SimpleNamespace(dependent_dag_id=dependent, upstream_dag_id=upstream)
+def _edge_row(dependent, upstream, uri=None):
+    return SimpleNamespace(
+        dependent_dag_id=dependent, upstream_dag_id=upstream, uri=uri
+    )
 
 
 def _dataset_row(dag_id, uri, satisfied, producer=None):
@@ -3033,35 +3039,23 @@ class TestDatasetFetchers:
 
 
 class TestCollectSlaFindingsDatasetWiring:
-    def test_passes_live_graph_and_emissions_through_and_enriches(self):
-        finding = {
-            "kind": _KIND_MISSING_RUN,
-            "dag_id": "bietlejuice.enrich_chatbot",
-            "run_id": "sla::2026-07-24T23:55:00+00:00",
-        }
+    def test_passes_live_graph_emissions_and_a_late_set_scoped_fetcher(self):
         live_upstream = {"bietlejuice.enrich_chatbot": {"bietlejuice.clean_chatbot"}}
+        session = mock.Mock()
         with (
             mock.patch(
                 f"{_MODULE}._load_upstream_index_safe", return_value={}
             ) as load_upstream,
             mock.patch(f"{_MODULE}._fetch_sla_history", return_value=[]),
             mock.patch(
-                f"{_MODULE}._evaluate_sla_missing_runs", return_value=[dict(finding)]
+                f"{_MODULE}._evaluate_sla_missing_runs", return_value=[]
             ) as evaluate,
             mock.patch(
-                f"{_MODULE}._fetch_dataset_satisfaction",
-                return_value={
-                    "bietlejuice.enrich_chatbot": {
-                        "uri-a": {
-                            "satisfied": False,
-                            "producers": {"bietlejuice.clean_chatbot"},
-                        }
-                    }
-                },
+                f"{_MODULE}._fetch_dataset_satisfaction", return_value={}
             ) as satisfaction,
         ):
-            findings = _collect_sla_findings(
-                mock.Mock(),
+            _collect_sla_findings(
+                session,
                 _SLA_CONFIG,
                 datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc),
                 {},
@@ -3069,19 +3063,24 @@ class TestCollectSlaFindingsDatasetWiring:
                 dataset_upstream_index=live_upstream,
                 emitted={"bietlejuice.clean_chatbot": datetime.now(timezone.utc)},
             )
+            # The fetcher is deferred: only the late set knows which DAGs to ask about.
+            satisfaction.assert_not_called()
+            evaluate.call_args.kwargs["fetch_dataset_status"](
+                ["bietlejuice.enrich_chatbot"]
+            )
+            satisfaction.assert_called_once_with(
+                session, ["bietlejuice.enrich_chatbot"]
+            )
         load_upstream.assert_called_once_with(live_upstream)
         assert evaluate.call_args.kwargs["emitted_this_cycle"] == {
             "bietlejuice.clean_chatbot"
         }
-        satisfaction.assert_called_once_with(mock.ANY, ["bietlejuice.enrich_chatbot"])
-        # The producer only counts as succeeded because it emitted this cycle.
-        assert findings[0]["dataset_verdict"] == _VERDICT_DROPPED_EVENT
 
     def test_no_satisfaction_query_when_nothing_is_late(self):
+        # _evaluate_sla_missing_runs returns before calling the fetcher at all.
         with (
             mock.patch(f"{_MODULE}._load_upstream_index_safe", return_value={}),
             mock.patch(f"{_MODULE}._fetch_sla_history", return_value=[]),
-            mock.patch(f"{_MODULE}._evaluate_sla_missing_runs", return_value=[]),
             mock.patch(f"{_MODULE}._fetch_dataset_satisfaction") as satisfaction,
         ):
             _collect_sla_findings(
@@ -3092,3 +3091,464 @@ class TestCollectSlaFindingsDatasetWiring:
                 candidates=["bietlejuice.enrich_chatbot"],
             )
         satisfaction.assert_not_called()
+
+
+# --------------------------------------------------------------------------- #
+# Required-dataset accounting (the reprocessing OR-branch is not a requirement)
+# --------------------------------------------------------------------------- #
+_FROD = ":first-run-of-day"
+_REPRO = ":reprocessing"
+
+
+def _uri(dag_id, task="load-x", reprocessing=False):
+    """A dataset URI exactly as BietlejuiceDatasetService names it.
+
+    4373 of the 4450 dependencies declared in ``dependencies.yaml`` carry the
+    ``:first-run-of-day`` variant, and the reprocessing twin appends its own variant to
+    whatever the dependency already was — so the common twin has four segments, not
+    three.
+    """
+    return f"{dag_id}:{task}{_FROD}{_REPRO if reprocessing else ''}"
+
+
+class TestProducerFromUri:
+    @pytest.mark.parametrize(
+        "uri,expected",
+        [
+            # Everything after the first separator is opaque: task, task plus variant,
+            # and either of those with the reprocessing variant appended.
+            ("bietlejuice.dw_a:load-dw-a-fact", "bietlejuice.dw_a"),
+            ("bietlejuice.dw_a:load-dw-a-fact:first-run-of-day", "bietlejuice.dw_a"),
+            (
+                "bietlejuice.dw_a:load-dw-a-fact:first-run-of-day:reprocessing",
+                "bietlejuice.dw_a",
+            ),
+            ("quintoml.wonka.seg:load-x:reprocessing", "quintoml.wonka.seg"),
+            # Not a Bietlejuice URI: never guess a producer.
+            ("s3://bucket/key", None),
+            ("uri-a", None),
+            ("a:", None),
+            (":b", None),
+        ],
+    )
+    def test_parses_the_dag_id_prefix_whatever_the_variant(self, uri, expected):
+        assert _producer_from_uri(uri) == expected
+
+
+class TestRequiredDatasets:
+    def test_drops_the_reprocessing_branch(self):
+        datasets = {
+            _uri("bietlejuice.p1"): {"satisfied": True, "producers": set()},
+            _uri("bietlejuice.p1", reprocessing=True): {
+                "satisfied": False,
+                "producers": set(),
+            },
+        }
+        assert list(_required_datasets(datasets)) == [_uri("bietlejuice.p1")]
+
+    def test_empty_and_none_are_empty(self):
+        assert _required_datasets(None) == {}
+        assert _required_datasets({}) == {}
+
+    def test_a_task_named_reprocessing_is_still_required(self):
+        # "<dag_id>:reprocessing" is a required dataset from a task that happens to be
+        # called reprocessing, not the twin of another one.
+        datasets = {
+            "bietlejuice.p1:reprocessing": {"satisfied": True, "producers": set()}
+        }
+        assert _required_datasets(datasets) == datasets
+
+    @pytest.mark.parametrize(
+        "uri,is_twin",
+        [
+            # The dependency may already carry a variant, so the twin has four segments.
+            ("bietlejuice.p1:load-x:first-run-of-day:reprocessing", True),
+            ("bietlejuice.p1:load-x:reprocessing", True),
+            ("bietlejuice.p1:load-x:first-run-of-day", False),
+            ("bietlejuice.p1:load-x", False),
+            ("bietlejuice.p1:reprocessing", False),
+        ],
+    )
+    def test_twin_detection_covers_every_declared_dependency_shape(self, uri, is_twin):
+        datasets = {uri: {"satisfied": False, "producers": set()}}
+        assert (_required_datasets(datasets) == {}) is is_twin
+
+    def test_reprocessing_only_schedule_collapses_to_empty(self):
+        datasets = {
+            _uri("bietlejuice.p1", reprocessing=True): {
+                "satisfied": False,
+                "producers": set(),
+            }
+        }
+        assert _required_datasets(datasets) == {}
+
+
+class TestQuotientExcludesReprocessing:
+    def test_dw_accounts_receivable_reads_three_of_four_not_three_of_seven(self):
+        # The 2026-07-25 shape: four real upstreams, three reprocessing twins, and a
+        # single genuine blocker whose producer was still computing it.
+        blocker = _uri("bietlejuice.dw_collection_recovery_quintoandar", "load-fopt")
+        datasets = {
+            _uri("bietlejuice.dw_listing"): {"satisfied": True, "producers": set()},
+            _uri("bietlejuice.dw_region"): {"satisfied": True, "producers": set()},
+            _uri("bietlejuice.enrich_retsuko"): {"satisfied": True, "producers": set()},
+            blocker: {"satisfied": False, "producers": set()},
+            _uri("bietlejuice.dw_listing", reprocessing=True): {
+                "satisfied": False,
+                "producers": set(),
+            },
+            _uri("bietlejuice.dw_region", reprocessing=True): {
+                "satisfied": False,
+                "producers": set(),
+            },
+            _uri(
+                "bietlejuice.dw_collection_recovery_quintoandar",
+                "load-fopt",
+                reprocessing=True,
+            ): {"satisfied": False, "producers": set()},
+        }
+        result = _classify_dataset_state(datasets, set())
+        assert result["dataset_required"] == 4
+        assert result["dataset_satisfied"] == 3
+        assert result["dataset_missing"] == [blocker]
+
+
+class TestDatasetReady:
+    def test_none_when_there_is_nothing_to_judge(self):
+        assert _dataset_ready(None) is None
+        assert _dataset_ready({}) is None
+        # Reprocessing-only leaves no requirement, so still no opinion.
+        assert (
+            _dataset_ready(
+                {
+                    _uri("bietlejuice.p1", reprocessing=True): {
+                        "satisfied": False,
+                        "producers": set(),
+                    }
+                }
+            )
+            is None
+        )
+
+    def test_true_only_when_every_required_dataset_is_satisfied(self):
+        satisfied = {_uri("bietlejuice.p1"): {"satisfied": True, "producers": set()}}
+        assert _dataset_ready(satisfied) is True
+        partial = dict(satisfied)
+        partial[_uri("bietlejuice.p2")] = {"satisfied": False, "producers": set()}
+        assert _dataset_ready(partial) is False
+
+    def test_unsatisfied_reprocessing_twin_does_not_block(self):
+        datasets = {
+            _uri("bietlejuice.p1"): {"satisfied": True, "producers": set()},
+            _uri("bietlejuice.p1", reprocessing=True): {
+                "satisfied": False,
+                "producers": set(),
+            },
+        }
+        assert _dataset_ready(datasets) is True
+
+
+class TestProducerRecoveredWithoutTaskOutletRows:
+    def test_status_attributes_producer_from_uri_when_join_is_empty(self):
+        uri = _uri("bietlejuice.dw_collection_recovery_quintoandar", "load-fact")
+        status = _build_dataset_status(
+            [_dataset_row("bietlejuice.dw_ar", uri, 0, None)]
+        )
+        assert status["bietlejuice.dw_ar"][uri]["producers"] == {
+            "bietlejuice.dw_collection_recovery_quintoandar"
+        }
+
+    def test_status_unions_both_producer_sources(self):
+        uri = _uri("bietlejuice.p1")
+        status = _build_dataset_status(
+            [_dataset_row("bietlejuice.d", uri, 0, "bietlejuice.p_declared")]
+        )
+        assert status["bietlejuice.d"][uri]["producers"] == {
+            "bietlejuice.p1",
+            "bietlejuice.p_declared",
+        }
+
+    def test_status_never_lists_the_consumer_as_its_own_producer(self):
+        uri = _uri("bietlejuice.d")
+        status = _build_dataset_status([_dataset_row("bietlejuice.d", uri, 0, None)])
+        assert status["bietlejuice.d"][uri]["producers"] == set()
+
+    def test_graph_builds_edges_from_uri_when_join_is_empty(self):
+        # An INNER JOIN on task_outlet_dataset_reference returned nothing at all, which
+        # left the live graph inert and every quintoml.* DAG looking like its own root.
+        upstream, downstream = _build_dataset_indexes(
+            [
+                _edge_row(
+                    "quintoml.wonka.segmentation",
+                    None,
+                    uri=_uri("bietlejuice.dw_collections_segmentation"),
+                )
+            ]
+        )
+        assert upstream == {
+            "quintoml.wonka.segmentation": {"bietlejuice.dw_collections_segmentation"}
+        }
+        assert downstream == {
+            "bietlejuice.dw_collections_segmentation": {"quintoml.wonka.segmentation"}
+        }
+
+    def test_graph_unions_both_producer_sources_and_skips_self_edges(self):
+        upstream, _ = _build_dataset_indexes(
+            [
+                _edge_row(
+                    "bietlejuice.d",
+                    "bietlejuice.p_declared",
+                    uri=_uri("bietlejuice.p_uri"),
+                ),
+                _edge_row("bietlejuice.d", None, uri=_uri("bietlejuice.d")),
+            ]
+        )
+        assert upstream == {
+            "bietlejuice.d": {"bietlejuice.p_declared", "bietlejuice.p_uri"}
+        }
+
+
+# --------------------------------------------------------------------------- #
+# Readiness-gated root selection (the 2026-07-25 avalanche)
+# --------------------------------------------------------------------------- #
+class TestReadinessGatedRoots:
+    _UPSTREAM = {
+        "bietlejuice.dw_accounts_receivable": {
+            "bietlejuice.dw_collection_recovery_quintoandar"
+        },
+        "bietlejuice.dw_collections_segmentation": {
+            "bietlejuice.dw_collection_recovery_quintoandar"
+        },
+    }
+
+    def _status(self, satisfied):
+        return {
+            dag_id: {
+                _uri("bietlejuice.dw_collection_recovery_quintoandar"): {
+                    "satisfied": satisfied,
+                    "producers": {"bietlejuice.dw_collection_recovery_quintoandar"},
+                }
+            }
+            for dag_id in self._UPSTREAM
+        }
+
+    def test_mid_flight_upstream_no_longer_promotes_its_dependents(self):
+        # The upstream emitted one early outlet, so it counts as succeeded and has left
+        # the late set — but the dataset each dependent needs is still being computed.
+        late = set(self._UPSTREAM)
+        roots, suppressed, used_fallback = _select_sla_roots(
+            late,
+            upstream_index=self._UPSTREAM,
+            succeeded_this_cycle={"bietlejuice.dw_collection_recovery_quintoandar"},
+            dataset_status=self._status(False),
+        )
+        assert roots == []
+        assert suppressed == 2
+        assert used_fallback is False
+
+    def test_ready_and_still_not_started_is_the_root_we_want(self):
+        late = set(self._UPSTREAM)
+        roots, _, used_fallback = _select_sla_roots(
+            late,
+            upstream_index=self._UPSTREAM,
+            succeeded_this_cycle={"bietlejuice.dw_collection_recovery_quintoandar"},
+            dataset_status=self._status(True),
+        )
+        assert roots == sorted(self._UPSTREAM)
+        assert used_fallback is False
+
+    def test_unreadable_status_keeps_the_previous_behaviour(self):
+        late = set(self._UPSTREAM)
+        roots, _, _ = _select_sla_roots(
+            late,
+            upstream_index=self._UPSTREAM,
+            succeeded_this_cycle={"bietlejuice.dw_collection_recovery_quintoandar"},
+            dataset_status=None,
+        )
+        assert roots == sorted(self._UPSTREAM)
+
+    def test_cron_dag_without_datasets_is_unaffected(self):
+        roots, _, _ = _select_sla_roots(
+            {"bietlejuice.cron_dag"},
+            upstream_index={},
+            succeeded_this_cycle=set(),
+            dataset_status={"bietlejuice.cron_dag": {}},
+        )
+        assert roots == ["bietlejuice.cron_dag"]
+
+    def test_fallback_stays_silent_on_a_dag_known_to_be_unready(self):
+        # Nothing is confirmed (the upstream never succeeded), so the old code fell back
+        # to the tops of the late set. Positive evidence of blockage outranks that.
+        late = {"bietlejuice.dw_accounts_receivable"}
+        roots, suppressed, used_fallback = _select_sla_roots(
+            late,
+            upstream_index=self._UPSTREAM,
+            succeeded_this_cycle=set(),
+            expected_this_cycle=late
+            | {"bietlejuice.dw_collection_recovery_quintoandar"},
+            dataset_status=self._status(False),
+        )
+        assert roots == []
+        assert suppressed == 1
+        assert used_fallback is False
+
+    def test_fallback_still_fires_when_status_is_unavailable(self):
+        late = {"bietlejuice.dw_accounts_receivable"}
+        roots, _, used_fallback = _select_sla_roots(
+            late,
+            upstream_index=self._UPSTREAM,
+            succeeded_this_cycle=set(),
+            expected_this_cycle=late
+            | {"bietlejuice.dw_collection_recovery_quintoandar"},
+            dataset_status=None,
+        )
+        assert roots == ["bietlejuice.dw_accounts_receivable"]
+        assert used_fallback is True
+
+
+class TestMissingRunAlertCap:
+    def _findings(self, count):
+        return [
+            {"dag_id": f"bietlejuice.dag_{i:02d}", "late_by_s": float(i * 60)}
+            for i in range(count)
+        ]
+
+    def test_under_the_cap_is_untouched(self):
+        findings = self._findings(3)
+        assert _apply_missing_run_cap(findings, {"sla_max_missing_run_alerts": 5}) == (
+            findings
+        )
+        assert all("capped_count" not in f for f in findings)
+
+    def test_keeps_the_latest_roots_and_records_what_was_withheld(self):
+        kept = _apply_missing_run_cap(
+            self._findings(10), {"sla_max_missing_run_alerts": 3}
+        )
+        assert [f["dag_id"] for f in kept] == [
+            "bietlejuice.dag_09",
+            "bietlejuice.dag_08",
+            "bietlejuice.dag_07",
+        ]
+        assert all(f["capped_count"] == 7 for f in kept)
+
+    def test_zero_or_missing_cap_disables_it(self):
+        findings = self._findings(4)
+        assert _apply_missing_run_cap(findings, {"sla_max_missing_run_alerts": 0}) == (
+            findings
+        )
+        assert _apply_missing_run_cap(findings, {}) == findings
+
+    def test_cap_survives_into_the_delivered_entry(self):
+        # Chat text is built from the ledger entry, not the finding, so a field that
+        # stops at _entry_from_finding never reaches an operator.
+        entry = _entry_from_finding(
+            {
+                "kind": _KIND_MISSING_RUN,
+                "dag_id": "bietlejuice.dw_accounts_receivable",
+                "run_id": "sla::2026-07-24T23:55:00+00:00",
+                "due_at": "2026-07-25T14:00:00+00:00",
+                "expected_start": "2026-07-25T13:00:00+00:00",
+                "grace_minutes": 60,
+                "percentile": 90,
+                "history_count": 14,
+                "lookback_days": 14,
+                "capped_count": 7,
+            }
+        )
+        assert entry["capped_count"] == 7
+        assert "• Alert cap reached: 7 more late root(s) not reported" in (
+            _build_alert_text(entry)
+        )
+
+    def test_message_reports_the_cap(self):
+        text = _missing_run_initial_text(
+            {
+                "kind": _KIND_MISSING_RUN,
+                "dag_id": "bietlejuice.dw_accounts_receivable",
+                "run_id": "sla::2026-07-24T23:55:00+00:00",
+                "due_at": "2026-07-25T14:00:00+00:00",
+                "expected_start": "2026-07-25T13:00:00+00:00",
+                "grace_minutes": 60,
+                "percentile": 90,
+                "history_count": 14,
+                "lookback_days": 14,
+                "capped_count": 7,
+            },
+            3600,
+        )
+        assert "• Alert cap reached: 7 more late root(s) not reported" in text
+
+
+class TestTwentyThreeHundredTickRegression:
+    """End-to-end replay of the 2026-07-25 23:00 tick that produced the avalanche.
+
+    dw_collection_recovery_quintoandar was triggered by hand and emitted its first
+    outlet at 22:58, which marked it succeeded and pulled it out of the late set. Its
+    two dependents were still short the dataset it had not finished computing, yet both
+    were promoted to confirmed roots and alerted; both then started on their own within
+    fifteen minutes with no human action.
+    """
+
+    _ROOT = "bietlejuice.dw_collection_recovery_quintoandar"
+    _DEPENDENTS = [
+        "bietlejuice.dw_accounts_receivable",
+        "bietlejuice.dw_collections_segmentation",
+    ]
+
+    def _history(self, now):
+        cycle = _cycle_anchor(now, hhmm="20:55")
+        rows = []
+        for i in range(12):
+            anchor = cycle - timedelta(days=i + 1)
+            for dag_id in self._DEPENDENTS:
+                rows.append(
+                    SimpleNamespace(
+                        dag_id=dag_id,
+                        start_date=anchor + timedelta(minutes=230.0),
+                        state="success",
+                    )
+                )
+        return rows
+
+    def _status(self, satisfied):
+        return {
+            dag_id: {
+                _uri(self._ROOT, "load-fact"): {
+                    "satisfied": satisfied,
+                    "producers": {self._ROOT},
+                },
+                _uri(self._ROOT, "load-fact", reprocessing=True): {
+                    "satisfied": False,
+                    "producers": {self._ROOT},
+                },
+            }
+            for dag_id in self._DEPENDENTS
+        }
+
+    def _run(self, satisfied):
+        now = datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc)
+        return _evaluate_sla_missing_runs(
+            list(self._DEPENDENTS),
+            self._history(now),
+            now=now,
+            config=_SLA_CONFIG,
+            upstream_index={d: {self._ROOT} for d in self._DEPENDENTS},
+            downstream_index={},
+            expected_dag_ids=set(self._DEPENDENTS) | {self._ROOT},
+            # The mid-flight upstream emitted one outlet, so it counts as succeeded.
+            emitted_this_cycle={self._ROOT},
+            fetch_dataset_status=lambda dag_ids: self._status(satisfied),
+        )
+
+    def test_mid_flight_upstream_produces_no_alerts(self):
+        assert self._run(satisfied=False) == []
+
+    def test_same_tick_still_alerts_once_the_dataset_lands(self):
+        # The gate must not simply mute dataset-scheduled DAGs: a genuinely dropped
+        # event leaves them satisfied and still not running, which is the real alert.
+        findings = self._run(satisfied=True)
+        assert sorted(f["dag_id"] for f in findings) == self._DEPENDENTS
+        assert all(f["dataset_verdict"] == _VERDICT_DROPPED_EVENT for f in findings)
+        # The reprocessing twin is neither required nor counted as missing.
+        assert all(f["dataset_required"] == 1 for f in findings)
+        assert all(f["dataset_missing"] == [] for f in findings)
