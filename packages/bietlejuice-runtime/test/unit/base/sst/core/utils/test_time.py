@@ -14,7 +14,7 @@ TUESDAY = "2026-06-16"
 
 
 class TestIsWeekendWindow:
-    """Weekend window spans Friday 18:00 (inclusive) to Monday 08:00 (exclusive)."""
+    """Weekend window spans Friday 18:00 (inclusive) to Monday 11:00 (exclusive)."""
 
     @pytest.mark.parametrize(
         "partition_date, partition_hour, expected",
@@ -31,8 +31,10 @@ class TestIsWeekendWindow:
             # Monday boundary
             (NEXT_MONDAY, "00", True),
             (NEXT_MONDAY, "07", True),
-            (NEXT_MONDAY, "08", False),
-            (NEXT_MONDAY, "09", False),
+            (NEXT_MONDAY, "08", True),
+            (NEXT_MONDAY, "09", True),
+            (NEXT_MONDAY, "10", True),
+            (NEXT_MONDAY, "11", False),
             # Weekdays are never in the window
             (TUESDAY, "03", False),
             (MONDAY, "20", False),

@@ -99,7 +99,7 @@ class GenericContractQualityChecks:
             if is_weekend:
                 self.logger.warning(
                     f"m=run, msg=Failed contract checks for {self.table_name} during "
-                    f"weekend window (Fri 18h-Mon 8h), skipping failure. "
+                    f"weekend window (Fri 18h-Mon 11h), skipping failure. "
                     f"failed metrics: {failed_metric}"
                 )
                 return
