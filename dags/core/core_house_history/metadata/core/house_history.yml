@@ -106,7 +106,16 @@ columns:
       - datalake_ebdb_transactional.usuario.personuuid
     description: New value of the changed column, cast to string.
   payload:
-    description: Event payload with additional context. NULL for CDC sources; reserved for future outbox_pattern use.
+    lineage:
+      - datalake_ebdb_transactional.imovel_aud.REV
+      - datalake_ebdb_transactional.imovel_aud.rEVTYPE
+      - datalake_ebdb_transactional.imovel_aud.ts_database_transaction
+      - datalake_ebdb_transactional.imovel_aud.ts_cdc_transaction
+      - datalake_ebdb_transactional.usuariorevisionentity.timestamp
+      - datalake_ebdb_transactional.usuariorevisionentity.motivo
+      - datalake_ebdb_transactional.usuariorevisionentity.usuario_id
+      - datalake_ebdb_transactional.imovel.op_cdc
+    description: "JSON string with AUD revision context for CDC events where an AUD match is found. Always includes payload_version, op_cdc, rev, rev_type, ts_revision, ts_cdc_transaction (millisecond-precision timestamp from the transactional AUD), revision_reason, aud_user_id, and aud_values (a JSON object with the field name and its new value). NULL when no AUD match is found (unmapped columns or inserts without a rEVTYPE=0 revision). For delete events (op_cdc='d'), a minimal payload is always emitted even without an AUD match so consumers can detect deletions via JSON_EXTRACT(payload, '$.op_cdc') = 'd'. Snapshot read rows (op_cdc='r') always have NULL payload. AUD source is datalake_ebdb_transactional.imovel_aud (source name imovel in aud_configs); revision metadata comes from datalake_ebdb_transactional.usuariorevisionentity. Not enrichable and always NULL: ev_id_external (no _MOD flag in imovel_aud), ev_ts_created / ev_ts_updated (not audited by Envers), ev_id_user_registrant (coalesce of two source columns with distinct _MOD flags), and owner events ev_id_owner / ev_uuid_owner (built from the imovellistingrelation timeline, AUD enrichment is a planned follow-up). Existing rows loaded before this enrichment retain NULL payload."
   ts_transaction:
     lineage:
       - datalake_ebdb_transactional.imovel.ts_database_transaction

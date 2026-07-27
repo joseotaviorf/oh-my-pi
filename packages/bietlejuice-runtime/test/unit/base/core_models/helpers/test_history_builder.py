@@ -1,5 +1,6 @@
 """Unit tests for HistoryBuilder."""
 
+import json
 from datetime import datetime
 
 import pytest
@@ -962,6 +963,46 @@ class TestHistoryBuilderSnapshotRead:
 
 
 # ---------------------------------------------------------------------------
+# AUD payload enrichment tests
+# ---------------------------------------------------------------------------
+
+AUD_EVENT_CONFIGS = [
+    {
+        "tracked_col": "status",
+        "event_name": "ev_STATUS",
+        "aud_mod_col": "status_MOD",
+    },
+    {
+        "tracked_col": "rent",
+        "event_name": "ev_RENT_VALUE",
+        "aud_mod_col": "valorAluguel_MOD",
+    },
+]
+
+AUD_CONFIG = {
+    "aud_id_col": "id",
+    "revision_pk_col": "REV",
+    "revision_type_col": "rEVTYPE",
+    "enabled": True,
+}
+
+AUD_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+        StructField("REV", LongType(), True),
+        StructField("rEVTYPE", IntegerType(), True),
+        StructField("status_MOD", BooleanType(), True),
+        StructField("valorAluguel_MOD", BooleanType(), True),
+        StructField("ts_cdc_transaction", TimestampType(), True),
+        StructField("ts_revision", TimestampType(), True),
+        StructField("revision_reason", StringType(), True),
+        StructField("aud_user_id", LongType(), True),
+    ]
+)
+
+
+# ---------------------------------------------------------------------------
 # Canonicalization: collapse many CDC rows per (entity_id, ts) to one
 # ---------------------------------------------------------------------------
 
@@ -998,6 +1039,694 @@ IMOVEL_SCHEMA = StructType(
         StructField("cdc_transaction_id", StringType(), True),
     ]
 )
+
+
+def _build_with_aud(spark_session, cdc_data, aud_data):
+    """Helper: build history with AUD enrichment enabled.
+
+    Always creates a non-None AUD DataFrame so enrichment is activated even
+    when the AUD list is empty (empty ≠ disabled).
+    """
+    cdc_df = spark_session.createDataFrame(cdc_data, TRANSACTIONAL_SCHEMA)
+    aud_df = spark_session.createDataFrame(aud_data, AUD_SCHEMA)
+    return HistoryBuilder.build_history_for_columns(
+        cdc_df,
+        entity_name="contract",
+        id_col="id",
+        ts_col="ts_database_transaction",
+        op_col="op_cdc",
+        event_configs=AUD_EVENT_CONFIGS,
+        event_type="cdc",
+        event_origin=SOURCE_TABLE,
+        aud_df=aud_df,
+        aud_config=AUD_CONFIG,
+    )
+
+
+class TestHistoryBuilderAudPayload:
+    """AUD enrichment: payload JSON is populated when AUD match is found."""
+
+    TS_CREATE = datetime(2026, 1, 10, 8, 0, 0)
+    TS_UPDATE = datetime(2026, 1, 11, 9, 0, 0)
+    TS_REVISION = datetime(2026, 1, 11, 9, 0, 1)
+
+    def test_update_event_payload_is_non_null_when_aud_match_found(self, spark_session):
+        cdc_data = [
+            ("100", "Ativo", 2500.0, "c", self.TS_CREATE),
+            ("100", "Finalizado", 2500.0, "u", self.TS_UPDATE),
+        ]
+        aud_data = [
+            (
+                "100",
+                self.TS_UPDATE,
+                9001,
+                1,
+                True,  # status_MOD=true
+                False,  # valorAluguel_MOD=false
+                self.TS_UPDATE,  # ts_cdc_transaction
+                self.TS_REVISION,
+                None,
+                12345,
+            ),
+        ]
+        result = _build_with_aud(spark_session, cdc_data, aud_data)
+        update_status = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == self.TS_UPDATE and r["event_name"] == "ev_STATUS"
+        ]
+        assert len(update_status) == 1
+        assert update_status[0]["payload"] is not None
+        payload = json.loads(update_status[0]["payload"])
+        assert payload["payload_version"] == 1
+        assert payload["op_cdc"] == "u"
+        assert payload["rev"] == 9001
+        assert payload["rev_type"] == 1
+        assert payload["aud_user_id"] == 12345
+        assert "status" in payload["aud_values"]
+        assert "ts_cdc_transaction" in payload
+
+    def test_payload_is_null_when_no_aud_match(self, spark_session):
+        cdc_data = [
+            ("200", "Ativo", 2500.0, "c", self.TS_CREATE),
+            ("200", "Finalizado", 2500.0, "u", self.TS_UPDATE),
+        ]
+        # AUD has no row for entity 200 at TS_UPDATE
+        aud_data = []
+        result = _build_with_aud(spark_session, cdc_data, aud_data)
+        update_status = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == self.TS_UPDATE and r["event_name"] == "ev_STATUS"
+        ]
+        assert len(update_status) == 1
+        assert update_status[0]["payload"] is None
+
+    def test_mod_flag_discriminator_filters_wrong_revision(self, spark_session):
+        # Two AUD rows at same ts: one for status, one for rent (different mod flags).
+        # The status event should match only the status revision.
+        cdc_data = [
+            ("300", "Ativo", 2500.0, "c", self.TS_CREATE),
+            ("300", "Finalizado", 2500.0, "u", self.TS_UPDATE),
+        ]
+        aud_data = [
+            # rev 9001: status_MOD=True, valorAluguel_MOD=False
+            (
+                "300",
+                self.TS_UPDATE,
+                9001,
+                1,
+                True,
+                False,
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                None,
+                111,
+            ),
+            # rev 9002: status_MOD=False, valorAluguel_MOD=True (duplicate ts, different field)
+            (
+                "300",
+                self.TS_UPDATE,
+                9002,
+                1,
+                False,
+                True,
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                None,
+                222,
+            ),
+        ]
+        result = _build_with_aud(spark_session, cdc_data, aud_data)
+        update_status = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == self.TS_UPDATE and r["event_name"] == "ev_STATUS"
+        ]
+        assert len(update_status) == 1
+        payload = json.loads(update_status[0]["payload"])
+        # Should match rev 9001 (mod_status=True), not 9002 (mod_status=False)
+        assert payload["rev"] == 9001
+        assert payload["aud_user_id"] == 111
+
+    def test_max_rev_tiebreaker_picks_highest_rev_for_same_mod_flag(
+        self, spark_session
+    ):
+        # Two AUD rows at same ts with mod_status=True on both: should pick MAX(rev)
+        cdc_data = [
+            ("400", "Ativo", 2500.0, "c", self.TS_CREATE),
+            ("400", "Finalizado", 2500.0, "u", self.TS_UPDATE),
+        ]
+        aud_data = [
+            # Both have status_MOD=True; tiebreaker should pick rev 9002
+            (
+                "400",
+                self.TS_UPDATE,
+                9001,
+                1,
+                True,
+                False,
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                None,
+                111,
+            ),
+            (
+                "400",
+                self.TS_UPDATE,
+                9002,
+                1,
+                True,
+                False,
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                None,
+                222,
+            ),
+        ]
+        result = _build_with_aud(spark_session, cdc_data, aud_data)
+        update_status = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == self.TS_UPDATE and r["event_name"] == "ev_STATUS"
+        ]
+        assert len(update_status) == 1
+        payload = json.loads(update_status[0]["payload"])
+        assert payload["rev"] == 9002
+
+    def test_insert_event_joins_aud_without_mod_flag_filter(self, spark_session):
+        # On insert (op_cdc='c'), mod flags are never set by Envers.
+        # The join should use rev_type=0 path, ignoring mod_status.
+        cdc_data = [
+            ("500", "Ativo", 2500.0, "c", self.TS_CREATE),
+        ]
+        aud_data = [
+            # rEVTYPE=0 (insert revision); mod flags all False as expected
+            (
+                "500",
+                self.TS_CREATE,
+                8000,
+                0,
+                False,
+                False,
+                self.TS_CREATE,
+                self.TS_REVISION,
+                None,
+                99,
+            ),
+        ]
+        result = _build_with_aud(spark_session, cdc_data, aud_data)
+        create_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == self.TS_CREATE and r["event_name"] == "ev_STATUS"
+        ]
+        assert len(create_rows) == 1
+        assert create_rows[0]["payload"] is not None
+        payload = json.loads(create_rows[0]["payload"])
+        assert payload["op_cdc"] == "c"
+        assert payload["rev"] == 8000
+        assert payload["rev_type"] == 0
+
+    def test_delete_event_payload_contains_op_cdc_d(self, spark_session):
+        # Delete events (op_cdc='d') must have a non-null payload with op_cdc='d'
+        # even when no AUD match is found (rev_type=2 is absent for soft-delete contracts).
+        cdc_data = [
+            ("600", "Ativo", 3000.0, "c", self.TS_CREATE),
+            ("600", "Ativo", 3000.0, "d", self.TS_UPDATE),
+        ]
+        aud_data = []  # no AUD match for delete
+        result = _build_with_aud(spark_session, cdc_data, aud_data)
+        delete_rows = [
+            r for r in result.collect() if r["ts_transaction"] == self.TS_UPDATE
+        ]
+        assert len(delete_rows) == 2  # one per tracked column
+        for row in delete_rows:
+            assert row["payload"] is not None
+            payload = json.loads(row["payload"])
+            assert payload["op_cdc"] == "d"
+            assert payload["payload_version"] == 1
+
+    def test_snapshot_read_payload_is_always_null(self, spark_session):
+        # op_cdc='r' rows must never receive AUD enrichment
+        cdc_data = [
+            ("700", "Ativo", 1800.0, "r", self.TS_CREATE),
+        ]
+        aud_data = [
+            (
+                "700",
+                self.TS_CREATE,
+                7000,
+                0,
+                False,
+                False,
+                self.TS_CREATE,
+                self.TS_REVISION,
+                None,
+                55,
+            ),
+        ]
+        result = _build_with_aud(spark_session, cdc_data, aud_data)
+        for row in result.collect():
+            assert row["payload"] is None, (
+                f"Snapshot read row should never have payload; got {row['payload']}"
+            )
+
+    def test_aud_disabled_keeps_payload_null(self, spark_session):
+        cdc_data = [
+            ("800", "Ativo", 2500.0, "c", self.TS_CREATE),
+        ]
+        aud_data = [
+            (
+                "800",
+                self.TS_CREATE,
+                8888,
+                0,
+                False,
+                False,
+                self.TS_CREATE,
+                self.TS_REVISION,
+                None,
+                42,
+            ),
+        ]
+        cdc_df = spark_session.createDataFrame(cdc_data, TRANSACTIONAL_SCHEMA)
+        aud_df = spark_session.createDataFrame(aud_data, AUD_SCHEMA)
+        disabled_config = {**AUD_CONFIG, "enabled": False}
+        result = HistoryBuilder.build_history_for_columns(
+            cdc_df,
+            entity_name="contract",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=AUD_EVENT_CONFIGS,
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+            aud_df=aud_df,
+            aud_config=disabled_config,
+        )
+        for row in result.collect():
+            assert row["payload"] is None
+
+    def test_unmapped_event_keeps_payload_null(self, spark_session):
+        # paganteCondominio has no aud_mod_col -- must always keep payload=NULL
+        schema_extra = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("status", StringType(), True),
+                StructField("condo_payer", StringType(), True),
+                StructField("op_cdc", StringType(), True),
+                StructField("ts_database_transaction", TimestampType(), True),
+            ]
+        )
+        event_configs_mixed = [
+            {
+                "tracked_col": "status",
+                "event_name": "ev_STATUS",
+                "aud_mod_col": "status_MOD",
+            },
+            {"tracked_col": "condo_payer", "event_name": "ev_CONDO"},  # no aud_mod_col
+        ]
+        cdc_df = spark_session.createDataFrame(
+            [("900", "Ativo", "QuintoAndar", "c", self.TS_CREATE)], schema_extra
+        )
+        aud_sch = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("ts_database_transaction", TimestampType(), True),
+                StructField("REV", LongType(), True),
+                StructField("rEVTYPE", IntegerType(), True),
+                StructField("status_MOD", BooleanType(), True),
+                StructField("ts_cdc_transaction", TimestampType(), True),
+                StructField("ts_revision", TimestampType(), True),
+                StructField("revision_reason", StringType(), True),
+                StructField("aud_user_id", LongType(), True),
+            ]
+        )
+        aud_df = spark_session.createDataFrame(
+            [
+                (
+                    "900",
+                    self.TS_CREATE,
+                    1111,
+                    0,
+                    False,
+                    self.TS_CREATE,
+                    self.TS_REVISION,
+                    None,
+                    77,
+                )
+            ],
+            aud_sch,
+        )
+        result = HistoryBuilder.build_history_for_columns(
+            cdc_df,
+            entity_name="contract",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=event_configs_mixed,
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+            aud_df=aud_df,
+            aud_config=AUD_CONFIG,
+        )
+        rows = {r["event_name"]: r for r in result.collect()}
+        assert rows["ev_CONDO"]["payload"] is None
+
+    def test_payload_revision_reason_included_when_present(self, spark_session):
+        cdc_data = [("1000", "Ativo", 2500.0, "c", self.TS_CREATE)]
+        aud_data = [
+            (
+                "1000",
+                self.TS_CREATE,
+                5555,
+                0,
+                False,
+                False,
+                self.TS_CREATE,  # ts_cdc_transaction
+                self.TS_REVISION,
+                "Admin correction",
+                888,
+            )
+        ]
+        result = _build_with_aud(spark_session, cdc_data, aud_data)
+        status_row = next(r for r in result.collect() if r["event_name"] == "ev_STATUS")
+        payload = json.loads(status_row["payload"])
+        assert payload["revision_reason"] == "Admin correction"
+
+
+# ---------------------------------------------------------------------------
+# Multi-AUD-source enrichment tests
+# ---------------------------------------------------------------------------
+
+# Second AUD source mirroring imovellistingrelation_aud's shape: different
+# entity-id join column (imovelId, not id) and different revision-type column
+# casing (REVTYPE, not rEVTYPE).
+HLR_AUD_SCHEMA = StructType(
+    [
+        StructField("imovelId", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+        StructField("REV", LongType(), True),
+        StructField("REVTYPE", IntegerType(), True),
+        StructField("valorAluguel_MOD", BooleanType(), True),
+        StructField("ts_cdc_transaction", TimestampType(), True),
+        StructField("ts_revision", TimestampType(), True),
+        StructField("revision_reason", StringType(), True),
+        StructField("aud_user_id", LongType(), True),
+    ]
+)
+
+MULTI_AUD_CONFIGS = [
+    {
+        "name": "imovel",
+        "aud_id_col": "id",
+        "revision_pk_col": "REV",
+        "revision_type_col": "rEVTYPE",
+        "enabled": True,
+    },
+    {
+        "name": "hlr",
+        "aud_id_col": "imovelId",
+        "revision_pk_col": "REV",
+        "revision_type_col": "REVTYPE",
+        "enabled": True,
+    },
+]
+
+MULTI_AUD_EVENT_CONFIGS = [
+    {
+        "tracked_col": "status",
+        "event_name": "ev_STATUS",
+        "aud_mod_col": "status_MOD",
+        "aud_source": "imovel",
+    },
+    {
+        "tracked_col": "rent",
+        "event_name": "ev_RENT_VALUE",
+        "aud_mod_col": "valorAluguel_MOD",
+        "aud_source": "hlr",
+    },
+]
+
+
+class TestHistoryBuilderMultiAudSource:
+    """Enrichment from multiple named AUD sources via aud_dfs/aud_configs."""
+
+    TS_CREATE = datetime(2026, 1, 10, 8, 0, 0)
+    TS_UPDATE = datetime(2026, 1, 11, 9, 0, 0)
+    TS_REVISION = datetime(2026, 1, 11, 9, 0, 1)
+
+    def _build(
+        self,
+        spark_session,
+        cdc_data,
+        imovel_aud_data,
+        hlr_aud_data,
+        event_configs=None,
+        aud_configs=None,
+        aud_dfs=None,
+    ):
+        cdc_df = spark_session.createDataFrame(cdc_data, TRANSACTIONAL_SCHEMA)
+        if aud_dfs is None:
+            aud_dfs = {
+                "imovel": spark_session.createDataFrame(imovel_aud_data, AUD_SCHEMA),
+                "hlr": spark_session.createDataFrame(hlr_aud_data, HLR_AUD_SCHEMA),
+            }
+        return HistoryBuilder.build_history_for_columns(
+            cdc_df,
+            entity_name="house",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=event_configs or MULTI_AUD_EVENT_CONFIGS,
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+            aud_dfs=aud_dfs,
+            aud_configs=aud_configs or MULTI_AUD_CONFIGS,
+        )
+
+    def _update_rows(self, result):
+        return {
+            r["event_name"]: r
+            for r in result.collect()
+            if r["ts_transaction"] == self.TS_UPDATE
+        }
+
+    def test_each_source_enriches_its_own_columns(self, spark_session):
+        cdc_data = [
+            ("100", "Ativo", 2500.0, "c", self.TS_CREATE),
+            ("100", "Finalizado", 3000.0, "u", self.TS_UPDATE),
+        ]
+        imovel_aud_data = [
+            (
+                "100",
+                self.TS_UPDATE,
+                9001,
+                1,
+                True,  # status_MOD
+                False,  # valorAluguel_MOD
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                "imovel reason",
+                111,
+            ),
+        ]
+        hlr_aud_data = [
+            (
+                "100",  # imovelId (different join column)
+                self.TS_UPDATE,
+                7001,
+                1,  # REVTYPE (different casing)
+                True,  # valorAluguel_MOD
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                "hlr reason",
+                222,
+            ),
+        ]
+
+        result = self._build(spark_session, cdc_data, imovel_aud_data, hlr_aud_data)
+        rows = self._update_rows(result)
+
+        status_payload = json.loads(rows["ev_STATUS"]["payload"])
+        assert status_payload["rev"] == 9001
+        assert status_payload["revision_reason"] == "imovel reason"
+        assert status_payload["aud_user_id"] == 111
+
+        rent_payload = json.loads(rows["ev_RENT_VALUE"]["payload"])
+        assert rent_payload["rev"] == 7001
+        assert rent_payload["revision_reason"] == "hlr reason"
+        assert rent_payload["aud_user_id"] == 222
+
+    def test_insert_path_uses_each_sources_revision_type_column(self, spark_session):
+        # rev_type=0 rows must be recognized through each source's own
+        # revision_type_col (rEVTYPE vs REVTYPE).
+        cdc_data = [("100", "Ativo", 2500.0, "c", self.TS_CREATE)]
+        imovel_aud_data = [
+            (
+                "100",
+                self.TS_CREATE,
+                5001,
+                0,  # rEVTYPE=0 (insert revision)
+                False,
+                False,
+                self.TS_CREATE,
+                self.TS_REVISION,
+                None,
+                111,
+            ),
+        ]
+        hlr_aud_data = [
+            (
+                "100",
+                self.TS_CREATE,
+                4001,
+                0,  # REVTYPE=0 (insert revision)
+                False,
+                self.TS_CREATE,
+                self.TS_REVISION,
+                None,
+                222,
+            ),
+        ]
+
+        result = self._build(spark_session, cdc_data, imovel_aud_data, hlr_aud_data)
+        rows = {r["event_name"]: r for r in result.collect()}
+
+        assert json.loads(rows["ev_STATUS"]["payload"])["rev"] == 5001
+        assert json.loads(rows["ev_RENT_VALUE"]["payload"])["rev"] == 4001
+
+    def test_raises_when_both_singular_and_plural_given(self, spark_session):
+        cdc_df = spark_session.createDataFrame(
+            [("100", "Ativo", 2500.0, "c", self.TS_CREATE)], TRANSACTIONAL_SCHEMA
+        )
+        aud_df = spark_session.createDataFrame([], AUD_SCHEMA)
+
+        with pytest.raises(ValueError, match="not both"):
+            HistoryBuilder.build_history_for_columns(
+                cdc_df,
+                entity_name="house",
+                id_col="id",
+                ts_col="ts_database_transaction",
+                op_col="op_cdc",
+                event_configs=MULTI_AUD_EVENT_CONFIGS,
+                aud_df=aud_df,
+                aud_config=AUD_CONFIG,
+                aud_dfs={"imovel": aud_df},
+                aud_configs=MULTI_AUD_CONFIGS,
+            )
+
+    def test_raises_when_aud_mod_col_missing_aud_source_with_multiple_sources(
+        self, spark_session
+    ):
+        event_configs = [
+            {
+                "tracked_col": "status",
+                "event_name": "ev_STATUS",
+                "aud_mod_col": "status_MOD",
+                # no aud_source, but two sources configured
+            },
+        ]
+
+        with pytest.raises(ValueError, match="aud_source is required"):
+            self._build(spark_session, [], [], [], event_configs=event_configs)
+
+    def test_raises_on_unknown_aud_source(self, spark_session):
+        event_configs = [
+            {
+                "tracked_col": "status",
+                "event_name": "ev_STATUS",
+                "aud_mod_col": "status_MOD",
+                "aud_source": "typo_source",
+            },
+        ]
+
+        with pytest.raises(ValueError, match="unknown aud_source"):
+            self._build(spark_session, [], [], [], event_configs=event_configs)
+
+    def test_sole_source_is_default_when_aud_source_omitted(self, spark_session):
+        cdc_data = [
+            ("100", "Ativo", 2500.0, "c", self.TS_CREATE),
+            ("100", "Finalizado", 2500.0, "u", self.TS_UPDATE),
+        ]
+        imovel_aud_data = [
+            (
+                "100",
+                self.TS_UPDATE,
+                9001,
+                1,
+                True,
+                False,
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                None,
+                111,
+            ),
+        ]
+        event_configs = [
+            {
+                "tracked_col": "status",
+                "event_name": "ev_STATUS",
+                "aud_mod_col": "status_MOD",
+                # no aud_source: defaults to the sole configured source
+            },
+        ]
+        aud_configs = [MULTI_AUD_CONFIGS[0]]
+        aud_dfs = {"imovel": spark_session.createDataFrame(imovel_aud_data, AUD_SCHEMA)}
+
+        result = self._build(
+            spark_session,
+            cdc_data,
+            imovel_aud_data,
+            [],
+            event_configs=event_configs,
+            aud_configs=aud_configs,
+            aud_dfs=aud_dfs,
+        )
+        rows = self._update_rows(result)
+
+        assert json.loads(rows["ev_STATUS"]["payload"])["rev"] == 9001
+
+    def test_disabled_source_leaves_its_events_unenriched(self, spark_session):
+        cdc_data = [
+            ("100", "Ativo", 2500.0, "c", self.TS_CREATE),
+            ("100", "Finalizado", 3000.0, "u", self.TS_UPDATE),
+        ]
+        imovel_aud_data = [
+            (
+                "100",
+                self.TS_UPDATE,
+                9001,
+                1,
+                True,
+                False,
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                None,
+                111,
+            ),
+        ]
+        aud_configs = [
+            MULTI_AUD_CONFIGS[0],
+            {**MULTI_AUD_CONFIGS[1], "enabled": False},
+        ]
+        # Disabled source has no loaded DataFrame (mirrors
+        # HistoricalHelper.load_aud_revision_datasets output).
+        aud_dfs = {"imovel": spark_session.createDataFrame(imovel_aud_data, AUD_SCHEMA)}
+
+        result = self._build(
+            spark_session,
+            cdc_data,
+            imovel_aud_data,
+            [],
+            aud_configs=aud_configs,
+            aud_dfs=aud_dfs,
+        )
+        rows = self._update_rows(result)
+
+        assert rows["ev_STATUS"]["payload"] is not None
+        assert rows["ev_RENT_VALUE"]["payload"] is None
 
 
 class TestHistoryBuilderCanonicalization:

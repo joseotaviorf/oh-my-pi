@@ -5,9 +5,19 @@ Tests verify that the job correctly transforms CDC transactional data into
 the fixed 13-column narrow event-log schema used by contract_history.
 """
 
+import json
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+from pyspark.sql.types import (
+    BooleanType,
+    IntegerType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
 from pyspark.sql.utils import AnalysisException
 
 from dags.core.core_contract_history.spark_jobs.load_core_contract_history import (
@@ -61,13 +71,13 @@ class TestCoreContractHistorySchema:
         assert len(result.columns) == 13
         assert set(result.columns) == EXPECTED_HISTORY_COLUMNS
 
-    def test_payload_is_null_for_all_cdc_rows(
+    def test_payload_is_null_when_aud_config_disabled(
         self,
         spark_session,
         transactional_contract_df,
         mock_configuration_service_history,
     ):
-        # arrange
+        # arrange — aud_config is absent from the mock config (returns None)
         job = CoreContractHistorySparkJob()
         args = _make_args()
         with patch(
@@ -78,7 +88,7 @@ class TestCoreContractHistorySchema:
             # act
             result = job.create_core_model(spark_session, args)
 
-        # assert — CDC source never populates payload (outbox pattern only)
+        # assert — no aud_config in mock → payload stays NULL for all rows
         for row in result.collect():
             assert row["payload"] is None
 
@@ -302,6 +312,177 @@ class TestTargetTableEmptyDetection:
         result = job._is_target_table_empty(mock_spark, "db.populated_table")
 
         assert result is False
+
+
+AUD_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+        StructField("REV", LongType(), True),
+        StructField("rEVTYPE", IntegerType(), True),
+        StructField("status_MOD", BooleanType(), True),
+        StructField("ts_cdc_transaction", TimestampType(), True),
+        StructField("ts_revision", TimestampType(), True),
+        StructField("revision_reason", StringType(), True),
+        StructField("aud_user_id", LongType(), True),
+    ]
+)
+
+AUD_CONFIG_ENABLED = {
+    "aud_table": "test.contrato_aud",
+    "aud_id_col": "id",
+    "revision_entity_table": "test.usuariorevisionentity",
+    "revision_reason_col": "motivo",
+    "revision_user_id_col": "usuario_id",
+    "revision_ts_col": "timestamp",
+    "revision_ts_is_epoch_ms": True,
+    "revision_pk_col": "REV",
+    "revision_type_col": "rEVTYPE",
+    "enabled": True,
+}
+
+HISTORICAL_EVENT_CONFIGS_WITH_MOD = [
+    {
+        "tracked_col": "status",
+        "target_col": "status",
+        "target_type": "string",
+        "aud_mod_col": "status_MOD",
+    },
+]
+
+CONFIG_MAP_WITH_AUD = {
+    "ENTITY_TYPE": "CONTRACT",
+    "CONTRACT_TRANSACTIONAL_TABLE": "test.transactional_contrato",
+    "merge_on_historical": [
+        "id_contract",
+        "event_name",
+        "ts_transaction",
+        "year",
+        "month",
+        "day",
+    ],
+    "when_matched_update_condition_historical": "FALSE",
+    "event_configs": HISTORICAL_EVENT_CONFIGS_WITH_MOD,
+    "aud_config": AUD_CONFIG_ENABLED,
+}
+
+
+def _aud_config_side_effect(key, required=False, default=None):
+    if key in CONFIG_MAP_WITH_AUD:
+        return CONFIG_MAP_WITH_AUD[key]
+    if required:
+        raise KeyError(f"Missing required config key: {key}")
+    return default
+
+
+class TestCoreContractHistoryAudPayload:
+    """Tests that AUD enrichment is wired correctly in the spark job."""
+
+    TS_CREATE = __import__("datetime").datetime(2026, 1, 10, 8, 0, 0)
+    TS_UPDATE = __import__("datetime").datetime(2026, 1, 11, 9, 0, 0)
+    TS_REVISION = __import__("datetime").datetime(2026, 1, 11, 9, 0, 1)
+
+    @staticmethod
+    def _minimal_cdc_schema():
+        return StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("status", StringType(), True),
+                StructField("op_cdc", StringType(), True),
+                StructField("ts_database_transaction", TimestampType(), True),
+                StructField("ts_cdc_transaction", TimestampType(), True),
+            ]
+        )
+
+    def test_payload_is_non_null_when_aud_config_enabled_and_match_found(
+        self, spark_session
+    ):
+        schema = self._minimal_cdc_schema()
+        cdc_df = spark_session.createDataFrame(
+            [
+                ("100", "Ativo", "c", self.TS_CREATE, self.TS_CREATE),
+                ("100", "Finalizado", "u", self.TS_UPDATE, self.TS_UPDATE),
+            ],
+            schema,
+        )
+        aud_data = [
+            (
+                "100",
+                self.TS_UPDATE,
+                9001,
+                1,
+                True,
+                self.TS_UPDATE,
+                self.TS_REVISION,
+                None,
+                123,
+            ),
+        ]
+        aud_df = spark_session.createDataFrame(aud_data, AUD_SCHEMA)
+
+        job = CoreContractHistorySparkJob()
+        args = _make_args()
+
+        with (
+            patch(
+                "dags.core.core_contract_history.spark_jobs.load_core_contract_history"
+                ".CoreContractHistorySparkJob.get_config",
+                side_effect=_aud_config_side_effect,
+            ),
+            patch(
+                "dags.core.core_contract_history.spark_jobs.load_core_contract_history"
+                ".HistoricalHelper.load_transactional_data",
+                return_value=cdc_df,
+            ),
+            patch(
+                "dags.core.core_contract_history.spark_jobs.load_core_contract_history"
+                ".HistoricalHelper.load_aud_revision_data",
+                return_value=aud_df,
+            ),
+        ):
+            result = job.create_core_model(spark_session, args)
+
+        update_rows = [
+            r for r in result.collect() if r["ts_transaction"] == self.TS_UPDATE
+        ]
+        assert len(update_rows) == 1
+        assert update_rows[0]["payload"] is not None
+        payload = json.loads(update_rows[0]["payload"])
+        assert payload["op_cdc"] == "u"
+        assert payload["rev"] == 9001
+
+    def test_payload_remains_null_when_no_aud_match(self, spark_session):
+        schema = self._minimal_cdc_schema()
+        cdc_df = spark_session.createDataFrame(
+            [("200", "Ativo", "c", self.TS_CREATE, self.TS_CREATE)],
+            schema,
+        )
+        aud_df = spark_session.createDataFrame([], AUD_SCHEMA)
+
+        job = CoreContractHistorySparkJob()
+        args = _make_args()
+
+        with (
+            patch(
+                "dags.core.core_contract_history.spark_jobs.load_core_contract_history"
+                ".CoreContractHistorySparkJob.get_config",
+                side_effect=_aud_config_side_effect,
+            ),
+            patch(
+                "dags.core.core_contract_history.spark_jobs.load_core_contract_history"
+                ".HistoricalHelper.load_transactional_data",
+                return_value=cdc_df,
+            ),
+            patch(
+                "dags.core.core_contract_history.spark_jobs.load_core_contract_history"
+                ".HistoricalHelper.load_aud_revision_data",
+                return_value=aud_df,
+            ),
+        ):
+            result = job.create_core_model(spark_session, args)
+
+        for row in result.collect():
+            assert row["payload"] is None
 
 
 class TestRunPipelineBypass:

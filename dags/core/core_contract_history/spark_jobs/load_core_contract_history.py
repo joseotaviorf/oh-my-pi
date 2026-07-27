@@ -38,6 +38,7 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
         """Build the contract history DataFrame from the CDC transactional layer."""
         transactional_table = self.get_config("CONTRACT_TRANSACTIONAL_TABLE")
         event_configs = self.get_config("event_configs")
+        aud_config = self.get_config("aud_config", required=False, default=None)
 
         self.logger.info(
             f"m=create_core_model, "
@@ -46,6 +47,14 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
         )
 
         df = HistoricalHelper.load_transactional_data(spark, transactional_table, args)
+
+        aud_df = None
+        if aud_config and aud_config.get("enabled", False):
+            self.logger.info(
+                f"m=create_core_model, "
+                f"msg=AUD enrichment enabled, loading {aud_config['aud_table']}"
+            )
+            aud_df = HistoricalHelper.load_aud_revision_data(spark, aud_config, args)
 
         # HistoryBuilder caches only the narrow, repartitioned slice of the
         # source data internally. Caching the full wide source here would
@@ -61,22 +70,9 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
             event_configs=event_configs,
             event_type="cdc",
             event_origin=transactional_table,
+            aud_df=aud_df,
+            aud_config=aud_config,
         )
-
-        # event_count = result_df.count()
-        # self.logger.info(
-        #     f"m=create_core_model, "
-        #     f"msg=Produced {event_count} history event rows, "
-        #     f"date_range={args.load_start_date}..{args.load_end_date}"
-        # )
-        # if event_count == 0:
-        #     self.logger.warning(
-        #         f"m=create_core_model, "
-        #         f"msg=Zero event rows produced from {transactional_table} for "
-        #         f"date_range={args.load_start_date}..{args.load_end_date}. "
-        #         f"Check that the transactional table has data and that field-level "
-        #         f"changes exist in this range."
-        #     )
 
         return result_df
 

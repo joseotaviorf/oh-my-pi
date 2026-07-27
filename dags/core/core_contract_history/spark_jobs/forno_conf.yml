@@ -2,6 +2,16 @@ ENTITY_TYPE: "CONTRACT"
 CONTRACT_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.contrato"
 merge_on_historical: ["id_contract", "event_name", "ts_transaction", "year", "month", "day"]
 when_matched_update_condition_historical: "FALSE"
+# The shared transactional Hibernate Envers convention (revision-entity
+# table, REV/rEVTYPE/motivo/usuario_id/timestamp column names, epoch-ms
+# timestamps) is now a framework default in
+# HistoricalHelper.DEFAULT_TRANSACTIONAL_ENVERS_CONFIG -- only aud_table,
+# aud_id_col and enabled are entity-specific here. Override any default key
+# explicitly if this entity's AUD source ever deviates (e.g. clean layer).
+aud_config:
+  aud_table: datalake_ebdb_transactional.contrato_aud
+  aud_id_col: id
+  enabled: true
 event_configs:
   - tracked_col: imovel_id
     target_col: id_house
@@ -15,15 +25,18 @@ event_configs:
   - tracked_col: status
     target_col: status
     target_type: string
+    aud_mod_col: status_MOD
   - tracked_col: contractRentModel
     target_col: contract_rent_model
     target_type: string
+    aud_mod_col: contractRentModel_MOD
   - tracked_col: rentalAdministrator
     source_col: contractRentModel
     json_path: "$.rentalAdministrator"
     target_col: rental_administrator
     target_type: string
     default_value: "QUINTOANDAR"
+    aud_mod_col: contractRentModel_MOD
   - tracked_col: paganteCondominio
     target_col: paying_condo
     target_type: string
@@ -39,19 +52,24 @@ event_configs:
   - tracked_col: tipoAssinatura
     target_col: signature_type
     target_type: string
+    aud_mod_col: tipoAssinatura_MOD
   - tracked_col: statusClosing
     target_col: status_closing
     target_type: string
+    aud_mod_col: statusClosing_MOD
   - tracked_col: relistingEnabled
     target_col: is_relisting_enabled
     target_type: boolean
     default_value: "false"
+    aud_mod_col: relistingEnabled_MOD
   - tracked_col: valorAluguel
     target_col: rent
     target_type: double
+    aud_mod_col: valorAluguel_MOD
   - tracked_col: iptu_valor
     target_col: iptu
     target_type: double
+    aud_mod_col: iptu_MOD
   - tracked_col: seguroFianca_parcelas
     target_col: rental_guarantee_installment
     target_type: int
@@ -67,27 +85,35 @@ event_configs:
   - tracked_col: taxaComissaoPrimeiroAluguel
     target_col: first_rent_comission_fee
     target_type: double
+    aud_mod_col: taxaComissaoPrimeiroAluguel_MOD
   - tracked_col: tenantServiceFee
     target_col: tenant_service_fee
     target_type: double
+    aud_mod_col: tenantServiceFee_MOD
   - tracked_col: dataInicio
     target_col: dt_started
     target_type: date
+    aud_mod_col: dataInicio_MOD
   - tracked_col: dataEntrada
     target_col: dt_entered
     target_type: date
+    aud_mod_col: dataEntrada_MOD
   - tracked_col: dataRescisao
     target_col: dt_termination
     target_type: date
+    aud_mod_col: dataRescisao_MOD
   - tracked_col: dataFimContratoPrevisto
     target_col: ts_contract_expected_end
     target_type: date
+    aud_mod_col: dataFimContratoPrevisto_MOD
   - tracked_col: dataAssinado
     target_col: ts_signed
     target_type: timestamp
+    aud_mod_col: dataAssinado_MOD
   - tracked_col: dataRescisaoPrevista
     target_col: ts_expected_termination
     target_type: date
+    aud_mod_col: dataRescisaoPrevista_MOD
   - tracked_col: dataMinutaAprovada
     target_col: ts_minuta_approved
     target_type: timestamp

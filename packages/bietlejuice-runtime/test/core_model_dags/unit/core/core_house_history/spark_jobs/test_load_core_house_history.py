@@ -7,9 +7,20 @@ the complex id_owner / uuid_owner resolution from combined house + HLR + user
 timelines with as-of joins.
 """
 
+import json
+from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+from pyspark.sql.types import (
+    BooleanType,
+    IntegerType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
 from pyspark.sql.utils import AnalysisException
 
 from dags.core.core_house_history.spark_jobs.load_core_house_history import (
@@ -615,3 +626,182 @@ class TestRunPipelineBypass:
             "day",
         ]
         assert call_kwargs["when_matched_update_condition"] == "FALSE"
+
+
+# ---------------------------------------------------------------------------
+# AUD payload enrichment (aud_configs multi-source API, single imovel source)
+# ---------------------------------------------------------------------------
+
+IMOVEL_AUD_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+        StructField("REV", LongType(), True),
+        StructField("rEVTYPE", IntegerType(), True),
+        StructField("endereco_MOD", BooleanType(), True),
+        StructField("ts_cdc_transaction", TimestampType(), True),
+        StructField("ts_revision", TimestampType(), True),
+        StructField("revision_reason", StringType(), True),
+        StructField("aud_user_id", LongType(), True),
+    ]
+)
+
+HOUSE_AUD_CONFIGS_ENABLED = [
+    {
+        "name": "imovel",
+        "aud_table": "test.imovel_aud",
+        "aud_id_col": "id",
+        "enabled": True,
+    }
+]
+
+# Minimal event_configs: one imovel_aud-mapped field (endereco) and one
+# non-mapped field (externalId, no _MOD flag in imovel_aud).
+HOUSE_EVENT_CONFIGS_WITH_MOD = [
+    {
+        "tracked_col": "externalId",
+        "target_col": "id_external",
+        "target_type": "string",
+    },
+    {
+        "tracked_col": "endereco",
+        "target_col": "address",
+        "target_type": "string",
+        "aud_mod_col": "endereco_MOD",
+    },
+]
+
+CONFIG_MAP_WITH_AUD = {
+    "ENTITY_TYPE": "HOUSE",
+    "HOUSE_TRANSACTIONAL_TABLE": "test_transactional_imovel",
+    "HLR_TRANSACTIONAL_TABLE": _HLR_VIEW,
+    "USER_TRANSACTIONAL_TABLE": _USER_VIEW,
+    "merge_on_historical": [
+        "id_house",
+        "event_name",
+        "ts_transaction",
+        "year",
+        "month",
+        "day",
+    ],
+    "when_matched_update_condition_historical": "FALSE",
+    "event_configs": HOUSE_EVENT_CONFIGS_WITH_MOD,
+    "aud_configs": HOUSE_AUD_CONFIGS_ENABLED,
+}
+
+
+def _aud_config_side_effect(key, required=False, default=None):
+    if key in CONFIG_MAP_WITH_AUD:
+        return CONFIG_MAP_WITH_AUD[key]
+    if required:
+        raise KeyError(f"Missing required config key: {key}")
+    return default
+
+
+class TestCoreHouseHistoryAudPayload:
+    """AUD enrichment wiring: aud_configs load + pass-through to the builder."""
+
+    TS_CREATE = datetime(2026, 1, 10, 8, 0, 0)
+    TS_REVISION = datetime(2026, 1, 10, 8, 0, 1)
+
+    def _run_with_aud(self, spark_session, imovel_df, hlr_df, usuario_df, aud_df):
+        _register_tables(spark_session, hlr_df, usuario_df)
+        job = CoreHouseHistorySparkJob()
+        args = _make_args()
+
+        with (
+            patch(
+                f"{_MODULE}.CoreHouseHistorySparkJob.get_config",
+                side_effect=_aud_config_side_effect,
+            ),
+            patch(
+                f"{_MODULE}.HistoricalHelper.load_transactional_data",
+                return_value=imovel_df,
+            ),
+            patch(
+                f"{_MODULE}.HistoricalHelper.load_aud_revision_datasets",
+                return_value={"imovel": aud_df},
+            ) as mock_load_datasets,
+        ):
+            result = job.create_core_model(spark_session, args)
+            assert mock_load_datasets.call_args[0][1] == HOUSE_AUD_CONFIGS_ENABLED
+            return result
+
+    def test_mapped_field_payload_populated_others_stay_null(
+        self,
+        spark_session,
+        transactional_imovel_df,
+        transactional_hlr_df,
+        transactional_usuario_df,
+    ):
+        # arrange — imovel_aud has the rEVTYPE=0 insert revision matching the
+        # house-42 create event exactly on (id, ts_database_transaction)
+        aud_df = spark_session.createDataFrame(
+            [
+                (
+                    "42",
+                    self.TS_CREATE,
+                    7001,
+                    0,
+                    False,
+                    self.TS_CREATE,
+                    self.TS_REVISION,
+                    None,
+                    999,
+                ),
+            ],
+            IMOVEL_AUD_SCHEMA,
+        )
+
+        # act
+        result = self._run_with_aud(
+            spark_session,
+            transactional_imovel_df,
+            transactional_hlr_df,
+            transactional_usuario_df,
+            aud_df,
+        )
+        rows = {(r["event_name"], r["ts_transaction"]): r for r in result.collect()}
+
+        # assert — imovel_aud-mapped field is enriched
+        address_row = rows[("ev_address", self.TS_CREATE)]
+        payload = json.loads(address_row["payload"])
+        assert payload["op_cdc"] == "c"
+        assert payload["rev"] == 7001
+        assert payload["aud_user_id"] == 999
+
+        # assert — non-mapped field stays NULL
+        assert rows[("ev_id_external", self.TS_CREATE)]["payload"] is None
+
+        # assert — owner events (bespoke path) always keep payload NULL
+        owner_rows = [
+            r
+            for r in result.collect()
+            if r["event_name"] in ("ev_id_owner", "ev_uuid_owner")
+        ]
+        assert len(owner_rows) > 0
+        for row in owner_rows:
+            assert row["payload"] is None
+
+    def test_mapped_field_payload_null_when_no_aud_match(
+        self,
+        spark_session,
+        transactional_imovel_df,
+        transactional_hlr_df,
+        transactional_usuario_df,
+    ):
+        # arrange — empty AUD: enrichment enabled but nothing matches
+        aud_df = spark_session.createDataFrame([], IMOVEL_AUD_SCHEMA)
+
+        # act
+        result = self._run_with_aud(
+            spark_session,
+            transactional_imovel_df,
+            transactional_hlr_df,
+            transactional_usuario_df,
+            aud_df,
+        )
+
+        # assert
+        for row in result.collect():
+            assert row["payload"] is None

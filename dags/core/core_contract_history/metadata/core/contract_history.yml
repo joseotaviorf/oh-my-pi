@@ -82,8 +82,6 @@ columns:
       ev_ts_created: Change detected in the creation timestamp (criadoEm) column.
       ev_ts_updated: Change detected in the update timestamp (atualizadoEm) column.
   event_type:
-    lineage:
-      - datalake_ebdb_transactional.contrato.op_cdc
     description: Source type of the event. Currently only CDC is supported; outbox_pattern is reserved for future use.
     categories:
       cdc: Event sourced from CDC (Change Data Capture) transactional logs.
@@ -122,7 +120,16 @@ columns:
       - datalake_ebdb_transactional.contrato.atualizadoEm
     description: New value of the changed column, cast to string. Contains the current value at the time of the transaction.
   payload:
-    description: Event payload with additional context. NULL for CDC sources in Phase 1; will be enriched from AUD tables in a future phase. Outbox sources populate this with the full event content.
+    lineage:
+      - datalake_ebdb_transactional.contrato_aud.REV
+      - datalake_ebdb_transactional.contrato_aud.rEVTYPE
+      - datalake_ebdb_transactional.contrato_aud.ts_database_transaction
+      - datalake_ebdb_transactional.contrato_aud.ts_cdc_transaction
+      - datalake_ebdb_transactional.usuariorevisionentity.timestamp
+      - datalake_ebdb_transactional.usuariorevisionentity.motivo
+      - datalake_ebdb_transactional.usuariorevisionentity.usuario_id
+      - datalake_ebdb_transactional.contrato.op_cdc
+    description: "JSON string with AUD revision context for CDC events where an AUD match is found. Always includes payload_version, op_cdc, rev, rev_type, ts_revision, ts_cdc_transaction (millisecond-precision timestamp from the transactional AUD), revision_reason, aud_user_id, and aud_values (a JSON object with the field name and its new value). NULL when no AUD match is found (unmapped columns or inserts without a rEVTYPE=0 revision). For delete events (op_cdc='d'), a minimal payload is always emitted even without an AUD match so consumers can detect deletions via JSON_EXTRACT(payload, '$.op_cdc') = 'd'. Snapshot read rows (op_cdc='r') always have NULL payload. revision_reason has a 7.6% fill rate (sparse). AUD source is datalake_ebdb_transactional.contrato_aud; revision metadata comes from datalake_ebdb_transactional.usuariorevisionentity. Existing rows loaded before this enrichment retain NULL payload."
   ts_transaction:
     lineage:
       - datalake_ebdb_transactional.contrato.ts_database_transaction

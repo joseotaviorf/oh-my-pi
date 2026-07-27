@@ -318,15 +318,23 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
         """Build the house history DataFrame."""
         house_table = self.get_config("HOUSE_TRANSACTIONAL_TABLE")
         event_configs = self.get_config("event_configs")
+        aud_configs = self.get_config("aud_configs", required=False, default=None)
 
         self.logger.info(
             f"m=create_core_model, "
             f"msg=Building house history from {house_table}, "
-            f"date_range={args.load_start_date}..{args.load_end_date}"
+            f"date_range={args.load_start_date}..{args.load_end_date}, "
+            f"aud_sources={[c.get('name') for c in aud_configs] if aud_configs else None}"
         )
 
         house_df = HistoricalHelper.load_transactional_data(spark, house_table, args)
         house_df = self._align_registrant_column(house_df)
+
+        aud_dfs = None
+        if aud_configs:
+            aud_dfs = HistoricalHelper.load_aud_revision_datasets(
+                spark, aud_configs, args
+            )
 
         field_events_df = HistoryBuilder.build_history_for_columns(
             house_df,
@@ -337,8 +345,14 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
             event_configs=event_configs,
             event_type="cdc",
             event_origin=house_table,
+            aud_dfs=aud_dfs,
+            aud_configs=aud_configs,
         )
 
+        # Owner events (ev_id_owner / ev_uuid_owner) are built by the bespoke
+        # timeline path below and keep payload NULL: enriching them from
+        # imovellistingrelation_aud / usuario_aud needs its own discovery pass
+        # (ambiguous mod-flag semantics) and is a planned follow-up.
         owner_events_df = self._build_owner_events(spark, house_df, args)
 
         return field_events_df.unionByName(owner_events_df)
