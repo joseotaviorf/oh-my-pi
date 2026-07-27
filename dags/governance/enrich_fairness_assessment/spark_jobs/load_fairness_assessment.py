@@ -392,7 +392,7 @@ def main() -> None:
     )
 
     exists_set, phys_map, snapshot_partition = resolve_columns_metastore_snapshot(
-        spark, args.environment, td
+        spark, td
     )
     logger.info(
         f"m=columns_metastore_snapshot_used,snapshot_partition={snapshot_partition}"

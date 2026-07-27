@@ -11,9 +11,20 @@ from bietlejuice.governance.fairness_assessment.constants import COLUMNS_METASTO
 LOGGER = QuintoAndarLogger(__name__)
 
 
+def columns_metastore_fqn() -> str:
+    """Two-part Hive name for the ``columns_metastore`` snapshot table.
+
+    Resolved against the default catalog. A three-part Unity Catalog name
+    (``quintoandar_{env}.…``) only resolves on Databricks and fails silently on the
+    EMR fleet (no such catalog), so this stays aligned with every other
+    ``spark.table`` read in ``load_fairness_assessment``.
+    """
+    db, tbl = COLUMNS_METASTORE
+    return f"{db}.{tbl}"
+
+
 def resolve_columns_metastore_snapshot(
     spark: Any,
-    environment: str,
     td_df: Any,
 ) -> Tuple[Set[Tuple[str, str]], dict[Tuple[str, str], frozenset[str]], Optional[str]]:
     """Load latest partition of ``columns_metastore`` and aggregate physical column names per FQN.
@@ -29,8 +40,7 @@ def resolve_columns_metastore_snapshot(
     Replaces per-FQN ``spark.catalog.tableExists`` + ``spark.table`` probes for F1-03 / I1-01.
     """
 
-    db, tbl = COLUMNS_METASTORE
-    fqn = f"quintoandar_{environment}.{db}.{tbl}"
+    fqn = columns_metastore_fqn()
     try:
         cm = spark.table(fqn)
     except Exception as e:
