@@ -1,0 +1,742 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_bypass_revenue_control
+description: >
+  Google Sheets bypass revenue control workbook curated by Fintech Operations
+  on the Controle Receita tab. One row per For Sale bypass offer with deal,
+  commission, installment, and partner transfer details used in financial
+  reconciliation and bypass revenue recognition workflows.
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+columns:
+  revenue_source:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.origem_da_receita
+    description: Value from the Controle Receita sheet column 'Origem da receita', standardized in the bypass revenue control clean table.
+  id:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.id
+    description: Internal row identifier from the ID column in the Controle Receita bypass spreadsheet.
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.id_offer
+    description: For Sale offer identifier from the ID Offer column, used to link bypass deals to platform offers.
+  dt_sent_to_office:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_de_envio_ao_escritorio
+    description: Value from the Controle Receita sheet column 'Data de envio ao escritório', standardized in the bypass revenue control clean table.
+  offer_status:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_offer
+    description: Value from the Controle Receita sheet column 'Status Offer', standardized in the bypass revenue control clean table.
+  is_dm_case:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.o_caso_e_dm
+    description: Flag recorded in Controle Receita indicating whether the bypass deal is classified as a DM case by Fintech Operations.
+  status:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status
+    description: Value from the Controle Receita sheet column 'Status', standardized in the bypass revenue control clean table.
+  partner_channel:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.1p_ou_3p
+    description: Value from the Controle Receita sheet column '1P ou 3P', standardized in the bypass revenue control clean table.
+  office_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.escritorio
+    description: Value from the Controle Receita sheet column 'Escritório', standardized in the bypass revenue control clean table.
+  property_address:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.endereco_imovel
+    description: Value from the Controle Receita sheet column 'Endereço imóvel', standardized in the bypass revenue control clean table.
+  owner_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.nome_proprietario_quintoandar
+    description: Value from the Controle Receita sheet column 'Nome Proprietário QuintoAndar', standardized in the bypass revenue control clean table.
+  owner_cpf:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cpf_proprietario_quintoandar
+    description: Value from the Controle Receita sheet column 'CPF Proprietário QuintoAndar', standardized in the bypass revenue control clean table.
+  owner_email:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.email_proprietario_quintoandar
+    description: Value from the Controle Receita sheet column 'email proprietário QuintoAndar', standardized in the bypass revenue control clean table.
+  seller_address:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.endereco_do_pp
+    description: Value from the Controle Receita sheet column 'Endereço do PP', standardized in the bypass revenue control clean table.
+  seller_street:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.logradourorua_pp
+    description: Value from the Controle Receita sheet column 'Logradouro/Rua PP', standardized in the bypass revenue control clean table.
+  seller_number:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.no_pp
+    description: Street number for the seller (PP) address recorded in the bypass revenue control spreadsheet.
+  seller_complement:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.complemento_pp
+    description: Value from the Controle Receita sheet column 'Complemento PP', standardized in the bypass revenue control clean table.
+  seller_neighborhood:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.bairro_pp
+    description: Value from the Controle Receita sheet column 'Bairro PP', standardized in the bypass revenue control clean table.
+  seller_city:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cidade_pp
+    description: Value from the Controle Receita sheet column 'Cidade PP', standardized in the bypass revenue control clean table.
+  seller_state:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.estado_pp
+    description: Value from the Controle Receita sheet column 'Estado PP', standardized in the bypass revenue control clean table.
+  seller_zip_code:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cep_pp
+    description: Value from the Controle Receita sheet column 'CEP PP', standardized in the bypass revenue control clean table.
+  id_broker:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.id_corretor
+    description: Value from the Controle Receita sheet column 'ID Corretor', standardized in the bypass revenue control clean table.
+  broker_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.nome_corretor
+    description: Value from the Controle Receita sheet column 'Nome Corretor', standardized in the bypass revenue control clean table.
+  is_broker_active:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.corretor_esta_ativo
+    description: Value from the Controle Receita sheet column 'Corretor está ativo?', standardized in the bypass revenue control clean table.
+  broker_cpf:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cpf_corretor
+    description: Value from the Controle Receita sheet column 'CPF corretor', standardized in the bypass revenue control clean table.
+  broker_phone:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.telefone_corretor
+    description: Value from the Controle Receita sheet column 'Telefone corretor', standardized in the bypass revenue control clean table.
+  broker_email:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.email_corretor
+    description: Value from the Controle Receita sheet column 'email corretor', standardized in the bypass revenue control clean table.
+  id_negotiation_executive:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.id_en
+    description: Value from the Controle Receita sheet column 'ID EN', standardized in the bypass revenue control clean table.
+  negotiation_executive_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.nome_executivo_de_negociacao
+    description: Value from the Controle Receita sheet column 'Nome Executivo de Negociação', standardized in the bypass revenue control clean table.
+  negotiation_executive_cpf:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cpf_en
+    description: Value from the Controle Receita sheet column 'CPF EN', standardized in the bypass revenue control clean table.
+  negotiation_executive_phone:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.telefone_en
+    description: Value from the Controle Receita sheet column 'telefone EN', standardized in the bypass revenue control clean table.
+  negotiation_executive_email:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.email_en
+    description: Value from the Controle Receita sheet column 'email EN', standardized in the bypass revenue control clean table.
+  id_associate_executive:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.id_ea
+    description: Value from the Controle Receita sheet column 'ID EA', standardized in the bypass revenue control clean table.
+  associate_executive_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.nome_executivo_associado
+    description: Value from the Controle Receita sheet column 'Nome Executivo Associado', standardized in the bypass revenue control clean table.
+  associate_executive_cpf:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cpf_ea
+    description: Value from the Controle Receita sheet column 'cpf EA', standardized in the bypass revenue control clean table.
+  associate_executive_phone:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.telefone_ea
+    description: Value from the Controle Receita sheet column 'telefone EA', standardized in the bypass revenue control clean table.
+  associate_executive_email:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.email_ea
+    description: Value from the Controle Receita sheet column 'email EA', standardized in the bypass revenue control clean table.
+  ciq_code:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.ciq
+    description: Value from the Controle Receita sheet column 'CIQ', standardized in the bypass revenue control clean table.
+  ciq_name:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.nome_ciq
+    description: Value from the Controle Receita sheet column 'Nome CIQ', standardized in the bypass revenue control clean table.
+  ciq_cpf:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cpf_ciq
+    description: Value from the Controle Receita sheet column 'CPF CIQ', standardized in the bypass revenue control clean table.
+  ciq_email:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.email_ciq
+    description: Value from the Controle Receita sheet column 'email CIQ', standardized in the bypass revenue control clean table.
+  ciq_phone:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.telefone_ciq
+    description: Value from the Controle Receita sheet column 'telefone CIQ', standardized in the bypass revenue control clean table.
+  tqc_code:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.tqc
+    description: Value from the Controle Receita sheet column 'TQC', standardized in the bypass revenue control clean table.
+  dt_deed_update:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_de_atualizacao_da_matricula
+    description: Value from the Controle Receita sheet column 'Data de atualização da matrícula', standardized in the bypass revenue control clean table.
+  transaction_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_da_transacao
+    description: Value from the Controle Receita sheet column 'Valor da transação', standardized in the bypass revenue control clean table.
+  brokerage_rate:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.taxa_corretagem_ideal_6
+    description: Value from the Controle Receita sheet column 'Taxa corretagem [ideal 6%]', standardized in the bypass revenue control clean table.
+  amount_due:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_devido
+    description: Value from the Controle Receita sheet column 'Valor Devido', standardized in the bypass revenue control clean table.
+  brokerage_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_do_acordo_corretagem
+    description: Value from the Controle Receita sheet column 'Valor do Acordo corretagem', standardized in the bypass revenue control clean table.
+  dt_deal:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_acordo_termo_confissao_transito_em_julgado
+    description: Value from the Controle Receita sheet column 'Data Acordo (Termo Confissão | Trânsito em Julgado)', standardized in the bypass revenue control clean table.
+  installment_plan:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.a_vista_parcelado
+    description: Value from the Controle Receita sheet column 'À Vista / Parcelado', standardized in the bypass revenue control clean table.
+  bank_slip_reference:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.boleto
+    description: Value from the Controle Receita sheet column 'Boleto', standardized in the bypass revenue control clean table.
+  last_payment_month:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.mes_do_ultimo_pagamento
+    description: Value from the Controle Receita sheet column 'Mês do ultimo pagamento', standardized in the bypass revenue control clean table.
+  installment_amount_1:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_a_vista_1a_parcela
+    description: Value from the Controle Receita sheet column 'Valor À Vista / 1ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_1:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_1a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 1ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_1:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_1a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 1ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_1:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_1a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 1ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_1:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_1a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 1ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_1:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_1a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 1ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_2:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_2a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 2ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_2:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_2a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 2ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_2:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_2a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 2ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_2:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_2a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 2ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_2:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_2a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 2ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_2:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_2a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 2ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_3:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_3a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 3ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_3:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_3a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 3ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_3:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_3a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 3ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_3:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_3a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 3ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_3:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_3a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 3ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_3:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_3a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 3ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_4:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_4a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 4ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_4:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_4a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 4ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_4:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_4a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 4ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_4:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_4a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 4ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_4:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_4a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 4ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_4:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_4a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 4ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_5:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_5a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 5ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_5:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_5a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 5ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_5:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_5a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 5ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_5:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_5a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 5ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_5:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_5a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 5ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_5:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_5a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 5ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_6:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_6a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 6ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_6:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_6a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 6ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_6:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_6a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 6ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_6:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_6a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 6ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_6:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_6a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 6ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_6:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_6a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 6ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_7:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_7a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 7ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_7:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_7a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 7ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_7:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_7a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 7ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_7:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_7a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 7ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_7:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_7a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 7ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_7:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_7a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 7ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_8:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_8a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 8ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_8:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_8a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 8ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_8:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_8a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 8ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_8:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_8a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 8ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_8:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_8a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 8ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_9:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_9a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 9ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_9:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_9a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 9ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_9:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_9a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 9ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_9:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_9a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 9ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_9:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_9a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 9ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_9:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_9a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 9ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_10:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_10a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 10ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_10:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_10a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 10ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_10:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_10a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 10ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_10:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_10a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 10ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_10:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_10a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 10ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_10:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_10a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 10ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_11:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_11a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 11ª Parcela', standardized in the bypass revenue control clean table.
+  installment_interest_penalty_amount_11:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_juros_e_multa_se_houver_11a_parcela
+    description: Value from the Controle Receita sheet column 'Valor juros e multa (se houver) 11ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_11:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_11a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 11ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_11:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_11a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 11ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_11:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_11a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 11ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_11:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_11a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 11ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_12:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_12a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 12ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_12:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_12a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 12ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_12:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_12a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 12ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_12:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_12a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 12ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_12:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_12a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 12ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_13:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_13a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 13ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_13:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_13a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 13ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_13:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_13a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 13ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_13:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_13a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 13ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_13:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_13a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 13ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_14:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_14a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 14ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_14:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_14a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 14ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_14:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_14a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 14ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_14:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_14a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 14ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_14:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_14a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 14ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_15:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_15a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 15ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_15:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_15a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 15ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_15:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_15a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 15ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_15:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_15a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 15ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_15:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_15a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 15ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_16:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_16a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 16ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_16:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_16a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 16ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_16:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_16a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 16ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_16:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_16a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 16ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_16:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_16a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 16ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_17:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_17a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 17ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_17:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_17a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 17ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_17:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_17a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 17ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_17:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_17a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 17ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_17:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_17a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 17ª Parcela', standardized in the bypass revenue control clean table.
+  installment_amount_18:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_18a_parcela
+    description: Value from the Controle Receita sheet column 'Valor 18ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_bank_slip_sent_18:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_boleto_18a_parcela
+    description: Value from the Controle Receita sheet column 'Data envio boleto 18ª Parcela', standardized in the bypass revenue control clean table.
+  dt_installment_due_18:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_vencimento_pgto_18a_parcela
+    description: Value from the Controle Receita sheet column 'Data Vencimento Pgto 18ª Parcela', standardized in the bypass revenue control clean table.
+  dt_payment_18:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_do_pagamento_18a_parcela
+    description: Value from the Controle Receita sheet column 'Data do Pagamento 18ª Parcela', standardized in the bypass revenue control clean table.
+  installment_status_18:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_da_parcela_18a_parcela
+    description: Value from the Controle Receita sheet column 'Status da Parcela 18ª Parcela', standardized in the bypass revenue control clean table.
+  total_received:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_total_recebido
+    description: Value from the Controle Receita sheet column 'Valor Total Recebido', standardized in the bypass revenue control clean table.
+  agreement_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_do_acordo
+    description: Value from the Controle Receita sheet column 'Valor do acordo', standardized in the bypass revenue control clean table.
+  accounting_commission:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.comissao_escritorio_parceiro
+    description: Value from the Controle Receita sheet column 'Comissão Escritório Parceiro', standardized in the bypass revenue control clean table.
+  partner_share_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_a_ser_partilhado_entre_os_parceiros
+    description: Value from the Controle Receita sheet column 'Valor a ser partilhado entre os parceiros', standardized in the bypass revenue control clean table.
+  brokerage_estate_agent_amount_1:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.comissao_cr_175
+    description: Value from the Controle Receita sheet column 'Comissão CR (17,5%)', standardized in the bypass revenue control clean table.
+  brokerage_estate_agent_amount_2:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_comissao_en_4
+    description: Value from the Controle Receita sheet column 'Valor Comissão EN (4%)', standardized in the bypass revenue control clean table.
+  brokerage_estate_agent_amount_3:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_comissao_ea_05
+    description: Value from the Controle Receita sheet column 'Valor Comissão EA (0,5%)', standardized in the bypass revenue control clean table.
+  brokerage_estate_agent_amount_4:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_comissao_ciq_667
+    description: Value from the Controle Receita sheet column 'Valor Comissão CIQ (6,67%)', standardized in the bypass revenue control clean table.
+  brokerage_estate_agent_amount_5:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_comissao_tqc_20
+    description: Value from the Controle Receita sheet column 'Valor Comissão TQC (20%)', standardized in the bypass revenue control clean table.
+  brokerage_quinto_andar_amount_without_accounting_commission:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.comissao_quintoandar
+    description: Value from the Controle Receita sheet column 'Comissão QuintoAndar', standardized in the bypass revenue control clean table.
+  invoice_amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.valor_nf
+    description: Value from the Controle Receita sheet column 'Valor NF', standardized in the bypass revenue control clean table.
+  is_idactum:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.idactum
+    description: Value from the Controle Receita sheet column 'iDactum?', standardized in the bypass revenue control clean table.
+  dt_agreement_settlement:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_quitacao_acordo
+    description: Value from the Controle Receita sheet column 'Data quitação acordo', standardized in the bypass revenue control clean table.
+  receipt_links:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.links_comprovantes_drive
+    description: Value from the Controle Receita sheet column 'Links Comprovantes - Drive', standardized in the bypass revenue control clean table.
+  dt_settlement_term_sent:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_envio_termo_de_quitacao
+    description: Value from the Controle Receita sheet column 'Data envio termo de quitação', standardized in the bypass revenue control clean table.
+  dt_partner_transfer_communication:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_da_comunicacao_do_parceiro_sobre_repasse
+    description: Value from the Controle Receita sheet column 'Data da comunicação do parceiro sobre repasse', standardized in the bypass revenue control clean table.
+  dt_last_share_term_signature:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_da_ultima_assinatura_do_termo_partilha
+    description: Value from the Controle Receita sheet column 'Data da última assinatura do termo partilha', standardized in the bypass revenue control clean table.
+  payment_status:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.status_repasse_parceiros
+    description: Value from the Controle Receita sheet column 'Status Repasse parceiros', standardized in the bypass revenue control clean table.
+  broker_payment:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.total_repassado
+    description: Value from the Controle Receita sheet column 'Total repassado', standardized in the bypass revenue control clean table.
+  dt_transfer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_repasse
+    description: Value from the Controle Receita sheet column 'Data Repasse', standardized in the bypass revenue control clean table.
+  dt_invoice_5a_issued:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.data_emissao_nf_5a
+    description: Value from the Controle Receita sheet column 'Data emissão NF 5A', standardized in the bypass revenue control clean table.
+  invoice_5a_link:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.link_nf_5a
+    description: Value from the Controle Receita sheet column 'Link NF 5A', standardized in the bypass revenue control clean table.
+  invoice_recon_20250531:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.nf_recon_20250531
+    description: Value from the Controle Receita sheet column 'NF Recon 2025-05-31', standardized in the bypass revenue control clean table.
+  comment:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.comentario
+    description: Value from the Controle Receita sheet column 'COMENTÁRIO', standardized in the bypass revenue control clean table.
+  logradourorua:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.logradourorua
+    description: Value from the Controle Receita sheet column 'Logradouro/Rua', standardized in the bypass revenue control clean table.
+  property_number:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.no
+    description: Street number for the property address recorded in the bypass revenue control spreadsheet.
+  complement:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.complemento
+    description: Value from the Controle Receita sheet column 'Complemento', standardized in the bypass revenue control clean table.
+  neighborhood:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.bairro
+    description: Value from the Controle Receita sheet column 'Bairro', standardized in the bypass revenue control clean table.
+  city:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cidade
+    description: Value from the Controle Receita sheet column 'Cidade', standardized in the bypass revenue control clean table.
+  state:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.estado
+    description: Value from the Controle Receita sheet column 'Estado', standardized in the bypass revenue control clean table.
+  zip_code:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bypass_revenue_control.cep
+    description: Value from the Controle Receita sheet column 'CEP', standardized in the bypass revenue control clean table.
