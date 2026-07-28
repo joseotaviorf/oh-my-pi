@@ -1,3 +1,39 @@
+WITH house_sale_agreement AS (
+    SELECT
+        so.id_house,
+        MAX(so.ts_sale_agreement_signed) AS ts_last_sale_agreement_signed
+    FROM
+        datalake_sale_offer.sale_offer AS so
+    WHERE
+        so.ts_sale_agreement_signed IS NOT NULL
+    GROUP BY
+        so.id_house
+),
+portfolio_loss_flags AS (
+    SELECT
+        clp.id_listing_purchase,
+        COALESCE(
+            clp.listing_category = 'Re-Listing'
+            AND clp.ts_contract_signed IS NULL
+            AND clp.listing_status IN ('PUBLISHED', 'PUBLICADO')
+            AND clp.total_days_since_publish > 90,
+            FALSE
+        ) AS is_relisting_without_contract_90d,
+        -- id_house with CCV after a rent CS in compra de carteira era (CS >= 2026-07-01).
+        -- Pre-July CS + later CCV is not loss (Rafael / AAREDE-521).
+        COALESCE(
+            clp.ts_contract_signed IS NOT NULL
+            AND clp.ts_contract_signed >= DATE('2026-07-01')
+            AND hsa.ts_last_sale_agreement_signed IS NOT NULL
+            AND hsa.ts_last_sale_agreement_signed > clp.ts_contract_signed,
+            FALSE
+        ) AS is_ccv_after_post_july_rent_cs
+    FROM
+        datalake_ciq.ciq_listing_purchase AS clp
+    LEFT JOIN
+        house_sale_agreement AS hsa
+            ON hsa.id_house = clp.id_house
+)
 SELECT
     clp.id_listing_purchase AS sk_listing_purchase,
     lpp.id_listing_duplicity AS sk_listing_duplicity,
@@ -24,6 +60,15 @@ SELECT
     lpp.pricing_type_reason,
     lpp.acquisition_type,
     lpp.acquisition_type_reason,
+    CASE
+        WHEN plf.is_ccv_after_post_july_rent_cs
+            AND plf.is_relisting_without_contract_90d
+            THEN 'ccv_after_post_july_rent_cs|relisting_without_contract_90d'
+        WHEN plf.is_ccv_after_post_july_rent_cs
+            THEN 'ccv_after_post_july_rent_cs'
+        WHEN plf.is_relisting_without_contract_90d
+            THEN 'relisting_without_contract_90d'
+    END AS portfolio_loss_reason,
     lpp.purchase_value,
     clp.amount_paid,
     clp.total_days_since_house_inactived,
@@ -35,10 +80,8 @@ SELECT
     clp.is_last_house_listing,
     clp.is_house_inactive,
     COALESCE(
-        clp.listing_category = 'Re-Listing'
-        AND clp.ts_contract_signed IS NULL
-        AND clp.listing_status IN ('PUBLISHED', 'PUBLICADO')
-        AND clp.total_days_since_publish > 90,
+        plf.is_relisting_without_contract_90d
+        OR plf.is_ccv_after_post_july_rent_cs,
         FALSE
     ) AS is_portfolio_loss,
     lpp.is_eligible,
@@ -60,3 +103,6 @@ FROM
 JOIN
     datalake_ciq.listing_purchase_pricing AS lpp
         ON lpp.id_listing_purchase = clp.id_listing_purchase
+JOIN
+    portfolio_loss_flags AS plf
+        ON plf.id_listing_purchase = clp.id_listing_purchase

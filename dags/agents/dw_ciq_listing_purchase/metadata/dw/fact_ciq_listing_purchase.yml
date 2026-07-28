@@ -165,16 +165,40 @@ columns:
     description: True when the listing version is in qualifying inactive state.
     lineage:
       - datalake_ciq.ciq_listing_purchase.is_house_inactive
-  is_portfolio_loss:
+  portfolio_loss_reason:
     description: >
-      True when the listing is a Re-Listing still published (listing_status PUBLISHED or PUBLICADO,
-      uppercased) without a signed rent contract and total_days_since_publish exceeds 90 days
-      (CIQ portfolio loss rule).
+      Which portfolio-loss rule(s) fired for this row. Null when is_portfolio_loss is false.
+      Values: relisting_without_contract_90d (Re-Listing still published without rent contract
+      for more than 90 days since publish); ccv_after_post_july_rent_cs (rent CS on/after
+      2026-07-01 compra de carteira era and a later CCV on the same house); pipe-separated when
+      both rules apply.
+    categories:
+      relisting_without_contract_90d: >
+        Re-Listing still published without a signed rent contract and more than 90 days since publish.
+      ccv_after_post_july_rent_cs: >
+        Rent contract signed on or after 2026-07-01 and a later sale agreement (CCV) on the same house.
+      ccv_after_post_july_rent_cs|relisting_without_contract_90d: >
+        Both the post-July CS + later CCV and the 90-day Re-Listing rules apply.
     lineage:
       - datalake_ciq.ciq_listing_purchase.listing_category
       - datalake_ciq.ciq_listing_purchase.listing_status
       - datalake_ciq.ciq_listing_purchase.ts_contract_signed
       - datalake_ciq.ciq_listing_purchase.total_days_since_publish
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+  is_portfolio_loss:
+    description: >
+      True when any CIQ portfolio-loss rule applies: (1) Re-Listing still published
+      (listing_status PUBLISHED or PUBLICADO) without a signed rent contract and
+      total_days_since_publish exceeds 90 days; or (2) this row's rent CS is on or after
+      2026-07-01 (compra de carteira era) and the same house has a later signed sale agreement
+      (CCV). Pre-July CS with a later CCV is not loss. See portfolio_loss_reason for which
+      rule(s) fired.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.listing_category
+      - datalake_ciq.ciq_listing_purchase.listing_status
+      - datalake_ciq.ciq_listing_purchase.ts_contract_signed
+      - datalake_ciq.ciq_listing_purchase.total_days_since_publish
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
   is_eligible:
     description: >
       True when the final pricing_type from listing_purchase_pricing is not not-eligible, after both
