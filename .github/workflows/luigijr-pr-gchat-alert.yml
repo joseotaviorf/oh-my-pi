@@ -22,6 +22,7 @@ jobs:
     runs-on: github-actions-developers-runner
     permissions:
       pull-requests: read
+      contents: read
     steps:
       - name: Post alert to Google Chat
         env:
@@ -31,6 +32,7 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_ACTION: ${{ github.event.action }}
@@ -40,32 +42,6 @@ jobs:
           if [ -z "${WEBHOOK_URL}" ]; then
             echo "Secret GCHAT_LUIGIJR_PR_WEBHOOK is not configured."
             exit 1
-          fi
-
-          changed_files=$(
-            curl -fsSL \
-              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
-              | python3 -c "
-          import json, sys
-          files = [
-              f['filename']
-              for f in json.load(sys.stdin)
-              if f['filename'].startswith('dags/luigijr/')
-          ]
-          print('\n'.join(files))
-          "
-          )
-
-          dag_folders=$(
-            printf '%s\n' "${changed_files}" \
-              | awk -F/ 'NF >= 3 && $3 != "" { print $3 }' \
-              | sort -u
-          )
-
-          if [ -z "${dag_folders}" ]; then
-            dag_folders="(nenhuma pasta de DAG identificada)"
           fi
 
           if [ "${EVENT_ACTION}" = "reopened" ]; then
@@ -81,36 +57,131 @@ jobs:
             PR_URL="${PR_URL}" \
             PR_AUTHOR="${PR_AUTHOR}" \
             PR_BRANCH="${PR_BRANCH}" \
-            DAG_FOLDERS="${dag_folders}" \
+            PR_HEAD_SHA="${PR_HEAD_SHA}" \
+            REPOSITORY="${REPOSITORY}" \
+            GITHUB_TOKEN="${GITHUB_TOKEN}" \
             python3 <<'PY'
+          import base64
           import json
           import os
+          import re
+          import urllib.error
+          import urllib.parse
+          import urllib.request
 
-          event_title = os.environ["EVENT_TITLE"]
+          GENERATED_BY_RE = re.compile(r"generated-by:([^\s#]+)")
+          ZORDON_MARKERS = ("zordon",)
+          DECLARATION_SUFFIX = "_declaration.yml"
+
+
+          def github_get(path: str) -> object:
+              request = urllib.request.Request(
+                  f"https://api.github.com{path}",
+                  headers={
+                      "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                      "Accept": "application/vnd.github+json",
+                      "User-Agent": "luigijr-pr-gchat-alert",
+                  },
+              )
+              with urllib.request.urlopen(request) as response:
+                  return json.load(response)
+
+
+          def is_zordon_bot(login: str) -> bool:
+              lowered = login.lower()
+              return any(marker in lowered for marker in ZORDON_MARKERS)
+
+
+          def format_person_id(person_id: str) -> str:
+              return " ".join(part.capitalize() for part in person_id.split("."))
+
+
+          def extract_generated_by(content: str) -> list[str]:
+              return sorted(set(GENERATED_BY_RE.findall(content)))
+
+
+          def fetch_declaration_generated_by(
+              repository: str, path: str, ref: str
+          ) -> list[str]:
+              encoded_path = urllib.parse.quote(path, safe="")
+              try:
+                  payload = github_get(
+                      f"/repos/{repository}/contents/{encoded_path}?ref={ref}"
+                  )
+              except urllib.error.HTTPError:
+                  return []
+              if not isinstance(payload, dict) or payload.get("encoding") != "base64":
+                  return []
+              content = base64.b64decode(payload["content"]).decode("utf-8")
+              return extract_generated_by(content)
+
+
+          repository = os.environ["REPOSITORY"]
           pr_number = os.environ["PR_NUMBER"].strip()
           pr_title = os.environ["PR_TITLE"]
           pr_url = os.environ["PR_URL"]
           pr_author = os.environ["PR_AUTHOR"]
           pr_branch = os.environ["PR_BRANCH"]
-          dag_folders_raw = os.environ["DAG_FOLDERS"].strip()
+          pr_head_sha = os.environ["PR_HEAD_SHA"]
+          event_title = os.environ["EVENT_TITLE"]
 
-          if "\n" in dag_folders_raw:
-              dag_items = [line.strip() for line in dag_folders_raw.splitlines() if line.strip()]
-          elif dag_folders_raw.startswith("("):
-              dag_items = [dag_folders_raw]
-          else:
-              dag_items = [item.strip() for item in dag_folders_raw.split(",") if item.strip()]
+          pr_files = github_get(
+              f"/repos/{repository}/pulls/{pr_number}/files?per_page=100"
+          )
+          luigijr_files = [
+              item["filename"]
+              for item in pr_files
+              if item["filename"].startswith("dags/luigijr/")
+          ]
+
+          dag_items = sorted(
+              {
+                  path.split("/")[2]
+                  for path in luigijr_files
+                  if len(path.split("/")) > 2 and path.split("/")[2]
+              }
+          )
+          if not dag_items:
+              dag_items = ["(nenhuma pasta de DAG identificada)"]
 
           if len(dag_items) == 1:
               dags_text = dag_items[0]
           else:
-              dags_text = "<br>".join(f"• <font face=\"monospace\">{item}</font>" for item in dag_items)
+              dags_text = "<br>".join(
+                  f'• <font face="monospace">{item}</font>' for item in dag_items
+              )
 
-          summary_bits = [
-              f"<b>PR:</b> #{pr_number}",
-              f"<b>Autor:</b> <font color=\"#1a73e8\">@{pr_author}</font>",
-              f"<b>Branch:</b> <font face=\"monospace\">{pr_branch}</font>",
-          ]
+          generated_by_users: set[str] = set()
+          for path in luigijr_files:
+              if not path.endswith(DECLARATION_SUFFIX):
+                  continue
+              generated_by_users.update(
+                  fetch_declaration_generated_by(repository, path, pr_head_sha)
+              )
+
+          summary_bits = [f"<b>PR:</b> #{pr_number}"]
+
+          if generated_by_users:
+              requesters = [
+                  f"<b>{format_person_id(user)}</b> <font face=\"monospace\">({user})</font>"
+                  for user in sorted(generated_by_users)
+              ]
+              summary_bits.append(
+                  "<b>Solicitante:</b> " + "<br>".join(requesters)
+              )
+          elif not is_zordon_bot(pr_author):
+              summary_bits.append(
+                  f'<b>Solicitante:</b> <font color="#1a73e8">@{pr_author}</font>'
+              )
+          else:
+              summary_bits.append("<b>Solicitante:</b> não identificado")
+
+          if is_zordon_bot(pr_author):
+              summary_bits.append("<b>PR aberto por:</b> Zordon (bot)")
+
+          summary_bits.append(
+              f'<b>Branch:</b> <font face="monospace">{pr_branch}</font>'
+          )
 
           widgets = [
               {
