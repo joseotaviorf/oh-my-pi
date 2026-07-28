@@ -19,7 +19,7 @@ columns:
     lineage:
     - datalake_oitchau_raw.requests.companyUuid
   id_request_type:
-    description: Request type UUID; pairs with requests_types_tree for labels.
+    description: Request type UUID from Oitchau (requestTypeUuid on the API payload).
     lineage:
     - datalake_oitchau_raw.requests.requestTypeUuid
   id_request_subtype:

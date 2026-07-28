@@ -13,9 +13,8 @@ description: |
 
   Daily scheduled runs incrementally merge yesterday's punches; operator-triggered backfills (oitchau_api
   with wider load_start_date/load_end_date) populate historical months. The fact exposes the same
-  employee join keys used by reports_detailed and other dw_time facts so dashboards can union the
-  current-month window (this fact) with closed-month consolidated reports without special-casing the
-  query: sk_employee, person_number, id_employee_profile, and dt_punched.
+  employee join keys as other dw_time Oitchau facts (sk_employee, person_number, id_employee_profile,
+  and dt_punched) for consistent joins to dw_people and cross-fact dashboards.
 
   PII columns from the source (CPF, full name, PIS, matricula) are intentionally excluded; consumers
   that need contact details join dw_employee_details.dim_employee or dw_public.dim_person at query time.
@@ -52,7 +51,7 @@ columns:
   id_employee_profile:
     description: |
       OiTchau employee profile UUID (employees.uuid); shared join key with datalake_oitchau_clean
-      tables and reports_detailed for cross-source reconciliation.
+      employees and other dw_time facts sourced from Oitchau.
     lineage:
       - datalake_oitchau_clean.punches.id_employee_profile
   id_employee:
