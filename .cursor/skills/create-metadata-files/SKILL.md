@@ -146,6 +146,10 @@ CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
 
 Fix until all pass. Fill descriptions and lineage per [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc) and [fairness_metadata.mdc](.cursor/rules/fairness_metadata.mdc).
 
+### Special case: CDC clean tables (framework-injected columns)
+
+For clean tables of CDC workflows (`workflow.type: cdc` in the declaration), `load_cdc_clean` appends `op_cdc`, `ts_cdc_transaction`, and `ts_database_transaction` to the physical table at write time — they are **not** in the `.sql`. `validate-lineage-consistency` **requires** these three columns in the clean metadata `columns:` (aligned with the post-deploy FAIRness I1-01 check). Document them like any other column (description; no `lineage` needed — they are framework-generated, not sourced from upstream).
+
 ### Special case: SQL with SELECT *
 
 If `validate-lineage-consistency` fails with "SQL query uses SELECT * which prevents column validation", ask the user to replace `SELECT *` with explicit column names in the SQL before continuing.

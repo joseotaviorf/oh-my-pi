@@ -2,9 +2,16 @@
 Validates that metadata files (lineage) are consistent with their corresponding SQL queries.
 
 This script ensures that:
-1. All columns in the metadata file exist in the SQL query result
-2. All columns in the SQL query result are documented in the metadata file
-3. Column names match exactly (case-sensitive)
+1. All columns in the metadata file exist in the physical table schema
+2. All columns in the physical table schema are documented in the metadata file
+3. Column names match exactly (case-insensitive)
+
+The physical schema is approximated as the SQL query result plus any
+framework-injected columns (e.g. the CDC ``op_cdc`` / ``ts_*`` columns appended
+at write time by ``load_cdc_clean``) that never appear in the ``.sql``. Those
+injected columns are treated as required documentation so this PR-time check
+stays aligned with the FAIRness I1-01 assessment (documentation ↔ physical
+schema), which runs post-deploy against the ``columns_metastore`` snapshot.
 
 Usage:
     python validate_lineage_consistency.py -a              # Validate all files
@@ -39,10 +46,20 @@ with open(f"{Path(__file__).parent}/skip_list.yml") as f:
 
 SKIP_LIST_PATH_REGEX = re.compile(r"(?:.*/)?dags/(?P<path>.*)")
 
-# Injected at runtime by ``load_cdc_clean`` (see dags/cross/base/spark_jobs/load_cdc_clean.py).
+# Columns appended to the clean-layer SELECT at write time by the CDC spark jobs
+# (``insert_columns_into_query``), keyed by declaration ``workflow.type``. They are
+# physically present in the table but never appear in the ``.sql``. Names are lowercased
+# to match the physical ``columns_metastore`` snapshot used by FAIRness I1-01.
+#   - ``cdc``     -> dags/cross/base/spark_jobs/load_cdc_clean.py
+#   - ``dms_cdc`` -> dags/cross/base/spark_jobs/load_dms_cdc_clean.py (injects "Op" -> "op")
 CDC_CLEAN_INJECTED_COLUMNS = frozenset(
     {"op_cdc", "ts_cdc_transaction", "ts_database_transaction"}
 )
+DMS_CDC_CLEAN_INJECTED_COLUMNS = frozenset({"op", "event_timestamp"})
+CDC_INJECTED_COLUMNS_BY_WORKFLOW_TYPE: Dict[str, frozenset[str]] = {
+    "cdc": CDC_CLEAN_INJECTED_COLUMNS,
+    "dms_cdc": DMS_CDC_CLEAN_INJECTED_COLUMNS,
+}
 
 metadata_file_service = MetadataFileService()
 
@@ -288,7 +305,12 @@ def _declaration_path_from_sql(sql_path: str) -> Path | None:
 
 
 def cdc_injected_columns_for_sql(sql_path: str) -> Set[str]:
-    """Columns appended to clean-layer SELECT by ``load_cdc_clean`` for CDC workflows."""
+    """Columns appended to the clean-layer SELECT by the CDC spark jobs (by workflow type).
+
+    Covers both CDC variants — ``cdc`` (``load_cdc_clean``) and ``dms_cdc``
+    (``load_dms_cdc_clean``) — which inject different column sets. Returns an empty
+    set for non-clean queries or non-CDC workflows.
+    """
     if "/queries/clean/" not in sql_path.replace("\\", "/"):
         return set()
     declaration_path = _declaration_path_from_sql(sql_path)
@@ -296,9 +318,34 @@ def cdc_injected_columns_for_sql(sql_path: str) -> Set[str]:
         return set()
     with open(declaration_path) as f:
         declaration = yaml.safe_load(f) or {}
-    if declaration.get("workflow", {}).get("type") == "cdc":
-        return set(CDC_CLEAN_INJECTED_COLUMNS)
-    return set()
+    workflow_type = declaration.get("workflow", {}).get("type")
+    return set(CDC_INJECTED_COLUMNS_BY_WORKFLOW_TYPE.get(workflow_type, frozenset()))
+
+
+def compare_columns(
+    sql_columns: Set[str],
+    metadata_columns: Set[str],
+    injected_columns: Set[str],
+) -> Tuple[Set[str], Set[str]]:
+    """Align documented columns to the *physical* schema of the table.
+
+    The physical schema is the SQL ``SELECT`` output plus any framework-injected
+    columns (e.g. the CDC ``op_cdc`` / ``ts_*`` columns appended at write time by
+    ``load_cdc_clean``) that never appear in the ``.sql``. The FAIRness I1-01
+    assessment compares documentation against that physical schema, so this
+    PR-time check treats injected columns as **required** documentation — not
+    merely tolerated — to stay aligned with I1-01 and stop CDC tables from
+    passing CI only to fail the assessment after deploy.
+
+    Returns:
+        (missing_in_metadata, extra_in_metadata)
+        - ``missing_in_metadata``: physical columns (SQL output ∪ injected) not documented.
+        - ``extra_in_metadata``: documented columns that are neither in the SQL output nor injected.
+    """
+    expected_columns = sql_columns | injected_columns
+    missing_in_metadata = expected_columns - metadata_columns
+    extra_in_metadata = metadata_columns - expected_columns
+    return missing_in_metadata, extra_in_metadata
 
 
 def validate_lineage_consistency(sql_path: str, metadata_path: str) -> Dict:
@@ -348,24 +395,34 @@ def validate_lineage_consistency(sql_path: str, metadata_path: str) -> Dict:
             )
             return result
 
-        # Check for columns in SQL but not in metadata
-        missing_in_metadata = sql_columns - metadata_columns
+        # Compare documentation against the physical schema (SQL output + any
+        # framework-injected columns, e.g. CDC op/timestamp columns). Injected
+        # columns are required documentation so this check stays aligned with the
+        # FAIRness I1-01 assessment (documentation ↔ physical schema).
+        injected_columns = cdc_injected_columns_for_sql(sql_path)
+        missing_in_metadata, extra_in_metadata = compare_columns(
+            sql_columns, metadata_columns, injected_columns
+        )
+
+        # Physical columns (SQL output + injected) not documented in metadata
         if missing_in_metadata:
             result["valid"] = False
             result["error_type"] = "consistency"
-            result["errors"].append(
-                f"Columns in SQL query but missing in metadata: {sorted(missing_in_metadata)}"
-            )
+            injected_missing = sorted(missing_in_metadata & injected_columns)
+            detail = f"Columns in SQL query but missing in metadata: {sorted(missing_in_metadata)}"
+            if injected_missing:
+                detail += (
+                    f" (includes framework-injected columns that are physically present "
+                    f"but undocumented: {injected_missing})"
+                )
+            result["errors"].append(detail)
 
-        # Check for columns in metadata but not in SQL
-        missing_in_sql = (
-            metadata_columns - sql_columns - cdc_injected_columns_for_sql(sql_path)
-        )
-        if missing_in_sql:
+        # Documented columns that are neither in the SQL output nor injected
+        if extra_in_metadata:
             result["valid"] = False
             result["error_type"] = "consistency"
             result["errors"].append(
-                f"Columns in metadata but missing in SQL query: {sorted(missing_in_sql)}"
+                f"Columns in metadata but missing in SQL query: {sorted(extra_in_metadata)}"
             )
 
     except Exception as e:

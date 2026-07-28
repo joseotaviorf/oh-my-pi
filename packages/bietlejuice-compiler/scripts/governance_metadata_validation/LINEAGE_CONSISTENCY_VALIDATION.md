@@ -16,9 +16,38 @@ As confirmed by code analysis:
 
 ## What does the script validate?
 
-✅ All columns in the SQL query exist in the metadata file
-✅ All columns in the metadata exist in the SQL query
+✅ All columns in the **physical table schema** exist in the metadata file
+✅ All columns in the metadata exist in the physical table schema
 ✅ Column names match exactly (case-insensitive)
+
+The physical schema is the SQL query output **plus any framework-injected
+columns** — see [Framework-injected columns (CDC)](#framework-injected-columns-cdc).
+
+## Framework-injected columns (CDC)
+
+Some columns are part of the **physical** table even though they never appear in
+the `.sql`. The CDC clean spark jobs append them to the SELECT at write time
+(`insert_columns_into_query`), by workflow type:
+
+| `workflow.type` | Spark job | Injected columns (as documented, lowercase) |
+|---|---|---|
+| `cdc` | `load_cdc_clean` | `op_cdc`, `ts_cdc_transaction`, `ts_database_transaction` |
+| `dms_cdc` | `load_dms_cdc_clean` | `op`, `event_timestamp` |
+
+These injected columns are **required documentation**: they must be listed under
+`columns:` in the clean metadata, exactly as the post-deploy FAIRness **I1-01**
+assessment (documentation ↔ `columns_metastore` snapshot) requires. Omitting
+them fails this check with:
+
+```
+Columns in SQL query but missing in metadata: ['op_cdc', 'ts_cdc_transaction', 'ts_database_transaction'] (includes framework-injected columns that are physically present but undocumented: [...])
+```
+
+This keeps the PR-time check aligned with I1-01 and stops CDC tables from
+passing CI only to fail the FAIRness assessment after deploy. The injected sets
+live in `CDC_INJECTED_COLUMNS_BY_WORKFLOW_TYPE` in `validate_lineage_consistency.py`
+(kept in sync with the CDC spark jobs). If a new CDC spark job is added, wire its
+injected columns into that mapping.
 
 ## Parsing Skip List
 
