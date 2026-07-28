@@ -3,7 +3,7 @@ database_name: datalake_jira_bugs
 table_name: bug_issues
 description: Enriched Jira issues table (Bugs project) with context, SLAs, and comments/attachments summaries. Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by id_issue, id_line, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 domain: Cross
-owner: anne.macedo@quintoandar.com.br
+owner: luisa.frodrigues@quintoandar.com.br
 columns:
   id_issue:
     lineage:

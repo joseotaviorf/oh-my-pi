@@ -3,7 +3,7 @@ database_name: datalake_jira_bugs
 table_name: attachments
 description: Attachments extracted from Jira Bugs project issues. Partitioned by year, month, day. Always filter on year, month, day in WHERE clauses to enable partition pruning and avoid full table scans. When filtering by id_issue, id_attachment, ts_updated, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 domain: Cross
-owner: anne.macedo@quintoandar.com.br
+owner: luisa.frodrigues@quintoandar.com.br
 columns:
   id_issue:
     lineage:

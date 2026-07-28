@@ -3,7 +3,7 @@ database_name: datalake_jira_bugs
 table_name: user_account
 description: Dimension of Jira user accounts observed in Bugs project issues. When filtering by id_account, ts_updated, combine partition predicates with those columns to benefit from Z-order clustering and data skipping.
 domain: Cross
-owner: anne.macedo@quintoandar.com.br
+owner: luisa.frodrigues@quintoandar.com.br
 columns:
   id_account:
     lineage:

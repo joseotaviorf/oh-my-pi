@@ -3,10 +3,10 @@
 ## Ownership
 
 **Data Owner:**
-- anne.macedo@quintoandar.com.br
+- luisa.frodrigues@quintoandar.com.br
 
 **Data Steward:**
-- anne.macedo@quintoandar.com.br
+- luisa.frodrigues@quintoandar.com.br
 
 ---
 
@@ -61,7 +61,7 @@ An issue carries:
 | Per-attachment detail for an issue | `datalake_jira_bugs.attachments` |
 | Jira user account lookup (author display name) | `datalake_jira_bugs.user_account` |
 
-`bug_issues` is built by the `enrich_jira_bugs` DAG. It reads `datalake_jira_clean.issues`, keeps only `project.id = 10400`, and dedups **within each load** (`QUALIFY ROW_NUMBER() OVER (PARTITION BY key ORDER BY MAKE_DATE(year,month,day) DESC) = 1`, in Databricks SQL). Owner: `anne.macedo@quintoandar.com.br`.
+`bug_issues` is built by the `enrich_jira_bugs` DAG. It reads `datalake_jira_clean.issues`, keeps only `project.id = 10400`, and dedups **within each load** (`QUALIFY ROW_NUMBER() OVER (PARTITION BY key ORDER BY MAKE_DATE(year,month,day) DESC) = 1`, in Databricks SQL). Owner: `luisa.frodrigues@quintoandar.com.br`.
 
 > ⚠️ **Grain caveat — validated against production.** The served table is **not** strictly one row per issue: it accumulates snapshots across `ts_load`. A test over request type 9228 returned **265 rows for 233 distinct `id_issue`** (29 issues had 2–3 snapshots). **Always dedup to the latest snapshot per `id_issue` in your query** before counting or aggregating:
 >
