@@ -3,7 +3,7 @@
 ## Ownership
 
 **Data Owner:**
-- kevin.trindade@quintoandar.com.br
+- pedro.prates@quintoandar.com.br
 
 **Data Steward:**
 - kevin.trindade@quintoandar.com.br
@@ -139,6 +139,7 @@ fact_assignment_snapshots.sk_job_version → dw_employee_details.dim_job.sk_job_
 **Presentation:**
 
 - Report turnover and attrition percentages with exactly **2 decimal places** (e.g. `12.34%`). Golden queries use `ROUND(..., 2)` — match that precision in any derived rate.
+- **Cast to `DOUBLE` before dividing, not after.** Trino's decimal division does not expand scale (`x / y` scale is `max(xs, ys)`, it never grows), so a numerator built from a literal like `100.0` (scale 1) keeps that scale through every subsequent division — the result silently rounds to 1 decimal place before any outer `ROUND(..., 2)` runs, defeating the 2-decimal-place rule above. Wrap operands with `CAST(... AS DOUBLE)` at **each** division site in the expression tree (not just the outermost one) so the arithmetic runs in floating point throughout.
 
 **Do:**
 
@@ -229,11 +230,11 @@ monthly_turnover AS (
         COALESCE(l.leavers, 0) AS leavers,
         COALESCE(e.hc_eom, 0) AS hc_eom,
         COALESCE(e.hc_eom, 0) + COALESCE(t.terminations, 0) - COALESCE(h.new_hires, 0) AS hc_som,
-        100.0 * COALESCE(l.leavers, 0) / NULLIF(
-            (
+        100.0 * CAST(COALESCE(l.leavers, 0) AS DOUBLE) / NULLIF(
+            CAST(
                 (COALESCE(e.hc_eom, 0) + COALESCE(t.terminations, 0) - COALESCE(h.new_hires, 0))
                 + COALESCE(e.hc_eom, 0)
-            ) / 2.0,
+            AS DOUBLE) / 2.0,
             0
         ) AS turnover_pct
     FROM month_bounds AS mb
@@ -315,7 +316,10 @@ SELECT
     e.hc_eom + t.terminations - h.new_hires AS hc_som,
     e.hc_eom,
     ROUND(
-        100.0 * l.leavers / NULLIF((e.hc_eom + t.terminations - h.new_hires + e.hc_eom) / 2.0, 0),
+        100.0 * CAST(l.leavers AS DOUBLE) / NULLIF(
+            CAST(e.hc_eom + t.terminations - h.new_hires + e.hc_eom AS DOUBLE) / 2.0,
+            0
+        ),
         2
     ) AS voluntary_turnover_pct
 FROM leavers AS l
@@ -359,7 +363,7 @@ SELECT
     t.t90 AS terminations_90,
     a.a90 AS active_90_eom,
     t.t90 + a.a90 AS denominator,
-    ROUND(100.0 * t.t90 / NULLIF(t.t90 + a.a90, 0), 2) AS nh_attrition_pct
+    ROUND(100.0 * CAST(t.t90 AS DOUBLE) / NULLIF(t.t90 + a.a90, 0), 2) AS nh_attrition_pct
 FROM terminations_90 AS t
 CROSS JOIN active_90_eom AS a
 ```
