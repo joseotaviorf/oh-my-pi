@@ -1,0 +1,88 @@
+database_name: datalake_observability
+table_name: profile_partition_metrics
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >-
+  Partition-grain observability metrics for tables produced by bi-etl-ejuice, one row per
+  profiled partition and Delta version. Captures per-partition row counts, rows written by the
+  commit and time-column min/max collected by the post-load profiling task, used to detect
+  empty or partial partitions and freshness gaps. Append-only store written at runtime (no SQL
+  lineage).
+columns:
+  database:
+    description: >-
+      Hive schema of the profiled table (the subject being observed), for example dw_rent or
+      datalake_ebdb_clean.
+  table:
+    description: >-
+      Table name of the profiled table (the subject being observed), without the schema
+      prefix.
+  layer:
+    description: >-
+      Medallion layer of the profiled table (raw, clean, enrich, dw or metric), derived from
+      its database name.
+  environment:
+    description: >-
+      Execution environment where the metric was collected (for example prod or forno), used
+      to keep environments separate when querying history.
+  run_logical_date:
+    description: >-
+      Airflow logical (execution) date of the DAG run that produced this observation, used to
+      align metrics with the pipeline run rather than wall-clock time.
+  profiled_delta_version:
+    description: >-
+      Delta table version (commit) the metric row describes; the table-state identifier that
+      makes each observation reproducible and enables read-time dedup by latest version.
+  profiled_at:
+    description: >-
+      Timestamp in UTC when the metric was measured. This is the as_of anti-staleness stamp
+      surfaced to consumers so a value is always read as "as of" a point in time.
+  collection_method:
+    description: >-
+      Provenance of the measurement (spark_log for Delta log reads, spark_partition_agg for a
+      single-partition aggregation, or pydeequ for the content tier).
+  metric_schema_version:
+    description: >-
+      Schema version of this observability metric row, allowing forward-compatible evolution
+      of the store without breaking historical readers.
+  partition_key:
+    description: >-
+      Identifier of the observed partition as an array of name and value structs, handling
+      heterogeneous partition schemes (for example partition_date/partition_hour or
+      year/month/day) in a single generic shape.
+  row_count:
+    description: >-
+      Number of rows in the observed partition at the profiled version, read from
+      count-from-stats. Highest-value signal for empty or partial partitions.
+  rows_written:
+    description: >-
+      Number of rows written to this partition by the run's commit, from the Delta history
+      operation metrics. Detects 0-row writes even when the partition already held data.
+  num_files:
+    description: >-
+      Number of active data files in the observed partition, used to monitor per-partition
+      small-file proliferation.
+  size_bytes:
+    description: >-
+      Physical size in bytes of the observed partition, used as a per-partition volume
+      baseline.
+  min_ts:
+    description: >-
+      Minimum value of the partition's time column within the observed partition, computed by a
+      single-partition aggregation, used for latency and stale-content detection.
+  max_ts:
+    description: >-
+      Maximum value of the partition's time column within the observed partition, computed by a
+      single-partition aggregation, used as a recency signal.
+  year:
+    description: >-
+      Year of the observability load date, used for Hive partitioning — include in filters for
+      partition pruning.
+  month:
+    description: >-
+      Month of the observability load date, used for Hive partitioning — include in filters for
+      partition pruning.
+  day:
+    description: >-
+      Day of the observability load date, used for Hive partitioning — include in filters for
+      partition pruning.

@@ -1,0 +1,110 @@
+database_name: datalake_observability
+table_name: profile_table_metrics
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >-
+  Table-grain observability metrics for tables produced by bi-etl-ejuice, one row per
+  profiled table and Delta version. Captures row counts, physical size, schema fingerprint
+  and recency signals collected by the post-load profiling task, used to detect silent data
+  errors such as empty tables, schema drift and volume anomalies. Append-only store written at
+  runtime (no SQL lineage).
+columns:
+  database:
+    description: >-
+      Hive schema of the profiled table (the subject being observed), for example dw_rent or
+      datalake_ebdb_clean.
+  table:
+    description: >-
+      Table name of the profiled table (the subject being observed), without the schema
+      prefix.
+  layer:
+    description: >-
+      Medallion layer of the profiled table (raw, clean, enrich, dw or metric), derived from
+      its database name.
+  environment:
+    description: >-
+      Execution environment where the metric was collected (for example prod or forno), used
+      to keep environments separate when querying history.
+  run_logical_date:
+    description: >-
+      Airflow logical (execution) date of the DAG run that produced this observation, used to
+      align metrics with the pipeline run rather than wall-clock time.
+  profiled_delta_version:
+    description: >-
+      Delta table version (commit) the metric row describes; the table-state identifier that
+      makes each observation reproducible and enables read-time dedup by latest version.
+  profiled_at:
+    description: >-
+      Timestamp in UTC when the metric was measured. This is the as_of anti-staleness stamp
+      surfaced to consumers so a value is always read as "as of" a point in time.
+  collection_method:
+    description: >-
+      Provenance of the measurement (spark_log for Delta log reads, spark_partition_agg for a
+      single-partition aggregation, or pydeequ for the content tier).
+  metric_schema_version:
+    description: >-
+      Schema version of this observability metric row, allowing forward-compatible evolution
+      of the store without breaking historical readers.
+  row_count:
+    description: >-
+      Total number of rows in the profiled table at the profiled version, read from Delta
+      count-from-stats with a real-count fallback. Detects empty tables and volume explosions.
+  num_files:
+    description: >-
+      Number of active data files in the profiled table snapshot, used to monitor small-file
+      proliferation and storage/compaction health.
+  size_bytes:
+    description: >-
+      Physical size in bytes of the profiled table snapshot, used as a baseline for volume
+      anomaly detection.
+  created_at:
+    description: >-
+      Timestamp in UTC when the profiled Delta table was first created, from the Delta table
+      details.
+  last_modified:
+    description: >-
+      Timestamp in UTC of the profiled table's most recent write, from the Delta table
+      details. Primary recency signal for "was the table written recently".
+  latest_partition_value:
+    description: >-
+      Highest partition value present in the profiled table, read for free from the partition
+      list as a cheap recency signal for partitioned tables.
+  num_columns:
+    description: >-
+      Number of columns in the profiled table schema at the profiled version.
+  schema_hash:
+    description: >-
+      Stable hash of the ordered column name and type list, compared across runs to detect
+      schema drift (added, removed or retyped columns).
+  columns:
+    description: >-
+      Snapshot of the profiled table schema as an array of name and type structs, kept for
+      auditing what the schema looked like at the profiled version.
+  partition_columns:
+    description: >-
+      Ordered list of the profiled table's partition columns, used to interpret partition-grain
+      metrics and completeness expectations.
+  clustering_columns:
+    description: >-
+      Ordered list of the profiled table's clustering columns (liquid clustering or Z-order),
+      when defined, captured for structural-change detection.
+  table_properties:
+    description: >-
+      Delta table properties captured as context (for example deletion-vector or data-skipping
+      settings) needed to correctly interpret the collected statistics.
+  table_features:
+    description: >-
+      Delta table features enabled on the profiled table, stored as an array of feature names,
+      to interpret stats and behaviour such as deletion vectors.
+  year:
+    description: >-
+      Year of the observability load date, used for Hive partitioning — include in filters for
+      partition pruning.
+  month:
+    description: >-
+      Month of the observability load date, used for Hive partitioning — include in filters for
+      partition pruning.
+  day:
+    description: >-
+      Day of the observability load date, used for Hive partitioning — include in filters for
+      partition pruning.
