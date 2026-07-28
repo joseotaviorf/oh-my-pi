@@ -41,10 +41,10 @@ sheets_info:
     clean_table_name: aux_commission
     sheet_context: fintech
   
-  bandaid:
+  payfaturas_bandaid:
     sheet_id: 1-HKD9rv6Ov6_WLRDct56f3Gnur45-w004l_Q_ct8jX4
     sheet_name: Respostas
-    clean_table_name: bandaid
+    clean_table_name: payfaturas_bandaid
     sheet_context: fintech
   
   bandaid_payment:

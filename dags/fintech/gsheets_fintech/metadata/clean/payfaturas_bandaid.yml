@@ -1,147 +1,148 @@
 ---
 database_name: datalake_gsheets_clean
-table_name: bandaid
+table_name: payfaturas_bandaid
 description:
   Google Sheets intake for bandaid financial adjustments curated by Fintech
-  Operations. One row per bandaid request with contract, property, ticket,
-  installment plan, payer/payee, bank details, and automation context. Consumed
-  to track manual and automated bandaid postings and invoice reconciliation.
+  Operations (Pay Faturas workflow). One row per bandaid request with contract,
+  property, ticket, installment plan, payer/payee, bank details, and automation
+  context. Consumed to track manual and automated bandaid postings and invoice
+  reconciliation.
 owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 columns:
   creation_timestamp:
     lineage:
-      - datalake_gsheets_raw.bandaid.timestamp
+      - datalake_gsheets_raw.payfaturas_bandaid.timestamp
     description: Timestamp when the bandaid request was submitted in the Google Sheet.
   execution_timestamp:
     lineage:
-      - datalake_gsheets_raw.bandaid.execucao
+      - datalake_gsheets_raw.payfaturas_bandaid.execucao
     description: Timestamp when the bandaid workflow execution was recorded in the sheet.
   include_on_date:
     lineage:
-      - datalake_gsheets_raw.bandaid.incluirnadatade
+      - datalake_gsheets_raw.payfaturas_bandaid.incluirnadatade
     description: Date when the bandaid charge should be included in billing.
   charge_on_date:
     lineage:
-      - datalake_gsheets_raw.bandaid.cobrarnadatade
+      - datalake_gsheets_raw.payfaturas_bandaid.cobrarnadatade
     description: Date when the bandaid amount should be charged or collected.
   request_id:
     lineage:
-      - datalake_gsheets_raw.bandaid.solicitacao
+      - datalake_gsheets_raw.payfaturas_bandaid.solicitacao
     description: Identifier of the bandaid request in the Google Sheets intake form.
   contract_id:
     lineage:
-      - datalake_gsheets_raw.bandaid.contrato
+      - datalake_gsheets_raw.payfaturas_bandaid.contrato
     description: Rental contract identifier the bandaid adjustment applies to.
   property_id:
     lineage:
-      - datalake_gsheets_raw.bandaid.imovel
+      - datalake_gsheets_raw.payfaturas_bandaid.imovel
     description: Property listing identifier linked to the bandaid request.
   ticket_id:
     lineage:
-      - datalake_gsheets_raw.bandaid.ticket
+      - datalake_gsheets_raw.payfaturas_bandaid.ticket
     description: Support or operations ticket associated with the bandaid request.
   billing_installment_count:
     lineage:
-      - datalake_gsheets_raw.bandaid.quantidadeparcelas
+      - datalake_gsheets_raw.payfaturas_bandaid.quantidadeparcelas
     description: Number of installments planned for billing the bandaid amount.
   payment_installment_count:
     lineage:
-      - datalake_gsheets_raw.bandaid.quantidadeparcelascobranca
+      - datalake_gsheets_raw.payfaturas_bandaid.quantidadeparcelascobranca
     description: Number of installments planned for collecting the bandaid payment.
   sheet_row_index:
     lineage:
-      - datalake_gsheets_raw.bandaid.cancelado
+      - datalake_gsheets_raw.payfaturas_bandaid.cancelado
     description: Row index value recorded in the bandaid sheet for the request line.
   bandaid_value:
     lineage:
-      - datalake_gsheets_raw.bandaid.valorbandaid
+      - datalake_gsheets_raw.payfaturas_bandaid.valorbandaid
     description: Bandaid adjustment amount in BRL to be posted or reimbursed.
   task_name:
     lineage:
-      - datalake_gsheets_raw.bandaid.tarefa
+      - datalake_gsheets_raw.payfaturas_bandaid.tarefa
     description: Operational task name associated with processing the bandaid request.
   analyst_email:
     lineage:
-      - datalake_gsheets_raw.bandaid.analista
+      - datalake_gsheets_raw.payfaturas_bandaid.analista
     description: Email of the Fintech analyst who submitted or validated the bandaid.
   has_extra_invoice:
     lineage:
-      - datalake_gsheets_raw.bandaid.fatura_extra
+      - datalake_gsheets_raw.payfaturas_bandaid.fatura_extra
     description: Flag indicating whether an extra invoice is linked to this bandaid.
   payer_type:
     lineage:
-      - datalake_gsheets_raw.bandaid.de
+      - datalake_gsheets_raw.payfaturas_bandaid.de
     description: Party responsible for paying the bandaid charge (from / de in the sheet).
   receiver_type:
     lineage:
-      - datalake_gsheets_raw.bandaid.para
+      - datalake_gsheets_raw.payfaturas_bandaid.para
     description: Party that should receive the bandaid amount (to / para in the sheet).
   bandaid_type:
     lineage:
-      - datalake_gsheets_raw.bandaid.tipobandaid
+      - datalake_gsheets_raw.payfaturas_bandaid.tipobandaid
     description: Business classification of the bandaid adjustment type.
   billing_installment_type:
     lineage:
-      - datalake_gsheets_raw.bandaid.parcelamento
+      - datalake_gsheets_raw.payfaturas_bandaid.parcelamento
     description: Installment modality used for billing the bandaid amount.
   payment_installment_type:
     lineage:
-      - datalake_gsheets_raw.bandaid.parcelamentocobranca
+      - datalake_gsheets_raw.payfaturas_bandaid.parcelamentocobranca
     description: Installment modality used for collecting the bandaid payment.
   bandaid_summary:
     lineage:
-      - datalake_gsheets_raw.bandaid.resumo
+      - datalake_gsheets_raw.payfaturas_bandaid.resumo
     description: Short summary or description of the bandaid adjustment.
   bandaid_reference_code:
     lineage:
-      - datalake_gsheets_raw.bandaid.numerobandaid
+      - datalake_gsheets_raw.payfaturas_bandaid.numerobandaid
     description: Reference code or number identifying the bandaid in operational systems.
   expense_type:
     lineage:
-      - datalake_gsheets_raw.bandaid.tipodespesa
+      - datalake_gsheets_raw.payfaturas_bandaid.tipodespesa
     description: Expense category associated with the bandaid adjustment.
   bandaid_status:
     lineage:
-      - datalake_gsheets_raw.bandaid.statusbandaid
+      - datalake_gsheets_raw.payfaturas_bandaid.statusbandaid
     description: Processing status of the bandaid request in the Fintech workflow.
   invoice_divergence_notes:
     lineage:
-      - datalake_gsheets_raw.bandaid.divergencia_fatura
+      - datalake_gsheets_raw.payfaturas_bandaid.divergencia_fatura
     description: Notes describing invoice divergences related to the bandaid request.
   cancellation_reason:
     lineage:
-      - datalake_gsheets_raw.bandaid.taskrow
+      - datalake_gsheets_raw.payfaturas_bandaid.taskrow
     description: Reason or task context recorded when the bandaid request was canceled.
   cancellation_request_by:
     lineage:
-      - datalake_gsheets_raw.bandaid.solicitacao_cancelamento
+      - datalake_gsheets_raw.payfaturas_bandaid.solicitacao_cancelamento
     description: Requester or channel that initiated the bandaid cancellation.
   bank_account_holder_name:
     lineage:
-      - datalake_gsheets_raw.bandaid.titular_da_conta
+      - datalake_gsheets_raw.payfaturas_bandaid.titular_da_conta
     description: Bank account holder name provided for bandaid payout or reimbursement.
   tax_id:
     lineage:
-      - datalake_gsheets_raw.bandaid.cpf
+      - datalake_gsheets_raw.payfaturas_bandaid.cpf
     description: Brazilian tax identifier (CPF) linked to the payout account holder.
   bank_agency_code:
     lineage:
-      - datalake_gsheets_raw.bandaid.agencia
+      - datalake_gsheets_raw.payfaturas_bandaid.agencia
     description: Bank branch (agência) code for the bandaid payout account.
   bank_name:
     lineage:
-      - datalake_gsheets_raw.bandaid.banco
+      - datalake_gsheets_raw.payfaturas_bandaid.banco
     description: Bank name or identifier for the bandaid payout account.
   bank_account_code:
     lineage:
-      - datalake_gsheets_raw.bandaid.conta_corrente
+      - datalake_gsheets_raw.payfaturas_bandaid.conta_corrente
     description: Checking account number for the bandaid payout.
   bank_account_type:
     lineage:
-      - datalake_gsheets_raw.bandaid.tipo_de_conta
+      - datalake_gsheets_raw.payfaturas_bandaid.tipo_de_conta
     description: Bank account type provided for the bandaid payout.
   queue_context_name:
     lineage:
-      - datalake_gsheets_raw.bandaid.queue
+      - datalake_gsheets_raw.payfaturas_bandaid.queue
     description: Queue or workflow context name where the bandaid request was handled.

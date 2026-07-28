@@ -34,4 +34,4 @@ SELECT
     CAST(tipo_de_conta AS STRING) AS bank_account_type,
     CAST(queue AS STRING) AS queue_context_name
 FROM
-    datalake_gsheets_raw.bandaid
+    datalake_gsheets_raw.payfaturas_bandaid
