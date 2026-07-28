@@ -3,10 +3,10 @@
 ## Ownership
 
 **Data Owner:**
-- joao.mariani@quintoandar.com.br
+- [joao.mariani@quintoandar.com.br](mailto:joao.mariani@quintoandar.com.br)
 
 **Data Steward:**
-- victor.sakai@quintoandar.com.br
+- [victor.sakai@quintoandar.com.br](mailto:victor.sakai@quintoandar.com.br)
 
 ## Overview
 
