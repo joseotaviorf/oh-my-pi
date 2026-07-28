@@ -89,7 +89,12 @@ AND date = last_day_of_month(DATE '{reference_month}-01')
 
 ### Nuances
 
-`sandbox.summary_table_fr` is a general metrics mart (target/budget/actual/OKR by day, by `metric_name`, `city_group`, `business_context`) — it is **not currently registered in DataHub**; this document is the source of truth for its grain and filters until it is catalogued.
+`sandbox.summary_table_fr` is the denominator source for active contract stock. It is a
+general metrics mart keyed by `metric_name`, `city_group`, `country_code`, `business_context`,
+and `date` — **not currently registered in DataHub**; this document is the source of truth
+for its grain and filters until it is catalogued. Budget / OKR / target values for this
+metric live on the same table under this metric's own `metric_name` — see
+`## Targets and OKRs`.
 
 | Column | Description |
 | :----- | :---------- |
@@ -121,6 +126,32 @@ AND date = last_day_of_month(DATE '{reference_month}-01')
 - Don't drop the `country_code = 'BR'` filter on the denominator.
 - Don't express any of these values as a percentage.
 - Don't report a call-only or chat-only cut as if it were the official metric — always lead with the combined total unless the user explicitly asks for a channel breakdown.
+
+## Targets and OKRs
+
+**Budget (Target)** — annual commitment for Ticket Rate Front - Pós Contrato, on the same
+mart as the denominator.
+
+- **Source table:** `sandbox.summary_table_fr`
+- **Filter key / metric name:** `metric_name` for **Ticket Rate Front - Pós Contrato** (confirm
+  the exact string in the mart — distinct from `'Ongoing Rental'`)
+- **Period grain:** daily (`date`)
+- **Canonical scope filters:** `country_code = 'BR'`; sum across all `city_group` rows for
+  the national value
+- **Aliases / search terms:** orçamento ticket rate, budget ticket rate front pós contrato
+- **Caveat:** confirm the budget column name from the mart schema — the mart is not registered
+  in DataHub.
+
+**OKR** — period OKR for the same metric, on the same mart rows.
+
+- **Source table:** `sandbox.summary_table_fr`
+- **Filter key / metric name:** same `metric_name` as Budget above
+- **Period grain:** daily (`date`); align the reference `date` with the month used for the
+  calculated actual
+- **Canonical scope filters:** `country_code = 'BR'`; sum across `city_group` for national
+- **Aliases / search terms:** meta ticket rate pós contrato, OKR ticket rate front
+- **Caveat:** confirm the OKR column name from the mart schema; do not read goals from
+  `'Ongoing Rental'` rows.
 
 ## Golden Queries
 

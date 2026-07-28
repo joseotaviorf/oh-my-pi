@@ -195,7 +195,6 @@ hardcode**. The **same weights** serve NPS True and PP Multi.
 | `customer_journey` | Filter `= 'TRUE'` (UPPERCASE here — ≠ `dim_nps_campaign`, which uses lowercase `'true'`) for NPS FR weights |
 | `share` | Weight (string `'25%'`) — parse: `CAST(REPLACE(share, '%', '') AS DOUBLE) / 100.0` |
 | `dt_start`, `dt_end` | Quarterly validity |
-| `target` | Period NPS target (informational, not used in the calculation) |
 
 - **Join key**: `campaign_group` ↔ journey derived from `metric_group`.
 - **Date join**: `CAST(ref_month AS DATE) BETWEEN dt_start AND dt_end`.
@@ -308,6 +307,22 @@ breakdown via `customer_type` and crossable with one another):
 - Don't treat `tickets` and `digital_support` as overlapping — the categorization is exclusive and by precedence (`tickets` beats `digital_support`).
 - Don't use `MAX` to aggregate the weight source — use `MIN`, so `'fallback'` shows up when any journey lacks an official weight.
 - Don't treat **Total** as the average of the IQ and PP NPS — always pool the answers.
+
+## Targets and OKRs
+
+**OKR** — quarterly period NPS goal per journey, co-located with the official weights in
+the same GSheet table (informational — **not** used in the NPS calculation).
+
+- **Source table:** `datalake_gsheets_clean.nps_target_share`
+- **Filter key / metric name:** `customer_journey = 'TRUE'` (UPPERCASE — ≠ `dim_nps_campaign`,
+  which uses lowercase `'true'`) and match `campaign_group` to the journey
+  (`onboarding`, `ongoing`, `offboarding`)
+- **Period grain:** quarterly (`dt_start` / `dt_end`); join `CAST(ref_month AS DATE) BETWEEN dt_start AND dt_end`
+- **Value column:** `target` (period NPS target per journey)
+- **Aliases / search terms:** meta de NPS, target de NPS, meta NPS True, OKR NPS
+- **Caveat:** targets are informational only — never substitute `target` for computed NPS.
+  When a quarter has no registered row, the weight fallback applies; the target for that
+  journey may also be missing for the same period.
 
 ## Golden Queries
 
