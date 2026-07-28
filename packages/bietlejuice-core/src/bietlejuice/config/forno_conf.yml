@@ -91,6 +91,8 @@ databricks_bucket: databricks.s3.forno.data.quintoandar.com.br
 dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
 data_documentation_bucket: data-documentation.s3.forno.data.quintoandar.com.br
 datalake_bucket: 5a-datalake-forno
+profiling_enabled: true
+profiling_default_enabled: false
 incoming_bucket: 5a-datalake-incoming-forno
 wonka_bucket: wonka.s3.forno.data.quintoandar.com.br
 planning_and_performance_bucket: 5a-dataops-forno

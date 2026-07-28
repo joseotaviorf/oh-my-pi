@@ -91,6 +91,8 @@ databricks_bucket: 5a-databricks
 dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
 data_documentation_bucket: data-documentation.s3.data.quintoandar.com.br
 datalake_bucket: 5a-datalake-prod
+profiling_enabled: true
+profiling_default_enabled: false
 incoming_bucket: 5a-datalake-incoming-prod
 wonka_bucket: wonka.s3.data.quintoandar.com.br
 doc_md_chart_url: https://n2065e18540524a1cp-tp.appspot.com/admin/airflow/chart?chart_id=11&iteration_no=22&dag_id=
