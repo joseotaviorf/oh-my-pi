@@ -337,6 +337,7 @@ bietlejuice.dw_ciq_listing_purchase:
   - bietlejuice.enrich_ciq_listing_purchase:load-enrich-ciq-listing-purchase:first-run-of-day
   - bietlejuice.enrich_ciq_listing_purchase:load-enrich-listing-purchase-duplicity:first-run-of-day
   - bietlejuice.enrich_ciq_listing_purchase:load-enrich-listing-purchase-pricing:first-run-of-day
+  - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
 bietlejuice.dw_collection_ai_agents:
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-features-timeline:first-run-of-day
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day
