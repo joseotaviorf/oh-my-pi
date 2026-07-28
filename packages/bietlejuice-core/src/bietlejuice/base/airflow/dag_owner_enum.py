@@ -30,6 +30,7 @@ class DAGOwnerEnum:
     MLOPS = "MLOps"
     OPS_FINANCE = "Ops Finance"
     OPS_POC = "Ops POC"
+    OPS_PUBLIC = "Ops Public"
     OPS_SS = "Ops SS"
     QCX = "QCX"
     TECH_PLATAFORM_CYBER_SECURITY = "Tech Platform Cyber Security"

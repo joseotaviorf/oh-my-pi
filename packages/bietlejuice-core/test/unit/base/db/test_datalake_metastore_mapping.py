@@ -3,7 +3,7 @@ import pytest
 from bietlejuice.base.db.datalake_metastore_mapping import DatalakeMetastoreMapping
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
-_GOVERNED_SCHEMAS = ("ops_finance", "ops_ss", "forrent_postcontract")
+_GOVERNED_SCHEMAS = ("ops_finance", "ops_ss", "ops_public", "forrent_postcontract")
 
 
 class TestDatalakeMetastoreMapping:

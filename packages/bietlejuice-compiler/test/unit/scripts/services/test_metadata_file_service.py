@@ -24,7 +24,7 @@ def _validate(database_name: str, custom_schema: str, layer: str = "enrich"):
 class TestValidateDatabaseNameGovernedSchema:
     @pytest.mark.parametrize(
         "schema",
-        ("ops_finance", "ops_ss", "forrent_postcontract"),
+        ("ops_finance", "ops_ss", "ops_public", "forrent_postcontract"),
     )
     def test_governed_schema_uses_pure_name(self, schema):
         # governed Luigi materialization schemas -> enrich expects the prefixless name
@@ -32,7 +32,7 @@ class TestValidateDatabaseNameGovernedSchema:
 
     @pytest.mark.parametrize(
         "schema",
-        ("ops_finance", "ops_ss", "forrent_postcontract"),
+        ("ops_finance", "ops_ss", "ops_public", "forrent_postcontract"),
     )
     def test_governed_schema_rejects_datalake_prefix(self, schema):
         with pytest.raises(DatabaseNameMismatchException):
