@@ -70,7 +70,7 @@ gaps, connector health) rather than a Kimball business concept. Example:
 
 ## Step 3 — Write the entity file
 
-Create `docs/llm_context/business_entities/{entity_name}.md` following this structure exactly. Every section is required. Keep the file concise and objective, not exhaustive.
+Create `docs/llm_context/business_entities/{entity_name}.md` following this structure exactly. **Required** sections: `## Ownership`, `## Overview`, `## Glossary and Synonyms`, `## Tables`, `## Dos and Don'ts`, `## Golden Queries` (the CI gate blocks a PR missing any of them). `## Key Metrics` and `## Relationships with Other Entities` are optional — include them when they apply; `## DataHub catalog` is filled in automatically. Keep the file concise and objective, not exhaustive.
 
 ### Template
 
@@ -327,3 +327,75 @@ uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_da
 
 python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
 ```
+
+<!-- LUIGI:SELF-SERVICE:BEGIN -->
+
+## Self-Service Submissions via Zordon (Luigi)
+
+> **This block is the single source Zordon/Luigi reads to guide a self-service submission**,
+> so it is written for that consumer and is self-contained. The numbered Steps above — asking the
+> user, codebase research, Explore subagents, Trino MCP, the DataHub token-overflow byte check, the
+> related-entity back-links — are for an **engineer or Cursor agent editing the repo directly** and
+> do **not** apply to a chat submission. This block only restates the *content contract* the finished
+> file must satisfy. If it ever disagrees with the sections above, **the sections above win** — keep
+> it in lockstep with them.
+
+**How the flow actually works.** A non-technical user uploads a finished business-entity `.md` in
+Google Chat. Zordon validates it in the conversation and, if it passes, opens a review PR on
+`bi-etl-ejuice`; a human data engineer reviews it, and merging to `master` publishes it to DataHub.
+Zordon never researches the codebase or writes the doc for the user — it only checks the uploaded
+file against the contract below and tells the user, in plain language, what to fix and re-upload.
+
+**Filename — Zordon derives it, the user does not choose it.** It comes from the official entity
+name: lowercased, accents stripped, then every run of non-alphanumeric characters collapsed to a
+single `_` (e.g. `Broker XP` → `broker_xp.md`), landing under `docs/llm_context/business_entities/`.
+A name that collides with an already-published entity is surfaced by Zordon's own
+duplicate/existing-entity check (below), not asked about up front.
+
+**Language.** The prose (headings + body) must be predominantly **English**. Portuguese is expected
+and must NOT be flagged in: `## Glossary and Synonyms` entries, short parenthetical glosses of a
+local term (e.g. "eviction (despejo)"), and any code, SQL, identifiers, emails, or URLs.
+
+**No template leftovers.** Reject any unfilled placeholder (text wrapped in `{...}`) and any leftover
+`WRITING GUIDE` comment block.
+
+### Required sections — the automated gates block the PR if any is missing or empty
+
+Both the CI check (in `bi-etl-ejuice`) and Zordon's pre-check block the PR when a required
+section is **missing or empty**, and enforce the machine-checkable specifics: the Ownership
+Data Owner **and** Data Steward emails, at least one `sql` Golden Query block, and — for a
+domain doc — at least one concrete `` `schema.table` `` reference. The finer content rules in
+*What it must contain* describe what a **good** section looks like: CI surfaces them as
+**non-blocking warnings** (e.g. a Dos and Don'ts without both a Do and a Don't) and the
+responsible data engineer confirms them in review — advisory nudges, never a blocked PR.
+
+| Section | What it must contain |
+| :------ | :------------------- |
+| `# {Entity Name}` | The H1 title: the entity's full official name, spelled out. |
+| `## Ownership` | **Data Owner:** at least one `@quintoandar.com.br`/`@quintoandar.com` email, **and** **Data Steward:** at least one such email. The two roles may be the same person. |
+| `## Overview` | 2–4 sentences: what the entity is, why it matters, and who cares about it. |
+| `## Glossary and Synonyms` | At least one bullet mapping every PT-BR term / alias an analyst says to the technical concept. |
+| `## Tables` | At least one **concrete** `` `schema.table` `` reference — never a wildcard (`schema.*`, `table_*`); DataHub cannot link pattern URNs. |
+| `## Dos and Don'ts` | At least one **Do** and one **Don't**, specific to this entity's tables/filters. |
+| `## Golden Queries` | At least one Trino SQL block (a triple-backtick `sql` fence). No Spark-only constructs: `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-argument `DATEDIFF`, or `col:key` variant access. |
+
+> The required set is intentionally the same shape as a metric doc's — the shared sections
+> (Ownership, Overview, Glossary, Dos and Don'ts, Golden Queries) match; only the type-specific
+> ones differ (a domain doc has `## Tables`; a metric doc has Related Business Entities / Scope /
+> Calculation instead).
+
+### Optional sections — include only when they apply
+
+- `## Key Metrics` — the 5–10 most common KPIs, each referencing its table/column.
+- `## Relationships with Other Entities` — JOIN patterns to related entities, with real column names and caveats.
+- `## DataHub catalog` — added automatically by CI after publish; never fill it in by hand.
+
+### What Zordon must NOT ask the user
+
+- **The owner's / steward's email** — when `## Ownership` is present, Zordon reads it straight from
+  the uploaded file instead of asking again.
+- **Anything that needs repo access** (which tables exist, whether a slug is already taken, whether
+  this duplicates an existing entity) — Zordon checks that itself against `bi-etl-ejuice` and only
+  speaks up when it actually finds a conflict or a likely duplicate.
+
+<!-- LUIGI:SELF-SERVICE:END -->

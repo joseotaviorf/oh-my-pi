@@ -22,9 +22,9 @@ Metric entity docs are **calculation contracts** — they tell TARS (and analyst
 7. **Canonical filter** — the exact SQL predicates that define the metric's universe (mandatory fields + values).
 8. **Weight / parameter source** — where do coefficients, targets, or thresholds live (e.g., a GSheets table)? Never hardcode.
 9. **Common analyst mistakes** — the top 2–3 traps that produce a wrong number (drives Dos and Don'ts and the warning in Canonical Filter).
-10. **Superset golden assets** — the reference assets for this metric: canonical Superset virtual datasets and/or the materialized Trino/Databricks `schema.table` tables they map to (e.g. `sandbox.nps_fr`). These are linked as reference assets on the DataHub Data Product Summary. Optional.
-11. **Ownership emails** — at least one **Data Owner** (accountable for the business definition, usually a manager/lead) and at least one **Data Steward** (`@quintoandar.com.br`, maintains this document day-to-day; defaults to the requester if not otherwise specified). The two roles may share the same email.
-12. **MBR membership** — does this metric feed one or more Monthly Business Reviews (MBRs)? If so, which one(s)? Optional — omit if the metric is not part of any MBR. A metric may belong to several MBRs.
+10. **Superset golden assets** — the reference assets for this metric: canonical Superset virtual datasets and/or the materialized Trino/Databricks `schema.table` tables they map to (e.g. `sandbox.nps_fr`). These are linked as reference assets on the DataHub Data Product Summary. Optional section in the final doc — omit `## Superset Golden Assets` when no asset exists.
+11. **Ownership emails** — at least one **Data Owner** (accountable for the business definition, usually a manager/lead) and at least one **Data Steward** (`@quintoandar.com.br`/`@quintoandar.com`, maintains this document day-to-day; defaults to the requester if not otherwise specified). The two roles may share the same email.
+12. **MBR membership** — does this metric feed one or more Monthly Business Reviews (MBRs)? If so, which one(s)? Optional section — omit if the metric is not part of any MBR. A metric may belong to several MBRs.
 13. **Budget / OKR** — optional. Ask separately whether the metric has an official **Budget (Target)** (annual commitment, fixed for the fiscal year) and/or **OKR** (period challenge — quarter or semester — that may change across the year). For each that exists: source table, filter key / metric name in source, period grain (OKR only), PT-BR aliases, and scope caveats when comparing actuals vs Budget/OKR.
 
 Do NOT infer formula details from context — the whole point of this file is to be the definitive source of truth.
@@ -46,7 +46,54 @@ Before writing, verify the data model and calculation. Launch parallel explore s
 
 ## Step 3 — Write the metric entity file
 
-Create `docs/llm_context/metric_entities/{metric_slug}.md` following the template below exactly. Every section is required except **Targets and OKRs** and **Superset Golden Assets** (optional). Keep the file concise: thick on calculation, thin on schema.
+Create `docs/llm_context/metric_entities/{metric_slug}.md` following the template below exactly. Keep the file concise: thick on calculation, thin on schema.
+
+### Required sections (mandatory)
+
+**Every metric entity doc MUST include every `##` section from the template below, in order, with real content** — no omitted headings, no placeholder text (`TBD`, `{...}`), no empty sections.
+
+**Three sections are optional** and may be omitted entirely (no empty heading, no placeholders):
+
+- **`## MBR`** — omit when the metric does not feed any Monthly Business Review, always ask the user about it
+- **`## Targets and OKRs`** — omit when the metric has no official Budget or OKR source, always ask the user about it
+- **`## Superset Golden Assets`** — omit when the metric has no canonical Superset dataset or Trino table to link, always ask the user about it
+
+| Section | Required |
+| :------ | :------- |
+| `## Ownership` | Yes — at least one email under **Data Owner** and one under **Data Steward** |
+| `## Overview` | Yes |
+| `## Related Business Entities` | Yes — at least one bullet |
+| `## MBR` | No — omit when the metric feeds no MBR, but confirm with the user |
+| `## Glossary and Synonyms` | Yes — at least one bullet |
+| `## Scope` | Yes — both **Included** and **Excluded** |
+| `## Calculation` | Yes — includes `### Canonical Filter` and `### Nuances` |
+| `## Dos and Don'ts` | Yes — both **Do** and **Don't** lists |
+| `## Targets and OKRs` | No — omit when the metric has no official Budget or OKR source, but confirm with the user |
+| `## Golden Queries` | Yes — at least one Trino query |
+| `## Superset Golden Assets` | No — omit when no canonical asset exists, but confirm with the user |
+
+**Do not skip or reorder the required sections**. If a required section has no applicable content beyond the mandatory minimum (e.g. no product-scope restriction in Overview), state that explicitly in prose rather than deleting the section.
+
+### Template structure
+
+Full section order (optional sections shown in place — omit them entirely when not applicable):
+
+```
+# {Official Metric Name}
+## Ownership                         [required]
+## Overview                          [required]
+## Related Business Entities         [required]
+## MBR                               [optional]
+## Glossary and Synonyms              [required]
+## Scope                              [required]
+## Calculation                        [required]
+  ### Canonical Filter
+  ### Nuances
+## Dos and Don'ts                    [required]
+## Targets and OKRs                   [optional]
+## Golden Queries                     [required]
+## Superset Golden Assets             [optional]
+```
 
 ### Template
 
@@ -73,7 +120,7 @@ Create `docs/llm_context/metric_entities/{metric_slug}.md` following the templat
 
 ## MBR
 
-<!-- Optional — one bullet per MBR this metric feeds. Omit the whole section if none. -->
+<!-- [OPTIONAL] One bullet per MBR this metric feeds. Omit this entire section when the metric feeds no MBR. -->
 
 - {MBR Name}
 
@@ -214,7 +261,7 @@ URNs in backticks. Omit this section when no Superset asset exists for this metr
 - TARS uses this to navigate to the schema file before building SQL.
 
 **MBR:**
-- Optional. Include only when the metric feeds one or more Monthly Business Reviews; omit the section entirely otherwise.
+- Optional, but always confirm with the user. Include only when the metric feeds one or more Monthly Business Reviews; omit the section entirely otherwise.
 - One bullet per MBR name (a metric may belong to several). Grain is the whole document — every metric here is treated as part of the listed MBR(s).
 - Not folded into the DataHub Data Product description — CI syncs it to the `data_product.mbr` structured property (filterable in DataHub). It is routing metadata, not narrative content.
 
@@ -260,10 +307,10 @@ URNs in backticks. Omit this section when no Superset asset exists for this metr
 - Validate all table and column names against governance metadata YAMLs or database MCP.
 
 **Superset Golden Assets:**
+- Optional, but always confirm with the user; omit the section when the metric has no Trino table and no Superset asset.
 - Lists Superset virtual datasets and the materialized Trino `` `schema.table` `` pairs they map to, linked as reference assets on the Data Product Summary in DataHub (nps-fr pattern).
 - Include Superset URNs in backticks: `` `urn:li:dataset:(urn:li:dataPlatform:superset,{id},PROD)` ``.
 - Include every `` `schema.table` `` and Superset URN in backticks so CI can extract them deterministically.
-- Omit the section when the metric has no Trino table and no Superset asset.
 
 ---
 
@@ -355,6 +402,7 @@ If the business entity already has a "Related Metric Entities" section, just add
 Before presenting to the user, verify:
 
 - [ ] File lives at `docs/llm_context/metric_entities/{metric_slug}.md` (lowercase snake_case)
+- [ ] All mandatory `##` sections present (Ownership → Golden Queries), in template order — only `## MBR`, `## Targets and OKRs` and `## Superset Golden Assets` may be absent
 - [ ] `## Ownership` is the first section after the title, with at least one `@quintoandar.com.br` email under **Data Owner** and one under **Data Steward**
 - [ ] Overview states both what the metric is AND why the naive calculation is wrong
 - [ ] Product-scope restriction is bolded (or absent if the metric is universal)
@@ -372,3 +420,75 @@ Before presenting to the user, verify:
 - [ ] Back-link added to "Related Metric Entities" in the related business entity file(s)
 - [ ] Targets and OKRs omitted when no Budget/OKR source; Budget and OKR sub-blocks documented separately when both exist
 - [ ] Superset Golden Assets omitted if no canonical asset; Superset URNs and Trino tables in backticks when present
+
+---
+
+<!-- LUIGI:SELF-SERVICE:BEGIN -->
+
+## Self-Service Submissions via Zordon (Luigi)
+
+> **This block is the single source Zordon/Luigi reads to guide a self-service submission**,
+> so it is written for that consumer and is self-contained. Steps 1–6 above — asking the user, codebase research, Explore
+> subagents, Trino MCP, the `uv` byte-count check, the business-entity
+> back-link — are for an **engineer or Cursor agent editing the repo directly** and do **not**
+> apply to a chat submission. This block only restates the *content contract* the finished file
+> must satisfy. If it ever disagrees with the sections above, **the sections above win** — keep
+> it in lockstep with them.
+
+**How the flow actually works.** A non-technical user uploads a finished metric-entity `.md` in
+Google Chat. Zordon validates it in the conversation and, if it passes, opens a review PR on
+`bi-etl-ejuice`; a human data engineer reviews it, and merging to `master` publishes it to DataHub.
+Zordon never researches the codebase or writes the doc for the user — it only checks the uploaded
+file against the contract below and tells the user, in plain language, what to fix and re-upload.
+
+**Filename — Zordon derives it, the user does not choose it.** It comes from the official metric
+name: lowercased, accents stripped, then every run of non-alphanumeric characters collapsed to a
+single `_` (e.g. `Ticket Rate Front - Pós Contrato` → `ticket_rate_front_pos_contrato.md`). A name
+that collides with an already-published metric is surfaced by Zordon's own duplicate/existing-entity
+check (below), not asked about up front.
+
+**Language.** The prose (headings + body) must be predominantly **English**. Portuguese is expected
+and must NOT be flagged in: `## Glossary and Synonyms` entries, short parenthetical glosses of a
+local term (e.g. "condominium bills (condomínio)"), and any code, SQL, identifiers, emails, or URLs.
+
+**No template leftovers.** Reject any unfilled placeholder (text wrapped in `{...}`) and any leftover
+`WRITING GUIDE` comment block.
+
+### Required sections — the automated gates block the PR if any is missing or empty
+
+Both the CI check (in `bi-etl-ejuice`) and Zordon's pre-check block the PR when a required
+section is **missing or empty**, and enforce the machine-checkable specifics: the Ownership
+Data Owner **and** Data Steward emails, at least one `sql` Golden Query block, and a
+`## Related Business Entities` section. The finer content rules in *What it must contain*
+(Scope's Included/Excluded lists, both a Do and a Don't, Calculation's `### Canonical Filter`, …)
+describe what a **good** section looks like: CI surfaces them as **non-blocking warnings** and
+the responsible data engineer confirms them in review — advisory nudges, never a blocked PR.
+
+| Section | What it must contain |
+| :------ | :------------------- |
+| `# {Official Metric Name}` | The H1 title: the metric's full official name, spelled out (not an acronym). |
+| `## Ownership` | **Data Owner:** at least one `@quintoandar.com.br`/`@quintoandar.com` email, **and** **Data Steward:** at least one such email. The two roles may be the same person. |
+| `## Overview` | 2–4 sentences: what the metric is and why a naive/component calculation is wrong. Product-scope restriction in **bold** if it exists. |
+| `## Related Business Entities` | At least one bullet naming an existing business entity (names only — no paths, no descriptions). |
+| `## Glossary and Synonyms` | At least one bullet mapping every alias/synonym a user might say to this metric. |
+| `## Scope` | Both an **Included** and an **Excluded** list. |
+| `## Calculation` | The exact formula, plus `### Canonical Filter` (every mandatory predicate, not just the obvious one) and `### Nuances`. |
+| `## Dos and Don'ts` | Both a **Do** and a **Don't** list, specific to this metric's formula. |
+| `## Golden Queries` | At least one Trino SQL block (a triple-backtick `sql` fence). No Spark-only constructs: `QUALIFY`, `GROUP BY ALL`, `IFF`, 3-argument `DATEDIFF`, or `col:key` variant access. |
+
+### Optional sections — never required; include only when they apply
+
+- `## MBR` — one bullet per Monthly Business Review the metric feeds; omit the whole section otherwise.
+- `## Targets and OKRs` — the metric's official Budget (annual target) and/or OKR (period goal) lookup path; omit the whole section otherwise.
+- `## Superset Golden Assets` — canonical Superset datasets and the `` `schema.table` `` pairs they map to; omit the whole section otherwise.
+
+### What Zordon must NOT ask the user
+
+- **The owner's / steward's email** — it is already required inside `## Ownership`, so Zordon reads
+  it straight from the uploaded file instead of asking again.
+- **Anything that needs repo access** (which tables exist, whether a slug is already taken, whether
+  this duplicates an existing metric) — Zordon checks that itself against `bi-etl-ejuice` and only
+  speaks up when it actually finds a conflict or a likely duplicate.
+
+<!-- LUIGI:SELF-SERVICE:END -->
+
