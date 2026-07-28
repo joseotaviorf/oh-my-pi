@@ -6,8 +6,9 @@ dag:
   documentation:
     dag_purpose: |
       This DAG ingests CDC generated data from the [agentic-chatbot-service](https://github.com/quintoandar/quintoml) transactional database.
-      It captures the operational `traces` table (the full versioned `TraceEvent`: conversation content + agent-execution tree)
-      and lands it in datalake_agentic_platform_{raw,clean}.traces (CNVPL-2085).
+      It captures:
+      - `traces` — full versioned `TraceEvent` (conversation content + agent-execution tree) → datalake_agentic_platform_{raw,clean}.traces (CNVPL-2085)
+      - `agentic_sessions` — session lifecycle (stream/session identity + open/closed timestamps) → datalake_agentic_platform_raw.agentic_sessions / _clean.sessions
 workflow:
   type: cdc
   layer: raw
@@ -30,6 +31,12 @@ workflow:
       clean_primary_keys: ["event_id"]
       # Append-only history: ignore the operational table's purge DELETEs so they never erase lake history.
       has_soft_delete: true
+    agentic_sessions:
+      clean_table_name: sessions
+      raw_primary_keys: ["stream_id", "session_id"]
+      clean_primary_keys: ["id_stream", "id_session"]
+      # Application never hard-deletes rows; close is an UPDATE setting closed_at. Default
+      # merge (has_soft_delete: false) is correct — CDC UPDATEs land as latest-row merge.
 
 cluster:
   type: consolidation_s_memory_cluster
