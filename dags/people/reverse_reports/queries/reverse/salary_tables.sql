@@ -1,4 +1,14 @@
 WITH
+    active_employees AS (
+        SELECT DISTINCT
+            snap.sk_employee
+        FROM
+            dw_employee_details.fact_assignment_snapshots AS snap
+        WHERE
+            snap.is_monthly_snapshot_for_employee
+            AND snap.is_current_for_assignment
+            AND snap.is_active
+    ),
     active_headcount_per_job AS (
         SELECT
             snap.sk_job_version,
@@ -6,10 +16,8 @@ WITH
         FROM
             dw_employee_details.fact_assignment_snapshots AS snap
         INNER JOIN
-            dw_people.fact_employees AS emp
-                ON snap.sk_employee = emp.sk_employee
-                AND emp.is_current
-                AND emp.is_active
+            active_employees AS active_employee
+                ON snap.sk_employee = active_employee.sk_employee
         WHERE
             snap.is_current_for_employee
             AND snap.sk_job_version <> '-1'

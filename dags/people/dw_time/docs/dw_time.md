@@ -147,7 +147,7 @@ Detailed definitions for every column, metric, and flag are maintained in DataHu
 When joining this schema's tables with other People DW domains:
 
 1. Prefer `sk_employee` when the fact provides it; otherwise join on `person_number`, and use `assignment_number` together with `person_number` when you need assignment-level grain on PIN facts.
-2. Use `dw_people.dim_employee` for canonical People attributes and hierarchy.
+2. Use `dw_employee_details.dim_employee` for canonical People attributes (prefer over `dw_people` for internal analytics).
 
 ### Wide Join (Exploratory Query)
 
@@ -169,7 +169,7 @@ LEFT JOIN
     dw_time.dim_request AS subtype
         ON req.sk_request = subtype.sk_request
 LEFT JOIN
-    dw_people.dim_employee AS emp
+    dw_employee_details.dim_employee AS emp
         ON req.sk_employee = emp.sk_employee
 WHERE
     DATE(req.ts_interval_started) >= DATE_TRUNC('MONTH', CURRENT_DATE())
@@ -222,7 +222,7 @@ SELECT
 FROM
     dw_time.fact_vacation_balances AS vb
 LEFT JOIN
-    dw_people.dim_employee AS emp
+    dw_employee_details.dim_employee AS emp
         ON vb.person_number = emp.person_number
 WHERE
     vb.is_latest_period = TRUE
@@ -252,7 +252,7 @@ LEFT JOIN
     dw_time.dim_absence_type AS cat
         ON ar.sk_absence_type = cat.sk_absence_type
 LEFT JOIN
-    dw_people.dim_employee AS emp
+    dw_employee_details.dim_employee AS emp
         ON ar.person_number = emp.person_number
 WHERE
     (
@@ -285,7 +285,7 @@ SELECT
 FROM
     dw_time.fact_employee_punches AS fp
 LEFT JOIN
-    dw_people.dim_employee AS emp
+    dw_employee_details.dim_employee AS emp
         ON fp.sk_employee = emp.sk_employee
 WHERE
     fp.dt_punched BETWEEN DATE_SUB(CURRENT_DATE(), 1)
@@ -302,7 +302,7 @@ LIMIT 100
 
 ### Operational analytics — approvals and exposure
 
-The snippets below anchor on **`dw_time.fact_time_attendance_requests`** and joins to **`dw_organization`**, **`dw_people.fact_employees`** (month-end snapshot keyed to the request interval month), **`dim_management_hierarchy`**, and **`fact_employee_hourly_cost_windows`**. Interpretations are exploratory; payroll and product systems remain authoritative where they disagree.
+The snippets below anchor on **`dw_time.fact_time_attendance_requests`** and joins to **`dw_organization`**, **`dw_employee_details.fact_assignment_snapshots`** (month-end employee snapshot keyed to the request interval month via `is_monthly_snapshot_for_employee`), **`dw_employee_details.dim_management_hierarchy`** (assignment-version grain — join on `sk_hierarchy_version` / `assignment_number`, then resolve the direct manager through `manager_assignment_number`), **`dw_compensation.dim_job`** (on `sk_job_version`), and **`fact_employee_hourly_cost_windows`**. Interpretations are exploratory; payroll and product systems remain authoritative where they disagree.
 
 Where the text says **payroll cutoff**, replace placeholder dates (`2099-12-31`) with the official cutoff for the month under analysis, or drive the cutoff from a governed payroll-calendar table instead of literals.
 
@@ -346,7 +346,6 @@ WITH monthly_requests AS (
     SELECT
         attendance_request.sk_time_request,
         attendance_request.sk_employee,
-        attendance_request.person_number,
         attendance_request.approval_status,
         LAST_DAY(TO_DATE(attendance_request.ts_interval_started)) AS dt_month_end
     FROM
@@ -358,22 +357,30 @@ requests_with_org AS (
     SELECT
         monthly_requests.sk_time_request,
         monthly_requests.approval_status,
-        hierarchy.name_manager,
-        hierarchy.email_manager,
+        manager_employee.name AS name_manager,
+        manager_employee.work_email AS email_manager,
         cost_center.cost_center_name,
         cost_center.vertical
     FROM
         monthly_requests
     INNER JOIN
-        dw_people.fact_employees AS employee_snapshot
+        dw_employee_details.fact_assignment_snapshots AS employee_snapshot
             ON employee_snapshot.sk_employee = monthly_requests.sk_employee
             AND employee_snapshot.dt_reference = monthly_requests.dt_month_end
+            AND employee_snapshot.is_monthly_snapshot_for_employee = TRUE
     INNER JOIN
         dw_organization.dim_cost_center AS cost_center
             ON cost_center.sk_cost_center_version = employee_snapshot.sk_cost_center_version
     LEFT JOIN
-        dw_people.dim_management_hierarchy AS hierarchy
-            ON hierarchy.person_number = monthly_requests.person_number
+        dw_employee_details.dim_management_hierarchy AS hierarchy
+            ON hierarchy.sk_hierarchy_version = employee_snapshot.sk_hierarchy_version
+    LEFT JOIN
+        dw_employee_details.fact_assignment_snapshots AS manager_snapshot
+            ON manager_snapshot.assignment_number = hierarchy.manager_assignment_number
+            AND manager_snapshot.dt_reference = employee_snapshot.dt_reference
+    LEFT JOIN
+        dw_employee_details.dim_employee AS manager_employee
+            ON manager_employee.sk_employee = manager_snapshot.sk_employee
 )
 SELECT
     requests_with_org.name_manager,
@@ -451,7 +458,6 @@ WITH payroll_cutoff AS (
 open_after_close AS (
     SELECT
         attendance_request.sk_time_request,
-        attendance_request.person_number,
         attendance_request.sk_employee,
         attendance_request.approval_status,
         LAST_DAY(TO_DATE(attendance_request.ts_interval_started)) AS dt_month_end
@@ -464,24 +470,32 @@ open_after_close AS (
         AND TO_DATE(attendance_request.ts_updated) > cutoff_rule.dt_payroll_close
 )
 SELECT
-    hierarchy.name_manager,
+    manager_employee.name AS name_manager,
     cost_center.vertical,
     cost_center.cost_center_name,
     COUNT(DISTINCT open_after_close.sk_time_request) AS open_request_count_after_close
 FROM
     open_after_close
 INNER JOIN
-    dw_people.fact_employees AS employee_snapshot
+    dw_employee_details.fact_assignment_snapshots AS employee_snapshot
         ON employee_snapshot.sk_employee = open_after_close.sk_employee
         AND employee_snapshot.dt_reference = open_after_close.dt_month_end
+        AND employee_snapshot.is_monthly_snapshot_for_employee = TRUE
 INNER JOIN
     dw_organization.dim_cost_center AS cost_center
         ON cost_center.sk_cost_center_version = employee_snapshot.sk_cost_center_version
 LEFT JOIN
-    dw_people.dim_management_hierarchy AS hierarchy
-        ON hierarchy.person_number = open_after_close.person_number
+    dw_employee_details.dim_management_hierarchy AS hierarchy
+        ON hierarchy.sk_hierarchy_version = employee_snapshot.sk_hierarchy_version
+LEFT JOIN
+    dw_employee_details.fact_assignment_snapshots AS manager_snapshot
+        ON manager_snapshot.assignment_number = hierarchy.manager_assignment_number
+        AND manager_snapshot.dt_reference = employee_snapshot.dt_reference
+LEFT JOIN
+    dw_employee_details.dim_employee AS manager_employee
+        ON manager_employee.sk_employee = manager_snapshot.sk_employee
 GROUP BY
-    hierarchy.name_manager,
+    manager_employee.name,
     cost_center.vertical,
     cost_center.cost_center_name
 ORDER BY
@@ -492,14 +506,13 @@ ORDER BY
 
 **Question:** Which verticals show the slowest approval behaviour?
 
-**Pattern:** Median or average hours from **`ts_created`** to **`ts_updated`** for rows that reached **approved** or **declined**; segment by **`dim_cost_center.vertical`** on the request-month snapshot (`fact_employees` keyed to **`LAST_DAY`** of the interval started month).
+**Pattern:** Median or average hours from **`ts_created`** to **`ts_updated`** for rows that reached **approved** or **declined**; segment by **`dim_cost_center.vertical`** on the request-month snapshot (`fact_assignment_snapshots` with `is_monthly_snapshot_for_employee`, keyed to **`LAST_DAY`** of the interval started month).
 
 ```sql
 WITH decided_requests AS (
     SELECT
         attendance_request.sk_time_request,
         attendance_request.sk_employee,
-        attendance_request.person_number,
         attendance_request.ts_created,
         attendance_request.ts_updated,
         LAST_DAY(TO_DATE(attendance_request.ts_interval_started)) AS dt_month_end
@@ -514,8 +527,8 @@ SELECT
     ROUND(
         AVG(
             (
-                UNIX_TIMESTAMP(decided_requests.ts_updated)
-                - UNIX_TIMESTAMP(decided_requests.ts_created)
+                UNIX_TIMESTAMP(CAST(decided_requests.ts_updated AS TIMESTAMP))
+                - UNIX_TIMESTAMP(CAST(decided_requests.ts_created AS TIMESTAMP))
             ) / 3600.0
         ),
         2
@@ -523,9 +536,10 @@ SELECT
 FROM
     decided_requests
 INNER JOIN
-    dw_people.fact_employees AS employee_snapshot
+    dw_employee_details.fact_assignment_snapshots AS employee_snapshot
         ON employee_snapshot.sk_employee = decided_requests.sk_employee
         AND employee_snapshot.dt_reference = decided_requests.dt_month_end
+        AND employee_snapshot.is_monthly_snapshot_for_employee = TRUE
 INNER JOIN
     dw_organization.dim_cost_center AS cost_center
         ON cost_center.sk_cost_center_version = employee_snapshot.sk_cost_center_version
@@ -559,12 +573,13 @@ SELECT
 FROM
     monthly_pending
 INNER JOIN
-    dw_people.fact_employees AS employee_snapshot
+    dw_employee_details.fact_assignment_snapshots AS employee_snapshot
         ON employee_snapshot.sk_employee = monthly_pending.sk_employee
         AND employee_snapshot.dt_reference = monthly_pending.dt_month_end
+        AND employee_snapshot.is_monthly_snapshot_for_employee = TRUE
 LEFT JOIN
-    dw_organization.dim_job AS job_dimension
-        ON job_dimension.sk_job = employee_snapshot.sk_job
+    dw_compensation.dim_job AS job_dimension
+        ON job_dimension.sk_job_version = employee_snapshot.sk_job_version
 LEFT JOIN
     dw_organization.dim_business_unit AS business_unit
         ON business_unit.sk_business_unit = employee_snapshot.sk_business_unit
@@ -579,7 +594,7 @@ ORDER BY
 
 **Question:** What is the estimated financial exposure from unresolved lines where payroll-relevant flags apply?
 
-**Pattern:** Uses hourly-rate windows and booked duration from integration; payroll remains authoritative. Elapsed hours use **`UNIX_TIMESTAMP`** differences (Databricks / Spark SQL).
+**Pattern:** Uses hourly-rate windows and booked duration from integration; payroll remains authoritative. Elapsed hours use **`UNIX_TIMESTAMP(CAST(... AS TIMESTAMP))`** differences because attendance timestamps are stored as ISO-8601 strings (Databricks / Spark SQL).
 
 ```sql
 WITH pending_requests AS (
@@ -609,8 +624,8 @@ pending_with_rate_ranked AS (
         cost_window.hourly_rate_amount,
         GREATEST(
             (
-                UNIX_TIMESTAMP(pending_requests.ts_interval_ended)
-                - UNIX_TIMESTAMP(pending_requests.ts_interval_started)
+                UNIX_TIMESTAMP(CAST(pending_requests.ts_interval_ended AS TIMESTAMP))
+                - UNIX_TIMESTAMP(CAST(pending_requests.ts_interval_started AS TIMESTAMP))
             ) / 3600.0,
             0.0
         ) AS booked_hours,
@@ -679,24 +694,36 @@ WHERE
 
 #### Behaviour — managers with pendencies in three consecutive months
 
-**Question:** Which managers appear with open pendencies in three consecutive calendar months (**direct managers**, by **`person_number_manager`**)?
+**Question:** Which managers appear with open pendencies in three consecutive calendar months (**direct managers**, by manager **`person_number`** from `dim_employee` via `manager_assignment_number`)?
 
 ```sql
 WITH monthly_manager_pending AS (
     SELECT
         DATE_TRUNC('MONTH', attendance_request.ts_interval_started) AS dt_month,
-        hierarchy.person_number_manager AS person_number_manager,
+        manager_employee.person_number AS person_number_manager,
         COUNT(DISTINCT attendance_request.sk_time_request) AS pending_request_count
     FROM
         dw_time.fact_time_attendance_requests AS attendance_request
     INNER JOIN
-        dw_people.dim_management_hierarchy AS hierarchy
-            ON hierarchy.person_number = attendance_request.person_number
+        dw_employee_details.fact_assignment_snapshots AS employee_snapshot
+            ON employee_snapshot.sk_employee = attendance_request.sk_employee
+            AND employee_snapshot.dt_reference = LAST_DAY(TO_DATE(attendance_request.ts_interval_started))
+            AND employee_snapshot.is_monthly_snapshot_for_employee = TRUE
+    INNER JOIN
+        dw_employee_details.dim_management_hierarchy AS hierarchy
+            ON hierarchy.sk_hierarchy_version = employee_snapshot.sk_hierarchy_version
+    INNER JOIN
+        dw_employee_details.fact_assignment_snapshots AS manager_snapshot
+            ON manager_snapshot.assignment_number = hierarchy.manager_assignment_number
+            AND manager_snapshot.dt_reference = employee_snapshot.dt_reference
+    INNER JOIN
+        dw_employee_details.dim_employee AS manager_employee
+            ON manager_employee.sk_employee = manager_snapshot.sk_employee
     WHERE
         LOWER(TRIM(attendance_request.approval_status)) = 'pending'
     GROUP BY
         DATE_TRUNC('MONTH', attendance_request.ts_interval_started),
-        hierarchy.person_number_manager
+        manager_employee.person_number
 ),
 manager_month_streak AS (
     SELECT
@@ -728,7 +755,7 @@ WHERE
     AND manager_month_streak.dt_prev_month = ADD_MONTHS(manager_month_streak.dt_prev_prev_month, 1)
 ```
 
-**Pattern (collaborators / employees):** Reuse the same windowed pattern but aggregate and partition by **`attendance_request.person_number`** instead of **`person_number_manager`**.
+**Pattern (collaborators / employees):** Reuse the same windowed pattern but aggregate and partition by **`attendance_request.person_number`** instead of the manager's **`person_number`**.
 
 ## Glossary
 

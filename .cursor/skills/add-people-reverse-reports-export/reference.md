@@ -21,7 +21,7 @@ Technical rules for skill **`add-people-reverse-reports-export`**. The orchestra
 
 | Priority | Use when | Examples |
 | --- | --- | --- |
-| **1 — DW** | Almost always | `dw_organization`, `dw_employee_details`, `dw_compensation`, `dw_demographics`, `dw_performance`, `dw_people`, `dw_learning`, `dw_payroll`, `dw_hiring`, `dw_equity`, `dw_survey` — see [`people_domain.mdc`](../../rules/people/people_domain.mdc) |
+| **1 — DW** | Almost always | Prefer **`dw_employee_details`** for employee identity, assignments, and hierarchy (richer internal model). Also: `dw_organization`, `dw_compensation`, `dw_demographics`, `dw_performance`, `dw_time`, `dw_learning`, `dw_payroll`, `dw_hiring`, `dw_equity`, `dw_survey`. Use **`dw_people` only** when the export must match the slim **public** employee surface — see [`people_domain.mdc`](../../rules/people/people_domain.mdc) § Query preference |
 | **2 — Metrics** | Rollup / KPI already in a metric table | DAGs with `workflow.layer: metric`, often `metric_*` under `dags/` |
 | **3 — Enrich / clean (avoid)** | No DW or metric path; temporary exception only | Enrich: `datalake_*` without `_clean`/`_raw`. Clean: `datalake_*_clean`. Document why in PR + ticket. |
 
@@ -30,6 +30,9 @@ Technical rules for skill **`add-people-reverse-reports-export`**. The orchestra
 - `datalake_hr_system*`, `datalake_employment`
 - **`greenhouse` v1** — prefer **`greenhouse_v3`**
 - **`dw_employee`** — use domain **`dw_*`**
+- **`dw_people`** for identity / active-headcount filters when **`dw_employee_details`** already covers the need:
+  - identity → `dw_employee_details.dim_employee`
+  - active headcount without `dw_people.fact_employees` → filter `fact_assignment_snapshots` with `is_monthly_snapshot_for_employee` + `is_current_for_assignment` + `is_active` (mirrors the old `fact_employees` current/active grain), then join to the employee-current rows (`is_current_for_employee`) for job attributes
 - Legacy enrich called out in `people_domain.mdc`
 
 After remapping, summarize: *old → new + one-line reason*.

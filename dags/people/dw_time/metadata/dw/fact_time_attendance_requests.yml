@@ -12,7 +12,7 @@ description: |
   identifier_mapping (latest assignment, excluding test users). This mart focuses on the operational request stream;
   some absences or benefits may still live only in Oracle HCM or other systems by policy.
 
-  Join dw_time.dim_request on sk_request for subtype labels and defaults (paid, DSR). Join dw_people.dim_employee on
+  Join dw_time.dim_request on sk_request for subtype labels and defaults (paid, DSR). Join dw_employee_details.dim_employee on
   sk_employee or person_number for org context. Use approval_status, approval_stage, and approval_flow with hierarchy
   dimensions to monitor pending leader approvals before payroll close.
 
@@ -24,7 +24,7 @@ columns:
       reloads.
   sk_employee:
     description: |
-      Employee surrogate key shared across People marts; join dw_people.dim_employee for name, hierarchy, and location used
+      Employee surrogate key shared across People marts; join dw_employee_details.dim_employee for name, hierarchy, and location used
       in workforce reporting.
     lineage:
       - datalake_people.identifier_mapping.id_person

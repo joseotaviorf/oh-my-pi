@@ -15,15 +15,15 @@ description: |
   are not payroll truth until a folha integration exists.
 
   Population: employees who exist in the time product whose Oitchau externalId (id_external in clean) matches an Oracle
-  HCM person_number in dw_people.dim_employee. Reporting: filter is_closed = true for official monthly close balances.
-  Join dw_people.dim_employee and dim_hours_bank_rule for labels and segment mapping.
+  HCM person_number in dw_employee_details.dim_employee. Reporting: filter is_closed = true for official monthly close balances.
+  Join dw_employee_details.dim_employee and dim_hours_bank_rule for labels and segment mapping.
 columns:
   sk_hours_bank_rule_total:
     description: "Surrogate key for one grain row (employee, balance date, rule key). Computed as MD5 of the concatenated natural key components. Used for deduplication and fact table joins within this mart."
   sk_employee:
-    description: "Employee surrogate key shared across People marts; join dw_people.dim_employee for name, email, and hierarchy."
+    description: "Employee surrogate key shared across People marts; join dw_employee_details.dim_employee for name, email, and hierarchy."
     lineage:
-      - dw_people.dim_employee.sk_employee
+      - dw_employee_details.dim_employee.sk_employee
   sk_balance_date:
     description: "Date dimension key (YYYYMMDD style) for the balance snapshot day; use with dim_date for week, month, or fiscal reporting."
     lineage:
@@ -54,9 +54,9 @@ columns:
       - datalake_oitchau_clean.hoursbank_totals.hours_bank_totals
       - datalake_oitchau_clean.hoursbank_totals_month_close.hours_bank_totals
   person_number:
-    description: "Oracle HCM person number (PIN employee code). Natural key for filters, exports, and alignment with HR systems; join dw_people.dim_employee on person_number or sk_employee."
+    description: "Oracle HCM person number (PIN employee code). Natural key for filters, exports, and alignment with HR systems; join dw_employee_details.dim_employee on person_number or sk_employee."
     lineage:
-      - dw_people.dim_employee.person_number
+      - dw_employee_details.dim_employee.person_number
   minutes_balance_rule:
     description: "Balance minutes for that employee, date, and rule. Additive measure: sum across rows with the same person and date for total minutes in the snapshot; convert to hours in the reporting layer if needed."
     lineage:

@@ -1331,7 +1331,7 @@ bietlejuice.dw_table_snapshot:
 bietlejuice.dw_taxonomy:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
 bietlejuice.dw_time:
-  - bietlejuice.dw_people:load-dw-people-dim-employee:first-run-of-day
+  - bietlejuice.dw_employee_details:load-dw-employee-details-dim-employee:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.oitchau_api:load-clean-business-rules-groups:first-run-of-day
   - bietlejuice.oitchau_api:load-clean-employee-costs:first-run-of-day
@@ -4763,7 +4763,6 @@ bietlejuice.reverse_reports:
   - bietlejuice.dw_organization:load-dw-organization-dim-business-unit:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day
   - bietlejuice.dw_organization:load-dw-organization-dim-job:first-run-of-day
-  - bietlejuice.dw_people:load-dw-people-fact-employees:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day

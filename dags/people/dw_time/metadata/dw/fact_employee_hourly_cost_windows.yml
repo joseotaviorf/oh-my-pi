@@ -5,7 +5,7 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
   Salary-related hourly rate windows from the workforce time integration, after mapping each cost segment to
-  dw_people.dim_employee.
+  dw_employee_details.dim_employee.
 
   Grain: one row per cost segment identifier from the clean layer per mapped employee. Use to explain which rate applied
   on a given date, or join from fact_hours_bank_rule_totals.sk_employee_cost_window for audit. Dashboards can rely on
@@ -21,9 +21,9 @@ columns:
       Surrogate key for one cost window row, stable for joins from fact_hours_bank_rule_totals and other dw_time facts.
   sk_employee:
     description: |
-      Employee surrogate key shared across People marts; join dw_people.dim_employee for profile and hierarchy.
+      Employee surrogate key shared across People marts; join dw_employee_details.dim_employee for profile and hierarchy.
     lineage:
-      - dw_people.dim_employee.sk_employee
+      - dw_employee_details.dim_employee.sk_employee
   id_employee_profile:
     description: |
       Workforce time user profile UUID on the cost row; aligns with datalake_oitchau_clean.employees.id_employee_profile.
@@ -37,7 +37,7 @@ columns:
     description: |
       Oracle HCM person number denormalized for filters and reconciliation with registration-based joins in the lake.
     lineage:
-      - dw_people.dim_employee.person_number
+      - dw_employee_details.dim_employee.person_number
   cost_segment_status:
     description: Status label from the source for the segment when present (for example ACTIVE).
     lineage:

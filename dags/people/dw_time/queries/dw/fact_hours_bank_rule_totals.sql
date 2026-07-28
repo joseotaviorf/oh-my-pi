@@ -132,7 +132,7 @@ hours_bank_with_employee AS (
         employee_registration AS employee_reg
             ON employee_reg.id_employee_profile = hours_bank.id_employee_profile
     INNER JOIN
-        dw_people.dim_employee AS dim_employee
+        dw_employee_details.dim_employee AS dim_employee
             ON TRIM(CAST(employee_reg.id_external AS STRING)) = TRIM(CAST(dim_employee.person_number AS STRING))
     WHERE
         hours_bank.hours_bank_totals_map IS NOT NULL

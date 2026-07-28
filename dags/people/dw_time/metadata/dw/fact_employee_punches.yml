@@ -18,7 +18,7 @@ description: |
   query: sk_employee, person_number, id_employee_profile, and dt_punched.
 
   PII columns from the source (CPF, full name, PIS, matricula) are intentionally excluded; consumers
-  that need contact details join dw_people.dim_employee or dw_public.dim_person at query time.
+  that need contact details join dw_employee_details.dim_employee or dw_public.dim_person at query time.
 
 columns:
   sk_employee_punch:
@@ -27,7 +27,7 @@ columns:
       counts and distinct punch metrics stay consistent.
   sk_employee:
     description: |
-      Employee surrogate key shared across People marts; join dw_people.dim_employee for name,
+      Employee surrogate key shared across People marts; join dw_employee_details.dim_employee for name,
       hierarchy, and location used in workforce reporting.
     lineage:
       - datalake_people.identifier_mapping.id_person
@@ -94,7 +94,7 @@ columns:
   person_number:
     description: |
       Oracle HCM person number (PIN); natural key for filters, spreadsheets, and joins to
-      dw_people.dim_employee on person_number or sk_employee.
+      dw_employee_details.dim_employee on person_number or sk_employee.
     lineage:
       - datalake_people.identifier_mapping.person_number
   punch_key:

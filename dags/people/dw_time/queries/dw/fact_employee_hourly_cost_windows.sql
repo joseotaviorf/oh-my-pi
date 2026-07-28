@@ -77,7 +77,7 @@ employee_hourly_costs_with_person AS (
         employee_registration AS er
             ON er.id_employee_profile = cd.id_employee_profile
     INNER JOIN
-        dw_people.dim_employee AS de
+        dw_employee_details.dim_employee AS de
             ON TRIM(CAST(er.id_external AS STRING)) = TRIM(CAST(de.person_number AS STRING))
 )
 SELECT

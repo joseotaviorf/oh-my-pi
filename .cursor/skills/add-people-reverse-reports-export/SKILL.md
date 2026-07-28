@@ -5,7 +5,8 @@ description: >-
   `dags/people/reverse_reports/`. Interactive one-question-at-a-time flow in PT-BR
   (notebook migration, net-new tab, edit existing, validation/Forno/PR/cutover). DBP Jira
   kickoff on Enterprise Engineering (DBP). First turn: AskQuestion flow selection (like
-  provision-data-contract). Source priority DW (`dw_*`) then
+  provision-data-contract). Source priority: prefer `dw_employee_details` over
+  `dw_people` for employee identity/assignments, then other DW (`dw_*`), then
   metric-layer; avoid enrich/clean unless documented exception.
 ---
 
