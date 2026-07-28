@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 from typing import List
 
@@ -29,6 +30,7 @@ CONTEXT = "vespucio_pipeline_v2"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
+ENV = os.environ.get("ENVIRONMENT")
 EXECUTION_HOURS_TIMEOUT = 3.0
 
 config_service = ConfigurationService(DAG_NAME)
@@ -40,6 +42,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 output_location = config_service.get_config("vespucio_output_path")
+kafka_bootstrap_servers = config_service.get_config("kafka_bootstrap_servers")
 
 VESPUCIO_PACKAGE_VERSION = config_service.get_config("vespucio_pipeline_version")
 VESPUCIO_WHEEL_FILE = (
@@ -347,6 +350,21 @@ resolve_groups_step_task = create_task(
     ],
 )
 
+publish_resolved_identities_step_task = create_task(
+    entry_point="core_v2_publish_resolved_identities_step",
+    parameters=[
+        f"--input_artifact_groups={Tables.artifact_groups}",
+        f"--output_resolved_identities_publish_checkpoint={Tables.resolved_identities_publish_checkpoint}",
+        f"--bootstrap_servers={kafka_bootstrap_servers}",
+        f"--deployment_env={ENV}",
+        "--security_protocol=SASL_SSL",
+        "--credentials_secret_scope=quintoandar",
+        "--credentials_secret_key=VESPUCIO_CONFLUENT_CREDENTIALS",
+        "--running_mode=prod",
+    ],
+    task_id="publish_resolved_identities",
+)
+
 vespucio_v2_pipeline_complete_task = DummyOperator(
     task_id="vespucio-v2-pipeline-complete",
     dag=dag,
@@ -377,4 +395,5 @@ address_normalization_step_task >> address_enrich_step_task
     image_grouping_step_task,
 ] >> resolve_groups_step_task
 resolve_groups_step_task >> vespucio_v2_pipeline_complete_task
+resolve_groups_step_task >> publish_resolved_identities_step_task
 artifacts_step_task >> vespucio_v2_pipeline_complete_task
