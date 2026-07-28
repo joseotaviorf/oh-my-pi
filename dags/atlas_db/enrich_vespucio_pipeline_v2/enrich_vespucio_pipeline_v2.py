@@ -356,6 +356,7 @@ DatasetAdder.attach_dataset_to_task(vespucio_v2_pipeline_complete_task)
 
 execute_job_cluster_task >> source_tasks
 execute_job_cluster_task >> kodak_atlas_images_task
+execute_job_cluster_task >> image_grouping_step_task
 source_tasks >> registry_step_task
 registry_step_task >> address_normalization_step_task
 registry_step_task >> general_normalization_step_task
