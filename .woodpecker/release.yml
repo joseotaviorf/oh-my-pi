@@ -130,11 +130,14 @@ steps:
         make create-s3-dag-files INCLUDE_VALIDATION="$include_validation"
         # Refuse declaration-generated stubs only (sibling *_declaration.yml).
         # Hand-written *_dag.py without a declaration must remain (e.g. sync_tars_entities).
+        # Skip luigijr: create-s3 excludes it from the main bag; the parallel
+        # create-dag-files-luigijr-* step writes those stubs into the shared workspace.
         leftovers=""
         for stub in $(find dags \( -name '*_dag.py' -o -name '*_validation_dag.py' \) \
           ! -path '*/platform/migration_twin_*/*' \
           ! -path '*/platform/migration_emr_*/*' \
           ! -path '*/platform/migration_compare_*/*' \
+          ! -path '*/luigijr/*' \
           -print || true); do
           dir=$(dirname "$stub")
           if ls "$dir"/*_declaration.yml >/dev/null 2>&1; then
