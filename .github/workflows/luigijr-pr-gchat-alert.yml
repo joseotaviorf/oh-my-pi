@@ -1,0 +1,173 @@
+# Notify a Google Chat channel when a PR touches Luigi Jr DAGs (dags/luigijr/**).
+#
+# Setup (one-time):
+#   1. In the target GChat space: Apps & integrations → Incoming Webhooks → create webhook.
+#   2. In GitHub repo settings → Secrets and variables → Actions:
+#        GCHAT_LUIGIJR_PR_WEBHOOK = <webhook URL>
+#
+# The webhook URL is never committed to the repo.
+
+name: Luigi Jr PR GChat Alert
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - master
+    paths:
+      - "dags/luigijr/**"
+
+jobs:
+  notify-gchat:
+    runs-on: github-actions-developers-runner
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Post alert to Google Chat
+        env:
+          WEBHOOK_URL: ${{ secrets.GCHAT_LUIGIJR_PR_WEBHOOK }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_ACTION: ${{ github.event.action }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${WEBHOOK_URL}" ]; then
+            echo "Secret GCHAT_LUIGIJR_PR_WEBHOOK is not configured."
+            exit 1
+          fi
+
+          changed_files=$(
+            curl -fsSL \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
+              | python3 -c "
+          import json, sys
+          files = [
+              f['filename']
+              for f in json.load(sys.stdin)
+              if f['filename'].startswith('dags/luigijr/')
+          ]
+          print('\n'.join(files))
+          "
+          )
+
+          dag_folders=$(
+            printf '%s\n' "${changed_files}" \
+              | awk -F/ 'NF >= 3 && $3 != "" { print $3 }' \
+              | sort -u
+          )
+
+          if [ -z "${dag_folders}" ]; then
+            dag_folders="(nenhuma pasta de DAG identificada)"
+          fi
+
+          if [ "${EVENT_ACTION}" = "reopened" ]; then
+            event_title="PR reaberto — Luigi Jr"
+          else
+            event_title="Novo PR — Luigi Jr"
+          fi
+
+          payload=$(
+            EVENT_TITLE="${event_title}" \
+            PR_NUMBER="${PR_NUMBER}" \
+            PR_TITLE="${PR_TITLE}" \
+            PR_URL="${PR_URL}" \
+            PR_AUTHOR="${PR_AUTHOR}" \
+            PR_BRANCH="${PR_BRANCH}" \
+            DAG_FOLDERS="${dag_folders}" \
+            python3 <<'PY'
+          import json
+          import os
+
+          event_title = os.environ["EVENT_TITLE"]
+          pr_number = os.environ["PR_NUMBER"].strip()
+          pr_title = os.environ["PR_TITLE"]
+          pr_url = os.environ["PR_URL"]
+          pr_author = os.environ["PR_AUTHOR"]
+          pr_branch = os.environ["PR_BRANCH"]
+          dag_folders_raw = os.environ["DAG_FOLDERS"].strip()
+
+          if "\n" in dag_folders_raw:
+              dag_items = [line.strip() for line in dag_folders_raw.splitlines() if line.strip()]
+          elif dag_folders_raw.startswith("("):
+              dag_items = [dag_folders_raw]
+          else:
+              dag_items = [item.strip() for item in dag_folders_raw.split(",") if item.strip()]
+
+          if len(dag_items) == 1:
+              dags_text = dag_items[0]
+          else:
+              dags_text = "<br>".join(f"• <font face=\"monospace\">{item}</font>" for item in dag_items)
+
+          summary_bits = [
+              f"<b>PR:</b> #{pr_number}",
+              f"<b>Autor:</b> <font color=\"#1a73e8\">@{pr_author}</font>",
+              f"<b>Branch:</b> <font face=\"monospace\">{pr_branch}</font>",
+          ]
+
+          widgets = [
+              {
+                  "decoratedText": {
+                      "topLabel": "Título",
+                      "text": pr_title,
+                      "wrapText": True,
+                  }
+              },
+              {
+                  "textParagraph": {
+                      "text": "<br>".join(summary_bits),
+                  }
+              },
+              {
+                  "decoratedText": {
+                      "topLabel": "DAGs afetadas",
+                      "text": dags_text,
+                      "wrapText": True,
+                  }
+              },
+              {
+                  "buttonList": {
+                      "buttons": [
+                          {
+                              "text": "Abrir no GitHub",
+                              "onClick": {
+                                  "openLink": {"url": pr_url},
+                              },
+                          }
+                      ]
+                  }
+              },
+          ]
+
+          payload = {
+              "cardsV2": [
+                  {
+                      "cardId": "luigijr-pr-alert",
+                      "card": {
+                          "header": {
+                              "title": event_title,
+                              "subtitle": "bi-etl-ejuice · dags/luigijr",
+                              "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                              "imageType": "CIRCLE",
+                          },
+                          "sections": [{"widgets": widgets}],
+                      },
+                  }
+              ]
+          }
+
+          print(json.dumps(payload, ensure_ascii=False))
+          PY
+          )
+
+          curl -fsSL -X POST \
+            -H "Content-Type: application/json; charset=UTF-8" \
+            -d "${payload}" \
+            "${WEBHOOK_URL}"
