@@ -21,6 +21,8 @@
 
 The metric measures the share of the open backlog that has exceeded the applicable SLA target as of a reference date.
 
+**Exists exclusively for the Back Office, Post-Contract, email channel.**
+
 Backlog is a **stock** metric. Each date represents a snapshot of the tickets and cases still open at that moment. Because of this, the monthly value must always come from a single snapshot — never the sum or the average of the days in the month.
 
 **Known active limitations**: the Zendesk zero-contribution issue from 2026-06-25 onward (see [Data Sources — Zendesk](#zendesk)) and the "Out of SLA" residual in Onboarding/Offboarding (see [Confirmed field limitations](#confirmed-field-limitations-2026-07-23--known-out-of-sla-residual)) — see [Validation](#validation) for the full evidence.
@@ -140,7 +142,7 @@ AND last_department IN (
 AND (resolution_date IS NULL OR resolution_date > reference_date)
 ```
 
-**Warning**: use only the most recent version of each `case_number` (`ROW_NUMBER() OVER (PARTITION BY case_number ORDER BY last_modified_date DESC)`, `rn = 1`) and exclude deleted cases (`event_type = 'DELETE'`) and cases with status `CANCELED` — see the full mandatory rules below.
+**Warning**: use only the most recent version of each `case_number` (`ROW_NUMBER() OVER (PARTITION BY case_number ORDER BY last_modified_date DESC)`, `rn = 1`). Skipping this dedup keeps stale, superseded versions of the same case in the base — the same case is counted more than once, double-counting cases and inflating both Backlog Total and Backlog Out of SLA. Also exclude deleted cases (`event_type = 'DELETE'`) and cases with status `CANCELED` — see the full mandatory rules below.
 
 ### Nuances
 
