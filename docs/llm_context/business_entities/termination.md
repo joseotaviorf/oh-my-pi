@@ -44,7 +44,7 @@ Not all terminations follow every step. Some are canceled before completion, som
 | Termination data (status, fees, dates, flags) | `dw_offboarding.fact_terminations` (`ft`) + `dim_termination` (`dt`) |
 | Termination + inspection + repairs + report + mediation + discounts (cross-entity) | `dw_offboarding.obt_offboarding` (`obt`) — everything pre-joined, no manual JOINs needed. Already filters out canceled terminations. Covers: termination status/dates/fees, inspection execution, report access and approval flags by stage (review + budget approval) for both tenant and owner, repair counts by stage, repair costs, mediation, agreement, discounts/bandaid, Kirk automation flags (`is_automated_ar`, `automation_group`, `no_human_ar`), leadtimes. When unsure about specific columns, search the repo for the SQL that builds this table. |
 | Relisting / rerental after termination | `dw_offboarding.fact_house_listing_terminations` (`fhlt`) — **Relisting** (property relisted): `sk_next_house_listing_consolidated <> -1`. **Rerental** (new contract signed): `sk_next_contract <> -1`. Leadtime: `days_termination_to_contract_signed`. These are stages of the same funnel: relisting is the listing event, rerental is the conversion. See [`business_entities/house_and_listing.md`](house_and_listing.md) for listing version navigation. |
-| Enriched termination source data | `datalake_terminator.termination` (enrich — source for `fact_terminations`) |
+| Enriched termination source data | `datalake_terminator_clean.termination` (clean — upstream source for `datalake_terminator.termination` and `fact_terminations`) |
 | Mediation details (squad, resolution) | `datalake_offboarding.mediations` (enrich) |
 | NPS score linked to termination | `dw_retention.fact_contract_termination` (`fct`) + `dw_retention.dim_nps_answer` (`dna`) — bridges termination to NPS via `sk_nps_answer_owner` / `sk_nps_answer_tenant`. Enrich alternative: `datalake_offboarding.nps_agg` with `nps_iq`, `nps_pp` per contract. |
 | Discount data linked to inspections | `datalake_inspections.automatic_discounts` (enrich — JOIN via `uuid_inspection`) |
@@ -57,7 +57,7 @@ Not all terminations follow every step. Some are canceled before completion, som
 ## Key Metrics
 
 - Termination volume per month (filter by `ts_termination_request` or `ts_termination_finished`)
-- Termination rate by reason (`termination_reason` in `dim_termination`)
+- Termination rate by reason (`reason` in `dim_termination`)
 - Mediation rate (`has_mediation_ticket` in `dim_termination`) — **caveat:** this flag is only populated for terminations that already reached `DONE` (the upstream `mediations` source filters `status = 'DONE'`); it is not marked while a termination is still in progress. Any metric using it must scope the denominator to finished terminations so numerator and denominator stay coherent (e.g. "% of terminations without mediation and with repairs" should consider only terminations that already reached `DONE`)
 - Average time from request to vacancy (`leadtime_request_to_vacancy`)
 - Terminations with tenant repairs (`has_repairs`)

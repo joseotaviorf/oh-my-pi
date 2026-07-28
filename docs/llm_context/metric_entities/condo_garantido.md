@@ -260,7 +260,7 @@ WITH contract_month AS (
         dc.condo,
         dc.condo_payer,
         dc.dt_start,
-        dc.pp_multi_classification,
+        ppm.pp_multi_classification,
         dc.rental_administrator
     FROM dw_rent.dim_contract AS dc
     JOIN aux_contract_info AS ci
