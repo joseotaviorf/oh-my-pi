@@ -1,0 +1,26 @@
+database_name: datalake_amplitude_clean
+table_name: 233592_home_page_viewed_events
+owner: leticia.machado@quintoandar.com.br
+domain: For Sale & Agents
+description: Tracks when agents view the home page.
+columns:
+  id_user:
+    description: Unique identifier of the agent user who clicked the button.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  ts_event:
+    description: Timestamp when the button click event occurred.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event timestamp, used for efficient data partitioning and time-based filtering.
+    lineage:
+      - datalake_amplitude_clean.events.day
