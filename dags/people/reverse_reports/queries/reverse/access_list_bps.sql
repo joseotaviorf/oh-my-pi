@@ -1,6 +1,8 @@
+-- Base access-control list (assignment_number, email, HRBP/leadership access_list) for other reverse reports to consume.
 WITH
 access_list_rows AS (
     SELECT
+        es.assignment_number AS assignment_number,
         LOWER(es.work_email) AS email,
         es.access_list_no_employee AS access_list,
         ROW_NUMBER() OVER (
@@ -20,6 +22,7 @@ access_list_rows AS (
         AND es.work_email IS NOT NULL
 )
 SELECT
+    assignment_number,
     email,
     access_list,
     YEAR(DATE('{load_start_date}')) AS year,
