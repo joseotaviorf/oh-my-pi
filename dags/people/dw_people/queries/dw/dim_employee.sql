@@ -9,3 +9,4 @@ FROM
 WHERE
     NOT im.is_user_test
     AND im.is_person_latest_assignment
+    AND im.is_active

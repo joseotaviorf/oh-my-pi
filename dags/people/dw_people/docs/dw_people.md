@@ -26,9 +26,9 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 **✅ Employee Identity** : Public profile for every employee — name, work email, and internal identifier. The baseline reference for joining employee data across schemas.
 
-**✅ Employment Snapshots** : Month-by-month records of each employee's organizational placement, tenure, and employment status. Covers headcount, hire and termination dates, and references to business unit, job, cost center, and management hierarchy on each snapshot date.
+**✅ Employment placement (current)** : One row per active employee with current organizational placement, tenure, hire date, and keys to business unit, job, cost center, and management hierarchy.
 
-**✅ Management Hierarchy** : Current reporting chain for every employee, from the CEO (L0) down to the individual contributor. Exposes the full chain of managers to enable filtering and grouping by any level of the reporting structure.
+**✅ Management Hierarchy** : Current reporting chain for each active employee, from the CEO (L0) down to the individual contributor. Exposes the full chain of managers to enable filtering and grouping by any level of the reporting structure.
 
 ### Out of Scope
 
@@ -36,7 +36,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 ### Who is included
 
-* **Target Population:** All QuintoAndar employees with an active or historical employment record.
+* **Target Population:** Active QuintoAndar employees only (public Trino surface). Historical snapshots and terminated employees live in `dw_employee_details`.
 * **Exclusions:** Internal test accounts used for system validation are excluded from all tables in this schema.
 
 ## Data Model and Tables
@@ -47,15 +47,15 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 ### About the data
 
-* **Temporal coverage:** Mixed across tables. `dim_employee` and `dim_management_hierarchy` are always **current state only** — they reflect the latest version of each employee's identity and reporting chain, with no historical records stored. `fact_employees` is **historical** — it keeps one row per employee per month-end reference date (full archive from the first snapshot onwards) plus one additional row for the most recent available day (`is_current = TRUE`).
+* **Temporal coverage:** All tables in this schema are **current state only** for the **active workforce**. `dim_employee`, `dim_management_hierarchy`, and `fact_employees` are overwritten on each load and reflect the latest known placement for employees who are active today. For month-end history, terminations, and inactive assignments, use `dw_employee_details`.
 * **Airflow DAG:** `bietlejuice.dw_people`
 * **SLA:** D-1 available by 08:00 BRT
 
 | Table | Grain | Links |
 | :--- | :--- | :--- |
-| `dim_employee` | **Current state only** · One row per employee — always latest identity | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.dim_employee,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/dim_employee.sql) |
-| `fact_employees` | **Historical + current day** · One row per (employee, reference date) — full month-end archive plus `is_current` row | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.fact_employees,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/fact_employees.sql) |
-| `dim_management_hierarchy` | **Current state only** · One row per employee — always latest reporting chain | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.dim_management_hierarchy,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/dim_management_hierarchy.sql) |
+| `dim_employee` | **Current state only** · One row per active employee — latest identity | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.dim_employee,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/dim_employee.sql) |
+| `fact_employees` | **Current state only** · One row per active employee — latest org placement | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.fact_employees,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/fact_employees.sql) |
+| `dim_management_hierarchy` | **Current state only** · One row per active employee — latest reporting chain | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.dim_management_hierarchy,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/dim_management_hierarchy.sql) |
 
 > **Note:** VPN connection is required to access DataHub.
 
@@ -64,15 +64,22 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 * `sk_employee` (Standard surrogate key for employees, FK to fact tables)
 * `person_number` (Internal HR code, business key)
 
+### Model decision (DBP-1804)
+
+* **Public fact:** Keep the table name `fact_employees` and change the load to **one row per active employee** on the latest `assignment_snapshots` reference date (`is_current_for_employee` and `is_active`).
+* **Restricted history:** Do not store month-end series or terminated employees in `dw_people`. Use `dw_employee_details.fact_assignment_snapshots` (and related dimensions) for historical headcount, exits, and internal People analytics.
+* **Termination columns removed:** `dt_terminated` and `sk_terminated_date` are not part of the public fact; use `dw_employee_details` for exits.
+* **No status flags on the fact:** `is_active` and `is_current` were removed; the table grain (active employees only) is enforced at load time — do not filter on removed columns.
+
 ## Core Features and Business Logic
 
 ### Domain logic and core concepts
 
-* **fact_employees is historical** : This table accumulates one row per employee for every month-end reference date since their first snapshot. It is the only table in this schema that keeps a time series. Use `dt_reference` to select a specific point in time, or omit it to work with the full history.
-* **is_current marks the latest-day row** : In addition to the monthly archive, `fact_employees` includes one extra row per employee for the most recent available day. This row has `is_current = TRUE` and is not a month-end — it represents the latest known state before the next month closes. Use `is_current = TRUE` for the most up-to-date snapshot, and `is_active = TRUE` to further filter for currently employed individuals.
-* **dim_employee and dim_management_hierarchy have no history** : Both dimension tables are overwritten on each load and always reflect the latest state. They cannot be used for time-travel or point-in-time analysis on their own — combine them with `fact_employees` filtered to a specific `dt_reference` for that purpose.
+* **fact_employees is current-state only** : One row per active employee on the latest reference date from `assignment_snapshots`. Terminated employees and month-end history are not stored here — use `dw_employee_details.fact_assignment_snapshots` for point-in-time or exit analysis.
+* **All tables exclude terminated employees** : `dim_employee`, `fact_employees`, and `dim_management_hierarchy` load only people with `is_active = TRUE` on their current assignment in the enrich source. The fact does not expose `is_active` or `is_current` columns.
+* **dim_employee and dim_management_hierarchy have no history** : Both dimensions are overwritten on each load. They cannot be used for time-travel on their own — use `dw_employee_details` for historical org structure.
 * **Management Hierarchy Depth** : `dim_management_hierarchy` exposes the full reporting chain from the CEO (L0) down to each employee. Depth varies by position — some employees sit at L3, others at L8 or beyond. Levels deeper than the employee's actual position are NULL.
-* **Surrogate Keys for Historical Joins** : `fact_employees` connects to `dim_management_hierarchy` through `sk_manager_hierarchy`. This key represents the hierarchy version in effect on each reference date, enabling historical org structure analysis even though the dimension itself is always current.
+* **Surrogate Keys for Joins** : `fact_employees` connects to `dim_management_hierarchy` through `sk_manager_hierarchy` for the current hierarchy version. Historical hierarchy versions are in `dw_employee_details`.
 
 ### Business Assumptions
 
@@ -80,9 +87,9 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 ## Attention and Limitations
 
-* **fact_employees has two overlapping rows near the current date** : Each employee has one row for every month-end plus one row for the most recent available day (`is_current = TRUE`). When the current date is close to a month-end, both the month-end row and the latest-day row exist for the same period and will appear together without a filter. Always add either `is_current = TRUE` (latest day only) or a specific `dt_reference` (point-in-time) to avoid counting employees twice.
-* **dim_management_hierarchy is always current — history is in the fact** : The hierarchy dimension is overwritten on each run and only stores the latest reporting chain. If you need to know who managed someone on a past date, join `fact_employees` on `sk_manager_hierarchy` for the desired `dt_reference` and then use that key to look up the corresponding hierarchy version — not by joining directly to `dim_management_hierarchy`.
-* **dim_employee has no history** : Name and email in `dim_employee` always reflect the employee's latest values. Changes over time (e.g. name updates) are not tracked in this schema.
+* **Public schema — not for history** : This schema is intended for public Trino consumption (replacing `org_chart`). Do not use it for terminated headcount, month-end archives, or termination reasons; use `dw_employee_details` instead.
+* **dim_management_hierarchy is always current** : Join on `person_number` or `sk_manager_hierarchy` for today's reporting chain only.
+* **dim_employee has no history** : Name and email always reflect the employee's latest values.
 
 ## How to Use
 
@@ -92,6 +99,33 @@ When joining this schema's tables with other DW domains:
 
 1. Always join on `sk_employee` (preferred) or `person_number`.
 2. Reference `dw_people.dim_employee` for central employee attributes.
+
+### Joining `dw_organization` (job, cost center, business unit)
+
+**Question:** How do I attach job title, cost center, and business unit labels to the active workforce?
+
+```sql
+SELECT
+    emp.person_number,
+    emp.name,
+    job.job_name,
+    cc.cost_center_name,
+    cc.chapter,
+    cc.line,
+    bu.business_unit_name
+FROM
+    dw_people.fact_employees AS fact
+INNER JOIN dw_people.dim_employee AS emp
+    ON fact.sk_employee = emp.sk_employee
+LEFT JOIN dw_organization.dim_job AS job
+    ON fact.sk_job = job.sk_job
+LEFT JOIN dw_organization.dim_cost_center AS cc
+    ON fact.sk_cost_center_version = cc.sk_cost_center_version
+LEFT JOIN dw_organization.dim_business_unit AS bu
+    ON fact.sk_business_unit = bu.sk_business_unit
+```
+
+For **Product & Tech team formation** (squad/line/chapter teams beyond cost-center attributes), use `datalake_gsheets_people_clean.team_formation_product_tech` today (sheet-maintained structure). A dedicated DW bridge table is planned under [DBP-1606](https://quintoandar.atlassian.net/browse/DBP-1606); until it ships, join on `person_number` or `assignment_number` per the reverse export `tech_team_formation` pattern.
 
 ### Analytical Snapshot (Management Chain for an Employee)
 
@@ -125,7 +159,6 @@ SELECT
     emp.work_email,
     fact.dt_reference,
     fact.months_employee_tenure,
-    fact.is_active,
     hier.name_manager,
     hier.name_l0
 FROM
@@ -134,9 +167,6 @@ LEFT JOIN dw_people.dim_employee AS emp
     ON fact.sk_employee = emp.sk_employee
 LEFT JOIN dw_people.dim_management_hierarchy AS hier
     ON fact.sk_manager_hierarchy = hier.sk_manager_hierarchy
-WHERE
-    fact.is_current = TRUE
-    AND fact.is_active = TRUE
 LIMIT 100
 ```
 

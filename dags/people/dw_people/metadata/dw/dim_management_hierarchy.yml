@@ -3,9 +3,9 @@ table_name: dim_management_hierarchy
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |
-  Current reporting chain for each employee, with the direct manager and the people at each organizational layer from the CEO (L0) down to the employee (L1–L9).
+  Current reporting chain for each active employee, with the direct manager and the people at each organizational layer from the CEO (L0) down to the employee (L1–L9).
   One row per person_number (current reporting chain only).
-  Covers employees with a valid CEO-linked chain.
+  Covers active employees with a valid CEO-linked chain; terminated employees are excluded.
   Use person_number_manager / name_manager / email_manager for the immediate supervisor; use person_number_lN / name_lN / email_lN to slice by a fixed depth from the CEO. The direct manager may sit at any of L1–L9 depending on org depth.
 columns:
   sk_manager_hierarchy:

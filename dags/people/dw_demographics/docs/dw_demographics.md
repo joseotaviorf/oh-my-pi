@@ -67,7 +67,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 ### Domain logic and core concepts
 
-* **Today's profile** : `is_current = TRUE` returns the latest validity-window row for each person regardless of employment status — it includes both active employees and people who have already been offboarded. To restrict to the currently active workforce, join with `dw_people.fact_employees` and filter on `is_active = TRUE`.
+* **Today's profile** : `is_current = TRUE` returns the latest validity-window row for each person regardless of employment status — it includes both active employees and people who have already been offboarded. To restrict to the currently active workforce, inner join `dw_people.fact_employees` on `sk_employee` (the fact already contains active employees only).
 * **Validity over time** : When an attribute set changes, a new validity window opens and the previous one is closed; older windows remain available for trend and audit use. For an as-of historical date, filter the validity window to that date instead of relying only on `is_current`.
 * **Legislation drives applicability** : Some flags only make sense under specific legal context. The BIM (Black, Indigenous, Mixed-race) flag, for example, is filled only under Brazilian legislation; for other countries it stays empty.
 * **Composite inclusion flags** : URG (Underrepresented Group) is derived from BIM, Women, LGBT+, and PwD with documentation. When any input is unknown, the composite may stay empty; strict metrics should treat empty as not in scope.
@@ -77,7 +77,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 * **Empty BIM is intentional outside Brazil** : Race-based inclusion is meaningful only under Brazilian legislation. Outside Brazil the value is empty by design; do not treat empty as false.
 * **DataHub is the source of truth for column rules** : Authoritative definitions of metrics and flags (for example BIM, LGBT+, URG, PwD) are maintained in DataHub on each column. Use those descriptions for formulas, null handling, and governance.
-* **Reporting tip** : Start from `dim_employee_demographic` with `is_current = TRUE` to get the latest row per person, then left join `dim_employee_disability` only when you need disability breakdowns. Remember this returns both active employees and terminated ones; join with `dw_people.fact_employees` and filter `is_active = TRUE` when your analysis covers only the current workforce.
+* **Reporting tip** : Start from `dim_employee_demographic` with `is_current = TRUE` to get the latest row per person, then left join `dim_employee_disability` only when you need disability breakdowns. For active workforce only, inner join `dw_people.fact_employees` on `sk_employee`.
 
 ## Attention and Limitations
 
@@ -85,7 +85,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 * **Self-declaration is not the same as documentation** : `has_self_declared_pwd` captures what the person reported on the legislative form. `has_medical_disability_record` reflects whether a formal medical record overlaps the demographic period. They are independent and can disagree; choose deliberately for each metric.
 * **Avoid double-counting on disability** : A person can have multiple disability rows over time. When summarizing per person, deduplicate by `sk_employee` (or use `is_primary`) before counting.
 * **As-of reporting requires validity overlap** : To report a past month or to align demographic attributes with a fact row, compare `dt_valid_from` / `dt_valid_to` with the reference date rather than relying only on `is_current`.
-* **`is_current` does not mean active employee** : `is_current = TRUE` returns the latest validity-window row for each person regardless of employment status — it covers both active employees and terminated ones. Filtering on `is_current` alone is not enough to scope to the current workforce. Join with `dw_people.fact_employees` and add `is_active = TRUE` whenever the analysis should be restricted to people currently employed.
+* **`is_current` does not mean active employee** : `is_current = TRUE` on demographic dimensions returns the latest validity-window row per person, including terminated employees. Inner join `dw_people.fact_employees` on `sk_employee` when the analysis should cover only people currently employed.
 
 ## How to Use
 
@@ -101,7 +101,7 @@ When joining this schema's tables with other DW domains:
 
 **Question:** What is the latest DE&I profile for all employees and contractors, including those who have already left?
 
-> `is_current = TRUE` returns the most recent validity-window row for each person regardless of employment status. The result includes both active employees and terminated ones. To scope to active-only, join with `dw_people.fact_employees` and add `fact_employees.is_active = TRUE`.
+> To scope to active-only, inner join `dw_people.fact_employees` on `sk_employee`.
 
 ```sql
 SELECT
@@ -145,9 +145,9 @@ WHERE
     AND COALESCE(employee_disability.is_active, TRUE)
 ```
 
-### Headcount by ethnicity (fact + dimension)
+### Headcount by ethnicity (current active workforce)
 
-**Question:** How many active employees, by ethnicity, on a reference month? Align `dt_reference` with your reporting period.
+**Question:** How many active employees, by ethnicity, as of the latest load?
 
 ```sql
 SELECT
@@ -157,18 +157,14 @@ FROM
     dw_people.fact_employees AS fact_employees
 INNER JOIN dw_demographics.dim_employee_demographic AS employee_demographic
     ON employee_demographic.sk_employee = fact_employees.sk_employee
-    AND employee_demographic.dt_valid_from <= fact_employees.dt_reference
-    AND employee_demographic.dt_valid_to >= fact_employees.dt_reference
-WHERE
-    fact_employees.is_current = TRUE
-    AND fact_employees.is_active = TRUE
+    AND employee_demographic.is_current = TRUE
 GROUP BY
     employee_demographic.ethnicity
 ORDER BY
     employee_count DESC
 ```
 
-This example already restricts to active employees via `fact_employees.is_active = TRUE`. For an as-of historical date, replace `is_current = TRUE` with the validity-window overlap shown in the disability example above, and adjust the `is_active` filter to the date of reference.
+For a **past reference month**, use `dw_employee_details.fact_assignment_snapshots` with `is_monthly_snapshot_for_employee = TRUE` and align demographic validity windows to `dt_reference` (see the disability example above).
 
 ## Glossary
 

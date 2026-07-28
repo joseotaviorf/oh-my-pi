@@ -4,29 +4,20 @@ table_name: fact_employees
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |
-  Recurring employee snapshots on fixed calendar reference dates (month-end in
-  the series plus the latest day): headcount, tenure, hire/termination, and org
-  placement. Attributes are not uniformly 'as of that date': cost center is
-  historical on the reference date; job, job country, business unit id, and
-  hierarchy version follow that assignment snapshot (see How it works).
+  Current employment snapshot for each active employee: headcount placement, tenure,
+  hire date, and org keys (business unit, job, cost center, management hierarchy)
+  as of the latest reference date in assignment_snapshots.
 
-  Each row is one person on one reference date, with surrogate keys and dates
-  for employee, business unit, job, cost center, hierarchy, hire and termination,
-  reference and load timestamps, tenure in months, inferred job country, and
-  flags for active employment and whether the row is the latest-day snapshot.
+  Each row is one active employee on the current observation date, with surrogate
+  keys and dates for employee, business unit, job, cost center, hierarchy, hire,
+  reference and load timestamps, tenure in months, and inferred job country.
 
   How it works:
-  - Each employee appears once per snapshot date: there is a row for every
-    month-end in the series plus a row for the latest available day (current
-    observation).
-  - Cost center is historical—the version stored is the one effective on that
-    reference date.
-  - Job, job country, business unit id, and management hierarchy version follow
-    the assignment snapshot for that reference date.
-  - When a person has more than one assignment overlapping a reference date, the
-    enrich table flags the row to keep (latest hire) via
-    assignment_snapshots.is_primary_assignment_for_snapshot; this fact filters on
-    that flag plus monthly snapshot rows.
+  - Source rows use is_current_for_employee and is_active on assignment_snapshots.
+  - Terminated employees and month-end historical snapshots are excluded; use
+    dw_employee_details.fact_assignment_snapshots for history and exits.
+  - Cost center is the version effective on the reference date; job, business unit,
+    and hierarchy follow the primary assignment snapshot for that date.
 columns:
   sk_employee:
     description: Person identifier (Oracle HCM id_person) carried as the employee key for this fact, aligned with dim_employee.sk_employee.
@@ -52,13 +43,8 @@ columns:
     description: Employee-cycle hire date in YYYYMMDD format for calendar-style joins (e.g. '20210510'). Consistent with dt_employee_hired on the same row.
     lineage:
       - datalake_people.assignment_snapshots.dt_employee_hired
-  sk_terminated_date:
-    description: Termination date in YYYYMMDD form when the assignment has ended and termination is strictly before the load calendar date; NULL while still active or when termination is same-day or future relative to load (rule in this fact query).
-    lineage:
-      - datalake_people.assignment_snapshots.sk_terminated_date
-      - datalake_people.assignment_snapshots.dt_terminated
   sk_reference_date:
-    description: Snapshot reference date in YYYYMMDD form (month-end in the series or the latest day).
+    description: Latest observation date in YYYYMMDD form for this active employee snapshot (e.g. '20260728').
     lineage:
       - datalake_people.assignment_snapshots.sk_reference_date
   business_unit_country:
@@ -69,24 +55,12 @@ columns:
     description: Employee's company tenure in whole months at the reference date (e.g. 12). Preserved across internal transfers and reset on a genuine rehire.
     lineage:
       - datalake_people.assignment_snapshots.months_employee_tenure
-  is_active:
-    description: True when the employee is currently active.
-    lineage:
-      - datalake_people.assignment_snapshots.is_active
-  is_current:
-    description: True when the reference date is the latest observation day in the snapshot series (typically today).
-    lineage:
-      - datalake_people.assignment_snapshots.is_current_for_assignment
   dt_employee_hired:
     description: Date the employee was hired for their current employment cycle (e.g. 2021-05-10). Stays the same across internal transfers and resets on a genuine rehire.
     lineage:
       - datalake_people.assignment_snapshots.dt_employee_hired
-  dt_terminated:
-    description: Calendar date the assignment ended for reporting; NULL when still active or when termination is same-day or future relative to load (rule in this fact query).
-    lineage:
-      - datalake_people.assignment_snapshots.dt_terminated
   dt_reference:
-    description: Reference date of the snapshot. Last day of month or current date.
+    description: Reference date of the latest active snapshot (typically the current load date).
     lineage:
       - datalake_people.assignment_snapshots.dt_reference
   ts_load:
