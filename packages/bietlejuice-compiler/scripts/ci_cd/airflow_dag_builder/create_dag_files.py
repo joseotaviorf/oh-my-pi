@@ -39,7 +39,6 @@ DEFAULT_BUNDLE_EXCLUDE_FILE = join(
 )
 DEFAULT_MIGRATION_BUNDLE_GROUP = "platform_migration"
 MIGRATION_DAG_KINDS = ("twin", "emr", "compare")
-VALIDATION_BUNDLE_FILE_PREFIX = "_validation_bundle_"
 
 
 def has_validation_cluster(dag_package_path: str, dag_name: str) -> bool:
@@ -137,60 +136,14 @@ def create_dag_files(
             )
 
 
-def _write_bundles(
-    *,
-    template: str,
-    by_domain: dict[str, list[tuple[str, str]]],
-    output_dir: str,
-    file_prefix: str,
-    max_dags_per_bundle: int,
-    is_validation: bool,
-) -> list[str]:
-    """Write chunked bundle modules per domain, returning the generated paths."""
-    generated_bundles = []
-    for domain, specs in sorted(by_domain.items()):
-        domain_output_dir = join(output_dir, domain)
-        makedirs(domain_output_dir, exist_ok=True)
-        for offset in range(0, len(specs), max_dags_per_bundle):
-            chunk = specs[offset : offset + max_dags_per_bundle]
-            bundle_number = offset // max_dags_per_bundle + 1
-            bundle_path = join(
-                domain_output_dir, f"{file_prefix}{bundle_number:02d}.py"
-            )
-            dag_specs = (
-                "[\n"
-                + "".join(
-                    f"    ({dag_name!r}, {datasets_code}),\n"
-                    for dag_name, datasets_code in chunk
-                )
-                + "]"
-            )
-            with open(bundle_path, "w") as f:
-                f.write(
-                    template.replace("__DAG_SPECS__", dag_specs).replace(
-                        "__IS_VALIDATION__", repr(is_validation)
-                    )
-                )
-            generated_bundles.append(bundle_path)
-    return generated_bundles
-
-
 def create_domain_bundles(
     *,
     max_dags_per_bundle: int = 25,
     exclude_dir: str | None = None,
     output_dir: str = DEFAULT_BUNDLE_OUTPUT_DIR,
     exclude_file: str = DEFAULT_BUNDLE_EXCLUDE_FILE,
-    include_validation: bool = False,
 ) -> list[str]:
-    """Generate deterministic domain bundles and an exact rsync exclude list.
-
-    With *include_validation*, DAGs whose declaration resolves a
-    ``validation.cluster`` also get ``_validation_bundle_NN.py`` modules. They are
-    kept separate from the production bundles because a bundle module that fails to
-    build any of its DAGs registers none of them — a broken validation twin must not
-    take its production DAGs down with it. Only the prod pipeline asks for these.
-    """
+    """Generate deterministic domain bundles and an exact rsync exclude list."""
     if max_dags_per_bundle < 1:
         raise ValueError("max_dags_per_bundle must be at least 1")
 
@@ -209,8 +162,7 @@ def create_domain_bundles(
             if f"/{exclude_dir}/" not in file_path
         ]
 
-    by_domain: dict[str, list[tuple[str, str]]] = {}
-    validation_by_domain: dict[str, list[tuple[str, str]]] = {}
+    by_domain: dict[str, list[tuple[str, str, str]]] = {}
     excluded_stubs = []
     for declaration_file in declaration_files:
         dag_package_path = dirname(declaration_file)
@@ -221,26 +173,33 @@ def create_domain_bundles(
         )
         stub_path = join(dag_package_path, f"{dag_name}{DAG_PYTHON_FILE_SUFFIX}.py")
         excluded_stubs.append(relpath(stub_path, DAG_PACKAGES_ROOT))
-        by_domain.setdefault(domain, []).append((dag_name, datasets_code))
-        if include_validation and has_validation_cluster(dag_package_path, dag_name):
-            # Validation DAGs never take dataset dependencies.
-            validation_by_domain.setdefault(domain, []).append((dag_name, "None"))
+        by_domain.setdefault(domain, []).append(
+            (dag_name, datasets_code, declaration_file)
+        )
 
     makedirs(output_dir, exist_ok=True)
-    # Validation bundles are always cleaned, including when the flag is off, so a
-    # forno/dev run never keeps prod-only bundles a previous run left behind.
-    for pattern in ("_bundle_*.py", f"{VALIDATION_BUNDLE_FILE_PREFIX}*.py"):
-        for stale_bundle in glob(join(output_dir, "**", pattern), recursive=True):
-            remove(stale_bundle)
+    for stale_bundle in glob(join(output_dir, "**", "_bundle_*.py"), recursive=True):
+        remove(stale_bundle)
 
-    generated_bundles = _write_bundles(
-        template=template,
-        by_domain=by_domain,
-        output_dir=output_dir,
-        file_prefix="_bundle_",
-        max_dags_per_bundle=max_dags_per_bundle,
-        is_validation=False,
-    )
+    generated_bundles = []
+    for domain, specs in sorted(by_domain.items()):
+        domain_output_dir = join(output_dir, domain)
+        makedirs(domain_output_dir, exist_ok=True)
+        for offset in range(0, len(specs), max_dags_per_bundle):
+            chunk = specs[offset : offset + max_dags_per_bundle]
+            bundle_number = offset // max_dags_per_bundle + 1
+            bundle_path = join(domain_output_dir, f"_bundle_{bundle_number:02d}.py")
+            dag_specs = (
+                "[\n"
+                + "".join(
+                    f"    ({dag_name!r}, {datasets_code}),\n"
+                    for dag_name, datasets_code, _declaration_file in chunk
+                )
+                + "]"
+            )
+            with open(bundle_path, "w") as f:
+                f.write(template.replace("__DAG_SPECS__", dag_specs))
+            generated_bundles.append(bundle_path)
 
     makedirs(dirname(exclude_file), exist_ok=True)
     with open(exclude_file, "w") as f:
@@ -250,24 +209,6 @@ def create_domain_bundles(
         f"msg=Generated Astro domain bundles, bundles={len(generated_bundles)}, "
         f"dags={len(excluded_stubs)}, max_dags_per_bundle={max_dags_per_bundle}\n"
     )
-
-    if include_validation:
-        validation_bundles = _write_bundles(
-            template=template,
-            by_domain=validation_by_domain,
-            output_dir=output_dir,
-            file_prefix=VALIDATION_BUNDLE_FILE_PREFIX,
-            max_dags_per_bundle=max_dags_per_bundle,
-            is_validation=True,
-        )
-        validation_dags = sum(len(specs) for specs in validation_by_domain.values())
-        print(
-            f"msg=Generated Astro validation bundles, "
-            f"bundles={len(validation_bundles)}, dags={validation_dags}, "
-            f"max_dags_per_bundle={max_dags_per_bundle}\n"
-        )
-        generated_bundles += validation_bundles
-
     return generated_bundles
 
 
@@ -369,15 +310,6 @@ def main(argv: list[str] | None = None) -> None:
         ),
     )
     parser.add_argument(
-        "--include-validation",
-        action="store_true",
-        help=(
-            "With --bundle-domains, also emit separate _validation_bundle_*.py modules "
-            "for DAGs that resolve a validation.cluster. Production-only: forno and dev "
-            "must not receive validation twin DAGs."
-        ),
-    )
-    parser.add_argument(
         "--max-dags-per-bundle",
         type=int,
         default=25,
@@ -392,7 +324,6 @@ def main(argv: list[str] | None = None) -> None:
             exclude_dir=args.exclude_dir,
             output_dir=args.bundle_output_dir,
             exclude_file=args.bundle_exclude_file,
-            include_validation=args.include_validation,
         )
         ran_bundle = True
     if args.bundle_migrations:

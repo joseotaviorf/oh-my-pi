@@ -1,41 +1,32 @@
-# Path filters use Woodpecker `when.path`. lint/tests/validations workflow-level when
-# matches deploy branches + tag (clone-only on tag where step filters are narrower).
-# Release workflow when uses the same push branches so feature-branch pushes do not
-# deadlock depends_on on v3.9 (optional: true requires Woodpecker 3.15+).
+# Path filters use Woodpecker `when.path`. Skipped steps count as success so upstream
+# step deps still pass. lint/tests/validations workflow-level when matches deploy
+# branches + tag (clone-only on tag where step filters are narrower). Release
+# workflow when uses the same push branches so feature-branch pushes do not deadlock
+# depends_on on v3.9 (optional: true requires Woodpecker 3.15+).
 #
 # Layout: shared prerequisites, then the full prod block, then the full forno block
 # (each block in internal pipeline order — not interleaved by pipeline type).
 #
 # Path anchors (sources of truth for `when.path`):
 #
-#   *wheel_package_path         — wheel build / publish chain
-#   *astro_dag_bundle_path       — direct Astro DAG deploy (create-astro-dag-files + rsync)
-#   *astro_image_paths           — Astro Runtime image deploy (DinD + astro deploy --image)
-#   *core_init_scripts_path      — init_script.sh + emr_init_script.sh + emr_custom_libraries.py
-#   *sedona_init_script_path     — sedona/sedona-init.sh (Sedona JAR bootstrap)
-#   *wonka_init_scripts_path     — wonka/*.sh bootstrap scripts
-#   *dag_artifact_*_path         — per-artifact DAG package uploads
-#   *sst_pipelines_path          — SST pipeline upload
-#   *metadata_propagation_path   — metadata propagation uploads
-#   *qube_modules_path           — Qube module sync
-#   *luigijr_dag_bundle_path     — luigijr Astro deployment (dags/luigijr; forno + prod)
+#   *wheel_package_path        — wheel build / publish chain
+#   *dag_bundle_sync_path       — DAG-bag delivery chain
+#   *core_init_scripts_path     — init_script.sh + emr_init_script.sh + emr_custom_libraries.py
+#   *sedona_init_script_path    — sedona/sedona-init.sh (Sedona JAR bootstrap)
+#   *wonka_init_scripts_path    — wonka/*.sh bootstrap scripts
+#   *dag_artifact_*_path        — per-artifact DAG package uploads
+#   *sst_pipelines_path         — SST pipeline upload
+#   *metadata_propagation_path  — metadata propagation uploads
+#   *qube_modules_path          — Qube module sync
+#   *luigijr_dag_bundle_path    — luigijr Astro deployment (dags/luigijr; forno + prod)
 #
 # Dependency chains (Woodpecker shares workspace across steps; `depends_on` enforces order;
 # skipped deps cascade-skip downstream steps):
 #
 #   Wheels (sequential): setup → make-package-python → prepare-release-* → export-releases-to-s3-*
 #   Init scripts (independent): plugins/s3 reads shell files from clone — no `depends_on`
-#   Astro (direct, forno + prod):
-#            setup → setup-astro → create-astro-dag-files runs when either
-#            *astro_dag_bundle_path or *astro_image_paths matches.
-#            deploy-astro-dags-{env}: DAG-only path; uploads domain bag.
-#            deploy-astro-image-{env}: depends on create-astro-dag-files + credentials;
-#            runs --image then --dags so IMAGEONLY finalize cannot leave an empty/replaced bag.
-#            (setup-astro depends_on setup to avoid parallel uv sync races on .venv.
-#             create-astro-dag-files is shared: it adds prod-only validation bundles
-#             via INCLUDE_VALIDATION=1 on master/hotfix, never on forno.
-#             Dual-path pushes may double-upload DAGs; accepted — do not wire
-#             dags→image depends_on without optional: true / Woodpecker ≥3.15.)
+#   DAG bag: setup → create-dag-files; stage-bietlejuice-tree → upload-modules-*;
+#            create-dag-files → upload-dags-*; both uploads → astronomer-deploy-dags-*
 #   DAG artifacts / SST / metadata: setup → upload (reads dags/** or scripts from clone)
 #   Qube (independent): beethoven-s3-sync mirrors source tree — no `depends_on`
 #
@@ -49,25 +40,23 @@
 # downstream paths, and Woodpecker treats a skipped dep the same as a failed dep,
 # cascade-skipping the whole tail.
 #
-# Airflow delivery: forno (`branch: forno`) and prod (`branch: master, hotfix/*`) deploy
-# directly to their Astro deployments via `astro deploy --dags` / `--image`, using Vault
-# credentials at `kv:apps/{forno,prod}/astronomer/creds/cicd_token`. Airflow Python
-# packages ship inside the Runtime image (`astro/Dockerfile`); the DAG bag is a pruned
-# rsync into `astro/dags/` (see `astro/generated-dag-excludes.txt`). The isolated
-# development-branch deploy stays in `.woodpecker/development.yml` (ungated).
+# Repo layout note: `bietlejuice` is split across `packages/bietlejuice-core/src/bietlejuice/`
+# and `packages/bietlejuice-airflow/src/bietlejuice/`. The Astronomer DAG bundle still
+# expects a single `bietlejuice/` tree under `s3://{bucket}/astronomer/dags/`, so
+# `stage-bietlejuice-tree` merges both into `staging/bietlejuice/` before
+# `upload-bi-etl-ejuice-modules-s3-{env}` mirrors it to S3.
 #
 # `setup` runs `uv sync` for the compiler workspace once before any parallel Python
 # steps. Without it, several release steps share the repo workspace and concurrent
 # `uv run --project packages/bietlejuice-compiler` races on `.venv` (intermittent CI
 # failure). Same pattern as `.woodpecker/validations.yml` + `depends_on: [setup]`.
-# Astro DAG generation uses a separate `setup-astro` (`uv sync` on
-# prod-ci-astro-latest) because `make create-astro-dag-files` needs the full workspace.
 #
 # Wheel pipeline (`make-package-python` -> `prepare-release-*` -> `export-releases-to-s3-*`):
 # `make build` produces TWO wheels into `dist/` — `bietlejuice_core-*.whl` and
 # `bietlejuice_runtime-*.whl`. These are the wheels Spark/Databricks/EMR jobs install
 # via `default_libraries` / `emr_init_script.sh`. The Airflow wheel is intentionally NOT
-# published here — Airflow code ships in the Astro Runtime image, not via S3 DAG bag.
+# published here because Airflow code is shipped via the Astro DAG bundle (see
+# stage-bietlejuice-tree), not pip-installed on Spark workers.
 
 depends_on:
   - lint
@@ -121,6 +110,40 @@ steps:
         branch: [master, hotfix/*]
         path: *wheel_package_path
     depends_on: [setup]
+
+  # Single source of truth for the entire DAG-bag delivery chain
+  # (create-dag-files → stage/upload → astronomer-deploy-dags). All downstream
+  # env-specific steps reuse `*dag_bundle_sync_path`.
+  create-dag-files:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make create-dag-files
+    when:
+      event: push
+      branch: [master, hotfix/*, forno]
+      path: &dag_bundle_sync_path
+        include:
+          - "packages/bietlejuice-core/src/**"
+          - "packages/bietlejuice-airflow/src/**"
+          - "dags/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/**/*.py"
+          - "Makefile"
+        on_empty: false
+    depends_on: [setup]
+
+  stage-bietlejuice-tree:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - rm -rf staging/bietlejuice
+      - mkdir -p staging/bietlejuice
+      - cp -a packages/bietlejuice-core/src/bietlejuice/. staging/bietlejuice/
+      - cp -a packages/bietlejuice-airflow/src/bietlejuice/. staging/bietlejuice/
+    when:
+      event: push
+      branch: [master, hotfix/*, forno]
+      path: *dag_bundle_sync_path
 
   # --- prod (master / hotfix/*) ---
 
@@ -240,181 +263,41 @@ steps:
           - "packages/bietlejuice-compiler/scripts/init_script_anonymization.sh"
         on_empty: false
 
-  # Direct Astro deploy for prod (mirrors .woodpecker/development.yml / forno chain).
-  # Shared setup + create-astro-dag-files live in the forno block below (same path
-  # anchors, branch list covers master/hotfix/forno). Image and DAG deploys run in
-  # parallel after credentials.
-  get-astro-credentials-prod:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/vault
+  upload-bi-etl-ejuice-modules-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
     pull: true
-    settings:
-      vault_secrets:
-        - ASTRO_API_TOKEN=kv:apps/prod/astronomer/creds/cicd_token#ASTRO_API_TOKEN
-        - ASTRO_DEPLOYMENT_ID=kv:apps/prod/astronomer/creds/cicd_token#ASTRO_DEPLOYMENT_ID
-        - ASTRO_WORKSPACE_ID=kv:apps/prod/astronomer/creds/cicd_token#ASTRO_WORKSPACE_ID
-      output_file: ./astro-secrets-prod
-      vault_env: prod
-    when:
-      - event: push
-        branch: [master, hotfix/*]
-        path: &astro_dag_bundle_path
-          include:
-            - ".woodpecker/release.yml"
-            - "dags/**"
-            - "packages/bietlejuice-compiler/src/**"
-            - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/**/*.py"
-            - "Makefile"
-            - "astro/.airflowignore"
-            - "dags/.airflowignore"
-          on_empty: false
-      - event: push
-        branch: [master, hotfix/*]
-        path: &astro_image_paths
-          include:
-            - ".woodpecker/release.yml"
-            - "astro/Dockerfile"
-            - "astro/packages.txt"
-            - "astro/requirements.txt"
-            - "astro/runtime-constraints.txt"
-            - "astro/parse-alias-batching.patch"
-            - "astro/config/**"
-            - "packages/bietlejuice-core/src/**"
-            - "packages/bietlejuice-airflow/src/**"
-            - "packages/bietlejuice-airflow-operators/src/**"
-            - "packages/bietlejuice-airflow-plugins/src/**"
-            - "packages/bietlejuice-core/pyproject.toml"
-            - "packages/bietlejuice-airflow/pyproject.toml"
-            - "packages/bietlejuice-airflow-operators/pyproject.toml"
-            - "packages/bietlejuice-airflow-plugins/pyproject.toml"
-            - "pyproject.toml"
-            - "uv.lock"
-          on_empty: false
-
-  deploy-astro-dags-prod:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-astro-latest
-    pull: true
-    depends_on: [create-astro-dag-files, get-astro-credentials-prod]
-    commands:
-      - |
-        # POSIX /bin/sh (dash on ci-astro): no pipefail, no source builtin.
-        set -eu
-        set -a
-        # shellcheck disable=SC1091
-        . ./astro-secrets-prod
-        set +a
-        # Bare $VAR (no braces): Woodpecker only pre-substitutes braced forms; braces blank runtime secrets.
-        [ -n "$ASTRO_API_TOKEN" ] || { echo "ASTRO_API_TOKEN missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$ASTRO_DEPLOYMENT_ID" ] || { echo "ASTRO_DEPLOYMENT_ID missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$ASTRO_WORKSPACE_ID" ] || { echo "ASTRO_WORKSPACE_ID missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
-        astro version
-        # Airflow bag: parse/import only. queries/ for table discovery at parse time;
-        # SQL content + schemas/ + spark_jobs/*.py are S3 artifacts for Spark (Databricks/EMR).
-        # Must be a real directory — astro CLI's tar (filepath.Walk) does not follow
-        # symlinks, so `ln -s` here silently uploaded an empty DAG bundle.
-        # Conf includes before spark_jobs exclude (rsync first-match); exclude spark_jobs
-        # before *.py so job sources stay out while *_conf.yml under spark_jobs ships
-        # (ConfigurationService searches {dag}/ and {dag}/spark_jobs/).
-        rm -rf astro/dags
-        mkdir -p astro/dags
-        rsync -a --prune-empty-dirs \
-          --exclude-from=astro/generated-dag-excludes.txt \
-          --include='*/' \
-          --include='*_conf.yml' \
-          --include='*_declaration.yml' \
-          --include='*_cluster.yml' \
-          --include='.airflowignore' \
-          --include='queries/***' \
-          --include='data_quality/***' \
-          --include='metadata/***' \
-          --include='tables/***' \
-          --include='dependencies.yaml' \
-          --exclude='spark_jobs/***' \
-          --include='*.py' \
-          --exclude='*' \
-          dags/ astro/dags/
-        [ -n "$(find astro/dags -name '*.py' -print -quit)" ] || { echo "DAG bundle is empty — refusing to deploy" >&2; exit 1; }
-        cd astro
-        astro deploy "$ASTRO_DEPLOYMENT_ID" --workspace-id "$ASTRO_WORKSPACE_ID" --dags -f
-    when:
-      event: push
-      branch: [master, hotfix/*]
-      path: *astro_dag_bundle_path
-
-  deploy-astro-image-prod:
-    image: public.ecr.aws/docker/library/docker:24.0.9
-    privileged: true
-    depends_on: [create-astro-dag-files, get-astro-credentials-prod]
     environment:
-      GITHUB_TOKEN:
-        from_secret: github_token
-    commands:
-      - |
-        # POSIX /bin/sh (dash on ci-astro): no pipefail, no source builtin.
-        set -eu
-        set -a
-        # shellcheck disable=SC1091
-        . ./astro-secrets-prod
-        set +a
-        # Bare $VAR (no braces): Woodpecker only pre-substitutes braced forms; braces blank runtime secrets.
-        [ -n "$ASTRO_API_TOKEN" ] || { echo "ASTRO_API_TOKEN missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$ASTRO_DEPLOYMENT_ID" ] || { echo "ASTRO_DEPLOYMENT_ID missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$ASTRO_WORKSPACE_ID" ] || { echo "ASTRO_WORKSPACE_ID missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$GITHUB_TOKEN" ] || { echo "GITHUB_TOKEN secret missing" >&2; exit 1; }
-        apk add --no-cache curl bash sudo
-        # Same as beethoven/.woodpecker/.02-deploy.yml — unpinned install (v1.42.0 tag fails godownloader).
-        curl -sSL https://install.astronomer.io | sudo bash -s
-        sh -c 'dockerd-entrypoint.sh --registry-mirror=http://docker-registry.shared.quintoandar.com.br:5000 1>/dev/null 2>/dev/null' &
-        while ! docker stats --no-stream >/dev/null 2>&1; do
-          echo "Waiting Docker daemon to start..."
-          sleep 1
-        done
-        printf '%s' "$GITHUB_TOKEN" > /tmp/github_token
-        DOCKER_BUILDKIT=1 docker build \
-          --target production \
-          --file astro/Dockerfile \
-          --secret id=GITHUB_TOKEN,src=/tmp/github_token \
-          --build-arg UV_VERSION=0.11.7 \
-          -t bietlejuice-airflow:deploy \
-          .
-        rm -f /tmp/github_token
-        cd astro
-        astro deploy "$ASTRO_DEPLOYMENT_ID" \
-          --workspace-id "$ASTRO_WORKSPACE_ID" \
-          --image-name bietlejuice-airflow:deploy \
-          --image \
-          -f
-        # IMAGEONLY finalize sends DagTarballVersion="" when DAG deploys are enabled on the
-        # deployment; Astronomer may mint a new DAG stamp and replace the live bag (forno
-        # 86540: 20:27:44 replaced 20:12:22 with no DAG upload). Re-upload the domain bag
-        # so the last finalize is a real --dags deploy.
-        cd /woodpecker/src/github.com/quintoandar/bi-etl-ejuice
-        # docker:24 image has no rsync by default
-        apk add --no-cache rsync findutils
-        rm -rf astro/dags
-        mkdir -p astro/dags
-        rsync -a --prune-empty-dirs \
-          --exclude-from=astro/generated-dag-excludes.txt \
-          --include='*/' \
-          --include='*_conf.yml' \
-          --include='*_declaration.yml' \
-          --include='*_cluster.yml' \
-          --include='.airflowignore' \
-          --include='queries/***' \
-          --include='data_quality/***' \
-          --include='metadata/***' \
-          --include='tables/***' \
-          --include='dependencies.yaml' \
-          --exclude='spark_jobs/***' \
-          --include='*.py' \
-          --exclude='*' \
-          dags/ astro/dags/
-        [ -n "$(find astro/dags -name '*.py' -print -quit)" ] || { echo "DAG bundle is empty — refusing to deploy after image" >&2; exit 1; }
-        cd astro
-        astro deploy "$ASTRO_DEPLOYMENT_ID" --workspace-id "$ASTRO_WORKSPACE_ID" --dags -f
+      BUCKET: artifacts.s3.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: staging/bietlejuice
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *astro_image_paths
+      path: *dag_bundle_sync_path
+    depends_on: [stage-bietlejuice-tree]
+
+  upload-dag-packages-dags-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: dags
+    when:
+      event: push
+      branch: [master, hotfix/*]
+      path: *dag_bundle_sync_path
+    depends_on: [create-dag-files]
+
+  astronomer-deploy-dags-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:prod-latest
+    pull: true
+    when:
+      event: push
+      branch: [master, hotfix/*]
+      path: *dag_bundle_sync_path
+    depends_on:
+      [upload-bi-etl-ejuice-modules-s3-prod, upload-dag-packages-dags-s3-prod]
 
   upload-dag-packages-spark-jobs-s3-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -638,198 +521,41 @@ steps:
       branch: forno
       path: *anonymization_init_script_path
 
-  # Shared Astro DAG generation (forno + prod). Path anchors `*astro_dag_bundle_path`
-  # and `*astro_image_paths` are defined once on get-astro-credentials-prod above.
-  # Must also run on image-only pushes: deploy-astro-image-* rsyncs the domain bag
-  # after --image (IMAGEONLY finalize can mint an empty DAG stamp — forno 86540).
-  setup-astro:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-astro-latest
+  upload-bi-etl-ejuice-modules-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
     pull: true
-    commands:
-      - uv sync
-    when:
-      - event: push
-        branch: [master, hotfix/*, forno]
-        path: *astro_dag_bundle_path
-      - event: push
-        branch: [master, hotfix/*, forno]
-        path: *astro_image_paths
-    # After shared `setup` so both uv syncs never race on the same workspace `.venv`.
-    # Safe: `setup` has no path filter and always runs on push/tag.
-    depends_on: [setup]
-
-  create-astro-dag-files:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-astro-latest
-    pull: true
-    commands:
-      - |
-        # POSIX /bin/sh (dash on ci-astro): no bashisms.
-        set -eu
-        # Validation twin DAGs (_validation_bundle_*.py) are prod-only — forno and
-        # Astro "dev" must not receive them. Bare $VAR: Woodpecker pre-substitutes
-        # only braced forms.
-        case "$CI_COMMIT_BRANCH" in
-          master|hotfix/*) include_validation=1 ;;
-          *) include_validation= ;;
-        esac
-        make create-astro-dag-files INCLUDE_VALIDATION="$include_validation"
-    when:
-      - event: push
-        branch: [master, hotfix/*, forno]
-        path: *astro_dag_bundle_path
-      - event: push
-        branch: [master, hotfix/*, forno]
-        path: *astro_image_paths
-    depends_on: [setup-astro]
-
-  # Single Vault fetch shared by forno DAG and image deploys.
-  # Runs when either DAG-bundle or image paths change (when-list = OR).
-  get-astro-credentials-forno:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/vault
-    pull: true
-    settings:
-      vault_secrets:
-        - ASTRO_API_TOKEN=kv:apps/forno/astronomer/creds/cicd_token#ASTRO_API_TOKEN
-        - ASTRO_DEPLOYMENT_ID=kv:apps/forno/astronomer/creds/cicd_token#ASTRO_DEPLOYMENT_ID
-        - ASTRO_WORKSPACE_ID=kv:apps/forno/astronomer/creds/cicd_token#ASTRO_WORKSPACE_ID
-      output_file: ./astro-secrets-forno
-      vault_env: prod
-    when:
-      - event: push
-        branch: [forno]
-        path: *astro_dag_bundle_path
-      - event: push
-        branch: [forno]
-        path: *astro_image_paths
-
-  deploy-astro-dags-forno:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-astro-latest
-    pull: true
-    depends_on: [create-astro-dag-files, get-astro-credentials-forno]
-    commands:
-      - |
-        # POSIX /bin/sh (dash on ci-astro): no pipefail, no source builtin.
-        set -eu
-        set -a
-        # shellcheck disable=SC1091
-        . ./astro-secrets-forno
-        set +a
-        # Bare $VAR (no braces): Woodpecker only pre-substitutes braced forms; braces blank runtime secrets.
-        [ -n "$ASTRO_API_TOKEN" ] || { echo "ASTRO_API_TOKEN missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$ASTRO_DEPLOYMENT_ID" ] || { echo "ASTRO_DEPLOYMENT_ID missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$ASTRO_WORKSPACE_ID" ] || { echo "ASTRO_WORKSPACE_ID missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
-        astro version
-        # Airflow bag: parse/import only. queries/ for table discovery at parse time;
-        # SQL content + schemas/ + spark_jobs/*.py are S3 artifacts for Spark (Databricks/EMR).
-        # Must be a real directory — astro CLI's tar (filepath.Walk) does not follow
-        # symlinks, so `ln -s` here silently uploaded an empty DAG bundle.
-        # Conf includes before spark_jobs exclude (rsync first-match); exclude spark_jobs
-        # before *.py so job sources stay out while *_conf.yml under spark_jobs ships
-        # (ConfigurationService searches {dag}/ and {dag}/spark_jobs/).
-        rm -rf astro/dags
-        mkdir -p astro/dags
-        rsync -a --prune-empty-dirs \
-          --exclude-from=astro/generated-dag-excludes.txt \
-          --include='*/' \
-          --include='*_conf.yml' \
-          --include='*_declaration.yml' \
-          --include='*_cluster.yml' \
-          --include='.airflowignore' \
-          --include='queries/***' \
-          --include='data_quality/***' \
-          --include='metadata/***' \
-          --include='tables/***' \
-          --include='dependencies.yaml' \
-          --exclude='spark_jobs/***' \
-          --include='*.py' \
-          --exclude='*' \
-          dags/ astro/dags/
-        [ -n "$(find astro/dags -name '*.py' -print -quit)" ] || { echo "DAG bundle is empty — refusing to deploy" >&2; exit 1; }
-        cd astro
-        astro deploy "$ASTRO_DEPLOYMENT_ID" --workspace-id "$ASTRO_WORKSPACE_ID" --dags -f
-    when:
-      event: push
-      branch: [forno]
-      path: *astro_dag_bundle_path
-
-  # Same shape as .woodpecker/development.yml / beethoven/.woodpecker/.02-deploy.yml
-  # (DinD + astro deploy --image). Build from monorepo root with BuildKit GITHUB_TOKEN.
-  # After --image, always --dags so IMAGEONLY finalize cannot leave an empty/replaced bag.
-  deploy-astro-image-forno:
-    image: public.ecr.aws/docker/library/docker:24.0.9
-    privileged: true
-    depends_on: [create-astro-dag-files, get-astro-credentials-forno]
     environment:
-      GITHUB_TOKEN:
-        from_secret: github_token
-    commands:
-      - |
-        # POSIX /bin/sh (dash on ci-astro): no pipefail, no source builtin.
-        set -eu
-        set -a
-        # shellcheck disable=SC1091
-        . ./astro-secrets-forno
-        set +a
-        # Bare $VAR (no braces): Woodpecker only pre-substitutes braced forms; braces blank runtime secrets.
-        [ -n "$ASTRO_API_TOKEN" ] || { echo "ASTRO_API_TOKEN missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$ASTRO_DEPLOYMENT_ID" ] || { echo "ASTRO_DEPLOYMENT_ID missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$ASTRO_WORKSPACE_ID" ] || { echo "ASTRO_WORKSPACE_ID missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
-        [ -n "$GITHUB_TOKEN" ] || { echo "GITHUB_TOKEN secret missing" >&2; exit 1; }
-        apk add --no-cache curl bash sudo
-        # Same as beethoven/.woodpecker/.02-deploy.yml — unpinned install (v1.42.0 tag fails godownloader).
-        curl -sSL https://install.astronomer.io | sudo bash -s
-        sh -c 'dockerd-entrypoint.sh --registry-mirror=http://docker-registry.shared.quintoandar.com.br:5000 1>/dev/null 2>/dev/null' &
-        while ! docker stats --no-stream >/dev/null 2>&1; do
-          echo "Waiting Docker daemon to start..."
-          sleep 1
-        done
-        printf '%s' "$GITHUB_TOKEN" > /tmp/github_token
-        DOCKER_BUILDKIT=1 docker build \
-          --target production \
-          --file astro/Dockerfile \
-          --secret id=GITHUB_TOKEN,src=/tmp/github_token \
-          --build-arg UV_VERSION=0.11.7 \
-          -t bietlejuice-airflow:deploy \
-          .
-        rm -f /tmp/github_token
-        cd astro
-        astro deploy "$ASTRO_DEPLOYMENT_ID" \
-          --workspace-id "$ASTRO_WORKSPACE_ID" \
-          --image-name bietlejuice-airflow:deploy \
-          --image \
-          -f
-        # IMAGEONLY finalize sends DagTarballVersion="" when DAG deploys are enabled on the
-        # deployment; Astronomer may mint a new DAG stamp and replace the live bag (forno
-        # 86540: 20:27:44 replaced 20:12:22 with no DAG upload). Re-upload the domain bag
-        # so the last finalize is a real --dags deploy.
-        cd /woodpecker/src/github.com/quintoandar/bi-etl-ejuice
-        # docker:24 image has no rsync by default
-        apk add --no-cache rsync findutils
-        rm -rf astro/dags
-        mkdir -p astro/dags
-        rsync -a --prune-empty-dirs \
-          --exclude-from=astro/generated-dag-excludes.txt \
-          --include='*/' \
-          --include='*_conf.yml' \
-          --include='*_declaration.yml' \
-          --include='*_cluster.yml' \
-          --include='.airflowignore' \
-          --include='queries/***' \
-          --include='data_quality/***' \
-          --include='metadata/***' \
-          --include='tables/***' \
-          --include='dependencies.yaml' \
-          --exclude='spark_jobs/***' \
-          --include='*.py' \
-          --exclude='*' \
-          dags/ astro/dags/
-        [ -n "$(find astro/dags -name '*.py' -print -quit)" ] || { echo "DAG bundle is empty — refusing to deploy after image" >&2; exit 1; }
-        cd astro
-        astro deploy "$ASTRO_DEPLOYMENT_ID" --workspace-id "$ASTRO_WORKSPACE_ID" --dags -f
+      BUCKET: artifacts.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: staging/bietlejuice
     when:
       event: push
       branch: [forno]
-      path: *astro_image_paths
+      path: *dag_bundle_sync_path
+    depends_on: [stage-bietlejuice-tree]
+
+  upload-dag-packages-dags-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: dags
+    when:
+      event: push
+      branch: [forno]
+      path: *dag_bundle_sync_path
+    depends_on: [create-dag-files]
+
+  astronomer-deploy-dags-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:forno-latest
+    pull: true
+    when:
+      event: push
+      branch: [forno]
+      path: *dag_bundle_sync_path
+    depends_on:
+      [upload-bi-etl-ejuice-modules-s3-forno, upload-dag-packages-dags-s3-forno]
 
   upload-dag-packages-spark-jobs-s3-forno:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
