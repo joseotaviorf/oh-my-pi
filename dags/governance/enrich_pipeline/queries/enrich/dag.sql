@@ -1,4 +1,4 @@
-WITH most_recent_run AS (
+WITH most_recent_run_ranked AS (
   SELECT
   -- The last run date of a DAG. A reminder that usually our DAGs are D-1
     id_dag,
@@ -6,14 +6,26 @@ WITH most_recent_run AS (
     is_in_exclusion_list,
     is_first_execution_inside_sla AS is_inside_sla,
     DATE(ts_run) AS dt_run,
-    ts_first_execution_success
-  FROM 
+    ts_first_execution_success,
+    ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_run DESC) AS rn
+  FROM
     datalake_pipeline.dag_run
   WHERE
     is_manual_run = FALSE   -- Excluding manual DAG runs, because it's created as D0
     AND id_run IS NOT NULL  -- Excluding runs without id_run because we won't know if it's manual, scheduled, etc.
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_run DESC) = 1
+),
+most_recent_run AS (
+  SELECT
+    id_dag,
+    state,
+    is_in_exclusion_list,
+    is_inside_sla,
+    dt_run,
+    ts_first_execution_success
+  FROM
+    most_recent_run_ranked
+  WHERE
+    rn = 1
 ),
 medians AS (
     SELECT
@@ -29,7 +41,7 @@ medians AS (
         id_run NOT LIKE 'manual%'
     GROUP BY 1
 ),
-most_recent_events AS (
+most_recent_events_ranked AS (
     SELECT
         id_dag,
         duration,
@@ -38,11 +50,25 @@ most_recent_events AS (
         ts_ended AS ts_last_execution_ended,
         ts_ended_brt AS ts_last_execution_ended_brt,
         ts_first_execution_success AS ts_last_run_first_success,
-        ts_first_execution_success_brt AS ts_last_run_first_success_brt
+        ts_first_execution_success_brt AS ts_last_run_first_success_brt,
+        ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_started DESC) AS rn
     FROM
         datalake_pipeline.dag_run
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_started DESC) = 1
+),
+most_recent_events AS (
+    SELECT
+        id_dag,
+        duration,
+        ts_last_execution_started,
+        ts_last_execution_started_brt,
+        ts_last_execution_ended,
+        ts_last_execution_ended_brt,
+        ts_last_run_first_success,
+        ts_last_run_first_success_brt
+    FROM
+        most_recent_events_ranked
+    WHERE
+        rn = 1
 ),
 first_execution AS (
     SELECT
@@ -97,7 +123,11 @@ dag_info AS (
         is_active,
         is_paused,
         IF(d.id_dag LIKE '%datamarts%', TRUE, FALSE) AS is_datamart,
-        IF(de.dag IS NOT NULL, TRUE, FALSE) AS is_in_exclusion_list,
+        IF(
+            de.dag IS NOT NULL OR endswith(d.id_dag, '__validation'),
+            TRUE,
+            FALSE
+        ) AS is_in_exclusion_list,
         IF(ds.id_dag IS NOT NULL, TRUE, FALSE) AS has_special_scheduler
     FROM
         datalake_airflow.dag AS d
@@ -131,7 +161,7 @@ sla_base AS (
                 WHEN d.has_special_scheduler = TRUE AND mc.ts_first_execution_success IS NULL THEN TRUE
                 WHEN d.has_special_scheduler = TRUE AND DATE(mc.ts_first_execution_success) < CURRENT_DATE THEN TRUE -- DAGs with special scheduler that didn't run today
                 WHEN d.has_special_scheduler = TRUE AND DATE(mc.ts_first_execution_success) = CURRENT_DATE THEN FALSE -- DAGs with special scheduler that had a run today
-            END 
+            END
             ELSE NULL
         END AS is_in_sla_ignoring_list,  -- DAGs that should be ignored in the SLA calculation
         d.is_datamart,

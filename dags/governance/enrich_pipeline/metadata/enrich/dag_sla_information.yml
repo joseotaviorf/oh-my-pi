@@ -43,13 +43,19 @@ columns:
   is_in_sla_exclusion_list:
     lineage:
       - datalake_gsheets_clean.dags_sla_exclusion_list.dag
-    description: Boolean flag indicating whether the DAG is listed in the SLA exclusion Google Sheet.
+      - datalake_pipeline.dag.id_dag
+    description: >
+      Boolean flag indicating whether the DAG is excluded from Data SLA via the exclusion Google Sheet
+      or by name suffix __validation (shadow/validation DAGs for EMR and cluster resize).
   is_in_ignoring_list:
     lineage:
       - datalake_gsheets_clean.dags_special_scheduler.id_dag
       - datalake_gsheets_clean.dags_sla_exclusion_list.dag
+      - datalake_pipeline.dag.id_dag
       - datalake_pipeline.dag_run.is_first_execution_inside_sla
-    description: Boolean flag indicating whether the DAG is excluded from SLA calculation (exclusion list, special scheduler without run, or first-run null SLA).
+    description: >
+      Boolean flag indicating whether the DAG is excluded from SLA calculation (exclusion list,
+      __validation shadow DAGs, special scheduler without run, or first-run null SLA).
   is_inside_sla:
     lineage:
       - datalake_pipeline.dag_run.is_first_execution_inside_sla

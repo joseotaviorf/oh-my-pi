@@ -1,4 +1,4 @@
-WITH intraday_dags AS (
+WITH intraday_dags_ranked AS (
     SELECT
         id_dag,
         schedule_interval,
@@ -15,12 +15,21 @@ WITH intraday_dags AS (
             WHEN CONTAINS(SPLIT(schedule_interval, ' ')[0], '-') THEN TRUE
             WHEN CONTAINS(SPLIT(schedule_interval, ' ')[0], '/') THEN TRUE
             ELSE FALSE
-        END AS is_intraday
+        END AS is_intraday,
+        ROW_NUMBER() OVER(PARTITION BY id_dag ORDER BY ts_last_parsed DESC) AS rn
     FROM
         datalake_astro_clean.dag
+),
+intraday_dags AS (
     -- get the most recent schedule interval for each DAG
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_dag ORDER BY ts_last_parsed DESC) = 1
+    SELECT
+        id_dag,
+        schedule_interval,
+        is_intraday
+    FROM
+        intraday_dags_ranked
+    WHERE
+        rn = 1
 ),
 dag_run_base AS (
     SELECT
@@ -48,7 +57,8 @@ paused_dates AS (
         ts_event,
         CASE
             -- astro semantics: event is always 'paused' and the real status comes in the payload.
-            WHEN event = 'paused' THEN CAST(extra:is_paused AS BOOLEAN)
+            -- TODO: verify column type before EMR migration; default rewrite is GET_JSON_OBJECT if STRING JSON
+            WHEN event = 'paused' THEN CAST(GET_JSON_OBJECT(extra, '$.is_paused') AS BOOLEAN)
             -- legacy semantics: 'paused' means paused, 'cli_run' means active/unpaused.
             WHEN event = 'cli_run' THEN FALSE
             ELSE NULL
@@ -80,20 +90,29 @@ paused_cli_run AS (
         is_paused_status = TRUE
         AND (prev_is_paused_status IS NULL OR prev_is_paused_status <> is_paused_status)
 ),
-astro_dag_pause_status AS (
+astro_dag_pause_status_ranked AS (
     SELECT
         id_dag,
         MAKE_DATE(year, month, day) AS dt_event,
-        is_paused
+        is_paused,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_dag, MAKE_DATE(year, month, day)
+            ORDER BY ts_last_parsed DESC
+        ) AS rn
     FROM
         datalake_astro_clean.dag
     WHERE
         MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_dag, MAKE_DATE(year, month, day)
-            ORDER BY ts_last_parsed DESC
-        ) = 1
+),
+astro_dag_pause_status AS (
+    SELECT
+        id_dag,
+        dt_event,
+        is_paused
+    FROM
+        astro_dag_pause_status_ranked
+    WHERE
+        rn = 1
 ),
 dag_base AS (
     SELECT
@@ -136,6 +155,15 @@ sla_exclusion_list AS (
             ON ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     WHERE
         ad.date BETWEEN dt_dag_added AND COALESCE(dt_dag_removed, CURRENT_DATE)
+    UNION
+    -- Shadow/validation DAGs (cluster.validation): manual-only, never in Data SLA
+    SELECT
+        id_dag,
+        dt_event
+    FROM
+        dag_base
+    WHERE
+        endswith(id_dag, '__validation')
 ),
 special_scheduler AS (
     SELECT
@@ -148,7 +176,7 @@ special_scheduler AS (
         datalake_quintoandar.aux_date AS ad
             ON ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     JOIN
-        dag_base AS db 
+        dag_base AS db
             ON db.id_dag = ds.id_dag    -- Only active DAGs
             AND db.dt_event = ad.date
     LEFT JOIN
@@ -162,15 +190,15 @@ ignoring_list AS (
     -- Unifying all DAGs that has special scheduler + are in the SLA exclusion list + first execution has null SLA
     SELECT
         id_dag,
-        dt_event 
+        dt_event
     FROM
-        special_scheduler 
+        special_scheduler
     -- Adding DAGs with special scheduler that executed or not, since the ones that executed soon will be removed
     UNION
     SELECT
         id_dag,
         dt_event
-    FROM 
+    FROM
         sla_exclusion_list
     UNION
     SELECT
@@ -178,12 +206,12 @@ ignoring_list AS (
         dt_event
     FROM
         dag_run_base
-    WHERE 
-        rn = 1 
+    WHERE
+        rn = 1
         AND is_first_execution_inside_sla IS NULL
 ),
 checking_ignored_tables AS (
-    -- Assuring that the DAGs to be ignored are currently active and running on Airflow, 
+    -- Assuring that the DAGs to be ignored are currently active and running on Airflow,
     -- otherwise we could be counting on the calculation DAGs that doesn't exist anymore
     SELECT
         i.id_dag,
@@ -203,7 +231,7 @@ base AS (
         TRUE AS is_active,
         CASE
             WHEN d.is_paused = FALSE THEN TRUE
-            WHEN d.is_paused = TRUE THEN FALSE 
+            WHEN d.is_paused = TRUE THEN FALSE
             ELSE NULL
         END AS is_active_and_unpaused,
         CASE
@@ -222,7 +250,7 @@ base AS (
             ELSE NULL
         END AS is_special_scheduler_executed,
         CASE
-            WHEN ds.id_dag IS NOT NULL THEN TRUE 
+            WHEN ds.id_dag IS NOT NULL THEN TRUE
             WHEN ds.id_dag IS NULL THEN FALSE
             ELSE NULL
         END AS is_in_sla_exclusion_list,
@@ -234,7 +262,7 @@ base AS (
         CASE
             WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = TRUE THEN TRUE
             WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN FALSE
-            ELSE NULL 
+            ELSE NULL
         END AS is_inside_sla,
         CASE
             WHEN d.is_paused = FALSE AND db.id_dag IS NOT NULL AND db.is_first_execution_inside_sla = FALSE THEN TRUE
@@ -247,22 +275,22 @@ base AS (
             ELSE NULL
         END AS is_null_sla,
         CASE
-            WHEN db.id_dag IS NOT NULL AND db.state = 'success' THEN TRUE 
+            WHEN db.id_dag IS NOT NULL AND db.state = 'success' THEN TRUE
             WHEN db.id_dag IS NOT NULL AND db.state <> 'success' THEN FALSE
             ELSE NULL
         END AS is_run_successful,
         CASE
-            WHEN db.id_dag IS NOT NULL AND db.state = 'failed' THEN TRUE 
+            WHEN db.id_dag IS NOT NULL AND db.state = 'failed' THEN TRUE
             WHEN db.id_dag IS NOT NULL AND db.state <> 'failed' THEN FALSE
             ELSE NULL
         END AS is_run_failed,
         CASE
-            WHEN db.id_dag IS NOT NULL AND db.is_manual_run = TRUE THEN TRUE 
+            WHEN db.id_dag IS NOT NULL AND db.is_manual_run = TRUE THEN TRUE
             WHEN db.id_dag IS NOT NULL AND db.is_manual_run <> TRUE THEN FALSE
             ELSE NULL
         END AS is_manual_run,
         CASE
-            WHEN db.id_dag IS NOT NULL AND db.is_triggered_by_mediator = TRUE THEN TRUE 
+            WHEN db.id_dag IS NOT NULL AND db.is_triggered_by_mediator = TRUE THEN TRUE
             WHEN db.id_dag IS NOT NULL AND db.is_triggered_by_mediator <> TRUE THEN FALSE
             ELSE NULL
         END AS is_run_triggered_by_mediator,
@@ -316,10 +344,10 @@ SELECT
     CASE
         WHEN is_active_and_unpaused = TRUE AND COALESCE(is_inside_sla, is_outside_sla, is_null_sla) IS NULL THEN TRUE
         WHEN is_active_and_unpaused = TRUE AND is_in_ignoring_list = FALSE AND COALESCE(is_inside_sla, is_outside_sla) IS NULL THEN TRUE
-        WHEN is_active_and_unpaused = TRUE AND is_special_scheduler_executed = TRUE AND is_in_sla_exclusion_list = FALSE 
+        WHEN is_active_and_unpaused = TRUE AND is_special_scheduler_executed = TRUE AND is_in_sla_exclusion_list = FALSE
          AND COALESCE(is_inside_sla, is_outside_sla) IS NULL AND is_null_sla = TRUE THEN TRUE
         WHEN is_active_and_unpaused = TRUE AND is_special_scheduler_executed = TRUE AND is_in_ignoring_list = FALSE THEN TRUE
-        ELSE NULL  
+        ELSE NULL
     END AS has_possible_problem,
     dt_event AS dt_snapshot,
     dt_run,
@@ -331,4 +359,4 @@ SELECT
     MONTH(dt_event) AS month,
     DAY(dt_event) AS day
 FROM
-    base 
+    base
