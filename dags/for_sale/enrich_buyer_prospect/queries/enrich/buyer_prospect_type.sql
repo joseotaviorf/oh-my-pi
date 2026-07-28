@@ -1,79 +1,107 @@
 WITH bp_status AS (
   SELECT
-    bps.id_demand_prospect_conversion_event,
-    bps.id_buyer_prospect,
-    ce.id_offer,
-    ce.id_house,
-    ce.id_booking,
-    ce.id_region,
-    bps.prospect_event_name,
-    bps.status_trigger_event_name,
-    CASE
-      WHEN bps.prospect_event_name = 'USER RECOVERY' THEN 'RBP'
-      WHEN
-        bps.prospect_event_name IN ('USER FIRST ACTIVATION', 'USER FIRST ACTIVATION IN CITY GROUP')
-      THEN
-        'NBP'
-    END AS bp_type,
-    bps.city_group,
-    bps.status_detail,
-    bps.status,
-    bps.ts_status_started AS ts_activation,
-    COALESCE(
-      bps.ts_status_ended,
-      LEAD(bps.ts_status_started) OVER (
-          PARTITION BY bps.id_buyer_prospect
-          ORDER BY bps.ts_status_started
-        )
-    ) AS ts_activation_end
-  FROM
-    datalake_demand_flows.buyer_prospect_status AS bps
-  LEFT JOIN 
-    datalake_demand_flows.conversion_events AS ce
+    id_demand_prospect_conversion_event,
+    id_buyer_prospect,
+    id_offer,
+    id_house,
+    id_booking,
+    id_region,
+    prospect_event_name,
+    status_trigger_event_name,
+    bp_type,
+    city_group,
+    status_detail,
+    status,
+    ts_activation,
+    ts_activation_end
+  FROM (
+    SELECT
+      bps.id_demand_prospect_conversion_event,
+      bps.id_buyer_prospect,
+      ce.id_offer,
+      ce.id_house,
+      ce.id_booking,
+      ce.id_region,
+      bps.prospect_event_name,
+      bps.status_trigger_event_name,
+      CASE
+        WHEN bps.prospect_event_name = 'USER RECOVERY'
+        THEN 'RBP'
+        WHEN bps.prospect_event_name IN ('USER FIRST ACTIVATION', 'USER FIRST ACTIVATION IN CITY GROUP')
+        THEN 'NBP'
+      END AS bp_type,
+      bps.city_group,
+      bps.status_detail,
+      bps.status,
+      bps.ts_status_started AS ts_activation,
+      COALESCE(
+        bps.ts_status_ended,
+        LEAD(bps.ts_status_started) OVER (PARTITION BY bps.id_buyer_prospect ORDER BY bps.ts_status_started)
+      ) AS ts_activation_end,
+      bps.ts_status_started,
+      MIN(bps.ts_status_started) OVER (PARTITION BY bps.id_buyer_prospect, COALESCE(
+        bps.ts_status_ended,
+        LEAD(bps.ts_status_started) OVER (PARTITION BY bps.id_buyer_prospect ORDER BY bps.ts_status_started)
+      ) ORDER BY bps.ts_status_started) AS _w
+    FROM datalake_demand_flows.buyer_prospect_status AS bps
+    LEFT JOIN datalake_demand_flows.conversion_events AS ce
       ON bps.id_demand_prospect_conversion_event = ce.id_demand_prospect_conversion_event
-  QUALIFY
-    bps.ts_status_started = MIN(bps.ts_status_started) OVER (
-        PARTITION BY bps.id_buyer_prospect, ts_activation_end
-        ORDER BY bps.ts_status_started
-      )
+  ) AS _t
+  WHERE
+    ts_status_started = _w
 )
 SELECT
-  MD5(
-    CONCAT(
-      id_buyer_prospect,
-      COALESCE(id_offer, -1),
-      COALESCE(id_booking, -1),
-      bp_status.ts_activation
-    )
-  ) AS id_buyer_prospect_type,
-  bp_status.id_buyer_prospect AS id_prospect,
-  bp_status.id_offer,
-  bp_status.id_house,
-  bp_status.id_booking,
-  bp_status.id_region,
-  bp_status.id_demand_prospect_conversion_event,
-  bp_status.prospect_event_name,
-  bp_status.status_trigger_event_name,
-  bp_status.bp_type,
-  bp_status.city_group,
-  slpc.price_segment,
-  slpc.change_number AS price_change_number,
-  bp_status.ts_activation,
-  bp_status.ts_activation_end,
-  NOW() AS ts_load
-FROM
-  bp_status
-LEFT JOIN 
-  datalake_sale_listings.sale_listing_price_changes AS slpc
+  id_buyer_prospect_type,
+  id_prospect,
+  id_offer,
+  id_house,
+  id_booking,
+  id_region,
+  id_demand_prospect_conversion_event,
+  prospect_event_name,
+  status_trigger_event_name,
+  bp_type,
+  city_group,
+  price_segment,
+  price_change_number,
+  ts_activation,
+  ts_activation_end,
+  ts_load
+FROM (
+  SELECT
+    MD5(
+      CONCAT(
+        id_buyer_prospect,
+        COALESCE(id_offer, -1),
+        COALESCE(id_booking, -1),
+        bp_status.ts_activation
+      )
+    ) AS id_buyer_prospect_type,
+    bp_status.id_buyer_prospect AS id_prospect,
+    bp_status.id_offer,
+    bp_status.id_house,
+    bp_status.id_booking,
+    bp_status.id_region,
+    bp_status.id_demand_prospect_conversion_event,
+    bp_status.prospect_event_name,
+    bp_status.status_trigger_event_name,
+    bp_status.bp_type,
+    bp_status.city_group,
+    slpc.price_segment,
+    slpc.change_number AS price_change_number,
+    bp_status.ts_activation,
+    bp_status.ts_activation_end,
+    NOW() AS ts_load,
+    slpc.change_number,
+    MAX(slpc.change_number) OVER (PARTITION BY bp_status.id_buyer_prospect, bp_status.ts_activation, bp_status.id_house) AS _w,
+    bp_status.id_buyer_prospect
+  FROM bp_status
+  LEFT JOIN datalake_sale_listings.sale_listing_price_changes AS slpc
     ON bp_status.id_house = slpc.id_house
-    AND bp_status.ts_activation BETWEEN
-      slpc.ts_price_started
-    AND
-      COALESCE(slpc.ts_price_ended, NOW())
+    AND bp_status.ts_activation BETWEEN slpc.ts_price_started AND COALESCE(slpc.ts_price_ended, NOW())
+  WHERE
+    bp_status.prospect_event_name IN ('USER FIRST ACTIVATION', 'USER FIRST ACTIVATION IN CITY GROUP', 'USER RECOVERY')
+    AND bp_status.status = 'ACTIVE'
+) AS _t
 WHERE
-  bp_status.prospect_event_name IN (
-    'USER FIRST ACTIVATION', 'USER FIRST ACTIVATION IN CITY GROUP', 'USER RECOVERY'
-  )
-  AND bp_status.status = 'ACTIVE'
-QUALIFY 
-  slpc.change_number = MAX(slpc.change_number) OVER (PARTITION BY bp_status.id_buyer_prospect, bp_status.ts_activation, bp_status.id_house)
+  change_number = _w
