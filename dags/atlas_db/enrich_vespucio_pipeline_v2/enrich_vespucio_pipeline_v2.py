@@ -166,16 +166,18 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            "--script=navent_house_composed.sql",
+            "--script=v2/navent_house_composed.sql",
             f"--output_table={Tables.source_navent_houses_composed_v2}",
+            "--checkpoint_column=_checkpoint",
         ],
         task_id="navent_house_composed",
     ),
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            "--script=union_house.sql",
+            "--script=v2/union_house.sql",
             f"--output_table={Tables.source_union_houses_v2}",
+            "--checkpoint_column=event_timestamp",
         ],
         task_id="union_house",
     ),
@@ -214,8 +216,9 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            "--script=zap_imoveis_house.sql",
+            "--script=v2/zap_imoveis_house.sql",
             f"--output_table={Tables.source_zap_imoveis_houses_v2}",
+            "--checkpoint_column=ts_updated",
         ],
         task_id="zap_house",
     ),
@@ -301,6 +304,18 @@ image_enrich_step_task = create_task(
     ],
 )
 
+artifacts_step_task = create_task(
+    entry_point="core_v2_artifacts_step",
+    parameters=[
+        f"--input_general_normalized={Tables.general_normalization_step_v2}",
+        f"--input_enriched={Tables.address_enrich_step_v2}",
+        f"--input_image_enrich={Tables.image_enrich_step_v2}",
+        "--overwrite_schema",
+        f"--output_artifacts={Tables.artifacts_v2}",
+    ],
+    task_id="artifacts_step",
+)
+
 address_grouping_step_task = create_task(
     entry_point="core_v2_address_grouping_step",
     parameters=[
@@ -351,9 +366,14 @@ address_normalization_step_task >> address_enrich_step_task
     address_enrich_step_task,
     general_normalization_step_task,
 ] >> address_grouping_step_task
-image_enrich_step_task >> image_grouping_step_task
+[
+    general_normalization_step_task,
+    address_enrich_step_task,
+    image_enrich_step_task,
+] >> artifacts_step_task
 [
     address_grouping_step_task,
     image_grouping_step_task,
 ] >> resolve_groups_step_task
 resolve_groups_step_task >> vespucio_v2_pipeline_complete_task
+artifacts_step_task >> vespucio_v2_pipeline_complete_task
