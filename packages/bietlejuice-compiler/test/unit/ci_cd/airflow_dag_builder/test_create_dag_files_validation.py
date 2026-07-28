@@ -256,6 +256,222 @@ def test_generated_bundle_reports_all_build_failures(
     assert "broken_b" in error
 
 
+def _write_validation_declaration(root: Path, domain: str, dag_name: str) -> None:
+    """Declaration whose cluster file resolves a validation block."""
+    dag_dir = root / domain / dag_name
+    dag_dir.mkdir(parents=True)
+    (dag_dir / f"{dag_name}_declaration.yml").write_text(
+        f"dag:\n  name: {dag_name}\nworkflow:\n  type: query_delta\n  layer: clean\n"
+    )
+    (dag_dir / f"{dag_name}_cluster.yml").write_text(
+        "cluster:\n  type: xs\nvalidation:\n  cluster:\n    type: xs\n"
+    )
+
+
+def _bundle_names(bundles: list[str]) -> list[str]:
+    return [Path(bundle).name for bundle in bundles]
+
+
+def _only_validation_bundle(bundles: list[str]) -> str:
+    """Pick the validation bundle by file name — tmp_path itself can contain
+    "_validation_bundle_" because pytest names it after the test function."""
+    return next(
+        bundle
+        for bundle in bundles
+        if Path(bundle).name.startswith("_validation_bundle_")
+    )
+
+
+def _patch_bundle_deps(create_dag_files_mod, monkeypatch, dags_root: Path) -> None:
+    monkeypatch.setattr(create_dag_files_mod, "DAG_PACKAGES_ROOT", str(dags_root))
+    monkeypatch.setattr(create_dag_files_mod, "_datasets_code", lambda *_args: "None")
+    monkeypatch.setattr(
+        create_dag_files_mod.BietlejuiceDependencyHelper,
+        "read_dependencies",
+        lambda: {},
+    )
+
+
+def test_domain_bundles_skip_validation_by_default(
+    create_dag_files_mod, monkeypatch, tmp_path
+):
+    dags_root = tmp_path / "dags"
+    _write_validation_declaration(dags_root, "people", "dw_employee")
+    _patch_bundle_deps(create_dag_files_mod, monkeypatch, dags_root)
+
+    bundles = create_dag_files_mod.create_domain_bundles(
+        output_dir=str(dags_root / "_astro_bundles"),
+        exclude_file=str(tmp_path / "excludes.txt"),
+    )
+
+    assert _bundle_names(bundles) == ["_bundle_01.py"]
+    assert "_IS_VALIDATION = False" in Path(bundles[0]).read_text()
+
+
+def test_include_validation_emits_separate_bundles(
+    create_dag_files_mod, monkeypatch, tmp_path
+):
+    dags_root = tmp_path / "dags"
+    _write_validation_declaration(dags_root, "people", "dw_employee")
+    # Same domain, no validation block → production bundle only.
+    _write_declaration(dags_root, "people", "dw_people")
+    _patch_bundle_deps(create_dag_files_mod, monkeypatch, dags_root)
+
+    bundles = create_dag_files_mod.create_domain_bundles(
+        output_dir=str(dags_root / "_astro_bundles"),
+        exclude_file=str(tmp_path / "excludes.txt"),
+        include_validation=True,
+    )
+
+    assert _bundle_names(bundles) == ["_bundle_01.py", "_validation_bundle_01.py"]
+    production = Path(bundles[0]).read_text()
+    validation = Path(bundles[1]).read_text()
+    assert "_IS_VALIDATION = False" in production
+    assert "('dw_employee', None)" in production
+    assert "('dw_people', None)" in production
+    # Only the DAG with a validation.cluster reaches the validation bundle.
+    assert "_IS_VALIDATION = True" in validation
+    assert "('dw_employee', None)" in validation
+    assert "dw_people" not in validation
+
+
+def test_validation_bundles_are_cleaned_when_flag_is_off(
+    create_dag_files_mod, monkeypatch, tmp_path
+):
+    """A forno/dev run must evict validation bundles a prod run left behind."""
+    dags_root = tmp_path / "dags"
+    _write_validation_declaration(dags_root, "people", "dw_employee")
+    _patch_bundle_deps(create_dag_files_mod, monkeypatch, dags_root)
+    output_dir = dags_root / "_astro_bundles"
+
+    with_validation = create_dag_files_mod.create_domain_bundles(
+        output_dir=str(output_dir),
+        exclude_file=str(tmp_path / "excludes.txt"),
+        include_validation=True,
+    )
+    assert Path(with_validation[1]).exists()
+
+    create_dag_files_mod.create_domain_bundles(
+        output_dir=str(output_dir),
+        exclude_file=str(tmp_path / "excludes.txt"),
+    )
+
+    assert not Path(with_validation[1]).exists()
+    assert not list(output_dir.rglob("_validation_bundle_*.py"))
+
+
+def test_generated_validation_bundle_builds_validation_dags(
+    create_dag_files_mod, monkeypatch, tmp_path
+):
+    import bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser as parser_module
+    import bietlejuice.base.airflow.dag_builders.main_builder.factories.factory_dispatcher as dispatcher_module
+
+    dags_root = tmp_path / "dags"
+    _write_validation_declaration(dags_root, "people", "dw_employee")
+    _patch_bundle_deps(create_dag_files_mod, monkeypatch, dags_root)
+
+    class FakeParser:
+        def __init__(self, dag_name):
+            self.dag_name = dag_name
+
+        def dag_declaration(self):
+            return {
+                "dag": {"name": self.dag_name},
+                "workflow": {"layer": "clean"},
+                "cluster": {"type": "xs"},
+                "validation": {"cluster": {"type": "xs"}},
+            }
+
+    captured = {}
+
+    class FakeWorkflow:
+        def __init__(self, dag_name):
+            self.dag_name = dag_name
+
+        def build_dag(self):
+            return DAG(dag_id=f"bietlejuice.{self.dag_name}_validation")
+
+    class FakeFactory:
+        def __init__(self, dag_name):
+            self.dag_name = dag_name
+
+        def get_workflow(self):
+            return FakeWorkflow(self.dag_name)
+
+    class FakeDispatcher:
+        def __init__(self, layer):
+            self.layer = layer
+
+        def get_factory(self, **kwargs):
+            captured.update(kwargs)
+            return FakeFactory(kwargs["dag_args"]["name"])
+
+    monkeypatch.setattr(parser_module, "DAGYamlParser", FakeParser)
+    monkeypatch.setattr(dispatcher_module, "FactoryDispatcher", FakeDispatcher)
+
+    bundles = create_dag_files_mod.create_domain_bundles(
+        output_dir=str(dags_root / "_astro_bundles"),
+        exclude_file=str(tmp_path / "excludes.txt"),
+        include_validation=True,
+    )
+    validation_bundle = _only_validation_bundle(bundles)
+    dagbag = DagBag(
+        dag_folder=validation_bundle, include_examples=False, safe_mode=False
+    )
+
+    assert not dagbag.import_errors, dagbag.import_errors
+    assert set(dagbag.dags) == {"bietlejuice.dw_employee_validation"}
+    assert captured["is_validation"] is True
+    assert captured["dataset_dependencies"] is None
+    assert captured["validation_config"] == {"cluster": {"type": "xs"}}
+
+
+def test_validation_bundle_fails_loudly_on_missing_validation_block(
+    create_dag_files_mod, monkeypatch, tmp_path
+):
+    """Guards against a stale bundle whose declaration lost validation.cluster."""
+    import bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser as parser_module
+
+    dags_root = tmp_path / "dags"
+    _write_validation_declaration(dags_root, "people", "dw_employee")
+    _patch_bundle_deps(create_dag_files_mod, monkeypatch, dags_root)
+
+    class FakeParser:
+        def __init__(self, dag_name):
+            self.dag_name = dag_name
+
+        def dag_declaration(self):
+            return {
+                "dag": {"name": self.dag_name},
+                "workflow": {"layer": "clean"},
+                "cluster": {"type": "xs"},
+            }
+
+    monkeypatch.setattr(parser_module, "DAGYamlParser", FakeParser)
+    bundles = create_dag_files_mod.create_domain_bundles(
+        output_dir=str(dags_root / "_astro_bundles"),
+        exclude_file=str(tmp_path / "excludes.txt"),
+        include_validation=True,
+    )
+    validation_bundle = _only_validation_bundle(bundles)
+    dagbag = DagBag(
+        dag_folder=validation_bundle, include_examples=False, safe_mode=False
+    )
+
+    error = next(iter(dagbag.import_errors.values()))
+    assert "validation.cluster" in error
+
+
+def test_domain_bundle_template_supports_both_modes():
+    template = (
+        REPO_ROOT / "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/"
+        "__domain_bundle_template__.py"
+    ).read_text()
+    assert "__IS_VALIDATION__" in template
+    assert "merge_validation_cluster_args" in template
+    assert "is_validation" in template
+
+
 def _write_migration_dag(
     root: Path, kind: str, folder_suffix: str, dag_id: str, *, broken: bool = False
 ) -> Path:

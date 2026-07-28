@@ -1151,17 +1151,30 @@ create-dag-files: generate-query-manifests generate-metadata-manifests generate-
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name) --exclude-dir luigijr
 
 .PHONY: create-astro-dag-files
-## Astro "dev" deployment only: regenerate parse-time manifests and domain bundles.
-## Does NOT emit per-DAG *_dag.py / *_validation_dag.py stubs — those are excluded
-## from the Astro upload anyway. Skips dags/luigijr/ (dedicated luigijr instances).
-## Also bundles platform migration_{twin,emr,compare}_* Python DAGs (exec-passthrough).
-## Forno/prod continue to use `create-dag-files`; luigijr uses `create-luigijr-dag-files`.
+## Astro "dev" direct-deploy path: regenerate parse-time manifests, domain bundles, and
+## platform migration_{twin,emr,compare}_* exec-passthrough bundles. Does NOT emit per-DAG
+## stubs. Skips dags/luigijr/. Pass INCLUDE_VALIDATION=1 for prod-only validation bundles.
 create-astro-dag-files: generate-query-manifests generate-metadata-manifests generate-data-quality-manifests
 	@echo ""
 	@echo "Creating Astro domain + migration bundles + manifests (no per-DAG stubs; excluding luigijr)"
 	@echo "=========="
 	@echo ""
-	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py --bundle-domains --bundle-migrations --exclude-dir luigijr
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py \
+		--bundle-domains --bundle-migrations --exclude-dir luigijr \
+		$(if $(filter 1,$(INCLUDE_VALIDATION)),--include-validation,)
+
+.PHONY: create-s3-dag-files
+## Hybrid forno/prod/Dev Beethoven path: domain bundles only (no migration bundles, no
+## per-DAG stubs). Full `dags/` tree is mirrored to S3 afterward. Pass INCLUDE_VALIDATION=1
+## on master/hotfix to emit separate _validation_bundle_*.py modules (prod only).
+create-s3-dag-files: generate-query-manifests generate-metadata-manifests generate-data-quality-manifests
+	@echo ""
+	@echo "Creating S3 domain bundles + manifests (no per-DAG stubs, no migration bundles; excluding luigijr)"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py \
+		--bundle-domains --exclude-dir luigijr \
+		$(if $(filter 1,$(INCLUDE_VALIDATION)),--include-validation,)
 
 .PHONY: create-luigijr-dag-files
 ## creates the DAG Python files for the luigijr sandbox ONLY (dags/luigijr/). Used by the

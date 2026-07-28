@@ -57,4 +57,15 @@ We stay on Runtime `-base` (build context is the monorepo root; non-base ONBUILD
 `astro/parse-alias-batching.patch` batches DatasetAlias expansion during DAG serialization (one IN query per file instead of one SELECT per task alias).
 
 Local Airflow (`astro/docker-compose.override.yml`) bind-mounts repo-root `dags/` into `/usr/local/airflow/dags`.
-CI rsyncs the DAG bag into `astro/dags/` before `astro deploy --dags` — that path must be a **real directory** (not a symlink); the Astro CLI tar uses `filepath.Walk`, which does not follow symlinks and would silently upload an empty bundle.
+
+## Deployments (CI) — hybrid
+
+| Branch | Pipeline | Image | DAGs |
+|--------|----------|-------|------|
+| `development` | [`.woodpecker/development.yml`](../.woodpecker/development.yml) | `astro deploy --image` from this repo | S3 mirror of domain bundles under **`s3://artifacts.s3.data.quintoandar.com.br/astronomer/dags-dev/`** (prod artifacts bucket, isolated prefix) → assemble + `astro deploy --dags` |
+| `forno` | [`.woodpecker/release.yml`](../.woodpecker/release.yml) | `astro deploy --image` from this repo | `make create-s3-dag-files` → S3 `astronomer/dags/dags/` + clear `bietlejuice/` → `beethoven-deploy-dags` |
+| `master` / `hotfix/*` | same `release.yml` | same | same as forno, plus `INCLUDE_VALIDATION=1` for `_validation_bundle_*.py` |
+
+`bietlejuice` Python packages live in the Runtime image — they are **not** uploaded to S3. Release/Dev CI empty-mirrors `…/bietlejuice/` before DAG deploy so a stale bag-local tree cannot shadow site-packages. QuintoML keeps publishing `quintoml/` + `quintoflow/` to the live forno/prod S3 prefixes unchanged.
+
+Codegen: `make create-s3-dag-files` (hybrid) vs `make create-astro-dag-files` (direct Astro path with migration bundles). Local stub workflow remains `make create-dag-files`.
