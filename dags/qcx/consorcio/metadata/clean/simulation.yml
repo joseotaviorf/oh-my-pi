@@ -1,0 +1,90 @@
+---
+database_name: datalake_consorcio_clean
+table_name: simulation
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: Consorcio credit and installment simulations generated for prospects, optionally linked to a lead.
+columns:
+  id:
+    lineage:
+      - datalake_consorcio_raw.simulation.id
+    description: Primary key of table.
+  id_lead:
+    lineage:
+      - datalake_consorcio_raw.simulation.lead_id
+    description: Foreign key to the consorcio lead associated with this simulation, when present.
+  uuid:
+    lineage:
+      - datalake_consorcio_raw.simulation.uuid
+    description: Unique identifier of the simulation.
+  credit_value:
+    lineage:
+      - datalake_consorcio_raw.simulation.credit_value
+    description: Simulated credit amount offered to the prospect.
+  installment_value:
+    lineage:
+      - datalake_consorcio_raw.simulation.installment_value
+    description: Full monthly installment value for the simulated plan.
+  reduced_installment_value:
+    lineage:
+      - datalake_consorcio_raw.simulation.reduced_installment_value
+    description: Reduced monthly installment value when a contemplation discount applies.
+  cashback_percentage:
+    lineage:
+      - datalake_consorcio_raw.simulation.cashback_percentage
+    description: Cashback percentage applied in the simulation.
+  cashback_value:
+    lineage:
+      - datalake_consorcio_raw.simulation.cashback_value
+    description: Absolute cashback value derived from the simulation.
+  target_credit_value:
+    lineage:
+      - datalake_consorcio_raw.simulation.target_credit_value
+    description: Target credit value requested by the prospect before matching a product.
+  target_installment_value:
+    lineage:
+      - datalake_consorcio_raw.simulation.target_installment_value
+    description: Target installment value requested by the prospect before matching a product.
+  deadline_term:
+    lineage:
+      - datalake_consorcio_raw.simulation.deadline_term
+    description: Plan deadline term in months for the simulated product.
+  sale_plan_contemplation:
+    lineage:
+      - datalake_consorcio_raw.simulation.sale_plan_contemplation
+    description: Contemplation percentage used by the sale plan in the simulation.
+  simulation_image_url:
+    lineage:
+      - datalake_consorcio_raw.simulation.simulation_image_url
+    description: URL of the generated simulation summary image shared with the prospect.
+  source:
+    lineage:
+      - datalake_consorcio_raw.simulation.source
+    description: Channel or flow that originated the simulation (for example BSP or API).
+  is_composed:
+    lineage:
+      - datalake_consorcio_raw.simulation.is_composed
+    description: Flag indicating whether the simulation combines more than one product or quota.
+  dt_expiration:
+    lineage:
+      - datalake_consorcio_raw.simulation.expiration_date
+    description: Date when the simulation offer expires.
+  ts_created:
+    lineage:
+      - datalake_consorcio_raw.simulation.created_at
+    description: Timestamp when record was created.
+  ts_updated:
+    lineage:
+      - datalake_consorcio_raw.simulation.updated_at
+    description: Timestamp when record was last updated.
+  op_cdc:
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.

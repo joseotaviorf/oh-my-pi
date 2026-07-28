@@ -19,9 +19,13 @@ workflow:
     #   clean_table_name: consorciado_quota
     lead:
       clean_table_name: lead
+    lead_external_data:
+      clean_table_name: lead_external_data
     # order:
     #   clean_table_name: order
     # order_item:
     #   clean_table_name: order_item
     product:
       clean_table_name: product
+    simulation:
+      clean_table_name: simulation

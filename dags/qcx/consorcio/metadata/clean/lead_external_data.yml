@@ -1,0 +1,46 @@
+---
+database_name: datalake_consorcio_clean
+table_name: lead_external_data
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: Links a consorcio lead to external identifiers in Blip (BSP contact and conversation) and HubSpot (CRM deal id).
+columns:
+  id:
+    lineage:
+      - datalake_consorcio_raw.lead_external_data.id
+    description: Primary key of table.
+  id_lead:
+    lineage:
+      - datalake_consorcio_raw.lead_external_data.lead_id
+    description: Foreign key to the consorcio lead row in the source database.
+  id_bsp_contact:
+    lineage:
+      - datalake_consorcio_raw.lead_external_data.bsp_contact_id
+    description: Blip contact identity associated with the lead (BSP contact id).
+  id_bsp_conversation:
+    lineage:
+      - datalake_consorcio_raw.lead_external_data.bsp_conversation_id
+    description: Blip conversation / tunnel id (BlipId) associated with the lead.
+  id_crm:
+    lineage:
+      - datalake_consorcio_raw.lead_external_data.crm_id
+    description: HubSpot deal object id linked to the consorcio lead.
+  ts_created:
+    lineage:
+      - datalake_consorcio_raw.lead_external_data.created_at
+    description: Timestamp when record was created.
+  ts_updated:
+    lineage:
+      - datalake_consorcio_raw.lead_external_data.updated_at
+    description: Timestamp when record was last updated.
+  op_cdc:
+    description: CDC operation type captured by Debezium change-data-capture stream.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Wall-clock timestamp when the CDC connector captured this change event (millisecond precision).
+  ts_database_transaction:
+    description: Timestamp of the originating database transaction in the source application before CDC propagation.
