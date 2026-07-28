@@ -54,7 +54,8 @@ tool_observations AS (
             'get_last_paid_invoices_v1',
             'simulate_negotiation_v1',
             'create_negotiation_v1',
-            'get_original_invoices_by_status_v1'
+            'get_original_invoices_by_status_v1',
+            'send_original_invoice_boleto_pix_email'
         )
 ),
 mcp_with_obs AS (

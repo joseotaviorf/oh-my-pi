@@ -54,6 +54,8 @@ SELECT
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_last_paid_invoices_v1' AND b.is_mcp_success = false THEN b.id_request END) AS n_last_paid_invoices_errors,
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_original_invoices_by_status_v1' THEN b.id_request END) AS n_original_invoices_calls,
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_original_invoices_by_status_v1' AND b.is_mcp_success = false THEN b.id_request END) AS n_original_invoices_errors,
+    COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'send_original_invoice_boleto_pix_email' THEN b.id_request END) AS n_original_invoice_email_calls,
+    COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'send_original_invoice_boleto_pix_email' AND b.is_mcp_success = false THEN b.id_request END) AS n_original_invoice_email_errors,
     COUNT(DISTINCT CASE WHEN b.is_mcp_success = false THEN b.id_request END) AS n_mcp_tool_errors,
     MAX(
         CASE

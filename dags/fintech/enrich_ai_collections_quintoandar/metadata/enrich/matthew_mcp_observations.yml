@@ -162,6 +162,21 @@ columns:
     description:
       Count of distinct get_original_invoices_by_status_v1 MCP requests with
       a non-2xx HTTP status in the session.
+  n_original_invoice_email_calls:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
+    description:
+      Count of distinct send_original_invoice_boleto_pix_email MCP requests
+      made in the session to send or resend an original invoice by email.
+  n_original_invoice_email_errors:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
+    description:
+      Count of distinct send_original_invoice_boleto_pix_email MCP requests
+      with a non-2xx HTTP status in the session.
   n_mcp_tool_errors:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
