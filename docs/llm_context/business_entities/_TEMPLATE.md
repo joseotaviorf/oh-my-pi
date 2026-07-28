@@ -11,8 +11,8 @@ Rules:
   • Plain language. No DataHub URNs in prose — catalog links live in `## DataHub catalog`.
   • CI publishes to DataHub from this MD via `generate_and_push_datahub_entities.py`.
   • Every table section must state grain, key dedup flags, and common join keys.
-  • Every synonym that has a Portuguese name should be listed in the Synonyms table.
-  • Golden query: the single most important / most-asked metric for this entity.
+  • Every synonym that has a Portuguese name should be listed in the Glossary and Synonyms table.
+  • Golden Queries: the single most important / most-asked metric for this entity.
   • Cross-link to sibling .md files instead of duplicating their content.
   • File name: lowercase_snake_case.md (matches the entity slug in the YAML).
 -->
@@ -52,12 +52,12 @@ data architecture, upstream source systems, and pointers to related entities.
 
 ---
 
-## Synonyms
+## Glossary and Synonyms
 
 <!--
 List every Portuguese / internal term that analysts or stakeholders might use
-when asking questions. TARS uses this table to map user language to canonical
-column values and table names.
+when asking questions, and its meaning. TARS uses this table to map user language
+to canonical column values and table names.
 -->
 
 | Term | Meaning | Notes |
@@ -67,12 +67,12 @@ column values and table names.
 
 ---
 
-## Where to query what
+## Tables
 
 <!--
 Use-case routing table. Column "You need…" should be written the way a business
-user would phrase the need. "Schema / table" is the canonical answer.
-TARS uses this to decide which table to query before writing SQL.
+user would phrase the need. "Schema / table" is the canonical answer (concrete
+`schema.table`). TARS uses this to decide which table to query before writing SQL.
 No DataHub links here — those are auto-generated.
 -->
 
@@ -132,7 +132,7 @@ wrong schema names, missing filters, cast issues, methodology distinctions.
 
 ---
 
-## Golden query: {Query Name}
+## Golden Queries
 
 <!--
 The single most important SQL template for this entity. Should demonstrate:

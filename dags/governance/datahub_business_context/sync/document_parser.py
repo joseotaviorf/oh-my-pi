@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from sync.constants import DATA_PRODUCT_TYPE_DOMAIN, DATA_PRODUCT_TYPE_METRIC
@@ -358,6 +359,22 @@ def _find_section(sections: dict[str, str], *candidates: str) -> str:
     return ""
 
 
+# A Dos and Don'ts line leading with "Do" / "Don't", in either common authoring
+# style: a bold label (``**Do:**`` / ``**Don't:**``) or a bullet (``- Do …``).
+# ``do\b`` can't match the ``do`` inside ``don't`` (the ``n`` blocks the boundary).
+_DO_LINE_RE = re.compile(r"(?im)^\s*(?:[-*]\s*)?\*{0,2}do\b")
+_DONT_LINE_RE = re.compile(r"(?im)^\s*(?:[-*]\s*)?\*{0,2}don'?t\b")
+
+
+def _has_do_and_dont(section_body: str) -> bool:
+    """Heuristic: the Dos and Don'ts body names at least one Do AND one Don't.
+
+    Advisory only (drives a warning, never a blocking error), so it accepts either
+    authoring style — a bold label or a bullet — rather than requiring a fixed shape.
+    """
+    return bool(_DONT_LINE_RE.search(section_body) and _DO_LINE_RE.search(section_body))
+
+
 def _has_exact_section(sections: dict[str, str], heading: str) -> bool:
     """True when a ``##`` heading equals ``heading`` after emphasis stripping."""
     target = heading.strip().lower()
@@ -376,17 +393,30 @@ def extract_subjects_from_sql(sql: str) -> list[tuple[str, str]]:
 
 
 def parse_entity_markdown(
-    markdown: str, *, fallback_title: str = ""
+    markdown: str,
+    *,
+    fallback_title: str = "",
+    unescape: bool = True,
+    sanitize_fn: Callable[[str], str] = sanitize_datahub_markdown,
 ) -> ParsedEntityDocument:
-    """Parse a TARS entity Context Document body into structured fields."""
+    """Parse a TARS entity Context Document body into structured fields.
+
+    ``unescape`` and ``sanitize_fn`` let the same parser serve a non-DataHub source
+    (a hand-uploaded ``.md``) without corrupting the author's formatting: a Luigi
+    caller passes ``unescape=False`` (hand-authored markdown isn't backslash-escaped)
+    and the lighter :func:`sync.markdown_sanitizer.sanitize_uploaded_markdown` (so the
+    aggressive DataHub-export rewrites don't touch intentional formatting). The
+    defaults reproduce today's DataHub behavior exactly.
+    """
     # Unescape BEFORE sanitizing: DataHub backslash-escapes markdown special
     # chars (see _MD_ESCAPE_RE below), and the sanitizer's emphasis/heading
     # regexes only match literal `*`/`_` runs. Sanitizing first left escaped
     # artifacts (e.g. ``**\_Data Owner:\_**``) untouched, since the escaping
     # backslash breaks the regex; unescaping afterward then revealed the
     # un-sanitized ``**_Data Owner:_**`` in the final output.
-    markdown = _MD_ESCAPE_RE.sub(r"\1", markdown)
-    markdown = sanitize_datahub_markdown(markdown)
+    if unescape:
+        markdown = _MD_ESCAPE_RE.sub(r"\1", markdown)
+    markdown = sanitize_fn(markdown)
     title = _extract_title(markdown)
     _stripped_fallback = fallback_title.strip()
     if (
@@ -445,39 +475,80 @@ def validate_parsed_document(
 ) -> tuple[list[str], list[str]]:
     """Return blocking errors and non-blocking warnings (each list empty when none).
 
-    Required sections differ by data product type (see the authoring templates in
-    ``docs/llm_context/{business,metric}_entities/_TEMPLATE.md``):
+    The single authoritative gate for the template contract: the enforced required
+    set is kept equal to the set documented in the authoring templates and
+    ``create-{metric,business}-entity-doc`` skills, so a doc the skill (or the Luigi
+    bot) tells an author to produce is exactly the doc this gate accepts.
 
-    - Domain entities (``business_entities``) route by table and teach a canonical
-      query, so they require both a ``## Tables`` / ``## Where to query what``
-      section and a ``## Golden Query`` section.
-    - Metric entities (``metric_entities``) are deliberately thin on schema and
-      link to their business entity instead — they have no ``## Tables`` section,
-      and the official ``## Calculation`` / ``## Canonical Filter`` are the source
-      of truth — so neither datasets nor a golden query are required.
+    Both types share the same core: H1, ``## Overview``, ``## Ownership`` (Data Owner
+    AND Data Steward), ``## Glossary and Synonyms``, ``## Dos and Don'ts`` and
+    ``## Golden Queries``. Only the type-specific sections differ — domain adds
+    ``## Tables`` (concrete ``schema.table``); metric adds ``## Related Business
+    Entities``, ``## Scope`` and ``## Calculation``.
+
+    Legacy docs missing a newly-required section aren't retroactively broken: the CI
+    gate runs ``--changed-only`` and TARS sync skips an incomplete doc rather than
+    failing it.
     """
     is_metric = data_product_type == DATA_PRODUCT_TYPE_METRIC
     errors: list[str] = []
     warnings: list[str] = []
+    sections = _split_sections(parsed.raw_markdown or "")
+
+    # Required for BOTH entity types (kept in lockstep with Zordon's dp_validator):
+    # title, Overview, an Ownership section naming a Data Owner AND a Data Steward
+    # @quintoandar email, a Glossary, a Dos and Don'ts, and at least one Golden Query.
     if not parsed.title or parsed.title == "Untitled Entity":
         errors.append("Missing H1 title")
     if not parsed.overview.strip():
         errors.append("Missing ## Overview section")
-    if not is_metric and not parsed.datasets:
-        errors.append("No schema.table references found in ## Tables section")
-    if not is_metric and not parsed.golden_queries:
-        errors.append("Missing ## Golden Queries with at least one SQL block")
-    if is_metric and parsed.has_ownership_section:
+    if not parsed.has_ownership_section:
+        errors.append("Missing ## Ownership section")
+    else:
         if not parsed.owners.get("data_owner"):
             errors.append("Missing Data Owner email in ## Ownership section")
         if not parsed.owners.get("data_steward"):
             errors.append("Missing Data Steward email in ## Ownership section")
-    if (
-        is_metric
-        and parsed.has_related_business_entities_section
-        and not parsed.related_data_products
-    ):
+    if not _find_section(sections, "glossary and synonyms", "glossary", "synonyms"):
+        errors.append("Missing ## Glossary and Synonyms section")
+    dos_and_donts = _find_section(
+        sections, "dos and don'ts", "dos and don", "do's and don"
+    )
+    if not dos_and_donts:
+        errors.append("Missing ## Dos and Don'ts section")
+    elif not _has_do_and_dont(dos_and_donts):
+        # Advisory (non-blocking): the section is present and non-empty, but the
+        # authoring guidance asks for at least one Do AND one Don't. Left to the
+        # reviewer rather than blocked, so CI never diverges from Zordon's gate.
+        warnings.append("## Dos and Don'ts should list at least one Do and one Don't")
+    if not parsed.golden_queries:
+        errors.append("Missing ## Golden Queries with at least one SQL block")
+
+    if not is_metric:
+        # Domain-specific: routes by table, so it needs concrete schema.table refs.
+        if not parsed.datasets:
+            errors.append("No schema.table references found in ## Tables section")
+        return errors, warnings
+
+    # Metric-specific: links to a business entity and defines the calculation.
+    if not parsed.has_related_business_entities_section:
+        errors.append("Missing ## Related Business Entities section")
+    elif not parsed.related_data_products:
         warnings.append(
             "## Related Business Entities section is present but no entities were parsed"
+        )
+    scope = _find_section(sections, "scope")
+    if not scope:
+        errors.append("Missing ## Scope section")
+    elif not ("included" in scope.lower() and "excluded" in scope.lower()):
+        warnings.append(
+            "## Scope should list both what is Included and what is Excluded"
+        )
+    calculation = _find_section(sections, "calculation")
+    if not calculation:
+        errors.append("Missing ## Calculation section")
+    elif "canonical filter" not in calculation.lower():
+        warnings.append(
+            "## Calculation should include a ### Canonical Filter subsection"
         )
     return errors, warnings

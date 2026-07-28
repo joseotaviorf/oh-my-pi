@@ -933,6 +933,20 @@ validate-context-docs:
 	@echo ""
 	@uv run python dags/governance/datahub_business_context/sync_tars_entities.py --dry-run --force
 
+.PHONY: validate-datahub-context-entities
+## Deterministic, offline gate for changed DataHub context entity .md files
+## (docs/llm_context/{business,metric}_entities). Reuses the authoritative
+## parser+validator; needs NO DataHub/LLM credentials. Runs on PRs (see
+## .woodpecker/validations.yml) so a malformed entity doc is blocked before it
+## reaches master and the DataHub publish step.
+validate-datahub-context-entities:
+	@echo ""
+	@echo "Validating changed DataHub context entity docs (business + metric)"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run python dags/governance/datahub_business_context/validate_datahub_context_entities.py --changed-only -b "$(CI_COMMIT_BRANCH)"
+
 .PHONY: validate-fair-metadata
 validate-fair-metadata:
 	@echo ""

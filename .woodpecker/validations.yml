@@ -34,6 +34,8 @@ steps:
             - ".woodpecker/validations.yml"
             - "Makefile"
             - "docs/platform/cluster_validation_dags.md"
+            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/metric_entities/**"
           on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
@@ -432,4 +434,34 @@ steps:
       - event: push
         branch: [master, hotfix/*, forno]
         path: *no_new_databricks_clusters_path
+    depends_on: [setup]
+
+  # Deterministic, offline gate for self-service DataHub context entity docs
+  # (business + metric). Runs the SAME parser+validator the DataHub publish path
+  # uses — no DataHub/LLM credentials — so a malformed entity .md is blocked on
+  # the PR, before it reaches master and .woodpecker/datahub.yml's publish step.
+  validate-datahub-context-entities:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    # On failure, the validator posts the reason as a PR comment (best-effort) so
+    # zordon's poller can relay it to the non-technical Luigi submitter in Chat.
+    environment:
+      GITHUB_TOKEN:
+        from_secret: github_token
+    commands:
+      - make validate-datahub-context-entities
+    when:
+      - event: pull_request
+        path: &datahub_context_entities_path
+          include:
+            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/metric_entities/**"
+            - "dags/governance/datahub_business_context/validate_datahub_context_entities.py"
+            - "dags/governance/datahub_business_context/sync/document_parser.py"
+            - "dags/governance/datahub_business_context/sync/markdown_sanitizer.py"
+            - "dags/governance/datahub_business_context/sync/constants.py"
+          on_empty: false
+      - event: push
+        branch: [master]
+        path: *datahub_context_entities_path
     depends_on: [setup]

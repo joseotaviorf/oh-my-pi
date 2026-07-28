@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from sync.markdown_sanitizer import sanitize_datahub_markdown
+from sync.markdown_sanitizer import (
+    sanitize_datahub_markdown,
+    sanitize_uploaded_markdown,
+)
 
 # ── sanitize_datahub_markdown ───────────────────────────────────────────────
 
@@ -290,3 +293,26 @@ def test_does_not_touch_inline_code_spans():
 def test_does_not_split_hyphenated_word():
     md = "- the automatic-discount agreement flag (`has_discount_agreement`)"
     assert sanitize_datahub_markdown(md) == md
+
+
+# ── sanitize_uploaded_markdown (Luigi source, light + non-destructive) ────────
+
+
+def test_uploaded_strips_bom_and_normalizes_crlf():
+    md = "\ufeff# Title\r\n\r\nBody\r\n"
+    assert sanitize_uploaded_markdown(md) == "# Title\n\nBody\n"
+
+
+def test_uploaded_trims_trailing_whitespace_and_excess_blank_lines():
+    md = "# Title   \n\n\n\n## Section\t\nx\n"
+    assert sanitize_uploaded_markdown(md) == "# Title\n\n## Section\nx\n"
+
+
+def test_uploaded_preserves_intentional_emphasis_and_bullets():
+    # Unlike the DataHub sanitizer, italics/bullets/dashes are NOT rewritten.
+    md = "# T\n\n*italic* and a - b prose\n\n- item one\n- item two\n"
+    assert sanitize_uploaded_markdown(md) == md
+
+
+def test_uploaded_empty_is_empty():
+    assert sanitize_uploaded_markdown("") == ""

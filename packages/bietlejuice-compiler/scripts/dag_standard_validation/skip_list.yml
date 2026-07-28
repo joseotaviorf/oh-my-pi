@@ -86,13 +86,17 @@ dags_not_using_builder:
   - governance/datahub_business_context/sync/document_parser.py
   - governance/datahub_business_context/sync/github_delivery.py
   - governance/datahub_business_context/sync/markdown_sanitizer.py
+  - governance/datahub_business_context/sync/pr_comment.py
   - governance/datahub_business_context/sync/sync_state.py
   - governance/datahub_business_context/sync/yaml_generator.py
   - governance/datahub_business_context/sync/__init__.py
   - governance/datahub_business_context/sync/test_document_parser.py
   - governance/datahub_business_context/sync/test_github_delivery.py
   - governance/datahub_business_context/sync/test_markdown_sanitizer.py
+  - governance/datahub_business_context/sync/test_pr_comment.py
   - governance/datahub_business_context/sync/test_sync_state_path.py
+  - governance/datahub_business_context/validate_datahub_context_entities.py
+  - governance/datahub_business_context/test_validate_datahub_context_entities.py
   - governance/sync_tars_entities/sync_tars_entities_dag.py
   - for_sale/salesforce_for_sale/salesforce_for_sale.py
   - platform/migration_compare_agents__dw_agent_accreditation/migration_compare_agents__dw_agent_accreditation_dag.py

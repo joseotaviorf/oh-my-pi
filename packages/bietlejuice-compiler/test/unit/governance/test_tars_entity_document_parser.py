@@ -19,6 +19,14 @@ from sync.document_parser import (  # noqa: E402
 SAMPLE_MD = """\
 # Payments
 
+## Ownership
+
+**Data Owner:**
+- owner@quintoandar.com.br
+
+**Data Steward:**
+- steward@quintoandar.com.br
+
 ## Overview
 
 Payments tracks every charge processed through Checkout.
@@ -34,6 +42,12 @@ Payments tracks every charge processed through Checkout.
 | You need… | Use this table |
 |-----------|----------------|
 | Unified payment fact | `dw_payments_platform.fact_payment` |
+
+## Dos and Don'ts
+
+**Do:** filter on `is_valid = true`.
+
+**Don't:** double-count refunds.
 
 ## Golden Queries
 
@@ -86,13 +100,16 @@ def test_validate_parsed_document_fails_without_golden_query():
 # the audit task, so the parser must still find the golden query.
 DATAHUB_INLINE_MD = (
     "# Testing NPS 2\n\n"
+    "## Ownership\n\n**Data Owner:**\n- owner@quintoandar.com.br\n\n"
+    "**Data Steward:**\n- steward@quintoandar.com.br\n\n"
     "## Overview\n\nNPS overview for For Rent.\n\n"
+    "## Glossary and Synonyms\n\n- **NPS** → net promoter score\n\n"
     "## Tables\n\nUse `dw_customer_satisfaction.fact_nps_dispatches`.\n\n"
     "## Golden Query\n\n"
     "\\`\\``sql WITH j AS ( SELECT 1 AS x "
     "FROM dw_customer_satisfaction.fact_nps_dispatches ) "
     "SELECT * FROM j ORDER BY x` \\`\\`\n\n"
-    "## Dos and Don'ts\n\nDo things.\n"
+    "## Dos and Don'ts\n\n**Do:** things.\n\n**Don't:** other things.\n"
 )
 
 
@@ -107,19 +124,30 @@ def test_parse_inline_datahub_fence_extracts_golden_query():
     assert warnings == []
 
 
-def test_metric_document_skips_tables_and_golden_query_checks():
-    # Metric docs are thin on schema: no ## Tables section and no golden query
-    # required (calculation + canonical filter are the source of truth).
+def test_metric_document_skips_tables_but_requires_documented_sections():
+    # Metric docs are thin on schema: no ## Tables section required, but they must
+    # carry the full documented authoring set (ownership, scope, golden query, …).
     metric_md = (
         "# NPS FR\n\n"
+        "## Ownership\n\n"
+        "**Data Owner:**\n- owner@quintoandar.com.br\n\n"
+        "**Data Steward:**\n- steward@quintoandar.com.br\n\n"
         "## Overview\n\nOfficial weighted NPS for For Rent.\n\n"
+        "## Related Business Entities\n\n- NPS\n\n"
+        "## Glossary and Synonyms\n\n- **NPS FR** → this metric\n\n"
+        "## Scope\n\n**Included**: For Rent journeys\n\n**Excluded**: test campaigns\n\n"
         "## Calculation\n\nWeighted sum of journey components.\n\n"
-        "### Canonical Filter\n\n```sql\nbusiness_context = 'forRent'\n```\n"
+        "### Canonical Filter\n\n```sql\nbusiness_context = 'forRent'\n```\n\n"
+        "## Dos and Don'ts\n\n**Do:**\n\n- apply the canonical filter\n\n"
+        "**Don't:**\n\n- pool components directly\n\n"
+        "## Golden Queries\n\n"
+        "```sql\nSELECT journey, weighted_nps FROM dw.nps_fr\n```\n"
     )
     parsed = parse_entity_markdown(metric_md)
     errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
     assert errors == []
     assert warnings == []
+    assert ("dw", "nps_fr") not in parsed.datasets  # no ## Tables gate for metrics
 
 
 def test_domain_document_still_requires_tables_and_golden_query():
@@ -130,6 +158,36 @@ def test_domain_document_still_requires_tables_and_golden_query():
     errors, _warnings = validate_parsed_document(parsed, data_product_type="domain")
     assert any("Golden Queries" in e for e in errors)
     assert any("schema.table" in e for e in errors)
+
+
+def test_domain_document_requires_ownership():
+    # Ownership (Data Owner + Steward) is now required for domain entities too,
+    # in lockstep with Zordon's dp_validator — mirrors the metric gate.
+    domain_md = (
+        "# Payments\n\n## Overview\n\nx\n\n"
+        "## Tables\n\n`dw_a.fact_b`\n\n"
+        "## Golden Queries\n\n```sql\nSELECT 1 FROM dw_a.fact_b\n```\n"
+    )
+    parsed = parse_entity_markdown(domain_md)
+    errors, _ = validate_parsed_document(parsed, data_product_type="domain")
+    assert "Missing ## Ownership section" in errors
+
+
+def test_domain_document_requires_glossary_and_dos_and_donts():
+    # Parity with metric: the shared content sections (Glossary, Dos and Don'ts) are
+    # now required for domain entities too — only the type-specific sections differ.
+    domain_md = (
+        "# Payments\n\n"
+        "## Ownership\n\n**Data Owner:**\n- a@quintoandar.com.br\n\n"
+        "**Data Steward:**\n- b@quintoandar.com.br\n\n"
+        "## Overview\n\nx\n\n"
+        "## Tables\n\n`dw_a.fact_b`\n\n"
+        "## Golden Queries\n\n```sql\nSELECT 1 FROM dw_a.fact_b\n```\n"
+    )
+    parsed = parse_entity_markdown(domain_md)
+    errors, _ = validate_parsed_document(parsed, data_product_type="domain")
+    assert any("Glossary" in e for e in errors)
+    assert any("Dos and Don" in e for e in errors)
 
 
 def test_extract_subjects_from_sql():

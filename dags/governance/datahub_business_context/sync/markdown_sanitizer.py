@@ -329,3 +329,36 @@ def sanitize_datahub_markdown(markdown: str) -> str:
     protected = _reflow_inline_bullets(protected)
 
     return _unshield_code(protected, code_blocks)
+
+
+# ── Uploaded-markdown sanitizer (Luigi source) ────────────────────────────────
+
+_BOM = "\ufeff"
+_TRAILING_WS_RE = re.compile(r"[ \t]+(\n|$)")
+_EXCESS_BLANK_LINES_RE = re.compile(r"\n{3,}")
+
+
+def sanitize_uploaded_markdown(markdown: str) -> str:
+    """Light, non-destructive normalizer for hand-uploaded ``.md`` (Luigi source).
+
+    Unlike :func:`sanitize_datahub_markdown`, it does NOT touch emphasis, headings,
+    tables, bullets or code fences — a hand-uploaded file has no DataHub-export
+    artifacts, so rewriting those would only corrupt the author's intended
+    formatting. It does encoding/whitespace hygiene only:
+
+    - strips a leading UTF-8 BOM;
+    - normalizes CRLF / lone-CR to ``\\n``;
+    - trims trailing spaces/tabs per line;
+    - collapses 3+ blank lines to one;
+    - ensures exactly one trailing newline.
+
+    Every rule is a no-op on already-clean markdown.
+    """
+    if not markdown:
+        return ""
+    if markdown.startswith(_BOM):
+        markdown = markdown[len(_BOM) :]
+    markdown = markdown.replace("\r\n", "\n").replace("\r", "\n")
+    markdown = _TRAILING_WS_RE.sub(r"\1", markdown)
+    markdown = _EXCESS_BLANK_LINES_RE.sub("\n\n", markdown)
+    return markdown.rstrip("\n") + "\n"

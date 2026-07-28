@@ -9,8 +9,61 @@ emphasis.
 
 from __future__ import annotations
 
+import pytest
+
 from sync.document_parser import parse_entity_markdown, validate_parsed_document
+from sync.markdown_sanitizer import sanitize_uploaded_markdown
 from sync.yaml_generator import build_datahub_yaml
+
+# A metric doc carrying every section the template/skill document as required.
+# Tests that check a specific missing section omit exactly one part from this set.
+_METRIC_PARTS = [
+    (
+        "## Ownership",
+        "**Data Owner:**\n- owner@quintoandar.com.br\n\n"
+        "**Data Steward:**\n- steward@quintoandar.com.br",
+    ),
+    ("## Overview", "What it measures and why the naive path is wrong."),
+    ("## Related Business Entities", "- Contact"),
+    ("## Glossary and Synonyms", "- **My Metric** → this metric"),
+    ("## Scope", "**Included**: x\n\n**Excluded**: y"),
+    (
+        "## Calculation",
+        "Metric = a / b\n\n### Canonical Filter\n\n`where is_current = true`\n\n"
+        "### Nuances\n\nMind the denominator.",
+    ),
+    ("## Dos and Don'ts", "**Do:**\n\n- do this\n\n**Don't:**\n\n- not that"),
+    ("## Golden Queries", "```sql\nSELECT count(*) FROM dw.my_table\n```"),
+]
+
+
+def _metric_doc(omit: str | None = None) -> str:
+    """A complete metric doc, optionally omitting one ``## Heading`` section."""
+    out = "# My Metric\n\n"
+    for heading, content in _METRIC_PARTS:
+        if heading == omit:
+            continue
+        out += f"{heading}\n\n{content}\n\n"
+    return out
+
+
+def test_unescape_false_keeps_author_backslashes():
+    # A hand-uploaded (Luigi) file is never DataHub-escaped; unescape=False must
+    # leave the author's literal backslash intact instead of stripping it.
+    md = "# T\n\n## Overview\nField named 50\\_pct here.\n"
+    parsed = parse_entity_markdown(
+        md, unescape=False, sanitize_fn=sanitize_uploaded_markdown
+    )
+    assert "50\\_pct" in parsed.raw_markdown
+
+
+def test_default_unescape_true_still_strips_datahub_escapes():
+    # Default behavior (DataHub source) is unchanged: backslash-escapes removed.
+    md = "# T\n\n## Overview\nField named 50\\_pct here.\n"
+    parsed = parse_entity_markdown(md)
+    assert "50_pct" in parsed.raw_markdown
+    assert "50\\_pct" not in parsed.raw_markdown
+
 
 _GARBLED_DOC = """\
 # **<span style="font-size:12px">Property Integrity</span>**
@@ -220,9 +273,12 @@ Notes about ownership handoff — not the Ownership section.
     parsed = parse_entity_markdown(doc)
     assert parsed.has_ownership_section is False
     assert parsed.owners == {"data_owner": [], "data_steward": []}
-    errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
-    assert errors == []
-    assert warnings == []
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    # The section is genuinely absent → flagged as a missing SECTION; the
+    # ``## Pre-ownership`` heading must NOT trigger the owner/steward EMAIL checks
+    # (those only run when a real Ownership section is present).
+    assert "Missing ## Ownership section" in errors
+    assert not any("email in ## Ownership" in e for e in errors)
 
 
 def test_ownership_still_found_after_pre_ownership_heading():
@@ -248,9 +304,10 @@ Handoff notes.
     assert parsed.has_ownership_section is True
     assert parsed.owners["data_owner"] == ["owner@quintoandar.com.br"]
     assert parsed.owners["data_steward"] == ["steward@quintoandar.com.br"]
-    errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
-    assert errors == []
-    assert warnings == []
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    # Ownership parsed correctly → no ownership-related error (other sections are
+    # absent in this minimal doc, so they error separately — not this test's concern).
+    assert not any("Ownership" in e for e in errors)
 
 
 def test_owners_accept_quintoandar_com_and_com_br():
@@ -272,9 +329,8 @@ Body.
     parsed = parse_entity_markdown(doc)
     assert parsed.owners["data_owner"] == ["owner@quintoandar.com"]
     assert parsed.owners["data_steward"] == ["steward@quintoandar.com.br"]
-    errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
-    assert errors == []
-    assert warnings == []
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    assert not any("Ownership" in e for e in errors)
 
 
 def test_metric_validation_warns_when_related_section_unparsed():
@@ -291,8 +347,76 @@ Body.
 """
     parsed = parse_entity_markdown(doc)
     errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
-    assert errors == []
+    # Section PRESENT but empty → warning, not the missing-section error.
     assert any("Related Business Entities" in warn for warn in warnings)
+    assert not any("Related Business Entities" in e for e in errors)
+
+
+def test_complete_metric_doc_passes():
+    parsed = parse_entity_markdown(_metric_doc())
+    errors, warnings = validate_parsed_document(parsed, data_product_type="metric")
+    assert errors == []
+    assert warnings == []
+
+
+def test_scope_without_included_or_excluded_warns_not_blocks():
+    # Present + non-empty → no error; the finer Included/Excluded rule is advisory.
+    doc = _metric_doc().replace(
+        "**Included**: x\n\n**Excluded**: y", "Only paying customers."
+    )
+    errors, warnings = validate_parsed_document(
+        parse_entity_markdown(doc), data_product_type="metric"
+    )
+    assert not any("Scope" in e for e in errors)
+    assert any("Scope" in w and "Included" in w for w in warnings)
+
+
+def test_calculation_without_canonical_filter_warns_not_blocks():
+    doc = _metric_doc().replace(
+        "### Canonical Filter\n\n`where is_current = true`\n\n"
+        "### Nuances\n\nMind the denominator.",
+        "Just the formula.",
+    )
+    errors, warnings = validate_parsed_document(
+        parse_entity_markdown(doc), data_product_type="metric"
+    )
+    assert not any("Calculation" in e for e in errors)
+    assert any("Canonical Filter" in w for w in warnings)
+
+
+def test_dos_and_donts_missing_a_dont_warns_not_blocks():
+    doc = _metric_doc().replace(
+        "**Do:**\n\n- do this\n\n**Don't:**\n\n- not that", "- Always use is_current"
+    )
+    errors, warnings = validate_parsed_document(
+        parse_entity_markdown(doc), data_product_type="metric"
+    )
+    assert not any("Dos and Don'ts" in e for e in errors)
+    assert any("Do and one Don't" in w for w in warnings)
+
+
+@pytest.mark.parametrize(
+    "omit,needle",
+    [
+        ("## Ownership", "Missing ## Ownership section"),
+        ("## Overview", "Missing ## Overview section"),
+        (
+            "## Related Business Entities",
+            "Missing ## Related Business Entities section",
+        ),
+        ("## Glossary and Synonyms", "Missing ## Glossary and Synonyms section"),
+        ("## Scope", "Missing ## Scope section"),
+        ("## Calculation", "Missing ## Calculation section"),
+        ("## Dos and Don'ts", "Missing ## Dos and Don'ts section"),
+        ("## Golden Queries", "Golden Queries"),
+    ],
+)
+def test_metric_requires_each_documented_section(omit, needle):
+    # Every section the template/skill mark required is enforced for metrics — the
+    # ENFORCED set is kept equal to the DOCUMENTED set so the two can't drift.
+    parsed = parse_entity_markdown(_metric_doc(omit=omit))
+    errors, _ = validate_parsed_document(parsed, data_product_type="metric")
+    assert any(needle in e for e in errors), (omit, errors)
 
 
 def test_yaml_generator_emits_related_data_products_and_superset_datasets():

@@ -103,6 +103,30 @@ steps:
         path: *unit_tests_dags_path
     depends_on: [setup]
 
+  # The datahub_business_context tests (sync/: document_parser, github_delivery,
+  # markdown_sanitizer, …; plus the context-entity CI validator) live under dags/
+  # but are NOT run by make unit-tests-dags (which only scans
+  # packages/bietlejuice-runtime/test/dags/). This path-scoped step closes that gap.
+  unit-tests-datahub-sync:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
+    pull: true
+    commands:
+      - export AWS_DEFAULT_REGION=us-east-1
+      - uv run pytest dags/governance/datahub_business_context/ -q
+    when:
+      - event: pull_request
+        path: &unit_tests_datahub_sync_path
+          include:
+            - "dags/governance/datahub_business_context/sync/**"
+            - "dags/governance/datahub_business_context/sync_tars_entities.py"
+            - "dags/governance/datahub_business_context/validate_datahub_context_entities.py"
+            - "dags/governance/datahub_business_context/test_validate_datahub_context_entities.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno]
+        path: *unit_tests_datahub_sync_path
+    depends_on: [setup]
+
   integration-tests-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
     pull: true
