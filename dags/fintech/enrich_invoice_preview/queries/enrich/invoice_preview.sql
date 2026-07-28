@@ -1,48 +1,57 @@
-WITH source AS (
+WITH latest_partition AS (
     SELECT
-        id_contract,
-        contract_version,
-        is_blocked,
-        paid_from,
-        paid_to,
-        payment_description,
-        paid_amount,
-        item_category,
-        entry_accrual_year_month,
-        dt_due,
-        dt_tenant_due,
-        dt_tenant_paid,
-        tenant_status,
-        dt_landlord_due,
-        dt_landlord_paid,
-        landlord_status,
-        payment_purpose,
-        dt_tenant_invoice_created_at,
-        dt_landlord_invoice_created_at,
-        ts_load,
-        invoice_accrual_year_month,
-        country,
-        year,
-        month,
-        day
+        MAX(MAKE_DATE(year, month, day)) AS load_date
     FROM
         datalake_invoice_preview_clean.invoice_preview
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND country = 'BR'
+        country = 'BR'
 ),
-latest_load_per_day AS (
+latest_load AS (
     SELECT
-        year,
-        month,
-        day,
-        MAX(ts_load) AS ts_load
+        MAX(c.ts_load) AS ts_load
     FROM
-        source
-    GROUP BY
-        year,
-        month,
-        day
+        datalake_invoice_preview_clean.invoice_preview AS c
+    INNER JOIN latest_partition AS lp
+        ON MAKE_DATE(c.year, c.month, c.day) = lp.load_date
+    WHERE
+        c.country = 'BR'
+),
+source AS (
+    SELECT
+        c.id_contract,
+        c.contract_version,
+        c.is_blocked,
+        c.paid_from,
+        c.paid_to,
+        c.payment_description,
+        c.paid_amount,
+        c.item_category,
+        c.entry_accrual_year_month,
+        c.dt_due,
+        c.dt_tenant_due,
+        c.dt_tenant_paid,
+        c.tenant_status,
+        c.dt_landlord_due,
+        c.dt_landlord_paid,
+        c.landlord_status,
+        c.payment_purpose,
+        c.dt_tenant_invoice_created_at,
+        c.dt_landlord_invoice_created_at,
+        c.ts_load,
+        c.invoice_filename,
+        c.invoice_accrual_year_month,
+        c.country,
+        c.year,
+        c.month,
+        c.day
+    FROM
+        datalake_invoice_preview_clean.invoice_preview AS c
+    INNER JOIN latest_partition AS lp
+        ON MAKE_DATE(c.year, c.month, c.day) = lp.load_date
+    INNER JOIN latest_load AS l
+        ON c.ts_load = l.ts_load
+    WHERE
+        c.country = 'BR'
 )
 SELECT
     s.id_contract,
@@ -68,6 +77,7 @@ SELECT
     s.dt_tenant_invoice_created_at,
     s.dt_landlord_invoice_created_at,
     s.ts_load,
+    s.invoice_filename,
     s.invoice_accrual_year_month,
     s.country,
     TRY_CAST(
@@ -84,8 +94,3 @@ SELECT
     s.day
 FROM
     source AS s
-INNER JOIN latest_load_per_day AS l
-    ON s.year = l.year
-    AND s.month = l.month
-    AND s.day = l.day
-    AND s.ts_load = l.ts_load

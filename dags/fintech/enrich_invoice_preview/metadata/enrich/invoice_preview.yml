@@ -4,11 +4,12 @@ table_name: invoice_preview
 owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 description: |
-  Stakeholder-ready SeuBarriga invoice preview snapshot for Brazil. Applies the sign
-  convention used in SeuBarriga validation (negative amounts for Proprietario/Inquilino),
-  exposes blocked instead of is_blocked, derives payment_installment from payment
-  descriptions, and keeps only the latest ts_load per partition day. Refreshed after
-  each invoice_preview clean load (morning and afternoon slots).
+  Stakeholder-ready SeuBarriga invoice preview snapshot for Brazil. Fully refreshed on
+  each run with the latest load batch only: most recent load partition day and highest
+  ts_load within that day (09:00 vs 15:00), excluding stale rows from reprocessed older
+  partitions. Applies sign convention for validation, blocked rename, payment_installment
+  parsing, and exposes invoice_filename for export traceability. For historical loads use
+  datalake_invoice_preview_clean.invoice_preview.
 columns:
   id_contract:
     description: EBDB contract identifier for the rental contract associated with the preview billing line.
@@ -88,9 +89,13 @@ columns:
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.dt_landlord_invoice_created_at
   ts_load:
-    description: Timestamp of the clean snapshot load selected as the latest for the partition day.
+    description: Timestamp of the selected clean snapshot batch (latest ts_load on the most recent load partition day).
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.ts_load
+  invoice_filename:
+    description: Source CSV filename of the SeuBarriga invoice preview export for the selected snapshot batch.
+    lineage:
+      - datalake_invoice_preview_clean.invoice_preview.invoice_filename
   invoice_accrual_year_month:
     description: Accrual year-month parsed from the source invoice preview CSV filename.
     lineage:
@@ -104,14 +109,14 @@ columns:
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.payment_description
   year:
-    description: Partition year of the calendar date when the preview snapshot was loaded into the datalake.
+    description: Load partition year of the selected snapshot batch in the clean table (metadata only; table is not partitioned).
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.year
   month:
-    description: Partition month of the calendar date when the preview snapshot was loaded into the datalake.
+    description: Load partition month of the selected snapshot batch in the clean table (metadata only; table is not partitioned).
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.month
   day:
-    description: Partition day of the calendar date when the preview snapshot was loaded into the datalake.
+    description: Load partition day of the selected snapshot batch in the clean table (metadata only; table is not partitioned).
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.day

@@ -11,10 +11,11 @@ dag:
       of the same calendar day, and again at 15:00 (~15:30) the latest available batch
       for that day (afternoon export when ready on S3, otherwise morning fallback).
       Stakeholders consume validation-ready snapshots from
-      datalake_invoice_preview.invoice_preview (enrich_invoice_preview DAG), which
-      applies sign convention, blocked rename, and latest ts_load per partition day.
-      The clean table datalake_invoice_preview_clean.invoice_preview remains the
-      raw-ingestion-aligned snapshot for pipeline debugging.
+      datalake_invoice_preview.invoice_preview (enrich_invoice_preview DAG): a full-refresh
+      table with the latest load batch only (no partition filter required), including
+      invoice_filename. Applies sign convention, blocked rename, and latest ts_load on the
+      most recent load day. The clean table datalake_invoice_preview_clean.invoice_preview
+      remains the raw-ingestion-aligned history for pipeline debugging.
 workflow:
   layer: raw
   type: custom_ingestion

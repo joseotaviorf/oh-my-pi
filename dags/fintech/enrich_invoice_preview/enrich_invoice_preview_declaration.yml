@@ -6,16 +6,14 @@ dag:
   documentation:
     dag_purpose: |
       Stakeholder-ready invoice preview snapshot from SeuBarriga. Applies sign convention
-      on amounts, renames blocked, derives payment_installment, and keeps only the latest
-      ts_load per partition day for Brazil. Triggered after invoice_preview clean loads
-      (09:00 and 15:00 BRT slots).
+      on amounts, renames blocked, derives payment_installment, and fully refreshes a
+      single Brazil snapshot from the latest load partition day and ts_load (morning vs
+      afternoon batch). Ignores older partition reprocessing. Historical loads remain in
+      datalake_invoice_preview_clean.invoice_preview. Triggered after invoice_preview
+      clean loads (09:00 and 15:00 BRT slots).
 workflow:
   type: query_delta
   layer: enrich
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
   tables_customization:
     invoice_preview:
-      extraction_type: incremental
-      partitions: [year, month, day]
+      extraction_type: full
