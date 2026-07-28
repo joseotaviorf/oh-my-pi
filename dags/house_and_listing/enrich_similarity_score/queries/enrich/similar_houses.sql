@@ -110,12 +110,12 @@ get_similar AS (
         similar.id_house AS similar_id_house,
         base.days_published,
         base.business_context,
-        -- Inlined from default.HAVERSINE_DISTANCE (Databricks-only UDF, unresolvable on EMR Spark 3.5).
-        -- Preserves the exact argument mapping used in the original call (lng into the x_lat/y_lat slots,
-        -- lat into the x_lng/y_lng slots) for behavior parity with production; see similar_houses.sql history.
-        6371 * ACOS(
-            COS(RADIANS(base.lng)) * COS(RADIANS(similar.lng)) * COS(RADIANS(base.lat) - RADIANS(similar.lat))
-            + SIN(RADIANS(base.lng)) * SIN(RADIANS(similar.lng))
+        6371 * 2 * ASIN(
+            SQRT(
+                POWER(SIN(RADIANS(similar.lat - base.lat) / 2), 2)
+                + COS(RADIANS(base.lat)) * COS(RADIANS(similar.lat))
+                * POWER(SIN(RADIANS(similar.lng - base.lng) / 2), 2)
+            )
         ) AS distance,
         (
             similar.price BETWEEN base.p_10 AND base.p_90
