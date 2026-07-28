@@ -42,7 +42,6 @@ _DATABRICKS_ONLY_CUSTOM_KEYS = frozenset(
     {
         "driver_node_type_id",
         "node_type_id",
-        "master_node_type_id",
         "data_security_mode",
         "runtime_engine",
         "num_workers",
@@ -89,6 +88,19 @@ _CONSOLIDATION_TIER_ORDER = {"xs": 0, "s": 1, "m": 2, "l": 3, "xl": 4}
 
 _SINGLE_NODE_FLEET_PRESET_RE = re.compile(
     r"^emr_7_12_consolidation_(xs|s|m|l|xl)_(general|memory|compute)_single_node_fleet_cluster$"
+)
+
+_FLEET_PRESET_RE = re.compile(
+    r"^emr_7_12_consolidation_(xs|s|m|l|xl)_(general|memory|compute)(?:_single_node)?_fleet_cluster$"
+)
+
+_DRIVER_SPARK_CONF_KEYS = frozenset(
+    {
+        "spark.driver.memory",
+        "spark.driver.memoryOverhead",
+        "spark.yarn.am.memory",
+        "spark.yarn.am.cores",
+    }
 )
 
 
@@ -156,6 +168,64 @@ def _maybe_bump_single_node_fleet_preset(
         return fleet_type
 
     return f"emr_7_12_consolidation_{required_tier}_{family}_single_node_fleet_cluster"
+
+
+def _master_spark_conf_override_diff(
+    base_spark: dict[str, Any], target_spark: dict[str, Any]
+) -> dict[str, Any]:
+    """Driver/YARN AM spark_conf keys where target tier exceeds fleet preset tier."""
+    override: dict[str, Any] = {}
+    for key in _DRIVER_SPARK_CONF_KEYS:
+        target_val = target_spark.get(key)
+        base_val = base_spark.get(key)
+        if target_val is not None and target_val != base_val:
+            override[key] = target_val
+    return override
+
+
+def _maybe_bump_master_spark_conf(
+    fleet_type: str,
+    preset_fleet: dict[str, Any],
+    effective_master: str,
+    config_service: ConfigurationService,
+) -> dict[str, Any]:
+    """Bump driver JVM spark_conf when master exceeds the fleet preset default master size."""
+    match = _FLEET_PRESET_RE.match(fleet_type)
+    if not match:
+        return {}
+
+    _, family = match.group(1), match.group(2)
+    preset_master = str(preset_fleet.get("master_node_type_id") or "r6g.xlarge")
+    if effective_master == preset_master:
+        return {}
+
+    effective_size = effective_master.rsplit(".", 1)[-1].lower()
+    preset_size = preset_master.rsplit(".", 1)[-1].lower()
+    if (
+        effective_size not in _SIZE_SUFFIX_ORDER
+        or preset_size not in _SIZE_SUFFIX_ORDER
+    ):
+        return {}
+    if _SIZE_SUFFIX_ORDER.index(effective_size) <= _SIZE_SUFFIX_ORDER.index(
+        preset_size
+    ):
+        return {}
+
+    required_tier = _consolidation_tier_for_instance_size(effective_size)
+    bumped_fleet_type = f"emr_7_12_consolidation_{required_tier}_{family}_fleet_cluster"
+    if bumped_fleet_type == fleet_type:
+        return {}
+
+    bumped_preset = config_service.get_config(bumped_fleet_type)
+    if not isinstance(bumped_preset, dict):
+        return {}
+
+    base_spark = preset_fleet.get("spark_conf") or {}
+    target_spark = bumped_preset.get("spark_conf") or {}
+    if not isinstance(base_spark, dict) or not isinstance(target_spark, dict):
+        return {}
+
+    return _master_spark_conf_override_diff(base_spark, target_spark)
 
 
 def _emr_minimum_instance_type(instance_type: str) -> str:
@@ -321,6 +391,23 @@ def build_validation_block(
     custom_configurations = _deep_merge(fleet_custom, preserved)
     strip_group_topology_keys(custom_configurations)
     _strip_databricks_only_keys(custom_configurations)
+
+    master_spark = _maybe_bump_master_spark_conf(
+        fleet_type,
+        preset_fleet,
+        str(
+            effective_fleet.get("master_node_type_id")
+            or preset_fleet.get("master_node_type_id")
+            or "r6g.xlarge"
+        ),
+        config_service,
+    )
+    if master_spark:
+        spark_conf = custom_configurations.get("spark_conf")
+        if isinstance(spark_conf, dict):
+            custom_configurations["spark_conf"] = _deep_merge(spark_conf, master_spark)
+        else:
+            custom_configurations["spark_conf"] = copy.deepcopy(master_spark)
 
     validation_cluster: dict[str, Any] = {"type": fleet_type}
     if custom_configurations:

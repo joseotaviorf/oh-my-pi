@@ -4,3 +4,23 @@ cluster:
   custom_configurations:
     driver_node_type_id: r7g.2xlarge
     num_workers: 4
+validation:
+  cluster:
+    type: emr_7_12_consolidation_m_compute_fleet_cluster
+    custom_configurations:
+      master_node_type_id: r6g.2xlarge
+      task_nodes:
+        instance_types:
+        - c6g.2xlarge
+        - c7g.2xlarge
+        target_on_demand: 0
+        target_spot: 2
+        allocation_strategy: price-capacity-optimized
+        bid_price_percentage: 100
+      core_nodes:
+        target_on_demand: 2
+        target_spot: 0
+        instance_types:
+        - c6g.2xlarge
+        - c7g.2xlarge
+  allow_custom_spark_job: true

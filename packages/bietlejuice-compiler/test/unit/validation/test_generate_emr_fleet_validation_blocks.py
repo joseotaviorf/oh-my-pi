@@ -212,6 +212,67 @@ class TestBuildValidationBlock:
         validation = build_validation_block(prod_cluster, {}, service)
         assert validation["cluster"]["custom_configurations"]["spark_conf"] == {}
 
+    def test_langfuse_style_multi_node_master_override(self, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        ConfigurationService._instance_cache.clear()
+        service = ConfigurationService()
+
+        prod_cluster = {
+            "type": "consolidation_s_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "num_workers": 7,
+                "driver_node_type_id": "r7g.2xlarge",
+            },
+        }
+        validation = build_validation_block(prod_cluster, {}, service)
+        assert (
+            validation["cluster"]["type"]
+            == "emr_7_12_consolidation_s_memory_fleet_cluster"
+        )
+        custom = validation["cluster"]["custom_configurations"]
+        assert custom["master_node_type_id"] == "r6g.2xlarge"
+        assert custom["core_nodes"]["target_on_demand"] == 2
+        spark_conf = custom["spark_conf"]
+        assert spark_conf["spark.yarn.am.memory"] == "3g"
+
+    def test_xs_memory_xlarge_driver_no_master_spark_bump(self, monkeypatch):
+        """xs_memory + r7g.xlarge driver matches preset master size — no JVM bump."""
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        ConfigurationService._instance_cache.clear()
+        service = ConfigurationService()
+
+        prod_cluster = {
+            "type": "consolidation_xs_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "r7g.xlarge",
+            },
+        }
+        validation = build_validation_block(prod_cluster, {}, service)
+        custom = validation["cluster"].get("custom_configurations") or {}
+        spark_conf = custom.get("spark_conf")
+        assert spark_conf is None or "spark.driver.memory" not in spark_conf
+
+    def test_multi_node_general_s_driver_2xlarge_bumps_driver_spark(self, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "prod")
+        ConfigurationService._instance_cache.clear()
+        service = ConfigurationService()
+
+        prod_cluster = {
+            "type": "consolidation_s_general_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "r7g.2xlarge",
+            },
+        }
+        validation = build_validation_block(prod_cluster, {}, service)
+        spark_conf = validation["cluster"]["custom_configurations"]["spark_conf"]
+        assert spark_conf["spark.driver.memory"] == "8g"
+        assert spark_conf["spark.yarn.am.memory"] == "3g"
+
 
 class TestApplyValidationToClusterFile:
     def test_writes_validation_block(self, tmp_path, monkeypatch):
