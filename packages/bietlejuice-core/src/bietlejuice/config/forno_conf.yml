@@ -3951,7 +3951,7 @@ notification_webhooks_keys:
     iam_alerts: NOTIFICATION_HUB_IAM_ALERTS_WEBHOOK
     dag_runtime_monitoring: GCHAT_DAG_RUNTIME_MONITORING_WEBHOOK
 
-vespucio_pipeline_version: "forno-latest"
+vespucio_pipeline_version: "0.0.0"
 vespucio_output_path: "s3://5a-vespucio-forno"
 
 ### Datazord Configs
