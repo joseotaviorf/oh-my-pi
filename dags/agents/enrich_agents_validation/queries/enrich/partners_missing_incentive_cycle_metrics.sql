@@ -47,6 +47,20 @@ partner_metrics AS (
         AND mp.id IN (72, 73, 74, 75, 76)
     GROUP BY
         pm.id_partner_external
+),
+agents_inactivated_6m AS (
+    SELECT DISTINCT
+        ael.id_agent
+    FROM
+        datalake_ebdb_clean.agent_event_log AS ael
+    WHERE
+        ael.event_type = 'AGENT_INACTIVATED'
+        AND ael.ts_occurred < ADD_MONTHS(CURRENT_TIMESTAMP(), -6)
+        AND ael.ts_occurred = (
+            SELECT MAX(ael2.ts_occurred)
+            FROM datalake_ebdb_clean.agent_event_log AS ael2
+            WHERE ael2.id_agent = ael.id_agent
+        )
 )
 SELECT DISTINCT
     u.id AS id_user,
@@ -83,6 +97,9 @@ LEFT JOIN
 LEFT JOIN
     partner_metrics AS pm
         ON pm.id_partner_external = u.uuid_person
+LEFT JOIN
+    agents_inactivated_6m AS ai6m
+        ON ai6m.id_agent = ag.id_agent
 INNER JOIN
     datalake_company_clean.member_profile AS cmp_mp
         ON cmp_mp.uuid_person = u.uuid_person
@@ -108,6 +125,7 @@ WHERE
     AND cap.type = 'DEMAND_VISIT_MANAGEMENT'
     AND u.id_country = 1
     AND pt.id IS NULL
+    AND ai6m.id_agent IS NULL
     AND (
         pm.id_partner_external IS NULL
         OR pm.total < 5
