@@ -545,7 +545,7 @@ Grain: **one row per `id_house`** — address-normalized dedup analysis over the
 ### Other filters analysts often need
 
 - **CIQ_FULL scope:** enrich rows use `house_consultant_history` with `consultant_type = 'CIQ_FULL'`; pricing filters `business_context = 'RENT'` and `consultant_type = 'CIQ_FULL'`.
-- **Payment:** prefer fact/`listing_purchase_pricing` — `payment_status`, `is_paid`, `amount_paid`; fact merge updates matched rows only while `is_paid` is not true.
+- **Payment:** prefer fact/`listing_purchase_pricing` — `payment_status`, `is_paid`, `amount_paid`; fact merge always refreshes unpaid rows, and refreshes paid rows when `is_portfolio_loss` / `portfolio_loss_reason` change (CCV after payment is valid loss).
 - **Duplicity flags on base enrich:** `has_similiar_house_by_address_parsed`, `has_similiar_house_by_atlas`; use `sk_listing_duplicity` / `sk_similar_house_paid` for paid-peer anti-repurchase.
 
 ---

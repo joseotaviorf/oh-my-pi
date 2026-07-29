@@ -11,7 +11,12 @@ workflow:
     fact_ciq_listing_purchase:
       merge_on: [sk_listing_purchase]
       partitions: [year, month, day]
-      when_matched_update_condition: "NOT COALESCE(target.is_paid, FALSE)"
+      # Unpaid rows always refresh. Paid rows refresh only when portfolio-loss fields change
+      # (CCV can land after payment under the post-July CS + later CCV rule).
+      when_matched_update_condition: >-
+        NOT COALESCE(target.is_paid, FALSE)
+        OR COALESCE(target.is_portfolio_loss, FALSE) <> COALESCE(source.is_portfolio_loss, FALSE)
+        OR COALESCE(target.portfolio_loss_reason, '') <> COALESCE(source.portfolio_loss_reason, '')
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"

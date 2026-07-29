@@ -4,7 +4,8 @@ table_name: fact_ciq_listing_purchase
 description: >
   Fact for CIQ_FULL rent listing-purchase rows joining ciq_listing_purchase with
   listing_purchase_pricing for acquisition tiers. Full enrich snapshot merged on
-  sk_listing_purchase; matched rows update only while is_paid is not true.
+  sk_listing_purchase; matched unpaid rows always refresh, and paid rows refresh
+  when portfolio-loss fields change (CCV after payment is a valid loss case).
 domain: Agents
 owner: anne.macedo@quintoandar.com.br
 columns:
