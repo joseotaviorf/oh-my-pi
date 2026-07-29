@@ -14,9 +14,18 @@
 **Offboard Human vs Digital Metrics** is the official metric family that measures how For Rent
 offboarding terminations (TFs) are served — **digital** (no human ticket, no mediation, not SPOC),
 **human support** (ticket or mediation, excluding SPOC), or **SPOC** — and how NPS varies across
-those segments. Metrics 1–3 count finished TFs by channel share; metrics 4–8 report classic NPS
-(`(% promoters − % detractors) × 100`) on the corresponding NPS-answer subsets; metrics 9–13
-count the NPS response volumes that serve as denominators.
+the **digital** and **human-support** segments only. Metrics 1–3 count finished TFs by channel
+share; metrics 4–5 report classic NPS (`(% promoters − % detractors) × 100`) on the
+corresponding NPS-answer subsets; metrics 6–7 count the NPS response volumes that serve as
+denominators.
+
+These TF shares are the **population counterpart** to the offboarding NPS digital / human-support
+cuts in this file — they measure how **big** each segment is, while the NPS metrics measure how
+**satisfied** each segment is. (They are computed on different bases and grains, so the two will
+not tie out one-to-one.)
+
+**NPS geral (offboarding), NPS SPOC, and NPS não-SPOC / AS IS** are defined exclusively in
+[`nps_fr.md`](nps_fr.md) (`sandbox.nps_fr`) — do not redefine or duplicate them here.
 
 A naive approach — e.g. counting any Zendesk ticket on the contract, or pooling NPS answers
 without the offboarding campaign filter and ticket/mediation classification — produces numbers
@@ -26,6 +35,10 @@ that do not match the Superset MBR dashboards.
 
 ## Changelog
 
+- **2026-07-28** — Delegated NPS geral, SPOC, and não-SPOC to
+  [`nps_fr.md`](nps_fr.md) (`sandbox.nps_fr`). Reduced metric set from 13 to 7 (TF shares 1–3;
+  NPS digital / human support 4–5; response volumes 6–7). NPS golden queries now read answers
+  from `sandbox.nps_fr` with `score_category`, aligned with NPS FR.
 - **2026-07-22 (b)** — Replaced fixed `2025-04-01` lookback in golden queries with
   `lookback_start_date = DATE_ADD('month', -6, report_start_date)`, where `report_start_date` is
   the earliest date in the user's requested period. Added `params` / `bounds` CTEs; final SELECT
@@ -35,7 +48,7 @@ that do not match the Superset MBR dashboards.
   `is_current = TRUE`); dropped `'Reanálise de reparos [OFF] [POS] [BACK]'` from Salesforce
   queues (Ops comment: no human contact). Closed the `2025-10-01` scope open question — live
   query uses `2025-04-01`. Documented the 2026-06-25 front/back entity split and noted
-  `encarteiramento_inteligente_model` as an Ops-only breakdown, outside metrics 1–13.
+  `encarteiramento_inteligente_model` as an Ops-only breakdown, outside metrics 1–7.
 - **2026-07-21** — Fixed Query 1 (metrics 1–3): `fact_customer_contacts` has no `theme` or
   `dt_created` column. Both now come from `dw_support_journey.fact_services` (join key
   `sk_support_session`), matching Ops's live Superset query, plus the UTC→BRT (`-3h`) adjustment
@@ -49,6 +62,10 @@ that do not match the Superset MBR dashboards.
 - NPS
 - Ticket
 
+## Related Metric Entities
+
+- NPS FR (NPS geral offboarding, SPOC, não-SPOC / AS IS — source of truth for all offboarding NPS except digital / human-support cuts)
+
 ## MBR
 
 - Post Contract
@@ -58,27 +75,22 @@ that do not match the Superset MBR dashboards.
 - **% TFs digitais**, **% digital offboarding**, **TF digital share** → metric 1
 - **% TFs com suporte humano**, **% human support offboarding**, **TF human support share** → metric 2
 - **% TFs atendidas por SPOC**, **% SPOC offboarding**, **SPOC TF share** → metric 3
-- **NPS geral (offboarding)**, **NPS offboarding**, **NPS geral off** → metric 4
-- **NPS SPOC (offboarding)**, **NPS SPOC off** → metric 5
-- **NPS NOT SPOC (offboarding)**, **NPS não-SPOC off**, **NPS AS IS off** → metric 6
-- **NPS human support (offboarding)**, **NPS suporte humano off** → metric 7
-- **NPS digital (offboarding)**, **NPS digital off**, **NPS self-service off** → metric 8
-- **Qtd. respostas NPS totais (offboarding)**, **volume NPS off** → metric 9
-- **Qtd. respostas NPS SPOC (offboarding)** → metric 10
-- **Qtd. respostas NPS NOT SPOC (offboarding)** → metric 11
-- **Qtd. respostas NPS human support (offboarding)** → metric 12
-- **Qtd. respostas NPS digital (offboarding)** → metric 13
+- **NPS human support (offboarding)**, **NPS suporte humano off** → metric 4
+- **NPS digital (offboarding)**, **NPS digital off**, **NPS self-service off** → metric 5
+- **Qtd. respostas NPS human support (offboarding)** → metric 6
+- **Qtd. respostas NPS digital (offboarding)** → metric 7
 - **TF**, **rescisão**, **termination** → one finished offboarding contract (`sk_contract`)
+- **NPS geral (offboarding)**, **NPS SPOC**, **NPS não-SPOC / AS IS** → see [`nps_fr.md`](nps_fr.md) (not defined in this file)
 
 ## Scope
 
 **Included**: finished For Rent offboarding terminations with `ts_termination_finished IS NOT NULL`
 and `dim_contract.status = 'Finalizado'` (TF volume metrics 1–3); offboarding NPS responses
-from campaigns `iqoffboarding` / `ppoffboarding` with `business_context = 'forRent'`, matched to
-the termination timeline (NPS metrics 4–13). Support classification uses tickets matched within
-the offboarding window (`ts_termination_request` → `ts_termination_finished + 15 days`), by
-contract or by tenant/owner when the contract key is unavailable. Ticket sources: legacy Zendesk
-contacts (`dw_customer_support.fact_customer_contacts`, themed via `dw_support_journey.fact_services`
+from **`sandbox.nps_fr`** (`campanha_nps = 'offboarding'`), matched to the termination timeline
+(NPS metrics 4–7). Support classification uses tickets matched within the offboarding window
+(`ts_termination_request` → `ts_termination_finished + 15 days`), by contract or by tenant/owner
+when the contract key is unavailable. Ticket sources: legacy Zendesk contacts
+(`dw_customer_support.fact_customer_contacts`, themed via `dw_support_journey.fact_services`
 — see Nuances), `dw_bpo_performance.segments_perspective` (front), and Salesforce
 `dw_bpo_performance.cases_perspective` offboarding queues.
 
@@ -99,14 +111,10 @@ has_ticket           = (tipo_ticket IS NOT NULL) OR is_mediacao
 human_support_no_spoc = has_ticket AND NOT is_spoc
 ```
 
-On the **NPS grain** (one row per `id_nps_answer`), the same flags are inherited from the
-linked termination. `nps_score` is pre-classified from the raw 0–10 score:
-
-| Raw score | `nps_score` | Classification |
-|-----------|-------------|----------------|
-| 9–10 | `1` | promoter |
-| 7–8 | `0` | passive |
-| 0–6 | `-1` | detractor |
+On the **NPS grain** (one row per `sk_nps_answer`), ticket/mediation flags are inherited from
+the linked termination; SPOC exclusion uses `is_spoc_test` from `sandbox.nps_fr`. NPS is
+computed from `score_category` (`promoter` / `passive` / `detractor`) — same engine as
+[`nps_fr.md`](nps_fr.md).
 
 ### Metric 1 — % de TFs digitais
 
@@ -137,89 +145,53 @@ Pivot date: `ts_termination_finished`.
            / COUNT(DISTINCT sk_contract)
 ```
 
-### Metric 4 — NPS geral (offboarding)
+### Metric 4 — NPS human support (offboarding)
 
-Pivot date: `ts_response_nps` (= `dim_nps_answer.ts_answered`).
-
-```
-NPS geral = (
-    COUNT(DISTINCT CASE WHEN nps_score = 1  THEN id_nps_answer END)
-  - COUNT(DISTINCT CASE WHEN nps_score = -1 THEN id_nps_answer END)
-) / CAST(COUNT(DISTINCT id_nps_answer) AS DOUBLE) * 100
-```
-
-### Metric 5 — NPS SPOC (offboarding)
-
-Pivot date: `ts_response_nps`. Restricted to `is_spoc = TRUE`.
-
-```
-NPS SPOC = (
-    COUNT(DISTINCT CASE WHEN nps_score = 1 AND is_spoc = TRUE THEN id_nps_answer END)
-  - COUNT(DISTINCT CASE WHEN nps_score = -1 AND is_spoc = TRUE THEN id_nps_answer END)
-) / CAST(COUNT(DISTINCT CASE WHEN is_spoc = TRUE THEN id_nps_answer END) AS DOUBLE) * 100
-```
-
-### Metric 6 — NPS NOT SPOC (offboarding)
-
-Pivot date: `ts_response_nps`. Restricted to `is_spoc != TRUE` (human support + digital).
-
-```
-NPS NOT SPOC = (
-    COUNT(DISTINCT CASE WHEN nps_score = 1 AND is_spoc != TRUE THEN id_nps_answer END)
-  - COUNT(DISTINCT CASE WHEN nps_score = -1 AND is_spoc != TRUE THEN id_nps_answer END)
-) / CAST(COUNT(DISTINCT CASE WHEN is_spoc != TRUE THEN id_nps_answer END) AS DOUBLE) * 100
-```
-
-### Metric 7 — NPS human support (offboarding)
-
-Pivot date: `ts_response_nps`. Restricted to
-`((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc != TRUE`.
+Pivot date: `ts_response_nps` (= `sandbox.nps_fr.ts_answered`). Restricted to
+`((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc_test = FALSE`.
 
 ```
 NPS human support = (
-    COUNT(DISTINCT CASE WHEN nps_score = 1
-         AND ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc != TRUE
-         THEN id_nps_answer END)
-  - COUNT(DISTINCT CASE WHEN nps_score = -1
-         AND ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc != TRUE
-         THEN id_nps_answer END)
+    COUNT(DISTINCT CASE WHEN score_category = 'promoter'
+         AND ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc_test = FALSE
+         THEN sk_nps_answer END)
+  - COUNT(DISTINCT CASE WHEN score_category = 'detractor'
+         AND ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc_test = FALSE
+         THEN sk_nps_answer END)
 ) / CAST(COUNT(DISTINCT CASE WHEN ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE))
-                              AND is_spoc != TRUE THEN id_nps_answer END) AS DOUBLE) * 100
+                              AND is_spoc_test = FALSE THEN sk_nps_answer END) AS DOUBLE) * 100
 ```
 
-### Metric 8 — NPS digital (offboarding)
+### Metric 5 — NPS digital (offboarding)
 
 Pivot date: `ts_response_nps`. Restricted to
-`(tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc != TRUE)`.
+`(tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc_test = FALSE)`.
 
 ```
 NPS digital = (
-    COUNT(DISTINCT CASE WHEN nps_score = 1
-         AND (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc != TRUE)
-         THEN id_nps_answer END)
-  - COUNT(DISTINCT CASE WHEN nps_score = -1
-         AND (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc != TRUE)
-         THEN id_nps_answer END)
+    COUNT(DISTINCT CASE WHEN score_category = 'promoter'
+         AND (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc_test = FALSE)
+         THEN sk_nps_answer END)
+  - COUNT(DISTINCT CASE WHEN score_category = 'detractor'
+         AND (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc_test = FALSE)
+         THEN sk_nps_answer END)
 ) / CAST(COUNT(DISTINCT CASE WHEN (tipo_ticket IS NULL) AND (is_mediacao = FALSE)
-                              AND (is_spoc != TRUE) THEN id_nps_answer END) AS DOUBLE) * 100
+                              AND (is_spoc_test = FALSE) THEN sk_nps_answer END) AS DOUBLE) * 100
 ```
 
-### Metrics 9–13 — NPS response counts (offboarding)
+### Metrics 6–7 — NPS response counts (offboarding)
 
 Pivot date: `ts_response_nps`. Each metric is the denominator of the corresponding NPS metric:
 
 | # | Metric | Formula |
 |---|--------|---------|
-| 9 | Qtd. respostas NPS totais | `COUNT(DISTINCT id_nps_answer)` |
-| 10 | Qtd. respostas NPS SPOC | `COUNT(DISTINCT CASE WHEN is_spoc = TRUE THEN id_nps_answer END)` |
-| 11 | Qtd. respostas NPS NOT SPOC | `COUNT(DISTINCT CASE WHEN is_spoc != TRUE THEN id_nps_answer END)` |
-| 12 | Qtd. respostas NPS human support | `COUNT(DISTINCT CASE WHEN ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc != TRUE THEN id_nps_answer END)` |
-| 13 | Qtd. respostas NPS digital | `COUNT(DISTINCT CASE WHEN (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc != TRUE) THEN id_nps_answer END)` |
+| 6 | Qtd. respostas NPS human support | `COUNT(DISTINCT CASE WHEN ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc_test = FALSE THEN sk_nps_answer END)` |
+| 7 | Qtd. respostas NPS digital | `COUNT(DISTINCT CASE WHEN (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc_test = FALSE) THEN sk_nps_answer END)` |
 
 ### Common time aggregations
 
 - **Month**: `date_trunc('month', DATE(ts_termination_finished))` (metrics 1–3) or
-  `date_trunc('month', DATE(ts_response_nps))` (metrics 4–13)
+  `date_trunc('month', DATE(ts_response_nps))` (metrics 4–7)
 - **Week**: `date_trunc('week', DATE(...))` on the same pivot column
 - **Day / quarter**: same pattern with `date_trunc('day', ...)` or `date_trunc('quarter', ...)`
 
@@ -227,7 +199,7 @@ Pivot date: `ts_response_nps`. Each metric is the denominator of the correspondi
 
 **Reporting period (user request)** — set `report_start_date` to the **earliest date** in the
 analysis window the user asked for (on the pivot column: `ts_termination_finished` for metrics
-1–3, `ts_response_nps` for metrics 4–13). Optionally set `report_end_date` for the upper bound.
+1–3, `ts_response_nps` for metrics 4–7). Optionally set `report_end_date` for the upper bound.
 
 **Rolling lookback (component CTEs)** — never hardcode a fixed historical cutoff. Derive the
 lower bound for all upstream scans as **six months before** `report_start_date`:
@@ -249,20 +221,20 @@ AND dc.status = 'Finalizado'
 -- final output: DATE(ts_termination_finished) >= report_start_date
 ```
 
-**NPS base** (`dw_customer_satisfaction`):
+**NPS base** (`sandbox.nps_fr` — same source as [`nps_fr.md`](nps_fr.md)):
 
 ```sql
-disp.sk_nps_answer > 0
-AND camp.metric_group IN ('iqoffboarding', 'ppoffboarding')
-AND camp.business_context = 'forRent'
-AND ans.ts_answered >= lookback_start_date
+campanha_nps = 'offboarding'
+AND CAST(ts_answered AS TIMESTAMP) >= lookback_start_date
 -- final output: DATE(ts_response_nps) >= report_start_date
 ```
 
-**Warning**: filtering only on `dim_nps_campaign.customer_journey = 'offboarding'` without
-`metric_group IN ('iqoffboarding', 'ppoffboarding')` includes campaigns outside the official
-offboarding scope. Counting tickets without the offboarding time window or department filters
-inflates human-support share.
+Use `COUNT(DISTINCT sk_nps_answer)` for all NPS counts — `sandbox.nps_fr` may fan out on wide
+joins (see `nps_fr.md` → Golden Queries).
+
+**Warning**: for NPS geral, SPOC, and não-SPOC / AS IS, use [`nps_fr.md`](nps_fr.md) — not this
+file. Counting tickets without the offboarding time window or department filters inflates
+human-support share.
 
 ### Nuances
 
@@ -328,7 +300,7 @@ when analysing periods spanning `2026-06-25`.
 **Salesforce queue exclusions** — `'Reanálise de reparos [OFF] [POS] [BACK]'` is explicitly
 **out of scope** for human-support classification (Ops: no human contact on that queue).
 
-**Out of scope for metrics 1–13** — This validation SQL also joins
+**Out of scope for metrics 1–7** — This validation SQL also joins
 `datalake_emlio_clean.emlio_logs` (`users-and-journeys-ml-service`) to label TFs as
 `encarteiramento inteligente` vs `encarteiramento padrão`, and breaks down `has_repairs` by
 segment. These are analysis dimensions only — they do not change the digital / human / SPOC
@@ -337,18 +309,19 @@ formulas.
 **Mediation** — `is_mediacao = TRUE` from `obt_offboarding.has_mediation_ticket` classifies the
 TF as human support even without a matched ticket.
 
-**NPS-to-termination link** — NPS answers join to terminations via contract key when
-`fact_nps_dispatches.sk_contract` is present, otherwise via `sk_user`. Only answers with
+**NPS-to-termination link** — NPS answers from `sandbox.nps_fr` join to terminations via
+contract key when `sk_contract` is present, otherwise via `sk_user`. Only answers with
 `ts_answered >= ts_termination_request` are kept.
 
 | Column | Description |
 | :---- | :---- |
 | `sk_contract` | Contract grain for TF metrics; join key to terminations |
-| `id_nps_answer` | NPS answer grain (`dim_nps_answer.sk_nps_answer`) |
+| `sk_nps_answer` | NPS answer grain (`sandbox.nps_fr`) |
 | `ts_termination_finished` | Pivot date for TF volume metrics (1–3) |
-| `ts_response_nps` | Pivot date for NPS metrics (4–13); equals `ts_answered` |
-| `nps_score` | Pre-classified: `1` promoter, `-1` detractor, `0` passive |
-| `is_spoc` | SPOC termination flag from `fact_terminations.is_spoc_contract` |
+| `ts_response_nps` | Pivot date for NPS metrics (4–7); equals `ts_answered` |
+| `score_category` | `promoter` / `passive` / `detractor` — use for NPS calculation |
+| `is_spoc_test` | SPOC flag from `sandbox.nps_fr` (excludes SPOC from digital / human NPS) |
+| `is_spoc` | SPOC termination flag from `fact_terminations.is_spoc_contract` (TF metrics 1–3) |
 | `tipo_ticket` | Non-NULL when a human-support ticket was matched in the offboarding window |
 | `is_mediacao` | Mediation flag from `obt_offboarding.has_mediation_ticket` |
 | `human_support_no_spoc` | Derived: `(tipo_ticket IS NOT NULL OR is_mediacao) AND NOT is_spoc` |
@@ -358,24 +331,25 @@ TF as human support even without a matched ticket.
 **Do:**
 
 - Use `ts_termination_finished` as the pivot for TF share metrics (1–3) and `ts_response_nps` for
-  all NPS metrics (4–13)
+  all NPS metrics (4–7)
 - Set `report_start_date` to the user's earliest requested date and derive
   `lookback_start_date = DATE_ADD('month', -6, report_start_date)` for all component CTE scans
 - Apply the full ticket-matching logic (three sources + offboarding window + mediation flag)
   before classifying digital vs human support
 - Treat SPOC as its own segment — never fold SPOC TFs into digital or human support
-- Use `nps_score` (−1 / 0 / 1) for NPS calculation, not the raw 0–10 score
-- Filter NPS on `metric_group IN ('iqoffboarding', 'ppoffboarding')` and
-  `business_context = 'forRent'`
+- Read offboarding NPS answers from `sandbox.nps_fr` (`campanha_nps = 'offboarding'`) and classify
+  by `score_category` — same engine as [`nps_fr.md`](nps_fr.md)
+- Use `COUNT(DISTINCT sk_nps_answer)` for NPS numerators and denominators
+- Delegate NPS geral, SPOC, and não-SPOC / AS IS to [`nps_fr.md`](nps_fr.md)
 
 **Don't:**
 
+- Don't redefine or compute NPS geral, NPS SPOC, or NPS não-SPOC / AS IS in this file — see
+  [`nps_fr.md`](nps_fr.md)
 - Don't hardcode a fixed lookback date (e.g. `2025-04-01`) — always compute it as six months
   before the user's `report_start_date`
 - Don't query the Superset virtual datasets directly in golden queries — they are reference
-  assets only; build from the DW tables documented here
-- Don't use `dim_nps_answer.score_category` for these metrics — the official classification
-  uses the `nps_score` mapping (−1 / 0 / 1) defined above
+  assets only; build from `sandbox.nps_fr` plus the ticket-classification CTEs documented here
 - Don't count tickets outside the offboarding window (`ts_termination_request` to
   `ts_termination_finished + 15 days`)
 - Don't include non-finished terminations in TF denominators
@@ -385,16 +359,18 @@ TF as human support even without a matched ticket.
   only
 - Don't confuse this family with Journey PC (`metric_entities/journey_pc.md`) — Journey PC
   covers onboarding/ongoing only; this family covers offboarding only
+- Don't confuse this family with [`nps_fr.md`](nps_fr.md) for overall offboarding NPS — that
+  file is the source of truth for NPS geral, SPOC, and não-SPOC
 
 ## Golden Queries
 
 The component CTEs below reproduce the logic behind the Superset reference datasets
 `digital_vs_human_support_offboarding[For Rent][U&J]` and
-`NPS_digital_vs_human_support_offboarding[For Rent][U&J]`. Schema and join patterns for
-terminations, NPS, and tickets are documented in the related business entities; what is
+`NPS_digital_vs_human_support_offboarding[For Rent][U&J]`. TF classification uses DW tables;
+NPS answers are read from **`sandbox.nps_fr`** (same source as [`nps_fr.md`](nps_fr.md)). What is
 exclusive to this metric family is the ticket-classification layer, the offboarding window,
 the **rolling six-month lookback** (`lookback_start_date`), and the digital / human / SPOC
-segmentation.
+segmentation for TF shares and digital / human NPS cuts.
 
 ### Query 1 — TF volume shares (metrics 1–3)
 
@@ -692,40 +668,32 @@ GROUP BY 1
 ORDER BY 1
 ```
 
-### Query 2 — NPS and response volumes (metrics 4–13)
+### Query 2 — NPS digital / human support and response volumes (metrics 4–7)
 
-Monthly NPS by segment and corresponding response counts. **Prepend `params`, `bounds`, and all
-CTEs from Query 1** (`terminator_enriched` through `tf_base`) before the CTEs below.
+Monthly NPS for digital and human-support segments and corresponding response counts. **Prepend
+`params`, `bounds`, and all CTEs from Query 1** (`terminator_enriched` through `tf_base`) before
+the CTEs below. NPS answers come from `sandbox.nps_fr` — the same base as NPS geral in
+[`nps_fr.md`](nps_fr.md).
 
 ```sql
 -- Prepend params, bounds, and terminator_enriched → tf_base CTEs from Query 1.
 
 WITH nps_answers AS (
     SELECT
-        ans.sk_nps_answer AS id_nps_answer,
-        CAST(disp.sk_user AS VARCHAR) AS sk_user,
-        disp.sk_contract,
-        CASE
-            WHEN ans.nps_answer < 7 THEN -1  -- dim_nps_answer has no `score` column; raw 0-10 score is `nps_answer`
-            WHEN ans.nps_answer > 8 THEN 1
-            ELSE 0
-        END AS nps_score,
-        ans.ts_answered AS ts_response_nps
-    FROM dw_customer_satisfaction.dim_nps_answer AS ans
-    LEFT JOIN dw_customer_satisfaction.fact_nps_dispatches AS disp
-        ON ans.sk_nps_answer = disp.sk_nps_answer
-    INNER JOIN dw_customer_satisfaction.dim_nps_campaign AS camp
-        ON disp.sk_nps_campaign = camp.sk_nps_campaign
+        nfr.sk_nps_answer,
+        CAST(nfr.sk_user AS VARCHAR) AS sk_user,
+        nfr.sk_contract,
+        nfr.score_category,
+        nfr.is_spoc_test,
+        CAST(nfr.ts_answered AS TIMESTAMP) AS ts_response_nps
+    FROM sandbox.nps_fr AS nfr
     CROSS JOIN bounds AS b
-    WHERE disp.sk_nps_answer > 0
-        AND camp.metric_group IN ('iqoffboarding', 'ppoffboarding')
-        AND camp.business_context = 'forRent'
-        AND ans.ts_answered >= b.lookback_start_date
+    WHERE nfr.campanha_nps = 'offboarding'
+        AND CAST(nfr.ts_answered AS TIMESTAMP) >= b.lookback_start_date
 ),
 tf_expanded AS (
     SELECT
         tf.sk_contract,
-        tf.is_spoc,
         tf.is_mediacao,
         tf.tipo_ticket,
         tf.ts_offboarding_start,
@@ -740,8 +708,9 @@ tf_expanded AS (
 ),
 nps_keyed AS (
     SELECT
-        nps.id_nps_answer,
-        nps.nps_score,
+        nps.sk_nps_answer,
+        nps.score_category,
+        nps.is_spoc_test,
         nps.ts_response_nps,
         CAST(nps.sk_contract AS VARCHAR) AS match_key,
         'contract' AS match_type
@@ -749,8 +718,9 @@ nps_keyed AS (
     WHERE nps.sk_contract IS NOT NULL
     UNION ALL
     SELECT
-        nps.id_nps_answer,
-        nps.nps_score,
+        nps.sk_nps_answer,
+        nps.score_category,
+        nps.is_spoc_test,
         nps.ts_response_nps,
         nps.sk_user AS match_key,
         'user' AS match_type
@@ -759,10 +729,10 @@ nps_keyed AS (
 ),
 nps_classified AS (
     SELECT
-        nk.id_nps_answer,
-        MAX(nk.nps_score) AS nps_score,
+        nk.sk_nps_answer,
+        MAX(nk.score_category) AS score_category,
+        MAX(nk.is_spoc_test) AS is_spoc_test,
         MAX(nk.ts_response_nps) AS ts_response_nps,
-        MAX(fe.is_spoc) AS is_spoc,
         MAX(fe.tipo_ticket) AS tipo_ticket,
         MAX(fe.is_mediacao) AS is_mediacao
     FROM tf_expanded AS fe
@@ -770,74 +740,53 @@ nps_classified AS (
         ON fe.match_key = nk.match_key
         AND fe.match_type = nk.match_type
         AND nk.ts_response_nps >= fe.ts_offboarding_start
-    GROUP BY nk.id_nps_answer
+    GROUP BY nk.sk_nps_answer
 )
 SELECT
     DATE_TRUNC('month', DATE(ts_response_nps)) AS month_response,
     (
         (
-            COUNT(DISTINCT CASE WHEN nps_score = 1 THEN id_nps_answer END)
-            - COUNT(DISTINCT CASE WHEN nps_score = -1 THEN id_nps_answer END)
-        ) / CAST(COUNT(DISTINCT id_nps_answer) AS DOUBLE)
-    ) * 100 AS nps_geral,
-    (
-        (
-            COUNT(DISTINCT CASE WHEN nps_score = 1 AND is_spoc = TRUE THEN id_nps_answer END)
-            - COUNT(DISTINCT CASE WHEN nps_score = -1 AND is_spoc = TRUE THEN id_nps_answer END)
-        ) / CAST(COUNT(DISTINCT CASE WHEN is_spoc = TRUE THEN id_nps_answer END) AS DOUBLE)
-    ) * 100 AS nps_spoc,
-    (
-        (
-            COUNT(DISTINCT CASE WHEN nps_score = 1 AND is_spoc != TRUE THEN id_nps_answer END)
-            - COUNT(DISTINCT CASE WHEN nps_score = -1 AND is_spoc != TRUE THEN id_nps_answer END)
-        ) / CAST(COUNT(DISTINCT CASE WHEN is_spoc != TRUE THEN id_nps_answer END) AS DOUBLE)
-    ) * 100 AS nps_not_spoc,
-    (
-        (
             COUNT(DISTINCT CASE
-                WHEN nps_score = 1
+                WHEN score_category = 'promoter'
                     AND ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE))
-                    AND is_spoc != TRUE
-                THEN id_nps_answer
+                    AND is_spoc_test = FALSE
+                THEN sk_nps_answer
             END)
             - COUNT(DISTINCT CASE
-                WHEN nps_score = -1
+                WHEN score_category = 'detractor'
                     AND ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE))
-                    AND is_spoc != TRUE
-                THEN id_nps_answer
+                    AND is_spoc_test = FALSE
+                THEN sk_nps_answer
             END)
         ) / CAST(COUNT(DISTINCT CASE
-            WHEN ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc != TRUE
-            THEN id_nps_answer
+            WHEN ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc_test = FALSE
+            THEN sk_nps_answer
         END) AS DOUBLE)
     ) * 100 AS nps_human_support,
     (
         (
             COUNT(DISTINCT CASE
-                WHEN nps_score = 1
-                    AND (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc != TRUE)
-                THEN id_nps_answer
+                WHEN score_category = 'promoter'
+                    AND (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc_test = FALSE)
+                THEN sk_nps_answer
             END)
             - COUNT(DISTINCT CASE
-                WHEN nps_score = -1
-                    AND (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc != TRUE)
-                THEN id_nps_answer
+                WHEN score_category = 'detractor'
+                    AND (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc_test = FALSE)
+                THEN sk_nps_answer
             END)
         ) / CAST(COUNT(DISTINCT CASE
-            WHEN (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc != TRUE)
-            THEN id_nps_answer
+            WHEN (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc_test = FALSE)
+            THEN sk_nps_answer
         END) AS DOUBLE)
     ) * 100 AS nps_digital,
-    COUNT(DISTINCT id_nps_answer) AS qtd_respostas_totais,
-    COUNT(DISTINCT CASE WHEN is_spoc = TRUE THEN id_nps_answer END) AS qtd_respostas_spoc,
-    COUNT(DISTINCT CASE WHEN is_spoc != TRUE THEN id_nps_answer END) AS qtd_respostas_not_spoc,
     COUNT(DISTINCT CASE
-        WHEN ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc != TRUE
-        THEN id_nps_answer
+        WHEN ((tipo_ticket IS NOT NULL) OR (is_mediacao = TRUE)) AND is_spoc_test = FALSE
+        THEN sk_nps_answer
     END) AS qtd_respostas_human_support,
     COUNT(DISTINCT CASE
-        WHEN (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc != TRUE)
-        THEN id_nps_answer
+        WHEN (tipo_ticket IS NULL) AND (is_mediacao = FALSE) AND (is_spoc_test = FALSE)
+        THEN sk_nps_answer
     END) AS qtd_respostas_digital
 FROM nps_classified
 CROSS JOIN params AS p
@@ -850,11 +799,14 @@ ORDER BY 1
 ## Superset Golden Assets
 
 These Superset virtual datasets are the **reference** for the official numbers. Do **not**
-query them directly in golden queries — reproduce the logic from the DW tables above.
+query them directly in golden queries — reproduce the logic from `sandbox.nps_fr` (NPS) and the
+DW ticket-classification CTEs above (TF shares and digital / human segmentation).
 
 - **digital_vs_human_support_offboarding[For Rent][U&J]** — reference dataset for TF volume
   metrics (1–3). Grain: one row per finished offboarding contract with `human_support_no_spoc`,
   `is_spoc`, `tipo_ticket`, `is_mediacao`, and `ts_termination_finished`.
 - **NPS_digital_vs_human_support_offboarding[For Rent][U&J]** — reference dataset for NPS
-  metrics (4–13). Grain: one row per NPS answer with `id_nps_answer`, `nps_score`,
-  `ts_response_nps`, `is_spoc`, `tipo_ticket`, and `is_mediacao`. Superset id: 22972.
+  metrics (4–7). Grain: one row per NPS answer with segmentation flags. Superset id: 22972.
+- **NPS For Rent Post Contract [Perf.] [Support and Services]** — canonical offboarding NPS base
+  (NPS geral, SPOC, não-SPOC / AS IS). Materialized in **`sandbox.nps_fr`** (Superset id 16266).
+  See [`nps_fr.md`](nps_fr.md).

@@ -16,10 +16,15 @@ metric — **NPS True** — is a **weighted average** of the NPS computed indepe
 journey (onboarding, ongoing, offboarding), with quarterly weights defined by the CX team.
 Pooling all answers into a single flat pool produces a **systematically incorrect** number
 (per-journey volumes are very different, distorting the NPS by up to 5 points). The other
-metrics in this file (per-journey components, PP Multi, SPOC, AS IS, and the interaction-type
-ones — Seamless / Digital Sup / Human Support) use the **same engine**
+metrics in this file (per-journey components, PP Multi, SPOC, AS IS / não-SPOC, and the
+interaction-type ones — Seamless / Digital Sup / Human Support) use the **same engine**
 (`% promoters − % detractors`) over different cuts of the same answer base.
 **All are breakable by IQ / PP / Total.**
+
+Offboarding NPS segmented by **digital** vs **human support** (U&J / Seamless ticket
+classification) is defined in
+[`offboard_human_vs_digital_metrics.md`](offboard_human_vs_digital_metrics.md) — this file does
+not redefine those cuts.
 
 **This product exists exclusively for For Rent — there is no equivalent weighted NPS for FS
 or other products.**
@@ -27,6 +32,10 @@ or other products.**
 ## Related Business Entities
 
 - NPS
+
+## Related Metric Entities
+
+- Offboard Human vs Digital Metrics (offboarding digital / human-support NPS only)
 
 ## MBR
 
@@ -38,7 +47,7 @@ or other products.**
 - **NPS Onboarding**, **NPS Ongoing**, **NPS Offboarding** → single-journey component (not weighted)
 - **NPS PP Multi**, **NPS PPM**, **PP Multi (Up to 15 Properties)**, **N15** → NPS PP Multi
 - **SPOC NPS**, **NPS SPOC** → offboarding NPS with `is_spoc_test = TRUE`
-- **AS IS NPS**, **NPS AS IS**, **NPS BAU offboarding** → offboarding NPS with `is_spoc_test = FALSE`
+- **AS IS NPS**, **NPS AS IS**, **NPS BAU offboarding**, **NPS não SPOC**, **NPS no-spoc**, **NPS sem SPOC**, **NPS NOT SPOC (offboarding)** → offboarding NPS with `is_spoc_test = FALSE`
 - **NPS Offboarding cuts** (SPOC BAU/LAB, with/without Repairs, with Mediation, with Early Mediation, with Early Both Agree, with Repairs Contested PP/IQ, Ldt ≷ 15d, …) → sub-cuts of NPS Offboarding via `sandbox.nps_fr` flags (see Nuances)
 - **NPS Seamless**, **NPS Seamless (Onb./Ong.)**, **self-service NPS** → pooled NPS of onboarding+ongoing with `seamless_ticket_type = 'seamless'`
 - **NPS Digital Sup**, **NPS Digital Support (Onb./Ong.)** → pooled NPS of onboarding+ongoing with `seamless_ticket_type = 'digital_support'`
@@ -97,14 +106,15 @@ PP Multi is owner-exclusive → in practice `PP = Total` and `IQ` is empty.
 applying the weights — reproduce it this way to match the official gsheets number. (This
 differs from NPS True, which rounds to 1 decimal.)
 
-**SPOC NPS / AS IS NPS** — **offboarding** NPS (`campanha_nps = 'offboarding'` in
+**SPOC NPS / AS IS NPS (não-SPOC)** — **offboarding** NPS (`campanha_nps = 'offboarding'` in
 `sandbox.nps_fr`), **without weighting**, split by the `is_spoc_test` flag. The **only**
 difference between the two is the flag; within SPOC, `spoc_team` distinguishes **SPOC BAU**
-from **SPOC LAB**:
+from **SPOC LAB**. **AS IS** is the team's label for the non-SPOC bucket — also called
+**NPS não SPOC**, **no-spoc**, or **sem SPOC**:
 
 ```
-SPOC NPS  = offboarding NPS where is_spoc_test = TRUE
-AS IS NPS = offboarding NPS where is_spoc_test = FALSE
+SPOC NPS       = offboarding NPS where is_spoc_test = TRUE
+AS IS NPS      = offboarding NPS where is_spoc_test = FALSE   -- same as não-SPOC / no-spoc / sem SPOC
 ```
 
 **NPS by interaction type (Onb./Ong.)** — three sibling metrics with **identical
@@ -268,7 +278,7 @@ breakdown via `customer_type` and crossable with one another):
 | Cut | Column in `sandbox.nps_fr` | Filter |
 | :---- | :---- | :---- |
 | SPOC | `is_spoc_test` | `= true` |
-| w/o SPOC | `is_spoc_test` | `= false` |
+| w/o SPOC (AS IS / não-SPOC / no-spoc / sem SPOC) | `is_spoc_test` | `= false` |
 | SPOC BAU | `is_spoc_test` + `spoc_team` | `is_spoc_test AND spoc_team = 'BAU'` |
 | SPOC LAB | `is_spoc_test` + `spoc_team` | `is_spoc_test AND spoc_team = 'LAB'` |
 | w/ Repairs | `com_ou_sem_reparos` | `= true` |
@@ -301,7 +311,7 @@ breakdown via `customer_type` and crossable with one another):
 - Don't pool the journeys directly in NPS True / PP Multi — use the weighted calculation.
 - Don't hardcode the weights (e.g. 25%, 53%, 22%) — always read from `nps_target_share`.
 - Don't apply `cnt_15_seg = '<= 15'` to `off_ppm`.
-- Don't confuse SPOC with AS IS — the only difference is `is_spoc_test` (TRUE vs FALSE), both in offboarding.
+- Don't confuse SPOC with AS IS / não-SPOC — the only difference is `is_spoc_test` (TRUE vs FALSE), both in offboarding. AS IS, não-SPOC, no-spoc, and sem SPOC are the same metric.
 - Don't weight NPS Seamless / Digital Sup / Human Support — it is a direct pool of onb+ong (sum num/den), not a weighted average.
 - Don't try to rebuild `seamless_ticket_type` from the raw tables — always consume from `sandbox.nps_onb_cohort` / `sandbox.nps_ong_cohort` (the exact `has_ticket` only exists in the cohorts' logic).
 - Don't treat `tickets` and `digital_support` as overlapping — the categorization is exclusive and by precedence (`tickets` beats `digital_support`).
@@ -544,20 +554,21 @@ GROUP BY d.ref_month
 ORDER BY d.ref_month
 ```
 
-### Query 4 — SPOC NPS and AS IS NPS, by IQ/PP/Total
+### Query 4 — SPOC NPS and AS IS NPS (não-SPOC), by IQ/PP/Total
 
 Both metrics side by side, reading the ready `is_spoc_test` and `spoc_team` from
 `sandbox.nps_fr` — without re-joining `fact_terminations`. Already broken down by
 `customer_type` and by `spoc_team` (`'BAU'`/`'LAB'` within SPOC). For **Total**, remove
 `customer_type` from the `GROUP BY`; for SPOC/AS IS without the BAU/LAB breakdown, remove
-`spoc_team`.
+`spoc_team`. In the result set, `spoc_group = 'AS IS'` is the dashboard label for the
+**não-SPOC / no-spoc / sem SPOC** bucket (`is_spoc_test = FALSE`).
 
 ```sql
 SELECT
     date_trunc('month', CAST(ts_answered AS TIMESTAMP)) AS ref_month,
     customer_type,
-    CASE WHEN is_spoc_test THEN 'SPOC' ELSE 'AS IS' END AS spoc_group,
-    spoc_team,   -- 'BAU' / 'LAB' when SPOC; NULL in AS IS
+    CASE WHEN is_spoc_test THEN 'SPOC' ELSE 'AS IS' END AS spoc_group,  -- 'AS IS' = não-SPOC
+    spoc_team,   -- 'BAU' / 'LAB' when SPOC; NULL in AS IS (não-SPOC)
     COUNT(DISTINCT sk_nps_answer) AS total_answers,
     ROUND(
         (CAST(COUNT(DISTINCT CASE WHEN score_category = 'promoter'  THEN sk_nps_answer END) AS DOUBLE)
