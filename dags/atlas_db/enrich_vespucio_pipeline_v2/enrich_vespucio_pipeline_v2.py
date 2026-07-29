@@ -151,7 +151,7 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
 # calls, address hashing) and are reused as-is to avoid doubling that cost.
 source_tasks = [
     create_task(
-        entry_point="sources_sql_job",
+        entry_point="sources_cnefe_house_job",
         parameters=[
             "--script=cnefe_house.sql",
             f"--output_table={Tables.source_cnefe_houses_v2}",
@@ -161,8 +161,9 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            "--script=ebdb_house.sql",
+            "--script=v2/ebdb_house.sql",
             f"--output_table={Tables.source_ebdb_houses_v2}",
+            "--checkpoint_column=_checkpoint",
         ],
         task_id="ebdb_house",
     ),
@@ -187,31 +188,33 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            "--script=idactum_house.sql",
+            "--script=v2/idactum_house.sql",
             f"--output_table={Tables.source_idactum_houses_v2}",
+            "--checkpoint_column=dt_load",
         ],
         task_id="idactum_house",
     ),
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            "--script=idactum_transactions.sql",
+            "--script=v2/idactum_transactions.sql",
             f"--output_table={Tables.source_idactum_transactions_v2}",
+            "--checkpoint_column=dt_load",
         ],
         task_id="idactum_transactions",
     ),
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            "--script=itbi_house.sql",
+            "--script=v2/itbi_house.sql",
             f"--output_table={Tables.source_itbi_houses_v2}",
+            "--checkpoint_column=ts_load",
         ],
         task_id="itbi_house",
     ),
     create_task(
-        entry_point="sources_sql_job",
+        entry_point="sources_iptu_house_job",
         parameters=[
-            "--script=iptu_house.sql",
             f"--output_table={Tables.source_iptu_houses_v2}",
         ],
         task_id="iptu_house",
@@ -286,12 +289,11 @@ address_enrich_step_task = create_task(
 )
 
 kodak_atlas_images_task = create_task(
-    entry_point="sources_kodak_atlas_images_job",
+    entry_point="sources_sql_job",
     parameters=[
+        "--script=kodak_atlas_images.sql",
         f"--output_table={Tables.source_kodak_atlas_images_v2}",
-        f"--input_kodak_photo={Tables.kodak_photo}",
-        f"--input_extracted_houses_images={Tables.extract_step_houses_images}",
-        f"--input_clustered_houses={Tables.cluster_step_houses}",
+        "--checkpoint_column=ts_cdc_transaction",
     ],
     task_id="kodak_atlas_images",
 )
