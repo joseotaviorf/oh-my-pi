@@ -64,6 +64,43 @@ unique_users_list_ids AS (
     GROUP BY
         1
 ),
+
+business_unit_region_daily_raw AS (
+    SELECT
+        bur.id_region,
+        bur.hub_name,
+        bur.ts_start_coverage,
+        EXPLODE(
+            SEQUENCE(
+                DATE(bur.ts_start_coverage),
+                COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1))
+            )
+        ) AS dt_coverage
+    FROM
+        datalake_sale_visit_hubs.business_unit_region_history AS bur
+),
+
+business_unit_region_daily AS (
+    SELECT
+        id_region,
+        hub_name,
+        dt_coverage
+    FROM (
+        SELECT
+            id_region,
+            hub_name,
+            dt_coverage,
+            ROW_NUMBER() OVER (
+                PARTITION BY id_region, dt_coverage
+                ORDER BY ts_start_coverage DESC
+            ) AS rw_coverage
+        FROM
+            business_unit_region_daily_raw
+    )
+    WHERE
+        rw_coverage = 1
+),
+
 secretariat_contact AS (
     SELECT
         uu.id_secretariat_client,
@@ -117,9 +154,9 @@ secretariat_contact AS (
         datalake_ebdb_clean.house AS qah
             ON qah.id = h.id_house_quintoandar
     LEFT JOIN
-        datalake_sale_visit_hubs.business_unit_region_history AS bur
+        business_unit_region_daily AS bur
             ON qah.id_region = bur.id_region
-            AND (DATE(c.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
+            AND DATE(c.ts_created) = bur.dt_coverage
 ),
 first_secretariat_contact AS (
     SELECT *
@@ -199,9 +236,9 @@ booking AS (
         datalake_ebdb_clean.house AS qah
             ON qah.id = h.id_house_quintoandar
     LEFT JOIN
-        datalake_sale_visit_hubs.business_unit_region_history AS bur
+        business_unit_region_daily AS bur
             ON qah.id_region = bur.id_region
-            AND (DATE(v.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
+            AND DATE(v.ts_created) = bur.dt_coverage
 ),
 first_booking AS (
     SELECT *

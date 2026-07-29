@@ -112,6 +112,42 @@ last_business_unit AS (
     datalake_hub_services_clean.business_unit_aud
 ),
 
+business_unit_region_daily_raw AS (
+  SELECT
+    bur.id_region,
+    bur.hub_name,
+    bur.ts_start_coverage,
+    EXPLODE(
+      SEQUENCE(
+        DATE(bur.ts_start_coverage),
+        COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1))
+      )
+    ) AS dt_coverage
+  FROM
+    datalake_sale_visit_hubs.business_unit_region_history AS bur
+),
+
+business_unit_region_daily AS (
+  SELECT
+    id_region,
+    hub_name,
+    dt_coverage
+  FROM (
+    SELECT
+      id_region,
+      hub_name,
+      dt_coverage,
+      ROW_NUMBER() OVER (
+        PARTITION BY id_region, dt_coverage
+        ORDER BY ts_start_coverage DESC
+      ) AS rw_coverage
+    FROM
+      business_unit_region_daily_raw
+  )
+  WHERE
+    rw_coverage = 1
+),
+
 -- LEADS
 leads AS (
   SELECT
@@ -142,9 +178,9 @@ leads AS (
       ON l.id_business_unit = bu.id
       AND bu.rw_hub_desc = 1
   LEFT JOIN
-    datalake_sale_visit_hubs.business_unit_region_history AS bur
+    business_unit_region_daily AS bur
       ON h.id_region = bur.id_region
-      AND (DATE(l.ts_created) BETWEEN DATE(bur.ts_start_coverage) AND COALESCE(DATE(bur.ts_end_coverage), DATE_SUB(CURRENT_DATE, 1)))
+      AND DATE(l.ts_created) = bur.dt_coverage
   WHERE
     l.business_context = 'SALE'
     AND v.rw_asc = 1
