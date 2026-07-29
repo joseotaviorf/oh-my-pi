@@ -126,14 +126,13 @@ columns:
     description: Human-readable acquisition outcome combining pricing and duplicity signals.
     lineage:
       - datalake_ciq.listing_purchase_pricing.acquisition_type_reason
-  partner_justification_pt:
+  acquisition_type_resume_pt:
     description: >
-      Partner-facing Portuguese justification for Compra de Carteira reports. One-sentence
-      summary of pricing_type_reason and acquisition_type_reason (EN→PT map; unknown English
-      kept as-is). When both reasons differ after trim, pricing text is used with acquisition
-      in parentheses; when equal or acquisition is null, pricing alone.
+      Partner-facing Portuguese summary for Compra de Carteira reports. Prefix from
+      acquisition_type ([Preço cheio], [Preço reduzido], [Não elegível]) plus translated
+      acquisition_type_reason; unknown English reasons are kept as-is after the prefix.
     lineage:
-      - datalake_ciq.listing_purchase_pricing.pricing_type_reason
+      - datalake_ciq.listing_purchase_pricing.acquisition_type
       - datalake_ciq.listing_purchase_pricing.acquisition_type_reason
   purchase_value:
     description: Reference listing-purchase amount in BRL from acquisition_type tiers.

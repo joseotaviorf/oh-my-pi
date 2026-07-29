@@ -62,6 +62,25 @@ SELECT
     lpp.pricing_type_reason,
     lpp.acquisition_type,
     lpp.acquisition_type_reason,
+    CONCAT(
+        CASE TRIM(lpp.acquisition_type)
+            WHEN 'full-price' THEN '[Preço cheio]: '
+            WHEN 'not-eligible' THEN '[Não elegível]: '
+            WHEN 'reduced-price' THEN '[Preço reduzido]: '
+            ELSE ''
+        END,
+        CASE TRIM(lpp.acquisition_type_reason)
+            WHEN "Don't have a contract signed yet" THEN 'Não tem contrato assinado'
+            WHEN 'House is an ongoing-rentals' THEN 'Contrato em andamento (ongoing-rentals)'
+            WHEN 'Contract signed before the transition' THEN 'Contrato assinado antes da transição de contrato (compra de carteira)'
+            WHEN 'House is an ongoing-listing outside Belo Horizonte, Rio de Janeiro or RMSP' THEN 'Anúncio em andamento (ongoing-listing) fora de Belo Horizonte, Rio de Janeiro e RMSP'
+            WHEN 'House is an ongoing-listing in Belo Horizonte, Rio de Janeiro or RMSP' THEN 'Anúncio em andamento (ongoing-listing) em Belo Horizonte, Rio de Janeiro ou RMSP'
+            WHEN 'House is not eligible to acquire because it is a hybrid house converted by a non-CIQ channel' THEN 'Não elegível: híbrido convertido por canal não-CIQ'
+            WHEN 'House listing published after the transition' THEN 'Anúncio publicado após a transição de contrato (compra de carteira)'
+            WHEN 'House is a hybrid house converted by a CIQ channel' THEN 'Híbrido convertido por canal CIQ'
+            ELSE ''
+        END
+    ) AS acquisition_type_resume_pt,
     CASE
         WHEN plf.is_ccv_after_post_july_rent_cs
             THEN 'ccv_after_post_july_rent_cs'
