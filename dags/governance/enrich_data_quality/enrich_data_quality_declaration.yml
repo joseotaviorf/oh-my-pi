@@ -9,6 +9,8 @@ dag:
       It's very important to BE CAREFUL when performing any reprocessing, as a table in this DAG performs a retroactive calculation
       that depends on its own values on the previous day.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   default_extraction_type: incremental

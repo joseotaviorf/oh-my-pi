@@ -6,6 +6,8 @@ dag:
     dag_purpose: |
       This DAG creates the full table for Jira issues status change.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   tables_customization:

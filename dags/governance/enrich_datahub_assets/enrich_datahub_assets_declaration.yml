@@ -10,6 +10,8 @@ dag:
       and whether the dataset is produced by an Airflow load job. Outputs to datalake_datahub.datahub_assets
       (enrich layer, partitioned by year/month/day) for governance observability and data quality monitoring.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   custom_schema: datahub

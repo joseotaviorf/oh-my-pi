@@ -6,6 +6,8 @@ dag:
   documentation:
     dag_purpose: Get data from JiraOps schedules to enrich Data Engineering On-Call schedules.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   default_partitions: [year, month, day]

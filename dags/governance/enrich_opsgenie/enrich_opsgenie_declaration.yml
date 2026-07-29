@@ -6,6 +6,8 @@ dag:
   documentation:
     dag_purpose: Get data from JiraOps alerts and Jira incidents to monitor Data Engineering Incidents.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   extra_query_template_params:

@@ -9,6 +9,8 @@ dag:
       the documentation bucket to calculate metrics about our tables documentation,
       lineage and tags.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   default_extraction_type: incremental

@@ -9,6 +9,8 @@ dag:
       materialising query-grain annotations, session-grain metrics, DataHub asset usage, and a
       product-topic coverage map. Powers the TARS: Usage and Context Coverage Superset dashboard.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   default_extraction_type: incremental

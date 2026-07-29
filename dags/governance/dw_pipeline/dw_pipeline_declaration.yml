@@ -6,6 +6,8 @@ dag:
     dag_purpose: |
       This DAG loads to DW our pipeline models, based in our bi-etl-ejuice Airflow DAGs.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: dw
   custom_schema: pipeline

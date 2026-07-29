@@ -5,5 +5,7 @@ dag:
     dag_purpose:
       This DAG extracts DataHub user information and enriches it with platform tool usage and org_chart data.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich

@@ -5,6 +5,8 @@ dag:
   documentation:
     dag_purpose: "This DAG loads to DW the data quality validations applied to bietlejuice DAGs by Inmetro."
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: dw
   custom_schema: data_quality

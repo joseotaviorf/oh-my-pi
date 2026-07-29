@@ -5,6 +5,8 @@ dag:
   documentation:
     dag_purpose: This DAG get all validation about anonymization.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   default_extraction_type: incremental

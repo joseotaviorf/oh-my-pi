@@ -5,6 +5,8 @@ dag:
   documentation:
     dag_purpose: This DAG sample all data lake tables data, so we can analyse and classify PII information.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   default_partitions: [year, month, day]

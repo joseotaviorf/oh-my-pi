@@ -6,6 +6,8 @@ dag:
     dag_purpose: |
       This DAG creates the full tables for Superset entities, except for the lake_tables_usage table.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   inner_dependencies:

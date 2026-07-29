@@ -27,6 +27,8 @@ dag:
       Enrich outputs are Hive-synced (``has_hive_sync: true``) so ``fairness_assessment`` / ``fairness_classification``
       are queryable in Trino alongside Databricks.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   custom_schema: fairness_assessment

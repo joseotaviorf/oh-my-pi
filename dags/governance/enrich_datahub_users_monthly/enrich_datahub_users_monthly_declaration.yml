@@ -11,6 +11,8 @@ dag:
       if there was any qualifying usage on any day that month. Runs day 1 at 10:00 UTC for the **previous** closed month
       (partitions year/month/day=1). Historical backfill via manual Databricks notebook with the same SQL.
 workflow:
+  observability:
+    enabled: true
   type: query_delta
   layer: enrich
   custom_schema: datahub_metrics
