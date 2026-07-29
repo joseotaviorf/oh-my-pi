@@ -28,6 +28,24 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  has_self_declared_disability:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_demographics.dim_employee_disability
+         WHERE has_self_declared_disability IS NOT NULL
+         AND has_self_declared_disability NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
+  has_accessibility_need:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_demographics.dim_employee_disability
+         WHERE has_accessibility_need IS NOT NULL
+         AND has_accessibility_need NOT IN (TRUE, FALSE)
+        ) = 0
+      severity_level: Warning
   dt_valid_from:
     has_null_count:
       less_than_or_equal_to: 1

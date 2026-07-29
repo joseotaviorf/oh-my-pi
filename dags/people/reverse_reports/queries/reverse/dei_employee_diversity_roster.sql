@@ -83,11 +83,17 @@ SELECT
         ELSE 'N/A'
     END AS lgbt,
     CASE dis.category
+        WHEN 'Deficiência física' THEN 'Deficiência física'
         WHEN 'Motor Deficiency' THEN 'Deficiência física'
+        WHEN 'Deficiência visual' THEN 'Deficiência visual'
         WHEN 'Visual impairment' THEN 'Deficiência visual'
+        WHEN 'Deficiência auditiva' THEN 'Deficiência auditiva'
         WHEN 'Hearing impairment' THEN 'Deficiência auditiva'
+        WHEN 'Deficiência mental/psicossocial' THEN 'Deficiência mental/psicossocial'
         WHEN 'Mental disorder' THEN 'Deficiência mental/psicossocial'
+        WHEN 'Deficiência intelectual' THEN 'Deficiência intelectual'
         WHEN 'Intellectual disability' THEN 'Deficiência intelectual'
+        WHEN 'Múltiplas' THEN 'Múltiplas'
         WHEN 'Múltiplo' THEN 'Múltiplas'
     END AS com_laudo,
     COALESCE(
@@ -99,13 +105,26 @@ SELECT
             WHEN '6' THEN 'Deficiência mental/psicossocial'
             WHEN '7' THEN 'Múltiplas'
             WHEN '8' THEN 'Outra'
+            WHEN 'Outra' THEN 'Outra'
+            WHEN 'Deficiência auditiva' THEN 'Deficiência auditiva'
+            WHEN 'Deficiência física' THEN 'Deficiência física'
+            WHEN 'Deficiência intelectual' THEN 'Deficiência intelectual'
+            WHEN 'Deficiência visual' THEN 'Deficiência visual'
+            WHEN 'Deficiência mental/psicossocial' THEN 'Deficiência mental/psicossocial'
+            WHEN 'Múltiplas' THEN 'Múltiplas'
         END,
         CASE dis.category
+            WHEN 'Deficiência física' THEN 'Deficiência física'
             WHEN 'Motor Deficiency' THEN 'Deficiência física'
+            WHEN 'Deficiência visual' THEN 'Deficiência visual'
             WHEN 'Visual impairment' THEN 'Deficiência visual'
+            WHEN 'Deficiência auditiva' THEN 'Deficiência auditiva'
             WHEN 'Hearing impairment' THEN 'Deficiência auditiva'
+            WHEN 'Deficiência mental/psicossocial' THEN 'Deficiência mental/psicossocial'
             WHEN 'Mental disorder' THEN 'Deficiência mental/psicossocial'
+            WHEN 'Deficiência intelectual' THEN 'Deficiência intelectual'
             WHEN 'Intellectual disability' THEN 'Deficiência intelectual'
+            WHEN 'Múltiplas' THEN 'Múltiplas'
             WHEN 'Múltiplo' THEN 'Múltiplas'
         END
     ) AS auto_declarado,

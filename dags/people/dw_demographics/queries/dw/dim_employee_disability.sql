@@ -19,13 +19,23 @@ lookups_ranked AS (
                 lookup_type,
                 lookup_code
             ORDER BY
+                CASE
+                    WHEN language = 'US' THEN 0
+                    WHEN language = 'PTB' THEN 1
+                    ELSE 2
+                END,
                 ts_updated DESC
         ) AS rn
     FROM
         datalake_pin_core_clean.foundation_lookup_value
     WHERE
-        lookup_type IN ('DISABILITY_CATEGORY', 'QA_DISABILITY_SUBCLAS')
-        AND language = 'US'
+        lookup_type IN (
+            'DISABILITY_CATEGORY',
+            'QA_DISABILITY_SUBCLAS',
+            'QA_DEF_AUTODECLARADA',
+            'QA_NEURODIVERSIDADE'
+        )
+        AND language IN ('PTB', 'US')
         AND is_enabled = TRUE
 ),
 lookups AS (
@@ -48,8 +58,13 @@ disability_enriched_ranked AS (
         d.category,
         d.status,
         d.quota_fte,
+        d.disability_description,
+        d.work_restriction,
+        d.accommodation_request,
+        d.documented_subclassification,
+        d.clinical_classification_code,
         pl.accessibility_need,
-        COALESCE(flv.meaning, pl.neurodiversity) AS neurodiversity,
+        pl.neurodiversity AS neurodiversity_code,
         pl.disability_answer,
         pl.disability_type,
         d.dt_effective_started AS dt_valid_from,
@@ -74,10 +89,6 @@ disability_enriched_ranked AS (
             AND pl.legislation_code = d.legislation_code
             AND pl.dt_effective_started <= d.dt_effective_ended
             AND pl.dt_effective_ended >= d.dt_effective_started
-    LEFT JOIN
-        datalake_pin_core_clean.foundation_lookup_value AS flv
-            ON flv.lookup_type = 'QA_NEURODIVERSIDADE'
-            AND flv.lookup_code = pl.neurodiversity
 ),
 disability_enriched AS (
     SELECT
@@ -89,8 +100,13 @@ disability_enriched AS (
         category,
         status,
         quota_fte,
+        disability_description,
+        work_restriction,
+        accommodation_request,
+        documented_subclassification,
+        clinical_classification_code,
         accessibility_need,
-        neurodiversity,
+        neurodiversity_code,
         disability_answer,
         disability_type,
         dt_valid_from,
@@ -105,11 +121,44 @@ SELECT
     person_number,
     legislation_code,
     COALESCE(lc.meaning, category) AS category,
-    COALESCE(ls.meaning, disability_code, 'Unknown') AS documented_name,
-    COALESCE(disability_type, disability_answer) AS self_declared_name,
-    neurodiversity,
-    accessibility_need,
-    CAST(NULL AS STRING) AS disability_reason,
+    COALESCE(
+        de.documented_subclassification,
+        de.disability_description,
+        ls.meaning,
+        disability_code,
+        'Unknown'
+    ) AS documented_name,
+    documented_subclassification,
+    disability_description,
+    work_restriction,
+    accommodation_request,
+    clinical_classification_code,
+    COALESCE(
+        lt.meaning,
+        de.disability_type,
+        CASE
+            WHEN UPPER(TRIM(COALESCE(de.disability_answer, ''))) NOT IN (
+                'SIM', 'S', 'Y', 'YES', 'NÃO', 'NAO', 'N', 'NO', ''
+            )
+                THEN COALESCE(la.meaning, de.disability_answer)
+            ELSE NULL
+        END
+    ) AS self_declared_name,
+    CASE
+        WHEN UPPER(TRIM(COALESCE(disability_answer, ''))) IN ('SIM', 'S', 'Y', 'YES')
+            THEN TRUE
+        WHEN UPPER(TRIM(COALESCE(disability_answer, ''))) IN ('NÃO', 'NAO', 'N')
+            THEN FALSE
+        ELSE NULL
+    END AS has_self_declared_disability,
+    COALESCE(ln.meaning, de.neurodiversity_code) AS neurodiversity,
+    CASE
+        WHEN UPPER(TRIM(COALESCE(accessibility_need, ''))) IN ('SIM', 'S', 'Y', 'YES')
+            THEN TRUE
+        WHEN UPPER(TRIM(COALESCE(accessibility_need, ''))) IN ('NÃO', 'NAO', 'N')
+            THEN FALSE
+        ELSE NULL
+    END AS has_accessibility_need,
     CASE UPPER(COALESCE(status, ''))
         WHEN 'A' THEN 'Active'
         WHEN 'P' THEN 'Pending'
@@ -139,3 +188,15 @@ LEFT JOIN
     lookups AS ls
         ON ls.lookup_code = de.disability_code
         AND ls.lookup_type = 'QA_DISABILITY_SUBCLAS'
+LEFT JOIN
+    lookups AS lt
+        ON lt.lookup_code = de.disability_type
+        AND lt.lookup_type = 'QA_DEF_AUTODECLARADA'
+LEFT JOIN
+    lookups AS la
+        ON la.lookup_code = de.disability_answer
+        AND la.lookup_type = 'QA_DEF_AUTODECLARADA'
+LEFT JOIN
+    lookups AS ln
+        ON ln.lookup_code = de.neurodiversity_code
+        AND ln.lookup_type = 'QA_NEURODIVERSIDADE'

@@ -175,22 +175,33 @@ dei_enriched AS (
         CASE
             WHEN LOWER(COALESCE(d.category, '')) IN (
                 'motor deficiency',
-                'physical disability'
+                'physical disability',
+                'deficiência física'
             ) THEN 'Physical disability'
             WHEN LOWER(COALESCE(d.category, '')) IN (
                 'visual impairment',
-                'visual disability'
+                'visual disability',
+                'deficiência visual'
             ) THEN 'Visual Disability'
             WHEN LOWER(COALESCE(d.category, '')) IN (
                 'hearing impairment',
-                'hearing disability'
+                'hearing disability',
+                'deficiência auditiva'
             ) THEN 'Hearing Impairment'
             WHEN LOWER(COALESCE(d.category, '')) IN (
                 'mental disorder',
-                'intellectual disability'
+                'intellectual disability',
+                'deficiência mental/psicossocial',
+                'deficiência intelectual',
+                'mental'
             ) THEN 'Intellectual disability'
-            WHEN LOWER(COALESCE(d.category, '')) IN ('múltiplo', 'multiplo', 'multiple') THEN 'Multiple'
-            WHEN LOWER(COALESCE(d.category, '')) IN ('other', 'otro') THEN 'Other'
+            WHEN LOWER(COALESCE(d.category, '')) IN (
+                'múltiplo',
+                'multiplo',
+                'multiple',
+                'múltiplas'
+            ) THEN 'Multiple'
+            WHEN LOWER(COALESCE(d.category, '')) IN ('other', 'otro', 'outra') THEN 'Other'
             ELSE 'N/A'
         END AS disability_type,
         CASE
@@ -198,11 +209,26 @@ dei_enriched AS (
             ELSE 'Not Trans'
         END AS fl_trans,
         CASE
-            WHEN b.neurodiversity NOT IN ('', '-1', 'neurotypical')
-                AND b.neurodiversity IS NOT NULL THEN 'Neurodiverse'
+            WHEN b.neurodiversity IS NOT NULL
+                AND LOWER(TRIM(b.neurodiversity)) NOT IN (
+                    '',
+                    '-1',
+                    'neurotypical',
+                    'n/a',
+                    'na',
+                    'prefiro não informar',
+                    'prefiro nao informar',
+                    'não sou uma pessoa de neurominoria',
+                    'nao sou uma pessoa de neurominoria',
+                    'i''d rather not answer',
+                    'prefer not to say'
+                ) THEN 'Neurodiverse'
             WHEN LOWER(COALESCE(d.category, '')) IN (
                 'mental disorder',
-                'intellectual disability'
+                'intellectual disability',
+                'deficiência mental/psicossocial',
+                'deficiência intelectual',
+                'mental'
             ) THEN 'Neurodiverse'
             ELSE 'Neurotypical'
         END AS fl_neurodiversity,

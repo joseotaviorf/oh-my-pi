@@ -8,8 +8,10 @@ description: |
   record with its own effective dates in PIN. Use with dim_employee_demographic on sk_employee and legislation_code to add medical
   disability detail and self-declared or accessibility fields that overlap that period.
 
-  Category and documented disability names use English labels from PIN reference data when available; otherwise the raw code or
-  category from the disability record is shown.
+  Documented fields (description, restrictions, subclassification, clinical codes) come from the PIN disability record; self-declared
+  disability, neurodiversity, and accessibility need come from overlapping PIN legislative data for the same person and legislation.
+
+  Documented narrative fields (description, restrictions, subclassification, clinical codes) are kept as entered in PIN (typically Brazilian Portuguese). Lookup-backed columns (category, self-declared type, neurodiversity) use English (US) PIN reference labels when available, with PTB as fallback, aligned with other dw_demographics dimensions.
 
   Same population as dim_employee_demographic: latest assignment types E or C in People identifier data (not pending), excluding
   test users.
@@ -31,38 +33,82 @@ columns:
       - datalake_pin_core_clean.disability.legislation_code
   category:
     description: |
-      High-level disability category in English from PIN reference data when a label exists; otherwise the raw category from
-      the disability record.
+      Documented disability category in English from PIN reference data (US lookup) when a label exists; otherwise the raw
+      category code from the disability record.
     lineage:
       - datalake_pin_core_clean.foundation_lookup_value.meaning
       - datalake_pin_core_clean.disability.category
   documented_name:
     description: |
-      Documented disability type in English from PIN reference data when a label exists; otherwise the disability code or
-      “Unknown” when nothing is available.
+      Primary documented disability label for reporting: HR subclassification or clinical description from PIN when present
+      (often Portuguese), otherwise the English PIN reference label for the disability code, otherwise the code itself.
     lineage:
+      - datalake_pin_core_clean.disability.documented_subclassification
+      - datalake_pin_core_clean.disability.disability_description
       - datalake_pin_core_clean.foundation_lookup_value.meaning
       - datalake_pin_core_clean.disability.disability_code
+  documented_subclassification:
+    description: |
+      HR-entered subclassification on the disability record (for example a specific visual condition), when populated in PIN.
+    lineage:
+      - datalake_pin_core_clean.disability.documented_subclassification
+  disability_description:
+    description: |
+      Free-text medical or HR narrative on the documented disability record in PIN (restricted use; People and occupational health).
+    lineage:
+      - datalake_pin_core_clean.disability.disability_description
+  work_restriction:
+    description: |
+      Work restrictions attested on the documented disability record in PIN, for leadership and accessibility planning.
+    lineage:
+      - datalake_pin_core_clean.disability.work_restriction
+  accommodation_request:
+    description: |
+      Workplace accommodation request text on the disability record in PIN when filled.
+    lineage:
+      - datalake_pin_core_clean.disability.accommodation_request
+  clinical_classification_code:
+    description: |
+      Clinical or administrative classification code from PIN on the disability record (for example ICD/CID codes such as H544).
+    lineage:
+      - datalake_pin_core_clean.disability.clinical_classification_code
   self_declared_name:
     description: |
-      Self-declared disability type or answer from PIN legislative fields when present (type or answer, whichever applies).
+      Self-declared disability type from PIN legislative data in English (US lookup) when available (for example Other, Physical
+      disability). Uses `disability_type` first; when the type code is stored only in `disability_answer` (and is not a yes/no
+      flag), the same autodeclaration lookup is applied.
     lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
       - datalake_pin_core_clean.people_legislative.disability_type
-      - datalake_pin_core_clean.people_legislative.disability_answer
-  neurodiversity:
-    description: Self-declared neurodiversity detail from PIN legislative data, aligned to the same period when possible.
+  has_self_declared_disability:
+    description: |
+      Whether the person declared having a disability in PIN legislative data for the overlapping period; true or false when
+      the source uses standard yes/no codes, otherwise null.
     lineage:
+      - datalake_pin_core_clean.people_legislative.disability_answer
+    categories:
+      'TRUE': Person declared yes in PIN.
+      'FALSE': Person declared no in PIN.
+  neurodiversity:
+    description: |
+      Self-declared neurodiversity from PIN legislative data in English (US lookup) when available; otherwise the raw flex code
+      or value from PIN.
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
       - datalake_pin_core_clean.people_legislative.neurodiversity
-  accessibility_need:
-    description: Declared workplace accessibility need from PIN legislative data.
+  has_accessibility_need:
+    description: |
+      Whether the person declared a workplace accessibility need in PIN legislative data for the overlapping period; true or false
+      when the source uses standard yes/no codes, otherwise null.
     lineage:
       - datalake_pin_core_clean.people_legislative.accessibility_need
-  disability_reason:
-    description: Reserved for congenital versus acquired classification when PIN exposes a dedicated field; currently not populated in this extract.
+    categories:
+      'TRUE': Person declared an accessibility need.
+      'FALSE': Person declared no accessibility need.
   disability_status:
     description: |
-      Human-readable status of the disability record in PIN: Active, Pending, or Inactive when the source code matches; if status
-      is missing, the label is Unknown; any other code is kept as returned from PIN.
+      Human-readable status of the disability record in PIN: Active, Pending, or Inactive when the source code matches; Unknown
+      when status is missing; any other code is kept as returned from PIN.
     lineage:
       - datalake_pin_core_clean.disability.status
     categories:
