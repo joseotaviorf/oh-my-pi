@@ -32,3 +32,6 @@ workflow:
     dim_earning_sources:
       merge_on: [sk_earning_source]
       z_order_by: [sk_contract, sk_sales_flow, domain_type]
+    fact_partner_payments:
+      merge_on: [sk_partner_payment]
+      z_order_by: [sk_partner_payment, incentive_system]

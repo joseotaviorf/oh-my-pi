@@ -5,7 +5,7 @@ description: >
   Combines Big Agent calculated earnings (demand conversion/acquisition and supply CIQ)
   with Nazaré revenue-share participants, aggregated per partition date.
 domain: Agents
-owner: gustavo.rompe@quintoandar.com.br
+owner: anne.macedo@quintoandar.com.br
 columns:
   id_user:
     lineage:

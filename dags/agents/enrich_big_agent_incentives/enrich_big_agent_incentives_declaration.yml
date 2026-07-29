@@ -20,6 +20,7 @@ workflow:
       - partner_tier
       - revenue_share
       - unresolved_earnings
+      - brokerage_share_history
   tables_customization:
     brokerage_share_history:
       merge_on: [id_revision, id_contract]

@@ -1,0 +1,173 @@
+database_name: datalake_agent_payments
+table_name: partner_payments
+description: |
+  Unified partner payment lines from Big Agent calculated earnings and Nazaré revenue-share
+  participants. One row per partner payment event by incentive system and revenue source,
+  with brokerage context, tier reference, and monetary breakdown for agent payment analytics.
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_partner_payment:
+    lineage:
+      - datalake_big_agent.earnings.id_earning
+      - datalake_nazare_clean.revenue_share_by_participant.id_revenue_share
+    description: |
+      Surrogate payment identifier. Big Agent rows use id_earning; Nazaré rows use a hash of
+      revenue share, incentive system, and revenue source.
+  id_earning:
+    lineage:
+      - datalake_big_agent.earnings.id_earning
+    description: Big Agent earning identifier when revenue_source is BIG_AGENT; null on Nazaré rows.
+  id_earning_source:
+    lineage:
+      - datalake_big_agent.earnings.id_earning_source
+      - datalake_big_agent_clean.earning_sources.id
+    description: Earning source identifier linked to the payment line.
+  id_revenue_share:
+    lineage:
+      - datalake_big_agent.earnings.id_revenue_share
+      - datalake_nazare_clean.revenue_share_by_participant.id_revenue_share
+    description: Revenue share configuration or participant record identifier for the payment.
+  id_house:
+    lineage:
+      - datalake_big_agent.earnings.id_house
+      - datalake_nazare_clean.revenue_share_by_participant.id_house
+    description: House identifier associated with the payment context.
+  id_contract:
+    lineage:
+      - datalake_big_agent.earnings.id_contract
+    description: Rent contract identifier when the payment is tied to a rent earning source.
+  id_offer:
+    lineage:
+      - datalake_big_agent.earnings.id_offer
+      - datalake_nazare_clean.offer.id_external
+    description: Offer identifier on the sales or Nazaré offer path.
+  id_business_unit:
+    lineage:
+      - datalake_big_agent.earnings.id_offer_business_unit
+      - datalake_nazare_clean.offer.id_business_unit
+    description: Business unit (hub) identifier for the offer or partner tier context.
+  id_tier:
+    lineage:
+      - datalake_big_agent.earnings.id_tier
+      - datalake_big_agent.partner_tier.id_tier
+    description: Tier configuration identifier applied to the partner at payment time.
+  id_user:
+    lineage:
+      - datalake_person.person_sks.id_user
+      - datalake_nazare_clean.agent.id_external
+    description: EBDB user identifier of the agent receiver when applicable.
+  uuid_person:
+    lineage:
+      - datalake_big_agent.earnings.uuid_person
+      - datalake_nazare_clean.agent.uuid_external_person
+    description: Person UUID of the agent receiver when the payment targets an agent.
+  uuid_company:
+    lineage:
+      - datalake_big_agent.earnings.uuid_company
+      - datalake_nazare_clean.partner.uuid_company
+    description: Company UUID of the partner receiver when the payment targets a company.
+  incentive_system:
+    lineage:
+      - datalake_big_agent.earnings.incentive_system
+    description: Incentive system label that produced the payment (for example DEMAND_CONVERSION_FS).
+  calculated_from:
+    lineage:
+      - datalake_big_agent.earnings.calculated_from
+    description: Basis used to calculate the earning on the Big Agent path; null on Nazaré rows.
+  business_context:
+    lineage:
+      - datalake_big_agent.earnings.business_context
+    description: Business context of the payment (RENT or SALE).
+  participant_role:
+    lineage:
+      - datalake_big_agent.earnings.participant_role
+      - datalake_nazare_clean.revenue_share_by_participant.participant_role
+      - datalake_agent_accreditation.agent.profile
+    description: Participant role describing how the receiver acted on the transaction.
+  tier_name:
+    lineage:
+      - datalake_big_agent.earnings.tier_name
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: Display name of the tier applied to the partner at payment time.
+  revenue_receiver_type:
+    lineage:
+      - datalake_big_agent.earnings.external_receiver_type
+    description: Receiver type discriminator (AGENT or COMPANY) for the payment line.
+  revenue_source:
+    description: |
+      Origin system of the payment row (BIG_AGENT or NAZARE). Partition column grouping payments
+      by source system. Derived in SQL from the union branch, not a direct source column.
+  revenue_role:
+    description: |
+      Revenue role SUPPLY or DEMAND. Big Agent branches set the role from incentive system;
+      Nazaré maps CIQ participants to SUPPLY and other roles to DEMAND.
+  revenue_share_type:
+    lineage:
+      - datalake_big_agent.earnings.revenue_share_type
+    description: Revenue share type on the Big Agent path (for example TIER, CRCC, FIFTY).
+  revenue_share_value:
+    lineage:
+      - datalake_big_agent.earnings.revenue_share_value
+    description: Configured revenue share value from the Big Agent revenue share record.
+  ticket_base_amount:
+    lineage:
+      - datalake_big_agent.earnings.base_amount
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: Ticket base amount (sale price or rent base) used as reference for the payment.
+  brokerage_fee:
+    lineage:
+      - datalake_big_agent.earnings.brokerage_fee
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: Brokerage fee percentage applied to the ticket for partner payment calculation.
+  brokerage_amount:
+    lineage:
+      - datalake_big_agent.earnings.calculation_base_amount
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: Monetary brokerage base amount used as the calculation base for the payment.
+  revenue_amount:
+    lineage:
+      - datalake_big_agent.earnings.revenue_amount
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: Gross revenue amount allocated to this payment line for the incentive system.
+  revenue_percentage:
+    lineage:
+      - datalake_big_agent.earnings.revenue_percentage
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: Revenue share percentage applied to the brokerage base for this payment line.
+  is_3p_lead_gen_offer:
+    lineage:
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: True when the Nazaré offer category indicates a third-party lead-gen offer.
+  is_fifty_revenue_share:
+    lineage:
+      - datalake_big_agent.earnings.revenue_share_type
+    description: True when the revenue share type is FIFTY on the Big Agent path.
+  is_crcc_revenue_share:
+    lineage:
+      - datalake_big_agent.earnings.revenue_share_type
+    description: True when the revenue share type is CRCC on the Big Agent path.
+  is_tier_revenue_share:
+    lineage:
+      - datalake_big_agent.earnings.revenue_share_type
+    description: True when the revenue share type is TIER on the Big Agent path.
+  is_manual_calculation:
+    lineage:
+      - datalake_big_agent.earnings.is_manual_calculation
+    description: True when the Big Agent earning was manually calculated.
+  dt_tier_reference:
+    lineage:
+      - datalake_big_agent.earnings.dt_tier_reference
+      - datalake_big_agent.partner_tier.dt_validity_started
+    description: Tier validity start date used as reference when assigning the partner tier.
+  ts_created:
+    lineage:
+      - datalake_big_agent.earnings.ts_created
+      - datalake_nazare_clean.revenue_share_by_participant.ts_created
+    description: Timestamp when the payment event was created in the source system.
+  ts_updated:
+    lineage:
+      - datalake_big_agent.earnings.ts_updated
+      - datalake_nazare_clean.revenue_share_by_participant.ts_created
+      - datalake_nazare_clean.revenue_share_by_participant.ts_database_transaction
+    description: Timestamp of the latest update used for incremental load on this payment line.

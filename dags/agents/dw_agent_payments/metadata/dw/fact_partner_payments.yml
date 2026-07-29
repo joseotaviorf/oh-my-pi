@@ -1,0 +1,157 @@
+database_name: dw_agent_payments
+table_name: fact_partner_payments
+description: |
+  Fact table of unified partner payments projected from enrich_agent_payments partner_payments,
+  resolved to person and company surrogate keys. One row per partner payment updated within
+  the load window, with brokerage breakdown, tier context, and revenue source attribution.
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+columns:
+  sk_partner_payment:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_partner_payment
+    description: Surrogate key of the partner payment. Primary key of this fact table.
+  sk_earning:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_earning
+    description: Surrogate key of the Big Agent earning when revenue_source is BIG_AGENT.
+  sk_earning_source:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_earning_source
+    description: Surrogate key of the earning source linked to this payment.
+  sk_revenue_share:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_revenue_share
+    description: Surrogate key of the revenue share configuration linked to this payment.
+  sk_house:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_house
+    description: Surrogate key of the house associated with the payment context.
+  sk_contract:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_contract
+    description: Surrogate key of the rent contract when the payment is tied to a rent context.
+  sk_offer:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_offer
+    description: Surrogate key of the offer associated with the payment.
+  sk_business_unit:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_business_unit
+    description: Surrogate key of the business unit (hub) for the offer or tier context.
+  sk_tier:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_tier
+    description: Surrogate key of the tier configuration applied to the partner.
+  sk_user:
+    lineage:
+      - datalake_agent_payments.partner_payments.id_user
+    description: Surrogate key of the agent user receiver when applicable.
+  sk_person:
+    lineage:
+      - datalake_person.person_sks.sk_person
+      - datalake_agent_payments.partner_payments.uuid_person
+    description: Surrogate key of the person receiver, resolved from the Person data model.
+  sk_company:
+    lineage:
+      - datalake_company.company_sks.sk_company
+      - datalake_agent_payments.partner_payments.uuid_company
+    description: Surrogate key of the company receiver, resolved from the Company data model.
+  incentive_system:
+    lineage:
+      - datalake_agent_payments.partner_payments.incentive_system
+    description: Incentive system label that produced this payment.
+  business_context:
+    lineage:
+      - datalake_agent_payments.partner_payments.business_context
+    description: Business context of the payment (RENT or SALE).
+  participant_role:
+    lineage:
+      - datalake_agent_payments.partner_payments.participant_role
+    description: Participant role describing how the receiver acted on the transaction.
+  tier_name:
+    lineage:
+      - datalake_agent_payments.partner_payments.tier_name
+    description: Display name of the tier applied to the partner at payment time.
+  revenue_receiver_type:
+    lineage:
+      - datalake_agent_payments.partner_payments.revenue_receiver_type
+    description: Receiver type discriminator (AGENT or COMPANY) for the payment line.
+  revenue_source:
+    lineage:
+      - datalake_agent_payments.partner_payments.revenue_source
+    description: Origin system of the payment row (BIG_AGENT or NAZARE).
+  revenue_role:
+    lineage:
+      - datalake_agent_payments.partner_payments.revenue_role
+    description: Revenue role SUPPLY or DEMAND for the payment line.
+  revenue_share_type:
+    lineage:
+      - datalake_agent_payments.partner_payments.revenue_share_type
+    description: Revenue share type on the Big Agent path when applicable.
+  revenue_share_value:
+    lineage:
+      - datalake_agent_payments.partner_payments.revenue_share_value
+    description: Configured revenue share value from the linked revenue share record.
+  ticket_base_amount:
+    lineage:
+      - datalake_agent_payments.partner_payments.ticket_base_amount
+    description: Ticket base amount used as reference for the payment calculation.
+  brokerage_fee:
+    lineage:
+      - datalake_agent_payments.partner_payments.brokerage_fee
+    description: Brokerage fee percentage applied to the ticket for partner payment calculation.
+  brokerage_amount:
+    lineage:
+      - datalake_agent_payments.partner_payments.brokerage_amount
+    description: Monetary brokerage base amount used as the calculation base for the payment.
+  revenue_amount:
+    lineage:
+      - datalake_agent_payments.partner_payments.revenue_amount
+    description: Gross revenue amount allocated to this payment line.
+  revenue_percentage:
+    lineage:
+      - datalake_agent_payments.partner_payments.revenue_percentage
+    description: Revenue share percentage applied to the brokerage base for this payment line.
+  is_3p_lead_gen_offer:
+    lineage:
+      - datalake_agent_payments.partner_payments.is_3p_lead_gen_offer
+    description: True when the offer category indicates a third-party lead-gen offer.
+  is_fifty_revenue_share:
+    lineage:
+      - datalake_agent_payments.partner_payments.is_fifty_revenue_share
+    description: True when the revenue share type is FIFTY.
+  is_crcc_revenue_share:
+    lineage:
+      - datalake_agent_payments.partner_payments.is_crcc_revenue_share
+    description: True when the revenue share type is CRCC.
+  is_tier_revenue_share:
+    lineage:
+      - datalake_agent_payments.partner_payments.is_tier_revenue_share
+    description: True when the revenue share type is TIER.
+  dt_tier_reference:
+    lineage:
+      - datalake_agent_payments.partner_payments.dt_tier_reference
+    description: Tier validity start date used as reference when assigning the partner tier.
+  ts_created:
+    lineage:
+      - datalake_agent_payments.partner_payments.ts_created
+    description: Timestamp when the payment event was created in the source system.
+  ts_updated:
+    lineage:
+      - datalake_agent_payments.partner_payments.ts_updated
+    description: Timestamp when the payment was last updated in the source enrich table.
+  ts_load:
+    description: Timestamp when this row was loaded into the DW fact table.
+  year:
+    lineage:
+      - datalake_agent_payments.partner_payments.ts_updated
+    description: Partition year derived from ts_updated.
+  month:
+    lineage:
+      - datalake_agent_payments.partner_payments.ts_updated
+    description: Partition month derived from ts_updated.
+  day:
+    lineage:
+      - datalake_agent_payments.partner_payments.ts_updated
+    description: Partition day derived from ts_updated.

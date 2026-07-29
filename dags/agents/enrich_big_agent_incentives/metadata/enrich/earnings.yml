@@ -64,7 +64,27 @@ columns:
   id_incentive_engine:
     lineage:
       - datalake_big_agent.revenue_share.id_incentive_engine
-    description: Incentive engine identifier linked to the earning through revenue share, when the relation type is INCENTIVE_ENGINE.
+      - datalake_big_agent.tier_rule.id_incentive_engine
+    description: |
+      Incentive engine identifier linked to the earning, preferring revenue share and falling back
+      to the tier rule when the partner tier path supplies the engine context.
+  id_house:
+    lineage:
+      - datalake_sales_flow_clean.house.id_external
+      - datalake_ebdb_clean.contract.id_house
+    description: House identifier resolved from sales flow or rent contract on the earning source.
+  id_offer:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_firestore
+    description: Firestore offer identifier when the earning source is linked to a sales flow offer.
+  id_offer_business_unit:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_hub
+    description: Business unit (hub) identifier of the offer on the sales flow path.
+  id_partner_tier_business_unit:
+    lineage:
+      - datalake_big_agent.tier_rule.id_business_unit
+    description: Business unit identifier from the tier rule linked to the partner tier assignment.
   uuid_cart:
     lineage:
       - datalake_big_agent_clean.earning_sources.uuid_external_cart
@@ -127,10 +147,29 @@ columns:
     lineage:
       - datalake_big_agent.revenue_share.revenue_share_type
     description: Revenue share type configured on the linked revenue share record (for example TIER, CRCC, FIFTY).
+  revenue_share_value:
+    lineage:
+      - datalake_big_agent.revenue_share.revenue_share_value
+    description: Configured revenue share value from the linked revenue share record.
   tier_name:
     lineage:
       - datalake_big_agent.partner_tier.tier_name
     description: Display name of the tier assigned to the agent receiver at the earning creation date.
+  base_amount:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.base_amount
+    description: Base monetary amount from the earning source before revenue share calculation.
+  revenue_share_total_amount:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.revenue_share_total_amount
+    description: Total revenue share amount configured on the earning source.
+  brokerage_fee:
+    lineage:
+      - datalake_sales_flow_clean.brokerage.brokerage_fee
+      - datalake_big_agent.brokerage_share_history.agent_brokerage_share
+    description: |
+      Brokerage fee percentage for the transaction context: sales-flow brokerage fee on SALE
+      or latest rent contract brokerage share on RENT.
   calculation_base_amount:
     lineage:
       - datalake_big_agent_clean.earning_sources.revenue_share_total_amount
@@ -180,6 +219,10 @@ columns:
     lineage:
       - datalake_big_agent_clean.new_earnings.dt_payment_due
     description: Date when the payment for this earning is due.
+  dt_tier_reference:
+    lineage:
+      - datalake_big_agent.partner_tier.dt_validity_started
+    description: Partner tier validity start date used as the tier reference for this earning.
   ts_unresolved_earning_solved:
     lineage:
       - datalake_big_agent.unresolved_earnings.ts_solved

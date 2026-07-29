@@ -32,7 +32,10 @@ columns:
     lineage:
       - datalake_big_agent_clean.revenue_share.id_relation
       - datalake_big_agent_clean.revenue_share.relation_type
-    description: Incentive engine identifier when the revenue share relation type is INCENTIVE_ENGINE; otherwise null.
+      - datalake_big_agent_clean.tier.id_incentive_engine
+    description: |
+      Incentive engine identifier when relation_type is INCENTIVE_ENGINE, or from the linked tier
+      when relation_type is TIER and the tier carries an incentive engine reference.
   id_region:
     lineage:
       - datalake_big_agent_clean.revenue_share_condition.value

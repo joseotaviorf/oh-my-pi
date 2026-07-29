@@ -1,12 +1,14 @@
 WITH tier AS (
     SELECT
         tier.id AS id_tier,
+        tier.id_incentive_engine,
         IF(ie.external_condition_type = "HUB", ie.id_external_condition, NULL) AS id_business_unit,
         tier.id_classifier_score_rule,
         tier.id_qualifier_score_rule,
         ie.external_condition_type AS incentive_engine_external_condition_type,
         ie.incentive_system,
         tier.name AS tier_name,
+        rs.value AS tier_value,
         tier.priority AS tier_priority,
         IF(sr_classifier.min_score = '0E-18', 0, CAST(sr_classifier.min_score AS INTEGER)) AS classifier_min_score,
         IF(sr_qualifier.min_score = '0E-18', 0, CAST(sr_qualifier.min_score AS INTEGER)) AS qualifier_min_score,
@@ -23,6 +25,10 @@ WITH tier AS (
     LEFT JOIN
         datalake_big_agent_clean.score_rule AS sr_qualifier
             ON sr_qualifier.id = tier.id_qualifier_score_rule
+    LEFT JOIN
+        datalake_big_agent_clean.revenue_share AS rs
+            ON rs.id_relation = tier.id
+            AND rs.relation_type = 'TIER'
     WHERE
         DATE(tier.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
@@ -92,10 +98,12 @@ tier_qualifier AS (
 )
 SELECT
     tier.id_tier,
+    tier.id_incentive_engine,
     tier.id_business_unit,
     tier.incentive_engine_external_condition_type,
     tier.incentive_system,
     tier.tier_name,
+    tier.tier_value,
     tier.tier_priority,
     tier.classifier_min_score,
     tc.classifier_resume,

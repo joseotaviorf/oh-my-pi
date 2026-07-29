@@ -36,7 +36,10 @@ SELECT
         GET_JSON_OBJECT(invalid.author, "$.id")
     ) AS id_invalidation_author,
     IF(rs.relation_type = 'TIER', rs.id_relation, NULL) AS id_tier,
-    IF(rs.relation_type = 'INCENTIVE_ENGINE', rs.id_relation, NULL) AS id_incentive_engine,
+    COALESCE(
+        IF(rs.relation_type = 'INCENTIVE_ENGINE', rs.id_relation, NULL),
+        tier.id_incentive_engine
+    ) AS id_incentive_engine,
     condition.id_region,
     GET_JSON_OBJECT(rs.author, "$.id") AS id_author,
     GET_JSON_OBJECT(rs.author, "$.role") AS author_role,
@@ -85,3 +88,7 @@ LEFT JOIN
 LEFT JOIN
     revenue_share_condition AS condition
         ON condition.id_revenue_share = updated.id_revenue_share
+LEFT JOIN
+    datalake_big_agent_clean.tier AS tier
+        ON tier.id = rs.id_relation
+        AND rs.relation_type = 'TIER'

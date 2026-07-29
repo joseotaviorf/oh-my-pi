@@ -10,6 +10,10 @@ columns:
     lineage:
       - datalake_big_agent_clean.tier.id
     description: Primary identifier of the tier in Big Agent.
+  id_incentive_engine:
+    lineage:
+      - datalake_big_agent_clean.tier.id_incentive_engine
+    description: Incentive engine identifier linked to this tier configuration.
   id_business_unit:
     lineage:
       - datalake_big_agent_clean.incentive_engine.id_external_condition
@@ -27,6 +31,11 @@ columns:
     lineage:
       - datalake_big_agent_clean.tier.name
     description: Display name of the tier in the Big Agent incentive configuration.
+  tier_value:
+    lineage:
+      - datalake_big_agent_clean.revenue_share.value
+      - datalake_big_agent_clean.revenue_share.relation_type
+    description: Revenue share percentage configured on the tier when a TIER relation revenue share exists.
   tier_priority:
     lineage:
       - datalake_big_agent_clean.tier.priority

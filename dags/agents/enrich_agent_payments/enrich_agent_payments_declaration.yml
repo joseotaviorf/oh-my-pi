@@ -1,0 +1,22 @@
+dag:
+  name: enrich_agent_payments
+  schedule_start_date: 2026, 7, 28
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich layer for agent partner payments: unified revenue-share and earning payment lines
+      from Big Agent incentives and Nazaré offer participants for brokerage analytics.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  tables_customization:
+    agent_revenue_share:
+      partitions: [dt_updated]
+    partner_payments:
+      merge_on: [id_partner_payment]
+      partitions: [revenue_source]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"

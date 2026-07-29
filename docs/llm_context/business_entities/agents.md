@@ -25,13 +25,13 @@
 
 | Topic | DW table(s) | Enrich fallback (only if needed) |
 |-------|-------------|----------------------------------|
-| BigAgent earnings & tiers | `dw_agent_payments.fact_earnings`, `dim_earning_sources`, `dim_tier`, `fact_partner_tier` | `datalake_big_agent.earnings`, `partner_tier`, `tier_rule` |
+| BigAgent earnings, tiers & partner payments | `dw_agent_payments.fact_earnings`, `fact_partner_payments`, `dim_earning_sources`, `dim_tier`, `fact_partner_tier` | `datalake_big_agent.earnings`, `partner_tier`, `tier_rule`; enrich `datalake_agent_payments.partner_payments` |
 | CIQ Compra de Carteira | `dw_ciq.fact_ciq_listing_purchase`, `fact_listing_purchase_duplicity` | `datalake_ciq.ciq_listing_purchase`, `listing_purchase_duplicity` |
 | Daily agent state (new ID system) | `dw_agent.fact_agent_daily`, `dim_agent` | `datalake_agent_accreditation.agent` |
 | Legacy `sk_agent ↔ id_user` bridge | `dw_public.dim_agent` | — |
 | Visits | `dw_visit.fact_visits`, `fact_visit_schedules` | see [`visits.md`](visits.md) |
 
-> Topics **without a DW table yet** (enrich is the only option): hub allocation (`member_hub_allocation`), monthly reports (`agent_status_by_month`, `agent_new_agent_activation_metrics`), For-Sale BigAgent vs Nazaré reconciliation (`agent_revenue_share`), For-Rent broker share (`brokerage_share_history`), PFA/PPA (`preferred_property_agent_relation_history`), tier performance EAV (`agent_performance`).
+> Topics **without a DW table yet** (enrich is the only option): hub allocation (`member_hub_allocation`), monthly reports (`agent_status_by_month`, `agent_new_agent_activation_metrics`), For-Rent broker share (`brokerage_share_history`), PFA/PPA (`preferred_property_agent_relation_history`), tier performance EAV (`agent_performance`).
 
 ### Operation type (`profile`)
 
@@ -41,12 +41,12 @@
 
 These are the functions business teams mean by "demand agent", "TQC" / "TQA", and "CIQ". One agent can hold several at once; they are NOT mutually exclusive and are separate from `profile`.
 
-| Function | Also called | What they own | Capability (`capability.type`) | Earns (in `agent_revenue_share`) |
+| Function | Also called | What they own | Capability (`capability.type`) | Earns (in `fact_partner_payments`) |
 |---|---|---|---|---|
-| **Demand / conversion** | demand agent, visit agent | Conduct the visit **and convert** the deal | `DEMAND_VISIT_MANAGEMENT` (RENT/SALE) | `revenue_role = DEMAND`, `brokerage_percentage`; BigAgent `DEMAND_CONVERSION_*` |
-| **Demand acquisition (Sale)** | **TQC** (Traz Quem Compra) | Bring / qualify the **buyer** lead (For-Sale) | `DEMAND_ACQUISITION` (rows in `agent_lead_referral` with `business_context = 'SALE'`) | `tqc_percentage`, `has_tqc_revenue_share = true` (bonus on the `DEMAND` row); BigAgent `DEMAND_ACQUISITION_*` |
-| **Demand acquisition (Rent)** | **TQA** (Traz Quem Aluga) | Bring / qualify the **tenant** lead (For-Rent) — rent counterpart of TQC | `DEMAND_ACQUISITION` (rows in `agent_lead_referral` with `business_context = 'RENT'`) | Same capability as TQC; splits from TQC only by `business_context = 'RENT'` on `agent_lead_referral` |
-| **Supply acquisition** | **CIQ** | Register / bring the property (supply) | `SUPPLY_ACQUISITION`, `SUPPLY_CONVERSION_CONSULTANCY` | `revenue_role = SUPPLY`, `ciq_percentage`; BigAgent `SUPPLY_ACQUISITION_*` |
+| **Demand / conversion** | demand agent, visit agent | Conduct the visit **and convert** the deal | `DEMAND_VISIT_MANAGEMENT` (RENT/SALE) | `revenue_role = DEMAND`, `incentive_system` `DEMAND_CONVERSION_FS` (Sale) or `DEMAND_CONVERSION_FR` (Rent); `revenue_amount`, `revenue_percentage` |
+| **Demand acquisition (Sale)** | **TQC** (Traz Quem Compra) | Bring / qualify the **buyer** lead (For-Sale) | `DEMAND_ACQUISITION` (rows in `agent_lead_referral` with `business_context = 'SALE'`) | `revenue_role = DEMAND`, `incentive_system = DEMAND_ACQUISITION_FS` (separate row, often alongside conversion); `revenue_amount`, `revenue_percentage` |
+| **Demand acquisition (Rent)** | **TQA** (Traz Quem Aluga) | Bring / qualify the **tenant** lead (For-Rent) — rent counterpart of TQC | `DEMAND_ACQUISITION` (rows in `agent_lead_referral` with `business_context = 'RENT'`) | `revenue_role = DEMAND`, `incentive_system = DEMAND_ACQUISITION_FR`; splits from TQC by `business_context = 'RENT'` |
+| **Supply acquisition** | **CIQ** | Register / bring the property (supply) | `SUPPLY_ACQUISITION`, `SUPPLY_CONVERSION_CONSULTANCY` | `revenue_role = SUPPLY`, `incentive_system` `SUPPLY_ACQUISITION_FS` (Sale) or `SUPPLY_ACQUISITION_FR` (Rent); `revenue_amount`, `revenue_percentage` |
 
 > "CIQ" is overloaded — it is both the affiliation **program** (Corretor Integrado QuintoAndar, `1P`) and this **supply-acquisition function**. Confirm which the user means. Likewise "demand agent" usually means the conversion function, but a TQC-only agent also acquires demand without converting.
 
@@ -84,12 +84,12 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | **Independent Agent / agente independente** | Agent with both acquisition and demand | `DEMAND_ACQUISITION ENABLED` AND `affiliation_type = '1P'` AND `is_passive_lead_receiver = false`; or `is_independent_agent` in activation metrics. |
 | **Ativação / activation** | ⚠ No single definition | `is_activated` in `agent_new_agent_activation_metrics` (first commercial event ≤60 days of registration), or first visit/listing/TQC/deal. Always confirm. |
 | **Agente ativo / active agent** | ⚠ Ambiguous | account-available (`is_agent_active` in `dim_agent`), has-visits (`fact_visit_schedules`), operationally-eligible (combine flags), or app-active (Amplitude). Always confirm. |
-| **TQC (Traz Quem Compra)** | **Demand-acquisition function on Sale** — agent who brings/qualifies the buyer lead | Capability `DEMAND_ACQUISITION`; source `datalake_ebdb_clean.agent_lead_referral` with `business_context = 'SALE'`; `id_user_agent_lead_referral` in `datalake_sale_offer_flows.offer_specialists`; `tqc_percentage` / `has_tqc_revenue_share` in `agent_revenue_share`. |
+| **TQC (Traz Quem Compra)** | **Demand-acquisition function on Sale** — agent who brings/qualifies the buyer lead | Capability `DEMAND_ACQUISITION`; source `datalake_ebdb_clean.agent_lead_referral` with `business_context = 'SALE'`; `id_user_agent_lead_referral` in `datalake_sale_offer_flows.offer_specialists`; `revenue_percentage` on `DEMAND_ACQUISITION_*` rows in `dw_agent_payments.fact_partner_payments`. |
 | **TQA (Traz Quem Aluga)** | **Demand-acquisition function on Rent** — agent who brings/qualifies the tenant lead. Rent counterpart of TQC. | Capability `DEMAND_ACQUISITION`; source `datalake_ebdb_clean.agent_lead_referral` with `business_context = 'RENT'`. |
-| **CIQ (function)** | **Supply-acquisition function** — agent who registers/brings the property | Capability `SUPPLY_ACQUISITION` / `SUPPLY_CONVERSION_CONSULTANCY`; `revenue_role = SUPPLY`, `ciq_percentage`. Distinct from the CIQ *program* (next row). |
+| **CIQ (function)** | **Supply-acquisition function** — agent who registers/brings the property | Capability `SUPPLY_ACQUISITION` / `SUPPLY_CONVERSION_CONSULTANCY`; `revenue_role = SUPPLY`, `incentive_system` `SUPPLY_ACQUISITION_*`, `revenue_percentage`. Distinct from the CIQ *program* (next row). |
 | **PPA (Preferred Property Agent)** | Agent fixed to a listing (agent brought the supply) | `preferred_property_agent_relation_history`. |
 | **PFA (Preferred Fixed Agent)** | Agent fixed to a lead (usually first-visit; see `origin`) | Same table; reason in `origin`. |
-| **BIG_AGENT** | Newer brokerage/earnings model | `revenue_source = 'BIG_AGENT'` in `agent_revenue_share`; analyst DW in `dw_agent_payments.fact_earnings`. |
+| **BIG_AGENT** | Newer brokerage/earnings model | `revenue_source = 'BIG_AGENT'` in `dw_agent_payments.fact_partner_payments`; earning-level detail in `dw_agent_payments.fact_earnings`. |
 | **Nazaré** | Legacy per-offer brokerage / payment system | `revenue_source = 'NAZARE'`. |
 | **VBBA / VCBA** | Visits Booked / Completed Booked **By Agent** | `sk_author_creator = sk_user_agent` in `dw_visit.fact_visit_schedules` (+ `is_completed = 1` for VCBA). |
 | **Hub / Business Unit** | Regional agent grouping | `hub_name`, `id_business_unit` in `member_hub_allocation`. |
@@ -112,6 +112,9 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | You need… | **Start here (DW)** | Fallback (enrich/clean — only when DW is insufficient) |
 |-----------|---------------------|--------------------------------------------------------|
 | BigAgent earnings, tiers, partner assignments | **`dw_agent_payments.fact_earnings`**, `dim_earning_sources`, `dim_tier`, `fact_partner_tier` | `datalake_big_agent.earnings`, `partner_tier`, `tier_rule` |
+| Partner payments to agents and companies (Sale + Rent) | **`dw_agent_payments.fact_partner_payments`** | `datalake_agent_payments.partner_payments` |
+| Sale offer context for a partner payment | **`dw_sale.fact_offers`**, `dw_sale.dim_offer` | — |
+| Rent contract context for a partner payment | **`dw_rent.fact_contracts`**, `dw_rent.dim_contract` | — |
 | BigAgent earning-source calculation audit trail | **`dw_agent_payments.fact_earning_calculation_log`** | `datalake_big_agent_clean.earning_sources_aud` |
 | CIQ Compra de Carteira (pricing, portfolio loss, eligibility) | **`dw_ciq.fact_ciq_listing_purchase`** | `datalake_ciq.ciq_listing_purchase` (initial pricing only), `listing_purchase_pricing` |
 | CIQ listing-purchase duplicity peers | **`dw_ciq.fact_listing_purchase_duplicity`** | `datalake_ciq.listing_purchase_duplicity` |
@@ -128,7 +131,7 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | New-agent activation funnel (monthly cohort) | — | `datalake_agent_reports.agent_new_agent_activation_metrics` |
 | Per-agent support tickets (monthly) | — | `datalake_agent_reports.agent_support_tickets_by_month` |
 | Agent hub assignment, NE, region (daily) | — | `datalake_hub_services.member_hub_allocation` |
-| For-Sale agent revenue share, BigAgent vs Nazaré reconciliation | — | `datalake_agent_payments.agent_revenue_share` |
+| Partner payments to agents and companies | **`dw_agent_payments.fact_partner_payments`** | `datalake_agent_payments.partner_payments` |
 | For-Rent contract broker share (revision history) | — | `datalake_big_agent.brokerage_share_history` |
 | Per-offer brokerage fee (Nazaré legacy) | — | `datalake_brokerage.partner_brokerage` |
 | Valid first listing (dedup-gated) for CIQ / activation | — | `datalake_listing_deduplication.valid_first_listing` |
@@ -248,28 +251,33 @@ Grain: **one row per `(id_user, dt_reference)`**. Replaces the deprecated `agent
 
 ## `datalake_agent_payments` / `datalake_big_agent` (earnings & brokerage)
 
-> ⚠ **DW first:** for BigAgent earnings and tier questions, start at **`dw_agent_payments`** (see next section). The enrich tables below are reconciliation sources, rent-contract share history, or fallbacks for columns not projected into the DW.
+> ⚠ **DW first:** for partner payments, earnings, and tier questions, start at **`dw_agent_payments`** (see next section). The enrich tables below are upstream fallbacks or rent-contract share history.
 
 Two distinct earning concepts — **do not conflate**:
 
-### `datalake_agent_payments.agent_revenue_share` — For-Sale revenue share
+### Partner payments — **`dw_agent_payments.fact_partner_payments`** (source of truth)
 
-**Purpose (ADR 2026-06-19):** reconciliation table surfacing BigAgent-calculated vs Nazaré-paid values side-by-side for **Sale** deals. **Pipeline:** `enrich_brokerage`, incremental, partitioned `year/month/day` on `dt_updated`.
+**Purpose:** unified partner payment lines paid to **agents** (`sk_person` / `sk_user`) and **companies** (`sk_company`) across Big Agent calculated earnings and Nazaré revenue-share participants. **Pipeline:** enrich `enrich_agent_payments.partner_payments` → DW `dw_agent_payments.fact_partner_payments`, incremental MERGE on `sk_partner_payment`, load window on `DATE(ts_updated)`, partitions `year/month/day` derived from `ts_created`.
 
-Grain: **one row per `(id_user, id_house, id_offer, business_context, revenue_source, revenue_role)`** — the same agent appears twice per offer (one row per source) for direct comparison.
+Grain: **one row per `sk_partner_payment`** (= enrich `id_partner_payment`). A single Sale offer can have multiple rows (e.g. `DEMAND_CONVERSION_FS` + `DEMAND_ACQUISITION_FS` TQC + `SUPPLY_ACQUISITION_FS` CIQ; or side-by-side `BIG_AGENT` vs `NAZARE` rows for reconciliation). Person/company keys are resolved in the DW via `uuid_person` → `datalake_person.person_sks` and `uuid_company` → `datalake_company.company_sks`.
 
 | Topic | Fields |
 |-------|--------|
-| Keys | `id_user`, `id_house`, `id_offer`, `uuid_person` |
-| Discriminators | `business_context`, `revenue_source` (`BIG_AGENT` / `NAZARE`), `revenue_role` — maps to business function: `DEMAND` = conversion agent (base `brokerage_percentage` ± `tqc_percentage` demand-acquisition bonus) / `SUPPLY` = CIQ supply-acquisition agent (`ciq_percentage`) |
-| Amounts | `revenue_amount` (gross BRL), `revenue_percentage` |
-| Share breakdown | `brokerage_percentage` (base demand fee), `tqc_percentage` (TQC bonus), `ciq_percentage` (CIQ supply), `has_tqc_revenue_share` |
-| Timing | `dt_created`, `dt_updated` |
+| Keys | `sk_partner_payment` (PK), `sk_earning` (Big Agent earning id when `revenue_source = 'BIG_AGENT'`), `sk_earning_source`, `sk_revenue_share`, `sk_house`, `sk_contract`, `sk_offer`, `sk_business_unit`, `sk_tier`, `sk_user`, `sk_person`, `sk_company` |
+| Discriminators | `business_context` (`SALE` / `RENT`), `revenue_source` (`BIG_AGENT` / `NAZARE`), `revenue_role` (`DEMAND` / `SUPPLY`), `incentive_system`, `participant_role`, `revenue_receiver_type` (`AGENT` / `COMPANY`) |
+| Amounts | `ticket_base_amount`, `brokerage_fee`, `brokerage_amount`, `revenue_amount`, `revenue_percentage`, `revenue_share_type`, `revenue_share_value` |
+| Flags | `is_3p_lead_gen_offer`, `is_fifty_revenue_share`, `is_crcc_revenue_share`, `is_tier_revenue_share` |
+| Tier context | `tier_name`, `dt_tier_reference` |
+| Timing | `ts_created`, `ts_updated`, `ts_load`; partitions `year/month/day` from `ts_created` |
 
-- `BIG_AGENT` ← `dw_agent_payments.fact_earnings` (preferred) or enrich `datalake_big_agent.earnings` (fallback for unreconciled detail keys).
-- `NAZARE` ← `datalake_nazare_clean.revenue_share_by_participant` (non-invalidated).
+**Transaction context (join out for detail):**
 
-> **Double-count trap:** always filter `revenue_source` before any `SUM`/percentage — the table UNIONs both systems for the same offer. `id_offer`/`id_house` may be NULL when the BigAgent→offer join chain is missing.
+| Context | Join from `fact_partner_payments` | Detail tables |
+|---------|-----------------------------------|---------------|
+| **Sale offer** | `sk_offer` | **`dw_sale.fact_offers`**, **`dw_sale.dim_offer`** — offer status, sale price, brokerage fee, buyer/owner keys, 3P flags |
+| **Rent contract** | `sk_contract` | **`dw_rent.fact_contracts`**, **`dw_rent.dim_contract`** — contract status, rent amounts, listing linkage |
+
+> **Double-count trap:** always filter `revenue_source` (and usually `incentive_system` / `revenue_role`) before any `SUM` — the table UNIONs Big Agent and Nazaré paths and can emit multiple rows per offer/contract. Enrich fallback: `datalake_agent_payments.partner_payments` (same grain; no `sk_*` resolution).
 
 ### `datalake_big_agent.brokerage_share_history` — For-Rent contract broker share
 
@@ -288,7 +296,7 @@ Grain: **one row per `(id_revision, id_contract)`**. Columns: `id_revision`, `id
 
 **Purpose:** Kimball DW projection of the Big Agent Incentives Engine — **the default entry point for all BigAgent earnings and tier analysis.** **Pipeline:** `dw_agent_payments` DAG, incremental MERGE, partitioned `year/month/day`.
 
-> ⚠ **Name collision:** `datalake_agent_payments` (enrich — For-Sale `agent_revenue_share` reconciliation) ≠ **`dw_agent_payments`** (DW — BigAgent earnings star schema). They are different layers and scopes.
+> ⚠ **Name collision:** `datalake_agent_payments` (enrich — `partner_payments` upstream) ≠ **`dw_agent_payments`** (DW — earnings + partner payments star schema). Same domain word, different layer; prefer the DW tables for analysis.
 
 **Upstream:** enrich `datalake_big_agent.*` and clean `datalake_big_agent_clean.*`. Person/company/cart keys are pre-resolved through **`datalake_person.person_sks`**, **`datalake_company.company_sks`**, and **`datalake_cart_system_clean.cart`** — prefer joining other DW entities through these `sk_*` columns rather than re-deriving from enrich.
 
@@ -296,19 +304,23 @@ Grain: **one row per `(id_revision, id_contract)`**. Columns: `id_revision`, `id
 
 | Need | **Use (DW)** | Enrich fallback (only if column missing) |
 |------|--------------|------------------------------------------|
+| Partner payments to agents and companies | **`fact_partner_payments`** | `datalake_agent_payments.partner_payments` |
 | Earnings KPIs, dashboards, agent/tier joins | **`fact_earnings`** | `datalake_big_agent.earnings` |
 | Earning source status / failure context | **`dim_earning_sources`** | `datalake_big_agent_clean.earning_sources` |
 | Tier score rules | **`dim_tier`** | `datalake_big_agent.tier_rule` |
 | Partner tier assignments | **`fact_partner_tier`** | `datalake_big_agent.partner_tier` |
 | Calculation status audit trail | **`fact_earning_calculation_log`** | `earning_sources_aud` |
 | Revenue share / invalidation / unresolved-earning **record ids** | join enrich on `sk_earning = id_earning` | `datalake_big_agent.earnings` |
-| For-Sale BigAgent vs Nazaré reconciliation per offer | — (no DW) | `datalake_agent_payments.agent_revenue_share` |
+| Sale offer detail for a payment row | **`dw_sale.fact_offers`**, `dw_sale.dim_offer` via `sk_offer` | — |
+| Rent contract detail for a payment row | **`dw_rent.fact_contracts`**, `dw_rent.dim_contract` via `sk_contract` | — |
 
 ### Star schema
 
 ```
 dim_earning_sources ──┐
 dim_tier ─────────────┼──► fact_earnings ◄── fact_partner_tier
+                      │
+fact_partner_payments (partner payments; joins to dw_sale / dw_rent for transaction context)
                       │
 fact_earning_calculation_log (operational; joins on sk_earning_source)
 ```
@@ -367,6 +379,21 @@ Grain: **one row per `sk_partner_tier`** (partner tier assignment), incremental 
 | Validity | `is_valid`, `is_overwritten`, `is_overwritten_by_ops`, `dt_validity_started`, `dt_validity_ended`, `ts_overwritten` |
 
 > Join `fact_earnings.sk_partner_tier` → `fact_partner_tier.sk_partner_tier` for the assignment valid at earning time; `partner_tier_name` on the fact is a denormalized snapshot.
+
+### `fact_partner_payments`
+
+Grain: **one row per `sk_partner_payment`** (= enrich `id_partner_payment`). Incremental load window: `DATE(ts_updated)` between `{load_start_date}` and `{load_end_date}`. Projects enrich `datalake_agent_payments.partner_payments` with `sk_person` / `sk_company` resolved via LEFT JOIN on `uuid_person` / `uuid_company` to **`datalake_person.person_sks`** and **`datalake_company.company_sks`**.
+
+| Topic | Fields / notes |
+|-------|----------------|
+| Keys | `sk_partner_payment` (PK), `sk_earning` (non-null when `revenue_source = 'BIG_AGENT'`), `sk_earning_source`, `sk_revenue_share`, `sk_house`, `sk_contract`, `sk_offer`, `sk_business_unit`, `sk_tier`, `sk_user`, `sk_person`, `sk_company` |
+| Classification | `business_context` (`SALE` / `RENT`), `revenue_source` (`BIG_AGENT` / `NAZARE`), `revenue_role` (`DEMAND` / `SUPPLY`), `incentive_system`, `participant_role`, `revenue_receiver_type` (`AGENT` / `COMPANY`), `tier_name` |
+| Amounts | `ticket_base_amount`, `brokerage_fee` (% on ticket), `brokerage_amount`, `revenue_amount`, `revenue_percentage`, `revenue_share_type`, `revenue_share_value` |
+| Flags | `is_3p_lead_gen_offer`, `is_fifty_revenue_share`, `is_crcc_revenue_share`, `is_tier_revenue_share` |
+| Tier context | `dt_tier_reference` |
+| Timing | `ts_created`, `ts_updated`, `ts_load`; partitions `year/month/day` from `ts_created` |
+
+> **Primary source for partner payments:** use this fact for any question about amounts paid to agents or partner companies. Filter by `incentive_system` and `revenue_role` to isolate conversion vs TQC/TQA vs CIQ rows — each function is a separate payment line, not a wide column (`brokerage_percentage` / `tqc_percentage` / `ciq_percentage` do not exist on this fact). Join **`dw_sale.fact_offers`** / **`dw_sale.dim_offer`** on `sk_offer` for Sale context; join **`dw_rent.fact_contracts`** / **`dw_rent.dim_contract`** on `sk_contract` for Rent context. Bridge agents via `sk_person` / `sk_user` (not raw enrich ids).
 
 ### `fact_earning_calculation_log`
 
@@ -546,7 +573,9 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 - **Hub (`datalake_agent_accreditation.agent`) → reports:** `agent.id_user = agent_status_by_month.id_user` (1:N per month).
 - **Hub → hub services:** `agent.id_user = member_hub_allocation.id_user` (1:N per day; filter `is_active = true`).
 - **Hub → PFA:** `agent.id_agent = preferred_property_agent_relation_history.id_related_agent` (1:N per listing).
-- **Hub → revenue:** `agent.id_user = agent_revenue_share.id_user` (filter `revenue_source` first).
+- **Hub → partner payments:** `datalake_person.person_sks.id_user = agent.id_user` → `person_sks.sk_person = dw_agent_payments.fact_partner_payments.sk_person`; companies via `sk_company`. Filter `revenue_source` before aggregating.
+- **Partner payment → Sale offer:** `fact_partner_payments.sk_offer` → **`dw_sale.fact_offers.sk_offer`** / **`dw_sale.dim_offer`** for offer status, pricing, and participant keys.
+- **Partner payment → Rent contract:** `fact_partner_payments.sk_contract` → **`dw_rent.fact_contracts.sk_contract`** / **`dw_rent.dim_contract`** for contract status and rent terms.
 - **Hub → BigAgent earnings (DW):** `datalake_person.person_sks.id_user = agent.id_user` → `person_sks.sk_person = dw_agent_payments.fact_earnings.sk_person` (receiver) or `.sk_author` (author).
 - **Earnings fact → dimensions:** `fact_earnings.sk_earning_source` → `dim_earning_sources.sk_earning_source`; `sk_tier` → `dim_tier.sk_tier`; `sk_partner_tier` → `fact_partner_tier.sk_partner_tier`.
 - **Earnings enrich detail:** `fact_earnings.sk_earning` = `datalake_big_agent.earnings.id_earning` for revenue-share / invalidation / unresolved-earning keys not projected in the fact.
@@ -566,8 +595,9 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 - Confirm what "active agent", "activation", and "first listing" mean — each maps to a different table/filter (see Synonyms).
 - Translate legacy jargon ("Demand Agent", "CIQ-Only", "Independent Agent") to capability/`agent_type_segment` filters, not literal column values.
 - Use `datalake_agent_accreditation.agent` for canonical `id_agent` identity; for **daily state** prefer **`dw_agent.fact_agent_daily`**; bridge `sk_agent ↔ id_user` via `dw_public.dim_agent`.
-- Filter `revenue_source` in `agent_revenue_share` before any aggregation.
-- For **BigAgent earnings**, **always** query **`dw_agent_payments.fact_earnings`** first; join enrich `datalake_big_agent.earnings` only for `id_revenue_share`, `id_incentive_engine`, or `id_earning_invalidation`.
+- Filter `revenue_source` in **`fact_partner_payments`** before any aggregation (Big Agent vs Nazaré UNION).
+- For **partner payments to agents and companies**, **always** query **`dw_agent_payments.fact_partner_payments`** first; enrich `datalake_agent_payments.partner_payments` only for pipeline debugging or columns not projected to DW.
+- For **BigAgent earning-level** detail (invalidation, revenue-share record ids), join **`fact_partner_payments.sk_earning`** → **`fact_earnings.sk_earning`** or enrich `datalake_big_agent.earnings`.
 - Resolve earning authors through **`sk_person`** (`sk_author`, `sk_invalidation_author`) — bridge to `id_user` via `datalake_person.person_sks`, not via raw BigAgent author ids.
 - Apply `ROW_NUMBER()`/`LAST_VALUE` on `brokerage_share_history` to get the current share per contract.
 - Filter `ts_relation_ended IS NULL` (active PFA) and `ts_status_ended IS NULL` (current eligibility).
@@ -581,8 +611,8 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 
 - **Query enrich or clean when a DW table covers the same topic** — e.g. do not use `datalake_big_agent.earnings` for earnings KPIs (`dw_agent_payments.fact_earnings`), `datalake_ciq.ciq_listing_purchase` for portfolio loss (`dw_ciq.fact_ciq_listing_purchase`), or `datalake_agent_accreditation.agent` for daily capability history (`dw_agent.fact_agent_daily`).
 - **Mix the two ID systems.** `sk_agent`/`id_agent` (new Agent Domain) ≠ `sk_agent_data`/`id_agent_data` (legacy `dadosAgent`). The column `sk_agent` exists in both `dw_public.dim_agent` (legacy) and `dw_agent.*` (new) with different value spaces — never join them directly; bridge through a table carrying both keys (`dw_agent.fact_agent_daily`).
-- Confuse **`agent_revenue_share`** (For-Sale revenue share, BigAgent vs Nazaré reconciliation) with **`brokerage_share_history`** (For-Rent contract broker share) — different scopes, grains, and DAGs.
-- Confuse **`datalake_agent_payments`** (enrich reconciliation) with **`dw_agent_payments`** (BigAgent earnings DW) — same domain word, different layer and grain.
+- Confuse **`fact_partner_payments`** (unified partner payment lines — agents and companies) with **`brokerage_share_history`** (For-Rent contract broker share revision history) — different scopes, grains, and DAGs.
+- Confuse **`datalake_agent_payments.partner_payments`** (enrich upstream) with **`dw_agent_payments.fact_partner_payments`** (DW source of truth for payments) — prefer the DW fact for analysis.
 - Expect `sk_revenue_share`, `sk_incentive_engine`, or `sk_unresolved_earning` on **`dw_agent_payments.fact_earnings`** — use enrich `datalake_big_agent.earnings` or the `has_unresolved_earning` flag instead.
 - Treat `sk_author` / `sk_invalidation_author` as BigAgent operational ids — they are **`sk_person`** values resolved through `person_sks`.
 - Use `datalake_hub_services.agent_hub_alocation` (deprecated, typo `alocation`) or `agent_hub_relation` (deprecated) — use `member_hub_allocation` with `is_active = true`.
@@ -619,19 +649,24 @@ ORDER BY number_agents DESC;
 
 > **Note:** `YEAR`/`MONTH`/`DAY` follow Trino/Presto syntax. Partition columns are integers — never filter the daily tables with `dt_reference BETWEEN`.
 
-### Reconciliation: BigAgent vs Nazaré revenue share (For-Sale)
+### Partner payments by revenue source (BigAgent vs Nazaré)
 
 ```sql
 SELECT
-    ars.revenue_source,
-    ars.revenue_role,
-    COUNT(DISTINCT ars.id_offer)  AS offers,
-    SUM(ars.revenue_amount)       AS total_amount
-FROM datalake_agent_payments.agent_revenue_share AS ars
-WHERE ars.year = 2026 AND ars.month = 6
-GROUP BY 1, 2          -- never SUM without grouping/filtering revenue_source
-ORDER BY 1, 2;
+    fp.revenue_source,
+    fp.revenue_role,
+    fp.incentive_system,
+    COUNT(DISTINCT fp.sk_offer)     AS offers,
+    SUM(fp.revenue_amount)          AS total_amount
+FROM dw_agent_payments.fact_partner_payments AS fp
+WHERE fp.year = 2026
+  AND fp.month = 6
+  AND fp.business_context = 'SALE'
+GROUP BY 1, 2, 3       -- never SUM without filtering revenue_source
+ORDER BY 1, 2, 3;
 ```
+
+> Join **`dw_sale.fact_offers`** / **`dw_sale.dim_offer`** on `sk_offer` for offer-level attributes. For Rent rows, join **`dw_rent.fact_contracts`** / **`dw_rent.dim_contract`** on `sk_contract`.
 
 ### BigAgent earnings by incentive system (DW)
 

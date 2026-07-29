@@ -3,8 +3,9 @@ WITH new_earnings_filtered AS (
         ne.id,
         ne.id_earning_source,
         ne.id_revenue_share,
-        ne.id_external_receiver,
         ne.id_author,
+        IF(ne.external_receiver_type = "COMPANY", ne.id_external_receiver, NULL) AS uuid_company,
+        IF(ne.external_receiver_type = "AGENT", ne.id_external_receiver, NULL) AS uuid_person,
         ne.author_role,
         ne.author_channel,
         ne.author_on_behalf_of_role,
@@ -45,6 +46,33 @@ earning_sources AS (
         ) AS calculation_status
     FROM 
         datalake_big_agent_clean.earning_sources AS es
+),
+sales_flow_offer AS (
+    SELECT
+        sf.id AS id_sales_flow,
+        o.id_firestore AS id_offer,
+        h.id_external AS id_house,
+        o.id_hub AS id_business_unit,
+        fee.brokerage_fee
+    FROM
+        datalake_sales_flow_clean.sales_flow AS sf
+    LEFT JOIN
+        datalake_sales_flow_clean.offer AS o
+            ON o.id_sales_flow = sf.id
+    LEFT JOIN
+        datalake_sales_flow_clean.house AS h
+            ON h.id = sf.id_house
+    LEFT JOIN
+        datalake_sales_flow_clean.brokerage AS fee
+            ON fee.id_sales_flow = sf.id
+),
+rent_brokerage_share_history AS (
+    SELECT
+        id_contract,
+        agent_brokerage_share,
+        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_revision DESC) = 1 AS is_last_revision
+    FROM
+        datalake_big_agent.brokerage_share_history
 )
 SELECT DISTINCT
     ne.id AS id_earning,
@@ -61,12 +89,16 @@ SELECT DISTINCT
         NULL
     ) AS id_invalidation_author,
     IF(ne.author_role <> "SYSTEM", ne.id_author, NULL) AS id_author,
-    COALESCE(person_tier.id_tier, rs.id_tier) AS id_tier,
+    COALESCE(rs.id_tier, person_tier.id_tier) AS id_tier,
     person_tier.id_partner_tier,
-    rs.id_incentive_engine,
+    COALESCE(rs.id_incentive_engine, tier.id_incentive_engine) AS id_incentive_engine,
+    COALESCE(sf.id_house, c.id_house) AS id_house,
+    sf.id_offer,
+    sf.id_business_unit AS id_offer_business_unit,
+    tier.id_business_unit AS id_partner_tier_business_unit,
     es.uuid_cart,
-    IF(ne.external_receiver_type = "COMPANY", ne.id_external_receiver, NULL) AS uuid_company,
-    IF(ne.external_receiver_type = "AGENT", ne.id_external_receiver, NULL) AS uuid_person,
+    ne.uuid_company,
+    ne.uuid_person,
     es.business_context,
     es.domain_type,
     ne.incentive_system,
@@ -79,7 +111,14 @@ SELECT DISTINCT
     ei.invalidation_description,
     ue.reason AS unresolved_earning_reason,
     rs.revenue_share_type,
+    rs.revenue_share_value,
     person_tier.tier_name,
+    es.base_amount,
+    es.revenue_share_total_amount,
+    CASE
+        WHEN es.business_context = "SALE" THEN sf.brokerage_fee
+        WHEN es.business_context = "RENT" THEN fee.agent_brokerage_share
+    END AS brokerage_fee,
     CASE
         WHEN ne.calculated_from = 'REVENUE_SHARE_TOTAL_AMOUNT' THEN es.revenue_share_total_amount
         WHEN ne.calculated_from = 'BASE_AMOUNT' THEN es.base_amount
@@ -95,6 +134,7 @@ SELECT DISTINCT
     ne.status = 'INVALIDATED' OR ei.id IS NOT NULL AS is_invalid,
     ne.status = 'CALCULATED' AS is_calculated,
     ne.dt_payment_due,
+    person_tier.dt_validity_started AS dt_tier_reference,
     ue.ts_solved AS ts_unresolved_earning_solved,
     ne.ts_created,
     ei.ts_invalidated,
@@ -119,8 +159,20 @@ LEFT JOIN
         AND ue.is_first_solved_by_earning IS TRUE
 LEFT JOIN
     datalake_big_agent.partner_tier AS person_tier
-        ON ne.external_receiver_type = 'AGENT'
-        AND person_tier.uuid_person = ne.id_external_receiver
+        ON person_tier.uuid_person = ne.uuid_person
         AND person_tier.incentive_system = ne.incentive_system
         AND person_tier.is_valid IS TRUE
         AND DATE(ne.ts_created) BETWEEN person_tier.dt_validity_started AND person_tier.dt_validity_ended
+LEFT JOIN
+    datalake_big_agent.tier_rule AS tier
+        ON tier.id_tier = person_tier.id_tier
+LEFT JOIN
+    sales_flow_offer AS sf
+        ON sf.id_sales_flow = es.id_sales_flow
+LEFT JOIN
+    datalake_ebdb_clean.contract AS c 
+        ON c.id = es.id_contract
+LEFT JOIN
+    rent_brokerage_share_history AS fee
+        ON fee.id_contract = es.id_contract
+        AND fee.is_last_revision IS TRUE
