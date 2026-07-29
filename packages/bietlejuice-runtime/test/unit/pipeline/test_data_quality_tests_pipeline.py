@@ -75,35 +75,3 @@ def test_execute_test_omits_table_identifier_when_unsupported(monkeypatch):
     # Assert
     assert result == {"status": "success"}
     assert captured["suite_name"] == "Pipeline Validations: database.table"
-
-
-def test_publish_to_metadata_propagator_is_best_effort(monkeypatch):
-    # A metadata-propagator failure (outage/timeout/rejected payload) must NOT
-    # propagate: publishing DQ metrics is a side-effect and cannot fail the DQ
-    # pipeline (which would fail the DAG). The error is logged and swallowed.
-    class _Dbutils:
-        secrets = SimpleNamespace(get=lambda scope, key: '{"host": "http://mp"}')
-
-    class _BaseDBUtils:
-        def get_dbutils(self):
-            return _Dbutils()
-
-    class _FailingPipeline:
-        def __init__(self, **_kwargs):
-            pass
-
-        def run(self):
-            raise RuntimeError("metadata-propagator down")
-
-    monkeypatch.setattr(data_quality_tests_pipeline, "BaseDBUtils", _BaseDBUtils)
-    monkeypatch.setattr(
-        data_quality_tests_pipeline, "DatahubQualityMetricsPipeline", _FailingPipeline
-    )
-
-    pipeline = _pipeline()
-    pipeline.platforms = ["databricks", "glue"]
-
-    # Act & Assert: must not raise despite the propagator error
-    pipeline._publish_validation_results_to_metadata_propagator(
-        {"metadata": {}}, "database", "table"
-    )

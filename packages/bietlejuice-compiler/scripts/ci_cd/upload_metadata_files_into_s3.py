@@ -1,9 +1,8 @@
 import argparse
-import glob
 import json
 import os
 import sys
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import boto3
 import requests
@@ -17,7 +16,6 @@ for _p in (_REPO_ROOT, _COMPILER_ROOT):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from bietlejuice.base.pipeline.platform_resolver import resolve_platforms
 from scripts.services.git_service import GitService
 from scripts.services.metadata_file_info import MetadataFileInfo
 from scripts.services.metadata_file_service import (
@@ -204,50 +202,12 @@ def generate_metric_payload(file_info: MetadataFileInfo) -> List[Dict]:
     return payload
 
 
-def resolve_platforms_for_file(file_info: MetadataFileInfo) -> Optional[List[str]]:
-    """Resolve the DataHub platforms a table should be propagated to.
-
-    Reads the table's DAG declaration (``*_declaration.yml`` in the DAG dir,
-    derived from the metadata file path) and delegates to
-    ``bietlejuice.base.pipeline.platform_resolver``. Returns ``None`` on any
-    problem (missing declaration/type, resolution error) so the propagator
-    falls back to its legacy single-target behavior.
-    """
-    try:
-        dag_dir = os.path.dirname(
-            os.path.dirname(os.path.dirname(file_info.local_path))
-        )
-        matches = glob.glob(os.path.join(dag_dir, "*_declaration.yml"))
-        if not matches:
-            return None
-        with open(matches[0]) as declaration_file:
-            declaration = yaml.safe_load(declaration_file) or {}
-        workflow = declaration.get("workflow") or {}
-        workflow_type = workflow.get("type")
-        if not workflow_type:
-            return None
-        table_customization = (workflow.get("tables_customization") or {}).get(
-            file_info.table_name, {}
-        ) or {}
-        return resolve_platforms(workflow_type, workflow, table_customization)
-    except Exception as error:  # never break the CI upload over one declaration
-        print(
-            f"m=resolve_platforms_for_file, table={file_info.table_name}, "
-            f"msg=Falling back to default platform, error={error}"
-        )
-        return None
-
-
 def generate_documentation_payload(file_info: MetadataFileInfo) -> Dict:
-    payload = {
+    return {
         "vendor": ["datahub"],
         "database_name": file_info.database_name,
         "table_name": file_info.table_name,
     }
-    platforms = resolve_platforms_for_file(file_info)
-    if platforms:
-        payload["platforms"] = platforms
-    return payload
 
 
 def generate_payloads(files_info: List[MetadataFileInfo]):
