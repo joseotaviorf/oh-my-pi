@@ -41,6 +41,17 @@ def parse_args():
         default="",
         help="partial path used in some DAGs off of our pattern",
     )
+    # NAMED flag (not positional): on EMR the empty ``intermediate_path`` arg is
+    # dropped from the spark-submit shell command; a positional ``platforms`` would
+    # then be parsed as ``intermediate_path`` and break the job. A named flag is
+    # matched by name, so the dropped empty no longer shifts it.
+    parser.add_argument(
+        "--platforms",
+        type=str,
+        default="",
+        help="Comma-separated DataHub platforms to propagate DQ to "
+        "(e.g. 'databricks,glue,trino'). Empty => metadata-propagator default.",
+    )
 
     return parser.parse_args()
 
@@ -152,6 +163,7 @@ def main() -> None:
             args.relative_file_path,
             args.table_name,
             args.intermediate_path,
+            [platform for platform in args.platforms.split(",") if platform],
         )
         pipeline.run()
     else:

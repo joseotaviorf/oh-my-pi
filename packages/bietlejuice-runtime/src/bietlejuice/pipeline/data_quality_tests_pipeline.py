@@ -145,6 +145,7 @@ class DataQualityTestsPipeline:
         relative_file_path: str,
         table_name: str,
         intermediate_path: str,
+        platforms=None,
     ):
         self.env = env
         self.execution_date = execution_date
@@ -153,6 +154,9 @@ class DataQualityTestsPipeline:
         self.relative_file_path = relative_file_path
         self.table_name = table_name
         self.intermediate_path = intermediate_path
+        # DataHub platforms the DQ results should be propagated to (resolved
+        # from the FQN by the task creator). Empty/None => propagator default.
+        self.platforms = platforms
         self.config_service = ConfigurationService()
         self.spark_client = InmetroSparkClient()
 
@@ -346,23 +350,35 @@ class DataQualityTestsPipeline:
     def _publish_validation_results_to_metadata_propagator(
         self, validation_results: dict, database_name: str, table_name: str
     ) -> None:
-        base_dbutils = BaseDBUtils()
-        dbutils = None
-        if base_dbutils.get_dbutils() is not None:
-            dbutils = base_dbutils.get_dbutils()
+        # Best-effort: publishing DQ metrics to the metadata-propagator (and hence
+        # DataHub) is a side-effect and must NEVER fail the DQ pipeline. A propagator
+        # outage / timeout / rejected payload is logged and swallowed; the quality
+        # checks and the durable S3 record are unaffected.
+        try:
+            base_dbutils = BaseDBUtils()
+            dbutils = None
+            if base_dbutils.get_dbutils() is not None:
+                dbutils = base_dbutils.get_dbutils()
 
-        metadata_propagator_credentials = json.loads(
-            dbutils.secrets.get(
-                scope="quintoandar", key=ServiceEnum.METADATA_PROPAGATOR.value
+            metadata_propagator_credentials = json.loads(
+                dbutils.secrets.get(
+                    scope="quintoandar", key=ServiceEnum.METADATA_PROPAGATOR.value
+                )
             )
-        )
-        DatahubQualityMetricsPipeline(
-            metadata_propagator_host=metadata_propagator_credentials["host"],
-            database_name=database_name,
-            table_name=table_name,
-            metadata_type=MetadataTypeEnum.QUALITY_METRICS,
-            validation_results=validation_results,
-        ).run()
+            DatahubQualityMetricsPipeline(
+                metadata_propagator_host=metadata_propagator_credentials["host"],
+                database_name=database_name,
+                table_name=table_name,
+                metadata_type=MetadataTypeEnum.QUALITY_METRICS,
+                validation_results=validation_results,
+                platforms=self.platforms,
+            ).run()
+        except Exception as error:
+            logger.error(
+                f"m={JOB_NAME}, table={database_name}.{table_name}, "
+                f"msg=Failed to publish DQ metrics to metadata-propagator "
+                f"(ignored; does not fail the pipeline), error={error}"
+            )
 
     def _publish_failed_validation_results_to_google_chat(
         self,

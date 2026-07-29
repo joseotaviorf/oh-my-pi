@@ -14,11 +14,15 @@ class DatahubQualityMetricsPipeline(MetadataPropagatorPipeline):
         table_name,
         metadata_type: MetadataTypeEnum,
         validation_results,
+        platforms=None,
     ):
         super().__init__(
             metadata_propagator_host, database_name, table_name, metadata_type
         )
         self.validation_results = validation_results
+        # DataHub platforms this table's DQ should be propagated to. When empty,
+        # the metadata-propagator keeps its legacy single-target behavior.
+        self.platforms = platforms
 
     def build_metadata_propagator_payload(self):
         quality_check_status = self.validation_results["metadata"]["suite_result"]
@@ -28,16 +32,18 @@ class DatahubQualityMetricsPipeline(MetadataPropagatorPipeline):
         success_rate = self.validation_results["metadata"]["success_rate"]
         quality_checks = self.validation_results["validations"]
 
-        return [
-            {
-                "vendor": ["datahub"],
-                "database_name": self.database_name,
-                "table_name": self.table_name,
-                "quality_check_status": quality_check_status,
-                "last_quality_check": datetime.strftime(
-                    last_quality_check, "%Y-%m-%d %H:%M:%S"
-                ),
-                "success_rate": success_rate,
-                "quality_checks": quality_checks,
-            }
-        ]
+        payload = {
+            "vendor": ["datahub"],
+            "database_name": self.database_name,
+            "table_name": self.table_name,
+            "quality_check_status": quality_check_status,
+            "last_quality_check": datetime.strftime(
+                last_quality_check, "%Y-%m-%d %H:%M:%S"
+            ),
+            "success_rate": success_rate,
+            "quality_checks": quality_checks,
+        }
+        if self.platforms:
+            payload["platforms"] = self.platforms
+
+        return [payload]
