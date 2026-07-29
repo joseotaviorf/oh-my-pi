@@ -115,7 +115,7 @@ WITH firestore_sale_offer_clean AS (
     soa.status <> 'DRAFT'
 ), latest_sales_flow AS (
   SELECT
-    *,
+    *
   FROM (
     SELECT
       sf.*,
