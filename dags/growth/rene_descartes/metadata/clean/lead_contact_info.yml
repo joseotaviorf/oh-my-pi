@@ -25,6 +25,10 @@ columns:
     description: List of JSON objects containing all identified contacts (phone numbers, email, Meta username), their type, value, and validation status.
     lineage:
       - datalake_rene_descartes_raw.lead_contact_info.contact_info
+  linked_devices:
+    description: A list of unique Device IDs associated with the customer (e.g., smartphone, tablet, computer).
+    lineage:
+      - datalake_rene_descartes_raw.lead_contact_info.linked_devices
   ts_created:
     description: UTC timestamp when this Supply customer contact was first registered in the Rene Descartes service upon initial form submission or interaction.
     lineage:
@@ -33,6 +37,12 @@ columns:
     description: UTC timestamp of the most recent change to this customer's contact profile — triggered when new contact details are captured, devices are linked, or the person_id is resolved. Drives the partition columns (year, month, day).
     lineage:
       - datalake_rene_descartes_raw.lead_contact_info.ts_updated
+  op_cdc:
+    description: Change operation emitted by the PostgreSQL CDC framework for this contact record.
+  ts_cdc_transaction:
+    description: UTC timestamp when the CDC framework captured this contact change transaction.
+  ts_database_transaction:
+    description: UTC timestamp when the source PostgreSQL database committed this contact change.
   year:
     description: Calendar year extracted from `ts_updated`, used as a Hive partition for incremental reads of contact records.
   month:

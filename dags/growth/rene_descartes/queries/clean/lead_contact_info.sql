@@ -3,6 +3,7 @@ SELECT
     person_id AS id_person,
     name,
     contact_info,
+    linked_devices,
     ts_created,
     ts_updated,
     YEAR(ts_updated) AS year,
