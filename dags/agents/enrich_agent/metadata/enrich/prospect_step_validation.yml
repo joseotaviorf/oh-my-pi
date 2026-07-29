@@ -15,11 +15,12 @@ columns:
     description: Prospect agent identifier from the enriched prospect profile.
   id_user:
     lineage:
-      - datalake_agent_accreditation.agent.id_user
+      - datalake_hub_services.users.id_main_user
     description: Main application user id for the linked agent when present from enrich_agent agent output.
   id_negotiation_executive_user:
     lineage:
-      - datalake_agent_accreditation.agent.id_negotiation_executive_user
+      - datalake_hub_services.member_profile.id_user
+      - datalake_hub_services_clean.member_profile.id_user
     description: Negotiation executive user id from enrich_agent agent when the prospect resolves to an active agent Hub profile hierarchy.
   uuid_person:
     lineage:

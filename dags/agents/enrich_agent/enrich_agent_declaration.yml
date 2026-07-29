@@ -11,7 +11,6 @@ workflow:
   custom_schema: agent_accreditation
   inner_dependencies:
     prospect_step_validation:
-      - agent
       - prospect_agent
       - qualification_step
       - signup_profile_conflict

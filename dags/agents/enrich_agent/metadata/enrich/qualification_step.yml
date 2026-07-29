@@ -54,10 +54,24 @@ columns:
     lineage:
       - datalake_ebdb_clean.qualification_step_progress.reason
     description: Reason or notes for the step progress event.
+  automatic_creci_status:
+    lineage:
+      - datalake_ebdb_clean.creci_validation.status
+      - datalake_ebdb_clean.creci_validation.reason
+      - datalake_ebdb_clean.qualification_step.name
+    description: |
+      Outcome of the latest automatic CRECI check for the prospect, populated only on
+      CRECI_VALIDATION steps.When status is INCONCLUSIVE the validation reason is returned, otherwise the status
+      value (for example ACTIVE).
   step_author_type:
     lineage:
       - datalake_ebdb_clean.qualification_step_progress.author_type
     description: Type of author who performed the step progress event.
+  is_creci_manually_approved:
+    lineage:
+      - datalake_agent_accreditation.qualification_step.creci_validation_status
+      - datalake_agent_accreditation.qualification_step.automatic_creci_status
+    description: Whether the CRECI was manually approved by OPS. When the CRECI validation status is approved and the automatic CRECI status is not active or is NULL, TRUE; otherwise FALSE. IF the step is not CRECI_VALIDATION, NULL.
   ts_step_changed:
     lineage:
       - datalake_ebdb_clean.qualification_step_progress.ts_changed

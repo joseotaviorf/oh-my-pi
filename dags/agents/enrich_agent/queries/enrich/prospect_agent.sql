@@ -18,14 +18,23 @@ qualification_by_agent AS (
         id_qualification,
         qualification_state,
         MAX(step_status) FILTER(WHERE step_name = 'CRECI_VALIDATION') AS creci_validation_status,
+        MAX(automatic_creci_status) FILTER(WHERE step_name = 'CRECI_VALIDATION') AS automatic_creci_status,
+        MAX(is_creci_manually_approved) FILTER(WHERE step_name = 'CRECI_VALIDATION') AS is_creci_manually_approved,
         MAX(ts_step_changed) FILTER(WHERE step_name = 'CRECI_VALIDATION' AND step_status = 'APPROVED') AS ts_creci_validation_approved
     FROM
         datalake_agent_accreditation.qualification_step
     GROUP BY 1,2,3
+),
+prospect_with_agent_active AS (
+    SELECT DISTINCT
+        uuid_person
+    FROM
+        datalake_ebdb_clean.agent
+    WHERE
+        status = 'ACTIVE'
 )
 SELECT
     pa.id AS id_prospect_agent,
-    a.id AS id_agent,
     qba.id_qualification,
     IF(qapa.primary_operating_region_type = 'HUB', qapa.id_primary_operating_region, NULL) AS id_business_unit,
     IF(qapa.parent_operating_region_type = 'REGION', qapa.id_parent_operating_region, NULL) AS id_region,
@@ -35,6 +44,7 @@ SELECT
     pa.status,
     qba.qualification_state,
     qba.creci_validation_status,
+    qba.automatic_creci_status,
     lc.contract_signature_status,
     lc.contract_template_name,
     pa.business_association,
@@ -54,6 +64,8 @@ SELECT
     qapa.is_accepted_alternative_context,
     qapa.is_accepted_alternative_region,
     IF(pa.status = 'CONVERTED', ROW_NUMBER() OVER(PARTITION BY pa.uuid_person ORDER BY pa.ts_created DESC) = 1, FALSE) AS is_last_prospect_person_converted,
+    qba.is_creci_manually_approved,
+    IF(pwa.uuid_person IS NOT NULL, TRUE, FALSE) AS has_agent_active,
     qba.ts_creci_validation_approved,
     lc.ts_contract_process_initiated,
     lc.ts_contract_signed,
@@ -63,9 +75,6 @@ SELECT
 FROM
     datalake_ebdb_clean.prospect_agent AS pa
 LEFT JOIN
-    datalake_ebdb_clean.agent AS a
-        ON a.uuid_person = pa.uuid_person
-LEFT JOIN
     datalake_ebdb_clean.quintoandar_prospect_agent AS qapa
         ON qapa.id_prospect_agent = pa.id
 LEFT JOIN
@@ -74,3 +83,6 @@ LEFT JOIN
 LEFT JOIN
     last_contract AS lc
         ON lc.id_prospect_agent = pa.id
+LEFT JOIN
+    prospect_with_agent_active AS pwa
+        ON pwa.uuid_person = pa.uuid_person

@@ -10,11 +10,6 @@ columns:
     description: Unique identifier of the prospect agent record.
     lineage:
     - datalake_agent_accreditation.prospect_agent.id_prospect_agent
-  sk_agent:
-    description: Agent identifier when the prospect person matches an existing EBDB
-      agent.
-    lineage:
-    - datalake_agent_accreditation.prospect_agent.id_agent
   sk_qualification:
     description: Qualification identifier when the prospect person matches an existing
       EBDB qualification.

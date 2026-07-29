@@ -1513,6 +1513,7 @@ bietlejuice.enrich_agent:
   - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-event-log
   - bietlejuice.ebdb_agent:load-clean-capability
+  - bietlejuice.ebdb_agent:load-clean-creci-validation:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-demand-visit-management-capability-settings
   - bietlejuice.ebdb_agent:load-clean-prospect-agent
   - bietlejuice.ebdb_agent:load-clean-qualification-step-progress

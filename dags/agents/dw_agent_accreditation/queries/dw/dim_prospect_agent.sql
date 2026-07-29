@@ -1,6 +1,5 @@
 SELECT
     id_prospect_agent AS sk_prospect_agent,
-    id_agent AS sk_agent,
     id_qualification AS sk_qualification,
     id_business_unit AS sk_business_unit,
     id_region AS sk_region,

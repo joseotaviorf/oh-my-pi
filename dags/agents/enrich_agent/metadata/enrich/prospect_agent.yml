@@ -9,10 +9,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.prospect_agent.id
     description: Unique identifier of the prospect agent record.
-  id_agent:
-    lineage:
-      - datalake_ebdb_clean.agent.id
-    description: Agent identifier when the prospect person matches an existing EBDB agent.
   id_qualification:
     lineage:
       - datalake_agent_accreditation.qualification_step.id_qualification
@@ -51,6 +47,10 @@ columns:
     lineage:
       - datalake_agent_accreditation.qualification_step.step_status
     description: Current status of the CRECI validation step.
+  automatic_creci_status:
+    lineage:
+      - datalake_agent_accreditation.qualification_step.automatic_creci_status
+    description: Automatic CRECI status for the qualification step.
   contract_signature_status:
     lineage:
       - datalake_agent_accreditation.contract_process.signature_status
@@ -128,6 +128,14 @@ columns:
       - datalake_ebdb_clean.prospect_agent.status
       - datalake_ebdb_clean.prospect_agent.ts_created
     description: When a person has multiple prospect onboarding journeys, TRUE on the converted record with the latest ts_created for that uuid_person; FALSE on non-converted rows and on older converted records for the same person.
+  is_creci_manually_approved:
+    lineage:
+      - datalake_agent_accreditation.qualification_step.is_creci_manually_approved
+    description: Whether the CRECI was manually approved by OPS.
+  has_agent_active:
+    lineage:
+      - datalake_ebdb_clean.agent.status
+    description: True when the prospect person has an active agent; FALSE otherwise.
   ts_creci_validation_approved:
     lineage:
       - datalake_agent_accreditation.qualification_step.ts_changed
