@@ -78,6 +78,12 @@ SELECT
             WHEN 'House is not eligible to acquire because it is a hybrid house converted by a non-CIQ channel' THEN 'Não elegível: híbrido convertido por canal não-CIQ'
             WHEN 'House listing published after the transition' THEN 'Anúncio publicado após a transição de contrato (compra de carteira)'
             WHEN 'House is a hybrid house converted by a CIQ channel' THEN 'Híbrido convertido por canal CIQ'
+            WHEN 'This house has already been purchased'
+                THEN 'Este imóvel já foi adquirido (compra de carteira anterior)'
+            WHEN 'Similar house was terminated, is unpublished and has not generated a relisting, but the owner is the same'
+                THEN 'Imóvel similar rescindido, despublicado, sem republicação, mesmo proprietário'
+            WHEN 'Similar house was terminated, is unpublished, has not generated a relisting and the owner is different'
+                THEN 'Imóvel similar rescindido, despublicado, sem republicação, proprietário diferente'
             ELSE ''
         END
     ) AS acquisition_type_resume_pt,
