@@ -52,7 +52,7 @@ open_monthly_invoice AS (
         fiwt.due_amount,
         fiwt.dt_due,
         fiwt.has_bill_item_condominio,
-        DATEDIFF(CURRENT_DATE(), fiwt.dt_due) AS days_to_due,
+        DATEDIFF(fiwt.dt_due, CURRENT_DATE()) AS days_to_due,
         fcwt.max_delay_contaminated_contract_t1,
         fcwt.max_delay_contaminated_contract_t2,
         fcft.n_days_over1_t2_l180
