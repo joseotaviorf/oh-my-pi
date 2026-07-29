@@ -441,7 +441,7 @@ Grain: **one row per PFA/PPA relation revision**. Join on `id_house` / `id_relat
 
 ### `agent_performance` — EAV
 
-Grain: **one row per `(id_user, id_agent, id_metric_period, metric_name)`**. All accredited agents × active periods are cross-joined; missing combos filled `metric_value = 0, is_valid = true`. Compound ratios (`BP2CCV`, `TP2CS`, `OS2CCV_BY`) capped at 1.0. Pivot on `metric_name` for wide views; confirm enum live via `SELECT DISTINCT metric_name … LIMIT 50`.
+Grain: **one row per `(id_user, id_agent, id_metric_period, metric_name)`**. All accredited agents × active periods are cross-joined; missing combos filled `metric_value = 0, is_valid = true`. Compound ratios (`BP2CCV`, `TP2CS`, `OS2CCV_BY`) capped at 1.0. **For Sale VGV:** `VGV_ACQ` (CIQ acquisition value on signed CCV), `VGV_CONV` (broker conversion value, parallel to `GMV`), `VGV_TOTAL` (per-offer dedupe when the same `id_user` is broker and CIQ). Pivot on `metric_name` for wide views; confirm enum live via `SELECT DISTINCT metric_name … LIMIT 50`.
 
 ### `ciq_first_listing` — CIQ first-listing validation (for tiers)
 

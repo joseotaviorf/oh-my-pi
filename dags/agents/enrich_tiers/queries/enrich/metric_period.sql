@@ -25,7 +25,10 @@ metrics AS (
                 "TP",
                 "FL_FR",
                 "FL_FS",
-                "TP2CS"
+                "TP2CS",
+                "VGV_ACQ",
+                "VGV_CONV",
+                "VGV_TOTAL"
             )
         ) AS metric
 )

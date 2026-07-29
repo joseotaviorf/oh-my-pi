@@ -11,7 +11,7 @@ columns:
   id:
     description: Deterministic hash identifier of (metric, dt_init).
   metric:
-    description: Metric label (e.g., CCV, GMV, OS_BY, BP2CCV, TP2CS).
+    description: Metric label (e.g., CCV, GMV, VGV_ACQ, VGV_CONV, VGV_TOTAL, OS_BY, BP2CCV, TP2CS).
   status:
     description: Period status. Set as "VALID" for generated rows.
   dt_init:

@@ -27,7 +27,7 @@ columns:
       - datalake_tiers.metric_period.id
     description: Identifier of the metric period.
   metric_name:
-    description: Metric name aggregated (e.g., CCV, GMV, CCV_TQC, CCV_CIQ, OS_BY, OS2CCV_BY, BP2CCV, BP, TP, and INVALID variants).
+    description: Metric name aggregated (e.g., CCV, GMV, VGV_ACQ, VGV_CONV, VGV_TOTAL, CCV_TQC, CCV_CIQ, OS_BY, OS2CCV_BY, BP2CCV, BP, TP, and INVALID variants).
   metric_value:
     description: Aggregated metric value for the period (count or ratio depending on the metric definition).
   is_valid:
