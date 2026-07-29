@@ -1,16 +1,16 @@
 WITH updated_business_unit AS (
-    SELECT 
+    SELECT
         id_business_unit
-    FROM 
+    FROM
         datalake_hub_services_clean.business_unit_region_aud
-    WHERE 
+    WHERE
         DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION
-    SELECT 
+    SELECT
         id AS id_business_unit
-    FROM 
+    FROM
         datalake_hub_services_clean.business_unit
-    WHERE 
+    WHERE
         DATE(ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
@@ -49,6 +49,6 @@ LEFT JOIN
     datalake_hub_services_clean.business_unit_region_aud AS aud_end
         ON aud_end.rev = aud.rev_end
         AND aud_end.id = aud.id
-LEFT JOIN 
+LEFT JOIN
     datalake_region.region AS r
         ON aud.id_region = CAST(r.id AS INT)
