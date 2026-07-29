@@ -22,6 +22,7 @@ class TaskEnum(Enum):
     LOAD_DELTA = "load_delta"
     LOAD_CDF_TO_DATAZORD = "load_cdf_to_datazord"
     OPTIMIZE_DELTA_TABLE = "optimize_delta_table"
+    PROFILING = "profiling"
     REGISTER_DELTA_TABLE = "register_delta_table"
     REPROCESSING_GUARD = "reprocessing_guard"
     SKIP_RUN = "skip_run"

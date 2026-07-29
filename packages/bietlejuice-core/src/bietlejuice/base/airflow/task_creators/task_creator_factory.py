@@ -74,6 +74,9 @@ from bietlejuice.base.airflow.task_creators.load_wonka_task_creator import (
 from bietlejuice.base.airflow.task_creators.optimize_delta_table_task_creator import (
     OptimizeDeltaTableTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.profiling_task_creator import (
+    ProfilingTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.qube_register_delta_table_task_creator import (
     QubeRegisterDeltaTableTaskCreator,
 )
@@ -115,6 +118,7 @@ class TaskCreatorFactory:
         TaskEnum.LOAD_CORE_MODEL: LoadCustomTaskCreator,
         TaskEnum.LOAD_WONKA: LoadWonkaTaskCreator,
         TaskEnum.OPTIMIZE_DELTA_TABLE: OptimizeDeltaTableTaskCreator,
+        TaskEnum.PROFILING: ProfilingTaskCreator,
         TaskEnum.REGISTER_DELTA_TABLE: RegisterDeltaTableTaskCreator,
         TaskEnum.REPROCESSING_GUARD: ReprocessingGuardTaskCreator,
         TaskEnum.SKIP_RUN: SkipRunTaskCreator,

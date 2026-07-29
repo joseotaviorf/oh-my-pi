@@ -24,6 +24,7 @@ from bietlejuice.base.incident_context_enrichers.databricks.databricks_enricher 
 )
 from bietlejuice.base.incident_context_enrichers.jira.jira_enricher import JiraEnricher
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.observability.profiling_config import ProfilingConfig
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import (
     DAGPackagesPathService,
@@ -69,10 +70,11 @@ class BaseWorkflow(BuilderInterface):
         self.dataset_dependencies = [] if is_validation else dataset_dependencies
 
         self._dq_cache = DataQualityLayerCache(self.dag_name)
+        self._profiling_config = None
         self.local_tz = timezone("America/Sao_Paulo")
 
     def _config_service_dag_name(self) -> str:
-        """Cache key for ConfigurationService. Subclasses may redirect (e.g. Wonka)."""
+        """DAG name used to resolve ConfigurationService (overridden by Wonka)."""
         return self.dag_name
 
     def get_date_param(self, dag_run, default_date, date_param_name) -> str:
@@ -334,6 +336,24 @@ class BaseWorkflow(BuilderInterface):
         return os_path.normpath(
             table_attributes.table_name
         ) in self._get_data_quality_tables(table_attributes.layer.value)
+
+    def _check_include_profiling_task(self, table_attributes: TableAttributes) -> bool:
+        """
+        Checks if the post-load profiling task should be added into the workflow.
+
+        Gated by the ``observability`` declaration block (opt-in per DAG) and the
+        global runtime kill-switch / default (``ProfilingConfig``). Validation DAGs
+        never profile. The gate config is resolved once per workflow.
+        """
+        if self.is_validation:
+            return False
+        observability = self.workflow_args.get("observability") or {}
+        dag_enabled = observability.get("enabled") if observability else None
+        if self._profiling_config is None:
+            self._profiling_config = ProfilingConfig.from_configuration_service(
+                self.config_service
+            )
+        return self._profiling_config.is_profiling_active(dag_enabled)
 
     def _check_include_propagate_metadata_task(
         self, table_attributes: TableAttributes

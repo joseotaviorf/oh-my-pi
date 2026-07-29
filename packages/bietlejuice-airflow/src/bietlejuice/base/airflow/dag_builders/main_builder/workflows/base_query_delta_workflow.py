@@ -207,6 +207,11 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             load >> data_quality
             if last_task is not None:
                 data_quality >> last_task
+        if self._check_include_profiling_task(table):
+            profiling = self.profiling_task_creator.create_task(table)
+            load >> profiling
+            if last_task is not None:
+                profiling >> last_task
         return load, load
 
     def _set_dependencies(
@@ -275,6 +280,9 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         )
         self.data_quality_tests_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
+        )
+        self.profiling_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.PROFILING
         )
         self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SYNC_METADATA

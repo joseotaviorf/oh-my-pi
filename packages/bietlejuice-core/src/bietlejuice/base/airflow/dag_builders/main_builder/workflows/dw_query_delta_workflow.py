@@ -125,6 +125,11 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
             dq_upstream >> data_quality
             if last_task_after_groups is not None:
                 data_quality >> last_task_after_groups
+        if self._check_include_profiling_task(table):
+            profiling = self.profiling_task_creator.create_task(table)
+            load >> profiling
+            if last_task_after_groups is not None:
+                profiling >> last_task_after_groups
         return load, last_task_in_group
 
     def _serialize_dq_after_default_row(self) -> bool:
@@ -202,6 +207,9 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
         )
         self.data_quality_tests_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
+        )
+        self.profiling_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.PROFILING
         )
         self.sync_metadata_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.SYNC_METADATA
