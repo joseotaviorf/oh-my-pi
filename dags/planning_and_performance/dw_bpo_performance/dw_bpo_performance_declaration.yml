@@ -95,3 +95,7 @@ workflow:
       extraction_type: incremental
       merge_on: [sk_answer_csat]
       z_order_by: [sk_answer_csat]
+    customer_contacts_session:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [sk_support_session_fallback_ticket]

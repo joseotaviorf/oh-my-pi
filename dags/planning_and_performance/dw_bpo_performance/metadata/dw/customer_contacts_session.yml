@@ -8,6 +8,10 @@ columns:
     lineage:
       - dw_customer_support.fact_customer_contacts.sk_support_session
     description: Support session identifier for the contact.
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_task
+    description: Task identifier associated with the contact.
   sk_user:
     lineage:
       - dw_customer_support.fact_customer_contacts.sk_user
