@@ -115,7 +115,7 @@ def translate(config: dict) -> dict:
     if ebs_root_volume_size is not None:
         overrides["EbsRootVolumeSize"] = int(ebs_root_volume_size)
 
-    overrides["StepConcurrencyLevel"] = int(cfg.pop("step_concurrency_level", 8))
+    overrides["StepConcurrencyLevel"] = int(cfg.pop("step_concurrency_level", 4))
 
     for field in list(cfg.keys()):
         cfg.pop(field)

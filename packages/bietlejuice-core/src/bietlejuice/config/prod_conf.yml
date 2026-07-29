@@ -1616,6 +1616,7 @@ emr_cluster_base: &emr_cluster_anchor
         instance_count: 0
     autotermination_minutes: 60
     emr_auto_terminate: false
+    step_concurrency_level: 4
     aws_attributes: &emr_aws_anchor
         availability: ON_DEMAND
         task_availability: SPOT
