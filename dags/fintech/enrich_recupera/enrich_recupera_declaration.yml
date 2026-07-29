@@ -12,6 +12,8 @@ workflow:
   inner_dependencies:
     changes_debts_distribution:
       - snapshot_daily_debts
+    negotiation_wallet:
+      - negotiation
   tables_customization:
     collection:
       extraction_type: incremental
@@ -25,6 +27,10 @@ workflow:
         - year
         - month
         - day
+    invoice_debt_negotiation:
+      extraction_type: full
+    negotiation_wallet:
+      extraction_type: full
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
