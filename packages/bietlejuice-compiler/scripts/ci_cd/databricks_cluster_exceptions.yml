@@ -43,3 +43,10 @@ exceptions:
       Databricks production runtime until 2026-07-31, when they will be
       migrated to EMR.
     approved_by: mario.abreu@quintoandar.com.br
+  - dag: oitchau_api
+    path: dags/people/oitchau_api
+    reason: >-
+      Revert EMR migration from #26852 (DBP-1808): restore Databricks
+      consolidation_m_memory_single_node_cluster and databricks_new for
+      people-scoped api_ingestion secrets.
+    approved_by: isabella.carolinasl@quintoandar.com.br
