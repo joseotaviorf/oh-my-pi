@@ -516,6 +516,7 @@ Grain: **one row per `id_house`** — address-normalized dedup analysis over the
 |-------|---------|---------|
 | Base enrich | `initial_pricing_type` / `initial_pricing_type_reason` | Transition-rule **speculation** (e.g. `new-listings`, `ongoing-listings`, `ongoing-rentals`, `hybrid`, `not-eligible`) from publish/contract timing. |
 | Pricing enrich / fact | `pricing_type` / `pricing_type_reason` | **Final** segment after previous-paid and paid-similar-house overrides. |
+| Fact (partner report) | `partner_justification_pt` | **DW only.** One-sentence PT summary of `pricing_type_reason` + `acquisition_type_reason` (EN fallback if unmapped). |
 | Pricing enrich / fact | `acquisition_type` / `purchase_value` / `payment_status` / `is_eligible` | Acquisition bucket (full-price / reduced-price / not-eligible), BRL tier, payment lifecycle, eligibility. |
 
 > ⚠ **`payment_status` and `is_eligible` live on `listing_purchase_pricing` / the DW fact** — they are **not** on `ciq_listing_purchase` anymore.
@@ -615,6 +616,7 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 - For `offer_flow_events` / `offer_flow_performance`, add `WHERE ts_event > DATE '2010-01-01'` (epoch-overflow min dates show as `1899-12-29`).
 - For **CIQ portfolio loss**, use **`dw_ciq.fact_ciq_listing_purchase.is_portfolio_loss`** — do not re-derive from `has_republication` alone (that flag is on the **prior** cycle when a later version exists).
 - For Compra de Carteira **pricing**, use **`pricing_type`** (final) on the fact/pricing enrich — not `initial_pricing_type` on the base enrich (that is pre-override speculation).
+- For partner-facing Compra de Carteira **justificativa** text, use **`partner_justification_pt`** on the DW fact (not the English `*_reason` columns).
 - Join **listing relist semantics** to [`house_and_listing.md`](house_and_listing.md) when explaining `listing_category` vs sale hybrid tables.
 
 **Don't:**
