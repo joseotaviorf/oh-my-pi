@@ -128,6 +128,7 @@ def _load_dataframe_into_datalake(
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
 
     spark_client = SparkClient()
+    spark = spark_client.conn
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, bucket)
     database_name = db_info["db_raw_databricks"]

@@ -51,6 +51,7 @@ if __name__ == "__main__":
     )
 
     spark_client = SparkClient()
+    spark = spark_client.conn
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(spark_client)

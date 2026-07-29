@@ -31,6 +31,8 @@ JOB_NAME = "load_facebook_insights_impression_device_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient()
+spark = spark_client.conn
 
 
 def get_dbutils():
@@ -62,8 +64,6 @@ def save_to_datalake(
     Returns:
         None
     """
-    spark_client = SparkClient()
-
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]

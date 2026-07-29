@@ -18,6 +18,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "Hightouch Logs Load"
 spark_client = SparkClient()
+spark = spark_client.conn
 
 
 def read_input(input_path, format, **params):
