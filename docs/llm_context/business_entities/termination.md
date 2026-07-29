@@ -29,6 +29,7 @@ Not all terminations follow every step. Some are canceled before completion, som
 
 - Offboard Human vs Digital Metrics
 - [ER2RR](../metric_entities/er2rr.md) — ended-rental-to-new-contract conversion rate, read by 28-day maturation cohort month (4w/8w/12w horizons).
+- [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md) — offboarding-quality ratios (mediation, repairs, agreement, SPOC) from `obt_offboarding`.
 
 ## Glossary and Synonyms
 

@@ -36,6 +36,8 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 ## Related Metric Entities
 
 - [Inspection SLA](../metric_entities/inspection_sla.md) — official onboarding/offboarding inspection SLA compliance rate.
+- [Property Integrity Onboarding](../metric_entities/property_integrity_onboarding.md) — tenant engagement ratios on entry inspection report review (access, finish, comments); H2'2026 OKR = % Tenant Finished.
+- [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md) — offboarding-quality ratios (mediation, repairs, agreement, SPOC) from `obt_offboarding`.
 
 ## Glossary and Synonyms
 

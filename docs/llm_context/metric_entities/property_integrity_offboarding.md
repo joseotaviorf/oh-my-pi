@@ -1,4 +1,4 @@
-# Property Integrity
+# Property Integrity Offboarding
 
 ## Ownership
 
@@ -11,7 +11,15 @@
 
 ## Overview
 
-**Property Integrity** is a family of offboarding-quality metrics for the For Rent product that
+**Property Integrity** is a set of three metric-entity docs that cover the For Rent
+Post Contract property-integrity theme across the rental lifecycle:
+
+1. **Property Integrity Offboarding** (this file) — exit / termination quality
+2. [Property Integrity Onboarding](property_integrity_onboarding.md) — entry inspection
+   review engagement
+3. **Property Integrity Ongoing** (forthcoming) — ongoing repairs / in-contract integrity
+
+**Property Integrity Offboarding** is the family of offboarding-quality metrics that
 measure how a termination resolves repairs and agreements — how often it closes **without
 friction** (no mediation), **without repairs**, and, when repairs do exist, how the parties
 settle them (mutual agreement vs. compulsory / band-aid) — plus how far the **SPOC** (Single
@@ -26,7 +34,7 @@ finished/non-eviction base the other four use) and excludes evictions via `termi
 instead of `is_eviction` — see Scope and Calculation below.
 
 **Exists exclusively for For Rent offboarding — these metrics have no equivalent for FS or
-other products.**
+other products. Do not mix with Property Integrity Onboarding.**
 
 ## Related Business Entities
 
@@ -40,7 +48,7 @@ other products.**
 
 ## Glossary and Synonyms
 
-- **Property Integrity**, **integridade do imóvel**, **qualidade do offboarding** → this family of five metrics
+- **Property Integrity Offboarding**, **Property Integrity**, **integridade do imóvel**, **qualidade do offboarding** → this family of five metrics
 - **% Offb. W/o Mediation**, **% Offboarding sem mediação**, **% sem mediação** → % Offb. W/o Mediation
 - **% Without Repairs**, **% sem reparos**, **% termos sem reparo** → % Without Repairs
 - **% Both Agree**, **% ambos concordam**, **% acordo mútuo**, **both agree** → % Both Agree
@@ -198,7 +206,7 @@ The first four metrics share the same base, axis and filter, so a single scan of
 `dw_offboarding.obt_offboarding` produces them side by side. **% SPOC Roll Out** uses a
 different base and axis (see Scope and Calculation), so it needs its own query. Trino dialect.
 
-### Query 1 — Property Integrity (first four metrics by month)
+### Query 1 — Property Integrity Offboarding (first four metrics by month)
 
 The month axis and the range predicates below bucket by the **calendar date** of
 `ts_termination_finished` (`CAST(... AS DATE)`, i.e. the UTC date), matching the operational
