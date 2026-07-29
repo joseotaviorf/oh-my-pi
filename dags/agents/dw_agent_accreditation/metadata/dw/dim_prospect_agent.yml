@@ -49,6 +49,10 @@ columns:
     description: Current status of the CRECI validation step.
     lineage:
     - datalake_agent_accreditation.prospect_agent.creci_validation_status
+  automatic_creci_status:
+    description: Current status of the automatic CRECI validation step.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.automatic_creci_status
   contract_signature_status:
     description: Current status of the signature contract document.
     lineage:
@@ -129,6 +133,14 @@ columns:
       rows and on older converted records for the same person.
     lineage:
     - datalake_agent_accreditation.prospect_agent.is_last_prospect_person_converted
+  is_creci_manually_approved:
+    description: True when the CRECI was manually approved by OPERATIONS team.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.is_creci_manually_approved
+  has_agent_active:
+    description: True when the prospect agent has an active agent in the system; otherwise false.
+    lineage:
+    - datalake_agent_accreditation.prospect_agent.has_agent_active
   ts_creci_validation_approved:
     description: Timestamp when the CRECI validation step was approved.
     lineage:
