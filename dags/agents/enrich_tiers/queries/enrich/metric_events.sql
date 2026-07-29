@@ -145,6 +145,7 @@ sale_vgv_total_attribution AS (
             AND ao.dt_contract_cancelled BETWEEN mp_invalid.dt_init AND mp_invalid.dt_end
     WHERE
         ao.business_context = "SALE"
+        AND ao.agent_profile = "AGENT"
         AND ao.ts_contract_signed IS NOT NULL
     UNION ALL
     SELECT
