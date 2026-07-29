@@ -11,6 +11,8 @@ workflow:
   inner_dependencies:
     fact_ai_agents_interaction:
       - fact_user_wallet_timeline
+    fact_rental_current_segments:
+      - fact_user_wallet_timeline
   tables_customization:
     fact_user_wallet_timeline:
       extraction_type: incremental

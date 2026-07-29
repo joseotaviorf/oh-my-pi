@@ -1,0 +1,65 @@
+database_name: dw_collection_ai_agents
+table_name: fact_rental_current_segments
+description: |-
+  Daily snapshot of the tenants eligible for the rental payment reminder communication, one row per person (uuid_person). Feeds the Salesforce Marketing Cloud campaign that sends a WhatsApp outbound reminder before the rental due date and hands the conversation over to the Matthew AI collections agent when the tenant replies. Built for the "paid on time" leading metric recovery initiative.
+  Population by construction: only people holding at least one open monthly rental invoice that is still not overdue (invoice_delay_t1 <= 0) on an active contract, and whose invoice is due on the standard due date elected for that month. Tenants outside this definition are absent by design, and invoices whose due date was moved by manual intervention are filtered out so the wave never contradicts a customised schedule.
+  Grain and history: exactly one row per person, deduplicated to the riskiest segment when the person holds several eligible invoices. This is a snapshot, not a timeline — the table is fully rebuilt on every run and keeps no history, so it answers "who should be reminded today" and never "who was in a given segment in the past". Use dw_collections_segmentation.fact_contract_features_timeline or fact_invoice_wallet_timeline for historical segment questions.
+domain: Fintech
+owner: thiago.villani@quintoandar.com.br
+columns:
+  sk_user:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.sk_user
+    description: "Surrogate key of the user billed for the invoice, taken from the user wallet snapshot of the reference date. A user can hold several contracts; only the contract of the elected invoice is kept in this row."
+  sk_contract:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.contracts
+    description: "Surrogate key of the rental contract that carries the elected invoice. Sourced by exploding the array of active contracts of the user, so it is always one of the contracts the person held on the reference date."
+  sk_invoice:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.sk_invoice
+    description: "Surrogate key of the open monthly rental invoice the reminder refers to. When the person holds more than one eligible invoice, this is the one that determined the segment: riskiest segment first, then latest due date."
+  uuid_person:
+    lineage:
+      - dw_public.dim_user.uuid_person
+    description: "Person UUID used by Salesforce Marketing Cloud as the addressing key of the WhatsApp reminder, and the deduplication key of this table. Users with no UUID cannot be contacted and are excluded from the snapshot."
+  segment:
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.has_bill_item_condominio
+      - dw_collections_segmentation.fact_contract_features_timeline.n_days_over1_t2_l180
+    description: "Communication segment that drives the reminder message and tone in Salesforce Marketing Cloud. The A/B/T prefix encodes decreasing risk and is load-bearing: it is the sort key used to keep the riskiest segment when a person holds several eligible invoices."
+    categories:
+      A1 - DELAY CONTRACT - ONGOING-DEAL: "Contract already in delay but covered by an ongoing deal — on time under T1, contaminated under T2. Needs a tone that acknowledges the running agreement."
+      A2 - DELAY CONTRACT OTHER SEGMENTS: "Contract in delay under T2 without an ongoing deal, so the tenant carries older unpaid debt on top of the invoice about to fall due."
+      B1 - CURRENT CONTRACT WITH CONDO: "No contract delay, but the invoice carries condominium bill items, a recurring source of payment friction and questions for the AI agent."
+      B2 - CURRENT CONTRACT NOT-GOOD-PAYER HISTORY: "No contract delay, but the contract was over one day late on more than three days in the last 180 days, indicating a repeated late-payment habit."
+      T - PERFECT CURRENT: "No delay, no condominium items and no recent late-payment history. Receives the plain reminder."
+  user_level_delay:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.max_delay_contaminated_contract_t2
+    description: "Largest T2 contaminated delay in days across all contracts of the person on the reference date. Aggregated at user level, so it can exceed the delay of the contract in sk_contract and is used to gauge overall exposure before contacting the person."
+  days_to_due:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_due
+    description: "Days between the snapshot date and the invoice due date, as DATEDIFF(dt_reference, dt_due). Negative or zero by construction since only invoices not yet overdue enter the table: -3 means the invoice falls due in three days, 0 means it falls due today."
+  due_amount:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.due_amount
+    description: "Outstanding amount of the invoice in BRL, as a positive number. The collections timeline stores billed amounts with a negative sign, so the absolute value is taken here to make the figure directly usable in the reminder message."
+  dt_reference:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.dt_reference
+    description: "Date of the snapshot, always the current UTC date of the run. Present for traceability of the wave that was sent; the table holds a single reference date at a time because it is rebuilt in full on every run."
+  dt_due:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_wallet_timeline.dt_due
+    description: "Nominal due date of the invoice the reminder refers to. Always equal to dt_standard_due, since invoices on a customised due date are filtered out of the wave."
+  dt_standard_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_retsuko.invoice.id_external
+    description: "Standard due date elected for the month of the invoice: the due date carrying the largest volume of monthly rental invoices in that month. Identifies the communication wave and is the reference used to discard invoices whose due date was moved manually."
+  ts_load:
+    description: "Moment the snapshot was written, in UTC. Since the table is overwritten in full on every run, this is identical across all rows and marks when the current wave was produced. Use it to confirm Salesforce Marketing Cloud is reading a fresh snapshot rather than a stale one from a failed or skipped run."
