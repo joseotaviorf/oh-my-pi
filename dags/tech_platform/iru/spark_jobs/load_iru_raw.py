@@ -44,7 +44,7 @@ IRU_API_VERSION = "v1"
 ENDPOINT_KEY = "endpoint"
 
 IRU_ALLOWED_SCHEME = "https"
-IRU_ALLOWED_HOST_PATTERN = re.compile(r"^[a-zA-Z0-9\-]+\.api\.kandji\.io$")
+IRU_ALLOWED_HOST_PATTERN = re.compile(r"^[a-zA-Z0-9\-]+\.api\.iru\.com$")
 IRU_ALLOWED_PATH_PREFIX = f"/api/{IRU_API_VERSION}/"
 
 
@@ -56,7 +56,7 @@ def _validate_iru_tenant(tenant: str) -> str:
     if not IRU_ALLOWED_HOST_PATTERN.match(tenant):
         raise ValueError(
             f"IRU tenant '{tenant}' does not match expected pattern "
-            "(e.g. 'yourcompany.api.kandji.io')"
+            "(e.g. 'yourcompany.api.iru.com')"
         )
     return tenant
 
