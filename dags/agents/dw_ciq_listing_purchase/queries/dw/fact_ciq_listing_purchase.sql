@@ -6,6 +6,7 @@ WITH house_sale_agreement AS (
         datalake_sale_offer.sale_offer AS so
     WHERE
         so.ts_sale_agreement_signed IS NOT NULL
+        AND COALESCE(so.is_ccv_canceled, FALSE) = FALSE
     GROUP BY
         so.id_house
 ),
@@ -19,8 +20,9 @@ portfolio_loss_flags AS (
             AND clp.total_days_since_publish > 90,
             FALSE
         ) AS is_relisting_without_contract_90d,
-        -- id_house with CCV after a rent CS in compra de carteira era (CS >= 2026-07-01).
-        -- Pre-July CS + later CCV is not loss (Rafael / AAREDE-521).
+        -- id_house with non-canceled CCV after a rent CS in compra de carteira era
+        -- (CS >= 2026-07-01). Pre-July CS + later CCV is not loss (Rafael / AAREDE-521).
+        -- Rules are mutually exclusive on one row (90d needs null CS; CCV needs CS).
         COALESCE(
             clp.ts_contract_signed IS NOT NULL
             AND clp.ts_contract_signed >= DATE('2026-07-01')
@@ -61,9 +63,6 @@ SELECT
     lpp.acquisition_type,
     lpp.acquisition_type_reason,
     CASE
-        WHEN plf.is_ccv_after_post_july_rent_cs
-            AND plf.is_relisting_without_contract_90d
-            THEN 'ccv_after_post_july_rent_cs|relisting_without_contract_90d'
         WHEN plf.is_ccv_after_post_july_rent_cs
             THEN 'ccv_after_post_july_rent_cs'
         WHEN plf.is_relisting_without_contract_90d

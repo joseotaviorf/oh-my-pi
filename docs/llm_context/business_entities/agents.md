@@ -1,5 +1,15 @@
 # Agents
 
+## Ownership
+
+**Data Owner:**
+- anne.macedo@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.rompe@quintoandar.com.br
+
+---
+
 ## Overview
 
 - **Objective:** QuintoAndar field agents and their full operating lifecycle — accreditation, identity & capabilities, hub allocation, performance tiers, brokerage/revenue earnings, and Preferred Fixed/Property Agent assignment.
@@ -98,7 +108,7 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | **Primeira listagem / first listing** | ⚠ "any first listing" vs "valid first listing" (dedup-gated) | Valid first listing gated by `datalake_listing_deduplication.valid_first_listing`; used for CIQ payment eligibility and activation. Default to valid for CIQ/activation, confirm. |
 | **Valid First Listing** | A first listing that survives property **deduplication** — a re-listed / duplicated property does NOT count again | Custom QuintoAndar concept; lives in `datalake_listing_deduplication`. ⚠ Metric definition still evolving — see schema section. |
 | **Compra de Carteira / CIQ listing purchase** | CIQ_FULL rent **listing-purchase** — eligibility, initial vs final pricing, portfolio loss | **DW:** `dw_ciq.fact_ciq_listing_purchase`. Enrich fallback: `datalake_ciq.ciq_listing_purchase` (initial pricing only). |
-| **Perda de carteira / portfolio loss** | Relist still on market >90 days without a signed rent contract, **or** rent CS on/after 2026-07-01 with a later CCV on the same house | **`dw_ciq.fact_ciq_listing_purchase.is_portfolio_loss`** (+ **`portfolio_loss_reason`**) — not on enrich. |
+| **Perda de carteira / portfolio loss** | Relist still on market >90 days without a signed rent contract, **or** rent CS on/after 2026-07-01 with a later non-canceled CCV on the same house (rules mutually exclusive per row) | **`dw_ciq.fact_ciq_listing_purchase.is_portfolio_loss`** (+ **`portfolio_loss_reason`**) — not on enrich. |
 | **Initial pricing segment** | Transition-rule speculation before duplicity / previous-paid overrides | `initial_pricing_type` / `initial_pricing_type_reason` on `datalake_ciq.ciq_listing_purchase` only. |
 | **Final pricing segment** | Category after previous-paid and paid-similar-house rules | `pricing_type` / `pricing_type_reason` on `listing_purchase_pricing` / fact (not the enrich base columns). |
 | **Re-Listing (rent version category)** | New rent listing cycle after a prior rental ended | `listing_category = 'Re-Listing'` on purchase rows (from `datalake_ebdb_listing.house_listing`). See [`house_and_listing.md`](house_and_listing.md). |
@@ -526,7 +536,7 @@ Grain: **one row per `id_house`** — address-normalized dedup analysis over the
 | This version is a relist cycle | `listing_category = 'Re-Listing'` | Rent listing versioning label from `house_listing` — publication after a prior rental cycle. |
 | Start of publish for this version | `ts_publicated` | Anchor for “new publish event” on this listing version (aligns with rent versioning; see [`house_and_listing.md`](house_and_listing.md)). |
 | Days since that publish | `total_days_since_publish` | Calendar days from `ts_publicated` to load date for **every** listing version on enrich and fact (no Re-Listing filter in enrich). |
-| **Portfolio loss (business rule)** | **`is_portfolio_loss`** / **`portfolio_loss_reason`** | **DW only.** True when either: (1) `Re-Listing` AND `listing_status` in (`PUBLISHED`, `PUBLICADO`) AND no signed rent contract (`ts_contract_signed` null) AND `total_days_since_publish > 90` → reason `relisting_without_contract_90d`; or (2) this row's rent `ts_contract_signed >= 2026-07-01` (compra de carteira era) AND a later CCV on the same house (`datalake_sale_offer.sale_offer`) → reason `ccv_after_post_july_rent_cs`. Pre-July CS + later CCV is not loss. Both can apply (pipe-separated reason). |
+| **Portfolio loss (business rule)** | **`is_portfolio_loss`** / **`portfolio_loss_reason`** | **DW only.** Exactly one of: (1) `Re-Listing` AND `listing_status` in (`PUBLISHED`, `PUBLICADO`) AND no signed rent contract (`ts_contract_signed` null) AND `total_days_since_publish > 90` → reason `relisting_without_contract_90d`; or (2) this row's rent `ts_contract_signed >= 2026-07-01` (compra de carteira era) AND a later **non-canceled** CCV on the same house (`datalake_sale_offer.sale_offer`, `is_ccv_canceled = false`) → reason `ccv_after_post_july_rent_cs`. Pre-July CS + later CCV is not loss. Rules are mutually exclusive on one row (90d needs null CS; CCV needs CS). |
 
 > Do **not** use `total_days_since_house_inactived` for portfolio loss — it counts **inactive** listing-version days, not time on market since publish.
 
@@ -688,7 +698,7 @@ ORDER BY 1, 2, 3;
 
 ### CIQ portfolio loss (Compra de Carteira)
 
-Current-state rows flagged by either portfolio-loss rule on the DW fact (90-day Re-Listing without rent contract, and/or post-July rent CS with a later CCV). Use `portfolio_loss_reason` to see which rule(s) fired.
+Current-state rows flagged by either portfolio-loss rule on the DW fact (90-day Re-Listing without rent contract, or post-July rent CS with a later non-canceled CCV). Use `portfolio_loss_reason` to see which rule fired (mutually exclusive per row).
 
 ```sql
 SELECT
@@ -710,4 +720,4 @@ WHERE f.is_portfolio_loss = true;
 ```
 
 > For ad-hoc checks on enrich inputs only, the 90-day rule is  
-> `listing_category = 'Re-Listing'` + `listing_status IN ('PUBLISHED', 'PUBLICADO')` + `ts_contract_signed IS NULL` + `total_days_since_publish > 90` on `datalake_ciq.ciq_listing_purchase`. The FS rule is `ts_contract_signed >= DATE '2026-07-01'` plus a later CCV from `datalake_sale_offer.sale_offer` — prefer the DW fact.
+> `listing_category = 'Re-Listing'` + `listing_status IN ('PUBLISHED', 'PUBLICADO')` + `ts_contract_signed IS NULL` + `total_days_since_publish > 90` on `datalake_ciq.ciq_listing_purchase`. The FS rule is `ts_contract_signed >= DATE '2026-07-01'` plus a later non-canceled CCV from `datalake_sale_offer.sale_offer` (`is_ccv_canceled = false`) — prefer the DW fact.
