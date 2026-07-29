@@ -15,6 +15,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration.incentive_system
     description: Configured incentive system.
+  configuration_key:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration.configuration_key
+    description: Unique key identifying this configuration row, allowing multiple configurations per incentive_system.
   performance_evaluation_period:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration.performance_evaluation_period

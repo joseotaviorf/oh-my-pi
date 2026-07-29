@@ -27,6 +27,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.incentive_system
     description: Incentive program code configured in this audit revision.
+  configuration_key:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.configuration_key
+    description: Unique key identifying this configuration row in this audit revision.
   performance_evaluation_period:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.performance_evaluation_period
@@ -39,6 +43,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.incentive_system_mod
     description: Modification flag/column for incentive_system.
+  mod_configuration_key:
+    lineage:
+      - datalake_big_agent_raw.incentive_system_configuration_aud.configuration_key_mod
+    description: Modification flag/column for configuration_key.
   mod_performance_evaluation_period:
     lineage:
       - datalake_big_agent_raw.incentive_system_configuration_aud.performance_evaluation_period_mod

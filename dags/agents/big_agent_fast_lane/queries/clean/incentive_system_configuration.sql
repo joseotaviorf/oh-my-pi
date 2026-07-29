@@ -1,6 +1,7 @@
 SELECT
     id,
     incentive_system,
+    configuration_key,
     performance_evaluation_period,
     tier_validity_period,
     TIMESTAMP(classification_start_at) AS ts_classification_started,
