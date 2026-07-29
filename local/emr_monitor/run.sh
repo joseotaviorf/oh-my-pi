@@ -70,4 +70,12 @@ for env in available_environments():
 ")
 
 echo "Auth OK for all environments. Starting the UI..."
-uv sync && uv run streamlit run app.py
+uv sync
+
+_AUTOREFRESH_BUILD=".venv/lib/python3.*/site-packages/streamlit_autorefresh/frontend/build/index.html"
+if ! compgen -G "${SCRIPT_DIR}/${_AUTOREFRESH_BUILD}" >/dev/null; then
+	echo "streamlit-autorefresh frontend assets missing; reinstalling…" >&2
+	uv sync --reinstall-package streamlit-autorefresh
+fi
+
+uv run streamlit run app.py

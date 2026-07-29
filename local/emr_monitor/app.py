@@ -158,6 +158,30 @@ def _ebs_idle_percent(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def _ebs_cumulative_write_volume_chart(df: pd.DataFrame) -> go.Figure | None:
+    """Cumulative sum of VolumeWriteBytes (GiB) over the selected window per volume."""
+    subset = df[df["metric_name"] == "VolumeWriteBytes"].copy()
+    if subset.empty:
+        return None
+
+    subset["series"] = subset.apply(_volume_label, axis=1)
+    cumulative_frames: list[pd.DataFrame] = []
+    for _, group in subset.groupby("series", sort=False):
+        ordered = group.sort_values("timestamp").copy()
+        ordered["value"] = ordered["value"].cumsum() / (1024**3)
+        cumulative_frames.append(ordered)
+
+    if not cumulative_frames:
+        return None
+
+    return _line_chart(
+        pd.concat(cumulative_frames, ignore_index=True),
+        title="EBS cumulative write volume",
+        color="series",
+        y_title="GiB written (cumulative)",
+    )
+
+
 def _ebs_chart(
     df: pd.DataFrame,
     metric_name: str,
@@ -571,6 +595,17 @@ def render_ebs_charts(
         row1_b.plotly_chart(fig_idle, width='stretch')
     else:
         row1_b.caption("No EBS idle time data in this window.")
+
+    fig_write_vol = _ebs_cumulative_write_volume_chart(ebs_df)
+    if fig_write_vol:
+        st.caption(
+            "Cumulative sum of `VolumeWriteBytes` in the selected window. "
+            "Shows total write I/O volume, not filesystem space used "
+            "(overwrites and deletes are not reflected)."
+        )
+        st.plotly_chart(fig_write_vol, width='stretch')
+    else:
+        st.caption("No EBS write volume data in this window.")
 
 
 def render_cluster_logs(logs_result: ClusterLogsResult) -> None:
