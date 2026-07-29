@@ -3,7 +3,9 @@ database_name: datalake_pin_core_clean
 table_name: disability
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Stores disability information for individuals.
+description: >-
+  Documented disability records from Oracle HCM (quota law / PCD), including HR narrative,
+  work restrictions, accommodation requests, and flex subclassification and clinical codes.
 columns:
   id_business_group:
     description: Identifier for the business unit, used for multi-tenant data separation.
@@ -41,9 +43,35 @@ columns:
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.quota_fte
   status:
-    description: Current status of the person's disability (e.g., Temporary).
+    description: >-
+      PIN disability record status code (A active, P pending, I inactive). Pending often
+      indicates documentation under review or not yet framed under quota law.
     lineage:
       - datalake_pin_core_raw.per_disabilities_f.status
+  disability_description:
+    description: Free-text description of the documented disability as entered in PIN (e.g. clinical or HR narrative).
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.description
+  work_restriction:
+    description: Work restrictions associated with the documented disability record in PIN.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.work_restriction
+  accommodation_request:
+    description: Workplace accommodation request text linked to the disability record in PIN.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.accommodation_request
+  clinical_classification_code:
+    description: >-
+      Clinical or administrative classification code from PIN flex attribute2 when populated
+      (for example ICD/CID codes such as H544).
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.attribute2
+  documented_subclassification:
+    description: >-
+      HR-entered disability subclassification from PIN attribute1 (Levantamento PCD
+      "Subclassificação", for example Visual - Baixa Visão).
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.attribute1
   legislation_code:
     description: Legal code applicable to this disability information.
     lineage:

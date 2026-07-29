@@ -9,8 +9,39 @@ column_level_validations:
   id_disability:
     is_complete:
       severity_level: Warning
+  id_person:
+    is_complete:
+      severity_level: Warning
+  legislation_code:
+    is_complete:
+      severity_level: Warning
+  dt_effective_started:
+    is_complete:
+      severity_level: Warning
+  dt_effective_ended:
+    is_complete:
+      severity_level: Warning
   one_row_per_disability_and_object_version:
     custom:
       # id_disability + object_version_number should be unique
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_core_clean.disability GROUP BY id_disability, object_version_number HAVING COUNT(*) > 1)) = 0"
+      severity_level: Warning
+  effective_end_must_not_be_before_effective_start:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.disability
+         WHERE dt_effective_started IS NOT NULL
+         AND dt_effective_ended IS NOT NULL
+         AND dt_effective_ended < dt_effective_started
+        ) = 0
+      severity_level: Warning
+  status_must_be_known_code_when_present:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_core_clean.disability
+         WHERE status IS NOT NULL
+         AND UPPER(TRIM(status)) NOT IN ('A', 'P', 'I')
+        ) = 0
       severity_level: Warning
