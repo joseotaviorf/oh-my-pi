@@ -35,6 +35,7 @@ from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
 )
+from bietlejuice.jobs.common.corrupt_record_monitor import alert_on_corrupt_records
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -220,7 +221,7 @@ def main():
         """
     )
 
-    df = (
+    raw_df = (
         spark.read.schema(OUTER_SCHEMA)
         .option("mode", "PERMISSIVE")
         .json(
@@ -231,8 +232,9 @@ def main():
                 str(args.execution_date.hour).zfill(2),
             )
         )
-    )
-    df = clean_cf(df)
+    ).cache()
+
+    df = clean_cf(raw_df)
 
     database_name, database_location, _ = DatalakeMetastoreService.get_layer_info(
         args.env, args.schema, args.datalake_bucket, _CLEAN_LAYER
@@ -254,6 +256,17 @@ def main():
         source_df=df,
         partition_by=args.partition_cols,
     )
+
+    # After the write: monitoring must never delay or block the load.
+    alert_on_corrupt_records(
+        raw_df,
+        ts_field="start_time",
+        env=args.env,
+        table_name=f"datalake_{args.schema}_clean.{args.table_name}",
+        channel="AUTHX_ALERTS",
+    )
+
+    raw_df.unpersist()
 
 
 def get_claims_schema():
