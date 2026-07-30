@@ -24,7 +24,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 **✅ Demographic profile** : Ethnicity, religion, gender identity, sexual orientation, neurodiversity signals, and related inclusion flags (URG, LGBT+, Women, BIM, PwD) versioned per person and legislation, with both current and historical rows for trends and as-of reporting.
 
-**✅ Documented disability** : Records for people with formal disability documentation covering categories, status, accessibility needs, and quota-related signals where applicable, linked to the same person and legislation context as the profile table.
+**✅ Documented disability** : Records for people with formal disability documentation in PIN, including category and status, HR narrative (description, subclassification, work restrictions, accommodation requests, clinical codes), boolean self-declaration and accessibility-need flags, neurodiversity, and quota-related signals where applicable — linked to the same person and legislation context as the profile table.
 
 **✅ People in scope** : Current and former employees and contractors whose last assignment was an employee or contractor type, so both active workforce and historical profiles are available.
 
@@ -71,7 +71,10 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 * **Validity over time** : When an attribute set changes, a new validity window opens and the previous one is closed; older windows remain available for trend and audit use. For an as-of historical date, filter the validity window to that date instead of relying only on `is_current`.
 * **Legislation drives applicability** : Some flags only make sense under specific legal context. The BIM (Black, Indigenous, Mixed-race) flag, for example, is filled only under Brazilian legislation; for other countries it stays empty.
 * **Composite inclusion flags** : URG (Underrepresented Group) is derived from BIM, Women, LGBT+, and PwD with documentation. When any input is unknown, the composite may stay empty; strict metrics should treat empty as not in scope.
-* **Disability optionality** : Rows in `dim_employee_disability` are optional; not every person has them. Join only when you need disability taxonomy or medically documented fields, and prefer the primary disability per person and legislation when quota information indicates it.
+* **Disability optionality** : Rows in `dim_employee_disability` are optional; not every person has them. Join only when you need disability taxonomy, documented narrative, or self-declared fields, and prefer the primary disability per person and legislation when quota information indicates it.
+* **Documented vs self-declared** : Documented fields (category, status, description, restrictions, subclassification, clinical codes) come from the formal disability record in PIN. Self-declared disability type, neurodiversity, and accessibility need come from overlapping legislative data for the same person and legislation period.
+* **Label language** : HR narrative fields are kept as entered in PIN (source language as typed by HR). Lookup-backed labels for category, self-declared type, and neurodiversity prefer English PIN reference data, with a local-language lookup fallback when no English label exists.
+* **Primary documented label** : `documented_name` is the reporting-friendly label: HR subclassification or clinical description when present, otherwise the English lookup label for the disability code, otherwise the raw code.
 
 ### Business Assumptions
 
@@ -82,7 +85,10 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 ## Attention and Limitations
 
 * **Disability rows are not universal** : Most people do not have rows in `dim_employee_disability`. Always use a `LEFT JOIN` when adding disability detail to a demographic query; an `INNER JOIN` will silently drop everyone without a record.
-* **Self-declaration is not the same as documentation** : `has_self_declared_pwd` captures what the person reported on the legislative form. `has_medical_disability_record` reflects whether a formal medical record overlaps the demographic period. They are independent and can disagree; choose deliberately for each metric.
+* **Self-declaration is not the same as documentation** : `has_self_declared_pwd` on the demographic profile captures what the person reported on the legislative form. `has_self_declared_disability` on the disability table applies the same yes/no decoding when joined to an overlapping disability row. `has_medical_disability_record` reflects whether a formal medical record overlaps the demographic period. They are independent and can disagree; choose deliberately for each metric.
+* **Accessibility need is a boolean flag** : `has_accessibility_need` is true, false, or null when PIN uses standard yes/no codes. Use this flag for counts and filters; free-text accommodation detail lives on the documented disability record.
+* **Documented narrative is restricted** : Description, work restrictions, and accommodation request text are sensitive occupational-health fields. Prefer aggregate reporting on `category`, `documented_name`, `disability_status`, and the boolean flags; do not publish free-text narrative in open DE&I dashboards.
+* **Quota status labels** : PIN status maps to Active, Pending, Inactive (or Unknown). There is no dedicated warehouse status for a disability that is not quota-eligible; treat self-declaration and documentation as separate signals when those populations differ.
 * **Avoid double-counting on disability** : A person can have multiple disability rows over time. When summarizing per person, deduplicate by `sk_employee` (or use `is_primary`) before counting.
 * **As-of reporting requires validity overlap** : To report a past month or to align demographic attributes with a fact row, compare `dt_valid_from` / `dt_valid_to` with the reference date rather than relying only on `is_current`.
 * **`is_current` does not mean active employee** : `is_current = TRUE` on demographic dimensions returns the latest validity-window row per person, including terminated employees. Inner join `dw_people.fact_employees` on `sk_employee` when the analysis should cover only people currently employed.
@@ -121,28 +127,80 @@ WHERE
     employee_demographic.is_current = TRUE
 ```
 
-### Demographics with active documented disability rows
+### Disability status and category (active workforce)
 
-**Question:** Among all people with a latest demographic row (active and terminated), who also has active documented disability lines aligned in time?
+**Question:** Among active employees, how many have an active documented disability record, by status and category?
+
+> Use `is_primary` when counting people so multiple disability rows do not inflate headcount. Prefer `category` and `disability_status` for open reporting; keep free-text description and work restrictions out of shared dashboards.
 
 ```sql
 SELECT
-    employee_demographic.sk_employee,
-    employee_demographic.legislation_code,
-    employee_demographic.gender_identity,
-    employee_disability.documented_name,
     employee_disability.disability_status,
-    employee_disability.is_active
+    employee_disability.category,
+    COUNT(DISTINCT fact_employees.sk_employee) AS employee_count
 FROM
-    dw_demographics.dim_employee_demographic AS employee_demographic
+    dw_people.fact_employees AS fact_employees
+INNER JOIN dw_demographics.dim_employee_disability AS employee_disability
+    ON employee_disability.sk_employee = fact_employees.sk_employee
+    AND employee_disability.is_active = TRUE
+    AND employee_disability.is_primary = TRUE
+GROUP BY
+    employee_disability.disability_status,
+    employee_disability.category
+ORDER BY
+    employee_count DESC
+```
+
+### Self-declared disability and accessibility need (active workforce)
+
+**Question:** How many active people self-declared a disability, and how many declared an accessibility need?
+
+> Workforce-wide self-declaration uses `has_self_declared_pwd` on the demographic profile (including people without a quota-eligible disability record). Accessibility need lives on the disability dimension and is only available when a documented disability row exists.
+
+```sql
+SELECT
+    COUNT(
+        DISTINCT CASE
+            WHEN employee_demographic.has_self_declared_pwd = TRUE
+                THEN fact_employees.sk_employee
+        END
+    ) AS count_self_declared_pwd,
+    COUNT(
+        DISTINCT CASE
+            WHEN employee_disability.has_accessibility_need = TRUE
+                THEN fact_employees.sk_employee
+        END
+    ) AS count_accessibility_need
+FROM
+    dw_people.fact_employees AS fact_employees
+INNER JOIN dw_demographics.dim_employee_demographic AS employee_demographic
+    ON employee_demographic.sk_employee = fact_employees.sk_employee
+    AND employee_demographic.is_current = TRUE
 LEFT JOIN dw_demographics.dim_employee_disability AS employee_disability
-    ON employee_disability.sk_employee = employee_demographic.sk_employee
+    ON employee_disability.sk_employee = fact_employees.sk_employee
     AND employee_disability.legislation_code = employee_demographic.legislation_code
     AND employee_disability.dt_valid_from <= employee_demographic.dt_valid_to
     AND employee_disability.dt_valid_to >= employee_demographic.dt_valid_from
-WHERE
-    employee_demographic.is_current = TRUE
-    AND COALESCE(employee_disability.is_active, TRUE)
+    AND employee_disability.is_primary = TRUE
+```
+
+### Neurodiversity among people with documented disability (active workforce)
+
+**Question:** Among active people with a primary disability record, how does self-declared neurodiversity break down?
+
+```sql
+SELECT
+    COALESCE(employee_disability.neurodiversity, 'Unknown') AS neurodiversity,
+    COUNT(DISTINCT fact_employees.sk_employee) AS employee_count
+FROM
+    dw_people.fact_employees AS fact_employees
+INNER JOIN dw_demographics.dim_employee_disability AS employee_disability
+    ON employee_disability.sk_employee = fact_employees.sk_employee
+    AND employee_disability.is_primary = TRUE
+GROUP BY
+    COALESCE(employee_disability.neurodiversity, 'Unknown')
+ORDER BY
+    employee_count DESC
 ```
 
 ### Headcount by ethnicity (current active workforce)
@@ -164,7 +222,7 @@ ORDER BY
     employee_count DESC
 ```
 
-For a **past reference month**, use `dw_employee_details.fact_assignment_snapshots` with `is_monthly_snapshot_for_employee = TRUE` and align demographic validity windows to `dt_reference` (see the disability example above).
+For a **past reference month**, use `dw_employee_details.fact_assignment_snapshots` with `is_monthly_snapshot_for_employee = TRUE` and align demographic validity windows to `dt_reference`.
 
 ## Glossary
 
@@ -175,5 +233,6 @@ For a **past reference month**, use `dw_employee_details.fact_assignment_snapsho
 * **BIM** : Black, Indigenous, and Mixed-race. Inclusion signal under Brazilian legislation.
 * **URG** : Underrepresented Group. Composite signal combining race, gender, sexual orientation, and disability inclusion.
 * **LGBT+** : Inclusion signal derived from gender identity and sexual orientation.
-* **PwD** : Person with a Disability. Distinguished here between self-declaration and formal documentation.
+* **PwD** : Person with a Disability. Distinguished here between self-declaration (`has_self_declared_pwd`, `has_self_declared_disability`) and formal documentation (`has_medical_disability_record`, disability rows in `dim_employee_disability`).
+* **Documented disability narrative** : Free-text description, subclassification, work restrictions, accommodation requests, and clinical classification codes on the documented disability record — kept as entered in PIN. Restricted use; prefer `category`, `documented_name`, and status for open reporting.
 
