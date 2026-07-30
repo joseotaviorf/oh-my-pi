@@ -1,0 +1,27 @@
+SELECT
+  id,
+  image_inspection_id AS id_image_inspection,
+  group_id AS id_group,
+  batch_id AS id_batch,
+  source_dhash AS source_deduplication_hash,
+  model,
+  prompt_version,
+  triggering_red_flags,
+  fingerprint,
+  input_url,
+  url,
+  path,
+  failure_reason,
+  revalidation_provider,
+  successful AS is_successful,
+  chosen AS is_chosen,
+  revalidation_passed AS is_revalidation_passed,
+  claimed_at AS ts_claimed,
+  created_at AS ts_created,
+  updated_at AS ts_updated,
+  image_attributes,
+  year,
+  month,
+  day
+FROM
+  datalake_kodak_raw.ai_image_enhancement

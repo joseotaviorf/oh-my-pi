@@ -36,6 +36,7 @@ dag:
       - **watermark_removal**: Watermark detection and removal processing results
       - **photo_invalid_source**: Tracking of failed photo processing attempts
       - **image_inspection_refine_history**: Audit log of Refine - Photo Lever runs, capturing image quality attributes and URLs before and after the refine workflow
+      - **ai_image_enhancement**: AI image enhancement attempts (model, prompt, success/chosen outcome, revalidation, and before/after quality attributes)
       - **Audit tables**: Complete change history via Hibernate Envers for compliance
       
       **Business Impact:**
@@ -48,6 +49,7 @@ workflow:
   source_database: kodak
   source_schema: public
   tables_customization:
+    ai_image_enhancement: {}
     image_inspection: {}
     image_analysis: {}
     image_inspection_group: {}

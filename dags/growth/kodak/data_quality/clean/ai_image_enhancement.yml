@@ -1,0 +1,77 @@
+---
+table_name: datalake_kodak_clean.ai_image_enhancement
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_image_inspection:
+    is_complete:
+      severity_level: Error
+  id_group:
+    is_complete:
+      severity_level: Error
+  model:
+    is_complete:
+      severity_level: Error
+  prompt_version:
+    is_complete:
+      severity_level: Error
+  triggering_red_flags:
+    is_complete:
+      severity_level: Error
+  is_chosen:
+    is_complete:
+      severity_level: Error
+  failure_reason:
+    is_contained_in:
+      values:
+        - TRANSIENT_EXHAUSTED
+        - CONTENT_POLICY
+        - VALIDATION_FAILED_COMPLIANCE
+        - VALIDATION_FAILED_WATERMARK
+        - BATCH_TIMEOUT
+        - EXTERNAL_API_NOT_ACCESSIBLE
+        - INVALID_RESPONSE
+        - UNKNOWN
+      severity_level: Warning
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 31
+      severity_level: Error

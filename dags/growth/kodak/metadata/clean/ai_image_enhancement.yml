@@ -1,0 +1,120 @@
+---
+database_name: datalake_kodak_clean
+table_name: ai_image_enhancement
+description: |
+  Tracks AI-powered image enhancement attempts in Kodak's media pipeline. Each row represents one enhancement run for a single inspected image under a specific model and prompt version, storing the input and output media locations, processing outcome (success/chosen), failure reason when applicable, post-enhancement revalidation results, and a before/after image quality attributes snapshot. Grain: one row per (image_inspection_id, model, prompt_version) attempt. Primary key: id. Foreign keys link to image_inspection (id_image_inspection) and image_inspection_group (id_group). Used to measure enhancement success rates, model/prompt performance, and quality uplift for property listing photos.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.id
+    description: 'Unique identifier of the AI image enhancement attempt. Primary key, auto-incremented in the source Kodak database.'
+  id_image_inspection:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.image_inspection_id
+    description: 'Foreign key to the image_inspection row that triggered this enhancement attempt. Links the enhancement outcome back to the original per-image AI analysis.'
+  id_group:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.group_id
+    description: 'Foreign key to the image_inspection_group that owns the inspected image. Used for per-group completion checks and group-level reanalysis after enhancements settle.'
+  id_batch:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.batch_id
+    description: 'LiteLLM batch job identifier when the enhancement was submitted asynchronously via the batches API. Null for sync per-image processing.'
+  source_deduplication_hash:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.source_dhash
+    description: 'Perceptual dhash of the image at schedule time (original, IQA-refined, or watermark-cleaned input), captured before any AI-chosen pixels overwrite image_inspection.dhash. Used to recognize the same visual content across inspections.'
+  model:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.model
+    description: 'LiteLLM / provider model identifier used for the enhancement request (for example vertex_ai/gemini-3.1-flash-image). Combined with prompt_version to identify the exact generation configuration.'
+  prompt_version:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.prompt_version
+    description: 'Version identifier of the prompt template sent to the enhancement model. Together with model uniquely scopes an enhancement attempt for a given image inspection.'
+  triggering_red_flags:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.triggering_red_flags
+    description: 'Encoded set of image red flags that made the image eligible for AI enhancement (for example sharpness or brightness faults). Explains why enhancement was scheduled for this inspection.'
+  fingerprint:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.fingerprint
+    description: 'SHA-256 hash of source_dhash + model + prompt_version. When present, enforces idempotency so the same visual content is not enhanced twice with the same model and prompt.'
+  input_url:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.input_url
+    description: 'URL of the image fed into the enhancement model. Points to the pre-enhancement media used as model input.'
+  url:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.url
+    description: 'Public URL of the enhanced image produced by the model when the attempt succeeds. Null when enhancement did not produce an output image.'
+  path:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.path
+    description: 'S3 object key/path where the enhanced image file is stored in QuintoAndar cloud storage after a successful enhancement upload.'
+  failure_reason:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.failure_reason
+    description: 'Kodak AiImageEnhancementFailureReason enum name explaining why enhancement failed; null when the attempt succeeded or is still pending.'
+    categories:
+      TRANSIENT_EXHAUSTED: 'Retries for a transient provider error were exhausted without success.'
+      CONTENT_POLICY: 'Provider refused the request due to content policy restrictions.'
+      VALIDATION_FAILED_COMPLIANCE: 'Post-enhancement revalidation failed compliance checks.'
+      VALIDATION_FAILED_WATERMARK: 'Post-enhancement revalidation detected a watermark issue.'
+      BATCH_TIMEOUT: 'Asynchronous batch job timed out before producing a result.'
+      EXTERNAL_API_NOT_ACCESSIBLE: 'Enhancement provider or related external API was unreachable.'
+      INVALID_RESPONSE: 'Provider returned a response that could not be parsed or used.'
+      UNKNOWN: 'Failure could not be classified into a more specific reason.'
+  revalidation_provider:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.revalidation_provider
+    description: 'Name of the image analysis provider used to revalidate the enhanced image after generation (for example Image Quality Analyzer). Null when revalidation was not run.'
+  is_successful:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.successful
+    description: 'Boolean flag indicating whether the enhancement attempt completed successfully and produced a usable enhanced image. Null while processing is still in flight.'
+  is_chosen:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.chosen
+    description: 'Boolean flag indicating whether this enhancement result was selected as the final chosen output for the image. At most one chosen row is allowed per image_inspection_id.'
+  is_revalidation_passed:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.revalidation_passed
+    description: 'Boolean flag indicating whether post-enhancement revalidation accepted the enhanced image. Null when revalidation was not performed.'
+  ts_claimed:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.claimed_at
+    description: 'Timestamp when a sync submit worker claimed this row for processing so concurrent jobs do not call the enhancement API twice. Null means the row is unclaimed.'
+  ts_created:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.created_at
+    description: 'Timestamp when the enhancement attempt row was created in Kodak, typically when the image was scheduled for AI enhancement.'
+  ts_updated:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.updated_at
+    description: 'Timestamp when the enhancement attempt row was last updated with processing progress, outcome, or revalidation results.'
+  image_attributes:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.image_attributes
+    description: |
+      JSONB before/after image-analysis snapshot for the enhanced image (dimensions, IQA metrics, faults, and image red flags including RestB-derived ones). Populated during post-enhancement re-analysis without overwriting image_inspection.url.
+
+      Expected structure:
+        {
+          "before": { "width": <int>, "height": <int>, "ratio": <decimal>, "framing": <decimal>, "brightness": <decimal>, "sharpness": <decimal>, "faultBrightness": <bool>, ... },
+          "after":  { "width": <int>, "height": <int>, "ratio": <decimal>, "framing": <decimal>, "brightness": <decimal>, "sharpness": <decimal>, "faultBrightness": <bool>, ... }
+        }
+  year:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.year
+    description: 'Year partition key derived at the raw layer. Used together with month and day to optimize partition pruning on incremental loads.'
+  month:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.month
+    description: 'Month partition key derived at the raw layer. Used together with year and day to optimize partition pruning on incremental loads.'
+  day:
+    lineage:
+      - datalake_kodak_raw.ai_image_enhancement.day
+    description: 'Day partition key derived at the raw layer. Used together with year and month to optimize partition pruning on incremental loads.'

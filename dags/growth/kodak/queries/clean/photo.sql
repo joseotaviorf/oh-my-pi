@@ -4,6 +4,7 @@ SELECT
   externaldomain AS external_domain,
   metadata,
   path,
+  ai_enhanced AS is_ai_enhanced,
   year,
   month,
   day

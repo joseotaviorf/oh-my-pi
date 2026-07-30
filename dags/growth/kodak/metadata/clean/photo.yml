@@ -31,6 +31,10 @@ columns:
     lineage:
       - datalake_kodak_raw.photo.path
     description: 'S3 object key/path where the photo file is stored in QuintoAndar cloud storage. Used for generating public URLs and accessing the actual image file.'
+  is_ai_enhanced:
+    lineage:
+      - datalake_kodak_raw.photo.ai_enhanced
+    description: 'Boolean flag indicating whether this photo was produced or replaced by Kodak AI image enhancement. True when the stored media corresponds to an AI-enhanced version of the original listing photo.'
   year:
     lineage:
       - datalake_kodak_raw.photo.year
