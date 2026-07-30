@@ -18,7 +18,8 @@ visitor AS (
         v.id,
         COALESCE(v.id_external, u_email.id_user,u_phone.id_user) AS id_external,
         COALESCE(v.email, u_email.email, u_phone.email) AS visitor_email,
-        visitor_name
+        visitor_name,
+        ROW_NUMBER() OVER (PARTITION BY COALESCE(v.id_external, u_email.id_user,u_phone.id_user), v.id ORDER BY version DESC) = 1 AS is_last_update
     FROM
         datalake_hub_services_clean.visitor AS v
     LEFT JOIN
@@ -29,8 +30,6 @@ visitor AS (
         users_5a AS u_phone
             ON COALESCE(v.id_external, 0) = 0
             AND TRIM(u_phone.main_phone) = TRIM(REPLACE(phone_number,'+',''))
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY COALESCE(v.id_external, u_email.id_user,u_phone.id_user), v.id ORDER BY version DESC) = 1
 ),
 leads AS (
     SELECT
@@ -47,6 +46,7 @@ leads AS (
     LEFT JOIN
         visitor AS vi
             ON vi.id = le.id_visitor
+            AND vi.is_last_update IS TRUE
 ),
 events_aud AS (
     SELECT

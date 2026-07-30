@@ -34,7 +34,7 @@ unpublished AS (
     WHERE
         status = 'UNPUBLISHED'
         AND mod_status = 1
-    GROUP BY ALL
+    GROUP BY 1, 2
 ),
 first_listing AS (
     SELECT
@@ -119,7 +119,7 @@ house_first_listing AS (
     WHERE
         fcs.id_house IS NULL
         OR fcs.ts_contract_signed = cfl.ts_contract_signed
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 deduped_house_first_listing AS (
     SELECT

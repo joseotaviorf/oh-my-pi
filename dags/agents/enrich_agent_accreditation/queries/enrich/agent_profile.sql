@@ -16,20 +16,31 @@ WITH agent_type AS (
             ON u.id = aud.rev
     WHERE
         DATE(u.ts_revision) <= DATE('{load_end_date}')
+),
+profiles AS (
+    SELECT
+        XXHASH64(ag.id_agent, ag.types, ag.ts_revision_started) AS id_agent_profile,
+        ag.id_agent,
+        ag.types AS profile,
+        ROW_NUMBER() OVER (
+            PARTITION BY ag.id_agent, ag.types, ag.ts_revision_started
+            ORDER BY ag.ts_revision_started, COALESCE(ag.ts_revision_ended, ag.ts_updated) DESC
+        ) = 1 AS is_latest_revision,
+        ag.ts_revision_started,
+        ag.ts_revision_ended
+    FROM
+        agent_type AS ag
+    WHERE
+        ag.rev_type <> 2
+        AND DATE(ag.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
-    XXHASH64(ag.id_agent, ag.types, ag.ts_revision_started) AS id_agent_profile,
-    ag.id_agent,
-    ag.types AS profile,
-    ag.ts_revision_started,
-    ag.ts_revision_ended
+    p.id_agent_profile,
+    p.id_agent,
+    p.profile,
+    p.ts_revision_started,
+    p.ts_revision_ended
 FROM
-    agent_type AS ag
+    profiles AS p
 WHERE
-    ag.rev_type <> 2
-    AND DATE(ag.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-QUALIFY
-    1 = ROW_NUMBER() OVER (
-        PARTITION BY id_agent_profile
-        ORDER BY ag.ts_revision_started, COALESCE(ag.ts_revision_ended, ag.ts_updated) DESC
-    )
+    p.is_latest_revision IS TRUE

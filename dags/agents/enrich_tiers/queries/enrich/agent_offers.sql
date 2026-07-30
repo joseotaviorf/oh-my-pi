@@ -62,7 +62,7 @@ rent_offer_agents AS (
     WHERE 
         rde.id_event_type IN (3, 9)
         AND rde.id_agent IS NOT NULL
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7
 ),
 union_offer_agents AS (
     SELECT

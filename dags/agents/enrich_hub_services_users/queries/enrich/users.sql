@@ -5,6 +5,7 @@ WITH users AS (
         u.name,
         u.email,
         u.phone_number,
+        u.ts_updated = FIRST(u.ts_updated) OVER (PARTITION BY u.id ORDER BY u.ts_updated DESC) AS is_last_update,
         u.ts_created,
         u.ts_updated,
         u.year,
@@ -15,8 +16,6 @@ WITH users AS (
     LEFT JOIN
         datalake_ebdb_user.user_merge AS um
             ON ARRAY_CONTAINS(um.predecessor_user_list, u.id_external)
-    QUALIFY
-        u.ts_updated = FIRST(u.ts_updated) OVER (PARTITION BY u.id ORDER BY u.ts_updated DESC)
 )
 SELECT
     u.id AS id_user,
@@ -39,3 +38,5 @@ FROM
 LEFT JOIN
     datalake_ebdb_clean.user AS ua
         ON ua.id = u.id_external
+WHERE
+    u.is_last_update IS TRUE

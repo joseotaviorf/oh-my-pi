@@ -1,5 +1,5 @@
 WITH sale_historical_consultant AS (
-    SELECT /*+ RANGE_JOIN(hch, 340) */
+    SELECT
         sl.id_sale_listing,
         sl.id_house,
         hch.id_enrollment,
@@ -26,7 +26,7 @@ WITH sale_historical_consultant AS (
         hch.is_last_status_of_day = True
 ),
 rent_historical_consultant AS (
-    SELECT /*+ RANGE_JOIN(hch, 340) */
+    SELECT
         hl.id_house_listing,
         hl.id_house,
         hch.id_enrollment,
@@ -54,11 +54,8 @@ rent_historical_consultant AS (
     LEFT JOIN
         datalake_big_agent.house_consultant_history AS hch
             ON hl.id_house = hch.id_house
-            AND (
-                    (hch.ts_enrollment_started >= COALESCE(hl.ts_listing_version_start,ho.dt_creation) AND  hch.ts_enrollment_started < COALESCE(hl.ts_listing_version_end, '2100-04-01'))
-                    OR 
-                    (COALESCE(hl.ts_listing_version_start,ho.dt_creation) >= hch.ts_enrollment_started AND COALESCE(hl.ts_listing_version_start,ho.dt_creation) < COALESCE(hch.ts_enrollment_ended, '2100-04-01'))
-                )
+            AND COALESCE(hl.ts_listing_version_start, ho.dt_creation) < COALESCE(hch.ts_enrollment_ended, '2100-04-01')
+            AND hch.ts_enrollment_started < COALESCE(hl.ts_listing_version_end, '2100-04-01')
             AND hch.is_last_status_of_day = True
 )
 SELECT 

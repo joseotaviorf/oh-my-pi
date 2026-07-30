@@ -314,7 +314,7 @@ broker_prospects_simple_metrics AS (
     WHERE
         (ap.business_context = "SALE" AND mp.metric = "BP")
         OR (ap.business_context = "RENT" AND mp.metric = "TP")
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
 ),
 broker_prospects_compound_metrics AS (
     SELECT
@@ -348,7 +348,7 @@ broker_prospects_compound_metrics AS (
     WHERE
         (ap.business_context = "SALE" AND mp.metric = "BP2CCV")
         OR (ap.business_context = "RENT" AND mp.metric = "TP2CS")
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
 ),
 negotiation_executive_prospects_simple_metrics AS (
     SELECT
@@ -386,7 +386,7 @@ negotiation_executive_prospects_simple_metrics AS (
     WHERE
         ap.business_context = "SALE"
         AND aa.id_parent_user IS NOT NULL
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
 ),
 negotiation_executive_prospects_compound_metrics AS (
     SELECT
@@ -424,7 +424,7 @@ negotiation_executive_prospects_compound_metrics AS (
     WHERE
         ap.business_context = "SALE"
         AND aa.id_parent_user IS NOT NULL
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21
 ),
 sale_first_listing_simple_metrics AS (
     SELECT

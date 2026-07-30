@@ -3,11 +3,10 @@ WITH last_type AS (
     id_agent_data,
     types,
     rev_type,
-    rev
+    rev,
+    ROW_NUMBER() OVER (PARTITION BY id_agent_data, types ORDER BY rev DESC) = 1 AS is_latest_revision
   FROM
     datalake_ebdb_clean.agent_data_types_aud
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_agent_data, types ORDER BY rev DESC) = 1
 ),
 divergent_results AS (
   SELECT
@@ -16,10 +15,12 @@ divergent_results AS (
     lt.types AS last_type_in_aud
   FROM
     datalake_ebdb_clean.agent_data_types AS adt
-  LEFT JOIN last_type AS lt
-    ON adt.id_agent_data = lt.id_agent_data
-    AND adt.types = lt.types
-    AND COALESCE(lt.rev_type, 0) <> 2
+  LEFT JOIN 
+    last_type AS lt
+      ON adt.id_agent_data = lt.id_agent_data
+      AND adt.types = lt.types
+      AND COALESCE(lt.rev_type, 0) <> 2
+      AND lt.is_latest_revision IS TRUE
   WHERE
     lt.types IS NULL
     AND adt.types = 'Visita'

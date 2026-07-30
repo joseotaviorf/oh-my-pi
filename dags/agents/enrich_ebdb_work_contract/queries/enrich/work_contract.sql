@@ -1,4 +1,4 @@
-WITH partner_agencies_aux AS (
+WITH hubspot_company_snapshots AS (
     SELECT
         id_company AS id_company_hubspot,
         NULLIF(
@@ -14,23 +14,37 @@ WITH partner_agencies_aux AS (
         ts_updated
     FROM
         datalake_hubspot_clean.company
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY REPLACE(UPPER(extracted_3p_tag), ' ', '') ORDER BY ts_updated DESC) = 1
-        AND extracted_3p_tag IS NOT NULL
+),
+partner_agencies_aux AS (
+    SELECT
+        hcs.id_company_hubspot,
+        hcs.extracted_3p_tag,
+        hcs.partner_state,
+        hcs.ts_updated,
+        ROW_NUMBER() OVER (
+            PARTITION BY REPLACE(UPPER(hcs.extracted_3p_tag), ' ', '')
+            ORDER BY hcs.ts_updated DESC
+        ) = 1 AS is_last_update_by_3p_tag
+    FROM
+        hubspot_company_snapshots AS hcs
+    WHERE
+        hcs.extracted_3p_tag IS NOT NULL
 ),
 partner_agencies AS (
     SELECT
         paa.id_company_hubspot,
         REPLACE(UPPER(paa.extracted_3p_tag), ' ', '') AS extracted_3p_tag,
-        current_paa.extracted_3p_tag AS current_tag,
+        current_snapshot.extracted_3p_tag AS current_tag,
         paa.partner_state,
         paa.ts_updated
     FROM
         partner_agencies_aux AS paa
     LEFT JOIN
-        partner_agencies_aux AS current_paa
-            ON paa.id_company_hubspot = current_paa.id_company_hubspot
-            AND current_paa.is_most_recent_row
+        hubspot_company_snapshots AS current_snapshot
+            ON paa.id_company_hubspot = current_snapshot.id_company_hubspot
+            AND current_snapshot.is_most_recent_row
+    WHERE
+        paa.is_last_update_by_3p_tag IS TRUE
 ),
 work_contract_aux AS (
   SELECT
@@ -83,5 +97,4 @@ LEFT JOIN
 LEFT JOIN
   hubspot_company_name_history AS ch
     ON wc.3p_partner = ch.hubspot_company_name
-GROUP BY
-  ALL
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11

@@ -33,7 +33,7 @@ simple_metrics AS (
     WHERE 
         me.is_compound_metric_part IS FALSE
         AND me.is_cumulative_metric IS FALSE
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 7, 8, 9, 10
 ),
 cumulative_metrics AS (
     SELECT
@@ -55,7 +55,7 @@ cumulative_metrics AS (
     WHERE 
         me.is_compound_metric_part IS FALSE
         AND me.is_cumulative_metric IS TRUE
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 7, 8, 9, 10
 ),
 compound_metrics AS (
     SELECT
@@ -78,7 +78,7 @@ compound_metrics AS (
         me.is_valid IS TRUE
         AND me.is_compound_metric_part IS TRUE
         AND me.is_cumulative_metric IS FALSE
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 8, 9, 10
 ),
 BP2CCV_compound_metric AS (
     SELECT
@@ -106,7 +106,7 @@ BP2CCV_compound_metric AS (
     WHERE
         cm.partial_metric = "CCV"
         AND cm.metric = "BP2CCV"
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 TP2CS_compound_metric AS (
     SELECT
@@ -134,7 +134,7 @@ TP2CS_compound_metric AS (
     WHERE
         cm.partial_metric = "CS"
         AND cm.metric = "TP2CS"
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 OS2CCV_BY_compound_metric AS (
     SELECT
@@ -162,7 +162,7 @@ OS2CCV_BY_compound_metric AS (
     WHERE
         cm.partial_metric = "CCV"
         AND cm.metric = "OS2CCV_BY"
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 combined_agent_performance AS (
     SELECT

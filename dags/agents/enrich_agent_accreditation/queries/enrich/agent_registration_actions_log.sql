@@ -96,7 +96,7 @@ other_actions AS (
         AND bc.is_last_update_by_date IS TRUE
 ),
 actions AS (
-    SELECT /*+ RANGE_JOIN(act2, 1500) */ 
+    SELECT
         ac.id_agent,
         ac.id_user,
         ac.id_work_contract,

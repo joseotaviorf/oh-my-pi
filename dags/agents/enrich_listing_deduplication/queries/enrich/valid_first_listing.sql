@@ -12,17 +12,16 @@ WITH house_agregation_dates AS (
     MIN(cfl.ts_contract_signed) FILTER(WHERE cfl.business_context = 'RENT') AS ts_contract_signed_rent
   FROM
     datalake_listing_deduplication.first_listing AS cfl
-  GROUP BY ALL
+  GROUP BY 1
 ),
 last_house_listing_status AS (
   SELECT
     id_house,
     status,
-    business_context
+    business_context,
+    ROW_NUMBER() OVER (PARTITION BY id_house, business_context ORDER BY ts_updated DESC) = 1 AS is_last_update_by_context
   FROM
     datalake_listing_deduplication.first_listing AS cfl
-  QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY id_house, business_context ORDER BY ts_updated DESC) = 1
 ),
 house_listing_status_by_context AS (
   SELECT
@@ -31,7 +30,9 @@ house_listing_status_by_context AS (
     FIRST(status) FILTER(WHERE business_context = 'RENT') AS last_house_listing_status_rent
   FROM
     last_house_listing_status AS hls
-  GROUP BY ALL
+  WHERE
+    hls.is_last_update_by_context IS TRUE
+  GROUP BY 1
 ),
 draft_contract AS (
   SELECT
@@ -43,19 +44,18 @@ draft_contract AS (
   WHERE 
     l.status_reason = 'ContractDraft'
     AND l.ts_state_started IS NOT NULL
-  GROUP BY ALL
+  GROUP BY 1
 ),
 rent_ongoing_contract AS (
   SELECT
     c.id_house,
-    c.is_ongoing_contract
-  FROM
-    datalake_ebdb_contract.contract AS c
-  QUALIFY
+    c.is_ongoing_contract,
     ROW_NUMBER() OVER (
       PARTITION BY c.id_house 
       ORDER BY c.ts_updated DESC
-    ) = 1
+    ) = 1 AS is_last_update
+  FROM
+    datalake_ebdb_contract.contract AS c
 ),
 indica_ai_listings AS (
   SELECT
@@ -112,6 +112,7 @@ accumulated_published_days AS (
     SELECT 
         bcsh.id_house,
         bcsh.business_context,
+        ROW_NUMBER() OVER (PARTITION BY bcsh.id_house, bcsh.business_context ORDER BY ad.date) AS date_order,
         CASE WHEN bcsh.business_context = 'RENT' THEN ad.date END AS dt_rent,
         CASE WHEN bcsh.business_context = 'SALE' THEN ad.date END AS dt_sale
     FROM 
@@ -122,8 +123,6 @@ accumulated_published_days AS (
     WHERE 
       bcsh.status = 'PUBLISHED'
       AND bcsh.ts_state_started < bcsh.ts_first_publication + INTERVAL 60 DAY
-    QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY bcsh.id_house, bcsh.business_context ORDER BY ad.date) = 2
   )
   SELECT 
     id_house,
@@ -131,7 +130,9 @@ accumulated_published_days AS (
     MAX(dt_sale) AS dt_min_published_accumulated_days_sale
   FROM 
     accumulated_days
-  GROUP BY ALL
+  WHERE
+    date_order = 2
+  GROUP BY 1
 ),
 last_depub_dates AS (
   SELECT
@@ -143,7 +144,7 @@ last_depub_dates AS (
     datalake_ebdb_listing.listing_business_context_status_history
   WHERE
     status IN ('UNPUBLISHED', 'SUSPENDED', 'OPTED-OUT')
-  GROUP BY ALL
+  GROUP BY 1
 )
 SELECT
   h.id_house,
@@ -235,6 +236,7 @@ LEFT JOIN
 LEFT JOIN
   rent_ongoing_contract AS roc
     ON roc.id_house = h.id_house
+    AND roc.is_last_update IS TRUE
 LEFT JOIN
   last_depub_dates AS ldd
     ON h.id_house = ldd.id_house
