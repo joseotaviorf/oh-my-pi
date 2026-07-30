@@ -1,3 +1,4 @@
+import inspect
 import logging
 
 from pyspark.sql.functions import col, from_json
@@ -23,6 +24,9 @@ message_schema = StructType(
         StructField("relative_file_path", StringType(), False),
         StructField("table_name", StringType(), False),
         StructField("intermediate_path", StringType(), False),
+        # Nullable: older producers (pre platform fan-out) omit it; `from_json`
+        # sets it to null and the consumer falls back to the propagator default.
+        StructField("platforms", StringType(), True),
     ]
 )
 
@@ -38,12 +42,19 @@ def run_validation_job(params: dict):
     relative_file_path = params["relative_file_path"]
     table_name = params["table_name"]
     intermediate_path = params["intermediate_path"]
+    platforms = [p for p in (params.get("platforms") or "").split(",") if p]
 
     logger.info(
         f"m={JOB_NAME}, env={env}, inmetro_bucket={inmetro_bucket}, layer={layer.value}, "
         f"relative_file_path={relative_file_path}, table_name={table_name},  msg=Job execution started."
     )
 
+    # Runtime-version-safe, INLINE on purpose (see data_quality_tests.py): pass
+    # ``platforms`` only if the installed runtime accepts it; importing a helper from a
+    # bietlejuice bootstrap wheel would just move the skew to an ImportError.
+    pipeline_kwargs = {}
+    if "platforms" in inspect.signature(DataQualityTestsPipeline.__init__).parameters:
+        pipeline_kwargs["platforms"] = platforms
     pipeline = DataQualityTestsPipeline(
         env,
         execution_date,
@@ -52,6 +63,7 @@ def run_validation_job(params: dict):
         relative_file_path,
         table_name,
         intermediate_path,
+        **pipeline_kwargs,
     )
     pipeline.run()
     logger.info(

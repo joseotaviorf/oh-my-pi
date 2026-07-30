@@ -1,3 +1,4 @@
+import inspect
 import json
 import logging
 from argparse import ArgumentParser, Namespace
@@ -40,6 +41,19 @@ def parse_args():
         nargs="?",
         default="",
         help="partial path used in some DAGs off of our pattern",
+    )
+    # NAMED flag (never a trailing positional): on EMR the empty ``intermediate_path``
+    # positional is dropped from the spark-submit shell command, so a positional
+    # ``platforms`` would slide into ``intermediate_path``. A named flag is matched by
+    # name, immune to that shift. Accepted here (backward-compat phase) even though the
+    # DAG does not emit it yet, so this spark job is ready on S3 before the task creator
+    # starts sending it.
+    parser.add_argument(
+        "--platforms",
+        type=str,
+        default="",
+        help="Comma-separated DataHub platforms to propagate DQ to "
+        "(e.g. 'databricks,glue,trino'). Empty => metadata-propagator default.",
     )
 
     return parser.parse_args()
@@ -144,6 +158,21 @@ def main() -> None:
     args = parse_args()
 
     if can_run_data_quality_in_this_cluster():
+        platforms = [platform for platform in args.platforms.split(",") if platform]
+        # Runtime-version-safe, INLINE on purpose: the spark job (S3) and the runtime
+        # wheel (cluster bootstrap) deploy on independent chains, so a newer spark job can
+        # run against an older runtime whose __init__ predates ``platforms``. Only pass it
+        # when the installed runtime accepts it; otherwise degrade to the legacy call --
+        # no fan-out, no crash. Kept inline (stdlib ``inspect`` on the already-imported
+        # class) rather than importing a helper from bietlejuice-core: that package is
+        # ALSO a bootstrap wheel, so a new import would just move the same skew to an
+        # ImportError. Mirrors the inmetro ConfigReader compat pattern in the pipeline.
+        pipeline_kwargs = {}
+        if (
+            "platforms"
+            in inspect.signature(DataQualityTestsPipeline.__init__).parameters
+        ):
+            pipeline_kwargs["platforms"] = platforms
         pipeline = DataQualityTestsPipeline(
             args.env,
             args.execution_date,
@@ -152,6 +181,7 @@ def main() -> None:
             args.relative_file_path,
             args.table_name,
             args.intermediate_path,
+            **pipeline_kwargs,
         )
         pipeline.run()
     else:
