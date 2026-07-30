@@ -52,7 +52,7 @@ columns:
     lineage:
       - datalake_retsuko.entry.amount
   sap_amount:
-    description: Value recorded in SAP.
+    description: Value recorded in SAP for the entry, taken from the create-bill counterpart account of each revenue account (420022 for 420001, 420021 for 420002, 420023 for 420004 and 211415 for 420010), which is the posting that carries id_finance_entity_entry.
     lineage:
       - datalake_pas.ledger.debit_credit
   is_completeness:

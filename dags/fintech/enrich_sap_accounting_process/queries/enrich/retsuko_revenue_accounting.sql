@@ -126,7 +126,7 @@ retsuko_invoice AS (
   SELECT DISTINCT
     ct.id_external AS id_business_entity,
     i.id_external AS id_finance_entity,
-    CAST(NULL AS INT) AS id_finance_entity_entry,
+    e.id_external AS id_finance_entity_entry,
     i.id_external AS id_external,
     'seu barriga' AS source_name,
     CASE
@@ -274,6 +274,10 @@ errors_base AS (
     sap_ledger sl
       ON sl.hash = sg.hash
       AND r.account_number = sl.account_number
+      AND (
+        r.id_finance_entity_entry IS NULL
+        OR CAST(sl.id_finance_entity_entry AS STRING) = CAST(r.id_finance_entity_entry AS STRING)
+      )
     GROUP BY 1, 2, 3, 4, 5 ,6 ,7 ,8, 12
 ),
 

@@ -24,7 +24,7 @@ retsuko_brokerage AS (
     ct.id_external AS id_business_entity,
     ct.landlord_legal_person AS contract_type,
     i.id_external AS id_finance_entity,
-    CAST(NULL AS INT) AS id_finance_entity_entry,
+    e.id_external AS id_finance_entity_entry,
     COALESCE(o.id_invoice, i.id_external) AS id_entity,
     o.id_invoice AS id_original_invoice,
     'seu barriga' AS source_name,
@@ -95,7 +95,7 @@ retsuko_adm_service_fee AS (
       ct.id_external AS id_business_entity,
       ct.landlord_legal_person AS contract_type,
       i.id_external AS id_finance_entity,
-      CAST(NULL AS INT) AS id_finance_entity_entry,
+      e.id_external AS id_finance_entity_entry,
       COALESCE(o.id_invoice, i.id_external) AS id_entity,
       o.id_invoice AS id_original_invoice,
       'seu barriga' AS source_name,
@@ -228,18 +228,38 @@ sap_gateway AS (
     rn = 1
 ),
 
+-- The revenue accounts below only receive the aggregated nota fiscal posting, which carries
+-- the source client instead of the entry id. The create-bill counterpart of each account is
+-- the only posting keyed by entry, so it is what allows matching SAP at entry grain.
 sap_ledger AS (
   SELECT
-    id_finance_entity,
+    id_finance_entity_entry,
     account_number,
     SUM(debit_credit) AS debit_credit,
     MAX(DATE(dt_created)) AS dt_sap_created,
     MAX(DATE(dt_reference)) AS dt_sap_reference
-  FROM
-    datalake_pas.ledger
-  WHERE
-    dt_reference >= DATE('2024-01-01')
-    AND account_number IN ('420001', '420002', '420004', '420005', '420010')
+  FROM (
+    SELECT
+      l.id_finance_entity_entry,
+      CASE l.account_number
+        WHEN '420022' THEN '420001'
+        WHEN '420021' THEN '420002'
+        WHEN '420023' THEN '420004'
+        WHEN '211415' THEN '420010'
+      END AS account_number,
+      l.debit_credit,
+      l.dt_created,
+      l.dt_reference
+    FROM
+      datalake_pas.ledger l
+    WHERE
+      l.dt_reference >= DATE('2024-01-01')
+      AND l.id_finance_entity_entry RLIKE '^[0-9]+$'
+      AND (
+        (l.account_number IN ('420022', '420021', '420023') AND l.accounting_rule LIKE 'invoice-transfer-entry-create-bill-%')
+        OR (l.account_number = '211415' AND l.accounting_rule LIKE 'invoice-bill-entry-create-bill-%')
+      )
+  )
   GROUP BY 1, 2
 ),
 
@@ -254,20 +274,20 @@ errors_base AS (
     r.accounting_name,
     r.accrual_year_month,
     MIN(CASE
-      WHEN sl.id_finance_entity IS NOT NULL THEN 'success'
-      WHEN sl.id_finance_entity IS NULL AND (se.id_finance_entity IS NULL OR se.status = 'failed' OR se.failed_reason IS NOT NULL) THEN 'source failure'
-      WHEN sl.id_finance_entity IS NULL AND (sg.id_feature IS NULL OR sg.sync_sap_job_status = 'error' OR sg.webhook_error IS NOT NULL) THEN 'gateway failure'
+      WHEN sl.id_finance_entity_entry IS NOT NULL THEN 'success'
+      WHEN sl.id_finance_entity_entry IS NULL AND (se.id_finance_entity IS NULL OR se.status = 'failed' OR se.failed_reason IS NOT NULL) THEN 'source failure'
+      WHEN sl.id_finance_entity_entry IS NULL AND (sg.id_feature IS NULL OR sg.sync_sap_job_status = 'error' OR sg.webhook_error IS NOT NULL) THEN 'gateway failure'
       ELSE 'unknown failure'
     END) AS accounting_process_status,
     MIN(CASE
-      WHEN sl.id_finance_entity IS NULL AND se.id_finance_entity IS NULL THEN 'source not found'
-      WHEN sl.id_finance_entity IS NULL AND se.status = 'failed' THEN se.failed_reason
-      WHEN sl.id_finance_entity IS NULL AND sg.id_feature IS NULL THEN 'gateway not found'
-      WHEN sl.id_finance_entity IS NULL AND sg.sync_sap_job_status = 'error' THEN COALESCE(sg.type, '') || ' - ' || COALESCE(sg.webhook_error, '')
-      WHEN sl.id_finance_entity IS NULL AND se.id_finance_entity IS NOT NULL AND sg.id_feature IS NOT NULL THEN 'sap not found'
+      WHEN sl.id_finance_entity_entry IS NULL AND se.id_finance_entity IS NULL THEN 'source not found'
+      WHEN sl.id_finance_entity_entry IS NULL AND se.status = 'failed' THEN se.failed_reason
+      WHEN sl.id_finance_entity_entry IS NULL AND sg.id_feature IS NULL THEN 'gateway not found'
+      WHEN sl.id_finance_entity_entry IS NULL AND sg.sync_sap_job_status = 'error' THEN COALESCE(sg.type, '') || ' - ' || COALESCE(sg.webhook_error, '')
+      WHEN sl.id_finance_entity_entry IS NULL AND se.id_finance_entity IS NOT NULL AND sg.id_feature IS NOT NULL THEN 'sap not found'
       ELSE NULL
     END) AS error_description,
-    MIN(IF(sl.id_finance_entity IS NULL, FALSE, TRUE)) AS is_completeness,
+    MIN(IF(sl.id_finance_entity_entry IS NULL, FALSE, TRUE)) AS is_completeness,
     CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
     CAST(sl.debit_credit AS DECIMAL(12,2)) AS sap_amount,
     MAX(r.dt_source_trigger) AS dt_source_trigger,
@@ -284,7 +304,7 @@ errors_base AS (
   LEFT JOIN
     sap_ledger sl
       ON r.account_number = sl.account_number
-      AND sl.id_finance_entity = r.id_entity
+      AND CAST(sl.id_finance_entity_entry AS STRING) = CAST(r.id_finance_entity_entry AS STRING)
     GROUP BY 1, 2, 3, 5, 6, 7, 8, 12, 13
 ),
 
