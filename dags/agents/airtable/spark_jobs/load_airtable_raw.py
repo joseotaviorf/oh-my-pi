@@ -13,7 +13,6 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    BaseSparkContext,
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
@@ -31,6 +30,7 @@ JOB_NAME = "load_airtable_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
 
 
 def get_dbutils():
@@ -158,8 +158,6 @@ if __name__ == "__main__":
     airtable_client = AirtableClient(api_token=api_token["auth_token"])
     airtable_consumer = AirtableConsumer(client=airtable_client, path=path)
 
-    spark_client = SparkClient()
-
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
@@ -193,7 +191,7 @@ if __name__ == "__main__":
         )
 
         # Create an RDD from the list of records
-        rdd = BaseSparkContext.sc.parallelize(records)
+        rdd = spark_client.conn.sparkContext.parallelize(records)
 
         # Normalize each record in the RDD by transforming column names.
         rdd_normalized = rdd.map(

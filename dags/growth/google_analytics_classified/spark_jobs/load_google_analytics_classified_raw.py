@@ -3,7 +3,6 @@ import json
 from argparse import ArgumentParser
 
 from google.oauth2 import service_account
-from pyspark.sql import SparkSession
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
@@ -79,7 +78,7 @@ if __name__ == "__main__":
     """
     logger.info(f"Running query: {query}")
 
-    spark = SparkSession.builder.getOrCreate()
+    spark = SparkClient(app_name=JOB_NAME).conn
 
     df = (
         spark.read.format("bigquery")

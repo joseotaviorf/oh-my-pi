@@ -436,6 +436,25 @@ steps:
         path: *no_new_databricks_clusters_path
     depends_on: [setup]
 
+  # Gates only ADDED spark jobs, so pre-existing bypasses never block a PR.
+  # Local audit of the whole tree: make validate-emr-runtime-clients-all
+  validate-emr-runtime-clients:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make validate-emr-runtime-clients
+    when:
+      - event: pull_request
+        path: &emr_runtime_clients_path
+          include:
+            - "dags/**/spark_jobs/*.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/validate_emr_runtime_clients.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*, forno]
+        path: *emr_runtime_clients_path
+    depends_on: [setup]
+
   # Deterministic, offline gate for self-service DataHub context entity docs
   # (business + metric). Runs the SAME parser+validator the DataHub publish path
   # uses — no DataHub/LLM credentials — so a malformed entity .md is blocked on

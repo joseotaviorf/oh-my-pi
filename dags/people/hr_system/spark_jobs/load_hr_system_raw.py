@@ -32,6 +32,8 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 DATABRICKS_SCOPE = "people"
 JOB_NAME = "load_hr_system_raw"
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def get_dbutils():
@@ -271,7 +273,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     url, token = get_conn_config()
     ingestion = Ingestion(args, url, token)
-    spark_client = SparkClient()
     logger.info(
         f"m={JOB_NAME}, hr_system_api_client_version={HR_SYSTEM_CLIENT_VERSION}, "
         f"environment={ingestion.environment}, source={ingestion.source}, datalake_bucket={ingestion.datalake_bucket}, "

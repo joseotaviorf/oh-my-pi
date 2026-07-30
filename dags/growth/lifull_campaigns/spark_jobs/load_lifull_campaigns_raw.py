@@ -31,6 +31,8 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 JOB_NAME = "load_lifull_campaigns_raw"
 
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def get_dbutils():
@@ -229,7 +231,6 @@ if __name__ == "__main__":
         """
         Load data to datalake.
         """
-        spark_client = SparkClient()
         spark_context = spark_client.conn.sparkContext
         dataframe_service = SparkDataFrameService()
 

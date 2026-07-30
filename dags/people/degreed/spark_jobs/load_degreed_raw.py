@@ -8,6 +8,7 @@ from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 from bietlejuice.jobs.degreed.argument_parser import JobArgumentParser
 from bietlejuice.jobs.degreed.degreed_api import DegreedAPI
 
+JOB_NAME = "load_degreed_raw"
 LOGGER = QuintoAndarLogger(__name__)
 
 # Cluster validation: add_validation_target_args / resolve_datalake_write_target
@@ -31,8 +32,8 @@ def main():
 
         use_from_id_list = bool(job_args.get("use_ingestion_from_id_list"))
 
-        spark = SparkSession.builder.getOrCreate()
-        spark_client = SparkClient()
+        spark_client = SparkClient(app_name=JOB_NAME)
+        spark = spark_client.conn
         BaseDBUtils().get_dbutils()
 
         api_data_list = _fetch_api_data(job_args, spark, use_from_id_list)

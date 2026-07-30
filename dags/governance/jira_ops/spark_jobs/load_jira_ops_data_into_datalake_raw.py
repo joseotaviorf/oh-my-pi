@@ -11,7 +11,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import BaseDBUtils, BaseSparkContext
+from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
@@ -24,6 +24,8 @@ JOB_NAME = "load_jira_ops_data_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def get_dbutils():
@@ -119,7 +121,7 @@ if __name__ == "__main__":
         date_column_filter = feedback_config.get("date_column_filter")
 
         rows = (
-            BaseSparkContext.spark.table(table)
+            spark.table(table)
             .filter(
                 f"""
                     DATE({date_column_filter}) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
@@ -151,8 +153,6 @@ if __name__ == "__main__":
         response = jira_consumer.sync(endpoint_enum=endpoint_enum, params=params)
 
     if response:
-        spark_client = SparkClient()
-
         json_lines = [json.dumps(item) for item in response]
         response_rdd = spark_client.conn.sparkContext.parallelize(json_lines)
 

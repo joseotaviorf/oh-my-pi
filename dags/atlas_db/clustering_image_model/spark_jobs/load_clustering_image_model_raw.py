@@ -214,7 +214,7 @@ def main():
     if dbutils is None:
         raise RuntimeError("dbutils is required to list dated folders on S3.")
 
-    spark = SparkSession.builder.getOrCreate()
+    spark = SparkClient(app_name=JOB_NAME).conn
 
     for entry in dbutils.fs.ls(base_path):
         if not _fs_entry_is_directory(entry):

@@ -15,6 +15,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.jobs.common.helpers import insert_partitions, json_to_dataframe
 from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 
+JOB_NAME = "load_greenhouse_audit_log_raw"
 LOGGER = logging.getLogger(__name__)
 
 # Cluster validation: add_validation_target_args / resolve_datalake_write_target
@@ -755,8 +756,8 @@ def main():
         )
         LOGGER.info("Full job arguments: %s", job_args)
 
-        spark_client = SparkClient()
-        spark = SparkSession.builder.getOrCreate()
+        spark_client = SparkClient(app_name=JOB_NAME)
+        spark = spark_client.conn
 
         load_start = job_args.get("load_start_date")
         load_end = job_args.get("load_end_date")

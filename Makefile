@@ -1107,6 +1107,25 @@ validate-no-new-databricks-clusters-all:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_no_new_databricks_clusters.py -a
 
+.PHONY: validate-emr-runtime-clients
+## Fail if a newly added spark job bypasses SparkClient/BaseDBUtils/dual-catalog registration
+validate-emr-runtime-clients:
+	@echo ""
+	@echo "Validating new spark jobs use the bietlejuice dual-runtime clients"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_emr_runtime_clients.py -b "$(CI_COMMIT_BRANCH)"
+
+.PHONY: validate-emr-runtime-clients-all
+## List every spark job bypassing the dual-runtime clients (local audit)
+validate-emr-runtime-clients-all:
+	@echo ""
+	@echo "Listing spark jobs that bypass SparkClient/BaseDBUtils/dual-catalog registration"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_emr_runtime_clients.py -a
+
 MAKE_TARGET ?=
 MAKE_EXTRA_ARGS ?=
 .PHONY: run-domain-validation

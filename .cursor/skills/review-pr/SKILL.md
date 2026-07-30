@@ -55,7 +55,14 @@ For every changed `.py` file in `bietlejuice/`, verify:
 - No wildcard imports (`from x import *`)
 - No bare `raise NotImplementedError()` (use `@abstractmethod` instead)
 - Pydantic: `model_dump()` not `.dict()`, `field_validator` not `validator`
-- **No new `SparkSession` or `SparkContext` creation** — look for `SparkSession.builder...build()`, `SparkSession(...)`, `SparkContext(...)`, or `SparkContext(conf=...)`. The only acceptable pattern is `SparkSession.builder.getOrCreate()`. Creating a second session causes intermittent library-resolution failures on shared clusters (incident ref: PR #22756).
+- **No new `SparkSession` or `SparkContext` creation** — look for `SparkSession.builder...`, `SparkSession(...)`, `SparkContext(...)`, or `SparkContext(conf=...)`. The only acceptable pattern is `SparkClient(app_name=JOB_NAME).conn`, which is the sole path reaching `create_emr_spark_session()` (Delta extension, `DeltaCatalog`, s3a ACLs). Creating a second session causes intermittent library-resolution failures on shared clusters (incident ref: PR #22756).
+- **Dual-runtime clients in `dags/**/spark_jobs/`** — flag each of these, all of which fail on EMR:
+  - a bare `spark` or `dbutils` global (Databricks injects them; EMR raises `NameError`) → `spark_client.conn` / `BaseDBUtils().get_dbutils()`
+  - `BaseSparkContext.spark` / `.sc` (session built at import time, not Glue-backed on EMR) → `spark_client.conn` / `spark_client.conn.sparkContext`
+  - a direct `SparkMetastoreService(...)` (registers in the runtime-native catalog only, so the table never reaches Glue) → `MetastoreServiceFactory.create_loader_metastore_service(spark_client)`
+
+  `make validate-emr-runtime-clients` gates these on newly added files only, so an edit to an
+  existing job will not be caught by CI — check it by hand here.
 
 Return: file path + line number for each violation found.
 

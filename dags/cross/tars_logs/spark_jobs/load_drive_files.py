@@ -33,6 +33,8 @@ _DRIVE_SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = logging.getLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def get_dbutils():
@@ -240,7 +242,7 @@ if __name__ == "__main__":
     datalake_info = DatalakeMetastoreService.get_db_info(
         args.environment, args.source, args.datalake_bucket
     )
-    spark_metastore_service = SparkMetastoreService(SparkClient())
+    spark_metastore_service = SparkMetastoreService(spark_client)
     database_name = datalake_info["db_raw_databricks"]
     database_location = datalake_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW

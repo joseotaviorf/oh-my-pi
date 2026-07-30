@@ -13,7 +13,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import BaseSparkContext, SparkTableStorageFormat
+from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
@@ -25,6 +25,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 JOB_NAME = "load_table_usage_in_queries"
 REGEX_TABLE_PATTERN_IN_SQL = r"(?i)(?:FROM|JOIN)\s*(`?\w+`?\.`?\w+`?)"
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
 
 
 def main() -> None:
@@ -132,7 +133,7 @@ def generate_dataframe(
         for table in tables:
             values.append((query_path, table, query_modified_dates[query_path]))
     columns = ["query_path", "used_table", "query_last_modified"]
-    return BaseSparkContext.spark.createDataFrame(values, columns)
+    return spark_client.conn.createDataFrame(values, columns)
 
 
 def generate_relevant_columns(df: DataFrame, execution_date: datetime) -> DataFrame:
@@ -175,7 +176,6 @@ def load_table(
     )
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(write_database_name)

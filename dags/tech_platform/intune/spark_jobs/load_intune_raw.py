@@ -8,7 +8,6 @@ from typing import Any
 from urllib.parse import urlparse
 
 import requests
-from pyspark.sql import SparkSession
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -23,6 +22,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
+JOB_NAME = "load_intune_raw"
 LOGGER = QuintoAndarLogger(__name__)
 
 
@@ -322,8 +322,8 @@ def main() -> None:
             job_args[ENDPOINT_KEY], base_filters, token
         )
 
-        spark = SparkSession.builder.getOrCreate()
-        spark_client = SparkClient()
+        spark_client = SparkClient(app_name=JOB_NAME)
+        spark = spark_client.conn
 
         if api_data_list:
             df = json_to_dataframe(spark, api_data_list)

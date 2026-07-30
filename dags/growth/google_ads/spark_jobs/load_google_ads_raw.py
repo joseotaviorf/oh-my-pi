@@ -13,7 +13,6 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    BaseSparkContext,
     SparkTableStorageFormat,
 )
 from bietlejuice.base.validation.spark_args import (
@@ -35,6 +34,7 @@ BACKOFF_FACTOR = 5
 MAX_RETRIES = 5
 
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
 
 
 def _list_customer_ids(client, customer_id, customer_filter):
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     logger.info('m=__main__, msg="Collecting requests"')
 
     results = (
-        BaseSparkContext.sc.parallelize(search_request_args)
+        spark_client.conn.sparkContext.parallelize(search_request_args)
         .map(_issue_search_request)
         .collect()
     )
@@ -194,8 +194,9 @@ if __name__ == "__main__":
             )
         raise GoogleAdsException
 
-    spark_client = SparkClient()
-    df = spark_client.conn.read.json(BaseSparkContext.sc.parallelize(successes))
+    df = spark_client.conn.read.json(
+        spark_client.conn.sparkContext.parallelize(successes)
+    )
 
     logger.info('m=__main__, msg="Dataframe created with successfull results"')
 

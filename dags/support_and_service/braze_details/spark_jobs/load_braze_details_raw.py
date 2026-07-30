@@ -21,6 +21,8 @@ JOB_NAME = "load_braze_details_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def get_dbutils():
@@ -113,7 +115,6 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     s3_loader = S3Loader()
-    spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     datalake_info = DatalakeMetastoreService.get_db_info(

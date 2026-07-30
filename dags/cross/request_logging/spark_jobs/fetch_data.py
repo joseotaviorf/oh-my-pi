@@ -8,6 +8,7 @@ from pyspark.sql.types import StructType
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
+    BaseDBUtils,
     SparkTableStorageFormat,
 )
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
@@ -33,6 +34,7 @@ logging.basicConfig(
 )
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = logging.getLogger(JOB_NAME)
+dbutils = BaseDBUtils().get_dbutils()
 
 
 def fetch_from_s3(

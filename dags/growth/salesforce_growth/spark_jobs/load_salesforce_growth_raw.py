@@ -28,6 +28,8 @@ JOB_NAME = "load_salesforce_growth_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def get_dbutils():
@@ -800,7 +802,6 @@ def main():
     }
 
     # Initialize Spark Client
-    spark_client = SparkClient()
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, bucket)
     database_name = db_info["db_raw_databricks"]

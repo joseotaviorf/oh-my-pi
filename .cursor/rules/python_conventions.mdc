@@ -69,7 +69,43 @@ class MyModel(BaseModel):
 - Inherit from `BaseCoreModelSparkJob` (`bietlejuice.base.spark.base_core_model_spark_job`).
 - Use `parse_args()` with the standard argument order: `environment`, `bucket`, `dag_name`, `schema`, `table_name`, `partitions`, `load_start_date`, `load_end_date`.
 - Use `ConfigurationService` for environment-aware config; never hard-code bucket paths or environment strings.
-- **Never create a new `SparkSession` or `SparkContext`**. Always reuse the existing session via `SparkSession.builder.getOrCreate()`. Creating a second session causes intermittent library-resolution errors on shared clusters . If you need specific Spark configs, set them on the existing session's `conf` object.
+
+### Dual-runtime clients (Databricks + EMR) — CI-enforced
+
+A job only works on both runtimes when its session, its `dbutils` handle, and its metastore
+service all come from bietlejuice. Hoist them to module scope next to the logger:
+
+```python
+JOB_NAME = "load_<x>_raw"
+logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
+dbutils = BaseDBUtils().get_dbutils()                                    # only if used
+metastore_service = MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+```
+
+- **Session: only `SparkClient(app_name=JOB_NAME).conn`.** It is the sole path that reaches
+  `create_emr_spark_session()`, which applies the Delta SQL extension, `DeltaCatalog`, and the
+  `BucketOwnerFullControl` s3a ACLs. `app_name` is ignored on Databricks, so it is safe on both.
+  Never `SparkSession.builder...` (skips the EMR factory — and because `SparkClient.conn` is
+  **lazy**, a bare `builder` call next to a `SparkClient()` still wins the race) and never
+  `BaseSparkContext.spark` / `.sc` (built at import time, not Glue-backed on EMR).
+  Still **never construct a second session**: a second one causes intermittent
+  library-resolution errors on shared clusters (incident ref: PR #22756). For specific configs,
+  pass `session_params=` to `SparkClient` or set them on `spark_client.conn.conf`.
+- **`dbutils`: only `BaseDBUtils().get_dbutils()`**, which returns the boto3-backed facade on
+  EMR. A bare `dbutils` global exists only because Databricks injects it; on EMR it raises
+  `NameError`. Same for a bare `spark` global.
+- **Metastore: only `MetastoreServiceFactory.create_loader_metastore_service(spark_client)`**
+  (or `MetastoreLoaderFactory.create(spark_client)`). A direct `SparkMetastoreService(...)`
+  registers the table in the runtime-native catalog only, so a raw JSON/Parquet table written
+  on Databricks never lands in Glue and EMR cannot read it. The failure is silent:
+  `CompositeMetastoreService` logs secondary-catalog failures as warnings and swallows them, and
+  `GlueMetastoreService.add_partitions` no-ops when the Glue table is missing.
+
+Ruff cannot catch bare `spark`/`dbutils` because `pyproject.toml` declares them as `builtins`.
+`make validate-emr-runtime-clients` gates all five patterns on **newly added** files in
+`dags/**/spark_jobs/`; `make validate-emr-runtime-clients-all` audits the whole tree.
 
 ## Design Patterns & Modularity
 - Prefer **factory** or **strategy** patterns when behaviour varies by configuration or environment. Avoid long `if/elif` chains that encode business rules directly in pipeline logic.

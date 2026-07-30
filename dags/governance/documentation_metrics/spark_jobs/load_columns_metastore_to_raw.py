@@ -24,6 +24,8 @@ INFORMATION_SCHEMA_COLUMNS_TABLE_NAME = "system.information_schema.columns"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient(app_name=JOB_NAME)
+spark = spark_client.conn
 
 
 def get_columns_from_metastore():
@@ -111,7 +113,6 @@ if __name__ == "__main__":
     )
 
     s3_loader = S3Loader()
-    spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     datalake_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)

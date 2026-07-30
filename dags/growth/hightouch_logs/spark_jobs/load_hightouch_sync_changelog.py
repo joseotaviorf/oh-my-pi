@@ -10,7 +10,7 @@ from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
@@ -23,8 +23,9 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 JOB_NAME = "Hightouch Sync Changelog Trino Load"
 RAW_PARTITION_COLUMNS = ["year", "month", "day"]
 logger = QuintoAndarLogger(JOB_NAME)
-spark_client = SparkClient()
+spark_client = SparkClient(app_name=JOB_NAME)
 spark = spark_client.conn
+dbutils = BaseDBUtils().get_dbutils()
 
 
 def _load_window_timestamps_ms(

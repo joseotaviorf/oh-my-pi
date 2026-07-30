@@ -117,8 +117,8 @@ if __name__ == "__main__":
         api_key=credentials,
     )
 
-    spark_client = SparkClient()
-    spark = SparkSession.builder.getOrCreate()
+    spark_client = SparkClient(app_name=JOB_NAME)
+    spark = spark_client.conn
 
     dfs = []
 

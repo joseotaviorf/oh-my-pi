@@ -32,6 +32,8 @@ scope = "quintoandar"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(job_name)
+spark_client = SparkClient(app_name=job_name)
+spark = spark_client.conn
 
 
 def get_dbutils():
@@ -127,7 +129,6 @@ def _load_dataframe_into_datalake(
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
 
-    spark_client = SparkClient()
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, bucket)
     database_name = db_info["db_raw_databricks"]

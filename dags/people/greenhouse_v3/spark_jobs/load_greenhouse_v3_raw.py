@@ -2,8 +2,6 @@ import json
 import logging
 from typing import Any, Dict, List
 
-from pyspark.sql import SparkSession
-
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.api.auth.oauth2 import BasicAuthOAuth2ClientCredentials
 from bietlejuice.base.api.common.client import BaseAPIClient
@@ -14,6 +12,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.jobs.common.helpers import insert_partitions, json_to_dataframe
 from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 
+JOB_NAME = "load_greenhouse_v3_raw"
 LOGGER = logging.getLogger(__name__)
 
 # Cluster validation: add_validation_target_args / resolve_datalake_write_target
@@ -178,8 +177,8 @@ def main():
             f"Running Greenhouse v3 job with the following arguments: {job_args}"
         )
 
-        spark_client = SparkClient()
-        spark = SparkSession.builder.getOrCreate()
+        spark_client = SparkClient(app_name=JOB_NAME)
+        spark = spark_client.conn
 
         LOGGER.info(f"Fetching data for table: {job_args.get('table_name')}")
         api_client = GreenhouseAPIV3(job_args)
