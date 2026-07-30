@@ -25,11 +25,17 @@ workflow:
     lead_origin_cdp:
       merge_on: ["id_lead"]
       z_order_by: ["id_lead"]
+    isaias_session_attribution:
+      merge_on: ["id_langfuse_session"]
+      z_order_by: ["id_langfuse_session"]
   inner_dependencies:
     lead_origin:
       - inbound_attribution
     lead_origin_cdp:
       - inbound_attribution
+    isaias_session_attribution:
+      - inbound_attribution
+      - lead_origin
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:

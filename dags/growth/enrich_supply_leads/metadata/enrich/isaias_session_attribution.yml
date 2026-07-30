@@ -1,0 +1,55 @@
+database_name: datalake_supply_flows
+table_name: isaias_session_attribution
+domain: Growth
+owner: alexandre.gimenez@quintoandar.com.br
+description: |
+  One row per chatbot session handled by the isaias supply agent (plus wall-e sessions that produced supply events), attributing the supply lead worked during that session. Combines chatbot session anchors, CDP supply funnel events, and inbound/lead-origin attribution to resolve which lead was retrieved or created in the conversation and whether it converted to an OPPORTUNITY within 24h. Grain is one isaias/wall-e session (id_langfuse_session); consumed by the Data Growth squad for supply agent performance and conversion analysis. Rolling 7-day window merged on id_langfuse_session.
+columns:
+  id_langfuse_session:
+    description: Langfuse session identifier of the chatbot conversation; the primary grain and merge key of this table.
+    lineage:
+      - datalake_chatbot.sessions.id_langfuse_session
+  id_sss_session:
+    description: Support Session Service (SSS) public identifier for the same conversation, used to bridge to support and messaging systems.
+    lineage:
+      - datalake_chatbot.sessions.id_sss_session
+  id_sauron_session:
+    description: Sauron chat session identifier for the conversation, used to join inbound lead attribution.
+    lineage:
+      - datalake_chatbot.sessions.id_sauron_session
+  resolved_lead_id:
+    description: The supply lead (EBDB id) handled during the session after guardrails; null when no lead can be trusted (e.g. a retrieved lead created after the session started).
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_supply_flows.inbound_attribution.id_lead_ebdb
+      - datalake_supply_flows.lead_origin.ts_event
+  bot:
+    description: Chatbot agent that handled the session; always isaias, or wall-e when the session produced tracked supply events.
+    lineage:
+      - datalake_chatbot.sessions.bot
+  lead_acquisition_type:
+    description: How the resolved lead relates to the session - no_lead, created_in_session (new lead generated in the conversation), or retrieved_lead (pre-existing lead worked in the conversation).
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_supply_flows.inbound_attribution.id_lead_ebdb
+      - datalake_supply_flows.lead_origin.ts_event
+      - datalake_chatbot.sessions.ts_created
+  has_reschedule_event:
+    description: True when the session emitted any photo-session reschedule or availability/lookup event from the CDP supply funnel.
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+  is_converted_within_24h:
+    description: True when the resolved lead reached its first OPPORTUNITY funnel step within 24 hours after the session started.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+      - datalake_chatbot.sessions.ts_created
+      - datalake_supply_flows.lead_origin.ts_event
+  ts_session_start:
+    description: Timestamp when the chatbot session was created; anchor used for the 24h conversion window and lead-timing guardrails.
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+  ts_first_qualified:
+    description: Timestamp of the resolved lead's first OPPORTUNITY funnel step; nulled when the lead was created after the session started.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+      - datalake_supply_flows.lead_origin.ts_event
