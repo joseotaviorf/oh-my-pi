@@ -1,5 +1,8 @@
 from argparse import ArgumentParser
+from io import BytesIO
+from urllib.parse import urlparse
 
+import boto3
 import joblib
 from quintoandar_logger import QuintoAndarLogger
 
@@ -57,7 +60,12 @@ if __name__ == "__main__":
 
     import lightgbm  # noqa: F401 — must load before joblib.load on Graviton (libgomp TLS)
 
-    model = joblib.load(lost_listings_model_path)
+    parsed_model_path = urlparse(lost_listings_model_path)
+    model_object = boto3.client("s3").get_object(
+        Bucket=parsed_model_path.netloc,
+        Key=parsed_model_path.path.lstrip("/"),
+    )
+    model = joblib.load(BytesIO(model_object["Body"].read()))
 
     lost_listings_df_pd = spark_client.conn.sql(
         lost_listings_query.format(execution_date=execution_date)

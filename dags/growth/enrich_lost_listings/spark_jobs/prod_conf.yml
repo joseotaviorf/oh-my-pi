@@ -1,7 +1,7 @@
 ---
 table_name: lost_listings
 enrich_partition_cols: ["year", "month", "day"]
-lost_listings_model_path: /dbfs/FileStore/models/marketing/lost_listings_model.joblib
+lost_listings_model_path: s3://data-science.s3.data.quintoandar.com.br/lost_listings/lost_listings_model.joblib
 segements_mapping:
   0: "Pequeno Padrão"
   1: 'Padrão "Morumbi"'
