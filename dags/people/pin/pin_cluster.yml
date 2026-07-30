@@ -1,6 +1,7 @@
 cluster:
   type: emr_7_12_consolidation_xs_memory_fleet_cluster
   custom_configurations:
+    autotermination_minutes: 120
     aws_attributes:
       ebs_volume_size: 200
       instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
