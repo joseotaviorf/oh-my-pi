@@ -15,6 +15,9 @@ dags_not_using_builder:
   - fintech/velo/velo.py
   - fintech/wall_street/wall_street.py
   - for_rent/ebdb/ebdb.py
+  # Hand-rolled: needs a hybrid cron + dataset schedule (DatasetOrTimeSchedule +
+  # CronTriggerTimetable) that BaseWorkflow/DAG Builder can't express.
+  - for_rent/vocs_machina_planning/vocs_machina_planning.py
   - for_sale/casa_mineira_crm/casa_mineira_crm.py
   - for_sale/reverse_dsat_report_access/reverse_dsat_report_access.py
   - for_sale/reverse_dsat_report_load/reverse_dsat_report_load.py

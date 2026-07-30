@@ -1,0 +1,34 @@
+database_name: datalake_vocs_machina_planning_raw
+table_name: vocs_machina_inference_status
+owner: data-ae-for-rent@quintoandar.com.br
+domain: For Rent
+description: >
+  Daily inference-status snapshot for the vocs-machina LLM classification backfill.
+  One row per (day, prompt_id, prompt_hash) partition that should exist according to
+  quintoml's active-prompt manifest, flagging whether quintoml has already finalized
+  that partition (_SUCCESS marker present in the data-science raw bucket) as of the
+  DAG run. Used to plan/monitor the vocs-machina backfill (VOCS-34).
+columns:
+  day:
+    description: >
+      Backfill day-of-month the row reports on (int, not a date string), reused as the
+      year/month/day Hive partition below -- this table has no separate date column
+      beyond year/month/day, matching dag_inventory's raw dag_bag_content convention
+      (create_dag_dataframe).
+  prompt_id:
+    description: >
+      Identifier of the vocs-machina prompt this partition belongs to (from quintoml's
+      latest_active_prompts.json manifest).
+  prompt_hash:
+    description: >
+      Hash of the compiled prompt content this partition was classified with (from
+      quintoml's manifest).
+  inference_status:
+    description: >
+      "done" if quintoml has finalized this (day, prompt_id, prompt_hash) partition
+      (the raw/.../_SUCCESS marker exists in the data-science bucket), "missing"
+      otherwise.
+  year:
+    description: Hive partition year, parsed from this row's own day field.
+  month:
+    description: Hive partition month, parsed from this row's own day field.

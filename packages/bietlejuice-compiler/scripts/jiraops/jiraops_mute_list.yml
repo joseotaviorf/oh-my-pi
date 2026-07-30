@@ -43,6 +43,7 @@ DAG:
     - bietlejuice.search_metrics_service
     - bietlejuice.services_integration_validations
     - bietlejuice.signup
+    - bietlejuice.vocs_machina_planning
   contains:
     - bietlejuice.gsheets_
     - bietlejuice.idactum_

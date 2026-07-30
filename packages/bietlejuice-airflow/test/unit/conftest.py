@@ -1,5 +1,21 @@
 import sys
+from pathlib import Path
 from unittest.mock import MagicMock
+
+# Put the repo root on sys.path before ANYTHING else in this test session runs.
+# bietlejuice.base.paths.DAG_PACKAGES_ROOT is computed once, at first import, by
+# trying `import dags` (see _find_dag_packages_root()); if that first import
+# happens before the repo root is on sys.path, it silently caches None for the
+# rest of the process, and BaseDAG.get_dag_doc() then fails for every DAG test
+# that resolves a doc file. test/unit/dags/conftest.py already does this
+# insertion, but conftest loading follows collection order (e.g. "airflow/"
+# sorts before "dags/"), so by the time it runs, some earlier-collected test
+# may have already imported bietlejuice.base.paths and frozen the cache. This
+# top-level conftest is loaded before collection descends into any
+# subdirectory, so doing it here removes the order dependency.
+_REPO_ROOT = Path(__file__).resolve().parents[4]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 # Stub private Nexus packages not available in local dev environment.
 # These are only needed at runtime inside Databricks/Composer, not in unit tests.

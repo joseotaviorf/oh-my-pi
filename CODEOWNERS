@@ -7,6 +7,7 @@ dags/atlas_db/**                                                        @quintoa
 dags/conversational_xp/**                                               @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/bi-etl-ejuice-code-owners @quintoandar/data-ingestion-code-owners
 dags/publisher_xp/**                                                    @quintoandar/publisher-xp @quintoandar/data-ingestion-code-owners
 dags/dependencies.yaml                                                  @quintoandar/bi-etl-ejuice-code-owners @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-ingestion-code-owners
+dags/for_rent/vocs_machina_planning/**                                  @quintoandar/fr-poscontrato-data-ai @quintoandar/data-ingestion-code-owners
 dags/mlops/**                                                           @quintoandar/mlcops @quintoandar/data-ingestion-code-owners
 dags/ops_poc/**                                                         @luisarodriguees @GabriellRodrigues @henriquedepaulo @quintoandar/data-ingestion-code-owners
 dags/people/**                                                          @gab-berger @isa-carol @pedroprates @quintoandar/data-ingestion-code-owners
