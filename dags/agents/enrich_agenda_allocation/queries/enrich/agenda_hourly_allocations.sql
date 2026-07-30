@@ -21,14 +21,14 @@ first_booking AS (
         MIN(b.ts_booking_utc) FILTER (WHERE b.type = 'Visita') AS ts_first_visit_booked,
         MIN(b.ts_booking_utc) FILTER (WHERE b.type IN ('Vistoria', 'VistoriaQuarteirizada')) AS ts_first_inspection_booked,
         MIN(b.ts_booking_utc) FILTER (WHERE b.type = 'SessaoFotos') AS ts_first_photo_job_booked
-    FROM 
+    FROM
         datalake_booking.booking AS b
     WHERE
         DATE(b.ts_booking_utc) <= '{load_end_date}' + INTERVAL 21 DAYS
-    GROUP BY ALL
+    GROUP BY 1
 ),
 agent_work_contract AS (
-    SELECT 
+    SELECT
         aud.id AS id_agent,
         aud.id_work_contract,
         aud.rev_type,
@@ -36,12 +36,12 @@ agent_work_contract AS (
         LEAD(ure.ts_revision) OVER (PARTITION BY aud.id, aud.id_work_contract ORDER BY ure.ts_revision) AS ts_ended
     FROM
         datalake_ebdb_clean.agent_data_aud AS aud
-    JOIN 
-        datalake_ebdb_user.user_revision_entity AS ure 
+    JOIN
+        datalake_ebdb_user.user_revision_entity AS ure
             ON aud.rev = ure.id
 ),
 daily_agent_work_contract AS (
-    SELECT 
+    SELECT
         ad.date AS dt_reference,
         awc.id_agent,
         awc.id_work_contract,
@@ -51,14 +51,14 @@ daily_agent_work_contract AS (
     JOIN
         datalake_quintoandar.aux_date AS ad
             ON ad.date BETWEEN awc.ts_started AND COALESCE(awc.ts_ended, '{load_end_date}' + INTERVAL 21 DAYS)
-    WHERE 
+    WHERE
         awc.rev_type <> 2
         AND ad.date BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
 ),
--- A few percentage of agents has two business lines at the same period. 
+-- A few percentage of agents has two business lines at the same period.
 -- But for the OPS team these cases should be ignored
 daily_agent_business_context AS (
-    SELECT 
+    SELECT
         ad.date AS dt_reference,
         abch.id_agent_data AS id_agent,
         abch.business_context AS agent_business_context,
@@ -68,11 +68,11 @@ daily_agent_business_context AS (
     JOIN
         datalake_quintoandar.aux_date AS ad
             ON ad.date BETWEEN abch.ts_revision_started AND COALESCE(abch.ts_revision_ended, '{load_end_date}' + INTERVAL 21 DAYS)
-    WHERE 
+    WHERE
         ad.date BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
 ),
 agents_region AS (
-    SELECT 
+    SELECT
         ag.id_agent,
         ag.id_region,
         ag.rev_type,
@@ -82,7 +82,7 @@ agents_region AS (
         datalake_ebdb_agents.agents_region AS ag
 ),
 daily_agents_region AS (
-    SELECT 
+    SELECT
         ad.date AS dt_reference,
         ag.id_agent,
         ag.id_region,
@@ -92,7 +92,7 @@ daily_agents_region AS (
     JOIN
         datalake_quintoandar.aux_date AS ad
             ON ad.date BETWEEN ag.ts_started AND COALESCE(ag.ts_ended, '{load_end_date}' + INTERVAL 21 DAYS)
-    WHERE 
+    WHERE
         ag.rev_type <> 2
         AND ad.date BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
 ),
@@ -112,7 +112,7 @@ daily_agent_region_group AS (
 SELECT
     ash.id_agent,
     ash.id_slot_date,
-    CAST(DATE_FORMAT(ash.ts_slot_hour, 'yyyyMMddHH') AS BIGINT) AS id_slot_date_hour, 
+    CAST(DATE_FORMAT(ash.ts_slot_hour, 'yyyyMMddHH') AS BIGINT) AS id_slot_date_hour,
     COALESCE(
         CAST(DATE_FORMAT(
           COALESCE(arg.dt_reference, arg_future.dt_reference)
@@ -153,24 +153,24 @@ SELECT
     ash.month,
     ash.day,
     NOW() AS ts_load
-FROM 
+FROM
     agents_slots_hourly AS ash
-JOIN 
+JOIN
     datalake_quintoandar.aux_date AS d
         ON d.year = ash.year
         AND d.month = ash.month
         AND d.day = ash.day
-LEFT JOIN 
+LEFT JOIN
     daily_agent_region_group AS arg
         ON arg.id_agent = ash.id_agent
         AND arg.dt_reference = d.date
         AND arg.is_last_update_by_date IS TRUE
-LEFT JOIN 
+LEFT JOIN
     daily_agent_region_group AS arg_future
         ON arg_future.id_agent = ash.id_agent
         AND arg.id_agent IS NULL
         AND arg_future.is_last_updated IS TRUE
-LEFT JOIN 
+LEFT JOIN
     first_booking AS fb
         ON fb.id_agent = ash.id_agent
 LEFT JOIN
@@ -178,17 +178,17 @@ LEFT JOIN
         ON abc.id_agent = ash.id_agent
         AND abc.dt_reference = d.date
         AND abc.is_last_update_by_date IS TRUE
-LEFT JOIN 
+LEFT JOIN
     daily_agent_work_contract AS acr
-        ON acr.id_agent = ash.id_agent 
+        ON acr.id_agent = ash.id_agent
         AND acr.dt_reference = d.date
         AND acr.is_last_update_by_date IS TRUE
-LEFT JOIN 
-    daily_agents_region AS ar 
+LEFT JOIN
+    daily_agents_region AS ar
         ON ar.id_agent = ash.id_agent
         AND ar.dt_reference = d.date
         AND ar.is_last_update_by_date IS TRUE
-LEFT JOIN 
+LEFT JOIN
     datalake_ebdb_clean.mask_weekly_hour AS mwh
-        ON mwh.id_work_contract  = acr.id_work_contract 
+        ON mwh.id_work_contract  = acr.id_work_contract
         AND MOD(mwh.day_of_week, 7) = MOD(d.week_day, 7)
