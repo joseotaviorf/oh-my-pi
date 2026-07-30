@@ -1,5 +1,14 @@
 # Collections
 
+## Ownership
+
+**Data Owner:**
+- thiago.villani@quintoandar.com.br
+
+**Data Steward:**
+- thiago.villani@quintoandar.com.br
+
+
 ## Overview
 
 Collections is the **operational phase** focused on recovering overdue payments: reminders, outbound contact, restructuring, and negotiations. The debt remains **accounts receivable** (asset) but is flagged as past due until paid, renegotiated, or written off.
@@ -15,24 +24,22 @@ Fintech models described here live in **`dw_collection_recovery_quintoandar`**, 
 
 ## Related Metric Entities
 
-- Condo Garantido (CG)
+- [Condo Garantido](../metric_entities/condo_garantido.md) — For Rent product that monitors condominium bills of ongoing contracts via DDA to detect and settle a tenant's condo default proactively, tracked via adoption and automatic-identification rates.
 
-## Synonyms
+## Glossary and Synonyms
 
-| Term | Meaning |
-|------|---------|
-| **Cobrança** | Collections |
-| **Assessoria** | Third-party advisory collection |
-| **Acordo** | Negotiated payment plan (often multiple installments) |
-| **Promessa** | Promise to pay (before first installment is paid) |
-| **FPD** | First payment default |
-| **SSN / BOSSN** | Self-service negotiation flows (see `is_ssn` on overdue timeline) |
+- **Cobrança** → Collections
+- **Assessoria** → Third-party advisory collection
+- **Acordo** → Negotiated payment plan (often multiple installments)
+- **Promessa** → Promise to pay (before first installment is paid)
+- **FPD** → First payment default
+- **SSN / BOSSN** → Self-service negotiation flows (see `is_ssn` on overdue timeline)
 
-## Where to query what
+## Tables
 
-| You need… | Schema / table |
-|-----------|----------------|
-| Daily overdue invoice timeline, recovery amounts, queues, Flow/Stock | `dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline` (+ incremental variant if using partitions) |
+| You need... | Use this table |
+|-------------|----------------|
+| Daily overdue invoice timeline, recovery amounts, queues, Flow/Stock, **`has_matthew_interaction`** (interaction flag from collections QuintoAndar datalake inputs — Matthew itself is not defined in these DAGs; see `business_entities/matthew.md`) | `dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline` (+ incremental variant if using partitions) |
 | Collection touches (Cyber + Recupera) | `dw_collection_recovery_quintoandar.fact_collection` + `dim_operator` |
 | Debt at invoice grain (negotiated deals, sources) | `dw_collection_recovery_quintoandar.fact_debt` |
 | Negotiations (status, amounts, classification) | `dw_collection_recovery_quintoandar.fact_negotiation` |
@@ -192,7 +199,7 @@ Custas / expenses by case and stage: amounts, authorization/reimbursement flags,
 - **Evictions:** Link **`dw_evictions.fact_evictions.sk_contract`** to contract timelines; **`fact_contract_wallet_timeline.is_evictions`** / **`id_process_evictions`** aligns operational segmentation with cases.
 - **Losses:** For provisioned delay buckets use **`dw_losses.fact_delay`** / **`fact_provision`**; for operational delay buckets use collections timeline fields (`delay_contamined_range`, `delay_contract_range`, wallet T2/T3).
 
-## Dos and don'ts
+## Dos and Don'ts
 
 **Do:**
 
@@ -206,7 +213,9 @@ Custas / expenses by case and stage: amounts, authorization/reimbursement flags,
 - Confuse schema names: recovery DW is **`dw_collection_recovery_quintoandar`** (not `dw_collections_recovery_quintoandar`).
 - Assume landlord table YAML always lists the right `database_name` — DAG **`dw_collections_landlord`** outputs to **`dw_collections_landlord`**.
 
-## Golden query: AR recovery rate (C&E / Neotribe-style)
+## Golden Queries
+
+### Query 1 — AR recovery rate (C&E / Neotribe-style)
 
 Consolidates **`dw_losses.fact_accounts_receivable`** with overdue invoices **not** yet on that table for the same month, using **`dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline`** and optional **`dw_losses.fact_delay`** for contaminated range. Fix schema names to match production (`dw_collection_recovery_quintoandar`).
 
@@ -254,3 +263,38 @@ ORDER BY 1 DESC, 2;
 ```
 
 **Note:** Exact **`delay_range`** string values must match your environment (losses vs collections naming). Adjust date functions if your engine uses different syntax than Presto/Trino-style `date_add` / `last_day_of_month`.
+
+### Query 2 — Monthly recovery rate by debtor type (Flow vs Stock)
+
+Simple filtered/aggregated variant of Query 1: recovery rate computed directly from **`dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline`**, split by **`debtor_type`** (Flow = new in month vs Stock), without the AR union.
+
+```sql
+SELECT
+    dt_month_start,
+    debtor_type,
+    SUM(due_amount) AS due_amount,
+    SUM(recovered_amount) AS recovered_amount,
+    SUM(net_recovered_amount) AS net_recovered_amount,
+    SUM(net_recovered_amount) / NULLIF(SUM(due_amount), 0) AS recovery_rate
+FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
+WHERE is_most_recent_record_month = true
+  AND dt_month_start >= date_add('month', -6, current_date)
+GROUP BY 1, 2
+ORDER BY 1 DESC, 2
+```
+
+### Query 3 — Negotiation volume and amount by status and classification
+
+Uses **`dw_collection_recovery_quintoandar.fact_negotiation`** (documented in `## Tables`) to break down negotiation counts and negotiated amounts by **`negotiation_status`** (started, offset, broken, finished, canceled) and **`negotiation_classification`** (ACORDO, QUITAÇÃO, SUBSTITUIÇÃO, PROMESSA, PROMESSA QUEBRADA).
+
+```sql
+SELECT
+    negotiation_status,
+    negotiation_classification,
+    COUNT(*) AS total_negotiations,
+    SUM(negotiated_amount) AS total_negotiated_amount
+FROM dw_collection_recovery_quintoandar.fact_negotiation
+WHERE dt_promisse >= date_add('month', -3, current_date)
+GROUP BY 1, 2
+ORDER BY total_negotiations DESC
+```
