@@ -69,7 +69,7 @@ cap_formated AS (
 
 vans_formated AS ( --Change columns name to match CAP layout
   SELECT
-    SPLIT(SPLIT(SPLIT(SPLIT(SPLIT(c.company_use, 'T')[0], 'P')[0], '!')[0], 'L')[0], 'I')[0] as supplier_description,
+    SPLIT(SPLIT(SPLIT(SPLIT(SPLIT(SPLIT(c.company_use, 'T')[0], 'P')[0], '!')[0], 'L')[0], 'I')[0], 'C')[0] as supplier_description,
     c.dt_paid AS dt_paid,
     CAST(extract(YEAR from c.dt_paid) AS varchar(4)) || LPAD(CAST(extract(MONTH from c.dt_paid) AS varchar(2)), 2, '0') as accrual_year_month,
     CASE
@@ -158,6 +158,9 @@ vans_formated AS ( --Change columns name to match CAP layout
         WHEN regexp_like((company_use),'^[0-9]+![0-9]+MC[0-9]+$') THEN 'Condominio v9'
         WHEN regexp_like((company_use),'^[0-9]+![0-9]+MT[0-9]+$') THEN 'Aluguel Manual'
         WHEN regexp_like((company_use),'^[0-9]+![0-9]+MCD[0-9]+$') THEN 'Condominio v9 - Despejo'
+        WHEN regexp_like((company_use), '^[0-9]+CD[0-9]+$') AND requested_by = 'payout-system' THEN 'Condomínio'
+        WHEN regexp_like((company_use), '^[0-9]+CDM[0-9]+$') AND requested_by = 'payout-system' THEN 'Condomínio'
+        WHEN regexp_like((company_use), '^[0-9]+CDD[0-9]+$') AND requested_by = 'payout-system' THEN 'Condomínio'
         WHEN regexp_like((company_use),'REFERA+!MO[0-9]+$') THEN 'Ongoing - Boleto'
         WHEN regexp_like((company_use),'^[0-9]+![0-9]+MCCM[0-9]+$') AND ts_updated >= '2024-02-06' THEN 'Contas de Consumo'
       END as pagamento

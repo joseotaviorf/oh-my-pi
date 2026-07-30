@@ -1,0 +1,141 @@
+---
+database_name: dw_fintech_snapshot_recon
+table_name: reservation_snapshot
+owner: sonia.gondo@quintoandar.com.br
+domain: Fintech
+description: "Monthly snapshot of charged rent reservations enriched with proposal, contract, tenant, listing, and Mundipagg payment data for finance reconciliation and reservation lifecycle tracking."
+columns:
+  sk_house_listing:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_house_listing
+    description: "Surrogate key of the house listing linked to the reservation rent flow."
+  id_house:
+    lineage:
+      - dw_rent.dim_house_listing.id_house
+    description: "Business identifier of the house associated with the reservation listing."
+  sk_client:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_client
+    description: "Surrogate key of the tenant user who created the reservation."
+  sk_rent_flow:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_rent_flow
+    description: "Surrogate key of the rent flow that ties reservation, proposal, and contract events."
+  reservation_status_real:
+    lineage:
+      - dw_rent.dim_reservation.status
+    description: "Current reservation status from dim_reservation at snapshot time."
+  status_at_date:
+    lineage:
+      - datalake_kill_queue_clean.reservation_aud.status
+    description: "Most recent audited reservation status from Kill Queue reservation history."
+  sk_reservation:
+    lineage:
+      - dw_rent.dim_reservation.sk_reservation
+    description: "Surrogate key of the reservation in the rent data warehouse."
+  value:
+    lineage:
+      - dw_rent.dim_reservation.value
+    description: "Reservation charge amount in local currency before payment gateway normalization."
+  installments:
+    lineage:
+      - dw_rent.dim_reservation.installments
+    description: "Number of credit card installments configured for the reservation charge."
+  reservation_date:
+    lineage:
+      - dw_rent.dim_reservation.ts_created
+    description: "Calendar date when the reservation was first created."
+  reservation_month:
+    lineage:
+      - dw_rent.dim_reservation.ts_created
+    description: "First day of the calendar month of the reservation creation date."
+  house_status:
+    lineage:
+      - dw_rent.dim_house_listing.house_status
+    description: "Listing status of the house at snapshot time."
+  nome:
+    lineage:
+      - dw_public.dim_user.nome
+    description: "Tenant full name from dim_user linked to the reservation client."
+  cpf:
+    lineage:
+      - dw_public.dim_user.cpf
+    description: "Tenant CPF document number from dim_user linked to the reservation client."
+  mundipagg_status:
+    lineage:
+      - datalake_wall_street_clean.charge.charge_status
+    description: "Mundipagg charge status for the reservation payment in store id 5."
+  mundipagg_updated_at:
+    lineage:
+      - datalake_wall_street_clean.charge.ts_updated
+    description: "Timestamp of the last Mundipagg charge update for the reservation payment."
+  mundipagg_charged_amount:
+    lineage:
+      - datalake_wall_street_clean.charge.amount
+    description: "Mundipagg charged amount in BRL after dividing the stored cents value by 100."
+  mundipagg_installments:
+    lineage:
+      - datalake_wall_street_clean.charge.installments
+    description: "Number of installments recorded in the Mundipagg charge."
+  sk_proposal:
+    lineage:
+      - dw_rent.dim_proposal.sk_proposal
+    description: "Surrogate key of the most recent proposal linked to the rent flow."
+  proposal_dt_update:
+    lineage:
+      - dw_rent.dim_proposal.dt_updated
+    description: "Last update date of the most recent proposal linked to the rent flow."
+  proposal_status:
+    lineage:
+      - dw_rent.dim_proposal.status
+    description: "Status of the most recent proposal linked to the rent flow."
+  proposal_rejection_reason:
+    lineage:
+      - dw_rent.dim_proposal.rejection_reason
+    description: "Rejection reason of the most recent proposal when the proposal was rejected."
+  sk_contract:
+    lineage:
+      - dw_rent.dim_contract.sk_contract
+    description: "Surrogate key of the contract linked to the rent flow proposal."
+  contract_signed:
+    lineage:
+      - dw_rent.dim_contract.ts_signature
+    description: "Flag indicating whether the linked contract has a recorded signature timestamp."
+  dt_contract_signed:
+    lineage:
+      - dw_rent.dim_contract.ts_signature
+    description: "Timestamp when the linked contract was signed."
+  contract_dt_update:
+    lineage:
+      - dw_rent.dim_contract.ts_updated
+    description: "Timestamp of the last update to the linked contract."
+  contract_created:
+    lineage:
+      - dw_rent.dim_contract.ts_created
+    description: "Timestamp when the linked contract was created."
+  contract_status:
+    lineage:
+      - dw_rent.dim_contract.status
+    description: "Current lifecycle status of the linked contract."
+  contract_rejection_reason:
+    lineage:
+      - dw_rent.dim_contract.cancellation_reason
+    description: "Cancellation reason of the linked contract when the contract was canceled."
+  reservation_status_final:
+    description: "Derived reservation outcome (FINISHED, RETURNED, CANCELED) based on audited status, proposal, and contract rules."
+  proposal_count:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_rent_flow
+    description: "Count of proposals associated with the rent flow before deduplication to the latest proposal."
+  charged_more_then_30_days:
+    lineage:
+      - dw_rent.dim_reservation.ts_created
+    description: "Flag indicating whether a charged or waiting-refund reservation is older than 30 days from creation."
+  ts_snapshot:
+    description: "Timestamp when the snapshot job ran (NOW)."
+  year:
+    description: "Year of CURRENT_DATE when the snapshot was taken."
+  month:
+    description: "Month of CURRENT_DATE when the snapshot was taken."
+  day:
+    description: "Day of CURRENT_DATE when the snapshot was taken."

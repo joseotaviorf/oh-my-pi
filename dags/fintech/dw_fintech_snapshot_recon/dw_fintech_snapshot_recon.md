@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG creates monthly snapshots of accounting funnel, contract recon, Robin Hood accounting entries, and rental guarantee data for finance reconciliation and time travel.
+This DAG creates monthly snapshots of accounting funnel, contract recon, Robin Hood accounting entries, rental guarantee, and reservation charge data for finance reconciliation and time travel.
 
 ### Execution interval
 
@@ -16,5 +16,6 @@ Incremental Delta tables in `dw_fintech_snapshot_recon`:
 - `dw_fintech_snapshot_recon.contract_recon_snapshot`
 - `dw_fintech_snapshot_recon.robin_hood_accounting_entry_snapshot`
 - `dw_fintech_snapshot_recon.rental_guarantee_snapshot`
+- `dw_fintech_snapshot_recon.reservation_snapshot`
 
 Partition columns: `year`, `month`, `day` (from `CURRENT_DATE()` at snapshot run). `ts_snapshot` is `NOW()` at run time.
