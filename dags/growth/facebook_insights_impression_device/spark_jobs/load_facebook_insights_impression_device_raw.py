@@ -25,7 +25,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_facebook_insights_impression_device_raw"
 
@@ -78,7 +78,9 @@ def save_to_datalake(
         )
     )
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     spark_metastore_service.create_database(write_database_name)
 
     s3_loader = S3Loader()

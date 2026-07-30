@@ -18,7 +18,7 @@ from bietlejuice.base.validation.spark_args import (
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_emlio_raw"
 
@@ -116,7 +116,9 @@ if __name__ == "__main__":
     }
 
     spark_client = SparkClient(session_params=session_params)
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     datalake_info = DatalakeMetastoreService.get_db_info(
         environment, schema, datalake_bucket

@@ -25,7 +25,7 @@ from bietlejuice.base.validation.spark_args import (
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 job_name = "load_survicate_survey_attributes_raw"
 scope = "quintoandar"
@@ -143,7 +143,9 @@ def _load_dataframe_into_datalake(
             target_table=args.target_table_name,
         )
     )
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(write_database_name)

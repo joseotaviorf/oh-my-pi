@@ -26,7 +26,7 @@ from bietlejuice.base.validation.spark_args import (
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_categories_documentation_to_raw"
 
@@ -166,7 +166,9 @@ if __name__ == "__main__":
 
     s3_loader = S3Loader()
     spark_client = SparkClient()
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     datalake_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
 

@@ -12,9 +12,11 @@ from bietlejuice.base.validation.spark_args import (
     resolve_datalake_write_target,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.pipeline import FullTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.pipeline import (
+    FullTableLoaderPipeline,
+    IncrementalTableLoaderPipeline,
+)
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "Hightouch Logs Load"
 spark_client = SparkClient()
@@ -97,7 +99,9 @@ def load_table_into_datalake(
         )
         format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+        )
 
         logging.info(
             "m=__main__, msg=Creating database in Spark Metastore if not exists..."
@@ -129,13 +133,16 @@ def load_table_into_datalake(
 
             partition_cols = ["year", "month", "day"]
             df.show()
-            # Write to S3
-            s3_loader = S3Loader()
-            s3_loader.load_df(
-                df=df,
-                s3_path=f"{write_location}{write_table_name}",
-                format_options=SparkTableStorageFormat.DEFAULT_RAW,
+            IncrementalTableLoaderPipeline(
+                write_database_name,
+                write_table_name,
+                write_location,
+                LayerEnum.RAW,
+                None,
                 partitions=partition_cols,
+            ).load_and_register(
+                df,
+                format_options,
                 optimize_dataframe=False,
             )
         else:

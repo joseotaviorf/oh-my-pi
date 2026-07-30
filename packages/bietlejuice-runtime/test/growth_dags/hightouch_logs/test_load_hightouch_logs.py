@@ -128,8 +128,8 @@ class TestLoadHightouchLogs(unittest.TestCase):
 
     @patch("load_hightouch_logs.spark")
     @patch("load_hightouch_logs.UnityCatalogHelper")
-    @patch("load_hightouch_logs.S3Loader")
-    @patch("load_hightouch_logs.SparkMetastoreService")
+    @patch("load_hightouch_logs.IncrementalTableLoaderPipeline")
+    @patch("load_hightouch_logs.MetastoreServiceFactory")
     @patch("load_hightouch_logs.DatalakeMetastoreService")
     @patch("load_hightouch_logs.SparkTableStorageFormat")
     @patch("load_hightouch_logs.spark_client")
@@ -139,7 +139,7 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_storage_format,
         mock_datalake_service,
         mock_metastore_service,
-        mock_s3_loader_class,
+        mock_incremental_pipeline,
         mock_unity_catalog,
         mock_spark,
     ):
@@ -154,10 +154,12 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = False
 
         mock_metastore_instance = Mock()
-        mock_metastore_service.return_value = mock_metastore_instance
+        mock_metastore_service.create_loader_metastore_service.return_value = (
+            mock_metastore_instance
+        )
 
-        mock_s3_loader_instance = Mock()
-        mock_s3_loader_class.return_value = mock_s3_loader_instance
+        mock_incremental_pipeline_instance = Mock()
+        mock_incremental_pipeline.return_value = mock_incremental_pipeline_instance
 
         # Act
         load_table_into_datalake(
@@ -186,20 +188,23 @@ class TestLoadHightouchLogs(unittest.TestCase):
         self.mock_df.selectExpr.assert_called_once()
         self.mock_df.show.assert_called_once()
 
-        # Verify S3Loader was called
-        mock_s3_loader_instance.load_df.assert_called_once()
-        s3_loader_call_args = mock_s3_loader_instance.load_df.call_args
-        self.assertEqual(s3_loader_call_args[1]["df"], self.mock_df)
-        self.assertEqual(
-            s3_loader_call_args[1]["s3_path"], "s3://bucket/raw/path/sync_runs_trino"
-        )
-        self.assertEqual(s3_loader_call_args[1]["partitions"], ["year", "month", "day"])
-        self.assertEqual(s3_loader_call_args[1]["optimize_dataframe"], False)
+        # The incremental branch registers through the pipeline so the table and its
+        # partitions land in Glue as well as the native catalog.
+        pipeline_args = mock_incremental_pipeline.call_args
+        self.assertEqual(pipeline_args[0][0], "datalake_hightouch_logs_raw")
+        self.assertEqual(pipeline_args[0][1], "sync_runs_trino")
+        self.assertEqual(pipeline_args[0][2], "s3://bucket/raw/path/")
+        self.assertEqual(pipeline_args[1]["partitions"], ["year", "month", "day"])
+
+        mock_incremental_pipeline_instance.load_and_register.assert_called_once()
+        register_args = mock_incremental_pipeline_instance.load_and_register.call_args
+        self.assertEqual(register_args[0][0], self.mock_df)
+        self.assertEqual(register_args[1]["optimize_dataframe"], False)
 
     @patch("load_hightouch_logs.spark")
     @patch("load_hightouch_logs.UnityCatalogHelper")
     @patch("load_hightouch_logs.FullTableLoaderPipeline")
-    @patch("load_hightouch_logs.SparkMetastoreService")
+    @patch("load_hightouch_logs.MetastoreServiceFactory")
     @patch("load_hightouch_logs.DatalakeMetastoreService")
     @patch("load_hightouch_logs.SparkTableStorageFormat")
     @patch("load_hightouch_logs.spark_client")
@@ -224,7 +229,9 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = False
 
         mock_metastore_instance = Mock()
-        mock_metastore_service.return_value = mock_metastore_instance
+        mock_metastore_service.create_loader_metastore_service.return_value = (
+            mock_metastore_instance
+        )
 
         mock_pipeline_instance = Mock()
         mock_pipeline.return_value = mock_pipeline_instance
@@ -253,8 +260,8 @@ class TestLoadHightouchLogs(unittest.TestCase):
 
     @patch("load_hightouch_logs.spark")
     @patch("load_hightouch_logs.UnityCatalogHelper")
-    @patch("load_hightouch_logs.S3Loader")
-    @patch("load_hightouch_logs.SparkMetastoreService")
+    @patch("load_hightouch_logs.IncrementalTableLoaderPipeline")
+    @patch("load_hightouch_logs.MetastoreServiceFactory")
     @patch("load_hightouch_logs.DatalakeMetastoreService")
     @patch("load_hightouch_logs.SparkTableStorageFormat")
     @patch("load_hightouch_logs.spark_client")
@@ -264,7 +271,7 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_storage_format,
         mock_datalake_service,
         mock_metastore_service,
-        mock_s3_loader_class,
+        mock_incremental_pipeline,
         mock_unity_catalog,
         mock_spark,
     ):
@@ -282,10 +289,12 @@ class TestLoadHightouchLogs(unittest.TestCase):
         mock_unity_catalog.get_current_catalog.return_value = "quintoandar_prod"
 
         mock_metastore_instance = Mock()
-        mock_metastore_service.return_value = mock_metastore_instance
+        mock_metastore_service.create_loader_metastore_service.return_value = (
+            mock_metastore_instance
+        )
 
-        mock_s3_loader_instance = Mock()
-        mock_s3_loader_class.return_value = mock_s3_loader_instance
+        mock_incremental_pipeline_instance = Mock()
+        mock_incremental_pipeline.return_value = mock_incremental_pipeline_instance
 
         mock_spark_sql = Mock()
         mock_spark.sql = mock_spark_sql
@@ -333,12 +342,12 @@ class TestLoadHightouchLogs(unittest.TestCase):
         self.mock_df.filter.return_value = self.mock_df
 
         with (
-            patch("load_hightouch_logs.SparkMetastoreService"),
+            patch("load_hightouch_logs.MetastoreServiceFactory"),
             patch(
                 "load_hightouch_logs.DatalakeMetastoreService"
             ) as mock_datalake_service,
             patch("load_hightouch_logs.SparkTableStorageFormat"),
-            patch("load_hightouch_logs.S3Loader"),
+            patch("load_hightouch_logs.IncrementalTableLoaderPipeline"),
             patch("load_hightouch_logs.UnityCatalogHelper") as mock_unity_catalog,
             patch("load_hightouch_logs.spark"),
         ):
@@ -661,8 +670,8 @@ class TestLoadHightouchLogsEdgeCases(unittest.TestCase):
 
     @patch("load_hightouch_logs.spark")
     @patch("load_hightouch_logs.UnityCatalogHelper")
-    @patch("load_hightouch_logs.S3Loader")
-    @patch("load_hightouch_logs.SparkMetastoreService")
+    @patch("load_hightouch_logs.IncrementalTableLoaderPipeline")
+    @patch("load_hightouch_logs.MetastoreServiceFactory")
     @patch("load_hightouch_logs.DatalakeMetastoreService")
     @patch("load_hightouch_logs.SparkTableStorageFormat")
     @patch("load_hightouch_logs.spark_client")
@@ -672,7 +681,7 @@ class TestLoadHightouchLogsEdgeCases(unittest.TestCase):
         mock_storage_format,
         mock_datalake_service,
         mock_metastore_service,
-        mock_s3_loader_class,
+        mock_incremental_pipeline,
         mock_unity_catalog,
         mock_spark,
     ):
@@ -684,10 +693,12 @@ class TestLoadHightouchLogsEdgeCases(unittest.TestCase):
         mock_unity_catalog.is_cluster_unity_catalog_enabled.return_value = False
 
         mock_metastore_instance = Mock()
-        mock_metastore_service.return_value = mock_metastore_instance
+        mock_metastore_service.create_loader_metastore_service.return_value = (
+            mock_metastore_instance
+        )
 
-        mock_s3_loader_instance = Mock()
-        mock_s3_loader_class.return_value = mock_s3_loader_instance
+        mock_incremental_pipeline_instance = Mock()
+        mock_incremental_pipeline.return_value = mock_incremental_pipeline_instance
 
         # Act
         load_table_into_datalake(
@@ -703,7 +714,7 @@ class TestLoadHightouchLogsEdgeCases(unittest.TestCase):
         )
 
         # Assert - should still process even with empty DataFrame
-        mock_s3_loader_instance.load_df.assert_called_once()
+        mock_incremental_pipeline_instance.load_and_register.assert_called_once()
 
     @patch("load_hightouch_logs.spark")
     def test_read_input_with_special_characters_in_path(self, mock_spark):

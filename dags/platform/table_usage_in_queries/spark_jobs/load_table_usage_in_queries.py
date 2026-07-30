@@ -20,7 +20,7 @@ from bietlejuice.base.validation.spark_args import (
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_table_usage_in_queries"
 REGEX_TABLE_PATTERN_IN_SQL = r"(?i)(?:FROM|JOIN)\s*(`?\w+`?\.`?\w+`?)"
@@ -176,7 +176,9 @@ def load_table(
     )
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(write_database_name)
 

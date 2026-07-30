@@ -30,7 +30,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.json_service import JsonService
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
@@ -154,7 +154,9 @@ if __name__ == "__main__":
         datalake_info = DatalakeMetastoreService.get_db_info(
             environment, dag_name, bucket
         )
-        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+        )
         database_name = datalake_info["db_raw_databricks"]
         database_location = datalake_info["db_raw_path"]
         write_database_name, write_table_name, write_location = (

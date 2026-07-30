@@ -27,7 +27,7 @@ from bietlejuice.base.validation.spark_args import (
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 DATABRICKS_SCOPE = "people"
 JOB_NAME = "load_hr_system_raw"
@@ -164,7 +164,9 @@ class Ingestion:
         logger.info(
             f"m={JOB_NAME}, msg=Creating database in Spark Metastore if not exists..."
         )
-        metastore_service = SparkMetastoreService(spark_client)
+        metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        )
         metastore_service.create_database(write_database_name)
         s3_loader = S3Loader()
         s3_loader.load_df(

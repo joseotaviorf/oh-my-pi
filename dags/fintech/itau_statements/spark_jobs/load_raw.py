@@ -30,7 +30,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_raw_sap_4hana"
 
@@ -229,7 +229,9 @@ if __name__ == "__main__":
         db_info = DatalakeMetastoreService.get_db_info(
             environment, source, datalake_bucket
         )
-        spark_metastore_service = SparkMetastoreService(SparkClient())
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(SparkClient())
+        )
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
         database_name = db_info["db_raw_databricks"]

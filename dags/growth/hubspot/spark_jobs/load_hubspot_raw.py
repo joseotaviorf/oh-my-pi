@@ -35,7 +35,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.json_service import JsonService
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_hubspot_raw"
 
@@ -327,7 +327,9 @@ def load_table_dataframes_into_datalake(
     database_location = db_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     partition_cols = ["year", "month", "day"]
 

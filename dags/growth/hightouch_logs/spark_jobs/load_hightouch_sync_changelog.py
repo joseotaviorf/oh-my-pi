@@ -10,6 +10,7 @@ from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.base.validation.spark_args import (
@@ -17,8 +18,8 @@ from bietlejuice.base.validation.spark_args import (
     resolve_datalake_write_target,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.pipeline import FullTableLoaderPipeline
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "Hightouch Sync Changelog Trino Load"
 RAW_PARTITION_COLUMNS = ["year", "month", "day"]
@@ -177,15 +178,20 @@ def _write_to_raw(
             target_table=target_table_name,
         )
     )
-    full_table_path = f"{write_location}{write_table_name}"
+    MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    ).create_database(write_database_name)
 
-    SparkMetastoreService(spark_client).create_database(write_database_name)
-
-    S3Loader().load_df(
-        df=df,
-        s3_path=full_table_path,
-        format_options=SparkTableStorageFormat.DEFAULT_RAW,
+    FullTableLoaderPipeline(
+        write_database_name,
+        write_table_name,
+        write_location,
+        LayerEnum.RAW,
+        None,
         partitions=RAW_PARTITION_COLUMNS,
+    ).load_and_register(
+        df,
+        SparkTableStorageFormat.DEFAULT_RAW,
         optimize_dataframe=False,
     )
 

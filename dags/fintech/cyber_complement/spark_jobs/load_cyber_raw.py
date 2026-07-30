@@ -24,7 +24,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_cyber_complement_into_datalake"
 
@@ -184,7 +184,9 @@ if __name__ == "__main__":
         db_info = DatalakeMetastoreService.get_db_info(
             environment, source, datalake_bucket
         )
-        spark_metastore_service = SparkMetastoreService(SparkClient())
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(SparkClient())
+        )
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
         # create database if it doesn't exists

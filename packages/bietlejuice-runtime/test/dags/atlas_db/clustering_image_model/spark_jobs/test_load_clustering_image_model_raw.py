@@ -147,7 +147,7 @@ class TestLoadDataframeIntoDatalake(unittest.TestCase):
         self.source = "clustering_image_model"
         self.raw_table_name = "clustering_image"
 
-    @patch(f"{MODULE_PATH}.SparkMetastoreService")
+    @patch(f"{MODULE_PATH}.MetastoreServiceFactory")
     @patch(f"{MODULE_PATH}.SparkMetastoreLoader")
     @patch(f"{MODULE_PATH}.S3Loader")
     @patch(f"{MODULE_PATH}.SparkClient")
@@ -160,7 +160,7 @@ class TestLoadDataframeIntoDatalake(unittest.TestCase):
         mock_spark_client,
         mock_s3_loader_cls,
         mock_metastore_loader_cls,
-        mock_metastore_svc_cls,
+        mock_metastore_factory,
     ):
         mock_datalake_svc.get_db_info.return_value = {
             "db_raw_databricks": "datalake_clustering_image_model_raw",
@@ -171,8 +171,11 @@ class TestLoadDataframeIntoDatalake(unittest.TestCase):
         mock_s3_loader = MagicMock()
         mock_s3_loader_cls.return_value = mock_s3_loader
 
+        # The job now goes through the factory so writes fan out to Glue as well.
         mock_metastore_svc = MagicMock()
-        mock_metastore_svc_cls.return_value = mock_metastore_svc
+        mock_metastore_factory.create_loader_metastore_service.return_value = (
+            mock_metastore_svc
+        )
 
         mock_metastore_loader = MagicMock()
         mock_metastore_loader_cls.return_value = mock_metastore_loader

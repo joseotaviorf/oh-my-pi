@@ -9,7 +9,7 @@ from bietlejuice.base.validation.spark_args import (
     resolve_datalake_write_target,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 from bietlejuice.services.storage_services import S3Service
 
 SOURCE = "zendesk"
@@ -46,7 +46,9 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
     db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
-    metastore_service = SparkMetastoreService(spark_client)
+    metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     s3_service = S3Service(boto3.resource("s3"))
 
     database_name = db_info["db_raw_databricks"]

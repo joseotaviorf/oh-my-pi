@@ -20,7 +20,7 @@ from bietlejuice.base.validation.spark_args import (
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_full_data_into_datalake_raw"
@@ -108,7 +108,9 @@ if __name__ == "__main__":
         df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
 
         db_info = DatalakeMetastoreService.get_db_info(environment, dag_name, bucket)
-        metastore_service = SparkMetastoreService(spark_client)
+        metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        )
         spark_metastore_loader = SparkMetastoreLoader(metastore_service)
         s3_loader = S3Loader()
 

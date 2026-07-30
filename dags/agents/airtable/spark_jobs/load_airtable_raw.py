@@ -24,7 +24,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_airtable_raw"
 
@@ -159,7 +159,9 @@ if __name__ == "__main__":
     airtable_consumer = AirtableConsumer(client=airtable_client, path=path)
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")

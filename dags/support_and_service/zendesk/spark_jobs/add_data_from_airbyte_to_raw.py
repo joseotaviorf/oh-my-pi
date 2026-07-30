@@ -16,7 +16,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 from bietlejuice.services.storage_services import S3Service
 
 JOB_NAME = "add_data_from_airbyte_to_raw"
@@ -46,7 +46,9 @@ if __name__ == "__main__":
     s3_consumer = S3Consumer(spark_client)
     s3_loader = S3Loader()
     s3_service = S3Service(boto3.resource("s3"))
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)

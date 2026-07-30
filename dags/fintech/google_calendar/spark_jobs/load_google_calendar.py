@@ -22,7 +22,7 @@ from bietlejuice.base.validation.spark_args import (
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_google_calendar"
 
@@ -62,7 +62,9 @@ if __name__ == "__main__":
     spark_client = SparkClient()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
