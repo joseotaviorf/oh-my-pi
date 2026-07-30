@@ -1,5 +1,13 @@
 # Matthew
 
+## Ownership
+
+**Data Owner:**
+- thiago.villani@quintoandar.com.br
+
+**Data Steward:**
+- thiago.villani@quintoandar.com.br
+
 ## Overview
 
 Matthew is the **AI agent dedicated to tenants with open balances** — overdue invoices or invoices not yet due — helping them regularize their debts via direct payment, payment-method support, or full-debt negotiation (installments / discounts). It is the collections counterpart to QuintoAndar's general-purpose support bot Wall-E.
@@ -149,7 +157,7 @@ When investigating escalations, decompose hierarchically:
 ### CDP (N:1 — user journey and persona outside session grain)
 
 - For **cross-entity user context** (visits, offers, contracts, invoices in one row set for Domi/Matthew-style products) → `datalake_transactional_entities.entities` on `sessions.id_user = entities.id_user`; see `business_entities/cdp.md`.
-- For **current platform role / journey step** → `datalake_cdp.persona` on `id_user` (not `datalake_cdp_personas.persona` unless the question is historical).
+- For **current platform role / journey step** → `datalake_cdp.persona` (external system, not in this repo) on `id_user` — not `datalake_cdp_personas.persona` (the repo-built table) unless the question is historical.
 - Session-level chatbot metrics stay in this doc and `business_entities/chatbot_sessions.md` — CDP does not replace `datalake_chatbot.sessions`.
 
 ### Support Tickets (1:1 — one ticket per escalated session)
