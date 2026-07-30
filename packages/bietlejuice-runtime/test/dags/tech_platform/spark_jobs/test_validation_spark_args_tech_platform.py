@@ -516,27 +516,13 @@ class TestTechPlatformSparkJobValidationArgs:
         monkeypatch.setattr(
             "dags.tech_platform.identitynow.spark_jobs.events_load.ConfigurationService",
             MagicMock(
-                return_value=MagicMock(
-                    get_config=MagicMock(
-                        side_effect=lambda key: {
-                            "input_path": "s3://input",
-                            "output_path": "s3://output",
-                        }[key]
-                    )
-                )
+                return_value=MagicMock(get_config=MagicMock(return_value="s3://input"))
             ),
         )
         monkeypatch.setattr(
             "dags.tech_platform.identitynow.spark_jobs.account_activities_load.ConfigurationService",
             MagicMock(
-                return_value=MagicMock(
-                    get_config=MagicMock(
-                        side_effect=lambda key: {
-                            "input_path": "s3://input",
-                            "output_path": "s3://output",
-                        }[key]
-                    )
-                )
+                return_value=MagicMock(get_config=MagicMock(return_value="s3://input"))
             ),
         )
         monkeypatch.setattr(
@@ -615,27 +601,13 @@ class TestTechPlatformSparkJobValidationArgs:
         monkeypatch.setattr(
             "dags.tech_platform.identitynow.spark_jobs.events_load.ConfigurationService",
             MagicMock(
-                return_value=MagicMock(
-                    get_config=MagicMock(
-                        side_effect=lambda key: {
-                            "input_path": "s3://input",
-                            "output_path": "s3://output",
-                        }[key]
-                    )
-                )
+                return_value=MagicMock(get_config=MagicMock(return_value="s3://input"))
             ),
         )
         monkeypatch.setattr(
             "dags.tech_platform.identitynow.spark_jobs.account_activities_load.ConfigurationService",
             MagicMock(
-                return_value=MagicMock(
-                    get_config=MagicMock(
-                        side_effect=lambda key: {
-                            "input_path": "s3://input",
-                            "output_path": "s3://output",
-                        }[key]
-                    )
-                )
+                return_value=MagicMock(get_config=MagicMock(return_value="s3://input"))
             ),
         )
         monkeypatch.setattr(

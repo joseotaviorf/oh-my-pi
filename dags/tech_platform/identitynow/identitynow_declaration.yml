@@ -10,6 +10,7 @@ dag:
 workflow:
   layer: clean
   type: query_delta
+  bucket_config_name: auditlogs_bucket
   custom_schema: identitynow_audit_logs
   spark_job_arguments:
     - "{dag_name}"

@@ -50,7 +50,6 @@ def parse_arguments():
 
     config_service = ConfigurationService(args.source)
     args.input_path = config_service.get_config("input_path")
-    args.output_path = config_service.get_config("output_path")
 
     return args
 
@@ -149,22 +148,17 @@ def main():
     database_name, database_location, _ = DatalakeMetastoreService.get_layer_info(
         args.env, args.schema, args.datalake_bucket, _CLEAN_LAYER
     )
-    if args.target_database_name and args.target_table_name:
-        write_database_name, write_table_name, write_location = (
-            resolve_datalake_write_target(
-                prod_database=database_name,
-                prod_table=args.table_name,
-                prod_location=database_location,
-                bucket=args.datalake_bucket,
-                target_database=args.target_database_name,
-                target_table=args.target_table_name,
-            )
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=args.table_name,
+            prod_location=database_location,
+            bucket=args.datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
         )
-        write_path = f"{write_location.rstrip('/')}/{write_table_name}"
-    else:
-        write_database_name = database_name
-        write_table_name = args.table_name
-        write_path = f"{args.output_path}/clean/{args.schema}/{args.table_name}/"
+    )
+    write_path = f"{write_location.rstrip('/')}/{write_table_name}"
 
     full_table_name = managed_table_fqn(
         prod_database=database_name,

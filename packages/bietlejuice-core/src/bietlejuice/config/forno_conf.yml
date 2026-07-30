@@ -97,6 +97,7 @@ incoming_bucket: 5a-datalake-incoming-forno
 wonka_bucket: wonka.s3.forno.data.quintoandar.com.br
 planning_and_performance_bucket: 5a-dataops-forno
 people_bucket: people-s3-forno-data-quintoandar-com-br
+auditlogs_bucket: auditlogs.s3.forno.quintoandar.com.br
 union_bucket: ingestao-dados-union/union
 analytical_environment_costs_bucket: 5a-analytical-environment-costs-prod
 doc_md_chart_url: https://qb343dade3ecd6cd6p-tp.appspot.com/admin/airflow/chart?chart_id=3&iteration_no=0&dag_id=
