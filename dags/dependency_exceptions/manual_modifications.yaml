@@ -490,6 +490,8 @@ bietlejuice.enrich_customer_demand:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
 bietlejuice.enrich_debt_recovery:
   remove:
+    - bietlejuice.enrich_recupera:load-enrich-invoice-debt-negotiation:first-run-of-day
+    - bietlejuice.enrich_recupera:load-enrich-negotiation-wallet:first-run-of-day
     - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
     - bietlejuice.recupera:load-clean-complementary-records-written-down:first-run-of-day
     - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day

@@ -1,0 +1,101 @@
+---
+database_name: datalake_retsuko
+table_name: bill_item_flags
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: |-
+  Invoice-level bill-item cluster flags and positive balances for tenant wallet segmentation.
+  Incremental snapshot keyed by id_invoice, recomputed when invoice or entry ts_retsuko_updated
+  changes within the load window. Requires an initial backfill run with a wide load_start_date
+  before consumers rely on complete coverage. Grain is one row per invoice with has_* and balance_*
+  columns per bill_item_cluster_name.
+columns:
+  id_invoice:
+    description: Retsuko invoice identifier (id_external).
+    lineage:
+      - datalake_retsuko.invoice.id_external
+      - datalake_retsuko.bill_items.id_invoice
+  has_bill_item_condominio:
+    description: True if the invoice has condominium (CONDOMINIO) bill items with positive balance.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_multa_recisoria:
+    description: True if the invoice has termination-fine (MULTA-RECISORIA) bill items with positive balance.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_acordo:
+    description: True if the invoice has agreement (ACORDO) bill items with positive balance.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_rental_core:
+    description: True if the invoice has rental-core (RENTAL-CORE) bill items with positive balance.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_reparos:
+    description: True if the invoice has repair (REPAROS) bill items with positive balance.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_multas_ongoing:
+    description: True if the invoice has ongoing-fine (MULTAS ONGOING) bill items with positive balance.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_utilidades:
+    description: True if the invoice has utilities (UTILIDADES) bill items with positive balance.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  has_bill_item_outros:
+    description: True if the invoice has other (OUTROS) bill items with positive balance.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_condominio:
+    description: Positive balance amount of condominium bill items on the invoice.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_multa_recisoria:
+    description: Positive balance amount of termination-fine bill items on the invoice.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_acordo:
+    description: Positive balance amount of agreement bill items on the invoice.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_rental_core:
+    description: Positive balance amount of rental-core bill items on the invoice.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_reparos:
+    description: Positive balance amount of repair bill items on the invoice.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_multas_ongoing:
+    description: Positive balance amount of ongoing-fine bill items on the invoice.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_utilidades:
+    description: Positive balance amount of utilities bill items on the invoice.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  balance_bill_item_outros:
+    description: Positive balance amount of other bill items on the invoice.
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_cluster_name
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  ts_load:
+    description: Timestamp when the invoice bill-item flags snapshot was materialized.
+    lineage:
+      - datalake_retsuko.bill_item_flags.NOW()

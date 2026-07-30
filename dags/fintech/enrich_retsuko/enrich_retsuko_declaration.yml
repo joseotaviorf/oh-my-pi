@@ -11,14 +11,24 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -7), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   inner_dependencies:
     bill_items:
       - invoice
     debt_forgiveness:
       - bill_items
+    bill_item_flags:
+      - bill_items
+      - invoice
+      - entry
     invoice_entry:
       - entry
     invoice_info:
       - invoice
     invoice:
       - entry
+  tables_customization:
+    bill_item_flags:
+      extraction_type: incremental

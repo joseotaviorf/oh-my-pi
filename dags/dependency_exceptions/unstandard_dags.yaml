@@ -14,6 +14,8 @@ bietlejuice.enrich_databricks_pricing:
   is_static: true
 bietlejuice.enrich_public_date:
   is_static: true
+bietlejuice.enrich_recupera:
+  is_static: true
 bietlejuice.enrich_static_files:
   is_static: true
 bietlejuice.enrich_trino_costs:
@@ -21,6 +23,8 @@ bietlejuice.enrich_trino_costs:
 bietlejuice.enrich_velo_omie:
   is_static: true
 bietlejuice.velo_omie:
+  is_static: true
+bietlejuice.recupera:
   is_static: true
 
 bietlejuice.gsheets: &gsheets-default

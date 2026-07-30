@@ -3,7 +3,7 @@ table_name: invoice_wallet_timeline_trato_feito
 owner: juliana.hocihara@quintoandar.com.br
 domain: Fintech
 description: |-
-  Daily timeline of tenant BR invoices for debt recovery wallet segmentation, built from Trato Feito (datalake_debt_recovery / datalake_trato_feito_clean) and Recupera without Cyber sources. Grain is one row per invoice, contract, and reference date, with bill-item composition from datalake_retsuko.bill_items. Each invoice is exploded into a daily timeline from begin date through payment (or load end if open).
+  Daily timeline of tenant BR invoices for debt recovery wallet segmentation, built from Trato Feito (datalake_debt_recovery / datalake_trato_feito_clean) and frozen Recupera legacy snapshots (datalake_recupera.invoice_debt_negotiation, datalake_recupera.negotiation_wallet) without Cyber sources. Grain is one row per invoice, contract, and reference date. Each invoice is exploded into a daily timeline from begin date through payment (or load end if open).
   Delay methodologies: T1 is delay from the nominal due date (ts_due). T2 applies deal delay contamination via dt_invoice_anchor and dt_created_negotiation_parent. T3 is the contract-level maximum of T2 on the reference date.
 columns:
   sk_invoice_wallet_timeline:
@@ -71,22 +71,12 @@ columns:
     description: Invoice purpose/type from invoice_portfolio.purpose (e.g. monthly, onboarding, extra).
     lineage:
     - datalake_collections_quintoandar.invoice_portfolio.purpose
-  recovery_channel:
-    description: Recovery channel assigned to the invoice in invoice_portfolio.
-    lineage:
-    - datalake_collections_quintoandar.invoice_portfolio.recovery_channel
   anchor_delay_from_deal:
     description: Days between parent negotiation creation and the invoice anchor date (DATEDIFF(dt_created_negotiation_parent,
       dt_invoice_anchor)). Used in T2 delay contamination.
     lineage:
     - datalake_collections_quintoandar.invoice_portfolio.dt_created_negotiation_parent
     - datalake_collections_quintoandar.invoice_portfolio.dt_invoice_anchor
-  recovery_channel_timeline:
-    description: Recovery channel as of dt_reference; null when the invoice was paid after the reference
-      date.
-    lineage:
-    - datalake_collections_quintoandar.invoice_portfolio.recovery_channel
-    - datalake_collections_quintoandar.invoice_portfolio.ts_paid
   has_negotiation_in_contract:
     description: Contract-level flag on dt_reference indicating at least one child-negotiation invoice
       exists in the wallet.
@@ -146,102 +136,6 @@ columns:
     - datalake_collections_quintoandar.invoice_portfolio.net_rate_recovery
     - datalake_collections_quintoandar.invoice_portfolio.invoice_status
     - datalake_collections_quintoandar.invoice_portfolio.ts_paid
-  has_bill_item_condominio:
-    description: True if the invoice has condominium (CONDOMINIO) bill items with positive balance.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  has_bill_item_multa_recisoria:
-    description: True if the invoice has termination-fine (MULTA-RECISORIA) bill items with positive balance.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  has_bill_item_acordo:
-    description: True if the invoice has agreement (ACORDO) bill items with positive balance.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  has_bill_item_rental_core:
-    description: True if the invoice has rental-core (RENTAL-CORE) bill items with positive balance.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  has_bill_item_reparos:
-    description: True if the invoice has repair (REPAROS) bill items with positive balance.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  has_bill_item_multas_ongoing:
-    description: True if the invoice has ongoing-fine (MULTAS ONGOING) bill items with positive balance.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  has_bill_item_utilidades:
-    description: True if the invoice has utilities (UTILIDADES) bill items with positive balance.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  has_bill_item_outros:
-    description: True if the invoice has other (OUTROS) bill items with positive balance.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  balance_bill_item_condominio:
-    description: Positive balance amount of condominium bill items on the invoice.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  balance_bill_item_multa_recisoria:
-    description: Positive balance amount of termination-fine bill items on the invoice.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  balance_bill_item_acordo:
-    description: Positive balance amount of agreement bill items on the invoice.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  balance_bill_item_rental_core:
-    description: Positive balance amount of rental-core bill items on the invoice.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  balance_bill_item_reparos:
-    description: Positive balance amount of repair bill items on the invoice.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  balance_bill_item_multas_ongoing:
-    description: Positive balance amount of ongoing-fine bill items on the invoice.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  balance_bill_item_utilidades:
-    description: Positive balance amount of utilities bill items on the invoice.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
-  balance_bill_item_outros:
-    description: Positive balance amount of other bill items on the invoice.
-    lineage:
-    - datalake_retsuko.bill_items.id_invoice
-    - datalake_retsuko.bill_items.bill_item_cluster_name
-    - datalake_retsuko.bill_items.value_sign_bill_item
   is_first_payment:
     description: Flag from invoice_portfolio indicating the contract first-payment milestone.
     lineage:
