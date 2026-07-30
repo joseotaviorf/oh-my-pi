@@ -213,44 +213,6 @@ columns:
     lineage:
     - datalake_ebdb_clean.visitor.absence_reason
     description: Describes the reason why owner did not show up
-  troublesome_entrance_problem:
-    lineage:
-    - datalake_ebdb_clean.entrance.problem
-    - datalake_ebdb_clean.visit_status_log.reason
-    description: If it was not possible to enter the property to visit (succesful_entrance = 0), then this column lists the reason why it was not possible to enter.
-    categories:
-      Allowed: The visit was allowed
-      BrokenLockbox: The lockbox was damaged and the visit could not be completed
-      BuildingAsOkAuthorizationListRequired: It was necessary to align the visit with the condominium/building and it was not possible to complete the visit
-      DamagedKeys: The keys were damaged and it was not possible to enter the listing
-      DidntGetKeys: The keys were not delivered by the person in charge for the visit to be complete
-      KeysKeeperNotPresent: The person responsible for the keys to the listing did not show up for the visit
-      KeysNotAvailable: The keys were not available for the visit
-      LandlordNoShow: The owner did not show up for the visit
-      LockboxProblems: Lockbox related problems and the visit could not be completed
-      MissplacedKeys: The keys were missplaced
-      NameNotInTheList: Some of the parties involved in the visit did not have permission to enter the listing
-      NoCollectiveAuthorization: Some of the parties involved in the visit did not have permission to enter the listing
-      NoEntrancePermission: He was not allowed to enter the listing.'
-      NoIndividualAuthorization: Some of the parties involved in the visit did not have permission to enter the listing
-      NoKeysLockbox: The keys were not in the lockbox and the visit cannot be compelled
-      NoLockbox: Not having lockbox once the visit cannot be completed
-      None: Booking with no troublesome or unknown troublesome
-      NotAllowed: The visit was not allowed for some unspecified reason
-      OwnerQuitAnnouncement: The owner has given up listing
-      PropertyNorForRent: Listing was actually not for rent
-      PropertyNotForSale: Listing was actually not for sale
-      Rented: The listing was already rented
-      RentedByAnotherCompany: The listing has been rented on another platform or real estate agent
-      RentedOrLandlordQuitRenting: Rented or owner has given up putting the listing up for rent
-      ResidentTenantDidntAllowVisit: Current tenant did not allow listing to be visited
-      ResidentTenantDidntKnowVisit: Current tenant did not know that the listing would be visited
-      SoldByAnotherCompany: The listing was sold by another platform or real estate company
-      TemporarilyUnavailable: The listing is temporarily unavailable
-      TenantDelay: The tenant was delaye
-      VisitOffAllowedHours: The visit was outside the available visiting hours
-      WrongAddress: The listing address was incorrect
-      WrongPassword: The password for the electronic lock entered was incorrect
   cancellation_reason:
     lineage:
     - datalake_ebdb_clean.booking_status_change.reason_enum
@@ -354,11 +316,6 @@ columns:
       Reschedule_Tenant: The booking was rescheduled by the tenant
       Tenant: The tenant cancelled the booking
       Unknown: ''
-  owner_missing_reason:
-    lineage:
-    - datalake_ebdb_clean.entrance.problem
-    - datalake_ebdb_clean.visit_status_log.reason
-    description: '[Deprecated] Describes the reason why owner did not show up (by agent app follow up).'
   reason_category:
     lineage:
     - datalake_gsheets_clean.from_to_cancellation.new_reason
@@ -501,23 +458,6 @@ columns:
     lineage:
     - datalake_ebdb_clean.booking.id_rescheduled_booking
     description: Boolean column indicating if the visit has been rescheduled. True if it was cancelled to be reschedule.
-  has_tenant_attended:
-    lineage:
-    - datalake_ebdb_clean.visitor.has_attended
-    description: Boolean column to identify if the visitor appeared at the visit. True if attended.
-  has_agent_attended:
-    lineage:
-    - datalake_ebdb_clean.visitor.has_attended
-    description: Boolean column to identify if the agent appeared at the visit. True if attended.
-  has_landlord_attended:
-    lineage:
-    - datalake_ebdb_clean.visitor.has_attended
-    description: Boolean column to identify if the owner appeared at the visit where the rule is visitor_type = 'Landlord' and has attended = true from the table datalake_ebdb_clean.visitor
-  has_owner_arrived:
-    lineage:
-    - datalake_ebdb_clean.entrance.problem
-    - datalake_ebdb_clean.visit_status_log.reason
-    description: Boolean column to identify if the owner appeared at the visit where the rule is if the entrance problem <> 'LandlordNoShow then true
   is_first_booking_auto:
     lineage:
     - datalake_ebdb_clean.booking_status_change.id_user

@@ -97,16 +97,6 @@ visit_origin_unified AS (
     WHERE
         new.ts_visit_requested IS NOT NULL
 ),
-visitor_attendance AS (
-    SELECT
-        v.id_booking,
-        MAX(IF(v.type='Tenant', v.has_attended, NULL)) AS has_tenant_attended,
-        MAX(IF(v.type='Agent', v.has_attended, NULL)) AS has_agent_attended,
-        MAX(IF(v.type='Landlord', v.has_attended, NULL)) AS has_landlord_attended
-    FROM
-        datalake_ebdb_clean.visitor AS v
-    GROUP BY v.id_booking
-),
 visitor_absence_reason AS (
     -- get valid absence reasons
     WITH base_reasons AS (
@@ -450,7 +440,6 @@ base_booking AS (
           AS tenant_absence_reason,
         vab.agent_absence_reason,
         vab.landlord_absence_reason,
-        COALESCE(e.problem, fup_vsl.reason) AS troublesome_entrance_problem,
         IF(b.status = 'Cancelado', sc.reason_enum, NULL) AS cancellation_reason,
         CASE
           WHEN b.status = 'Cancelado' THEN
@@ -504,7 +493,6 @@ base_booking AS (
               ELSE 'Unknown'
             END
         END AS cancellation_reason_category,
-        IF(COALESCE(e.problem, fup_vsl.reason) = 'LandlordNoShow', 'Absent', NULL) AS owner_missing_reason,
         COALESCE(
           NULLIF(
             COALESCE(
@@ -595,10 +583,6 @@ base_booking AS (
         (b.id_rescheduled_booking IS NOT NULL) AS is_via_reschedule,
         -- was rescheduled to another booking
         (resc.id_rescheduled_from IS NOT NULL) AS has_reschedule,
-        va.has_tenant_attended,
-        va.has_agent_attended,
-        va.has_landlord_attended,
-        (COALESCE(e.problem, fup_vsl.reason) <> 'LandlordNoShow') AS has_owner_arrived,
         CASE
             WHEN fba.id_user_creation = 194233 THEN True
             ELSE False
@@ -620,17 +604,11 @@ base_booking AS (
         canceled_date AS cd
             ON cd.id_booking = b.id
     LEFT JOIN
-        visitor_attendance AS va
-            ON b.id = va.id_booking
-    LEFT JOIN
         visitor_absence_reason AS vab
             ON b.id = vab.id_booking
     LEFT JOIN
         datalake_ebdb_clean.follow_up_details AS fud
             ON fud.id = b.id_fup_details
-    LEFT JOIN
-        datalake_ebdb_clean.entrance AS e
-      ON fud.id_entrance = e.id
     LEFT JOIN
         reschedules AS resc
       ON resc.id_rescheduled_from = b.id
@@ -760,10 +738,8 @@ SELECT
     bb.tenant_absence_reason,
     bb.agent_absence_reason,
     bb.landlord_absence_reason,
-    bb.troublesome_entrance_problem,
     bb.cancellation_reason,
     bb.cancellation_reason_category,
-    bb.owner_missing_reason,
     bb.reason_category,
     bb.user_sale_booking_creator,
     bb.hub_agent_region,
@@ -794,10 +770,6 @@ SELECT
     bb.is_visit_performed,
     bb.is_via_reschedule,
     bb.has_reschedule,
-    bb.has_tenant_attended,
-    bb.has_agent_attended,
-    bb.has_landlord_attended,
-    bb.has_owner_arrived,
     bb.is_first_booking_auto,
     bb.is_house_rented,
     TO_UTC_TIMESTAMP(bb.ts_booking_local_tz, default_timezone) AS ts_booking_utc,

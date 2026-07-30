@@ -1809,7 +1809,6 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb_visit:load-clean-appointment-change-reason-category:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking-aud:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-booking-status-change:first-run-of-day
-  - bietlejuice.ebdb_visit:load-clean-entrance:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-follow-up-details:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-house-weekly-schedule-aud:first-run-of-day
   - bietlejuice.ebdb_visit:load-clean-house-weekly-schedule:first-run-of-day
