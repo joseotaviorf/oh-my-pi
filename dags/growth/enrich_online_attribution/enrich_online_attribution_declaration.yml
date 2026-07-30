@@ -17,6 +17,3 @@ workflow:
   inner_dependencies:
     online_attribution:
       - events_exploded
-  tables_customization:
-    online_attribution:
-      z_order_by: [ts_event, event_type_sanitized]
