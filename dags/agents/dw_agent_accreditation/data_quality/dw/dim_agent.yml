@@ -37,12 +37,16 @@ column_level_validations:
       # Every sk_broker > -1 must exist in dw_brokers.dim_broker (no orphan broker FKs).
       constraint: |-
         (SELECT COUNT(*)
-         FROM dw_agent.dim_agent AS da
-         WHERE da.sk_broker > -1
-           AND NOT EXISTS (
-             SELECT 1 FROM dw_brokers.dim_broker AS db
-             WHERE db.sk_broker = da.sk_broker
-           )
+         FROM (
+           SELECT sk_broker AS agent_broker_sk
+           FROM dw_agent.dim_agent
+           WHERE sk_broker > -1
+         ) AS agent_row
+         WHERE NOT EXISTS (
+           SELECT 1
+           FROM dw_brokers.dim_broker AS broker_dim
+           WHERE broker_dim.sk_broker = agent_row.agent_broker_sk
+         )
         ) = 0
       severity_level: Error
   has_rent_lead_referral:
