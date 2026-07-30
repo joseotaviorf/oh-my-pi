@@ -3,8 +3,11 @@ database_name: dw_agent
 table_name: dim_agent
 domain: Agents
 owner: gustavo.rompe@quintoandar.com.br
-description: Dimension table projecting agent accreditation agent profile from enrich
-  layer.
+description: |
+  Agent dimension from the agent accreditation enrich layer, one row per accredited agent.
+  Projects profile, partnership flags, Traz Quem Aluga (TQA) and Traz Quem Compra (TQC) referral
+  invite flags, and broker linkage for 3P agents. Consumed by Agents squad analytics; join
+  sk_broker to dw_brokers.dim_broker for imobiliária attributes.
 columns:
   sk_agent:
     description: Unique identifier of the agent in EBDB.
@@ -25,6 +28,13 @@ columns:
       main credential reference.
     lineage:
     - datalake_agent_accreditation.agent.id_user
+  sk_broker:
+    description: |
+      Surrogate key of the imobiliária (broker agency) in dw_brokers.dim_broker. Populated
+      only when is_3p_partnership is TRUE, resolved by matching uuid_company to
+      core_brokers.brokers. Returns -1 for non-3P agents with no broker linkage.
+    lineage:
+    - core_brokers.brokers.sk_broker
   uuid_company:
     description: Company UUID when the agent partnership representative type is COMPANY_UUID.
     lineage:
@@ -100,6 +110,39 @@ columns:
       flag).
     lineage:
     - datalake_agent_accreditation.agent.is_3p_partnership
+  has_rent_lead_referral:
+    description: |
+      True when the agent has at least one tenant lead referral invite (business context
+      RENT, status other than NOT_ELIGIBLE). Indicates participation in the Traz Quem
+      Aluga (TQA) program via pending or active invites sent by the agent.
+    lineage:
+    - datalake_ebdb_clean.agent_lead_referral.business_context
+    - datalake_ebdb_clean.agent_lead_referral.status
+  has_rent_lead_referral_confirmed:
+    description: |
+      True when the agent has at least one confirmed tenant lead referral invite (business
+      context RENT, status CONFIRMED). Indicates a tenant accepted an invite sent by the
+      agent, effectively confirming participation in the Traz Quem Aluga (TQA) program.
+    lineage:
+    - datalake_ebdb_clean.agent_lead_referral.business_context
+    - datalake_ebdb_clean.agent_lead_referral.status
+  has_sale_lead_referral:
+    description: |
+      True when the agent has at least one buyer lead referral invite (business context
+      SALE or null, status other than NOT_ELIGIBLE). Indicates participation in the Traz
+      Quem Compra (TQC) program via pending or active invites sent by the agent.
+    lineage:
+    - datalake_ebdb_clean.agent_lead_referral.business_context
+    - datalake_ebdb_clean.agent_lead_referral.status
+  has_sale_lead_referral_confirmed:
+    description: |
+      True when the agent has at least one confirmed buyer lead referral invite
+      (business context SALE or null, status CONFIRMED). Indicates a buyer accepted an
+      invite sent by the agent, effectively confirming participation in the Traz Quem
+      Compra (TQC) program.
+    lineage:
+    - datalake_ebdb_clean.agent_lead_referral.business_context
+    - datalake_ebdb_clean.agent_lead_referral.status
   days_in_current_status:
     description: Number of days in the current status.
     lineage:

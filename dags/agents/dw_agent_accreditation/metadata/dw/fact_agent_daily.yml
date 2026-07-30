@@ -41,6 +41,14 @@ columns:
     lineage:
       - datalake_agent_accreditation.agent_daily.id_user
       - datalake_agent_accreditation.agent.id_user
+  sk_broker:
+    description: |
+      Surrogate key of the imobiliária (broker agency) in dw_brokers.dim_broker on the
+      reference date. Populated only when is_3p_partnership is TRUE for that day, resolved
+      via uuid_company and core_brokers.brokers. Returns -1 for non-3P agents or when no
+      broker match exists.
+    lineage:
+      - core_brokers.brokers.sk_broker
   sk_tier_demand_conversion_fr:
     description: Tier identifier for the for rent demand conversion incentive system. Only available for active agents.
     lineage:

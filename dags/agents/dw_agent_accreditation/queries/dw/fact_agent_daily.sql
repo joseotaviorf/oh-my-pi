@@ -155,6 +155,7 @@ SELECT
     COALESCE(ad.id_agent_data, ds.id_agent_data) AS sk_agent_data,
     COALESCE(ad.id_partner, ds.id_partner) AS sk_partner,
     COALESCE(ad.id_user, ds.id_user) AS sk_user,
+    COALESCE(cb.sk_broker, -1) AS sk_broker,
     IF(ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED'), t.sk_tier_demand_conversion_fr, NULL) AS sk_tier_demand_conversion_fr,
     IF(ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED'), t.sk_tier_demand_conversion_fs, NULL) AS sk_tier_demand_conversion_fs,
     COALESCE(ad.uuid_company, ds.uuid_company) AS uuid_company,
@@ -196,6 +197,10 @@ LEFT JOIN
 LEFT JOIN
     tier AS t
         ON t.id_agent_daily = ds.id_agent_daily
+LEFT JOIN
+    core_brokers.brokers AS cb
+        ON COALESCE(ad.uuid_company, ds.uuid_company) = cb.uuid_company
+        AND COALESCE(ad.is_3p_partnership, ds.is_3p_partnership) = TRUE
 WHERE
     ds.agent_status IN ('AGENT_ACTIVATED', 'AGENT_REACTIVATED')
     OR (ds.agent_status = 'AGENT_INACTIVATED' AND TIMESTAMPDIFF(DAY, DATE(ds.ts_last_status_changed), ds.dt_ref) < 1)

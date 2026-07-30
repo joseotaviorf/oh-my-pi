@@ -97,7 +97,9 @@ bietlejuice.dw_agent:
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
 bietlejuice.dw_agent_accreditation:
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
+  - bietlejuice.ebdb_agent:load-clean-agent-lead-referral:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-agent-daily:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-agent-event-log:first-run-of-day
   - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day

@@ -19,3 +19,41 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
+  sk_broker_only_for_3p_partnership:
+    custom:
+      # sk_broker is populated (not -1) only when is_3p_partnership is TRUE; non-3P agents must have sk_broker = -1.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_agent.dim_agent
+         WHERE (is_3p_partnership = TRUE AND sk_broker = -1)
+            OR (is_3p_partnership = FALSE AND sk_broker <> -1)
+        ) = 0
+      severity_level: Error
+  matching_sk_broker_dim_broker:
+    custom:
+      # Every sk_broker > -1 must exist in dw_brokers.dim_broker (no orphan broker FKs).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_agent.dim_agent AS da
+         WHERE da.sk_broker > -1
+           AND NOT EXISTS (
+             SELECT 1 FROM dw_brokers.dim_broker AS db
+             WHERE db.sk_broker = da.sk_broker
+           )
+        ) = 0
+      severity_level: Error
+  has_rent_lead_referral:
+    is_complete:
+      severity_level: Error
+  has_rent_lead_referral_confirmed:
+    is_complete:
+      severity_level: Error
+  has_sale_lead_referral:
+    is_complete:
+      severity_level: Error
+  has_sale_lead_referral_confirmed:
+    is_complete:
+      severity_level: Error
