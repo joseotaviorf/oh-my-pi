@@ -31,7 +31,7 @@ lease lifecycle stage.
 
 ## Glossary and Synonyms
 
-- **SLA - VT**, **SLA de Vistoria**, **Inspection SLA**, **Produtividade de Vistoria** → Inspection SLA
+- **SLA - VT**, **SLA de Vistoria**, **Inspection SLA**, **Produtividade de Vistoria**, **SLA de inspections**→ Inspection SLA
 - **target de sla de vistoria**, **meta de SLA**, **target de sla de onb+off** → Inspection SLA
 
 ## Scope
