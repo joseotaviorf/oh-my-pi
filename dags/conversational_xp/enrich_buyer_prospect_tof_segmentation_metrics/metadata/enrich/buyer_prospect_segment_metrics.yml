@@ -1,0 +1,42 @@
+---
+database_name: datalake_search
+table_name: buyer_prospect_segment_metrics
+owner: catarina.freitas@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Monthly top of funnel (ToF) business metrics pivoted by buyer activity segment and post-activation cohort window (4w or 8w). Each row is one metric for an activation month, business context, and cohort window with values per segment. A range run refreshes every activation month that has at least one daily activity row within the requested interval. Segments are derived from cumulative daily activity in buyer_prospect_segmentation. Output for dashboards and experimentation monitoring.
+columns:
+  dt_activation_month:
+    description: Calendar month when buyers converted, used as the metrics time axis.
+    lineage:
+      - datalake_search.buyer_prospect_segmentation.dt_activation_month
+  business_context:
+    description: Sale business line for the aggregated buyer cohort.
+    lineage:
+      - datalake_search.buyer_prospect_segmentation.business_context
+  cohort_window:
+    description: Post-activation activity window label, either 4w (27 days) or 8w (55 days) after buyer conversion.
+  metric:
+    description: Business metric identifier such as num_active_buyers, avg_spv_per_active_buyer, pct_search_with_lpv, or discovery_rate.
+  overall:
+    description: Metric value calculated across every buyer in the activation-month cohort, including cohort-level rates not broken out by segment.
+  qualified_search_active:
+    description: Metric value for buyers with more than 10 search interactions in the cohort window.
+  low_search_active:
+    description: Metric value for buyers with 1 to 10 search interactions in the cohort window.
+  active_no_search:
+    description: Metric value for buyers with zero search interactions but at least one LPV or schedule page view in the cohort window.
+  inactive:
+    description: Metric value for buyers with no search interactions, LPVs, or schedule page views in the cohort window.
+  year:
+    description: Partition year derived from dt_activation_month for partition pruning.
+    lineage:
+      - datalake_search.buyer_prospect_segmentation.dt_activation_month
+  month:
+    description: Partition month derived from dt_activation_month for partition pruning.
+    lineage:
+      - datalake_search.buyer_prospect_segmentation.dt_activation_month
+  day:
+    description: Partition day derived from dt_activation_month (always first of month).
+    lineage:
+      - datalake_search.buyer_prospect_segmentation.dt_activation_month

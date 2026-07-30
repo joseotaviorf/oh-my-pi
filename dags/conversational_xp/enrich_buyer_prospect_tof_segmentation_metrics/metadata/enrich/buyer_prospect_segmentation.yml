@@ -1,0 +1,127 @@
+---
+database_name: datalake_search
+table_name: buyer_prospect_segmentation
+owner: catarina.freitas@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Daily user-level search, LPV, schedule, and visit activity counts for buyer prospects in the 4-week and 8-week post-activation windows. A range run writes one daily slice for every requested partition date. Grain is one row per user per activation month per partition date (dt_partition). Rows are merged incrementally; buyer_prospect_segment_metrics aggregates them for cohort health reporting. Sale business context only.
+columns:
+  id_user:
+    description: QuintoAndar internal user identifier for the segmented buyer prospect.
+    lineage:
+      - datalake_search.buyer_prospect_base.id_user
+  business_context:
+    description: Sale business line for the buyer cohort.
+    lineage:
+      - datalake_search.buyer_prospect_base.business_context
+  is_concierge_prospect:
+    description: Whether the buyer prospect's conversion is linked to a visit booked through the Concierge chatbot.
+    lineage:
+      - datalake_search.buyer_prospect_base.is_concierge_prospect
+  dt_activation_month:
+    description: Calendar month of the buyer conversion used to group cohort metrics.
+    lineage:
+      - datalake_search.buyer_prospect_base.dt_activation_month
+  ts_bp_activation:
+    description: Timestamp when the buyer prospect activated and the post-activation cohort windows begin.
+    lineage:
+      - datalake_search.buyer_prospect_base.ts_bp_activation
+  dt_window_4w_end:
+    description: Final calendar date included in the buyer's 4-week post-activation activity window.
+    lineage:
+      - datalake_search.buyer_prospect_base.dt_window_4w_end
+  dt_window_8w_end:
+    description: Final calendar date included in the buyer's 8-week post-activation activity window.
+    lineage:
+      - datalake_search.buyer_prospect_base.dt_window_8w_end
+  dt_partition:
+    description: Snapshot date for the daily incremental load; activity counts reflect events on this calendar day within each buyer's post-activation window.
+  sum_interactions_8w:
+    description: Distinct search impression timestamps on dt_partition within the 8-week post-activation window.
+    lineage:
+      - datalake_search.search_impressions.ts_event
+  sum_interactions_4w:
+    description: Distinct search impression timestamps on dt_partition within the 4-week post-activation window.
+    lineage:
+      - datalake_search.search_impressions.ts_event
+  sum_search_8w:
+    description: Distinct searches, identified by id_search, on dt_partition within the 8-week post-activation window.
+    lineage:
+      - datalake_search.search_impressions.ids
+  sum_search_4w:
+    description: Distinct searches, identified by id_search, on dt_partition within the 4-week post-activation window.
+    lineage:
+      - datalake_search.search_impressions.ids
+  sum_search_with_lpv_8w:
+    description: Distinct searches on dt_partition with at least one search-result listing matched to an LPV within the 8-week post-activation window. An LPV matches only when day, buyer, session, search, and listing all match; the earliest matching LPV is retained.
+    lineage:
+      - datalake_search.search_impressions.ids
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  sum_search_with_lpv_4w:
+    description: Distinct searches on dt_partition with at least one search-result listing matched to an LPV within the 4-week post-activation window. An LPV matches only when day, buyer, session, search, and listing all match; the earliest matching LPV is retained.
+    lineage:
+      - datalake_search.search_impressions.ids
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  sum_search_lpv_8w:
+    description: Total search-result listing rows on dt_partition with a matched LPV within the 8-week post-activation window. This counts matched search-result listings, not LPV events; use sum_lpv_8w for LPV event counts.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  sum_search_lpv_4w:
+    description: Total search-result listing rows on dt_partition with a matched LPV within the 4-week post-activation window. This counts matched search-result listings, not LPV events; use sum_lpv_4w for LPV event counts.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  sum_listing_spv_8w:
+    description: Total listing impressions shown in search results on dt_partition within the 8-week post-activation window.
+    lineage:
+      - datalake_search.search_impressions.ids
+  sum_listing_spv_4w:
+    description: Total listing impressions shown in search results on dt_partition within the 4-week post-activation window.
+    lineage:
+      - datalake_search.search_impressions.ids
+  sum_lpv_8w:
+    description: Total listing page views from any source on dt_partition within the 8-week post-activation window.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  sum_lpv_4w:
+    description: Total listing page views from any source on dt_partition within the 4-week post-activation window.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  sum_schedule_8w:
+    description: Total schedule page views on dt_partition within the 8-week post-activation window.
+    lineage:
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.ts_event
+  sum_schedule_4w:
+    description: Total schedule page views on dt_partition within the 4-week post-activation window.
+    lineage:
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.ts_event
+  sum_visit_8w:
+    description: Total visit bookings on dt_partition within the 8-week post-activation window.
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_booking_created
+  sum_visit_4w:
+    description: Total visit bookings on dt_partition within the 4-week post-activation window.
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_booking_created
+  id_house_partition_spv_ts:
+    description: Daily array of first search-result impressions per listing within the buyer post-activation window. Each struct contains id_house, ts_event, is_4w, and has_lpv; is_4w marks whether the event falls in the 4-week window, while has_lpv is 1 when the search-result listing matches an LPV on day, buyer, session, search, and listing (retaining the earliest matching LPV) and 0 otherwise.
+    lineage:
+      - datalake_search.search_impressions.ids
+      - datalake_search.search_impressions.ts_event
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.event_properties
+  id_house_partition_lpv_ts:
+    description: Daily array of first listing page views per listing within the buyer post-activation window. Each struct contains id_house, ts_event, and is_4w; is_4w marks whether the event falls in the 4-week window.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
+  id_house_partition_vb_ts:
+    description: Daily array of first visit bookings per listing within the buyer post-activation window. Each struct contains id_house, ts_event from ts_first_booking_created, and is_4w; is_4w marks whether the event falls in the 4-week window.
+    lineage:
+      - datalake_sale_flows.sale_flow.id_house
+      - datalake_sale_flows.sale_flow.ts_first_booking_created
+  year:
+    description: Partition year derived from dt_partition.
+  month:
+    description: Partition month derived from dt_partition.
+  day:
+    description: Partition day derived from dt_partition.

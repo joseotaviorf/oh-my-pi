@@ -1,0 +1,52 @@
+---
+database_name: datalake_search
+table_name: buyer_prospect_base
+owner: catarina.freitas@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Active buyer prospects (first time activation or recovery from inactivity) deduplicated per user and activation month. The cohort includes only CONVERSION events in the sale business context with event_name equal to USER FIRST ACTIVATION, USER RECOVERY, or USER RECOVERY IN OTHER CITY GROUP. Each run rebuilds activation months intersecting its requested date interval. Each row defines the 4-week and 8-week post-activation cohort windows used by downstream top of funnel (ToF) metrics. Grain is one row per user per activation month.
+columns:
+  id_user:
+    description: QuintoAndar internal user identifier for the converted buyer prospect.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_prospect
+  business_context:
+    description: Business line for the buyer cohort. Always sale for this pipeline.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.business_context
+  is_concierge_prospect:
+    description: Whether the buyer prospect's conversion is linked to a visit booked through the Concierge chatbot (direct or indirect) when user and visit id match a record in the Concierge demand funnel.
+    lineage:
+      - datalake_search.concierge_demand.is_concierge_prospect
+  dt_activation_month:
+    description: Calendar month of the buyer conversion, truncated to the first day of the month.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+  ts_bp_activation:
+    description: Timestamp of the nBP or rBP conversion event that opens the post-activation cohort window.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+  dt_window_4w_end:
+    description: End date of the 4-week post-activation window (27 days after activation).
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+  dt_window_8w_end:
+    description: End date of the 8-week post-activation window (55 days after activation).
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+  event_name:
+    description: Conversion type label distinguishing new buyer prospect (nbp) from recovered buyer prospect (rbp).
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.event_name
+  year:
+    description: Partition year derived from dt_activation_month for storing each buyer cohort by its activation month.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+  month:
+    description: Partition month derived from dt_activation_month for storing each buyer cohort by its activation month.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
+  day:
+    description: Partition day derived from dt_activation_month; always the first day of the buyer activation month.
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.ts_event
