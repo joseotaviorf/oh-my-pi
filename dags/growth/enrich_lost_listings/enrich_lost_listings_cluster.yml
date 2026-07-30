@@ -2,9 +2,11 @@ cluster:
   type: emr_7_12_consolidation_xs_memory_fleet_cluster
   custom_libraries:
   - pypi:
-      package: lightgbm>=3.3.1
+      package: lightgbm==4.5.0
   - pypi:
-      package: scikit-learn>=0.24.0
+      package: scikit-learn==1.0.2
+  - pypi:
+      package: numpy==1.26.4
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
