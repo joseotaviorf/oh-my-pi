@@ -57,7 +57,7 @@ retsuko AS (
     e.description != 'Crédito - Parcelamento corretagem - QuintoAndar'
     AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin', 'entry.bill-item/service-fee')
     AND ct.country_code = 'BR'
-    AND DATE(e.ts_created)>= DATE ('2025-01-01') AND DATE(e.ts_created)< DATE ('2026-08-01')
+    AND DATE(e.ts_created)>= DATE ('2025-01-01') AND DATE(e.ts_created)< DATE ('2026-09-01')
     AND af.type IN ('contract', 'tenant', 'landlord')
     AND at.type IN ('contract', 'tenant','landlord')
     AND i.status != 'canceled'

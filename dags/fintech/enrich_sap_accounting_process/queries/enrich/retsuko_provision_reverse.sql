@@ -131,7 +131,7 @@ sap_ledger AS (
     WHERE
         dt_reference >= DATE('2025-01-01')
         AND (account_number IN ('420021', '420022', '420023') 
-            OR (account_number IN ('420037') AND dt_reference >= DATE('2026-08-01')))
+            OR (account_number IN ('420037') AND dt_reference >= DATE('2026-09-01')))
 )
 
 SELECT
