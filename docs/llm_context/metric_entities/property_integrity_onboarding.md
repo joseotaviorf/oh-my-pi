@@ -51,6 +51,7 @@ Offboarding.**
 ## Glossary and Synonyms
 
 - **Property Integrity Onboarding**, **integridade do imóvel onboarding**, **onboarding report review** → this family of metrics
+- **Tenant**, **TT**, **IQ**, **inquilino** → Tenant (`reviewer_type = 'TENANT'` in the raw clean layer; TT/IQ/inquilino are Portuguese names/abbreviations for the same role, not distinct `reviewer_type` values)
 - **% Tenant Accessed**, **% Tenant Access**, **acesso do inquilino ao laudo de entrada** → % Tenant Accessed
 - **% Tenant Finished**, **% Tenant Finalização**, **completion rate**, **share of tenants completing the entry inspection review**, **KR 1.2** → % Tenant Finished (the H2'2026 OKR indicator)
 - **% Tenant Finalização / Access**, **% Tenant Finished of Accessed** → % Tenant Finalização / Access
@@ -191,7 +192,7 @@ accurate record of the property's condition; **completion = % Tenant Finished**.
   ([slice 61062](https://superset.apps.data-prd.habitat.zone/explore/?form_data_key=EaugNXjtT-i2ucxW_USDH_qR30_rtrFA29V9nM2UwSuVH7b6b58XupZVE0y_pV_Y&slice_id=61062&save_action=overwrite))
   over the golden dataset below
 - **Filter key / metric name:** `KR 1.2` / `% Tenant Finished` /
-  `pct_tenant_approved`
+  `pct_tenant_finished`
 - **Period grain:** H2'2026 (semester)
 - **Aliases / search terms:** meta de finalização de revisão de entrada, OKR
   onboarding review completion, KR 1.2, share of tenants completing entry
@@ -212,8 +213,8 @@ accurate record of the property's condition; **completion = % Tenant Finished**.
 Assembles the OBT Onboarding grain (same pattern as the product-files OBT —
 component identity/execution from `fact_inspection` + `dim_inspection`, access from
 `fact_report_inspections`, approval/comments from clean `assessment`/`reviewer`/
-`review`), then computes the five official ratios by month of execution. Trino
-dialect.
+`review`), then computes the five official ratios by month of `ts_sent_to_review`.
+Trino dialect.
 
 ```sql
 WITH raw_review AS (
@@ -244,6 +245,7 @@ onboarding_inspections AS (
         fi.sk_contract,
         fi.sk_inspection,
         fi.ts_inspected,
+        fri.ts_sent_to_review,
         fri.has_tenant_access_review AS has_tenant_accessed_review,
         COALESCE(rr.has_tenant_approved_review, FALSE) AS has_tenant_approved_review,
         COALESCE(rr.total_tenant_comments, 0) AS total_tenant_comments,
@@ -269,6 +271,7 @@ obt_onboarding AS (
         sk_contract,
         sk_inspection,
         ts_inspected,
+        ts_sent_to_review,
         has_tenant_accessed_review,
         has_tenant_approved_review,
         total_tenant_comments
@@ -276,7 +279,7 @@ obt_onboarding AS (
     WHERE rni = 1
 )
 SELECT
-    DATE_TRUNC('month', CAST(obt.ts_inspected AS DATE)) AS ref_month,
+    DATE_TRUNC('month', CAST(obt.ts_sent_to_review AS DATE)) AS ref_month,
     COUNT(*) AS total_inspections,
     CAST(COUNT_IF(obt.has_tenant_accessed_review = TRUE) AS DOUBLE)
         / COUNT(*) AS pct_tenant_accessed,
@@ -289,8 +292,8 @@ SELECT
         / CAST(NULLIF(COUNT_IF(obt.has_tenant_accessed_review = TRUE), 0) AS DOUBLE)
         AS pct_tenant_commented_of_accessed
 FROM obt_onboarding AS obt
-WHERE CAST(obt.ts_inspected AS DATE) >= DATE_ADD('month', -24, CURRENT_DATE)
-    AND CAST(obt.ts_inspected AS DATE) < CURRENT_DATE
+WHERE CAST(obt.ts_sent_to_review AS DATE) >= DATE_ADD('month', -24, CURRENT_DATE)
+    AND CAST(obt.ts_sent_to_review AS DATE) < CURRENT_DATE
 GROUP BY 1
 ORDER BY 1
 ```
