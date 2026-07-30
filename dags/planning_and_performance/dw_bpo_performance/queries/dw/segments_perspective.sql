@@ -54,6 +54,7 @@ fcc_dept_agg AS (
 fact_service AS (
     SELECT
         sk_support_session,
+        sk_task,
         SUBSTR(theme, 3, LENGTH(theme) - 4) AS theme,
         SUBSTR(theme_detail, 3, LENGTH(theme_detail) - 4) AS theme_detail,
         dt_task_created
@@ -246,7 +247,7 @@ segments_perspective AS (
       dt.group_name
     FROM base_fcc AS fcc
     LEFT JOIN fact_service fs
-      ON fcc.sk_support_session = fs.sk_support_session AND fs.dt_task_created >= '2026-06-25'
+      ON fcc.sk_task = fs.sk_task AND fs.dt_task_created >= '2026-06-25'
     LEFT JOIN dw_customer_support.dim_department AS dd
       ON dd.sk_department = fcc.sk_department
     LEFT JOIN fcc_dept_agg AS fda
@@ -280,7 +281,6 @@ segments_perspective AS (
     WHERE
       fcc.channel IN ('chat','call')
       AND fcc.direction IN ('inbound')
-      AND dd.area = 'CX'
 )
 
 SELECT
