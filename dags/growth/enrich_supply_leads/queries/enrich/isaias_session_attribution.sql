@@ -1,5 +1,6 @@
 -- One row per chatbot session (isaias + wall-e with tracked events) with the supply lead handled during it.
 -- 7-day rolling window: [load_start_date, load_end_date] inclusive (DAG params: ds-6 .. ds) merged on id_langfuse_session.
+-- Session-to-lead attribution only; no conversion outcome.
 WITH base_sessions AS (
     -- Target sessions (small) -> broadcastable everywhere downstream
     SELECT
@@ -169,29 +170,13 @@ staging_session_spine AS (
             ON bs.id_sauron_session = il.id_session
 ),
 candidate_leads AS (
-    -- Only the lead ids the final joins can possibly match; prunes the two lookups below
+    -- Only the lead ids the final join can possibly match; prunes the lookup below
     SELECT DISTINCT
         resolved_lead_key AS id_lead
     FROM
         staging_session_spine
     WHERE
         resolved_lead_key IS NOT NULL
-),
-lead_conversion_times AS (
-    -- Opportunity times, pruned to candidate leads and the load window
-    SELECT
-        id_lead_ebdb AS id_lead,
-        MIN(ts_event_adjusted) AS ts_first_qualified
-    FROM
-        datalake_supply_flows.supply_events_tracking
-    WHERE
-        funnel_step = 'OPPORTUNITY'
-        AND id_lead_ebdb IS NOT NULL
-        AND ts_event_adjusted >= DATE('{load_start_date}')
-        AND ts_event_adjusted < DATE_ADD(DATE('{load_end_date}'), 1)
-        AND id_lead_ebdb IN (SELECT id_lead FROM candidate_leads)
-    GROUP BY
-        1
 ),
 lead_origin_pruned AS (
     -- Lead creation times, pruned to candidate leads and the load window
@@ -226,23 +211,9 @@ SELECT
         ELSE 'retrieved_lead'
     END AS lead_acquisition_type,
     spine.has_reschedule_event,
-    CASE
-        WHEN (lo.ts_event IS NULL OR spine.ts_session_start >= lo.ts_event)
-            AND lct.ts_first_qualified IS NOT NULL
-            AND lct.ts_first_qualified BETWEEN spine.ts_session_start AND (spine.ts_session_start + INTERVAL 24 HOUR)
-        THEN TRUE
-        ELSE FALSE
-    END AS is_converted_within_24h,
-    spine.ts_session_start,
-    CASE
-        WHEN lo.ts_event IS NOT NULL AND spine.ts_session_start < lo.ts_event THEN CAST(NULL AS TIMESTAMP)
-        ELSE lct.ts_first_qualified
-    END AS ts_first_qualified
+    spine.ts_session_start
 FROM
     staging_session_spine AS spine
-LEFT JOIN
-    lead_conversion_times AS lct
-        ON spine.resolved_lead_key = lct.id_lead
 LEFT JOIN
     lead_origin_pruned AS lo
         ON spine.resolved_lead_key = lo.id_lead_ebdb

@@ -4052,6 +4052,9 @@ bietlejuice.enrich_supply_acquisition:
   - bietlejuice.enrich_bob:load-enrich-house-draft:first-run-of-day
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-last-contact:first-run-of-day
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-mailing:first-run-of-day
+  - bietlejuice.enrich_supply_leads:load-enrich-lead-origin:first-run-of-day
+  - bietlejuice.enrich_supply_leads:load-enrich-leads-sks:first-run-of-day
+  - bietlejuice.enrich_supply_leads:load-enrich-recovered-region-leads:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-address:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-house-lead-aud:first-run-of-day
@@ -4072,6 +4075,11 @@ bietlejuice.enrich_supply_conversion:
   - bietlejuice.enrich_bob:load-enrich-house-draft:first-run-of-day
   - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-events:first-run-of-day
   - bietlejuice.enrich_olos_dialer:load-enrich-reprocessing-mailing:first-run-of-day
+  - bietlejuice.enrich_supply_acquisition:load-enrich-acquisition-tracking:first-run-of-day
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup:first-run-of-day
+  - bietlejuice.enrich_supply_acquisition:load-enrich-landing-3p:first-run-of-day
+  - bietlejuice.enrich_supply_acquisition:load-enrich-prospects-3p:first-run-of-day
+  - bietlejuice.enrich_supply_leads:load-enrich-leads-sks:first-run-of-day
   - bietlejuice.olos_dialer:load-clean-attempts-raw-data:first-run-of-day
   - bietlejuice.olos_dialer:load-clean-campaign:first-run-of-day
   - bietlejuice.olos_dialer:load-clean-users:first-run-of-day
@@ -4119,11 +4127,20 @@ bietlejuice.enrich_supply_taxonomy:
   - bietlejuice.ebdb_lead:load-clean-lead:first-run-of-day
   - bietlejuice.enrich_bob:load-enrich-house-draft:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup:first-run-of-day
+  - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events:first-run-of-day
+  - bietlejuice.enrich_supply_conversion:load-enrich-operations-agents:first-run-of-day
   - bietlejuice.wololo:load-clean-context-discard:first-run-of-day
   - bietlejuice.wololo:load-clean-prospect:first-run-of-day
 bietlejuice.enrich_supply_tracking:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
+  - bietlejuice.enrich_supply_acquisition:load-enrich-acquisition-tracking:first-run-of-day
+  - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup:first-run-of-day
+  - bietlejuice.enrich_supply_conversion:load-enrich-conversion-events:first-run-of-day
+  - bietlejuice.enrich_supply_conversion:load-enrich-manual-reprocessing-events:first-run-of-day
+  - bietlejuice.enrich_supply_conversion:load-enrich-operations-agents:first-run-of-day
+  - bietlejuice.enrich_supply_taxonomy:load-enrich-conversion-taxonomy:first-run-of-day
 bietlejuice.enrich_support_and_service_kpis_targets:
   - bietlejuice.gsheets_support_and_service:done-clean-target-service-kpis:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-target-support-kpis:first-run-of-day
