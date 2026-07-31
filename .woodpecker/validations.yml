@@ -529,3 +529,24 @@ steps:
         branch: [master]
         path: *golden_queries_metadata_path
     depends_on: [setup]
+
+  # Reverse golden-query gate: when DAG metadata YAML changes, ensure removed or
+  # renamed columns are not still referenced in docs/llm_context golden queries.
+  validate-llm-context-dag-impact:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make validate-llm-context-dag-impact
+    when:
+      - event: pull_request
+        path: &llm_context_dag_impact_path
+          include:
+            - "dags/**/metadata/**/*.yml"
+            - "dags/governance/datahub_business_context/validate_llm_context_dag_impact.py"
+            - "dags/governance/datahub_business_context/llm_context_dag_impact_validator.py"
+            - "dags/governance/datahub_business_context/golden_query_schema_validator.py"
+          on_empty: false
+      - event: push
+        branch: [master]
+        path: *llm_context_dag_impact_path
+    depends_on: [setup]

@@ -127,6 +127,9 @@ steps:
             - "dags/governance/datahub_business_context/test_datahub_table_fallback.py"
             - "dags/governance/datahub_business_context/validate_entity_golden_queries_metadata.py"
             - "dags/governance/datahub_business_context/test_validate_entity_golden_queries_metadata.py"
+            - "dags/governance/datahub_business_context/validate_llm_context_dag_impact.py"
+            - "dags/governance/datahub_business_context/llm_context_dag_impact_validator.py"
+            - "dags/governance/datahub_business_context/test_validate_llm_context_dag_impact.py"
           on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]

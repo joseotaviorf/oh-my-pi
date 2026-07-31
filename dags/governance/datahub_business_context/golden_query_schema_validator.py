@@ -10,6 +10,7 @@ structural ``()[]`` balance checks) before metadata table/column checks.
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from typing import Any, Optional, Protocol
 
 try:
@@ -44,6 +45,29 @@ _SQL_TABLE_REF_RE = re.compile(
 _SKIPPED_METADATA_COLUMNS = frozenset({"_placeholder"})
 _HIVE_CATALOG_PREFIX = "hive"
 _TRINO_DIALECT = "trino"
+
+
+@dataclass(frozen=True)
+class ColumnRefsResult:
+    """Column references on a physical table extracted from golden-query SQL."""
+
+    refs: frozenset[str]
+    target_in_query: bool
+    verified: bool
+    verification_error: str | None = None
+
+
+def _grep_column_mentions(sql: str, columns: set[str]) -> set[str]:
+    """Best-effort identifier search when sqlglot cannot parse the statement."""
+    if not columns:
+        return set()
+    prepared = substitute_sql_placeholders(sql or "")
+    found: set[str] = set()
+    for col in columns:
+        col_re = re.escape(col.strip().lower())
+        if re.search(rf"(?<![\w.]){col_re}(?![\w])", prepared, flags=re.IGNORECASE):
+            found.add(col.strip().lower())
+    return found
 
 
 def substitute_sql_placeholders(sql: str) -> str:
@@ -401,6 +425,93 @@ def validate_golden_query_sql(
             )
 
     return errors, warnings
+
+
+def column_refs_for_table_in_sql(
+    sql: str,
+    *,
+    schema: str,
+    table: str,
+    known_columns: set[str] | None = None,
+) -> ColumnRefsResult:
+    """Return column names in ``sql`` that resolve to ``schema.table``.
+
+    ``known_columns`` is the pre-change column set on the table (used to attribute
+    unqualified references). When omitted, only qualified references are returned.
+
+    When sqlglot cannot parse the statement but the table appears in the SQL text,
+    ``verified`` is ``False`` and ``refs`` may still contain matches from a regex
+    fallback over ``known_columns`` (if provided).
+    """
+    target = (schema.strip().lower(), table.strip().lower())
+    known = {c.lower() for c in (known_columns or set())}
+    empty = ColumnRefsResult(
+        refs=frozenset(),
+        target_in_query=False,
+        verified=True,
+    )
+    if not (sql or "").strip():
+        return empty
+
+    prepared = substitute_sql_placeholders(sql)
+    tables_in_query = {(s.lower(), t.lower()) for s, t in table_refs_in_sql(prepared)}
+    target_in_query = target in tables_in_query
+    if not target_in_query:
+        return empty
+
+    if sqlglot is None:
+        fallback = _grep_column_mentions(prepared, known)
+        return ColumnRefsResult(
+            refs=frozenset(fallback),
+            target_in_query=True,
+            verified=False,
+            verification_error="sqlglot not installed",
+        )
+
+    try:
+        expression = sqlglot.parse_one(prepared, dialect="trino")
+    except Exception as exc:
+        fallback = _grep_column_mentions(prepared, known)
+        return ColumnRefsResult(
+            refs=frozenset(fallback),
+            target_in_query=True,
+            verified=False,
+            verification_error=str(exc),
+        )
+
+    refs: set[str] = set()
+    cte_names = _cte_names(expression)
+    output_aliases = _output_aliases_in_query(expression)
+
+    for column in expression.find_all(exp.Column):
+        col_name = (column.name or "").strip().lower()
+        if not col_name or col_name == "*":
+            continue
+        table_ref = (column.table or "").strip().lower()
+        if table_ref in cte_names or col_name in output_aliases:
+            continue
+
+        select = _enclosing_select(column)
+        if select is None:
+            continue
+        physical_aliases, derived_aliases = _alias_maps_for_select(select, cte_names)
+
+        if table_ref:
+            if table_ref in derived_aliases:
+                continue
+            physical = physical_aliases.get(table_ref)
+            if physical == target:
+                refs.add(col_name)
+            continue
+
+        if known and col_name in known:
+            refs.add(col_name)
+
+    return ColumnRefsResult(
+        refs=frozenset(refs),
+        target_in_query=True,
+        verified=True,
+    )
 
 
 def validate_golden_queries(

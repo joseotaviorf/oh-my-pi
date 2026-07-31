@@ -106,6 +106,9 @@ dags_not_using_builder:
   - governance/datahub_business_context/test_datahub_table_fallback.py
   - governance/datahub_business_context/validate_entity_golden_queries_metadata.py
   - governance/datahub_business_context/test_validate_entity_golden_queries_metadata.py
+  - governance/datahub_business_context/llm_context_dag_impact_validator.py
+  - governance/datahub_business_context/validate_llm_context_dag_impact.py
+  - governance/datahub_business_context/test_validate_llm_context_dag_impact.py
   - governance/sync_tars_entities/sync_tars_entities_dag.py
   - for_sale/salesforce_for_sale/salesforce_for_sale.py
   - platform/migration_compare_agents__dw_agent_accreditation/migration_compare_agents__dw_agent_accreditation_dag.py

@@ -970,6 +970,17 @@ validate-entity-golden-queries-metadata:
 	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python dags/governance/datahub_business_context/validate_entity_golden_queries_metadata.py --changed-only -b "$(CI_COMMIT_BRANCH)"
 
+.PHONY: validate-llm-context-dag-impact
+## Block DAG metadata YAML changes that remove or rename columns still used in
+## docs/llm_context golden queries; warn when columns are only added.
+validate-llm-context-dag-impact:
+	@echo ""
+	@echo "Validating llm_context golden-query impact of changed DAG metadata YAML files"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-compiler python dags/governance/datahub_business_context/validate_llm_context_dag_impact.py --changed-only -b "$(CI_COMMIT_BRANCH)"
+
 .PHONY: validate-fair-metadata
 validate-fair-metadata:
 	@echo ""

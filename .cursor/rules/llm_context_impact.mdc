@@ -4,7 +4,7 @@ globs: "dags/**/queries/**/*.sql,dags/**/*_declaration.yml,dags/**/metadata/**/*
 ---
 # LLM Context Impact — TARS Entity-Doc Drift Check
 
-**Complementary to** `make validate-metadata-files-content` / `validate-lineage-consistency`. CI does not enforce this — the goal is to keep `docs/llm_context/business_entities/` in sync so TARS does not silently generate SQL against an outdated schema.
+**Complementary to** `make validate-metadata-files-content` / `validate-lineage-consistency`. **CI enforces** golden-query column breakage via `make validate-llm-context-dag-impact` (Woodpecker: `validate-llm-context-dag-impact`) whenever DAG **metadata YAML** files change (SQL-only edits are covered by existing SQL↔metadata validators).
 
 Run this check whenever any of the following is touched:
 - `.sql` file under `dags/{domain}/{dag_name}/queries/`
@@ -138,7 +138,7 @@ If yes:
 
 ## Notes
 
-- This check is **advisory** — it does not block CI, but will be revised by automated validation step.
+- This check is **advisory in Cursor** for Path B (new DAGs) and grain/filter heuristics; **CI blocks** removed/renamed columns still referenced in golden queries (`make validate-llm-context-dag-impact`).
 - For large renames/removals affecting many tables, run the `impact-analysis` skill first and feed its table list into this check.
 - Skip bare `{table_name}` grep for generic names (`events`, `tickets`, `users`); rely on the FQN to avoid false positives.
 - When unsure whether a new table needs coverage, default to "Should review" with a question rather than silently ignoring it.
