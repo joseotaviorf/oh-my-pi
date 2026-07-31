@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 
 class BietlejuiceCyclicDependencyFinder:
@@ -27,11 +27,43 @@ class BietlejuiceCyclicDependencyFinder:
             if len(component) <= 1:
                 continue
             for dag in component:
-                for dependency in dependencies[dag]:
+                # A component may contain DAGs that only appear as dependency targets, and those are
+                # not keys of the dependency dictionary.
+                for dependency in dependencies.get(dag, []):
                     dependency_dag = dependency.split(":")[0]
                     if dependency_dag in component:
                         cyclic_dependencies[dag].append(dependency)
         return cyclic_dependencies
+
+    @classmethod
+    def find_cyclic_dependencies_by_cycle(
+        cls, dependencies: dict
+    ) -> List[Dict[str, List[str]]]:
+        """
+        Same as `find_all_cyclic_dependencies`, but grouped by cycle instead of flattened into a
+        single dictionary. Useful when reporting cycles, since each cycle has to be described on its
+        own: knowing which DAGs take part in it is what points to the dependency that closed it.
+
+        :param dependencies: Dictionary containing the dependency configuration: keys are DAGs, and values are lists of task dependencies
+        :return: One dictionary per cycle, mapping each DAG in the cycle to the sorted list of its dependencies that stay inside that cycle
+        """
+
+        cyclic_dependencies = cls.find_all_cyclic_dependencies(dependencies)
+        if not cyclic_dependencies:
+            return []
+
+        cycles = []
+        for component in cls._find_strongly_connected_components(dependencies):
+            if len(component) <= 1:
+                continue
+            cycle = {
+                dag: sorted(cyclic_dependencies[dag])
+                for dag in sorted(component)
+                if cyclic_dependencies.get(dag)
+            }
+            if cycle:
+                cycles.append(cycle)
+        return cycles
 
     @classmethod
     def _find_strongly_connected_components(cls, dependencies: dict) -> List[Set[str]]:

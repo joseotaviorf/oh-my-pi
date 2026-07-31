@@ -201,16 +201,31 @@ class FileDependencyGenerator(DependencyGenerator):
         :rtype: dict
         """
         logger.info("m=treat_exceptions, msg=treating dependencies exceptions")
-        static_dags = [
-            dag_name
-            for dag_name, dag in self.unstandard_dags.items()
-            if dag.get("is_static")
-        ]
-        dependencies = self._remove_static_dependencies_in_non_static_dags(
-            dependencies, static_dags
-        )
+        dependencies = self.treat_static_dag_exceptions(dependencies)
         logger.info(
             "m=treat_exceptions, msg=dependencies exceptions successfully treated."
         )
         dependencies = self._remove_cyclic_dependencies(dependencies)
         return dependencies
+
+    def treat_static_dag_exceptions(self, dependencies: dict) -> dict:
+        """
+        Everything `treat_exceptions` does apart from breaking cycles.
+
+        Kept separate so callers that need to inspect the graph *before* cycles are broken can build
+        it without reimplementing this step -- see
+        `scripts/dependency_handling/validate_no_new_cyclic_dependencies.py`.
+
+        :param dependencies: A dictionary, in which keys are DAGs and values are lists of tasks
+        :type dependencies: dict
+        :return: A dictionary, in which keys are DAGs and values are lists of tasks, without non-static DAGs depending on static DAGs.
+        :rtype: dict
+        """
+        static_dags = [
+            dag_name
+            for dag_name, dag in self.unstandard_dags.items()
+            if dag.get("is_static")
+        ]
+        return self._remove_static_dependencies_in_non_static_dags(
+            dependencies, static_dags
+        )

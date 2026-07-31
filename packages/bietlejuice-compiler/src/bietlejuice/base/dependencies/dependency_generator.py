@@ -234,15 +234,36 @@ class DependencyGenerator:
     def _remove_cyclic_dependencies(self, dependencies: dict) -> dict:
         """
         Finds and removes circular dependencies from the dependency dictionary, returning a new one.
+
+        Every edge inside a cycle is removed, not only the one that closed it, so a single backwards
+        read can cost a whole chain its ordering. Each removal is logged individually on purpose: the
+        2026-07-30 obt_supply incident went unnoticed because this step used to report nothing but a
+        generic "removing cyclic dependencies" line. New cycles are blocked before reaching here, by
+        `scripts/dependency_handling/validate_no_new_cyclic_dependencies.py`.
+
         :param dependencies: A dictionary, in which keys are DAGs and values are lists of tasks
         :type dependencies: dict
         :return: A dictionary, in which keys are DAGs and values are lists of tasks, without cyclic dependencies.
         :rtype: dict
         """
         logger.info("m=remove_cyclic_dependencies, msg=removing cyclic dependencies.")
-        cyclic_dependencies = (
-            BietlejuiceCyclicDependencyFinder.find_all_cyclic_dependencies(dependencies)
-        )
+        cyclic_dependencies = {}
+        # Each DAG belongs to at most one cycle, so merging the cycles back together is lossless.
+        for (
+            cycle
+        ) in BietlejuiceCyclicDependencyFinder.find_cyclic_dependencies_by_cycle(
+            dependencies
+        ):
+            logger.info(
+                f"m=remove_cyclic_dependencies, msg=cycle found between the DAGs {sorted(cycle)}. "
+                "Every dependency between them will be removed."
+            )
+            for dag, dag_dependencies in cycle.items():
+                cyclic_dependencies[dag] = dag_dependencies
+                for dag_dependency in dag_dependencies:
+                    logger.info(
+                        f"msg={dag_dependency} removed from {dag}, since it is part of a cycle"
+                    )
         return BietlejuiceDependencyHelper.subtract_dependencies(
             dependencies, cyclic_dependencies
         )

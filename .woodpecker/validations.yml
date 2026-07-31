@@ -330,6 +330,10 @@ steps:
             - "dags/dependencies.yaml"
             - "dags/**/*"
             - "packages/bietlejuice-core/src/bietlejuice/base/dependencies/**/*.py"
+            # Cycle detection and graph building live here (dependency_generator,
+            # file_dependency_generator, bietlejuice_cyclic_dependency_finder), so a change to them
+            # can alter both the generated file and whether a cycle is reported.
+            - "packages/bietlejuice-compiler/src/bietlejuice/base/dependencies/**/*.py"
             - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/**/*.py"
             - "packages/bietlejuice-core/src/bietlejuice/base/airflow/**/*.py"
             - "packages/bietlejuice-runtime/src/bietlejuice/base/db/**/*.py"
@@ -338,6 +342,16 @@ steps:
           on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *dependency_file_correctness_path
+    depends_on: [setup]
+
+  validate-no-new-cyclic-dependencies:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make validate-no-new-cyclic-dependencies
+    when:
+      - event: pull_request
         path: *dependency_file_correctness_path
     depends_on: [setup]
 

@@ -785,6 +785,17 @@ validate-dependency-file-correctness:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/validate_dependency_file_correctness.py
 
+.PHONY: validate-no-new-cyclic-dependencies
+## fails when a change introduces a DAG dependency cycle that does not exist on master. A cycle makes
+## the generator delete every dependency between the DAGs involved, silently losing their ordering.
+validate-no-new-cyclic-dependencies:
+	@echo ""
+	@echo "Validating that no new cyclic DAG dependencies were introduced"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/validate_no_new_cyclic_dependencies.py
+
 level ?= warning
 domain ?=
 export ENVIRONMENT ?= forno
