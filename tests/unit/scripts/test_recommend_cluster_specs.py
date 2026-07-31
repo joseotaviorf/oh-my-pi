@@ -1129,7 +1129,7 @@ class TestCostProjection:
         od_drv = rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.large"]
         spot_wrk = round(rcs.EC2_ON_DEMAND_USD_PER_HOUR["m6g.2xlarge"] * 0.37, 6)
         ec2 = od_drv * wall_h + spot_wrk * wall_h * 4
-        dbu = (1.0 + 4 * 4.0) * wall_h * 0.114  # driver + 4 workers, $0.114/DBU
+        dbu = (1.0 + 4 * 4.0) * wall_h * 0.15  # driver + 4 workers, $0.15/DBU PAYG
 
         assert projected == pytest.approx(round(ec2 + dbu, 6))
 

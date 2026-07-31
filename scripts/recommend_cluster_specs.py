@@ -188,9 +188,9 @@ _WALL_CPU_BOUND_FRACTION_CAP = 1.0
 _DEFAULT_RECENT_ERA_MIN_DAYS = 1
 _DEFAULT_RECENT_ERA_MIN_RUNS = 2
 
-# Negotiated JOBS $/DBU from dim_dbu_price (cost-attribution seed).
+# JOBS $/DBU from dim_dbu_price (cost-attribution seed; AWS Premium PAYG).
 # TODO: source dynamically from fact_databricks_dag_run.dbu_rate_usd.
-_USD_PER_DBU = 0.114
+_USD_PER_DBU = 0.15
 # +100% wall when Photon is normalized off: middle of the observed 2-3x Photon
 # ETL speedup and the 2x TPC-DS baseline — conservative for both SLA and cost.
 _PHOTON_OFF_WALL_INFLATION = 2.0

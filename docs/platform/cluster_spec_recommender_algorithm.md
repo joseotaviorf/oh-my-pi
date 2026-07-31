@@ -269,7 +269,7 @@ Every candidate is priced by `estimate_projected_total_cost` under one consisten
 projected_cost =
     on_demand_driver_ec2_per_hour * wall_hours
   + spot_worker_ec2_per_hour * worker_count * wall_hours      # spot = 0.37 * on_demand
-  + dbu_per_run * negotiated_usd_per_dbu                      # _USD_PER_DBU = 0.114
+  + dbu_per_run * negotiated_usd_per_dbu                      # _USD_PER_DBU = 0.15 (PAYG JOBS)
 ```
 
 Key rules:

@@ -1,0 +1,39 @@
+dag:
+  name: enrich_databricks_pricing
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      Source-controlled FINAL dimension for Databricks DBU pricing.
+
+      Publishes a static, auditable seed that is the single source of truth for
+      negotiated / list DBU rates used by the Databricks cost model:
+
+        - dim_dbu_price: USD/DBU by compute_type and validity window.
+          Replaces the stale gsheet `databricks_contract_details` and the
+          inline Superset CASE rates. Current rates encode the AWS Premium
+          pay-as-you-go list from 2026-07-01 (JOBS 0.15 / ALL_PURPOSE 0.55 /
+          SQL 0.17). Prior windows keep the Oct-2024 committed-use contract
+          (closed 2026-07-01) and the expired 2024-09-01 gsheet rates.
+
+      This table is a full-refresh static seed (no date partitions); the data
+      lives in the query, so there is no upstream lake dependency. The price
+      dim feeds dw_databricks_costs.fact_databricks_costs and
+      dw_databricks_health.fact_databricks_task_run, which price net DBU by
+      joining usage to it on the validity window.
+
+      This DAG is a manually-triggered static seed: it is neither cron-scheduled
+      nor dataset-triggered. Run it once at deploy and again on any DBU rate
+      change to (re)materialize the table the cost facts read at query time.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: databricks_pricing
+  default_extraction_type: full
+  has_hive_sync: true
+  tables_customization:
+    dim_dbu_price:
+      extraction_type: full
+      partitions: []
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
