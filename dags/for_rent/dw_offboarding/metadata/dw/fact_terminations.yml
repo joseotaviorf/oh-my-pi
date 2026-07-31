@@ -52,7 +52,13 @@ columns:
     lineage:
       - datalake_terminator.termination.dt_last_rescheduled
   sk_analyst:
-    description: Identification for the responsable analyst for the id_contract/id_termination based on SPOC contracts.
+    description: |
+      Surrogate key for the SPOC analyst assigned to the contract/termination pair.
+      Populated only for SPOC contracts in the test group (is_spoc_contract = true
+      and is_spoc_control_group = false); control-group contracts are always NULL.
+      Analyst assignment in the test group happens during termination processing, so
+      there may be a delay between the contract entering the SPOC rollout and an
+      analyst being assigned.
     lineage:
       - datalake_hefesto.spoc_offboarding_contracts.id_analyst
   sk_worker_twilio:
@@ -155,7 +161,10 @@ columns:
     lineage:
       - datalake_terminator.termination.spoc_wave
   is_spoc_contract:
-    description: Boolean information indicating whether the termination is part of the spoc control group.
+    description: |
+      Boolean flag indicating whether the termination is part of the SPOC rollout program,
+      including both test and control groups. Distinct from dw_offboarding.obt_offboarding.is_spoc_test_group_contract,
+      which flags only the SPOC test group (rollout minus control).
     lineage:
       - datalake_terminator.termination.is_spoc
   is_spoc_eligible:

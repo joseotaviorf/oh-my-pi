@@ -41,10 +41,15 @@ columns:
       inspection data across tables (e.g., with annotation and automatic_discounts).
     lineage:
       - dw_inspections.fact_inspection.sk_client_side
-  is_spoc_contract:
-    description: Boolean indicating whether the termination is part of the SPOC test group.
+  is_spoc_test_group_contract:
+    description: |
+      Boolean indicating whether the termination is in the SPOC test group (rollout
+      contracts excluding the control group). Derived from fact_terminations.is_spoc_contract
+      and is_spoc_control_group. Distinct from fact_terminations.is_spoc_contract, which
+      includes both test and control groups.
     lineage:
       - dw_offboarding.fact_terminations.is_spoc_contract
+      - dw_offboarding.fact_terminations.is_spoc_control_group
   is_spoc_eligible:
     description: Boolean indicating whether the termination is eligible for SPOC.
     lineage:
