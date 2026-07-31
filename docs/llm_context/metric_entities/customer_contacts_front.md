@@ -30,6 +30,10 @@ The metrics are: post-service satisfaction (**DSat Front**), perceived resolutio
 - Satisfaction
 - Department
 
+## MBR
+
+- Post Contract
+
 ## Glossary and Synonyms
 
 - **DSat**, **DSat Front**, **Dissatisfaction Rate**, **taxa de insatisfação** → % DSat Front

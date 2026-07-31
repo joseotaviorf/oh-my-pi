@@ -38,6 +38,10 @@ The metrics covered by this document:
 - Satisfaction
 - Department
 
+## MBR
+
+- Post Contract
+
 ## Glossary and Synonyms
 
 - **SLA Back**, **Back SLA**, **percentage solved within SLA**, **SLA Back por time**, **SLA Back por operação**, **SLA Back by team**, **SLA Back by operation** → SLA Back; when broken down by operation, use `last_team_adjusted` (same field as DSAT Back and Resolution Rate Back — see [Derived operation mapping](#last_team_adjusted--official-post-contract-back-operation-mapping) and the "SLA Back by Operation" golden query)
