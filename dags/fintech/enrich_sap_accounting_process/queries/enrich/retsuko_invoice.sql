@@ -230,7 +230,7 @@ sap_gateway AS (
 
 -- The revenue accounts below only receive the aggregated nota fiscal posting, which carries
 -- the source client instead of the entry id. The create-bill counterpart of each account is
--- the only posting keyed by entry, so it is what allows matching SAP at entry grain.
+-- the only posting keyed by entry, so it is what allows matching SAP amounts at entry grain.
 sap_ledger AS (
   SELECT
     id_finance_entity_entry,
@@ -263,6 +263,23 @@ sap_ledger AS (
   GROUP BY 1, 2
 ),
 
+-- Temporality compares dt_source_trigger to the SAP event that matches that trigger.
+-- For NF accounts the trigger is invoice due date, so dates come from the NF posting.
+-- For 420010 the trigger is last_day(entry created), so dates stay on the create-bill bridge.
+sap_nf_dates AS (
+  SELECT
+    id_finance_entity AS id_entity,
+    account_number,
+    MAX(DATE(dt_created)) AS dt_sap_created,
+    MAX(DATE(dt_reference)) AS dt_sap_reference
+  FROM
+    datalake_pas.ledger
+  WHERE
+    dt_reference >= DATE('2024-01-01')
+    AND account_number IN ('420001', '420002', '420004')
+  GROUP BY 1, 2
+),
+
 errors_base AS (
   SELECT
     r.id_business_entity,
@@ -291,8 +308,18 @@ errors_base AS (
     CAST(r.source_amount AS DECIMAL(12,2)) AS source_amount,
     CAST(sl.debit_credit AS DECIMAL(12,2)) AS sap_amount,
     MAX(r.dt_source_trigger) AS dt_source_trigger,
-    MAX(sl.dt_sap_created) AS dt_sap_created,
-    MAX(sl.dt_sap_reference) AS dt_sap_reference
+    MAX(
+      CASE
+        WHEN r.account_number = '420010' THEN sl.dt_sap_created
+        ELSE nf.dt_sap_created
+      END
+    ) AS dt_sap_created,
+    MAX(
+      CASE
+        WHEN r.account_number = '420010' THEN sl.dt_sap_reference
+        ELSE nf.dt_sap_reference
+      END
+    ) AS dt_sap_reference
   FROM
     retsuko r
   LEFT JOIN
@@ -305,6 +332,10 @@ errors_base AS (
     sap_ledger sl
       ON r.account_number = sl.account_number
       AND CAST(sl.id_finance_entity_entry AS STRING) = CAST(r.id_finance_entity_entry AS STRING)
+  LEFT JOIN
+    sap_nf_dates nf
+      ON r.account_number = nf.account_number
+      AND CAST(nf.id_entity AS STRING) = CAST(r.id_entity AS STRING)
     GROUP BY 1, 2, 3, 5, 6, 7, 8, 12, 13
 ),
 

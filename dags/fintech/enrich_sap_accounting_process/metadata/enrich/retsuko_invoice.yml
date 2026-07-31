@@ -64,7 +64,7 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_invoice.is_correctness
   is_temporality:
-    description: TRUE if dt_sap_reference and dt_source_trigger are in the same calendar month, or if dt_sap_reference is in the month immediately after dt_source_trigger and there are at most three Brazilian business days (datalake_quintoandar.aux_date) between the two dates, inclusive. FALSE if either date is NULL or neither rule applies.
+    description: TRUE if dt_sap_reference and dt_source_trigger are in the same calendar month, or if dt_sap_reference is in the month immediately after dt_source_trigger and there are at most three Brazilian business days (datalake_quintoandar.aux_date) between the two dates, inclusive. FALSE if either date is NULL or neither rule applies. For NF accounts (420001, 420002, 420004) dt_sap_reference comes from the nota fiscal posting; for 420010 it comes from the create-bill bridge posting, matching each account's dt_source_trigger event.
     lineage:
       - datalake_pas.ledger.dt_reference
       - datalake_quintoandar.aux_date.is_brz_business_day
@@ -91,10 +91,10 @@ columns:
       - datalake_retsuko.entry.ts_created
       - datalake_retsuko.invoice.ts_due
   dt_sap_reference:
-    description: Reference date in SAP associated with accrual.
+    description: Reference date in SAP associated with the same event as dt_source_trigger. For 420001, 420002 and 420004 this is the nota fiscal posting on the revenue account; for 420010 this is the create-bill bridge posting. Amount matching still uses the create-bill bridge.
     lineage:
       - datalake_pas.ledger.dt_reference
   dt_sap_created:
-    description: Creation date of transaction in SAP.
+    description: Creation date of the SAP posting used for temporality (nota fiscal for 420001/420002/420004, create-bill bridge for 420010).
     lineage:
       - datalake_pas.ledger.dt_created
