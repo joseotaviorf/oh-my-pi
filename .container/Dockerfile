@@ -11,7 +11,11 @@
 #
 #   ci-astro         — ci-base + Astro CLI (pinned ASTRO_CLI_VERSION).
 #                      Used by .woodpecker/development.yml Astro DAG deploy steps.
-#                      linux/amd64 only (Woodpecker CI runners).
+#                      Local builds may be amd64 or arm64; ECR publish remains amd64-only.
+#
+#   ci-astro-dind    — ci-astro + Docker Engine 29.6.2 static binaries (DinD).
+#                      Debian-based alternative to stock docker:dind for Astro image deploy.
+#                      Local-only for now (not published to ECR / Woodpecker).
 #
 #   ci-jdk           — ci-base + openjdk-17-jre-headless +
 #                      dbr-16-4 venv at /opt/bietlejuice/venvs/dbr-16-4.
@@ -39,13 +43,14 @@
 #
 # Build locally:
 #   make build-ci-container-base   # → bi-etl-ejuice-ci:base-latest
-#   make build-ci-container-astro  # → bi-etl-ejuice-ci:astro-latest
-#   make build-ci-container-jdk    # → bi-etl-ejuice-ci:jdk-latest
+#   make build-ci-container-astro      # → bi-etl-ejuice-ci:astro-latest
+#   make build-ci-container-astro-dind # → bi-etl-ejuice-ci:astro-dind-latest
+#   make build-ci-container-jdk        # → bi-etl-ejuice-ci:jdk-latest
 #   make build-devcontainer        # → bi-etl-ejuice:devcontainer-latest
 #
-# ci-base / ci-jdk / devcontainer are multi-arch (amd64 + arm64). ci-astro is
-# linux/amd64 only. Use PLATFORM=linux/arm64 with Makefile targets for
-# cross-arch local builds of the multi-arch targets.
+# ci-base / ci-jdk / devcontainer / ci-astro-dind are multi-arch (amd64 + arm64).
+# ci-astro ECR publish remains amd64-only. Use PLATFORM=linux/amd64 with Makefile
+# targets for cross-arch local builds.
 
 ARG UV_VERSION=0.11.7
 ARG ASTRO_CLI_VERSION=1.42.0
@@ -102,20 +107,121 @@ RUN --mount=type=secret,id=GITHUB_TOKEN,required=false \
 
 ###############################################################################
 # Target: ci-astro — ci-base + Astro CLI (Woodpecker development.yml DAG deploy)
-# linux/amd64 only — CI runners; do not build/publish arm64 for this target.
+# Local builds may be amd64 or arm64; ECR publish remains amd64-only.
 ###############################################################################
 FROM ci-base AS ci-astro
 
 ARG ASTRO_CLI_VERSION
+ARG TARGETARCH
 
 # Same tarball install as .devcontainer/install_devcontainer_tools.sh (astro only).
-# Hardcoded amd64: this image is never published for arm64.
 RUN apt-get update -qq \
   && apt-get install -y --no-install-recommends curl ca-certificates \
-  && curl -fsSL "https://github.com/astronomer/astro-cli/releases/download/v${ASTRO_CLI_VERSION}/astro_${ASTRO_CLI_VERSION}_linux_amd64.tar.gz" \
+  && case "${TARGETARCH}" in \
+       amd64|x86_64) ASTRO_ARCH=amd64 ;; \
+       arm64|aarch64) ASTRO_ARCH=arm64 ;; \
+       *) echo "unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
+     esac \
+  && curl -fsSL "https://github.com/astronomer/astro-cli/releases/download/v${ASTRO_CLI_VERSION}/astro_${ASTRO_CLI_VERSION}_linux_${ASTRO_ARCH}.tar.gz" \
     | tar -xz -C /usr/local/bin astro \
   && rm -rf /var/lib/apt/lists/* \
   && astro version
+
+###############################################################################
+# Stage: docker-static — pinned Docker Engine static binaries (no apt build tooling)
+###############################################################################
+FROM debian:bookworm-slim AS docker-static
+
+ARG DOCKER_VERSION=29.6.2
+ARG DOCKER_BUILDX_VERSION=0.35.0
+ARG DIND_COMMIT=8d9e3502aba39127e4d12196dae16d306f76993d
+ARG TARGETARCH
+
+RUN apt-get update -qq \
+  && apt-get install -y --no-install-recommends ca-certificates curl \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+  mkdir -p /out/usr/local/bin /out/usr/local/libexec/docker/cli-plugins; \
+  case "${TARGETARCH}" in \
+    amd64) DOCKER_ARCH=x86_64 ;; \
+    arm64) DOCKER_ARCH=aarch64 ;; \
+    *) echo >&2 "error: unsupported TARGETARCH (${TARGETARCH})"; exit 1 ;; \
+  esac; \
+  curl -fsSL "https://download.docker.com/linux/static/stable/${DOCKER_ARCH}/docker-${DOCKER_VERSION}.tgz" -o /tmp/docker.tgz; \
+  tar --extract --file /tmp/docker.tgz --strip-components 1 --directory /out/usr/local/bin --no-same-owner; \
+  rm /tmp/docker.tgz; \
+  curl -fsSL "https://github.com/docker/buildx/releases/download/v${DOCKER_BUILDX_VERSION}/buildx-v${DOCKER_BUILDX_VERSION}.linux-${TARGETARCH}" \
+    -o /out/usr/local/libexec/docker/cli-plugins/docker-buildx; \
+  chmod +x /out/usr/local/libexec/docker/cli-plugins/docker-buildx; \
+  curl -fsSL "https://raw.githubusercontent.com/moby/moby/${DIND_COMMIT}/hack/dind" \
+    -o /out/usr/local/bin/dind; \
+  chmod 0755 /out/usr/local/bin/dind
+
+###############################################################################
+# Target: ci-astro-dind — ci-astro + Docker-in-Docker (Debian, static Engine)
+###############################################################################
+FROM ci-astro AS ci-astro-dind
+
+USER root
+
+RUN apt-get update -qq \
+  && apt-get install -y --no-install-recommends \
+    iptables \
+    e2fsprogs \
+    xfsprogs \
+    btrfs-progs \
+    pigz \
+    xz-utils \
+    openssl \
+    uidmap \
+    iproute2 \
+    kmod \
+  && rm -rf /var/lib/apt/lists/*
+
+# iptables-legacy symlink farm (Debian paths under /usr/sbin)
+RUN set -eux; \
+  mkdir -p /usr/local/sbin/.iptables-legacy; \
+  for f in \
+    iptables iptables-save iptables-restore \
+    ip6tables ip6tables-save ip6tables-restore \
+  ; do \
+    b="$(command -v "${f/tables/tables-legacy}")"; \
+    "$b" --version; \
+    ln -svT "$b" "/usr/local/sbin/.iptables-legacy/$f"; \
+  done; \
+  export PATH="/usr/local/sbin/.iptables-legacy:$PATH"; \
+  iptables --version | grep legacy
+
+# subuid/subgid for --userns-remap=default
+RUN set -eux; \
+  groupadd -r dockremap; \
+  useradd -r -g dockremap dockremap; \
+  echo 'dockremap:165536:65536' >> /etc/subuid; \
+  echo 'dockremap:165536:65536' >> /etc/subgid
+
+COPY --from=docker-static /out/usr/local/ /usr/local/
+
+COPY .container/dind/modprobe.sh /usr/local/bin/modprobe
+COPY .container/dind/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY .container/dind/dockerd-entrypoint.sh /usr/local/bin/dockerd-entrypoint.sh
+
+RUN chmod +x /usr/local/bin/modprobe /usr/local/bin/docker-entrypoint.sh /usr/local/bin/dockerd-entrypoint.sh \
+  && docker --version \
+  && dockerd --version \
+  && containerd --version \
+  && runc --version \
+  && docker buildx version \
+  && astro version
+
+ENV DOCKER_TLS_CERTDIR=/certs
+RUN mkdir -p /certs /certs/client && chmod 1777 /certs /certs/client
+
+VOLUME /var/lib/docker
+EXPOSE 2375 2376
+
+ENTRYPOINT ["dockerd-entrypoint.sh"]
+CMD []
 
 ###############################################################################
 # Target: ci-jdk — ci-base + JRE for PySpark + dbr-16-4 venv

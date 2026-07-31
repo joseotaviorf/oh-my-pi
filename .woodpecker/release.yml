@@ -373,7 +373,8 @@ steps:
 
   # Image from this repo; DAGs stay on Beethoven/S3. IMAGEONLY bag risk deferred.
   deploy-astro-image-prod:
-    image: public.ecr.aws/docker/library/docker:24.0.9
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-astro-dind-latest
+    pull: true
     privileged: true
     depends_on: [get-astro-credentials-prod]
     environment:
@@ -390,8 +391,6 @@ steps:
         [ -n "$ASTRO_DEPLOYMENT_ID" ] || { echo "ASTRO_DEPLOYMENT_ID missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
         [ -n "$ASTRO_WORKSPACE_ID" ] || { echo "ASTRO_WORKSPACE_ID missing from Vault (apps/prod/astronomer/creds/cicd_token)" >&2; exit 1; }
         [ -n "$GITHUB_TOKEN" ] || { echo "GITHUB_TOKEN secret missing" >&2; exit 1; }
-        apk add --no-cache curl bash sudo
-        curl -sSL https://install.astronomer.io | sudo bash -s
         sh -c 'dockerd-entrypoint.sh --registry-mirror=http://docker-registry.shared.quintoandar.com.br:5000 1>/dev/null 2>/dev/null' &
         while ! docker stats --no-stream >/dev/null 2>&1; do
           echo "Waiting Docker daemon to start..."
@@ -692,7 +691,8 @@ steps:
       path: *astro_image_paths
 
   deploy-astro-image-forno:
-    image: public.ecr.aws/docker/library/docker:24.0.9
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-astro-dind-latest
+    pull: true
     privileged: true
     depends_on: [get-astro-credentials-forno]
     environment:
@@ -709,8 +709,6 @@ steps:
         [ -n "$ASTRO_DEPLOYMENT_ID" ] || { echo "ASTRO_DEPLOYMENT_ID missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
         [ -n "$ASTRO_WORKSPACE_ID" ] || { echo "ASTRO_WORKSPACE_ID missing from Vault (apps/forno/astronomer/creds/cicd_token)" >&2; exit 1; }
         [ -n "$GITHUB_TOKEN" ] || { echo "GITHUB_TOKEN secret missing" >&2; exit 1; }
-        apk add --no-cache curl bash sudo
-        curl -sSL https://install.astronomer.io | sudo bash -s
         sh -c 'dockerd-entrypoint.sh --registry-mirror=http://docker-registry.shared.quintoandar.com.br:5000 1>/dev/null 2>/dev/null' &
         while ! docker stats --no-stream >/dev/null 2>&1; do
           echo "Waiting Docker daemon to start..."

@@ -41,6 +41,24 @@ build-ci-container-astro:
 	@echo ""
 	@echo "-> Image ready: bi-etl-ejuice-ci:astro-latest"
 
+.PHONY: build-ci-container-astro-dind
+## Builds the ci-astro-dind image locally (Debian DinD + Astro CLI).
+## Requires GITHUB_TOKEN for private Git deps (BuildKit secret), same as build-devcontainer.
+## Optional: PLATFORM=linux/amd64 for cross-arch builds; default is native arch.
+build-ci-container-astro-dind:
+	@echo "Building CI Astro DinD image$(if $(PLATFORM), ($(PLATFORM)),)"
+	@echo "=========="
+	@echo ""
+	@DOCKER_BUILDKIT=1 docker build \
+	  $(if $(PLATFORM),--platform $(PLATFORM),) \
+	  --target ci-astro-dind \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t bi-etl-ejuice-ci:astro-dind-latest \
+	  -f .container/Dockerfile \
+	  .
+	@echo ""
+	@echo "-> Image ready: bi-etl-ejuice-ci:astro-dind-latest"
+
 .PHONY: build-ci-container-jdk
 ## Builds the ci-jdk image: ci-base + openjdk-17-jre-headless.
 ## Used by test CI steps (PySpark needs a JVM).
@@ -61,9 +79,9 @@ build-ci-container-jdk:
 	@echo "-> Image ready: bi-etl-ejuice-ci:jdk-latest"
 
 .PHONY: build-ci-containers
-## Builds CI images (ci-base + ci-astro + ci-jdk) in one go.
+## Builds CI images (ci-base + ci-astro + ci-astro-dind + ci-jdk) in one go.
 ## Requires GITHUB_TOKEN for private Git deps (same as build-devcontainer).
-build-ci-containers: build-ci-container-base build-ci-container-astro build-ci-container-jdk
+build-ci-containers: build-ci-container-base build-ci-container-astro build-ci-container-astro-dind build-ci-container-jdk
 
 ###############################################################################
 ######################### ECR publish (local) #################################

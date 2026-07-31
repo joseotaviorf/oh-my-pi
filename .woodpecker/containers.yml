@@ -2,7 +2,7 @@
 #
 # ci-base, ci-jdk, and devcontainer are built for linux/amd64 + linux/arm64
 # via the ECR-hosted Kaniko plugin (plugins/docker) with privileged: true for QEMU
-# binfmt registration. ci-astro is amd64-only (Woodpecker CI runners only).
+# binfmt registration. ci-astro and ci-astro-dind are amd64-only (Woodpecker CI runners only).
 # GITHUB_TOKEN is passed via settings.github_token
 # (PLUGIN_GITHUB_TOKEN); the plugin stages /kaniko/run/secrets/GITHUB_TOKEN for
 # Dockerfile RUN steps. Multi-arch targets push a
@@ -47,6 +47,7 @@ steps:
         include: &container_dep_paths
           - ".woodpecker/containers.yml"
           - ".container/Dockerfile"
+          - ".container/dind/**"
           - "pyproject.toml"
           - "uv.lock"
           - "packages/**/pyproject.toml"
@@ -111,6 +112,29 @@ steps:
       tag:
         - prod-ci-astro-latest
         - prod-ci-astro-${CI_COMMIT_SHA:0:7}
+      platforms:
+        - linux/amd64
+      github_token:
+        from_secret: github_token
+    when:
+      - path:
+          include: *container_dep_paths
+        branch: [master]
+        event: push
+      - branch: [master]
+        event: manual
+
+  publish-ci-astro-dind-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
+    pull: true
+    privileged: true
+    settings:
+      repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
+      dockerfile: .container/Dockerfile
+      target: ci-astro-dind
+      tag:
+        - prod-ci-astro-dind-latest
+        - prod-ci-astro-dind-${CI_COMMIT_SHA:0:7}
       platforms:
         - linux/amd64
       github_token:
