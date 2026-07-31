@@ -14,7 +14,7 @@ WITH
         GROUP BY
             id_house
         HAVING
-            CAST(MAX_BY(ts_photos_uploaded, id) AS DATE) >= DATE('{load_start_date}')
+            CAST(MAX_BY(ts_photos_uploaded, id) AS DATE) >= DATE('{load_end_date}') - INTERVAL '1 day'
             AND CAST(MAX_BY(ts_photos_uploaded, id) AS DATE) < DATE('{load_end_date}')
     ), -- imóveis com job publicado/completado cujo upload de fotos ocorreu no intervalo da DAG
 
@@ -39,17 +39,26 @@ WITH
 GROUP BY a.id_house, a.id_job, a.ts_photos_uploaded, e.bathrooms, e.bedrooms, e.type, e.internal_admin_info
     ), -- reune as informações dos imóveis como quantidade de quartos e banheiros (informados pelo pp), a descrição do im, informação interna vindo do admin, contagem de vídeos por imóvel, dados do fotógrado e do proprietário
 
+    -- Core join kodak clean tables with row number
+    kodak_inspection_houses_rn AS (
+        SELECT
+            id,
+            id_external,
+            ROW_NUMBER() OVER(PARTITION BY id_external ORDER BY dt_creation) as rn
+        FROM
+            datalake_ebdb_clean.house
+        WHERE
+            id_external IS NOT NULL
+    ),
     -- Core join kodak clean tables
     kodak_inspection_houses AS (
         SELECT
             id,
             id_external
         FROM
-            datalake_ebdb_clean.house
+            kodak_inspection_houses_rn
         WHERE
-            id_external IS NOT NULL
-        QUALIFY
-            ROW_NUMBER() OVER(PARTITION BY id_external ORDER BY dt_creation) = 1
+            rn = 1
     ),
     fact_kodak_image_inspection_inline AS (
         SELECT
@@ -208,7 +217,7 @@ FROM details_inspection a
         SELECT
             id_house
         FROM datalake_ebdb_clean.listing_quality_analysis_request
-        WHERE ts_created >= DATE('{load_start_date}')
+        WHERE ts_created >= DATE('{load_end_date}') - INTERVAL '1 day'
           AND ts_created < DATE('{load_end_date}')
           AND analysis_requested = true
           AND id_house NOT IN (SELECT id_house FROM ims_details)
