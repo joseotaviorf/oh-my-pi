@@ -12,7 +12,9 @@ SPARK_VERSION="${SPARK_VERSION:-3.5}"
 # Keep in lockstep with ClusterEnvVarsHelper.INMETRO_VERSION_MAP["3.5"]
 # (yarn-env is not visible during EMR bootstrap; this default installs the wheel).
 INMETRO_VERSION="${INMETRO_VERSION:-4.11.0}"
-KAFKA_CLIENTS_JAR="${KAFKA_CLIENTS_JAR:-kafka-clients-3.5.0.jar}"
+KAFKA_CLIENTS_JAR="${KAFKA_CLIENTS_JAR:-kafka-clients-3.5.1.jar}"
+SPARK_SQL_KAFKA_JAR="${SPARK_SQL_KAFKA_JAR:-spark-sql-kafka-0-10_2.12-3.5.1.jar}"
+SPARK_TOKEN_PROVIDER_KAFKA_JAR="${SPARK_TOKEN_PROVIDER_KAFKA_JAR:-spark-token-provider-kafka-0-10_2.12-3.5.1.jar}"
 OPENLINEAGE_JAR="${OPENLINEAGE_JAR:-openlineage-spark_2.12-1.46.0.jar}"
 MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"
 QUINTOANDAR_LOGGER_WHEEL="${QUINTOANDAR_LOGGER_WHEEL:-quintoandar_logger-0.8.0-py3-none-any.whl}"
@@ -775,6 +777,8 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "spark-plugins_2.12-0.2.jar" \
         "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar" \
         "${KAFKA_CLIENTS_JAR}" \
+        "${SPARK_SQL_KAFKA_JAR}" \
+        "${SPARK_TOKEN_PROVIDER_KAFKA_JAR}" \
         "${MYSQL_JDBC_JAR}" \
         "${OPENLINEAGE_JAR}"; do
         aws s3 cp "${ARTIFACTS_BUCKET}/jars/${jar}" "${TMP_DIR}/${jar}" \
@@ -840,6 +844,8 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "spark-plugins_2.12-0.2.jar" \
         "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar" \
         "${KAFKA_CLIENTS_JAR}" \
+        "${SPARK_SQL_KAFKA_JAR}" \
+        "${SPARK_TOKEN_PROVIDER_KAFKA_JAR}" \
         "${MYSQL_JDBC_JAR}" \
         "${OPENLINEAGE_JAR}"; do
         if [ -f "${TMP_DIR}/${jar}" ]; then
