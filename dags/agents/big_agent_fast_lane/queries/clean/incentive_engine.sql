@@ -3,6 +3,7 @@ SELECT
     external_condition_id AS id_external_condition,
     external_condition_type,
     incentive_system,
+    incentive_system_configuration_key,
     status,
     author,
     TIMESTAMP(validity_start_at) AS ts_validity_started,
