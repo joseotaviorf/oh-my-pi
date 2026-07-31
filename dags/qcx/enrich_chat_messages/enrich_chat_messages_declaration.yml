@@ -1,0 +1,29 @@
+dag:
+  name: enrich_chat_messages
+  schedule_start_date: 2026, 7, 1
+  schedule_interval: 0 0,12 * * *
+  owner: QCX
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Materializes Copilot chat messages into datalake_consorcio.chat_messages
+      with Blip (BSP), CRM, and lead identifiers for Consórcio conversational analytics.
+      Currently scoped to host_name = conrado (Langfuse tag filter in SQL).
+      Incremental merge on id_message. Scheduled runs default to a rolling 30-day
+      window via load_start_date / load_end_date; override those params in the DAG
+      conf for a one-time historical backfill (older rows are kept).
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: consorcio
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    chat_messages:
+      merge_on: [id_message]
+      z_order_by: [ts_created, id_bsp, host_name]
+      run_optimize: true
+      run_vacuum: true

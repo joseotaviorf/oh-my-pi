@@ -1,0 +1,57 @@
+---
+database_name: datalake_consorcio
+table_name: chat_messages
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  One row per Copilot chat message for the Conrado host, linked to Consórcio leads
+  when Blip identity is available. Grain is id_message. Includes Blip identity
+  (id_bsp), optional Consórcio lead and HubSpot CRM ids from lead_external_data,
+  message role/content, and host_name from Langfuse tags (currently always conrado).
+  Incremental merge on id_message twice daily; scheduled default is a rolling
+  30-day load window (override load_start_date / load_end_date for backfill).
+  Built for funnel and chat analytics without re-joining Copilot, Langfuse, and
+  lead bridge tables on every query.
+columns:
+  id_lead:
+    lineage:
+      - datalake_consorcio_clean.lead_external_data.id_lead
+    description: Consórcio lead primary key when the Blip identity is linked in lead_external_data; null when no link exists.
+  id_bsp:
+    lineage:
+      - datalake_langfuse_clean.traces.id_user
+    description: Blip user identity for the chat (Langfuse traces.id_user, typically uuid@tunnel.msging.net).
+  id_crm:
+    lineage:
+      - datalake_consorcio_clean.lead_external_data.id_crm
+    description: HubSpot CRM deal id linked to the lead via lead_external_data; null when no CRM link exists.
+  id_message:
+    lineage:
+      - datalake_copilot_service_clean.message.id
+    description: Copilot message primary key; unique grain of this table.
+  id_session:
+    lineage:
+      - datalake_copilot_service_clean.message.id_session
+    description: Copilot session id that contains this message.
+  host_name:
+    lineage:
+      - datalake_langfuse_clean.traces.tags
+    description: Conversational host / bot name from the first Langfuse trace tag (lowercase), for example conrado.
+  role:
+    lineage:
+      - datalake_copilot_service_clean.message.role
+    description: Message author role lowercased from Copilot (user, ai, hardcoded).
+  content:
+    lineage:
+      - datalake_copilot_service_clean.message.content
+    description: Text or structured body of the chat message as stored by Copilot.
+  ts_created:
+    lineage:
+      - datalake_copilot_service_clean.message.ts_created
+    description: Timestamp when the Copilot message was created.
+  year:
+    description: Partition column — calendar year of ts_created.
+  month:
+    description: Partition column — calendar month of ts_created.
+  day:
+    description: Partition column — calendar day of ts_created.
