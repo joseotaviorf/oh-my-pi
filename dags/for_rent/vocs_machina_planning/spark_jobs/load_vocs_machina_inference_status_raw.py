@@ -38,7 +38,7 @@ from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_vocs_machina_inference_status_raw"
 DATE_FMT = "%Y-%m-%d"
@@ -137,7 +137,9 @@ def main() -> None:
     database_location = db_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     logger.info("m=main, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(database_name)

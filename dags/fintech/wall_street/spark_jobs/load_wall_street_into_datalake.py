@@ -10,7 +10,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import MySqlConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_wall_street_into_datalake"
 
@@ -41,7 +41,9 @@ if __name__ == "__main__":
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    metastore_service = SparkMetastoreService(SparkClient())
+    metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        SparkClient()
+    )
 
     # create database if not exists
     database_name = db_info["db_raw_databricks"]

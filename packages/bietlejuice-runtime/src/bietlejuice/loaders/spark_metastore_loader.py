@@ -94,6 +94,9 @@ class SparkMetastoreLoader:
                     f"m=update_metastore, db={database_name}, table={table_name}, msg=table and dataframe have the same schema "
                     "and metastore will not be changed."
                 )
+                self.ensure_secondary_catalog_table(
+                    database_name, table_name, s3_path, format_options, partitions
+                )
         else:
             logger.info(
                 f"m=update_metastore, db={database_name}, table={table_name}, msg=table is not in metastore "
@@ -127,6 +130,48 @@ class SparkMetastoreLoader:
 
     def is_table_in_metastore(self, database_name, table_name):
         return table_name in self.metastore_service.get_table_names(database_name)
+
+    def ensure_secondary_catalog_table(
+        self, database_name, table_name, s3_path, format_options, partitions
+    ):
+        """
+        Registers an unchanged table in the secondary catalog.
+
+        The same-schema branch of update_metastore emits no DDL, so a table that exists in
+        the primary catalog but not in the secondary one would never be created:
+        CompositeMetastoreService answers get_table_names and get_table_schema from the
+        primary only, so the absence is invisible to the merge check. Syncing explicitly
+        lets Glue (on Databricks) or Unity Catalog (on EMR) converge.
+
+        :param database_name: the database name
+        :type database_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param s3_path: location of the table in the object storage
+        :type s3_path: str
+        :param format_options: the file format options used to save
+        :type format_options: str
+        :param partitions: names of partitioning columns
+        :type partitions: list
+        :return: None
+        """
+        # Import needs to be internal, otherwise this class is not serializable
+        # (see the note in update_metastore).
+        catalog_strategy_resolver = importlib.import_module(
+            "bietlejuice.base.spark.catalog_strategy_resolver"
+        ).CatalogStrategyResolver
+
+        table_schema = self.metastore_service.get_table_schema(
+            database_name, table_name
+        )
+        catalog_strategy_resolver.sync_to_secondary_catalog(
+            database_name=database_name,
+            table_name=table_name,
+            table_location=s3_path,
+            table_schema=table_schema,
+            partitions=partitions,
+            format_str=format_options,
+        )
 
     def create_merge_schema(self, database_name, table_name, df):
         table_schema = self.metastore_service.get_table_schema(

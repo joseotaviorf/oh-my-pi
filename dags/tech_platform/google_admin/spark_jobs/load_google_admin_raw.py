@@ -27,7 +27,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.jobs.common.helpers import insert_partitions, json_to_dataframe
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 LOGGER = QuintoAndarLogger(__name__)
 
@@ -560,7 +560,9 @@ def _load_to_raw(spark_client: SparkClient, job_args: dict[str, Any], df) -> Non
     )
 
     s3_loader = S3Loader()
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     spark_metastore_service.create_database(write_database_name)

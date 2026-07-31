@@ -647,9 +647,11 @@ def main() -> None:
     if not under_pytest:
         from bietlejuice.base.databricks.table_privileges import TablePrivileges
         from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
-        from bietlejuice.services.metastore_services import SparkMetastoreService
+        from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
-        SparkMetastoreService(spark_client).create_database(write_db)
+        MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        ).create_database(write_db)
     DeltaLoader(spark_client.conn).load_table(
         table_name=table,
         path=path,
@@ -659,7 +661,9 @@ def main() -> None:
         when_matched_update_condition=MERGE_INSERT_ONLY_CONDITION,
     )
     if not under_pytest:
-        SparkMetastoreService(spark_client).refresh_table(write_db, TABLE_NAME)
+        MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        ).refresh_table(write_db, TABLE_NAME)
         priv = TablePrivileges.from_environment_default(table)
         if priv and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
             priv.apply()

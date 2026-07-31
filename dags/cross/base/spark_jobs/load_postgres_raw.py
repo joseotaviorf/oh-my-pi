@@ -14,7 +14,7 @@ from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
 from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_postgres_raw"
 
@@ -157,7 +157,9 @@ def main():
     else:
         table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(database_name)

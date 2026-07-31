@@ -19,7 +19,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_cdp_clickhouse"
 
@@ -280,7 +280,9 @@ if __name__ == "__main__":
     )
     format_options = "delta"
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     spark_metastore_service.create_database(write_database_name)
 
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)

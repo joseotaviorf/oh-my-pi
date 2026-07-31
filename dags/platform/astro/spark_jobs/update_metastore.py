@@ -8,7 +8,7 @@ from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "update_metastore"
@@ -44,7 +44,9 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(
         environment, context, datalake_bucket
     )
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(db_info["db_raw_databricks"])

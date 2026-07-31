@@ -18,7 +18,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_chat5a_messages_raw"
 
@@ -130,7 +130,9 @@ if __name__ == "__main__":
     )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     spark_metastore_service.create_database(write_database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     database_name = write_database_name

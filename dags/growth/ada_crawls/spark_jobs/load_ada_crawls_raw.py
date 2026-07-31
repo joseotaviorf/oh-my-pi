@@ -23,7 +23,10 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
+from bietlejuice.services.metastore_services.metastore_service import (
+    MetastoreService,
+)
 
 JOB_NAME = "load_ada_crawls_into_datalake"
 
@@ -277,7 +280,7 @@ def update_df_with_missing_columns(
     df: DataFrame,
     database_name: str,
     table_name: str,
-    spark_metastore_service: SparkMetastoreService,
+    spark_metastore_service: MetastoreService,
     fallback_database_name: str = None,
     fallback_table_name: str = None,
 ) -> DataFrame:
@@ -288,7 +291,7 @@ def update_df_with_missing_columns(
         df (DataFrame): The DataFrame being loaded to the Datalake.
         database_name (str): The name of the Datalake.
         table_name (str): The name of the table.
-        spark_metastore_service (SparkMetastoreService): The Spark Metastore Service.
+        spark_metastore_service (MetastoreService): The metastore service.
         fallback_database_name (str): Prod database when the write target table does not exist yet.
         fallback_table_name (str): Prod table when the write target table does not exist yet.
 
@@ -367,7 +370,9 @@ def load_dataframe_into_datalake(
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
     s3_loader = S3Loader()
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     spark_metastore_service.create_database(write_database_name)

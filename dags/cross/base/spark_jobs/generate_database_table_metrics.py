@@ -11,7 +11,7 @@ from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import MySqlConsumer, PostgresConsumer
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "generate_database_table_metrics"
 
@@ -92,7 +92,9 @@ def main():
     database_name = db_info["db_clean_databricks"]
     database_location = db_info["db_clean_path"]
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(database_name)

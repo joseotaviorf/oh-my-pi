@@ -28,7 +28,7 @@ from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 from bietlejuice.services.storage_services.s3_service import S3Service
 
 JOB_NAME = "load_csv_into_datalake"
@@ -303,7 +303,9 @@ if __name__ == "__main__":
         db_info = DatalakeMetastoreService.get_db_info(
             environment, source, datalake_bucket
         )
-        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+        )
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
         logger.info(

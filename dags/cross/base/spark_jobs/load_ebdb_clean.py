@@ -9,7 +9,7 @@ from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_ebdb_clean"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -35,7 +35,9 @@ if __name__ == "__main__":
 
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
-    metastore_service = SparkMetastoreService(spark_client)
+    metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 

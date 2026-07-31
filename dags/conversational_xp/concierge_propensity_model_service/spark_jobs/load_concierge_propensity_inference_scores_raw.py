@@ -13,7 +13,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_concierge_propensity_inference_scores_raw"
 RUN_ID_PATH_PATTERN = r"concierge-propensity-model-batch/([^/]+)/"
@@ -86,7 +86,9 @@ def main():
     database_location = db_info["db_raw_path"]
     format_options = SparkTableStorageFormat.PARQUET
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(database_name)

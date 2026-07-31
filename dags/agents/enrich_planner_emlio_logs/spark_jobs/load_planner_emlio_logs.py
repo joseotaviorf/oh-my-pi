@@ -35,7 +35,7 @@ from bietlejuice.base.validation.spark_args import (
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 # COMMAND ----------
 
@@ -546,7 +546,9 @@ def _save_to_enrich(
         "spark.databricks.delta.schema.autoMerge.enabled", "true"
     )
 
-    SparkMetastoreService(spark_client).create_database(write_database_name)
+    MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    ).create_database(write_database_name)
     DeltaLoader().load_table(
         table_name=full_table_name,
         path=s3_path,
@@ -554,7 +556,7 @@ def _save_to_enrich(
         partition_by=["year", "month", "day"],
         merge_on=["uuid"],
     )
-    SparkMetastoreService(spark_client).refresh_table(
+    MetastoreServiceFactory.create_loader_metastore_service(spark_client).refresh_table(
         write_database_name, write_table_name
     )
     priv = TablePrivileges.from_environment_default(full_table_name)

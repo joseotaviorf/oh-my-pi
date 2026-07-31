@@ -23,7 +23,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.json_service import JsonService
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_firestore_raw"
 
@@ -130,7 +130,9 @@ if __name__ == "__main__":
                 environment, source, datalake_bucket
             )
             spark_client = SparkClient()
-            spark_metastore_service = SparkMetastoreService(spark_client)
+            spark_metastore_service = (
+                MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+            )
             database_name = datalake_info["db_raw_databricks"]
             spark_metastore_service.create_database(database_name)
 

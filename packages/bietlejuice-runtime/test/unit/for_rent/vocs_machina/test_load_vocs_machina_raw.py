@@ -199,7 +199,11 @@ def test_main_uses_validation_target_for_all_writes():
         patch.object(_job, "S3Consumer", return_value=s3_consumer),
         patch.object(_job, "S3Loader", return_value=s3_loader),
         patch.object(
-            _job, "SparkMetastoreService", return_value=spark_metastore_service
+            _job,
+            "MetastoreServiceFactory",
+            create_loader_metastore_service=MagicMock(
+                return_value=spark_metastore_service
+            ),
         ),
         patch.object(_job, "SparkMetastoreLoader", return_value=spark_metastore_loader),
         patch.object(_job, "_prepare_day_df", return_value=day_df),
@@ -288,7 +292,11 @@ def test_main_no_data_table_not_exists_raises():
         patch.object(_job, "S3Consumer", return_value=s3_consumer),
         patch.object(_job, "S3Loader", return_value=s3_loader),
         patch.object(
-            _job, "SparkMetastoreService", return_value=spark_metastore_service
+            _job,
+            "MetastoreServiceFactory",
+            create_loader_metastore_service=MagicMock(
+                return_value=spark_metastore_service
+            ),
         ),
         patch.object(_job, "SparkMetastoreLoader", return_value=spark_metastore_loader),
     ):
@@ -350,7 +358,11 @@ def test_main_no_data_table_exists_skips_gracefully():
         patch.object(_job, "S3Consumer", return_value=s3_consumer),
         patch.object(_job, "S3Loader", return_value=s3_loader),
         patch.object(
-            _job, "SparkMetastoreService", return_value=spark_metastore_service
+            _job,
+            "MetastoreServiceFactory",
+            create_loader_metastore_service=MagicMock(
+                return_value=spark_metastore_service
+            ),
         ),
         patch.object(_job, "SparkMetastoreLoader", return_value=spark_metastore_loader),
     ):
@@ -413,7 +425,11 @@ def test_main_reads_only_finalized_part_files():
         patch.object(_job, "S3Consumer", return_value=s3_consumer),
         patch.object(_job, "S3Loader", return_value=s3_loader),
         patch.object(
-            _job, "SparkMetastoreService", return_value=spark_metastore_service
+            _job,
+            "MetastoreServiceFactory",
+            create_loader_metastore_service=MagicMock(
+                return_value=spark_metastore_service
+            ),
         ),
         patch.object(_job, "SparkMetastoreLoader", return_value=spark_metastore_loader),
         patch.object(_job, "_prepare_day_df", return_value=day_df),

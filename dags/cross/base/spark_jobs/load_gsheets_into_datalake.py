@@ -15,7 +15,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.gsheets_service import GsheetsService
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_gsheets_by_context_into_datalake"
 
@@ -122,7 +122,9 @@ if __name__ == "__main__":
     datalake_info = DatalakeMetastoreService.get_db_info(
         environment, schema, datalake_bucket
     )
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
     database_name = datalake_info["db_raw_databricks"]
     spark_metastore_service.create_database(database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)

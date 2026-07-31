@@ -15,7 +15,7 @@ from bietlejuice.base.validation.spark_args import (
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_description_features"
 
@@ -144,7 +144,9 @@ def save_df(df: DataFrame, args: Namespace) -> None:
 
     spark_client = SparkClient()
     loader = DeltaLoader()
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     db_info = DatalakeMetastoreService.get_db_info(
         args.env, args.database_base_name, args.datalake_bucket

@@ -9,7 +9,7 @@ from bietlejuice.base.validation.spark_args import (
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_dim_price_suggested"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -106,7 +106,9 @@ if __name__ == "__main__":
             )
         )
 
-        SparkMetastoreService(spark_client).create_database(write_database_name)
+        MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        ).create_database(write_database_name)
 
         full_table_name = f"{write_database_name}.{write_table_name}"
         s3_path = (
@@ -122,9 +124,9 @@ if __name__ == "__main__":
             merge_on=["sk_price_suggested"],
         )
 
-        SparkMetastoreService(spark_client).refresh_table(
-            write_database_name, write_table_name
-        )
+        MetastoreServiceFactory.create_loader_metastore_service(
+            spark_client
+        ).refresh_table(write_database_name, write_table_name)
         logger.info(
             f"m=__main__, table={full_table_name}, msg=Load completed successfully"
         )

@@ -14,7 +14,7 @@ from bietlejuice.base.validation.spark_args import (
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_buyer_funnel_users"
@@ -206,7 +206,9 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
     loader = DeltaLoader()
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     db_info = DatalakeMetastoreService.get_db_info(
         environment, database_name, datalake_bucket

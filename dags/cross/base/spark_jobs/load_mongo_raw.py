@@ -21,7 +21,7 @@ from bietlejuice.clients.db_clients import MongoClient, SparkClient
 from bietlejuice.consumers.db_consumers import MongoConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_mongo_raw"
 
@@ -224,7 +224,9 @@ if __name__ == "__main__":
     )
     if not args.target_database_name or not args.target_table_name:
         write_table_name = write_table_name.lower()
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(databricks_database_name)

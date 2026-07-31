@@ -13,7 +13,7 @@ from bietlejuice.consumers.db_consumers import MySqlConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 SOURCE = "ebdb"
 config_service = ConfigurationService(SOURCE)
@@ -110,7 +110,9 @@ if __name__ == "__main__":
     mysql_consumer = MySqlConsumer(conn_config, SparkClient())
 
     db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
-    metastore_service = SparkMetastoreService(SparkClient())
+    metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        SparkClient()
+    )
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 

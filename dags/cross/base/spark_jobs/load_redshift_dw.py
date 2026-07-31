@@ -9,7 +9,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import PostgresClient, SparkClient
 from bietlejuice.loaders.redshift_loader import RedshiftLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 from bietlejuice.services.storage_services.s3_service import S3Service
 
 JOB_NAME = "load_redshift_dw"
@@ -50,7 +50,9 @@ if __name__ == "__main__":
     )
 
     s3_client = S3Service(boto3.resource("s3"))
-    spark_metastore_service = SparkMetastoreService(SparkClient())
+    spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        SparkClient()
+    )
 
     redshift_client = PostgresClient(
         dbname=redshift_connection["db"],

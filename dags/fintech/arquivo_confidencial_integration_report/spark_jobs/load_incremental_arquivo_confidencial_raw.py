@@ -14,7 +14,7 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import MySqlConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
 JOB_NAME = "load_incremental_arquivo_confidencial_raw"
 
@@ -71,7 +71,9 @@ if __name__ == "__main__":
     mysql_consumer = MySqlConsumer(conn_config, spark_client)
 
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
-    metastore_service = SparkMetastoreService(spark_client)
+    metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
+        spark_client
+    )
 
     # create database if it doesn't exists
     database_name = db_info["db_raw_databricks"]

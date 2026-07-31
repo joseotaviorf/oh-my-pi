@@ -330,3 +330,89 @@ class TestCreateMergeSchemaDoesNotRecreateOnCasingAlone:
         result = loader.create_merge_schema("db", "t", self._df("id", "brand_new"))
 
         assert result == OrderedDict([("id", "string"), ("brand_new", "string")])
+
+
+class TestSameSchemaStillRegistersInSecondaryCatalog:
+    """The same-schema branch emits no DDL, which used to strand the secondary catalog.
+
+    ``CompositeMetastoreService`` answers ``get_table_names`` and ``get_table_schema``
+    from the primary only, so a table present in Unity Catalog but missing from Glue
+    looks unchanged and never converges. Regression test for a raw crawler table that
+    existed in UC for months and was never created in Glue.
+    """
+
+    TABLE_SCHEMA = OrderedDict(
+        [("id", "string"), ("year", "int"), ("month", "int"), ("day", "int")]
+    )
+    PARTITIONS = ["year", "month", "day"]
+
+    @pytest.fixture(autouse=True)
+    def unity_catalog_helper(self):
+        with patch(
+            "bietlejuice.base.spark.unity_catalog_helper.UnityCatalogHelper"
+        ) as unity_catalog_helper:
+            yield unity_catalog_helper
+
+    @pytest.fixture()
+    def catalog_strategy_resolver(self):
+        with patch(
+            "bietlejuice.base.spark.catalog_strategy_resolver.CatalogStrategyResolver"
+        ) as catalog_strategy_resolver:
+            yield catalog_strategy_resolver
+
+    @pytest.fixture()
+    def loader(self):
+        from bietlejuice.loaders.spark_metastore_loader import SparkMetastoreLoader
+
+        service = Mock()
+        service.get_table_names = Mock(return_value=["chaves_na_mao"])
+        service.get_table_schema = Mock(return_value=self.TABLE_SCHEMA)
+        service.merge_table_and_dataframe_schemas = Mock(return_value=self.TABLE_SCHEMA)
+        return SparkMetastoreLoader(service)
+
+    def _update(self, loader):
+        loader.update_metastore(
+            df=Mock(),
+            database_name="datalake_crawler_chaves_na_mao_raw",
+            table_name="chaves_na_mao",
+            format_options="JSON",
+            database_location="s3://bucket/raw/crawler_chaves_na_mao/",
+            partitions=self.PARTITIONS,
+            force_recreate=False,
+        )
+
+    def test_syncs_to_secondary_catalog_when_schema_is_unchanged(
+        self, loader, catalog_strategy_resolver
+    ):
+        self._update(loader)
+
+        catalog_strategy_resolver.sync_to_secondary_catalog.assert_called_once_with(
+            database_name="datalake_crawler_chaves_na_mao_raw",
+            table_name="chaves_na_mao",
+            table_location="s3://bucket/raw/crawler_chaves_na_mao/chaves_na_mao",
+            table_schema=self.TABLE_SCHEMA,
+            partitions=self.PARTITIONS,
+            format_str="JSON",
+        )
+
+    def test_does_not_touch_the_primary_catalog(
+        self, loader, catalog_strategy_resolver
+    ):
+        """The live table keeps its grants and data contract: no DROP, no CREATE."""
+        self._update(loader)
+
+        loader.metastore_service.drop_table.assert_not_called()
+        loader.metastore_service.create_external_table.assert_not_called()
+
+    def test_recreated_table_does_not_sync_twice(
+        self, loader, catalog_strategy_resolver
+    ):
+        """A genuine schema change takes the recreate path, which already fans out."""
+        loader.metastore_service.merge_table_and_dataframe_schemas.return_value = (
+            OrderedDict(list(self.TABLE_SCHEMA.items()) + [("brand_new", "string")])
+        )
+
+        self._update(loader)
+
+        loader.metastore_service.create_external_table.assert_called_once()
+        catalog_strategy_resolver.sync_to_secondary_catalog.assert_not_called()
