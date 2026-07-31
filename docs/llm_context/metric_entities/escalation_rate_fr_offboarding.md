@@ -8,7 +8,7 @@
 
 **Data Steward:**
 
-- [lira.maria@quintoandar.com.br](mailto:lira.maria@quintoandar.com.br)
+- [joao.veronezzi@quintoandar.com.br](mailto:joao.veronezzi@quintoandar.com.br)
 
 ## Overview
 
