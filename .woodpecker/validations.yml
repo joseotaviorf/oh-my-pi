@@ -498,3 +498,34 @@ steps:
         branch: [master]
         path: *datahub_context_entities_path
     depends_on: [setup]
+
+  # Golden-query schema gate: referenced schema.table pairs and column names must
+  # exist in repo metadata YAML under dags/**/metadata (DataHub fallback for tables
+  # without YAML — see datahub_table_fallback.py). Does not execute SQL on Trino.
+  validate-entity-golden-queries-metadata:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      GITHUB_TOKEN:
+        from_secret: github_token
+      DATAHUB_GRAPHQL_URL:
+        from_secret: datahub_graphql_url
+      DATAHUB_TOKEN:
+        from_secret: datahub_token
+    commands:
+      - make validate-entity-golden-queries-metadata
+    when:
+      - event: pull_request
+        path: &golden_queries_metadata_path
+          include:
+            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/metric_entities/**"
+            - "dags/governance/datahub_business_context/validate_entity_golden_queries_metadata.py"
+            - "dags/governance/datahub_business_context/golden_query_metadata_validator.py"
+            - "dags/governance/datahub_business_context/golden_query_schema_validator.py"
+            - "dags/governance/datahub_business_context/datahub_table_fallback.py"
+          on_empty: false
+      - event: push
+        branch: [master]
+        path: *golden_queries_metadata_path
+    depends_on: [setup]

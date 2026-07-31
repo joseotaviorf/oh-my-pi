@@ -22,11 +22,28 @@ docs/llm_context/business_entities/{entity}.md
 
 | Step | When | Action |
 |------|------|--------|
+| `validate-datahub-context-entities` | pull request | Offline template contract (sections, placeholders) |
+| `validate-entity-golden-queries-metadata` | pull request / push | Golden-query Trino SQL syntax + tables/columns vs repo `dags/**/metadata` YAML |
 | `push-datahub-business-context` | push to master / hotfix | MD → YAML → push (changed MDs; all MDs if loader changed) |
 | `validate-datahub-entities-post-push` | push (after generate) | smoke test: changed MDs have a live Data Product |
 | `validate-datahub-entities` | pull request | smoke test: full catalog |
 | `sync-tars-entities` | push (sync path changes) | Context Documents tagged `tars-entity` → Data Product (direct mode) |
 | `push-context-documents` | push (context doc changes) | Publish guide + template Markdown as DataHub Context Documents |
+
+### DataHub fallback for the golden-query schema gate
+
+`validate-entity-golden-queries-metadata` normally requires every `schema.table` referenced by a
+golden query to have a metadata YAML under `dags/**/metadata`. Tables such as `sandbox.*`
+(Luigi Jr / ad-hoc materializations) may exist only in DataHub.
+
+`datahub_table_fallback.py` closes that gap: when a table is missing from repo metadata, the
+gate probes DataHub (read-only GraphQL — dataset existence + `schemaMetadata.fields`) before
+failing. A table found only in DataHub passes column checks against the DataHub schema
+silently; a table absent from both stays a blocking error.
+
+The probe is a no-op unless both `DATAHUB_GRAPHQL_URL` and `DATAHUB_TOKEN` are set. CI wires
+the same read-only secrets already used by `validate-datahub-entities`. Pass
+`--no-datahub-fallback` to force repo-metadata-only behavior locally.
 
 ---
 
@@ -117,6 +134,7 @@ After GitOps PR merge, CI runs `generate_and_push_datahub_entities.py` as for en
 |------|------|
 | [`reference/`](./reference/) | LLM schema examples (`_TEMPLATE`, `payments`, `visits`) |
 | [`datahub_domain_catalog.py`](./datahub_domain_catalog.py) | Fetch live DataHub domains for LLM inference + validation |
+| [`datahub_table_fallback.py`](./datahub_table_fallback.py) | Golden-query gate: DataHub existence/schema probe for tables missing repo metadata YAML |
 | [`load_collections_context.py`](./load_collections_context.py) | GraphQL loader (consumes YAML from `--config`) |
 | [`smoke_test_datahub.py`](./smoke_test_datahub.py) | Read-only: Data Product exists per entity MD filename |
 | [`push_all_entities.py`](./push_all_entities.py) | **Deprecated** — forwards to `generate_and_push_datahub_entities.py --all` |
@@ -155,6 +173,14 @@ uv run --script packages/bietlejuice-compiler/scripts/ci_cd/generate_and_push_da
 
 # Smoke test (read-only — no LLM)
 python dags/governance/datahub_business_context/smoke_test_datahub.py --verbose
+
+# Golden-query schema gate (Trino syntax + tables/columns vs repo metadata; no execution).
+# When DATAHUB_GRAPHQL_URL/DATAHUB_TOKEN are set, tables absent from repo metadata YAML are
+# also probed against DataHub before being reported as errors (see README § DataHub fallback).
+# Pass --no-datahub-fallback to force repo-metadata-only behavior.
+uv run --project packages/bietlejuice-compiler python \
+  dags/governance/datahub_business_context/validate_entity_golden_queries_metadata.py \
+  --paths docs/llm_context/business_entities/payments.md
 
 # Loader only (debug with reference example)
 python dags/governance/datahub_business_context/load_collections_context.py \

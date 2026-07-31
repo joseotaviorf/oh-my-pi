@@ -20,6 +20,8 @@
 # The sync-tars-entities and push-context-documents steps keep their own path filters below.
 #
 # Steps:
+#   validate-entity-golden-queries-metadata — golden-query tables/columns vs repo
+#                                          metadata YAML (push + same path as MD changes)
 #   get-credentials-prod — Vault OPENAI_API_KEY for LiteLLM (push only)
 #   push-datahub-business-context — LLM → ephemeral YAML → DataHub via
 #                                   generate_and_push_datahub_entities.py (push only).
@@ -95,6 +97,25 @@ clone:
       partial: false
 
 steps:
+  validate-entity-golden-queries-metadata:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      DATAHUB_GRAPHQL_URL:
+        from_secret: datahub_graphql_url_prod
+      DATAHUB_TOKEN:
+        from_secret: datahub_api_key_prod
+    commands:
+      - make validate-entity-golden-queries-metadata
+    when:
+      - event: push
+        branch: [master, hotfix/*]
+        path:
+          include:
+            - "docs/llm_context/business_entities/**"
+            - "docs/llm_context/metric_entities/**"
+          on_empty: false
+
   get-credentials-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/vault
     pull: true
@@ -136,7 +157,7 @@ steps:
         path: *datahub_path
     # Runs after sync-tars-entities so this step's full-Markdown description is always
     # the last write to the Data Product (see step comment above for the race it avoids).
-    depends_on: [get-credentials-prod, sync-tars-entities]
+    depends_on: [get-credentials-prod, sync-tars-entities, validate-entity-golden-queries-metadata]
 
   validate-datahub-entities:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest

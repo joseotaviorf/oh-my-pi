@@ -100,6 +100,12 @@ dags_not_using_builder:
   - governance/datahub_business_context/sync/test_sync_state_path.py
   - governance/datahub_business_context/validate_datahub_context_entities.py
   - governance/datahub_business_context/test_validate_datahub_context_entities.py
+  - governance/datahub_business_context/golden_query_metadata_validator.py
+  - governance/datahub_business_context/golden_query_schema_validator.py
+  - governance/datahub_business_context/datahub_table_fallback.py
+  - governance/datahub_business_context/test_datahub_table_fallback.py
+  - governance/datahub_business_context/validate_entity_golden_queries_metadata.py
+  - governance/datahub_business_context/test_validate_entity_golden_queries_metadata.py
   - governance/sync_tars_entities/sync_tars_entities_dag.py
   - for_sale/salesforce_for_sale/salesforce_for_sale.py
   - platform/migration_compare_agents__dw_agent_accreditation/migration_compare_agents__dw_agent_accreditation_dag.py

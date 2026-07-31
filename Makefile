@@ -958,6 +958,18 @@ validate-datahub-context-entities:
 	@git fetch --no-tags origin +refs/heads/master
 	@uv run python dags/governance/datahub_business_context/validate_datahub_context_entities.py --changed-only -b "$(CI_COMMIT_BRANCH)"
 
+.PHONY: validate-entity-golden-queries-metadata
+## Validate golden-query SQL in changed entity docs against repo metadata YAML
+## under dags/**/metadata (tables + documented columns). Does not execute SQL on
+## Trino (see validate_entity_golden_queries_metadata.py).
+validate-entity-golden-queries-metadata:
+	@echo ""
+	@echo "Validating golden queries in changed entity docs (repo metadata gate)"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-compiler python dags/governance/datahub_business_context/validate_entity_golden_queries_metadata.py --changed-only -b "$(CI_COMMIT_BRANCH)"
+
 .PHONY: validate-fair-metadata
 validate-fair-metadata:
 	@echo ""
