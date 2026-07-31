@@ -1,6 +1,6 @@
 # Root pyproject.toml — not a buildable package.
 # Per-package configuration (pytest, coverage, uv) lives in packages/*/pyproject.toml.
-# Shared tool configuration (ruff, sqlfluff, ty) lives here so every package inherits it.
+# Shared tool configuration (ruff, sqlfluff, ty, basedpyright) lives here so every package inherits it.
 # Workspace-wide dev tools (ruff, ty, sqlfluff) are declared in [dependency-groups].dev
 # so they are installed once at a consistent version for all members.
 #
@@ -46,11 +46,26 @@ override-dependencies = [
 [tool.uv.sources]
 quintoandar-logger = { git = "https://github.com/quintoandar/python-logger", tag = "0.8.1" }
 
+# basedpyright — shared editor config for Cursor Pyright (anysphere.cursorpyright).
+# typeCheckingMode=off matches Cursor Pyright's default (Pylance-like). CI type
+# signal stays on Astral ty via `make type-check` (non-blocking).
+[tool.basedpyright]
+typeCheckingMode = "off"
+pythonVersion = "3.9"
+extraPaths = [
+    "packages/bietlejuice-core/src",
+    "packages/bietlejuice-airflow/src",
+    "packages/bietlejuice-airflow-operators/src",
+    "packages/bietlejuice-airflow-plugins/src",
+    "packages/bietlejuice-compiler/src",
+    "packages/bietlejuice-runtime/src",
+]
+
 # ---------------------------------------------------------------------------
 # ty — shared across all packages.
 # ---------------------------------------------------------------------------
 [tool.ty.environment]
-python-version = "3.10"
+python-version = "3.9"
 
 # ---------------------------------------------------------------------------
 # Ruff — shared across all packages (ruff walks up the directory tree).

@@ -401,7 +401,7 @@ steps:
           --target production \
           --file astro/Dockerfile \
           --secret id=GITHUB_TOKEN,src=/tmp/github_token \
-          --build-arg UV_VERSION=0.11.7 \
+          --build-arg UV_VERSION=0.12.0 \
           -t bietlejuice-airflow:deploy \
           .
         rm -f /tmp/github_token
@@ -719,7 +719,7 @@ steps:
           --target production \
           --file astro/Dockerfile \
           --secret id=GITHUB_TOKEN,src=/tmp/github_token \
-          --build-arg UV_VERSION=0.11.7 \
+          --build-arg UV_VERSION=0.12.0 \
           -t bietlejuice-airflow:deploy \
           .
         rm -f /tmp/github_token

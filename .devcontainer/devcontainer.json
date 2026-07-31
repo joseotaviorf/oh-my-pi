@@ -27,8 +27,11 @@
     "source=${localEnv:HOME}/.aws,target=/home/vscode/.aws,type=bind",
     "source=${localEnv:HOME}/.databrickscfg,target=/home/vscode/.databrickscfg,type=bind,readonly",
     "source=${localEnv:HOME}/.weep,target=/home/vscode/.weep,type=bind",
-    "source=bi-etl-ejuice-uv-cache,target=/home/vscode/.cache/uv,type=volume"
+    "source=bi-etl-ejuice-uv-cache,target=/home/vscode/.cache/uv,type=volume",
+    "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
   ],
+  "entrypoint": "/usr/local/share/docker-init.sh",
+  "securityOpt": ["label=disable"],
   "forwardPorts": [
     8080,
     4040
@@ -87,6 +90,14 @@
           "${workspaceFolder}/packages/bietlejuice-compiler/src",
           "${workspaceFolder}/packages/bietlejuice-runtime/src"
         ],
+        "basedpyright.analysis.extraPaths": [
+          "${workspaceFolder}/packages/bietlejuice-core/src",
+          "${workspaceFolder}/packages/bietlejuice-airflow/src",
+          "${workspaceFolder}/packages/bietlejuice-airflow-operators/src",
+          "${workspaceFolder}/packages/bietlejuice-airflow-plugins/src",
+          "${workspaceFolder}/packages/bietlejuice-compiler/src",
+          "${workspaceFolder}/packages/bietlejuice-runtime/src"
+        ],
         "python.analysis.venvPath": "/opt/bietlejuice/venvs",
         "python.analysis.venv": "workspace",
         // Keep the Python extension from starting its own LSP — anysphere.cursorpyright
@@ -131,12 +142,6 @@
           }
         }
       }
-    }
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-      "version": "latest",
-      "moby": false
     }
   }
 }

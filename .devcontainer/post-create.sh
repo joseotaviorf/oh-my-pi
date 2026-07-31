@@ -8,6 +8,10 @@ if [ -d /home/vscode/.cache ]; then
   sudo chown -R vscode:vscode /home/vscode/.cache 2>/dev/null || true
 fi
 
+if [ -d /opt/bietlejuice ]; then
+  sudo chown -R vscode:vscode /opt/bietlejuice 2>/dev/null || true
+fi
+
 if [ -n "${GITHUB_TOKEN:-}" ]; then
   git config --global credential.helper "cache --timeout=36000"
   git credential approve <<EOF

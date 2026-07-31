@@ -123,7 +123,7 @@ To create an object of the ExecuteJobCluster operator (therefore an Airflow task
     execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
         task_id="execute_job_cluster_task_id",
         dag=dag,
-        cluster_configuration = {
+        cluster_configuration={
             "cluster_name": "CLUSTER_NAME",
             "autoscale": {"min_workers": 3, "max_workers": 4},
             "spark_version": "10.4.x-scala2.12",
@@ -138,8 +138,8 @@ To create an object of the ExecuteJobCluster operator (therefore an Airflow task
             "node_type_id": "i3.xlarge",
             "driver_node_type_id": "i3.xlarge",
             "spark_env_vars": {"PYSPARK_PYTHON": "/databricks/python3/bin/python3"},
-            "autotermination_minutes": 10, #this parameter is automatically removed
-        }
+            "autotermination_minutes": 10,  # this parameter is automatically removed
+        },
     )
     ```
 
@@ -150,9 +150,7 @@ To create an object of the ExecuteJobCluster operator (therefore an Airflow task
         task_id="check_job_task_id",
         dag=dag,
         json={
-            "spark_python_task": {
-                "python_file": "path/to/my/pyspark_job.py"
-            },
+            "spark_python_task": {"python_file": "path/to/my/pyspark_job.py"},
             "new_cluster": {
                 "cluster_name": "CLUSTER_NAME",
                 "autoscale": {"min_workers": 3, "max_workers": 4},
@@ -168,9 +166,9 @@ To create an object of the ExecuteJobCluster operator (therefore an Airflow task
                 "node_type_id": "i3.xlarge",
                 "driver_node_type_id": "i3.xlarge",
                 "spark_env_vars": {"PYSPARK_PYTHON": "/databricks/python3/bin/python3"},
-                "autotermination_minutes": 10, #this parameter is automatically removed
-            }
-        }
+                "autotermination_minutes": 10,  # this parameter is automatically removed
+            },
+        },
     )
     ```
 
@@ -213,59 +211,39 @@ These Airflow tasks:
 
 ```python
 execute_job_cluster = QuintoAndarDatabricksExecuteJobClusterOperator(
-    task_id = "execute-job-cluster",
-    libraries = [
-        {
-            "whl": "s3://artifacts_bucket/default_lib.whl"
-        }
-    ],
+    task_id="execute-job-cluster",
+    libraries=[{"whl": "s3://artifacts_bucket/default_lib.whl"}],
     cluster_configuration={
         cluster_name: "shared_job_cluster_example__YYYY-MM-DDTSSSSS-LLLLLL_LLLL"
-        #... other cluster configs
-    }
+        # ... other cluster configs
+    },
 )
 
 load_task_0 = QuintoAndarDatabricksCheckJobTaskOperator(
-    task_id = "load-dw-job-cluster-example-test-table-0",
-    libraries = [
-        {
-            "whl": "s3://artifacts_bucket/load_lib.whl"
-        }
-    ],
-    json = {
+    task_id="load-dw-job-cluster-example-test-table-0",
+    libraries=[{"whl": "s3://artifacts_bucket/load_lib.whl"}],
+    json={
         "spark_python_task": {
             "python_file": "s3://spark_jobs_bucket/prefix/load_table_spark_job.py",
-            "parameters": [
-                "dev_environment",
-                "job_cluster_example",
-                "test_table_0"
-            ]
+            "parameters": ["dev_environment", "job_cluster_example", "test_table_0"],
         }
         # No `new_cluster` key
-    }
+    },
 )
 
 sync_task_0 = QuintoAndarDatabricksCheckJobTaskOperator(
-    task_id = "sync-hive-metastore-structure-dw-job-cluster-example-test-table-0",
-    libraries = [
-        {
-            "whl": "s3://artifacts_bucket/sync_lib.whl"
-        }
-    ],
-    json = {
+    task_id="sync-hive-metastore-structure-dw-job-cluster-example-test-table-0",
+    libraries=[{"whl": "s3://artifacts_bucket/sync_lib.whl"}],
+    json={
         "spark_python_task": {
             "python_file": "s3://spark_jobs_bucket/prefix/sync_table_spark_job.py",
-            "parameters": [
-                "dev_environment",
-                "job_cluster_example",
-                "test_table_0"
-            ]
+            "parameters": ["dev_environment", "job_cluster_example", "test_table_0"],
         },
         "new_cluster": {
             "cluster_name": "sync_task_exclusive_job_cluster__YYYY-MM-DDTSSSSS-LLLLLL_LLLL",
-            #... other cluster configs
-        }
-    }
+            # ... other cluster configs
+        },
+    },
 )
 
 execute_job_cluster >> load_task_0 >> sync_task_0

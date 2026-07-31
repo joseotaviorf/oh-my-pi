@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from emr.steps import (
-    SPARK_SUBMIT_BIN,
     _DEFAULT_SPARK_SUBMIT_CONFS,
+    SPARK_SUBMIT_BIN,
     build_spark_step,
 )
 

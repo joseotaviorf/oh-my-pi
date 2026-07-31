@@ -90,7 +90,9 @@ Modeled on [`load_parquet_batch_inference_into_datalake.py`](../demand_balancer_
 path = f"{source_root_path}/year={dt.year}/month={dt.month}/day={dt.day}/"
 df = s3_consumer.get_data_from_file(path, format)
 # add year/month/day columns from date_to_ingest, keep model_version from parquet
-s3_loader.load_df(df, s3_path=..., format_options=PARQUET, partitions=raw_partition_cols)
+s3_loader.load_df(
+    df, s3_path=..., format_options=PARQUET, partitions=raw_partition_cols
+)
 spark_metastore_loader.update_metastore(...)
 spark_metastore_service.create_new_partitions_from_df(...)
 ```

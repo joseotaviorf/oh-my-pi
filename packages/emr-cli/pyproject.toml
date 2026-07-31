@@ -41,5 +41,3 @@ testpaths = ["test"]
 pythonpath = ["src"]
 addopts = ["--import-mode=importlib"]
 
-[tool.ruff.lint.isort]
-known-first-party = ["emr"]

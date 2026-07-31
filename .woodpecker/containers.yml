@@ -1,8 +1,10 @@
 # Container image builds — CI images published to ECR.
 #
-# ci-base, ci-jdk, and devcontainer are built for linux/amd64 + linux/arm64
-# via the ECR-hosted Kaniko plugin (plugins/docker) with privileged: true for QEMU
-# binfmt registration. ci-astro and ci-astro-dind are amd64-only (Woodpecker CI runners only).
+# PRs smoke-build the devcontainer target twice in parallel (one plugin
+# invocation per arch: amd64 + arm64). Publish steps build ci-base / ci-jdk /
+# devcontainer for their configured platforms via the ECR-hosted Kaniko plugin
+# (plugins/docker) with privileged: true for QEMU binfmt registration.
+# ci-astro and ci-astro-dind are amd64-only (Woodpecker CI runners only).
 # GITHUB_TOKEN is passed via settings.github_token
 # (PLUGIN_GITHUB_TOKEN); the plugin stages /kaniko/run/secrets/GITHUB_TOKEN for
 # Dockerfile RUN steps. Multi-arch targets push a
@@ -25,9 +27,10 @@ when:
   - event: manual
 
 steps:
-  # Validates that ci-jdk builds for both amd64 and arm64 on PRs.
-  # No push — build-only smoke test.
-  validate-multi-arch-pr:
+  # Smoke-build devcontainer per arch on PRs (parallel). No push.
+  # Astro/DinD stages sit after devcontainer in the Dockerfile so Kaniko
+  # --target=devcontainer does not build DinD apt under QEMU.
+  validate-devcontainer-amd64-pr:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
     privileged: true
@@ -37,7 +40,6 @@ steps:
       target: devcontainer
       platforms:
         - linux/amd64
-        - linux/arm64
       no_push: true
       github_token:
         from_secret: github_token
@@ -48,11 +50,30 @@ steps:
           - ".woodpecker/containers.yml"
           - ".container/Dockerfile"
           - ".container/dind/**"
+          - ".devcontainer/**"
           - "pyproject.toml"
           - "uv.lock"
           - "packages/**/pyproject.toml"
           - "packages/**/uv.lock"
           - "packages/bietlejuice-runtime/hatch_build.py"
+
+  validate-devcontainer-arm64-pr:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
+    pull: true
+    privileged: true
+    settings:
+      repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
+      dockerfile: .container/Dockerfile
+      target: devcontainer
+      platforms:
+        - linux/arm64
+      no_push: true
+      github_token:
+        from_secret: github_token
+    when:
+      event: pull_request
+      path:
+        include: *container_dep_paths
 
   publish-ci-base-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1

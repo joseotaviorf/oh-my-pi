@@ -274,7 +274,7 @@ dev = [
     { name = "quintoandar-survicate-api-client", git = "https://github.com/quintoandar/survicate-api-client-python?tag=0.1.0" },
     { name = "quintoandar-tracksale-api-client", git = "https://github.com/quintoandar/tracksale-api-client-python?tag=0.2.0" },
     { name = "quintoandar-velo-neurotech-api-client", git = "https://github.com/quintoandar/velo-neurotech-api-client-python?tag=0.3.2" },
-    { name = "ruff", specifier = "==0.15.13" },
+    { name = "ruff", specifier = "==0.16.0" },
     { name = "spacy", specifier = ">=3.7.2,<4" },
     { name = "ty" },
 ]
