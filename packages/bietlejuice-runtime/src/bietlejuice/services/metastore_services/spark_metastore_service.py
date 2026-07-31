@@ -224,6 +224,15 @@ class SparkMetastoreService(MetastoreService):
         :param df: a dataframe
         :type df: SparkDataFrame
         :return: a schema formed by an union operation as an OrderedDict.
+
+        The union matches column names **case-insensitively** while keeping the
+        casing the table already has.  Databricks' metastore preserves the
+        dataframe's casing, but Hive/Glue lower-cases it (see
+        ``SparkMetastoreHelper.set_columns_to_lower``), so on EMR a camelCased
+        dataframe column would otherwise look "new" against the lower-cased
+        table and be appended a second time.  ``spark.sql.caseSensitive`` is
+        ``false``, so the resulting DDL declares one identifier twice and Spark
+        rejects it with ``COLUMN_ALREADY_EXISTS``.
         """
 
         if not df:
@@ -243,9 +252,11 @@ class SparkMetastoreService(MetastoreService):
         )
 
         new_schema = copy.deepcopy(table_schema)
+        known_columns = {col.lower() for col in new_schema}
         for col_df in df_schema:
-            if col_df not in new_schema:
+            if col_df.lower() not in known_columns:
                 new_schema[col_df] = df_schema[col_df]
+                known_columns.add(col_df.lower())
 
         return new_schema
 

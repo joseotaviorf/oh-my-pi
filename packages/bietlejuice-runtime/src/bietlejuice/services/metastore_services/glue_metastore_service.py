@@ -333,6 +333,11 @@ class GlueMetastoreService(MetastoreService):
 
         ``partition_cols`` may be a list of strings (column names) or a
         list of ``(name, type)`` tuples.
+
+        Names are matched **case-insensitively**: Glue lower-cases column names,
+        so a partition column declared as ``Year`` against a schema holding
+        ``year`` would otherwise land in both ``StorageDescriptor.Columns`` and
+        ``PartitionKeys`` and be rejected as a duplicate column.
         """
         if not partition_cols:
             return list(table_schema.items()), []
@@ -342,20 +347,23 @@ class GlueMetastoreService(MetastoreService):
 
         for item in partition_cols:
             if isinstance(item, (list, tuple)) and len(item) == 2:
-                partition_names.add(item[0])
+                partition_names.add(str(item[0]).lower())
                 partition_typed.append((item[0], item[1]))
             else:
-                partition_names.add(str(item))
+                partition_names.add(str(item).lower())
 
         regular = [
             (col, col_type)
             for col, col_type in table_schema.items()
-            if col not in partition_names
+            if col.lower() not in partition_names
         ]
 
         if not partition_typed:
+            types_by_lower_name = {
+                col.lower(): col_type for col, col_type in table_schema.items()
+            }
             partition_typed = [
-                (col, table_schema.get(col, "string"))
+                (col, types_by_lower_name.get(col.lower(), "string"))
                 for col in partition_cols
                 if isinstance(col, str)
             ]

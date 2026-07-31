@@ -390,3 +390,87 @@ class TestSparkMetastoreService:
         unity_catalog_helper.sync_table_to_unity_catalog.assert_called_once_with(
             f"{database_name}.{table_name}"
         )
+
+
+class TestMergeTableAndDataframeSchemas:
+    """The union must match column names case-insensitively.
+
+    Databricks' metastore preserves the dataframe's casing; Hive/Glue lower-cases
+    it. A case-sensitive union therefore re-appends every camelCased dataframe
+    column on EMR, and ``spark.sql.caseSensitive=false`` makes the resulting DDL
+    illegal (``COLUMN_ALREADY_EXISTS``).
+    """
+
+    @staticmethod
+    def _service(table_schema, table_name="t"):
+        service = SparkMetastoreService(Mock())
+        service.get_table_names = Mock(return_value=[table_name])
+        service.get_table_schema = Mock(return_value=table_schema)
+        return service
+
+    @staticmethod
+    def _df(*columns):
+        return Mock(
+            schema=StructType([StructField(name, StringType()) for name in columns])
+        )
+
+    def test_databricks_casing_matches_so_schema_is_unchanged(self):
+        """The Databricks case: table casing == df casing. Must be a no-op."""
+        table_schema = OrderedDict(
+            [("Id", "string"), ("BusinessProcessId", "string"), ("year", "int")]
+        )
+        service = self._service(table_schema)
+
+        merged = service.merge_table_and_dataframe_schemas(
+            "db", "t", self._df("Id", "BusinessProcessId", "year")
+        )
+
+        # Equality is what SparkMetastoreLoader.create_merge_schema tests to
+        # decide whether to drop and recreate the table.
+        assert merged == table_schema
+
+    def test_emr_lowercased_table_does_not_duplicate_camelcase_column(self):
+        """The EMR case: Glue returned lower-case, the df still has PascalCase."""
+        table_schema = OrderedDict(
+            [("id", "string"), ("businessprocessid", "string"), ("year", "int")]
+        )
+        service = self._service(table_schema)
+
+        merged = service.merge_table_and_dataframe_schemas(
+            "db", "t", self._df("Id", "BusinessProcessId", "year")
+        )
+
+        assert merged == table_schema
+        assert list(merged) == ["id", "businessprocessid", "year"]
+
+    def test_genuinely_new_column_is_still_added(self):
+        table_schema = OrderedDict([("id", "string")])
+        service = self._service(table_schema)
+
+        merged = service.merge_table_and_dataframe_schemas(
+            "db", "t", self._df("Id", "brand_new")
+        )
+
+        assert merged == OrderedDict([("id", "string"), ("brand_new", "string")])
+
+    def test_existing_casing_is_never_rewritten(self):
+        """No key may be replaced by a differently-cased variant of itself."""
+        table_schema = OrderedDict([("BusinessProcessId", "string")])
+        service = self._service(table_schema)
+
+        merged = service.merge_table_and_dataframe_schemas(
+            "db", "t", self._df("businessprocessid")
+        )
+
+        assert list(merged) == ["BusinessProcessId"]
+
+    def test_df_with_internal_case_collision_adds_only_one(self):
+        """A df carrying both spellings must not produce an illegal DDL."""
+        table_schema = OrderedDict([("id", "string")])
+        service = self._service(table_schema)
+
+        merged = service.merge_table_and_dataframe_schemas(
+            "db", "t", self._df("userId", "userid")
+        )
+
+        assert [col.lower() for col in merged] == ["id", "userid"]

@@ -74,3 +74,62 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         self.assertEqual(params.get("spark.sql.partitionProvider"), "catalog")
         self.assertEqual(params.get("EXTERNAL"), "TRUE")
         self.assertNotIn("unity_catalog_source", params)
+
+
+class TestGlueMetastoreServiceSplitColumns(unittest.TestCase):
+    """Partition columns must be excluded from ``Columns`` case-insensitively.
+
+    Glue lower-cases column names, so a partition column declared as ``Year``
+    against a schema holding ``year`` would otherwise appear in both
+    ``StorageDescriptor.Columns`` and ``PartitionKeys`` and be rejected as a
+    duplicate. Glue failures are swallowed as warnings by
+    ``CompositeMetastoreService``, so this would drift silently.
+    """
+
+    def test_partition_column_excluded_when_casing_matches(self):
+        schema = OrderedDict([("id", "bigint"), ("year", "int")])
+
+        regular, partitioned = GlueMetastoreService._split_columns(schema, ["year"])
+
+        self.assertEqual(regular, [("id", "bigint")])
+        self.assertEqual(partitioned, [("year", "int")])
+
+    def test_partition_column_excluded_when_casing_differs(self):
+        schema = OrderedDict([("id", "bigint"), ("year", "int")])
+
+        regular, partitioned = GlueMetastoreService._split_columns(schema, ["Year"])
+
+        self.assertEqual(regular, [("id", "bigint")], "year leaked into Columns")
+        # Type is resolved from the schema despite the casing mismatch.
+        self.assertEqual(partitioned, [("Year", "int")])
+
+    def test_no_duplicate_reaches_table_input(self):
+        """End-to-end through _build_table_input, which is what Glue receives."""
+        schema = OrderedDict([("id", "bigint"), ("year", "int"), ("month", "int")])
+
+        table_input = GlueMetastoreService._build_table_input(
+            table_name="t",
+            table_location="s3://bucket/t",
+            table_schema=schema,
+            partition_cols=["Year", "Month"],
+            format_str="JSON",
+        )
+
+        column_names = [
+            c["Name"].lower() for c in table_input["StorageDescriptor"]["Columns"]
+        ]
+        partition_names = [c["Name"].lower() for c in table_input["PartitionKeys"]]
+
+        self.assertEqual(column_names, ["id"])
+        self.assertEqual(partition_names, ["year", "month"])
+        self.assertEqual(set(column_names) & set(partition_names), set())
+
+    def test_typed_tuple_partitions_still_work(self):
+        schema = OrderedDict([("id", "bigint"), ("year", "int")])
+
+        regular, partitioned = GlueMetastoreService._split_columns(
+            schema, [("Year", "string")]
+        )
+
+        self.assertEqual(regular, [("id", "bigint")])
+        self.assertEqual(partitioned, [("Year", "string")])
