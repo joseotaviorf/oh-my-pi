@@ -4,8 +4,6 @@ cluster:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    aws_attributes:
-      ebs_volume_size: 200
     task_nodes:
       instance_types:
       - r6g.xlarge

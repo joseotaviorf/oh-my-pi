@@ -15,7 +15,5 @@ validation:
   cluster:
     type: emr_7_12_consolidation_xl_general_single_node_fleet_cluster
     custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
       spark_conf: {}
   allow_custom_spark_job: true

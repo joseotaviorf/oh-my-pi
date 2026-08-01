@@ -4,6 +4,4 @@ cluster:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200
     master_node_type_id: m6g.xlarge

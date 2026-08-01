@@ -12,8 +12,6 @@ cluster:
       spark.sql.shuffle.partitions: '800'
       spark.memory.fraction: '0.8'
       spark.memory.storageFraction: '0.3'
-    aws_attributes:
-      ebs_volume_size: 200
     task_nodes:
       instance_types:
       - r6g.8xlarge

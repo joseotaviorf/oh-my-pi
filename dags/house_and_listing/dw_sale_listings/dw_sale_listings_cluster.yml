@@ -13,8 +13,6 @@ cluster:
       - r6g.2xlarge
       - r7g.2xlarge
       - r6i.2xlarge
-    aws_attributes:
-      ebs_volume_size: 200
     spark_conf:
       # 8× r6g.2xlarge ≈ 16× (24g/4core) m_memory executors when one step runs alone.
       spark.dynamicAllocation.maxExecutors: "16"

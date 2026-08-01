@@ -17,5 +17,3 @@ cluster:
       target_spot: 2
       allocation_strategy: price-capacity-optimized
       bid_price_percentage: 100
-    aws_attributes:
-      ebs_volume_size: 200

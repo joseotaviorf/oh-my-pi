@@ -7,6 +7,3 @@ cluster:
       package: scikit-learn==1.0.2
   - pypi:
       package: numpy==1.26.4
-  custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200

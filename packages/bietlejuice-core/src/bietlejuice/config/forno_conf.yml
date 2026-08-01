@@ -1815,8 +1815,8 @@ emr_cluster_base: &emr_cluster_anchor
         availability: ON_DEMAND
         task_availability: SPOT
         ebs_volume_count: 1
-        ebs_volume_size: 200
-        ebs_volume_type: GENERAL_PURPOSE_SSD
+        ebs_volume_size: 400
+        ebs_volume_type: GENERAL_PURPOSE_SSD_GP3
         instance_profile_arn: "{{ var.value.emr_instance_profile_arn }}"
     emr_applications:
         - Hadoop

@@ -3,7 +3,6 @@ cluster:
   custom_configurations:
     autotermination_minutes: 120
     aws_attributes:
-      ebs_volume_size: 200
       instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
     # EMR StepConcurrencyLevel: caps concurrent Spark steps (OIC/SFTP pulls) on this
     # cluster. Replaces the old pattern of 8 staggered pin_* DAG schedules.

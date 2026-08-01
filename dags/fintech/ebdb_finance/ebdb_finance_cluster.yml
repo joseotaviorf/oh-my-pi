@@ -1,8 +1,6 @@
 cluster:
   type: emr_7_12_consolidation_m_memory_fleet_cluster
   custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200
     core_nodes:
       instance_types:
       - r6g.2xlarge

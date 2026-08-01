@@ -7,8 +7,6 @@ cluster:
       spark.driver.memoryOverhead: 2g
       spark.yarn.am.memory: 2g
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    aws_attributes:
-      ebs_volume_size: 200
     core_nodes:
       target_on_demand: 2
       target_spot: 0

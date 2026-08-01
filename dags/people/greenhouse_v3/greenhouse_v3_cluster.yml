@@ -14,6 +14,5 @@ validation:
     type: emr_7_12_consolidation_s_memory_fleet_cluster
     custom_configurations:
       aws_attributes:
-        ebs_volume_size: 200
         instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
   allow_custom_spark_job: true

@@ -29,6 +29,4 @@ validation:
         - r6g.xlarge
         - r7g.xlarge
         - r6i.xlarge
-      aws_attributes:
-        ebs_volume_size: 200
   allow_custom_spark_job: true

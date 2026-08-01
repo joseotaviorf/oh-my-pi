@@ -28,7 +28,5 @@ validation:
         instance_types:
         - m6g.2xlarge
         - m7g.2xlarge
-      aws_attributes:
-        ebs_volume_size: 200
       spark_conf: {}
   allow_custom_spark_job: true

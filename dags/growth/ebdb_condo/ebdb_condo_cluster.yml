@@ -3,5 +3,3 @@ cluster:
   custom_configurations:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    aws_attributes:
-      ebs_volume_size: 200

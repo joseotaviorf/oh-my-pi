@@ -5,8 +5,6 @@ cluster:
       spark.driver.memory: 12g
       spark.driver.memoryOverhead: 4g
       spark.yarn.am.memory: 2g
-    aws_attributes:
-      ebs_volume_size: 200
     core_nodes:
       target_on_demand: 2
       target_spot: 0
