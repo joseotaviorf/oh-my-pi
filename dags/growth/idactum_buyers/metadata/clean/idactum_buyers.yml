@@ -34,10 +34,9 @@ columns:
     description: |
       Brazilian tax identification number of the buyer — CPF for individuals or CNPJ for legal entities — as registered in the transaction.
   is_document_missing_at_some_step:
-    lineage:
-      - datalake_idactum_buyers_raw.idactum_buyers.doc_faltante_em_algum_ponto
     description: |
       Indicates whether the buyer's identification document was absent at any stage of the transaction registration process, signaling potential data quality issues.
+      Known limitation: the source column (`doc_faltante_em_algum_ponto`) was dropped from the Idactum CSV dump starting 2026-07-23. Since then this column is hardcoded to NULL for every row — it no longer reflects real source data — until Idactum restores or replaces the underlying signal. See bi-etl-ejuice#27076.
   dt_load:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.dt_load

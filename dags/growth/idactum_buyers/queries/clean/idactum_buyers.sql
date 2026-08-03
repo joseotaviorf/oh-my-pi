@@ -4,7 +4,7 @@ SELECT
   id_idactum,
   NULLIF(TRIM(nome), '') AS buyer_name,
   NULLIF(TRIM(documento), '') AS buyer_document,
-  doc_faltante_em_algum_ponto AS is_document_missing_at_some_step,
+  CAST(NULL AS BOOLEAN) AS is_document_missing_at_some_step, -- dropped from source in the 2026-07-23 iDactum dump
   dt_load
 FROM
   datalake_idactum_buyers_raw.idactum_buyers
