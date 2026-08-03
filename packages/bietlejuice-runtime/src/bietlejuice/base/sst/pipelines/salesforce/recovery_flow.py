@@ -209,8 +209,6 @@ def events_case_recovery(
         "transaction_key",
         "sequence_number",
         "commit_number",
-        "partition_date",
-        "partition_hour",
     ]
 
     validate_and_upsert(
