@@ -1,23 +1,20 @@
 cluster:
-  type: emr_7_12_consolidation_m_memory_fleet_cluster
+  type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
     aws_attributes:
-      # j-1MEHOZYKVJRZU: /mnt/yarn + container logs >90% on all cores during load-raw-search.
+      # Residual disk spill + prior /mnt UNHEALTHY on load-raw-search (j-1MEHOZYKVJRZU).
       ebs_volume_size: 500
-    # Cap concurrent Spark steps when the 8-table CDC fan-out runs (default EMR limit is 8).
-    step_concurrency_level: 3
-    # Overnight 2026-07-15 (j-2FFAZXIRWTYBO): all workers core OD; task fleet left at preset 0.
+    # Cap concurrent Spark steps when the 8-table CDC fan-out runs (was 3 on m_memory).
+    step_concurrency_level: 2
+    # Job totals: ~1 TiB shuffle / 2.3 TiB mem spill on 4x24g — need ~8x96g heap.
     core_nodes:
       target_on_demand: 4
       target_spot: 0
       instance_types:
-      - r6g.2xlarge
-      - r7g.2xlarge
-      - r6i.2xlarge
+      - r6g.8xlarge
+      - r7g.8xlarge
+      - r6i.8xlarge
     spark_conf:
-      # m_memory preset is 24g/4g; 32g/6g oversizes r6g.2xlarge and worsens /mnt pressure.
-      spark.executor.memory: 24g
-      spark.executor.memoryOverhead: 4g
-      spark.executor.cores: '4'
-      spark.dynamicAllocation.maxExecutors: '4'
-      spark.sql.shuffle.partitions: '128'
+      # xl_memory preset: 96g/8g, 4 cores — do not override memory down.
+      spark.dynamicAllocation.maxExecutors: '8'
+      spark.sql.shuffle.partitions: '2048'
