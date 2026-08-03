@@ -13,9 +13,8 @@ workflow:
   layer: dw
   custom_schema: people
   bucket_config_name: people_bucket
-  has_hive_sync: false  # Private to People; Trino has no s3:ListBucket on people bucket.
+  has_hive_sync: true
   serialize_dq_after_default_row: true
-  # When made public, configure a bucket with public access before re-enabling hive_sync.
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
@@ -25,9 +24,15 @@ workflow:
     dim_employee:
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
     dim_management_hierarchy:
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
     fact_employees:
       vacuum_retention_hours: 168
       vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"
