@@ -34,7 +34,10 @@ SELECT
         THEN GET_JSON_OBJECT(attributes, '$.reports[0].negativeData.pefin.summary.count')
     END AS serasa_pefin_count,
     CASE
-      WHEN TRIM(UPPER(integration_provider)) = 'BOAVISTA_SCORE_P6'
+      WHEN TRIM(UPPER(integration_provider)) IN (
+        'BOAVISTA_SCORE_P6',
+        'BOAVISTA_REPORT_SCORE_P6'
+      )
         THEN GET_JSON_OBJECT(attributes, '$.score_p6')
     END AS bvs_score,
     created_at AS ts_created,

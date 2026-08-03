@@ -64,7 +64,7 @@ columns:
   bvs_score:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.attributes
-    description: "Boa Vista score extracted from score_p6 in the JSON attributes."
+    description: "Boa Vista P6 score extracted from score_p6 in the JSON attributes (legacy BOAVISTA_SCORE_P6 and report BOAVISTA_REPORT_SCORE_P6 providers)."
   ts_created:
     lineage:
       - datalake_arquivo_confidencial_raw.integration_report_aud.created_at
