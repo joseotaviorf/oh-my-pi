@@ -5,7 +5,7 @@ WITH agent_external_reference AS (
         FIRST(aer.value) FILTER(WHERE aer.type = 'PARTNER_ID') AS id_partner
     FROM
         datalake_ebdb_clean.agent_external_reference AS aer
-    GROUP BY ALL
+    GROUP BY 1
 ),
 main_user AS (
     WITH main_user_ranked AS (
@@ -52,40 +52,30 @@ agent AS (
     LEFT JOIN
         main_user AS mu
             ON mu.uuid_person = a.uuid_person
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13
 ),
 agent_product AS (
-    WITH agent_product_ranked AS (
-        SELECT
-            a.id_agent,
-            p.name AS company_product_name,
-            CASE
-                WHEN p.name IN ('Rede Sale', 'Rede Rent') THEN 'REDE'
-                WHEN p.name IN ('PRO_ACQUIRER_AGENT', 'PRO_ACQUIRER_MANAGER_AGENT') THEN 'PRO_ACQUIRER'
-                ELSE p.name
-            END AS profile,
-            ROW_NUMBER() OVER(PARTITION BY a.id_agent ORDER BY p.ts_updated DESC) AS rn
-        FROM
-            agent AS a
-        JOIN
-            datalake_company_clean.company AS c
-                ON c.uuid_company = a.uuid_company
-        JOIN
-            datalake_company_clean.member_profile AS mp
-                ON mp.id_company = c.id
-                AND mp.uuid_person = a.uuid_person
-        JOIN
-            datalake_company_clean.product AS p
-                ON p.id = mp.id_product
-    )
     SELECT
-        id_agent,
-        company_product_name,
-        profile
+        a.id_agent,
+        p.name AS company_product_name,
+        CASE
+            WHEN p.name IN ('Rede Sale', 'Rede Rent') THEN 'REDE'
+            WHEN p.name IN ('PRO_ACQUIRER_AGENT', 'PRO_ACQUIRER_MANAGER_AGENT') THEN 'PRO_ACQUIRER'
+            ELSE p.name
+        END AS profile,
+        ROW_NUMBER() OVER(PARTITION BY a.id_agent ORDER BY p.ts_updated DESC) = 1 AS is_last_update
     FROM
-        agent_product_ranked
-    WHERE
-        rn = 1
+        agent AS a
+    JOIN
+        datalake_company_clean.company AS c
+            ON c.uuid_company = a.uuid_company
+    JOIN
+        datalake_company_clean.member_profile AS mp
+            ON mp.id_company = c.id
+            AND mp.uuid_person = a.uuid_person
+    JOIN
+        datalake_company_clean.product AS p
+            ON p.id = mp.id_product
 ),
 agent_parent_user AS (
     WITH member_profile AS (
@@ -101,55 +91,34 @@ agent_parent_user AS (
         JOIN
             datalake_hub_services.users AS u
                 ON u.id_user = mp.id_user
-    ),
-    agent_parent_user_ranked AS (
-        SELECT
-            mp.id_user,
-            mp_parent.id_user AS id_parent_user,
-            ROW_NUMBER() OVER(PARTITION BY mp.id_user ORDER BY mp.ts_created DESC) AS rn
-        FROM
-            member_profile AS mp
-        JOIN
-            member_profile AS mp_parent
-                ON mp_parent.id = mp.id_parent_member_profile
-        WHERE
-            mp.profile = "AGENT"
-            AND mp.is_active IS TRUE
-            AND mp_parent.profile = "NEGOTIATION_EXECUTIVE"
     )
     SELECT
-        id_user,
-        id_parent_user
+        mp.id_user,
+        mp_parent.id_user AS id_parent_user,
+        ROW_NUMBER() OVER(PARTITION BY mp.id_user ORDER BY mp.ts_created DESC) = 1 AS is_last_update
     FROM
-        agent_parent_user_ranked
+        member_profile AS mp
+    JOIN
+        member_profile AS mp_parent
+            ON mp_parent.id = mp.id_parent_member_profile
     WHERE
-        rn = 1
+        mp.profile = "AGENT"
+        AND mp.is_active IS TRUE
+        AND mp_parent.profile = "NEGOTIATION_EXECUTIVE"
 ),
 agent_log AS (
-    WITH agent_log_ranked AS (
-        SELECT
-            id_agent,
-            event_type = 'AGENT_REACTIVATED' AS is_reactivated,
-            LAG(ts_started) OVER(PARTITION BY id_agent ORDER BY ts_started) AS ts_previous_event_agent,
-            ts_started AS ts_last_status_changed,
-            TIMESTAMPDIFF(DAY, ts_started, NOW()) AS days_in_current_status,
-            ROW_NUMBER() OVER(PARTITION BY id_agent ORDER BY ts_started DESC) AS rn
-        FROM
-            datalake_agent_accreditation.agent_event_log
-        WHERE
-            id_capability IS NULL
-            AND event_type IN ('AGENT_ACTIVATED', 'AGENT_INACTIVATED', 'AGENT_REACTIVATED')
-    )
     SELECT
         id_agent,
-        is_reactivated,
-        ts_previous_event_agent,
-        ts_last_status_changed,
-        days_in_current_status
+        event_type = 'AGENT_REACTIVATED' AS is_reactivated,
+        LAG(ts_started) OVER(PARTITION BY id_agent ORDER BY ts_started) AS ts_previous_event_agent,
+        ts_started AS ts_last_status_changed,
+        TIMESTAMPDIFF(DAY, ts_started, NOW()) AS days_in_current_status,
+        ROW_NUMBER() OVER(PARTITION BY id_agent ORDER BY ts_started DESC) = 1 AS is_last_update
     FROM
-        agent_log_ranked
+        datalake_agent_accreditation.agent_event_log
     WHERE
-        rn = 1
+        id_capability IS NULL
+        AND event_type IN ('AGENT_ACTIVATED', 'AGENT_INACTIVATED', 'AGENT_REACTIVATED')
 ),
 old_agent_data AS (
     SELECT
@@ -230,15 +199,18 @@ LEFT JOIN
 LEFT JOIN
     agent_product AS ap
         ON ap.id_agent = a.id_agent
+        AND ap.is_last_update IS TRUE
 LEFT JOIN
     agent_parent_user AS apu
         ON apu.id_user = a.id_user
+        AND apu.is_last_update IS TRUE
 LEFT JOIN
     capability_by_agent AS ca
         ON ca.id_agent = a.id_agent
 LEFT JOIN
     agent_log AS al
         ON al.id_agent = a.id_agent
+        AND al.is_last_update IS TRUE
 LEFT JOIN
     old_agent_data AS oad
         ON oad.id = a.id_agent_data

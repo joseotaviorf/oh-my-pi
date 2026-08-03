@@ -82,32 +82,21 @@ daily_status AS (
             ON ad.id_agent = ah.id_agent
             AND ad.dt_ref >= ah.dt_started
             AND ad.dt_ref < COALESCE(ah.dt_ended, CURRENT_DATE+1)
-    GROUP BY ALL
+    GROUP BY 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
 ),
 visit_demand_history AS (
-    WITH visit_demand_history_ranked AS (
-        SELECT
-            daily_status.id_agent_daily,
-            visit_demand_history.business_context = 'SALE' AS is_allow_demand_sale,
-            visit_demand_history.business_context = 'RENT' AS is_allow_demand_rent,
-            visit_demand_history.passive_lead_receiver AS is_passive_lead_receiver,
-            ROW_NUMBER() OVER(PARTITION BY daily_status.id_agent_daily ORDER BY visit_demand_history.updated_at DESC) AS rn
-        FROM
-            daily_status
-        LEFT JOIN
-            datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings AS visit_demand_history
-                ON daily_status.id_capability_demand_visit = visit_demand_history.capability_id
-                AND daily_status.dt_ref >= DATE(visit_demand_history.updated_at)
-    )
     SELECT
-        id_agent_daily,
-        is_allow_demand_sale,
-        is_allow_demand_rent,
-        is_passive_lead_receiver
+        daily_status.id_agent_daily,
+        visit_demand_history.business_context = 'SALE' AS is_allow_demand_sale,
+        visit_demand_history.business_context = 'RENT' AS is_allow_demand_rent,
+        visit_demand_history.passive_lead_receiver AS is_passive_lead_receiver,
+        ROW_NUMBER() OVER(PARTITION BY daily_status.id_agent_daily ORDER BY visit_demand_history.updated_at DESC) = 1 AS is_last_update
     FROM
-        visit_demand_history_ranked
-    WHERE
-        rn = 1
+        daily_status
+    LEFT JOIN
+        datalake_ebdb_transactional.DemandVisitManagementCapabilitySettings AS visit_demand_history
+            ON daily_status.id_capability_demand_visit = visit_demand_history.capability_id
+            AND daily_status.dt_ref >= DATE(visit_demand_history.updated_at)
 ),
 tier AS (
     SELECT
@@ -126,28 +115,19 @@ tier AS (
     GROUP BY 1
 ),
 old_agent_history AS (
-    WITH old_agent_history_ranked AS (
-        SELECT
-            daily_status.id_agent_daily,
-            ad.is_passive_lead_receiver,
-            ROW_NUMBER() OVER(PARTITION BY daily_status.id_agent_daily ORDER BY ure.ts_revision DESC) AS rn
-        FROM
-            datalake_ebdb_clean.agent_data_aud AS ad
-        JOIN
-            datalake_ebdb_user.user_revision_entity AS ure
-                ON ad.rev = ure.id
-        JOIN
-            daily_status
-                ON ad.id = daily_status.id_agent_data
-                AND daily_status.dt_ref >= DATE(ure.ts_revision)
-    )
     SELECT
-        id_agent_daily,
-        is_passive_lead_receiver
+        daily_status.id_agent_daily,
+        ad.is_passive_lead_receiver,
+        ROW_NUMBER() OVER(PARTITION BY daily_status.id_agent_daily ORDER BY ure.ts_revision DESC) = 1 AS is_last_update
     FROM
-        old_agent_history_ranked
-    WHERE
-        rn = 1
+        datalake_ebdb_clean.agent_data_aud AS ad
+    JOIN
+        datalake_ebdb_user.user_revision_entity AS ure
+            ON ad.rev = ure.id
+    JOIN
+        daily_status
+            ON ad.id = daily_status.id_agent_data
+            AND daily_status.dt_ref >= DATE(ure.ts_revision)
 )
 SELECT
     ds.id_agent_daily AS sk_agent_daily,
@@ -188,12 +168,14 @@ FROM
 LEFT JOIN
     visit_demand_history AS vdh
         ON vdh.id_agent_daily = ds.id_agent_daily
+        AND vdh.is_last_update IS TRUE
 LEFT JOIN
     datalake_agent_accreditation.agent_daily AS ad
         ON ad.id_agent_daily = ds.id_agent_daily
 LEFT JOIN
     old_agent_history AS oah
         ON oah.id_agent_daily = ds.id_agent_daily
+        AND oah.is_last_update IS TRUE
 LEFT JOIN
     tier AS t
         ON t.id_agent_daily = ds.id_agent_daily
