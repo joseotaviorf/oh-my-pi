@@ -178,25 +178,6 @@ plugin_tasks = [
         ],
     ),
     create_task(
-        entry_point="plugins_seo_neighborhood_recommendation",
-        parameters=[
-            f"--input_listings={Tables.listings}",
-            f"--input_houses={Tables.ebdb_clean_house}",
-            f"--input_regions={Tables.ebdb_clean_region}",
-            f"--input_map_regions={Tables.ebdb_clean_map_region}",
-            "--output_database=neighborhood_recommendation_vespucio_plugin",
-            "--output_listings_agg_by_neighborhood=listings_agg_by_neighborhood",
-            "--output_listings_agg_by_city=listings_agg_by_city",
-            "--output_listings_agg_ordered_by_count=listings_agg_ordered_by_count",
-            "--output_nearest_neighborhoods=nearest_neighborhoods",
-            "--output_keys_and_values_to_city_slug=keys_and_values_to_city_slug",
-            "--output_keys_and_values_to_neighborhood_slug=keys_and_values_to_neighborhood_slug",
-            "--output_price_by_neighborhood_slug=price_by_neighborhood_slug",
-            f"--env={ENV}",
-            "--overwrite_schema",
-        ],
-    ),
-    create_task(
         entry_point="plugins_metrics_reporter",
         parameters=[
             f"--input_house_compounds={Tables.house_compounds}",
@@ -287,6 +268,43 @@ classifieds_tasks = [
     ),
 ]
 
+NEIGHBORHOOD_RECOMMENDATION_DATABASE = "neighborhood_recommendation_vespucio_plugin"
+
+neighborhood_recommendation_task = create_task(
+    entry_point="plugins_seo_neighborhood_recommendation",
+    parameters=[
+        f"--input_listings={Tables.listings}",
+        f"--input_houses={Tables.ebdb_clean_house}",
+        f"--input_regions={Tables.ebdb_clean_region}",
+        f"--input_map_regions={Tables.ebdb_clean_map_region}",
+        f"--output_database={NEIGHBORHOOD_RECOMMENDATION_DATABASE}",
+        "--output_listings_agg_by_neighborhood=listings_agg_by_neighborhood",
+        "--output_listings_agg_by_city=listings_agg_by_city",
+        "--output_listings_agg_by_city_prices=listings_agg_by_city_prices",
+        "--output_listings_agg_ordered_by_count=listings_agg_ordered_by_count",
+        "--output_nearest_neighborhoods=nearest_neighborhoods",
+        "--output_keys_and_values_to_city_slug=keys_and_values_to_city_slug",
+        "--output_keys_and_values_to_neighborhood_slug=keys_and_values_to_neighborhood_slug",
+        "--output_price_by_neighborhood_slug=price_by_neighborhood_slug",
+        f"--env={ENV}",
+        "--overwrite_schema",
+    ],
+)
+
+prices_exporter_task = create_task(
+    entry_point="plugins_prices_exporter",
+    parameters=[
+        f"--input_listings_agg_by_neighborhood={NEIGHBORHOOD_RECOMMENDATION_DATABASE}.listings_agg_by_neighborhood",
+        f"--input_listings_agg_by_city_prices={NEIGHBORHOOD_RECOMMENDATION_DATABASE}.listings_agg_by_city_prices",
+        f"--sqs_queue_url={IL_SQS_URL}",
+        "--sqs_region=us-east-1",
+        "--sqs_batch_size=10",
+        "--sqs_num_writers=4",
+        "--items_per_message=500",
+        "--tenant_id=quintoandar",
+    ],
+)
+
 join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 
 execute_job_cluster_task >> join_plugins
@@ -296,6 +314,8 @@ join_plugins >> property_search_indexer_task
 property_search_indexer_task >> compound_indexer_task
 join_plugins >> classifieds_tasks[0]
 join_plugins >> zordominium_tasks[0]
+join_plugins >> neighborhood_recommendation_task
+neighborhood_recommendation_task >> prices_exporter_task
 chain(*zordominium_tasks)
 
 zordominium_tasks[1] >> condominium_by_region_exporter
