@@ -639,6 +639,9 @@ bietlejuice.enrich_olos_dialer:
     - bietlejuice.olos_dialer:load-clean-mailing:first-run-of-day
 bietlejuice.enrich_open_external_data:
   override: []
+bietlejuice.enrich_payments_platform:
+  remove:
+    - bietlejuice.gsheets_fintech:done-clean-getnet-return-codes:first-run-of-day
 bietlejuice.enrich_entities_views:
   remove:
     - bietlejuice.core_contract:load-core-contract:first-run-of-day

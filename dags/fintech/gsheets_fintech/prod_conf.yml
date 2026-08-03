@@ -259,6 +259,12 @@ sheets_info:
     clean_table_name: quintocred_aux_form
     sheet_context: fintech
 
+  getnet_return_codes:
+    sheet_id: 1K6k_I-ov7iqlA-5jya5bDSstV6hsTi4xxHig3fxRA6g
+    sheet_name: tabela_ws_getnet
+    clean_table_name: getnet_return_codes
+    sheet_context: fintech
+
   collections_targets:
     sheet_id: 1NFHHQgYHVxeVc4yCQ9hykn9J07CCjopzCe4F0M7OnYw
     sheet_name: Daily
