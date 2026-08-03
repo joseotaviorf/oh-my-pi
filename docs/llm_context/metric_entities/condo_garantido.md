@@ -543,7 +543,7 @@ All of the following swap only the aggregation layer over the same `condo_monito
   in the combined Query 2 it would also drop activated-but-ineligible contracts from Metric 1's
   numerator (which the official formula keeps) and silently lower adoption. Keep it self-contained:
 
-  ```sql
+  ```text
   CAST(SUM(CASE WHEN is_activated = TRUE AND is_eligible = TRUE THEN nprs_current_month END) AS DOUBLE)
       / NULLIF(SUM(CASE WHEN is_eligible = TRUE THEN nprs_current_month END), 0) AS pct_default_identified_auto_eligible
   ```
