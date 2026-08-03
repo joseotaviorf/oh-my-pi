@@ -56,16 +56,20 @@ _STRUCT_RE = re.compile(r"^STRUCT\s*<(.+)>$", re.IGNORECASE)
 
 
 def _split_top_level(s: str, max_splits: int = -1) -> List[str]:
-    """Split by comma respecting nested angle brackets."""
+    """Split by comma respecting nested angle brackets and parentheses.
+
+    Parentheses count towards depth so that the comma inside a parameterised
+    type such as ``decimal(10,7)`` is not mistaken for a field separator.
+    """
     parts: List[str] = []
     depth = 0
     buf: List[str] = []
     splits = 0
     for ch in s:
-        if ch == "<":
+        if ch in "<(":
             depth += 1
             buf.append(ch)
-        elif ch == ">":
+        elif ch in ">)":
             depth -= 1
             buf.append(ch)
         elif ch == "," and depth == 0:
