@@ -104,7 +104,7 @@ divide by the **with-repairs** subset (`count_if(has_repairs = true)`).
 `termination_category` instead of `is_eviction`:
 
 ```
-% SPOC Roll Out = count_if(is_spoc_contract = true
+% SPOC Roll Out = count_if(is_spoc_test_group_contract = true
                            AND termination_category NOT IN ('EVICTION'))
                  / count(*)
 ```
@@ -148,13 +148,19 @@ it directly. Concept → column:
 | Compulsory owner-approval settlement | `has_compulsory_agreement` |
 | Eviction termination | `is_eviction` |
 | Termination-finished date (axis) | `CAST(ts_termination_finished AS DATE)` (UTC calendar date) |
-| SPOC test-group flag (net of control group) | `is_spoc_contract` |
+| SPOC test-group flag (net of control group) | `is_spoc_test_group_contract` |
 | Raw termination category (includes `EVICTION`) | `termination_category` |
 
-**SPOC flag already nets out the control group**: `is_spoc_contract` in `obt_offboarding` is
-`is_spoc AND NOT is_spoc_control_group` from `dw_offboarding.fact_terminations` — it is already
-`TRUE` only for the SPOC treatment group, not the raw SPOC test-membership flag. Do not re-apply
-a control-group exclusion on top of it.
+**SPOC flag already nets out the control group**: `is_spoc_test_group_contract` in
+`obt_offboarding` is `is_spoc_contract AND NOT is_spoc_control_group` from
+`dw_offboarding.fact_terminations` — it is already `TRUE` only for the SPOC treatment group, not
+the raw SPOC test-membership flag. Do not re-apply a control-group exclusion on top of it.
+
+**Do not confuse the two SPOC flags**: `fact_terminations.is_spoc_contract` is the raw
+test-membership flag and includes the control group, while `obt_offboarding.is_spoc_test_group_contract`
+is the treatment group only. `obt_offboarding` has no column named `is_spoc_contract` — using that
+name against the OBT fails, and using the `fact_terminations` flag as a substitute overstates
+**% SPOC Roll Out**.
 
 **`termination_category` vs. `is_eviction`**: `is_eviction` is derived from
 `termination_reason = 'EVICTION'`; `termination_category` is a separate raw classification
@@ -185,7 +191,7 @@ terminations excluded), so `count(*)` / `count_if(...)` need no dedup.
 - Keep the exact `= true` / `= false` comparisons — a NULL flag is neither `true` nor `false`.
 - Divide **% Both Agree** and **% Compulsory/Band-Aid 2** by `count_if(has_repairs = true)`, not
   by `count(*)`.
-- For **% SPOC Roll Out**, use `is_spoc_contract` (already net of the control group) and
+- For **% SPOC Roll Out**, use `is_spoc_test_group_contract` (already net of the control group) and
   `termination_category NOT IN ('EVICTION')` over the full, unfiltered `obt_offboarding` base.
 
 **Don't:**
@@ -197,8 +203,8 @@ terminations excluded), so `count(*)` / `count_if(...)` need no dedup.
   nothing (a NULL is already not `true`) and only obscures the intent.
 - Don't apply the finished-only / `is_eviction` canonical filter to **% SPOC Roll Out** — its
   denominator is deliberately the whole table.
-- Don't use `is_eviction` or the raw `is_spoc` flag from `fact_terminations` for **% SPOC Roll
-  Out** — use `termination_category` and `is_spoc_contract` respectively.
+- Don't use `is_eviction` or the raw `is_spoc_contract` flag from `fact_terminations` for **% SPOC
+  Roll Out** — use `termination_category` and `is_spoc_test_group_contract` respectively.
 
 ## Golden Queries
 
@@ -271,7 +277,7 @@ SELECT
     COUNT(*) AS total_terminations,
     CAST(
         COUNT_IF(
-            obt.is_spoc_contract = true
+            obt.is_spoc_test_group_contract = true
             AND obt.termination_category NOT IN ('EVICTION')
         ) AS DOUBLE
     ) / COUNT(*) AS pct_spoc_rollout
