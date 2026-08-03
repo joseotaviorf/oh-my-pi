@@ -33,5 +33,4 @@ validation:
         - r6g.2xlarge
         - r7g.2xlarge
         - r6i.2xlarge
-      spark_conf: {}
   allow_custom_spark_job: true

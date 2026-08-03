@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
+import yaml
 
 from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
+from bietlejuice.base.validation.cluster_args import merge_validation_cluster_args
 from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     _instance_family,
@@ -1380,6 +1384,103 @@ class TestEmrConsolidationSparkDefaults:
         assert spark_conf["spark.driverEnv.SPARK_RUNTIME"] == "emr"
         assert spark_conf["spark.driver.memory"] == "8g"
         assert spark_conf["spark.dynamicAllocation.maxExecutors"] == "24"
+
+    def test_empty_custom_spark_conf_preserves_preset_defaults(self):
+        """``spark_conf: {}`` means "no extra conf", not "drop the preset's conf".
+
+        HierarchicalConf._deep_update only recurses into truthy mappings, so an
+        empty dict used to replace the whole block — stripping
+        spark.sql.catalogImplementation and every sizing override, which made
+        Glue-backed JSON/Parquet tables raise TABLE_OR_VIEW_NOT_FOUND on EMR.
+        """
+        service = ConfigurationService()
+        cluster_args = {
+            "type": "emr_7_12_consolidation_l_memory_fleet_cluster",
+            "custom_configurations": {"spark_conf": {}},
+        }
+        effective = merge_cluster_configuration(cluster_args, service)
+        spark_conf = effective["spark_conf"]
+
+        assert spark_conf["spark.sql.catalogImplementation"] == "hive"
+        assert spark_conf["spark.driverEnv.SPARK_RUNTIME"] == "emr"
+        assert "spark.executor.memory" in spark_conf
+
+
+class TestEmrValidationClustersResolveHiveCatalog:
+    """Every declared EMR validation cluster must resolve a Hive-backed catalog.
+
+    Without ``spark.sql.catalogImplementation: hive`` in the effective spark_conf,
+    Spark cannot resolve plain Hive-SerDe (JSON/Parquet) Glue tables — Delta tables
+    still work via delta-defaults, so the gap surfaces only on non-Delta reads.
+    """
+
+    @staticmethod
+    def _emr_validation_cluster_args():
+        repo_root = Path(__file__).resolve().parents[6]
+        for path in sorted((repo_root / "dags").glob("*/*/*_cluster.yml")):
+            declaration = yaml.safe_load(path.read_text()) or {}
+            prod_cluster = declaration.get("cluster") or {}
+            validation_cluster = (declaration.get("validation") or {}).get("cluster")
+            if not validation_cluster:
+                continue
+            if not str(validation_cluster.get("type", "")).startswith("emr_"):
+                continue
+            yield path, merge_validation_cluster_args(prod_cluster, validation_cluster)
+
+    def test_every_emr_validation_cluster_keeps_hive_catalog_and_sizing(self):
+        service = ConfigurationService()
+        offenders = []
+        checked = 0
+
+        for path, cluster_args in self._emr_validation_cluster_args():
+            checked += 1
+            spark_conf = (
+                merge_cluster_configuration(cluster_args, service).get("spark_conf")
+                or {}
+            )
+            missing = [
+                key
+                for key in (
+                    "spark.sql.catalogImplementation",
+                    "spark.driverEnv.SPARK_RUNTIME",
+                    "spark.executor.memory",
+                )
+                if key not in spark_conf
+            ]
+            if missing or spark_conf.get("spark.sql.catalogImplementation") != "hive":
+                offenders.append(f"{path.name}: missing={missing}")
+
+        assert checked > 0, "no EMR validation clusters discovered"
+        assert not offenders, (
+            "EMR validation clusters with a broken catalog:\n" + "\n".join(offenders)
+        )
+
+    def test_custom_configurations_never_drop_preset_spark_conf_keys(self):
+        """``spark_conf`` must always *merge* with the preset anchor, never replace it.
+
+        ``custom_configurations.spark_conf`` may override a preset key or add a new
+        one, but it must never remove one — the anchors (``emr_spark_base`` plus the
+        sizing anchor) are the floor for every EMR cluster.
+        """
+        service = ConfigurationService()
+        offenders = []
+
+        for path, cluster_args in self._emr_validation_cluster_args():
+            preset_keys = set(
+                service.get_config(cluster_args["type"]).get("spark_conf") or {}
+            )
+            effective_keys = set(
+                merge_cluster_configuration(cluster_args, service).get("spark_conf")
+                or {}
+            )
+            dropped = preset_keys - effective_keys
+            if dropped:
+                offenders.append(f"{path.name}: dropped={sorted(dropped)}")
+
+        assert not offenders, (
+            "custom_configurations dropped preset spark_conf keys:\n"
+            + "\n".join(offenders)
+        )
 
 
 def _map_dbr_instance_to_emr(instance_type: str) -> str:

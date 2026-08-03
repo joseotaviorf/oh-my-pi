@@ -31,5 +31,4 @@ validation:
         instance_types:
         - m6g.2xlarge
         - m7g.2xlarge
-      spark_conf: {}
   allow_custom_spark_job: true

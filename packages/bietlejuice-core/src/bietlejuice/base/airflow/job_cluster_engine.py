@@ -17,6 +17,7 @@ from databricks_plugin import (
 )
 
 from bietlejuice.base.airflow.cluster_config_resolver import (
+    apply_custom_configurations,
     resolve_airflow_compute_mode,
 )
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
@@ -219,9 +220,10 @@ class DatabricksJobClusterEngine(JobClusterEngine):
         cluster_configuration = copy.deepcopy(
             self._config_service.get_config(cluster_type)
         )
-        return self._config_service._deep_update(
+        return apply_custom_configurations(
             cluster_configuration,
             self._ctx.cluster_args.get("custom_configurations", {}),
+            self._config_service,
         )
 
     def _validate_minimum_cluster_runtime_version(

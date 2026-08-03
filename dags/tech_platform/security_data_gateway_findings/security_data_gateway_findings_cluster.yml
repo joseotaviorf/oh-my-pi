@@ -27,5 +27,4 @@ validation:
         target_spot: 1
         allocation_strategy: price-capacity-optimized
         bid_price_percentage: 100
-      spark_conf: {}
   allow_custom_spark_job: true

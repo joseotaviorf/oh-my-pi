@@ -26,5 +26,4 @@ validation:
         target_spot: 0
         instance_types:
         - m6gd.4xlarge
-      spark_conf: {}
   allow_custom_spark_job: true

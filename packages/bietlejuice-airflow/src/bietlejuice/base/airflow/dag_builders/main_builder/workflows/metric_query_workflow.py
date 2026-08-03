@@ -4,6 +4,9 @@ from databricks_plugin import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
+from bietlejuice.base.airflow.cluster_config_resolver import (
+    apply_custom_configurations,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
@@ -116,9 +119,10 @@ class MetricQueryWorkflow(BaseWorkflow):
         cluster_configuration = self.config_service.get_config(
             self.cluster_args["type"]
         )
-        cluster_configuration = self.config_service._deep_update(
+        cluster_configuration = apply_custom_configurations(
             cluster_configuration,
             self.cluster_args.get("custom_configurations", {}),
+            self.config_service,
         )
         cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
             cluster_configuration

@@ -39,5 +39,4 @@ validation:
         - r6i.xlarge
       aws_attributes:
         instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
-      spark_conf: {}
   allow_custom_spark_job: true

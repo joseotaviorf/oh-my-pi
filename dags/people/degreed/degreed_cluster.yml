@@ -19,5 +19,4 @@ validation:
     custom_configurations:
       aws_attributes:
         instance_profile_arn: '{{ var.value.emr_instance_profile_arn_people }}'
-      spark_conf: {}
   allow_custom_spark_job: true

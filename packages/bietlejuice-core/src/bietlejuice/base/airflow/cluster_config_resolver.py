@@ -9,6 +9,7 @@ opt in to deferrable wait behaviour on EMR Airflow operators.
 from __future__ import annotations
 
 import copy
+from collections.abc import Mapping
 from typing import Any, Dict, Tuple
 
 from bietlejuice.base.validation.cluster_args import merge_validation_cluster_args
@@ -22,13 +23,53 @@ CLUSTER_VALIDATION_EXCLUDED_DAGS = frozenset(
 )
 
 
+def prune_empty_mappings(overrides: Mapping[str, Any]) -> Dict[str, Any]:
+    """Drop empty-mapping values so they no-op instead of wiping preset defaults.
+
+    ``HierarchicalConf._deep_update`` only recurses into *truthy* mappings
+    (``if isinstance(value, Mapping) and value``); an empty dict falls through to
+    plain assignment and replaces the preset's nested block wholesale. A
+    declaration writing ``spark_conf: {}`` means "no extra spark conf", not "drop
+    the preset's spark_conf" — the latter silently strips
+    ``spark.sql.catalogImplementation: hive`` (breaking Glue resolution for
+    non-Delta tables) along with every driver/executor override.
+    """
+    pruned: Dict[str, Any] = {}
+    for key, value in overrides.items():
+        if isinstance(value, Mapping):
+            nested = prune_empty_mappings(value)
+            if not nested:
+                continue
+            pruned[key] = nested
+        else:
+            pruned[key] = value
+    return pruned
+
+
+def apply_custom_configurations(
+    cluster_configuration: Dict[str, Any],
+    custom_configurations: Mapping[str, Any],
+    config_service: ConfigurationService,
+) -> Dict[str, Any]:
+    """Deep-merge ``custom_configurations`` into an already-resolved cluster preset.
+
+    Use this instead of calling ``_deep_update`` directly so empty mappings stay
+    no-ops (see :func:`prune_empty_mappings`).
+    """
+    return config_service._deep_update(
+        cluster_configuration, prune_empty_mappings(custom_configurations or {})
+    )
+
+
 def merge_cluster_configuration(
     cluster_args: Dict[str, Any], config_service: ConfigurationService
 ) -> Dict[str, Any]:
     cluster_type = cluster_args.get("type")
     cluster_configuration = copy.deepcopy(config_service.get_config(cluster_type))
-    return config_service._deep_update(
-        cluster_configuration, cluster_args.get("custom_configurations", {})
+    return apply_custom_configurations(
+        cluster_configuration,
+        cluster_args.get("custom_configurations", {}),
+        config_service,
     )
 
 
