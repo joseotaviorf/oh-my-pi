@@ -17,6 +17,9 @@ SPARK_SQL_KAFKA_JAR="${SPARK_SQL_KAFKA_JAR:-spark-sql-kafka-0-10_2.12-3.5.1.jar}
 SPARK_TOKEN_PROVIDER_KAFKA_JAR="${SPARK_TOKEN_PROVIDER_KAFKA_JAR:-spark-token-provider-kafka-0-10_2.12-3.5.1.jar}"
 OPENLINEAGE_JAR="${OPENLINEAGE_JAR:-openlineage-spark_2.12-1.46.0.jar}"
 MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"
+# Glue JSON tables registered with org.apache.hive.hcatalog.data.JsonSerDe
+# (timestamp.formats). Hive's copy is not on Spark's classpath by default.
+HIVE_HCATALOG_CORE_JAR="${HIVE_HCATALOG_CORE_JAR:-hive-hcatalog-core-3.1.3.jar}"
 QUINTOANDAR_LOGGER_WHEEL="${QUINTOANDAR_LOGGER_WHEEL:-quintoandar_logger-0.8.0-py3-none-any.whl}"
 REQUESTS_VERSION="${REQUESTS_VERSION:-2.32.5}"
 DATABRICKS_SDK_VERSION="${DATABRICKS_SDK_VERSION:-0.102.0}"
@@ -780,7 +783,8 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "${SPARK_SQL_KAFKA_JAR}" \
         "${SPARK_TOKEN_PROVIDER_KAFKA_JAR}" \
         "${MYSQL_JDBC_JAR}" \
-        "${OPENLINEAGE_JAR}"; do
+        "${OPENLINEAGE_JAR}" \
+        "${HIVE_HCATALOG_CORE_JAR}"; do
         aws s3 cp "${ARTIFACTS_BUCKET}/jars/${jar}" "${TMP_DIR}/${jar}" \
             || echo "  WARN: ${jar} not found in S3, skipping"
     done
@@ -847,7 +851,8 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "${SPARK_SQL_KAFKA_JAR}" \
         "${SPARK_TOKEN_PROVIDER_KAFKA_JAR}" \
         "${MYSQL_JDBC_JAR}" \
-        "${OPENLINEAGE_JAR}"; do
+        "${OPENLINEAGE_JAR}" \
+        "${HIVE_HCATALOG_CORE_JAR}"; do
         if [ -f "${TMP_DIR}/${jar}" ]; then
             for jdir in ${SPARK_JARS_DIRS}; do
                 sudo cp "${TMP_DIR}/${jar}" "${jdir}/${jar}"
