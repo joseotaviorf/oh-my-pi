@@ -260,6 +260,117 @@ Mexico listings that are out of scope for this metric.
   rounding differences") for any cohort month whose relevant horizon has already
   fully matured as of the data as-of date.
 
+## Targets and OKRs
+
+**Master planning source (annual targets — Actual, OKR, QTS, Budget, Last Year):**
+[ER2RR — Master Plan (Google Sheets)](https://docs.google.com/spreadsheets/d/1RmCSKyfX8vaDznCyel7OdoUlkach5mmHZITo6X8-osI/edit?gid=376741002#gid=376741002).
+This is the original annual planning source that feeds `sandbox.summary_table_fr` —
+consult it directly for any month/field not derivable from the Fibonacci table below
+(e.g. the January OKR/QTS exception).
+
+**Actual, Target (OKR) and QTS all live in the same pre-aggregated Fibonacci table**
+— `sandbox.summary_table_fr` — alongside Last Year and Budget. This is the official
+Superset-facing source (dashboard 3387, slice 52764) and is the one validated
+end-to-end against the from-scratch Golden Query above (validated 2026-07-29):
+Actual matched exactly for every fully-matured month.
+
+**Actual (for cross-checking the from-scratch Golden Query above):**
+
+- **Source table:** `sandbox.summary_table_fr`
+- **Filter key / metric name:** `metric_name IN ('ER2RR')`, `business_context IN ('For Rent')`
+- **Fields:** `act_numerator` / `act_denominator`, summed with `FILTER (WHERE one_level_deeper IN ('0W','1W','2W','3W','4W'))` on the numerator only — that 5-bucket filter is what makes this the **4w** cut specifically (0–4 weeks post-ERC).
+- **Caveat:** none found — matched the from-scratch Golden Query exactly for every month whose 4w window was already fully matured as of the pull date. Re-validated live 2026-08-03 against the Golden Query for Jan–Jun/26: exact match on all six months.
+
+**OKR ("TGT") — the official annual target curve:**
+
+- **Source table:** `sandbox.summary_table_fr` (same table, same filters as Actual)
+- **Filter key / metric name:** `metric_name IN ('ER2RR')`, `business_context IN ('For Rent')`
+- **Fields:** `okr_numerator` / `okr_denominator`, same `one_level_deeper IN ('0W'..'4W')` filter on the numerator
+- **Aliases / search terms:** TGT, target, meta, OKR
+- **Critical caveat — one-month forward shift:** the OKR value stored under calendar
+  month **M**'s `date` row is **not** month M's target — it's month **M+1**'s. To read
+  the target for month M, query the row where `date_trunc('month', date)` = **M − 1
+  month**. Confirmed exact 2026-07-29 against the Data Steward's reference curve for
+  11 of 12 months (Fev–Dez/26); see table below.
+- **January exception:** `okr_numerator`/`okr_denominator` are NULL for every Dez/25
+  row in this table (rows exist for that month, the OKR fields just aren't
+  populated), so January's target cannot be derived from `summary_table_fr` at all —
+  it comes from the master planning spreadsheet (see link above), which is the
+  original annual planning source behind this table.
+
+| Mês (target for) | Row read (`date` month) | OKR ("TGT") |
+| :--- | :--- | ---: |
+| Janeiro/26 | *(n/a — Dez/25 OKR is NULL)* | 43.9%¹ |
+| Fevereiro/26 | Janeiro/26 | 47.9% |
+| Março/26 | Fevereiro/26 | 48.7% |
+| Abril/26 | Março/26 | 48.6% |
+| Maio/26 | Abril/26 | 48.1% |
+| Junho/26 | Maio/26 | 48.1% |
+| Julho/26 | Junho/26 | 48.8% |
+| Agosto/26 | Julho/26 | 48.7% |
+| Setembro/26 | Agosto/26 | 48.3% |
+| Outubro/26 | Setembro/26 | 46.7% |
+| Novembro/26 | Outubro/26 | 46.9% |
+| Dezembro/26 | Novembro/26 | 46.9% |
+
+¹ Not derivable from `summary_table_fr` (see January exception above) — value as
+supplied directly by the Data Steward from the master planning spreadsheet linked above.
+
+**QTS — same one-month forward shift as OKR (confirmed):**
+
+- **Source table:** `sandbox.summary_table_fr` (same table/filters as above)
+- **Fields:** `tgt_numerator` / `tgt_denominator`, same `one_level_deeper` filter
+- **Shift:** confirmed 2026-08-03 by the Data Steward — QTS follows the exact same
+  one-month forward shift as OKR (the row under month **M** holds month **M+1**'s
+  QTS target). No longer an assumption; read it the same way as the OKR table above.
+- **January exception:** same as OKR — `tgt_numerator`/`tgt_denominator` are NULL for
+  every Dez/25 row, so January's QTS target is not derivable from `summary_table_fr`
+  either. Pull it from the master planning spreadsheet (see link above); not yet
+  transcribed into this doc.
+
+| Mês (target for) | Row read (`date` month) | QTS |
+| :--- | :--- | ---: |
+| Janeiro/26 | *(n/a — Dez/25 QTS is NULL)* | *(pending — see master plan)* |
+| Fevereiro/26 | Janeiro/26 | 48.0% |
+| Março/26 | Fevereiro/26 | 48.4% |
+| Abril/26 | Março/26 | 48.9% |
+| Maio/26 | Abril/26 | 47.9% |
+| Junho/26 | Maio/26 | 48.7% |
+| Julho/26 | Junho/26 | 48.3% |
+| Agosto/26 | Julho/26 | 50.3% |
+
+*(QTS values above pulled live from `sandbox.summary_table_fr` on 2026-08-03, same
+query pattern as the OKR table — not yet independently reference-checked against the
+master planning spreadsheet cell-by-cell, only the shift logic is confirmed.)*
+
+**Reference queries (Superset, dashboard 3387 / slice 52764) — treat as the golden
+source for Actual/OKR/QTS, distinct from the from-scratch cohort Golden Query above:**
+
+```sql
+-- Actual (4w = one_level_deeper IN 0W..4W)
+SELECT date_trunc('month', CAST(date AS TIMESTAMP)) AS date,
+  SUM(act_numerator) FILTER (WHERE one_level_deeper IN ('0W', '1W', '2W', '3W', '4W'))
+  / SUM(act_denominator) AS "Actual"
+FROM sandbox.summary_table_fr
+WHERE date >= DATE '2025-07-01' AND date < DATE '2026-07-01'
+  AND metric_name IN ('ER2RR') AND business_context IN ('For Rent')
+GROUP BY date_trunc('month', CAST(date AS TIMESTAMP))
+ORDER BY "Actual" DESC
+```
+
+```sql
+-- QTS / OKR / Last Year — same one-month forward shift applies to both QTS and OKR (confirmed 2026-08-03)
+SELECT date_trunc('month', CAST(date AS TIMESTAMP)) AS date,
+  NULLIF(SUM(tgt_numerator) FILTER (WHERE one_level_deeper IN ('0W','1W','2W','3W','4W')) / SUM(tgt_denominator), 0) AS "QTS",
+  NULLIF(SUM(okr_numerator) FILTER (WHERE one_level_deeper IN ('0W','1W','2W','3W','4W')) / SUM(okr_denominator), 0) AS "OKR",
+  NULLIF(SUM(ly_act_numerator) FILTER (WHERE one_level_deeper IN ('0W','1W','2W','3W','4W')) / SUM(ly_act_denominator), 0) AS "Last Year"
+FROM sandbox.summary_table_fr
+WHERE date >= DATE '2025-07-01' AND date < DATE '2026-07-01'
+  AND metric_name IN ('ER2RR') AND business_context IN ('For Rent')
+GROUP BY date_trunc('month', CAST(date AS TIMESTAMP))
+ORDER BY "QTS" DESC
+```
+
 ## Golden Queries
 
 Computes ER2RR 4w/8w/12w per maturation cohort month in one pass. The
@@ -418,4 +529,17 @@ time, not just a Monday label, to stop climbing):
 until ~16/08/26 and its 12w window until ~13/09/26. Treat weekly 8w/12w numbers for
 any week matured in the last ~2 months as provisional; only 4w is reliably matured
 week-to-week at this granularity.
+
+## Superset Golden Assets
+
+- **ER2RR Fibonacci summary (For Rent)** — official pre-aggregated Actual / OKR
+  ("TGT") / QTS / Budget / Last Year table for ER2RR, used as the source-of-truth
+  reference for this metric's dashboard. Materialized in `sandbox.summary_table_fr`.
+  Superset dashboard `3387`, slice `52764`. Trino/DataHub dataset URNs:
+  `urn:li:dataset:(urn:li:dataPlatform:trino,hive.sandbox.summary_table_fr,PROD)`
+  and `urn:li:dataset:(urn:li:dataPlatform:hive,sandbox.summary_table_fr,PROD)` —
+  no separate Superset-platform dataset URN is registered in DataHub for this asset.
+- **ER2RR — Master Plan (Google Sheets)** — original annual planning source for
+  Actual / OKR / QTS / Budget targets, upstream of `sandbox.summary_table_fr`.
+  [Link](https://docs.google.com/spreadsheets/d/1RmCSKyfX8vaDznCyel7OdoUlkach5mmHZITo6X8-osI/edit?gid=376741002#gid=376741002).
 
