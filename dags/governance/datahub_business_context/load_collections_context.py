@@ -38,10 +38,15 @@ Metric products: link Trino/Databricks tables and Superset dataset URNs from
 ``related_data_products`` to upstream domain products; golden-query ``subjects`` may
 duplicate Trino tables for Query entity wiring. The optional ``mbr`` list (CI-injected
 from the ``## MBR`` MD section) is synced onto the ``data_product.mbr`` and
-``data_product.mbr_category`` structured properties, and the ``catalog`` list (from the
-``## Catalog`` MD table) onto ``data_product.metrics`` and ``data_product.metric_type``
-(all multi-valued and filterable) — a metric whose MD dropped a section has the matching
-property cleared, so DataHub stays in lockstep with the Markdown.
+``data_product.mbr_category`` structured properties (multi-valued and filterable). The
+``catalog`` list (from the ``## Catalog`` MD table) is synced onto the single
+``data_product.metrics`` structured property, one value per metric with its OKR /
+Health Metric type embedded (e.g. ``"NPS True (OKR)"``) — every row is required to
+carry a type before it reaches here, so the mapping is always exact, unlike the
+retired ``data_product.metric_type`` property (a separate de-duplicated list with no
+positional link back to the metric names), which is now actively cleared on every
+sync. A metric whose MD dropped a section has the matching property cleared, so
+DataHub stays in lockstep with the Markdown.
 
 Full-overwrite semantics: the Markdown/YAML is the single source of truth. A republish
 *reconciles* the product to the YAML — assets dropped from ``datasets`` are unlinked
@@ -3121,12 +3126,25 @@ def _ensure_metric_type_sp_definition() -> bool:
 
 
 def curated_push_catalog(cfg: dict[str, Any]) -> None:
-    """Declaratively sync the metric catalog structured properties (metric DPs only).
+    """Declaratively sync the metric catalog structured property (metric DPs only).
 
-    ``metrics`` carries one value per official metric named in ``## Catalog``;
-    ``metric_type`` carries the de-duplicated set of classifications (OKR / Health
-    Metric) so the catalog stays filterable from both angles in DataHub. An absent or
-    empty catalog clears both, keeping DataHub in lockstep with the Markdown.
+    ``metrics`` carries one value per official metric named in ``## Catalog``, with its
+    OKR / Health Metric classification embedded in the value itself (e.g.
+    ``"NPS True (OKR)"``). Every row is guaranteed to carry a type by the time it
+    reaches here — the CI/CD publish script (``_validate_catalog_types`` in
+    ``generate_and_push_datahub_entities.py``) refuses to publish a metric with no
+    recognized type — so this is a straight 1:1 rendering, not a best-effort fallback.
+
+    The legacy ``data_product.metric_type`` property (a separately de-duplicated list
+    with no positional link back to ``metrics``) is actively cleared here rather than
+    just abandoned, so Data Products published before this change don't keep showing a
+    stale, unpaired type list next to the new self-describing ``metrics`` values. The
+    clear runs *after* the ``metrics`` upsert succeeds: dropping it first would leave a
+    product whose upsert then failed with plain, unclassified metric names and no type
+    list at all until the next successful publish.
+
+    An absent or empty catalog clears both properties, keeping DataHub in lockstep with
+    the Markdown.
     """
     print("\n[13/13] Metric catalog...")
     is_metric = str(cfg.get("data_product_type") or "").strip().lower() == "metric"
@@ -3135,29 +3153,31 @@ def curated_push_catalog(cfg: dict[str, Any]) -> None:
         return
 
     raw = cfg.get("catalog") or []
-    names = _dedup_preserving_order(
-        [str(row.get("name") or "") for row in raw if isinstance(row, dict)]
-    )
-    types = _dedup_preserving_order(
-        [str(row.get("type") or "") for row in raw if isinstance(row, dict)]
+    entries = _dedup_preserving_order(
+        [
+            f"{row['name']} ({row['type']})" if row.get("type") else str(row["name"])
+            for row in raw
+            if isinstance(row, dict) and row.get("name")
+        ]
     )
 
-    if not _ensure_metrics_sp_definition() or not _ensure_metric_type_sp_definition():
+    if not _ensure_metrics_sp_definition():
         return
 
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
 
-    if not _sync_multi_value_sp(dp_u, _METRICS_SP_QNAME, names, "curated.metrics"):
-        return
-    if not _sync_multi_value_sp(
-        dp_u, _METRIC_TYPE_SP_QNAME, types, "curated.metric_type"
-    ):
+    if not _sync_multi_value_sp(dp_u, _METRICS_SP_QNAME, entries, "curated.metrics"):
         return
 
-    if not names:
+    # Deprecated in favor of embedding the type in each `metrics` value above — drop any
+    # value left over from before this change, now that the new values are in place.
+    if _ensure_metric_type_sp_definition():
+        _sync_multi_value_sp(dp_u, _METRIC_TYPE_SP_QNAME, [], "curated.metric_type")
+
+    if not entries:
         _ok("No catalog declared — cleared any previous value")
         return
-    _ok(f"Set metrics = {names!r}, metric_type = {types!r}")
+    _ok(f"Set metrics = {entries!r}")
 
 
 def run_data_product_curated_entity(spec: dict[str, Any]) -> None:

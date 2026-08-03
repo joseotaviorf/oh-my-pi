@@ -149,8 +149,10 @@ _DEFAULT_MAX_TOKENS = 16000
 #   metric  — Related Business Entities → related_data_products SP; Glossary → glossary;
 #             Golden Queries → Query entities; DataHub Catalog → tooling pointer only;
 #             MBR → data_product.mbr / data_product.mbr_category structured properties;
-#             Catalog → data_product.metrics / data_product.metric_type structured
-#             properties — none of these are narrative content
+#             Catalog → data_product.metrics structured property, one entry per metric
+#             with its OKR/Health Metric type embedded (e.g. "NPS True (OKR)") — a row
+#             missing a valid type fails the entity instead of publishing unclassified
+#             (see _validate_catalog_types) — none of these are narrative content
 #   metric  — Targets and OKRs is intentionally NOT listed here: Budget/OKR lookup
 #             guidance stays in product_description (narrative content for downstream agents)
 EXCLUDE_HEADING_PATTERNS = [
@@ -620,6 +622,9 @@ def _normalize_catalog_type(raw: str) -> str:
     return _CATALOG_TYPE_ALIASES.get(cleaned.lower(), cleaned)
 
 
+_CATALOG_VALID_TYPES = {_CATALOG_TYPE_OKR, _CATALOG_TYPE_HEALTH}
+
+
 def _extract_catalog(md_path: Path) -> list[dict[str, str]]:
     """Parse the ``## Catalog`` table into ``{name, type}`` rows (metric docs).
 
@@ -627,6 +632,12 @@ def _extract_catalog(md_path: Path) -> list[dict[str, str]]:
     document. ``exact_only`` matching keeps the unrelated ``## DataHub Catalog`` section
     from being read as the catalog. Header/separator rows and unfilled ``{...}``
     placeholders are skipped; metrics are de-duplicated by name, case-insensitively.
+
+    A metric row always keeps its ``type`` cell verbatim (normalized via
+    ``_normalize_catalog_type``), even when it is missing or does not resolve to a
+    recognized category — ``_validate_catalog_types`` below is the single place that
+    turns an unclassified metric into a hard error, so every metric published to
+    DataHub is unambiguously tagged ``OKR`` or ``Health Metric``.
     """
     section = _extract_section_body(md_path.read_text(), "catalog", exact_only=True)
     rows: list[dict[str, str]] = []
@@ -650,6 +661,20 @@ def _extract_catalog(md_path: Path) -> list[dict[str, str]]:
             row["type"] = metric_type
         rows.append(row)
     return rows
+
+
+def _validate_catalog_types(catalog: list[dict[str, str]]) -> list[str]:
+    """Return the names of ``## Catalog`` metrics missing a valid OKR/Health Metric type.
+
+    A metric with no ``type`` cell (or one that doesn't resolve to a recognized
+    category) can no longer be published: ``curated_push_catalog`` embeds the type
+    directly into each ``data_product.metrics`` value (e.g. ``"NPS True (OKR)"``), so
+    an unclassified metric would either be silently dropped or published with a
+    misleading blank category. Every metric must be classified at authoring time.
+    """
+    return [
+        row["name"] for row in catalog if row.get("type") not in _CATALOG_VALID_TYPES
+    ]
 
 
 def _inject_catalog(yaml_content: str, catalog: list[dict[str, str]]) -> str:
@@ -1456,7 +1481,20 @@ def main(argv: list[str] | None = None) -> int:
         if _md_to_data_product_type(md_path) == "metric":
             yaml_content = _inject_metric_datasets(yaml_content, md_path)
             yaml_content = _inject_mbr(yaml_content, _extract_mbrs(md_path))
-            yaml_content = _inject_catalog(yaml_content, _extract_catalog(md_path))
+
+            catalog = _extract_catalog(md_path)
+            unclassified = _validate_catalog_types(catalog)
+            if unclassified:
+                print(
+                    "   ERROR: ## Catalog metric(s) missing a valid Type "
+                    f"('OKR' or 'Health Metric'): {', '.join(unclassified)}. "
+                    "Refusing to publish an unclassified metric catalog.",
+                    file=sys.stderr,
+                )
+                failed.append(entity_slug)
+                continue
+            yaml_content = _inject_catalog(yaml_content, catalog)
+
             yaml_content = _inject_related_data_products(
                 yaml_content, _extract_related_data_products(md_path)
             )

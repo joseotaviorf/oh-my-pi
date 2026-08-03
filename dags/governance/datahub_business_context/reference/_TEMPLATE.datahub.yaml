@@ -56,13 +56,19 @@ data_product_type: domain  # domain | metric
 #     category: {category}
 
 # Catalog — metric products only; CI-injected from the `## Catalog` table of the metric
-# .md; do NOT hand-author. One row per official metric the document defines. `name`
-# values feed the `data_product.metrics` structured property; `type` values (OKR |
-# Health Metric) feed `data_product.metric_type`. Both multi-valued and filterable, and
-# declaratively synced the same way as `mbr`.
+# .md; do NOT hand-author. One row per official metric the document defines. `type`
+# (OKR | Health Metric) is REQUIRED on every row — the publish script refuses to publish
+# a metric with no recognized type (_validate_catalog_types).
+# The YAML keeps `name` and `type` as SEPARATE keys, as below; the loader joins them at
+# push time into one `data_product.metrics` value per metric — "NPS True (OKR)" — so the
+# metric-to-type mapping stays exact in DataHub instead of the two separately
+# de-duplicated lists it used to publish (`metrics` + the now-retired `metric_type`).
+# Multi-valued, filterable, declaratively synced like `mbr`.
 # catalog:
 #   - name: {Official Metric Name}
 #     type: OKR
+#   - name: {Another Metric Name}
+#     type: Health Metric
 
 structured_property:
   qualified_name: br.com.quintoandar.datahub.data_product.golden_query

@@ -1026,6 +1026,52 @@ class CatalogTest(unittest.TestCase):
         self.assertRegex(out, r"data_product_type: metric\ncatalog:\n")
 
 
+class CatalogTypeRequiredTest(unittest.TestCase):
+    """A metric published to DataHub must always carry a recognized Type.
+
+    ``curated_push_catalog`` embeds the type directly into each
+    ``data_product.metrics`` value (e.g. ``"NPS True (OKR)"``), so an unclassified
+    metric can no longer be silently published — ``_validate_catalog_types`` is the
+    single gate that turns a missing/invalid Type into a hard error in ``main()``.
+    """
+
+    def test_all_rows_classified_returns_no_errors(self) -> None:
+        catalog = [
+            {"name": "NPS True", "type": "OKR"},
+            {"name": "NPS Onboarding", "type": "Health Metric"},
+        ]
+        self.assertEqual(g._validate_catalog_types(catalog), [])
+
+    def test_empty_catalog_returns_no_errors(self) -> None:
+        self.assertEqual(g._validate_catalog_types([]), [])
+
+    def test_row_missing_type_key_is_reported(self) -> None:
+        catalog = [{"name": "NPS True", "type": "OKR"}, {"name": "Untyped Metric"}]
+        self.assertEqual(g._validate_catalog_types(catalog), ["Untyped Metric"])
+
+    def test_row_with_unrecognized_type_is_reported(self) -> None:
+        """A typo'd/unknown Type cell (e.g. "KPI") must fail, not pass through verbatim."""
+        catalog = [{"name": "Weird Metric", "type": "KPI"}]
+        self.assertEqual(g._validate_catalog_types(catalog), ["Weird Metric"])
+
+    def test_extract_catalog_with_blank_type_cell_fails_validation(self) -> None:
+        """End-to-end: a Markdown row with an empty Type cell must be rejected."""
+        md_path = self._md(
+            "# Demo\n\n## Catalog\n\n"
+            "| Metric | Type |\n| :---- | :---- |\n"
+            "| NPS True | OKR |\n| Untyped Metric |  |\n"
+        )
+        catalog = g._extract_catalog(md_path)
+        self.assertEqual(g._validate_catalog_types(catalog), ["Untyped Metric"])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def _md(self, body: str) -> Path:
+        tmp = Path(tempfile.mkdtemp()) / "entity.md"
+        tmp.write_text(body, encoding="utf-8")
+        return tmp
+
+
 class GoldenQueryCompletenessTest(unittest.TestCase):
     """Regression coverage for the Cases Perspective incident.
 

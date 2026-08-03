@@ -378,3 +378,117 @@ class TestCreateOrUpdateDataProductDescriptionOwnership:
         )
         update_call = calls[-1]
         assert update_call["input"]["description"] == "full markdown text"
+
+
+class TestCuratedPushCatalog:
+    """Metric catalog sync: one self-describing ``metrics`` value per metric.
+
+    ``metrics`` and ``metric_type`` used to be two independently de-duplicated lists (10
+    metric names next to 2 distinct types), so DataHub could not show which metric was
+    OKR vs Health Metric. Each ``metrics`` value now embeds its own type, and the
+    now-redundant ``metric_type`` property is cleared — but only *after* the new values
+    land, so a failed upsert can never strip the classification from a product.
+    """
+
+    _CFG = {
+        "data_product_type": "metric",
+        "data_product_id": "nps-fr",
+        "catalog": [
+            {"name": "NPS True", "type": "OKR"},
+            {"name": "NPS Onboarding", "type": "Health Metric"},
+        ],
+    }
+
+    @staticmethod
+    def _stub_transport(calls: list[tuple[str, dict]], *, upsert_fails: bool = False):
+        def _transport(query: str, variables: dict):
+            calls.append((query, variables))
+            if "FetchDataProductStructuredProperties" in query:
+                return {"dataProduct": {"structuredProperties": {"properties": []}}}
+            if "UpsertStructuredPropertiesGoldenQuery" in query:
+                return None if upsert_fails else {"upsertStructuredProperties": {}}
+            return {}
+
+        return _transport
+
+    def _patch(self, monkeypatch, calls, *, upsert_fails: bool = False) -> None:
+        # Both SP definitions already exist in DataHub, so _ensure_* short-circuits.
+        monkeypatch.setattr(loader, "_entity_exists", lambda urn: True)
+        transport = self._stub_transport(calls, upsert_fails=upsert_fails)
+        monkeypatch.setattr(loader, "_post", transport)
+        monkeypatch.setattr(loader, "_graphql_root", transport)
+
+    @staticmethod
+    def _sp_urn(qname: str) -> str:
+        return loader.structured_property_urn(qname)
+
+    def test_metrics_values_embed_the_type_per_row(self, monkeypatch) -> None:
+        calls: list[tuple[str, dict]] = []
+        self._patch(monkeypatch, calls)
+
+        loader.curated_push_catalog(self._CFG)
+
+        upserts = [v for q, v in calls if "UpsertStructuredPropertiesGoldenQuery" in q]
+        assert len(upserts) == 1
+        metrics_row = next(
+            row
+            for row in upserts[0]["input"]["structuredPropertyInputParams"]
+            if row["structuredPropertyUrn"] == self._sp_urn(loader._METRICS_SP_QNAME)
+        )
+        assert metrics_row["values"] == [
+            {"stringValue": "NPS True (OKR)"},
+            {"stringValue": "NPS Onboarding (Health Metric)"},
+        ]
+
+    def test_legacy_metric_type_is_cleared_after_the_metrics_upsert(
+        self, monkeypatch
+    ) -> None:
+        calls: list[tuple[str, dict]] = []
+        self._patch(monkeypatch, calls)
+
+        loader.curated_push_catalog(self._CFG)
+
+        ops = [q for q, _ in calls]
+        upsert_at = next(
+            i for i, q in enumerate(ops) if "UpsertStructuredPropertiesGoldenQuery" in q
+        )
+        removals = [
+            (i, v)
+            for i, (q, v) in enumerate(calls)
+            if "RemoveStructuredProperties" in q
+        ]
+        assert len(removals) == 1
+        remove_at, remove_vars = removals[0]
+        assert remove_vars["input"]["structuredPropertyUrns"] == [
+            self._sp_urn(loader._METRIC_TYPE_SP_QNAME)
+        ]
+        assert remove_at > upsert_at
+
+    def test_failed_metrics_upsert_leaves_metric_type_untouched(
+        self, monkeypatch
+    ) -> None:
+        calls: list[tuple[str, dict]] = []
+        self._patch(monkeypatch, calls, upsert_fails=True)
+
+        loader.curated_push_catalog(self._CFG)
+
+        # Clearing the old type list after a failed upsert would leave the product with
+        # plain, unclassified metric names and no type list at all.
+        assert not any("RemoveStructuredProperties" in q for q, _ in calls)
+
+    def test_empty_catalog_clears_both_properties(self, monkeypatch) -> None:
+        calls: list[tuple[str, dict]] = []
+        self._patch(monkeypatch, calls)
+
+        loader.curated_push_catalog({**self._CFG, "catalog": []})
+
+        cleared = {
+            v["input"]["structuredPropertyUrns"][0]
+            for q, v in calls
+            if "RemoveStructuredProperties" in q
+        }
+        assert cleared == {
+            self._sp_urn(loader._METRICS_SP_QNAME),
+            self._sp_urn(loader._METRIC_TYPE_SP_QNAME),
+        }
+        assert not any("UpsertStructuredPropertiesGoldenQuery" in q for q, _ in calls)
