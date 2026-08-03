@@ -316,6 +316,10 @@ workflow:
       extra_spark_job_arguments:
         - "1RNvYAYC2KlpigkQ5Xz9nmjuaoIOf5GHbmUX-AG9M8bE"
         - "certificados_base"
+    blitz_regulatory_training_extended_deadlines:
+      extra_spark_job_arguments:
+        - "18eCVoI2krrzU9oS2x7BPpHfaVZN4MAVXIUGUeJLe9I4"
+        - "automacao"
 
     # Former notebook view: leiturinha_desligados
     leiturinha_terminated_roster:
