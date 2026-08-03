@@ -203,7 +203,12 @@ def build_datahub_yaml(
 
     # MBR (## MBR) — metric products only; the loader clears membership when absent.
     if data_product_type == DATA_PRODUCT_TYPE_METRIC and parsed.mbr:
-        spec["mbr"] = list(parsed.mbr)
+        spec["mbr"] = [dict(entry) for entry in parsed.mbr]
+
+    # Catalog (## Catalog) — metric products only: the metric inventory and how each
+    # one is used (OKR / Health Metric). Cleared by the loader when absent.
+    if data_product_type == DATA_PRODUCT_TYPE_METRIC and parsed.catalog:
+        spec["catalog"] = [dict(row) for row in parsed.catalog]
 
     if data_product_type == DATA_PRODUCT_TYPE_METRIC and parsed.related_data_products:
         spec["related_data_products"] = list(parsed.related_data_products)

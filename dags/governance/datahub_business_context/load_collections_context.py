@@ -37,9 +37,11 @@ Metric products: link Trino/Databricks tables and Superset dataset URNs from
 ``## Superset Golden Assets`` as reference assets on the product Summary; wire
 ``related_data_products`` to upstream domain products; golden-query ``subjects`` may
 duplicate Trino tables for Query entity wiring. The optional ``mbr`` list (CI-injected
-from the ``## MBR`` MD section) is synced onto the ``data_product.mbr`` structured
-property (multi-valued, filterable) — a metric with no ``## MBR`` section has any
-previous value cleared, so MBR membership stays in lockstep with the Markdown.
+from the ``## MBR`` MD section) is synced onto the ``data_product.mbr`` and
+``data_product.mbr_category`` structured properties, and the ``catalog`` list (from the
+``## Catalog`` MD table) onto ``data_product.metrics`` and ``data_product.metric_type``
+(all multi-valued and filterable) — a metric whose MD dropped a section has the matching
+property cleared, so DataHub stays in lockstep with the Markdown.
 
 Full-overwrite semantics: the Markdown/YAML is the single source of truth. A republish
 *reconciles* the product to the YAML — assets dropped from ``datasets`` are unlinked
@@ -1894,7 +1896,7 @@ def _create_or_update_data_product(
 
 
 def curated_push_assets(cfg: dict[str, Any]) -> None:
-    print("\n[1/12] DataProduct assets (datasets only)...")
+    print("\n[1/13] DataProduct assets (datasets only)...")
     pid = str(cfg["data_product_id"])
     pname = cfg.get("product_display_name") or pid
     pdesc_raw = cfg.get("product_description")
@@ -1980,7 +1982,7 @@ def curated_push_assets(cfg: dict[str, Any]) -> None:
 
 
 def curated_push_documentation_link(cfg: dict[str, Any]) -> None:
-    print("\n[2/12] Documentation link...")
+    print("\n[2/13] Documentation link...")
     dl = cfg.get("documentation_link")
     if not isinstance(dl, dict) or not dl.get("url") or not dl.get("label"):
         print("  -> skipping documentation_link")
@@ -2018,7 +2020,7 @@ def curated_push_glossary_terms(cfg: dict[str, Any]) -> None:
     After terms are created / verified the function attaches them to the Data Product
     via ``batchAddTerms``.
     """
-    print("\n[3/12] Glossary terms...")
+    print("\n[3/13] Glossary terms...")
     gt_block = cfg.get("glossary_terms")
     if not isinstance(gt_block, dict) or not gt_block.get("terms"):
         print("  -> no glossary_terms block — skipping")
@@ -2135,7 +2137,7 @@ def _curated_extra_query_discovery_urls(cfg: dict[str, Any]) -> list[str]:
 
 
 def curated_purge_discovery_links(cfg: dict[str, Any]) -> None:
-    print("\n[4/12] Purge golden-query deep links...")
+    print("\n[4/13] Purge golden-query deep links...")
     gqs = _get_all_golden_queries(cfg)
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
     ui_base = DATAHUB_UI_ORIGIN.rstrip("/")
@@ -2258,7 +2260,7 @@ def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
     SQL block cannot wipe the rest.
     """
     gqs = _get_all_golden_queries(cfg)
-    print(f"\n[5/12] Golden Query entities ({len(gqs)})...")
+    print(f"\n[5/13] Golden Query entities ({len(gqs)})...")
     if not gqs:
         print("  -> no golden queries in YAML — skipping")
         return []
@@ -2274,7 +2276,7 @@ def curated_push_all_golden_queries(cfg: dict[str, Any]) -> list[str]:
 def curated_push_sidebar_struct_props(
     cfg: dict[str, Any], query_urns: list[str]
 ) -> None:
-    print("\n[6/12] Sidebar structured property...")
+    print("\n[6/13] Sidebar structured property...")
     spec_sp = cfg.get("structured_property")
     if not isinstance(spec_sp, dict) or not spec_sp.get("qualified_name"):
         raise SystemExit("`structured_property.qualified_name` is required")
@@ -2390,7 +2392,7 @@ def _drop_legacy_structured_properties(
 
 
 def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
-    print("\n[7/12] Re-affirm dataset-only memberships...")
+    print("\n[7/13] Re-affirm dataset-only memberships...")
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
     urns_r = _filter_assignable_urns(
         _filter_registered_dataset_urns(_curated_data_product_asset_urns(cfg)), dp_u
@@ -2402,7 +2404,7 @@ def curated_refresh_dataset_assets(cfg: dict[str, Any]) -> None:
                 "(Trino tables / Superset URNs may be pending DataHub ingestion)."
             )
             return
-        # Tables may not yet be ingested into DataHub (handled gracefully in step [1/12]).
+        # Tables may not yet be ingested into DataHub (handled gracefully in step [1/13]).
         # Log a warning but do not fail — the description already notes the pending tables.
         print(
             "  ⚠ no DataHub-registered datasets to re-affirm — tables may still be "
@@ -2511,7 +2513,7 @@ def _ensure_upstream_sp_definition() -> bool:
 
 def curated_push_upstream_data_products(cfg: dict[str, Any]) -> None:
     """Wire upstream data product URNs as a structured property on the metric data product."""
-    print("\n[8/12] Upstream data product relationships...")
+    print("\n[8/13] Upstream data product relationships...")
     related = cfg.get("related_data_products")
     if not related or not isinstance(related, list):
         print("  -> no related_data_products — skipping")
@@ -2599,7 +2601,7 @@ def _ensure_lifecycle_sp_definition() -> bool:
 
 def curated_push_lifecycle_stage(cfg: dict[str, Any]) -> None:
     """Upsert the lifecycle_stage structured property on the data product."""
-    print("\n[9/12] Lifecycle stage...")
+    print("\n[9/13] Lifecycle stage...")
     stage = str(cfg.get("lifecycle_stage") or "").strip().lower()
     if not stage:
         print(
@@ -2672,7 +2674,7 @@ def _ensure_type_sp_definition() -> bool:
 
 def curated_push_data_product_type(cfg: dict[str, Any]) -> None:
     """Upsert the data_product.type structured property; defaults to 'domain' if not set."""
-    print("\n[10/12] Data product type...")
+    print("\n[10/13] Data product type...")
     dp_type = str(cfg.get("data_product_type") or _TYPE_SP_DEFAULT).strip().lower()
     if dp_type not in _TYPE_SP_ALLOWED_VALUES:
         _fail(
@@ -2843,7 +2845,7 @@ def curated_push_owners(cfg: dict[str, Any]) -> None:
     - A declared owner is never used to justify a removal even if its lookup/provisioning
       fails — a transient miss must not drop a still-declared owner.
     """
-    print("\n[11/12] Owners (Data Owner / Data Steward)...")
+    print("\n[11/13] Owners (Data Owner / Data Steward)...")
     owners_block = cfg.get("owners")
     if not isinstance(owners_block, dict):
         print("  -> no owners block — skipping")
@@ -2932,102 +2934,246 @@ def curated_push_owners(cfg: dict[str, Any]) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Mutation 12 — MBR membership (data_product.mbr structured property, metric-only)
+# Mutation 12 — MBR membership (data_product.mbr / .mbr_category, metric-only)
 # ---------------------------------------------------------------------------
 
 _MBR_SP_QNAME = "br.com.quintoandar.datahub.data_product.mbr"
+_MBR_CATEGORY_SP_QNAME = "br.com.quintoandar.datahub.data_product.mbr_category"
+
+# DataHub allows only ONE badge structured property per entity type, and
+# data_product.type already claims it — every curated multi-valued property below
+# therefore stays off the badge while remaining a search filter.
+_MULTI_VALUE_SP_SETTINGS = {
+    "showInAssetSummary": True,
+    "hideInAssetSummaryWhenEmpty": True,
+    "showInSearchFilters": True,
+    "isHidden": False,
+    "showAsAssetBadge": False,
+    "showInColumnsTable": False,
+}
 
 
-def _ensure_mbr_sp_definition() -> bool:
+def _ensure_multi_value_sp_definition(
+    qname: str, display_name: str, description: str, label: str
+) -> bool:
     return _ensure_structured_property(
-        _MBR_SP_QNAME,
+        qname,
         {
-            "qualifiedName": _MBR_SP_QNAME,
-            "id": _MBR_SP_QNAME,
-            "displayName": "MBR",
-            "description": (
-                "Monthly Business Review(s) this metric Data Product's metrics belong to. "
-                "Multi-valued: a metric may feed more than one MBR. Present only on metric "
-                "Data Products that participate in an MBR; absent = not part of any MBR."
-            ),
+            "qualifiedName": qname,
+            "id": qname,
+            "displayName": display_name,
+            "description": description,
             "valueType": _STRUCTURED_PROPERTY_VALUE_TYPE_STRING,
             "cardinality": "MULTIPLE",
             "entityTypes": [STRUCTURED_PROPERTY_ENTITY_TYPE_DATA_PRODUCT],
-            "settings": {
-                "showInAssetSummary": True,
-                "hideInAssetSummaryWhenEmpty": True,
-                "showInSearchFilters": True,
-                "isHidden": False,
-                # DataHub allows only ONE badge structured property per entity type,
-                # and data_product.type already claims it — keep MBR off the badge.
-                "showAsAssetBadge": False,
-                "showInColumnsTable": False,
-            },
+            "settings": dict(_MULTI_VALUE_SP_SETTINGS),
         },
+        label,
+    )
+
+
+def _sync_multi_value_sp(
+    dp_urn: str, qname: str, values: list[str], label: str
+) -> bool:
+    """Upsert a multi-valued SP, or drop the aspect entirely when ``values`` is empty.
+
+    The empty case is the flip-off half of the declarative contract: a document that
+    dropped the section must not keep publishing a stale value in DataHub.
+    """
+    sp_urn = structured_property_urn(qname)
+    if not values:
+        _drop_legacy_structured_properties(dp_urn, frozenset({sp_urn}))
+        return True
+    return _upsert_sp_on_data_product(
+        dp_urn,
+        sp_urn,
+        [{"stringValue": value} for value in values],
+        label,
+    )
+
+
+def _dedup_preserving_order(values: list[str]) -> list[str]:
+    """De-duplicate case-insensitively while keeping the first spelling and its order."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        cleaned = str(value).strip()
+        if cleaned and cleaned.lower() not in seen:
+            seen.add(cleaned.lower())
+            out.append(cleaned)
+    return out
+
+
+def _mbr_entries(cfg: dict[str, Any]) -> tuple[list[str], list[str]]:
+    """Split the ``mbr:`` spec block into MBR names and MBR categories.
+
+    Accepts both shapes: the current ``- name: X`` / ``category: Y`` mappings and the
+    legacy plain-string list, so a spec generated before the ``## MBR`` format change
+    still publishes its membership (with no category).
+    """
+    raw = cfg.get("mbr")
+    if isinstance(raw, str):
+        raw = [raw]
+    names: list[str] = []
+    categories: list[str] = []
+    for item in raw or []:
+        if isinstance(item, dict):
+            names.append(str(item.get("name") or "").strip())
+            categories.append(str(item.get("category") or "").strip())
+        else:
+            names.append(str(item).strip())
+    return _dedup_preserving_order(names), _dedup_preserving_order(categories)
+
+
+def _ensure_mbr_sp_definition() -> bool:
+    return _ensure_multi_value_sp_definition(
+        _MBR_SP_QNAME,
+        "MBR",
+        (
+            "Monthly Business Review(s) this metric Data Product's metrics belong to. "
+            "Multi-valued: a metric may feed more than one MBR. Present only on metric "
+            "Data Products that participate in an MBR; absent = not part of any MBR."
+        ),
         "data_product.mbr",
     )
 
 
-def curated_push_mbr(cfg: dict[str, Any]) -> None:
-    """Declaratively sync the ``data_product.mbr`` structured property (metric DPs only).
+def _ensure_mbr_category_sp_definition() -> bool:
+    return _ensure_multi_value_sp_definition(
+        _MBR_CATEGORY_SP_QNAME,
+        "MBR Category",
+        (
+            "Category this metric Data Product occupies inside its Monthly Business "
+            "Review agenda. Multi-valued: a metric feeding several MBRs may sit in a "
+            "different category in each. Absent = no category declared."
+        ),
+        "data_product.mbr_category",
+    )
 
-    Multi-valued: a metric may belong to several MBRs. Absent/empty on a metric product
-    clears any previously-set value (flip-off), so removing the ``## MBR`` section from
-    the Markdown removes the membership in DataHub. Non-metric products are skipped —
-    MBR is a metric-only concept.
+
+def curated_push_mbr(cfg: dict[str, Any]) -> None:
+    """Declaratively sync the MBR structured properties (metric DPs only).
+
+    Multi-valued: a metric may belong to several MBRs, each with its own category.
+    Absent/empty on a metric product clears any previously-set value (flip-off), so
+    removing the ``## MBR`` section from the Markdown removes the membership in DataHub.
+    Non-metric products are skipped — MBR is a metric-only concept.
     """
-    print("\n[12/12] MBR membership...")
+    print("\n[12/13] MBR membership...")
     is_metric = str(cfg.get("data_product_type") or "").strip().lower() == "metric"
     if not is_metric:
         print("  -> not a metric data product — skipping")
         return
 
-    raw = cfg.get("mbr")
-    if isinstance(raw, str):
-        raw = [raw]
-    mbrs: list[str] = []
-    seen: set[str] = set()
-    for item in raw or []:
-        name = str(item).strip()
-        if name and name.lower() not in seen:
-            seen.add(name.lower())
-            mbrs.append(name)
+    mbrs, categories = _mbr_entries(cfg)
 
-    if not _ensure_mbr_sp_definition():
+    if not _ensure_mbr_sp_definition() or not _ensure_mbr_category_sp_definition():
         return
 
     dp_u = _data_product_urn(str(cfg["data_product_id"]))
-    mbr_sp_urn = structured_property_urn(_MBR_SP_QNAME)
 
-    if not mbrs:
-        # Flip-off: drop the aspect so a metric that left every MBR is not left stale.
-        _drop_legacy_structured_properties(dp_u, frozenset({mbr_sp_urn}))
-        _ok("No MBR declared — cleared any previous value")
+    if not _sync_multi_value_sp(dp_u, _MBR_SP_QNAME, mbrs, "curated.mbr"):
         return
-
-    if not _upsert_sp_on_data_product(
-        dp_u,
-        mbr_sp_urn,
-        [{"stringValue": name} for name in mbrs],
-        "curated.mbr",
+    if not _sync_multi_value_sp(
+        dp_u, _MBR_CATEGORY_SP_QNAME, categories, "curated.mbr_category"
     ):
         return
-    _ok(f"Set mbr = {mbrs!r}")
+
+    if not mbrs:
+        _ok("No MBR declared — cleared any previous value")
+        return
+    _ok(f"Set mbr = {mbrs!r}, mbr_category = {categories!r}")
+
+
+# ---------------------------------------------------------------------------
+# Mutation 13 — Metric catalog (data_product.metrics / .metric_type, metric-only)
+# ---------------------------------------------------------------------------
+
+_METRICS_SP_QNAME = "br.com.quintoandar.datahub.data_product.metrics"
+_METRIC_TYPE_SP_QNAME = "br.com.quintoandar.datahub.data_product.metric_type"
+
+
+def _ensure_metrics_sp_definition() -> bool:
+    return _ensure_multi_value_sp_definition(
+        _METRICS_SP_QNAME,
+        "Metrics",
+        (
+            "Official metrics defined by this metric Data Product, as named in its "
+            "`## Catalog` section. Multi-valued: a document may define a family of "
+            "related metrics. Absent = no catalog declared."
+        ),
+        "data_product.metrics",
+    )
+
+
+def _ensure_metric_type_sp_definition() -> bool:
+    return _ensure_multi_value_sp_definition(
+        _METRIC_TYPE_SP_QNAME,
+        "Metric Type",
+        (
+            "How this Data Product's metrics are used by the business: OKR = carries a "
+            "period goal tracked as an objective; Health Metric = monitored for "
+            "operational health with no goal of its own. Multi-valued: a document "
+            "defining several metrics may mix both."
+        ),
+        "data_product.metric_type",
+    )
+
+
+def curated_push_catalog(cfg: dict[str, Any]) -> None:
+    """Declaratively sync the metric catalog structured properties (metric DPs only).
+
+    ``metrics`` carries one value per official metric named in ``## Catalog``;
+    ``metric_type`` carries the de-duplicated set of classifications (OKR / Health
+    Metric) so the catalog stays filterable from both angles in DataHub. An absent or
+    empty catalog clears both, keeping DataHub in lockstep with the Markdown.
+    """
+    print("\n[13/13] Metric catalog...")
+    is_metric = str(cfg.get("data_product_type") or "").strip().lower() == "metric"
+    if not is_metric:
+        print("  -> not a metric data product — skipping")
+        return
+
+    raw = cfg.get("catalog") or []
+    names = _dedup_preserving_order(
+        [str(row.get("name") or "") for row in raw if isinstance(row, dict)]
+    )
+    types = _dedup_preserving_order(
+        [str(row.get("type") or "") for row in raw if isinstance(row, dict)]
+    )
+
+    if not _ensure_metrics_sp_definition() or not _ensure_metric_type_sp_definition():
+        return
+
+    dp_u = _data_product_urn(str(cfg["data_product_id"]))
+
+    if not _sync_multi_value_sp(dp_u, _METRICS_SP_QNAME, names, "curated.metrics"):
+        return
+    if not _sync_multi_value_sp(
+        dp_u, _METRIC_TYPE_SP_QNAME, types, "curated.metric_type"
+    ):
+        return
+
+    if not names:
+        _ok("No catalog declared — cleared any previous value")
+        return
+    _ok(f"Set metrics = {names!r}, metric_type = {types!r}")
 
 
 def run_data_product_curated_entity(spec: dict[str, Any]) -> None:
-    curated_push_assets(spec)  # [1/12]
-    curated_push_documentation_link(spec)  # [2/12]
-    curated_push_glossary_terms(spec)  # [3/12]
-    curated_purge_discovery_links(spec)  # [4/12]
-    query_urns = curated_push_all_golden_queries(spec)  # [5/12]
-    curated_push_sidebar_struct_props(spec, query_urns)  # [6/12]
-    curated_refresh_dataset_assets(spec)  # [7/12]
-    curated_push_upstream_data_products(spec)  # [8/12]
-    curated_push_lifecycle_stage(spec)  # [9/12]
-    curated_push_data_product_type(spec)  # [10/12]
-    curated_push_owners(spec)  # [11/12]
-    curated_push_mbr(spec)  # [12/12]
+    curated_push_assets(spec)  # [1/13]
+    curated_push_documentation_link(spec)  # [2/13]
+    curated_push_glossary_terms(spec)  # [3/13]
+    curated_purge_discovery_links(spec)  # [4/13]
+    query_urns = curated_push_all_golden_queries(spec)  # [5/13]
+    curated_push_sidebar_struct_props(spec, query_urns)  # [6/13]
+    curated_refresh_dataset_assets(spec)  # [7/13]
+    curated_push_upstream_data_products(spec)  # [8/13]
+    curated_push_lifecycle_stage(spec)  # [9/13]
+    curated_push_data_product_type(spec)  # [10/13]
+    curated_push_owners(spec)  # [11/13]
+    curated_push_mbr(spec)  # [12/13]
+    curated_push_catalog(spec)  # [13/13]
 
 
 def run_full_curated_datahub_bundle(spec: dict[str, Any]) -> None:

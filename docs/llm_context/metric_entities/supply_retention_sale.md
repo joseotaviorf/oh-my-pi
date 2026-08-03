@@ -1,5 +1,13 @@
 # Supply Retention (Sale)
 
+## Ownership
+
+**Data Owner:**
+- bruna.prates@quintoandar.com.br
+
+**Data Steward:**
+- bruna.prates@quintoandar.com.br
+
 ## Overview
 
 **Supply Retention (Sale)** measures, month over month, the flow of published Sale (For Sale) listing inventory on QuintoAndar: how many listings were published for the first time (**FL**), how many returned to `PUBLISHED` after having left (**Republished**), how many left (**Churn**), how many converted to a signed contract (**CCV**), and what the published stock was at the start and end of each month.
@@ -22,6 +30,12 @@ The naive way to compute this — diffing month-over-month counts — does not w
 
 *   House and Listing
     
+
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Supply Retention (Sale) | Health Metric |
 
 ## Glossary and Synonyms
 
@@ -177,7 +191,7 @@ house_supply_classification AS (
     GROUP BY sk_house
 ),
 -- Single scan of fact_listing_status, already carrying real dates, city_group and
--- operation (1P/3P). ts_status_started/ts_status_ended are the table's own real
+-- operation (1P/3P). ts_status_started/ts_status_ended are real timestamps owned
 -- timestamps, with no sentinel and no need to join dim_date. sk_first_publication_date
 -- still goes through dim_date (no equivalent timestamp exists on the table).
 fact_enriched AS (
@@ -302,7 +316,7 @@ fl_by_month AS (
     GROUP BY 1, 2, 3
 ),
 -- Current month (n) x previous month (n+1) pair — the only self-join needed. The
--- join matches prev.period = cur.period: without it, a listing's "previous month"
+-- join matches prev.period = cur.period: without it, the "previous month" of a listing
 -- in the "current" period could incorrectly come from the "last_year" period (or
 -- vice-versa) purely because the n values match.
 snapshot_pairs AS (
@@ -339,7 +353,7 @@ retention_flags AS (
         COUNT(DISTINCT CASE WHEN sp.status_previous = 'PUBLISHED' THEN sp.sk_sale_listing END) AS opening_stock_count,
         COUNT(DISTINCT CASE WHEN sp.status_current  = 'PUBLISHED' THEN sp.sk_sale_listing END) AS closing_stock_count,
         -- Republished = C MINUS whoever is FL this month. Without this "minus", a
-        -- listing's lifetime-first publication would be counted in FL and in
+        -- lifetime-first publication of a listing would be counted in FL and in
         -- Republished at the same time.
         COUNT(DISTINCT CASE
             WHEN COALESCE(sp.status_previous, 'NOT_PUBLISHED') <> 'PUBLISHED'
@@ -367,7 +381,7 @@ retention_flags AS (
         END) AS churn_count,
         -- CCV_exit = subset of B that converted this month, UNION the same FL
         -- flicker above when the listing converted (CCV_SIGNED) within its own
-        -- first-publication month. Always LESS THAN OR EQUAL TO agg_direct's "ccv"
+        -- first-publication month. Always LESS THAN OR EQUAL TO the "ccv" of agg_direct
         -- (which counts every signature in the month, including those that stayed
         -- PUBLISHED afterward) — ccv_exit exists only for the stock reconciliation;
         -- the business "ccv" metric remains the one in agg_direct.
@@ -393,7 +407,7 @@ retention_flags AS (
        AND flm.n = sp.n_current
     -- Filter by period: "current" reports n=0..6 (6 closed months + current
     -- month); "last_year" reports n=0..3 (the same 4 months one year back). n=7/
-    -- n=4 (each period's "previous month") only feed the self-join above and
+    -- n=4 (the "previous month" of each period) only feed the self-join above and
     -- never appear in the result.
     WHERE (sp.period = 'current'   AND sp.n_current BETWEEN 0 AND 6)
        OR (sp.period = 'last_year' AND sp.n_current BETWEEN 0 AND 3)

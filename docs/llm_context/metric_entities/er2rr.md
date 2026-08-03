@@ -59,9 +59,18 @@ further out on the calendar for the higher horizons.
 
 - Termination
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| ER2RR 4w | OKR |
+| ER2RR 8w | Health Metric |
+| ER2RR 12w | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Retention
 
 ## Glossary and Synonyms
 
@@ -361,8 +370,9 @@ Same structure as the monthly query — only `cohort_window` changes to a fixed
 `erc_events` CTEs above:
 
 ```sql
-cohort_week AS (
-    -- One row per candidate mature week (Monday), with its 4w maturation window.
+-- Prepend the termination_base and erc_events CTEs from the monthly query above.
+WITH cohort_week AS (
+    -- One row per candidate mature week (Monday), covering its 4w maturation window.
     SELECT
         wk AS mature_week_start,
         date_add('day', -28, wk) AS window_start,

@@ -29,9 +29,15 @@ same payment rails.
 
 - Payouts
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| % Monthly Payouts Successfully Completed Until Due Date | OKR |
+
 ## MBR
 
-- Fintech MBR
+**Name** Fintech MBR
 
 ## Glossary and Synonyms
 

@@ -1,5 +1,13 @@
 # FL (First Listings) 
 
+## Ownership
+
+**Data Owner:**
+- alexandre.gimenez@quintoandar.com.br
+
+**Data Steward:**
+- alexandre.gimenez@quintoandar.com.br
+
 ## Overview
 
 **FL (First Listings)** is the count of unique properties or listings published for the first time on the platform within a selected period. It is a leading indicator of new inventory health (supply), measuring acquisition performance across proprietary channels (1P) and partner channels (3P/Rede).
@@ -11,6 +19,14 @@ The metric supports segmentation by **supply source** (1P vs 3P) and by **busine
 ## Related Business Entities
 
 - Supply
+
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| FL (First Listings) | OKR |
+| First Listings 1P | Health Metric |
+| First Listings 3P | Health Metric |
 
 ## DataHub Catalog
 
@@ -359,6 +375,10 @@ tb_fl AS (
         act.planning_cluster, act.planning_conversion, act.company_report_origin,
         act.business_context, act.nm_supply_source, act.metric_name, act.is_ht
 )
+
+-- Reusable base: the extraction queries below replace this final SELECT with their own.
+SELECT *
+FROM tb_fl
 ```
 
 ### Extraction: FL 1P by week (For Rent)

@@ -1,5 +1,13 @@
 # Supply Funnel Conversions
 
+## Ownership
+
+**Data Owner:**
+- alexandre.gimenez@quintoandar.com.br
+
+**Data Steward:**
+- alexandre.gimenez@quintoandar.com.br
+
 ## Overview 
 
 **Supply Funnel Conversions** measures the volume and conversion rates between sequential stages of the property acquisition (supply) funnel. The funnel tracks a property's journey from initial contact to published listing through these ordered stages:
@@ -17,6 +25,18 @@ All conversions use **cohort logic**: a property is counted as converted when it
 ## Related Business Entities
 
 - Supply
+
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Lead to Prospect | Health Metric |
+| Prospect to Qualified | Health Metric |
+| Qualified to Opportunity | Health Metric |
+| Opportunity to First Listing | OKR |
+| Prospect to Opportunity | Health Metric |
+| Prospect to Listing | Health Metric |
+| Lead to Listing | Health Metric |
 
 ## DataHub Catalog
 
@@ -455,6 +475,10 @@ actual_vol AS (
         END,
         COALESCE(fl_unique.fl_unique, 'Cross-listing')
 )
+
+-- Reusable base: the extraction queries below replace this final SELECT with their own.
+SELECT *
+FROM actual_vol
 ```
 
 ### Extraction: all adjacent-stage conversion rates by week (For Rent)

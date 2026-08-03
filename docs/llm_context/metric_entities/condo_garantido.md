@@ -33,9 +33,17 @@ LL report.
 
 - Collections
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| % Adoption of CG within eligibility base | OKR |
+| % Payment Default Identified Automatically | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Payments
 
 ## Glossary and Synonyms
 

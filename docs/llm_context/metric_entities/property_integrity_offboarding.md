@@ -42,9 +42,20 @@ other products. Do not mix with Property Integrity Onboarding.**
 - Inspection
 - Repairs
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| % Offb. W/o Mediation | OKR |
+| % Without Repairs | Health Metric |
+| % Both Agree | Health Metric |
+| % Compulsory/Band-Aid 2 | Health Metric |
+| % SPOC Roll Out | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Property Integrity
 
 ## Glossary and Synonyms
 

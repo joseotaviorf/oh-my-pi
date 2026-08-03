@@ -25,9 +25,16 @@ Related metrics: [Absolute Cost Ops Total (For Rent)](./absolute_cost_ops_total_
 
 - Finance Revenue and Cost
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Absolute Cost Post-Contract (For Rent) | OKR |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Cost of Service
 
 ## Glossary and Synonyms
 
@@ -147,19 +154,21 @@ The canonical filter uses `version = 'Actuals'` for realized costs. The same `YY
 
 ## Golden Queries
 
-Single-month net Post-Contract cost (Actuals). Replace `<YYYYMM>` and use the table for the matching year (`_2025` or `_2026`).
+Single-month net Post-Contract cost (Actuals), written for March 2026.
 
 ```sql
 SELECT
-    SUM(TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE)) AS absolute_cost_post_contract_fr
-FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_<YEAR> f
+    -- Change the "202603" column to the target month (YYYYMM).
+    SUM(TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE)) AS absolute_cost_post_contract_fr
+-- Change the _2026 suffix to the calendar year of the month above (_2025 or _2026).
+FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_2026 f
 WHERE f.bece_business = 'For Rent'
   AND f.bece_l2 = 'Felipe Abreu'
   AND f.pl_line_1 = 'Operations'
   AND f.pl_line_2 IN ('Onboarding', 'Ongoing', 'Offboarding')
   AND f.reporting_group <> '-'
   AND f.version = 'Actuals'
-  AND TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE) IS NOT NULL;
+  AND TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE) IS NOT NULL;
 ```
 
 Monthly time series for Actuals across 2025 and 2026. Extend the `VALUES` lists as new `YYYYMM` columns become available.
@@ -216,21 +225,23 @@ GROUP BY 1
 ORDER BY 1;
 ```
 
-Side-by-side comparison with total For Rent cost for the same period (Actuals):
+Side-by-side comparison with total For Rent cost for the same period (Actuals), written for March 2026:
 
 ```sql
 SELECT
-    SUM(TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE)) AS absolute_cost_ops_total_fr,
-    SUM(TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE)) FILTER (
+    -- Change every "202603" column reference to the target month (YYYYMM).
+    SUM(TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE)) AS absolute_cost_ops_total_fr,
+    SUM(TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE)) FILTER (
         WHERE f.bece_l2 = 'Felipe Abreu'
           AND f.pl_line_2 IN ('Onboarding', 'Ongoing', 'Offboarding')
     ) AS absolute_cost_post_contract_fr
-FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_<YEAR> f
+-- Change the _2026 suffix to the calendar year of the month above (_2025 or _2026).
+FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_2026 f
 WHERE f.bece_business = 'For Rent'
   AND f.pl_line_1 = 'Operations'
   AND f.reporting_group <> '-'
   AND f.version = 'Actuals'
-  AND TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE) IS NOT NULL;
+  AND TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE) IS NOT NULL;
 ```
 
 To compare budget or OKR scenarios for the same month, change `version` and keep all other filters — never aggregate across versions in one pass.

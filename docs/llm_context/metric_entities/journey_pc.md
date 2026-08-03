@@ -41,9 +41,18 @@ counted independently for each role. This is intentional and matches the officia
 - ticket
 - chatbot_sessions
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| % Seamless clients | Health Metric |
+| % Digital clients | Health Metric |
+| % Human Support clients | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** FR XP
 
 ## Glossary and Synonyms
 

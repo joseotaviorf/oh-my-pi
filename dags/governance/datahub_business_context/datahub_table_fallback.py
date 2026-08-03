@@ -7,6 +7,7 @@ DataHub (read-only GraphQL) for dataset existence and ``schemaMetadata.fields``.
 from __future__ import annotations
 
 import json
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -42,6 +43,12 @@ GraphQLPost = Callable[
     [str, Optional[str], str, dict[str, Any], float],
     tuple[Optional[dict[str, Any]], str],
 ]
+
+# Transport-level failures say nothing about the dataset, so retry them instead of
+# letting a single hiccup surface as "this table has no schema".
+_TRANSIENT_POST_STATUSES = frozenset({"fetch_error", "http_error", "empty_body"})
+_MAX_POST_ATTEMPTS = 3
+_RETRY_BASE_DELAY_SEC = 0.5
 
 
 def build_urllib_graphql_post(
@@ -106,15 +113,29 @@ class DataHubSchemaProbe:
 
     post: GraphQLPost
     token: Optional[str]
+    sleep: Callable[[float], None] = time.sleep
     _urn_cache: dict[tuple[str, str], Optional[str]] = field(default_factory=dict)
     _columns_cache: dict[str, Optional[set[str]]] = field(default_factory=dict)
+
+    def _post_with_retry(
+        self, query: str, variables: dict[str, Any]
+    ) -> tuple[Optional[dict[str, Any]], str]:
+        data: Optional[dict[str, Any]] = None
+        status = "fetch_error"
+        for attempt in range(_MAX_POST_ATTEMPTS):
+            data, status = self.post("", self.token, query, variables)
+            if status not in _TRANSIENT_POST_STATUSES:
+                return data, status
+            if attempt < _MAX_POST_ATTEMPTS - 1:
+                self.sleep(_RETRY_BASE_DELAY_SEC * (2**attempt))
+        return data, status
 
     def resolve_dataset_urn(self, schema: str, table: str) -> Optional[str]:
         key = (schema.strip().lower(), table.strip().lower())
         if key not in self._urn_cache:
             resolved: Optional[str] = None
             for urn in _urn_candidates(key[0], key[1]):
-                data, status = self.post("", self.token, _ENTITY_EXISTS, {"urn": urn})
+                data, status = self._post_with_retry(_ENTITY_EXISTS, {"urn": urn})
                 if status == "ok" and data and data.get("entityExists"):
                     resolved = urn
                     break
@@ -123,7 +144,7 @@ class DataHubSchemaProbe:
 
     def column_names_for_urn(self, urn: str) -> Optional[set[str]]:
         if urn not in self._columns_cache:
-            data, status = self.post("", self.token, _DATASET_SCHEMA, {"urn": urn})
+            data, status = self._post_with_retry(_DATASET_SCHEMA, {"urn": urn})
             if status != "ok" or not data:
                 self._columns_cache[urn] = None
             else:

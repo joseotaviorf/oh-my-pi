@@ -63,7 +63,7 @@ Create `docs/llm_context/metric_entities/{metric_slug}.md` following the templat
 | `## Ownership` | Yes — at least one email under **Data Owner** and one under **Data Steward** |
 | `## Overview` | Yes |
 | `## Related Business Entities` | Yes — at least one bullet |
-| `## MBR` | No — omit when the metric feeds no MBR, but confirm with the user |
+| `## MBR` | No — omit when the metric feeds no MBR, but confirm with the user. When present, **Name** is required and **Category** is optional (drop its line when the block is unknown) |
 | `## Glossary and Synonyms` | Yes — at least one bullet |
 | `## Scope` | Yes — both **Included** and **Excluded** |
 | `## Calculation` | Yes — includes `### Canonical Filter` and `### Nuances` |
@@ -118,11 +118,20 @@ Full section order (optional sections shown in place — omit them entirely when
 
 - {Business Entity Name}
 
+## Catalog
+
+<!-- [REQUIRED] One row per official metric this document defines. Type: OKR (carries a period goal) or Health Metric (monitored, no goal of its own). -->
+
+| Metric | Type |
+| :---- | :---- |
+| {Official Metric Name} | {OKR \| Health Metric} |
+
 ## MBR
 
-<!-- [OPTIONAL] One bullet per MBR this metric feeds. Omit this entire section when the metric feeds no MBR. -->
+<!-- [OPTIONAL] One Name/Category pair per MBR this metric feeds. Omit this entire section when the metric feeds no MBR. -->
 
-- {MBR Name}
+**Name** {MBR Name}
+**Category** {category}
 
 ## Glossary and Synonyms
 
@@ -260,10 +269,17 @@ URNs in backticks. Omit this section when no Superset asset exists for this metr
 - Plain list of entity names (no paths, no descriptions). One bullet per entity.
 - TARS uses this to navigate to the schema file before building SQL.
 
+**Catalog:**
+- Required. One table row per official metric the document defines — a single-metric doc has one row; a metric family has one row per member.
+- Use the exact official metric name analysts see, matching the name used in Overview / Calculation / Glossary.
+- `Type` is `OKR` when the metric carries a period goal tracked as an objective, or `Health Metric` when it is monitored for operational health without a goal of its own (it may still be a component of an OKR).
+- Not folded into the DataHub Data Product description — CI syncs the names to `data_product.metrics` and the types to `data_product.metric_type` (both filterable in DataHub).
+
 **MBR:**
 - Optional, but always confirm with the user. Include only when the metric feeds one or more Monthly Business Reviews; omit the section entirely otherwise.
-- One bullet per MBR name (a metric may belong to several). Grain is the whole document — every metric here is treated as part of the listed MBR(s).
-- Not folded into the DataHub Data Product description — CI syncs it to the `data_product.mbr` structured property (filterable in DataHub). It is routing metadata, not narrative content.
+- One `**Name**` / `**Category**` pair per MBR (a metric may belong to several). Grain is the whole document — every metric here is treated as part of the listed MBR(s).
+- `Name` identifies the MBR; `Category` is the block the metric sits in inside that MBR's agenda.
+- Not folded into the DataHub Data Product description — CI syncs `Name` to the `data_product.mbr` structured property and `Category` to `data_product.mbr_category` (both filterable in DataHub). It is routing metadata, not narrative content.
 
 **Glossary and Synonyms:**
 - Bullet list format. Include every alias analysts or stakeholders use to ask for this metric.

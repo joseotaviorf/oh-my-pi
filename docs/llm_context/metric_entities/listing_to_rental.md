@@ -1,5 +1,13 @@
 # Listing to Rental (L2R)
 
+## Ownership
+
+**Data Owner:**
+- bruna.prates@quintoandar.com.br
+
+**Data Steward:**
+- bruna.prates@quintoandar.com.br
+
 ## Overview
 
 **Listing to Rental (L2R)** — same metric as **Listing to Contract Signed** — measures whether a **rent listing version** (`sk_house_listing`) eventually signed a rental contract.
@@ -20,6 +28,12 @@ converted listing version = fact_house_listings.sk_contract <> -1
 
 - House and Listing
 - Closing
+
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Listing to Rental (L2R) | OKR |
 
 ## Glossary and Synonyms
 
@@ -43,7 +57,15 @@ converted listing version = fact_house_listings.sk_contract <> -1
 
 ---
 
-## Views by time grain
+## Calculation
+
+Every rate view is the same ratio, evaluated per publication cohort:
+
+```
+L2R (cohort) = COUNT(DISTINCT fhl.sk_contract) / COUNT(DISTINCT dhl.sk_house_listing)
+```
+
+### Views by time grain
 
 Pick the section that matches the question. All rates share the same join; only **cohort grouping** and **optional window filters** change.
 
@@ -128,17 +150,31 @@ ORDER BY month DESC, country_code
 
 ### Query 2 — L2R weekly or daily (same formula, change `DATE_TRUNC`)
 
-Replace `cohort_period` expression only:
+Identical to Query 1 except for the `cohort_period` expression:
 
 ```sql
--- Weekly cohort
-DATE_TRUNC('week', dhl.ts_publication) AS cohort_period
-
--- Daily cohort
-CAST(dhl.ts_publication AS DATE) AS cohort_period
+WITH sums AS (
+    SELECT
+        -- Weekly cohort. For a daily cohort, use CAST(dhl.ts_publication AS DATE) instead.
+        DATE_TRUNC('week', dhl.ts_publication) AS cohort_period,
+        dhl.country_code,
+        COUNT(DISTINCT dhl.sk_house_listing) AS total_listings,
+        COUNT(DISTINCT fhl.sk_contract) AS new_contracts_signed
+    FROM dw_rent.dim_house_listing AS dhl
+    LEFT JOIN dw_rent.fact_house_listings AS fhl
+        ON fhl.sk_house_listing = dhl.sk_house_listing
+    WHERE dhl.ts_publication IS NOT NULL
+    GROUP BY 1, 2
+)
+SELECT
+    cohort_period,
+    country_code,
+    total_listings,
+    new_contracts_signed,
+    CAST(new_contracts_signed AS DOUBLE) / NULLIF(total_listings, 0) AS l2r
+FROM sums
+ORDER BY cohort_period DESC, country_code
 ```
-
-Reuse Query 1 structure; group and order by `cohort_period`.
 
 ### Query 3 — L2R with 4W / 8W window (**variant — not corporate monthly**)
 

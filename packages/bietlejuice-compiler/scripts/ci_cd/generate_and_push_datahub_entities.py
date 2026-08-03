@@ -148,12 +148,15 @@ _DEFAULT_MAX_TOKENS = 16000
 #   domain  — Where to query what → datasets; Synonyms → glossary; Golden query(ies) → Query entities
 #   metric  — Related Business Entities → related_data_products SP; Glossary → glossary;
 #             Golden Queries → Query entities; DataHub Catalog → tooling pointer only;
-#             MBR → data_product.mbr structured property, not narrative content
+#             MBR → data_product.mbr / data_product.mbr_category structured properties;
+#             Catalog → data_product.metrics / data_product.metric_type structured
+#             properties — none of these are narrative content
 #   metric  — Targets and OKRs is intentionally NOT listed here: Budget/OKR lookup
 #             guidance stays in product_description (narrative content for downstream agents)
 EXCLUDE_HEADING_PATTERNS = [
     re.compile(r"^## Ownership$", re.I),
     re.compile(r"^## MBR$", re.I),
+    re.compile(r"^## Catalog$", re.I),
     re.compile(r"^## (Tables|Where to query what)$", re.I),
     re.compile(r"^## (Synonyms|Glossary and Synonyms)$", re.I),
     re.compile(r"^## Golden [Qq]uer(y|ies)\b.*$", re.I),
@@ -209,6 +212,25 @@ _MAILTO_LINK_RE = re.compile(r"^\[([^\]]+)\]\(mailto:[^)]+\)$", re.IGNORECASE)
 # MBR parsing (## MBR section → mbr: list block in the YAML, metric entities only).
 # Template placeholders such as ``{MBR Name}`` are ignored (the braces break the match).
 _MBR_BLOCK_RE = re.compile(r"(?ms)^mbr:.*?\n(?=\S|\Z)")
+# ``**Name** Post Contract`` / ``**Category:** Quality`` — the colon may sit inside or
+# outside the bold wrap, or be absent entirely (the authoring template omits it).
+_MBR_FIELD_RE = re.compile(
+    r"^\*{2,3}\s*(name|category)\s*:?\s*\*{2,3}\s*:?\s*(.*)$", re.I
+)
+
+# Catalog parsing (## Catalog table → catalog: list block in the YAML, metric entities
+# only). Rows are ``| {Metric Name} | {OKR | Health Metric} |``; the header and the
+# ``|---|`` separator are skipped, as are unfilled ``{...}`` template placeholders.
+_CATALOG_BLOCK_RE = re.compile(r"(?ms)^catalog:.*?\n(?=\S|\Z)")
+_CATALOG_TYPE_OKR = "OKR"
+_CATALOG_TYPE_HEALTH = "Health Metric"
+# Canonical spelling per lowercased alias, so ``okr`` / ``health metric`` / ``health``
+# authored in any case all land on one filterable structured-property value.
+_CATALOG_TYPE_ALIASES = {
+    "okr": _CATALOG_TYPE_OKR,
+    "health metric": _CATALOG_TYPE_HEALTH,
+    "health": _CATALOG_TYPE_HEALTH,
+}
 
 
 def md_path_to_data_product_id(md_path: Path) -> str:
@@ -238,11 +260,15 @@ def _normalize_heading(text: str) -> str:
     return re.sub(r"\s+", " ", cleaned).strip().lower()
 
 
-def _extract_section_body(md_text: str, *heading_substrings: str) -> str:
+def _extract_section_body(
+    md_text: str, *heading_substrings: str, exact_only: bool = False
+) -> str:
     """Return the body of the best-matching ``##`` section.
 
     Exact heading matches (after stripping emphasis) win over substring matches so
     ``## Pre-ownership`` cannot steal an ``ownership`` lookup from ``## Ownership``.
+    ``exact_only`` disables the substring fallback entirely — required for ``catalog``,
+    where the unrelated ``## DataHub Catalog`` section would otherwise match.
     """
     lines = md_text.splitlines()
     exact_body: list[str] | None = None
@@ -274,6 +300,8 @@ def _extract_section_body(md_text: str, *heading_substrings: str) -> str:
         if mode is not None:
             current.append(line)
     _flush()
+    if exact_only:
+        return "\n".join(exact_body or []).strip()
     chosen = exact_body if exact_body is not None else substring_body
     return "\n".join(chosen or []).strip()
 
@@ -499,43 +527,147 @@ def _inject_owners(yaml_content: str, owners: dict[str, list[str]]) -> str:
     return yaml_content.rstrip() + f"\n{block}"
 
 
-def _extract_mbrs(md_path: Path) -> list[str]:
-    """Parse ``## MBR`` bullets into a de-duplicated list of MBR names (metric docs).
+def _is_placeholder(value: str) -> bool:
+    """True for an unfilled authoring placeholder such as ``{MBR Name}`` or ``{category}``."""
+    return not value or "{" in value or "}" in value
 
-    Reads the ``- {MBR name}`` bullets under ``## MBR``. Template placeholders (wrapped
-    in ``{...}``) are ignored, so an unfilled template yields an empty list. Names are
-    de-duplicated case-insensitively, preserving document order.
+
+def _extract_mbrs(md_path: Path) -> list[dict[str, str]]:
+    """Parse ``## MBR`` into a de-duplicated list of ``{name, category}`` (metric docs).
+
+    Reads the ``**Name** {MBR name}`` / ``**Category** {category}`` pairs under
+    ``## MBR``, repeated once per MBR when the document feeds several. The legacy
+    ``- {MBR name}`` bullet form is still accepted (category omitted) so a document that
+    has not been migrated yet keeps publishing its MBR membership. Template placeholders
+    (wrapped in ``{...}``) are ignored, so an unfilled template yields an empty list.
+    Entries are de-duplicated by name, case-insensitively, preserving document order.
     """
     section = _extract_section_body(md_path.read_text(), "mbr")
-    names: list[str] = []
+    entries: list[dict[str, str]] = []
     seen: set[str] = set()
+
+    def _add(name: str, category: str = "") -> None:
+        if _is_placeholder(name) or name.lower() in seen:
+            return
+        seen.add(name.lower())
+        entry = {"name": name}
+        if category and not _is_placeholder(category):
+            entry["category"] = category
+        entries.append(entry)
+
+    pending_name: str | None = None
     for line in section.splitlines():
         stripped = line.strip()
+        field = _MBR_FIELD_RE.match(stripped)
+        if field:
+            key, value = field.group(1).lower(), field.group(2).strip()
+            if key == "name":
+                if pending_name is not None:
+                    _add(pending_name)
+                pending_name = value
+            elif pending_name is not None:
+                _add(pending_name, value)
+                pending_name = None
+            continue
         if stripped.startswith("- "):
-            name = stripped[2:].strip().strip("*").strip()
-        elif stripped and not stripped.startswith("#"):
-            name = stripped.strip("*").strip()
-        else:
-            continue
-        if not name or "{" in name or "}" in name:
-            continue
-        if name.lower() not in seen:
-            seen.add(name.lower())
-            names.append(name)
-    return names
+            _add(stripped[2:].strip().strip("*").strip())
+    if pending_name is not None:
+        _add(pending_name)
+    return entries
 
 
-def _inject_mbr(yaml_content: str, mbrs: list[str]) -> str:
-    """Insert (or replace) the ``mbr:`` list block with the names parsed from the MD.
+def _inject_mbr(yaml_content: str, mbrs: list[dict[str, str]]) -> str:
+    """Insert (or replace) the ``mbr:`` list block with the entries parsed from the MD.
 
     Drops any LLM-authored ``mbr:`` block first (the Markdown is the single source of
-    truth). When no MBR names were parsed the block is omitted entirely — the loader
+    truth). When no MBR entries were parsed the block is omitted entirely — the loader
     treats a missing block on a metric product as "clear MBR membership".
     """
     yaml_content = _MBR_BLOCK_RE.sub("", yaml_content)
     if not mbrs:
         return yaml_content
-    block = "mbr:\n" + "".join(f"  - {json.dumps(name)}\n" for name in mbrs)
+    lines = ["mbr:"]
+    for entry in mbrs:
+        lines.append(f"  - name: {json.dumps(entry['name'])}")
+        if entry.get("category"):
+            lines.append(f"    category: {json.dumps(entry['category'])}")
+    block = "\n".join(lines) + "\n"
+    if _DATA_PRODUCT_TYPE_RE.search(yaml_content):
+        return _DATA_PRODUCT_TYPE_RE.sub(
+            lambda m: f"{m.group(0)}\n{block.rstrip()}", yaml_content, count=1
+        )
+    return yaml_content.rstrip() + f"\n{block}"
+
+
+def _split_table_row(line: str) -> list[str]:
+    """Split a Markdown table row into cells, honouring escaped pipes.
+
+    A metric name may legitimately contain a pipe (``EC|ES2CS``), which Markdown
+    requires the author to escape as ``EC\\|ES2CS``. Splitting naively on ``|`` would
+    tear that name in half and shift every following cell.
+    """
+    cells = re.split(r"(?<!\\)\|", line.strip().strip("|"))
+    return [cell.replace(r"\|", "|").strip() for cell in cells]
+
+
+def _normalize_catalog_type(raw: str) -> str:
+    """Map an authored Type cell onto its canonical spelling (``OKR``/``Health Metric``).
+
+    Unknown values are kept verbatim rather than dropped: the row still reaches DataHub,
+    where a reviewer can see and correct it, instead of silently disappearing.
+    """
+    cleaned = re.sub(r"[*`]+", "", raw).strip()
+    return _CATALOG_TYPE_ALIASES.get(cleaned.lower(), cleaned)
+
+
+def _extract_catalog(md_path: Path) -> list[dict[str, str]]:
+    """Parse the ``## Catalog`` table into ``{name, type}`` rows (metric docs).
+
+    Reads the ``| Metric | Type |`` table: one row per official metric defined in the
+    document. ``exact_only`` matching keeps the unrelated ``## DataHub Catalog`` section
+    from being read as the catalog. Header/separator rows and unfilled ``{...}``
+    placeholders are skipped; metrics are de-duplicated by name, case-insensitively.
+    """
+    section = _extract_section_body(md_path.read_text(), "catalog", exact_only=True)
+    rows: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = _split_table_row(stripped)
+        if len(cells) < 2 or set(cells[0]) <= {"-", ":", " "}:
+            continue
+        name = re.sub(r"[*`]+", "", cells[0]).strip()
+        if _is_placeholder(name) or name.lower() in {"metric", "metrics"}:
+            continue
+        if name.lower() in seen:
+            continue
+        seen.add(name.lower())
+        row = {"name": name}
+        metric_type = _normalize_catalog_type(cells[1])
+        if not _is_placeholder(metric_type):
+            row["type"] = metric_type
+        rows.append(row)
+    return rows
+
+
+def _inject_catalog(yaml_content: str, catalog: list[dict[str, str]]) -> str:
+    """Insert (or replace) the ``catalog:`` block with the rows parsed from the MD.
+
+    Same "Markdown is the single source of truth" contract as ``owners:`` and ``mbr:``:
+    any LLM-authored block is dropped first, and an empty catalog omits the block so the
+    loader clears whatever the product had before.
+    """
+    yaml_content = _CATALOG_BLOCK_RE.sub("", yaml_content)
+    if not catalog:
+        return yaml_content
+    lines = ["catalog:"]
+    for row in catalog:
+        lines.append(f"  - name: {json.dumps(row['name'])}")
+        if row.get("type"):
+            lines.append(f"    type: {json.dumps(row['type'])}")
+    block = "\n".join(lines) + "\n"
     if _DATA_PRODUCT_TYPE_RE.search(yaml_content):
         return _DATA_PRODUCT_TYPE_RE.sub(
             lambda m: f"{m.group(0)}\n{block.rstrip()}", yaml_content, count=1
@@ -1001,8 +1133,10 @@ LIVE DATAHUB DOMAIN CATALOG ({domain_count} domains):
   DataHub: Trino/Databricks `schema.table` pairs (materialized metric tables) AND Superset
   virtual-dataset URNs (in backticks). CI injects both into `datasets:` — do not drop either.{asset_rule}
 - Parse glossary from `## Glossary and Synonyms` bullet list (`- **term** → mapping`).
-- Do NOT emit an `mbr:` block — CI injects it from the optional `## MBR` section (a
-  bullet list of MBR names; any hand-authored `mbr:` is discarded).
+- Do NOT emit an `mbr:` block — CI injects it from the optional `## MBR` section (the
+  `**Name**` / `**Category**` pairs; any hand-authored `mbr:` is discarded).
+- Do NOT emit a `catalog:` block — CI injects it from the `## Catalog` table (one
+  `{{name, type}}` row per official metric; any hand-authored `catalog:` is discarded).
 - Do NOT hand-author `related_data_products` — CI injects from `## Related Business Entities`.{related_rule}"""
         )
 
@@ -1322,6 +1456,7 @@ def main(argv: list[str] | None = None) -> int:
         if _md_to_data_product_type(md_path) == "metric":
             yaml_content = _inject_metric_datasets(yaml_content, md_path)
             yaml_content = _inject_mbr(yaml_content, _extract_mbrs(md_path))
+            yaml_content = _inject_catalog(yaml_content, _extract_catalog(md_path))
             yaml_content = _inject_related_data_products(
                 yaml_content, _extract_related_data_products(md_path)
             )

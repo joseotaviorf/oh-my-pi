@@ -25,6 +25,20 @@
 - Losses
 - Payments
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| EversXMobY Clean | OKR |
+| Volume of CS | Health Metric |
+| EC\|ES2CS | OKR |
+| Unpublishing Rate | Health Metric |
+| Mix of Guarantees | Health Metric |
+| Volume of ES | Health Metric |
+| OA2CA | Health Metric |
+| Risk Profile Mix | Health Metric |
+| First Payment Default | OKR |
+
 ## DataHub Catalog
 
 - **This metric's data product**: `urn:li:dataProduct:credit-metrics` (published by CI from this file)

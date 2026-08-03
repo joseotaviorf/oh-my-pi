@@ -81,6 +81,8 @@ Read the full Markdown file. Map sections to YAML fields using the extraction ta
 |---|---|---|
 | `datasets` | `## Superset Golden Assets` | Extract every `` `schema.table` `` backtick pair **and** every Superset ``urn:li:dataset:(urn:li:dataPlatform:superset,...)`` URN. CI injects both as reference assets on the product Summary (nps-fr pattern). |
 | `related_data_products` | `## Related Business Entities` bullets | Convert each entity display name to kebab-case id (`NPS` → `nps`, `House and Listing` → `house-and-listing`). CI also injects this list. |
+| `mbr` | `## MBR` `**Name**` / `**Category**` pairs | **Do NOT hand-author** — CI injects `- name: … / category: …` mappings. |
+| `catalog` | `## Catalog` `\| Metric \| Type \|` table | **Do NOT hand-author** — CI injects one `- name: … / type: …` row per official metric. |
 | `glossary_terms.terms[].id` | `## Glossary and Synonyms` bullets | snake_case slug from the primary bold term |
 | `glossary_terms.terms[].name` | Bullet bold text | The term name as written |
 | `glossary_terms.terms[].description` | Bullet arrow (`→`) text | Expand into a full DataHub description |
@@ -100,6 +102,8 @@ other DataHub features:
 | `## Golden query:` / `## Golden Queries` | Query entities |
 | `## DataHub catalog` / `## DataHub Catalog` | tooling pointer only |
 | `## Related Business Entities` | upstream data products SP (metric only) |
+| `## MBR` | `data_product.mbr` + `data_product.mbr_category` SPs (metric only) |
+| `## Catalog` | `data_product.metrics` + `data_product.metric_type` SPs (metric only) |
 
 `## Targets and OKRs` is **not** excluded — Budget/OKR lookup guidance remains in
 `product_description` (narrative only; no dedicated YAML field).
@@ -309,6 +313,20 @@ datasets:
 related_data_products:
   - nps
   - supply
+```
+
+**Metric-only CI-injected fields** (never hand-author — CI parses them from the Markdown):
+
+```yaml
+mbr:
+  - name: "Post Contract"
+    category: "{category}"
+
+catalog:
+  - name: "NPS True"
+    type: "OKR"
+  - name: "NPS Onboarding"
+    type: "Health Metric"
 ```
 
 **Domain-only field:**

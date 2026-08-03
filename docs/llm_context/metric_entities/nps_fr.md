@@ -37,9 +37,25 @@ or other products.**
 
 - Offboard Human vs Digital Metrics (offboarding digital / human-support NPS only)
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| NPS True | OKR |
+| NPS Onboarding | Health Metric |
+| NPS Ongoing | Health Metric |
+| NPS Offboarding | Health Metric |
+| NPS PP Multi (Up to 15 Properties) | Health Metric |
+| SPOC NPS | Health Metric |
+| AS IS NPS | Health Metric |
+| NPS Seamless | Health Metric |
+| NPS Digital Sup | Health Metric |
+| NPS Human Support | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** FR XP
 
 ## Glossary and Synonyms
 

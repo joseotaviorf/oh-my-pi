@@ -33,9 +33,16 @@ their own cut using the same mechanics but a different `segmento` filter.**
 - Ticket
 - Chatbot Sessions
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| % Non Wall-E (POST) | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Resolution Effectiveness
 
 ## Glossary and Synonyms
 
@@ -122,8 +129,9 @@ AND dd.department IN (
     '[AeC] CX Parceiros [FRONT] [PRE]',
     '[AeC] CX Parceiros da Portaria [FRONT] [PRE]'
 )
-AND fcc.ts_task_created - INTERVAL '3' HOUR >= TIMESTAMP '{start_date}'
-AND fcc.ts_task_created - INTERVAL '3' HOUR < TIMESTAMP '{end_date}'
+-- Change both bounds to the analysis window you want (half-open interval).
+AND fcc.ts_task_created - INTERVAL '3' HOUR >= TIMESTAMP '2026-07-01 00:00:00'
+AND fcc.ts_task_created - INTERVAL '3' HOUR < TIMESTAMP '2026-08-01 00:00:00'
 ```
 
 (`ts_contact` = `fcc.ts_task_created - INTERVAL '3' HOUR` — local-time reporting axis; see Nuances.)
@@ -218,7 +226,7 @@ bot_sessions AS (
 )
 ```
 
-Restricting `bot_sessions` to `ts_created >= '{start_date}'` drops Wall-E rows that predate the
+Restricting `bot_sessions` to the analysis start date drops Wall-E rows that predate the
 analysis window but still own the contact's `session_key`, inflating Non Wall-E. The metric is
 validated for reporting from **2024-01-01** onward — do not run it on earlier `ts_contact`
 periods.
@@ -243,7 +251,7 @@ at face value for very recent dates.
 - Always use the full session-key fallback chain (Sauron → SSS) on **both** sides of the Wall-E
   join.
 - Always load `bot_sessions` with the fixed `ts_created >= TIMESTAMP '2024-01-01 00:00:00'`
-  lookback — never narrow it to the analysis `{start_date}`.
+  lookback — never narrow it to the analysis start date.
 - Always report the `Outra_origem` bucket size alongside the Pos/Pre split — never silently
   redistribute it without flagging the assumption.
 
@@ -293,8 +301,9 @@ faturaveis22 AS (
     ) AS t(department)
 ),
 first_dept_raw AS (
-    -- Component: first-ever department per session — same pattern as the Ticket entity's
-    -- first_department CTE (is_first_interaction = TRUE, ranked by ts_task_created).
+    -- Component: first-ever department per session — same pattern as the
+    -- first_department CTE in the Ticket entity (is_first_interaction = TRUE,
+    -- ranked by ts_task_created).
     -- Fixed lookback from 2025-01-01 — do not narrow to the analysis window.
     SELECT
         COALESCE(NULLIF(CAST(fcc.sk_session AS VARCHAR), '-1'), NULLIF(fcc.sk_support_session, '-1')) AS session_key,
@@ -320,7 +329,8 @@ faturaveis_rows AS (
     WHERE fcc.channel = 'chat'
       AND fcc.is_interaction_answered = TRUE
       AND dd.department IN (SELECT department FROM faturaveis22)
-      AND fcc.ts_task_created >= TIMESTAMP '{start_date}'
+      -- Change to the start of the analysis window you want.
+      AND fcc.ts_task_created >= TIMESTAMP '2026-07-01 00:00:00'
 ),
 bot_sessions AS (
     -- Fixed lookback from 2024-01-01 — do not narrow to the analysis window.
@@ -385,8 +395,9 @@ SELECT
     ) AS pct_non_wall_e_pos
 FROM classified
 WHERE segmento = 'Pos'
-  AND ts_contact >= TIMESTAMP '{start_date}'
-  AND ts_contact < TIMESTAMP '{end_date}'
+  -- Change both bounds to the analysis window you want (half-open interval).
+  AND ts_contact >= TIMESTAMP '2026-07-01 00:00:00'
+  AND ts_contact < TIMESTAMP '2026-08-01 00:00:00'
 GROUP BY 1
 ORDER BY 1
 ```

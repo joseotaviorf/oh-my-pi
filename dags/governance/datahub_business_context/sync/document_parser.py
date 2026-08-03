@@ -33,7 +33,8 @@ class ParsedEntityDocument:
     metric_dataset_rows: list[dict[str, str]] = field(default_factory=list)
     golden_queries: list[GoldenQuery] = field(default_factory=list)
     owners: dict[str, list[str]] = field(default_factory=dict)
-    mbr: list[str] = field(default_factory=list)
+    mbr: list[dict[str, str]] = field(default_factory=list)
+    catalog: list[dict[str, str]] = field(default_factory=list)
     related_data_products: list[str] = field(default_factory=list)
     has_ownership_section: bool = False
     has_related_business_entities_section: bool = False
@@ -41,8 +42,11 @@ class ParsedEntityDocument:
 
 
 # DataHub's rich-text editor backslash-escapes standard Markdown characters on save.
-# Unescape them before any parsing so the regexes below see clean markdown.
-_MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()+\-#.!|])")
+# Unescape them before any parsing so the regexes below see clean markdown. ``|`` is
+# deliberately NOT in this set: inside a table it is the cell delimiter, so unescaping
+# it here would split a metric name that legitimately contains one (``EC|ES2CS``) into
+# two cells. The table parsers unescape it per cell instead (``_split_table_row``).
+_MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()+\-#.!])")
 
 _SECTION_RE = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 _H3_RE = re.compile(r"^###\s+(.+)$", re.MULTILINE)
@@ -87,6 +91,20 @@ _OWNER_ROLE_HEADING_RE = re.compile(r"^\*{2,3}_?\s*(.+?)\s*:\s*_?\*{2,3}$")
 # DataHub's editor auto-linkifies a typed email into a markdown mailto link
 # (``[x@y.com](mailto:x@y.com)``) — extract the display text before validating.
 _MAILTO_LINK_RE = re.compile(r"^\[([^\]]+)\]\(mailto:[^)]+\)$", re.IGNORECASE)
+# ``**Name** Post Contract`` / ``**Category:** Quality`` — the colon may sit inside or
+# outside the bold wrap, or be absent entirely (the authoring template omits it).
+_MBR_FIELD_RE = re.compile(
+    r"^\*{2,3}_?\s*(name|category)\s*:?\s*_?\*{2,3}\s*:?\s*(.*)$", re.IGNORECASE
+)
+# ``## Catalog`` Type column — canonical spelling per lowercased alias, so a value
+# authored in any case lands on one filterable structured-property value.
+_CATALOG_TYPE_OKR = "OKR"
+_CATALOG_TYPE_HEALTH = "Health Metric"
+_CATALOG_TYPE_ALIASES = {
+    "okr": _CATALOG_TYPE_OKR,
+    "health metric": _CATALOG_TYPE_HEALTH,
+    "health": _CATALOG_TYPE_HEALTH,
+}
 
 
 def _slugify(text: str) -> str:
@@ -97,6 +115,17 @@ def _slugify(text: str) -> str:
 def _display_name_to_product_id(name: str) -> str:
     """``NPS`` → ``nps``; ``House and Listing`` → ``house-and-listing``."""
     return re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
+
+
+def _split_table_row(line: str) -> list[str]:
+    """Split a Markdown table row into cells, honouring escaped pipes.
+
+    A metric name may legitimately contain a pipe (``EC|ES2CS``), which Markdown
+    requires the author to escape as ``EC\\|ES2CS``. Splitting naively on ``|`` would
+    tear that name in half and shift every following cell.
+    """
+    cells = re.split(r"(?<!\\)\|", line.strip().strip("|"))
+    return [cell.replace(r"\|", "|").strip() for cell in cells]
 
 
 def _split_sections(markdown: str) -> dict[str, str]:
@@ -154,7 +183,7 @@ def _parse_glossary(section_text: str) -> list[GlossaryTerm]:
             or line.startswith("|---")
         ):
             continue
-        cells = [c.strip() for c in line.strip("|").split("|")]
+        cells = _split_table_row(line)
         if len(cells) < 2:
             continue
         name = cells[0].strip("* ")
@@ -310,24 +339,87 @@ def _parse_owners(section_text: str) -> dict[str, list[str]]:
     return owners
 
 
-def _parse_mbr(section_text: str) -> list[str]:
-    """Parse ``## MBR`` bullets into a de-duplicated list of MBR names (metric docs)."""
-    names: list[str] = []
+def _is_placeholder(value: str) -> bool:
+    """True for an unfilled authoring placeholder such as ``{MBR Name}`` or ``{category}``."""
+    return not value or "{" in value or "}" in value
+
+
+def _parse_mbr(section_text: str) -> list[dict[str, str]]:
+    """Parse ``## MBR`` into a de-duplicated list of ``{name, category}`` (metric docs).
+
+    Reads the ``**Name** {MBR name}`` / ``**Category** {category}`` pairs, repeated once
+    per MBR when the document feeds several. The legacy ``- {MBR name}`` bullet form is
+    still accepted (category omitted) so a document that has not been migrated yet keeps
+    publishing its MBR membership.
+    """
+    entries: list[dict[str, str]] = []
+    seen: set[str] = set()
+
+    def _add(name: str, category: str = "") -> None:
+        if _is_placeholder(name) or name.lower() in seen:
+            return
+        seen.add(name.lower())
+        entry = {"name": name}
+        if category and not _is_placeholder(category):
+            entry["category"] = category
+        entries.append(entry)
+
+    pending_name: str | None = None
+    for line in section_text.splitlines():
+        stripped = line.strip()
+        field_match = _MBR_FIELD_RE.match(stripped)
+        if field_match:
+            key, value = field_match.group(1).lower(), field_match.group(2).strip()
+            if key == "name":
+                if pending_name is not None:
+                    _add(pending_name)
+                pending_name = value
+            elif pending_name is not None:
+                _add(pending_name, value)
+                pending_name = None
+            continue
+        if stripped.startswith("- "):
+            _add(stripped[2:].strip().strip("*").strip())
+        elif stripped and not stripped.startswith("#") and not stripped.startswith("*"):
+            _add(stripped.strip("*").strip())
+    if pending_name is not None:
+        _add(pending_name)
+    return entries
+
+
+def _normalize_catalog_type(raw: str) -> str:
+    """Map an authored Type cell onto its canonical spelling (``OKR``/``Health Metric``).
+
+    Unknown values are kept verbatim rather than dropped: the row still reaches DataHub,
+    where a reviewer can see and correct it, instead of silently disappearing.
+    """
+    cleaned = re.sub(r"[*`]+", "", raw).strip()
+    return _CATALOG_TYPE_ALIASES.get(cleaned.lower(), cleaned)
+
+
+def _parse_catalog(section_text: str) -> list[dict[str, str]]:
+    """Parse the ``## Catalog`` ``| Metric | Type |`` table into ``{name, type}`` rows."""
+    rows: list[dict[str, str]] = []
     seen: set[str] = set()
     for line in section_text.splitlines():
         stripped = line.strip()
-        if stripped.startswith("- "):
-            name = stripped[2:].strip().strip("*").strip()
-        elif stripped and not stripped.startswith("#"):
-            name = stripped.strip("*").strip()
-        else:
+        if not stripped.startswith("|"):
             continue
-        if not name or "{" in name or "}" in name:
+        cells = _split_table_row(stripped)
+        if len(cells) < 2 or set(cells[0]) <= {"-", ":", " "}:
             continue
-        if name.lower() not in seen:
-            seen.add(name.lower())
-            names.append(name)
-    return names
+        name = re.sub(r"[*`]+", "", cells[0]).strip()
+        if _is_placeholder(name) or name.lower() in {"metric", "metrics"}:
+            continue
+        if name.lower() in seen:
+            continue
+        seen.add(name.lower())
+        row = {"name": name}
+        metric_type = _normalize_catalog_type(cells[1])
+        if not _is_placeholder(metric_type):
+            row["type"] = metric_type
+        rows.append(row)
+    return rows
 
 
 def _normalize_heading(text: str) -> str:
@@ -336,12 +428,16 @@ def _normalize_heading(text: str) -> str:
     return re.sub(r"\s+", " ", cleaned).strip().lower()
 
 
-def _find_section(sections: dict[str, str], *candidates: str) -> str:
+def _find_section(
+    sections: dict[str, str], *candidates: str, exact_only: bool = False
+) -> str:
     """Return the body of the best-matching ``##`` section.
 
     Exact heading matches (after stripping emphasis) win over substring matches so
     a heading like ``## Pre-ownership`` cannot steal the ``ownership`` candidate
-    from a later ``## Ownership`` / ``## **Ownership**`` block.
+    from a later ``## Ownership`` / ``## **Ownership**`` block. ``exact_only`` disables
+    the substring fallback entirely — required for ``catalog``, where the unrelated
+    ``## DataHub Catalog`` section would otherwise match.
     """
     normalized_items = [
         (_normalize_heading(key), body) for key, body in sections.items()
@@ -351,6 +447,8 @@ def _find_section(sections: dict[str, str], *candidates: str) -> str:
         for norm_key, body in normalized_items:
             if norm_key == cand:
                 return body
+    if exact_only:
+        return ""
     for candidate in candidates:
         cand = candidate.strip().lower()
         for norm_key, body in normalized_items:
@@ -433,6 +531,7 @@ def parse_entity_markdown(
     golden_text = _find_section(sections, "golden")
     ownership_text = _find_section(sections, "ownership")
     mbr_text = _find_section(sections, "mbr")
+    catalog_text = _find_section(sections, "catalog", exact_only=True)
     related_text = _find_section(sections, "related business entities")
     superset_text = _find_section(sections, "superset golden")
 
@@ -444,6 +543,7 @@ def parse_entity_markdown(
     golden_queries = _parse_golden_queries(golden_text)
     owners = _parse_owners(ownership_text)
     mbr = _parse_mbr(mbr_text)
+    catalog = _parse_catalog(catalog_text)
     related_data_products = _parse_related_data_products(related_text)
     # Exact heading only — substring false positives like "## Pre-ownership" must
     # not flip this flag and force Data Owner/Steward validation.
@@ -461,6 +561,7 @@ def parse_entity_markdown(
         golden_queries=golden_queries,
         owners=owners,
         mbr=mbr,
+        catalog=catalog,
         related_data_products=related_data_products,
         has_ownership_section=has_ownership_section,
         has_related_business_entities_section=has_related_business_entities_section,

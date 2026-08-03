@@ -44,9 +44,20 @@ Offboarding.**
 
 - Inspection
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| total inspections | Health Metric |
+| % Tenant Accessed | Health Metric |
+| % Tenant Finished | OKR |
+| % Tenant Finalização / Access | Health Metric |
+| % Tenant Comentarios / Access | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Property Integrity
 
 ## Glossary and Synonyms
 

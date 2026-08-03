@@ -20,9 +20,16 @@
 
 - Chatbot Sessions
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Escalation Rate FR Offboarding | OKR |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** New Offboarding
 
 ## Glossary and Synonyms
 

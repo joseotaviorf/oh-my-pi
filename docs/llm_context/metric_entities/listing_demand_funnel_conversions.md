@@ -1,5 +1,13 @@
 # Listing Demand Funnel Conversions (L2VB, L2VC, L2OS, L2TP, L2CCV)
 
+## Ownership
+
+**Data Owner:**
+- bruna.prates@quintoandar.com.br
+
+**Data Steward:**
+- bruna.prates@quintoandar.com.br
+
 ## Overview
 
 These metrics measure **listing cohort conversion** through the **demand funnel** — from publication to downstream events (visit booked, visit completed, offer submitted, tenant prospect, sale agreement signed).
@@ -23,6 +31,16 @@ These metrics measure **listing cohort conversion** through the **demand funnel*
 - FS Transact
 - Visits
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Listing to Visit Booked | Health Metric |
+| Listing to Visit Completed | Health Metric |
+| Listing to Offer Submitted | Health Metric |
+| Listing to Tenant Prospect | Health Metric |
+| Listing to CCV | Health Metric |
+
 ## Glossary and Synonyms
 
 - **L2VB**, **Listing to Visit Booked** → first visit booked within cohort window
@@ -43,14 +61,22 @@ These metrics measure **listing cohort conversion** through the **demand funnel*
 | **RENT** | `dw_rent.dim_house_listing` | `ts_publication` | `sk_house_listing` |
 | **SALE** | `dw_sale.dim_listing` / `dw_sale.fact_listings` | `ts_first_publication` or first publication date | `sk_sale_listing` |
 
-**Rate formula (all metrics):**
+Cohorts whose conversion window has not ended are **incomplete** — still valid to report; state that explicitly (rates will keep updating).
+
+---
+
+## Calculation
+
+Every metric in this family is the same ratio; only the event that defines the numerator and the length of the conversion window change:
 
 ```
 L2X (window W) = COUNT(DISTINCT listings with event X within W days/weeks of publication)
                  / COUNT(DISTINCT listings in cohort)
 ```
 
-Cohorts whose conversion window has not ended are **incomplete** — still valid to report; state that explicitly (rates will keep updating).
+RENT reads event signals from `dw_rent.fact_listing_rent_flows` (L2VB, L2VC, L2OS, L2TP); SALE reads them from the sale listing/demand tables (L2CCV). The two contexts use different listing keys and are never pooled into one rate.
+
+Each context has its own canonical filter — see [Canonical filter (RENT cohort)](#canonical-filter-rent-cohort) and [Canonical filter (SALE cohort)](#canonical-filter-sale-cohort) for the exact predicates.
 
 ---
 
@@ -83,6 +109,57 @@ dhl.ts_publication IS NOT NULL
 ```
 
 Windows: **1W / 2W / 4W** from `CAST(dhl.ts_publication AS DATE)` (common for L2VB, L2VC, L2OS, L2TP).
+
+**L2R** in a 4W window — ad-hoc slice only; same cohort base; join `dim_contract` on `rf.sk_contract` with `ts_signature` between publication and window end (reference pattern):
+
+```sql
+-- L2R 4W slice (RENT) — not L2CCV; not the official monthly L2R
+MIN(c.ts_signature) FILTER (
+    WHERE c.ts_signature BETWEEN lp.publication_date AND lp.publication_date + INTERVAL '4' WEEK
+) IS NOT NULL
+-- via fact_listing_rent_flows rf + dim_contract c on rf.sk_contract
+```
+
+Official **L2R** (monthly, no fixed window) → `metric_entities/listing_to_rental.md`.
+
+---
+
+## For Sale (SALE)
+
+### Source of truth
+
+SALE listing demand uses **house-keyed** visit/offer/CCV facts (one active sale listing per house in typical funnel joins):
+
+| Metric | Primary tables |
+|--------|----------------|
+| **L2VB** | `dw_sale.fact_visits` — `ts_booking_created` |
+| **L2VC** | `dw_sale.fact_visits` — `ts_visit_completed` |
+| **L2OS** | `dw_sale.fact_offers` + `dw_sale.dim_offer` — `ts_offer_submitted` |
+| **L2CCV** | `dw_sale.dim_sale_agreement` — `ts_sale_agreement_signed` |
+
+Entry point for offer funnel: **`dw_sale.fact_offers`** (EoF). Join **`dim_offer`**, **`dim_sale_agreement`** for timestamps and status.
+
+**L2TP does not apply to SALE** the same way — buyers can submit **direct offers** without a visit; do not reuse the RENT L2TP definition.
+
+### L2CCV windows (SALE)
+
+Report **8W** and **12W** from publication date, plus **M0+M1**:
+
+- **8W / 12W:** `ts_sale_agreement_signed` within 8 / 12 weeks of listing publication
+- **M0+M1:** CCV signed from **`publication_date`** through the **last day of the calendar month after publication** (remainder of publication month + full next month — not from month start, which would count pre-publication events)
+
+### Canonical filter (SALE cohort)
+
+```sql
+dl.ts_first_publication IS NOT NULL
+-- cohort month: DATE_TRUNC('month', dl.ts_first_publication)
+```
+
+Use `sk_sale_listing` as listing grain; join demand on **`sk_house`** (validated FS demand pattern).
+
+---
+
+## Golden Queries
 
 ### Golden Query — RENT listing cohort + demand flags (pattern)
 
@@ -147,53 +224,6 @@ FROM listing_demand
 GROUP BY 1
 ORDER BY 1 DESC
 ```
-
-**L2R** in a 4W window — ad-hoc slice only; same cohort base; join `dim_contract` on `rf.sk_contract` with `ts_signature` between publication and window end (reference pattern):
-
-```sql
--- L2R 4W slice (RENT) — not L2CCV; not the official monthly L2R
-MIN(c.ts_signature) FILTER (
-    WHERE c.ts_signature BETWEEN lp.publication_date AND lp.publication_date + INTERVAL '4' WEEK
-) IS NOT NULL
--- via fact_listing_rent_flows rf + dim_contract c on rf.sk_contract
-```
-
-Official **L2R** (monthly, no fixed window) → `metric_entities/listing_to_rental.md`.
-
----
-
-## For Sale (SALE)
-
-### Source of truth
-
-SALE listing demand uses **house-keyed** visit/offer/CCV facts (one active sale listing per house in typical funnel joins):
-
-| Metric | Primary tables |
-|--------|----------------|
-| **L2VB** | `dw_sale.fact_visits` — `ts_booking_created` |
-| **L2VC** | `dw_sale.fact_visits` — `ts_visit_completed` |
-| **L2OS** | `dw_sale.fact_offers` + `dw_sale.dim_offer` — `ts_offer_submitted` |
-| **L2CCV** | `dw_sale.dim_sale_agreement` — `ts_sale_agreement_signed` |
-
-Entry point for offer funnel: **`dw_sale.fact_offers`** (EoF). Join **`dim_offer`**, **`dim_sale_agreement`** for timestamps and status.
-
-**L2TP does not apply to SALE** the same way — buyers can submit **direct offers** without a visit; do not reuse the RENT L2TP definition.
-
-### L2CCV windows (SALE)
-
-Report **8W** and **12W** from publication date, plus **M0+M1**:
-
-- **8W / 12W:** `ts_sale_agreement_signed` within 8 / 12 weeks of listing publication
-- **M0+M1:** CCV signed from **`publication_date`** through the **last day of the calendar month after publication** (remainder of publication month + full next month — not from month start, which would count pre-publication events)
-
-### Canonical filter (SALE cohort)
-
-```sql
-dl.ts_first_publication IS NOT NULL
--- cohort month: DATE_TRUNC('month', dl.ts_first_publication)
-```
-
-Use `sk_sale_listing` as listing grain; join demand on **`sk_house`** (validated FS demand pattern).
 
 ### Golden Query — SALE listing cohort + demand (pattern)
 

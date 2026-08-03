@@ -30,9 +30,19 @@ The metrics are: post-service satisfaction (**DSat Front**), perceived resolutio
 - Satisfaction
 - Department
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| DSat Front | OKR |
+| Resolution Rate | Health Metric |
+| Recontato D4 | Health Metric |
+| Recontato D0 | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** CS Quality
 
 ## Glossary and Synonyms
 

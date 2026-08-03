@@ -24,9 +24,16 @@ one of the eleven curated front-facing queues listed in Scope below.**
 
 - Chatbot Sessions
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| % Escalation Error Rate (Wall-E) | OKR |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Resolution Effectiveness
 
 ## DataHub Catalog
 
@@ -113,8 +120,9 @@ AND last_queue IN (
     '[IS] Inbound Principal [FRONT][PRE]',
     'CX Ongoing [FRONT] [POS]'
 )
-AND ts_created >= TIMESTAMP '{start_date}'
-AND ts_created < TIMESTAMP '{end_date}'
+-- Change both bounds to the analysis window you want (half-open interval).
+AND ts_created >= TIMESTAMP '2026-07-01 00:00:00'
+AND ts_created < TIMESTAMP '2026-08-01 00:00:00'
 ```
 
 **Warning**: Filtering only on `bot = 'wall-e'` and `is_escalated` (the pattern used by the
@@ -192,10 +200,12 @@ component AS (
     FROM datalake_chatbot.sessions AS s
     WHERE s.bot = 'wall-e'
         AND s.is_escalated = TRUE
-        AND s.first_queue IN (SELECT queue_name FROM allowed_queues)
-        AND s.last_queue IN (SELECT queue_name FROM allowed_queues)
-        AND s.ts_created >= TIMESTAMP '{start_date}'
-        AND s.ts_created < TIMESTAMP '{end_date}'
+        -- Add or remove entries in allowed_queues above to change the queue whitelist.
+        AND s.first_queue IN (SELECT aq.queue_name FROM allowed_queues aq)
+        AND s.last_queue IN (SELECT aq.queue_name FROM allowed_queues aq)
+        -- Change both bounds to the analysis window you want (half-open interval).
+        AND s.ts_created >= TIMESTAMP '2026-07-01 00:00:00'
+        AND s.ts_created < TIMESTAMP '2026-08-01 00:00:00'
 )
 SELECT
     ROUND(CAST(escalation_errors AS DOUBLE) / escalated_sessions, 4) AS escalation_error_rate_wall_e

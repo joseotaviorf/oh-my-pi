@@ -1,5 +1,13 @@
 # Ongoing Listings (Daily Volume)
 
+## Ownership
+
+**Data Owner:**
+- bruna.prates@quintoandar.com.br
+
+**Data Steward:**
+- bruna.prates@quintoandar.com.br
+
 ## Overview
 
 **Ongoing Listings** is the daily count of listings with active **PUBLISHED** status on each calendar day — published inventory (supply stock), not demand or distinct houses.
@@ -14,6 +22,12 @@ The metric exists for **both For Rent (RENT) and For Sale (SALE)**, but **implem
 ## Related Business Entities
 
 - House and Listing
+
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Ongoing Listings | Health Metric |
 
 ## Glossary and Synonyms
 
@@ -30,6 +44,21 @@ The metric exists for **both For Rent (RENT) and For Sale (SALE)**, but **implem
 
 ---
 
+## Calculation
+
+RENT and SALE are counted independently and are never summed into a single number:
+
+```
+Ongoing Listings RENT (day D) = COUNT(DISTINCT sk_house_listing)
+Ongoing Listings SALE (day D) = COUNT(DISTINCT sk_sale_listing)
+```
+
+RENT has no materialized metrics table — it is computed on demand by exploding PUBLISHED status intervals against `dim_date`, then deduplicating to the latest `ts_status_start` per listing per day. SALE reads the pre-materialized daily snapshot in `dw_sale.fact_daily_ongoing_listing`, one row per listing per PUBLISHED day.
+
+Each context has its own canonical filter — see [Canonical filter (RENT)](#canonical-filter-rent) and [Canonical filter (SALE)](#canonical-filter-sale) for the exact predicates.
+
+---
+
 ## For Rent (RENT)
 
 ### What counts
@@ -39,7 +68,7 @@ Each day **D**, count distinct **`sk_house_listing`** (rent listing version) wit
 1. **Exclusive end-day** interval via `dim_date` (see below)
 2. `dim_house_listing.version <> 0`
 3. `dim_region.city_group IS NOT NULL`
-4. Same-day dedup: latest `ts_status_start` per listing per day (`QUALIFY ROW_NUMBER()`)
+4. Same-day dedup: latest `ts_status_start` per listing per day (`ROW_NUMBER()` ranked per listing/day)
 
 ```
 Ongoing Listings RENT (day D) = COUNT(DISTINCT sk_house_listing)
@@ -51,12 +80,12 @@ Ongoing Listings RENT (day D) = COUNT(DISTINCT sk_house_listing)
 
 ```sql
 d.date BETWEEN COALESCE(DATE(fhls.ts_status_start), DATE '2000-01-01')
-         AND COALESCE(DATE_ADD(DATE(fhls.ts_status_end), -1), CURRENT_DATE)
+         AND COALESCE(DATE_ADD('day', -1, DATE(fhls.ts_status_end)), CURRENT_DATE)
 ```
 
 Do **not** use simplified `ts_status_start ≤ day AND ts_status_end IS NULL OR ≥ day` — it is not the official definition.
 
-On Trino, use `RANGE_JOIN(fhls, 800)` when exploding intervals.
+On Databricks, add the `RANGE_JOIN(fhls, 800)` hint when exploding intervals. Trino has no equivalent hint — the golden query below runs the range join directly.
 
 ### Canonical filter (RENT)
 
@@ -72,39 +101,6 @@ AND dr.city_group IS NOT NULL
 - **Multi-country:** group by `country_code` (BR, MX, …).
 - **1P vs 3P:** optional; join `dim_house_listing.is_rent_3p_supply` when segmenting.
 - **`house_listings_daily_info`** and visits-booked **ratio** metrics use a different path — not source of truth for volume.
-
-### Golden Query — RENT daily volume
-
-```sql
-WITH ongoing_listings AS (
-    SELECT /*+ RANGE_JOIN(fhls, 800) */
-        fhls.sk_house_listing,
-        fhls.country_code,
-        d.date
-    FROM dw_rent.fact_house_listing_status AS fhls
-    JOIN dw_rent.dim_house_listing AS dhl
-        ON fhls.sk_house_listing = dhl.sk_house_listing
-    JOIN dw_public.dim_region AS dr
-        ON fhls.sk_region = dr.sk_region
-    JOIN dw_public.dim_date AS d
-        ON d.date BETWEEN COALESCE(DATE(fhls.ts_status_start), DATE '2000-01-01')
-            AND COALESCE(DATE_ADD(DATE(fhls.ts_status_end), -1), CURRENT_DATE)
-    WHERE fhls.status_history IN ('publicado', 'PUBLISHED')
-      AND dhl.version <> 0
-      AND dr.city_group IS NOT NULL
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY fhls.sk_house_listing, d.date
-        ORDER BY fhls.ts_status_start DESC
-    ) = 1
-)
-SELECT
-    date AS day,
-    country_code,
-    COUNT(DISTINCT sk_house_listing) AS ongoing_listings
-FROM ongoing_listings
-GROUP BY 1, 2
-ORDER BY 1 DESC, 2
-```
 
 ---
 
@@ -155,6 +151,50 @@ Add `country_code` via `dim_region` when country-specific.
 - **3P:** `sk_broker`, `sk_company` on the fact for broker/Rede cuts.
 - Grain for volume is **`sk_sale_listing`**, not `sk_house` (pipeline dedups by house when building the snapshot).
 
+---
+
+## Golden Queries
+
+### Golden Query — RENT daily volume
+
+```sql
+WITH exploded AS (
+    SELECT
+        fhls.sk_house_listing,
+        fhls.country_code,
+        d.date,
+        ROW_NUMBER() OVER (
+            PARTITION BY fhls.sk_house_listing, d.date
+            ORDER BY fhls.ts_status_start DESC
+        ) AS rn
+    FROM dw_rent.fact_house_listing_status AS fhls
+    JOIN dw_rent.dim_house_listing AS dhl
+        ON fhls.sk_house_listing = dhl.sk_house_listing
+    JOIN dw_public.dim_region AS dr
+        ON fhls.sk_region = dr.sk_region
+    JOIN dw_public.dim_date AS d
+        ON d.date BETWEEN COALESCE(DATE(fhls.ts_status_start), DATE '2000-01-01')
+            AND COALESCE(DATE_ADD('day', -1, DATE(fhls.ts_status_end)), CURRENT_DATE)
+    -- Add AND fhls.country_code = 'BR' when the question is Brazil-only.
+    WHERE fhls.status_history IN ('publicado', 'PUBLISHED')
+      AND dhl.version <> 0
+      AND dr.city_group IS NOT NULL
+),
+ongoing_listings AS (
+    -- Same-day dedup: keep the latest status interval per listing per day.
+    SELECT sk_house_listing, country_code, date
+    FROM exploded
+    WHERE rn = 1
+)
+SELECT
+    date AS day,
+    country_code,
+    COUNT(DISTINCT sk_house_listing) AS ongoing_listings
+FROM ongoing_listings
+GROUP BY 1, 2
+ORDER BY 1 DESC, 2
+```
+
 ### Golden Query — SALE daily volume
 
 ```sql
@@ -165,12 +205,13 @@ SELECT
 FROM dw_sale.fact_daily_ongoing_listing AS fdol
 JOIN dw_public.dim_region AS dr
     ON fdol.sk_region = dr.sk_region
+-- Add AND dr.country_code = 'BR' when the question is Brazil-only.
 WHERE dr.city_group IS NOT NULL
 GROUP BY 1, 2
 ORDER BY 1 DESC, 2
 ```
 
-Add `AND dr.country_code = 'BR'` when the question is Brazil-only. Filter `year`, `month`, `day` (or `MAKE_DATE`) for partition pruning on large scans.
+Filter `year`, `month`, `day` (or `MAKE_DATE`) for partition pruning on large scans.
 
 ---
 

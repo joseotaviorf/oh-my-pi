@@ -32,9 +32,16 @@ Backlog is a **stock** metric. Each date represents a snapshot of the tickets an
 - Ticket
 - Department
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Backlog Out of SLA Rate | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** CS Quality
 
 ## Glossary and Synonyms
 
@@ -312,7 +319,7 @@ When breaking down by ticket or `case_number`, the metric must keep the same agg
 
 ## Golden Queries
 
-All queries are parameterized only by `<start_date>` and `<end_date>`, contain no `LIMIT`, and are reduced to the minimal logic needed to reproduce % Fora Prazo Back — they are not full copies of the dashboard queries. Trino dialect.
+All queries are written for the July 2026 window — change the two `DATE(...)` bounds to move it. They contain no `LIMIT` and are reduced to the minimal logic needed to reproduce % Fora Prazo Back — they are not full copies of the dashboard queries. Trino dialect.
 
 ### Zendesk Canonical Base
 
@@ -346,7 +353,8 @@ WITH zendesk_raw AS (
   LEFT JOIN dw_customer_support.dim_department  AS dd      ON bmt.sk_main_department = dd.sk_department
   LEFT JOIN dw_customer_support.fact_tickets    AS tickets ON bmt.sk_task = CAST(tickets.sk_ticket AS VARCHAR(99))
   LEFT JOIN dw_customer_support.dim_analyst     AS da_last ON da_last.sk_analyst = tickets.sk_last_analyst
-  WHERE bmt.dt_metric_reference BETWEEN DATE('<start_date>') AND DATE('<end_date>')
+  -- Change both bounds to the analysis window you want.
+  WHERE bmt.dt_metric_reference BETWEEN DATE('2026-07-01') AND DATE('2026-07-31')
     AND dit.tags NOT LIKE '%closed_by_merge%'
     AND NOT (
       (dit.tags LIKE '%form_faq%' OR dit.tags LIKE '%email_orientacao_do_processo%'
@@ -405,7 +413,7 @@ WHERE aux_number = 1
 
 ### Salesforce Canonical Base
 
-Note: the Salesforce dashboard query rebuilds the daily backlog from raw case events, inline (status history, milestones, SPOC classification, days-off calendar). Reproducing that full reconstruction inside this metric's Golden Query would violate the instruction to keep Golden Queries minimal. This query assumes that reconstruction already exists as a stable upstream table/view (`<curated_salesforce_daily_backlog_base>`) exposing `date_reference`, `case_number`, `last_department`, `last_agent_organization`, `sla_target`, `days_worked`, `days_worked_with_days_offs`, `is_backlog_in_time`, `is_backlog_not_in_time`, `ts_solved`, `ts_closed`, `channel`. Confirming the exact name/location of that upstream object is an **Open Decision** — if it does not yet exist, the full `cases_perspective` → calendar → `exploded_backlog`/`days_off` chain from the dashboard query needs to be materialized first.
+Note: the Salesforce dashboard query rebuilds the daily backlog from raw case events, inline (status history, milestones, SPOC classification, days-off calendar). Reproducing that full reconstruction inside this metric's Golden Query would violate the instruction to keep Golden Queries minimal. This query assumes that reconstruction already exists as a stable upstream table/view (`curated_salesforce_daily_backlog_base`) exposing `date_reference`, `case_number`, `last_department`, `last_agent_organization`, `sla_target`, `days_worked`, `days_worked_with_days_offs`, `is_backlog_in_time`, `is_backlog_not_in_time`, `ts_solved`, `ts_closed`, `channel`. Confirming the exact name/location of that upstream object is an **Open Decision** — if it does not yet exist, the full `cases_perspective` → calendar → `exploded_backlog`/`days_off` chain from the dashboard query needs to be materialized first.
 
 ```sql
 WITH salesforce_raw AS (
@@ -414,7 +422,7 @@ WITH salesforce_raw AS (
   -- "Data Sources > Salesforce". This Golden Query intentionally does not repeat
   -- the full case-event reconstruction (status history, milestones, SPOC, etc.)
   -- since those concerns belong to the upstream cases-perspective model, not
-  -- to this metric's Golden Query.
+  -- to the Golden Query of this metric.
   SELECT
     case_number                                    AS raw_ticket_id,
     CAST(date_reference AS DATE)                   AS reference_date,
@@ -426,8 +434,10 @@ WITH salesforce_raw AS (
     is_backlog_in_time,
     is_backlog_not_in_time,
     COALESCE(DATE(ts_solved), DATE(ts_closed))     AS resolution_date
-  FROM <curated_salesforce_daily_backlog_base>      -- see Open Decisions: name/location to confirm
-  WHERE date_reference BETWEEN DATE('<start_date>') AND DATE('<end_date>')
+  -- Replace with the real schema.table once the Open Decision below is settled.
+  FROM curated_salesforce_daily_backlog_base
+  -- Change both bounds to the analysis window you want.
+  WHERE date_reference BETWEEN DATE('2026-07-01') AND DATE('2026-07-31')
     AND channel = 'email'
     AND last_department IN (
       'Onboarding ForRent',
@@ -478,7 +488,8 @@ month_bounds AS (
     d.month_start,
     LEAST(date_add('day', -1, date_add('month', 1, d.month_start)), CURRENT_DATE) AS snapshot_ceiling
   FROM UNNEST(
-    sequence(date_trunc('month', DATE('<start_date>')), date_trunc('month', DATE('<end_date>')), interval '1' month)
+    -- Change both bounds to the analysis window you want.
+    sequence(date_trunc('month', DATE('2026-07-01')), date_trunc('month', DATE('2026-07-31')), interval '1' month)
   ) AS d(month_start)
 ),
 snapshot_dates AS (
@@ -596,10 +607,10 @@ Main evidence:
 - Zendesk contributes zero from 2026-06-25 onward due to the fixed `ts_solved` fallback (see [Data Sources → Zendesk](#zendesk)) — a confirmed source bug, not a Golden Query issue.
 - Known "Out of SLA" residual in Onboarding and Offboarding in Jun/Jul 2026 (see [Confirmed field limitations](#confirmed-field-limitations-2026-07-23--known-out-of-sla-residual)).
 
-#### Open decision — name/location of `<curated_salesforce_daily_backlog_base>`
+#### Open decision — name/location of `curated_salesforce_daily_backlog_base`
 
 The Salesforce Golden Query depends on a stable upstream table/view that rebuilds the daily backlog from `events_case` + calendar + days-off (see the note above in the Salesforce Canonical Base). The exact name and location of that object have not yet been confirmed. Until that decision is made:
 
-- do not assume a specific schema/table name beyond the `<curated_salesforce_daily_backlog_base>` placeholder;
+- do not assume a specific schema/table name beyond the `curated_salesforce_daily_backlog_base` placeholder;
 - if the object does not yet exist, materialize the `cases_perspective` → calendar → `exploded_backlog`/`days_off` chain from the dashboard query first;
 - confirm with the Data Steward before assuming the final location.

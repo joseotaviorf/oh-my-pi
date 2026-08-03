@@ -179,10 +179,20 @@ Official weighted NPS.
 
 - NPS
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| NPS True | OKR |
+| NPS Onboarding | Health Metric |
+
 ## MBR
 
-- Support MBR
-- Retention MBR
+**Name** Support MBR
+**Category** Experience
+
+**Name** Retention MBR
+**Category** Retention
 
 ## Glossary and Synonyms
 
@@ -247,6 +257,8 @@ SELECT 1
             "## MBR",
             "Support MBR",
             "Retention MBR",
+            "## Catalog",
+            "NPS Onboarding",
             "## Glossary and Synonyms",
             "## Golden Queries",
             "## DataHub Catalog",
@@ -806,20 +818,63 @@ class MbrTest(unittest.TestCase):
         tmp.write_text(body, encoding="utf-8")
         return tmp
 
-    def test_extract_mbrs_multiple_dedup_case_insensitive(self) -> None:
+    def test_extract_mbrs_name_and_category_pair(self) -> None:
         md_path = self._md(
             "# Demo\n\n## MBR\n\n"
-            "- Support MBR\n"
-            "- Retention MBR\n"
-            "- support mbr\n\n"
+            "**Name** Post Contract\n"
+            "**Category** Quality\n\n"
             "## Overview\n\nBody.\n"
         )
-        self.assertEqual(g._extract_mbrs(md_path), ["Support MBR", "Retention MBR"])
+        self.assertEqual(
+            g._extract_mbrs(md_path),
+            [{"name": "Post Contract", "category": "Quality"}],
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_mbrs_multiple_pairs_dedup_case_insensitive(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## MBR\n\n"
+            "**Name** Support MBR\n"
+            "**Category** Experience\n\n"
+            "**Name** Retention MBR\n"
+            "**Category** Retention\n\n"
+            "**Name** support mbr\n"
+            "**Category** Experience\n"
+        )
+        self.assertEqual(
+            g._extract_mbrs(md_path),
+            [
+                {"name": "Support MBR", "category": "Experience"},
+                {"name": "Retention MBR", "category": "Retention"},
+            ],
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_mbrs_accepts_colon_inside_bold(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## MBR\n\n**Name:** Post Contract\n**Category:** Quality\n"
+        )
+        self.assertEqual(
+            g._extract_mbrs(md_path),
+            [{"name": "Post Contract", "category": "Quality"}],
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_mbrs_unfilled_category_placeholder_yields_name_only(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## MBR\n\n**Name** Post Contract\n**Category** {category}\n"
+        )
+        self.assertEqual(g._extract_mbrs(md_path), [{"name": "Post Contract"}])
         md_path.unlink()
         md_path.parent.rmdir()
 
     def test_extract_mbrs_ignores_template_placeholder(self) -> None:
-        md_path = self._md("# Demo\n\n## MBR\n\n- {MBR Name}\n")
+        md_path = self._md(
+            "# Demo\n\n## MBR\n\n**Name** {MBR Name}\n**Category** {category}\n"
+        )
         self.assertEqual(g._extract_mbrs(md_path), [])
         md_path.unlink()
         md_path.parent.rmdir()
@@ -830,28 +885,145 @@ class MbrTest(unittest.TestCase):
         md_path.unlink()
         md_path.parent.rmdir()
 
-    def test_extract_mbrs_plain_line_without_bullet(self) -> None:
-        md_path = self._md("# Demo\n\n## **MBR**\n\nPost Contract\n")
-        self.assertEqual(g._extract_mbrs(md_path), ["Post Contract"])
+    def test_extract_mbrs_still_reads_legacy_bullet_form(self) -> None:
+        """A doc not yet migrated to Name/Category must keep publishing membership."""
+        md_path = self._md("# Demo\n\n## **MBR**\n\n- Post Contract\n")
+        self.assertEqual(g._extract_mbrs(md_path), [{"name": "Post Contract"}])
         md_path.unlink()
         md_path.parent.rmdir()
 
     def test_inject_mbr_emits_parseable_block(self) -> None:
         out = g._inject_mbr(
-            "data_product_type: metric\n", ["Support MBR", "Retention MBR"]
+            "data_product_type: metric\n",
+            [
+                {"name": "Support MBR", "category": "Experience"},
+                {"name": "Retention MBR"},
+            ],
         )
         parsed = yaml.safe_load(out)
-        self.assertEqual(parsed["mbr"], ["Support MBR", "Retention MBR"])
+        self.assertEqual(
+            parsed["mbr"],
+            [
+                {"name": "Support MBR", "category": "Experience"},
+                {"name": "Retention MBR"},
+            ],
+        )
 
     def test_inject_mbr_empty_drops_block_and_strips_llm_authored(self) -> None:
-        llm_yaml = "data_product_type: metric\nmbr:\n  - Hallucinated MBR\n"
+        llm_yaml = "data_product_type: metric\nmbr:\n  - name: Hallucinated MBR\n"
         out = g._inject_mbr(llm_yaml, [])
         parsed = yaml.safe_load(out)
         self.assertNotIn("mbr", parsed)
 
     def test_inject_mbr_anchors_after_data_product_type(self) -> None:
-        out = g._inject_mbr("data_product_type: metric\n", ["Support MBR"])
+        out = g._inject_mbr("data_product_type: metric\n", [{"name": "Support MBR"}])
         self.assertRegex(out, r"data_product_type: metric\nmbr:\n")
+
+
+class CatalogTest(unittest.TestCase):
+    def _md(self, body: str) -> Path:
+        tmp = Path(tempfile.mkdtemp()) / "entity.md"
+        tmp.write_text(body, encoding="utf-8")
+        return tmp
+
+    def test_extract_catalog_reads_metric_and_type_rows(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Catalog\n\n"
+            "| Metric | Type |\n"
+            "| :---- | :---- |\n"
+            "| NPS True | OKR |\n"
+            "| NPS Onboarding | Health Metric |\n\n"
+            "## Overview\n\nBody.\n"
+        )
+        self.assertEqual(
+            g._extract_catalog(md_path),
+            [
+                {"name": "NPS True", "type": "OKR"},
+                {"name": "NPS Onboarding", "type": "Health Metric"},
+            ],
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_catalog_normalizes_type_casing(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Catalog\n\n"
+            "| Metric | Type |\n| :---- | :---- |\n"
+            "| A | okr |\n| B | health metric |\n"
+        )
+        self.assertEqual(
+            [row["type"] for row in g._extract_catalog(md_path)],
+            ["OKR", "Health Metric"],
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_catalog_dedups_case_insensitively(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Catalog\n\n"
+            "| Metric | Type |\n| :---- | :---- |\n"
+            "| NPS True | OKR |\n| nps true | Health Metric |\n"
+        )
+        self.assertEqual(
+            g._extract_catalog(md_path), [{"name": "NPS True", "type": "OKR"}]
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_catalog_keeps_escaped_pipe_in_metric_name(self) -> None:
+        """``EC|ES2CS`` is a real metric name; Markdown escapes its pipe as ``\\|``."""
+        md_path = self._md(
+            "# Demo\n\n## Catalog\n\n"
+            "| Metric | Type |\n| :---- | :---- |\n"
+            "| EC\\|ES2CS | OKR |\n"
+        )
+        self.assertEqual(
+            g._extract_catalog(md_path), [{"name": "EC|ES2CS", "type": "OKR"}]
+        )
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_catalog_ignores_template_placeholders(self) -> None:
+        md_path = self._md(
+            "# Demo\n\n## Catalog\n\n"
+            "| Metric | Type |\n| :---- | :---- |\n"
+            "| {Official Metric Name} | {OKR \\| Health Metric} |\n"
+        )
+        self.assertEqual(g._extract_catalog(md_path), [])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_extract_catalog_ignores_datahub_catalog_section(self) -> None:
+        """``## DataHub Catalog`` is a tooling pointer, not the metric catalog."""
+        md_path = self._md(
+            "# Demo\n\n## DataHub Catalog\n\n"
+            "| Metric | Type |\n| :---- | :---- |\n| Stray | OKR |\n"
+        )
+        self.assertEqual(g._extract_catalog(md_path), [])
+        md_path.unlink()
+        md_path.parent.rmdir()
+
+    def test_inject_catalog_emits_parseable_block(self) -> None:
+        out = g._inject_catalog(
+            "data_product_type: metric\n",
+            [{"name": "NPS True", "type": "OKR"}, {"name": "NPS Onboarding"}],
+        )
+        parsed = yaml.safe_load(out)
+        self.assertEqual(
+            parsed["catalog"],
+            [{"name": "NPS True", "type": "OKR"}, {"name": "NPS Onboarding"}],
+        )
+
+    def test_inject_catalog_empty_drops_block_and_strips_llm_authored(self) -> None:
+        llm_yaml = "data_product_type: metric\ncatalog:\n  - name: Hallucinated\n"
+        out = g._inject_catalog(llm_yaml, [])
+        self.assertNotIn("catalog", yaml.safe_load(out))
+
+    def test_inject_catalog_anchors_after_data_product_type(self) -> None:
+        out = g._inject_catalog(
+            "data_product_type: metric\n", [{"name": "NPS True", "type": "OKR"}]
+        )
+        self.assertRegex(out, r"data_product_type: metric\ncatalog:\n")
 
 
 class GoldenQueryCompletenessTest(unittest.TestCase):

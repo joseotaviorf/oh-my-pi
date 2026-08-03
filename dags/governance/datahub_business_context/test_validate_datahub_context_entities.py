@@ -222,6 +222,20 @@ def test_placeholder_inside_code_block_is_ignored(tmp_path: Path):
     assert not any("placeholder" in e.lower() for e in errors)
 
 
+def test_unfilled_category_placeholder_is_blocked(tmp_path: Path):
+    # MBR Category is optional by omitting its line, so a leftover ``{category}``
+    # is an unfilled stub like any other.
+    content = "# M\n\n## MBR\n\n**Name** Post Contract\n**Category** {category}\n"
+    errors, _ = _static_checks(Path("m.md"), content)
+    assert any("{category}" in e for e in errors)
+
+
+def test_mbr_entry_without_category_line_is_allowed(tmp_path: Path):
+    content = "# M\n\n## MBR\n\n**Name** Post Contract\n"
+    errors, _ = _static_checks(Path("m.md"), content)
+    assert not any("placeholder" in e.lower() for e in errors)
+
+
 def test_filename_casing_is_warning_not_error(tmp_path: Path):
     errors, warnings = _static_checks(Path("Bad-Name.md"), "# M\n\n## Overview\n\nx\n")
     assert not any("snake_case" in e for e in errors)

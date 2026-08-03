@@ -26,6 +26,15 @@ Real exits are identified by `termination_type IS NOT NULL`, scoped to effective
 
 - Employee Details
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Turnover | OKR |
+| New Hire Attrition | Health Metric |
+| 6-Month Turnover | Health Metric |
+| 12-Month Turnover | Health Metric |
+
 ## Known Limitations
 
 PIN went live on **2024-03-01**; before that date, job, cost center, hierarchy, `is_effective_worker`, and the resulting eligible workforce population may be inconsistent because the source system was not yet live.

@@ -90,7 +90,7 @@ def test_owners_are_recovered_from_glued_datahub_export():
         "felipe.abreu@quintoandar.com.br",
     ]
     assert parsed.owners["data_steward"] == ["victor.prado@quintoandar.com.br"]
-    assert parsed.mbr == ["Post Contract"]
+    assert parsed.mbr == [{"name": "Post Contract"}]
 
 
 def test_sanitizes_bold_italic_underscore_when_underscores_are_backslash_escaped():
@@ -124,7 +124,7 @@ def test_mbr_parsed_from_bold_wrapped_heading():
 - Post Contract
 """
     parsed = parse_entity_markdown(doc)
-    assert parsed.mbr == ["Post Contract"]
+    assert parsed.mbr == [{"name": "Post Contract"}]
 
 
 def test_mbr_parsed_from_plain_line_without_bullet():
@@ -136,7 +136,81 @@ def test_mbr_parsed_from_plain_line_without_bullet():
 Post Contract
 """
     parsed = parse_entity_markdown(doc)
-    assert parsed.mbr == ["Post Contract"]
+    assert parsed.mbr == [{"name": "Post Contract"}]
+
+
+def test_mbr_parsed_from_name_and_category_pair():
+    doc = """\
+# Metric
+
+## MBR
+
+**Name** Post Contract
+**Category** Quality
+"""
+    parsed = parse_entity_markdown(doc)
+    assert parsed.mbr == [{"name": "Post Contract", "category": "Quality"}]
+
+
+def test_mbr_category_placeholder_is_dropped():
+    doc = """\
+# Metric
+
+## MBR
+
+**Name** Post Contract
+**Category** {category}
+"""
+    parsed = parse_entity_markdown(doc)
+    assert parsed.mbr == [{"name": "Post Contract"}]
+
+
+def test_catalog_parsed_into_metric_and_type_rows():
+    doc = """\
+# Metric
+
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| NPS True | OKR |
+| NPS Onboarding | health metric |
+"""
+    parsed = parse_entity_markdown(doc)
+    assert parsed.catalog == [
+        {"name": "NPS True", "type": "OKR"},
+        {"name": "NPS Onboarding", "type": "Health Metric"},
+    ]
+
+
+def test_catalog_keeps_escaped_pipe_in_metric_name():
+    """``EC|ES2CS`` is a real metric name; Markdown escapes its pipe as ``\\|``."""
+    doc = """\
+# Metric
+
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| EC\\|ES2CS | OKR |
+"""
+    parsed = parse_entity_markdown(doc)
+    assert parsed.catalog == [{"name": "EC|ES2CS", "type": "OKR"}]
+
+
+def test_catalog_ignores_datahub_catalog_section():
+    """``## DataHub Catalog`` is a tooling pointer, not the metric catalog."""
+    doc = """\
+# Metric
+
+## DataHub Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Stray | OKR |
+"""
+    parsed = parse_entity_markdown(doc)
+    assert parsed.catalog == []
 
 
 def test_title_has_no_html_or_style_leakage():
@@ -440,9 +514,16 @@ Metric family.
 
 - Termination
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Property Integrity Offboarding | OKR |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Quality
 
 ## Superset Golden Assets
 
@@ -456,7 +537,10 @@ Metric family.
         data_product_type="metric",
     )
     assert spec["related_data_products"] == ["termination"]
-    assert spec["mbr"] == ["Post Contract"]
+    assert spec["mbr"] == [{"name": "Post Contract", "category": "Quality"}]
+    assert spec["catalog"] == [
+        {"name": "Property Integrity Offboarding", "type": "OKR"}
+    ]
     assert spec["datasets"] == [
         {"schema": "dw_offboarding", "table": "obt_offboarding"},
         {"urn": superset_urn},

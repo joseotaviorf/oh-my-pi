@@ -1,5 +1,13 @@
 # Quality of Supply (Pricing Levers) — Pub & 4Ws
 
+## Ownership
+
+**Data Owner:**
+- alexandre.gimenez@quintoandar.com.br
+
+**Data Steward:**
+- alexandre.gimenez@quintoandar.com.br
+
 ## Overview
 
 **Quality Pub** and **Quality 4Ws** measure the competitiveness and health of a listing's pricing (pricing levers) within the For Rent (Locação) vertical in Brazil (BR).
@@ -15,6 +23,13 @@ The metrics support segmentation by temporal views (Monthly/L5M and Weekly/Matur
 
 - Supply
 - Pricing
+
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Quality Pub | Health Metric |
+| Quality 4Ws | Health Metric |
 
 ## Glossary and Synonyms
 

@@ -25,9 +25,16 @@ lease lifecycle stage.
 
 - Inspection
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Inspection SLA (SLA - VT) | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** CS Quality
 
 ## Glossary and Synonyms
 

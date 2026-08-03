@@ -47,11 +47,22 @@ data_product_type: domain  # domain | metric
 #     - {data_steward_email@quintoandar.com.br}
 
 # MBR — metric products only; CI-injected from the `## MBR` section of the metric .md;
-# do NOT hand-author. Each name becomes a value of the `data_product.mbr` structured
-# property (multi-valued, filterable in DataHub). Declaratively synced: a metric with no
-# `## MBR` section has any previous value cleared. Omit the block when not part of any MBR.
+# do NOT hand-author. `name` becomes a value of the `data_product.mbr` structured property
+# and `category` of `data_product.mbr_category` (both multi-valued, filterable in DataHub).
+# Declaratively synced: a metric with no `## MBR` section has any previous value cleared.
+# Omit the block when not part of any MBR; `category` is optional within an entry.
 # mbr:
-#   - {MBR Name}
+#   - name: {MBR Name}
+#     category: {category}
+
+# Catalog — metric products only; CI-injected from the `## Catalog` table of the metric
+# .md; do NOT hand-author. One row per official metric the document defines. `name`
+# values feed the `data_product.metrics` structured property; `type` values (OKR |
+# Health Metric) feed `data_product.metric_type`. Both multi-valued and filterable, and
+# declaratively synced the same way as `mbr`.
+# catalog:
+#   - name: {Official Metric Name}
+#     type: OKR
 
 structured_property:
   qualified_name: br.com.quintoandar.datahub.data_product.golden_query

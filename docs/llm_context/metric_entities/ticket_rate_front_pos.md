@@ -20,9 +20,16 @@
 - Department
 - Ticket
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Ticket Rate Front - Pós Contrato | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Resolution Effectiveness
 
 ## Glossary and Synonyms
 

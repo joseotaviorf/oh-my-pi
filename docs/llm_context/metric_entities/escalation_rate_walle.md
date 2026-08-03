@@ -23,9 +23,16 @@ different bot filter.**
 
 - Chatbot Sessions
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| % Escalation Rate (Wall-E) | OKR |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Resolution Effectiveness
 
 ## DataHub Catalog
 
@@ -67,8 +74,9 @@ Apply on `datalake_chatbot.sessions`:
 
 ```sql
 bot = 'wall-e'
-AND ts_created >= TIMESTAMP '{start_date}'
-AND ts_created < TIMESTAMP '{end_date}'
+-- Change both bounds to the analysis window you want (half-open interval).
+AND ts_created >= TIMESTAMP '2026-07-01 00:00:00'
+AND ts_created < TIMESTAMP '2026-08-01 00:00:00'
 ```
 
 **Warning**: Filtering only on `is_escalated` for the numerator without also restricting the
@@ -120,8 +128,9 @@ WITH component AS (
         COUNT_IF(s.is_escalated) AS escalated_sessions
     FROM datalake_chatbot.sessions AS s
     WHERE s.bot = 'wall-e'
-        AND s.ts_created >= TIMESTAMP '{start_date}'
-        AND s.ts_created < TIMESTAMP '{end_date}'
+        -- Change both bounds to the analysis window you want (half-open interval).
+        AND s.ts_created >= TIMESTAMP '2026-07-01 00:00:00'
+        AND s.ts_created < TIMESTAMP '2026-08-01 00:00:00'
     GROUP BY 1
 )
 SELECT

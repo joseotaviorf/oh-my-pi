@@ -28,6 +28,8 @@ Rules:
   • Optional sections: MBR, Targets and OKRs (Budget and/or OKR lookup — see section
     below; Budget = annual commitment fixed for the fiscal year; OKR = period
     challenge that may change across quarters/semesters), Superset Golden Assets.
+  • Required section: Catalog — every named metric defined in this document, each
+    classified as OKR or Health Metric.
 -->
 
 ## Ownership
@@ -65,19 +67,51 @@ related entity.
 
 - {Business Entity Name}
 
+## Catalog
+
+<!--
+Required — the inventory of every OFFICIAL metric this document defines. One row per
+metric, using the exact official name analysts see (the same name used in Overview /
+Calculation / Glossary). A single-metric document has exactly one row; a metric family
+has one row per member.
+
+Type classifies how the metric is used by the business:
+  • OKR           — the metric carries a period goal (quarter/semester) and is tracked
+                    as a company/area objective.
+  • Health Metric — the metric is monitored to watch operational health; it has no
+                    OKR goal of its own (it may still be a component of one).
+
+Not folded into the DataHub Data Product description (see EXCLUDE_HEADING_PATTERNS in
+generate_and_push_datahub_entities.py) — CI syncs the names to the
+`data_product.metrics` structured property and the types to `data_product.metric_type`
+(both multi-valued and filterable in DataHub). It is routing metadata, not narrative
+content.
+-->
+
+| Metric | Type |
+| :---- | :---- |
+| {Official Metric Name} | {OKR \| Health Metric} |
+
 ## MBR
 
 <!--
 Optional — include ONLY when this metric participates in one or more Monthly Business
 Reviews (MBRs). Grain is the Data Product: this flag marks the WHOLE document, so every
-metric defined here is considered part of the listed MBR(s). One bullet per MBR (a metric
-may feed several). Omit the entire section if the metric is not part of any MBR. Not folded
-into the DataHub Data Product description (see EXCLUDE_HEADING_PATTERNS in
-generate_and_push_datahub_entities.py) — CI syncs it to the `data_product.mbr` structured
-property (filterable in DataHub), it is routing metadata, not narrative content.
+metric defined here is considered part of the listed MBR(s). Repeat the Name/Category
+pair once per MBR (a metric may feed several). Omit the entire section if the metric is
+not part of any MBR.
+
+Name marks WHICH MBR the document feeds; Category marks the block the metric sits in
+inside that MBR's agenda. Name is required once the section is present; Category is
+optional — drop its line entirely when the block is unknown, rather than leaving the
+placeholder behind. Not folded into the DataHub Data Product description (see
+EXCLUDE_HEADING_PATTERNS in generate_and_push_datahub_entities.py) — CI syncs Name to
+the `data_product.mbr` structured property and Category to `data_product.mbr_category`
+(both filterable in DataHub), it is routing metadata, not narrative content.
 -->
 
-- {MBR Name}
+**Name** {MBR Name}
+**Category** {category}
 
 ## Glossary and Synonyms
 

@@ -27,9 +27,16 @@ Related metrics: [Absolute Cost Ops Total (For Rent)](./absolute_cost_ops_total_
 
 - Finance Revenue and Cost
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| Onboarding Unit Cost (For Rent) | OKR |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** Cost of Service
 
 ## Glossary and Synonyms
 
@@ -170,47 +177,53 @@ Both numerator and denominator use the `version` column in the year-matching tab
 ```sql
 SELECT
     f.version,
-    SUM(TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE)) AS new_rentals
-FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_<YEAR> f
+    -- Change the "202603" column to the target month (YYYYMM).
+    SUM(TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE)) AS new_rentals
+-- Change the _2026 suffix to the calendar year of the month above (_2025 or _2026).
+FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_2026 f
 WHERE f.bece_business = 'For Rent'
   AND f.bece_l2 = 'Lucas Lima'
   AND f.pl_line_1 = '-'
   AND f.pl_line_2 = '-'
   AND f.pl_line_3 = '-'
   AND f.pl_line_4 = 'New Rentals (active)'
-  AND f.version = '<VERSION>'
-  AND TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE) IS NOT NULL
+  -- Change to 'Budget' or 'OKR' to read a target instead of the actual.
+  AND f.version = 'Actuals'
+  AND TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE) IS NOT NULL
 GROUP BY 1;
 ```
 
 ### Onboarding UC — single month
 
-Replace `<YYYYMM>`, `<YEAR>`, and `<VERSION>` for the target month.
+Written for March 2026 Actuals.
 
 ```sql
 WITH onboarding_cost AS (
     SELECT
-        SUM(TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE)) AS onboarding_cost
-    FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_<YEAR> f
+        -- Change every "202603" column reference to the target month (YYYYMM).
+        SUM(TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE)) AS onboarding_cost
+    -- Change the _2026 suffix to the calendar year of the month above (_2025 or _2026).
+    FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_2026 f
     WHERE f.bece_business = 'For Rent'
       AND f.pl_line_1 = 'Operations'
       AND f.pl_line_2 = 'Onboarding'
       AND f.reporting_group <> '-'
-      AND f.version = '<VERSION>'
-      AND TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE) IS NOT NULL
+      -- Change to 'Budget' or 'OKR' to read a target instead of the actual.
+      AND f.version = 'Actuals'
+      AND TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE) IS NOT NULL
 ),
 new_rentals AS (
     SELECT
-        SUM(TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE)) AS new_rentals
-    FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_<YEAR> f
+        SUM(TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE)) AS new_rentals
+    FROM datalake_luigijr_ops_finance_clean.finance_revenue_cost_2026 f
     WHERE f.bece_business = 'For Rent'
       AND f.bece_l2 = 'Lucas Lima'
       AND f.pl_line_1 = '-'
       AND f.pl_line_2 = '-'
       AND f.pl_line_3 = '-'
       AND f.pl_line_4 = 'New Rentals (active)'
-      AND f.version = '<VERSION>'
-      AND TRY_CAST(REPLACE(f."<YYYYMM>", ',', '') AS DOUBLE) IS NOT NULL
+      AND f.version = 'Actuals'
+      AND TRY_CAST(REPLACE(f."202603", ',', '') AS DOUBLE) IS NOT NULL
 )
 SELECT
     oc.onboarding_cost,

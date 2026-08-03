@@ -66,9 +66,22 @@ that do not match the Superset MBR dashboards.
 
 - NPS FR (NPS geral offboarding, SPOC, não-SPOC / AS IS — source of truth for all offboarding NPS except digital / human-support cuts)
 
+## Catalog
+
+| Metric | Type |
+| :---- | :---- |
+| % de TFs digitais | OKR |
+| % de TFs com suporte humano | Health Metric |
+| % de TFs atendidas por SPOC | Health Metric |
+| NPS human support (offboarding) | OKR |
+| NPS digital (offboarding) | OKR |
+| Qtd. respostas NPS human support | Health Metric |
+| Qtd. respostas NPS digital | Health Metric |
+
 ## MBR
 
-- Post Contract
+**Name** Post Contract
+**Category** New Offboarding
 
 ## Glossary and Synonyms
 
