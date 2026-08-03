@@ -63,6 +63,7 @@ Create `docs/llm_context/metric_entities/{metric_slug}.md` following the templat
 | `## Ownership` | Yes — at least one email under **Data Owner** and one under **Data Steward** |
 | `## Overview` | Yes |
 | `## Related Business Entities` | Yes — at least one bullet |
+| `## Catalog` | Yes — one row per official metric defined in this document, each classified as **OKR** or **Health Metric**. CI (`_validate_catalog_types` in `generate_and_push_datahub_entities.py`) hard-blocks publishing when a catalog row has a missing/invalid type. |
 | `## MBR` | No — omit when the metric feeds no MBR, but confirm with the user. When present, **Name** is required and **Category** is optional (drop its line when the block is unknown) |
 | `## Glossary and Synonyms` | Yes — at least one bullet |
 | `## Scope` | Yes — both **Included** and **Excluded** |
@@ -83,6 +84,7 @@ Full section order (optional sections shown in place — omit them entirely when
 ## Ownership                         [required]
 ## Overview                          [required]
 ## Related Business Entities         [required]
+## Catalog                           [required]
 ## MBR                               [optional]
 ## Glossary and Synonyms              [required]
 ## Scope                              [required]
@@ -423,6 +425,7 @@ Before presenting to the user, verify:
 - [ ] Overview states both what the metric is AND why the naive calculation is wrong
 - [ ] Product-scope restriction is bolded (or absent if the metric is universal)
 - [ ] Related Business Entities lists names only — no paths, no descriptions
+- [ ] Catalog has one row per official metric defined in the document, each classified as `OKR` or `Health Metric` — CI hard-blocks on a missing/invalid type
 - [ ] MBR section present with one bullet per MBR when the metric feeds an MBR — omitted entirely otherwise (no empty section, no placeholders)
 - [ ] Scope Excluded section covers every known non-qualifying segment/campaign
 - [ ] Canonical Filter lists ALL mandatory predicates, not just the primary one
@@ -474,11 +477,14 @@ local term (e.g. "condominium bills (condomínio)"), and any code, SQL, identifi
 
 Both the CI check (in `bi-etl-ejuice`) and Zordon's pre-check block the PR when a required
 section is **missing or empty**, and enforce the machine-checkable specifics: the Ownership
-Data Owner **and** Data Steward emails, at least one `sql` Golden Query block, and a
-`## Related Business Entities` section. The finer content rules in *What it must contain*
-(Scope's Included/Excluded lists, both a Do and a Don't, Calculation's `### Canonical Filter`, …)
-describe what a **good** section looks like: CI surfaces them as **non-blocking warnings** and
-the responsible data engineer confirms them in review — advisory nudges, never a blocked PR.
+Data Owner **and** Data Steward emails, at least one `sql` Golden Query block, a
+`## Related Business Entities` section, and a `## Catalog` row per metric with a valid
+`OKR`/`Health Metric` type (`_validate_catalog_types` in `generate_and_push_datahub_entities.py`
+hard-fails the publish step on a missing/invalid type). The finer content rules in *What it must
+contain* (Scope's Included/Excluded lists, both a Do and a Don't, Calculation's
+`### Canonical Filter`, …) describe what a **good** section looks like: CI surfaces them as
+**non-blocking warnings** and the responsible data engineer confirms them in review — advisory
+nudges, never a blocked PR.
 
 | Section | What it must contain |
 | :------ | :------------------- |
@@ -486,6 +492,7 @@ the responsible data engineer confirms them in review — advisory nudges, never
 | `## Ownership` | **Data Owner:** at least one `@quintoandar.com.br`/`@quintoandar.com` email, **and** **Data Steward:** at least one such email. The two roles may be the same person. |
 | `## Overview` | 2–4 sentences: what the metric is and why a naive/component calculation is wrong. Product-scope restriction in **bold** if it exists. |
 | `## Related Business Entities` | At least one bullet naming an existing business entity (names only — no paths, no descriptions). |
+| `## Catalog` | One row per official metric defined in the document (exact name used elsewhere in the doc), each with a `Type` of `OKR` or `Health Metric`. Missing or invalid type hard-blocks the publish step. |
 | `## Glossary and Synonyms` | At least one bullet mapping every alias/synonym a user might say to this metric. |
 | `## Scope` | Both an **Included** and an **Excluded** list. |
 | `## Calculation` | The exact formula, plus `### Canonical Filter` (every mandatory predicate, not just the obvious one) and `### Nuances`. |
