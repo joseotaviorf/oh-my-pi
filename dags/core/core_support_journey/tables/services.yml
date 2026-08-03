@@ -3,22 +3,30 @@ target_table: services
 partition_cols: ["partition_date", "partition_hour"]
 merge_on: ["id_event"]
 when_matched_update_condition: "source.partition_date = target.partition_date AND source.partition_hour = target.partition_hour"
+is_backfill_run: false
 
 sources:
   support_session:
     table_name: "datalake_support_session_service_clean.support_session"
+    delta_hours: 72
   sauron_session:
     table_name: "datalake_sauron_clean.session"
+    delta_hours: 72
   bigfone_event:
     table_name: "datalake_bigfone_clean.event"
+    delta_hours: 24
   qm_channel:
     table_name: "datalake_quinto_messenger_clean.channel"
+    delta_hours: 72
   qm_chat:
     table_name: "datalake_quinto_messenger_clean.chat"
+    delta_hours: 72
   qm_task:
     table_name: "datalake_quinto_messenger_clean.task"
+    delta_hours: 24
   qm_task_event:
     table_name: "datalake_quinto_messenger_clean.task_event"
+    delta_hours: 72
 
 schema:
   columns:

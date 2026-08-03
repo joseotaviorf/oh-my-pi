@@ -3,6 +3,7 @@ target_table: cases
 partition_cols: ["partition_date", "partition_hour"]
 merge_on: ["id_event"]
 when_matched_update_condition: "source.partition_date = target.partition_date AND source.partition_hour = target.partition_hour"
+is_backfill_run: false
 
 sources:
   case:
@@ -34,7 +35,8 @@ sources:
         "partition_hour",
         "ts_load",
       ]
-    tracked_cols: [
+    tracked_cols:
+      [
         "AccountId",
         "OwnerId",
         "CreatedById",
@@ -49,7 +51,7 @@ sources:
         "IsClosed",
         "CreatedDate",
         "ClosedDate",
-    ]
+      ]
   record_types:
     table_name: "datalake_salesforce_clean.record_types"
     key_cols: ["id_record_type"]

@@ -143,6 +143,7 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         self,
         spark: SparkSession,
         session_df: DataFrame,
+        sources: Dict[str, Any],
         bigfone_table: str,
     ) -> DataFrame:
         # For workflow_name == IVR Events -> URA, we don't have a direction, so we're settign it to inbound
@@ -156,7 +157,9 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             spark.table(bigfone_table)
             .where(
                 self.build_ts_filter(
-                    self.cfg.partition_date, delta_hours=-24, col="ts_cdc_transaction"
+                    self.cfg.partition_date,
+                    delta_hours=-sources["bigfone_event"]["delta_hours"],
+                    col="ts_cdc_transaction",
                 )
             )
             .withColumn("direction", direction_cond)
@@ -241,6 +244,7 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         self,
         spark: SparkSession,
         session_df: DataFrame,
+        sources: Dict[str, Any],
         qm_channel_table: str,
         qm_chat_table: str,
         qm_task_table: str,
@@ -248,7 +252,9 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
     ) -> DataFrame:
 
         chat_filter = self.build_ts_filter(
-            self.cfg.partition_date, delta_hours=-72, col="ts_updated"
+            self.cfg.partition_date,
+            delta_hours=-sources["qm_task_event"]["delta_hours"],
+            col="ts_updated",
         )
 
         # A task can be routed through more than one queue, so we keep the queue_name from
@@ -322,7 +328,9 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             spark.table(qm_task_table)
             .where(
                 self.build_ts_filter(
-                    self.cfg.partition_date, delta_hours=-24, col="ts_updated"
+                    self.cfg.partition_date,
+                    delta_hours=-sources["qm_task"]["delta_hours"],
+                    col="ts_updated",
                 )
             )
             .withColumn("dedup_ts", F.col("ts_updated"))
@@ -501,7 +509,9 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
             .otherwise(F.lit(None))
         )
         ts_filter = self.build_ts_filter(
-            self.cfg.partition_date, delta_hours=-72, col="ts_updated"
+            self.cfg.partition_date,
+            delta_hours=-sources["support_session"]["delta_hours"],
+            col="ts_updated",
         )
 
         sss_source_df = spark.table(sources["support_session"]["table_name"]).where(
@@ -556,12 +566,18 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         call_events_df = self._build_call_events_df(
             spark,
             session_df,
-            sources["bigfone_event"]["table_name"],
+            sources,
+            sources["bigfone_event"][
+                "table_name"
+            ],  # TODO: manter apenas o parametro de source e referenciar as tabelas de acordo com o contexto
         )
         chats_results_df = self._build_chats_results_df(
             spark,
             session_df,
-            sources["qm_channel"]["table_name"],
+            sources,
+            sources["qm_channel"][
+                "table_name"
+            ],  # TODO: manter apenas o parametro de source e referenciar as tabelas de acordo com o contexto
             sources["qm_chat"]["table_name"],
             sources["qm_task"]["table_name"],
             sources["qm_task_event"]["table_name"],
@@ -615,31 +631,33 @@ class SupportJourneyServicesCoreModelPipeline(BaseCoreModelSparkJob):
         expected_schema = self.table_spec["schema"]["columns"]
         schema_column_names = list(expected_schema.keys())
 
-        previous_partition_date = (
-            datetime.strptime(self.cfg.partition_date, "%Y-%m-%d") - timedelta(hours=24)
-        ).strftime("%Y-%m-%d")
+        if not self.table_spec.get("is_backfill_run", False):
+            previous_partition_date = (
+                datetime.strptime(self.cfg.partition_date, "%Y-%m-%d")
+                - timedelta(hours=24)
+            ).strftime("%Y-%m-%d")
 
-        if partition_has_data(
-            spark,
-            target_full_table_name,
-            previous_partition_date,
-            None,
-        ):
-            self.logger.info(
-                "m=create_core_model, "
-                f"msg=Partition {self.cfg.partition_date} already exists in "
-                f"{target_full_table_name}"
-            )
-            return
+            if partition_has_data(
+                spark,
+                target_full_table_name,
+                previous_partition_date,
+                None,
+            ):
+                self.logger.info(
+                    "m=create_core_model, "
+                    f"msg=Partition {self.cfg.partition_date} already exists in "
+                    f"{target_full_table_name}"
+                )
+                return
 
         bigfone_events_ts_filter = self.build_ts_filter(
             self.cfg.partition_date,
-            delta_hours=-24,
+            delta_hours=-sources["bigfone_event"]["delta_hours"],
             col="ts_cdc_transaction",
         )
         qm_tasks_ts_filter = self.build_ts_filter(
             self.cfg.partition_date,
-            delta_hours=-24,
+            delta_hours=-sources["qm_task"]["delta_hours"],
             col="ts_updated",
         )
 

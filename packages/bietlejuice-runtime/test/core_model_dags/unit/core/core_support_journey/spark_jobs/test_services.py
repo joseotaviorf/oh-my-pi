@@ -530,6 +530,7 @@ class TestSupportJourneyServicesQueueAttribution:
         return pipeline_with_spec._build_chats_results_df(
             spark_stub,
             session_df,
+            pipeline_with_spec.table_spec["sources"],
             "qm_channel",
             "qm_chat",
             "qm_task",

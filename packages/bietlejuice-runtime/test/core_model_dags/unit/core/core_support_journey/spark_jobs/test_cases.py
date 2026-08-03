@@ -105,7 +105,10 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
 
         # assert
         mock_partition_has_data.assert_called_once_with(
-            spark, "core_support_journey.cases", cfg.partition_date, cfg.partition_hour
+            spark,
+            "core_support_journey.cases",
+            cfg.partition_date,
+            cfg.partition_hour,
         )
         spark.table.assert_not_called()
 
@@ -134,6 +137,50 @@ class TestSupportJourneyCoreModelPipelineCreateCoreModel:
         )
         mock_filter.assert_called_once_with(source_df, pipeline.tracked_cols["case"])
         filtered_df.isEmpty.assert_called_once()
+
+    @mock.patch.object(cases_module, "filter_relevant_cdc_events")
+    @mock.patch.object(cases_module, "partition_has_data")
+    def test_backfill_run_filters_partitions_forward(
+        self, mock_partition_has_data, mock_filter, table_spec
+    ):
+        # arrange: a backfill run reprocesses every partition from the target
+        # (partition_date, partition_hour) forward, so the skip guard receives
+        # is_backfill_run=True and the source is filtered by a partition_key
+        # >= target condition instead of an exact (date, hour) match.
+        backfill_table_spec = {**table_spec, "is_backfill_run": True}
+        backfill_cfg = SimpleNamespace(
+            job_name="load_core_support_journey_cases",
+            dag_name="core_support_journey",
+            partition_date="2026-05-27",
+            partition_hour="14",
+            bucket="test-bucket",
+            table_config_json=json.dumps(backfill_table_spec),
+        )
+        pipeline = cases_module.SupportJourneyCoreModelPipeline(backfill_cfg)
+        pipeline.table_spec = table_spec_from_cfg(backfill_cfg)
+        pipeline.tracked_cols = {
+            table: source["tracked_cols"]
+            for table, source in pipeline.table_spec["sources"].items()
+            if source.get("tracked_cols")
+        }
+        mock_partition_has_data.return_value = False
+
+        # Return early via an empty filtered frame so we only assert the filter.
+        empty_df = mock.MagicMock()
+        empty_df.isEmpty.return_value = True
+        mock_filter.return_value.dropDuplicates.return_value = empty_df
+
+        spark = mock.MagicMock()
+        spark.table.return_value.where.return_value = mock.MagicMock()
+
+        # act
+        pipeline.create_core_model(spark)
+
+        # assert: backfill skips the partition-exists guard
+        mock_partition_has_data.assert_not_called()
+        where_condition = spark.table.return_value.where.call_args.args[0]
+        assert "2026-05-27 14" in str(where_condition)
+        assert ">=" in str(where_condition)
 
     @mock.patch.object(cases_module, "filter_relevant_cdc_events")
     @mock.patch.object(cases_module, "DataFrameDeltaTableLoaderPipeline")

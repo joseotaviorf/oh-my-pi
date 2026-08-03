@@ -121,22 +121,39 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
         expected_schema = self.table_spec["schema"]["columns"]
         schema_column_names = list(expected_schema.keys())
 
-        # Checking if the partition already exists in the target table
-        if partition_has_data(
-            spark,
-            target_full_table_name,
-            self.cfg.partition_date,
-            self.cfg.partition_hour,
-        ):
-            self.logger.info(
-                f"m=create_core_model, msg=Partition {self.cfg.partition_date} {self.cfg.partition_hour} already exists in {target_full_table_name}"
+        if not self.table_spec.get("is_backfill_run", False):
+            # Checking if the partition already exists in the target table
+            if partition_has_data(
+                spark,
+                target_full_table_name,
+                self.cfg.partition_date,
+                self.cfg.partition_hour,
+            ):
+                self.logger.info(
+                    f"m=create_core_model, msg=Partition {self.cfg.partition_date} {self.cfg.partition_hour} already exists in {target_full_table_name}"
+                )
+                return
+
+            # Regular hourly run: process only the target partition (date + hour).
+            hourly_filter_condition = (
+                F.col("partition_date") == self.cfg.partition_date
+            ) & (F.col("partition_hour") == self.cfg.partition_hour)
+        else:
+            # Backfill run: reprocess everything from the target partition forward.
+            # partition_date (YYYY-MM-DD) and partition_hour (HH) are fixed-width and
+            # lexicographically sortable, so we combine them into a single comparable
+            # value and keep all partitions >= the target date + hour.
+            partition_key = F.concat(
+                F.col("partition_date"), F.lit(" "), F.col("partition_hour")
             )
-            return
+            target_partition_key = (
+                f"{self.cfg.partition_date} {self.cfg.partition_hour}"
+            )
+            hourly_filter_condition = partition_key >= F.lit(target_partition_key)
 
         # Reading the main source table and filtering by the partition
         source_case_df = spark.table(case_src["table_name"]).where(
-            (F.col("partition_date") == self.cfg.partition_date)
-            & (F.col("partition_hour") == self.cfg.partition_hour)
+            hourly_filter_condition
         )
 
         tracked_cols = self.tracked_cols["case"]
