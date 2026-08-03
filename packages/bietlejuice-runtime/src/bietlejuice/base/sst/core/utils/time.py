@@ -81,12 +81,18 @@ def build_start_end_date(partition_date, days=1):
     return start_date, end_date
 
 
-def build_hour_window(partition_date: str, partition_hour: str) -> tuple[str, str]:
+def build_hour_window(
+    partition_date: str, partition_hour: str, full_hour=True
+) -> tuple[str, str]:
     """Return ``(start_ts, end_ts)`` ISO-8601 UTC strings covering one hour."""
     base = datetime.strptime(partition_date, "%Y-%m-%d").replace(
         hour=int(partition_hour), tzinfo=timezone.utc
     )
     end = base + timedelta(hours=1)
+    if not full_hour:
+        # cover the range until HH:59:59
+        end -= timedelta(seconds=1)
+
     return (
         base.isoformat().replace("+00:00", "Z"),
         end.isoformat().replace("+00:00", "Z"),

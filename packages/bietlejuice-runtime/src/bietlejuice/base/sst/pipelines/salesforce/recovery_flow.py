@@ -64,7 +64,10 @@ def events_case_recovery(
     headers = build_salesforce_table_description_header(access_token)
     subject_url = f"{base_endpoint}{SUBJECT_ENDPOINT}".format(table=api_entity)
 
-    start_ts, end_ts = build_hour_window(partition_date, partition_hour)
+    # full_hour = False -> We cover only up to HH:59:59
+    start_ts, end_ts = build_hour_window(
+        partition_date, partition_hour, full_hour=False
+    )
 
     logger.info(f"m=events_case_recovery, msg=Window {start_ts=} {end_ts=}")
 

@@ -2,7 +2,7 @@
 
 import pytest
 
-from bietlejuice.base.sst.core.utils.time import is_weekend_window
+from bietlejuice.base.sst.core.utils.time import build_hour_window, is_weekend_window
 
 # Reference dates (ISO weekday in comment): the week of 2026-06-15.
 MONDAY = "2026-06-15"
@@ -64,3 +64,44 @@ class TestIsWeekendWindow:
         # Arrange / Act / Assert: "00" must be parsed as hour 0, not falsy.
         assert is_weekend_window(FRIDAY, "00") is False
         assert is_weekend_window(NEXT_MONDAY, "00") is True
+
+
+class TestBuildHourWindow:
+    @pytest.mark.parametrize(
+        "partition_date, partition_hour, full_hour, expected",
+        [
+            (
+                FRIDAY,
+                "14",
+                True,
+                ("2026-06-19T14:00:00Z", "2026-06-19T15:00:00Z"),
+            ),
+            (
+                FRIDAY,
+                "14",
+                False,
+                ("2026-06-19T14:00:00Z", "2026-06-19T14:59:59Z"),
+            ),
+            (
+                FRIDAY,
+                "23",
+                False,
+                ("2026-06-19T23:00:00Z", "2026-06-19T23:59:59Z"),
+            ),
+        ],
+    )
+    def test_returns_expected_window(
+        self, partition_date, partition_hour, full_hour, expected
+    ):
+        # Act / Assert
+        assert (
+            build_hour_window(partition_date, partition_hour, full_hour=full_hour)
+            == expected
+        )
+
+    def test_defaults_to_full_hour(self):
+        # Act / Assert
+        assert build_hour_window(FRIDAY, "14") == (
+            "2026-06-19T14:00:00Z",
+            "2026-06-19T15:00:00Z",
+        )
