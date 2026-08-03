@@ -27,13 +27,14 @@ _JSON_OUTPUT = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
 # JsonSerDe calls Timestamp.valueOf and rejects ISO-8601 with ``T`` / ``Z``,
 # which breaks EMR reads of raw JSON tables synced from Databricks → Glue.
 _JSON_SERDE = "org.apache.hive.hcatalog.data.JsonSerDe"
-# Comma-separated SimpleDateFormat patterns for Hive JsonSerDe.
-# Covers common ISO-8601 variants written by API raw loaders.
+# Comma-separated patterns for Hive JsonSerDe TimestampParser.
+# EMR Spark embeds Hive 2.3 + Joda-Time (not Java DateTimeFormatter): do NOT use
+# ``XXX`` (ISO offset) — SerDe init fails with ``Illegal pattern component: XXX``
+# and Spark then sees Data Cols: []. Prefer literal ``'Z'`` for UTC ISO values.
 JSON_TIMESTAMP_FORMATS = (
     "yyyy-MM-dd'T'HH:mm:ss.SSS'Z',"
     "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z',"
     "yyyy-MM-dd'T'HH:mm:ss'Z',"
-    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX,"
     "yyyy-MM-dd HH:mm:ss"
 )
 # Delta: Hive-compatible stub (SequenceFile + LazySimpleSerDe) + Spark
