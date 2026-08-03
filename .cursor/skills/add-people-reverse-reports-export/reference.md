@@ -86,7 +86,11 @@ In `reverse_reports_declaration.yml`, the only comment to add above a migration 
 
 **Unclear:** default to preserving names with `AS`.
 
-For Oracle flexfield-style PIN headers, consider `column_mapping_mode: name` (see `organization_codex_pin_sync` in declaration).
+**`column_mapping_mode: name`** (in `tables_customization`): Delta Lake only — last resort when
+`load_delta_table` must persist SQL aliases that are not valid Delta identifiers. **Avoid** when
+possible: those names break [`naming_conventions.mdc`](../../rules/naming_conventions.mdc). Use
+only for reverse-layer exports where legacy headers cannot be renamed without breaking consumers.
+Does **not** control Google Sheets column mapping. See `dag_build.mdc` (`DELTA_INVALID_CHARACTERS_IN_COLUMN_NAMES`).
 
 ### English identifiers everywhere except sheet headers
 

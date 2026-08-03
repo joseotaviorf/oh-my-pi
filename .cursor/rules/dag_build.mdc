@@ -385,10 +385,27 @@ workflow:
             optimize_frequency_days: 7  # Optional, minimum days between OPTIMIZE runs
             table_properties:  # Optional
                 delta.enableChangeDataFeed: "true"
+            column_mapping_mode: name  # Optional — see #### column_mapping_mode below
             execution_timeout_hours: 3.0  # Optional
 ```
 
-*`load_delta_table` only:* `tables_customization.<table>.column_mapping_mode: name` if the job fails with `DELTA_INVALID_CHARACTERS_IN_COLUMN_NAMES` (e.g. Oracle flexfield-style column names).
+#### `column_mapping_mode` (`load_delta_table` only)
+
+Per-table key: `tables_customization.<table>.column_mapping_mode`. Valid values: `none`, `name`, `id` (omit the key when the default is enough).
+
+**Not recommended by default.** Column names with spaces, accents, or special characters do not follow [`naming_conventions.mdc`](naming_conventions.mdc). Prefer valid `snake_case` identifiers in SQL and omit this setting. Use `column_mapping_mode: name` only in **exceptional** cases — typically **reverse-layer** exports that must preserve a fixed downstream contract (legacy sheet headers, Oracle flexfield names) and cannot rename columns without breaking consumers.
+
+| | |
+|---|---|
+| **Applies to** | `load_delta_table` Spark job only (`DeltaLoader` / `delta.columnMapping.mode`). |
+| **Purpose** | Let Delta Lake store column names that are not valid identifiers. Without `name`, writes fail with `DELTA_INVALID_CHARACTERS_IN_COLUMN_NAMES`. |
+| **Does not** | Map or rename columns in Google Sheets or other export targets. Downstream jobs read the Delta table schema as-is. |
+
+```yaml
+tables_customization:
+    my_reverse_export:
+        column_mapping_mode: name  # last resort: legacy headers cannot be renamed yet
+```
 
 #### `run_optimize` default on EMR
 
