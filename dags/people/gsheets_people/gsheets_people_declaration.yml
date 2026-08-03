@@ -9,6 +9,7 @@ workflow:
   has_hive_sync: false
   credentials_scope: people
   bucket_config_name: people_bucket
+  alert_channel: PEOPLE_ALERTS
   tables_customization:
     codex_cost_centers:
       vacuum_retention_hours: 168

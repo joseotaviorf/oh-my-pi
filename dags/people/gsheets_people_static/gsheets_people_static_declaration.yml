@@ -8,6 +8,7 @@ workflow:
   has_hive_sync: false
   credentials_scope: people
   bucket_config_name: people_bucket
+  alert_channel: PEOPLE_ALERTS
   custom_schema: gsheets_people
   default_table_privileges:
     people-team:

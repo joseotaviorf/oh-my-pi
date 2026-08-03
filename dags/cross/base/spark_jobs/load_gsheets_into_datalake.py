@@ -6,13 +6,15 @@ from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.gsheets_service import GsheetsService
+from bietlejuice.services.messaging_services.alert_channel_service import (
+    AlertChannelService,
+)
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
 from bietlejuice.services.metastore_services import MetastoreServiceFactory
@@ -89,6 +91,16 @@ if __name__ == "__main__":
         required=False,
         default=None,
     )
+    parser.add_argument(
+        "--alert-channel",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+        help=(
+            "Optional GchatWebhooksEnum keyword from the DAG declaration. "
+            "Falls back to AE_ALERTS_PROD / AE_ALERTS_FORNO when omitted."
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -101,6 +113,7 @@ if __name__ == "__main__":
     dag_name = args.dag_name
     credentials_key = args.credentials_key
     credentials_scope = args.credentials_scope
+    alert_channel = args.alert_channel
 
     logger.info(
         f"""
@@ -176,18 +189,18 @@ if __name__ == "__main__":
     except Exception as e:
         is_able_to_load = False
 
-        if environment == "prod":
-            key = GchatWebhooksEnum.AE_ALERTS_PROD
-        else:
-            key = GchatWebhooksEnum.AE_ALERTS_FORNO
-
-        gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=key)
+        gchat_webhook = AlertChannelService(
+            dbutils=dbutils
+        ).get_gsheets_failure_webhook_url(
+            environment=environment,
+            alert_channel=alert_channel,
+        )
 
         message_sent = __alert_not_ingesting_sheet(sheet_details, e, gchat_webhook)
         logger.error(
             f"""
                 m={JOB_NAME}, table_name={table_name}, msg=Sheet was not loaded, message_sending_result={message_sent},
-                exception={e}"
+                alert_channel={alert_channel}, exception={e}"
             """
         )
 

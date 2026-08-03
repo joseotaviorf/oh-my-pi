@@ -73,3 +73,38 @@ class AlertChannelService:
             raise ValueError(
                 error_message + " No valid keywords were provided or found."
             )
+
+    @staticmethod
+    def default_gsheets_alert_keyword(environment: str) -> str:
+        """
+        Return the AE alerts keyword used as fallback for gsheet ingestion failures.
+
+        Args:
+            environment: Pipeline environment name (``prod`` or forno-like).
+
+        Returns:
+            GchatWebhooksEnum attribute name for AE alerts in that environment.
+        """
+        return "AE_ALERTS_PROD" if environment == "prod" else "AE_ALERTS_FORNO"
+
+    def get_gsheets_failure_webhook_url(
+        self, environment: str, alert_channel: str = None
+    ) -> str:
+        """
+        Resolve the Google Chat webhook for gsheet ingestion failure alerts.
+
+        Prefers an optional DAG-declared ``alert_channel`` keyword and falls back
+        to AE_ALERTS_PROD / AE_ALERTS_FORNO (ae-alerts-opsgenie) so existing
+        behavior is preserved when the channel is omitted.
+
+        Args:
+            environment: Pipeline environment name (``prod`` or forno-like).
+            alert_channel: Optional GchatWebhooksEnum keyword from the DAG declaration.
+
+        Returns:
+            Webhook URL string fetched from Databricks Secrets.
+        """
+        return self.get_gchat_webhook_url(
+            channel_keyword=alert_channel or None,
+            default_keyword=self.default_gsheets_alert_keyword(environment),
+        )

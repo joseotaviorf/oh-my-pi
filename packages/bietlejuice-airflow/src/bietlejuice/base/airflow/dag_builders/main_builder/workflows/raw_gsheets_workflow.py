@@ -92,6 +92,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
         }
         self.credentials_scope = workflow_args.get("credentials_scope", "quintoandar")
         self.credentials_key = CREDENTIALS_SCOPE[self.credentials_scope]
+        self.alert_channel = workflow_args.get("alert_channel")
         self.dag = self.dag_instance()
 
     def build_dag(self):
@@ -385,19 +386,23 @@ class RawGsheetsWorkflow(BaseWorkflow):
         for table_name, sheet_details in google_files:
             sheet_details["raw_table_name"] = table_name
 
+            raw_spark_job_extra_args = [
+                schema,
+                table_name,
+                json.dumps(sheet_details),
+                self.dag_name,
+                self.credentials_key,
+                self.credentials_scope,
+            ]
+            if self.alert_channel:
+                raw_spark_job_extra_args.extend(["--alert-channel", self.alert_channel])
+
             raw_task_group = task_group.build_raw_task_group_for_single_table(
                 source=dag_name,
                 table_name=table_name,
                 target_database_base_name=schema,
                 extraction_spark_job_file=raw_spark_job_path,
-                raw_spark_job_extra_args=[
-                    schema,
-                    table_name,
-                    json.dumps(sheet_details),
-                    self.dag_name,
-                    self.credentials_key,
-                    self.credentials_scope,
-                ],
+                raw_spark_job_extra_args=raw_spark_job_extra_args,
                 pool=task_pool,
                 has_hive_sync=self.has_hive_sync,
             )
