@@ -238,6 +238,11 @@ def _get_user_display(account_id: str, jira_ops_auth: HTTPBasicAuth) -> dict:
     }
 
 
+def _is_sunday_morning_report(anchor: datetime) -> bool:
+    """True when the 09:00 report runs on Sunday (exceptional 09:00-12:00 shift)."""
+    return anchor.weekday() == 6
+
+
 def _get_oncall_recipients(
     cloud_id: str,
     jira_ops_auth: HTTPBasicAuth,
@@ -249,28 +254,47 @@ def _get_oncall_recipients(
     Returns (recipients, periods_length_exception) where:
     - recipients: list of {displayName, emailAddress}
     - periods_length_exception: 1 = exception day (Sunday/holiday), 2 = normal day
+
+    Sunday 09:00 is special: there is no Sat 21:00 → Sun 09:00 overnight shift, but the
+    report still covers DEI errors from that window. The recipient is the engineer on the
+    exceptional Sun 09:00-12:00 shift (fetched from today's timeline, not D-1).
     """
-    days = 1
     anchor = now_sp or datetime.now(tz=SP_TZ)
     today = anchor.strftime("%Y-%m-%d")
-    shift_date = (anchor - timedelta(days=days)).strftime("%Y-%m-%d")
-    logger.info("today=%s, shift_date=%s", today, shift_date)
 
-    timeline = _get_schedule_timeline(cloud_id, jira_ops_auth, shift_date)
-    rotations = timeline.get("finalTimeline", {}).get("rotations", [])
-    periods_length_exception = len(rotations[0].get("periods", [])) if rotations else 2
-    logger.info("periods_length_exception=%s", periods_length_exception)
-
-    if periods_length_exception == 1:
+    if _is_sunday_morning_report(anchor):
+        shift_date = today
+        periods_length_exception = 1
         logger.info(
-            "Exception day detected on D-1 (%s) — re-fetching with midnight UTC window "
-            "to capture the 09:00 BRT exception shift.",
+            "Sunday morning report — fetching exceptional shift on %s (09:00-12:00 BRT). "
+            "DEI errors still cover Sat 21:00 → Sun 09:00 (no overnight on-call).",
             shift_date,
         )
         timeline = _get_schedule_timeline(
             cloud_id, jira_ops_auth, shift_date, time_suffix="T00:00:00Z"
         )
         rotations = timeline.get("finalTimeline", {}).get("rotations", [])
+    else:
+        shift_date = (anchor - timedelta(days=1)).strftime("%Y-%m-%d")
+        logger.info("today=%s, shift_date=%s", today, shift_date)
+
+        timeline = _get_schedule_timeline(cloud_id, jira_ops_auth, shift_date)
+        rotations = timeline.get("finalTimeline", {}).get("rotations", [])
+        periods_length_exception = (
+            len(rotations[0].get("periods", [])) if rotations else 2
+        )
+        logger.info("periods_length_exception=%s", periods_length_exception)
+
+        if periods_length_exception == 1:
+            logger.info(
+                "Exception day detected on D-1 (%s) — re-fetching with midnight UTC window "
+                "to capture the 09:00 BRT exception shift.",
+                shift_date,
+            )
+            timeline = _get_schedule_timeline(
+                cloud_id, jira_ops_auth, shift_date, time_suffix="T00:00:00Z"
+            )
+            rotations = timeline.get("finalTimeline", {}).get("rotations", [])
 
     recipients: list[dict] = []
     for rotation in rotations:
@@ -412,12 +436,19 @@ def _count_voice_wakeups(
     """Count distinct alerts that triggered a voice call (acordamentos) in the shift window.
 
     Normal day: shift ran D-1 21:00 → D 09:00 SP. Query window: D-1 21:00 → D noon.
-    Exception day (Sunday/holiday): shift ran D 09:00 → 21:00 SP. Query window: 09:00 → noon.
+    Exception day (holiday): shift ran D 09:00 → 21:00 SP. Query window: 09:00 → noon.
+    Sunday 09:00 report: no overnight on-call Sat 21:00 → Sun 09:00, but alerts in that
+    window are still attributed to the Sun 09:00-12:00 engineer. Query window: Sat 21:00 → noon.
     Both windows are expressed as SP-local timestamps to match the worker environment.
     Retries on the same alert count once; separate alerts (e.g. from different DAGs) count separately.
     """
     now = now_sp or datetime.now(tz=SP_TZ)
-    if periods_length_exception != 1:
+    if _is_sunday_morning_report(now) and periods_length_exception == 1:
+        start_dt = (now - timedelta(days=1)).replace(
+            hour=21, minute=0, second=0, microsecond=0
+        )
+        end_dt = now.replace(hour=12, minute=0, second=0, microsecond=0)
+    elif periods_length_exception != 1:
         start_dt = (now - timedelta(days=1)).replace(
             hour=21, minute=0, second=0, microsecond=0
         )
@@ -571,9 +602,18 @@ def notify_dag_rotation(session=None, **context):
 
     dt_start = (now_sp - timedelta(days=1)).strftime("%Y-%m-%d")
     dt_end = now_sp.strftime("%Y-%m-%d")
-    logger.info(
-        "On-call window: %s 21:00 → %s 09:00 (America/Sao_Paulo)", dt_start, dt_end
-    )
+    if _is_sunday_morning_report(now_sp):
+        logger.info(
+            "On-call window: %s 21:00 → %s 09:00 (America/Sao_Paulo, no overnight on-call; "
+            "exceptional shift %s 09:00-12:00)",
+            dt_start,
+            dt_end,
+            dt_end,
+        )
+    else:
+        logger.info(
+            "On-call window: %s 21:00 → %s 09:00 (America/Sao_Paulo)", dt_start, dt_end
+        )
     logger.info(_environment_suffix() or "· local/other")
 
     dag_owner_map = {

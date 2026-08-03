@@ -364,10 +364,16 @@ class TestGetOncallRecipients:
             "displayName": "Zacarias Engineer",
             "emailAddress": "zacarias@example.com",
         }
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
         from requests.auth import HTTPBasicAuth
 
+        sp_tz = ZoneInfo("America/Sao_Paulo")
+        monday_anchor = datetime(2026, 5, 5, 9, 0, 0, tzinfo=sp_tz)
+
         recipients, periods_length = _get_oncall_recipients(
-            "cloud-id", HTTPBasicAuth("u", "t")
+            "cloud-id", HTTPBasicAuth("u", "t"), now_sp=monday_anchor
         )
 
         assert periods_length == 2
@@ -403,10 +409,16 @@ class TestGetOncallRecipients:
             "displayName": "Bob Engineer",
             "emailAddress": "bob@example.com",
         }
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
         from requests.auth import HTTPBasicAuth
 
+        sp_tz = ZoneInfo("America/Sao_Paulo")
+        monday_anchor = datetime(2026, 5, 5, 9, 0, 0, tzinfo=sp_tz)
+
         recipients, periods_length = _get_oncall_recipients(
-            "cloud-id", HTTPBasicAuth("u", "t")
+            "cloud-id", HTTPBasicAuth("u", "t"), now_sp=monday_anchor
         )
 
         assert periods_length == 1
@@ -418,6 +430,56 @@ class TestGetOncallRecipients:
         )
         assert len(recipients) == 1
         assert recipients[0]["emailAddress"] == "bob@example.com"
+
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._get_user_display"
+    )
+    @mock.patch(
+        "dags.governance.notify_dag_rotation.notify_dag_rotation._get_schedule_timeline"
+    )
+    def test_sunday_morning_fetches_exceptional_shift_on_today(
+        self, mock_schedule, mock_user_display
+    ):
+        """Sunday 09:00: no overnight on-call, but exceptional shift starts today at 09:00."""
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        from requests.auth import HTTPBasicAuth
+
+        sp_tz = ZoneInfo("America/Sao_Paulo")
+        sunday_anchor = datetime(2026, 7, 26, 9, 0, 0, tzinfo=sp_tz)
+        mock_schedule.return_value = {
+            "finalTimeline": {
+                "rotations": [
+                    {
+                        "name": "Primary",
+                        "periods": [
+                            {
+                                "startDate": "2026-07-26T12:00:00Z",
+                                "endDate": "2026-07-26T15:00:00Z",
+                                "responder": {"id": "user-1"},
+                            }
+                        ],
+                    }
+                ]
+            }
+        }
+        mock_user_display.return_value = {
+            "displayName": "Weekend Engineer",
+            "emailAddress": "weekend@example.com",
+        }
+
+        recipients, periods_length = _get_oncall_recipients(
+            "cloud-id", HTTPBasicAuth("u", "t"), now_sp=sunday_anchor
+        )
+
+        assert periods_length == 1
+        assert mock_schedule.call_count == 1
+        call_args, call_kwargs = mock_schedule.call_args
+        assert call_args[2] == "2026-07-26"
+        assert call_kwargs.get("time_suffix") == "T00:00:00Z"
+        assert len(recipients) == 1
+        assert recipients[0]["emailAddress"] == "weekend@example.com"
 
 
 class TestCountVoiceWakeups:
@@ -491,6 +553,34 @@ class TestCountVoiceWakeups:
         )
         assert str(expected_start) in str(call_params), (
             f"Expected start timestamp {expected_start} (D-1 21:00) in query params, got {call_params}"
+        )
+
+    @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.get")
+    def test_sunday_voice_wakeup_window_covers_overnight_gap(self, mock_get):
+        """Sunday report still counts alerts from Sat 21:00 → Sun 09:00 (no on-call overnight)."""
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        sp_tz = ZoneInfo("America/Sao_Paulo")
+        sunday_anchor = datetime(2026, 7, 26, 9, 0, 0, tzinfo=sp_tz)
+
+        mock_resp = mock.MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"values": []}
+        mock_get.return_value = mock_resp
+        from requests.auth import HTTPBasicAuth
+
+        _count_voice_wakeups(
+            "cloud-id", HTTPBasicAuth("u", "t"), 1, now_sp=sunday_anchor
+        )
+
+        call_params = (
+            mock_get.call_args_list[0][1].get("params") or mock_get.call_args_list[0][0]
+        )
+        expected_start = int(datetime(2026, 7, 25, 21, 0, 0, tzinfo=sp_tz).timestamp())
+        assert str(expected_start) in str(call_params), (
+            f"Expected start timestamp {expected_start} (Sat 21:00) in query params, "
+            f"got {call_params}"
         )
 
 
