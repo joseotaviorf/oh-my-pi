@@ -16,7 +16,6 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import MetastoreServiceFactory
 
-DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_buyer_funnel_users"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -189,7 +188,7 @@ if __name__ == "__main__":
     logger.info(
         f"""m=__main__, environment={environment},
         datalake_bucket={datalake_bucket}, database_name={database_name},
-        table_name={table_name}, partitions={partitions}, 
+        table_name={table_name}, partitions={partitions},
         load_start_date={load_start_date}, load_end_date={load_end_date}
         msg=Load Buyer Funnel Users spark job running.
         """
