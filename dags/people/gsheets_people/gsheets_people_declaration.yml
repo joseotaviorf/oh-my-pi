@@ -20,9 +20,6 @@ workflow:
     few_shot_phrases:
       vacuum_retention_hours: 168
       vacuum_lite: true
-    navent_convenia_like:
-      vacuum_retention_hours: 168
-      vacuum_lite: true
     org_health_user_roles:
       vacuum_retention_hours: 168
       vacuum_lite: true

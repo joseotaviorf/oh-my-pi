@@ -44,7 +44,7 @@ SELECT
     NULLIF(CAST(hr_bp_responsible AS STRING), '') AS hr_bp_responsible,
     NULLIF(status, '') AS status,
     NULLIF(CAST(final_evaluation AS STRING), '') AS final_evaluation,
-    NULLIF(CAST(no_oficial___on_going_performa_updates_ AS STRING), '') AS informal_performance_updates,
+    NULLIF(CAST(no_oficial___on_going_performa_updates AS STRING), '') AS informal_performance_updates,
     NULLIF(CAST(last_editor AS STRING), '') AS last_editor,
     NULLIF(type_of_last_movement_recognition, '') AS last_movement_recognition_type,
     CAST(NULLIF(salary, '') AS DECIMAL(18, 2)) AS salary,

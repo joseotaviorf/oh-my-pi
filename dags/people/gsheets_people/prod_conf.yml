@@ -11,12 +11,6 @@ sheets_info:
     sheet_id: 1-ruuef3Dl16wAzh_woF8-usy4oETSuhU5ZyFmC2TgxM
     sheet_name: codex_cost_informations
 
-  navent_convenia_like:
-    clean_table_name: navent_convenia_like
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: navent_convenia_like
-
   talent_review:
     clean_table_name: talent_review
     sheet_context: people

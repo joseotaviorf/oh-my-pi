@@ -231,7 +231,7 @@ columns:
     description: Informal or in-progress performance notes recorded outside of the
       official review cycle.
     lineage:
-    - datalake_gsheets_people_raw.talent_mapping_base.no_oficial___on_going_performa_updates_
+    - datalake_gsheets_people_raw.talent_mapping_base.no_oficial___on_going_performa_updates
   last_editor:
     description: Name of the person who last updated the employee's talent mapping
       record in the source spreadsheet.
