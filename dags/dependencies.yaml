@@ -3226,7 +3226,6 @@ bietlejuice.enrich_nps_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose-legacy:first-run-of-day
   - bietlejuice.enrich_velo:load-enrich-propose:first-run-of-day
   - bietlejuice.enrich_velo:load-enrich-user:first-run-of-day
-  - bietlejuice.gsheets_fintech:done-clean-quintocred-real-estates:first-run-of-day
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
   - bietlejuice.person:load-clean-person:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-company-executive:first-run-of-day
@@ -3343,7 +3342,6 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.checkout:load-clean-pix-webhook:first-run-of-day
   - bietlejuice.checkout:load-clean-pix:first-run-of-day
   - bietlejuice.checkout:load-clean-requester:first-run-of-day
-  - bietlejuice.gsheets_fintech:done-clean-getnet-return-codes:first-run-of-day
   - bietlejuice.vans:load-clean-boleto-file:first-run-of-day
   - bietlejuice.vans:load-clean-boleto:first-run-of-day
   - bietlejuice.vans:load-clean-file:first-run-of-day
@@ -3635,7 +3633,6 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.fastforward:load-clean-contract:first-run-of-day
   - bietlejuice.fastforward:load-clean-long-term-anticipation:first-run-of-day
   - bietlejuice.fastforward:load-clean-lra-installment:first-run-of-day
-  - bietlejuice.gsheets_fintech:done-clean-mova-lra-owners:first-run-of-day
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee:first-run-of-day
   - bietlejuice.rental_guarantee:load-clean-guarantee-aud:first-run-of-day
   - bietlejuice.retsuko:load-clean-credit-card-payment:first-run-of-day
@@ -3916,9 +3913,6 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.enrich_survicate:load-enrich-salesforce-surveys:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-scheduling-surveys:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys:first-run-of-day
-  - bietlejuice.gsheets_fintech:done-clean-owner-entrance-inspection-csat:first-run-of-day
-  - bietlejuice.gsheets_fintech:done-clean-owner-exit-inspection-csat:first-run-of-day
-  - bietlejuice.gsheets_fintech:done-clean-tenant-entrance-inspection-csat:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-csat-reimbursement-true:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day

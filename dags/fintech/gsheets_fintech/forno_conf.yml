@@ -11,36 +11,12 @@ sheets_info:
     clean_table_name: advance_base
     sheet_context: fintech
 
-  agents_payments:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: agents_payments
-    clean_table_name: agents_payments
-    sheet_context: fintech
-
   associate_executive_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: associate_executive_bonus
     clean_table_name: associate_executive_bonus
     sheet_context: fintech
 
-  associate_executive_correction:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: associate_executive_correction
-    clean_table_name: associate_executive_correction
-    sheet_context: fintech
-
-  audit_decisions:
-    sheet_id: 1FB5aycyIb6XQ0xVh_XTiaHmo6ksepRrHWg_g8mxsdLU
-    sheet_name: AuditDecisions
-    clean_table_name: audit_decisions
-    sheet_context: fintech
-
-  aux_commission:
-    sheet_id: 1IbmJlF7YNGA6xaApwFVGMyupJzwsAcD7uJDD0qvrCGg
-    sheet_name: aux_commission
-    clean_table_name: aux_commission
-    sheet_context: fintech
-  
   payfaturas_bandaid:
     sheet_id: 1-HKD9rv6Ov6_WLRDct56f3Gnur45-w004l_Q_ct8jX4
     sheet_name: Respostas
@@ -65,12 +41,6 @@ sheets_info:
     clean_table_name: campaign_bonus
     sheet_context: fintech
 
-  closing_analysts_hierarchy:
-    sheet_id: 1iG68JgfjlWezT1d5rMiCIQIoN3fgskXLpqnKs9OltyA
-    sheet_name: clean
-    clean_table_name: closing_analysts_hierarchy
-    sheet_context: fintech
-  
   feature_matrix:
     sheet_id: 1Vh2Z8IkGP-aar3t6yzp0f0IA4q7maWIJJEZdraOh_K0
     sheet_name: "Times X Tarefas/Despesas"
@@ -131,24 +101,6 @@ sheets_info:
     clean_table_name: expected_evers
     sheet_context: fintech
 
-  csat_vistoria_iq_entrada:
-    sheet_id: 1AqKMDXh_xgv3LY5fzmiHSRWSXROxfUXNDAIrsW3ScFs
-    sheet_name: entrada_iq
-    clean_table_name: tenant_entrance_inspection_csat
-    sheet_context: fintech
-
-  csat_vistoria_pp_entrada:
-    sheet_id: 1AqKMDXh_xgv3LY5fzmiHSRWSXROxfUXNDAIrsW3ScFs
-    sheet_name: entrada_pp
-    clean_table_name: owner_entrance_inspection_csat
-    sheet_context: fintech
-
-  csat_vistoria_pp_saida:
-    sheet_id: 1AqKMDXh_xgv3LY5fzmiHSRWSXROxfUXNDAIrsW3ScFs
-    sheet_name: saida_pp
-    clean_table_name: owner_exit_inspection_csat
-    sheet_context: fintech
-
   evictions_base:
     sheet_id: 1szFDxdZgzJn7rXYZwgRWbAHXCS2Jjq8vzVH4QOSsMvw
     sheet_name: Base Evictions
@@ -181,18 +133,6 @@ sheets_info:
     clean_table_name: manual_payment
     sheet_context: fintech
 
-  quintocred_executives_targets_commercial:
-    sheet_id: 1lN9XZ16_-Ym2CwiV2-O0ocpTimH_z3S4DWA-G80Yfr4
-    sheet_name: executives_targets_commercial
-    clean_table_name: quintocred_executives_targets_commercial
-    sheet_context: fintech
-
-  quintocred_test_proposals:
-    sheet_id: 1nqLwYeDxdq5lP9C2UCrOPO12B_X-B9rKYdY5HtJg2Gc
-    sheet_name: quintocred_test_proposals
-    clean_table_name: quintocred_test_proposals
-    sheet_context: fintech
-
   fraud_contracts:
     sheet_id: 136-4lHPUEE4FZL9lPws8DfNOUGF5o8KeZM_kIaReeBM
     sheet_name: BaseConsolidada
@@ -205,30 +145,12 @@ sheets_info:
     clean_table_name: fraud_contracts_for_rent
     sheet_context: fintech
 
-  for_sale_bandaids:
-    sheet_id: 1LPSu9lbDddTiHk9EtVKwQKsAVzgzuIwG-nMGcYiP2dA
-    sheet_name: forsale
-    clean_table_name: for_sale_bandaids
-    sheet_context: fintech
-
-  for_sale_financial_flow_raw:
-    sheet_id: 1wduO27OMWmNLN4kIRN2p_5E3-sV4wxEJDf8ECDkIsL0
-    sheet_name: Base
-    clean_table_name: for_sale_financial_flow
-    sheet_context: fintech
-  
   for_sale_invoice:
     sheet_id: 1qCNXOZLnpwwVdwm9V3xCBV-CIPPeTLii-Xl9f5ybhIc
     sheet_name: Sheet1
     clean_table_name: for_sale_invoice
     sheet_context: fintech
 
-  for_sale_invoices_20220225:
-    sheet_id: 1xemQxfpH5VuOyAXzUcYL1SfdP0T1gnJZy62AhmVxKdY
-    sheet_name: bd_sap
-    clean_table_name: for_sale_sap_invoices
-    sheet_context: fintech
-  
   for_sale_legacy_control:
     sheet_id: 1c9F91FwkOY_g10W9DhqKFpP7jbtramY1mphHRMEw4mA
     sheet_name: Sheet1
@@ -271,66 +193,16 @@ sheets_info:
     clean_table_name: for_sale_casa_mineira_invoice_control
     sheet_context: fintech
 
-  for_sale_closing_assistance:
-    sheet_id: 1OpAdK9YWNjc8WV0rKCTEaE0fN71EfqzZW463tttI0gA
-    sheet_name: BD_ZD
-    clean_table_name: for_sale_closing_assistance
-    sheet_context: fintech
-
   hub_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: hub_bonus
     clean_table_name: hub_bonus
     sheet_context: fintech
 
-  imovelweb_customer_portfolio:
-    sheet_id: 1_pDCFmURUe7uYbmnkjw6GDaucfkjR-xNGJj9wKh-GMU
-    sheet_name: carteira_inicial
-    clean_table_name: imovelweb_customer_portfolio
-    sheet_context: fintech
-
-  mova_lra_owners:
-    sheet_id: 1Df7vmUXQpUtCrU6gDkwr49bNQTdksa9T0V_XHwIc3hQ
-    sheet_name: 5A_Proprietarios_Completo
-    clean_table_name: mova_lra_owners
-    sheet_context: fintech
-
   negotiation_executive_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: negotiation_executive_bonus
     clean_table_name: negotiation_executive_bonus
-    sheet_context: fintech
-
-  negotiation_executive_correction:
-    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
-    sheet_name: negotiation_executive_correction
-    clean_table_name: negotiation_executive_correction
-    sheet_context: fintech
-
-  # to be excluded @Q1, 2023
-  offboarding_payments_contracts:
-    sheet_id: 1aN5gU1eKM-9ukMzdtCpb9hLJPKLy6LHav7DcNNP7tGw
-    sheet_name: Contratos
-    clean_table_name: offboarding_payments_contracts
-    sheet_context: fintech
-
-  # to be excluded @Q1, 2023
-  offboarding_payments_expenses:
-    sheet_id: 1aN5gU1eKM-9ukMzdtCpb9hLJPKLy6LHav7DcNNP7tGw
-    sheet_name: Despesas Calculadas
-    clean_table_name: offboarding_payments_expenses
-    sheet_context: fintech
-
-  payments_deals_and_discounts:
-    sheet_id: 1j0zGI74gyA6e4PWjk7yegpz5no6A102qHaIIvC1viCk
-    sheet_name: form_requests
-    clean_table_name: payments_deals_and_discounts
-    sheet_context: fintech
-
-  poa_partners:
-    sheet_id: 1Tq4Aq6TWz2csI-MTCyy49I63I1amEzn3cmTTyaZDKlU
-    sheet_name: poa_partners
-    clean_table_name: poa_partners
     sheet_context: fintech
 
   process_eviction:
@@ -357,34 +229,16 @@ sheets_info:
     clean_table_name: ead_lgd_liability
     sheet_context: fintech
 
-  target_nps_weekly:
-    sheet_id: 17hx0dsLK4CJ-sivMf7w1L54LMpZgkHboKpuI0S1Di3o
-    sheet_name: target_nps_weekly
-    clean_table_name: target_nps_weekly
-    sheet_context: fintech
-
   tracking_catalog_event_properties:
     sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
     sheet_name: event_properties
     clean_table_name: tracking_catalog_event_properties
     sheet_context: fintech
 
-  vistoria_bugs_v2:
-    sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc
-    sheet_name: vistoria_bugs_v2
-    clean_table_name: inspection_bugs_v2
-    sheet_context: fintech
-
   quintocred_process_evictions:
     sheet_id: 1kBgfI0W1jXmUtzwLTHYiXimGZ7GU-PaR1GGOOwR1oco
     sheet_name: Processos Velo (Fintech Ops)
     clean_table_name: quintocred_process_evictions
-    sheet_context: fintech
-
-  quintocred_pre_evictions:
-    sheet_id: 1ChYP2E2qvVmn0NRHeDjFvgOa31a4SPLhuFKmjUnS2B0
-    sheet_name: Trancamento Vigentes
-    clean_table_name: quintocred_pre_evictions
     sheet_context: fintech
 
   quintocred_termination_form:
@@ -399,64 +253,10 @@ sheets_info:
     clean_table_name: quintocred_coincident_targets
     sheet_context: fintech
 
-  qc_qa_ops_targets:
-    sheet_id: 1BhTxPZ-zF_Z4wM0ZdqSQdKUIgdostoK5CIEQsFjI1pw
-    sheet_name: daily
-    clean_table_name: qc_qa_ops_targets
-    sheet_context: fintech
-
-  quintocred_real_estates:
-    sheet_id: 1Xj7ISmSwT4RMDjfMyEvmCPq5QQQrruqNd-ygu9DjOVE
-    sheet_name: all_realestates
-    clean_table_name: quintocred_real_estates
-    sheet_context: fintech
-
   quintocred_aux_form:
     sheet_id: 1dFAXZk-TA6DjRlNkH1crncWZlMZkQ2LYKyHEH84a6MM
     sheet_name: Aux
     clean_table_name: quintocred_aux_form
-    sheet_context: fintech
-
-  quintocred_collections_targets:
-    sheet_id: 19U8w20GDJjIaT-zzWXoBch3MPpx6POS22OenBRNEvDM
-    sheet_name: collections_targets
-    clean_table_name: quintocred_collections_targets
-    sheet_context: fintech
-
-  quintocred_collections_capacity_plan:
-    sheet_id: 19U8w20GDJjIaT-zzWXoBch3MPpx6POS22OenBRNEvDM
-    sheet_name: collections_capacity_plan
-    clean_table_name: quintocred_collections_capacity_plan
-    sheet_context: fintech
-
-  quintocred_iaf_occurrences:
-    sheet_id: 1gBO7nEtBL5lN4GSMKfNnQVHxAihYzbnCdpmuwWK2KJ0
-    sheet_name: Sheet1
-    clean_table_name: quintocred_iaf_occurrences
-    sheet_context: fintech
-
-  quintocred_iaf_qualifies_calls:
-    sheet_id: 1gBO7nEtBL5lN4GSMKfNnQVHxAihYzbnCdpmuwWK2KJ0
-    sheet_name: Sheet2
-    clean_table_name: quintocred_iaf_qualifies_calls
-    sheet_context: fintech
-
-  quintocred_excluded_proposals:
-    sheet_id: 1nqLwYeDxdq5lP9C2UCrOPO12B_X-B9rKYdY5HtJg2Gc
-    sheet_name: quintocred_excluded_proposals
-    clean_table_name: quintocred_excluded_proposals
-    sheet_context: fintech
-
-  quintocred_wallet_history:
-    sheet_id: 10LrirX0uAGO5oNJ07F1D8n4a6KVMMUyGhfPcb83bS7c
-    sheet_name: wallet_history
-    clean_table_name: quintocred_wallet_history
-    sheet_context: fintech
-
-  getnet_return_codes:
-    sheet_id: 1K6k_I-ov7iqlA-5jya5bDSstV6hsTi4xxHig3fxRA6g
-    sheet_name: tabela_ws_getnet
-    clean_table_name: getnet_return_codes
     sheet_context: fintech
 
   collections_targets:
