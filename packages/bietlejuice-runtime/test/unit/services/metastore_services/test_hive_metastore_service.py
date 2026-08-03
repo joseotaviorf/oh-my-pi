@@ -7,6 +7,9 @@ from hive_metastore_client.builders import ColumnBuilder, PartitionBuilder
 
 from bietlejuice.base.hive import TableStorageDescriptorEnum
 from bietlejuice.services.metastore_services import HiveMetastoreService
+from bietlejuice.services.metastore_services.glue_storage_formats import (
+    JSON_TIMESTAMP_FORMATS,
+)
 
 
 class TestHiveMetastoreService:
@@ -93,7 +96,7 @@ class TestHiveMetastoreService:
         )
         mocked_serde_info_builder.assert_called_once_with(
             serialization_lib=format_info.serde_lib,
-            parameters={"timestamp.formats": "yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'"},
+            parameters={"timestamp.formats": JSON_TIMESTAMP_FORMATS},
         )
         mocked_storage_desc_builder.assert_called_once_with(
             columns=mocked_cols_or_part_keys,

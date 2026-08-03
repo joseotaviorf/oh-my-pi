@@ -23,7 +23,19 @@ _PARQUET_OUTPUT = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputForma
 _PARQUET_SERDE = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 _JSON_INPUT = "org.apache.hadoop.mapred.TextInputFormat"
 _JSON_OUTPUT = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
-_JSON_SERDE = "org.openx.data.jsonserde.JsonSerDe"
+# Hive JsonSerDe (same as TableFormatInfo.json / HiveMetastoreService). OpenX
+# JsonSerDe calls Timestamp.valueOf and rejects ISO-8601 with ``T`` / ``Z``,
+# which breaks EMR reads of raw JSON tables synced from Databricks → Glue.
+_JSON_SERDE = "org.apache.hive.hcatalog.data.JsonSerDe"
+# Comma-separated SimpleDateFormat patterns for Hive JsonSerDe.
+# Covers common ISO-8601 variants written by API raw loaders.
+JSON_TIMESTAMP_FORMATS = (
+    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z',"
+    "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z',"
+    "yyyy-MM-dd'T'HH:mm:ss'Z',"
+    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX,"
+    "yyyy-MM-dd HH:mm:ss"
+)
 # Delta: Hive-compatible stub (SequenceFile + LazySimpleSerDe) + Spark
 # table properties — matches UC→Glue sync and Spark/EMR Delta recognition.
 _DELTA_INPUT = "org.apache.hadoop.mapred.SequenceFileInputFormat"
@@ -67,6 +79,10 @@ GLUE_STORAGE_FORMATS: Dict[str, StorageFormatConfig] = {
         output_format=_JSON_OUTPUT,
         serialization_library=_JSON_SERDE,
         classification="json",
+        serde_params={
+            "serialization.format": "1",
+            "timestamp.formats": JSON_TIMESTAMP_FORMATS,
+        },
     ),
 }
 

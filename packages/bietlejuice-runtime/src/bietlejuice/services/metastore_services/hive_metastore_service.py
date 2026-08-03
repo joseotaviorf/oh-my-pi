@@ -75,9 +75,13 @@ class HiveMetastoreService(MetastoreService):
         columns = self._build_columns_from_dict(table_schema.items())
         partition_keys = self._build_columns_from_dict(partition_cols)
 
+        from bietlejuice.services.metastore_services.glue_storage_formats import (
+            JSON_TIMESTAMP_FORMATS,
+        )
+
         serde_info = SerDeInfoBuilder(
             serialization_lib=format_info.serde_lib,
-            parameters={"timestamp.formats": "yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'"},
+            parameters={"timestamp.formats": JSON_TIMESTAMP_FORMATS},
         ).build()
 
         storage_descriptor = StorageDescriptorBuilder(

@@ -75,6 +75,65 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         self.assertEqual(params.get("EXTERNAL"), "TRUE")
         self.assertNotIn("unity_catalog_source", params)
 
+    def test_json_uses_hive_json_serde_with_iso_timestamp_formats(self):
+        """Databricks→Glue secondary sync must not use OpenX (rejects ISO T/Z)."""
+        schema = OrderedDict(
+            [("id", "bigint"), ("created_at", "timestamp"), ("year", "int")]
+        )
+        ti = GlueMetastoreService._build_table_input(
+            table_name="report_card",
+            table_location="s3://bucket/raw/report_card",
+            table_schema=schema,
+            partition_cols=["year"],
+            format_str="JSON",
+        )
+        sd = ti["StorageDescriptor"]
+        self.assertEqual(
+            sd["SerdeInfo"]["SerializationLibrary"],
+            "org.apache.hive.hcatalog.data.JsonSerDe",
+        )
+        sparams = sd["SerdeInfo"]["Parameters"]
+        self.assertIn("timestamp.formats", sparams)
+        self.assertIn("'T'", sparams["timestamp.formats"])
+        self.assertIn("'Z'", sparams["timestamp.formats"])
+        self.assertEqual(ti["Parameters"].get("classification"), "json")
+        self.assertNotIn("openx", sd["SerdeInfo"]["SerializationLibrary"].lower())
+
+    def test_update_preserves_unity_catalog_source(self):
+        """Databricks secondary Glue tables carry UC provenance; keep it on update."""
+        from unittest.mock import MagicMock
+
+        glue_client = MagicMock()
+        glue_client.get_table.return_value = {
+            "Name": "report_card",
+            "Parameters": {
+                "classification": "json",
+                "unity_catalog_source": (
+                    "quintoandar_prod.datalake_metabase_raw.report_card"
+                ),
+            },
+        }
+        svc = GlueMetastoreService(glue_client)
+        schema = OrderedDict([("id", "bigint"), ("created_at", "timestamp")])
+        svc.create_external_table(
+            database_name="datalake_metabase_raw",
+            table_name="report_card",
+            table_location="s3://bucket/raw/report_card",
+            table_schema=schema,
+            partition_cols=[],
+            format_options="JSON",
+        )
+        glue_client.update_table.assert_called_once()
+        table_input = glue_client.update_table.call_args[0][1]
+        self.assertEqual(
+            table_input["Parameters"]["unity_catalog_source"],
+            "quintoandar_prod.datalake_metabase_raw.report_card",
+        )
+        self.assertEqual(
+            table_input["StorageDescriptor"]["SerdeInfo"]["SerializationLibrary"],
+            "org.apache.hive.hcatalog.data.JsonSerDe",
+        )
+
 
 class TestGlueMetastoreServiceSplitColumns(unittest.TestCase):
     """Partition columns must be excluded from ``Columns`` case-insensitively.

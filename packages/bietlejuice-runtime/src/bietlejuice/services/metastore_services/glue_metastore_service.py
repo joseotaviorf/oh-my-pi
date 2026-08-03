@@ -89,6 +89,12 @@ class GlueMetastoreService(MetastoreService):
 
         existing = self._client.get_table(database_name, table_name)
         if existing:
+            # Preserve provenance markers set by Databricks UC→Glue tooling
+            # (e.g. unity_catalog_source) that our TableInput does not manage.
+            existing_params = existing.get("Parameters") or {}
+            for key in ("unity_catalog_source",):
+                if key in existing_params and key not in table_input["Parameters"]:
+                    table_input["Parameters"][key] = existing_params[key]
             logger.info(
                 f"m=create_external_table, table={database_name}.{table_name}, "
                 "msg=table exists in Glue, updating"
