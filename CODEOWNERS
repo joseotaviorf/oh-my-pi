@@ -10,7 +10,7 @@ dags/dependencies.yaml                                                  @quintoa
 dags/for_rent/vocs_machina_planning/**                                  @quintoandar/fr-poscontrato-data-ai @quintoandar/data-ingestion-code-owners
 dags/mlops/**                                                           @quintoandar/mlcops @quintoandar/data-ingestion-code-owners
 dags/ops_poc/**                                                         @luisarodriguees @GabriellRodrigues @henriquedepaulo @quintoandar/data-ingestion-code-owners
-dags/people/**                                                          @gab-berger @isa-carol @pedroprates @quintoandar/data-ingestion-code-owners
+dags/people/**                                                          @quintoandar/enterprise-engineering @quintoandar/data-ingestion-code-owners
 dags/planning_and_performance/**                                        @luisarodriguees @gbrunelli  @GabriellRodrigues @domus123 @quintoandar/data-ingestion-code-owners
 dags/platform/**                                                        @quintoandar/data-ingestion-code-owners @quintoandar/data-ingestion-code-owners
 dags/primitives/**                                                      @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives @quintoandar/data-ingestion-code-owners
