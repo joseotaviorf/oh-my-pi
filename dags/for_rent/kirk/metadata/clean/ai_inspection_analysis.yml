@@ -22,18 +22,16 @@ columns:
     description: Processing outcome of the Kirk analysis, such as completed or failed.
     lineage:
       - datalake_kirk_raw.ai_inspection_analysis.analysis_status
+  analysis_mode:
+    description: >
+      Mode used by Kirk to run the AI inspection analysis (for example automatic versus
+      manual or controlled experiment variants from the product database).
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.analysis_mode
   identified_repairs:
     description: JSON payload listing repair items automatically detected by the Kirk model.
     lineage:
       - datalake_kirk_raw.ai_inspection_analysis.identified_repairs
-  ts_created:
-    description: Timestamp when Kirk registered the AI inspection analysis request.
-    lineage:
-      - datalake_kirk_raw.ai_inspection_analysis.created_at
-  ts_updated:
-    description: Timestamp when the analysis record was last modified in Kirk.
-    lineage:
-      - datalake_kirk_raw.ai_inspection_analysis.updated_at
   error_details:
     description: JSON payload with failure diagnostics when the automated analysis could not finish.
     lineage:
@@ -46,3 +44,34 @@ columns:
     description: Business policy ruleset version applied when classifying identified repairs.
     lineage:
       - datalake_kirk_raw.ai_inspection_analysis.policy_version
+  ts_created:
+    description: Timestamp when Kirk registered the AI inspection analysis request.
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.created_at
+  ts_updated:
+    description: Timestamp when the analysis record was last modified in Kirk.
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.updated_at
+  op_cdc:
+    description: >
+      CDC operation captured by Debezium for this row version, used to tell inserts,
+      updates and deletes apart when replaying the Kirk change stream.
+    categories:
+      r: Read/snapshot - initial load of an already existing record.
+      c: Create - new record inserted in Kirk.
+      u: Update - existing record modified in Kirk.
+      d: Delete - record removed from Kirk.
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.op_cdc
+  ts_cdc_transaction:
+    description: >
+      Wall-clock timestamp when the CDC connector captured this change event, used to
+      order row versions and measure ingestion lag against the source database.
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.ts_cdc_transaction
+  ts_database_transaction:
+    description: >
+      Timestamp of the originating transaction in the Kirk database, before CDC
+      propagation, representing when the change actually happened in the product.
+    lineage:
+      - datalake_kirk_raw.ai_inspection_analysis.ts_database_transaction
