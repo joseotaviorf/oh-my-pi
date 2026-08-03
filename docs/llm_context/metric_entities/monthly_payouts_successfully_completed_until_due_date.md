@@ -205,3 +205,4 @@ FROM landlord_payouts
 GROUP BY 1
 ORDER BY 1 DESC
 ```
+

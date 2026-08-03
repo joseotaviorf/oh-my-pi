@@ -211,3 +211,4 @@ ORDER BY 1;
 ```
 
 To compare budget or OKR scenarios for the same month, change `version` and keep all other filters — never aggregate across versions in one pass.
+

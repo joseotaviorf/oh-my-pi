@@ -400,3 +400,4 @@ ORDER BY 2 DESC
 ```
 
 > **Tip:** The default window is the trailing 12 months; adjust the `dt_terminated` predicate to the period the user asks for.
+

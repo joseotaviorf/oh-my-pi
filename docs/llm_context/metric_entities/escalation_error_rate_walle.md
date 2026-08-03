@@ -217,3 +217,4 @@ FROM component
 - **Wall-E Escalation Error Rate chart** — reference Superset chart used as the canonical
   starting point for this metric. URN: `urn:li:chart:(superset,chart.51683)`
   ([link](https://datahub.apps.data-prd.habitat.zone/chart/urn:li:chart:(superset,chart.51683)/Documentation?is_lineage_mode=false)).
+

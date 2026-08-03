@@ -469,3 +469,4 @@ ORDER BY md.month_start, ak.city_group, ak.operation;
 
 - **Data Product:** `urn:li:dataProduct:supply-retention-sale`
 
+

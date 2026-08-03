@@ -321,3 +321,4 @@ To isolate the H2'2026 OKR indicator, keep only `pct_tenant_finished` (and
 - **KR 1.2 monitor (Superset chart)** — H2'2026 OKR progress for % Tenant Finished.
   URN: `urn:li:chart:(superset,chart.61062)`
   ([explore](https://superset.apps.data-prd.habitat.zone/explore/?form_data_key=EaugNXjtT-i2ucxW_USDH_qR30_rtrFA29V9nM2UwSuVH7b6b58XupZVE0y_pV_Y&slice_id=61062&save_action=overwrite))
+

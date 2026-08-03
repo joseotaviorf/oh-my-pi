@@ -245,3 +245,4 @@ WHERE f.bece_business = 'For Rent'
 ```
 
 To compare budget or OKR scenarios for the same month, change `version` and keep all other filters — never aggregate across versions in one pass.
+

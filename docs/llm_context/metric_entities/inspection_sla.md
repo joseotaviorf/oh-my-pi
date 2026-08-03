@@ -181,3 +181,4 @@ ORDER BY 1, 2, 3
 ## Superset Golden Assets
 
 - **Booking Resolution Sandbox** — Materialized in `sandbox.booking_resolution`.
+

@@ -559,3 +559,4 @@ All of the following swap only the aggregation layer over the same `condo_monito
 ## Superset Golden Assets
 
 - **Condo Garantido — Superset dashboard** — the dashboard the owner team uses to track these metrics. Reference only: surface it to the user if they ask about Superset assets for this metric; it is not used in the calculation. URN: `urn:li:dashboard:(superset,dashboard.2314)` ([link](https://datahub.apps.data-prd.habitat.zone/dashboard/urn:li:dashboard:(superset,dashboard.2314)/))
+

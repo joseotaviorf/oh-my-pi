@@ -316,3 +316,4 @@ Use **1W / 2W / 4W / 8W** for L2VB/L2VC/L2OS on SALE by shortening the interval 
 - Don't defer to Looker or “confirm with owner” — run the golden query pattern
 - Don't confuse **L2CCV** (SALE) with **L2R** (RENT) — same as Listing to Contract Signed
 - Don't mix RENT and SALE in one query without normalizing keys and tables
+

@@ -418,3 +418,4 @@ time, not just a Monday label, to stop climbing):
 until ~16/08/26 and its 12w window until ~13/09/26. Treat weekly 8w/12w numbers for
 any week matured in the last ~2 months as provisional; only 4w is reliably matured
 week-to-week at this granularity.
+

@@ -813,3 +813,4 @@ ORDER BY 1
 - Don't compute FPD over all invoices — only the first invoice per contract counts.  
 - Don't compare Risk Profile Mix or Mix of Guarantees across groups by absolute counts — use within-group shares.
 
+

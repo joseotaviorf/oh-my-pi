@@ -575,3 +575,4 @@ ORDER BY DATE_TRUNC('week', date), business_context
 ## Superset Golden Assets
 
 - **Relatório de Supply Funnel** — canonical Superset dataset for supply funnel analysis segmented by business context, channel, and operation.
+

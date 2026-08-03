@@ -231,3 +231,4 @@ Filter `year`, `month`, `day` (or `MAKE_DATE`) for partition pruning on large sc
 - **SALE:** don't reimplement status explosion ad hoc unless validating the pipeline
 - Don't equate `dim_house_listing.status = 'PUBLISHED'` with the **daily historical series** — that is current state, not daily volume
 - Don't count `sk_house` without understanding listing grain and dedup rules per context
+

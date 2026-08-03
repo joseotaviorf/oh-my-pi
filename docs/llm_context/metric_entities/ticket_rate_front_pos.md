@@ -214,3 +214,4 @@ JOIN active_contracts ac
     ON ac.ref_month = ip.ref_month
 ORDER BY 1
 ```
+

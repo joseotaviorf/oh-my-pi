@@ -278,3 +278,4 @@ CROSS JOIN ongoing_base ob;
 ```
 
 To compare budget or OKR scenarios, change `version` on **both** CTEs to the matching scenario label.
+

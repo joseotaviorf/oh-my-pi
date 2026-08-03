@@ -614,3 +614,4 @@ The Salesforce Golden Query depends on a stable upstream table/view that rebuild
 - do not assume a specific schema/table name beyond the `curated_salesforce_daily_backlog_base` placeholder;
 - if the object does not yet exist, materialize the `cases_perspective` → calendar → `exploded_backlog`/`days_off` chain from the dashboard query first;
 - confirm with the Data Steward before assuming the final location.
+

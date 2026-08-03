@@ -401,3 +401,4 @@ WHERE segmento = 'Pos'
 GROUP BY 1
 ORDER BY 1
 ```
+

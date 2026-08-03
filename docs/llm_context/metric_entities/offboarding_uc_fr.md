@@ -272,3 +272,4 @@ CROSS JOIN ended_rentals er;
 ```
 
 To compare budget or OKR scenarios, change `version` on **both** CTEs to the matching scenario label.
+

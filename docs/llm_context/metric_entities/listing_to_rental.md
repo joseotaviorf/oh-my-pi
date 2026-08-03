@@ -229,3 +229,4 @@ GROUP BY 1
 ```
 
 For demand-funnel windowed L2R via `fact_listing_rent_flows` + `dim_contract`, see `metric_entities/listing_demand_funnel_conversions.md`.
+

@@ -823,3 +823,4 @@ DW ticket-classification CTEs above (TF shares and digital / human segmentation)
 - **NPS For Rent Post Contract [Perf.] [Support and Services]** — canonical offboarding NPS base
   (NPS geral, SPOC, não-SPOC / AS IS). Materialized in **`sandbox.nps_fr`** (Superset id 16266).
   See [`nps_fr.md`](nps_fr.md).
+
