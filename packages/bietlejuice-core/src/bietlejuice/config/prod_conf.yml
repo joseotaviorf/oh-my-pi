@@ -1668,13 +1668,16 @@ emr_cluster_base: &emr_cluster_anchor
         - key: for-use-with-amazon-emr-managed-policies
           value: "true"
     emr_configurations:
-        - Classification: iceberg-defaults
+        - &emr_conf_iceberg_defaults
+          Classification: iceberg-defaults
           Properties:
               iceberg.enabled: "true"
-        - Classification: delta-defaults
+        - &emr_conf_delta_defaults
+          Classification: delta-defaults
           Properties:
               delta.enabled: "true"
-        - Classification: yarn-env
+        - &emr_conf_yarn_env
+          Classification: yarn-env
           Configurations:
               - Classification: export
                 Properties:
@@ -1685,7 +1688,8 @@ emr_cluster_base: &emr_cluster_anchor
                     DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
                     DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
           Properties: {}
-        - Classification: spark-hive-site
+        - &emr_conf_spark_hive_site
+          Classification: spark-hive-site
           Properties:
               hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
               hive.metastore.glue.skip-archive: "true"
@@ -1695,14 +1699,16 @@ emr_cluster_base: &emr_cluster_anchor
               aws.glue.cache.db.enable: "true"
               aws.glue.cache.db.size: "1000"
               aws.glue.cache.db.ttl-mins: "30"
-        - Classification: yarn-site
+        - &emr_conf_yarn_site
+          Classification: yarn-site
           Properties:
               yarn.resourcemanager.scheduler.enable-preemption: "true"
               yarn.scheduler.capacity.maximum-am-resource-percent: "0.2"
               yarn.scheduler.capacity.resource-calculator: org.apache.hadoop.yarn.util.resource.DominantResourceCalculator
               yarn.nodemanager.vmem-check-enabled: "false"
               yarn.nodemanager.pmem-check-enabled: "false"
-        - Classification: capacity-scheduler
+        - &emr_conf_capacity_scheduler
+          Classification: capacity-scheduler
           Properties:
               yarn.scheduler.capacity.root.queues: "default"
               yarn.scheduler.capacity.root.default.capacity: "100"
@@ -1713,7 +1719,7 @@ emr_cluster_base: &emr_cluster_anchor
               yarn.scheduler.capacity.maximum-applications: "2000"
               yarn.scheduler.capacity.minimum-user-limit-percent: "10"
         - Classification: spark-defaults
-          Properties:
+          Properties: &emr_spark_defaults_props
               spark.databricks.delta.vacuum.parallelDelete.enabled: "true"
     spark_conf: &emr_spark_base
         spark.dynamicAllocation.enabled: "true"
@@ -3774,6 +3780,23 @@ wonka_cluster_emr:
     <<: *emr_cluster_anchor
     # Airflow-only (stripped before EMR API); avoids deferred create-cluster resume issues.
     airflow_emr_create_cluster_deferrable: false
+    # Overrides the anchor's list to add Delta schema autoMerge, restoring parity
+    # with wonka_runtime's Databricks spark_conf. It must live here (cluster
+    # classification) and not in spark_conf: the EMR template translator drops
+    # every spark.databricks.* key from spark_conf, and OSS Delta uses that same
+    # prefix. Without it, the first schema evolution of any wonka feature set
+    # fails the write with a Delta schema mismatch.
+    emr_configurations:
+        - *emr_conf_iceberg_defaults
+        - *emr_conf_delta_defaults
+        - *emr_conf_yarn_env
+        - *emr_conf_spark_hive_site
+        - *emr_conf_yarn_site
+        - *emr_conf_capacity_scheduler
+        - Classification: spark-defaults
+          Properties:
+              <<: *emr_spark_defaults_props
+              spark.databricks.delta.schema.autoMerge.enabled: "true"
     init_scripts:
         - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh"
