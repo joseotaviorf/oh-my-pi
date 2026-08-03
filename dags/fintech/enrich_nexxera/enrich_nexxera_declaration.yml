@@ -6,6 +6,8 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  extra_query_template_params:
+    rental_guarantee_payment_raw_path: "s3://{{ var.value.get('datalake_bucket', '5a-datalake-prod') }}/raw/rental_guarantee_platform/payment"
   inner_dependencies:
     nexxera_base:
       - adjustments

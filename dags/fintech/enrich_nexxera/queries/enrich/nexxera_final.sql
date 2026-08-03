@@ -36,12 +36,59 @@ JDT_A AS (
 -- END | SETUP STANDARD
 
 -- START | PRODUCT BLOCK
+PAYMENT_RAW_JSON AS (
+    SELECT
+        value
+    FROM
+        text.`{rental_guarantee_payment_raw_path}`
+),
+PAYMENT_RAW AS (
+    SELECT
+        CAST(get_json_object(value, '$.id') AS BIGINT) AS id,
+        CAST(get_json_object(value, '$.propose') AS BIGINT) AS propose,
+        get_json_object(value, '$.status') AS status,
+        get_json_object(value, '$.billing_type') AS billing_type,
+        CAST(get_json_object(value, '$.value') AS DECIMAL(38, 18)) AS value,
+        COALESCE(
+            TRY_TO_TIMESTAMP(get_json_object(value, '$.client_payment_date')),
+            TO_TIMESTAMP(
+                REGEXP_REPLACE(
+                    REPLACE(get_json_object(value, '$.client_payment_date'), 'Z', ''),
+                    'T',
+                    ' '
+                ),
+                'yyyy-MM-dd HH:mm:ss.SSS'
+            )
+        ) AS client_payment_date,
+        COALESCE(
+            TRY_TO_TIMESTAMP(get_json_object(value, '$.due_date')),
+            TO_TIMESTAMP(
+                REGEXP_REPLACE(
+                    REPLACE(get_json_object(value, '$.due_date'), 'Z', ''),
+                    'T',
+                    ' '
+                ),
+                'yyyy-MM-dd HH:mm:ss.SSS'
+            )
+        ) AS due_date
+    FROM
+        PAYMENT_RAW_JSON
+),
 PAYMENTS_INSTALLMENT_VELO AS ( -- HELPER CTE
     SELECT
-        ROW_NUMBER() OVER (PARTITION BY propose ORDER BY id, IF(client_payment_date IS NULL, 0, -1), client_payment_date) AS rn_payments,
-        *
+        ROW_NUMBER() OVER (
+            PARTITION BY propose
+            ORDER BY id, IF(client_payment_date IS NULL, 0, -1), client_payment_date
+        ) AS rn_payments,
+        id,
+        propose,
+        status,
+        billing_type,
+        value,
+        client_payment_date,
+        due_date
     FROM
-        datalake_rental_guarantee_platform_raw.payment
+        PAYMENT_RAW
     WHERE
         status = 'SUCCESS'
         AND (billing_type = 'CREDIT_CARD' OR billing_type = 'ANNUAL_CREDIT_CARD')
@@ -49,8 +96,8 @@ PAYMENTS_INSTALLMENT_VELO AS ( -- HELPER CTE
 JDT_B AS ( -- INPUT PRODUCT
     SELECT c1.rn_end,
         ROW_NUMBER() OVER(PARTITION BY c1.rn_end ORDER BY IF(c.id_store IS NULL, 0, -1), py.rn_payments, c1.rn_end) AS rn_product,
-        CAST(COALESCE(DATE_FORMAT(CAST(SPLIT(inn.createdat, 'T')[0] AS DATE),'yyyyMM'),date_format(c1.dt_sale, 'yyyyMM')) AS INT) AS Reference3, -- REQUIRED | AccrualDate
-        COALESCE(CAST(SPLIT(inn.createdat, 'T')[0] AS DATE) + (interval '1' month * coalesce(c1.installment_number, 1)),c1.dt_sale + (interval '1' month * coalesce(c1.installment_number, 1))) AS DueDate,
+        CAST(COALESCE(DATE_FORMAT(inn.ts_created, 'yyyyMM'), date_format(c1.dt_sale, 'yyyyMM')) AS INT) AS Reference3, -- REQUIRED | AccrualDate
+        COALESCE(CAST(inn.ts_created AS DATE) + (interval '1' month * coalesce(c1.installment_number, 1)), c1.dt_sale + (interval '1' month * coalesce(c1.installment_number, 1))) AS DueDate,
         IF(c1.total_installments > 1,
             COALESCE(CONCAT(CAST(acquire_nsu AS INT),':',acquire_auth_code,':',c1.installment_number),CONCAT(c1.receipt,':',c1.authorization_number,':',c1.installment_number)),
             COALESCE(CONCAT(CAST(acquire_nsu AS INT), ':', acquire_auth_code),CONCAT(c1.receipt, ':', c1.authorization_number)))
@@ -76,8 +123,8 @@ JDT_B AS ( -- INPUT PRODUCT
         ON c.acquire_auth_code = LPAD(c1.authorization_number, 6, '0')
         AND CAST(c.acquire_nsu AS INT) = c1.receipt
     LEFT JOIN
-        datalake_wall_street_raw.invoice inn
-        ON c.id = inn.chargeid
+        datalake_wall_street_clean.invoice inn
+        ON c.id = inn.id_charge
     LEFT JOIN
         PAYMENTS_INSTALLMENT_VELO py
         ON CAST(py.propose AS varchar(30)) = CAST(c.id_business_entity AS varchar(30))

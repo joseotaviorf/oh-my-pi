@@ -77,13 +77,15 @@ columns:
     lineage: []
   duedate:
     description: Financial attribute representing duedate on the nexxera_final dataset.
-    lineage: []
+    lineage:
+      - datalake_wall_street_clean.invoice.ts_created
   parentkey:
     description: Financial attribute representing parentkey on the nexxera_final dataset.
     lineage: []
   reference3:
     description: Financial attribute representing reference3 on the nexxera_final dataset.
-    lineage: []
+    lineage:
+      - datalake_wall_street_clean.invoice.ts_created
   linenum:
     description: Financial attribute representing linenum on the nexxera_final dataset.
     lineage: []
@@ -101,13 +103,16 @@ columns:
     lineage: []
   reference2:
     description: Financial attribute representing reference2 on the nexxera_final dataset.
-    lineage: []
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.id
   additionalreference:
     description: Financial attribute representing additionalreference on the nexxera_final dataset.
-    lineage: []
+    lineage:
+      - datalake_wall_street_clean.invoice.ts_created
   duedate_:
     description: Financial attribute representing duedate on the nexxera_final dataset.
-    lineage: []
+    lineage:
+      - datalake_wall_street_clean.invoice.ts_created
   u_sourceclient:
     description: Financial attribute representing u sourceclient on the nexxera_final dataset.
     lineage: []

@@ -3206,6 +3206,7 @@ bietlejuice.enrich_nexxera:
   - bietlejuice.rental_guarantee_platform:load-clean-address:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-property-propose:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-propose:first-run-of-day
+  - bietlejuice.wall_street:load-clean-invoice:first-run-of-day
   - bietlejuice.wall_street_fast_lane:load-clean-charge:first-run-of-day
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
