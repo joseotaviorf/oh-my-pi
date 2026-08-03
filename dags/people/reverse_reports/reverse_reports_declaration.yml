@@ -179,6 +179,12 @@ workflow:
       extra_spark_job_arguments:
         - "1A-am4WUHHoFMMbdArbQxhviprC1UHL_Wvt7phOEhJRo"
         - "base_analytics_raw"
+    # Former notebook view: base_compensation (tab base comp) — DBP-1819
+    compensation_base:
+      column_mapping_mode: name
+      extra_spark_job_arguments:
+        - "1JdEi_cwBzs1NsY30dUCodAW3QOlxHarQgSRJTMeKTqo"
+        - "base comp"
     # Former notebook view: people_governance_project_management
     governance_pm_roster:
       extra_spark_job_arguments:
