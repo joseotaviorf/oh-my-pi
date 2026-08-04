@@ -50,19 +50,16 @@ import os
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from typing import Iterable
-from urllib.parse import quote
 
 import pendulum
 import requests
 from airflow import DAG
-from airflow.configuration import conf
 from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from airflow.utils.db import provide_session
 from sqlalchemy import bindparam, text
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
@@ -72,7 +69,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 DAG_NAME = "dag_runtime_monitoring"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-AIRFLOW_URL = conf.get("webserver", "base_url")
+_BIETLEJUICE_DAG_PREFIX = "bietlejuice."
 
 # Airflow Variables.
 JIRA_OPS_VARIABLE = "JIRA_OPS_ONCALL_APIKEY"
@@ -107,16 +104,6 @@ _VERDICT_WAITING_UPSTREAM = "waiting_upstream"
 # task_outlet_dataset_reference has no row for it.
 _REPROCESSING_VARIANT = "reprocessing"
 _REPROCESSING_URI_SUFFIX = f":{_REPROCESSING_VARIANT}"
-# Same runbook the check_dags_dataset_queue alert links to.
-_DATASET_QUEUE_RUNBOOK_URL = (
-    "https://docs.google.com/document/d/"
-    "1dfTMqxDFV00uElPONo8a85m5dhpqnfHeBKNn48Kdcb8/edit#heading=h.7mfa516ef9eo"
-)
-# A bare manual trigger resolves to TEST_RUN and emits no dataset events, leaving
-# downstream blocked; the recovery trigger must carry this conf to fan out.
-_IMPACT_DOWNSTREAM_CONF = json.dumps(
-    {"run_type": DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS.value}
-)
 # Channel payload limits (hard caps; truncate before send).
 # GChat incoming webhooks reject text > 4096 characters.
 _GCHAT_TEXT_MAX = 4096
@@ -1336,14 +1323,6 @@ def _evaluate_sla_missing_runs(
     return findings
 
 
-def _trigger_url(dag_id: str, *, run_conf: str | None = None) -> str:
-    """Trigger deep link, optionally pre-filled with a ``dag_run.conf`` payload."""
-    url = f"{AIRFLOW_URL}/dags/{quote(dag_id, safe='')}/trigger"
-    if run_conf:
-        url = f"{url}?conf={quote(run_conf, safe='')}"
-    return url
-
-
 def _build_alert_text(finding: dict) -> str:
     """JiraOps / log description — dispatches by finding kind."""
     if finding.get("kind") == _KIND_MISSING_RUN:
@@ -1458,6 +1437,13 @@ def _join_capped(items: list, limit: int) -> str:
     return f"{', '.join(shown)}{suffix}"
 
 
+def _short_dag_label(dag_id: str) -> str:
+    """Strip ``bietlejuice.`` for Chat display; leave other namespaces intact."""
+    if isinstance(dag_id, str) and dag_id.startswith(_BIETLEJUICE_DAG_PREFIX):
+        return dag_id[len(_BIETLEJUICE_DAG_PREFIX) :]
+    return dag_id
+
+
 def _format_impacted_dw_line(
     impacted_dw_dags: list | None, *, limit: int = _IMPACTED_DW_LIST_LIMIT
 ) -> str:
@@ -1465,7 +1451,8 @@ def _format_impacted_dw_line(
     dags = list(impacted_dw_dags or [])
     if not dags:
         return "• Impacted DW: none"
-    return f"• Impacted DW ({len(dags)}): {_join_capped(dags, limit)}"
+    labels = [_short_dag_label(dag_id) for dag_id in dags]
+    return f"• Impacted DW ({len(dags)}): {_join_capped(labels, limit)}"
 
 
 def _slowness_body(
@@ -1526,9 +1513,7 @@ def _dataset_state_lines(entry: dict) -> list:
             if entry.get("dataset_ready_missing")
             else "all conditions met, no run created"
         )
-        lines.append(
-            f"• Likely a dropped dataset event ({cause}) — {_DATASET_QUEUE_RUNBOOK_URL}"
-        )
+        lines.append(f"• Likely a dropped dataset event ({cause})")
     elif verdict == _VERDICT_WAITING_UPSTREAM:
         blocking = list(entry.get("dataset_blocking_dags") or [])
         if blocking:
@@ -1536,18 +1521,6 @@ def _dataset_state_lines(entry: dict) -> list:
                 f"• Waiting on: {_join_capped(blocking, _MISSING_DATASET_LIST_LIMIT)}"
             )
     return lines
-
-
-def _missing_run_trigger_line(entry: dict) -> str:
-    """Trigger bullet. Only a dropped event warrants the fan-out recovery trigger.
-
-    When the DAG is genuinely still waiting on a producer, running it now would
-    process incomplete inputs *and* emit downstream events, so the plain link stays.
-    """
-    if entry.get("dataset_verdict") == _VERDICT_DROPPED_EVENT:
-        url = _trigger_url(entry["dag_id"], run_conf=_IMPACT_DOWNSTREAM_CONF)
-        return f"• Trigger (unblocks downstream): {url}"
-    return f"• Trigger: {_trigger_url(entry['dag_id'])}"
 
 
 def _missing_run_body(
@@ -1561,34 +1534,16 @@ def _missing_run_body(
     """Shared multiline layout for missing-run (SLA) alerts."""
     lines = [headline, f"• Owner: {_owner_label(entry)}"]
     if include_details:
-        expected = _format_utc_hhmm(entry.get("expected_start"))
-        grace = entry.get("grace_minutes")
-        pct = entry.get("percentile")
-        history = entry.get("history_count")
-        lookback = entry.get("lookback_days")
         lines.append(
-            f"• Expected by: {_format_utc_hhmm(entry.get('due_at'))} "
-            f"(P{pct} start {expected} + {grace:g}m grace, {history} cycles / {lookback}d)"
+            f"• Late by: {_format_duration(late_by_s)} "
+            f"(due {_format_utc_hhmm(entry.get('due_at'))})"
         )
-        lines.append(f"• Late by: {_format_duration(late_by_s)}")
         lines.extend(_dataset_state_lines(entry))
-        lines.append(_format_impacted_dw_line(entry.get("impacted_dw_dags") or []))
+        dw_line = _format_impacted_dw_line(entry.get("impacted_dw_dags") or [])
         also_waiting = entry.get("also_waiting_count") or 0
         if also_waiting:
-            lines.append(f"• Also waiting downstream: {also_waiting} DAG(s)")
-        capped = entry.get("capped_count") or 0
-        if capped:
-            lines.append(
-                f"• Alert cap reached: {capped} more late root(s) not reported"
-            )
-        if entry.get("root_is_fallback"):
-            # No late DAG had all its expected upstreams confirmed successful, so this
-            # is the top of the late subgraph rather than a confirmed root.
-            lines.append(
-                f"• Attribution: unconfirmed root "
-                f"({entry.get('late_count') or 0} DAG(s) late this cycle)"
-            )
-        lines.append(_missing_run_trigger_line(entry))
+            dw_line = f"{dw_line} · also waiting: {also_waiting}"
+        lines.append(dw_line)
     else:
         lines.append(f"• Late by: {_format_duration(late_by_s)}")
         also_waiting = entry.get("also_waiting_count")
@@ -1618,7 +1573,6 @@ def _missing_run_initial_text(entry: dict, late_by_s: float) -> str:
         late_by_s,
         headline=f"⏰ *{entry['dag_id']}* has not started",
         include_details=True,
-        footer="Tracking until it starts.",
     )
 
 

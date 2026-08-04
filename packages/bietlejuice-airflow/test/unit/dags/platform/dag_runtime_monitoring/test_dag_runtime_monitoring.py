@@ -63,6 +63,7 @@ from dags.platform.dag_runtime_monitoring.dag_runtime_monitoring import (
     _load_upstream_index_safe,
     _missing_run_initial_text,
     _missing_run_started_text,
+    _missing_run_update_text,
     _normalize_ledger,
     _offset_minutes,
     _parse_test_options,
@@ -378,7 +379,7 @@ def test_build_alert_text_contains_key_facts():
     assert "P90" in text
     assert "(+500%)" in text
     assert "• Run: r1" in text
-    assert "• Impacted DW (1): bietlejuice.dw_foo" in text
+    assert "• Impacted DW (1): dw_foo" in text
 
 
 # --------------------------------------------------------------------------- #
@@ -405,7 +406,7 @@ def test_message_builders():
     assert "running slower than usual" in initial
     assert "• Owner: Data Fintech" in initial
     assert "P90 baseline" in initial
-    assert "• Impacted DW (2): bietlejuice.dw_alpha, bietlejuice.dw_beta" in initial
+    assert "• Impacted DW (2): dw_alpha, dw_beta" in initial
     assert "Tracking until it finishes." in initial
     update = _update_text(_ENTRY, 5400)
     assert update.startswith("🐌")
@@ -452,18 +453,22 @@ class TestFormatImpactedDwLine:
 
     def test_lists_all_when_under_limit(self):
         dags = ["bietlejuice.dw_a", "bietlejuice.dw_b"]
-        assert (
-            _format_impacted_dw_line(dags)
-            == "• Impacted DW (2): bietlejuice.dw_a, bietlejuice.dw_b"
-        )
+        assert _format_impacted_dw_line(dags) == "• Impacted DW (2): dw_a, dw_b"
 
     def test_truncates_after_limit(self):
         dags = [f"bietlejuice.dw_{i:02d}" for i in range(_IMPACTED_DW_LIST_LIMIT + 5)]
         text = _format_impacted_dw_line(dags)
         assert f"• Impacted DW ({len(dags)}):" in text
         assert "… and 5 more" in text
-        assert f"bietlejuice.dw_{_IMPACTED_DW_LIST_LIMIT - 1:02d}" in text
-        assert f"bietlejuice.dw_{_IMPACTED_DW_LIST_LIMIT:02d}" not in text
+        assert f"dw_{_IMPACTED_DW_LIST_LIMIT - 1:02d}" in text
+        assert f"dw_{_IMPACTED_DW_LIST_LIMIT:02d}" not in text
+        assert "bietlejuice." not in text
+
+    def test_preserves_non_bietlejuice_namespaces(self):
+        assert (
+            _format_impacted_dw_line(["quintoml.wonka.segmentation"])
+            == "• Impacted DW (1): quintoml.wonka.segmentation"
+        )
 
 
 class TestFetchDagOwners:
@@ -958,7 +963,7 @@ def test_new_standard_anomaly_posts_initial_and_tracks(
     mock_post.assert_called_once()
     text_arg = mock_post.call_args.args[1]
     assert "running slower than usual" in text_arg
-    assert "bietlejuice.dw_impacted" in text_arg
+    assert "dw_impacted" in text_arg
     assert "bietlejuice.metric_not_listed" not in text_arg
     saved = _saved_ledger(mock_var)
     assert saved[f"{_STANDARD_DAG}|r2"]["tier"] == "standard"
@@ -1113,7 +1118,7 @@ def test_simulate_attaches_dw_impact(
     )
 
     mock_post.assert_called_once()
-    assert "bietlejuice.dw_impacted" in mock_post.call_args.args[1]
+    assert "dw_impacted" in mock_post.call_args.args[1]
 
 
 def _lifecycle_patches(func):
@@ -2105,13 +2110,15 @@ class TestSlaMessagesAndLedger:
         text = _missing_run_initial_text(entry, 4320)
         assert "has not started" in text
         assert "Data ForRent" in text
-        assert "Late by: 1h12m" in text
-        assert "Also waiting downstream: 319 DAG(s)" in text
-        assert "Trigger:" in text
-        assert "Tracking until it starts." in text
+        assert "Late by: 1h12m (due 04:45 UTC)" in text
+        assert "Expected by:" not in text
+        assert "• Impacted DW (1): dw_region · also waiting: 319" in text
+        assert "Also waiting downstream" not in text
+        assert "Trigger:" not in text
+        assert "Tracking until it starts." not in text
         assert "Attribution" not in text
 
-    def test_missing_run_initial_text_flags_unconfirmed_root(self):
+    def test_missing_run_initial_text_omits_unconfirmed_root(self):
         entry = {
             "kind": _KIND_MISSING_RUN,
             "dag_id": "bietlejuice.enrich_region",
@@ -2129,7 +2136,35 @@ class TestSlaMessagesAndLedger:
             "root_is_fallback": True,
         }
         text = _missing_run_initial_text(entry, 4320)
-        assert "Attribution: unconfirmed root (12 DAG(s) late this cycle)" in text
+        assert "Attribution" not in text
+        assert "• Impacted DW: none" in text
+
+    def test_missing_run_initial_text_merges_also_waiting_when_no_dw(self):
+        entry = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": "bietlejuice.enrich_region",
+            "owner": "Data ForRent",
+            "due_at": "2026-07-25T04:45:00+00:00",
+            "impacted_dw_dags": [],
+            "also_waiting_count": 12,
+        }
+        text = _missing_run_initial_text(entry, 3600)
+        assert "• Impacted DW: none · also waiting: 12" in text
+        assert "Also waiting downstream" not in text
+
+    def test_missing_run_update_text_keeps_also_waiting_separate(self):
+        entry = {
+            "kind": _KIND_MISSING_RUN,
+            "dag_id": "bietlejuice.enrich_region",
+            "owner": "Data ForRent",
+            "also_waiting_count": 12,
+        }
+        text = _missing_run_update_text(entry, 7200, also_waiting=12)
+        assert "still has not started" in text
+        assert "Late by: 2h" in text
+        assert "• Also waiting downstream: 12 DAG(s)" in text
+        assert "Impacted DW" not in text
+        assert "due " not in text
 
     def test_missing_run_started_text(self):
         entry = {
@@ -2804,7 +2839,7 @@ class TestMissingRunDatasetMessage:
         "lookback_days": 14,
     }
 
-    def test_dropped_event_names_missing_uri_and_offers_recovery_trigger(self):
+    def test_dropped_event_names_missing_uri_without_runbook_or_trigger(self):
         entry = {
             **self._BASE,
             "dataset_required": 14,
@@ -2817,10 +2852,10 @@ class TestMissingRunDatasetMessage:
         assert "• Datasets: 13/14 satisfied" in text
         assert "missing internal_chat:messages:first-run-of-day" in text
         assert "producer already delivered, update never recorded" in text
-        assert "docs.google.com" in text
-        assert "Trigger (unblocks downstream)" in text
-        assert "conf=" in text
-        assert "impact_downstream_dependents" in text
+        assert "• Likely a dropped dataset event (" in text
+        assert "docs.google.com" not in text
+        assert "Trigger" not in text
+        assert "conf=" not in text
 
     def test_all_satisfied_dropped_event_uses_the_other_cause(self):
         entry = {
@@ -2836,7 +2871,7 @@ class TestMissingRunDatasetMessage:
         assert "missing" not in text.split("• Datasets")[1].split("\n")[0]
         assert "all conditions met, no run created" in text
 
-    def test_waiting_upstream_names_blocker_and_keeps_plain_trigger(self):
+    def test_waiting_upstream_names_blocker_without_trigger(self):
         entry = {
             **self._BASE,
             "dataset_required": 5,
@@ -2848,14 +2883,13 @@ class TestMissingRunDatasetMessage:
         }
         text = _missing_run_initial_text(entry, 3600)
         assert "• Waiting on: bietlejuice.slow_upstream" in text
-        assert "• Trigger: " in text
-        assert "conf=" not in text
+        assert "Trigger" not in text
         assert "dropped dataset event" not in text
 
     def test_cron_dag_message_has_no_dataset_bullets(self):
         text = _missing_run_initial_text(dict(self._BASE), 3600)
         assert "• Datasets:" not in text
-        assert "• Trigger: " in text
+        assert "Trigger" not in text
 
     def test_missing_uri_list_is_capped(self):
         missing = [f"uri-{i}" for i in range(_MISSING_DATASET_LIST_LIMIT + 4)]
@@ -3561,11 +3595,9 @@ class TestMissingRunAlertCap:
             }
         )
         assert entry["capped_count"] == 7
-        assert "• Alert cap reached: 7 more late root(s) not reported" in (
-            _build_alert_text(entry)
-        )
+        assert "• Alert cap reached" not in _build_alert_text(entry)
 
-    def test_message_reports_the_cap(self):
+    def test_message_omits_the_cap_from_chat(self):
         text = _missing_run_initial_text(
             {
                 "kind": _KIND_MISSING_RUN,
@@ -3581,7 +3613,7 @@ class TestMissingRunAlertCap:
             },
             3600,
         )
-        assert "• Alert cap reached: 7 more late root(s) not reported" in text
+        assert "• Alert cap reached" not in text
 
 
 class TestTwentyThreeHundredTickRegression:

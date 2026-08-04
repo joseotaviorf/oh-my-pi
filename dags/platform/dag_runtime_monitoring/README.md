@@ -65,8 +65,9 @@ excluded from history but does emit real events.
 
 If nothing is confirmed but *unblocked* DAGs are still late — e.g. the true root has too
 little history to have a baseline — the monitor falls back to the **tops of the late
-subgraph** and marks the alert `Attribution: unconfirmed root (N DAG(s) late this
-cycle)`. A lower-confidence root beats going silent during a real cascade, which is
+subgraph**. Those findings still carry `root_is_fallback` / `late_count` in the
+ledger for diagnostics; Chat stays compact and does not surface an Attribution
+line. A lower-confidence root beats going silent during a real cascade, which is
 the failure mode the 2026-07-14 postmortem describes. The fallback distinguishes
 *missing information* from *known blockage*: when the dataset trigger state cannot be
 read at all, every late DAG stays eligible and the guard fails open; when it reads
@@ -117,12 +118,12 @@ whose update went missing. Two verdicts:
 - **Likely a dropped dataset event** — every condition is queued, or a missing dataset's
   producer already delivered this cycle. This is the postmortem signature: Airflow
   silently drops a dataset update that lands while the target DAG's `SerializedDagModel`
-  is stale and never retro-applies it, so the DAG sits at N-1/N forever. The alert links
-  the runbook and offers a trigger deep link pre-filled with
+  is stale and never retro-applies it, so the DAG sits at N-1/N forever. The alert names
+  the verdict (and cause) in Chat; operators recover with a manual trigger carrying
   `{"run_type": "impact_downstream_dependents"}` — the only form that fans out to
   dependents (a bare manual trigger resolves to `TEST_RUN` and emits nothing).
-- **Waiting on `<dag>`** — a producer genuinely has not delivered yet, so the plain
-  trigger link stays and the blocking upstream is named instead.
+- **Waiting on `<dag>`** — a producer genuinely has not delivered yet, so the blocking
+  upstream is named instead of a dropped-event verdict.
 
 Cron DAGs (no dataset schedule) keep the original message. A failure to read the dataset
 tables just drops these bullets; the alert still sends.
@@ -155,8 +156,8 @@ ships with the `dags/` package) via `BietlejuiceDependencyHelper`, builds a reve
 dependency index once, and for every flagged DAG attaches the **transitive** list of
 downstream IDs matching `bietlejuice.dw_*`.
 
-- **Initial** Google Chat / JiraOps messages include the full list (truncated after 25
-  names with `… and K more`).
+- **Initial** Google Chat / JiraOps messages include the list with the `bietlejuice.`
+  prefix stripped (truncated after 25 names with `… and K more`).
 - **Follow-up** Chat updates recompute the count from the live YAML so a mid-incident
   deploy that changes the graph is reflected (`Still blocking N dw_* DAG(s)`).
   If the YAML cannot be loaded on a later cycle, the update keeps the ledger's
@@ -167,9 +168,11 @@ downstream IDs matching `bietlejuice.dw_*`.
 - For **missing-run detection**, the same load failure is **fail-closed**: no new
   SLA roots are opened that cycle (an empty upstream map would otherwise treat
   every late DAG as a root). Existing SLA ledger entries are still followed up.
-- Missing-run roots also include `Also waiting downstream: N DAG(s)` (other late
-  DAGs transitively downstream of the root within the late set), the dataset
-  diagnostics described above, and a Trigger deep link.
+- Missing-run **initial** alerts fold due time into `Late by`, keep compact dataset
+  diagnostics, list Impacted DW (prefix-stripped) with `· also waiting: N` when
+  other late DAGs sit downstream of the root, and omit Trigger / runbook / Attribution
+  / tracking-footer noise. **Follow-ups** stay short (`still has not started` + Late by
+  + separate `Also waiting downstream` when > 0).
 - `sla_enabled: false` stops new missing-run alerts **and** drops any open SLA
   ledger entries without further Chat updates. Paused / inactive / excluded DAGs
   are likewise dropped from the SLA ledger on the next cycle (no more “still
@@ -178,7 +181,8 @@ downstream IDs matching `bietlejuice.dw_*`.
   (including slowness) keeps running.
 
 Alert text is multiline (🐌/⏰ + owner from Airflow `dag.owners` with fallback to
-serialized DAG `default_args.owner`, elapsed/baseline or SLA due-by, run id, DW impact).
+serialized DAG `default_args.owner`, elapsed/baseline or SLA late-by, run id for
+slowness, DW impact).
 Payloads are hard-capped before send: Google Chat `text` ≤ 4096 chars; JiraOps/Opsgenie
 `message` ≤ 130 and `description` ≤ 15000.
 
