@@ -4,13 +4,32 @@ from unittest.mock import MagicMock, patch
 import requests
 from requests.exceptions import RequestException
 
-from bietlejuice.base.api.common.client import BaseAPIClient
+from bietlejuice.base.api.common.client import DEFAULT_POOL_MAXSIZE, BaseAPIClient
 from bietlejuice.base.api.common.exceptions import (
     APIException,
     BadRequestError,
     NotFoundError,
     RateLimitError,
 )
+
+
+class TestBaseAPIClientConnectionPool(unittest.TestCase):
+    """Connection-pool sizing for parallel id_expansion fan-out."""
+
+    def test_default_connection_pool_supports_parallel_fan_out(self):
+        """Keep-alive pool must cover typical id_expansion max_workers."""
+        client = BaseAPIClient(base_url="http://fakeapi.com")
+        https_adapter = client.session.get_adapter("https://example.com")
+        self.assertEqual(https_adapter._pool_maxsize, DEFAULT_POOL_MAXSIZE)
+        self.assertEqual(https_adapter._pool_connections, DEFAULT_POOL_MAXSIZE)
+        self.assertEqual(client.pool_maxsize, DEFAULT_POOL_MAXSIZE)
+
+    def test_custom_pool_maxsize(self):
+        """Caller can raise the pool when fan-out concurrency exceeds the default."""
+        client = BaseAPIClient(base_url="http://fakeapi.com", pool_maxsize=128)
+        https_adapter = client.session.get_adapter("https://example.com")
+        self.assertEqual(https_adapter._pool_maxsize, 128)
+        self.assertEqual(client.pool_maxsize, 128)
 
 
 class TestBaseAPIClient(unittest.TestCase):

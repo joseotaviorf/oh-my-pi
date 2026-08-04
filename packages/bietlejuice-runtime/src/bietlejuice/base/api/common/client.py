@@ -14,6 +14,10 @@ from bietlejuice.base.api.rate_limit.header_adapter import HeaderRateLimitAdapte
 
 LOGGER = logging.getLogger(__name__)
 
+# urllib3 defaults to pool_maxsize=10; parallel id_expansion fan-out needs a
+# larger keep-alive pool so concurrent workers reuse TLS connections.
+DEFAULT_POOL_MAXSIZE = 64
+
 
 class BaseAPIClient:
     """
@@ -28,6 +32,7 @@ class BaseAPIClient:
         timeout: int = 30,
         max_retries: int = 3,
         min_remaining_threshold: int = 5,
+        pool_maxsize: int = DEFAULT_POOL_MAXSIZE,
     ):
         self.base_url = base_url
         self.session = requests.Session()
@@ -41,12 +46,16 @@ class BaseAPIClient:
             backoff_factor=1,
         )
         adapter = HeaderRateLimitAdapter(
-            max_retries=retry_strategy, min_remaining_threshold=min_remaining_threshold
+            max_retries=retry_strategy,
+            min_remaining_threshold=min_remaining_threshold,
+            pool_connections=pool_maxsize,
+            pool_maxsize=pool_maxsize,
         )
         self.session.mount("https://", adapter)
         self.session.mount("http://", adapter)
 
         self.timeout = timeout
+        self.pool_maxsize = pool_maxsize
 
     def _handle_response(self, response: requests.Response):
         """Checks for errors in the response and raises appropriate exceptions."""

@@ -29,7 +29,11 @@ sys.modules["bietlejuice.base.api.configuration.declaration_loader"] = MagicMock
 sys.modules["bietlejuice.base.api.configuration.loader"] = MagicMock()
 
 from dags.cross.base.spark_jobs.load_api_ingestion_raw import (  # noqa: E402
+    _dates_last_n_days,
+    _dates_previous_and_current_calendar_month,
     _fetch_with_id_expansion,
+    _format_date_expansion_value,
+    _resolve_date_expansion_values,
     _resolve_partitions,
 )
 
@@ -52,6 +56,56 @@ class TestResolvePartitions:
 
     def test_single_partition(self):
         assert _resolve_partitions("date") == ["date"]
+
+
+class TestDateExpansionHelpers:
+    """Tests for calendar date expansion helpers."""
+
+    def test_previous_and_current_month_from_mid_july(self):
+        dates = _dates_previous_and_current_calendar_month("2026-07-26")
+        assert dates[0] == "2026-06-01"
+        assert dates[-1] == "2026-07-26"
+        assert len(dates) == 56
+
+    def test_last_n_days_inclusive_window(self):
+        dates = _dates_last_n_days("2026-07-26", 45)
+        assert dates[0] == "2026-06-12"
+        assert dates[-1] == "2026-07-26"
+        assert len(dates) == 45
+
+    def test_resolve_last_n_days_from_config(self):
+        config = {
+            "strategy": "last_n_days",
+            "days": 45,
+            "anchor": "load_end_date",
+        }
+        dates = _resolve_date_expansion_values(config, "2026-01-01", "2026-07-26")
+        assert len(dates) == 45
+        assert dates[-1] == "2026-07-26"
+
+    def test_resolve_without_config_returns_single_none(self):
+        assert _resolve_date_expansion_values(None, "2026-07-01", "2026-07-26") == [
+            None
+        ]
+
+    def test_invalid_anchor_raises(self):
+        with pytest.raises(ValueError, match="date_expansion.anchor"):
+            _resolve_date_expansion_values(
+                {
+                    "strategy": "last_n_days",
+                    "days": 2,
+                    "anchor": "load_end",
+                },
+                "2026-01-01",
+                "2026-07-26",
+            )
+
+    def test_format_date_expansion_respects_date_format(self):
+        assert _format_date_expansion_value("2026-07-26", "%Y-%m-%d") == "2026-07-26"
+        assert (
+            _format_date_expansion_value("2026-07-26", None)
+            == "2026-07-26T00:00:00.000Z"
+        )
 
 
 class TestFetchWithIdExpansion:
@@ -109,6 +163,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="employees/hoursbank/totals",
             initial_params={"date": "2026-04-12"},
+            load_start_date="2026-04-12",
+            load_end_date="2026-04-12",
         )
 
         assert len(results) == 2
@@ -136,6 +192,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="requests/employees/emp-1",
             initial_params={},
+            load_start_date="2026-04-12",
+            load_end_date="2026-04-12",
         )
 
         assert len(results) == 2
@@ -163,6 +221,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="employees/hoursbank/totals",
             initial_params={"date": "2026-04-12"},
+            load_start_date="2026-04-12",
+            load_end_date="2026-04-12",
         )
 
         assert len(results) == 1
@@ -185,6 +245,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="employees/hoursbank/totals",
             initial_params={},
+            load_start_date="2026-04-12",
+            load_end_date="2026-04-12",
         )
 
         spark.table.assert_called_once_with("datalake_oitchau_raw.employees")
@@ -209,6 +271,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="employees/hoursbank/totals",
             initial_params={"date": "2026-04-12"},
+            load_start_date="2026-04-12",
+            load_end_date="2026-04-12",
         )
 
         assert client.get.call_count == 2
@@ -241,6 +305,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="requests/employees/{employeeUuid}",
             initial_params={"from": "2025-01-01", "to": "2026-01-01"},
+            load_start_date="2025-01-01",
+            load_end_date="2026-01-01",
         )
 
         client.get.assert_called_once_with(
@@ -274,6 +340,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="requests/employees/{employeeUuid}",
             initial_params={"from": "2025-01-01", "to": "2026-01-01"},
+            load_start_date="2025-01-01",
+            load_end_date="2026-01-01",
         )
 
         assert len(results) == 2
@@ -301,6 +369,8 @@ class TestFetchWithIdExpansion:
                 source_schema="oitchau",
                 endpoint="requests/employees/{employeeUuid}",
                 initial_params={},
+                load_start_date="2026-04-12",
+                load_end_date="2026-04-12",
             )
 
     def test_json_body_field_post_flattens_content_array(self):
@@ -332,6 +402,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="costs/list",
             initial_params={},
+            load_start_date="2026-04-12",
+            load_end_date="2026-04-12",
         )
 
         assert len(results) == 1
@@ -363,6 +435,8 @@ class TestFetchWithIdExpansion:
                 source_schema="oitchau",
                 endpoint="costs/list",
                 initial_params={},
+                load_start_date="2026-04-12",
+                load_end_date="2026-04-12",
             )
 
     def test_empty_source_table_returns_empty_list(self):
@@ -382,6 +456,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="employees/hoursbank/totals",
             initial_params={"date": "2026-04-12"},
+            load_start_date="2026-04-12",
+            load_end_date="2026-04-12",
         )
 
         assert results == []
@@ -409,6 +485,8 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="holidays-groups/holidays/employees/{employeeUuid}",
             initial_params={"from": "2026-01-01", "to": "2026-01-31"},
+            load_start_date="2026-01-01",
+            load_end_date="2026-01-31",
         )
 
         assert len(results) == 1
@@ -438,6 +516,8 @@ class TestFetchWithIdExpansion:
                 source_schema="oitchau",
                 endpoint="employees/hoursbank/totals",
                 initial_params={},
+                load_start_date="2026-04-12",
+                load_end_date="2026-04-12",
             )
 
     def test_payload_filters_single_dict_is_accepted(self):
@@ -461,7 +541,83 @@ class TestFetchWithIdExpansion:
             source_schema="oitchau",
             endpoint="employees/hoursbank/totals",
             initial_params={"date": "2026-04-12"},
+            load_start_date="2026-04-12",
+            load_end_date="2026-04-12",
         )
 
         assert len(results) == 1
         assert results[0]["uuid"] == "uuid-1"
+
+    def test_path_param_missing_placeholder_fails_before_fan_out(self):
+        """Bad endpoint_path / path_param pairs fail before per-entity tasks run."""
+        spark = self._make_spark(["emp-1"])
+        client = MagicMock()
+
+        with pytest.raises(ValueError, match="endpoint_path must contain"):
+            _fetch_with_id_expansion(
+                spark=spark,
+                client=client,
+                loader=self._loader_without_pagination(),
+                id_expansion_config={
+                    "source_table": "employees",
+                    "id_field": "uuid",
+                    "path_param": "employeeUuid",
+                },
+                source_schema="oitchau",
+                endpoint="requests/employees/missing-placeholder",
+                initial_params={},
+                load_start_date="2026-04-12",
+                load_end_date="2026-04-12",
+            )
+
+        client.get.assert_not_called()
+
+    def test_date_expansion_without_param_name_raises(self):
+        """date_expansion with multiple dates requires param_name to vary the query."""
+        spark = self._make_spark(["uuid-1"])
+        client = MagicMock()
+
+        with pytest.raises(ValueError, match="date_expansion.param_name"):
+            _fetch_with_id_expansion(
+                spark=spark,
+                client=client,
+                loader=self._loader_without_pagination(),
+                id_expansion_config={
+                    "source_table": "employees",
+                    "id_field": "uuid",
+                    "param_name": "employeeUuid",
+                },
+                source_schema="oitchau",
+                endpoint="employees/hoursbank/totals",
+                initial_params={},
+                load_start_date="2026-04-12",
+                load_end_date="2026-04-12",
+                date_expansion_config={
+                    "strategy": "last_n_days",
+                    "days": 2,
+                    "anchor": "load_end_date",
+                },
+            )
+
+    def test_max_workers_zero_raises(self):
+        """YAML max_workers: 0 must raise instead of silently becoming sequential."""
+        spark = self._make_spark(["uuid-1"])
+        client = MagicMock()
+
+        with pytest.raises(ValueError, match="max_workers must be >= 1"):
+            _fetch_with_id_expansion(
+                spark=spark,
+                client=client,
+                loader=self._loader_without_pagination(),
+                id_expansion_config={
+                    "source_table": "employees",
+                    "id_field": "uuid",
+                    "param_name": "employeeUuid",
+                    "max_workers": 0,
+                },
+                source_schema="oitchau",
+                endpoint="employees/hoursbank/totals",
+                initial_params={},
+                load_start_date="2026-04-12",
+                load_end_date="2026-04-12",
+            )

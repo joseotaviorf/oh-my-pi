@@ -1,5 +1,6 @@
 import logging
 import time
+from threading import Lock
 from typing import Dict
 
 import requests
@@ -60,6 +61,7 @@ class HeaderRateLimitAdapter(BaseRateLimitAdapter):
 
         self.rate_limit_remaining: int = min_remaining_threshold + 1
         self.rate_limit_reset_time: float = 0.0
+        self._state_lock = Lock()
 
     def _update_rate_limit_from_headers(self, headers: Dict[str, str]):
         """Updates the internal rate limit state from the response headers."""
@@ -102,12 +104,17 @@ class HeaderRateLimitAdapter(BaseRateLimitAdapter):
         """
         Sends the request, applying waiting logic before and, if necessary,
         after the request is sent.
+
+        Rate-limit counters are guarded with a lock so concurrent fan-out
+        threads sharing one session do not race on remaining/reset state.
         """
-        self._wait_if_needed()
+        with self._state_lock:
+            self._wait_if_needed()
 
         response = super().send(request, **kwargs)
 
-        self._update_rate_limit_from_headers(response.headers)
+        with self._state_lock:
+            self._update_rate_limit_from_headers(response.headers)
 
         if response.status_code == 429:
             retry_after = response.headers.get("Retry-After")

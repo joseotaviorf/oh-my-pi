@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+from threading import Lock
 from typing import Any, Dict, Optional
 
 import requests
@@ -86,6 +87,7 @@ class BasicAuthOAuth2ClientCredentials(AuthBase, RequestsAuthBase):
 
         self._access_token: Optional[str] = None
         self._token_expires_at: float = 0.0
+        self._token_lock = Lock()
 
     def _is_token_expired(self) -> bool:
         """
@@ -230,9 +232,11 @@ class BasicAuthOAuth2ClientCredentials(AuthBase, RequestsAuthBase):
             requests.PreparedRequest: The modified request with the
                                       Authorization header.
         """
-        if self._access_token is None or self._is_token_expired():
-            self._fetch_new_token()
-        r.headers["Authorization"] = f"Bearer {self._access_token}"
+        with self._token_lock:
+            if self._access_token is None or self._is_token_expired():
+                self._fetch_new_token()
+            access_token = self._access_token
+        r.headers["Authorization"] = f"Bearer {access_token}"
         return r
 
     def apply_auth(self, session: requests.Session):

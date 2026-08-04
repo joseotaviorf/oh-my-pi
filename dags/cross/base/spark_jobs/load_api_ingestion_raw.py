@@ -9,11 +9,15 @@ Uses the standard library :mod:`logging` for this workflow (aligned with
 ``declaration_loader`` and API configuration modules).
 """
 
+import itertools
 import json
 import logging
 import time
 from argparse import ArgumentParser, Namespace
-from typing import Any, Dict, List
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from datetime import date, timedelta
+from threading import Lock
+from typing import Any, Dict, List, Optional, Tuple
 
 from pyspark.sql import SparkSession
 
@@ -95,6 +99,226 @@ def _initialize_spark() -> SparkSession:
     return SparkSession.builder.getOrCreate()
 
 
+def _dates_previous_and_current_calendar_month(anchor_iso: str) -> List[str]:
+    """
+    Returns inclusive ISO dates from the first day of the previous calendar month
+    through the anchor date.
+    """
+    anchor = date.fromisoformat(anchor_iso)
+    if anchor.month == 1:
+        range_start = date(anchor.year - 1, 12, 1)
+    else:
+        range_start = date(anchor.year, anchor.month - 1, 1)
+    dates_out: List[str] = []
+    cursor = range_start
+    while cursor <= anchor:
+        dates_out.append(cursor.isoformat())
+        cursor += timedelta(days=1)
+    return dates_out
+
+
+def _dates_last_n_days(anchor_iso: str, days: int) -> List[str]:
+    """
+    Returns inclusive ISO dates for the last ``days`` calendar days ending on the anchor.
+
+    Example: anchor 2026-07-26 and days=45 → 2026-06-12 through 2026-07-26 (45 values).
+    """
+    if days < 1:
+        raise ValueError(
+            f"m=_dates_last_n_days, days={days} msg=days must be >= 1 for last_n_days strategy"
+        )
+    anchor = date.fromisoformat(anchor_iso)
+    range_start = anchor - timedelta(days=days - 1)
+    dates_out: List[str] = []
+    cursor = range_start
+    while cursor <= anchor:
+        dates_out.append(cursor.isoformat())
+        cursor += timedelta(days=1)
+    return dates_out
+
+
+def _format_date_expansion_value(iso_date: str, date_format: Optional[str]) -> str:
+    """
+    Formats an expanded calendar date the same way ``get_initial_params`` would.
+
+    Args:
+        iso_date: Date in ``YYYY-MM-DD``.
+        date_format: Optional strftime pattern from table/workflow ``date_format``.
+            When omitted, uses ISO-8601 with a start-of-day suffix (same default
+            family as ``APIConfigurationLoader.get_initial_params``).
+
+    Returns:
+        Formatted date string for the query param.
+    """
+    if date_format:
+        return date.fromisoformat(iso_date).strftime(date_format)
+    return f"{iso_date}T00:00:00.000Z"
+
+
+def _resolve_date_expansion_values(
+    date_expansion_config: Optional[Dict[str, Any]],
+    load_start_date: str,
+    load_end_date: str,
+) -> List[Optional[str]]:
+    """
+    Resolves which values to assign to the date query param for each fan-out call.
+
+    Returns a list of ISO date strings (``YYYY-MM-DD``), or ``[None]`` when no date
+    expansion is configured (single request per entity using ``initial_params`` only).
+    Callers that inject into HTTP params should pass values through
+    ``_format_date_expansion_value`` when a ``date_format`` is configured.
+    """
+    if not date_expansion_config:
+        return [None]
+
+    strategy = date_expansion_config.get("strategy")
+    anchor_key = date_expansion_config.get("anchor", "load_end_date")
+    if anchor_key not in ("load_end_date", "load_start_date"):
+        raise ValueError(
+            "m=_resolve_date_expansion_values, "
+            f"anchor={anchor_key!r} msg=date_expansion.anchor must be "
+            "'load_end_date' or 'load_start_date'"
+        )
+    anchor_iso = load_end_date if anchor_key == "load_end_date" else load_start_date
+
+    if strategy == "previous_and_current_calendar_month":
+        return _dates_previous_and_current_calendar_month(anchor_iso)
+
+    if strategy == "last_n_days":
+        days_raw = date_expansion_config.get("days")
+        if days_raw is None:
+            raise ValueError(
+                "m=_resolve_date_expansion_values, strategy=last_n_days "
+                "msg=date_expansion.days is required"
+            )
+        return _dates_last_n_days(anchor_iso, int(days_raw))
+
+    raise ValueError(
+        f"m=_resolve_date_expansion_values, strategy={strategy!r} "
+        "msg=Unsupported date_expansion strategy"
+    )
+
+
+def _warn_if_unpaginated_multi_page(
+    data: Any,
+    *,
+    id_field: str,
+    entity_id: str,
+    endpoint: str,
+) -> None:
+    """Log when the API signals multiple pages but no paginator is configured."""
+    if not isinstance(data, dict):
+        return
+    meta = data.get("metadata")
+    if not isinstance(meta, dict):
+        return
+    total_pages = meta.get("totalPages")
+    if isinstance(total_pages, (int, float)) and int(total_pages) > 1:
+        LOGGER.warning(
+            "m=_fetch_one_entity, %s=%s, endpoint=%s, totalPages=%s "
+            "msg=Multiple pages returned but only the first page was fetched; "
+            "configure api_policies.pagination for this table.",
+            id_field,
+            entity_id,
+            endpoint,
+            total_pages,
+        )
+
+
+def _fetch_one_entity(
+    client: Any,
+    loader: APIConfigurationLoader,
+    id_expansion_config: Dict[str, Any],
+    endpoint: str,
+    initial_params: Dict[str, Any],
+    entity_id: str,
+    date_param_name: Optional[str],
+    date_param_value: Optional[str],
+) -> Tuple[List[Dict[str, Any]], bool]:
+    """
+    Performs one fan-out HTTP call for a single entity (and optional date override).
+
+    Returns:
+        Tuple of (result rows, success flag).
+    """
+    injection_key = (
+        id_expansion_config.get("correlation_field") or id_expansion_config["id_field"]
+    )
+    path_param = id_expansion_config.get("path_param")
+    param_name = id_expansion_config.get("param_name")
+    json_body_field = id_expansion_config.get("json_body_field")
+
+    params = dict(initial_params)
+    if date_param_name and date_param_value is not None:
+        params[date_param_name] = date_param_value
+
+    resolved_endpoint = endpoint
+    if path_param:
+        path_placeholder = "{" + path_param + "}"
+        if path_placeholder not in endpoint:
+            raise ValueError(
+                f"m=_fetch_one_entity, msg=endpoint_path must contain "
+                f"placeholder '{path_placeholder}' when id_expansion.path_param is set."
+            )
+        resolved_endpoint = endpoint.replace(path_placeholder, str(entity_id))
+    elif param_name:
+        params[param_name] = entity_id
+
+    if json_body_field:
+        paginator = loader.create_paginator(client, resolved_endpoint, params)
+        if paginator:
+            raise ValueError(
+                "m=_fetch_one_entity, msg=id_expansion.json_body_field "
+                "(POST fan-out) does not support api_policies.pagination on this table."
+            )
+
+    rows: List[Dict[str, Any]] = []
+
+    if json_body_field:
+        response = client.post(
+            resolved_endpoint,
+            params=params,
+            json={json_body_field: entity_id},
+        )
+        data = response.json() if hasattr(response, "json") else response
+    else:
+        paginator = loader.create_paginator(client, resolved_endpoint, params)
+        if paginator:
+            for page_rows in paginator.fetch_all():
+                for item in page_rows:
+                    if isinstance(item, dict):
+                        item[injection_key] = entity_id
+                rows.extend(page_rows)
+            return rows, True
+
+        response = client.get(resolved_endpoint, params=params)
+        data = response.json() if hasattr(response, "json") else response
+
+    if isinstance(data, dict):
+        content = data.get("content")
+        if isinstance(content, list):
+            for item in content:
+                if isinstance(item, dict):
+                    item[injection_key] = entity_id
+            rows.extend(content)
+        else:
+            _warn_if_unpaginated_multi_page(
+                data,
+                id_field=id_expansion_config["id_field"],
+                entity_id=entity_id,
+                endpoint=resolved_endpoint,
+            )
+            data[injection_key] = entity_id
+            rows.append(data)
+    elif isinstance(data, list):
+        for item in data:
+            if isinstance(item, dict):
+                item[injection_key] = entity_id
+        rows.extend(data)
+
+    return rows, True
+
+
 def _fetch_with_id_expansion(
     spark: SparkSession,
     client: Any,
@@ -103,6 +327,10 @@ def _fetch_with_id_expansion(
     source_schema: str,
     endpoint: str,
     initial_params: Dict[str, Any],
+    load_start_date: str,
+    load_end_date: str,
+    date_expansion_config: Optional[Dict[str, Any]] = None,
+    date_format: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
     Fetches data from a per-entity endpoint by fanning out over IDs from a source table.
@@ -113,6 +341,9 @@ def _fetch_with_id_expansion(
     dict envelopes are kept as one row per entity (with correlation_field or id_field injected)
     unless the response dict exposes a ``content`` list (then one row per list element).
     List bodies are flattened similarly to GET.
+
+    Optional ``date_expansion`` repeats each entity call for multiple ``date`` (or other) param
+    values. Optional ``max_workers`` on ``id_expansion`` parallelizes HTTP calls.
 
     Args:
         spark: Active SparkSession used to read the source table.
@@ -126,6 +357,11 @@ def _fetch_with_id_expansion(
         source_schema: Raw metastore schema name (e.g. "oitchau").
         endpoint: API endpoint path.
         initial_params: Base query params (e.g. date filters) to merge with each call.
+        load_start_date: DAG load window start (YYYY-MM-DD).
+        load_end_date: DAG load window end (YYYY-MM-DD).
+        date_expansion_config: Optional table-level date_expansion block.
+        date_format: Optional strftime pattern from table/workflow ``date_format``;
+            applied to each expanded date before HTTP injection.
 
     Returns:
         Combined list of response dicts from all per-entity API calls.
@@ -135,7 +371,6 @@ def _fetch_with_id_expansion(
 
     source_table = id_expansion_config["source_table"]
     id_field = id_expansion_config["id_field"]
-    injection_key = id_expansion_config.get("correlation_field") or id_field
     path_param = id_expansion_config.get("path_param")
     param_name = id_expansion_config.get("param_name")
     json_body_field = id_expansion_config.get("json_body_field")
@@ -146,6 +381,48 @@ def _fetch_with_id_expansion(
             "m=_fetch_with_id_expansion, msg=id_expansion requires exactly one of "
             "'path_param', 'param_name', or 'json_body_field'."
         )
+
+    if json_body_field:
+        paginator = loader.create_paginator(client, endpoint, dict(initial_params))
+        if paginator:
+            raise ValueError(
+                "m=_fetch_with_id_expansion, msg=id_expansion.json_body_field "
+                "(POST fan-out) does not support api_policies.pagination on this table."
+            )
+
+    if path_param:
+        path_placeholder = "{" + path_param + "}"
+        if path_placeholder not in endpoint:
+            raise ValueError(
+                "m=_fetch_with_id_expansion, msg=endpoint_path must contain "
+                f"placeholder '{path_placeholder}' when id_expansion.path_param is set."
+            )
+
+    date_values = _resolve_date_expansion_values(
+        date_expansion_config, load_start_date, load_end_date
+    )
+    date_param_name = None
+    if date_expansion_config:
+        date_param_name = date_expansion_config.get("param_name")
+        if not date_param_name:
+            raise ValueError(
+                "m=_fetch_with_id_expansion, msg=date_expansion.param_name is required "
+                "when date_expansion is configured"
+            )
+        date_values = [
+            None if value is None else _format_date_expansion_value(value, date_format)
+            for value in date_values
+        ]
+
+    if (
+        "max_workers" not in id_expansion_config
+        or id_expansion_config.get("max_workers") is None
+    ):
+        max_workers = 1
+    else:
+        max_workers = int(id_expansion_config["max_workers"])
+    if max_workers < 1:
+        raise ValueError("m=_fetch_with_id_expansion, msg=max_workers must be >= 1")
 
     full_table_name = f"datalake_{source_schema}_raw.{source_table}"
     LOGGER.info(
@@ -203,121 +480,80 @@ def _fetch_with_id_expansion(
     ids_df = ids_df.select(F.col("_fanout_id").alias("_id_value")).distinct()
     ids = [row["_id_value"] for row in ids_df.collect()]
 
+    total_tasks = len(ids) * len(date_values)
     LOGGER.info(
-        "m=_fetch_with_id_expansion, count=%d msg=Entity IDs loaded, starting fan-out",
+        "m=_fetch_with_id_expansion, entities=%d, date_values=%d, tasks=%d, "
+        "max_workers=%d msg=Entity IDs loaded, starting fan-out",
         len(ids),
+        len(date_values),
+        total_tasks,
+        max_workers,
     )
 
     all_results: List[Dict[str, Any]] = []
+    results_lock = Lock() if max_workers > 1 else None
     failed = 0
+    id_field_log = id_expansion_config["id_field"]
 
-    path_placeholder = "{" + path_param + "}" if path_param else ""
-
-    for entity_id in ids:
-        params = dict(initial_params)
-        resolved_endpoint = endpoint
-        if path_param:
-            if path_placeholder not in endpoint:
-                raise ValueError(
-                    f"m=_fetch_with_id_expansion, msg=endpoint_path must contain "
-                    f"placeholder '{path_placeholder}' when id_expansion.path_param is set."
-                )
-            resolved_endpoint = endpoint.replace(path_placeholder, str(entity_id))
-        elif param_name:
-            params[param_name] = entity_id
-
-        if json_body_field:
-            paginator = loader.create_paginator(client, resolved_endpoint, params)
-            if paginator:
-                raise ValueError(
-                    "m=_fetch_with_id_expansion, msg=id_expansion.json_body_field "
-                    "(POST fan-out) does not support api_policies.pagination on this table."
-                )
-
+    def _run_task(task: Tuple[str, Optional[str]]) -> Tuple[List[Dict[str, Any]], bool]:
+        entity_id, date_value = task
         try:
-            if json_body_field:
-                response = client.post(
-                    resolved_endpoint,
-                    params=params,
-                    json={json_body_field: entity_id},
-                )
-                data = response.json() if hasattr(response, "json") else response
-
-                if isinstance(data, dict):
-                    content = data.get("content")
-                    if isinstance(content, list):
-                        for item in content:
-                            if isinstance(item, dict):
-                                item[injection_key] = entity_id
-                        all_results.extend(content)
-                    else:
-                        meta = data.get("metadata")
-                        if isinstance(meta, dict):
-                            total_pages = meta.get("totalPages")
-                            if (
-                                isinstance(total_pages, (int, float))
-                                and int(total_pages) > 1
-                            ):
-                                LOGGER.warning(
-                                    "m=_fetch_with_id_expansion, %s=%s, endpoint=%s, totalPages=%s "
-                                    "msg=Multiple pages returned but only the first page was fetched; "
-                                    "configure api_policies.pagination for this table.",
-                                    id_field,
-                                    entity_id,
-                                    resolved_endpoint,
-                                    total_pages,
-                                )
-                        data[injection_key] = entity_id
-                        all_results.append(data)
-                elif isinstance(data, list):
-                    for item in data:
-                        if isinstance(item, dict):
-                            item[injection_key] = entity_id
-                    all_results.extend(data)
-            else:
-                paginator = loader.create_paginator(client, resolved_endpoint, params)
-                if paginator:
-                    for page_rows in paginator.fetch_all():
-                        for item in page_rows:
-                            if isinstance(item, dict):
-                                item[injection_key] = entity_id
-                        all_results.extend(page_rows)
-                else:
-                    response = client.get(resolved_endpoint, params=params)
-                    data = response.json() if hasattr(response, "json") else response
-
-                    if isinstance(data, dict):
-                        meta = data.get("metadata")
-                        if isinstance(meta, dict):
-                            total_pages = meta.get("totalPages")
-                            if (
-                                isinstance(total_pages, (int, float))
-                                and int(total_pages) > 1
-                            ):
-                                LOGGER.warning(
-                                    "m=_fetch_with_id_expansion, %s=%s, endpoint=%s, totalPages=%s "
-                                    "msg=Multiple pages returned but only the first page was fetched; "
-                                    "configure api_policies.pagination for this table.",
-                                    id_field,
-                                    entity_id,
-                                    resolved_endpoint,
-                                    total_pages,
-                                )
-                        data[injection_key] = entity_id
-                        all_results.append(data)
-                    elif isinstance(data, list):
-                        for item in data:
-                            if isinstance(item, dict):
-                                item[injection_key] = entity_id
-                        all_results.extend(data)
+            return _fetch_one_entity(
+                client=client,
+                loader=loader,
+                id_expansion_config=id_expansion_config,
+                endpoint=endpoint,
+                initial_params=initial_params,
+                entity_id=entity_id,
+                date_param_name=date_param_name,
+                date_param_value=date_value,
+            )
         except Exception as exc:
-            failed += 1
             LOGGER.warning(
-                "m=_fetch_with_id_expansion, %s=%s, error=%s msg=Skipping entity after error",
-                id_field,
+                "m=_fetch_with_id_expansion, %s=%s, date=%s, error=%s "
+                "msg=Skipping entity after error",
+                id_field_log,
                 entity_id,
+                date_value,
                 exc,
             )
+            return [], False
+
+    tasks: List[Tuple[str, Optional[str]]] = [
+        (entity_id, date_value) for entity_id in ids for date_value in date_values
+    ]
+
+    if max_workers == 1:
+        for task in tasks:
+            rows, ok = _run_task(task)
+            if ok:
+                all_results.extend(rows)
+            else:
+                failed += 1
+    else:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            task_iter = iter(tasks)
+            pending = {
+                executor.submit(_run_task, task)
+                for task in itertools.islice(task_iter, max_workers)
+            }
+            while pending:
+                done, pending = wait(pending, return_when=FIRST_COMPLETED)
+                for future in done:
+                    rows, ok = future.result()
+                    if ok:
+                        if results_lock:
+                            with results_lock:
+                                all_results.extend(rows)
+                        else:
+                            all_results.extend(rows)
+                    else:
+                        failed += 1
+                    try:
+                        next_task = next(task_iter)
+                    except StopIteration:
+                        continue
+                    pending.add(executor.submit(_run_task, next_task))
 
     LOGGER.info(
         "m=_fetch_with_id_expansion, total=%d, failed=%d msg=Fan-out complete",
@@ -412,6 +648,19 @@ def main() -> None:
         source_schema = source_schema.replace("dw_", "", 1)
 
     id_expansion_config = loader.get_id_expansion_config()
+    date_expansion_config = table_config.get("date_expansion")
+    table_date_format = table_config.get("date_format")
+    if table_date_format == "":
+        raise ValueError(
+            "date_format cannot be an empty string. "
+            "Use ISO-8601 format by omitting date_format or specify a valid strftime format."
+        )
+    date_format = (
+        table_date_format
+        if table_date_format
+        else workflow_config.get("date_format")
+        or workflow_config.get("date_format_mask")
+    )
 
     if id_expansion_config:
         LOGGER.info(
@@ -427,6 +676,10 @@ def main() -> None:
             source_schema=source_schema,
             endpoint=endpoint,
             initial_params=initial_params,
+            load_start_date=args.load_start_date,
+            load_end_date=args.load_end_date,
+            date_expansion_config=date_expansion_config,
+            date_format=date_format,
         )
     else:
         paginator = loader.create_paginator(client, endpoint, initial_params)
