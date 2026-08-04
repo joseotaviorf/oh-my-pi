@@ -13,6 +13,7 @@ from databricks_plugin import (
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
@@ -32,6 +33,9 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 ENV = os.environ.get("ENVIRONMENT")
 EXECUTION_HOURS_TIMEOUT = 3.0
+
+_GEOCODE_MAX_PARTITIONS = 6
+_GEOCODE_MAX_REQUESTS_PER_PARTITION = 1500
 
 config_service = ConfigurationService(DAG_NAME)
 artifacts_bucket = config_service.get_config("artifacts_bucket")
@@ -146,9 +150,9 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
 
 
 # v1's registry sources are duplicated here (own _v2 tables) so this DAG runs independently
-# of enrich_vespucio_pipeline. geocode_step_cache / address_details_hasher_link /
-# staged_parsed_complements are NOT duplicated: they are v1 pipeline outputs (live geocoding
-# calls, address hashing) and are reused as-is to avoid doubling that cost.
+# of enrich_vespucio_pipeline. address_enrich_step_task below calls the unified geocoder
+# directly instead of reusing v1's geocode_step_cache / address_details_hasher_link /
+# staged_parsed_complements tables.
 source_tasks = [
     create_task(
         entry_point="sources_cnefe_house_job",
@@ -278,11 +282,10 @@ address_enrich_step_task = create_task(
     entry_point="core_v2_address_enrich_step",
     parameters=[
         f"--input_address_normalized={Tables.address_normalization_step_v2}",
-        f"--input_geocode_cache={Tables.geocode_step_cache}",
-        f"--input_address_details_hasher_link={Tables.address_details_hasher_link}",
-        f"--input_staged_parsed_complements={Tables.staged_parsed_complements}",
-        f"--input_source_cnefe_houses={Tables.source_cnefe_houses_v2}",
-        f"--input_source_iptu_houses={Tables.source_iptu_houses_v2}",
+        "--geocode_username=vespucio_prod_pipeline",
+        f"--google_geocode_api_keys_from_secret={APIEnum.GOOGLE_GEOCODING}",
+        f"--max_partitions={_GEOCODE_MAX_PARTITIONS}",
+        f"--max_requests_per_partition={_GEOCODE_MAX_REQUESTS_PER_PARTITION}",
         "--overwrite_schema",
         f"--output_enriched={Tables.address_enrich_step_v2}",
     ],

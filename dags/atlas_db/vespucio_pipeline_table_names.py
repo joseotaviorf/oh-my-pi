@@ -61,9 +61,9 @@ class Tables:
     listings = "vespucio_prod_delta.listings"
 
     # v2 pipeline (steps_v2: core_v2_registry_step / normalization_step / address_enrich_step).
-    # Sources are duplicated (own copies, suffixed _v2) so the v2 DAG runs independently of v1;
-    # geocode_step_cache / address_details_hasher_link / staged_parsed_complements are reused
-    # from v1 since those are stateful/expensive (live geocoding calls, address hashing).
+    # Sources are duplicated (own copies, suffixed _v2) so the v2 DAG runs independently of v1.
+    # address_enrich_step calls the unified geocoder directly (no more reuse of v1's
+    # geocode_step_cache / address_details_hasher_link / staged_parsed_complements tables).
     source_cnefe_houses_v2 = "vespucio_sources_delta.source_cnefe_house_v2"
     source_ebdb_houses_v2 = "vespucio_sources_delta.source_ebdb_house_v2"
     source_navent_houses_composed_v2 = (
