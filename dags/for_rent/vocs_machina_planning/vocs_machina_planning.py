@@ -103,8 +103,16 @@ def get_date_param(dag_run, default_date, date_param_name):
 
 
 def active_prompts(manifest):
-    """Return only the prompts flagged active=True in quintoml's manifest."""
-    return [prompt for prompt in manifest.get("prompts", []) if prompt.get("active")]
+    """Return only the prompts flagged active=True in quintoml's manifest.
+
+    Checks identity against True rather than bare truthiness: quintoml's
+    write_manifest() always writes a real JSON boolean, but a hand-edited or
+    malformed manifest could carry a truthy-but-wrong value (e.g. the string
+    "false", itself truthy in Python) that must not be treated as active.
+    """
+    return [
+        prompt for prompt in manifest.get("prompts", []) if prompt.get("active") is True
+    ]
 
 
 def backfill_day_range(today, backfill_days):
@@ -132,27 +140,65 @@ def success_marker_key(prompt_id, prompt_hash, day):
     )
 
 
+_UNSAFE_PARTITION_COMPONENT_RE = re.compile(r"[/\x00-\x1f]")
+
+
+def _is_safe_partition_component(value):
+    """True if value is safe to embed as a single S3 partition-key segment.
+
+    Rejects a literal "/" (which would inject extra path segments into the
+    year=/month=/day=/prompt_id=/prompt_hash=/ structure quintoml's own
+    _HASH_KEY_RE parser expects) and control characters, including a null
+    byte.
+    """
+    return isinstance(value, str) and not _UNSAFE_PARTITION_COMPONENT_RE.search(value)
+
+
 def iter_partition_days(prompts, today):
     """Expand each active prompt into (day, prompt_id, prompt_hash) tuples, one
     per backfill day.
 
-    A prompt missing "backfill_days" (KeyError) or carrying a negative one
-    (ValueError, see backfill_day_range) is skipped with a warning rather than
+    A prompt missing "prompt_id"/"prompt_hash"/"backfill_days" (KeyError),
+    carrying a negative backfill_days (ValueError, see backfill_day_range),
+    or carrying a prompt_id/prompt_hash unsafe for an S3 partition key (see
+    _is_safe_partition_component) is skipped with a warning rather than
     aborting the whole snapshot: one malformed manifest entry should not stop
     every other active prompt from being staged.
+
+    De-duplicates by (day, prompt_id, prompt_hash): two manifest entries that
+    describe the same partition (e.g. a duplicated entry, or two entries
+    whose backfill windows overlap) must not produce the same row twice in
+    the staged snapshot.
     """
     partition_days = []
+    seen = set()
     for prompt in prompts:
         try:
+            prompt_id = prompt["prompt_id"]
+            prompt_hash = prompt["prompt_hash"]
             days = backfill_day_range(today, prompt["backfill_days"])
         except (KeyError, ValueError) as exc:
             logger.warning(
                 f"m=iter_partition_days, prompt_id={prompt.get('prompt_id')}, "
-                f"msg=Skipping prompt with missing/invalid backfill_days: {exc}"
+                f"msg=Skipping prompt with missing/invalid required field: {exc}"
+            )
+            continue
+        if not (
+            _is_safe_partition_component(prompt_id)
+            and _is_safe_partition_component(prompt_hash)
+        ):
+            logger.warning(
+                f"m=iter_partition_days, prompt_id={prompt_id!r}, "
+                f"msg=Skipping prompt with a prompt_id/prompt_hash unsafe for "
+                f"S3 partition keys"
             )
             continue
         for day in days:
-            partition_days.append((day, prompt["prompt_id"], prompt["prompt_hash"]))
+            key = (day, prompt_id, prompt_hash)
+            if key in seen:
+                continue
+            seen.add(key)
+            partition_days.append(key)
     return partition_days
 
 

@@ -1,0 +1,71 @@
+database_name: datalake_vocs_machina_planning
+table_name: vocs_machina_backfill_status
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+description: >
+  Per-partition status of the vocs-machina LLM classification backfill
+  (VOCS-34). One row per (day, prompt_id, prompt_hash) partition tracked by
+  raw.vocs_machina_inference_status, joined against
+  datalake_vocs_machina_clean.vocs_machina to say whether the data-engineering
+  side has already ingested that partition once quintoml has finalized it.
+  Used to plan/monitor the backfill; see vocs_machina_backfill_status_summary
+  for the per-prompt rollup.
+columns:
+  id_vocs_machina_backfill_status:
+    description: >
+      MD5 hash of business_key -- synthetic unique identifier of the
+      (day, prompt_id, prompt_hash) partition.
+    lineage:
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.day
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.prompt_id
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.prompt_hash
+  business_key:
+    description: >
+      Key concatenated to generate id_vocs_machina_backfill_status, as
+      "day || prompt_id || prompt_hash".
+    lineage:
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.day
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.prompt_id
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.prompt_hash
+  day:
+    description: >
+      Backfill day this row reports on, reconstructed from raw's year/month/day
+      partition columns via MAKE_DATE.
+    lineage:
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.year
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.month
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.day
+  prompt_id:
+    description: Identifier of the vocs-machina prompt this partition belongs to.
+    lineage:
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.prompt_id
+  prompt_hash:
+    description: Hash of the compiled prompt content this partition was classified with.
+    lineage:
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.prompt_hash
+  inference_status:
+    description: >
+      "done" if quintoml has finalized this (day, prompt_id, prompt_hash)
+      partition, "missing" otherwise. Copied straight from raw.
+    lineage:
+      - datalake_vocs_machina_planning_raw.vocs_machina_inference_status.inference_status
+  ingestion_status:
+    description: >
+      Data-engineering ingestion status for this partition, meaningful only
+      once inference_status is "done": "ingested" if a matching row already
+      exists in datalake_vocs_machina_clean.vocs_machina for this
+      (day, prompt_id, prompt_hash), "pending" if inference is done but no
+      clean row exists yet. "not_applicable" when inference_status is
+      "missing" -- there is nothing to ingest yet, so ingestion can't
+      meaningfully be "pending" either.
+    lineage:
+      - datalake_vocs_machina_clean.vocs_machina.id_prompt
+      - datalake_vocs_machina_clean.vocs_machina.prompt_hash
+      - datalake_vocs_machina_clean.vocs_machina.year
+      - datalake_vocs_machina_clean.vocs_machina.month
+      - datalake_vocs_machina_clean.vocs_machina.day
+  age_days:
+    description: >
+      Number of days between today and this partition's backfill day
+      (CURRENT_DATE - day). Higher values on "missing"/"pending" rows flag
+      older, more urgent backlog.

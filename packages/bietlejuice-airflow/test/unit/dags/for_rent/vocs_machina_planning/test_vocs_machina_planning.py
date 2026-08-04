@@ -64,6 +64,23 @@ def test_active_prompts_empty_manifest():
     assert active_prompts({"prompts": []}) == []
 
 
+def test_active_prompts_only_accepts_literal_true():
+    # quintoml's write_manifest() always writes a real JSON boolean, but a
+    # hand-edited manifest could carry a truthy-but-wrong value -- the string
+    # "false" is truthy in Python, so a bare `if prompt.get("active")` check
+    # would wrongly treat it as active. Checking identity against True keeps
+    # anything other than a literal true excluded.
+    manifest = {
+        "prompts": [
+            {"prompt_id": "p_true", "active": True},
+            {"prompt_id": "p_false_string", "active": "false"},
+            {"prompt_id": "p_zero", "active": 0},
+            {"prompt_id": "p_none", "active": None},
+        ]
+    }
+    assert [p["prompt_id"] for p in active_prompts(manifest)] == ["p_true"]
+
+
 def test_backfill_day_range_is_inclusive():
     today = date(2026, 7, 30)
     days = backfill_day_range(today, 2)
@@ -131,6 +148,49 @@ def test_iter_partition_days_skips_prompt_with_negative_backfill_days():
 def test_iter_partition_days_all_malformed_yields_empty_list():
     prompts = [{"prompt_id": "p1", "prompt_hash": "h1"}]
     assert iter_partition_days(prompts, date(2026, 7, 30)) == []
+
+
+def test_iter_partition_days_skips_prompt_missing_prompt_id_or_hash():
+    # Same "one malformed entry should not stop everyone else" treatment as
+    # a missing/invalid backfill_days: a manifest entry missing prompt_id or
+    # prompt_hash outright is skipped with a warning, not fatal.
+    prompts = [
+        {"prompt_hash": "h_bad", "backfill_days": 0},  # missing prompt_id
+        {"prompt_id": "p_bad", "backfill_days": 0},  # missing prompt_hash
+        {"prompt_id": "p_ok", "prompt_hash": "h_ok", "backfill_days": 0},
+    ]
+    today = date(2026, 7, 30)
+    assert iter_partition_days(prompts, today) == [(today, "p_ok", "h_ok")]
+
+
+def test_iter_partition_days_skips_prompt_id_unsafe_for_s3_partition_keys():
+    # A literal "/" would inject extra path segments into the
+    # year=/month=/day=/prompt_id=/prompt_hash=/ structure, and a control
+    # character (e.g. a null byte) is likewise rejected outright.
+    prompts = [
+        {"prompt_id": "nps/../evil", "prompt_hash": "h1", "backfill_days": 0},
+        {"prompt_id": "bad\x00id", "prompt_hash": "h1", "backfill_days": 0},
+        {"prompt_id": "p_ok", "prompt_hash": "h1", "backfill_days": 0},
+    ]
+    today = date(2026, 7, 30)
+    assert iter_partition_days(prompts, today) == [(today, "p_ok", "h1")]
+
+
+def test_iter_partition_days_deduplicates_repeated_partitions():
+    # Two manifest entries describing the same (prompt_id, prompt_hash) --
+    # e.g. a duplicated entry with a different backfill_days -- must not
+    # produce the same (day, prompt_id, prompt_hash) row twice.
+    prompts = [
+        {"prompt_id": "p1", "prompt_hash": "h1", "backfill_days": 2},
+        {"prompt_id": "p1", "prompt_hash": "h1", "backfill_days": 0},
+    ]
+    today = date(2026, 7, 30)
+    partition_days = iter_partition_days(prompts, today)
+    assert partition_days == [
+        (date(2026, 7, 28), "p1", "h1"),
+        (date(2026, 7, 29), "p1", "h1"),
+        (date(2026, 7, 30), "p1", "h1"),
+    ]
 
 
 class TestExistingMarkerKeysForDays:
