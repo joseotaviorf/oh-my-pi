@@ -16,6 +16,7 @@ sys.modules["pyspark"] = MagicMock()
 sys.modules["pyspark.sql"] = MagicMock()
 sys.modules["pyspark.sql.session"] = MagicMock()
 sys.modules["pyspark.sql.functions"] = MagicMock()
+sys.modules["pyspark.sql.window"] = MagicMock()
 sys.modules["pyspark.sql.context"] = MagicMock()
 sys.modules["pyspark.context"] = MagicMock()
 sys.modules["bietlejuice.base.spark"] = MagicMock()
@@ -74,6 +75,7 @@ class TestFetchWithIdExpansion:
         df_mock = MagicMock()
         df_mock.select.return_value = df_mock
         df_mock.where.return_value = df_mock
+        df_mock.withColumn.return_value = df_mock
         df_mock.distinct.return_value = df_mock
         df_mock.collect.return_value = rows
 
@@ -416,3 +418,50 @@ class TestFetchWithIdExpansion:
             "holidays-groups/holidays/employees/emp-1",
             params={"from": "2026-01-01", "to": "2026-01-31"},
         )
+
+    def test_payload_filters_missing_equals_raises(self):
+        """A payload_filters entry without equals fails fast instead of silently skipping."""
+        spark = self._make_spark(["uuid-1"])
+        client = MagicMock()
+
+        with pytest.raises(ValueError, match="requires 'equals'"):
+            _fetch_with_id_expansion(
+                spark=spark,
+                client=client,
+                loader=self._loader_without_pagination(),
+                id_expansion_config={
+                    "source_table": "employees",
+                    "id_field": "uuid",
+                    "param_name": "employeeUuid",
+                    "payload_filters": [{"field": "active"}],
+                },
+                source_schema="oitchau",
+                endpoint="employees/hoursbank/totals",
+                initial_params={},
+            )
+
+    def test_payload_filters_single_dict_is_accepted(self):
+        """A bare YAML map under payload_filters is normalized to a one-element list."""
+        spark = self._make_spark(["uuid-1"])
+        client = MagicMock()
+        client.get.return_value = self._make_response(
+            {"date": "2026-04-12", "totals": {}}
+        )
+
+        results = _fetch_with_id_expansion(
+            spark=spark,
+            client=client,
+            loader=self._loader_without_pagination(),
+            id_expansion_config={
+                "source_table": "employees",
+                "id_field": "uuid",
+                "param_name": "employeeUuid",
+                "payload_filters": {"field": "active", "equals": True},
+            },
+            source_schema="oitchau",
+            endpoint="employees/hoursbank/totals",
+            initial_params={"date": "2026-04-12"},
+        )
+
+        assert len(results) == 1
+        assert results[0]["uuid"] == "uuid-1"

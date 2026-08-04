@@ -131,6 +131,7 @@ def _fetch_with_id_expansion(
         Combined list of response dicts from all per-entity API calls.
     """
     from pyspark.sql import functions as F
+    from pyspark.sql.window import Window
 
     source_table = id_expansion_config["source_table"]
     id_field = id_expansion_config["id_field"]
@@ -152,12 +153,54 @@ def _fetch_with_id_expansion(
         full_table_name,
     )
 
-    ids_df = (
-        spark.table(full_table_name)
-        .select(F.get_json_object(F.col("payload"), f"$.{id_field}").alias("_id_value"))
-        .where(F.col("_id_value").isNotNull())
-        .distinct()
+    ids_df = spark.table(full_table_name)
+    id_col = F.get_json_object(F.col("payload"), f"$.{id_field}")
+    latest_per_entity = Window.partitionBy(id_col).orderBy(
+        F.col("ts_load").desc_nulls_last(),
+        F.col("year").desc_nulls_last(),
+        F.col("month").desc_nulls_last(),
+        F.col("day").desc_nulls_last(),
     )
+    ids_df = (
+        ids_df.withColumn("_fanout_id", id_col)
+        .where(F.col("_fanout_id").isNotNull())
+        .withColumn("_fanout_rn", F.row_number().over(latest_per_entity))
+        .where(F.col("_fanout_rn") == 1)
+    )
+
+    payload_filters = id_expansion_config.get("payload_filters") or []
+    if isinstance(payload_filters, dict):
+        payload_filters = [payload_filters]
+    if not isinstance(payload_filters, list):
+        raise ValueError(
+            "m=_fetch_with_id_expansion, msg=payload_filters must be a list of "
+            "{field, equals} maps (a single map is also accepted)"
+        )
+    for payload_filter in payload_filters:
+        if not isinstance(payload_filter, dict):
+            raise ValueError(
+                "m=_fetch_with_id_expansion, msg=each payload_filters entry must be a map"
+            )
+        field_name = payload_filter.get("field") or payload_filter.get("json_path")
+        if not field_name:
+            raise ValueError(
+                "m=_fetch_with_id_expansion, msg=payload_filters entry requires 'field'"
+            )
+        if "equals" not in payload_filter:
+            raise ValueError(
+                "m=_fetch_with_id_expansion, msg=payload_filters entry requires 'equals'"
+            )
+        json_path = f"$.{field_name}"
+        column_expr = F.get_json_object(F.col("payload"), json_path)
+        expected = payload_filter["equals"]
+        if isinstance(expected, bool):
+            ids_df = ids_df.where(column_expr == str(expected).lower())
+        elif expected is None:
+            ids_df = ids_df.where(column_expr.isNull())
+        else:
+            ids_df = ids_df.where(column_expr == str(expected))
+
+    ids_df = ids_df.select(F.col("_fanout_id").alias("_id_value")).distinct()
     ids = [row["_id_value"] for row in ids_df.collect()]
 
     LOGGER.info(
