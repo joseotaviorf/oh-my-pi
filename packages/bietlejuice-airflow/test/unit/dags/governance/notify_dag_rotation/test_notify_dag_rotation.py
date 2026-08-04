@@ -13,6 +13,7 @@ from dags.governance.notify_dag_rotation.notify_dag_rotation import (
     _clean_dag_owner,
     _count_voice_wakeups,
     _environment_suffix,
+    _extract_dag_from_alert,
     _fetch_dei_issues,
     _get_oncall_recipients,
     _get_schedule_timeline,
@@ -482,6 +483,30 @@ class TestGetOncallRecipients:
         assert recipients[0]["emailAddress"] == "weekend@example.com"
 
 
+class TestExtractDagFromAlert:
+    def test_matches_known_dag_id_in_message(self):
+        result = _extract_dag_from_alert(
+            "domain.dag failed on task X", {"domain.dag", "other.dag"}
+        )
+        assert result == "domain.dag"
+
+    def test_prefers_longest_match(self):
+        result = _extract_dag_from_alert(
+            "domain.sub.dag is late", {"domain.sub", "domain.sub.dag"}
+        )
+        assert result == "domain.sub.dag"
+
+    def test_falls_back_to_message_when_no_known_match(self):
+        result = _extract_dag_from_alert("some free-text alert", {"domain.dag"})
+        assert result == "some free-text alert"
+
+    def test_falls_back_to_message_when_no_known_ids(self):
+        assert _extract_dag_from_alert("raw message", None) == "raw message"
+
+    def test_placeholder_when_message_empty(self):
+        assert _extract_dag_from_alert("", {"domain.dag"}) == "Alerta sem descrição"
+
+
 class TestCountVoiceWakeups:
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.get")
     def test_returns_zero_when_no_alerts(self, mock_get):
@@ -492,13 +517,15 @@ class TestCountVoiceWakeups:
         from requests.auth import HTTPBasicAuth
 
         result = _count_voice_wakeups("cloud-id", HTTPBasicAuth("u", "t"), 2)
-        assert result == 0
+        assert result == []
 
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.get")
     def test_counts_voice_sent_log_entries(self, mock_get):
         alerts_resp = mock.MagicMock()
         alerts_resp.status_code = 200
-        alerts_resp.json.return_value = {"values": [{"id": "alert-1"}]}
+        alerts_resp.json.return_value = {
+            "values": [{"id": "alert-1", "message": "domain.dag failed at task X"}]
+        }
 
         logs_resp = mock.MagicMock()
         logs_resp.status_code = 200
@@ -512,18 +539,22 @@ class TestCountVoiceWakeups:
         mock_get.side_effect = [alerts_resp, logs_resp]
         from requests.auth import HTTPBasicAuth
 
-        result = _count_voice_wakeups("cloud-id", HTTPBasicAuth("u", "t"), 2)
-        assert result == 1
+        result = _count_voice_wakeups(
+            "cloud-id", HTTPBasicAuth("u", "t"), 2, known_dag_ids={"domain.dag"}
+        )
+        assert len(result) == 1
+        assert result[0]["alert_id"] == "alert-1"
+        assert result[0]["dag"] == "domain.dag"
 
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.get")
-    def test_returns_zero_when_api_fails(self, mock_get):
+    def test_returns_empty_when_api_fails(self, mock_get):
         mock_resp = mock.MagicMock()
         mock_resp.status_code = 500
         mock_get.return_value = mock_resp
         from requests.auth import HTTPBasicAuth
 
         result = _count_voice_wakeups("cloud-id", HTTPBasicAuth("u", "t"), 2)
-        assert result == 0
+        assert result == []
 
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.requests.get")
     @mock.patch("dags.governance.notify_dag_rotation.notify_dag_rotation.datetime")
@@ -633,7 +664,11 @@ class TestNotifyDagRotationCallable:
             [{"displayName": "Zacarias", "emailAddress": "zacarias@example.com"}],
             2,
         )
-        mock_wakeups.return_value = 3
+        mock_wakeups.return_value = [
+            {"alert_id": "a1", "message": "domain.dag boom", "dag": "domain.dag"},
+            {"alert_id": "a2", "message": "other.dag boom", "dag": "other.dag"},
+            {"alert_id": "a3", "message": "domain.dag boom again", "dag": "domain.dag"},
+        ]
 
         mock_resp = mock.MagicMock()
         mock_resp.raise_for_status = mock.MagicMock()
@@ -648,6 +683,8 @@ class TestNotifyDagRotationCallable:
         call_kwargs = mock_post.call_args[1]
         payload = call_kwargs["json"]
         assert payload["called_count"] == "3"
+        # Deduplicated, first-seen order preserved.
+        assert payload["wakeup_dags"] == ["domain.dag", "other.dag"]
         assert len(payload["error_list"]) == 1
         assert payload["email"] == "zacarias@example.com"
 
@@ -728,7 +765,7 @@ class TestNotifyDagRotationCallable:
             [{"displayName": "Zacarias", "emailAddress": "zacarias@example.com"}],
             2,
         )
-        mock_wakeups.return_value = 0
+        mock_wakeups.return_value = []
 
         mock_session = mock.MagicMock()
         mock_session.query.return_value.filter.return_value.all.return_value = []
@@ -814,6 +851,35 @@ class TestWrapForGchat:
         assert len(sections) == 2
         assert sections[0]["widgets"][0]["textParagraph"]["text"]
         assert sections[1]["header"] == "Alertas"
+
+    def test_lists_wakeup_dags_under_acordamentos(self):
+        payload = {
+            "email": "zacarias@example.com",
+            "start_time": "2026-06-07T21:00",
+            "called_count": "2",
+            "wakeup_dags": ["domain.dag", "other.dag"],
+            "error_list": [],
+        }
+        result = _wrap_for_gchat(payload)
+        summary = result["cardsV2"][0]["card"]["sections"][0]["widgets"][0][
+            "textParagraph"
+        ]["text"]
+        assert "Acordamentos:" in summary
+        assert "domain.dag" in summary
+        assert "other.dag" in summary
+
+    def test_no_dag_bullets_when_wakeup_dags_absent(self):
+        payload = {
+            "email": "zacarias@example.com",
+            "start_time": "2026-06-07T21:00",
+            "called_count": "0",
+            "error_list": [],
+        }
+        result = _wrap_for_gchat(payload)
+        summary = result["cardsV2"][0]["card"]["sections"][0]["widgets"][0][
+            "textParagraph"
+        ]["text"]
+        assert "•" not in summary
 
     def test_shows_no_errors_when_empty_list(self):
         payload = {

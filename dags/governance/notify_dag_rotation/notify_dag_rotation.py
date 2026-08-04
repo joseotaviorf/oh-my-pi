@@ -342,18 +342,20 @@ def _next_page_after(next_link: str | None) -> str | None:
     return after_values[0] if after_values else None
 
 
-def _fetch_alert_ids_in_window(
+def _fetch_alerts_in_window(
     cloud_id: str,
     jira_ops_auth: HTTPBasicAuth,
     jql_query: str,
     start_ts_ms: int,
     end_ts_ms: int,
-) -> list[str]:
-    """List all alert IDs in the time window, following Jira Ops offset pagination.
+) -> list[dict]:
+    """List all alerts in the time window, following Jira Ops offset pagination.
 
+    Returns a list of ``{"id", "message"}`` dicts (the ``message`` is the alert
+    title, used to resolve which DAG triggered the wakeup).
     ``start_ts_ms`` and ``end_ts_ms`` are Unix epoch milliseconds (Jira Ops API format).
     """
-    alert_ids: list[str] = []
+    alerts: list[dict] = []
     offset = 0
     page_size = 100
     alerts_url = f"{JIRA_OPS_API_BASE}/{cloud_id}/v1/alerts"
@@ -381,13 +383,17 @@ def _fetch_alert_ids_in_window(
             break
 
         batch = resp.json().get("values", [])
-        alert_ids.extend(alert_id for item in batch if (alert_id := item.get("id")))
+        alerts.extend(
+            {"id": alert_id, "message": item.get("message", "")}
+            for item in batch
+            if (alert_id := item.get("id"))
+        )
 
         if len(batch) < page_size:
             break
         offset += len(batch)
 
-    return alert_ids
+    return alerts
 
 
 def _alert_had_voice_call(
@@ -427,13 +433,35 @@ def _alert_had_voice_call(
     return False
 
 
+def _extract_dag_from_alert(message: str, known_dag_ids: set[str] | None) -> str:
+    """Best-effort resolution of the DAG behind a wakeup alert.
+
+    Matches the alert message against the set of known active DAG IDs (longest
+    match wins, so a more specific 'domain.sub.dag' is preferred over 'domain.sub').
+    Falls back to the raw message when no known DAG ID is found, and to a
+    placeholder when the message is empty.
+    """
+    text = (message or "").strip()
+    if known_dag_ids:
+        matches = [dag_id for dag_id in known_dag_ids if dag_id and dag_id in text]
+        if matches:
+            return max(matches, key=len)
+    return text or "Alerta sem descrição"
+
+
 def _count_voice_wakeups(
     cloud_id: str,
     jira_ops_auth: HTTPBasicAuth,
     periods_length_exception: int,
     now_sp: datetime | None = None,
-) -> int:
-    """Count distinct alerts that triggered a voice call (acordamentos) in the shift window.
+    known_dag_ids: set[str] | None = None,
+) -> list[dict]:
+    """List distinct alerts that triggered a voice call (acordamentos) in the shift window.
+
+    Returns one ``{"alert_id", "message", "dag"}`` entry per alert that generated
+    at least one sent voice notification; ``len()`` of the result is the wakeup count.
+    ``dag`` is resolved from the alert message via ``known_dag_ids`` (see
+    ``_extract_dag_from_alert``).
 
     Normal day: shift ran D-1 21:00 → D 09:00 SP. Query window: D-1 21:00 → D noon.
     Exception day (holiday): shift ran D 09:00 → 21:00 SP. Query window: 09:00 → noon.
@@ -470,22 +498,28 @@ def _count_voice_wakeups(
         end_dt.strftime("%Y-%m-%dT%H:%M"),
     )
 
-    alert_ids = _fetch_alert_ids_in_window(
+    alerts = _fetch_alerts_in_window(
         cloud_id, jira_ops_auth, jql_query, start_ts_ms, end_ts_ms
     )
-    if not alert_ids:
+    if not alerts:
         logger.info("No alerts found in window")
-        return 0
+        return []
 
-    logger.info("Found %d alerts in window", len(alert_ids))
+    logger.info("Found %d alerts in window", len(alerts))
 
-    wakeup_count = sum(
-        1
-        for alert_id in alert_ids
-        if _alert_had_voice_call(cloud_id, jira_ops_auth, alert_id)
-    )
-    logger.info("%d alerts with voice calls", wakeup_count)
-    return wakeup_count
+    wakeups: list[dict] = []
+    for alert in alerts:
+        if _alert_had_voice_call(cloud_id, jira_ops_auth, alert["id"]):
+            message = alert.get("message", "")
+            wakeups.append(
+                {
+                    "alert_id": alert["id"],
+                    "message": message,
+                    "dag": _extract_dag_from_alert(message, known_dag_ids),
+                }
+            )
+    logger.info("%d alerts with voice calls", len(wakeups))
+    return wakeups
 
 
 def _is_gchat_webhook(url: str) -> bool:
@@ -506,6 +540,7 @@ def _wrap_for_gchat(payload: dict) -> dict:
         oncall = str(oncall)
     start_time = payload.get("start_time", "?")
     called_count = payload.get("called_count", "0")
+    wakeup_dags = payload.get("wakeup_dags", [])
     error_list = payload.get("error_list", [])
 
     summary_text = (
@@ -513,6 +548,8 @@ def _wrap_for_gchat(payload: dict) -> dict:
         f"<b>Início:</b> {start_time}<br>"
         f"<b>Acordamentos:</b> {called_count}"
     )
+    if wakeup_dags:
+        summary_text += "".join(f"<br>• {dag_name}" for dag_name in wakeup_dags)
 
     if error_list:
         alerts_widgets: list[dict] = [
@@ -571,7 +608,7 @@ def notify_dag_rotation(session=None, **context):
     2. Resolve missing incident owners using the Airflow DagModel (DAG summary = DAG ID).
     3. Write back inferred owners to the DEI Jira issues.
     4. Retrieve the current on-call engineer(s) from the Jira Ops schedule.
-    5. Count voice wakeups from Jira Ops alerts.
+    5. Count voice wakeups from Jira Ops alerts and resolve which DAG triggered each one.
     6. POST summary payload to notification-hub (DAG_Rotation space).
     7. Optionally POST to iam-alerts space for Cyber Security issues (best-effort, non-fatal).
 
@@ -635,10 +672,17 @@ def notify_dag_rotation(session=None, **context):
         logger.warning("No on-call recipients found — skipping notification.")
         return
 
-    wakeup_count = _count_voice_wakeups(
-        cloud_id, jira_ops_auth, periods_length_exception, now_sp=now_sp
+    wakeups = _count_voice_wakeups(
+        cloud_id,
+        jira_ops_auth,
+        periods_length_exception,
+        now_sp=now_sp,
+        known_dag_ids=set(dag_owner_map),
     )
-    logger.info("Voice wakeups: %d", wakeup_count)
+    wakeup_count = len(wakeups)
+    # Unique DAG names woken during the shift, preserving first-seen order.
+    wakeup_dags = list(dict.fromkeys(w["dag"] for w in wakeups))
+    logger.info("Voice wakeups: %d (DAGs: %s)", wakeup_count, wakeup_dags)
 
     oncall_emails = list(dict.fromkeys(r["emailAddress"] for r in recipients))
     oncall_email = " + ".join(oncall_emails)
@@ -653,6 +697,7 @@ def notify_dag_rotation(session=None, **context):
         "email": oncall_email,
         "start_time": start_time,
         "called_count": str(wakeup_count) if wakeup_count > 0 else "0",
+        "wakeup_dags": wakeup_dags,
         "error_list": [
             {
                 "url": f"{DEI_BOARD_URL}?selectedIssue={issue['key']}",
