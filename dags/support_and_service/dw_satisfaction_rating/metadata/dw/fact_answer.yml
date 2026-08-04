@@ -42,6 +42,18 @@ columns:
     description: Identifier of the person who answered the form.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.id_respondent
+  utm_source:
+    description: Origin of the survey dispatch (for example, 'sfmc'). Only populated for Survicate-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.utm_source
+  utm_medium:
+    description: Channel used to send the survey (for example, 'email' or 'whatsapp'). Only populated for Survicate-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.utm_medium
+  utm_campaign:
+    description: Identifier of the campaign responsible for the survey dispatch. Only populated for Survicate-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.utm_campaign
   satisfaction_score:
     description: Main satisfaction form responses.
     lineage:

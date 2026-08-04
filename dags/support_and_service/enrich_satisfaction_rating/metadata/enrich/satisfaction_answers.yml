@@ -130,6 +130,18 @@ columns:
     lineage:
       - datalake_satisfaction_rating.gsheets_surveys.survey_name
       - datalake_satisfaction_rating.survicate_surveys.survey_name
+  utm_source:
+    description: Origin of the survey dispatch (for example, 'sfmc'). Only populated for Survicate-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.utm_source
+  utm_medium:
+    description: Channel used to send the survey (for example, 'email' or 'whatsapp'). Only populated for Survicate-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.utm_medium
+  utm_campaign:
+    description: Identifier of the campaign responsible for the survey dispatch. Only populated for Survicate-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.utm_campaign
   improvement_tags:
     description: Process improvement tags, which are indicated by the respondent.
     lineage:

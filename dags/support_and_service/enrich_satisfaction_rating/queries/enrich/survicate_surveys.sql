@@ -197,7 +197,7 @@ WITH survicate_surveys_base AS
     WHERE
         MAKE_DATE(pss.year, pss.month, pss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
-zendesk_email_cte AS (
+zendesk_email_ranked AS (
    SELECT
         zes.response_uuid AS id_answer,
         zes.id_survey,
@@ -223,18 +223,49 @@ zendesk_email_cte AS (
         zes.ts_first_response AS ts_submitted,
         zes.year,
         zes.month,
-        zes.day
-    FROM 
+        zes.day,
+        ROW_NUMBER() OVER (PARTITION BY zes.response_uuid ORDER BY zes.ts_first_response DESC) AS rn
+    FROM
         datalake_survicate.zendesk_email_surveys AS zes
-    WHERE 
+    WHERE
         MAKE_DATE(zes.year, zes.month, zes.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND zes.response_uuid NOT IN (
             SELECT id_answer FROM survicate_surveys_base
         )
-    QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY zes.response_uuid ORDER BY zes.ts_first_response DESC) = 1
 ),
-salesforce_cte AS (
+zendesk_email_cte AS (
+    SELECT
+        id_answer,
+        id_survey,
+        id_contract,
+        id_ticket,
+        id_case,
+        id_account,
+        id_origin,
+        id_respondent,
+        respondent_email,
+        respondent_type,
+        survey_name,
+        service_type,
+        service_context,
+        source_name,
+        improvement_tags,
+        respondent_comments,
+        satisfaction_score,
+        score_description,
+        secondary_satisfaction_score,
+        secondary_score_description,
+        is_solved,
+        ts_submitted,
+        year,
+        month,
+        day
+    FROM
+        zendesk_email_ranked
+    WHERE
+        rn = 1
+),
+salesforce_ranked AS (
   SELECT
         ss.response_uuid AS id_answer,
         ss.id_survey,
@@ -260,16 +291,47 @@ salesforce_cte AS (
         ss.ts_first_response AS ts_submitted,
         ss.year,
         ss.month,
-        ss.day
-    FROM 
+        ss.day,
+        ROW_NUMBER() OVER (PARTITION BY ss.response_uuid ORDER BY ss.ts_first_response DESC) AS rn
+    FROM
         datalake_survicate.salesforce_surveys AS ss
-    WHERE 
+    WHERE
         MAKE_DATE(ss.year, ss.month, ss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND ss.response_uuid NOT IN (
             SELECT id_answer FROM survicate_surveys_base
         )
-    QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY ss.response_uuid ORDER BY ss.ts_first_response DESC) = 1
+),
+salesforce_cte AS (
+    SELECT
+        id_answer,
+        id_survey,
+        id_contract,
+        id_ticket,
+        id_case,
+        id_account,
+        id_origin,
+        id_respondent,
+        respondent_email,
+        respondent_type,
+        survey_name,
+        service_type,
+        service_context,
+        source_name,
+        improvement_tags,
+        respondent_comments,
+        satisfaction_score,
+        score_description,
+        secondary_satisfaction_score,
+        secondary_score_description,
+        is_solved,
+        ts_submitted,
+        year,
+        month,
+        day
+    FROM
+        salesforce_ranked
+    WHERE
+        rn = 1
 ),
 survicate_surveys AS (
     SELECT 
@@ -306,6 +368,9 @@ SELECT
     ss.service_type,
     ss.service_context,
     ss.source_name,
+    TRIM(LOWER(PARSE_URL(sr.response_url, 'QUERY', 'utm_source'))) AS utm_source,
+    TRIM(LOWER(PARSE_URL(sr.response_url, 'QUERY', 'utm_medium'))) AS utm_medium,
+    TRIM(LOWER(PARSE_URL(sr.response_url, 'QUERY', 'utm_campaign'))) AS utm_campaign,
     ss.improvement_tags,
     ss.respondent_comments,
     ss.satisfaction_score,
@@ -319,5 +384,8 @@ SELECT
     ss.day
 FROM
     survicate_surveys AS ss
+LEFT JOIN
+    datalake_survicate.survey_responses AS sr
+        ON sr.id_response = ss.id_answer
 WHERE
     MAKE_DATE(ss.year, ss.month, ss.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

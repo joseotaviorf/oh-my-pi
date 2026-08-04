@@ -3913,6 +3913,7 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.enrich_survicate:load-enrich-repairs-surveys:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-salesforce-surveys:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-scheduling-surveys:first-run-of-day
+  - bietlejuice.enrich_survicate:load-enrich-survey-responses:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-csat-reimbursement-true:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat:first-run-of-day
