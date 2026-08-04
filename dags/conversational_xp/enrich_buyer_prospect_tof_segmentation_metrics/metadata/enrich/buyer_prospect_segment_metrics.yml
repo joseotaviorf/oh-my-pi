@@ -4,7 +4,7 @@ table_name: buyer_prospect_segment_metrics
 owner: catarina.freitas@quintoandar.com.br
 domain: Conversational XP
 description: |
-  Monthly top of funnel (ToF) business metrics pivoted by buyer activity segment and post-activation cohort window (4w or 8w). Each row is one metric for an activation month, business context, and cohort window with values per segment. A range run refreshes every activation month that has at least one daily activity row within the requested interval. Segments are derived from cumulative daily activity in buyer_prospect_segmentation. Output for dashboards and experimentation monitoring.
+  Monthly top-of-funnel business metrics pivoted by buyer activity segment, concierge-prospect status, and post-activation cohort window (4w or 8w). Each row is one metric for an activation month, business context, concierge-prospect status, and cohort window, with values per segment. A range run refreshes every activation month that has at least one daily activity row within the requested interval. Segments are derived from cumulative daily activity in buyer_prospect_segmentation. Output for dashboards and experimentation monitoring.
 columns:
   dt_activation_month:
     description: Calendar month when buyers converted, used as the metrics time axis.
@@ -14,12 +14,16 @@ columns:
     description: Sale business line for the aggregated buyer cohort.
     lineage:
       - datalake_search.buyer_prospect_segmentation.business_context
+  is_concierge_prospect:
+    description: Boolean flag indicating whether the buyer prospect belongs to the concierge-assisted cohort.
+    lineage:
+      - datalake_search.buyer_prospect_base.is_concierge_prospect
   cohort_window:
     description: Post-activation activity window label, either 4w (27 days) or 8w (55 days) after buyer conversion.
   metric:
-    description: Business metric identifier such as num_active_buyers, avg_spv_per_active_buyer, pct_search_with_lpv, or discovery_rate.
+    description: Business metric identifier, including activity averages, conversion rates, visits per interaction or search page view, and BES, the share of buyers with at least three visit bookings.
   overall:
-    description: Metric value calculated across every buyer in the activation-month cohort, including cohort-level rates not broken out by segment.
+    description: Metric value calculated across every buyer in the activation-month cohort, including cohort-level rates such as BES, the share of buyers with at least three visit bookings, not broken out by segment.
   qualified_search_active:
     description: Metric value for buyers with more than 10 search interactions in the cohort window.
   low_search_active:

@@ -93,13 +93,13 @@ Window totals for additive metrics are built downstream by summing daily rows. D
 2. For those months, **sums all daily segmentation rows** per user to get full-window activity totals and merges daily listing arrays.
 3. Derives the number of distinct listings with an LPV followed by a visit booking, separately for the 4w and 8w windows.
 4. Assigns each user to an activity **segment** (separately for 4w and 8w windows).
-5. Computes cohort- and segment-level metrics and pivots them into long format (`metric` + value per segment column).
+5. Computes cohort- and segment-level metrics separately for each Concierge-prospect status, then pivots them into long format (`metric` + value per segment column).
 
 **Write method:** **Partition overwrite** on `(year, month, day)` where partition values come from `dt_activation_month` (always day 1 of the activation month). Only activation months affected by the requested interval are written; existing data for other months is preserved.
 
 Requires `spark.sql.sources.partitionOverwriteMode = dynamic` (configured on the cluster).
 
-**Grain:** one row per activation month × business context × cohort window (`4w` / `8w`) × metric name.
+**Grain:** one row per activation month × business context × Concierge-prospect status (`is_concierge_prospect`) × cohort window (`4w` / `8w`) × metric name.
 
 ### Activity segments
 
@@ -112,7 +112,7 @@ Segments are derived from cumulative search **interactions** (distinct search im
 | `active_no_search`        | 0 search interactions, but ≥ 1 LPV or schedule view |
 | `inactive`                | No search interactions, LPVs, or schedule views     |
 
-The `overall` column in `buyer_prospect_segment_metrics` holds cohort-wide metrics (e.g. `search_participation_rate`, `discovery_rate`, `bes`).
+The `overall` column in `buyer_prospect_segment_metrics` holds cohort-wide metrics (e.g. `search_participation_rate`, `discovery_rate`, `bes`). `bes` is the share of buyers in the cohort who have at least three visit bookings within the applicable 4w or 8w window.
 
 ### Outputs
 

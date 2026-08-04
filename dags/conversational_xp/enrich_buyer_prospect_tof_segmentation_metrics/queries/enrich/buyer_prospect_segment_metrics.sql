@@ -1,5 +1,5 @@
--- Monthly business metrics pivoted by buyer segment and cohort window (4w / 8w).
--- Grain: one row per activation month, cohort window, and metric name.
+-- Monthly business metrics pivoted by buyer segment, business context, concierge-prospect status, and cohort window (4w / 8w).
+-- Grain: one row per activation month, business context, concierge-prospect status, cohort window, and metric name.
 
 WITH activity_months_to_process AS (
     SELECT DISTINCT
@@ -315,6 +315,7 @@ cohort_and_activity_segmentation AS (
         dt_activation_month,
         business_context,
         id_user,
+        is_concierge_prospect,
         CASE
             WHEN sum_interactions_8w > 10 THEN 'qualified_search_active'
             WHEN sum_interactions_8w >= 1 AND sum_interactions_8w <= 10 THEN 'low_search_active'
@@ -340,6 +341,7 @@ cohort_and_activity_segmentation AS (
         dt_activation_month,
         business_context,
         id_user,
+        is_concierge_prospect,
         CASE
             WHEN sum_interactions_4w > 10 THEN 'qualified_search_active'
             WHEN sum_interactions_4w >= 1 AND sum_interactions_4w <= 10 THEN 'low_search_active'
@@ -366,6 +368,7 @@ activity_segment_metrics AS (
     SELECT
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         segment,
         COUNT(id_user) AS num_active_buyers,
@@ -384,6 +387,7 @@ activity_segment_metrics AS (
     GROUP BY
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         segment
 ),
@@ -392,6 +396,7 @@ activity_segment_long_format AS (
     SELECT
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         segment,
         stacked.metric,
@@ -425,6 +430,7 @@ overall_metrics AS (
     SELECT
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         COUNT(id_user) AS num_active_buyers,
         COUNT(CASE WHEN segment = 'qualified_search_active' THEN id_user END) AS num_qualified_search_active_buyers,
@@ -435,13 +441,16 @@ overall_metrics AS (
         SUM(sum_search_with_lpv) / NULLIF(SUM(sum_search), 0) AS pct_search_with_lpv,
         SUM(sum_visit) / NULLIF(SUM(sum_lpv), 0) AS avg_vb_per_lpv,
         SUM(sum_dist_listing_lpv_vb) / NULLIF(SUM(sum_dist_listing_lpv), 0) AS pct_vb_per_dist_lpv,
+        SUM(sum_visit) / NULLIF(SUM(sum_interactions), 0) AS avg_vb_per_int,
+        SUM(sum_visit) / NULLIF(SUM(sum_search), 0) AS avg_vb_per_spv,
         SUM(sum_dist_listing_spv_with_lpv) / NULLIF(SUM(sum_dist_listing_spv), 0) AS discovery_rate,
-        COUNT(CASE WHEN sum_visit >= 3 THEN id_user END) AS bes
+        COUNT(CASE WHEN sum_visit >= 3 THEN id_user END) / NULLIF(COUNT(id_user), 0) AS bes
     FROM
         cohort_and_activity_segmentation
     GROUP BY
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window
 ),
 
@@ -449,6 +458,7 @@ overall_metrics_all AS (
     SELECT
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         num_active_buyers,
         avg_lpv_per_int,
@@ -456,6 +466,8 @@ overall_metrics_all AS (
         pct_search_with_lpv,
         avg_vb_per_lpv,
         pct_vb_per_dist_lpv,
+        avg_vb_per_int,
+        avg_vb_per_spv,
         (num_qualified_search_active_buyers + num_low_search_active_buyers)
         / NULLIF(
             num_qualified_search_active_buyers
@@ -478,6 +490,7 @@ overall_metrics_long_format AS (
     SELECT
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         'overall' AS segment,
         stacked.metric,
@@ -485,7 +498,7 @@ overall_metrics_long_format AS (
     FROM
         overall_metrics_all
     LATERAL VIEW STACK(
-        10,
+        12,
         'num_active_buyers',
         CAST(num_active_buyers AS DOUBLE),
         'avg_lpv_per_int',
@@ -498,6 +511,10 @@ overall_metrics_long_format AS (
         avg_vb_per_lpv,
         'pct_vb_per_dist_lpv',
         pct_vb_per_dist_lpv,
+        'avg_vb_per_int',
+        avg_vb_per_int,
+        'avg_vb_per_spv',
+        avg_vb_per_spv,
         'search_participation_rate',
         search_participation_rate,
         'qualified_penetration',
@@ -513,6 +530,7 @@ metrics_long_format AS (
     SELECT
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         segment,
         metric,
@@ -523,6 +541,7 @@ metrics_long_format AS (
     SELECT
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         segment,
         metric,
@@ -535,6 +554,7 @@ metrics_pivoted AS (
     SELECT
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         metric,
         MAX(
@@ -570,12 +590,14 @@ metrics_pivoted AS (
     GROUP BY
         dt_activation_month,
         business_context,
+        is_concierge_prospect,
         cohort_window,
         metric
 )
 SELECT
     dt_activation_month,
     business_context,
+    is_concierge_prospect,
     cohort_window,
     metric,
     overall,
