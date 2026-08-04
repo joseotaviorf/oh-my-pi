@@ -26,16 +26,12 @@ workflow:
       clean_table_name: booking_aud
     MudancaStatusAgendamento:
       clean_table_name: booking_status_change
-    Entrance:
-      clean_table_name: entrance
     EntryAccessTracking:
       clean_table_name: entry_access_tracking
       clean_primary_keys: [id]
     EntryAccess:
       clean_table_name: entry_access
       clean_primary_keys: [id]
-    FollowUpDetails:
-      clean_table_name: follow_up_details
     Imovel_informacoesVisita:
       raw_primary_keys: [Imovel_id, informacoesVisita]
       clean_table_name: house_visit_information
