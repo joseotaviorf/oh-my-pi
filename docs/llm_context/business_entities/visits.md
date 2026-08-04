@@ -1,5 +1,13 @@
 # Visits
 
+## Ownership
+
+**Data Owner:**
+- leticia.machado@quintoandar.com.br
+
+**Data Steward:**
+- leticia.machado@quintoandar.com.br
+
 ## Overview
 
 This document covers **visit analytics**, tracking the journey from the initial booking (schedule) to the actual event at the property. This domain consolidates interactions between potential tenants/buyers (demand), brokers, and landlords (supply).
@@ -14,6 +22,10 @@ Before answering any visit question, decide which lens applies:
 |------|-----------------|-------------|
 | **Visit View** | What is the conversion rate from completed visits to proposals? | Funnel analysis, broker efficiency, and property attractiveness. |
 | **Schedule View** | How many times was a booking canceled or rescheduled before the visit happened? | Operational analysis of scheduling churn and platform usage behavior. |
+
+## Related Metric Entities
+
+- [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) — L2VB (listing → visit booked) and L2VC (listing → visit completed) at listing-cohort grain for RENT and SALE.
 
 ## Synonyms
 
@@ -68,6 +80,24 @@ Daily **schedule** grain: one row per appointment attempt.
 | Confirmation | `is_demand_confirmed`, `is_supply_confirmed`, `is_broker_confirmed` |
 | Timing | `dt_schedule`, `tm_schedule`, `is_last_schedule` |
 
+## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** listing-cohort L2VB/L2VC. The bullets below are **component** visit metrics on `dw_visit.fact_visits`.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| L2VB, L2VC (listing → visit booked/completed) | [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) |
+
+### Component / exploratory metrics
+
+- **Visits booked** — `SUM(fact_visits.num_visit_booked)`
+- **Visits completed** — `SUM(fact_visits.num_visit_completed)`
+- **VB2VC rate** — `SUM(num_visit_completed) / SUM(num_visit_booked)` on `fact_visits`
+- **Visits cancelled / unsuccessful** — `num_visit_canceled`, `num_visit_unsuccessful`
+- **Offers submitted / contracts signed** (visit-attributed funnel) — `num_offer_submitted`, `num_contract_signed`
+
 ## Dos and Don'ts
 
 **Do:**
@@ -110,7 +140,7 @@ Identifies which access methods (e.g., Broker keys vs. Concierge) lead to higher
 
 ```sql
 SELECT 
-    dim_h.entrance_model,
+    dim_h.entry_model_type,
     COUNT(DISTINCT f.sk_visit) AS total_visits,
     SUM(num_visit_completed) AS completed_visits,
     SUM(num_visit_unsuccessful) AS unsuccessful_visits

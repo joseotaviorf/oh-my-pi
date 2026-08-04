@@ -1,5 +1,13 @@
 # Satisfaction (CSAT)
 
+## Ownership
+
+**Data Owner:**
+- gustavo.silva@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 Satisfaction represents the **Customer Satisfaction (CSAT)** measurement across all contact channels in the Support & Services domain. CSAT data is collected from four independent sources and unified into a single table for cross-channel analysis.
@@ -122,6 +130,17 @@ Master union of all per-channel survey tables:
 - Enriches `id_respondent` and email from the user registry by email or ID match
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** DSAT and Resolution Rate (Front and Back). The bullets below are **component** CSAT metrics on satisfaction tables.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| DSat Front, Resolution Rate (Front Office) | [Customer Contacts Front](../metric_entities/customer_contacts_front.md) |
+| DSAT Back, Resolution Rate Back (Back Office) | [Cases Perspective](../metric_entities/cases_perspective.md) |
+
+### Component / exploratory metrics
 
 - **CSAT score** — satisfaction score per ticket or per survey answer
 - **DSAT (Dissatisfaction Rate)** — proportion of bad CSAT ratings. Pre-aggregated in `metric_ss__tickets.dsat`

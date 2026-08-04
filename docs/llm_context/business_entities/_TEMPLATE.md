@@ -52,6 +52,21 @@ data architecture, upstream source systems, and pointers to related entities.
 
 ---
 
+## Related Metric Entities
+
+<!--
+List every metric entity that defines OFFICIAL metrics built on this business entity's tables.
+One bullet per metric entity file — use markdown links so TARS can route to the exact
+calculation doc. Include a one-line description of what metrics live there.
+
+When a metric entity exists, its Calculation / Canonical Filter / Golden Query OVERRIDE
+generic logic in this business entity's Key Metrics section.
+-->
+
+- [{Official Metric Family Name}](../metric_entities/{metric_entity_slug}.md) — {one-line: which official metrics this file defines}
+
+---
+
 ## Glossary and Synonyms
 
 <!--
@@ -87,16 +102,31 @@ No DataHub links here — those are auto-generated.
 ## Key Metrics
 
 <!--
-List the most important metrics for this entity — the WHAT, not the HOW.
-These orient TARS and analysts on what can be measured; exact calculation
-details live in metric_entities/ docs.
-Use bullet points: metric name, brief description, and canonical column or
-table reference. Include 3–8 metrics.
+Split into two subsections when metric entities exist for this domain:
+
+1. **Official metrics (metric entities)** — table or bullets linking to
+   ../metric_entities/*.md for MBR/OKR/source-of-truth numbers. TARS must route here
+   when the user asks for an official, weighted, or canonical metric by name.
+
+2. **Component / exploratory metrics** — ad-hoc measures computable from this entity's
+   tables (volume, rates, distributions). State the WHAT and canonical column; do NOT
+   duplicate official formulas from metric entities.
+
+If no metric entity exists yet, a single bullet list is fine.
 -->
+
+Use [Related Metric Entities](#related-metric-entities) when the question asks for an **official**, **MBR**, or **OKR** number.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| {Official metric name or family} | [`{metric_entity_slug}.md`](../metric_entities/{metric_entity_slug}.md) |
+
+### Component / exploratory metrics
 
 - **{Metric name}:** {One-line description. Reference the canonical column, e.g. `fact_table.column_name`.}
 - **{Metric name 2}:** {One-line description.}
-- **{Metric name 3}:** {One-line description.}
 
 ---
 

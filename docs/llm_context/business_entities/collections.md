@@ -35,6 +35,23 @@ Fintech models described here live in **`dw_collection_recovery_quintoandar`**, 
 - **FPD** → First payment default
 - **SSN / BOSSN** → Self-service negotiation flows (see `is_ssn` on overdue timeline)
 
+## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** Condo Garantido adoption and identification rates. The bullets below are **component** collections operational metrics.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Condo Garantido adoption, automatic identification | [Condo Garantido](../metric_entities/condo_garantido.md) |
+
+### Component / exploratory metrics
+
+- **DSO** — days sales outstanding on overdue portfolio timelines
+- **Roll rates** — movement between delay buckets on `fact_overdue_portfolio_timeline`
+- **Recovery rate** — amount recovered vs overdue balance
+- **Contact KPIs** — CPC, ALO, promessas on collection touches
+
 ## Tables
 
 | You need... | Use this table |

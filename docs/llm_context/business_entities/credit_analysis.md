@@ -34,8 +34,7 @@ do not duplicate them here. Decisioning internals (scores, policy, experiments) 
 
 ## Related Metric Entities
 
-- Credit Metrics — official credit-policy monitoring toolkit (Evers, FPD, EC|ES2CS, OA2CA, volume,
-  unpublishing, guarantee/risk mix) in [`credit_metrics.md`](../metric_entities/credit_metrics.md).
+- [Credit Metrics](../metric_entities/credit_metrics.md) — official credit-policy monitoring toolkit (Evers, FPD, EC|ES2CS, OA2CA, volume, unpublishing, guarantee/risk mix).
 
 ## For-Rent credit funnel
 
@@ -168,15 +167,23 @@ than ~5–7 days, re-pull after maturity, and sanity-check against uncensored OA
 
 ## Key Metrics
 
+Use [Related Metric Entities](#related-metric-entities) for **official** credit-policy monitoring metrics. The bullets below are **component** funnel ratios on `fpcf` — suitable for ad-hoc exploration; EC|ES2CS and other official definitions live in the metric entity.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Evers, FPD, EC\|ES2CS, OA2CA, volume, unpublishing, guarantee/risk mix | [Credit Metrics](../metric_entities/credit_metrics.md) |
+
+### Component / exploratory metrics
+
 All on `fpcf` with `is_last_credit_evaluation = true`. Stage ratio =
 `SUM(later_flag) / SUM(earlier_flag)`. Past EP, exclude immature cohorts.
 
 - **Offers submitted** — `SUM(os_flag)`
 - **Approval rate (OS→CA)** — `SUM(ca_flag) / SUM(os_flag)`
 - **Offer→contract (OS→CS)** — `SUM(cs_flag) / SUM(os_flag)` (censored when recent)
-- **Credit-policy conversion (ES2CS / EC\|ES2CS)** — `ES→CS` is the common credit-policy conversion
-  metric, but it **misses the policy's effect on early credit**; the preferred metric is **EC\|ES2CS**
-  (client×house flows entering at EC *or* ES → CS). Official definition in the **Credit Metrics** entity.
+- **Credit-policy conversion (ES2CS / EC\|ES2CS)** — official definition in [Credit Metrics](../metric_entities/credit_metrics.md); do not use naive `ES→CS` alone for policy impact analysis
 - **Intent rate (OA→ES)** — `SUM(es_flag) / SUM(oa_flag)` (not censored)
 - **Evaluation-positive (OA→EP)** — `SUM(ep_flag) / SUM(oa_flag)` (not censored)
 - **CLEAR_NO rate (funnel product)** — share of `guarantee_offered = 'CLEAR_NO'` among `es_flag`
@@ -359,7 +366,7 @@ SELECT
         / NULLIF(count(*), 0) AS acceptance_rate
 FROM dw_credit.fact_proposal_credit_flows
 WHERE is_last_credit_evaluation = true
-  AND is_user_version = true                 -- User grain (Risk's ~77%); drop for event grain
+  AND is_user_version = true                 -- User grain per Risk ~77%; drop for event grain
   AND guarantee_offered LIKE 'PRO_GUARANTOR%'
   AND country_code = 'BR'
   AND rental_administrator = 'QUINTOANDAR'

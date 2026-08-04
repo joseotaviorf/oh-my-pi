@@ -1,5 +1,13 @@
 # House and Listing
 
+## Ownership
+
+**Data Owner:**
+- bruna.prates@quintoandar.com.br
+
+**Data Steward:**
+- bruna.prates@quintoandar.com.br
+
 ## Overview
 
 **House** and **listing** are two grains of the same property domain on QuintoAndar. The **house** is the physical property — a stable identity (apartment, house, unit) with enduring attributes like address, layout, and amenities. The **listing** is the publication of that property on the platform — status, pricing, and demand metrics. One house (`sk_house`) can appear in rent and sale contexts, sometimes in parallel (hybrid listings).
@@ -18,6 +26,15 @@ The end-to-end lifecycle typically follows:
 5. **Conversion** — rent listing → contract (`fact_house_listings.sk_contract`); sale listing → CCV (see `business_entities/fs-transact.md`)
 
 Not every house follows every step. Some are created during supply acquisition and never list; others are delisted and relisted months later under the same `sk_house`. At the EBDB source, each business context has its own row in `listing_business_context`.
+
+## Related Metric Entities
+
+- [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) — official rent listing-version cohort conversion to signed contract (monthly/weekly/daily grains).
+- [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) — L2VB, L2VC, L2OS, L2TP (RENT), L2CCV (SALE) listing-cohort demand funnel.
+- [Ongoing Listings](../metric_entities/ongoing_listings.md) — daily published-inventory volume (RENT and SALE; different table paths).
+- [FL (First Listings)](../metric_entities/first_listings_1p.md) — first-time published inventory (also referenced from Supply for acquisition funnel).
+- [Supply Retention (Sale)](../metric_entities/supply_retention_sale.md) — month-over-month Sale listing stock flow (FL, republished, churn, CCV) — **local definitions differ from corporate FL/OL**; use only for Supply Retention questions.
+- [Credit Metrics](../metric_entities/credit_metrics.md) — credit-policy monitoring metrics that join to listing/proposal grain (Evers, FPD, EC|ES2CS, etc.).
 
 ## RENT listing versioning
 
@@ -319,18 +336,32 @@ Sale has **no business listing versioning** — only `order_version` **0** (edit
 
 ## Key Metrics
 
-### House grain
+Use [Related Metric Entities](#related-metric-entities) for **official** L2R, demand-funnel conversions, ongoing listings, first listings, and Supply Retention (Sale). The bullets below are **component** metrics at house or listing grain.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| L2R / listing to contract signed (RENT) | [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) |
+| L2VB, L2VC, L2OS, L2TP, L2CCV | [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) |
+| Daily ongoing published inventory | [Ongoing Listings](../metric_entities/ongoing_listings.md) |
+| FL / First Listings 1P/3P | [FL (First Listings)](../metric_entities/first_listings_1p.md) |
+| Sale supply retention (FL/republished/churn/CCV stock flow) | [Supply Retention (Sale)](../metric_entities/supply_retention_sale.md) |
+
+### Component / exploratory metrics
+
+#### House grain
 
 - Distinct houses (`COUNT(DISTINCT dim_house.sk_house)`)
 - Houses by city/region (`dim_house.sk_region` → `dw_public.dim_region`)
 - Repeat-rental houses (`fact_house_listings.nr_renting > 1`)
 
-### Listing grain
+#### Listing grain
 
-- First Listings — **RENT:** `listing_category_start = 'First Listing'` on `dim_house_listing`. **SALE:** first publication date on `fact_listings` (see `metric_entities/first_listings_1p.md`)
-- **Ongoing listings (daily volume)** — RENT and SALE; see `metric_entities/ongoing_listings.md`
+- First Listings — **RENT:** `listing_category_start = 'First Listing'` on `dim_house_listing`. **SALE:** first publication date on `fact_listings` (official definition in [FL (First Listings)](../metric_entities/first_listings_1p.md))
+- **Ongoing listings (daily volume)** — RENT and SALE; official definition in [Ongoing Listings](../metric_entities/ongoing_listings.md)
 - Current published inventory snapshot (`status = 'PUBLISHED'`; rent also uses `is_last_version = TRUE`) — point-in-time, not the daily series above
-- **L2R (Listing to Rental)** — monthly, weekly, daily cohort rates and days-to-contract → `metric_entities/listing_to_rental.md`
+- **L2R (Listing to Rental)** — see [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) for the official cohort definition
 - **Listing unpublishes** — transition volume by day / week / month — see **Listing unpublishes** below
 - Relisting / rerent lag — **RENT only:** `days_ended_rental_to_relisting`, `days_relisting_to_re_rental`
 - Sale funnel velocity — **SALE:** `fact_listings.days_first_publication_to_*`
@@ -466,7 +497,7 @@ Same event definition; only the bucket on **event start** changes.
 ```sql
 SELECT
     dh.sk_house,
-    dr.city,
+    dr.city_name,
     dr.city_group,
     dh.bedrooms,
     dh.bathrooms,

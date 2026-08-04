@@ -1,5 +1,13 @@
 # Department
 
+## Ownership
+
+**Data Owner:**
+- gustavo.silva@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 A department (also called queue or "caixa"/"fila") is the organizational unit responsible for handling a specific type of customer support request. Departments determine **routing**, **SLA targets**, and **journey classification** for tickets and contacts.
@@ -68,6 +76,19 @@ Journey step (e.g., Offboarding)
 Source: **"Controle de Departamentos" Google Sheet** (`gsheets_clean.department_control`). Contains the department → journey_step → team mapping for both Twilio (Front Office) and Zendesk (Back Office) queues.
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** BPO Performance and ticket-rate metrics sliced by department. The bullets below are **component** department-level aggregates.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Front Office DSat, Resolution Rate, Recontato D0/D4 (by department) | [Customer Contacts Front](../metric_entities/customer_contacts_front.md) |
+| Back Office SLA, DSAT, Resolution Rate, volume (by department/team) | [Cases Perspective](../metric_entities/cases_perspective.md) |
+| Backlog out of SLA (Back Office, by department) | [Backlog Out of SLA](../metric_entities/backlog_out_of_sla_back.md) |
+| Ticket rate per active contract (Front, Post Contract queues) | [Ticket Rate Front - Pós Contrato](../metric_entities/ticket_rate_front_pos.md) |
+
+### Component / exploratory metrics
 
 - **Ticket volume by department** — how many tickets each department handles
 - **SLA compliance by department** — percentage of tickets resolved within SLA per department

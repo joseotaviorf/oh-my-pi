@@ -1,5 +1,13 @@
 # Ticket
 
+## Ownership
+
+**Data Owner:**
+- gustavo.silva@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 A ticket is a customer support request tracked in Zendesk. It is the **central entity** of the Support & Services domain — virtually every S&S metric, dashboard, and operational workflow is anchored to a ticket.
@@ -22,10 +30,10 @@ Tickets are split into two operational categories:
 
 ## Related Metric Entities
 
-- Journey PC
+- [Journey PC](../metric_entities/journey_pc.md) — post-contract client mix (% Seamless / Digital / Human Support) on onboarding+ongoing For Rent contracts.
 - [Customer Contacts Front](../metric_entities/customer_contacts_front.md) — Front Office DSat, Resolution Rate, and Recontato D0/D4.
 - [Cases Perspective](../metric_entities/cases_perspective.md) — Post Contract Back Office SLA, DSAT, Resolution Rate, and Inbound/Outbound Volume.
-- Offboard Human vs Digital Metrics
+- [Offboard Human vs Digital Metrics](../metric_entities/offboard_human_vs_digital_metrics.md) — offboarding TF channel mix and segment NPS (digital vs human support).
 - [Backlog Out of SLA](../metric_entities/backlog_out_of_sla_back.md) — BPO Performance Back Office backlog-out-of-SLA rate (% Fora Prazo Back), Zendesk side sourced from `fact_backlog_metrics_tasks`.
 - [% Non Wall-E (POST)](../metric_entities/non_walle_post.md) — share of billable front-office chat contacts in the Post-contract journey that did not originate from Wall-E, classified by the session's first department within the 22-queue "Contatos Faturáveis" universe.
 - [Ticket Rate Front - Pós Contrato](../metric_entities/ticket_rate_front_pos.md) — ratio of deduplicated Front Office interactions (call + chat) in seven Post Contract queues to active For Rent contracts at month-end (`sandbox.summary_table_fr` `Ongoing Rental`, Brazil only).
@@ -171,6 +179,22 @@ Special rules:
 - Offboarding queues (e.g., "Offboarding Reparos") have a **21-day SLA** by default
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** BPO Performance, Journey PC, offboarding channel-mix, and ticket-rate numbers. The bullets below are **component** metrics on `fact_tickets` and related tables.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Front Office DSat, Resolution Rate, Recontato D0/D4 | [Customer Contacts Front](../metric_entities/customer_contacts_front.md) |
+| Back Office SLA, DSAT, Resolution Rate, volume | [Cases Perspective](../metric_entities/cases_perspective.md) |
+| % Seamless / Digital / Human Support clients (onboarding+ongoing) | [Journey PC](../metric_entities/journey_pc.md) |
+| Offboarding digital vs human-support TF share | [Offboard Human vs Digital Metrics](../metric_entities/offboard_human_vs_digital_metrics.md) |
+| Backlog out of SLA (Back Office) | [Backlog Out of SLA](../metric_entities/backlog_out_of_sla_back.md) |
+| Ticket rate per active contract (Front, Post Contract) | [Ticket Rate Front - Pós Contrato](../metric_entities/ticket_rate_front_pos.md) |
+| % Non Wall-E chat contacts (Post Contract) | [% Non Wall-E (POST)](../metric_entities/non_walle_post.md) |
+
+### Component / exploratory metrics
 
 - **Ticket volume** per month (by `ts_created` or `ts_closed`)
 - **DSAT** — dissatisfaction rate (proportion of bad CSAT ratings). Metric in `metric_ss__tickets.dsat`

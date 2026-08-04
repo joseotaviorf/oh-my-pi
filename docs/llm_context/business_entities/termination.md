@@ -27,9 +27,9 @@ Not all terminations follow every step. Some are canceled before completion, som
 
 ## Related Metric Entities
 
-- Offboard Human vs Digital Metrics
+- [Offboard Human vs Digital Metrics](../metric_entities/offboard_human_vs_digital_metrics.md) — offboarding TF channel mix (digital vs human vs SPOC) and NPS by digital/human-support segment.
 - [ER2RR](../metric_entities/er2rr.md) — ended-rental-to-new-contract conversion rate, read by 28-day maturation cohort month (4w/8w/12w horizons).
-- [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md) — offboarding-quality ratios (mediation, repairs, agreement, SPOC) from `obt_offboarding`.
+- [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md) — offboarding-quality ratios (% w/o mediation, % without repairs, % both agree, % compulsory/band-aid, % SPOC roll out) from `obt_offboarding`.
 
 ## Glossary and Synonyms
 
@@ -56,6 +56,18 @@ Not all terminations follow every step. Some are canceled before completion, som
 - **Inspection JOINs**: CAST and Dedup rules apply — see Inspection entity for details
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** ER2RR, property-integrity, and offboarding channel-mix metrics. The bullets below are **component** metrics on `fact_terminations` and `obt_offboarding`.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| ER2RR (4w/8w/12w ended-rental-to-rerental) | [ER2RR](../metric_entities/er2rr.md) |
+| % offboarding w/o mediation, w/o repairs, both agree, compulsory/band-aid, SPOC roll out | [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md) |
+| Offboarding digital vs human-support TF share and segment NPS | [Offboard Human vs Digital Metrics](../metric_entities/offboard_human_vs_digital_metrics.md) |
+
+### Component / exploratory metrics
 
 - Termination volume per month (filter by `ts_termination_request` or `ts_termination_finished`)
 - Termination rate by reason (`reason` in `dim_termination`)
@@ -152,7 +164,8 @@ SELECT
     obt.has_repairs,
     obt.has_agreement,
     obt.model_discount_type,
-    obt.has_applied_discount,
+    obt.is_discount_accepted,
+    obt.invoice_discount_value,
     obt.inspection_status,
     obt.leadtime_total,
     obt.leadtime_vt,
@@ -160,11 +173,13 @@ SELECT
     obt.ts_termination_request,
     obt.dt_termination,
     obt.ts_termination_finished,
-    dcp.person_name AS tenant_name
+    dcp.full_name AS tenant_name
 FROM dw_offboarding.obt_offboarding AS obt
+LEFT JOIN dw_rent.fact_contract_people AS fcp
+    ON obt.sk_contract = fcp.sk_contract
+    AND fcp.contract_role = 'tenant'
 LEFT JOIN dw_rent.dim_contract_person AS dcp
-    ON obt.sk_contract = dcp.sk_contract
-    AND dcp.person_type = 'TENANT'
+    ON fcp.sk_contract_person = dcp.sk_contract_person
 WHERE obt.ts_termination_finished >= DATE '2025-01-01'
 ```
 

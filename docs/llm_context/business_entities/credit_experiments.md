@@ -33,7 +33,7 @@ of that matrix.
 
 ## Related Metric Entities
 
-- Credit Metrics — [`credit_metrics.md`](../metric_entities/credit_metrics.md).
+- [Credit Metrics](../metric_entities/credit_metrics.md) — official credit-policy monitoring toolkit (Evers, FPD, EC|ES2CS, OA2CA, volume, unpublishing, guarantee/risk mix).
 
 ## Glossary and Synonyms
 
@@ -65,6 +65,16 @@ of that matrix.
 - Validate randomization at **house** grain — report/proposal counts are post-treatment.
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** credit-policy outcome metrics when evaluating experiments. The bullets below are **component** experiment diagnostics.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Evers, FPD, EC\|ES2CS, OA2CA, volume, unpublishing, guarantee/risk mix | [Credit Metrics](../metric_entities/credit_metrics.md) |
+
+### Component / exploratory metrics
 
 - **Outcome by arm × cell** — pick the transition by **flip kind** (reject↔paid/free → ES→EP or proposal→CS; free↔paid → EP→CS), gated to the affected cell
 - **House-level arm balance** — `count(DISTINCT id_house)` per arm (~50/50 target)
@@ -341,10 +351,14 @@ WITH base AS (
       AND pr.is_retenant = false
       AND pr.ts_created >= TIMESTAMP '2026-05-01 00:00:00 UTC'
 ),
-cell AS (        -- KPI = proposal→CS (captures rj_cgrm's ES→EP margin-extensive lift)
-    SELECT arm, stratum, count(*) AS n,
-           CAST(SUM(cs_flag) AS DOUBLE) / NULLIF(count(*), 0) AS proposal_to_cs
-    FROM base GROUP BY arm, stratum
+cell AS (
+    SELECT
+        arm,
+        stratum,
+        count(*) AS n,
+        CAST(SUM(cs_flag) AS DOUBLE) / NULLIF(count(*), 0) AS proposal_to_cs
+    FROM base
+    GROUP BY arm, stratum
 ),
 w AS (
     SELECT stratum, CAST(n AS DOUBLE) / SUM(n) OVER () AS weight

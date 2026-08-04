@@ -33,7 +33,7 @@ governance metadata** for the tables below — this doc is the routing & methodo
 
 ## Related Metric Entities
 
-- Credit Metrics — [`credit_metrics.md`](../metric_entities/credit_metrics.md).
+- [Credit Metrics](../metric_entities/credit_metrics.md) — official credit-policy monitoring toolkit (Evers, FPD, EC|ES2CS, OA2CA, volume, unpublishing, guarantee/risk mix).
 
 ## Glossary and Synonyms
 
@@ -79,6 +79,16 @@ governance metadata** for the tables below — this doc is the routing & methodo
 - Analysis-time liquidity = `policy_report.house_rent_liquidity_score`; current = `dw_liquidity.*`.
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** credit-policy monitoring metrics (Evers, FPD, EC|ES2CS, etc.). The bullets below are **component** policy diagnostics on `policy_report` and related tables.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Evers, FPD, EC\|ES2CS, OA2CA, volume, unpublishing, guarantee/risk mix | [Credit Metrics](../metric_entities/credit_metrics.md) |
+
+### Component / exploratory metrics
 
 - **Guarantee mix by risk × income** — `analysis_category_name` × `risk_category_range` × `income_group`
 - **Policy clear-no rate** — `BAD_SCORE_ALL_PROPONENTS` among `guarantee_offered = 'CLEAR_NO'` /

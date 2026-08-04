@@ -1,5 +1,13 @@
 # NPS
 
+## Ownership
+
+**Data Owner:**
+- gustavo.silva@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 NPS (Net Promoter Score) measures overall customer loyalty and brand perception at QuintoAndar. Unlike CSAT (which is per-ticket or per-interaction), NPS is collected through **structured campaigns** dispatched via the **Tracksale** platform.
@@ -18,8 +26,10 @@ Each NPS answer may include a **justification** — free-text feedback explainin
 
 ## Related Metric Entities
 
-- NPS FR
-- Offboard Human vs Digital Metrics
+For **official** For Rent NPS (weighted NPS True, per-journey components, SPOC/AS IS cuts, interaction-type NPS), use the metric entities below — they override the generic `% promoters − % detractors` logic in this document.
+
+- [NPS FR](../metric_entities/nps_fr.md) — NPS True (weighted OKR), NPS Onboarding/Ongoing/Offboarding, PP Multi, SPOC/AS IS, NPS Seamless/Digital Sup/Human Support.
+- [Offboard Human vs Digital Metrics](../metric_entities/offboard_human_vs_digital_metrics.md) — offboarding TF channel mix (digital vs human vs SPOC) and NPS by digital/human-support segment (not NPS geral/SPOC/AS IS — those live in NPS FR).
 
 ## Synonyms
 
@@ -113,9 +123,20 @@ Each NPS answer may include a **justification** — free-text feedback explainin
 
 ## Key Metrics
 
-- **NPS score** — % Promoters − % Detractors (use `dim_nps_answer.score_category` for classification)
+Use [Related Metric Entities](#related-metric-entities) for **official** For Rent NPS. The bullets below are **component** metrics on Tracksale dispatches — suitable for ad-hoc exploration, not for MBR/OKR numbers.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| NPS True, per-journey NPS, PP Multi, SPOC/AS IS, Seamless/Digital/Human Support NPS | [NPS FR](../metric_entities/nps_fr.md) |
+| Offboarding digital vs human-support TF share and segment NPS | [Offboard Human vs Digital Metrics](../metric_entities/offboard_human_vs_digital_metrics.md) |
+
+### Component / exploratory metrics
+
+- **NPS score** — `% promoters − % detractors` on `fact_nps_dispatches` + `dim_nps_answer.score_category` (not the official weighted NPS True)
 - **Response rate** — dispatches answered / total dispatches
-- **NPS by campaign** — NPS segmented by campaign type (journey moment)
+- **NPS by campaign** — NPS segmented by `dim_nps_campaign` (journey moment)
 - **NPS trend** — NPS evolution per period
 - **Detractor volume** — count of detractors per period
 - **Justification analysis** — free-text analysis from `fact_nps_answer_justifications`

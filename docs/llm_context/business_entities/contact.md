@@ -1,5 +1,13 @@
 # Contact
 
+## Ownership
+
+**Data Owner:**
+- gustavo.silva@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 A contact is a direct interaction between a customer and a support agent — either a **call** or a **chat** session. Contacts are the real-time component of the Support & Services domain, representing the Front Office side of operations.
@@ -158,6 +166,18 @@ Resolves chat sessions from:
 
 ## Key Metrics
 
+Use [Related Metric Entities](#related-metric-entities) for **official** DSAT, Resolution Rate, Recontato, and ticket-rate metrics. The bullets below are **component** contact-volume and operational metrics.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Front Office DSat, Resolution Rate, Recontato D0/D4 | [Customer Contacts Front](../metric_entities/customer_contacts_front.md) |
+| Back Office SLA, DSAT, Resolution Rate, volume | [Cases Perspective](../metric_entities/cases_perspective.md) |
+| Ticket rate per active contract (Front, Post Contract) | [Ticket Rate Front - Pós Contrato](../metric_entities/ticket_rate_front_pos.md) |
+
+### Component / exploratory metrics
+
 - **Contact volume** per month, by channel (call, chat, WhatsApp)
 - **AHT** — Average Handling Time per chat interaction (`chat_aht`)
 - **Retention rate** — percentage of chatbot interactions that do not escalate to a human (derive from `datalake_chatbot.sessions` — not from deprecated `fact_sessions_chatbot`)
@@ -231,18 +251,18 @@ Messages exchanged within a support session, distinguishing analyst messages fro
 SELECT
     fcm.sk_session,
     fcm.sk_task,
-    ft.sk_ticket,   -- reach ticket via fact_tickets; fact_chat_messages has no sk_ticket
+    ft.sk_ticket,
     fcm.sk_user_sender,
-    fcm.user_type,   -- 'User', 'Analyst', or 'Bot'
-    fcm.message_body,
-    fcm.channel,
-    fcm.direction,
-    fcm.ts_message_created
+    fcm.user_type,
+    fcm.origin,
+    fcm.message,
+    fcm.message_index,
+    fcm.ts_created
 FROM dw_customer_support.fact_chat_messages AS fcm
 LEFT JOIN dw_customer_support.fact_tickets AS ft
-    ON fcm.sk_session = ft.sk_session   -- join on Sauron session id to get ticket context
-WHERE fcm.ts_message_created >= TIMESTAMP '2025-01-01'
-ORDER BY fcm.sk_session, fcm.ts_message_created
+    ON fcm.sk_session = ft.sk_session
+WHERE fcm.ts_created >= TIMESTAMP '2025-01-01'
+ORDER BY fcm.sk_session, fcm.ts_created
 ```
 
 ### Query 3 — IVR interactions with step details

@@ -1,5 +1,13 @@
 # Closing
 
+## Ownership
+
+**Data Owner:**
+- arthur.moura@quintoandar.com.br
+
+**Data Steward:**
+- arthur.moura@quintoandar.com.br
+
 ## Overview
 
 Closing (also called **CC2CS**, "Contract Created to Contract Signed") is the final step of the For Rent pre-contract journey. At this stage, a contract is generated for an accepted proposal and sent to the signatories — tenants, landlords, dwellers, sponsors (guarantors), and partners — who can request changes, refuse, or sign it. Closing is what materializes a deal, the bridge between a proposal and an active rental contract.
@@ -14,6 +22,11 @@ The lifecycle typically follows these stages:
 Do note that `dim_contract.status` and `dim_contract.closing_status` do not encode the same information and should always be checked in tandem.
 
 Not all closings reach signature. Some are cancelled before any signature (`OWNER_GAVE_UP_RENTING`, `TENANT_DOESNT_AGREE`, `SIG_DEADLINE_EXPIRED`, etc. in `cancellation_reason`); others go through multiple draft revisions when signatories request changes.
+
+## Related Metric Entities
+
+- [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) — official rent listing-version conversion to signed contract (closing is the terminal funnel event for L2R).
+- [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) — listing-cohort demand funnel including L2TP (RENT tenant prospect) and downstream conversion steps.
 
 ## Glossary and Synonyms
 
@@ -64,6 +77,17 @@ Not all closings reach signature. Some are cancelled before any signature (`OWNE
 - **Contract audit-trail join:** `contract_aud.rev = user_revision_entity.id` — both are `INTEGER`, so a direct equality works (no cast). `ca.mod_status = true` proxies a transition *into* the new `status` (not from a specific prior status); the `ure.reason` text disambiguates (e.g. reasons mentioning "Minuta" confirm a `Minuta → PreAssinaturas` transition). `user_revision_entity` is owned by [`fr_transact.md`](fr_transact.md).
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** listing-cohort conversion metrics. The bullets below are **component** metrics on `dim_contract` and related closing tables.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| L2R / listing to contract signed (RENT) | [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) |
+| L2TP and listing demand-funnel conversions | [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) |
+
+### Component / exploratory metrics
 
 - Contracts signed in a period (`COUNT(*)` over `dw_rent.dim_contract` filtered by `DATE(ts_signature)` and `closing_status = 'ContratoAssinado'`)
 - Signing rate — signed contracts over contracts created in a period (uses `closing_status` and `ts_created`)
@@ -209,18 +233,21 @@ ORDER BY dc_new.ts_created DESC
 
 ### Query 4 — CC2CS leadtime per signed contract
 
-Closing leadtime (working minutes from contract creation to signature). Uses the pre-computed `cc2cs_working_minutes` in `fact_listing_rent_flows`.
+Closing leadtime (working minutes from contract creation to signature). Uses the pre-computed `working_min_contract_created_to_contract_signed` in `fact_listing_rent_flows`; join `dim_contract` for contract timestamps.
 
 ```sql
 SELECT
     flrf.sk_contract,
-    flrf.ts_contract_created,
-    flrf.ts_contract_signed,
-    flrf.cc2cs_working_minutes,
-    flrf.cc2cs_working_minutes / 60.0 AS cc2cs_working_hours
+    dc.ts_created,
+    dc.ts_signature,
+    flrf.working_min_contract_created_to_contract_signed AS cc2cs_working_minutes,
+    flrf.working_min_contract_created_to_contract_signed / 60.0 AS cc2cs_working_hours
 FROM dw_rent.fact_listing_rent_flows AS flrf
-WHERE flrf.ts_contract_signed >= DATE '2026-01-01'
-ORDER BY flrf.cc2cs_working_minutes DESC
+INNER JOIN dw_rent.dim_contract AS dc
+    ON flrf.sk_contract = dc.sk_contract
+WHERE dc.ts_signature >= TIMESTAMP '2026-01-01 00:00:00'
+  AND flrf.funnel_step = 'contract_signed'
+ORDER BY flrf.working_min_contract_created_to_contract_signed DESC
 ```
 
 ### Query 5 — Share of contracts with multiple owners and/or legal representatives

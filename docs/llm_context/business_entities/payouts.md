@@ -50,6 +50,11 @@ Reference dashboards: [Payouts overview](https://superset.apps.data-prd.habitat.
 and [payout deep dive](https://superset.apps.data-prd.habitat.zone/superset/dashboard/3682/).
 
 
+## Related Metric Entities
+
+- [% Monthly Payouts Successfully Completed Until Due Date](../metric_entities/monthly_payouts_successfully_completed_until_due_date.md) — the official on-time landlord payout rate.
+
+
 ## Glossary and Synonyms
 
 
@@ -128,9 +133,17 @@ and [payout deep dive](https://superset.apps.data-prd.habitat.zone/superset/dash
 
 ## Key Metrics
 
+Use [Related Metric Entities](#related-metric-entities) for the **official** on-time landlord payout rate. The bullets below are **component** payout operational metrics.
 
-- **Monthly payout on-due rate** — share of landlord monthly invoices paid by day 11; the official
- definition lives in the metric entity below
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| % Monthly Payouts Successfully Completed Until Due Date | [% Monthly Payouts Successfully Completed Until Due Date](../metric_entities/monthly_payouts_successfully_completed_until_due_date.md) |
+
+### Component / exploratory metrics
+
+- **Monthly payout on-due rate** — component approximation; official definition in the metric entity above
 - **Payout rate by MOB** — the same rate split by contract age, which isolates the bank-data
  maturation effect
 - **Occurrence rate** — share of payouts whose latest bank return is neither `PAGAMENTO EFETUADO`
@@ -187,12 +200,6 @@ and [payout deep dive](https://superset.apps.data-prd.habitat.zone/superset/dash
 - [Collections](collections.md) works the tenant side of `datalake_retsuko_clean.invoice`
  (`account.type = 'tenant'`, negative `due_amount`). A tenant default does not excuse a late
  payout — that is the whole point of the product promise.
-
-
-## Related Metric Entities
-
-
-- [% Monthly Payouts Successfully Completed Until Due Date](../metric_entities/monthly_payouts_successfully_completed_until_due_date.md) — the official on-time landlord payout rate.
 
 
 ## Dos and Don'ts

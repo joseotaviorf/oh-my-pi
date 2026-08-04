@@ -1,5 +1,13 @@
 # FR Transact
 
+## Ownership
+
+**Data Owner:**
+- arthur.moura@quintoandar.com.br
+
+**Data Steward:**
+- arthur.moura@quintoandar.com.br
+
 ## Overview
 
 **FR Transact** is the For Rent (aluguel) **pre-contract transaction funnel** at QuintoAndar — every step a tenant prospect goes through on a property *before* the rental contract becomes active. It is the For Rent analog of [`fs-transact.md`](fs-transact.md) (For Sale). The journey is anchored to the **rent flow**: the tuple `(property, tenant prospect)` and all of its events over time.
@@ -24,6 +32,11 @@ Not every rent flow follows every step: many drop at visit or offer (no interest
 ### Advance payment (Sinal)
 
 The **sinal** (advance payment) is an **optional reservation product** within a rent flow: a tenant prospect pays an upfront amount (the `payment_amount`, a fraction of the rent set by `payment_percentage`) to reserve the property and signal intent while documentation and credit run. It is **not a mandatory funnel stage** — only some flows have a sinal — and it is owned by the **Rental Transact** system (`datalake_rental_transact*`), distinct from the For-Sale "Sinal / Earnest Payment" (~6% of the sale price) documented in [`fs-transact.md`](fs-transact.md) and [`bank_reconciliation.md`](bank_reconciliation.md). Each advance payment is keyed by `uuid_advance_payment`, attached to its rent flow via `uuid_offer` (= the rent-flow UUID), and moves through a payment lifecycle: `CREATED → PENDING → PROCESSING → PAID → FINISHED`, with off-ramps `CANCELED`, `PROCESSING_REFUND → REFUNDED`, `CHARGEBACK`, and `RETAINED` (cancelled but QuintoAndar keeps the amount). The advance-payment milestones are also emitted as `ADVANCE_PAYMENT`-stage events in the rent-demand-events funnel (see Tables).
+
+## Related Metric Entities
+
+- [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) — L2VB, L2VC, L2OS, L2TP and listing-cohort demand-funnel conversions for For Rent.
+- [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) — official rent listing-version conversion to signed contract (terminal stage of the FR Transact funnel).
 
 ## Glossary and Synonyms
 
@@ -81,6 +94,17 @@ The **sinal** (advance payment) is an **optional reservation product** within a 
 - **DataHub CI:** list concrete `schema.table` names only — never wildcards.
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** listing-cohort demand-funnel and L2R metrics. The bullets below are **component** funnel metrics on `fact_rent_demand_events` and `fact_listing_rent_flows`.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| L2VB, L2VC, L2OS, L2TP | [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) |
+| L2R / listing to contract signed | [Listing to Rental (L2R)](../metric_entities/listing_to_rental.md) |
+
+### Component / exploratory metrics
 
 - Funnel volume per stage (`COUNT(DISTINCT fde.sk_rent_flow)` per `det.abbreviation` on `fact_rent_demand_events`)
 - Stage conversion rates — OS→OA, OA→CA, CA→CC, CC→CS (ratios of the funnel volumes above)
@@ -149,7 +173,7 @@ The **sinal** (advance payment) is an **optional reservation product** within a 
 - Don't treat `fact_listing_rent_flows` as one row per rent flow — it is event-grain; counting raw rows inflates volume. Use `COUNT(DISTINCT sk_rent_flow)` or switch to `fact_rent_flows`.
 - Don't use the metadata's `offer_aproved` spelling in a `funnel_step` filter — the data value is `offer_approved`.
 - Don't count `dim_contract` rows as signed deals — drafts (`Minuta`), pre-signature (`PreAssinaturas`), and cancelled (`Cancelado`) rows are all present.
-- Don't run a window `LAG(status)` over the full `contract_aud` table to find transitions — it is very slow. Filter `mod_status = true` plus a `ts_database_transaction` date range first (use `mod_status` as the transition proxy).
+- Don't run a window `LAG(status)` over the full `contract_aud` table to find transitions — it is very slow. Filter `mod_status = true` plus a `user_revision_entity.ts_revision` range first (`ca.rev = ure.id`; `ts_revision` is Unix ms — use `mod_status` as the transition proxy).
 - Don't recompute CA2CS / CC2CS by hand — use the `working_min_*` columns (they already exclude non-working hours).
 - Don't confuse `ts_canceled` (cancelled before signing) with `dt_annulment` (annulled after signing) — the former is pre-contract, the latter post-signature.
 
@@ -234,15 +258,15 @@ Reasons behind the draft-approval transition (auto Offer Express vs CRM vs other
 ```sql
 WITH transitions AS (
     SELECT
-        DATE(ca.ts_database_transaction) AS dt_transition,
-        COALESCE(ure.reason, '(null)') AS reason
+        DATE(FROM_UNIXTIME(ure.ts_revision / 1000)) AS dt_transition,
+        COALESCE(ure.reason, 'null') AS reason
     FROM datalake_ebdb_clean.contract_aud AS ca
     LEFT JOIN datalake_ebdb_clean.user_revision_entity AS ure
         ON ca.rev = ure.id
     WHERE ca.status = 'PreAssinaturas'
       AND ca.mod_status = true
-      AND ca.ts_database_transaction >= TIMESTAMP '2026-05-01 00:00:00'
-      AND ca.ts_database_transaction < TIMESTAMP '2026-06-01 00:00:00'
+      AND ure.ts_revision >= 1714521600000
+      AND ure.ts_revision < 1717200000000
 )
 SELECT
     reason,

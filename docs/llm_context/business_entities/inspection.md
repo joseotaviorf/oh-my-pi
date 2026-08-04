@@ -83,6 +83,18 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 
 ## Key Metrics
 
+Use [Related Metric Entities](#related-metric-entities) for **official** inspection SLA and property-integrity metrics. Most offboarding inspection metrics are termination-anchored — see also [Termination](termination.md) and [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md).
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Inspection SLA compliance (onboarding/offboarding) | [Inspection SLA](../metric_entities/inspection_sla.md) |
+| % tenant finished / access / comments (onboarding report review) | [Property Integrity Onboarding](../metric_entities/property_integrity_onboarding.md) |
+| % offboarding w/o mediation, w/o repairs, both agree, compulsory/band-aid, SPOC roll out | [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md) |
+
+### Component / exploratory metrics
+
 Most inspection-related metrics are anchored to the **Termination** entity, not to the inspection itself. This is because stakeholders typically ask "what happened during the offboarding journey?" rather than "what happened in the inspection?". As a result, the main metrics use `fact_terminations` or `obt_offboarding` as the starting point and bring inspection data via JOINs:
 
 **Termination-anchored metrics (most common):**
@@ -97,7 +109,7 @@ Most inspection-related metrics are anchored to the **Termination** entity, not 
 **Inspection-only metrics (not tied to termination):**
 - Report access rate — percentage of inspections where landlord and/or tenant accessed the report (`fact_report_inspections.has_tenant_access_review`, `fact_report_inspections.has_owner_access_review`)
 - Inspection volume per month (filter by `inspection_type` and `status`)
-- SLA compliance: time between scheduling and execution (`fact_inspection.ldt_hours_execution`, `fact_inspection.is_sla_execution`) — this is a simpler, generic SLA signal. For the **official** SLA number (stage-specific thresholds — calendar days for onboarding vs. business days for offboarding — dedup/rank logic, and eviction segmentation, on the canonical `sandbox.booking_resolution` table), see [Inspection SLA](../metric_entities/inspection_sla.md).
+- SLA compliance: time between scheduling and execution (`fact_inspection.ldt_hours_execution`, `fact_inspection.is_sla_execution`) — generic SLA signal only; official SLA in [Inspection SLA](../metric_entities/inspection_sla.md)
 
 **Kirk / automatic laudo metrics:**
 - Kirk adoption rate — `COUNT_IF(is_automated_ar) / COUNT(*)` from `dw_offboarding.obt_offboarding` 

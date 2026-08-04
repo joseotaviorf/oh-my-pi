@@ -68,7 +68,21 @@ Not all repairs follow every step. Offboarding repairs may be exempted early, ag
 - **Dedup rule** (ongoing): `fact_ongoing_repairs` and `dim_ongoing_repairs` are deduped by `ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC)`. No additional dedup needed.
 - **Grain change**: joining `fact_inspection` → `fact_repair_request` fans out from inspection grain to repair grain (1:N). Always aggregate back when the desired output grain is per inspection.
 
+## Related Metric Entities
+
+- [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md) — official offboarding-quality ratios that use repair/agreement/mediation flags on `obt_offboarding` (% w/o mediation, % without repairs, % both agree, % compulsory/band-aid).
+
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** property-integrity offboarding metrics. The bullets below are **component** repair metrics on inspection and ongoing-repair tables.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| % offboarding w/o mediation, w/o repairs, both agree, compulsory/band-aid | [Property Integrity Offboarding](../metric_entities/property_integrity_offboarding.md) |
+
+### Component / exploratory metrics
 
 - Repair volume per inspection — count of `fact_repair_request` rows per `sk_inspection`
 - Repair volume per termination — use `fact_terminations.total_tentant_repair_ar` / `_review` / `_ac` for pre-aggregated counts by stage

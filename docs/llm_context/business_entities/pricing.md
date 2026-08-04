@@ -1,5 +1,13 @@
 # Pricing
 
+## Ownership
+
+**Data Owner:**
+- bruna.prates@quintoandar.com.br
+
+**Data Steward:**
+- bruna.prates@quintoandar.com.br
+
 ## Overview
 
 **Pricing** tracks how rental and sale prices change over time for each house on QuintoAndar as well as how the pricing calculators behave. The grain is **`(sk_house, business_context)`** — the same physical property can have independent price histories and price predictions for RENT and SALE.
@@ -260,7 +268,21 @@ Legacy enrich paths (`rent_listing_price_changes`, `sale_listing_price_changes`)
 - **Temporal join for daily snapshots:** `dt >= DATE(ts_price_started) AND dt < COALESCE(DATE(ts_price_ended), DATE '2100-01-01')` plus `is_last_price_of_day`.
 - **DataHub CI:** list concrete `schema.table` names only — never wildcards in the Tables section.
 
+## Related Metric Entities
+
+- [Quality of Supply (Pricing Levers)](../metric_entities/supply_quality_score.md) — official Quality Pub (at publication) and Quality 4Ws (after 4 weeks) pricing-health metrics for For Rent 1P listings.
+
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** Quality Pub and Quality 4Ws. The bullets below are **component** pricing metrics on `dim_pricing` and related tables.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Quality Pub, Quality 4Ws | [Quality of Supply (Pricing Levers)](../metric_entities/supply_quality_score.md) |
+
+### Component / exploratory metrics
 
 - Price change count (`change_number` or `COUNT(*)` with `is_last_price_of_day = TRUE`)
 - Current published price (`price` where `is_last_price = TRUE` and `business_context` filtered)
@@ -318,7 +340,7 @@ Official pricing grain is **`(sk_house, business_context)`**, not listing versio
 
 ```sql
 SELECT
-    dp.sk_house,
+    fpc.sk_house,
     dp.business_context,
     dp.price,
     dp.change_number,
@@ -353,7 +375,7 @@ ORDER BY 1, 2
 
 ```sql
 SELECT
-    dp.sk_house,
+    fpc.sk_house,
     dp.business_context,
     dp.price,
     dp.previous_price,
@@ -416,7 +438,7 @@ LIMIT 10
 
 ```sql
 SELECT
-    dp.sk_house,
+    fpc.sk_house,
     dp.business_context,
     dp.price AS listed_price,
     fps.suggested_price AS recommended_price,
@@ -438,18 +460,19 @@ WHERE dp.is_last_price = TRUE
 ```sql
 -- Listed price above p90; optional certainty filter at analyst discretion (official metrics do not require it)
 SELECT
-    dp.sk_house,
+    fpc.sk_house,
     dp.price AS listed_price,
     pp.p90 AS reference_p90,
     pp.prediction_certainty,
     dp.price > pp.p90 AS is_overpriced
 FROM dw_listing.dim_pricing AS dp
+INNER JOIN dw_listing.fact_price_changes AS fpc
+    ON dp.sk_pricing = fpc.sk_pricing
 INNER JOIN datalake_pricing_clean.price_prediction AS pp
-    ON dp.sk_house = pp.id_house
+    ON fpc.sk_house = pp.id_house
    AND dp.business_context = pp.business_context
 WHERE dp.is_last_price = TRUE
   AND dp.business_context = 'RENT'
-  -- AND pp.prediction_certainty NOT IN ('low', 'none')  -- optional; analyst choice
   AND dp.price > pp.p90
 -- dedupe to latest prediction per house+context in production queries
 ```

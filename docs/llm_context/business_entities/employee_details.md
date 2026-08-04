@@ -1,5 +1,13 @@
 # Employee Details
 
+## Ownership
+
+**Data Owner:**
+- isabella.araujo@quintoandar.com.br
+
+**Data Steward:**
+- isabella.araujo@quintoandar.com.br
+
 ## Overview
 
 Employee Details (`dw_employee_details`) is the primary internal People DW schema for workforce identity, contact and legal documentation, emergency contacts, management hierarchy, and daily assignment snapshots. It is the starting point for headcount, tenure, admissions, exits, and org-structure analysis within the People domain.
@@ -50,7 +58,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 
 ## Related Metric Entities
 
-- `../metric_entities/turnover.md` — Global Turnover, New Hire Attrition, early-tenure attrition (6/12-month), and Voluntary/Involuntary turnover.
+- [Turnover](../metric_entities/turnover.md) — Global Turnover, New Hire Attrition, early-tenure attrition (6/12-month), and Voluntary/Involuntary turnover.
 
 ## Glossary and Synonyms
 
@@ -128,13 +136,23 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Transferred employees stay active on the transfer date.** The pipeline keeps `is_active = TRUE` (and `employment_status = 'Active'`) on the old assignment's termination date when it is a Global Transfer, so daily active headcount does not dip on batch transfer dates (e.g. 2026-01-31, ~396 Global Transfers). If a sudden single-day headcount drop still appears, check terminations on that date against `is_transfer_termination` / `action_name = 'Global Transfer'` before reporting it as attrition.
 ## Key Metrics
 
+Use [Related Metric Entities](#related-metric-entities) for **official** turnover and attrition. The bullets below are **component** workforce metrics on `fact_assignment_snapshots`.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| Global Turnover, New Hire Attrition, Voluntary/Involuntary turnover | [Turnover](../metric_entities/turnover.md) |
+
+### Component / exploratory metrics
+
 - **Active headcount** — `COUNT(DISTINCT person_number)` where `is_current_for_employee = TRUE` and `is_active = TRUE`
 - **Tenure in company** — `days_employee_tenure`, `months_employee_tenure` (relative to `dt_reference`)
 - **Tenure in assignment** — `days_tenure_in_assignment` (current role only)
 - **Span of control** — `count_direct_report`, `count_indirect_report` (pre-computed on the fact)
 - **Real exits / leavers** — `termination_type IS NOT NULL` with `is_effective_worker = TRUE` (internal transfers, expatriate movements, and effectivations are `termination_type = NULL` and excluded); slice by `termination_type` for voluntary vs. involuntary
 - **Managers vs ICs** — `is_manager`, `is_leadership_team_member`
-- **Turnover / attrition** — official monthly formula lives in `../metric_entities/turnover.md` (never approximate ad hoc); all inputs use `is_monthly_snapshot_for_employee = TRUE` only, built from `termination_type`, `is_reorganization_termination`, `is_effective_worker`, `dt_terminated`, and month-end actives on `fact_assignment_snapshots`
+- **Turnover / attrition** — see [Turnover](../metric_entities/turnover.md) (never approximate ad hoc); all inputs use `is_monthly_snapshot_for_employee = TRUE` only
 
 ## Relationships with Other Entities
 

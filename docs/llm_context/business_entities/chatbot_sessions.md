@@ -1,5 +1,13 @@
 # Chatbot Sessions
 
+## Ownership
+
+**Data Owner:**
+- gustavo.silva@quintoandar.com.br
+
+**Data Steward:**
+- gustavo.silva@quintoandar.com.br
+
 ## Overview
 
 A chatbot session represents a conversation between a user and one of QuintoAndar's AI agents (bots/hosts) through WhatsApp or in-app channels. Sessions are orchestrated by Sauron and executed by Copilot Service, with LLM observability captured in Langfuse. The domain covers session lifecycle, message threading, LLM evaluation scores, pre-bot bypasses, and escalation to human support.
@@ -16,7 +24,7 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 
 ## Related Metric Entities
 
-- Journey PC
+- [Journey PC](../metric_entities/journey_pc.md) — post-contract client mix (% Seamless / Digital / Human Support) on onboarding+ongoing For Rent contracts.
 - [Escalation Rate FR Offboarding](../metric_entities/escalation_rate_fr_offboarding.md) — official escalation rate for the For Rent offboarding agent (`ForRentOffboardingAgentV1`), per day, segmented by `sessions.is_escalated`.
 - [% Escalation Rate (Wall-E)](../metric_entities/escalation_rate_walle.md) — official escalation rate for Wall-E sessions, scoped with `bot = 'wall-e'`.
 - [% Escalation Error Rate (Wall-E)](../metric_entities/escalation_error_rate_walle.md) — official Wall-E escalation error rate, restricted to a curated front-facing queue whitelist.
@@ -60,6 +68,20 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 - - **No partition columns** on `datalake_langfuse_clean` tables — filter on `ts_created` or `ts_started` for performance (z-ordered).
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** escalation and Journey PC numbers. The bullets below are **component** metrics on `datalake_chatbot.sessions` and related tables.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| % Seamless / Digital / Human Support clients (onboarding+ongoing) | [Journey PC](../metric_entities/journey_pc.md) |
+| Escalation rate (For Rent offboarding agent) | [Escalation Rate FR Offboarding](../metric_entities/escalation_rate_fr_offboarding.md) |
+| Escalation rate (Wall-E) | [% Escalation Rate (Wall-E)](../metric_entities/escalation_rate_walle.md) |
+| Escalation error rate (Wall-E) | [% Escalation Error Rate (Wall-E)](../metric_entities/escalation_error_rate_walle.md) |
+| % Non Wall-E billable Post-contract chat contacts | [% Non Wall-E (POST)](../metric_entities/non_walle_post.md) |
+
+### Component / exploratory metrics
 
 - Session volume per day/week/month (count of `sessions.id_sauron_session`, filter by `sessions.ts_created`)
 - Escalation rate (`COUNT_IF(is_escalated) / COUNT(*)` on `sessions`)
@@ -179,7 +201,7 @@ FROM
     datalake_chatbot.sessions AS s
 WHERE
     s.ts_created >= TIMESTAMP '{start_date}'
-    AND s.ts_created < TIMESTAMP '{end_date}'
+    AND s.ts_created < TIMESTAMP {end_date}
 GROUP BY
     DATE(s.ts_created),
     s.bot,
@@ -204,14 +226,14 @@ FROM
     datalake_chatbot.sessions AS s
 WHERE
     s.ts_created >= TIMESTAMP '{start_date}'
-    AND s.ts_created < TIMESTAMP '{end_date}'
+    AND s.ts_created < TIMESTAMP {end_date}
     AND s.is_escalated = true
 GROUP BY
     s.bot,
     s.first_queue,
     s.last_queue
 ORDER BY
-    escalated_sessions DESC
+    escalated_error DESC
 ```
 
 ## DataHub catalog

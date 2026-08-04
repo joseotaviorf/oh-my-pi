@@ -1,5 +1,13 @@
 # Visit
 
+## Ownership
+
+**Data Owner:**
+- aurelio.nogueira@quintoandar.com.br
+
+**Data Steward:**
+- aurelio.nogueira@quintoandar.com.br
+
 > **DataHub Data Product:** `urn:li:dataProduct:visits` (Domain: Growth) **Trino validation:** ✅ All 6 tables and 4 golden queries validated against Trino (2026-06-19).
 
 * * *
@@ -16,6 +24,10 @@ The domain covers two distinct analytical lenses:
     
 
 A visit is the strongest signal of transaction intent and feeds downstream offer and contract conversion metrics. It applies to both the **For Rent** and **For Sale** business contexts via `dim_visit.business_context`.
+
+## Related Metric Entities
+
+- [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) — L2VB (listing → visit booked) and L2VC (listing → visit completed) at listing-cohort grain for RENT and SALE.
 
 * * *
 
@@ -71,6 +83,16 @@ A visit is the strongest signal of transaction intent and feeds downstream offer
 * * *
 
 ## Key Metrics
+
+Use [Related Metric Entities](#related-metric-entities) for **official** listing-cohort L2VB/L2VC. The bullets below are **component** visit metrics on `dw_visit.fact_visits`.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| L2VB, L2VC (listing → visit booked/completed) | [Listing Demand Funnel Conversions](../metric_entities/listing_demand_funnel_conversions.md) |
+
+### Component / exploratory metrics
 
 All measures below come from `dw_visit.fact_visits` (prefix `fv`) unless noted.
 

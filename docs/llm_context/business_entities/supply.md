@@ -1,5 +1,13 @@
 # Supply
 
+## Ownership
+
+**Data Owner:**
+- alexandre.gimenez@quintoandar.com.br
+
+**Data Steward:**
+- alexandre.gimenez@quintoandar.com.br
+
 ## Overview
 
 Supply represents all channels and products QuintoAndar uses to acquire property owners and generate new listings on the platform, covering both for-rent and for-sale contexts. It tracks the owner journey from initial lead capture through a six-stage funnel to the creation of the first active listing.
@@ -16,8 +24,8 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 
 ## Related Metric Entities
 
-- FL (First Listings)
-- Supply Funnel Conversions
+- [FL (First Listings)](../metric_entities/first_listings_1p.md) — first-time published inventory (FL, First Listings 1P/3P) by supply source and business context.
+- [Supply Funnel Conversions](../metric_entities/funnel_conversions_supply.md) — official adjacent-stage conversion rates (L2P, P2Q, Q2O, O2L) and non-adjacent funnel transitions on `obt_supply`.
 
 ## Glossary and Synonyms
 
@@ -255,6 +263,17 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 
 ## Key Metrics
 
+Use [Related Metric Entities](#related-metric-entities) for **official** first-listing volume and supply-funnel conversion rates. The bullets below are **component** metrics for ad-hoc analysis on `obt_supply` and Isaias sessions.
+
+### Official metrics (metric entities)
+
+| When you need… | Metric entity |
+|----------------|---------------|
+| FL, First Listings 1P/3P | [FL (First Listings)](../metric_entities/first_listings_1p.md) |
+| L2P, P2Q, Q2O, O2L and non-adjacent supply funnel conversions | [Supply Funnel Conversions](../metric_entities/funnel_conversions_supply.md) |
+
+### Component / exploratory metrics
+
 - **Lead volume** (`COUNT(DISTINCT obt.sk_supply)` where `cd_funnel_step = 'lead'`, by `nm_business_context`)
 - **Lead → Opportunity conversion rate** (`COUNT_IF(cd_funnel_step = 'opportunity') / NULLIF(COUNT_IF(cd_funnel_step = 'lead'), 0)`)
 - **Lead → First Listing conversion rate** (`COUNT_IF(cd_funnel_step = 'first_listing') / NULLIF(COUNT_IF(cd_funnel_step = 'lead'), 0)`)
@@ -371,7 +390,7 @@ SELECT
 FROM dw_growth.obt_supply AS obt
 WHERE
     obt.date >= DATE '{start_date}'
-    AND obt.date < DATE '{end_date}'
+    AND obt.date < DATE {end_date}
 GROUP BY
     obt.nm_business_context,
     obt.acquisition_origin,
@@ -402,7 +421,7 @@ SELECT
 FROM dw_growth.obt_supply AS obt
 WHERE
     obt.date >= DATE '{start_date}'
-    AND obt.date < DATE '{end_date}'
+    AND obt.date < DATE {end_date}
 GROUP BY
     obt.nm_business_context,
     obt.company_report_origin
@@ -448,7 +467,7 @@ LEFT JOIN full_process_sessions AS fps
     ON icf.id_langfuse_session = fps.id_session
 WHERE
     icf.ts_session >= TIMESTAMP '{start_date}'
-    AND icf.ts_session < TIMESTAMP '{end_date}'
+    AND icf.ts_session < TIMESTAMP {end_date}
 GROUP BY DATE(icf.ts_session), fps.is_full_process
 ORDER BY dt_session DESC
 ```
@@ -467,7 +486,7 @@ FROM dw_growth.obt_supply AS obt
 WHERE
     obt.tp_origin_acquisition = 'isaias'
     AND obt.date >= DATE '{start_date}'
-    AND obt.date < DATE '{end_date}'
+    AND obt.date < DATE {end_date}
 GROUP BY
     obt.nm_business_context,
     obt.cd_funnel_step,
@@ -512,7 +531,7 @@ LEFT JOIN full_process_sessions AS fps
 WHERE
     obt.tp_origin_acquisition != 'isaias'
     AND obt.date >= DATE '{start_date}'
-    AND obt.date < DATE '{end_date}'
+    AND obt.date < DATE {end_date}
 GROUP BY
     obt.nm_business_context,
     obt.tp_origin_acquisition,
@@ -540,7 +559,7 @@ created AS (
     WHERE
         obt.tp_origin_acquisition = 'isaias'
         AND obt.date >= DATE '{start_date}'
-        AND obt.date < DATE '{end_date}'
+        AND obt.date < DATE {end_date}
 ),
 retrieved AS (
     SELECT DISTINCT
@@ -554,7 +573,7 @@ retrieved AS (
     WHERE
         obt.tp_origin_acquisition != 'isaias'
         AND obt.date >= DATE '{start_date}'
-        AND obt.date < DATE '{end_date}'
+        AND obt.date < DATE {end_date}
 ),
 touchpoint AS (
     SELECT sk_supply, nm_business_context, cd_funnel_step FROM created
