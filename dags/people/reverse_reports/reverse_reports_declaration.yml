@@ -213,6 +213,12 @@ workflow:
       extra_spark_job_arguments:
         - "1DR7EX8X8eufXEB8leXCWLRiEorJV0v7wJB5FSTkiuas"
         - "api_PIN_adquiridas"
+    # Former notebook view: dp_analysis
+    # Governance: docs/dp_continuous_analysis.md
+    dp_continuous_analysis:
+      extra_spark_job_arguments:
+        - "19wejhwGjx6YCFg3At5Jfnw-90TpMOkyTr5Cl3bhsIzw"
+        - "data"
     # Former notebook: dash_talent_review (Daily Pipeline).
     talent_review_dash_access_list:
       column_mapping_mode: name

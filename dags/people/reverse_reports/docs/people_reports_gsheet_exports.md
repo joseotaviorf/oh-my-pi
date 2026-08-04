@@ -16,3 +16,4 @@ People lake → Google Sheets exports migrated from the legacy `people_reports` 
 | compensation_base | [compensation_base.md](compensation_base.md) |
 | governance_pm_roster | [governance_pm_roster.md](governance_pm_roster.md) |
 | performa_talent_pin_roster | [performa_talent_pin_roster.md](performa_talent_pin_roster.md) |
+| dp_continuous_analysis | [dp_continuous_analysis.md](dp_continuous_analysis.md) |
