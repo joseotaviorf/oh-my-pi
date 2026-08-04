@@ -19,6 +19,7 @@ from bietlejuice.services.metastore_services.glue_partition_utils import (
     is_delta_glue_table,
     is_json_glue_table,
     is_openx_json_serde,
+    merge_glue_columns,
     partition_serde_needs_update,
     partition_tuples_to_dicts,
 )
@@ -99,6 +100,40 @@ class GlueMetastoreService(MetastoreService):
             for key in ("unity_catalog_source",):
                 if key in existing_params and key not in table_input["Parameters"]:
                     table_input["Parameters"][key] = existing_params[key]
+
+            # Glue replaces Columns on update while Spark/UC issues
+            # CREATE TABLE IF NOT EXISTS, so a run whose source omitted an
+            # optional field would narrow Glue only. Merge instead of replace.
+            #
+            # Drop partition keys from the existing columns first: a table
+            # registered elsewhere (crawler, Athena DDL) may carry them in
+            # StorageDescriptor.Columns, and keeping them would duplicate the
+            # PartitionKeys entries -- which Glue rejects, and which
+            # CompositeMetastoreService swallows as a warning (see
+            # _split_columns).
+            existing_sd = existing.get("StorageDescriptor") or {}
+            partition_key_names = {
+                str(key.get("Name", "")).lower()
+                for key in table_input.get("PartitionKeys") or []
+            }
+            existing_columns = [
+                column
+                for column in (existing_sd.get("Columns") or [])
+                if str(column.get("Name", "")).lower() not in partition_key_names
+            ]
+            merged_columns, preserved_columns = merge_glue_columns(
+                existing_columns,
+                table_input["StorageDescriptor"]["Columns"],
+            )
+            table_input["StorageDescriptor"]["Columns"] = merged_columns
+            if preserved_columns:
+                logger.info(
+                    f"m=create_external_table, table={database_name}.{table_name}, "
+                    f"preserved_columns={preserved_columns}, "
+                    "msg=incoming schema is narrower than the registered table, "
+                    "keeping existing columns so the Glue schema never shrinks"
+                )
+
             logger.info(
                 f"m=create_external_table, table={database_name}.{table_name}, "
                 "msg=table exists in Glue, updating"

@@ -12,6 +12,7 @@ from bietlejuice.services.metastore_services.glue_partition_utils import (
     is_delta_glue_table,
     is_json_glue_table,
     is_openx_json_serde,
+    merge_glue_columns,
     partition_serde_needs_update,
     partition_tuples_to_dicts,
     partition_values_tuple,
@@ -229,3 +230,83 @@ class TestBuildPartitionUpdateEntry(unittest.TestCase):
         self.assertEqual(sd["SerdeInfo"]["SerializationLibrary"], _HCATALOG)
         self.assertIn("timestamp.formats", sd["SerdeInfo"]["Parameters"])
         self.assertEqual(entry["PartitionInput"]["Parameters"], {"foo": "bar"})
+
+
+class TestMergeGlueColumns(unittest.TestCase):
+    """A re-registration must never drop a column from the Glue table."""
+
+    def test_narrower_incoming_schema_preserves_existing_column(self):
+        existing = [
+            {"Name": "id", "Type": "string"},
+            {"Name": "origin_complement", "Type": "string"},
+            {"Name": "amount_value", "Type": "double"},
+        ]
+        incoming = [
+            {"Name": "id", "Type": "string"},
+            {"Name": "amount_value", "Type": "double"},
+        ]
+        merged, preserved = merge_glue_columns(existing, incoming)
+        self.assertEqual(
+            [col["Name"] for col in merged],
+            ["id", "origin_complement", "amount_value"],
+        )
+        self.assertEqual(preserved, ["origin_complement"])
+
+    def test_new_column_appended_after_existing_ones(self):
+        existing = [{"Name": "id", "Type": "string"}]
+        incoming = [
+            {"Name": "id", "Type": "string"},
+            {"Name": "new_field", "Type": "string"},
+        ]
+        merged, preserved = merge_glue_columns(existing, incoming)
+        self.assertEqual([col["Name"] for col in merged], ["id", "new_field"])
+        self.assertEqual(preserved, [])
+
+    def test_existing_order_is_stable(self):
+        existing = [
+            {"Name": "c", "Type": "string"},
+            {"Name": "a", "Type": "string"},
+            {"Name": "b", "Type": "string"},
+        ]
+        incoming = [
+            {"Name": "a", "Type": "string"},
+            {"Name": "b", "Type": "string"},
+            {"Name": "c", "Type": "string"},
+        ]
+        merged, _ = merge_glue_columns(existing, incoming)
+        self.assertEqual([col["Name"] for col in merged], ["c", "a", "b"])
+
+    def test_type_collision_takes_incoming_type(self):
+        merged, _ = merge_glue_columns(
+            [{"Name": "amount_value", "Type": "string"}],
+            [{"Name": "amount_value", "Type": "double"}],
+        )
+        self.assertEqual(merged, [{"Name": "amount_value", "Type": "double"}])
+
+    def test_existing_column_metadata_survives_merge(self):
+        merged, _ = merge_glue_columns(
+            [{"Name": "id", "Type": "string", "Comment": "primary key"}],
+            [{"Name": "id", "Type": "string"}],
+        )
+        self.assertEqual(merged[0]["Comment"], "primary key")
+
+    def test_case_insensitive_match_keeps_registered_spelling(self):
+        merged, preserved = merge_glue_columns(
+            [{"Name": "date_event", "Type": "string"}],
+            [{"Name": "DATE_EVENT", "Type": "timestamp"}],
+        )
+        self.assertEqual(merged, [{"Name": "date_event", "Type": "timestamp"}])
+        self.assertEqual(preserved, [])
+
+    def test_missing_or_empty_inputs(self):
+        incoming = [{"Name": "id", "Type": "string"}]
+        self.assertEqual(merge_glue_columns(None, incoming), (incoming, []))
+        self.assertEqual(merge_glue_columns([], incoming), (incoming, []))
+        self.assertEqual(merge_glue_columns(incoming, None), (incoming, ["id"]))
+        self.assertEqual(merge_glue_columns(None, None), ([], []))
+
+    def test_merged_columns_are_copies(self):
+        existing = [{"Name": "id", "Type": "string"}]
+        merged, _ = merge_glue_columns(existing, [])
+        merged[0]["Type"] = "int"
+        self.assertEqual(existing[0]["Type"], "string")

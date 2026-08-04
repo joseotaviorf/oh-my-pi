@@ -134,6 +134,115 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
             "org.apache.hive.hcatalog.data.JsonSerDe",
         )
 
+    def test_update_does_not_shrink_registered_schema(self):
+        """A run whose source omitted an optional field must not narrow Glue.
+
+        Spark/UC issues ``CREATE TABLE IF NOT EXISTS`` and is a no-op on an
+        existing table, so UC keeps its accumulated union. Glue's
+        ``update_table`` replaces ``Columns``, which is how
+        ``datalake_itau_statements_raw`` lost ``origin_complement`` on the Glue
+        side only and broke the EMR read with ``UNRESOLVED_COLUMN``.
+        """
+        from unittest.mock import MagicMock
+
+        glue_client = MagicMock()
+        glue_client.get_table.return_value = {
+            "Name": "statement_879200426887",
+            "Parameters": {"classification": "json"},
+            "StorageDescriptor": {
+                "Columns": [
+                    {"Name": "id", "Type": "string"},
+                    {"Name": "origin_complement", "Type": "string"},
+                    {"Name": "amount_value", "Type": "double"},
+                ]
+            },
+        }
+        svc = GlueMetastoreService(glue_client)
+        # This run's payload omitted origin_complement.
+        schema = OrderedDict([("id", "string"), ("amount_value", "double")])
+        svc.create_external_table(
+            database_name="datalake_itau_statements_raw",
+            table_name="statement_879200426887",
+            table_location="s3://bucket/raw/itau_statements/statement_879200426887",
+            table_schema=schema,
+            partition_cols=[],
+            format_options="JSON",
+        )
+        table_input = glue_client.update_table.call_args[0][1]
+        self.assertEqual(
+            [col["Name"] for col in table_input["StorageDescriptor"]["Columns"]],
+            ["id", "origin_complement", "amount_value"],
+        )
+
+    def test_merge_does_not_reintroduce_partition_keys_as_columns(self):
+        """A table registered elsewhere may hold partition keys in Columns.
+
+        Glue rejects a column that also appears in PartitionKeys, and
+        CompositeMetastoreService swallows Glue failures as warnings, so
+        carrying them over from the existing table would drift silently.
+        """
+        from unittest.mock import MagicMock
+
+        glue_client = MagicMock()
+        glue_client.get_table.return_value = {
+            "Name": "statement_067000392216",
+            "Parameters": {"classification": "json"},
+            "StorageDescriptor": {
+                "Columns": [
+                    {"Name": "id", "Type": "string"},
+                    {"Name": "origin_complement", "Type": "string"},
+                    # Registered by a crawler / Athena DDL that did not split.
+                    {"Name": "year", "Type": "int"},
+                    {"Name": "Month", "Type": "int"},
+                ]
+            },
+        }
+        svc = GlueMetastoreService(glue_client)
+        schema = OrderedDict(
+            [("id", "string"), ("year", "int"), ("month", "int"), ("day", "int")]
+        )
+        svc.create_external_table(
+            database_name="datalake_itau_statements_raw",
+            table_name="statement_067000392216",
+            table_location="s3://bucket/raw/itau_statements/statement_067000392216",
+            table_schema=schema,
+            partition_cols=["year", "month", "day"],
+            format_options="JSON",
+        )
+        table_input = glue_client.update_table.call_args[0][1]
+        column_names = [
+            col["Name"] for col in table_input["StorageDescriptor"]["Columns"]
+        ]
+        # origin_complement still preserved, partition keys not duplicated.
+        self.assertEqual(column_names, ["id", "origin_complement"])
+        self.assertEqual(
+            [key["Name"] for key in table_input["PartitionKeys"]],
+            ["year", "month", "day"],
+        )
+
+    def test_create_path_uses_incoming_schema_only(self):
+        """Nothing to merge when the table does not exist yet."""
+        from unittest.mock import MagicMock
+
+        glue_client = MagicMock()
+        glue_client.get_table.return_value = None
+        svc = GlueMetastoreService(glue_client)
+        schema = OrderedDict([("id", "string"), ("amount_value", "double")])
+        svc.create_external_table(
+            database_name="datalake_itau_statements_raw",
+            table_name="statement_new",
+            table_location="s3://bucket/raw/itau_statements/statement_new",
+            table_schema=schema,
+            partition_cols=[],
+            format_options="JSON",
+        )
+        glue_client.update_table.assert_not_called()
+        table_input = glue_client.create_table.call_args[0][1]
+        self.assertEqual(
+            [col["Name"] for col in table_input["StorageDescriptor"]["Columns"]],
+            ["id", "amount_value"],
+        )
+
 
 class TestGlueMetastoreServiceSplitColumns(unittest.TestCase):
     """Partition columns must be excluded from ``Columns`` case-insensitively.

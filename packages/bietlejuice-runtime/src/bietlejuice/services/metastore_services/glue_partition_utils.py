@@ -153,6 +153,65 @@ def build_partition_update_entry(
     }
 
 
+def merge_glue_columns(
+    existing_columns: Sequence[Dict] | None,
+    incoming_columns: Sequence[Dict] | None,
+) -> Tuple[List[Dict], List[str]]:
+    """Union two Glue column lists so a re-registration can never drop a column.
+
+    Glue's ``update_table`` replaces ``StorageDescriptor.Columns`` wholesale,
+    while the Spark/UC side issues ``CREATE TABLE IF NOT EXISTS`` and is a no-op
+    on an existing table.  A run whose source payload omitted an optional field
+    therefore narrows the Glue table while UC keeps its accumulated union, and
+    the Hive JSON reader on EMR then rejects the column as non-existent.
+    Merging closes that gap.
+
+    Existing column order is preserved (Glue column order is positional metadata
+    for the reader); columns new to this run are appended.  On a name collision
+    the incoming ``Type`` wins — this run has fresher type information — while
+    extra keys already on the existing column (``Comment``, ``Parameters``)
+    survive.  Names are matched case-insensitively, as in ``_split_columns``,
+    because Glue lower-cases column names.
+
+    :return: ``(merged_columns, preserved_names)`` where ``preserved_names``
+        lists the columns kept only because the existing table had them.  A
+        non-empty list means the incoming schema was narrower.
+    """
+    existing = list(existing_columns or [])
+    incoming = list(incoming_columns or [])
+
+    incoming_by_name = {
+        str(col.get("Name", "")).lower(): col for col in incoming if col.get("Name")
+    }
+
+    merged: List[Dict] = []
+    preserved: List[str] = []
+
+    for column in existing:
+        name = str(column.get("Name", "")).lower()
+        match = incoming_by_name.get(name) if name else None
+        if match is None:
+            merged.append(dict(column))
+            if name:
+                preserved.append(column["Name"])
+            continue
+        combined = dict(column)
+        combined.update(match)
+        # Keep the registered spelling so a case-only difference is not churn.
+        combined["Name"] = column.get("Name", match.get("Name"))
+        merged.append(combined)
+
+    existing_names = {
+        str(col.get("Name", "")).lower() for col in existing if col.get("Name")
+    }
+    for column in incoming:
+        name = str(column.get("Name", "")).lower()
+        if not name or name not in existing_names:
+            merged.append(dict(column))
+
+    return merged, preserved
+
+
 def discover_hive_partitions_from_s3(
     table_location: str,
     partition_key_names: Sequence[str],

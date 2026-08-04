@@ -208,3 +208,47 @@ class TestGlueClientPartitionApis:
         client = self._client_with_mock_glue(mock_glue)
         assert client.batch_update_partition("db", "tbl", []) == 0
         mock_glue.batch_update_partition.assert_not_called()
+
+    def test_batch_update_partition_continues_after_a_failing_batch(self):
+        """A failing batch must not strand the partitions in later batches.
+
+        Glue applies the successful entries of a partially-failing batch, so
+        aborting early would leave everything after it untouched until a full
+        retry of the sync job.
+        """
+        mock_glue = MagicMock()
+        failure = {
+            "Errors": [
+                {
+                    "PartitionValues": ["2018", "10", "19"],
+                    "ErrorDetail": {
+                        "ErrorCode": "EntityNotFoundException",
+                        "ErrorMessage": "missing",
+                    },
+                }
+            ]
+        }
+        mock_glue.batch_update_partition.side_effect = [
+            failure,
+            {"Errors": []},
+            {"Errors": []},
+        ]
+
+        client = self._client_with_mock_glue(mock_glue)
+        entries = [
+            {
+                "PartitionValueList": [str(i)],
+                "PartitionInput": {"Values": [str(i)]},
+            }
+            for i in range(250)
+        ]
+
+        try:
+            client.batch_update_partition("db", "tbl", entries)
+            raise AssertionError("expected RuntimeError")
+        except RuntimeError as exc:
+            # All three batches attempted, not just the first.
+            assert mock_glue.batch_update_partition.call_count == 3
+            # 250 entries minus the single failed partition.
+            assert "249 updated" in str(exc)
+            assert "1 partition(s)" in str(exc)
