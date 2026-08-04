@@ -211,6 +211,8 @@ def events_case_recovery(
         "commit_number",
     ]
 
+    remapped_df = remapped_df.dropDuplicates(subset=unique_grain)
+
     validate_and_upsert(
         spark=spark,
         target_table=full_target_table,
