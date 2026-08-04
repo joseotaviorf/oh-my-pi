@@ -10,6 +10,7 @@
 
 - [victor.sakai@quintoandar.com.br](mailto:victor.sakai@quintoandar.com.br)
 
+
 ## Overview
 
 **Front SLA** is the official service-level indicator of the CX Front operation: the share of eligible inbound customer contacts that were answered fast enough, measured per day and split between the pre-contract and post-contract journeys. It is published as three component metrics — **SLA Chat**, **SLA Call** and **SLA Total** — computed over the segments perspective of `dw_bpo_performance.segments_perspective` (version v2).
