@@ -27,6 +27,7 @@ Technical rules for skill **`add-people-reverse-reports-export`**. The orchestra
 
 ### Do not add new references to
 
+- **`datalake_people_analytics_sandbox`** (any table) — not an approved lake path for `reverse_reports`. Legacy notebooks often use sandbox static tables (e.g. `base_quintocred_ta`, `base_completa_hierarquia`); **never** carry them into `queries/reverse/*.sql`. Remap to DW 2.0 / metric / `gsheets_people*` ingestion instead (see [Sandbox static tables](#sandbox-static-tables-never-in-reverse-sql)).
 - `datalake_hr_system*`, `datalake_employment`
 - **`greenhouse` v1** — prefer **`greenhouse_v3`**
 - **`dw_employee`** — use domain **`dw_*`**
@@ -35,7 +36,33 @@ Technical rules for skill **`add-people-reverse-reports-export`**. The orchestra
   - active headcount without `dw_people.fact_employees` → filter `fact_assignment_snapshots` with `is_monthly_snapshot_for_employee` + `is_current_for_assignment` + `is_active` (mirrors the old `fact_employees` current/active grain), then join to the employee-current rows (`is_current_for_employee`) for job attributes
 - Legacy enrich called out in `people_domain.mdc`
 
+### Workable (`datalake_workable_redshift_clean`)
+
+The Workable contract ended and the `workable_redshift` DAG was removed from bi-etl-ejuice, but the **frozen clean tables remain in the lake** and are a **legitimate source** for reverse exports. You may reference `datalake_workable_redshift_clean.*` directly whenever the logic can be expressed from those tables.
+
+### Sandbox static tables (never in reverse SQL)
+
+`datalake_people_analytics_sandbox` is a Databricks workspace scratchpad — **not** governed, not CI-approved, and **not** available on EMR. `reverse_reports` SQL must **never** reference it.
+
+| Legacy sandbox pattern | Approved replacement |
+| --- | --- |
+| `base_completa_hierarquia` | `metric_people.employee_snapshots` (current-state filter per [Filtering `metric_people.employee_snapshots`](#filtering-metric_peopleemployee_snapshots)) |
+| Curated static roster / mapping (e.g. `base_quintocred_ta`, `mapping_wb_to_gh`) | Ingest via **`gsheets_people_static`** or **`gsheets_people`** (`datalake_gsheets_people_clean.*`) **before** the reverse export — ask the user for `sheet_id` + tab; do not invent. Employee attributes (`email_pessoal`, `status`, hierarchy) still come from `employee_snapshots`. |
+| Workable staging (`base_declinios`, `base_requisitions_wb`) | Inline from `datalake_workable_redshift_clean` in `queries/reverse/*.sql` — do not reference sandbox copies. |
+| Ad-hoc sandbox dimension | DW `dw_*` / metric path, or new governed ingestion — document exception in PR + Jira |
+
+### Resolving legacy `people_analytics_sandbox` dependencies
+
+When a migrated notebook referenced `datalake_people_analytics_sandbox.{table}`:
+
+1. **Search the repo** for an equivalent governed table (DW, metric, `gsheets_people_clean`, or `workable_redshift_clean`).
+2. **Search Databricks workspace** [`/Workspace/People/People_Analytics`](https://dbc-931ee6e0-6803.cloud.databricks.com/browse/folders/1156481740231138?o=4531937035440038) for the notebook that materialized the sandbox table.
+3. If the logic can run on **`datalake_workable_redshift_clean`** alone, inline it in the reverse SQL.
+4. If the notebook is missing or the logic depends on other sandbox tables / GSheets, **bridge** via a one-time CTAS into `datalake_gsheets_people_clean.{snake_case_name}` and document the prerequisite in `docs/{table_name}.md`. **Ask the user** to run prod + forno CTAS before merge; never reference sandbox in the SQL.
+
 After remapping, summarize: *old → new + one-line reason*.
+
+**Agent gate:** if the legacy notebook SQL references `datalake_people_analytics_sandbox`, **stop** at the remap plan — do not implement `queries/reverse/*.sql` until the roster/mapping has an approved lake table.
 
 ---
 
@@ -233,6 +260,7 @@ Waivers must be explicit and documented in the PR body.
 ## Quality checks before merge
 
 - No new deprecated People sources; DW/metric default; enrich/clean only with exception note
+- **No `datalake_people_analytics_sandbox` references** in reverse SQL (see [Resolving legacy `people_analytics_sandbox` dependencies](#resolving-legacy-people_analytics_sandbox-dependencies))
 - SQL per `sql_conventions.mdc`; EMR-safe (no QUALIFY, etc.)
 - Downstream headers match contract
 - Service account Editor on production workbook

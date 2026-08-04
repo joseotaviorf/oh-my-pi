@@ -44,7 +44,9 @@ When the user selects **migrate** and supplies a notebook (`.ipynb`, workspace U
 | Row counts in cell output | Tier-1 validation baseline |
 | Multiple writes of the same `table_name` | Flag dual-sheet cutover (one `tables_customization` entry per destination) |
 
-**Default for migrations:** legacy headers **Sim** (step 8); remap `dw_employee.*` → domain `dw_*` / `metric_people.employee_snapshots` per [reference.md](reference.md). **Batch** steps 5–9: present one consolidated table for all tabs, then governance — still **one governance question per turn**. **Still ask** (never invent): business owner, technical owner, operational consumer, why Sheets when not in Jira/notebook.
+**Default for migrations:** legacy headers **Sim** (step 8); remap `dw_employee.*` → domain `dw_*` / `metric_people.employee_snapshots` per [reference.md](reference.md). **Never** leave `datalake_people_analytics_sandbox` in reverse SQL — resolve via `datalake_workable_redshift_clean`, governed tables, or `datalake_gsheets_people_clean` bridge ingestion ([reference.md — sandbox resolution](reference.md#resolving-legacy-people_analytics_sandbox-dependencies)). **Batch** steps 5–9: present one consolidated table for all tabs, then governance — still **one governance question per turn**. **Still ask** (never invent): business owner, technical owner, operational consumer, why Sheets when not in Jira/notebook.
+
+**Sandbox ban (mandatory):** `datalake_people_analytics_sandbox` is **never** an approved source for `queries/reverse/*.sql`. If the legacy notebook references sandbox (e.g. `base_quintocred_ta`, `base_completa_hierarquia`, `base_requisitions_wb`), flag it in the remap plan and **block implementation** until each sandbox table has an approved replacement (`employee_snapshots`, `gsheets_people_static`, `workable_redshift_clean` inline, etc.). See [reference.md — Sandbox static tables](reference.md#sandbox-static-tables-never-in-reverse-sql).
 
 ---
 
@@ -144,7 +146,7 @@ One at a time: business owner, technical owner, operational consumer; upstream o
 
 ### 12. Remap plan
 
-Present remap table + grain, headers, risks, cutover scope. Ask: **"Esse plano de remap está correto?"**
+Present remap table + grain, headers, risks, cutover scope. If legacy SQL references `datalake_people_analytics_sandbox`, include a **Sandbox → approved lake** row for every sandbox table and call out any missing ingestion (e.g. static roster → `gsheets_people_static`). Ask: **"Esse plano de remap está correto?"**
 
 ### 13. Summary
 
