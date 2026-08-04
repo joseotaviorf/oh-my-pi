@@ -1,10 +1,9 @@
-WITH dedup_users AS (
+WITH ranked AS (
     SELECT
-        *
+        *,
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) AS rn
     FROM
         datalake_velo_zendesk_raw.users
-    QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1
 )
 SELECT
     usr.id AS id_user,
@@ -51,4 +50,6 @@ SELECT
     MONTH(CAST(usr.updated_at AS DATE)) AS month,
     DAY(CAST(usr.updated_at AS DATE)) AS day
 FROM
-    dedup_users usr
+    ranked usr
+WHERE
+    usr.rn = 1

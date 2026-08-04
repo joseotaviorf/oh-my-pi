@@ -127,5 +127,14 @@ SELECT
     *
 FROM
     iptu_transformed
-QUALIFY
-     COUNT(id_house) OVER(PARTITION BY id_house) = 1
+WHERE
+    id_house IN (
+        SELECT
+            id_house
+        FROM
+            iptu_transformed
+        GROUP BY
+            id_house
+        HAVING
+            COUNT(*) = 1
+    )

@@ -1,11 +1,10 @@
-WITH filtered_max_stitch_data AS (
+WITH ranked AS (
     SELECT
         t.*,
-        CAST(GET_JSON_OBJECT(t.via, '$.channel') AS STRING) AS ticket_via
+        CAST(GET_JSON_OBJECT(t.via, '$.channel') AS STRING) AS ticket_via,
+        ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) AS rn
     FROM
         datalake_velo_zendesk_clean.tickets_history t
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
 )
 SELECT
     id_assignee,
@@ -41,6 +40,8 @@ SELECT
     MONTH(ts_created) AS month,
     DAY(ts_created) AS day
 FROM
-    filtered_max_stitch_data
+    ranked
 WHERE
-    ticket_via IS NOT NULL AND raw_subject != 'scrubbed'
+    rn = 1
+    AND ticket_via IS NOT NULL
+    AND raw_subject != 'scrubbed'

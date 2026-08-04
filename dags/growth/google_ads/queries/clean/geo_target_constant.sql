@@ -9,4 +9,12 @@ SELECT
     geoTargetConstant.targetType AS target_type
 FROM
     datalake_google_ads_raw.geo_target_constant
-GROUP BY ALL
+GROUP BY
+    geoTargetConstant.id,
+    geoTargetConstant.name,
+    geoTargetConstant.canonicalName,
+    geoTargetConstant.countryCode,
+    geoTargetConstant.parentGeoTarget,
+    geoTargetConstant.resourceName,
+    geoTargetConstant.status,
+    geoTargetConstant.targetType

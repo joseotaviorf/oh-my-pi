@@ -1,18 +1,18 @@
 SELECT
-    customer.id::BIGINT AS id_external_customer,
-    campaign.id::BIGINT AS id_campaign,
-    adgroup.id::BIGINT AS id_ad_group,
+    CAST(customer.id AS BIGINT) AS id_external_customer,
+    CAST(campaign.id AS BIGINT) AS id_campaign,
+    CAST(adgroup.id AS BIGINT) AS id_ad_group,
     campaign.name AS campaign_name,
     adgroup.name AS ad_group_name,
-    metrics.clicks::BIGINT AS clicks,
-    metrics.costMicros::DOUBLE AS cost,
-    MONTH(segments.date::DATE) AS month,
-    WEEKOFYEAR(segments.date::DATE) AS week,
-    YEAR(segments.date::DATE) AS year,
+    CAST(metrics.clicks AS BIGINT) AS clicks,
+    CAST(metrics.costMicros AS DOUBLE) AS cost,
+    MONTH(CAST(segments.date AS DATE)) AS month,
+    WEEKOFYEAR(CAST(segments.date AS DATE)) AS week,
+    YEAR(CAST(segments.date AS DATE)) AS year,
     segments.device,
     segments.adNetworkType AS ad_network_type,
-    metrics.impressions::BIGINT AS impressions,
-    metrics.conversions::BIGINT AS conversions,
+    CAST(metrics.impressions AS BIGINT) AS impressions,
+    CAST(metrics.conversions AS BIGINT) AS conversions,
     customer.descriptiveName AS account_descriptive_name,
     campaign.labels,
     report_type,
@@ -24,8 +24,8 @@ SELECT
         WHEN account_snake_case IS NULL THEN 'Undefined'
         ELSE 'BR'
     END AS country_code,
-    segments.date::DATE AS dt_loaded,
-    dt_created::DATE
+    CAST(segments.date AS DATE) AS dt_loaded,
+    CAST(dt_created AS DATE)
 FROM
     datalake_google_ads_raw.ad_group_geo_performance
 WHERE

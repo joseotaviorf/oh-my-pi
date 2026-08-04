@@ -30,20 +30,67 @@ WITH iptu_base AS (
         datalake_iptu_poa_raw.iptu_poa
     WHERE
         year = YEAR(DATE('{load_start_date}'))
+),
+with_id AS (
+    SELECT
+        MD5(
+            CONCAT_WS(
+                '-',
+                address_zipcode,
+                address_number,
+                address_complement,
+                unit_type,
+                unit,
+                floor,
+                level_type
+            )
+        ) AS id_house,
+        iptu_year,
+        address_neighborhood,
+        address_street_name,
+        address_zipcode,
+        address_number,
+        unit_type,
+        unit,
+        floor,
+        level_type,
+        address_complement,
+        property_use_description,
+        property_purpose_description,
+        house_registry_number,
+        house_registry_zone,
+        main_frontage_area_m2,
+        land_area_m2,
+        built_area_m2,
+        taxable_area_m2,
+        taxable_land_value,
+        taxable_built_value,
+        taxable_property_value,
+        tax_rate,
+        iptu_value,
+        tcrs_value,
+        dt_load,
+        year,
+        COUNT(*) OVER (
+            PARTITION BY
+                MD5(
+                    CONCAT_WS(
+                        '-',
+                        address_zipcode,
+                        address_number,
+                        address_complement,
+                        unit_type,
+                        unit,
+                        floor,
+                        level_type
+                    )
+                )
+        ) AS house_cnt
+    FROM
+        iptu_base
 )
 SELECT
-    MD5(
-        CONCAT_WS(
-            '-',
-            address_zipcode,
-            address_number,
-            address_complement,
-            unit_type,
-            unit,
-            floor,
-            level_type
-        )
-    ) AS id_house,
+    id_house,
     iptu_year,
     address_neighborhood,
     address_street_name,
@@ -71,6 +118,6 @@ SELECT
     dt_load,
     year
 FROM
-    iptu_base
-QUALIFY
-     COUNT(id_house) OVER(PARTITION BY id_house) = 1
+    with_id
+WHERE
+    house_cnt = 1
