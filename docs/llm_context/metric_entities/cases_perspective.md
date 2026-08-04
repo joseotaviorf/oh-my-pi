@@ -19,12 +19,11 @@
 
 This family is restricted to the official **Post Contract Back Office** scope. It excludes departments tied to service-line operations (repairs, mediation, inspections, reports, …) that are not in the official whitelist (`last_department`).
 
-**Department-level scope is not the whole story.** Even after the `last_department` whitelist and the `front_or_back` / `channel` filters are applied, the resulting population still contains a small number of `last_team` values that are administratively Pre-Contract, Front Office, or otherwise out of scope for Post Contract Back reporting (their cases happen to be routed, at some point, through an in-scope department/queue). These `last_team` values must be excluded explicitly — see [Scope → Business context](#business-context-pre-contract-vs-post-contract-vs-other) and [Calculation → Canonical Filter](#canonical-filter). This exclusion was validated against the official Post Contract Back dashboard in **June–July 2026** and is now a **permanent, mandatory** part of the scope for **every** metric in this family (SLA Back, DSAT Back, Resolution Rate Back, Inbound Volume, Outbound Volume, DSAT Response Analysis) — not only for operation-level breakdowns.
+**Department-level scope is not the whole story.** Even after the `last_department` whitelist and the `front_or_back` / `channel` filters are applied, the resulting population still contains a small number of `last_team` values that are administratively Pre-Contract, Front Office, or otherwise out of scope for Post Contract Back reporting (their cases happen to be routed, at some point, through an in-scope department/queue). These `last_team` values must be excluded explicitly — see [Scope → Business context](#business-context-pre-contract-vs-post-contract-vs-other) and [Calculation → Canonical Filter](#canonical-filter). This exclusion was validated against the official Post Contract Back dashboard in **June–July 2026** and is now a **permanent, mandatory** part of the scope for **every** metric in this family (SLA Back, Resolution Rate Back, Inbound Volume, Outbound Volume, DSAT Response Analysis) — not only for operation-level breakdowns.
 
 The metrics covered by this document:
 
 - SLA Back
-- DSAT Back
 - Resolution Rate Back
 - Inbound Volume
 - Outbound Volume
@@ -43,7 +42,6 @@ The metrics covered by this document:
 | Metric | Type |
 | :---- | :---- |
 | SLA Back | Health Metric |
-| DSAT Back | OKR |
 | Resolution Rate Back | Health Metric |
 | Inbound Volume | Health Metric |
 | Outbound Volume | Health Metric |
@@ -57,13 +55,12 @@ The metrics covered by this document:
 
 ## Glossary and Synonyms
 
-- **SLA Back**, **Back SLA**, **percentage solved within SLA**, **SLA Back por time**, **SLA Back por operação**, **SLA Back by team**, **SLA Back by operation** → SLA Back; when broken down by operation, use `last_team_adjusted` (same field as DSAT Back and Resolution Rate Back — see [Derived operation mapping](#last_team_adjusted--official-post-contract-back-operation-mapping) and the "SLA Back by Operation" golden query)
-- **DSAT Back**, **Dissatisfaction Rate Back**, **Back dissatisfaction rate** → DSAT Back
-- **Resolution Rate Back**, **Back resolution rate**, **Resolution Rate Back por time**, **Resolution Rate Back por operação**, **Resolution Rate Back by team**, **Resolution Rate Back by operation** → Resolution Rate Back; when broken down by operation, use `last_team_adjusted` (same field as DSAT Back — see [Derived operation mapping](#last_team_adjusted--official-post-contract-back-operation-mapping) and the "Resolution Rate Back by Operation" golden query)
+- **SLA Back**, **Back SLA**, **percentage solved within SLA**, **SLA Back por time**, **SLA Back por operação**, **SLA Back by team**, **SLA Back by operation** → SLA Back; when broken down by operation, use `last_team_adjusted` (same field as Resolution Rate Back — see [Derived operation mapping](#last_team_adjusted--official-post-contract-back-operation-mapping) and the "SLA Back by Operation" golden query)
+- **Resolution Rate Back**, **Back resolution rate**, **Resolution Rate Back por time**, **Resolution Rate Back por operação**, **Resolution Rate Back by team**, **Resolution Rate Back by operation** → Resolution Rate Back; when broken down by operation, use `last_team_adjusted` (see [Derived operation mapping](#last_team_adjusted--official-post-contract-back-operation-mapping) and the "Resolution Rate Back by Operation" golden query)
 - **Inbound Volume**, **created volume**, **cases created during the period** → Inbound Volume
 - **Outbound Volume**, **solved volume**, **cases solved during the period** → Outbound Volume
 - **DSAT Analysis**, **CSAT comments**, **qualitative DSAT analysis** → DSAT Response Analysis
-- **Operação**, **macro operação (Post Contract Back)**, **DSAT Back por time**, **DSAT Back por operação**, **DSAT Back by team**, **DSAT Back by operation** → breakdown by `last_team_adjusted` (see [Derived operation mapping](#last_team_adjusted--official-post-contract-back-operation-mapping))
+- **Operação**, **macro operação (Post Contract Back)** → breakdown by `last_team_adjusted` (see [Derived operation mapping](#last_team_adjusted--official-post-contract-back-operation-mapping))
 
 ## Scope
 
@@ -110,7 +107,6 @@ Each metric has its own official temporal anchor — there is no single cutoff f
 | Metric | Temporal anchor | Meaning |
 | :---- | :---- | :---- |
 | SLA Back | `CAST(ts_solved AS DATE)` | Date when the case was solved |
-| DSAT Back | `CAST(first_csat_ts_response AS DATE)` | Date when the first CSAT response was submitted |
 | Resolution Rate Back | `CAST(first_csat_ts_response AS DATE)` | Date of the customer survey response |
 | Inbound Volume | `CAST(ts_started AS DATE)` | Date when the case was created |
 | Outbound Volume | `CAST(ts_solved AS DATE)` | Date when the case was solved |
@@ -136,25 +132,11 @@ Computed from `is_ticket_solved_within_sla` and `case_number`, anchored on `ts_s
 
 When presenting the result, also return whenever possible: Tickets/Cases SLA (`cases_within_sla`, the numerator), Total Tickets/Cases (`solved_cases`, the denominator), and SLA Back (the rate).
 
-Never average previously calculated SLA Back percentages. Always recalculate the numerator and denominator from the underlying distinct cases — this applies both to the Post Contract consolidated row and to every `last_team_adjusted` operation row, exactly as required for DSAT Back and Resolution Rate Back. The Post Contract row must be computed directly over the full scoped population, never as an average (simple or weighted) of the operation rows.
+Never average previously calculated SLA Back percentages. Always recalculate the numerator and denominator from the underlying distinct cases — this applies both to the Post Contract consolidated row and to every `last_team_adjusted` operation row, exactly as required for Resolution Rate Back. The Post Contract row must be computed directly over the full scoped population, never as an average (simple or weighted) of the operation rows.
 
 > **Do not use `first_csat_ts_response`, `first_csat_score`, or `resolution_survey` for this metric.** SLA Back is computed entirely from `is_ticket_solved_within_sla` and `case_number`, anchored on `ts_solved` — it has no dependency on the CSAT survey or the resolution survey. Validated on the Aug/2025–Jul/2026 dataset: `is_ticket_solved_within_sla` has zero nulls in every month for the in-scope population, so there is no historical-coverage gap to account for on this column.
 
-### 2. DSAT Back
-
-DSAT Back measures the percentage of evaluated cases with CSAT score 1 or 2.
-
-```
-DSAT Back =
-    COUNT(DISTINCT CASE WHEN first_csat_score IN (1, 2) THEN case_number END)
-    / COUNT(DISTINCT CASE WHEN first_csat_score IS NOT NULL THEN case_number END)
-```
-
-Anchored on `first_csat_ts_response`. When presenting the result, also return whenever possible: DSAT cases, answered evaluations, and the DSAT rate.
-
-Never average previously calculated DSAT percentages. Always recalculate the numerator and denominator from the underlying distinct cases — this applies both to the Post Contract consolidated row and to every `last_team_adjusted` operation row. The Post Contract row must be computed directly over the full scoped population, never as an average (simple or weighted) of the operation rows.
-
-### 3. Resolution Rate Back
+### 2. Resolution Rate Back
 
 Resolution Rate Back measures the percentage of customers who reported that their issue was resolved.
 
@@ -166,11 +148,11 @@ Resolution Rate Back =
 
 Anchored on `first_csat_ts_response`. When presenting the result, also return whenever possible: Resolution Tickets/Cases (the numerator), Respostas Resolution / answered resolution surveys (the denominator), and Resolution Rate Back (the rate).
 
-Never average previously calculated Resolution Rate percentages. Always recalculate the numerator and denominator from the underlying distinct cases — this applies both to the Post Contract consolidated row and to every `last_team_adjusted` operation row, exactly as required for DSAT Back.
+Never average previously calculated Resolution Rate percentages. Always recalculate the numerator and denominator from the underlying distinct cases — this applies both to the Post Contract consolidated row and to every `last_team_adjusted` operation row.
 
 > **`first_csat_score` must never be used for this metric.** Resolution Rate Back is answered independently of the CSAT score question — a case can have `resolution_survey IS NOT NULL` with `first_csat_score IS NULL`, and vice versa. Do not add `AND first_csat_score IS NOT NULL` (or any other `first_csat_score` condition) to the numerator, the denominator, or the `WHERE` clause of a Resolution Rate Back query — doing so silently shrinks the denominator and produces a different (incorrect) rate. `first_csat_ts_response` is still the correct temporal anchor (it dates when the survey was answered) — only the score column, not the timestamp column, is off-limits here.
 
-### 4. Inbound Volume
+### 3. Inbound Volume
 
 Inbound Volume is the total number of distinct cases created during the selected period.
 
@@ -180,7 +162,7 @@ Inbound Volume = COUNT(DISTINCT case_number)
 
 Anchored on `ts_started`.
 
-### 5. Outbound Volume
+### 4. Outbound Volume
 
 Outbound Volume is the total number of distinct cases solved during the selected period.
 
@@ -192,11 +174,11 @@ Anchored on `ts_solved`.
 
 Inbound Volume and Outbound Volume use the same aggregation formula, but they must not be treated as the same metric because they use different temporal anchors.
 
-### 6. DSAT Response Analysis
+### 5. DSAT Response Analysis
 
 DSAT Response Analysis is a qualitative, record-level view based on `first_csat_comment`. This is **not** a ratio metric. When requested, return at least: `case_number`, `first_csat_ts_response`, `first_csat_score`, `first_csat_comment`, `last_department`, `last_team`, `last_agent_organization`, `platform`.
 
-### 7. Created, Solved and Open Case Analysis
+### 6. Created, Solved and Open Case Analysis
 
 ```
 Created = COUNT(DISTINCT case_number) WHERE ts_started BETWEEN <start_date> AND <end_date>
@@ -292,7 +274,7 @@ The following `last_team` names are easy to confuse with each other or with unre
 
 ### `last_team_adjusted` — official Post Contract Back operation mapping
 
-Apply this **only after** the Canonical Filter above has already been applied. This mapping is the authoritative operation breakdown for DSAT Back, SLA Back, Resolution Rate Back, Inbound Volume and Outbound Volume, and was validated against the official Post Contract Back dashboard for **Aug/2025–Jul/2026**:
+Apply this **only after** the Canonical Filter above has already been applied. This mapping is the authoritative operation breakdown for SLA Back, Resolution Rate Back, Inbound Volume and Outbound Volume, and was validated against the official Post Contract Back dashboard for **Aug/2025–Jul/2026**:
 
 ```sql
 CASE
@@ -322,7 +304,7 @@ Do **not** include `Payment FR - Dados Bancários` in Payments Ativo Back — it
 
 **Unvalidated legacy alias — `Payment_FR_GeneralCondominium`**: observed as a `last_team` value in the Aug/2025–Jul/2026 data (exactly 1 case, `ts_solved` in May/2026, 100% within SLA) during the Outbound Volume and SLA Back validation passes. It is **not** included in this `CASE` mapping — it falls through to `ELSE last_team` and is reported under its own literal name, not folded into Payments Ativo Back or Dados Bancários, despite the name's apparent similarity to `Payment FR - Condomínio Geral`. See [Open decision](#open-decision--payment_fr_generalcondominium) below.
 
-**`team_adjusted` is prohibited for this metric family.** The legacy `team_adjusted` mapping (used elsewhere, including a differently-defined `last_team_adjusted` macro-categorization for the *Front Office* family documented in `customer_contacts_front.md`, which is a distinct table and a distinct mapping) must **not** be used for any Post Contract Back metric or operation breakdown described in this document — for SLA Back, DSAT Back, Resolution Rate Back, Inbound Volume, Outbound Volume, or any Post Contract Back operation breakdown. It may exist in other dashboards or domains, but it is documented here only to prevent accidental use. Do not recreate, infer, or apply `team_adjusted` for this family — use the validated `last_team_adjusted` mapping above instead.
+**`team_adjusted` is prohibited for this metric family.** The legacy `team_adjusted` mapping (used elsewhere, including a differently-defined `last_team_adjusted` macro-categorization for the *Front Office* family documented in `customer_contacts_front.md`, which is a distinct table and a distinct mapping) must **not** be used for any Post Contract Back metric or operation breakdown described in this document — for SLA Back, Resolution Rate Back, Inbound Volume, Outbound Volume, or any Post Contract Back operation breakdown. It may exist in other dashboards or domains, but it is documented here only to prevent accidental use. Do not recreate, infer, or apply `team_adjusted` for this family — use the validated `last_team_adjusted` mapping above instead.
 
 ### Open decision — `Payment_FR_GeneralCondominium`
 
@@ -399,15 +381,11 @@ Apply all requested filters before calculating the metric numerator and denomina
 
 All queries apply the Canonical Filter documented above; what differs per query is the aggregation layer (consolidated vs. by `last_team_adjusted`) and the metric-specific temporal anchor. Trino dialect.
 
-### Query 1 — DSAT Back and Resolution Rate Back (Post Contract consolidated)
+### Query 1 — Resolution Rate Back (Post Contract consolidated)
 
 ```sql
 SELECT
     DATE_TRUNC('month', CAST(cp.first_csat_ts_response AS DATE)) AS ref_month,
-    COUNT(DISTINCT CASE WHEN cp.first_csat_score IN (1, 2) THEN cp.case_number END) AS dsat_cases,
-    COUNT(DISTINCT CASE WHEN cp.first_csat_score IS NOT NULL THEN cp.case_number END) AS answered_evaluations,
-    CAST(COUNT(DISTINCT CASE WHEN cp.first_csat_score IN (1, 2) THEN cp.case_number END) AS DOUBLE)
-        / NULLIF(CAST(COUNT(DISTINCT CASE WHEN cp.first_csat_score IS NOT NULL THEN cp.case_number END) AS DOUBLE), 0) AS dsat_back,
     COUNT(DISTINCT CASE WHEN cp.resolution_survey = TRUE THEN cp.case_number END) AS resolution_cases,
     COUNT(DISTINCT CASE WHEN cp.resolution_survey IS NOT NULL THEN cp.case_number END) AS answered_resolution_surveys,
     CAST(COUNT(DISTINCT CASE WHEN cp.resolution_survey = TRUE THEN cp.case_number END) AS DOUBLE)
@@ -442,100 +420,9 @@ GROUP BY 1
 ORDER BY 1
 ```
 
-### Query 2 — DSAT Back by Operation (`last_team_adjusted`) with Post Contract consolidated row
+### Query 2 — Resolution Rate Back by Operation (`last_team_adjusted`) with Post Contract consolidated row
 
-Only `<start_date>` and `<end_date>` should be changed to reproduce this query for a different period. `tt.total_answered > 0` hides an operation **only** if it had zero answered evaluations across the **entire** requested period (not per month) — a display convenience to avoid listing an all-"-" operation row; it never affects the Post Contract consolidated row, which is always computed from `consolidated_month`. Sort each operation's monthly values into a matrix (operations as rows, months as columns) and render an `answered_evaluations = 0` month as "-" instead of "0.0%" when presenting the result.
-
-```sql
-WITH scoped AS (
-    SELECT
-        cp.case_number,
-        cp.last_team,
-        CASE
-            WHEN cp.last_team IN (
-                'Offboarding Back', 'Offboarding - AEC', 'Offboarding - Atento', 'Offboarding - CNX'
-            ) THEN 'Offboarding Back'
-            WHEN cp.last_team IN (
-                'Onboarding Back', 'Onboarding ForRent'
-            ) THEN 'Onboarding Back'
-            WHEN cp.last_team IN (
-                'Ongoing Back', 'Ongoing FR - Geral', 'Ongoing FR - Informe de Rendimentos'
-            ) THEN 'Ongoing Back'
-            WHEN cp.last_team IN (
-                'Payments Ativo Back', 'Payment FR - Aluguel', 'Payment FR - Condomínio Geral',
-                'Payment FR - Reembolso de Condomínio', 'Payment FR - PP Multi'
-            ) THEN 'Payments Ativo Back'
-            WHEN cp.last_team IN (
-                'Payments', 'Payment FR - Dados Bancários'
-            ) THEN 'Dados Bancários'
-            ELSE cp.last_team
-        END AS last_team_adjusted,
-        cp.first_csat_score,
-        DATE_TRUNC('month', CAST(cp.first_csat_ts_response AS DATE)) AS ref_month
-    FROM dw_bpo_performance.cases_perspective AS cp
-    WHERE (LOWER(cp.front_or_back) = 'back' OR cp.front_or_back IS NULL)
-        AND cp.channel = 'email'
-        AND cp.first_csat_ts_response >= DATE('<start_date>')
-        AND cp.first_csat_ts_response < DATE('<end_date>') + INTERVAL '1' DAY
-        AND cp.last_department IN (
-            'CX Partners Tarefas [PRE] [BACK]', 'CX Propostas Tarefas [PRE] [BACK]',
-            'Aditivos [REP] [POS] [BACK]', 'Entrada no imóvel [ONB] [POS] [BACK]',
-            'CX Pagamentos Ativo [POS] [BACK] [PAY]', 'Alteração de dados bancários [BACK]',
-            'Atendimento Escalado [OFF] [POS] [BACK]', 'CX Rescisão [FRONT] [POS]',
-            'Rescisão por Inadimplência [OFF][POS][BACK]', 'CX Offboarding Reparos Receptivo [OFF] [POS] [BACK]',
-            'Offboarding pré saída [OFF] [POS] [BACK]', 'OPS - FUP Documentação Rental OA2DS [CLO] [PRE]',
-            'FUP Carteirização B2C [CLO] [PRE] [BACK]', 'EARLY DEMAND [CLOSING] [BACK]',
-            'Closing PP Multi [CLO] [PRE] [BACK]', 'CX Expert [BACK] [KA]',
-            'CX PP Multi Diamond [POS] [BACK]', 'Concierge PP Multi [PRE] [POS] [ESC]',
-            'Ongoing Back', 'Aditivos [POS] [BACK] [WH]', 'Onboarding Back',
-            'Condo Garantido [ONB] [POS] [BACK]', 'Onboarding ForRent', 'Ongoing FR - Geral',
-            'Ongoing FR - Informe de Rendimentos', 'Payment FR - Aluguel', 'Payment FR - Dados Bancários',
-            'Payment FR - Condomínio Geral', 'Payment FR - Reembolso de Condomínio',
-            'Payment FR - Condomínio Interno', 'Payment_FR_GeneralCondominium', 'Payment FR - PP Multi',
-            'Payment FR - Dados Bancários Front', 'Offboarding - AEC', 'Offboarding - CNX', 'Offboarding - Atento'
-        )
-        AND cp.last_team NOT IN (
-            'CX Expert', 'Propostas', 'Closing', 'CX Partners',
-            'Payment FR - Dados Bancários Front', 'Payment FR - Condomínio Interno'
-        )
-),
-adj_team_month AS (
-    SELECT
-        last_team_adjusted, ref_month,
-        COUNT(DISTINCT CASE WHEN first_csat_score IN (1, 2) THEN case_number END) AS dsat_cases,
-        COUNT(DISTINCT CASE WHEN first_csat_score IS NOT NULL THEN case_number END) AS answered_evaluations
-    FROM scoped
-    GROUP BY last_team_adjusted, ref_month
-),
-adj_team_totals AS (
-    SELECT last_team_adjusted, SUM(answered_evaluations) AS total_answered
-    FROM adj_team_month
-    GROUP BY last_team_adjusted
-),
-consolidated_month AS (
-    SELECT
-        'Post Contract' AS last_team_adjusted, ref_month,
-        COUNT(DISTINCT CASE WHEN first_csat_score IN (1, 2) THEN case_number END) AS dsat_cases,
-        COUNT(DISTINCT CASE WHEN first_csat_score IS NOT NULL THEN case_number END) AS answered_evaluations
-    FROM scoped
-    GROUP BY ref_month
-)
-SELECT
-    0 AS team_order, cm.last_team_adjusted, cm.ref_month, cm.dsat_cases, cm.answered_evaluations,
-    CAST(NULL AS BIGINT) AS total_answered
-FROM consolidated_month cm
-UNION ALL
-SELECT
-    1 AS team_order, tm.last_team_adjusted, tm.ref_month, tm.dsat_cases, tm.answered_evaluations, tt.total_answered
-FROM adj_team_month tm
-JOIN adj_team_totals tt ON tt.last_team_adjusted = tm.last_team_adjusted
-WHERE tt.total_answered > 0
-ORDER BY team_order, total_answered DESC, last_team_adjusted, ref_month
-```
-
-### Query 3 — Resolution Rate Back by Operation (`last_team_adjusted`) with Post Contract consolidated row
-
-Same structure as Query 2. This query intentionally does **not** select or filter on `first_csat_score` anywhere — see [Calculation → Resolution Rate Back](#3-resolution-rate-back) and Dos and Don'ts. `tt.total_answered > 0` is the same per-period (not per-month) display convenience as Query 2 and never affects the consolidated row.
+Only `<start_date>` and `<end_date>` should be changed to reproduce this query for a different period. This query intentionally does **not** select or filter on `first_csat_score` anywhere — see [Calculation → Resolution Rate Back](#2-resolution-rate-back) and Dos and Don'ts. `tt.total_answered > 0` hides an operation **only** if it had zero answered resolution surveys across the **entire** requested period (not per month) — a display convenience to avoid listing an all-"-" operation row; it never affects the Post Contract consolidated row, which is always computed from `consolidated_month`. Sort each operation's monthly values into a matrix (operations as rows, months as columns) and render an `answered_resolution_surveys = 0` month as "-" instead of "0.0%" when presenting the result.
 
 ```sql
 WITH scoped AS (
@@ -624,7 +511,7 @@ WHERE tt.total_answered > 0
 ORDER BY team_order, total_answered DESC, last_team_adjusted, ref_month
 ```
 
-### Query 4 — SLA Back (Post Contract consolidated)
+### Query 3 — SLA Back (Post Contract consolidated)
 
 ```sql
 SELECT
@@ -664,9 +551,9 @@ GROUP BY 1
 ORDER BY 1
 ```
 
-### Query 5 — SLA Back by Operation (`last_team_adjusted`) with Post Contract consolidated row
+### Query 4 — SLA Back by Operation (`last_team_adjusted`) with Post Contract consolidated row
 
-`tt.total_solved > 0` is the same per-period display convenience as Query 2/3 and never affects the consolidated row — it has not hidden any of the 5 validated operations for Aug/2025–Jul/2026 (all had solved cases in every month of that period). This query intentionally does **not** select or filter on `first_csat_ts_response`, `first_csat_score`, or `resolution_survey` anywhere — see [Calculation → SLA Back](#1-sla-back).
+`tt.total_solved > 0` is the same per-period display convenience as Query 2 and never affects the consolidated row — it has not hidden any of the 5 validated operations for Aug/2025–Jul/2026 (all had solved cases in every month of that period). This query intentionally does **not** select or filter on `first_csat_ts_response`, `first_csat_score`, or `resolution_survey` anywhere — see [Calculation → SLA Back](#1-sla-back).
 
 ```sql
 WITH scoped AS (
@@ -757,7 +644,7 @@ WHERE tt.total_solved > 0
 ORDER BY team_order, total_solved DESC, last_team_adjusted, ref_month
 ```
 
-### Query 6 — Inbound Volume (Post Contract consolidated)
+### Query 5 — Inbound Volume (Post Contract consolidated)
 
 ```sql
 SELECT
@@ -793,7 +680,7 @@ GROUP BY 1
 ORDER BY 1
 ```
 
-### Query 7 — Outbound Volume (Post Contract consolidated)
+### Query 6 — Outbound Volume (Post Contract consolidated)
 
 ```sql
 SELECT
@@ -830,7 +717,7 @@ GROUP BY 1
 ORDER BY 1
 ```
 
-### Query 8 — Inbound Volume by Operation (`last_team_adjusted`) with Post Contract consolidated row
+### Query 7 — Inbound Volume by Operation (`last_team_adjusted`) with Post Contract consolidated row
 
 ```sql
 WITH scoped AS (
@@ -900,7 +787,7 @@ SELECT 1 AS team_order, last_team_adjusted, ref_month, inbound_volume FROM opera
 ORDER BY team_order, last_team_adjusted, ref_month
 ```
 
-### Query 9 — Outbound Volume by Operation (`last_team_adjusted`) with Post Contract consolidated record
+### Query 8 — Outbound Volume by Operation (`last_team_adjusted`) with Post Contract consolidated record
 
 ```sql
 WITH scoped AS (
@@ -977,13 +864,12 @@ The following metrics were validated against the official Post Contract Back sou
 
 | Metric | Status |
 | :---- | :---- |
-| DSAT Back | **VALIDATED** |
 | Resolution Rate Back | **VALIDATED** |
 | Inbound Volume | **VALIDATED** |
 | Outbound Volume | **VALIDATED** |
 | SLA Back | **VALIDATED** |
 
-Confirmed for the validated period: DSAT Back used `first_csat_ts_response`, detractor scores 1/2, and distinct `case_number`; Resolution Rate Back used `first_csat_ts_response` and `resolution_survey`, with no dependency on `first_csat_score`; Inbound Volume used `ts_started`; Outbound Volume used `ts_solved`; SLA Back used `ts_solved`, `is_ticket_solved_within_sla`, and distinct solved cases; the Post Contract row was recalculated directly (never obtained by averaging operation rows); all six mandatory `last_team` exclusions were applied; `Payment FR - Dados Bancários` remained under Dados Bancários; and `Payment FR - Aluguel`, `Payment FR - Condomínio Geral`, `Payment FR - Reembolso de Condomínio`, and `Payment FR - PP Multi` were included in Payments Ativo Back.
+Confirmed for the validated period: Resolution Rate Back used `first_csat_ts_response` and `resolution_survey`, with no dependency on `first_csat_score`; Inbound Volume used `ts_started`; Outbound Volume used `ts_solved`; SLA Back used `ts_solved`, `is_ticket_solved_within_sla`, and distinct solved cases; the Post Contract row was recalculated directly (never obtained by averaging operation rows); all six mandatory `last_team` exclusions were applied; `Payment FR - Dados Bancários` remained under Dados Bancários; and `Payment FR - Aluguel`, `Payment FR - Condomínio Geral`, `Payment FR - Reembolso de Condomínio`, and `Payment FR - PP Multi` were included in Payments Ativo Back.
 
 **Mandatory regression tests whenever this document changes**: (1) one complete closed month for every metric; (2) the full Aug/2025–Jul/2026 validation window when scope or mappings change; (3) Post Contract consolidated results; (4) all five validated operations; (5) numerator and denominator for every rate metric; (6) one period with no results; (7) confirmation that excluded teams never contribute to operation rows or Post Contract; (8) confirmation that `Payment_FR_GeneralCondominium`, if present, remains separate until formally classified by the Data Steward.
 
