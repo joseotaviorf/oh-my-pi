@@ -1,0 +1,29 @@
+---
+database_name: datalake_consorcio_raw
+table_name: consorcio_chatbot_offline_eval
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  Lean raw landing for Consórcio chatbot offline-eval JSON artifacts. One row
+  per Atenas result file under s3://data-science.../chatbot/{host}/atenas/{suite}/.
+  Stores the file path, commit, run timestamp, and full result_json; host/suite
+  and metric indexing are derived in clean. Insert-only merge on s3_path.
+columns:
+  s3_path:
+    description: Full S3 object path of the ingested JSON file (merge key).
+  git_commit:
+    description: Git commit SHA from the S3 path commit= segment.
+  ts_eval:
+    description: Suite run timestamp parsed from the JSON filename stem (UTC).
+  result_json:
+    description: Full DatasetEvalResult JSON payload as a string.
+  dt_eval:
+    description: Evaluation calendar date from the S3 date= partition (ops/windowing).
+  ts_load:
+    description: Timestamp when the row was first inserted into the raw table.
+  year:
+    description: Partition column derived from dt_eval.
+  month:
+    description: Partition column derived from dt_eval.
+  day:
+    description: Partition column derived from dt_eval.

@@ -1,0 +1,43 @@
+dag:
+  name: consorcio_chatbot_offline_eval
+  schedule_start_date: 2026, 7, 1
+  schedule_interval: 0 6 * * *
+  owner: QCX
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Ingests Consórcio chatbot offline-eval artifacts from the data-science S3
+      bucket (Atenas JSON results under chatbot/{host}/atenas/{suite}/...) into
+      a lean raw table (s3_path, git_commit, ts_eval, result_json), then indexes
+      per-metric scores into datalake_consorcio_clean (host/suite derived from
+      path). Raw is incremental by watermark: max(dt_eval) in the raw table
+      bounds S3 listing to date= prefixes from that day through today; already
+      ingested s3_paths in that window are skipped. load_start_date (default 7
+      days back; override via DAG conf) is the empty-table bootstrap and also
+      forces an older lookback when set before the watermark. Clean indexes
+      rows raw-loaded since load_start_date. Insert-only merges keep both
+      layers idempotent.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: consorcio
+  load_spark_job: load_consorcio_chatbot_offline_eval_raw
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -7), 'load_start_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{load_start_date}"
+  tables_customization:
+    consorcio_chatbot_offline_eval:
+      clean_table_name: consorcio_chatbot_offline_eval
+      partitions: [year, month, day]
+      clean_partitions: [year, month, day]
+      merge_on: [id_eval_run, id_dataset_item, nr_run, metric_config_identifier]
+      when_matched_update_condition: "FALSE"

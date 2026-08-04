@@ -1,0 +1,106 @@
+---
+database_name: datalake_consorcio_clean
+table_name: consorcio_chatbot_offline_eval
+owner: carlos.procha@quintoandar.com.br
+domain: QCX
+description: >
+  Indexed offline-eval metric scores for Consórcio chatbots. Grain is one row
+  per eval artifact × dataset item × agent run × metric configuration. Built
+  from datalake_consorcio_raw.consorcio_chatbot_offline_eval; host_name,
+  suite_name, and id_eval_run are derived from s3_path. Insert-only merge on
+  the grain keys (already-seen metric rows are skipped).
+columns:
+  id_eval_run:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.s3_path
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.git_commit
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.dt_eval
+    description: Eval artifact identity derived from host/suite/date/commit/run stem.
+  id_dataset_item:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Dataset item id from metadata.id, or item_<index> when missing.
+  host_name:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.s3_path
+    description: Chatbot host from the S3 path (e.g. conrado).
+  suite_name:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.s3_path
+    description: Atenas suite from the S3 path (e.g. core-cujs).
+  dataset_item_label:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Human-readable dataset item label from metadata.label.
+  nr_run:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Zero-based agent run index within the dataset item (runs_per_item).
+  metric_name:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Metric family name (e.g. turn_relevancy, tool_correctness, conversational_geval).
+  metric_config_identifier:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Full metric config key; distinguishes multiple instances of the same metric_name.
+  metric_reason:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Judge or metric explanation string for the score.
+  agent_error:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Agent error message when the run failed; null otherwise.
+  git_commit:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.git_commit
+    description: Git commit SHA of the evaluated code.
+  s3_path:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.s3_path
+    description: Source S3 object path of the eval artifact.
+  score:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Normalized score (bool metrics cast to 0/1; continuous metrics keep float score).
+  raw_score:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Provider raw_score before normalization (may differ from score, e.g. toxicity).
+  agent_duration_ms:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: Wall-clock duration of the agent invocation for this run, in milliseconds.
+  is_pass:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: True/false for binary metrics; null for continuous metrics.
+  has_agent_error:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.result_json
+    description: True when the agent run recorded an error string.
+  dt_eval:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.dt_eval
+    description: Evaluation date from the S3 date= partition.
+  ts_eval:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.ts_eval
+    description: Suite run timestamp from the JSON filename stem (UTC).
+  ts_load:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.ts_load
+    description: Timestamp when the raw artifact was first loaded.
+  year:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.year
+    description: Partition column derived from dt_eval.
+  month:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.month
+    description: Partition column derived from dt_eval.
+  day:
+    lineage:
+      - datalake_consorcio_raw.consorcio_chatbot_offline_eval.day
+    description: Partition column derived from dt_eval.
