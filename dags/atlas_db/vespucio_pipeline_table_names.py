@@ -93,6 +93,9 @@ class Tables:
     resolved_identities_publish_checkpoint = (
         "vespucio_pipeline_delta.resolved_identities_publish_checkpoint"
     )
+    artifacts_publish_checkpoint = (
+        "vespucio_pipeline_delta.artifacts_publish_checkpoint"
+    )
 
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
 

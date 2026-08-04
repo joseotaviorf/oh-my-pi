@@ -352,6 +352,21 @@ resolve_groups_step_task = create_task(
     ],
 )
 
+publish_artifacts_step_task = create_task(
+    entry_point="core_v2_publish_artifacts_step",
+    parameters=[
+        f"--input_artifacts={Tables.artifacts_v2}",
+        f"--output_artifacts_publish_checkpoint={Tables.artifacts_publish_checkpoint}",
+        f"--bootstrap_servers={kafka_bootstrap_servers}",
+        f"--deployment_env={ENV}",
+        "--security_protocol=SASL_SSL",
+        "--credentials_secret_scope=quintoandar",
+        "--credentials_secret_key=VESPUCIO_CONFLUENT_CREDENTIALS",
+        "--running_mode=prod",
+    ],
+    task_id="publish_artifacts",
+)
+
 publish_resolved_identities_step_task = create_task(
     entry_point="core_v2_publish_resolved_identities_step",
     parameters=[
@@ -399,3 +414,4 @@ address_normalization_step_task >> address_enrich_step_task
 resolve_groups_step_task >> vespucio_v2_pipeline_complete_task
 resolve_groups_step_task >> publish_resolved_identities_step_task
 artifacts_step_task >> vespucio_v2_pipeline_complete_task
+artifacts_step_task >> publish_artifacts_step_task
