@@ -88,11 +88,9 @@ columns:
   export_slot:
     description: |
       SeuBarriga daily export batch for the ingestion run: morning (~01:00 BRT overwrite)
-      or afternoon (~12:00+ BRT append). Taken from raw when the Spark job sets export_slot;
-      otherwise inferred from ts_load hour BRT (before 12 morning, else afternoon).
+      or afternoon (~12:00+ BRT append). Set explicitly by the Spark job or --export-slot.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.export_slot
-      - datalake_invoice_preview_raw.invoice_preview.ts_load
   dt_due:
     description: Due date of the preview entry as exported by SeuBarriga.
     lineage:
@@ -143,8 +141,14 @@ columns:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.day
     description: Day partition derived from the source event timestamp for incremental loading.
+  ts_export_batch:
+    description: |
+      Canonical batch timestamp for the SeuBarriga export slot on the load partition day
+      (09:30 BRT morning, 16:30 BRT afternoon). Stable marker for ordering and SLA vs ts_load.
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.ts_export_batch
   ts_load:
-    description: Timestamp when the preview row was ingested into the datalake by the invoice_preview Spark job.
+    description: Timestamp when the Spark ingestion job finished loading this preview row into raw.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.ts_load
     description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

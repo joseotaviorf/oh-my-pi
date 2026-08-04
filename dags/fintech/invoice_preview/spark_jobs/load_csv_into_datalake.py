@@ -36,7 +36,8 @@ JOB_NAME = "load_invoice_preview_into_datalake"
 # up to 4h30. Files within LATEST_EXPORT_BATCH_WINDOW_SECONDS of the day's max
 # timestamp belong to the latest batch; older files on the same calendar day are
 # the morning batch. Morning DAG runs overwrite the partition; afternoon runs append
-# afternoon CSVs only (preserving the morning snapshot).
+# afternoon CSVs only (preserving the morning snapshot). ts_load records job finish time;
+# ts_export_batch holds the canonical slot timestamp (09:30 / 16:30 BRT on the partition day).
 LATEST_EXPORT_BATCH_WINDOW_SECONDS = 5 * 3600
 EXPORT_SLOT_MORNING = "morning"
 EXPORT_SLOT_AFTERNOON = "afternoon"
@@ -135,6 +136,19 @@ def _select_files_for_export_slot(file_paths, export_slot):
 
 def _write_mode_for_export_slot(export_slot):
     return "append" if export_slot == EXPORT_SLOT_AFTERNOON else "overwrite"
+
+
+def _canonical_ts_export_batch(load_date, export_slot):
+    hour, minute = (9, 30) if export_slot == EXPORT_SLOT_MORNING else (16, 30)
+    local = datetime(
+        load_date.year,
+        load_date.month,
+        load_date.day,
+        hour,
+        minute,
+        tzinfo=BRT,
+    )
+    return local.astimezone(timezone.utc).replace(tzinfo=None)
 
 
 def _generate_date_range(load_start_date, load_end_date):
@@ -273,6 +287,10 @@ if __name__ == "__main__":
             )
 
             df = df.withColumn("export_slot", functions.lit(export_slot))
+            df = df.withColumn(
+                "ts_export_batch",
+                functions.lit(_canonical_ts_export_batch(date_to_ingest, export_slot)),
+            )
             df = df.withColumn("ts_load", functions.current_timestamp())
 
             db_info = DatalakeMetastoreService.get_db_info(
