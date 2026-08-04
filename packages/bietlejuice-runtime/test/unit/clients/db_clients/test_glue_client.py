@@ -116,3 +116,95 @@ class TestGlueClient:
                     RoleArn=role_arn,
                     RoleSessionName="bietlejuice-glue-sync",
                 )
+
+
+class TestGlueClientPartitionApis:
+    def _client_with_mock_glue(self, mock_glue):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("GLUE_ASSUME_ROLE_ARN", None)
+            with patch(
+                "bietlejuice.clients.db_clients.glue_client.boto3.client",
+                return_value=mock_glue,
+            ):
+                client = GlueClient(role_arn=None)
+                _ = client.conn  # cache mock while patch is active
+                return client
+
+    def test_get_partitions_paginates_full_dicts(self):
+        mock_glue = MagicMock()
+        page1 = {
+            "Partitions": [
+                {"Values": ["2018", "10", "19"], "StorageDescriptor": {"Location": "a"}}
+            ]
+        }
+        page2 = {
+            "Partitions": [
+                {"Values": ["2019", "01", "01"], "StorageDescriptor": {"Location": "b"}}
+            ]
+        }
+        paginator = MagicMock()
+        paginator.paginate.return_value = [page1, page2]
+        mock_glue.get_paginator.return_value = paginator
+
+        client = self._client_with_mock_glue(mock_glue)
+        partitions = client.get_partitions("db", "tbl")
+
+        assert len(partitions) == 2
+        assert partitions[0]["Values"] == ["2018", "10", "19"]
+        mock_glue.get_paginator.assert_called_once_with("get_partitions")
+
+    def test_batch_update_partition_batches_of_100(self):
+        mock_glue = MagicMock()
+        mock_glue.batch_update_partition.return_value = {"Errors": []}
+
+        client = self._client_with_mock_glue(mock_glue)
+        entries = [
+            {
+                "PartitionValueList": [str(i)],
+                "PartitionInput": {"Values": [str(i)]},
+            }
+            for i in range(250)
+        ]
+
+        updated = client.batch_update_partition("db", "tbl", entries)
+
+        assert updated == 250
+        assert mock_glue.batch_update_partition.call_count == 3
+        first_batch = mock_glue.batch_update_partition.call_args_list[0][1]["Entries"]
+        assert len(first_batch) == 100
+        last_batch = mock_glue.batch_update_partition.call_args_list[2][1]["Entries"]
+        assert len(last_batch) == 50
+
+    def test_batch_update_partition_raises_on_errors(self):
+        mock_glue = MagicMock()
+        mock_glue.batch_update_partition.return_value = {
+            "Errors": [
+                {
+                    "PartitionValues": ["2018", "10", "19"],
+                    "ErrorDetail": {
+                        "ErrorCode": "EntityNotFoundException",
+                        "ErrorMessage": "missing",
+                    },
+                }
+            ]
+        }
+
+        client = self._client_with_mock_glue(mock_glue)
+        entries = [
+            {
+                "PartitionValueList": ["2018", "10", "19"],
+                "PartitionInput": {"Values": ["2018", "10", "19"]},
+            }
+        ]
+
+        try:
+            client.batch_update_partition("db", "tbl", entries)
+            raise AssertionError("expected RuntimeError")
+        except RuntimeError as exc:
+            assert "batch_update_partition failed" in str(exc)
+
+    def test_batch_update_partition_empty_is_noop(self):
+        mock_glue = MagicMock()
+        client = self._client_with_mock_glue(mock_glue)
+        assert client.batch_update_partition("db", "tbl", []) == 0
+        mock_glue.batch_update_partition.assert_not_called()

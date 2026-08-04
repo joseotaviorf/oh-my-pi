@@ -208,6 +208,25 @@ class GlueClient(DBClient):
                 values.add(tuple(partition.get("Values", [])))
         return values
 
+    def get_partitions(self, database_name: str, table_name: str) -> List[Dict]:
+        """Return all Glue partitions for a table (full partition dicts)."""
+        partitions: List[Dict] = []
+        paginator = self.conn.get_paginator("get_partitions")
+        for page in paginator.paginate(
+            DatabaseName=database_name, TableName=table_name
+        ):
+            partitions.extend(page.get("Partitions", []))
+        return partitions
+
+    def get_database_names(self) -> List[str]:
+        """List all Glue database names."""
+        names: List[str] = []
+        paginator = self.conn.get_paginator("get_databases")
+        for page in paginator.paginate():
+            for database in page.get("DatabaseList", []):
+                names.append(database["Name"])
+        return names
+
     def create_partition(
         self,
         database_name: str,
@@ -303,3 +322,56 @@ class GlueClient(DBClient):
                     created_count += 1
 
         return created_count
+
+    def batch_update_partition(
+        self,
+        database_name: str,
+        table_name: str,
+        entries: List[Dict],
+    ) -> int:
+        """Update Glue partitions in batches of 100.
+
+        Each entry must match the Glue ``BatchUpdatePartition`` shape::
+
+            {
+                "PartitionValueList": [...],
+                "PartitionInput": {...},
+            }
+
+        Returns the number of partitions successfully updated.
+        """
+        if not entries:
+            return 0
+
+        batch_size = 100
+        updated_count = 0
+        for i in range(0, len(entries), batch_size):
+            batch = entries[i : i + batch_size]
+            response = self.conn.batch_update_partition(
+                DatabaseName=database_name,
+                TableName=table_name,
+                Entries=batch,
+            )
+            errors = response.get("Errors", [])
+            if errors:
+                for err in errors:
+                    partition_values = err.get("PartitionValues", [])
+                    error_detail = err.get("ErrorDetail", {})
+                    logger.error(
+                        f"m=batch_update_partition, "
+                        f"table={database_name}.{table_name}, "
+                        f"partition_values={partition_values}, "
+                        f"error_code={error_detail.get('ErrorCode')}, "
+                        f"error_message={error_detail.get('ErrorMessage')}, "
+                        "msg=partition update failed in Glue"
+                    )
+                raise RuntimeError(
+                    f"Glue batch_update_partition failed for "
+                    f"{len(errors)} partition(s) in "
+                    f"{database_name}.{table_name}: "
+                    f"{[e.get('ErrorDetail', {}).get('ErrorCode') for e in errors]}"
+                )
+
+            updated_count += len(batch)
+
+        return updated_count

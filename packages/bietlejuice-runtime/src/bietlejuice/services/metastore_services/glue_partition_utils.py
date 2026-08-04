@@ -97,6 +97,62 @@ def is_delta_glue_table(table: Dict) -> bool:
     return False
 
 
+# OpenX rejects ISO-8601 ``T``/``Z`` timestamps; HCatalog JsonSerDe is the fix.
+_JSON_SERDE_HCATALOG = "org.apache.hive.hcatalog.data.JsonSerDe"
+_JSON_SERDE_OPENX = "org.openx.data.jsonserde.JsonSerDe"
+
+
+def _serde_library(storage_descriptor: Dict) -> str:
+    serde = (storage_descriptor or {}).get("SerdeInfo") or {}
+    return serde.get("SerializationLibrary") or ""
+
+
+def is_json_glue_table(table: Dict) -> bool:
+    """Return True when the Glue table is JSON (classification or JsonSerDe)."""
+    params = table.get("Parameters") or {}
+    if (params.get("classification") or "").lower() == "json":
+        return True
+    serde = _serde_library(table.get("StorageDescriptor") or {})
+    return serde in (_JSON_SERDE_HCATALOG, _JSON_SERDE_OPENX)
+
+
+def is_openx_json_serde(storage_descriptor: Dict) -> bool:
+    """Return True when the StorageDescriptor still uses OpenX JsonSerDe."""
+    return _serde_library(storage_descriptor) == _JSON_SERDE_OPENX
+
+
+def partition_serde_needs_update(
+    table_storage_descriptor: Dict, partition_storage_descriptor: Dict
+) -> bool:
+    """True when partition SerDe library or parameters differ from the table."""
+    table_serde = (table_storage_descriptor or {}).get("SerdeInfo") or {}
+    part_serde = (partition_storage_descriptor or {}).get("SerdeInfo") or {}
+    if table_serde.get("SerializationLibrary") != part_serde.get(
+        "SerializationLibrary"
+    ):
+        return True
+    return (table_serde.get("Parameters") or {}) != (part_serde.get("Parameters") or {})
+
+
+def build_partition_update_entry(
+    table_storage_descriptor: Dict, partition: Dict
+) -> Dict:
+    """Build a Glue ``BatchUpdatePartition`` entry; keep Values + Location."""
+    values = list(partition.get("Values") or [])
+    partition_sd = partition.get("StorageDescriptor") or {}
+    location = partition_sd.get("Location") or ""
+    return {
+        "PartitionValueList": values,
+        "PartitionInput": {
+            "Values": values,
+            "StorageDescriptor": copy_storage_descriptor_for_partition(
+                table_storage_descriptor, location
+            ),
+            "Parameters": dict(partition.get("Parameters") or {}),
+        },
+    }
+
+
 def discover_hive_partitions_from_s3(
     table_location: str,
     partition_key_names: Sequence[str],

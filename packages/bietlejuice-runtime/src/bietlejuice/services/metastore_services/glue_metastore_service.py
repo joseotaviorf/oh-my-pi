@@ -14,8 +14,12 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.services.metastore_services.glue_partition_utils import (
     build_partition_input,
+    build_partition_update_entry,
     discover_hive_partitions_from_s3,
     is_delta_glue_table,
+    is_json_glue_table,
+    is_openx_json_serde,
+    partition_serde_needs_update,
     partition_tuples_to_dicts,
 )
 from bietlejuice.services.metastore_services.glue_storage_formats import (
@@ -269,6 +273,107 @@ class GlueMetastoreService(MetastoreService):
             f"created_count={created_count}, "
             "msg=partitions registered in Glue"
         )
+
+    def sync_json_partition_serde(
+        self,
+        database_name: str,
+        table_name: str,
+        *,
+        dry_run: bool = False,
+    ) -> Dict[str, int]:
+        """Align JSON partition SerDe with the table StorageDescriptor.
+
+        Updates (does not drop/recreate) partitions whose ``SerdeInfo`` differs
+        from the table — typically stale OpenX after the table moved to
+        HCatalog JsonSerDe + ``timestamp.formats``.
+
+        Returns counts: ``scanned``, ``updated``, ``skipped``, ``errors``.
+        """
+        counts = {"scanned": 0, "updated": 0, "skipped": 0, "errors": 0}
+        table = self._client.get_table(database_name, table_name)
+        if not table:
+            logger.warning(
+                f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
+                "msg=table not found in Glue, skipping"
+            )
+            counts["skipped"] = 1
+            return counts
+
+        if is_delta_glue_table(table):
+            logger.info(
+                f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
+                "msg=Delta table, skipping"
+            )
+            counts["skipped"] = 1
+            return counts
+
+        if not is_json_glue_table(table):
+            logger.info(
+                f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
+                "msg=not a JSON table, skipping"
+            )
+            counts["skipped"] = 1
+            return counts
+
+        partition_keys = table.get("PartitionKeys") or []
+        if not partition_keys:
+            logger.info(
+                f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
+                "msg=table is not partitioned, skipping"
+            )
+            counts["skipped"] = 1
+            return counts
+
+        table_sd = table.get("StorageDescriptor") or {}
+        if is_openx_json_serde(table_sd):
+            logger.warning(
+                f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
+                "msg=table SerDe is still OpenX; re-register table via prod DAG "
+                "before syncing partitions, skipping"
+            )
+            counts["skipped"] = 1
+            return counts
+
+        partitions = self._client.get_partitions(database_name, table_name)
+        counts["scanned"] = len(partitions)
+
+        entries: List[Dict] = []
+        for partition in partitions:
+            partition_sd = partition.get("StorageDescriptor") or {}
+            if not partition_serde_needs_update(table_sd, partition_sd):
+                continue
+            entries.append(build_partition_update_entry(table_sd, partition))
+
+        if not entries:
+            logger.info(
+                f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
+                f"scanned={counts['scanned']}, msg=all partitions already match table SerDe"
+            )
+            return counts
+
+        logger.info(
+            f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
+            f"scanned={counts['scanned']}, to_update={len(entries)}, "
+            f"dry_run={dry_run}, msg=partitions need SerDe sync"
+        )
+
+        if dry_run:
+            counts["updated"] = len(entries)
+            return counts
+
+        try:
+            counts["updated"] = self._client.batch_update_partition(
+                database_name, table_name, entries
+            )
+        except Exception:
+            counts["errors"] = len(entries)
+            raise
+
+        logger.info(
+            f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
+            f"updated={counts['updated']}, msg=partition SerDe synced"
+        )
+        return counts
 
     # -- Internal helpers ----------------------------------------------------
 
