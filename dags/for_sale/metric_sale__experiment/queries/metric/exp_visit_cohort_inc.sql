@@ -159,9 +159,9 @@ visit_exp AS (
                 AND DATE(visit.dt_created) >= exp.dt_started
                 AND DATE(visit.dt_created) <= exp.dt_ended
         WHERE
-            exp.name_experiment != 'visits_triangulation_owner'
+            exp.name_experiment NOT IN ('visits_triangulation_owner', 'visits_triangulation_owner_new_triggers')
             OR (
-                exp.name_experiment = 'visits_triangulation_owner'
+                exp.name_experiment IN ('visits_triangulation_owner', 'visits_triangulation_owner_new_triggers')
                 AND visit.behavior IN ('INSTANT_BOOKING', 'CONFIRMATION_SUPPLY')
             )
     ),
