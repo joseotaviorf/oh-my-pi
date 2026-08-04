@@ -44,8 +44,14 @@ columns:
     description: Boolean flag indicating if the current state of the DAG run is successful,
       which means that all tasks of the DAG are marked as successful.
   is_first_execution_inside_sla:
+    lineage:
+      - datalake_airflow.log.ts_event
+      - datalake_dag_inventory_clean.table.layer
+      - datalake_pipeline.dag.layer
     description: Boolean flag indicating if the DAG's first execution of the day or if all DAG's table
       were successfully executed and also inside of our Data SLA. Each layer has its own SLA.
+      Cluster deadline uses inventory layer when available, otherwise datalake_pipeline.dag.layer
+      (covers reverse/access DAGs that do not appear in DAG Inventory).
   has_been_cleared:
     description: Boolean flag indicating if the DAG run suffered any clear, which means that it ran
       at least one more time.

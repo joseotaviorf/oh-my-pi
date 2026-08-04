@@ -1,16 +1,24 @@
-WITH first_run_ever AS (
+WITH first_run_ever_ranked AS (
   -- The first run of a DAG shouldn't be considered to calculate our SLA, so it's important to mark it
   SELECT
     id_dag,
-    ts_executed
+    ts_executed,
+    ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_event ASC) AS rn
   FROM
     datalake_airflow.log
   WHERE
     id_dag LIKE 'bietlejuice%'
     AND (id_task IN ('create-cluster', 'execute-job-cluster')
       OR id_task LIKE '%-skip-execution%')  -- Some DAGs may have as the first task a short-circuit that skips the cluster/job creation
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_dag ORDER BY ts_event ASC) = 1
+),
+first_run_ever AS (
+  SELECT
+    id_dag,
+    ts_executed
+  FROM
+    first_run_ever_ranked
+  WHERE
+    rn = 1
 ),
 /**
   Using DAG Inventory, we can related the id_task with the table. Usually we use the cluster termination task to understand if a DAG was
@@ -31,20 +39,30 @@ dag_inventory AS (
   WHERE
     dag LIKE 'bietlejuice%'
 ),
-first_task_success_log AS (
+first_task_success_log_ranked AS (
   -- Checking the first time that the DAG run was marked as successful, based on the table tasks
   SELECT
     id_dag,
     id_task,
     TIMESTAMP(ts_event) AS ts_success_event,
-    DATE(ts_executed) AS dt_run
+    DATE(ts_executed) AS dt_run,
+    ROW_NUMBER() OVER (PARTITION BY id_dag, id_task, DATE(ts_executed) ORDER BY ts_event ASC) AS rn
   FROM
     datalake_airflow.log
   WHERE
     id_dag LIKE 'bietlejuice%'
     AND event = 'success'
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_dag, id_task, DATE(ts_executed) ORDER BY ts_event ASC) = 1
+),
+first_task_success_log AS (
+  SELECT
+    id_dag,
+    id_task,
+    ts_success_event,
+    dt_run
+  FROM
+    first_task_success_log_ranked
+  WHERE
+    rn = 1
 ),
 table_task_success AS (
   SELECT
@@ -64,7 +82,8 @@ table_task_success AS (
   LEFT JOIN -- Left because we need to consider dummy tasks
     dag_inventory AS di
       ON l.id_task = di.id_task
-      AND l.dt_run = di.dt_extracted
+      -- Inventory partition is D-1 (dt_extracted); dt_current aligns it with the run date
+      AND l.dt_run = di.dt_current
   WHERE
     di.id_task IS NOT NULL  -- Assuring that we're only having the task that loads a table or dummy tasks
     OR l.id_task LIKE '%-skip-execution%'
@@ -103,23 +122,32 @@ all_tasks_sla AS (
   FROM
     expected_tasks
 ),
-success_run AS (
+success_run_ranked AS (
   -- Checking the first time that the DAG run was marked as successful, based on the job/cluster termination task
   SELECT
     l.id_dag,
     TIMESTAMP(l.ts_executed) AS ts_executed,
     l.ts_event AS ts_success_event,
     CASE
-        WHEN layer = 'reverse' THEN COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 15 HOUR
-        WHEN di.id_dag LIKE '%datamart%' OR layer = 'metric' THEN COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 13 HOUR
+        WHEN COALESCE(di.layer, d_layer.layer) = 'reverse'
+          THEN COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 15 HOUR
+        WHEN l.id_dag LIKE '%datamart%'
+          OR COALESCE(d_layer.is_datamart, FALSE) = TRUE
+          OR COALESCE(di.layer, d_layer.layer) = 'metric'
+          THEN COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 13 HOUR
         ELSE COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 11 HOUR
-      END AS ts_expected_sla
+      END AS ts_expected_sla,
+    ROW_NUMBER() OVER (PARTITION BY l.id_dag, DATE(l.ts_event) ORDER BY l.ts_event ASC) AS rn
   FROM
     datalake_airflow.log AS l
   LEFT JOIN -- We have cases where DAG Inventory was broken and didn't run
     dag_inventory AS di
       ON di.id_dag = l.id_dag
-      AND di.dt_extracted = DATE(l.ts_executed)
+      -- Inventory partition is D-1 (dt_extracted); dt_current aligns it with the run date
+      AND di.dt_current = DATE(l.ts_executed)
+  LEFT JOIN
+    datalake_pipeline.dag AS d_layer
+      ON d_layer.id_dag = l.id_dag
   JOIN
     datalake_airflow.dag_run AS dr
       ON dr.id_dag = l.id_dag
@@ -130,8 +158,17 @@ success_run AS (
     AND event = 'success'
     AND (l.id_task IN ('terminate-cluster', 'job-cluster-finished')
       OR l.id_task LIKE '%-skip-execution%') -- Some DAGs may have as the first task a short-circuit that skips the cluster/job creation
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY l.id_dag, DATE(l.ts_event) ORDER BY l.ts_event ASC) = 1
+),
+success_run AS (
+  SELECT
+    id_dag,
+    ts_executed,
+    ts_success_event,
+    ts_expected_sla
+  FROM
+    success_run_ranked
+  WHERE
+    rn = 1
 ),
 dag_clear AS (
   -- Checking if the DAG run suffered any clear, which indicates that it ran more than once
@@ -177,7 +214,7 @@ SELECT
   CASE
     WHEN fre.id_dag IS NOT NULL OR ds.dag IS NOT NULL OR dr.id_run LIKE 'manual%' THEN NULL -- Excluding DAGs on the SLA exclusion list
     WHEN s.ts_success_event <= s.ts_expected_sla THEN TRUE
-    WHEN s.ts_success_event > s.ts_expected_sla AND is_all_tables_inside_sla <> TRUE THEN FALSE
+    WHEN s.ts_success_event > s.ts_expected_sla AND is_all_tables_inside_sla IS NOT TRUE THEN FALSE
     WHEN s.ts_success_event > s.ts_expected_sla AND is_all_tables_inside_sla = TRUE THEN TRUE
     WHEN s.ts_success_event IS NULL THEN is_all_tables_inside_sla
     ELSE NULL
