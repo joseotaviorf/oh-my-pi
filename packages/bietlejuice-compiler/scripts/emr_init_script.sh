@@ -17,9 +17,12 @@ SPARK_SQL_KAFKA_JAR="${SPARK_SQL_KAFKA_JAR:-spark-sql-kafka-0-10_2.12-3.5.1.jar}
 SPARK_TOKEN_PROVIDER_KAFKA_JAR="${SPARK_TOKEN_PROVIDER_KAFKA_JAR:-spark-token-provider-kafka-0-10_2.12-3.5.1.jar}"
 OPENLINEAGE_JAR="${OPENLINEAGE_JAR:-openlineage-spark_2.12-1.46.0.jar}"
 MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"
-# Glue JSON tables registered with org.apache.hive.hcatalog.data.JsonSerDe
-# (timestamp.formats). Hive's copy is not on Spark's classpath by default.
-HIVE_HCATALOG_CORE_JAR="${HIVE_HCATALOG_CORE_JAR:-hive-hcatalog-core-3.1.3.jar}"
+# Glue JSON tables use org.apache.hive.hcatalog.data.JsonSerDe + timestamp.formats.
+# Spark 3.5 embeds Hive 2.3 on the executor classpath — NOT EMR's standalone Hive 3.1.3.
+# hive-hcatalog-core-3.1.3.jar calls TimestampParser.parseTimestamp returning
+# org.apache.hadoop.hive.common.type.Timestamp → NoSuchMethodError against Hive 2.3.
+# Use Hive 2.3.x hcatalog so JsonSerDe matches Spark's hive-common.
+HIVE_HCATALOG_CORE_JAR="${HIVE_HCATALOG_CORE_JAR:-hive-hcatalog-core-2.3.9.jar}"
 QUINTOANDAR_LOGGER_WHEEL="${QUINTOANDAR_LOGGER_WHEEL:-quintoandar_logger-0.8.0-py3-none-any.whl}"
 REQUESTS_VERSION="${REQUESTS_VERSION:-2.32.5}"
 DATABRICKS_SDK_VERSION="${DATABRICKS_SDK_VERSION:-0.102.0}"
@@ -855,6 +858,11 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "${HIVE_HCATALOG_CORE_JAR}"; do
         if [ -f "${TMP_DIR}/${jar}" ]; then
             for jdir in ${SPARK_JARS_DIRS}; do
+                # Drop mismatched Hive-3 hcatalog if a prior bootstrap left it behind.
+                if [ "${jar}" = "${HIVE_HCATALOG_CORE_JAR}" ]; then
+                    sudo rm -f "${jdir}/hive-hcatalog-core-3.1.3.jar" \
+                        "${jdir}/hive-hcatalog-core.jar" 2>/dev/null || true
+                fi
                 sudo cp "${TMP_DIR}/${jar}" "${jdir}/${jar}"
                 sudo chmod 644 "${jdir}/${jar}"
             done
@@ -886,3 +894,4 @@ else
 fi
 
 echo "DONE: bootstrap finished."
+
