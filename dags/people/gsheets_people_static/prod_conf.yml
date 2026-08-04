@@ -17,6 +17,12 @@ sheets_info:
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: layoffs
 
+  mapping_wb_to_gh:
+    clean_table_name: mapping_wb_to_gh
+    sheet_context: people
+    sheet_id: 1C1YVTrZPY7LUYYI9C7DIl575Xh0Ty751aRQnRa0ZPcY
+    sheet_name: mapping_requisitions_openings
+
   legacy_performance_review:
     clean_table_name: legacy_performance_review
     sheet_context: people

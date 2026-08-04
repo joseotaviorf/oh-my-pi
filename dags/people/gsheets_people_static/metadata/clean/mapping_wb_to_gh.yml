@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_people_clean
+table_name: mapping_wb_to_gh
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Maps Workable requisition codes to Greenhouse job opening IDs for TA migration tracking.
+  Sourced from the mapping_requisitions_openings Google Sheets tab (legacy notebook TA/mapping_wb_to_gh).
+columns:
+  requisition_code:
+    description: Workable requisition code (e.g. 5A5454).
+    lineage:
+    - datalake_gsheets_people_raw.mapping_wb_to_gh.requisition_code
+  job_opening_id:
+    description: Greenhouse job opening identifier when the requisition was migrated to GH.
+    lineage:
+    - datalake_gsheets_people_raw.mapping_wb_to_gh.job_opening_id
+  status:
+    description: Migration status label from the spreadsheet (e.g. Feito).
+    lineage:
+    - datalake_gsheets_people_raw.mapping_wb_to_gh.status
+  ts_load:
+    description: Timestamp when the record was loaded from Google Sheets.
+    lineage:
+    - datalake_gsheets_people_raw.mapping_wb_to_gh.ts_load

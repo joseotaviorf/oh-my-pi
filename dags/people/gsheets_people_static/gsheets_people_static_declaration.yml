@@ -23,6 +23,9 @@ workflow:
     layoffs:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    mapping_wb_to_gh:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     legacy_performance_review:
       vacuum_retention_hours: 168
       vacuum_lite: true
