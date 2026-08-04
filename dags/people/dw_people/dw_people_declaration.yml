@@ -36,3 +36,8 @@ workflow:
       vacuum_lite: true
       table_properties:
         "delta.enableDeletionVectors": "false"
+    dim_product_tech_team:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      table_properties:
+        "delta.enableDeletionVectors": "false"

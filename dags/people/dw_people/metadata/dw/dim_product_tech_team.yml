@@ -1,0 +1,90 @@
+---
+database_name: dw_people
+table_name: dim_product_tech_team
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Product & Tech team-formation attributes for employees listed in the P&T roster sheet, in wide form
+  (one row per active employee), mirroring the workbook columns line, chapter, team_1 … team_10, and leaders.
+  Current state only. Product & Technology sheet only — other employees simply have no row.
+  Join on sk_employee or person_number. Prefer team_1 for primary squad; additional squads use team_2 … team_10.
+columns:
+  sk_employee:
+    description: Key of the employee in the People public model (e.g. '300000123456789'). References dw_people.dim_employee; join for name and work email.
+    lineage:
+      - datalake_people.identifier_mapping.id_person
+  person_number:
+    description: Main business identifier of the employee in PIN, stable across assignments (e.g. '123456'). Links this dimension to other People tables on person_number.
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  assignment_number:
+    description: Assignment number from the team-formation sheet matched to PIN (e.g. 'E123456'). Use to reconcile the roster row with the source workbook.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.assignment_number
+      - datalake_people.identifier_mapping.assignment_number
+  line:
+    description: Product line for the employee in the Product & Tech org structure (e.g. 'Tech Platform'). NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.line
+  chapter:
+    description: Engineering chapter for the employee within the product line (e.g. 'Engineering'). NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.chapter
+  line_leader:
+    description: Line-leader label from the team-formation sheet for this employee (e.g. a line name). NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.line_leader
+  team_leader:
+    description: Team-leader label from the team-formation sheet for this employee (e.g. a squad name). NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_leader
+  team_1:
+    description: Primary Product & Tech squad or team label for the employee (e.g. 'Systems Efficiency'). NULL when blank in the sheet.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_1
+  team_2:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 2). NULL when the employee has fewer than two squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_2
+  team_3:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 3). NULL when the employee has fewer than three squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_3
+  team_4:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 4). NULL when the employee has fewer than four squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_4
+  team_5:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 5). NULL when the employee has fewer than five squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_5
+  team_6:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 6). NULL when the employee has fewer than six squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_6
+  team_7:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 7). NULL when the employee has fewer than seven squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_7
+  team_8:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 8). NULL when the employee has fewer than eight squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_8
+  team_9:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 9). NULL when the employee has fewer than nine squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_9
+  team_10:
+    description: Additional Product & Tech squad membership for the employee (sheet slot 10). NULL when the employee has fewer than ten squads.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.team_10
+  is_line_leader:
+    description: True when the sheet marks the employee as a line leader.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.is_line_leader
+  is_team_leader:
+    description: True when the sheet marks the employee as a team leader.
+    lineage:
+      - datalake_gsheets_people_clean.team_formation_product_tech.is_team_leader
+  ts_load:
+    description: Timestamp when this dimension row was loaded into the warehouse (e.g. 2026-08-03 12:00:00).
