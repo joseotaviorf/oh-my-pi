@@ -55,7 +55,9 @@ columns:
       - datalake_hub_services_transactional.business_unit_region_aud.revtype
     description: Resolved event name for the changed field.
     categories:
-      ev_business_context: Change in business_context (SALE or RENT), including association creation and deletion.
+      ev_business_context: Change in business_context (SALE or RENT), including the initial value on
+        association creation. Deletion emits no event for this field, since a delete row carries a null
+        business_context and is dropped by the value filter.
       ev_ts_created: Initial value of created_at (association creation timestamp). Immutable per junction record.
       ev_is_deleted: Whether the junction is deleted at source. 'true' is emitted from a delete row
         (CDC op_cdc='d' or an injected audit delete revision); 'false' on creation and on any later

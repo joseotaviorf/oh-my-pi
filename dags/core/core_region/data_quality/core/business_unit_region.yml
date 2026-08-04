@@ -9,10 +9,14 @@
 # id_business_unit_region. Validating against clean would raise non-actionable warnings until
 # clean ingestion is aligned.
 #
-# Aud liveness filtering (e.g. restricting current state to junction ids present in
-# business_unit_region_aud) is also intentionally not applied in load_core_business_unit.
-# Tombstone awareness belongs in a follow-up once history backfill and junction-grain
-# CS are stable in prod.
+# Deletion awareness is applied. CDC deletes on this junction arrive with null FKs and are dropped
+# by the junction-key filter, so delete revisions (revtype=2) from business_unit_region_aud are
+# injected into the CDC stream as tombstones in load_core_region_history and surface as
+# ev_is_deleted events in the history table. The current-state merge deletes a pair whose winning
+# junction is deleted at source and blocks it from being re-inserted, so this table holds only pairs
+# live at source; a junction with no ev_is_deleted event is treated as live. No rule below asserts
+# that liveness directly: it is enforced by the merge and verified against business_unit_region_aud
+# outside data quality.
 table_name: core_region.business_unit_region
 alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
 

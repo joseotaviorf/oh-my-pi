@@ -14,9 +14,11 @@ description: >
   source is removed from this table by the merge, and blocked from being re-inserted. A junction with
   no ev_is_deleted event at all is treated as live. Drops the source version and the (0,0) sentinel
   rows. Delta merge keys are id_region and id_business_unit. Clean parity is not enforced in data
-  quality for now, though deletion awareness is what makes the row count align with
-  datalake_hub_services_clean.business_unit_region. Used to resolve hub coverage by region and to join
-  hubs to regions in the region domain.
+  quality: deletion awareness brings this table close to
+  datalake_hub_services_clean.business_unit_region, but clean still publishes a small number of pairs
+  whose junction is deleted at source, so a residual row-count gap is expected and this table is the
+  more current of the two. Used to resolve hub coverage by region and to join hubs to regions in the
+  region domain.
 columns:
   sk_core_business_unit_region:
     lineage:

@@ -39,8 +39,8 @@ business_unit_region_when_matched_update_condition: >-
   OR source.id_business_unit_region > target.id_business_unit_region
 # Deletes stale pairs whose winning junction was removed at source, and blocks re-inserting them on
 # the next run (the flagged source row stays present and would otherwise be picked up as unmatched).
-# Both conditions treat NULL as live: a junction whose history predates ev_is_deleted has no such
-# event, so NULL is a real state during the transition window.
+# Both conditions treat NULL as live, defensively: every junction in history carries an ev_is_deleted
+# event, so NULL is not expected, and a missing event must never be read as a delete.
 business_unit_region_when_matched_delete_condition: "source.is_deleted = true"
 business_unit_region_when_not_matched_insert_condition: >-
   source.is_deleted IS NULL OR source.is_deleted = false
