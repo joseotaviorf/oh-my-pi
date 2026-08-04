@@ -37,7 +37,8 @@ same payment rails.
 
 ## MBR
 
-**Name** Fintech MBR
+**Name** Post Contract
+**Category** Payments
 
 ## Glossary and Synonyms
 
