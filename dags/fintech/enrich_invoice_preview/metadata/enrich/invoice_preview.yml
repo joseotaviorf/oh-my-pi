@@ -5,11 +5,11 @@ owner: sonia.gondo@quintoandar.com.br
 domain: Fintech
 description: |
   Stakeholder-ready SeuBarriga invoice preview snapshot for Brazil. Fully refreshed on
-  each run with the latest load batch only: most recent load partition day and highest
-  ts_load within that day (09:00 vs 15:00), excluding stale rows from reprocessed older
-  partitions. Applies sign convention for validation, blocked rename, payment_installment
-  parsing, and exposes invoice_filename for export traceability. For historical loads use
-  datalake_invoice_preview_clean.invoice_preview.
+  each run with the morning export only: most recent load partition day and highest
+  ts_load among export_slot=morning rows (afternoon append loads in clean are excluded),
+  excluding stale rows from reprocessed older partitions. Applies sign convention for
+  validation, blocked rename, payment_installment parsing, and exposes invoice_filename
+  for export traceability. For historical loads use datalake_invoice_preview_clean.invoice_preview.
 columns:
   id_contract:
     description: EBDB contract identifier for the rental contract associated with the preview billing line.
@@ -89,7 +89,7 @@ columns:
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.dt_landlord_invoice_created_at
   ts_load:
-    description: Timestamp of the selected clean snapshot batch (latest ts_load on the most recent load partition day).
+    description: Timestamp of the selected morning clean snapshot batch (latest ts_load among export_slot=morning rows on the most recent load partition day).
     lineage:
       - datalake_invoice_preview_clean.invoice_preview.ts_load
   invoice_filename:

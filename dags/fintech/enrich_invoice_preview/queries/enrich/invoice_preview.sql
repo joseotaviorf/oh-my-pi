@@ -6,7 +6,7 @@ WITH latest_partition AS (
     WHERE
         country = 'BR'
 ),
-latest_load AS (
+latest_morning_load AS (
     SELECT
         MAX(c.ts_load) AS ts_load
     FROM
@@ -15,6 +15,7 @@ latest_load AS (
         ON MAKE_DATE(c.year, c.month, c.day) = lp.load_date
     WHERE
         c.country = 'BR'
+        AND COALESCE(c.export_slot, 'morning') = 'morning'
 ),
 source AS (
     SELECT
@@ -48,10 +49,11 @@ source AS (
         datalake_invoice_preview_clean.invoice_preview AS c
     INNER JOIN latest_partition AS lp
         ON MAKE_DATE(c.year, c.month, c.day) = lp.load_date
-    INNER JOIN latest_load AS l
+    INNER JOIN latest_morning_load AS l
         ON c.ts_load = l.ts_load
     WHERE
         c.country = 'BR'
+        AND COALESCE(c.export_slot, 'morning') = 'morning'
 )
 SELECT
     s.id_contract,
