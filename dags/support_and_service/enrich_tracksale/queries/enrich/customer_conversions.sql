@@ -32,22 +32,26 @@ dispatch_customers_user_id AS (
     du.id as id_user
     FROM clean_unnested_dispatches AS cud
     LEFT JOIN datalake_ebdb_user.user AS du
-      ON LOWER(du.email) = LOWER(cud.customer_email)
-      AND SUBSTRING(du.main_phone, 4) = COALESCE(REGEXP_REPLACE(COALESCE(cud.customer_phone),'\\D+',''),'')
+      ON NULLIF(cud.customer_email, '') IS NOT NULL
+      AND NULLIF(cud.customer_phone, '') IS NOT NULL
+      AND LENGTH(cud.customer_phone) >= 10
+      AND NULLIF(cud.customer_name, '') IS NOT NULL
+      AND LOWER(du.email) = LOWER(cud.customer_email)
+      AND REGEXP_REPLACE(REGEXP_REPLACE(COALESCE(du.main_phone, ''), '\\D+', ''), '^55', '') = cud.customer_phone
       AND LOWER(du.name) = LOWER(cud.customer_name)
-), 
+),
 answer_keys AS (
   SELECT
     id_answer,
-    MAX(CASE 
+    MAX(CASE
           WHEN tag_name = 'User Id' THEN CAST(tag_value AS BIGINT)
         END
     ) AS id_user,
-    MAX(CASE 
+    MAX(CASE
           WHEN tag_name = 'CPF' THEN tag_value
         END
     ) AS cpf
-  FROM 
+  FROM
     datalake_tracksale.answer_tags
   WHERE
     tag_name IN ('User Id','CPF')
@@ -58,9 +62,9 @@ ebdb_user AS (
     ak.id_answer,
     ak.id_user,
     u.uuid_person
-  FROM 
+  FROM
     answer_keys AS ak
-  INNER JOIN 
+  INNER JOIN
     datalake_ebdb_clean.user u
       ON ak.id_user = u.id
 ),
@@ -86,7 +90,12 @@ answers AS (
 customer_keys AS (
   SELECT
     cc.id_customer,
-    MAX(COALESCE(cc.id_user, eu.id_user, cci_e.id_user, cci_p.id_user)) AS id_user
+    COALESCE(
+      MAX(eu.id_user),
+      MAX(cc.id_user),
+      MAX(cci_e.id_user),
+      MAX(cci_p.id_user)
+    ) AS id_user
   FROM
     dispatch_customers_user_id AS cc
   LEFT JOIN answers AS a
@@ -95,17 +104,21 @@ customer_keys AS (
     ON eu.id_answer = a.id_answer
   LEFT JOIN
     datalake_ebdb_customer_contact_identification.customer_contact_identification cci_p
-   ON REGEXP_REPLACE(REGEXP_REPLACE(cci_p.customer_contact,'\\D+',''),'^55','') = COALESCE(REGEXP_REPLACE(COALESCE(cc.customer_phone),'\\D+',''),'')
-    AND cci_p.channel = 'phone'
-  LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
-    ON lower(cci_e.customer_contact) = LOWER(cc.customer_email)
-   AND cci_e.channel = 'email'
+      ON cci_p.channel = 'phone'
+      AND NULLIF(cc.customer_phone, '') IS NOT NULL
+      AND LENGTH(cc.customer_phone) >= 10
+      AND REGEXP_REPLACE(REGEXP_REPLACE(cci_p.customer_contact, '\\D+', ''), '^55', '') = cc.customer_phone
+  LEFT JOIN
+    datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
+      ON cci_e.channel = 'email'
+      AND NULLIF(cc.customer_email, '') IS NOT NULL
+      AND LOWER(cci_e.customer_contact) = LOWER(cc.customer_email)
   WHERE
     cc.id_customer IS NOT NULL
   GROUP BY
     1),
 dispatch_customers AS (
-    SELECT 
+    SELECT
     f.id_dispatch,
     ck.id_user,
     f.customer_email,
@@ -113,7 +126,7 @@ dispatch_customers AS (
     f.customer_phone,
     ck.id_customer,
     u.uuid_person
-  FROM 
+  FROM
     dispatch_customers_user_id AS f
   LEFT JOIN customer_keys AS ck
     ON ck.id_customer = f.id_customer
@@ -142,7 +155,7 @@ answer_customers AS (
 all_answers AS (
 	SELECT * FROM answer_customers
     	UNION ALL
-    	SELECT 
+    	SELECT
               id_answer,
               id_dispatch,
               id_customer
@@ -168,13 +181,13 @@ all_answers AS (
     COALESCE(dc.id_customer != '',false) AS is_customer_identified,
     c.customer_type,
     CASE
-      WHEN da.ts_created IS NOT NULL 
+      WHEN da.ts_created IS NOT NULL
       THEN 'Finalizado'
       ELSE da.status
     END AS status,
     a.id_campaign,
     a.ts_dispatch AS ts_dispatch_created
-  FROM 
+  FROM
     all_answers AS ac
 FULL JOIN dispatch_customers dc
 	ON dc.id_dispatch = ac.id_dispatch
