@@ -157,6 +157,11 @@ workflow:
       extra_spark_job_arguments:
         - "1RR72o-4OZt0KgFomVu8ZHrY4KR2S8oKI3eISbhFeJAU"
         - "base_aplicações"
+    # Former notebook: declinios (Daily Pipeline).
+    offer_outcomes:
+      extra_spark_job_arguments:
+        - "1o1vg_ekZFODKCDLjCcww9lxmGZutxDn2f90Z1DboD0o"
+        - "base_nova_com_gh"
 
     # --- people_reports notebook migration (Tier-1 validated) ---
     # Former notebook view: base_wfa

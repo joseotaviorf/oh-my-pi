@@ -1155,6 +1155,8 @@ bietlejuice.reverse_robbyson_access:
 bietlejuice.reverse_reports:
   add:
     - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
+  remove:
+    - bietlejuice.gsheets_people_static:load-clean-mapping-wb-to-gh:first-run-of-day
 bietlejuice.reverse_anonymization:
   remove:
     - bietlejuice.astro:load-clean-dag:first-run-of-day
