@@ -4774,13 +4774,20 @@ bietlejuice.reverse_reports:
   - bietlejuice.enrich_learning:load-enrich-sections:first-run-of-day
   - bietlejuice.enrich_learning:load-enrich-user-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-codex-pin-sync-drift:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-application-stages:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-applications:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-candidates:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-close-reasons:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-demographic-answer-options:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-demographic-answers:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-demographic-questions:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-departments:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-job-interview-stages:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-jobs:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-offers:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-offices:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-rejection-details:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-rejection-reasons:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
   - bietlejuice.metric_people:load-metric-employee-snapshots:first-run-of-day
 bietlejuice.reverse_robbyson_access:

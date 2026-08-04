@@ -151,6 +151,12 @@ workflow:
       extra_spark_job_arguments:
         - "1cC-q_8VHBEfkLnB4tSq5plLQudCLfNiFmGxRCy-9kDM"
         - "base_ta"
+    # Former notebook: TA_Quintocred (Daily Pipeline) — DBP-1831.
+    # Governance: docs/quintocred_ta.md
+    quintocred_ta:
+      extra_spark_job_arguments:
+        - "1RR72o-4OZt0KgFomVu8ZHrY4KR2S8oKI3eISbhFeJAU"
+        - "base_aplicações"
 
     # --- people_reports notebook migration (Tier-1 validated) ---
     # Former notebook view: base_wfa
