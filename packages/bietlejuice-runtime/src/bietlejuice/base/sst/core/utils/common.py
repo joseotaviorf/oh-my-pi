@@ -557,21 +557,27 @@ def validate_and_upsert(
     match_fields: List[str],
     update_fields: Optional[List[str]] = None,
     insert_fields: Optional[List[str]] = None,
+    skip_matched: bool = False,
 ) -> None:
     """
     Generic Delta Lake upsert.
 
     Args:
         spark: SparkSession.
-        target_tables: Target table name or list of target tables.
+        target_table: Target table name.
         source_df: Source DataFrame containing updates/inserts.
         match_fields: Columns used to match source and target records.
         update_fields: Columns to update when matched. If None, update all.
+            Ignored when skip_matched is True.
         insert_fields: Columns to insert when not matched. If None, insert all.
+        skip_matched: If True, leave matched rows unchanged (insert-only merge).
     """
 
     assert match_fields and isinstance(match_fields, list), ValueError(
         f"Match Fields should be a List[str] type -> {match_fields=}"
+    )
+    assert not (skip_matched and update_fields is not None), ValueError(
+        "skip_matched=True is incompatible with update_fields; omit update_fields"
     )
     # Make sure the table exists and is delta
     # We could use _table_exists here, but it doesn't check for delta (in case of future migration)
@@ -592,7 +598,11 @@ def validate_and_upsert(
     merge_builder = delta_table.alias("target").merge(
         source_df.alias("source"), match_condition
     )
-    if update_fields is None:
+    if skip_matched:
+        logger.info(
+            "m=validate_and_upsert, msg=When Matched skipping update (insert-only)"
+        )
+    elif update_fields is None:
         merge_builder = merge_builder.whenMatchedUpdateAll()
         logger.info("m=validate_and_upsert, msg=When Matched updating all columns")
     else:

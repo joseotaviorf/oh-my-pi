@@ -218,4 +218,5 @@ def events_case_recovery(
         target_table=full_target_table,
         source_df=remapped_df,
         match_fields=unique_grain,
+        skip_matched=True,
     )
