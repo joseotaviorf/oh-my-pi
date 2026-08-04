@@ -21,6 +21,15 @@ lease lifecycle stage.
 - **Offboarding**: the inspection must be executed up to 3 business days after the
   tenant's departure date (`ww_dt_end_3`).
 
+> ⚠️ **Official metric excludes Eviction ("Despejo")**: The metric as reported in the
+> EMB-R (see [MBR](#mbr) and [Targets and OKRs](#targets-and-okrs) below) is **SLA VT
+> Onb + Off s/ Despejo** — i.e. it is always calculated **without** eviction cases.
+> Whenever the *official* Inspection SLA is being calculated (not an ad-hoc breakdown
+> requested by the user), eviction cases must be removed by filtering
+> `category <> 'EVICTION'` (or the NULL-safe equivalent) out of both the numerator and
+> the denominator. Only keep eviction cases in when the user explicitly asks to analyze
+> or compare Despejo separately.
+
 ## Related Business Entities
 
 - Inspection
@@ -48,14 +57,19 @@ lease lifecycle stage.
 - Inspections categorized as `onboarding` or `offboarding` (`di_inspection_type`).
 - Only valid, non-duplicated records (`removing_duplicate = 1` and `RANK_SLA = 1`).
 - Active or non-canceled contracts (where `status_contract` is not `'CANCELED'` or is NULL).
-- Eviction cases ("Despejo") are included in the base but can be filtered out or
-  analyzed separately using the `category` field.
+- Eviction cases ("Despejo") exist in the base table and remain available for ad-hoc
+  slicing/comparison via the `category` field, but see **Excluded** below — for the
+  **official** metric they must be removed.
 
 **Excluded**:
 - Canceled inspections or verification inspections (`verification`).
 - Unfinished/unexecuted inspections (`fi_dt_inspected IS NULL`).
 - Canceled contracts (`status_contract = 'CANCELED'`).
 - Duplicated inspection bookings.
+- **Eviction ("Despejo") cases (`category = 'EVICTION'`) — excluded by default from the
+  official Inspection SLA**, since that's how it's tracked in the EMB-R
+  (`SLA VT Onb + Off s/ Despejo`). Only include them when the user explicitly asks to
+  look at Despejo specifically.
 
 ## Calculation
 
@@ -78,6 +92,10 @@ where:
 - **SLA - Denominador**:
   - `fi_dt_inspected IS NOT NULL` AND `RANK_SLA = 1` AND
     `(status_contract NOT IN ('CANCELED') OR status_contract IS NULL)`
+
+> **For the official metric**, add `category <> 'EVICTION'` to both the SLA - Numerador
+> and SLA - Denominador conditions above, since the EMB-R view of this metric never
+> includes Despejo.
 
 ### Canonical Filter
 
@@ -115,8 +133,14 @@ AND (
   summing the Numerator and Denominator.
 - Use the `category` column to slice standard offboarding vs. eviction (Despejo) cases
   when requested.
+- **Always exclude eviction cases (`category = 'EVICTION'`) when calculating the
+  official Inspection SLA** — this matches how the metric is reported in the EMB-R
+  (`SLA VT Onb + Off s/ Despejo`). Only keep Despejo in the base when the user
+  explicitly asks to see it included or broken out.
 
 **Don't:**
+- Don't report a "SLA - VT" / "Inspection SLA" number as the official metric without
+  filtering out eviction (Despejo) cases first, unless explicitly asked to include them.
 - Don't try to calculate business days manually in the query; always rely on the
   `ww_dt_end_3` column.
 - Don't include `verification` or other `di_inspection_type` values in the general SLA
@@ -139,9 +163,18 @@ targets table alongside other service metrics.
 
 ## Golden Queries
 
-Calculates the monthly Inspection SLA for Onboarding and Offboarding. The results are
-grouped by `di_inspection_type` and `category` to allow analyzing standard journeys
-versus Evictions (Despejos).
+Calculates the monthly **official** Inspection SLA for Onboarding and Offboarding,
+matching the EMB-R (`SLA VT Onb + Off s/ Despejo`). Eviction ("Despejo") cases are
+removed via `(category IS NULL OR category <> 'EVICTION')` in the `base_inspections`
+WHERE clause — the `IS NULL` branch is required because `category` is only populated
+for offboarding rows with a matching termination record (onboarding rows have
+`category IS NULL` and must **not** be dropped by the filter). The results are still
+grouped by `di_inspection_type` and `category` so remaining (non-eviction) categories
+can be inspected individually.
+
+> If the user explicitly asks to analyze or include eviction/Despejo cases, remove the
+> `(category IS NULL OR category <> 'EVICTION')` filter from the `WHERE` clause below
+> instead of adjusting the aggregation.
 
 ```sql
 WITH base_inspections AS (
@@ -161,6 +194,7 @@ WITH base_inspections AS (
     FROM sandbox.booking_resolution
     WHERE di_inspection_type IN ('onboarding', 'offboarding')
       AND removing_duplicate = 1
+      AND (category IS NULL OR category <> 'EVICTION') -- official metric: exclude Despejo (see Overview/Scope)
       AND (
           fi_ts_synced >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '13' MONTH
           OR fi_ts_booking_inspected_local >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '13' MONTH
