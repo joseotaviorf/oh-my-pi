@@ -55,7 +55,14 @@ columns:
     type: int
     required: true
 
+  # Merge-control column, declared here because this file validates the DataFrame handed to
+  # run_pipeline, not the published table. It drives the merge delete/insert conditions and is
+  # withheld from both merge column maps, so the published table keeps the 11 columns above.
+  is_deleted:
+    type: boolean
+    required: true
+
 # Schema constraints
-min_columns: 11
-max_columns: 11
+min_columns: 12
+max_columns: 12
 strict: true

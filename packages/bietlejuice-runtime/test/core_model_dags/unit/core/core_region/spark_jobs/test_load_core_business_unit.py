@@ -63,7 +63,12 @@ EXPECTED_BUR_COLUMNS = {
     "year",
     "month",
     "day",
+    # Merge-control column: present on the source frame, withheld from the merge maps.
+    "is_deleted",
 }
+
+# The 11 columns that must reach the published table.
+PUBLISHED_BUR_COLUMNS = EXPECTED_BUR_COLUMNS - {"is_deleted"}
 
 BU_EVENT_CONFIGS = [
     {"target_col": "hub_name", "target_type": "string"},
@@ -86,16 +91,23 @@ BUR_EVENT_CONFIGS = [
         "target_type": "timestamp",
         "event_name": "ev_ts_created",
     },
+    {"target_col": "is_deleted", "target_type": "boolean"},
 ]
 
 CONFIG_MAP_BU = {
     "BUSINESS_UNIT_HISTORY_TABLE": "test.business_unit_history",
     "business_unit_event_configs": BU_EVENT_CONFIGS,
+    "business_unit_merge_on": ["id_business_unit"],
 }
 
 CONFIG_MAP_BUR = {
     "BUSINESS_UNIT_REGION_HISTORY_TABLE": "test.business_unit_region_history",
     "business_unit_region_event_configs": BUR_EVENT_CONFIGS,
+    "business_unit_region_merge_on": ["id_region", "id_business_unit"],
+    "business_unit_region_when_matched_delete_condition": "source.is_deleted = true",
+    "business_unit_region_when_not_matched_insert_condition": (
+        "source.is_deleted IS NULL OR source.is_deleted = false"
+    ),
 }
 
 
@@ -342,6 +354,155 @@ def bur_history_stale_sibling_df(spark_session):
     return spark_session.createDataFrame(data, schema)
 
 
+@pytest.fixture
+def bur_history_deleted_sibling_df(spark_session):
+    """A pair holding a live junction and a deleted one with a *higher* junction id.
+
+    The pair is still live, so the live junction must win even though it loses on id —
+    without live preference the deleted junction would win and the pair be dropped.
+    """
+    schema = StructType(
+        [
+            StructField("id_business_unit_region", StringType(), True),
+            StructField("id_region", StringType(), True),
+            StructField("id_business_unit", StringType(), True),
+            StructField("event_name", StringType(), True),
+            StructField("value", StringType(), True),
+            StructField("ts_transaction", TimestampType(), True),
+        ]
+    )
+    data = [
+        (
+            "200",
+            "5",
+            "50",
+            "ev_business_context",
+            "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        (
+            "200",
+            "5",
+            "50",
+            "ev_ts_created",
+            "2024-03-01 08:00:00.000",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        ("200", "5", "50", "ev_is_deleted", "false", datetime(2024, 3, 1, 8, 0, 0)),
+        (
+            "300",
+            "5",
+            "50",
+            "ev_business_context",
+            "RENT",
+            datetime(2024, 4, 1, 8, 0, 0),
+        ),
+        (
+            "300",
+            "5",
+            "50",
+            "ev_ts_created",
+            "2024-04-01 08:00:00.000",
+            datetime(2024, 4, 1, 8, 0, 0),
+        ),
+        ("300", "5", "50", "ev_is_deleted", "false", datetime(2024, 4, 1, 8, 0, 0)),
+        ("300", "5", "50", "ev_is_deleted", "true", datetime(2024, 5, 1, 8, 0, 0)),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def bur_history_unobserved_sibling_df(spark_session):
+    """A pair holding a junction with no ev_is_deleted event and a live one above it.
+
+    Both junctions are live, so the highest id must win. The unobserved junction is what
+    every junction looks like until the ev_is_deleted backfill reaches it, and it must not
+    outrank an observed live sibling just because its state is null.
+    """
+    schema = StructType(
+        [
+            StructField("id_business_unit_region", StringType(), True),
+            StructField("id_region", StringType(), True),
+            StructField("id_business_unit", StringType(), True),
+            StructField("event_name", StringType(), True),
+            StructField("value", StringType(), True),
+            StructField("ts_transaction", TimestampType(), True),
+        ]
+    )
+    data = [
+        (
+            "500",
+            "7",
+            "70",
+            "ev_business_context",
+            "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        (
+            "500",
+            "7",
+            "70",
+            "ev_ts_created",
+            "2024-03-01 08:00:00.000",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        (
+            "600",
+            "7",
+            "70",
+            "ev_business_context",
+            "RENT",
+            datetime(2024, 4, 1, 8, 0, 0),
+        ),
+        (
+            "600",
+            "7",
+            "70",
+            "ev_ts_created",
+            "2024-04-01 08:00:00.000",
+            datetime(2024, 4, 1, 8, 0, 0),
+        ),
+        ("600", "7", "70", "ev_is_deleted", "false", datetime(2024, 4, 1, 8, 0, 0)),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def bur_history_deleted_pair_df(spark_session):
+    """A pair whose only junction was deleted — the merge must remove it."""
+    schema = StructType(
+        [
+            StructField("id_business_unit_region", StringType(), True),
+            StructField("id_region", StringType(), True),
+            StructField("id_business_unit", StringType(), True),
+            StructField("event_name", StringType(), True),
+            StructField("value", StringType(), True),
+            StructField("ts_transaction", TimestampType(), True),
+        ]
+    )
+    data = [
+        (
+            "400",
+            "6",
+            "60",
+            "ev_business_context",
+            "SALE",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        (
+            "400",
+            "6",
+            "60",
+            "ev_ts_created",
+            "2024-03-01 08:00:00.000",
+            datetime(2024, 3, 1, 8, 0, 0),
+        ),
+        ("400", "6", "60", "ev_is_deleted", "false", datetime(2024, 3, 1, 8, 0, 0)),
+        ("400", "6", "60", "ev_is_deleted", "true", datetime(2024, 6, 1, 8, 0, 0)),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
 # ---------------------------------------------------------------------------
 # business_unit
 # ---------------------------------------------------------------------------
@@ -416,7 +577,14 @@ class TestBusinessUnitRegion:
     def test_column_names_match_schema(self, spark_session, bur_history_df):
         result = self._run(spark_session, bur_history_df)
         assert set(result.columns) == EXPECTED_BUR_COLUMNS
-        assert len(result.columns) == 11
+        assert len(result.columns) == 12
+
+    def test_missing_ev_is_deleted_yields_null_not_deleted(
+        self, spark_session, bur_history_df
+    ):
+        """History predating ev_is_deleted leaves NULL, which both merge conditions read as live."""
+        result = self._run(spark_session, bur_history_df)
+        assert {r["is_deleted"] for r in result.collect()} == {None}
 
     def test_zero_key_sentinel_is_filtered(self, spark_session, bur_history_df):
         result = self._run(spark_session, bur_history_df)
@@ -471,6 +639,145 @@ class TestBusinessUnitRegion:
         assert row["sk_core_business_unit_region"] == _sha256_sk(
             "BUSINESS_UNIT_REGION", "7214"
         )
+
+    def test_pair_dedup_prefers_live_junction_over_higher_deleted_id(
+        self, spark_session, bur_history_deleted_sibling_df
+    ):
+        result = self._run(spark_session, bur_history_deleted_sibling_df)
+        rows = result.collect()
+        assert len(rows) == 1
+        row = rows[0]
+        assert row["id_business_unit_region"] == 200, (
+            "The live junction must win the pair even with a lower junction id"
+        )
+        assert row["is_deleted"] is False
+        assert row["business_context"] == "SALE"
+
+    def test_pair_dedup_ties_unobserved_junction_with_live_sibling(
+        self, spark_session, bur_history_unobserved_sibling_df
+    ):
+        """A null is_deleted is live, so it must not outrank a live sibling with a higher id."""
+        result = self._run(spark_session, bur_history_unobserved_sibling_df)
+        rows = result.collect()
+        assert len(rows) == 1
+        row = rows[0]
+        assert row["id_business_unit_region"] == 600, (
+            "The highest live junction id must win when neither junction is deleted"
+        )
+        assert row["business_context"] == "RENT"
+        assert row["sk_core_business_unit_region"] == _sha256_sk(
+            "BUSINESS_UNIT_REGION", "600"
+        )
+
+    def test_fully_deleted_pair_is_flagged_for_deletion(
+        self, spark_session, bur_history_deleted_pair_df
+    ):
+        """The row stays on the source carrying the flag; the merge does the deleting."""
+        result = self._run(spark_session, bur_history_deleted_pair_df)
+        rows = result.collect()
+        assert len(rows) == 1
+        assert rows[0]["id_business_unit_region"] == 400
+        assert rows[0]["is_deleted"] is True
+
+
+# ---------------------------------------------------------------------------
+# run_pipeline — merge wiring
+# ---------------------------------------------------------------------------
+
+
+class TestRunPipelineMergeWiring:
+    def _make_pipeline_args(self, table_name):
+        return SimpleNamespace(
+            table_name=table_name,
+            load_start_date=None,
+            load_end_date=None,
+            partitions="['year', 'month', 'day']",
+            schema="core_region",
+            bucket="test-bucket",
+            target_database_name=None,
+            target_table_name=None,
+        )
+
+    def _run(self, spark_session, dataframe, table_name, config_map):
+        job = CoreBusinessUnitSparkJob()
+        args = self._make_pipeline_args(table_name)
+        with (
+            patch.object(
+                CoreBusinessUnitSparkJob,
+                "get_config",
+                side_effect=_config_side_effect(config_map),
+            ),
+            patch.object(spark_session, "table", return_value=dataframe),
+            patch(f"{_MODULE}.TablePrivileges"),
+            patch(f"{_MODULE}.DataFrameDeltaTableLoaderPipeline") as mock_pipeline_cls,
+        ):
+            job.run_pipeline(dataframe, args, spark_session)
+        return mock_pipeline_cls.call_args[1]
+
+    def _bur_source(self, spark_session, bur_history_deleted_pair_df):
+        job = CoreBusinessUnitSparkJob()
+        args = _make_args("business_unit_region")
+        with (
+            patch.object(
+                CoreBusinessUnitSparkJob,
+                "get_config",
+                side_effect=_config_side_effect(CONFIG_MAP_BUR),
+            ),
+            patch.object(
+                spark_session, "table", return_value=bur_history_deleted_pair_df
+            ),
+        ):
+            return job.create_core_model(spark_session, args)
+
+    def test_control_column_excluded_from_both_merge_maps(
+        self, spark_session, bur_history_deleted_pair_df
+    ):
+        """is_deleted must reach neither map, or schema auto-merge evolves it into the target."""
+        source = self._bur_source(spark_session, bur_history_deleted_pair_df)
+        kwargs = self._run(
+            spark_session, source, "business_unit_region", CONFIG_MAP_BUR
+        )
+
+        assert "is_deleted" not in kwargs["when_matched_operation"]
+        assert "is_deleted" not in kwargs["when_not_matched_operation"]
+        assert set(kwargs["when_matched_operation"]) == PUBLISHED_BUR_COLUMNS
+        assert set(kwargs["when_not_matched_operation"]) == PUBLISHED_BUR_COLUMNS
+
+    def test_delete_and_insert_conditions_are_passed_through(
+        self, spark_session, bur_history_deleted_pair_df
+    ):
+        source = self._bur_source(spark_session, bur_history_deleted_pair_df)
+        kwargs = self._run(
+            spark_session, source, "business_unit_region", CONFIG_MAP_BUR
+        )
+
+        assert kwargs["when_matched_delete_condition"] == "source.is_deleted = true"
+        assert kwargs["when_not_matched_insert_condition"] == (
+            "source.is_deleted IS NULL OR source.is_deleted = false"
+        )
+
+    def test_business_unit_keeps_insert_all_and_no_delete_clause(
+        self, spark_session, bu_history_df
+    ):
+        """business_unit has no control column, so its merge behaviour is unchanged."""
+        job = CoreBusinessUnitSparkJob()
+        args = _make_args("business_unit")
+        with (
+            patch.object(
+                CoreBusinessUnitSparkJob,
+                "get_config",
+                side_effect=_config_side_effect(CONFIG_MAP_BU),
+            ),
+            patch.object(spark_session, "table", return_value=bu_history_df),
+        ):
+            source = job.create_core_model(spark_session, args)
+
+        kwargs = self._run(spark_session, source, "business_unit", CONFIG_MAP_BU)
+
+        assert kwargs["when_not_matched_operation"] is None
+        assert kwargs["when_matched_delete_condition"] is None
+        assert kwargs["when_not_matched_insert_condition"] is None
+        assert set(kwargs["when_matched_operation"]) == EXPECTED_BU_COLUMNS
 
 
 # ---------------------------------------------------------------------------

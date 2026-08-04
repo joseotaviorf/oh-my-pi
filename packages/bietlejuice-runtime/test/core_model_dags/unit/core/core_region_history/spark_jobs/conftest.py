@@ -8,6 +8,7 @@ from unittest.mock import patch
 import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import (
+    IntegerType,
     StringType,
     StructField,
     StructType,
@@ -25,6 +26,11 @@ BUR_EVENT_CONFIGS = [
         "target_col": "ts_created",
         "target_type": "timestamp",
         "value_precision": "millisecond",
+    },
+    {
+        "tracked_col": "is_deleted",
+        "target_col": "is_deleted",
+        "target_type": "string",
     },
 ]
 
@@ -58,6 +64,7 @@ BU_EVENT_CONFIGS = [
 CONFIG_MAP_BUR = {
     "ENTITY_TYPE": "HUB_REGION_HISTORY",
     "BUSINESS_UNIT_REGION_HISTORY_TRANSACTIONAL_TABLE": "test.business_unit_region",
+    "BUSINESS_UNIT_REGION_AUD_TRANSACTIONAL_TABLE": "test.business_unit_region_aud",
     "merge_on_historical": ["id_event"],
     "business_unit_region_history_event_configs": BUR_EVENT_CONFIGS,
 }
@@ -309,6 +316,143 @@ def transactional_bur_snapshot_duplicate_fk_df(spark_session):
             "r",
             snapshot_ts,
             datetime(2024, 3, 1, 8, 0, 2),
+        ),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+# --- business_unit_region audit (tombstone injection) ---------------------------------
+
+_BUR_AUD_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("rev", IntegerType(), True),
+        StructField("revtype", IntegerType(), True),
+        StructField("business_unit_id", StringType(), True),
+        StructField("region_id", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+    ]
+)
+
+
+@pytest.fixture
+def bur_aud_empty_df(spark_session):
+    """No audit revisions — the CDC stream passes through unchanged."""
+    return spark_session.createDataFrame([], _BUR_AUD_SCHEMA)
+
+
+@pytest.fixture
+def bur_aud_delete_df(spark_session):
+    """One delete revision (revtype=2) for junction 100, carrying both FKs.
+
+    Also holds an update revision (revtype=1) that must not become a tombstone.
+    """
+    data = [
+        ("100", 7, 2, "20", "10", datetime(2024, 4, 1, 10, 0, 0)),
+        ("100", 6, 1, "20", "10", datetime(2024, 3, 5, 10, 0, 0)),
+    ]
+    return spark_session.createDataFrame(data, _BUR_AUD_SCHEMA)
+
+
+@pytest.fixture
+def bur_aud_duplicate_revision_df(spark_session):
+    """The same delete revision re-observed by two bulk snapshot batches."""
+    data = [
+        ("100", 7, 2, "20", "10", datetime(2024, 4, 1, 10, 0, 0)),
+        ("100", 7, 2, "20", "10", datetime(2024, 4, 3, 22, 0, 0)),
+    ]
+    return spark_session.createDataFrame(data, _BUR_AUD_SCHEMA)
+
+
+@pytest.fixture
+def bur_aud_delete_at_snapshot_ts_df(spark_session):
+    """Delete revision landing on the same instant as a CDC snapshot row."""
+    data = [("100", 7, 2, "20", "10", datetime(2024, 4, 1, 12, 0, 0))]
+    return spark_session.createDataFrame(data, _BUR_AUD_SCHEMA)
+
+
+@pytest.fixture
+def transactional_bur_snapshot_at_delete_ts_df(spark_session):
+    """Insert, then a snapshot row at the instant the audit delete was recorded.
+
+    The snapshot row carries a non-null ``ts_cdc_transaction``; the injected tombstone
+    carries none, so without the tombstone priority column the snapshot row would win
+    canonicalization under DESC NULLS LAST.
+    """
+    schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("business_unit_id", StringType(), True),
+            StructField("region_id", StringType(), True),
+            StructField("business_context", StringType(), True),
+            StructField("created_at", TimestampType(), True),
+            StructField("op_cdc", StringType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
+            StructField("ts_cdc_transaction", TimestampType(), True),
+        ]
+    )
+    created_at = datetime(2024, 3, 1, 8, 0, 0)
+    data = [
+        (
+            "100",
+            "20",
+            "10",
+            "SALE",
+            created_at,
+            "c",
+            datetime(2024, 3, 1, 8, 0, 0),
+            datetime(2024, 3, 1, 8, 0, 1),
+        ),
+        (
+            "100",
+            "20",
+            "10",
+            "SALE",
+            created_at,
+            "r",
+            datetime(2024, 4, 1, 12, 0, 0),
+            datetime(2024, 4, 1, 12, 0, 5),
+        ),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def transactional_bur_recreated_df(spark_session):
+    """Insert, then an update *after* the audit delete instant — a resurrected junction."""
+    schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("business_unit_id", StringType(), True),
+            StructField("region_id", StringType(), True),
+            StructField("business_context", StringType(), True),
+            StructField("created_at", TimestampType(), True),
+            StructField("op_cdc", StringType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
+            StructField("ts_cdc_transaction", TimestampType(), True),
+        ]
+    )
+    created_at = datetime(2024, 3, 1, 8, 0, 0)
+    data = [
+        (
+            "100",
+            "20",
+            "10",
+            "SALE",
+            created_at,
+            "c",
+            datetime(2024, 3, 1, 8, 0, 0),
+            datetime(2024, 3, 1, 8, 0, 1),
+        ),
+        (
+            "100",
+            "20",
+            "10",
+            "RENT",
+            created_at,
+            "u",
+            datetime(2024, 5, 1, 9, 0, 0),
+            datetime(2024, 5, 1, 9, 0, 1),
         ),
     ]
     return spark_session.createDataFrame(data, schema)

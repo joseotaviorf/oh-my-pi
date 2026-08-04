@@ -37,9 +37,20 @@ business_unit_region_merge_on: ["id_region", "id_business_unit"]
 business_unit_region_when_matched_update_condition: >-
   source.ts_business_unit_region_updated > target.ts_business_unit_region_updated
   OR source.id_business_unit_region > target.id_business_unit_region
+# Deletes stale pairs whose winning junction was removed at source, and blocks re-inserting them on
+# the next run (the flagged source row stays present and would otherwise be picked up as unmatched).
+# Both conditions treat NULL as live: a junction whose history predates ev_is_deleted has no such
+# event, so NULL is a real state during the transition window.
+business_unit_region_when_matched_delete_condition: "source.is_deleted = true"
+business_unit_region_when_not_matched_insert_condition: >-
+  source.is_deleted IS NULL OR source.is_deleted = false
 business_unit_region_event_configs:
   - target_col: business_context
     target_type: string
   - target_col: ts_business_unit_region_created
     target_type: timestamp
     event_name: ev_ts_created
+  # Merge-control column: drives the delete/insert conditions above and is excluded from both merge
+  # column maps, so it never lands in the published table.
+  - target_col: is_deleted
+    target_type: boolean

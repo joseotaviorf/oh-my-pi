@@ -4,14 +4,19 @@ domain: Data Platform
 owner: gustavo.alencar@quintoandar.com.br
 description: >
   Current-state Core Model for the hub-region junction association (which regions a hub/business_unit
-  serves and with which business context). One row per live (id_region, id_business_unit) pair,
-  holding the latest business_context reconstructed from core_region.business_unit_region_history via
-  CurrentStateBuilder. When CDC retains multiple junction ids for the same pair, the row with the
-  highest id_business_unit_region is kept (matches clean). id_business_unit_region and sk_core_* use
-  that winning junction id (same role as clean id). Clean parity is not enforced in data quality for
-  now. Drops the source version and the (0,0) sentinel rows. No aud liveness filter is applied in
-  the Spark job. Delta merge keys are id_region and id_business_unit. Used to resolve hub coverage
-  by region and to join hubs to regions in the region domain.
+  serves and with which business context). One row per currently live (id_region, id_business_unit)
+  pair, holding the latest business_context reconstructed from
+  core_region.business_unit_region_history via CurrentStateBuilder. When CDC retains multiple junction
+  ids for the same pair, a live junction always outranks a deleted one and the highest
+  id_business_unit_region wins among equals (matches clean). id_business_unit_region and sk_core_* use
+  that winning junction id (same role as clean id). Liveness comes from the history ev_is_deleted
+  event, which is sourced from audit delete revisions: a pair whose winning junction is deleted at
+  source is removed from this table by the merge, and blocked from being re-inserted. A junction with
+  no ev_is_deleted event at all is treated as live. Drops the source version and the (0,0) sentinel
+  rows. Delta merge keys are id_region and id_business_unit. Clean parity is not enforced in data
+  quality for now, though deletion awareness is what makes the row count align with
+  datalake_hub_services_clean.business_unit_region. Used to resolve hub coverage by region and to join
+  hubs to regions in the region domain.
 columns:
   sk_core_business_unit_region:
     lineage:
@@ -22,7 +27,8 @@ columns:
     lineage:
       - core_region.business_unit_region_history.id_business_unit_region
     description: Junction identifier for the winning live association for the pair. When multiple
-      junction ids exist in CDC for the same (id_region, id_business_unit), the highest id is kept
+      junction ids exist in CDC for the same (id_region, id_business_unit), a live junction is
+      preferred over a deleted one and the highest id wins among equals
       (matches datalake_hub_services_clean.business_unit_region.id).
   id_region:
     lineage:

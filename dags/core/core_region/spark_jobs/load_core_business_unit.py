@@ -18,6 +18,10 @@ from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
 
 JOB_NAME = "core_business_unit"
 
+# Columns carried on the merge source purely to drive merge conditions. They are kept out of both
+# merge column maps so schema auto-merge cannot evolve them into the published table.
+_MERGE_CONTROL_COLUMNS = frozenset({"is_deleted"})
+
 # Per-table specification for the two current-state models built by this job. Each table is
 # materialised from its narrow history table (produced by the core_region_history DAG) via
 # CurrentStateBuilder. Both run in the same core_region DAG as independent tasks; the existing
@@ -74,6 +78,9 @@ _TABLE_SPECS: Dict[str, Dict[str, Any]] = {
             "year",
             "month",
             "day",
+            # Merge-control column, not part of the published schema (_MERGE_CONTROL_COLUMNS).
+            # Selected here so it survives to run_pipeline and drives the delete condition.
+            "is_deleted",
         ],
     },
 }
@@ -231,8 +238,19 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
         When CDC retains multiple junction ids for the same pair after re-association,
         clean keeps the newest junction id; empirically that is the highest
         ``id_business_unit_region``. ``ts_business_unit_region_updated`` breaks ties.
+
+        A live junction outranks a deleted one regardless of junction id: when a pair was
+        re-pointed to a new junction and the old one deleted, the pair is still live and
+        must not be reported as deleted. Guarded on presence because ``business_unit``
+        shares this helper and has no ``is_deleted``.
         """
-        order_by = [
+        order_by = []
+        if "is_deleted" in df.columns:
+            # A null means the junction has no ev_is_deleted event yet, which both merge
+            # conditions read as live. It must therefore tie with false and leave the
+            # junction id to decide, or a pair holding one of each would keep the lower id.
+            order_by.append(F.coalesce(F.col("is_deleted"), F.lit(False)).asc())
+        order_by += [
             F.col(junction_col).cast("long").desc(),
             F.col(ts_updated_col).desc(),
         ]
@@ -252,6 +270,10 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
         with a null from source) but reads the merge key and update condition from
         table-prefixed config keys, since this DAG hosts multiple tables with distinct
         grains in one shared conf.
+
+        When the source carries merge-control columns (``_MERGE_CONTROL_COLUMNS``) they are
+        excluded from both column maps, so they drive the delete/insert conditions without
+        being written to the target.
         """
         source_cols = dataframe.columns
         if args.partitions is not None:
@@ -271,12 +293,25 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
             required=False,
             default=None,
         )
+        when_matched_delete_condition = self.get_config(
+            f"{args.table_name}_when_matched_delete_condition",
+            required=False,
+            default=None,
+        )
+        when_not_matched_insert_condition = self.get_config(
+            f"{args.table_name}_when_not_matched_insert_condition",
+            required=False,
+            default=None,
+        )
+
+        control_cols = [c for c in source_cols if c in _MERGE_CONTROL_COLUMNS]
+        published_cols = [c for c in source_cols if c not in _MERGE_CONTROL_COLUMNS]
 
         overwrite_with_null = self.get_config(
             "overwrite_with_null", required=False, default=False
         )
         when_matched_operation = {}
-        for col_name in source_cols:
+        for col_name in published_cols:
             if col_name in target_cols and not overwrite_with_null:
                 when_matched_operation[col_name] = (
                     f"CASE WHEN source.{col_name} IS NOT NULL "
@@ -284,6 +319,12 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
                 )
             else:
                 when_matched_operation[col_name] = f"source.{col_name}"
+
+        # An explicit insert map is only needed to withhold the control columns; without one the
+        # loader uses whenNotMatchedInsertAll, which is the existing behaviour for business_unit.
+        when_not_matched_operation = (
+            {c: f"source.{c}" for c in published_cols} if control_cols else None
+        )
 
         database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
 
@@ -324,7 +365,10 @@ class CoreBusinessUnitSparkJob(BaseCoreModelSparkJob):
             target_database_location=write_database_location,
             merge_on=merge_on,
             when_matched_update_condition=when_matched_update_condition,
+            when_matched_delete_condition=when_matched_delete_condition,
+            when_not_matched_insert_condition=when_not_matched_insert_condition,
             when_matched_operation=when_matched_operation,
+            when_not_matched_operation=when_not_matched_operation,
             table_privileges=table_privileges,
             spark=spark,
         )

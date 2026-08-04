@@ -2,6 +2,10 @@ ENTITY_TYPE: "HUB_REGION_HISTORY"
 merge_on_historical: ["id_event"]
 
 BUSINESS_UNIT_REGION_HISTORY_TRANSACTIONAL_TABLE: "datalake_hub_services_transactional.business_unit_region"
+# CDC deletes on the junction arrive with null FKs and are dropped by the junction-key filter, so
+# deletions are invisible in the CDC stream alone. The audit table carries the full FKs on its delete
+# revisions (revtype=2) and is unioned into the stream as tombstones (see load_core_region_history).
+BUSINESS_UNIT_REGION_AUD_TRANSACTIONAL_TABLE: "datalake_hub_services_transactional.business_unit_region_aud"
 # tracked_col = column name in transactional CDC; target_col = core convention (ev_{target_col}).
 business_unit_region_history_event_configs:
   - tracked_col: business_context
@@ -11,6 +15,11 @@ business_unit_region_history_event_configs:
     target_col: ts_created
     target_type: timestamp
     value_precision: millisecond
+  # Derived in the job from op_cdc, not a source column: 'true' on delete rows (CDC or injected
+  # tombstone), 'false' otherwise. Read by the current-state merge to delete stale pairs.
+  - tracked_col: is_deleted
+    target_col: is_deleted
+    target_type: string
 
 BUSINESS_UNIT_HISTORY_TRANSACTIONAL_TABLE: "datalake_hub_services_transactional.business_unit"
 business_unit_history_event_configs:

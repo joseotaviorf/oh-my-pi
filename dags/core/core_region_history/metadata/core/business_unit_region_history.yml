@@ -10,37 +10,56 @@ description: >
   of the same (id_region, id_business_unit) pair create separate entity timelines.
   id_region and id_business_unit are denormalized on every row for pipeline joins.
   15-column schema: standard 13-column event log plus denormalized FK columns.
+  Deletions are tracked via ev_is_deleted. CDC delete rows on this junction arrive with
+  null foreign keys and cannot be attributed to a hub-region pair, so delete revisions
+  (revtype=2) from business_unit_region_aud are injected into the CDC stream as "tombstones",
+  which is what makes a deletion observable here. A junction whose latest ev_is_deleted is
+  'true' has been removed at source; a later non-delete event resets it to 'false'
+  (re-created junction).
 columns:
   id_event:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.id
       - datalake_hub_services_transactional.business_unit_region.ts_database_transaction
+      - datalake_hub_services_transactional.business_unit_region_aud.id
+      - datalake_hub_services_transactional.business_unit_region_aud.ts_database_transaction
     description: SHA256 hash of id_business_unit_region, event_name, and ts_transaction.
       Used as the idempotent merge key.
   id_business_unit_region:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.id
+      - datalake_hub_services_transactional.business_unit_region_aud.id
     description: Junction record identifier (transactional PK). Entity grain for this history table.
   sk_core_business_unit_region:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.id
+      - datalake_hub_services_transactional.business_unit_region_aud.id
     description: Surrogate key for the junction record, derived from id_business_unit_region.
   id_region:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.region_id
+      - datalake_hub_services_transactional.business_unit_region_aud.region_id
     description: Region identifier denormalized from transactional region_id for joins.
+      On tombstone rows it comes from the audit revision, since CDC deletes carry a null FK.
   id_business_unit:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.business_unit_id
+      - datalake_hub_services_transactional.business_unit_region_aud.business_unit_id
     description: Hub (business unit) identifier denormalized from transactional business_unit_id for joins.
+      On tombstone rows it comes from the audit revision, since CDC deletes carry a null FK.
   event_name:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.business_context
       - datalake_hub_services_transactional.business_unit_region.created_at
+      - datalake_hub_services_transactional.business_unit_region.op_cdc
+      - datalake_hub_services_transactional.business_unit_region_aud.revtype
     description: Resolved event name for the changed field.
     categories:
       ev_business_context: Change in business_context (SALE or RENT), including association creation and deletion.
       ev_ts_created: Initial value of created_at (association creation timestamp). Immutable per junction record.
+      ev_is_deleted: Whether the junction is deleted at source. 'true' is emitted from a delete row
+        (CDC op_cdc='d' or an injected audit delete revision); 'false' on creation and on any later
+        non-delete event. The latest value per junction is what the current-state model acts on.
   event_type:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.op_cdc
@@ -49,13 +68,18 @@ columns:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.business_context
       - datalake_hub_services_transactional.business_unit_region.created_at
+      - datalake_hub_services_transactional.business_unit_region.op_cdc
+      - datalake_hub_services_transactional.business_unit_region_aud.revtype
     description: New value of the changed column as string (e.g. SALE or RENT). For ev_ts_created, the association creation timestamp.
+      For ev_is_deleted, 'true' or 'false'.
   payload:
     description: Reserved; null for CDC in this pipeline.
   ts_transaction:
     lineage:
       - datalake_hub_services_transactional.business_unit_region.ts_database_transaction
-    description: Source database transaction timestamp from Debezium CDC.
+      - datalake_hub_services_transactional.business_unit_region_aud.ts_database_transaction
+    description: Source database transaction timestamp from Debezium CDC. On tombstone rows it is the
+      earliest observation of the audit delete revision, the closest available proxy for the deletion time.
   event_origin:
     description: Fully qualified transactional source table name for this job.
   ts_load:

@@ -35,6 +35,26 @@ _BUR_OUTPUT_COLUMNS = [
     "day",
 ]
 
+# Synthetic priority flag distinguishing injected audit tombstones (1) from CDC rows (0).
+_TOMBSTONE_PRIORITY_COL = "_is_tombstone"
+
+# Tie-breaker chain for business_unit_region canonicalization. The tombstone flag comes first so an
+# injected delete wins against a CDC row sharing the same (id, ts_database_transaction): tombstones
+# carry nulls for the CDC recency columns, which would otherwise lose under DESC NULLS LAST ordering.
+# The remainder repeats HistoryBuilder.DEFAULT_CANONICALIZE_TIE_BREAKERS so every non-injected row
+# keeps its existing behaviour.
+_BUR_TIE_BREAKERS = [
+    _TOMBSTONE_PRIORITY_COL,
+    "version",
+    "updated_at",
+    "ts_cdc_transaction",
+    "cdc_binlog_position",
+    "cdc_transaction_id",
+]
+
+# Hibernate Envers revision type for a delete revision.
+_AUD_REVTYPE_DELETE = 2
+
 
 class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
     """Narrow CDC field-level history for Hub Services hub/region tables.
@@ -75,8 +95,14 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
         df = HistoricalHelper.load_transactional_data(spark, transactional_table, args)
 
         if args.table_name == "business_unit_region_history":
+            aud_table = self.get_config(
+                "BUSINESS_UNIT_REGION_AUD_TRANSACTIONAL_TABLE", required=True
+            )
+            # Read through the same helper as the CDC stream so the audit rows honour an
+            # identical load window and partition pruning.
+            aud_df = HistoricalHelper.load_transactional_data(spark, aud_table, args)
             return self._build_business_unit_region_history(
-                df, event_configs, transactional_table
+                df, event_configs, transactional_table, aud_df
             )
         else:
             return self._build_business_unit_history(
@@ -88,17 +114,33 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
         df: DataFrame,
         event_configs: List[Dict[str, Any]],
         transactional_table: str,
+        aud_df: DataFrame,
     ) -> DataFrame:
         """Build business_unit_region_history using transactional junction ``id``.
 
         Entity grain is the junction row (``id`` → ``id_business_unit_region``),
         aligned with clean/aud. ``id_region`` and ``id_business_unit`` are
         denormalized onto every event row for joins.
+
+        Audit delete revisions are injected into the CDC stream before the
+        junction-key filter, because CDC delete rows carry null FKs and would
+        otherwise be dropped, leaving deletions invisible in history.
         """
         if "id_business_unit" not in df.columns and "business_unit_id" in df.columns:
             df = df.withColumnRenamed("business_unit_id", "id_business_unit")
         if "id_region" not in df.columns and "region_id" in df.columns:
             df = df.withColumnRenamed("region_id", "id_region")
+
+        df = self._union_aud_tombstones(df, aud_df)
+        # Derived on the unioned frame so CDC deletes and injected tombstones are treated
+        # identically. HistoryBuilder always emits on op_cdc='d', so every tombstone yields an
+        # ev_is_deleted='true' row regardless of the previous value.
+        df = df.withColumn(
+            "is_deleted",
+            F.when(F.col("op_cdc") == F.lit("d"), F.lit("true")).otherwise(
+                F.lit("false")
+            ),
+        )
 
         df = self._filter_valid_junction_keys(df)
 
@@ -113,6 +155,7 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
             event_configs=event_configs,
             event_type="cdc",
             event_origin=transactional_table,
+            canonicalize_tie_breaker_columns=_BUR_TIE_BREAKERS,
         )
 
         result = self._filter_value_filled(result)
@@ -126,14 +169,50 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
         return result.select(*_BUR_OUTPUT_COLUMNS)
 
     @staticmethod
+    def _union_aud_tombstones(df: DataFrame, aud_df: DataFrame) -> DataFrame:
+        """Inject one delete row per audit delete revision into the CDC stream.
+
+        Audit delete revisions carry the full FKs that CDC delete rows lack, so they
+        survive ``_filter_valid_junction_keys`` and reach change detection as
+        ``op_cdc='d'`` rows.
+
+        Bulk snapshot batches re-observe the same revision at several instants, so each
+        ``(id, rev)`` collapses to its earliest observation — the closest available
+        proxy for the actual deletion time.
+        """
+        tombstones = (
+            aud_df.filter(F.col("revtype") == F.lit(_AUD_REVTYPE_DELETE))
+            .groupBy("id", "rev")
+            .agg(
+                F.min("ts_database_transaction").alias("ts_database_transaction"),
+                F.first("region_id", ignorenulls=True).alias("id_region"),
+                F.first("business_unit_id", ignorenulls=True).alias("id_business_unit"),
+            )
+            .select(
+                "id",
+                "ts_database_transaction",
+                "id_region",
+                "id_business_unit",
+                F.lit("d").alias("op_cdc"),
+                F.lit(1).alias(_TOMBSTONE_PRIORITY_COL),
+            )
+        )
+        return df.withColumn(_TOMBSTONE_PRIORITY_COL, F.lit(0)).unionByName(
+            tombstones, allowMissingColumns=True
+        )
+
+    @staticmethod
     def _build_bur_fk_lookup(df: DataFrame) -> DataFrame:
         """One denormalized FK row per junction id and transaction timestamp.
 
-        Uses the same CDC canonicalization as ``HistoryBuilder`` so a left join
-        cannot duplicate history rows when several raw CDC rows share
-        ``(id, ts_database_transaction)`` with conflicting FK columns.
+        Uses the same CDC canonicalization as ``HistoryBuilder`` — including the same
+        tie-breaker chain — so a left join cannot duplicate history rows when several
+        raw CDC rows share ``(id, ts_database_transaction)`` with conflicting FK
+        columns, and so the surviving row here is the one history canonicalized to.
         """
-        tie_breaker_columns = HistoryBuilder._resolve_tie_breaker_columns(df, None)
+        tie_breaker_columns = HistoryBuilder._resolve_tie_breaker_columns(
+            df, _BUR_TIE_BREAKERS
+        )
         lookup_cols = list(
             dict.fromkeys(
                 ["id", "ts_database_transaction", "id_region", "id_business_unit"]
