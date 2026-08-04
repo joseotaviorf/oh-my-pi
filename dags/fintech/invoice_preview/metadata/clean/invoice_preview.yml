@@ -5,9 +5,8 @@ description: |
   Daily snapshot of SeuBarriga monthly invoice preview CSV rows at billing-line grain.
   Operations uses this table as a work queue to review and correct entries before
   tenant and landlord monthly invoices are created. Loaded twice daily by invoice_preview
-  at 09:00 and 16:00 BRT: morning overwrite (export_slot=morning) and afternoon append
-  (export_slot=afternoon) when a separate afternoon batch exists on S3, preserving the
-  morning snapshot in the partition.
+  at 08:00 and 15:00 BRT; the Spark job ingests only the latest export batch available
+  at each run (morning export ~01:00; afternoon export ~12:00 when SeuBarriga runs it).
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
@@ -85,12 +84,6 @@ columns:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.invoice_filename
     description: Financial attribute representing invoice accrual year month on the invoice_preview dataset.
-  export_slot:
-    description: |
-      SeuBarriga daily export batch for the ingestion run: morning (~01:00 BRT overwrite)
-      or afternoon (~12:00+ BRT append). Set explicitly by the Spark job or --export-slot.
-    lineage:
-      - datalake_invoice_preview_raw.invoice_preview.export_slot
   dt_due:
     description: Due date of the preview entry as exported by SeuBarriga.
     lineage:
@@ -141,14 +134,8 @@ columns:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.day
     description: Day partition derived from the source event timestamp for incremental loading.
-  ts_export_batch:
-    description: |
-      Canonical batch timestamp for the SeuBarriga export slot on the load partition day
-      (09:30 BRT morning, 16:30 BRT afternoon). Stable marker for ordering and SLA vs ts_load.
-    lineage:
-      - datalake_invoice_preview_raw.invoice_preview.ts_export_batch
   ts_load:
-    description: Timestamp when the Spark ingestion job finished loading this preview row into raw.
+    description: Timestamp when the preview row was ingested into the datalake by the invoice_preview Spark job.
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.ts_load
     description: Timestamp when the row was materialized into the governance lake by the ETL pipeline.

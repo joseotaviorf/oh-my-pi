@@ -14,7 +14,6 @@ SELECT
     CAST(NULLIF(`year-month`, '') AS bigint) AS entry_accrual_year_month,
     NULLIF(invoice_filename, '') AS invoice_filename,
     ELEMENT_AT(SPLIT(invoice_filename, '(invoice-preview-)|(-\\d{{2}}\\.csv)' ), -2) AS invoice_accrual_year_month,
-    NULLIF(export_slot, '') AS export_slot,
     TO_DATE(NULLIF(`due-date`, ''), 'y-M-d') AS dt_due,
     TO_DATE(NULLIF(`tenant-due-date`, ''), 'y-M-d') AS dt_tenant_due,
     TO_DATE(NULLIF(`tenant-paid-date`, ''), 'y-M-d') AS dt_tenant_paid,
@@ -25,7 +24,6 @@ SELECT
     year,
     month,
     day,
-    ts_export_batch,
     ts_load
 FROM
     datalake_invoice_preview_raw.invoice_preview

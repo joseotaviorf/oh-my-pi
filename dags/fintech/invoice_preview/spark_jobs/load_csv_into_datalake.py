@@ -3,7 +3,7 @@ import logging
 import re
 from argparse import ArgumentParser
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from functools import reduce
 
 import boto3
@@ -32,16 +32,9 @@ from bietlejuice.services.storage_services.s3_service import S3Service
 
 JOB_NAME = "load_invoice_preview_into_datalake"
 
-# SeuBarriga morning export ~01:00 BRT; afternoon export starts at 12:00 and may take
-# up to 4h30. Files within LATEST_EXPORT_BATCH_WINDOW_SECONDS of the day's max
-# timestamp belong to the latest batch; older files on the same calendar day are
-# the morning batch. Morning DAG runs overwrite the partition; afternoon runs append
-# afternoon CSVs only (preserving the morning snapshot). ts_load records job finish time;
-# ts_export_batch holds the canonical slot timestamp (09:30 / 16:30 BRT on the partition day).
+# SeuBarriga afternoon export starts at 12:00 and may take up to 4h30.
+# Keep every file from the latest batch when multiple exports land on the same day.
 LATEST_EXPORT_BATCH_WINDOW_SECONDS = 5 * 3600
-EXPORT_SLOT_MORNING = "morning"
-EXPORT_SLOT_AFTERNOON = "afternoon"
-BRT = timezone(timedelta(hours=-3))
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -71,84 +64,6 @@ def _select_latest_export_batch(file_paths):
         f"batch_threshold={batch_threshold}, msg=Selected latest export batch."
     )
     return latest_batch
-
-
-def _select_morning_export_batch(file_paths):
-    if not file_paths:
-        return []
-
-    max_ts = max(_file_timestamp(path) for path in file_paths)
-    batch_threshold = max_ts - LATEST_EXPORT_BATCH_WINDOW_SECONDS
-    morning_batch = [
-        path for path in file_paths if _file_timestamp(path) < batch_threshold
-    ]
-
-    logger.info(
-        f"m=_select_morning_export_batch, total_files={len(file_paths)}, "
-        f"morning_batch_files={len(morning_batch)}, max_ts={max_ts}, "
-        f"batch_threshold={batch_threshold}, msg=Selected morning export batch."
-    )
-    return morning_batch
-
-
-def _resolve_export_slot(export_slot):
-    if export_slot in (EXPORT_SLOT_MORNING, EXPORT_SLOT_AFTERNOON):
-        return export_slot
-
-    local_hour = datetime.now(BRT).hour
-    resolved = EXPORT_SLOT_AFTERNOON if local_hour >= 12 else EXPORT_SLOT_MORNING
-    logger.info(
-        f"m=_resolve_export_slot, inferred_export_slot={resolved}, "
-        f"local_hour_brt={local_hour}, msg=Inferred export slot from job start time."
-    )
-    return resolved
-
-
-def _select_files_for_export_slot(file_paths, export_slot):
-    morning_batch = _select_morning_export_batch(file_paths)
-    latest_batch = _select_latest_export_batch(file_paths)
-
-    if export_slot == EXPORT_SLOT_MORNING:
-        if morning_batch:
-            selected = morning_batch
-        else:
-            selected = latest_batch
-        logger.info(
-            f"m=_select_files_for_export_slot, export_slot={export_slot}, "
-            f"selected_files={len(selected)}, msg=Selected morning export files."
-        )
-        return selected
-
-    if not morning_batch:
-        logger.warning(
-            f"m=_select_files_for_export_slot, export_slot={export_slot}, "
-            f"msg=No afternoon batch on S3 yet; skipping afternoon load."
-        )
-        return []
-
-    selected = latest_batch
-    logger.info(
-        f"m=_select_files_for_export_slot, export_slot={export_slot}, "
-        f"selected_files={len(selected)}, msg=Selected afternoon export files."
-    )
-    return selected
-
-
-def _write_mode_for_export_slot(export_slot):
-    return "append" if export_slot == EXPORT_SLOT_AFTERNOON else "overwrite"
-
-
-def _canonical_ts_export_batch(load_date, export_slot):
-    hour, minute = (9, 30) if export_slot == EXPORT_SLOT_MORNING else (16, 30)
-    local = datetime(
-        load_date.year,
-        load_date.month,
-        load_date.day,
-        hour,
-        minute,
-        tzinfo=BRT,
-    )
-    return local.astimezone(timezone.utc).replace(tzinfo=None)
 
 
 def _generate_date_range(load_start_date, load_end_date):
@@ -198,15 +113,6 @@ if __name__ == "__main__":
     parser.add_argument("table_name", help="name of the output table")
     parser.add_argument("file_format", help="file format")
     parser.add_argument("file_options", help="file options")
-    parser.add_argument(
-        "--export-slot",
-        choices=[EXPORT_SLOT_MORNING, EXPORT_SLOT_AFTERNOON],
-        default=None,
-        help=(
-            "SeuBarriga export batch for this run. When omitted, inferred from "
-            "America/Sao_Paulo hour at job start (before 12: morning, else afternoon)."
-        ),
-    )
 
     add_validation_target_args(parser)
     args = parser.parse_args()
@@ -221,15 +127,12 @@ if __name__ == "__main__":
     format = args.file_format
     options = json.loads(args.file_options)
     partition_cols = ["year", "month", "day"]
-    export_slot = _resolve_export_slot(args.export_slot)
-    write_mode = _write_mode_for_export_slot(export_slot)
 
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
                 source_root_path={source_root_path}, load_start_date={load_start_date}, load_end_date={load_end_date},
-                table_name={table_name}, format={format}, options = {options}, export_slot={export_slot},
-                write_mode={write_mode}, msg=Starting spark job...
+                table_name={table_name}, format={format}, options = {options}, msg=Starting spark job...
         """
     )
 
@@ -265,12 +168,7 @@ if __name__ == "__main__":
             )
             days_to_send_warning.append(date_ingested)
         else:
-            csv_files = _select_files_for_export_slot(
-                by_day_files[date_ingested], export_slot
-            )
-            if not csv_files:
-                continue
-
+            csv_files = _select_latest_export_batch(by_day_files[date_ingested])
             for csv in csv_files:
                 df = s3_consumer.get_data_from_file(
                     path=csv, format=format, options=options
@@ -286,11 +184,6 @@ if __name__ == "__main__":
                 .output()
             )
 
-            df = df.withColumn("export_slot", functions.lit(export_slot))
-            df = df.withColumn(
-                "ts_export_batch",
-                functions.lit(_canonical_ts_export_batch(date_to_ingest, export_slot)),
-            )
             df = df.withColumn("ts_load", functions.current_timestamp())
 
             db_info = DatalakeMetastoreService.get_db_info(
@@ -328,7 +221,6 @@ if __name__ == "__main__":
                 s3_path=s3_path,
                 format_options=format_options,
                 partitions=partition_cols,
-                write_mode=write_mode,
             )
 
             spark_metastore_loader.update_metastore(
