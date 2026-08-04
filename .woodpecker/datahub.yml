@@ -144,6 +144,12 @@ steps:
         from_secret: datahub_graphql_url_prod
       DATAHUB_TOKEN:
         from_secret: datahub_api_key_prod
+      # Default is 16000 (see _DEFAULT_MAX_TOKENS). PR #27167 (front-sla, 9 golden
+      # queries / ~18.7KB) truncated at 4/9 under the default — same failure mode as
+      # the Cases Perspective incident this ceiling was meant to prevent. Doubling
+      # gives headroom for entities with many/large golden queries without a
+      # per-entity override; applies to every entity this step publishes.
+      LITELLM_MAX_TOKENS: "32000"
     commands:
       - eval $(cat ./my-secrets)
       # Process ONLY the entity MDs added/edited in this push (auto-detected via git diff) —
