@@ -242,6 +242,7 @@ erDiagram
         jsonb product_settings
         varchar status
         varchar deactivation_reason
+        varchar deactivation_sub_reason
         varchar deactivation_additional_comment
     }
 
@@ -722,7 +723,8 @@ Which products a company uses. Composite PK `(company_id, product_id)`.
 | `product_id` | `id_product` | BIGINT | NOT NULL | **PK**, **FK → product.id** |
 | `status` | `status` | VARCHAR | NULL | enum `CompanyProductRelationshipStatus` |
 | `product_settings` | `product_settings` | JSONB | NULL | Banking/revenue-share UUID refs |
-| `deactivation_reason` | — | VARCHAR(50) | NULL | **Not in clean SQL** |
+| `deactivation_reason` | `deactivation_reason` | VARCHAR(50) | NULL | Reason code when relationship is inactive |
+| `deactivation_sub_reason` | `deactivation_sub_reason` | VARCHAR(100) | NULL | Sub-reason within `deactivation_reason` (product-specific taxonomy) |
 | `deactivation_additional_comment` | — | VARCHAR(500) | NULL | **Not in clean SQL** |
 
 ---

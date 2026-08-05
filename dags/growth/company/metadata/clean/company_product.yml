@@ -26,3 +26,21 @@ columns:
     lineage:
       - datalake_company_raw.company_product.product_settings
     description: 'Flexible configuration settings (JSONB, nullable). Company-specific customizations for how the product is offered, including pricing rules, feature toggles, regional settings, or business-specific parameters. Enables product personalization without schema changes.'
+  deactivation_reason:
+    lineage:
+      - datalake_company_raw.company_product.deactivation_reason
+    description: |
+      Primary reason code recorded when the company-product relationship is deactivated (VARCHAR, nullable).
+      Populated when status is INACTIVE; values depend on product-specific deactivation taxonomies in the Company service.
+  deactivation_sub_reason:
+    lineage:
+      - datalake_company_raw.company_product.deactivation_sub_reason
+    description: |
+      Granular sub-reason within deactivation_reason (VARCHAR, nullable). Valid only for the parent deactivation_reason
+      configured for the product; NULL when inactive without a structured reason or when not applicable.
+  op_cdc:
+    description: Change operation emitted by the PostgreSQL CDC framework for this company_product row.
+  ts_cdc_transaction:
+    description: UTC timestamp when the CDC framework captured this company_product change transaction.
+  ts_database_transaction:
+    description: UTC timestamp when the source PostgreSQL database committed this company_product change.
