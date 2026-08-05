@@ -18,7 +18,8 @@ WITH deduped AS (
     FROM
         datalake_oitchau_raw.hoursbank_totals
     WHERE
-        MAKE_DATE(year, month, day) = DATE_ADD(DATE('{load_start_date}'), 1)
+        CAST(`date` AS DATE) BETWEEN DATE_ADD(DATE('{load_end_date}'), -44)
+        AND DATE('{load_end_date}')
 )
 SELECT
     id_employee_profile,
