@@ -1,0 +1,16 @@
+---
+table_name: datalake_idactum_houses_clean.idactum_houses
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Error
+    # No is_unique here: Forno validation for ADB-1335 found ~98.7k id values
+    # that already repeat within a single Idactum houses dump (pre-existing,
+    # not caused by this fix). See PR #27205 discussion before re-adding.

@@ -6,6 +6,10 @@ description:
   Brazil, including address, geolocation, area measurements, valuation estimates,
   and fiscal information. Used by the Growth team for market intelligence, property
   scoring, and cross-referencing QuintoAndar's supply with broader market context.
+  Rows missing an `id` are filtered out at this layer and enforced by an
+  `is_complete` data quality contract, since the 2026-07-23 Idactum dump introduced
+  a fully empty row that otherwise propagated downstream. See ADB-1335 /
+  bi-etl-ejuice#27205.
 domain: Atlas DB
 owner: gabriel.mota@quintoandar.com.br
 columns:
@@ -13,7 +17,13 @@ columns:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.id
     description: |
-      Surrogate primary key that uniquely identifies a property record within this table.
+      Idactum-assigned identifier intended to identify a property record within this table.
+      Not currently enforced as unique: a Forno validation for ADB-1335 found ~98.7k id
+      values that already repeat within a single Idactum houses dump, independent of the
+      null-id issue below (see PR #27205 discussion). Rows with a null id are filtered out
+      at ingestion (`WHERE id IS NOT NULL`) and covered by an `is_complete` data quality
+      check, since Idactum has occasionally shipped fully empty rows in its dumps (e.g.
+      2026-07-23). See ADB-1335 / bi-etl-ejuice#27205.
   id_municipal_house:
     lineage:
       - datalake_idactum_houses_raw.idactum_houses.id_unidade

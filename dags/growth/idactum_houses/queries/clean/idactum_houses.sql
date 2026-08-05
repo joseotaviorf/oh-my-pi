@@ -35,3 +35,5 @@ SELECT
   dt_load
 FROM 
   datalake_idactum_houses_raw.idactum_houses
+WHERE
+  id IS NOT NULL

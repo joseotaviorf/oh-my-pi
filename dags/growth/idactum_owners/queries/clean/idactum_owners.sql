@@ -13,3 +13,5 @@ SELECT
   dt_load
 FROM
   datalake_idactum_owners_raw.idactum_owners
+WHERE
+  id_idactum IS NOT NULL

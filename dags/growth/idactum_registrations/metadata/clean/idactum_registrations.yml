@@ -6,6 +6,8 @@ description:
   attributes for properties across Brazilian municipalities. This is the richest
   property-level dataset from Idactum, used by the Growth team for market pricing
   models, supply scoring, geographic analysis, and competitive benchmarking.
+  Rows missing the join key (`id_idactum`) are filtered out at this layer and
+  enforced by an `is_complete` data quality contract. See ADB-1335 / bi-etl-ejuice#27205.
 domain: Atlas DB
 owner: gabriel.mota@quintoandar.com.br
 columns:
@@ -19,6 +21,8 @@ columns:
       - datalake_idactum_registrations_raw.idactum_registrations.id_idactum
     description: |
       Idactum's proprietary property identifier, used as the primary join key to link this registration with buyers, sellers, and transaction datasets.
+      Rows with a null id_idactum are filtered out at ingestion (`WHERE id_idactum IS NOT NULL`)
+      and covered by an `is_complete` data quality check. See ADB-1335 / bi-etl-ejuice#27205.
   id_patrimonial_assets:
     lineage:
       - datalake_idactum_registrations_raw.idactum_registrations.bpatri_key

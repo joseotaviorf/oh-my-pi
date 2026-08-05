@@ -6,6 +6,10 @@ description:
   cadastral records. Used by the Growth team to identify property owners for
   outreach campaigns, understand ownership concentration, and enrich supply-side
   intelligence for market analysis.
+  Rows missing the join key (`id_idactum`) are filtered out at this layer and
+  enforced by an `is_complete` data quality contract, since the 2026-07-23 Idactum
+  dump introduced fully empty rows across Idactum tables. See ADB-1335 /
+  bi-etl-ejuice#27205.
 domain: Atlas DB
 owner: gabriel.mota@quintoandar.com.br
 columns:
@@ -19,6 +23,9 @@ columns:
       - datalake_idactum_owners_raw.idactum_owners.id_idactum
     description: |
       Idactum's proprietary property identifier, used to join ownership data with other Idactum datasets such as houses and transactions.
+      Rows with a null id_idactum are filtered out at ingestion (`WHERE id_idactum IS NOT NULL`)
+      and covered by an `is_complete` data quality check (not `is_unique`, since multiple owner
+      rows legitimately share the same property). See ADB-1335 / bi-etl-ejuice#27205.
   owner_name:
     lineage:
       - datalake_idactum_owners_raw.idactum_owners.nome

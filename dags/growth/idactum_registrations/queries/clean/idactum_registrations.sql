@@ -70,3 +70,5 @@ SELECT
   CAST(transacao_mais_recente AS TIMESTAMP) AS ts_latest_transaction_date
 FROM
   datalake_idactum_registrations_raw.idactum_registrations
+WHERE
+  id_idactum IS NOT NULL

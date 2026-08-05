@@ -48,3 +48,5 @@ SELECT
   CAST(data_declaracao_transacao AS TIMESTAMP) AS ts_transaction_declaration_date,
   dt_load
 FROM datalake_idactum_transactions_raw.idactum_transactions
+WHERE
+  id_idactum IS NOT NULL

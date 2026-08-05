@@ -1,0 +1,13 @@
+---
+table_name: datalake_idactum_transactions_clean.idactum_transactions
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_idactum:
+    is_complete:
+      severity_level: Error

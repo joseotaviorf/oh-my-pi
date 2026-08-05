@@ -7,6 +7,8 @@ description:
   property attributes, and geolocation. Used by the Growth team for market price
   analysis, transaction volume tracking, and competitive benchmarking against
   QuintoAndar's own transaction data.
+  Rows missing the join key (`id_idactum`) are filtered out at this layer and
+  enforced by an `is_complete` data quality contract. See ADB-1335 / bi-etl-ejuice#27205.
 domain: Atlas DB
 owner: gabriel.mota@quintoandar.com.br
 columns:
@@ -15,6 +17,8 @@ columns:
       - datalake_idactum_transactions_raw.idactum_transactions.id_idactum
     description: |
       Idactum's proprietary property identifier linking this transaction to the corresponding property in other Idactum datasets.
+      Rows with a null id_idactum are filtered out at ingestion (`WHERE id_idactum IS NOT NULL`)
+      and covered by an `is_complete` data quality check. See ADB-1335 / bi-etl-ejuice#27205.
   id_unit:
     lineage:
       - datalake_idactum_transactions_raw.idactum_transactions.id_unidade

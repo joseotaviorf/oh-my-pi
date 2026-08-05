@@ -8,3 +8,5 @@ SELECT
   dt_load
 FROM
   datalake_idactum_buyers_raw.idactum_buyers
+WHERE
+  id IS NOT NULL

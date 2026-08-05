@@ -5,6 +5,10 @@ description:
   of purchasers in Brazilian real estate transactions extracted from notary records.
   Used by the Growth team for market analysis, buyer behavior profiling, and demand-side
   competitive intelligence in the real estate market.
+  Rows missing a primary key (`id`) are filtered out at this layer and enforced by
+  an `is_complete`/`is_unique` data quality contract, mirroring the same fix applied
+  to `idactum_houses` after the 2026-07-23 dump introduced empty rows. See ADB-1335 /
+  bi-etl-ejuice#27205.
 domain: Atlas DB
 owner: gabriel.mota@quintoandar.com.br
 columns:
@@ -13,6 +17,8 @@ columns:
       - datalake_idactum_buyers_raw.idactum_buyers.id
     description: |
       Surrogate primary key that uniquely identifies a buyer record within this table.
+      Rows with a null id are filtered out at ingestion (`WHERE id IS NOT NULL`) and covered
+      by an `is_complete` + `is_unique` data quality check. See ADB-1335 / bi-etl-ejuice#27205.
   id_transaction:
     lineage:
       - datalake_idactum_buyers_raw.idactum_buyers.id_transacao

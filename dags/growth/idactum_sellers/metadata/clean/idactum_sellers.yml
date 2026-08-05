@@ -5,6 +5,8 @@ description:
   of vendors in Brazilian real estate transactions extracted from notary (cartório)
   records. Used by the Growth team for supply-side market analysis, seller behavior
   profiling, and understanding property disposition patterns across the real estate market.
+  Rows missing the join key (`id_idactum`) are filtered out at this layer and enforced
+  by an `is_complete` data quality contract. See ADB-1335 / bi-etl-ejuice#27205.
 domain: Atlas DB
 owner: gabriel.mota@quintoandar.com.br
 columns:
@@ -13,6 +15,9 @@ columns:
       - datalake_idactum_sellers_raw.idactum_sellers.id_idactum
     description: |
       Idactum's proprietary property identifier linking the seller to the specific property transacted, used to join with other Idactum datasets.
+      Rows with a null id_idactum are filtered out at ingestion (`WHERE id_idactum IS NOT NULL`)
+      and covered by an `is_complete` data quality check (not `is_unique`, since multiple seller
+      rows legitimately share the same property). See ADB-1335 / bi-etl-ejuice#27205.
   id_transaction:
     lineage:
       - datalake_idactum_sellers_raw.idactum_sellers.id_transacao

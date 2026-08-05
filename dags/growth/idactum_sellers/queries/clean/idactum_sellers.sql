@@ -7,3 +7,5 @@ SELECT
   dt_load
 FROM
   datalake_idactum_sellers_raw.idactum_sellers
+WHERE
+  id_idactum IS NOT NULL
