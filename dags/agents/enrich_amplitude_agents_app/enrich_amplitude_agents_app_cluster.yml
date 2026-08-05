@@ -1,24 +1,25 @@
 cluster:
-  type: emr_7_12_consolidation_l_memory_fleet_cluster
+  type: emr_7_12_consolidation_xl_memory_fleet_cluster
   custom_configurations:
     spark_conf:
       spark.sql.adaptive.enabled: true
       spark.sql.adaptive.coalescePartitions.enabled: true
       spark.sql.adaptive.coalescePartitions.targetPostShuffleInputSize: 128MB
       spark.sql.shuffle.partitions: 512
+      spark.executor.cores: '2'
       spark.executor.memoryOverhead: 8g
     core_nodes:
       target_on_demand: 3
       target_spot: 0
       instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
+      - r6g.8xlarge
+      - r7g.8xlarge
+      - r6i.8xlarge
     task_nodes:
       instance_types:
-      - r6g.4xlarge
-      - r7g.4xlarge
-      - r6i.4xlarge
+      - r6g.8xlarge
+      - r7g.8xlarge
+      - r6i.8xlarge
       target_on_demand: 0
       target_spot: 2
       allocation_strategy: price-capacity-optimized
