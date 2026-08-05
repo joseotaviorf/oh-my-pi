@@ -1972,6 +1972,13 @@ bietlejuice.enrich_content_funnel:
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
+bietlejuice.enrich_crawled_idactum_houses:
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-go-goiania-cadastro-imobiliario:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-go-goiania-comprovacao-pagamento:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-go-goiania-informacoes-cadastrais:first-run-of-day
+  - bietlejuice.idactum_scrapy_cadastral:load-clean-sp-osasco-pesquisa-cdc:first-run-of-day
+  - bietlejuice.idactum_scrapy_itbi:load-clean-rj-itbi-main:first-run-of-day
+  - bietlejuice.idactum_scrapy_itbi:load-clean-sp-osasco-itbi:first-run-of-day
 bietlejuice.enrich_crawler_chaves_na_mao:
   - bietlejuice.crawler_chaves_na_mao:load-clean-chaves-na-mao:first-run-of-day
 bietlejuice.enrich_crawler_df_imoveis:

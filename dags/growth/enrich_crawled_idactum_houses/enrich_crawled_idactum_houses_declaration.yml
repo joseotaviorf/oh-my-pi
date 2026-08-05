@@ -1,0 +1,22 @@
+dag:
+  name: enrich_crawled_idactum_houses
+  owner: Data Growth
+  schedule_start_date: 2026, 05, 14
+  documentation:
+    dag_purpose: |
+      Aggregates six Idactum Scrapy clean tables (from idactum_scrapy_cadastral and
+      idactum_scrapy_itbi) with municipal house attributes into a unified houses-like
+      enrich table aligned with the legacy idactum_houses column contract, enriched with
+      crawl provenance.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: crawled_idactum_houses
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    idactum_houses:
+      partitions: [year, month, day]
