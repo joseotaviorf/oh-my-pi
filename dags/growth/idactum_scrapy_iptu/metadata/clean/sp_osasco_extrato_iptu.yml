@@ -1,0 +1,59 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: sp_osasco_extrato_iptu
+description: |
+  Clean passthrough of Osasco Scrapy crawler sp_osasco_extrato_iptu (IPTU statement extracts (including PDF payload) from the municipal tax portal).
+  Built from the shared crawled_idactum_houses raw table with crawl metadata
+  flattened and load provenance columns retained for analysis.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  response:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.response
+    description: |
+      Nested scraped payload fields returned by the spider (schema-on-read from JSONL).
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_extrato_iptu.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

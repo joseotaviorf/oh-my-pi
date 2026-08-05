@@ -1,0 +1,5 @@
+cluster:
+  type: emr_7_12_med_memory_general_fleet_cluster
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
