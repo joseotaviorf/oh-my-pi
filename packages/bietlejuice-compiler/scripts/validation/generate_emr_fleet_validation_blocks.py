@@ -617,7 +617,6 @@ DEFAULT_DAG_NAMES = [
     "enrich_monopoly",
     "enrich_nexxera",
     "enrich_nps_answer_drivers",
-    "enrich_nps_quintocred",
     "enrich_online_attribution",
     "enrich_open_external_data_addresses",
     "enrich_pixar",

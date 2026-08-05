@@ -11,8 +11,6 @@ dags_not_using_builder:
   - fintech/reverse_nazare/reverse_nazare.py
   - fintech/reverse_nexxera/reverse_nexxera.py
   - fintech/sap/sap.py
-  - fintech/velo_omie/velo_omie.py
-  - fintech/velo/velo.py
   - fintech/wall_street/wall_street.py
   - for_rent/ebdb/ebdb.py
   # Hand-rolled: needs a hybrid cron + dataset schedule (DatasetOrTimeSchedule +
@@ -844,7 +842,6 @@ database_ingestion_without_cdc:
   - pixar
   - property_tax
   - quinturk
-  - rental_guarantee_platform
   - risk_and_mortgage
   - robin_hood
   - saruman

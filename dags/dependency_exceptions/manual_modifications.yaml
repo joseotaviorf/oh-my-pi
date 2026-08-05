@@ -46,10 +46,6 @@ bietlejuice.dw_call:
 bietlejuice.dw_casa_mineira_portal:
   remove:
     - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency:first-run-of-day
-bietlejuice.dw_charging_payment_quintocred:
-  remove:
-    - bietlejuice.velo_asaas:load-clean-payments:first-run-of-day
-    - bietlejuice.gsheets_fintech:done-clean-quintocred-test-proposals:first-run-of-day
 bietlejuice.dw_collection_ai_agents:
   remove:
     - bietlejuice.langfuse:load-clean-traces:first-run-of-day
@@ -154,22 +150,6 @@ bietlejuice.dw_datamarts_spark.static:
 bietlejuice.dw_date:
   add:
     - bietlejuice.enrich_public_date:load-enrich-aux-date:first-run-of-day
-bietlejuice.dw_fintech_snapshot_quintocred:
-  remove:
-    - bietlejuice.dw_fintech_snapshot:load-dw-charging-payment-quintocred-fact-payment-full:first-run-of-day
-    - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-no-renewal:first-run-of-day
-    - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-renewal:first-run-of-day
-bietlejuice.dw_recon_quintocred:
-  remove:
-    - bietlejuice.dw_fintech_snapshot_quintocred:load-dw-fintech-snapshot-quintocred-quintocred-ifrs-occurrence:first-run-of-day
-    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
-    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-metrics:first-run-of-day
-bietlejuice.dw_recon_quintocred_snapshot:
-  remove:
-    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
-    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-metrics:first-run-of-day
-bietlejuice.dw_velo_zendesk__validation:
-  override: []
 bietlejuice.dw_losses:
   add:
     - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-renegotiations:first-run-of-day
@@ -185,18 +165,6 @@ bietlejuice.dw_collection_recovery_quintoandar:
     - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
     - bietlejuice.recupera:load-clean-operators:first-run-of-day
     - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera:first-run-of-day
-bietlejuice.dw_collection_recovery_quintocred:
-  remove:
-    - bietlejuice.enrich_recupera:load-enrich-changes-debts-distribution:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-collection:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-installment:first-run-of-day
-    - bietlejuice.enrich_recupera:load-enrich-negotiation:first-run-of-day
-    - bietlejuice.recupera:load-clean-complementary-records-written-down:first-run-of-day
-    - bietlejuice.recupera:load-clean-complementary-records:first-run-of-day
-    - bietlejuice.recupera:load-clean-contracts:first-run-of-day
-    - bietlejuice.recupera:load-clean-creditor-pending:first-run-of-day
-    - bietlejuice.recupera:load-clean-operational-records:first-run-of-day
-    - bietlejuice.recupera:load-clean-operators:first-run-of-day
 bietlejuice.dw_evictions:
   remove:
     - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment:first-run-of-day
@@ -1009,18 +977,6 @@ bietlejuice.enrich_transactional_entities_test:
     - bietlejuice.core_visit:load-core-visit:first-run-of-day
     - bietlejuice.core_house:load-core-house:first-run-of-day
     - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
-bietlejuice.enrich_velo:
-  add:
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposecompany-legacy:first-run-of-day
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-fianca-legacy:first-run-of-day
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-object-legacy:first-run-of-day
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-property-legacy:first-run-of-day
-    - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposeperson-legacy:first-run-of-day
-    - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy:first-run-of-day
-  remove:
-    - bietlejuice.gsheets_fintech:done-clean-quintocred-excluded-proposals:first-run-of-day
-    - bietlejuice.enrich_accounting_funnel:load-enrich-ledger:first-run-of-day
-    - bietlejuice.velo_asaas:load-clean-payments:first-run-of-day
 bietlejuice.enrich_vespucio_pipeline:
   add:
     - bietlejuice.ebdb_condo:load-clean-amenities:first-run-of-day
@@ -1073,10 +1029,6 @@ bietlejuice.reverse_concentrix:
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-contract:first-run-of-day
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-cases-perspective:first-run-of-day
-bietlejuice.reverse_birdie:
-  remove:
-    - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users:first-run-of-day
-    - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history:first-run-of-day
 bietlejuice.reverse_birdie_access:
   add:
     - bietlejuice.reverse_birdie:load-reverse-dsat-bot:first-run-of-day

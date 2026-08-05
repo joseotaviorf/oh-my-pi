@@ -20,10 +20,6 @@ bietlejuice.enrich_static_files:
   is_static: true
 bietlejuice.enrich_trino_costs:
   is_static: false
-bietlejuice.enrich_velo_omie:
-  is_static: true
-bietlejuice.velo_omie:
-  is_static: true
 bietlejuice.recupera:
   is_static: true
 

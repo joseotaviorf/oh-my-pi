@@ -103,8 +103,8 @@ JDT_B AS ( -- INPUT PRODUCT
             COALESCE(CONCAT(CAST(acquire_nsu AS INT), ':', acquire_auth_code),CONCAT(c1.receipt, ':', c1.authorization_number)))
         AS U_FinanceEntityEntryId, -- REQUIRED
         IF(c1.total_installments > 1,
-            COALESCE(CAST(p.id AS varchar(30)),CONCAT('(!):',c1.receipt,':',c1.authorization_number,':',c1.installment_number)),
-            COALESCE(CAST(p.id AS varchar(30)),CONCAT('(!):',c1.receipt,':',c1.authorization_number)))
+            CONCAT('(!):',c1.receipt,':',c1.authorization_number,':',c1.installment_number),
+            CONCAT('(!):',c1.receipt,':',c1.authorization_number))
         AS Reference, -- REQUIRED | BusinessEntityID
         COALESCE(IF(c1.total_installments > 1, CAST(py.id AS varchar(30)) || ':' || CAST(c1.installment_number AS varchar(90)), CAST(py.id AS varchar(30))),'') AS Reference2, -- REQUIRED | FinancialEntityID
         'L024' AS CostingCode, -- REQUIRED | Location
@@ -114,7 +114,7 @@ JDT_B AS ( -- INPUT PRODUCT
         '11201.07.01' AS incoming_account, -- REQUIRED
         '41102.02.13' AS tax_account, -- REQUIRED
         '11202.03.01' AS activate_account, -- NOT_STANDARD
-        COALESCE(IF(py.rn_payments = 1, p.activator_value, 0.00), 0.00) AS activate_value, -- NOT_STANDARD
+        0.00 AS activate_value, -- NOT_STANDARD
         COALESCE(c.id_store, -1) AS store_id_
     FROM
         JDT_A c1
@@ -130,15 +130,6 @@ JDT_B AS ( -- INPUT PRODUCT
         ON CAST(py.propose AS varchar(30)) = CAST(c.id_business_entity AS varchar(30))
         AND CAST(py.due_date AS DATE) = CAST(c.ts_paid AS DATE)
         AND c1.gross_amount = py.value
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.propose p
-        ON CAST(p.id AS BIGINT) = CAST(py.propose AS BIGINT)
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.property_propose pp
-        ON p.id = pp.id_propose
-    LEFT JOIN
-        datalake_rental_guarantee_platform_clean.address a
-        ON pp.id_address = a.id
 ),
 -- END | PRODUCT BLOCK
 

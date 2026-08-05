@@ -33,7 +33,6 @@ metadata_files_out_of_pattern:
   - support_and_service/enrich_chattermill/metadata/enrich/responses.yml
   - for_sale/dw_sale_events/metadata/dw/dim_sale_event_type.yml
   - for_sale/enrich_sale_flows/metadata/enrich/sale_flow.yml
-  - fintech/velo_omie/metadata/clean/country.yml
   - for_rent/enrich_offboarding/metadata/enrich/ongoing.yml
   - for_rent/enrich_offboarding/metadata/enrich/tickets.yml
   - support_and_service/enrich_survicate/metadata/enrich/salesforce_surveys.yml

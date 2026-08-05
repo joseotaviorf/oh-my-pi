@@ -1,9 +1,0 @@
-dag:
-  name: dw_velo_zendesk
-  schedule_start_date: 2020,08,29
-  owner: Data Fintech
-workflow:
-  type: query_delta
-  layer: dw
-  custom_schema: velo
-  has_load_to_redshift_task: false
