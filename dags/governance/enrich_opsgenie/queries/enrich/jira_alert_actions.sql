@@ -1,18 +1,25 @@
 WITH alerts_updated AS (
   SELECT
-    al.id_alert,
-    al.dt_load,
-    al.year,
-    al.month,
-    al.day
-  FROM
-    datalake_jira_ops_clean.alert_log AS al
+    id_alert,
+    dt_load,
+    year,
+    month,
+    day
+  FROM (
+    SELECT
+      al.id_alert,
+      al.dt_load,
+      al.year,
+      al.month,
+      al.day,
+      ROW_NUMBER() OVER (PARTITION BY al.id_alert ORDER BY al.dt_load DESC) AS rn
+    FROM datalake_jira_ops_clean.alert_log AS al
+    WHERE
+      MAKE_DATE(al.year, al.month, al.day) BETWEEN CAST('{load_start_date}' AS DATE) AND CAST('{load_end_date}' AS DATE)
+  ) AS ranked_alerts
   WHERE
-    MAKE_DATE(al.year, al.month, al.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
-  QUALIFY 
-    1 = ROW_NUMBER() OVER (PARTITION BY al.id_alert ORDER BY al.dt_load DESC)
-),
-alert_log AS (
+    rn = 1
+), alert_log AS (
   SELECT
     al.id_alert,
     al.log_type,
@@ -23,43 +30,46 @@ alert_log AS (
     au.year,
     au.month,
     au.day
-  FROM
-    datalake_jira_ops_clean.alert_log AS al
-  JOIN
-    alerts_updated AS au
-      ON al.id_alert = au.id_alert
-),
-get_alert_actions AS (
-  SELECT
+  FROM datalake_jira_ops_clean.alert_log AS al
+  JOIN alerts_updated AS au
+    ON al.id_alert = au.id_alert
+), get_alert_actions AS (
+  SELECT DISTINCT
     id_alert,
     log_type,
     owner,
-    TRIM(SPLIT(SPLIT(log, 'via') [0], 'Alert ') [1]) AS action,
+    /* ELEMENT_AT is 1-based on Databricks and EMR (equivalent to 0-based bracket [0]/[1]) */
+    TRIM(ELEMENT_AT(SPLIT(ELEMENT_AT(SPLIT(log, 'via'), 1), 'Alert '), 2)) AS action,
     TRIM(
-      SPLIT(SPLIT(SPLIT(log, 'via') [1], '\\\[') [0], '\\\.') [0]
+      ELEMENT_AT(
+        SPLIT(
+          ELEMENT_AT(
+            SPLIT(ELEMENT_AT(SPLIT(log, 'via'), 2), '\\\['),
+            1
+          ),
+          '\\\.'
+        ),
+        1
+      )
     ) AS direction,
     ts_log
-  FROM
-    alert_log
+  FROM alert_log
   WHERE
-    log LIKE "Alert%"
-  GROUP BY ALL
-),
-filter_alert_actions AS (
+    log LIKE 'Alert%'
+), filter_alert_actions AS (
   SELECT
     id_alert,
     FIRST(owner) FILTER(WHERE action = 'acknowledged') AS acknowledged_by,
     FIRST(owner) FILTER(WHERE action = 'closed') AS closed_by,
     MIN(ts_log) FILTER(WHERE action = 'acknowledged') AS ts_acknowledged,
     MIN(ts_log) FILTER(WHERE action = 'closed') AS ts_closed
-  FROM
-    get_alert_actions AS gaa
+  FROM get_alert_actions AS gaa
   WHERE
     action IN ('acknowledged', 'closed')
-  GROUP BY ALL
-),
-get_alert_notification AS (
-  SELECT
+  GROUP BY
+    id_alert
+), get_alert_notification AS (
+  SELECT DISTINCT
     id_alert,
     log_type,
     owner AS log_owner,
@@ -80,25 +90,25 @@ get_alert_notification AS (
     END AS direction,
     REGEXP_EXTRACT(log, '\\\[?(email|sms|voice)\\\]?', 1) AS notification_type,
     ts_log
-  FROM
-    alert_log
+  FROM alert_log
   WHERE
-    log LIKE "%notification%"
-  GROUP BY ALL
-),
-get_alert_out_of_rotation AS (
+    log LIKE '%notification%'
+), get_alert_out_of_rotation AS (
   SELECT
     id_alert,
     TRUE AS is_out_of_rotation,
-    MIN(ts_log) FILTER(WHERE REGEXP_LIKE(log, '(?i)^Will close alert automatically.*Auto-Close out-of-rotation time') IS TRUE) AS ts_out_of_rotation_identified,
-    MIN(ts_log) FILTER(WHERE REGEXP_LIKE(log, '(?i)^Alert closed via system.*Auto-Close out-of-rotation time') IS TRUE) AS ts_out_of_rotation_closed
-  FROM
-    alert_log
+    MIN(ts_log) FILTER(
+      WHERE log RLIKE '(?i)^Will close alert automatically.*Auto-Close out-of-rotation time'
+    ) AS ts_out_of_rotation_identified,
+    MIN(ts_log) FILTER(
+      WHERE log RLIKE '(?i)^Alert closed via system.*Auto-Close out-of-rotation time'
+    ) AS ts_out_of_rotation_closed
+  FROM alert_log
   WHERE
-    log LIKE '%[Auto-Close out-of-rotation time]%'    
-  GROUP BY ALL
-),
-get_alert_dei_automation AS (
+    log LIKE '%[Auto-Close out-of-rotation time]%'
+  GROUP BY
+    id_alert
+), get_alert_dei_automation AS (
   SELECT
     l.id_alert,
     IF(
@@ -107,52 +117,51 @@ get_alert_dei_automation AS (
       NULL
     ) AS id_issue_jira,
     NULLIF(REGEXP_EXTRACT(l.log, 'ExecutionStatus\\\[([^\\\]]+)\\\]', 1), '') AS card_creation_status,
-    REGEXP_EXTRACT(l.log, 'ExecutionStatus\\\[([^\\\]]+)\\\]', 1) = "failed" AS is_card_creation_failed
-  FROM
-    alert_log AS l
+    REGEXP_EXTRACT(l.log, 'ExecutionStatus\\\[([^\\\]]+)\\\]', 1) = 'failed' AS is_card_creation_failed
+  FROM alert_log AS l
   WHERE
-    REGEXP_LIKE(l.log, 'AE - DEI Automation')
-),
-get_alert_dei_automation_exception_1 AS (
+    l.log RLIKE 'AE - DEI Automation'
+), get_alert_dei_automation_exception_1 AS (
   SELECT
     l.id_alert,
     NULLIF(REGEXP_EXTRACT(l.log, '\\\{{[^=]+=(DEI-[0-9]+)\\\}}', 1), '') AS id_issue_jira
-  FROM
-    alert_log AS l
+  FROM alert_log AS l
   WHERE
-    REGEXP_LIKE(l.log, '\\\{{issueKey')
-),
-get_alert_dei_automation_exception_2 AS (
+    l.log RLIKE '\\\{{issueKey'
+), get_alert_dei_automation_exception_2 AS (
   SELECT
     l.id_alert,
     NULLIF(SUBSTRING_INDEX(SUBSTRING_INDEX(l.log, 'key: [', -1), ']', 1), '') AS id_issue_jira
-  FROM
-    alert_log AS l
+  FROM alert_log AS l
   WHERE
     l.log LIKE '%key: [DEI-%]'
-),
-filter_dei_automation AS (
+), filter_dei_automation AS (
   SELECT
-    gad.id_alert,
-    CASE 
-      WHEN gad.id_issue_jira RLIKE '^DEI-[0-9]+$' THEN gad.id_issue_jira
-      ELSE COALESCE(exception_1.id_issue_jira, exception_2.id_issue_jira)
-    END AS id_issue_jira,
-    gad.card_creation_status,
-    gad.is_card_creation_failed
-  FROM
-    get_alert_dei_automation AS gad
-  LEFT JOIN
-    get_alert_dei_automation_exception_1 AS exception_1
-      ON exception_1.id_alert = gad.id_alert
-  LEFT JOIN
-    get_alert_dei_automation_exception_2 AS exception_2
-      ON exception_2.id_alert = gad.id_alert
-  QUALIFY
-    1 = ROW_NUMBER() OVER (
+    id_alert,
+    id_issue_jira,
+    card_creation_status,
+    is_card_creation_failed
+  FROM (
+    SELECT
+      gad.id_alert,
+      CASE
+        WHEN gad.id_issue_jira RLIKE '^DEI-[0-9]+$' THEN gad.id_issue_jira
+        ELSE COALESCE(exception_1.id_issue_jira, exception_2.id_issue_jira)
+      END AS id_issue_jira,
+      gad.card_creation_status,
+      gad.is_card_creation_failed,
+      ROW_NUMBER() OVER (
         PARTITION BY gad.id_alert
         ORDER BY CAST(gad.is_card_creation_failed AS SMALLINT)
-    )
+      ) AS rn
+    FROM get_alert_dei_automation AS gad
+    LEFT JOIN get_alert_dei_automation_exception_1 AS exception_1
+      ON exception_1.id_alert = gad.id_alert
+    LEFT JOIN get_alert_dei_automation_exception_2 AS exception_2
+      ON exception_2.id_alert = gad.id_alert
+  ) AS ranked_dei
+  WHERE
+    rn = 1
 )
 SELECT
   a.id_alert,
@@ -176,18 +185,28 @@ SELECT
   a.year,
   a.month,
   a.day
-FROM
-  alert_log AS a
-LEFT JOIN
-  filter_alert_actions AS aa
-    ON a.id_alert = aa.id_alert
-LEFT JOIN
-  get_alert_notification AS an
-    ON aa.id_alert = an.id_alert
-LEFT JOIN
-  get_alert_out_of_rotation AS aor
-    ON a.id_alert = aor.id_alert
-LEFT JOIN
-  filter_dei_automation AS fda
-    ON a.id_alert = fda.id_alert
-GROUP BY ALL
+FROM alert_log AS a
+LEFT JOIN filter_alert_actions AS aa
+  ON a.id_alert = aa.id_alert
+LEFT JOIN get_alert_notification AS an
+  ON aa.id_alert = an.id_alert
+LEFT JOIN get_alert_out_of_rotation AS aor
+  ON a.id_alert = aor.id_alert
+LEFT JOIN filter_dei_automation AS fda
+  ON a.id_alert = fda.id_alert
+GROUP BY
+  a.id_alert,
+  fda.id_issue_jira,
+  aa.closed_by,
+  aa.acknowledged_by,
+  fda.card_creation_status,
+  COALESCE(aor.is_out_of_rotation, FALSE),
+  COALESCE(fda.is_card_creation_failed, FALSE),
+  aa.ts_acknowledged,
+  aa.ts_closed,
+  aor.ts_out_of_rotation_identified,
+  aor.ts_out_of_rotation_closed,
+  a.dt_load,
+  a.year,
+  a.month,
+  a.day

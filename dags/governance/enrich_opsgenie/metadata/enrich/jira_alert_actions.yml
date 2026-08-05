@@ -81,3 +81,23 @@ columns:
     lineage:
     - datalake_jira_ops_clean.alert_log.ts_log
     - datalake_jira_ops_clean.alert_log.log
+  dt_updated:
+    description: Load date of the most recent alert_log record for the alert, used to detect alerts
+      whose actions changed in the processed window
+    lineage:
+    - datalake_jira_ops_clean.alert_log.dt_load
+  year:
+    description: Year of the alert log partition the record was read from. Also a partition of the
+      table
+    lineage:
+    - datalake_jira_ops_clean.alert_log.year
+  month:
+    description: Month of the alert log partition the record was read from. Also a partition of the
+      table
+    lineage:
+    - datalake_jira_ops_clean.alert_log.month
+  day:
+    description: Day of the alert log partition the record was read from. Also a partition of the
+      table
+    lineage:
+    - datalake_jira_ops_clean.alert_log.day

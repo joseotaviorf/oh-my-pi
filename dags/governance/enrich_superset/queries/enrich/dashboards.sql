@@ -45,10 +45,10 @@ WITH last_dash AS (
 ), descr AS (
   SELECT
   id,
-  `value`:meta.code AS entity_description,
+  GET_JSON_OBJECT(`value`, '$.meta.code') AS entity_description,
   RANK() OVER (PARTITION BY id ORDER BY ts_changed DESC) most_recent_txt_rank
   FROM txt_boxes
-  WHERE `key` LIKE 'MARKDOWN-%' AND LOWER(`value`:meta.code) LIKE '%description%' AND CHAR_LENGTH(`value`:meta.code) > 60 -- this also filters published
+  WHERE `key` LIKE 'MARKDOWN-%' AND LOWER(GET_JSON_OBJECT(`value`, '$.meta.code')) LIKE '%description%' AND CHAR_LENGTH(GET_JSON_OBJECT(`value`, '$.meta.code')) > 60 -- this also filters published
 )
 SELECT
   d.id,
@@ -61,7 +61,7 @@ SELECT
   array_remove(regexp_extract_all(d.dashboard_title, '\\[([^\\]]+)\\]'), d.company_line) tags,
   sl.ids_slice AS lineage_charts,
   ds.entity_description,
-  "superset" AS platform,
+  'superset' AS platform,
   d.certified_by,
   IF(l.id_dashboard IS NOT NULL, 'ACTIVE', 'DEPRECATED') AS entity_status,
   d.ts_created,

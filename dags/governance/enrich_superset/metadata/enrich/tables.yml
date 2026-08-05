@@ -1,0 +1,124 @@
+---
+database_name: datalake_superset
+table_name: tables
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description:
+  Enriched Apache Superset dataset catalog for data governance and discovery, with one row per
+  dataset (latest version by change time). Combines physical/virtual classification, company line
+  and tags parsed from the dataset title, column and metric inventories, certification, and
+  creator/owner attribution used to prioritize catalog curation and deprecation work.
+columns:
+  id:
+    lineage:
+      - datalake_superset_clean.tables.id
+    description:
+      Primary key of the dataset in Superset. Uniquely identifies each row in this enrich output.
+  table_name:
+    lineage:
+      - datalake_superset_clean.tables.table_name
+    description:
+      Display name of the dataset as stored in Superset, including bracket tags used for company
+      line and tag extraction.
+  dataset_type:
+    lineage:
+      - datalake_superset_clean.tables.sql_code
+    description:
+      Classification of how the dataset is defined. Set to virtual when the dataset has SQL code and
+      physical when it maps directly to a source table.
+    categories:
+      physical: Dataset points directly to a table in the source database.
+      virtual: Dataset is defined by a custom SQL query in Superset.
+  schema:
+    lineage:
+      - datalake_superset_clean.tables.schema
+    description:
+      Database schema the dataset reads from in the underlying query engine, used to trace the
+      dataset back to lake tables.
+  description:
+    lineage:
+      - datalake_superset_clean.tables.description
+    description:
+      Free-form documentation text filled by the dataset author in Superset, used as the catalog
+      description for the dataset.
+  sql_code:
+    lineage:
+      - datalake_superset_clean.tables.sql_code
+    description:
+      Custom SQL that defines a virtual dataset. Null for physical datasets that map directly to a
+      source table.
+  columns:
+    lineage:
+      - datalake_superset.table_columns.column_name
+      - datalake_superset.table_columns.type
+      - datalake_superset.table_columns.description
+    description:
+      Inventory of the dataset columns, collected as structs with column name, data type, and
+      documentation, for column-level catalog and coverage analysis.
+  metrics:
+    lineage:
+      - datalake_superset_clean.sql_metrics.metric_name
+      - datalake_superset_clean.sql_metrics.verbose_name
+      - datalake_superset_clean.sql_metrics.description
+      - datalake_superset_clean.sql_metrics.metric_type
+      - datalake_superset_clean.sql_metrics.expression
+    description:
+      Inventory of the metrics declared on the dataset, collected as structs with name, label,
+      documentation, type, and SQL expression, for semantic layer auditing.
+  company_line:
+    lineage:
+      - datalake_superset_clean.tables.table_name
+    description:
+      Business area extracted from the dataset title via a fixed regex over known company lines
+      (e.g. For Rent, Growth). Null when the title does not match the expected pattern.
+  tags:
+    lineage:
+      - datalake_superset_clean.tables.table_name
+    description:
+      All bracketed tokens from the dataset title except the matched company_line, as an array of
+      free-form labels used for grouping and search in the governance layer.
+  certified_by:
+    lineage:
+      - datalake_superset_clean.tables.extra
+    description:
+      Certification label or owner string extracted from the certification block of the Superset
+      extra JSON. Null when the dataset has not been certified.
+  business_owners:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Set of email addresses of users explicitly linked to the dataset as owners in sqlatable_user,
+      aggregated for business accountability separate from creator/changed-by.
+  technical_owner:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Email of the Superset user who originally created the dataset (creator account), joined from
+      ab_user using id_user_created.
+  last_owner:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Email of the Superset user who last modified the dataset record, joined from ab_user using
+      id_user_changed.
+  is_semantic_layer:
+    lineage:
+      - datalake_superset_clean.tables.table_name
+    description:
+      True when the dataset title carries the Core bracket tag, marking it as part of the curated
+      semantic layer rather than an ad-hoc dataset.
+  ts_created:
+    lineage:
+      - datalake_superset_clean.tables.ts_created
+    description:
+      Timestamp when the dataset was first created in Superset, in the source timezone stored by the
+      application.
+  ts_changed:
+    lineage:
+      - datalake_superset_clean.tables.ts_changed
+    description:
+      Timestamp of the most recent update to the dataset row, used to pick the latest version in the
+      deduplication logic.
+  platform:
+    description:
+      Constant identifier for the BI tool. Always superset for rows produced by this pipeline.
