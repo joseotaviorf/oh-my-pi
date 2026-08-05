@@ -45,7 +45,6 @@ DAG:
     - bietlejuice.vocs_machina_planning
   contains:
     - bietlejuice.gsheets_
-    - bietlejuice.idactum_
     - bietlejuice.dw_datamarts_
     - quintoml.
 
