@@ -162,6 +162,12 @@ workflow:
       extra_spark_job_arguments:
         - "1o1vg_ekZFODKCDLjCcww9lxmGZutxDn2f90Z1DboD0o"
         - "base_nova_com_gh"
+    # Former notebook: hiring_bonus (Daily Pipeline) — DBP-1834.
+    # Governance: docs/hiring_bonus_offers.md
+    hiring_bonus_offers:
+      extra_spark_job_arguments:
+        - "1SNPW37g1l96rSgAJeQ9iAM0NJlDHxfJlGZ3iJZ4ico4"
+        - "base_hiring_gh"
 
     # --- people_reports notebook migration (Tier-1 validated) ---
     # Former notebook view: base_wfa
