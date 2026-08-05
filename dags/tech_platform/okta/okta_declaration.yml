@@ -7,7 +7,8 @@ dag:
     dag_purpose: |
       Loads and cleans Okta System Log events from the audit-logs S3 bucket into the
       datalake clean layer. Source data is delivered as GZIP NDJSON via EventBridge partner
-      integration and Kinesis Data Firehose.
+      integration and Kinesis Data Firehose. Each target in an event (app, user, policy)
+      is exploded into its own row in system_logs for IAM investigations.
 
 workflow:
   layer: clean
@@ -28,6 +29,6 @@ workflow:
   tables_customization:
     system_logs:
       load_spark_job: system_logs_load
-      merge_on: [year, month, day, id_event]
+      merge_on: [year, month, day, id_event, idx_target]
   default_table_privileges:
     auditlogs: ["ALL PRIVILEGES"]

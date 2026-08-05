@@ -9,11 +9,20 @@ from pyspark.sql.functions import (
     from_json,
     get_json_object,
     hour,
+    lit,
     month,
+    posexplode,
+    size,
     to_timestamp,
     year,
 )
-from pyspark.sql.types import ArrayType, StringType, StructField, StructType
+from pyspark.sql.types import (
+    ArrayType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+)
 from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
@@ -178,7 +187,7 @@ def clean_df(df):
         "detail_parsed", from_json(col("detail"), _OKTA_DETAIL_SCHEMA)
     )
     ts = to_timestamp(col("detail_parsed.published"))
-    return parsed.select(
+    events = parsed.select(
         ts.alias("ts_event"),
         col("detail_parsed.uuid").alias("id_event"),
         col("detail_parsed.eventType").alias("event_type"),
@@ -211,10 +220,77 @@ def clean_df(df):
         hour(ts).alias("hour"),
     ).where(col("detail_parsed.published").isNotNull())
 
+    event_cols = [
+        "ts_event",
+        "id_event",
+        "event_type",
+        "display_message",
+        "severity",
+        "legacy_event_type",
+        "outcome_result",
+        "outcome_reason",
+        "actor_id",
+        "actor_type",
+        "actor_alternate_id",
+        "actor_display_name",
+        "client_ip_address",
+        "client_user_agent",
+        "client_browser",
+        "client_os",
+        "client_device",
+        "client_city",
+        "client_country",
+        "transaction_id",
+        "transaction_type",
+        "id_eventbridge",
+        "eventbridge_source",
+        "eventbridge_detail_type",
+        "js_debug_context",
+        "year",
+        "month",
+        "day",
+        "hour",
+    ]
+
+    exploded = events.where(
+        col("target").isNotNull() & (size(col("target")) > 0)
+    ).select(
+        *[col(c) for c in event_cols],
+        posexplode(col("target")).alias("idx_target", "target_elt"),
+    )
+
+    without_target = events.where(
+        col("target").isNull() | (size(col("target")) == 0)
+    ).select(
+        *[col(c) for c in event_cols],
+        lit(None).cast(IntegerType()).alias("idx_target"),
+    )
+
+    target_rows = exploded.select(
+        *[col(c) for c in event_cols],
+        col("idx_target"),
+        col("target_elt.id").alias("id_target"),
+        col("target_elt.type").alias("target_type"),
+        col("target_elt.alternateId").alias("target_alternate_id"),
+        col("target_elt.displayName").alias("target_display_name"),
+    )
+
+    no_target_rows = without_target.select(
+        *[col(c) for c in event_cols],
+        col("idx_target"),
+        lit(None).cast(StringType()).alias("id_target"),
+        lit(None).cast(StringType()).alias("target_type"),
+        lit(None).cast(StringType()).alias("target_alternate_id"),
+        lit(None).cast(StringType()).alias("target_display_name"),
+    )
+
+    return target_rows.unionByName(no_target_rows)
+
 
 def main():
     """
     Load and clean Okta System Log events from the audit-logs S3 bucket.
+    One output row per target entity within each event (posexplode on detail.target).
     """
     args = parse_arguments()
     if args.table_privileges is not None:

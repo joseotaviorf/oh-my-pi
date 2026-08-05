@@ -2,8 +2,9 @@ database_name: datalake_okta_audit_logs_clean
 table_name: system_logs
 description: |
   Okta System Log events ingested from the audit-logs S3 bucket (EventBridge partner stream
-  delivered as GZIP NDJSON). One row per Okta audit event with actor, client, outcome,
-  and hourly partitions for IAM and security investigations.
+  delivered as GZIP NDJSON). One row per target entity within each event (apps, users,
+  policies); events without targets keep a single row with null target columns. Hourly
+  partitions for IAM and security investigations.
 domain: Tech Platform
 owner: diego.hahn@quintoandar.com.br
 columns:
@@ -15,6 +16,14 @@ columns:
     description: Unique identifier (uuid) assigned by Okta to the system log event.
     lineage:
       - s3_auditlogs_bucket.detail.uuid
+  id_target:
+    description: Okta identifier of the target entity for this row (app, user, policy).
+    lineage:
+      - s3_auditlogs_bucket.detail.target.id
+  idx_target:
+    description: Zero-based position of this target within the parent event target array.
+    lineage:
+      - s3_auditlogs_bucket.detail.target
   event_type:
     description: Okta event type code describing the security or lifecycle action performed.
     lineage:
@@ -103,10 +112,18 @@ columns:
     description: EventBridge detail-type marker indicating an Okta SystemLog payload.
     lineage:
       - s3_auditlogs_bucket.detail-type
-  target:
-    description: JSON array of Okta targets (users, apps, policies) affected by the event.
+  target_type:
+    description: Okta entity type of the target (AppInstance, User, Policy, etc.).
     lineage:
-      - s3_auditlogs_bucket.detail.target
+      - s3_auditlogs_bucket.detail.target.type
+  target_alternate_id:
+    description: Alternate identifier for the target, such as app label or user login.
+    lineage:
+      - s3_auditlogs_bucket.detail.target.alternateId
+  target_display_name:
+    description: Human-readable display name of the Okta target entity on this row.
+    lineage:
+      - s3_auditlogs_bucket.detail.target.displayName
   js_debug_context:
     description: JSON string with Okta debugContext payload for deep-dive investigations.
     lineage:
