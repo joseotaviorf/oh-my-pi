@@ -113,6 +113,7 @@ Rules:
 
 - For each month, use the last `reference_date` available within the month.
 - For a month still open, the value is a moving figure and must be revalidated once the month closes.
+- For weeks, use the last day (Sunday). If the week is still in progress, use yesterday's date as a provisional reference — this value must also be revalidated once the week closes.
 - Do not sum daily backlog and do not average daily percentages.
 
 ### Canonical Filter
@@ -181,9 +182,19 @@ Mandatory rules:
 
 ##### Salesforce
 
-The daily base is rebuilt from case events plus a calendar spine.
+The daily base is rebuilt from case events plus a calendar spine, and that reconstruction is already materialized and confirmed in production as **`sandbox.backlog_salesforce_adjusted`** — the same table backs both the official 5-operation rows (filtered by `team_adjusted IN ('Onboarding', 'Ongoing', 'Payments', 'Payments - DB', 'Offboarding')`) and other operational cuts. Query it directly for the Golden Query below instead of rebuilding from raw case events.
 
-Main components:
+Confirmed columns on `sandbox.backlog_salesforce_adjusted`: `date_reference`, `case_number`, `team_adjusted`, `last_department`, `last_agent_organization`, `ts_started`, `ts_solved`, `ts_closed`, `theme`, `days_worked_with_days_offs`, `is_backlog_not_in_time`.
+
+`team_adjusted` → operation leaf mapping (confirmed against production):
+
+- `Onboarding` → Onboarding
+- `Ongoing` → Ongoing
+- `Payments` → Payments Ativo Back
+- `Payments - DB` → Dados Bancários
+- `Offboarding` → Offboarding
+
+Main components of the underlying reconstruction (background/lineage, useful for auditing `sandbox.backlog_salesforce_adjusted` itself):
 
 - `datalake_salesforce_clean.events_case`
 - `datalake_salesforce_clean.record_types`
@@ -193,7 +204,7 @@ Main components:
 
 Mandatory rules:
 
-- Rebuild via the full official RunSQL — do not query the materialized table `dw_bpo_performance.backlog_metrics_salesforce` in isolation. Confirmed in the field (2026-07-23): this materialized table has up to 22 rows per `case_number` × `date_reference`, each with a distinct `ts_load` (repeated ETL loads, not deduplicated). Using it directly without deduplicating by `ts_load` inflates the backlog by up to ~2.6x. The official RunSQL avoids this problem because it rebuilds history directly from `datalake_salesforce_clean.events_case`, not from this materialized table.
+- Query `sandbox.backlog_salesforce_adjusted` directly (see above) — this is distinct from, and must not be confused with, the materialized table `dw_bpo_performance.backlog_metrics_salesforce`. Confirmed in the field (2026-07-23): `dw_bpo_performance.backlog_metrics_salesforce` has up to 22 rows per `case_number` × `date_reference`, each with a distinct `ts_load` (repeated ETL loads, not deduplicated) — using it directly without deduplicating by `ts_load` inflates the backlog by up to ~2.6x. The rules below describe how `sandbox.backlog_salesforce_adjusted` itself is built from `datalake_salesforce_clean.events_case`; they are lineage/audit context, not steps to reproduce inside this metric's Golden Query.
 - Rebuild `ts_solved` via the `status_historico`/`solved_date` logic (status change history in `events_case`), not from an already-materialized `ts_solved` field.
 - Use only the most recent version of each `case_number`, via `ROW_NUMBER() OVER (PARTITION BY case_number ORDER BY last_modified_date DESC)`, `rn = 1`.
 - Use the case's current/most recent queue; do not accept any historical queue.
@@ -269,7 +280,7 @@ These two residuals are known, small in absolute terms, and do not block using T
 
 The metric can be analyzed by:
 
-- month or reference date;
+- month, week, or reference date;
 - operation;
 - platform;
 - department or queue;
@@ -291,7 +302,7 @@ When breaking down by ticket or `case_number`, the metric must keep the same agg
 - Filter the Zendesk channel via `fact_backlog_metrics_tasks.origin = 'email'`.
 - Exclude `closed_by_merge` tickets.
 - Recompute `is_backlog_in_time`/`is_backlog_not_in_time` from `LEAST(days_worked, days_elapsed_business)` vs. `sla_target`.
-- Rebuild the Salesforce backlog via the full official RunSQL (from `events_case`), not via the isolated materialized table.
+- Query `sandbox.backlog_salesforce_adjusted` directly for the Golden Query — it is the already-materialized, production-confirmed reconstruction (from `events_case`); only rebuild from raw events when auditing the table itself, and never substitute the isolated `dw_bpo_performance.backlog_metrics_salesforce`.
 - Use only the most recent version of each `case_number` (`rn = 1` by `last_modified_date DESC`) and the case's current queue.
 - Exclude deleted Salesforce cases (`event_type = 'DELETE'`) and cases with status `CANCELED`.
 - Use **Saldo** (raw Backlog Total − resolved on the same day) as the official Salesforce denominator.
@@ -302,6 +313,7 @@ When breaking down by ticket or `case_number`, the metric must keep the same agg
 - Sum Payments (Payments Ativo Back + Dados Bancários) and Pós-Contrato (Onboarding + Ongoing + Payments + Offboarding) by summing numerators/denominators.
 - Treat Zendesk as a zero contribution from 2026-06-25 onward in any reconciliation, until the `ts_solved` fallback bug is fixed at the source.
 - Return the SQL used whenever the user requests validation or auditing.
+- Record, when publishing the number, whether the reference month/week has already closed or is still open (moving value).
 
 **Don't:**
 
@@ -316,6 +328,10 @@ When breaking down by ticket or `case_number`, the metric must keep the same agg
 - Don't compute Payments or Pós-Contrato as an average of the child percentages — always sum numerators and denominators.
 - Don't sum daily backlog or average daily percentages.
 - Don't include Pre-Contract operations, Front Office, `others` categories, or CSI/Escalated/Inspection/PP Multi queues outside the official seven-row mapping.
+
+## Targets and OKRs
+
+**Budget (Target)** — 15% Backlog Out of SLA Rate for all operations individually, as well as for the consolidated Post-Contract result.
 
 ## Golden Queries
 
@@ -413,40 +429,23 @@ WHERE aux_number = 1
 
 ### Salesforce Canonical Base
 
-Note: the Salesforce dashboard query rebuilds the daily backlog from raw case events, inline (status history, milestones, SPOC classification, days-off calendar). Reproducing that full reconstruction inside this metric's Golden Query would violate the instruction to keep Golden Queries minimal. This query assumes that reconstruction already exists as a stable upstream table/view (`curated_salesforce_daily_backlog_base`) exposing `date_reference`, `case_number`, `last_department`, `last_agent_organization`, `sla_target`, `days_worked`, `days_worked_with_days_offs`, `is_backlog_in_time`, `is_backlog_not_in_time`, `ts_solved`, `ts_closed`, `channel`. Confirming the exact name/location of that upstream object is an **Open Decision** — if it does not yet exist, the full `cases_perspective` → calendar → `exploded_backlog`/`days_off` chain from the dashboard query needs to be materialized first.
+Note: the Salesforce daily backlog reconstruction from raw case events (status history, milestones, SPOC classification, days-off calendar) is already materialized and confirmed in production as `sandbox.backlog_salesforce_adjusted` (see [Data Sources → Salesforce](#salesforce)) — this Golden Query queries it directly instead of repeating that reconstruction, keeping the query minimal.
 
 ```sql
 WITH salesforce_raw AS (
-  -- Assumes access to an existing, curated daily backlog view/table, built with
-  -- the same cases_perspective + calendar + days_off logic documented in
-  -- "Data Sources > Salesforce". This Golden Query intentionally does not repeat
-  -- the full case-event reconstruction (status history, milestones, SPOC, etc.)
-  -- since those concerns belong to the upstream cases-perspective model, not
-  -- to the Golden Query of this metric.
   SELECT
     case_number                                    AS raw_ticket_id,
     CAST(date_reference AS DATE)                   AS reference_date,
+    team_adjusted                                  AS team_adjusted,
     last_department                                AS last_department,   -- raw omni_channel_queue
     last_agent_organization                         AS agent_organization,
-    sla_target,
-    days_worked,
     days_worked_with_days_offs,
-    is_backlog_in_time,
     is_backlog_not_in_time,
     COALESCE(DATE(ts_solved), DATE(ts_closed))     AS resolution_date
-  -- Replace with the real schema.table once the Open Decision below is settled.
-  FROM curated_salesforce_daily_backlog_base
+  FROM sandbox.backlog_salesforce_adjusted
   -- Change both bounds to the analysis window you want.
   WHERE date_reference BETWEEN DATE('2026-07-01') AND DATE('2026-07-31')
-    AND channel = 'email'
-    AND last_department IN (
-      'Onboarding ForRent',
-      'Ongoing FR - Geral', 'Ongoing FR - Informe de Rendimentos',
-      'Payment FR - Reembolso de Condomínio', 'Payment FR - Condomínio Geral',
-      'Payment FR - Aluguel', 'Payment_FR_GeneralCondominium', 'Payment FR - PP Multi',
-      'Payment FR - Dados Bancários', 'Payment FR - Dados Bancários Front',
-      'Offboarding - CNX', 'Offboarding - AEC', 'Offboarding - Atento'
-    )
+    AND team_adjusted IN ('Onboarding', 'Ongoing', 'Payments', 'Payments - DB', 'Offboarding')
 )
 SELECT
   'salesforce'                                                          AS source_platform,
@@ -455,19 +454,16 @@ SELECT
   reference_date,
   last_department                                                        AS department,
   agent_organization,
-  sla_target,
-  days_worked,
   days_worked_with_days_offs,
   CASE
-    WHEN last_department = 'Onboarding ForRent'                                                                    THEN 'Onboarding'
-    WHEN last_department IN ('Ongoing FR - Geral', 'Ongoing FR - Informe de Rendimentos')                          THEN 'Ongoing'
-    WHEN last_department IN ('Payment FR - Reembolso de Condomínio', 'Payment FR - Condomínio Geral',
-                              'Payment FR - Aluguel', 'Payment_FR_GeneralCondominium', 'Payment FR - PP Multi')     THEN 'Payments Ativo Back'
-    WHEN last_department IN ('Payment FR - Dados Bancários', 'Payment FR - Dados Bancários Front')                 THEN 'Dados Bancários'
-    WHEN last_department IN ('Offboarding - CNX', 'Offboarding - AEC', 'Offboarding - Atento')                     THEN 'Offboarding'
+    WHEN team_adjusted = 'Onboarding'    THEN 'Onboarding'
+    WHEN team_adjusted = 'Ongoing'       THEN 'Ongoing'
+    WHEN team_adjusted = 'Payments'      THEN 'Payments Ativo Back'
+    WHEN team_adjusted = 'Payments - DB' THEN 'Dados Bancários'
+    WHEN team_adjusted = 'Offboarding'   THEN 'Offboarding'
     ELSE NULL
   END                                                                    AS backlog_operation_leaf,
-  is_backlog_in_time,
+  CASE WHEN is_backlog_not_in_time = 1 THEN 0 ELSE 1 END                 AS is_backlog_in_time,
   is_backlog_not_in_time,
   CASE WHEN days_worked_with_days_offs >= 60 THEN 1 ELSE 0 END           AS is_backlog_over_60d
 FROM salesforce_raw
@@ -607,11 +603,5 @@ Main evidence:
 - Zendesk contributes zero from 2026-06-25 onward due to the fixed `ts_solved` fallback (see [Data Sources → Zendesk](#zendesk)) — a confirmed source bug, not a Golden Query issue.
 - Known "Out of SLA" residual in Onboarding and Offboarding in Jun/Jul 2026 (see [Confirmed field limitations](#confirmed-field-limitations-2026-07-23--known-out-of-sla-residual)).
 
-#### Open decision — name/location of `curated_salesforce_daily_backlog_base`
-
-The Salesforce Golden Query depends on a stable upstream table/view that rebuilds the daily backlog from `events_case` + calendar + days-off (see the note above in the Salesforce Canonical Base). The exact name and location of that object have not yet been confirmed. Until that decision is made:
-
-- do not assume a specific schema/table name beyond the `curated_salesforce_daily_backlog_base` placeholder;
-- if the object does not yet exist, materialize the `cases_perspective` → calendar → `exploded_backlog`/`days_off` chain from the dashboard query first;
-- confirm with the Data Steward before assuming the final location.
+**Resolved (2026-08-04)** — the Salesforce upstream table/view name was previously an open decision; it is now confirmed as `sandbox.backlog_salesforce_adjusted` (see [Data Sources → Salesforce](#salesforce)), based on the production reference query that filters it by `team_adjusted` for these same 5 operations.
 
