@@ -116,11 +116,6 @@ def is_json_glue_table(table: Dict) -> bool:
     return serde in (_JSON_SERDE_HCATALOG, _JSON_SERDE_OPENX)
 
 
-def is_openx_json_serde(storage_descriptor: Dict) -> bool:
-    """Return True when the StorageDescriptor still uses OpenX JsonSerDe."""
-    return _serde_library(storage_descriptor) == _JSON_SERDE_OPENX
-
-
 def partition_serde_needs_update(
     table_storage_descriptor: Dict, partition_storage_descriptor: Dict
 ) -> bool:

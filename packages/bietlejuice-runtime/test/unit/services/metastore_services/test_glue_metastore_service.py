@@ -75,8 +75,8 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         self.assertEqual(params.get("EXTERNAL"), "TRUE")
         self.assertNotIn("unity_catalog_source", params)
 
-    def test_json_uses_hive_json_serde_with_iso_timestamp_formats(self):
-        """Databricks→Glue secondary sync must not use OpenX (rejects ISO T/Z)."""
+    def test_json_uses_openx_json_serde_without_serde_params(self):
+        """HCatalog JsonSerDe cannot read nested types and is absent on Serverless."""
         schema = OrderedDict(
             [("id", "bigint"), ("created_at", "timestamp"), ("year", "int")]
         )
@@ -90,15 +90,14 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         sd = ti["StorageDescriptor"]
         self.assertEqual(
             sd["SerdeInfo"]["SerializationLibrary"],
-            "org.apache.hive.hcatalog.data.JsonSerDe",
+            "org.openx.data.jsonserde.JsonSerDe",
         )
-        sparams = sd["SerdeInfo"]["Parameters"]
-        self.assertIn("timestamp.formats", sparams)
-        self.assertIn("'T'", sparams["timestamp.formats"])
-        self.assertIn("'Z'", sparams["timestamp.formats"])
+        # OpenX has no timestamp.formats; the pre-#27145 config set no params.
+        self.assertEqual(sd["SerdeInfo"]["Parameters"], {})
         self.assertEqual(ti["Parameters"].get("classification"), "json")
-        self.assertNotIn("openx", sd["SerdeInfo"]["SerializationLibrary"].lower())
-        # Fragile data columns coerced to string; partition keys stay typed.
+        self.assertNotIn("hcatalog", sd["SerdeInfo"]["SerializationLibrary"].lower())
+        # timestamp still coerced (Timestamp.valueOf rejects ISO T/Z);
+        # partition keys stay typed.
         self.assertEqual(
             sd["Columns"],
             [
@@ -108,7 +107,8 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         )
         self.assertEqual(ti["PartitionKeys"], [{"Name": "year", "Type": "int"}])
 
-    def test_json_coerces_decimal_and_complex_columns_to_string(self):
+    def test_json_keeps_decimal_and_complex_columns_typed(self):
+        """OpenX reads decimal/nested natively; coercing them would lose data."""
         schema = OrderedDict(
             [
                 ("id", "bigint"),
@@ -116,6 +116,8 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
                 ("tags", "array<string>"),
                 ("payload", "struct<a:int>"),
                 ("blob", "binary"),
+                ("created_at", "timestamp"),
+                ("as_of", "date"),
             ]
         )
         ti = GlueMetastoreService._build_table_input(
@@ -127,10 +129,12 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         )
         by_name = {c["Name"]: c["Type"] for c in ti["StorageDescriptor"]["Columns"]}
         self.assertEqual(by_name["id"], "bigint")
-        self.assertEqual(by_name["amount"], "string")
-        self.assertEqual(by_name["tags"], "string")
-        self.assertEqual(by_name["payload"], "string")
+        self.assertEqual(by_name["amount"], "decimal(17,2)")
+        self.assertEqual(by_name["tags"], "array<string>")
+        self.assertEqual(by_name["payload"], "struct<a:int>")
         self.assertEqual(by_name["blob"], "binary")
+        self.assertEqual(by_name["created_at"], "string")
+        self.assertEqual(by_name["as_of"], "string")
 
     def test_parquet_keeps_decimal_and_timestamp_typed(self):
         schema = OrderedDict(
@@ -178,7 +182,9 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
             c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]
         }
         self.assertEqual(by_name["id"], "string")
-        self.assertEqual(by_name["amount"], "string")
+        # decimal survives the merge untouched under OpenX...
+        self.assertEqual(by_name["amount"], "decimal(17,2)")
+        # ...while timestamp is still coerced.
         self.assertEqual(by_name["created_at"], "string")
 
     def test_coerce_json_table_column_types_updates_fragile_types(self):
@@ -192,11 +198,13 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
                 "Columns": [
                     {"Name": "id", "Type": "bigint"},
                     {"Name": "amount", "Type": "decimal(10,2)"},
+                    {"Name": "tags", "Type": "array<string>"},
+                    {"Name": "created_at", "Type": "timestamp"},
                     {"Name": "blob", "Type": "binary"},
                 ],
                 "Location": "s3://bucket/t",
                 "SerdeInfo": {
-                    "SerializationLibrary": "org.apache.hive.hcatalog.data.JsonSerDe",
+                    "SerializationLibrary": "org.openx.data.jsonserde.JsonSerDe",
                     "Parameters": {},
                 },
             },
@@ -205,13 +213,16 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         }
         svc = GlueMetastoreService(glue_client)
         result = svc.coerce_json_table_column_types("db", "t", dry_run=False)
+        # Only created_at is fragile under OpenX.
         self.assertEqual(result["updated"], 1)
         glue_client.update_table.assert_called_once()
         table_input = glue_client.update_table.call_args[0][1]
         by_name = {
             c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]
         }
-        self.assertEqual(by_name["amount"], "string")
+        self.assertEqual(by_name["created_at"], "string")
+        self.assertEqual(by_name["amount"], "decimal(10,2)")
+        self.assertEqual(by_name["tags"], "array<string>")
         self.assertEqual(by_name["blob"], "binary")
         self.assertEqual(table_input["PartitionKeys"][0]["Type"], "int")
 
@@ -258,7 +269,7 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
             {c["Name"]: c["Type"] for c in table_input["StorageDescriptor"]["Columns"]}[
                 "amount"
             ],
-            "string",
+            "decimal(10,2)",
         )
         self.assertEqual(
             [k["Name"].lower() for k in table_input["PartitionKeys"]],
@@ -297,7 +308,7 @@ class TestGlueMetastoreServiceTableInput(unittest.TestCase):
         )
         self.assertEqual(
             table_input["StorageDescriptor"]["SerdeInfo"]["SerializationLibrary"],
-            "org.apache.hive.hcatalog.data.JsonSerDe",
+            "org.openx.data.jsonserde.JsonSerDe",
         )
 
     def test_update_does_not_shrink_registered_schema(self):

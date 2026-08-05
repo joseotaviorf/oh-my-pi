@@ -18,7 +18,6 @@ from bietlejuice.services.metastore_services.glue_partition_utils import (
     discover_hive_partitions_from_s3,
     is_delta_glue_table,
     is_json_glue_table,
-    is_openx_json_serde,
     merge_glue_columns,
     partition_serde_needs_update,
     partition_tuples_to_dicts,
@@ -328,8 +327,11 @@ class GlueMetastoreService(MetastoreService):
         """Align JSON partition SerDe with the table StorageDescriptor.
 
         Updates (does not drop/recreate) partitions whose ``SerdeInfo`` differs
-        from the table — typically stale OpenX after the table moved to
-        HCatalog JsonSerDe + ``timestamp.formats``.
+        from the table. Direction-agnostic: whatever the table carries becomes
+        the target, so this works both for the original OpenX → HCatalog sweep
+        and for the HCatalog → OpenX restore. Partitions carry their own
+        ``SerdeInfo`` *and* ``Columns``, so a table-only update leaves them
+        unreadable.
 
         Returns counts: ``scanned``, ``updated``, ``skipped``, ``errors``.
         """
@@ -369,15 +371,6 @@ class GlueMetastoreService(MetastoreService):
             return counts
 
         table_sd = table.get("StorageDescriptor") or {}
-        if is_openx_json_serde(table_sd):
-            logger.warning(
-                f"m=sync_json_partition_serde, table={database_name}.{table_name}, "
-                "msg=table SerDe is still OpenX; re-register table via prod DAG "
-                "before syncing partitions, skipping"
-            )
-            counts["skipped"] = 1
-            return counts
-
         partitions = self._client.get_partitions(database_name, table_name)
         counts["scanned"] = len(partitions)
 
@@ -500,7 +493,7 @@ class GlueMetastoreService(MetastoreService):
             f"m=coerce_json_table_column_types, table={database_name}.{table_name}, "
             f"scanned={counts['scanned']}, to_update={len(changed)}, "
             f"dropped_partition_duplicates={dropped_partition_duplicates}, "
-            f"dry_run={dry_run}, changed={changed[:20]}, "
+            f"dry_run={dry_run}, changed={changed}, "
             "msg=coercing fragile JSON column types to string"
         )
 

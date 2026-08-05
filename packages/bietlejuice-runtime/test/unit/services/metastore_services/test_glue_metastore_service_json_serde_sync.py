@@ -107,16 +107,32 @@ class TestSyncJsonPartitionSerde(unittest.TestCase):
         self.assertEqual(result["updated"], 1)
         self.glue_client.batch_update_partition.assert_not_called()
 
-    def test_skips_when_table_still_openx(self):
+    def test_pushes_openx_table_serde_onto_hcatalog_partitions(self):
+        """The revert direction: table is OpenX again, partitions still HCatalog.
+
+        The sync is direction-agnostic — whatever the table carries becomes the
+        target — so this is the mode the SerDe backfill actually runs in.
+        """
         self.glue_client.get_table.return_value = _json_table(openx_table=True)
+        self.glue_client.get_partitions.return_value = [
+            _partition(["2018", "10", "19"], openx=False),
+            _partition(["2024", "01", "01"], openx=True),
+        ]
+        self.glue_client.batch_update_partition.return_value = 1
 
         result = self.service.sync_json_partition_serde(
             "datalake_metabase_raw", "report_card"
         )
 
-        self.assertEqual(result["skipped"], 1)
-        self.glue_client.get_partitions.assert_not_called()
-        self.glue_client.batch_update_partition.assert_not_called()
+        self.assertEqual(result["scanned"], 2)
+        self.assertEqual(result["updated"], 1)
+        self.glue_client.batch_update_partition.assert_called_once()
+        _, _, entries = self.glue_client.batch_update_partition.call_args.args
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0]["PartitionValueList"], ["2018", "10", "19"])
+        sd = entries[0]["PartitionInput"]["StorageDescriptor"]
+        self.assertEqual(sd["SerdeInfo"]["SerializationLibrary"], _OPENX)
+        self.assertNotIn("timestamp.formats", sd["SerdeInfo"]["Parameters"])
 
     def test_skips_delta_table(self):
         self.glue_client.get_table.return_value = {

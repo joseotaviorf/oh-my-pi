@@ -1,37 +1,45 @@
 """
-Backfill Glue JSON tables for EMR Hive JsonSerDe compatibility.
+Backfill Glue JSON table and partition metadata for EMR compatibility.
 
 Does two things per JSON table (emr-cli friendly):
 
-1. **Column types** — coerce fragile Glue types (``decimal``, ``timestamp``,
-   ``date``, ``array`` / ``struct`` / ``map``) to ``string``. ``binary`` is
-   left unchanged.
-2. **Partition SerDe** — for partitioned tables, align partition
-   ``SerdeInfo`` with the table StorageDescriptor (typically stale OpenX →
-   HCatalog JsonSerDe + ``timestamp.formats``).
+1. **Column types** — coerce fragile Glue types to ``string``. Only
+   ``timestamp`` and ``date`` qualify: they are the sole types the OpenX
+   JsonSerDe cannot parse (``Timestamp.valueOf`` rejects ISO-8601 ``T`` / ``Z``
+   and OpenX has no ``timestamp.formats``). ``decimal`` and
+   ``array`` / ``struct`` / ``map`` are read natively and left typed.
+2. **Partition SerDe** — for partitioned tables, align partition ``SerdeInfo``
+   and ``Columns`` with the table StorageDescriptor. Partitions carry their own
+   copies, so a table-only change leaves them unreadable. Direction-agnostic:
+   whatever the table declares becomes the target.
+
+The common case is ``--skip-type-coerce``: after the tables themselves have been
+re-registered by their production DAGs, this pushes the table's SerDe down onto
+every existing partition.
 
 Intended to run on EMR via emr-cli::
 
+    # Preview partition SerDe alignment for one database:
     emr-cli transient \\
-      --name glue-json-serde-types-dry-run \\
+      --name glue-json-serde-dry-run \\
       --uri s3://.../sync_glue_json_partition_serde.py \\
-      --job-args '--all-databases --dry-run' \\
+      --job-args '--skip-type-coerce --dry-run --database datalake_cyber_raw' \\
       --core-instance-count 1 \\
       --no-use-spot \\
       --wait --follow-logs
 
-    # Apply for one database (SerDe + types):
+    # Apply across every database:
     emr-cli transient \\
-      --name glue-json-serde-types \\
+      --name glue-json-serde \\
       --uri s3://.../sync_glue_json_partition_serde.py \\
-      --job-args '--database datalake_cyber_raw' \\
+      --job-args '--skip-type-coerce --all-databases' \\
       --core-instance-count 1 \\
       --no-use-spot \\
       --wait --follow-logs
 
 Flags:
 
-* ``--skip-type-coerce`` — only sync partition SerDe (legacy behaviour)
+* ``--skip-type-coerce`` — only sync partition SerDe
 * ``--skip-partition-serde`` — only coerce fragile column types
 """
 

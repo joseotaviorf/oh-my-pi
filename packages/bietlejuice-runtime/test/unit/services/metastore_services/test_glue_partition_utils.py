@@ -11,7 +11,6 @@ from bietlejuice.services.metastore_services.glue_partition_utils import (
     format_partition_value,
     is_delta_glue_table,
     is_json_glue_table,
-    is_openx_json_serde,
     merge_glue_columns,
     partition_serde_needs_update,
     partition_tuples_to_dicts,
@@ -204,14 +203,6 @@ class TestPartitionSerdeNeedsUpdate(unittest.TestCase):
         part = _hcatalog_sd("s3://bucket/raw/t/year=2020/month=01/day=01/")
         part["SerdeInfo"]["Parameters"] = {"serialization.format": "1"}
         self.assertTrue(partition_serde_needs_update(_hcatalog_sd(), part))
-
-
-class TestIsOpenxJsonSerde(unittest.TestCase):
-    def test_openx(self):
-        self.assertTrue(is_openx_json_serde(_openx_sd()))
-
-    def test_hcatalog(self):
-        self.assertFalse(is_openx_json_serde(_hcatalog_sd()))
 
 
 class TestBuildPartitionUpdateEntry(unittest.TestCase):

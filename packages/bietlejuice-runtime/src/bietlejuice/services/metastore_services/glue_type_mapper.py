@@ -125,13 +125,20 @@ def map_uc_type_to_glue(uc_type: str) -> str:
 
 
 def coerce_glue_type_for_json(glue_type: str) -> str:
-    """Coerce Glue types that break Hive JsonSerDe reads to ``string``.
+    """Coerce Glue types that break OpenX JsonSerDe reads to ``string``.
 
-    Fragile on EMR Spark 3.5 + HCatalog JsonSerDe:
+    Only ``timestamp`` and ``date`` are fragile: OpenX parses them with
+    ``Timestamp.valueOf`` / ``Date.valueOf``, which reject the ISO-8601 ``T``
+    separator and ``Z`` suffix emitted by our JSON producers, and OpenX has no
+    ``timestamp.formats`` property to configure around it. Registering them as
+    ``string`` keeps the read working; the consumer casts the value back to the
+    real type before writing to its target table.
 
-    - ``decimal`` — ClassCast ``String → HiveDecimal`` when JSON tokens are strings
-    - ``timestamp`` / ``date`` — format parsing / OpenX-style ISO regressions
-    - ``array`` / ``struct`` / ``map`` — ``ArrayList → HCatRecord`` ClassCast
+    Everything else is left alone. ``decimal`` and ``array`` / ``struct`` /
+    ``map`` were also coerced while the catalog was on HCatalog JsonSerDe
+    (#27238) because that SerDe raised ``String → HiveDecimal`` and
+    ``ArrayList → HCatRecord`` ClassCasts; OpenX handles all of them natively,
+    so coercing them would lose the nested payload for no benefit.
 
     ``binary`` is intentionally left unchanged (deferred separately).
     Partition keys must not be passed through this helper.
@@ -141,10 +148,6 @@ def coerce_glue_type_for_json(glue_type: str) -> str:
     if not lower:
         return "string"
     if lower in ("timestamp", "date"):
-        return "string"
-    if lower.startswith("decimal"):
-        return "string"
-    if lower.startswith(("array<", "struct<", "map<")):
         return "string"
     return trimmed
 

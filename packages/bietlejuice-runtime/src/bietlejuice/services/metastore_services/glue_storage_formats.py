@@ -23,10 +23,19 @@ _PARQUET_OUTPUT = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputForma
 _PARQUET_SERDE = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 _JSON_INPUT = "org.apache.hadoop.mapred.TextInputFormat"
 _JSON_OUTPUT = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
-# Hive JsonSerDe (same as TableFormatInfo.json / HiveMetastoreService). OpenX
-# JsonSerDe calls Timestamp.valueOf and rejects ISO-8601 with ``T`` / ``Z``,
-# which breaks EMR reads of raw JSON tables synced from Databricks → Glue.
-_JSON_SERDE = "org.apache.hive.hcatalog.data.JsonSerDe"
+# OpenX JsonSerDe. Hive's HCatalog JsonSerDe was tried instead (#27145) so that
+# ISO-8601 timestamps could be parsed via ``timestamp.formats``, but it cannot
+# deserialize nested types at all (``ArrayList -> HCatRecord`` ClassCast), it
+# needs ``hive-hcatalog-core`` bootstrapped onto every cluster, and it is absent
+# on EMR Serverless (reads return ``Data Cols: []``). OpenX handles
+# struct/array/map natively with no extra JAR.
+#
+# OpenX cannot parse ISO-8601 timestamps -- it relies on ``Timestamp.valueOf``,
+# which rejects the ``T`` separator and ``Z`` suffix, and upstream documents no
+# ``timestamp.formats`` property. ``timestamp`` / ``date`` columns are therefore
+# registered as ``string`` (see ``coerce_glue_type_for_json``) and cast back to
+# the real type by the consumer.
+_JSON_SERDE = "org.openx.data.jsonserde.JsonSerDe"
 # Comma-separated patterns for Hive JsonSerDe TimestampParser (Joda
 # DateTimeFormat.forPattern — not Java DateTimeFormatter).
 # Do NOT use ``XXX`` (Java-only ISO offset): SerDe init fails with
@@ -34,6 +43,9 @@ _JSON_SERDE = "org.apache.hive.hcatalog.data.JsonSerDe"
 # Use literal ``'Z'`` for UTC ``...Z``; Joda ``ZZ`` for ``+00:00`` offsets
 # (docs: https://www.joda.org/joda-time/apidocs/org/joda/time/format/DateTimeFormat.html
 # — "ZZ outputs the offset with a colon").
+#
+# Consumed only by ``HiveMetastoreService`` / ``TableFormatInfo``, which stay on
+# HCatalog. The Glue JSON config below deliberately sets no SerDe parameters.
 JSON_TIMESTAMP_FORMATS = (
     "yyyy-MM-dd'T'HH:mm:ss.SSS'Z',"
     "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z',"
@@ -86,10 +98,6 @@ GLUE_STORAGE_FORMATS: Dict[str, StorageFormatConfig] = {
         output_format=_JSON_OUTPUT,
         serialization_library=_JSON_SERDE,
         classification="json",
-        serde_params={
-            "serialization.format": "1",
-            "timestamp.formats": JSON_TIMESTAMP_FORMATS,
-        },
     ),
 }
 

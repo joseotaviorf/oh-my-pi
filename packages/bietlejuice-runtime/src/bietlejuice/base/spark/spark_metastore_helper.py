@@ -79,10 +79,14 @@ class SparkMetastoreHelper:
         """
         Forcefully set fragile JSON-read column types to string for raw sync.
 
-        Historically only timestamps were rewritten (Hive cannot parse the same
-        Mongo-style ``$date`` tokens Spark extracts). EMR HCatalog JsonSerDe
-        also fails on decimal / date / nested types, so those are coerced to
-        ``string`` as well. ``binary`` is left unchanged.
+        Timestamps are rewritten because Hive cannot parse the Mongo-style
+        ``$date`` tokens Spark extracts, and OpenX JsonSerDe on EMR cannot parse
+        ISO-8601 ``T`` / ``Z`` timestamps either. ``date`` is coerced for the
+        same reason. Everything else -- including ``decimal`` and nested
+        struct/array/map -- is left typed, because OpenX reads those natively.
+
+        Delegates the decision to ``coerce_glue_type_for_json`` so the raw-sync
+        path and the Glue registration path can never disagree.
 
         :param spark_ms_table_columns: the spark columns schema
         :return: columns with fragile types as string

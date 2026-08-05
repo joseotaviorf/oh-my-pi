@@ -82,19 +82,30 @@ class TestGetAllTablesMetadata:
 
 
 class TestSetTimestampsAsString:
-    def test_coerces_fragile_json_types_leaves_binary(self):
+    def test_coerces_only_timestamp_and_date(self):
+        """OpenX reads decimal and nested types natively; only dates are fragile."""
         cols = OrderedDict(
             [
                 ("id", "bigint"),
                 ("amount", "decimal(17,2)"),
                 ("ts", "timestamp"),
+                ("dt", "date"),
                 ("tags", "array<string>"),
                 ("blob", "binary"),
             ]
         )
         result = SparkMetastoreHelper.set_timestamps_as_string(cols)
         assert result["id"] == "bigint"
-        assert result["amount"] == "string"
+        assert result["amount"] == "decimal(17,2)"
         assert result["ts"] == "string"
-        assert result["tags"] == "string"
+        assert result["dt"] == "string"
+        assert result["tags"] == "array<string>"
         assert result["blob"] == "binary"
+
+    def test_nested_timestamp_is_not_rewritten(self):
+        """A naive substring replace turned ``array<timestamp>`` into
+        ``array<string>``; the type-aware coercion leaves the whole type alone.
+        """
+        cols = OrderedDict([("stamps", "array<timestamp>")])
+        result = SparkMetastoreHelper.set_timestamps_as_string(cols)
+        assert result["stamps"] == "array<timestamp>"
