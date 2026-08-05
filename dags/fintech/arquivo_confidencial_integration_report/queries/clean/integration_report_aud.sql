@@ -39,6 +39,10 @@ SELECT
         'BOAVISTA_REPORT_SCORE_P6'
       )
         THEN GET_JSON_OBJECT(attributes, '$.score_p6')
+      WHEN TRIM(UPPER(integration_provider)) = 'BOAVISTA_SCORE_EOS_2026'
+        THEN GET_JSON_OBJECT(attributes, '$.score_eos_2026')
+      WHEN TRIM(UPPER(integration_provider)) = 'BOAVISTA_REPORT_EOS_2026'
+        THEN GET_JSON_OBJECT(attributes, '$.eos_2026')
     END AS bvs_score,
     created_at AS ts_created,
     CAST(year AS INT) AS year,
