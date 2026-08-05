@@ -204,6 +204,22 @@ END
 - Don't treat the Recontato `agent_organization` filter as universal — it is specific to these two metrics; do not apply it to DSat Front or Resolution Rate unless explicitly requested.
 - Don't filter the `post-rental` scope with only `last_team IN (...)` — the `pre_and_post_contract` `CASE` (Nuances) classifies `post-rental` via **two independent branches**: a `last_department IN (...)` branch (e.g. `'CX Reparos [FRONT] [POS]'`) and a separate `last_team IN (...)` branch. Filtering on just one silently drops eligible sessions and skews DSat Front, Resolution Rate, and Recontato D0/D4 low versus the stated canonical scope — always replicate the full `CASE` (see Golden Queries).
 
+## Targets and OKRs
+
+**DSat Front** — monthly period DSat target for Post Contract front-office support.
+
+- **Source table:** `datalake_gsheets_clean.target_service_kpis`
+- **Filter key / metric name:** `DSAT Front Post Contract` — this target contains the four
+  areas of PostContract: 'Onboarding', 'Offboarding', 'Payments', and 'Repairs/Ongoing'.
+  If the user asks for individual views versus targets, consider the following filter keys
+  at metric name: Onboarding = `DSat Front Onboarding`; Offboarding = `DSat Front Offboarding`;
+  Payments = `DSAT Front Payments`; Repairs/Ongoing = `DSAT Front Reparos/Ongoing`.
+- **Period grain:** month
+- **Aliases / search terms:** target DSat Front Pós Contrato, OKR DSat Front PostContract,
+  meta DSat Front Post Rental
+- **Delta:** use percentage variation (result versus target) instead of percentage points
+- **Caveat:** targets are informational only — never substitute target for computed NPS.
+
 ## Golden Queries
 
 Temporal axis confirmed by the team: `ts_submitted` for DSat/Resolution, `dt_created` for Recontato D4/D0 (see "Temporal reference axis" above). `pre_and_post_contract` is not a stored column, so both queries materialize it in a `scoped` CTE using the **full** `CASE` documented under "Nuances" — not just its `last_team` branch. The `CASE` classifies `post-rental` via **two independent branches**: a `last_department IN (...)` branch (e.g. `'CX Reparos [FRONT] [POS]'`) and a separate `last_team IN (...)` branch; filtering on only one of the two silently drops eligible sessions and skews every metric in this family low. Trino dialect.

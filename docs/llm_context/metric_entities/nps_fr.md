@@ -336,19 +336,16 @@ breakdown via `customer_type` and crossable with one another):
 
 ## Targets and OKRs
 
-**OKR** — quarterly period NPS goal per journey, co-located with the official weights in
+**OKR** — monthly period NPS goal per journey, co-located with the official weights in
 the same GSheet table (informational — **not** used in the NPS calculation).
 
-- **Source table:** `datalake_gsheets_clean.nps_target_share`
-- **Filter key / metric name:** `customer_journey = 'TRUE'` (UPPERCASE — ≠ `dim_nps_campaign`,
-  which uses lowercase `'true'`) and match `campaign_group` to the journey
-  (`onboarding`, `ongoing`, `offboarding`)
-- **Period grain:** quarterly (`dt_start` / `dt_end`); join `CAST(ref_month AS DATE) BETWEEN dt_start AND dt_end`
+- **Source table:** `datalake_gsheets_clean.target_service_kpis`
+- **Filter key / metric name:** `NPS For Rent` and match `campaign_group` to the journey
+  (onboarding = `NPS Onboarding`, ongoing = `NPS Ongoing`, offboarding = `NPS Offboarding`)
+- **Period grain:** month
 - **Value column:** `target` (period NPS target per journey)
 - **Aliases / search terms:** meta de NPS, target de NPS, meta NPS True, OKR NPS
-- **Caveat:** targets are informational only — never substitute `target` for computed NPS.
-  When a quarter has no registered row, the weight fallback applies; the target for that
-  journey may also be missing for the same period.
+- **Caveat:** targets are informational only — never substitute target for computed NPS.
 
 ## Golden Queries
 
