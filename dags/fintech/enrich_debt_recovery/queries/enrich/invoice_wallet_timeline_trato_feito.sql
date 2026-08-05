@@ -502,11 +502,11 @@ delay_contamination_contract AS (
   GROUP BY 1, 2
 )
 SELECT
-  MD5(CONCAT(i.id_invoice, i.id_contract, DATE_FORMAT(i.dt_reference, 'yyyyMMdd'))) AS sk_invoice_wallet_timeline,
-  i.id_contract AS sk_contract,
-  i.id_invoice AS sk_invoice,
-  i.id_negotiation_parent AS sk_negotiation_parent,
-  i.id_negotiation_child AS sk_negotiation_child,
+  MD5(CONCAT(i.id_invoice, i.id_contract, DATE_FORMAT(i.dt_reference, 'yyyyMMdd'))) AS id_invoice_wallet_timeline,
+  i.id_contract,
+  i.id_invoice,
+  i.id_negotiation_parent,
+  i.id_negotiation_child,
   i.dt_reference,
   i.is_child_negotiation,
   i.is_negative_eligible,

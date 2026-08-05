@@ -23,4 +23,4 @@ workflow:
     invoice_wallet_timeline_trato_feito:
       extraction_type: incremental
       partitions: [year, month, day]
-      z_order_by: [dt_reference, sk_contract, sk_invoice]
+      z_order_by: [dt_reference, id_contract, id_invoice]
