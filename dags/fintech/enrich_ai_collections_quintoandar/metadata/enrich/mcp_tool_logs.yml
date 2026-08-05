@@ -94,6 +94,16 @@ columns:
     description: Polling attempt index for repeated downstream calls within a single MCP
       tool invocation (e.g. TratoFeito.GetOngoingNegotiation polling inside
       create_negotiation_v1); NULL for non-polling calls.
+  call_invoice_preview_dispatch:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Which next-invoice preview the downstream call asked SeuBarriga to compose,
+      from the call element invoice_preview_dispatch field; populated only for
+      SeuBarriga.GetInvoicePreview calls inside get_next_invoice_preview_v1. Values
+      first-invoice/onboarding (the tenant has no issued invoice yet, so the onboarding
+      charges are previewed), first-invoice/monthly-fallback (the onboarding preview came
+      back empty because the first charge was deferred onto the first monthly invoice) and
+      monthly (a regular monthly invoice preview); NULL for all other calls.
   call_index:
     lineage:
       - datalake_request_logging_clean.collections.application_payload
@@ -120,7 +130,9 @@ columns:
       element at its array position. Always a string value — either a scalar (e.g. empty,
       empty:NOT_FOUND, empty:NO_OPTIONS_FOR_AUDIENCE, empty:ONGOING_NEGOTIATION, EVICTIONS)
       or a JSON-stringified array (e.g. ["pixleto-1x-lpf","cc-lpf"] for GetNegotiationOptions,
-      [3990,10009,...] for GetContracts); NULL when the call element omits the response field.
+      [3990,10009,...] for GetContracts and GetIssuedInvoicesForContract, ["Aluguel",...] of
+      charge labels for GetInvoicePreview, also exposed typed as call_invoice_preview_entries);
+      NULL when the call element omits the response field.
   mcp_duration_ms:
     lineage:
       - datalake_request_logging_clean.collections.request
@@ -152,12 +164,23 @@ columns:
       - datalake_request_logging_clean.collections.application_payload
     description: Array of house identifiers returned or referenced by the downstream
       service call when applicable.
+  call_invoice_preview_entries:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Charge labels of the entries composing the previewed next invoice (e.g.
+      ["Aluguel", "Taxa de servico"]), parsed from the SeuBarriga.GetInvoicePreview call
+      response; the literal unlabeled stands for an entry SeuBarriga returned with no help
+      label. Empty array when the preview was composed with no entries (the onboarding
+      attempt that triggers the monthly fallback); NULL for every other downstream call and
+      when the preview itself could not be fetched. Amounts are deliberately not logged, so
+      use this to see which charges the tenant was shown, never how much was charged.
   call_payload_json:
     lineage:
       - datalake_request_logging_clean.collections.application_payload
     description: JSON serialization of the typed call struct fields (client, function,
-      outcome, http_status, reason, contract_id, order_id, house_ids, attempt) for
-      ad-hoc exploration. Does not include the response field; use call_response instead.
+      outcome, http_status, reason, contract_id, order_id, house_ids, attempt,
+      invoice_preview_dispatch) for ad-hoc exploration. Does not include the response
+      field; use call_response instead.
   year:
     lineage:
       - datalake_request_logging_clean.collections.ts_request

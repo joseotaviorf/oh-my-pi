@@ -177,6 +177,22 @@ columns:
     description:
       Count of distinct send_original_invoice_boleto_pix_email MCP requests
       with a non-2xx HTTP status in the session.
+  n_next_invoice_preview_calls:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
+    description:
+      Count of distinct get_next_invoice_preview_v1 MCP requests made in the
+      session to show the tenant what their next invoice is going to charge before it
+      is issued.
+  n_next_invoice_preview_errors:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.mcp_tool_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.is_mcp_success
+    description:
+      Count of distinct get_next_invoice_preview_v1 MCP requests with a non-2xx
+      HTTP status in the session.
   n_mcp_tool_errors:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.id_request
@@ -352,6 +368,53 @@ columns:
       successful TratoFeito.GetOngoingNegotiation call without an empty response was recorded
       in the session, indicating the payment confirmation info was not retrieved for display;
       else 0.
+  flag_next_invoice_preview_onboarding:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_invoice_preview_dispatch
+    description:
+      Whether the agent previewed a first invoice for a tenant who has no issued
+      invoice yet, so the preview was composed from the onboarding charges (move-in fees,
+      pro-rated rent). Technically, 1 when at least one SeuBarriga.GetInvoicePreview call in
+      the session used the first-invoice/onboarding dispatch; else 0. Not mutually exclusive
+      with flag_next_invoice_preview_monthly_fallback — an onboarding attempt that comes back
+      with no entries sets both, since the fallback is only reached after it.
+  flag_next_invoice_preview_monthly_fallback:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_invoice_preview_dispatch
+    description:
+      Whether the next invoice previewed for the tenant was a first invoice whose
+      onboarding charges had already been deferred onto the first monthly invoice (the
+      "boletão" case), so the preview had to be composed from the monthly charges instead.
+      Technically, 1 when at least one SeuBarriga.GetInvoicePreview call in the session used
+      the first-invoice/monthly-fallback dispatch (reached only after the onboarding preview
+      came back with no entries); else 0.
+  flag_next_invoice_preview_monthly:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_invoice_preview_dispatch
+    description:
+      Whether the agent previewed a regular monthly invoice — the tenant already has
+      issued invoices, so the preview is the next month's recurring charges rather than a
+      first invoice. Technically, 1 when at least one SeuBarriga.GetInvoicePreview call in
+      the session used the monthly dispatch; else 0. Can coexist with the first-invoice flags
+      when the session previews more than one of the person's contracts.
+  next_invoice_preview_entries_list:
+    lineage:
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_invoice_preview_entries
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.call_function_name
+      - datalake_ai_collections_quintoandar.mcp_tool_logs.is_call_success
+    description:
+      Which charges the agent showed the tenant when previewing their next invoice
+      (for example rent and the service fee), as the JSON array text of the charge labels
+      SeuBarriga composed the preview from — the literal unlabeled stands for a charge
+      returned with no label. Technically, from the successful SeuBarriga.GetInvoicePreview
+      calls in the session that returned at least one entry; empty previews are skipped so
+      the first-invoice fallback reports the monthly charges that were actually shown. NULL
+      when no preview was composed in the session. Amounts are not logged upstream, so this
+      says which charges were shown, never how much was charged; a session that previews more
+      than one contract reports only one of the previews.
   ts_first_mcp_call:
     lineage:
       - datalake_ai_collections_quintoandar.mcp_tool_logs.ts_request

@@ -11,6 +11,8 @@ WITH base AS (
         mtl.mcp_option_key,
         mtl.mcp_payment_method,
         mtl.call_function_name,
+        mtl.call_invoice_preview_dispatch,
+        mtl.call_invoice_preview_entries,
         mtl.call_outcome,
         mtl.call_response,
         mtl.call_http_status,
@@ -56,6 +58,8 @@ SELECT
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_original_invoices_by_status_v1' AND b.is_mcp_success = false THEN b.id_request END) AS n_original_invoices_errors,
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'send_original_invoice_boleto_pix_email' THEN b.id_request END) AS n_original_invoice_email_calls,
     COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'send_original_invoice_boleto_pix_email' AND b.is_mcp_success = false THEN b.id_request END) AS n_original_invoice_email_errors,
+    COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_next_invoice_preview_v1' THEN b.id_request END) AS n_next_invoice_preview_calls,
+    COUNT(DISTINCT CASE WHEN b.mcp_tool_name = 'get_next_invoice_preview_v1' AND b.is_mcp_success = false THEN b.id_request END) AS n_next_invoice_preview_errors,
     COUNT(DISTINCT CASE WHEN b.is_mcp_success = false THEN b.id_request END) AS n_mcp_tool_errors,
     MAX(
         CASE
@@ -198,6 +202,38 @@ SELECT
         THEN 1
         ELSE 0
     END AS flag_negotiation_created_missing_payment_info,
+    MAX(
+        CASE
+            WHEN b.call_function_name = 'GetInvoicePreview'
+                AND b.call_invoice_preview_dispatch = 'first-invoice/onboarding'
+            THEN 1
+            ELSE 0
+        END
+    ) AS flag_next_invoice_preview_onboarding,
+    MAX(
+        CASE
+            WHEN b.call_function_name = 'GetInvoicePreview'
+                AND b.call_invoice_preview_dispatch = 'first-invoice/monthly-fallback'
+            THEN 1
+            ELSE 0
+        END
+    ) AS flag_next_invoice_preview_monthly_fallback,
+    MAX(
+        CASE
+            WHEN b.call_function_name = 'GetInvoicePreview'
+                AND b.call_invoice_preview_dispatch = 'monthly'
+            THEN 1
+            ELSE 0
+        END
+    ) AS flag_next_invoice_preview_monthly,
+    MAX(
+        CASE
+            WHEN b.call_function_name = 'GetInvoicePreview'
+                AND b.is_call_success = true
+                AND SIZE(b.call_invoice_preview_entries) > 0
+            THEN TO_JSON(b.call_invoice_preview_entries)
+        END
+    ) AS next_invoice_preview_entries_list,
     MIN(b.ts_request) AS ts_first_mcp_call,
     MAX(b.ts_request) AS ts_last_mcp_call,
     YEAR(MAX(b.ts_request)) AS year,

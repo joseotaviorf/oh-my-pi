@@ -13,7 +13,7 @@ WITH collections AS (
         GET_JSON_OBJECT(c.application_payload, '$.domain_info.calls') AS calls_json_str,
         FROM_JSON(
             GET_JSON_OBJECT(c.application_payload, '$.domain_info.calls'),
-            'ARRAY<STRUCT<client:STRING, function:STRING, outcome:STRING, http_status:INT, reason:STRING, contract_id:LONG, order_id:STRING, house_ids:ARRAY<LONG>, attempt:INT>>'
+            'ARRAY<STRUCT<client:STRING, function:STRING, outcome:STRING, http_status:INT, reason:STRING, contract_id:LONG, order_id:STRING, house_ids:ARRAY<LONG>, attempt:INT, invoice_preview_dispatch:STRING>>'
         ) AS calls_array,
         c.ts_request,
         ROW_NUMBER() OVER (
@@ -55,7 +55,8 @@ tool_observations AS (
             'simulate_negotiation_v1',
             'create_negotiation_v1',
             'get_original_invoices_by_status_v1',
-            'send_original_invoice_boleto_pix_email'
+            'send_original_invoice_boleto_pix_email',
+            'get_next_invoice_preview_v1'
         )
 ),
 mcp_with_obs AS (
@@ -111,6 +112,7 @@ SELECT
     call.reason AS call_reason,
     call.order_id AS call_order_id,
     call.attempt AS call_attempt,
+    call.invoice_preview_dispatch AS call_invoice_preview_dispatch,
     pos AS call_index,
     p.mcp_input,
     p.mcp_tool_error_message,
@@ -122,6 +124,13 @@ SELECT
     (call.outcome = 'success') AS is_call_success,
     p.ts_request,
     call.house_ids AS call_house_ids,
+    CASE
+        WHEN call.function = 'GetInvoicePreview'
+        THEN FROM_JSON(
+            GET_JSON_OBJECT(p.calls_json_str, CONCAT('$[', pos, '].response')),
+            'ARRAY<STRING>'
+        )
+    END AS call_invoice_preview_entries,
     TO_JSON(call) AS call_payload_json,
     YEAR(p.ts_request) AS year,
     MONTH(p.ts_request) AS month,
