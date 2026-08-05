@@ -15,6 +15,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     sync_runs_trino:
+      execution_timeout_hours: 3
       clean_z_order_by: [id_sync]
       load_spark_job: load_hightouch_sync_runs
       extra_spark_job_arguments:
