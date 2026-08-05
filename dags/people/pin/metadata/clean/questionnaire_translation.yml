@@ -1,0 +1,76 @@
+database_name: datalake_pin_questionnaires_clean
+table_name: questionnaire_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Localized names, descriptions, and intro text for questionnaire definitions in PIN.
+  One row per questionnaire per language.
+  Covers all questionnaire translations ingested from PIN.
+  HTML tags are stripped from intro_text in the clean layer; timestamps are cast to TIMESTAMP.
+columns:
+  id_questionnaire:
+    description: Identifier of the questionnaire definition being translated in PIN. References datalake_pin_questionnaires_clean.questionnaire_base.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.questionnaire_id
+  id_business_group:
+    description: Identifier of the enterprise business group in PIN, used for multi-tenancy partitioning.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.business_group_id
+  name:
+    description: Localized display name of the questionnaire shown to participants.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.name
+  description:
+    description: Localized long description of the questionnaire purpose and context.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.description
+  intro_text:
+    description: Localized introduction shown before the first question, with HTML tags stripped in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.intro_text
+  language:
+    description: ISO language code of the translation row in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.language
+  source_language:
+    description: ISO language code in which the translatable content was originally authored in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.source_lang
+  created_by:
+    description: PIN user who created the row.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.created_by
+  updated_by:
+    description: PIN user or process that last updated the row.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.last_updated_by
+  object_version_number:
+    description: Optimistic locking counter incremented on each update to detect concurrent changes.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.object_version_number
+  questionnaire_version_number:
+    description: Version number of the questionnaire definition associated with this translation, cast to integer in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.qstnr_version_num
+  ts_created:
+    description: Timestamp when the row was created in PIN, cast to TIMESTAMP in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.creation_date
+  ts_updated:
+    description: Timestamp when the row was last updated in PIN, cast to TIMESTAMP in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.last_update_date
+  ts_load:
+    description: Timestamp when the record was loaded into the clean table.
+  year:
+    description: Partition year derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.year
+  month:
+    description: Partition month derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.month
+  day:
+    description: Partition day derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_tl.day

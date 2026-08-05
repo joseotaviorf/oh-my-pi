@@ -1,0 +1,88 @@
+database_name: datalake_pin_questionnaires_clean
+table_name: question_base
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Master question definitions in PIN, including type, scoring configuration, and lifecycle status.
+  One row per question version.
+  Covers all question definitions ingested from PIN.
+  Y/N source flags are converted to boolean; version numbers are cast to integers; full refresh from raw.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise business group in PIN, used for multi-tenancy partitioning.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.business_group_id
+  id_category:
+    description: Identifier of the question category in PIN used to group related questions.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.category_id
+  id_question:
+    description: Identifier of the question definition in PIN. Part of the table grain together with question_version_number; join on both columns when resolving a specific version. Referenced by datalake_pin_questionnaires_clean.questionnaire_question and question_translation.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.question_id
+  id_response_type:
+    description: Identifier of the default response type configured for this question in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.response_type_id
+  created_by:
+    description: PIN user who created the row.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.created_by
+  updated_by:
+    description: PIN user or process that last updated the row.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.last_updated_by
+  status:
+    description: Lifecycle status code of the question definition in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.status
+  question_code:
+    description: Stable business code that identifies the question across versions in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.question_code
+  question_type:
+    description: Interaction type of the question in PIN, defining how respondents answer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.question_type
+    categories:
+      1CHOICE: Single-choice question with one selectable answer.
+      MULTCHOICE: Multiple-choice question with one or more selectable answers.
+      TEXT: Free-text question answered with open text.
+  is_latest_version:
+    description: True when this row is the latest version of the question definition in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.latest_version
+  is_scored:
+    description: True when responses to this question contribute to a numeric score in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.scored_flag
+  object_version_number:
+    description: Optimistic locking counter incremented on each update to detect concurrent changes.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.object_version_number
+  question_version_number:
+    description: Version number of the question definition represented by this row, cast to integer in the clean layer. Part of the table grain together with id_question.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.qstn_version_num
+  ts_created:
+    description: Timestamp when the row was created in PIN, cast to TIMESTAMP in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.creation_date
+  ts_updated:
+    description: Timestamp when the row was last updated in PIN, cast to TIMESTAMP in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.last_update_date
+  ts_load:
+    description: Timestamp when the record was loaded into the clean table.
+  year:
+    description: Partition year derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.year
+  month:
+    description: Partition month derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.month
+  day:
+    description: Partition day derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questions_b.day

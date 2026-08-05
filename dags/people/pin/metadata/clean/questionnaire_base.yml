@@ -1,0 +1,88 @@
+database_name: datalake_pin_questionnaires_clean
+table_name: questionnaire_base
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Master questionnaire definitions in PIN, including lifecycle status, scoring configuration, and version metadata.
+  One row per questionnaire version.
+  Covers all questionnaire definitions ingested from PIN, including exit surveys and exit interviews.
+  Status codes are normalized to active, inactive, or draft; Y/N flags are converted to boolean; full refresh from raw.
+columns:
+  id_questionnaire:
+    description: Identifier of the questionnaire definition in PIN. Part of the table grain together with questionnaire_version_number; join on both columns when resolving a specific version. Referenced by datalake_pin_questionnaires_clean.questionnaire_translation and datalake_pin_core_clean.allocated_task_translation.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.questionnaire_id
+  id_business_group:
+    description: Identifier of the enterprise business group in PIN, used for multi-tenancy partitioning.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.business_group_id
+  questionnaire_code:
+    description: Stable business code that identifies the questionnaire across versions in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.questionnaire_code
+  status:
+    description: Lifecycle status of the questionnaire, normalized from PIN single-letter codes in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.status
+    categories:
+      active: Questionnaire is active and available for use in PIN.
+      inactive: Questionnaire is inactive and not available for new assignments in PIN.
+      draft: Questionnaire is in draft state and not yet published in PIN.
+  created_by:
+    description: PIN user who created the row.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.created_by
+  updated_by:
+    description: PIN user or process that last updated the row.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.last_updated_by
+  object_version_number:
+    description: Optimistic locking counter incremented on each update to detect concurrent changes.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.object_version_number
+  questionnaire_version_number:
+    description: Version number of the questionnaire definition represented by this row, cast to integer in the clean layer. Part of the table grain together with id_questionnaire.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.qstnr_version_num
+  is_in_use:
+    description: True when the questionnaire is currently available for assignment to participants in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.in_use
+  is_latest_version:
+    description: True when this row is the latest version of the questionnaire definition in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.latest_version
+  is_privacy:
+    description: True when the questionnaire is marked as private in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.privacy_flag
+  is_scored:
+    description: True when responses to this questionnaire contribute to a numeric score in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.scored_flag
+  is_template:
+    description: True when this questionnaire is a reusable template rather than a live instance in PIN.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.template_flag
+  ts_created:
+    description: Timestamp when the row was created in PIN, cast to TIMESTAMP in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.creation_date
+  ts_updated:
+    description: Timestamp when the row was last updated in PIN, cast to TIMESTAMP in the clean layer.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.last_update_date
+  ts_load:
+    description: Timestamp when the record was loaded into the clean table.
+  year:
+    description: Partition year derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.year
+  month:
+    description: Partition month derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.month
+  day:
+    description: Partition day derived from ts_updated.
+    lineage:
+    - datalake_pin_questionnaires_raw.hrq_questionnaires_b.day

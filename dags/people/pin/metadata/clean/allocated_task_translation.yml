@@ -1,0 +1,102 @@
+database_name: datalake_pin_core_clean
+table_name: allocated_task_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Localized offboarding survey tasks in PIN that link an employee to a questionnaire assignment.
+  One row per allocated task per language.
+  Covers exit-survey and exit-interview task assignments used to resolve questionnaire responses for terminated employees.
+  HTML tags are stripped from task_details in the clean layer; expiry_date is cast to DATE; timestamps are cast to TIMESTAMP.
+columns:
+  id_allocated_task:
+    description: Identifier of the allocated task in PIN. Primary key for this table; anchors exit-survey and exit-interview answer resolution in turnover analytics.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.allocated_task_id
+  id_business_group:
+    description: Identifier of the enterprise business group in PIN, used for multi-tenancy partitioning.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.business_group_id
+  id_performer_orig_sys:
+    description: Identifier of the person expected to perform the task in PIN.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.performer_orig_sys_id
+  id_questionnaire:
+    description: Identifier of the questionnaire assigned through this task in PIN. References datalake_pin_questionnaires_clean.questionnaire_base.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.questionnaire_id
+  id_task_owner_person:
+    description: Identifier of the employee who owns the allocated task and is the survey subject in PIN.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.task_owner_person_id
+  description:
+    description: Localized short summary of the task purpose shown in PIN work areas.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.description
+  task_details:
+    description: Localized detailed instructions for the task, with HTML tags stripped in the clean layer.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.task_details
+  task_status:
+    description: Current lifecycle status of the allocated task in PIN.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.task_status
+    categories:
+      COMPLETED: Task was completed by the employee.
+      INITIATED: Task was initiated but not yet in progress.
+      IN_PROGRESS: Task is currently in progress.
+      REJECTED: Task was rejected by the employee.
+      EXPIRED: Task expired before completion.
+  task_name:
+    description: Localized display name of the task shown to the employee in PIN.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.task_name
+  reject_action_label:
+    description: Localized label for the action that lets the employee decline the task in PIN.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.reject_action_label
+  language:
+    description: ISO language code of the translation row in PIN.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.language
+  source_language:
+    description: ISO language code in which the translatable content was originally authored in PIN.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.source_lang
+  created_by:
+    description: PIN user who created the row.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.created_by
+  updated_by:
+    description: PIN user or process that last updated the row.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.last_updated_by
+  object_version_number:
+    description: Optimistic locking counter incremented on each update to detect concurrent changes.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.object_version_number
+  dt_expired:
+    description: Date when the task expires if not completed by the employee, cast to DATE in the clean layer.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.expiry_date
+  ts_created:
+    description: Timestamp when the row was created in PIN, cast to TIMESTAMP in the clean layer.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.creation_date
+  ts_updated:
+    description: Timestamp when the row was last updated in PIN, cast to TIMESTAMP in the clean layer.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.last_update_date
+  ts_load:
+    description: Timestamp when the record was loaded into the clean table.
+  year:
+    description: Partition year derived from ts_updated.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.year
+  month:
+    description: Partition month derived from ts_updated.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.month
+  day:
+    description: Partition day derived from ts_updated.
+    lineage:
+    - datalake_pin_core_raw.per_allocated_tasks_tl.day
