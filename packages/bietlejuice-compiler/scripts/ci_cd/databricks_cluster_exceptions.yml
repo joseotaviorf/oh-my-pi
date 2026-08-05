@@ -64,10 +64,3 @@ exceptions:
       adapted for EMR. Once that migration lands, this DAG will move to EMR
       (consolidation_s_memory_cluster).
     approved_by: anne.macedo@quintoandar.com.br
-  - dag: enrich_amplitude_agents_app
-    path: dags/agents/enrich_amplitude_agents_app
-    reason: >-
-      Temporary Databricks exception: the enrich_amplitude_agents_app workflow is not yet
-      adapted for EMR. Once that migration lands, this DAG will move to EMR
-      (consolidation_s_memory_cluster).
-    approved_by: eduardo.soares@quintoandar.com.br

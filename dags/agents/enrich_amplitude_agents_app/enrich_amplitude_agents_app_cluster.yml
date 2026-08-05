@@ -1,15 +1,10 @@
 cluster:
-  type: consolidation_l_memory_cluster
-  databricks_conn_id: databricks_new_env
+  type: emr_7_12_consolidation_l_memory_fleet_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.sql.adaptive.enabled: true
       spark.sql.adaptive.coalescePartitions.enabled: true
       spark.sql.adaptive.coalescePartitions.targetPostShuffleInputSize: 128MB
       spark.sql.shuffle.partitions: 256
-      spark.databricks.delta.targetFileSize: 134217728
-    num_workers: 3
-    driver_node_type_id: r7g.2xlarge
+    core_nodes:
+      target_on_demand: 3
