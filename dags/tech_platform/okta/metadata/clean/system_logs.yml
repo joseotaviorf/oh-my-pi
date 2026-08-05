@@ -1,0 +1,129 @@
+database_name: datalake_okta_audit_logs_clean
+table_name: system_logs
+description: |
+  Okta System Log events ingested from the audit-logs S3 bucket (EventBridge partner stream
+  delivered as GZIP NDJSON). One row per Okta audit event with actor, client, outcome,
+  and hourly partitions for IAM and security investigations.
+domain: Tech Platform
+owner: diego.hahn@quintoandar.com.br
+columns:
+  ts_event:
+    description: Event timestamp parsed from the Okta published field for chronological analysis.
+    lineage:
+      - s3_auditlogs_bucket.detail.published
+  id_event:
+    description: Unique identifier (uuid) assigned by Okta to the system log event.
+    lineage:
+      - s3_auditlogs_bucket.detail.uuid
+  event_type:
+    description: Okta event type code describing the security or lifecycle action performed.
+    lineage:
+      - s3_auditlogs_bucket.detail.eventType
+  display_message:
+    description: Human-readable summary of the Okta event shown in the admin console.
+    lineage:
+      - s3_auditlogs_bucket.detail.displayMessage
+  severity:
+    description: Okta severity classification for the system log event (INFO, WARN, ERROR).
+    lineage:
+      - s3_auditlogs_bucket.detail.severity
+  legacy_event_type:
+    description: Legacy Okta event type string preserved for backward-compatible filtering.
+    lineage:
+      - s3_auditlogs_bucket.detail.legacyEventType
+  outcome_result:
+    description: Result of the Okta action (SUCCESS, FAILURE, ALLOW, DENY, etc.).
+    lineage:
+      - s3_auditlogs_bucket.detail.outcome.result
+  outcome_reason:
+    description: Optional reason code explaining the Okta outcome when provided.
+    lineage:
+      - s3_auditlogs_bucket.detail.outcome.reason
+  actor_id:
+    description: Okta identifier of the user, app, or system that performed the action.
+    lineage:
+      - s3_auditlogs_bucket.detail.actor.id
+  actor_type:
+    description: Okta entity type of the actor (User, SystemPrincipal, etc.).
+    lineage:
+      - s3_auditlogs_bucket.detail.actor.type
+  actor_alternate_id:
+    description: Alternate identifier for the actor, typically the login or email address.
+    lineage:
+      - s3_auditlogs_bucket.detail.actor.alternateId
+  actor_display_name:
+    description: Display name of the actor recorded in the Okta system log.
+    lineage:
+      - s3_auditlogs_bucket.detail.actor.displayName
+  client_ip_address:
+    description: Source IP address of the client that triggered the Okta event.
+    lineage:
+      - s3_auditlogs_bucket.detail.client.ipAddress
+  client_user_agent:
+    description: Raw user-agent string reported by the client for the Okta session.
+    lineage:
+      - s3_auditlogs_bucket.detail.client.userAgent.rawUserAgent
+  client_browser:
+    description: Browser family parsed from the Okta client user-agent.
+    lineage:
+      - s3_auditlogs_bucket.detail.client.userAgent.browser
+  client_os:
+    description: Operating system parsed from the Okta client user-agent.
+    lineage:
+      - s3_auditlogs_bucket.detail.client.userAgent.os
+  client_device:
+    description: Device category reported by Okta for the client (Computer, Mobile, etc.).
+    lineage:
+      - s3_auditlogs_bucket.detail.client.device
+  client_city:
+    description: City inferred from the client IP geolocation in the Okta event.
+    lineage:
+      - s3_auditlogs_bucket.detail.client.geographicalContext.city
+  client_country:
+    description: Country inferred from the client IP geolocation in the Okta event.
+    lineage:
+      - s3_auditlogs_bucket.detail.client.geographicalContext.country
+  transaction_id:
+    description: Okta transaction identifier correlating related events in the same request.
+    lineage:
+      - s3_auditlogs_bucket.detail.transaction.id
+  transaction_type:
+    description: Okta transaction channel type (WEB, JOB, API, etc.).
+    lineage:
+      - s3_auditlogs_bucket.detail.transaction.type
+  id_eventbridge:
+    description: EventBridge envelope identifier for the partner event delivery record.
+    lineage:
+      - s3_auditlogs_bucket.id
+  eventbridge_source:
+    description: EventBridge partner event source ARN for the Okta log stream.
+    lineage:
+      - s3_auditlogs_bucket.source
+  eventbridge_detail_type:
+    description: EventBridge detail-type marker indicating an Okta SystemLog payload.
+    lineage:
+      - s3_auditlogs_bucket.detail-type
+  target:
+    description: JSON array of Okta targets (users, apps, policies) affected by the event.
+    lineage:
+      - s3_auditlogs_bucket.detail.target
+  js_debug_context:
+    description: JSON string with Okta debugContext payload for deep-dive investigations.
+    lineage:
+      - s3_auditlogs_bucket.detail.debugContext
+  year:
+    description: Partition year derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.detail.published
+  month:
+    description: Partition month derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.detail.published
+  day:
+    description: Partition day derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.detail.published
+  hour:
+    description: Partition hour derived from ts_event; filter queries by this column for pruning.
+    lineage:
+      - s3_auditlogs_bucket.detail.published
