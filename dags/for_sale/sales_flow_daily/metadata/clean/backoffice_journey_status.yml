@@ -32,10 +32,18 @@ columns:
     description: Timestamp when the backoffice-assisted buyer onboarding (operations/chatbot contact) was concluded.
     lineage:
     - datalake_sales_flow_raw.backoffice_journey_status.buyer_onboarding_concluded_at
+  buyer_onboarded_by:
+    description: Free-text identifier of the user or system (e.g., the operations agent 'SPOC' or the 'AI' chatbot) that performed the backoffice-assisted buyer onboarding.
+    lineage:
+    - datalake_sales_flow_raw.backoffice_journey_status.buyer_onboarded_by
   ts_seller_onboarding_concluded:
     description: Timestamp when the backoffice-assisted seller onboarding (operations/chatbot contact) was concluded.
     lineage:
     - datalake_sales_flow_raw.backoffice_journey_status.seller_onboarding_concluded_at
+  seller_onboarded_by:
+    description: Free-text identifier of the user or system (e.g., the operations agent 'SPOC' or the 'AI' chatbot) that performed the backoffice-assisted seller onboarding.
+    lineage:
+    - datalake_sales_flow_raw.backoffice_journey_status.seller_onboarded_by
   ts_created:
     description: Timestamp of the creation of the record.
     lineage:
@@ -44,6 +52,23 @@ columns:
     description: Timestamp of the last update of the record.
     lineage:
     - datalake_sales_flow_raw.backoffice_journey_status.updated_at
+  op_cdc:
+    description: CDC operation type captured by Debezium.
+    lineage:
+    - datalake_sales_flow_raw.backoffice_journey_status.op_cdc
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+    lineage:
+    - datalake_sales_flow_raw.backoffice_journey_status.ts_cdc_transaction
+  ts_database_transaction:
+    description: Timestamp of the original database transaction in the source system.
+    lineage:
+    - datalake_sales_flow_raw.backoffice_journey_status.ts_database_transaction
   year:
     description: Year when the ETL run loaded this row into the lake table.
     lineage:
