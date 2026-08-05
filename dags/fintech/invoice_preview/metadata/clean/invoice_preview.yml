@@ -5,8 +5,9 @@ description: |
   Daily snapshot of SeuBarriga monthly invoice preview CSV rows at billing-line grain.
   Operations uses this table as a work queue to review and correct entries before
   tenant and landlord monthly invoices are created. Loaded twice daily by invoice_preview
-  at 08:00 and 15:00 BRT; the Spark job ingests only the latest export batch available
-  at each run (morning export ~01:00; afternoon export ~12:00 when SeuBarriga runs it).
+  at 09:00 and 16:00 BRT: morning overwrite and afternoon append when a separate batch
+  exists on S3 (billing days 22 through month-end). export_slot is derived in clean from
+  the source CSV timestamp prefix in invoice_filename.
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
@@ -84,6 +85,13 @@ columns:
     lineage:
       - datalake_invoice_preview_raw.invoice_preview.invoice_filename
     description: Financial attribute representing invoice accrual year month on the invoice_preview dataset.
+  export_slot:
+    description: |
+      SeuBarriga export batch inferred from the Unix timestamp prefix in invoice_filename
+      (hour BRT before 12:00 morning, else afternoon). Distinguishes morning and afternoon
+      rows within the same calendar partition without new raw columns.
+    lineage:
+      - datalake_invoice_preview_raw.invoice_preview.invoice_filename
   dt_due:
     description: Due date of the preview entry as exported by SeuBarriga.
     lineage:
