@@ -54,6 +54,10 @@ columns:
     description: Salesforce account unique identifier.
     lineage:
       - datalake_satisfaction_rating.survicate_surveys.id_account
+  id_trigger:
+    description: Salesforce trigger unique identifier extracted from the Survicate response URL. Populated only for Salesforce-originated Survicate surveys; NULL for all other sources.
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.id_trigger
   id_origin:
     lineage:
       - datalake_satisfaction_rating.survicate_surveys.id_origin

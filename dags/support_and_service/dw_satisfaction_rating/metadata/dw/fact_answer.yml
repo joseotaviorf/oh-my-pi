@@ -33,6 +33,10 @@ columns:
     description: Salesforce account unique identifier for the satisfaction response.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.id_account
+  sk_trigger:
+    description: Salesforce trigger unique identifier for the satisfaction response. Defaults to -1 when no trigger is associated (non-Salesforce sources).
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.id_trigger
   sk_origin:
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.id_origin

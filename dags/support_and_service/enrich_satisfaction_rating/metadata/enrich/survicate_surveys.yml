@@ -64,6 +64,10 @@ columns:
     lineage:
       - datalake_survicate.salesforce_surveys.id_account
       - datalake_survicate.repairs_surveys.id_account
+  id_trigger:
+    description: Salesforce trigger unique identifier extracted from the Survicate response URL. Populated only for Salesforce-originated surveys; NULL for all other sources.
+    lineage:
+      - datalake_survicate.salesforce_surveys.id_trigger
   id_origin:
     lineage:
       - datalake_survicate.inspections_surveys.id_inspection

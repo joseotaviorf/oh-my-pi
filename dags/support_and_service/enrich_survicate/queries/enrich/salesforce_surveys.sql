@@ -6,6 +6,7 @@ WITH explode_parse_url AS (
     sr.response_url,
     IF(REGEXP_EXTRACT(response_url,'case_id=([A-Za-z0-9]{{15,18}})') = '', NULL, REGEXP_EXTRACT(response_url,'case_id=([A-Za-z0-9]{{15,18}})')) AS id_case,
     IF(REGEXP_EXTRACT(response_url,'account_id=([A-Za-z0-9]{{15,18}})') = '', NULL, REGEXP_EXTRACT(response_url,'account_id=([A-Za-z0-9]{{15,18}})')) AS id_account,
+    IF(REGEXP_EXTRACT(response_url,'trigger_id=([A-Za-z0-9]{{15,18}})') = '', NULL, REGEXP_EXTRACT(response_url,'trigger_id=([A-Za-z0-9]{{15,18}})')) AS id_trigger,
     sr.survey_name
   FROM
     datalake_survicate.survey_responses AS sr
@@ -19,6 +20,7 @@ salesforce_surveys AS (
     id_respondent,
     id_case,
     id_account,
+    id_trigger,
     survey_name
   FROM
     explode_parse_url
@@ -29,6 +31,7 @@ SELECT
   ss.id_survey,
   ss.id_case,
   ss.id_account,
+  ss.id_trigger,
   rc.id_response AS response_uuid,
   ss.id_respondent,
   ss.survey_name,
@@ -55,4 +58,4 @@ LEFT JOIN datalake_survicate.response_content AS rc
     ON ss.id_response = rc.id_response
 WHERE
   MAKE_DATE(rc.year, rc.month, rc.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
-GROUP BY 1, 2, 3, 4, 5, 6, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15

@@ -1,4 +1,4 @@
-WITH survicate_surveys_base AS 
+WITH survicate_surveys_base AS
   (
      SELECT
         iss.id_answer,
@@ -7,6 +7,7 @@ WITH survicate_surveys_base AS
         NULL AS id_ticket,
         NULL AS id_case,
         NULL AS id_account,
+        NULL AS id_trigger,
         iss.id_inspection AS id_origin,
         iss.id_respondent,
         NULL AS respondent_email,
@@ -40,6 +41,7 @@ WITH survicate_surveys_base AS
         rss.id_ticket,
         rss.id_case,
         rss.id_account,
+        NULL AS id_trigger,
         NULL AS id_origin,
         rss.id_respondent,
         rss.respondent_email,
@@ -73,6 +75,7 @@ WITH survicate_surveys_base AS
         NULL AS id_ticket,
         NULL AS id_case,
         NULL AS id_account,
+        NULL AS id_trigger,
         NULL AS id_origin,
         NULL AS id_respondent,
         NULL AS respondent_email,
@@ -106,6 +109,7 @@ WITH survicate_surveys_base AS
         NULL AS id_ticket,
         NULL AS id_case,
         NULL AS id_account,
+        NULL AS id_trigger,
         NULL AS id_origin,
         NULL AS id_respondent,
         NULL AS respondent_email,
@@ -139,6 +143,7 @@ WITH survicate_surveys_base AS
         kss.id_ticket,
         NULL AS id_case,
         NULL AS id_account,
+        NULL AS id_trigger,
         NULL AS id_origin,
         NULL AS id_respondent,
         kss.email AS respondent_email,
@@ -173,6 +178,7 @@ WITH survicate_surveys_base AS
         NULL AS id_ticket,
         NULL AS id_case,
         NULL AS id_account,
+        NULL AS id_trigger,
         NULL AS id_origin,
         pss.id_owner AS id_respondent,
         NULL AS respondent_email,
@@ -205,6 +211,7 @@ zendesk_email_ranked AS (
         zes.id_ticket,
         NULL AS id_case,
         NULL AS id_account,
+        NULL AS id_trigger,
         NULL AS id_origin,
         zes.id_visitor AS id_respondent,
         NULL AS respondent_email,
@@ -241,6 +248,7 @@ zendesk_email_cte AS (
         id_ticket,
         id_case,
         id_account,
+        id_trigger,
         id_origin,
         id_respondent,
         respondent_email,
@@ -273,6 +281,7 @@ salesforce_ranked AS (
         NULL AS id_ticket,
         ss.id_case,
         ss.id_account,
+        ss.id_trigger,
         NULL AS id_origin,
         ss.id_respondent,
         NULL AS respondent_email,
@@ -309,6 +318,7 @@ salesforce_cte AS (
         id_ticket,
         id_case,
         id_account,
+        id_trigger,
         id_origin,
         id_respondent,
         respondent_email,
@@ -334,23 +344,23 @@ salesforce_cte AS (
         rn = 1
 ),
 survicate_surveys AS (
-    SELECT 
-        * 
-    FROM 
+    SELECT
+        *
+    FROM
         survicate_surveys_base
 
     UNION ALL
 
-    SELECT 
-        * 
-    FROM 
+    SELECT
+        *
+    FROM
         zendesk_email_cte
 
     UNION ALL
 
-    SELECT 
-        * 
-    FROM 
+    SELECT
+        *
+    FROM
         salesforce_cte
 )
 SELECT
@@ -360,6 +370,7 @@ SELECT
     ss.id_ticket,
     ss.id_case,
     ss.id_account,
+    ss.id_trigger,
     ss.id_origin,
     ss.id_respondent,
     ss.respondent_email,

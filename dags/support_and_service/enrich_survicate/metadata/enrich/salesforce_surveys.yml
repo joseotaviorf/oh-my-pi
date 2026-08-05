@@ -20,6 +20,10 @@ columns:
     lineage:
       - datalake_survicate.survey_responses.response_url
     description: Salesforce account unique identifier
+  id_trigger:
+    lineage:
+      - datalake_survicate.survey_responses.response_url
+    description: Salesforce trigger unique identifier extracted from the Survicate response URL
   id_respondent:
     lineage:
       - datalake_survicate.survey_responses.id_respondent
