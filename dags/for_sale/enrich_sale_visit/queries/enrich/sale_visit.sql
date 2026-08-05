@@ -72,7 +72,6 @@ SELECT DISTINCT
     b.hub_agent_region AS hub_agent_region,
     COALESCE(b.is_hub_flow,FALSE) AS is_hub_flow,
     COALESCE(b.is_house_rented,FALSE) AS is_house_rented,
-    COALESCE(b.is_virtual_visit,FALSE) AS is_virtual_visit,
     b.days_visit_cancelled_to_visit,
     b.days_visit_booked_to_visit,
     b.days_visit_booked_to_visit_cancelled,

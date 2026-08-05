@@ -57,7 +57,6 @@ SELECT
     partner_3p_supply,
     is_hub_flow,
     is_house_rented,
-    is_virtual_visit,
     is_3p_supply,
     is_3p_demand,
     is_3p_lead_gen,

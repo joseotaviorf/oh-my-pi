@@ -153,10 +153,6 @@ columns:
     lineage:
     - datalake_sale_visit.sale_visit.is_house_rented
     description: True if the house booked had an active rental contract at 5A at the booking date
-  is_virtual_visit:
-    lineage:
-    - datalake_sale_visit.sale_visit.is_virtual_visit
-    description: True if the visit is a virtual visit.
   is_3p_supply:
     lineage:
     - datalake_sale_visit.sale_visit.is_3p_supply

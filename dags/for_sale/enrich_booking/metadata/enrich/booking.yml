@@ -415,10 +415,6 @@ columns:
     lineage:
     - datalake_ebdb_listing.house.is_3p_supply_bh
     description: Boolean column that points if the listing is from a real estate partner (Rede Supply) in Belo Horizonte.
-  is_virtual_visit:
-    lineage:
-    - datalake_ebdb_clean.follow_up_details.visit_type
-    description: Boolean column to identify if the visit occurred virtually, i.e. visit_type = 'Video'
   is_entrance_successful:
     lineage:
     - datalake_ebdb_clean.booking.visit_fup
