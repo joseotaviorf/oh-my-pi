@@ -319,6 +319,10 @@ uv run --directory packages/bietlejuice-airflow pytest test/unit/airflow/dag_bui
 - **`path_param`** — entity id substituted into `endpoint_path` at **`{path_param}`** (e.g. `requests/employees/{employeeUuid}`).
 - **`json_body_field`** — entity id sent as JSON body `{ "<field>": "<id>" }` via **POST** (e.g. Oitchau `costs/list`). Response dicts with a **`content`** array are flattened to one row per element. **Pagination is not supported** with this mode.
 - **`correlation_field`** (optional) — JSON key used when stamping each row with the fan-out id (defaults to `id_field`).
+
+- **`payload_filters`** (optional) — filter source raw `payload` JSON before collecting IDs.
+- **`max_workers`** (optional) — parallel HTTP fan-out on the Spark **driver** (`ThreadPoolExecutor`); see user guide (not Spark executor parallelism).
+- **`date_expansion`** (optional, table-level) — repeat each entity call for multiple date param values (`last_n_days` / calendar-month strategies).
 - **`api_policies.pagination`** on the same table (e.g. **`page_per_page`**) — used inside the fan-out for **GET** so each per-entity call can walk all pages.
 
 | Concern | Primary file |

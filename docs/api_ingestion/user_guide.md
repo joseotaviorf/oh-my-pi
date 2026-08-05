@@ -18,6 +18,13 @@ It focuses only on what exists in code today, plus known limitations.
   - [Parameter reference (workflow)](#parameter-reference-workflow)
 - [tables_customization](#tables_customization-per-table)
   - [Parameter reference (tables_customization)](#parameter-reference-tables_customization)
+- [`id_expansion` (per-entity fan-out)](#id_expansion-per-entity-fan-out)
+  - [What is fan-out (id_expansion)?](#what-is-fan-out-id_expansion)
+  - [How it works at runtime](#how-it-works-at-runtime)
+  - [When to use it](#when-to-use-it)
+  - [`payload_filters`](#payload_filters)
+  - [Parallel fan-out (`max_workers`)](#parallel-fan-out-max_workers)
+  - [`date_expansion`](#date_expansion-per-table-optional)
 - [Authentication](#authentication-workflowauthentication)
   - [Parameter reference (authentication)](#parameter-reference-authentication)
 - [Request params and date placeholders](#request-params-and-date-placeholders)
@@ -207,14 +214,33 @@ Each entry under `tables_customization` is a dictionary keyed by the **raw table
 
 ## `id_expansion` (per-entity fan-out)
 
-Some API endpoints are **per-entity**: they require an entity ID (e.g. `employeeUuid`) as a query param or URL path segment and have no bulk variant. `id_expansion` enables ingesting these by reading the list of IDs from an already-ingested raw table and issuing one GET request per entity.
+### What is fan-out (id_expansion)?
 
-### When to use
+In a normal `api_ingestion` configuration, the job calls **one endpoint** (optionally paginated) and writes the result set once. It represents a linear 1-to-1 relationship between the ingestion task and the API.
 
-Use `id_expansion` when:
-- The endpoint requires a single entity ID and returns data only for that entity.
-- No bulk/list variant exists (omitting the ID returns an error or empty response).
-- The entity list is already available in a raw table ingested by the same DAG.
+**Fan-out** is the opposite pattern. It is used for APIs that lack bulk endpoints and only expose data **per-entity** (e.g., instead of an endpoint for "all employee costs," the API requires you to ask for "costs for employee X").
+
+Instead of making one call, the DAG "fans out" into dozens, hundreds, or thousands of individual HTTP requests to build a single raw table.
+
+> **The Core Rule:** **1 ID list → N HTTP calls (or N×M if paginated) → 1 raw table**. Because the fan-out task relies on reading another table first, you MUST use `workflow.raw_inner_dependencies` to ensure the source task finishes before the fan-out begins.
+
+### How it works at runtime
+
+When you configure an endpoint with `id_expansion`, the framework executes the following sequence:
+
+1. **Read source entities:** Spark reads an already-ingested raw table (defined as `source_table`, e.g., `employees`) and keeps the **latest row per entity ID** (`id_field` inside the JSON payload, ordered by `ts_load` / partition columns).
+2. **Filter the list (Optional but recommended):** If `payload_filters` are configured (e.g., only `active: true`), the job filters that latest snapshot *before* collecting IDs. This prevents making HTTP calls for inactive or irrelevant entities, including stale historical rows where the entity used to match the filter.
+3. **Execute HTTP Fan-out:** For every single ID collected, the job issues an independent HTTP request. It dynamically injects the ID into the URL path (`path_param`), the query string (`param_name`), or the JSON body (`json_body_field`) depending on your YAML configuration.
+4. **Paginate per entity (Optional):** If pagination is configured, *each* per-entity request will paginate until exhausted before moving to the next ID. All pages across all entities are collected.
+5. **Merge and Write:** The job optionally stamps each row with the `correlation_field` (so you retain a record of which ID generated which row), flattens all collected responses, and writes them together into a single raw Delta table.
+
+### When to use it
+
+You should configure `id_expansion` when:
+
+- The endpoint requires a single entity ID and returns data exclusively for that entity.
+- No bulk or list variant exists (omitting the ID returns an error or an empty response).
+- The entity list is already available in a raw table ingested by the **same DAG**.
 
 ### YAML schema
 
@@ -252,8 +278,82 @@ tables_customization:
 | `path_param` | yes* | Placeholder name matching `{placeholder}` in `endpoint_path` (e.g. `employeeUuid` for `requests/employees/{employeeUuid}`) |
 | `correlation_field` | no | JSON key used when stamping each response row with the fan-out entity id; defaults to `id_field`. Use when list items already expose `uuid` (or similar) from the API and you must not overwrite it. |
 | `json_body_field` | no\* | JSON body property name for **POST** fan-out (e.g. Oitchau `employeeExternalId`). Sends `POST` with body `{ "<json_body_field>": "<entity_id>" }` per ID. When the response is a dict with a `content` array, each element is flattened to one raw row (same as list responses). **Pagination is not supported** together with `json_body_field` (configure `api_policies.pagination` only for GET-style fan-out). |
+| `payload_filters` | no | List of `{ field, equals }` filters on the source raw `payload` JSON **before** collecting entity IDs (e.g. only `active: true` employees). Reduces fan-out volume without changing the endpoint. |
+| `max_workers` | no | Parallel HTTP fan-out threads on the **Spark driver** (default `1`). See [Parallel fan-out (`max_workers`)](#parallel-fan-out-max_workers). |
 
 \* Exactly one of `param_name`, `path_param`, or `json_body_field` must be provided.
+
+### `payload_filters`
+
+Each entry is applied as `get_json_object(payload, '$.<field>') = <equals>` on the **latest** source raw row per entity (not on the fan-out response). Boolean `equals` values are compared as lowercase strings (`true` / `false`), matching how Spark stringifies JSON booleans.
+
+Prefer a YAML **list** of `{ field, equals }` maps. A single bare map is accepted and normalized to a one-element list. Every entry **must** include both `field` and `equals` (use `equals: null` to keep rows where the JSON field is missing).
+
+Example — fan-out only over active OiTchau employees:
+
+```yaml
+id_expansion:
+  source_table: employees
+  id_field: uuid
+  param_name: employeeUuid
+  payload_filters:
+    - field: active
+      equals: true
+```
+
+### Parallel fan-out (`max_workers`)
+
+By default (`max_workers: 1`), fan-out runs **sequentially**: one HTTP call finishes before the next starts. That is safe but slow when the entity list is large (thousands of IDs).
+
+Setting **`max_workers` > 1** enables **parallel fan-out**:
+
+- The job builds a task list (one task per entity ID; with `date_expansion`, one task per entity × date).
+- A Python `ThreadPoolExecutor` on the **Spark driver** runs up to `max_workers` HTTP calls at once.
+- OAuth token refresh is locked; HTTP GETs run concurrently (do not put a global lock around the session for the whole request).
+- Failed entity calls are still logged and skipped; other tasks continue.
+
+#### How this relates to Spark / EMR
+
+| Expectation | Reality |
+|-------------|---------|
+| “More EMR core/task nodes will speed up fan-out” | **No.** Parallelism is **driver-side threads**, not Spark executor tasks. Extra cluster workers do not issue more API calls. |
+| “`max_workers` uses Spark partitions” | **No.** IDs are `collect()`’d to the driver; responses accumulate in driver memory before the raw write. |
+| “Any cluster size is fine” | Prefer a **memory-oriented single-node** preset so the driver has enough RAM for ID lists + buffered responses (e.g. `emr_7_12_consolidation_m_memory_single_node_fleet_cluster` / `r6g.2xlarge`). Scale up to `l`/`xl` memory single-node if the driver OOMs. |
+| “Raise `max_workers` freely” | Bound by **API rate limits (429)**, task `execution_timeout_hours`, and driver CPU/memory — not by “more Spark cores”. |
+
+**Practical guidance**
+
+1. Start with a modest `max_workers` (e.g. 8–16); raise toward 32–64 only if wall-clock is the bottleneck and the API tolerates the concurrency.
+2. Combine with `payload_filters` to shrink the entity set before parallelizing.
+3. Set `execution_timeout_hours` on long fan-out tables (OiTchau hours bank uses `5`).
+4. Keep `max_workers` at or below the HTTP connection pool size used by `BaseAPIClient` (default `pool_maxsize=64`) so workers reuse keep-alive TLS connections.
+5. Migrating the DAG to EMR (cluster YAML) is independent of enabling `max_workers`; both are required for production People runs on EMR.
+
+```yaml
+id_expansion:
+  source_table: employees
+  id_field: uuid
+  param_name: employeeUuid
+  max_workers: 64
+  payload_filters:
+    - field: active
+      equals: true
+```
+
+### `date_expansion` (per-table, optional)
+
+When an endpoint accepts a **single date param per call** (e.g. Oitchau `employees/hoursbank/totals?date=`), use table-level **`date_expansion`** to repeat each entity fan-out for multiple dates. Tasks become **entity × date**.
+
+| Key | Required | Description |
+|-----|----------|-------------|
+| `param_name` | yes | Query param to override per iteration (e.g. `date`) |
+| `strategy` | yes | `last_n_days` — inclusive rolling window of `days` ending on the anchor; or `previous_and_current_calendar_month` — from the 1st of the previous calendar month through the anchor |
+| `days` | when `strategy: last_n_days` | Positive integer (e.g. `45` for ~six weeks of retroactive hours-bank adjustments) |
+| `anchor` | no | `load_end_date` (default) or `load_start_date` — last day of the window for `last_n_days` |
+
+Keep the **clean SQL** date filter aligned with the chosen window (e.g. for `last_n_days: 45` and `anchor: load_end_date`, filter `dt_balanced` between `DATE_ADD(load_end_date, -44)` and `load_end_date` inclusive).
+
+Combine with `id_expansion.max_workers` and `payload_filters` to control volume and concurrency. Without parallel workers, a large lookback window will usually exceed Airflow task timeouts.
 
 ### Runtime behaviour
 
@@ -274,18 +374,29 @@ tables_customization:
   hoursbank_totals:
     endpoint_path: employees/hoursbank/totals
     extraction_type: incremental
+    execution_timeout_hours: 5
+    date_expansion:
+      param_name: date
+      strategy: last_n_days
+      days: 45
+      anchor: load_end_date
     id_expansion:
       source_table: employees
       id_field: uuid
       param_name: employeeUuid
+      max_workers: 64
+      payload_filters:
+        - field: active
+          equals: true
     date_format: "%Y-%m-%d"
+    date_filter_column: date
     params:
       date: load_start_date
     vacuum_retention_hours: 168
     vacuum_lite: true
 ```
 
-This fetches the D-1 hours bank balance for each employee UUID in `datalake_oitchau_raw.employees`, adding ~4,490 rows per daily run.
+This fetches hours-bank balances for each **active** employee UUID for each of the last **45 days** through `load_end_date` (one API call per employee per day), with up to 32 parallel HTTP workers on the Spark driver.
 
 ### Example — POST JSON body fan-out (OiTchau `costs/list`)
 
