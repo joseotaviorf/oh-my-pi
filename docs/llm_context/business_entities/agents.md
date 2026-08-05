@@ -18,8 +18,9 @@
 - **Common metrics:** active agents (monthly), CIQ-active agents, agents per hub, brokerage/revenue earned per agent, active PFA relations, new-agent activation rate.
 - **Source systems:** EBDB (agent, prospect, qualification, contract), Hub Services (membership, NE hierarchy), Amplitude (sign-up funnel), BigAgent (earnings/tiers/incentives), Nazaré (payments), Airtable/GSheets (ops manual data).
 - **Related entities:** for visit metrics see [`visits.md`](visits.md); for AI chatbots (Wall-E, Matthew, Sauron, Dominic/Matias) see [`chatbot_sessions.md`](chatbot_sessions.md) and [`matthew.md`](matthew.md) — those are **not** field agents.
+- **Agent profile classification (who is the agent? what do they do?):** **[`agents_profile.md`](agents_profile.md)** — source of truth for business profile rules (`QuintoAndar Agent`, `Demand Sale/Rent`, `3P`, `Embaixador`, `Inspector`, `Photographer`, Non-Demand CIQ, EN/EA). Use that doc first when the question is about agent type or role segmentation.
 
-> ⚠ **Two orthogonal axes — always pin down both before querying.** (1) **Operation type** = `profile` (what work the agent physically does); (2) **Business function** = which part of the deal the agent owns (what they earn for). Most tables mix everything unless filtered. Affiliation (`1P`/`3P`) is a third, independent axis.
+> ⚠ **Three orthogonal axes — always pin down which one the user means.** (1) **Business profile** — who the agent is (`dw_agent.dim_agent.profile` + classification rules in [`agents_profile.md`](agents_profile.md)). (2) **Hub operation type** — `member_hub_allocation.profile` (`Visita`, `Vistoria`, …; what work they do in the hub). (3) **Business function** — which part of the deal they own / earn for (TQC, CIQ, conversion). Affiliation (`1P`/`3P`) is a fourth, independent axis.
 
 ### ⚠⚠ Layer priority — **always start with DW**
 
@@ -43,9 +44,10 @@
 
 > Topics **without a DW table yet** (enrich is the only option): hub allocation (`member_hub_allocation`), monthly reports (`agent_status_by_month`, `agent_new_agent_activation_metrics`), For-Rent broker share (`brokerage_share_history`), PFA/PPA (`preferred_property_agent_relation_history`), tier performance EAV (`agent_performance`).
 
-### Operation type (`profile`)
+### Business profile vs hub operation type
 
-`Visita` (property visits — most common; usually what "agente" means), `Vistoria` (inspections), `VistoriaQuarteirizada` (outsourced visits/inspections), `SessaoFotos` (photographers), `CheckUpLar` (repairs). Default scope for CIQ/activation/brokerage questions is `Visita`, but confirm.
+- **Business profile** (who is the agent?): rules and SQL in **[`agents_profile.md`](agents_profile.md)** — `dw_agent.dim_agent.profile` (`AUTONOMOUS_BROKERAGE_AGENT`, `REDE`, `INSPECTOR`, …) plus capability flags and optional prospect/hub joins.
+- **Hub operation type** (`member_hub_allocation.profile`): what operational work the member does in the hub — `Visita` (property visits — most common; usually what "agente" means), `Vistoria` (inspections), `VistoriaQuarteirizada` (outsourced visits/inspections), `SessaoFotos` (photographers), `CheckUpLar` (repairs). Default scope for CIQ/activation/brokerage questions is `Visita`, but confirm. **Not** the same column as `agent.profile` in `dim_agent`.
 
 ### Business function (the three that matter most)
 
@@ -83,7 +85,7 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 
 | Term | Meaning | Notes |
 |------|---------|-------|
-| **Agente / corretor** | Field agent | Multi-type — see Overview warning. |
+| **Agente / corretor** | Field agent | Multi-type — see Overview warning; profile classification rules in [`agents_profile.md`](agents_profile.md). |
 | **Agente de visita / Visita** | Visit agent | `profile = 'Visita'`; default scope for most business questions. |
 | **Vistoria / Vistoriador** | Inspection agent | `profile = 'Vistoria'`. |
 | **SessãoFotos / fotógrafo** | Photographer agent | `profile = 'SessaoFotos'`. |
@@ -130,6 +132,7 @@ DW / enrich schemas described here: **`datalake_agent_accreditation`**, **`datal
 | CIQ listing-purchase duplicity peers | **`dw_ciq.fact_listing_purchase_duplicity`** | `datalake_ciq.listing_purchase_duplicity` |
 | Daily per-agent state snapshot (status, capabilities, profile) | **`dw_agent.fact_agent_daily`** | `datalake_agent_accreditation.agent` (identity only; no daily history) |
 | Agent dimension (new ID system) | **`dw_agent.dim_agent`** | `datalake_agent_accreditation.agent` |
+| **Business profile classification** (who / what type) | **`dw_agent.dim_agent`** (+ `dim_prospect_agent`, `member_hub_allocation` when needed) | See **[`agents_profile.md`](agents_profile.md)** |
 | Legacy `sk_agent ↔ id_user` bridge | **`dw_public.dim_agent`** | — |
 | Visit funnel / completion metrics | **`dw_visit.fact_visits`**, `fact_visit_schedules` | see [`visits.md`](visits.md) |
 | Canonical agent identity, capability flags (no DW daily grain) | — | `datalake_agent_accreditation.agent` |
@@ -602,7 +605,8 @@ Grain: **one row per agent per `dt_ref` (daily)**, partitioned `year/month/day`.
 **Do:**
 
 - **Always start with `dw_*` tables** when a DW projection exists for the topic (earnings → `dw_agent_payments`, Compra de Carteira → `dw_ciq`, daily agent state → `dw_agent`, visits → `dw_visit`). Drop to enrich/clean only for missing columns or topics without DW coverage.
-- Confirm **both axes** before scoping: **operation type** (`profile`: `Visita`/`Vistoria`/…) and **business function** (demand/conversion vs demand-acquisition/TQC vs supply-acquisition/CIQ). Most tables mix everything.
+- For **who is the agent / what profile type**, use **[`agents_profile.md`](agents_profile.md)** and **`dw_agent.dim_agent`** — do not guess from hub `profile` alone.
+- Confirm **which axis** before scoping: **business profile** ([`agents_profile.md`](agents_profile.md)), **hub operation type** (`member_hub_allocation.profile`: `Visita`/`Vistoria`/…), and **business function** (demand/conversion vs demand-acquisition/TQC vs supply-acquisition/CIQ). Most tables mix everything.
 - Confirm what "active agent", "activation", and "first listing" mean — each maps to a different table/filter (see Synonyms).
 - Translate legacy jargon ("Demand Agent", "CIQ-Only", "Independent Agent") to capability/`agent_type_segment` filters, not literal column values.
 - Use `datalake_agent_accreditation.agent` for canonical `id_agent` identity; for **daily state** prefer **`dw_agent.fact_agent_daily`**; bridge `sk_agent ↔ id_user` via `dw_public.dim_agent`.
