@@ -1,0 +1,94 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: go_goiania_comprovacao_pagamento
+description: |
+  Flattened Goiânia IPTU payment proof records from the go_goiania_comprovacao_pagamento
+  Scrapy spider. Each row exposes municipal inscription, address, neighborhood sector,
+  and owner document mapped toward the idactum_houses legacy contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.response._inscricao
+    description: |
+      Normalized municipal property registration number (digits only) from the payment proof.
+  inscricao_raw:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.response.inscricao
+    description: |
+      Raw inscription string as displayed on the municipal payment certificate.
+  state:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.response._inscricao
+    description: |
+      Brazilian state abbreviation for Goiânia properties (constant GO).
+  city:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.response._inscricao
+    description: |
+      Municipality name for Goiânia properties (constant Goiânia).
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.response.endereco
+    description: |
+      Property address as printed on the IPTU payment proof certificate.
+  neighborhood:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.response.setor
+    description: |
+      Neighborhood sector (setor) from the municipal payment proof.
+  owner_document:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.response.cpf_cnpj
+    description: |
+      Owner CPF or CNPJ as printed on the IPTU payment proof.
+  certificate_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.response.numero_certidao
+    description: |
+      Municipal certificate number for the IPTU payment proof.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_comprovacao_pagamento.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

@@ -1,0 +1,31 @@
+---
+database_name: datalake_crawled_idactum_houses_raw
+table_name: sp_osasco_pesquisa_cdc
+description: |
+  Raw Crawl JSONL feed from the Scrapy crawler sp_osasco_pesquisa_cdc (Osasco
+  CDC search results used as discovery input for related Osasco municipal crawlers). One table per spider under the shared crawled_idactum_houses
+  raw database. Schema-on-read from batch_*.jsonl under crawler-scrapy feeds.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  response:
+    description: |
+      Nested payload with spider-specific fields scraped from the municipal portal.
+  metadata:
+    description: |
+      Crawl metadata including source spider, URL, access timestamp and referer.
+  crawler_name:
+    description: |
+      Scrapy spider name that produced the record (always sp_osasco_pesquisa_cdc for this table).
+  dt_load:
+    description: |
+      Date when the JSONL batch was loaded into the raw datalake table.
+  year:
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

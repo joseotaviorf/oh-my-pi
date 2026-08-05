@@ -1,0 +1,36 @@
+dag:
+  name: idactum_scrapy_cadastral
+  owner: Data Growth
+  schedule_start_date: 2026, 05, 07
+  documentation:
+    dag_purpose: |
+      Ingest Idactum Scrapy cadastral crawler outputs (Goiânia informações cadastrais,
+      cadastro imobiliário, comprovação de pagamento, Osasco pesquisa CDC) from
+      crawler-scrapy-{forno|prod} into the shared crawled_idactum_houses raw/clean
+      databases. One EMR cluster per DAG run with parallel raw+clean tasks per spider.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: crawled_idactum_houses
+  spark_job_prefix: crawled_idactum_houses
+  load_spark_job: load_idactum_scrapy_raw
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "crawled_idactum_houses"
+    - "{table_name}"
+  tables_customization:
+    go_goiania_informacoes_cadastrais:
+      partitions: [year, month, day]
+    go_goiania_cadastro_imobiliario:
+      partitions: [year, month, day]
+    go_goiania_comprovacao_pagamento:
+      partitions: [year, month, day]
+    sp_osasco_pesquisa_cdc:
+      partitions: [year, month, day]

@@ -1,0 +1,100 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: sp_osasco_pesquisa_cdc
+description: |
+  Flattened Osasco CDC search results from the sp_osasco_pesquisa_cdc Scrapy spider.
+  Each row is one property from the response array with inscription, address,
+  registry number, and active status mapped toward the idactum_houses legacy contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.inscricao
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.cdc
+    description: |
+      Municipal property identifier (inscrição cadastral or CDC) from the CDC search result.
+  municipal_inscription:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.inscricao
+    description: |
+      Formatted municipal cadastral inscription from the CDC search.
+  cdc:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.cdc
+    description: |
+      Osasco CDC numeric identifier for the property unit.
+  state:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.inscricao
+    description: |
+      Brazilian state abbreviation for Osasco properties (constant SP).
+  city:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.inscricao
+    description: |
+      Municipality name for Osasco properties (constant Osasco).
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.endereco
+    description: |
+      Full address string returned by the Osasco CDC search portal.
+  real_estate_registry:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.no_matricula
+    description: |
+      Property registry number (matrícula) at the notary office.
+  owner_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.proprietario_compromissario
+    description: |
+      Owner or compromissário name associated with the CDC record.
+  is_active:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.response.situacao
+    description: |
+      Active status flag (1.0 for Ativo, 0.0 otherwise) derived from the situacao field.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_pesquisa_cdc.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

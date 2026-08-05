@@ -1,0 +1,84 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: go_goiania_cadastro_imobiliario
+description: |
+  Flattened Goiânia property registrations from the go_goiania_cadastro_imobiliario
+  Scrapy spider. Each row is one registration exploded from the neighborhood
+  listing, with municipal inscription and CI code for the idactum_houses contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.registrations.registration_number
+    description: |
+      Municipal property registration number for one unit in the neighborhood listing.
+  ci_code:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.registrations.ci
+    description: |
+      Cadastro imobiliário (CI) lot identifier linking units within the same land parcel.
+  state:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.neighborhood_id
+    description: |
+      Brazilian state abbreviation for Goiânia properties (constant GO).
+  city:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.neighborhood_id
+    description: |
+      Municipality name for Goiânia properties (constant Goiânia).
+  neighborhood_id:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.neighborhood_id
+    description: |
+      Numeric neighborhood identifier from the municipal portal (not the neighborhood name).
+  total_registrations:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.total_registrations
+    description: |
+      Total count of registrations returned for the neighborhood in this crawl item.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_cadastro_imobiliario.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

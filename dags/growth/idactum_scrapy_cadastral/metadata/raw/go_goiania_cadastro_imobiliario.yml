@@ -1,0 +1,37 @@
+---
+database_name: datalake_crawled_idactum_houses_raw
+table_name: go_goiania_cadastro_imobiliario
+description: |
+  Raw Crawl JSONL feed from the Scrapy crawler go_goiania_cadastro_imobiliario (Goiânia
+  municipal real-estate registration listing by neighborhood from the city map portal). One table per spider under the shared crawled_idactum_houses
+  raw database. Schema-on-read from batch_*.jsonl under crawler-scrapy feeds.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  neighborhood_id:
+    description: |
+      Municipal neighborhood identifier used in the cadastre query.
+  registrations:
+    description: |
+      Array of municipal registrations returned for the neighborhood.
+  total_registrations:
+    description: |
+      Count of registrations returned for the neighborhood.
+  metadata:
+    description: |
+      Crawl metadata including source spider, URL, access timestamp and referer.
+  crawler_name:
+    description: |
+      Scrapy spider name that produced the record (always go_goiania_cadastro_imobiliario for this table).
+  dt_load:
+    description: |
+      Date when the JSONL batch was loaded into the raw datalake table.
+  year:
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

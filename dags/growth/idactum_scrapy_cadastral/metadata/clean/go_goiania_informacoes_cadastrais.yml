@@ -1,0 +1,156 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: go_goiania_informacoes_cadastrais
+description: |
+  Flattened Goiânia municipal cadastral records from the go_goiania_informacoes_cadastrais
+  Scrapy spider. Each row is one cadastral_info element with address, area, valuation,
+  and usage attributes mapped toward the idactum_houses legacy contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.nrinscr
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.registration_number
+    description: |
+      Municipal property registration number (inscrição imobiliária) for the unit.
+  state:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.registration_number
+    description: |
+      Brazilian state abbreviation for Goiânia properties (constant GO).
+  city:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.registration_number
+    description: |
+      Municipality name for Goiânia properties (constant Goiânia).
+  neighborhood:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.nmbairro
+    description: |
+      Neighborhood name (bairro) from the municipal cadastral record.
+  street:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.nmlogradou
+    description: |
+      Street name (logradouro) from the municipal cadastral record.
+  address_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.nrimovel
+    description: |
+      Street number of the property as recorded in the municipal cadastre.
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.incompl
+    description: |
+      Address complement (apartment, block, building identifiers) from the cadastre.
+  lot_area:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.areaterr
+    description: |
+      Total land area in square meters (área do terreno).
+  building_area:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.areaedif
+    description: |
+      Built area in square meters (área edificada).
+  private_area:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.areatest
+    description: |
+      Private area in square meters (área testada / privativa).
+  assessed_iptu_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.vlvenal
+    description: |
+      Municipal assessed property value (valor venal) used for IPTU calculation.
+  usage_purpose:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.uso
+    description: |
+      Municipal usage code (uso) indicating the property purpose category.
+  usage_type:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.formauso
+    description: |
+      Municipal usage form code (forma de uso) for the property.
+  kind:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.tpedif1
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.tpedif2
+    description: |
+      Building type codes (tpedif1/tpedif2) concatenated as a composite kind identifier.
+  latitude:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.x_coord
+    description: |
+      Easting coordinate in SIRGAS projection (x_coord); not WGS84 latitude.
+  longitude:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.y_coord
+    description: |
+      Northing coordinate in SIRGAS projection (y_coord); not WGS84 longitude.
+  ci_code:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.ci
+    description: |
+      Cadastro imobiliário (CI) lot identifier linking units within the same land parcel.
+  building_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.cadastral_info.nmedificio
+    description: |
+      Building or condominium name from the municipal cadastral record.
+  registration_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.registration_number
+    description: |
+      Original lookup registration number from the crawl request.
+  total_records:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.total_records
+    description: |
+      Count of cadastral records returned for the registration in this crawl item.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_informacoes_cadastrais.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.
