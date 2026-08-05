@@ -24,7 +24,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 EVENTS_TABLE = "datalake_amplitude_agents_app.agents_search_events"
 
 
-def get_agents_search_events_state(dt_snapshot: date):
+def get_agents_search_events_state(dt_snapshot: date, spark):
     """
     Get the daily aggregate of agents search events.
     """
@@ -67,7 +67,7 @@ def get_agents_search_events_state(dt_snapshot: date):
     return df
 
 
-def get_previous_state_for_ids(df_state, full_table_name, dt_snapshot):
+def get_previous_state_for_ids(df_state, full_table_name, dt_snapshot, spark):
     """
     Load the previous state for the ids that appear in the day aggregate.
     """
@@ -204,7 +204,8 @@ if __name__ == "__main__":
         dt_current += timedelta(days=1)
 
     spark_client = SparkClient()
-    loader = DeltaLoader()
+    spark = spark_client.conn
+    loader = DeltaLoader(spark)
     spark_metastore_service = MetastoreServiceFactory.create_loader_metastore_service(
         spark_client
     )
@@ -230,9 +231,9 @@ if __name__ == "__main__":
     full_table_name = f"{write_database_name}.{write_table_name}"
 
     for dt_snapshot in dates_by_process:
-        df_state = get_agents_search_events_state(dt_snapshot)
+        df_state = get_agents_search_events_state(dt_snapshot, spark)
         df_previous_state = get_previous_state_for_ids(
-            df_state, full_table_name, dt_snapshot
+            df_state, full_table_name, dt_snapshot, spark
         )
         df_new_state = compute_new_state(df_state, df_previous_state)
 
