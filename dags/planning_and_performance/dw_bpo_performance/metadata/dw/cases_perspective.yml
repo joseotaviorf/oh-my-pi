@@ -261,6 +261,25 @@ columns:
         Salesforce: Salesforce Platform
         Zendesk: Zendesk Platform
     description: It indicates which platform the case belongs to.
+  id_case:
+    lineage:
+      - datalake_salesforce_clean.events_case.id_record
+      - dw_bpo_performance.tickets_perspecive.sk_ticket
+    description: SK identifying the case
+  agent_solved:
+    lineage:
+      - datalake_salesforce_clean.events_user.email
+      - dw_bpo_performance.tickets_perspecive.last_agent_email
+    description: Email identifying the person who triggered the "solved" event for the case.
+  agent_solved_organization:
+    lineage:
+      - datalake_salesforce_clean.events_user.email
+      - dw_bpo_performance.tickets_perspecive.last_agent_organization
+    description: Organization of the person responsible for the solution
+  ts_termination_finished:
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_finished
+    description: Termination process completion date
   year:
     lineage:
       - datalake_salesforce_clean.events_case.created_date

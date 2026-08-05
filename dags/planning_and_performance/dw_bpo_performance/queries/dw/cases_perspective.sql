@@ -63,6 +63,15 @@ WHERE event_type IN ('DELETE')
 
 ),
 
+events_user as (
+SELECT 
+id_record,
+email,
+ROW_NUMBER() OVER (PARTITION BY id_record ORDER BY committed_at DESC) as rn_user
+FROM datalake_salesforce_clean.events_user
+),
+
+
 milestones as (
 SELECT 
 id_case,
@@ -77,6 +86,7 @@ status_historico AS (
     SELECT 
         CAST(case_number AS INT) AS case_number, 
         status,
+        id_owner,
         -- No Spark, a subtração de horas é feita via INTERVAL
         CAST(last_modified_date AS TIMESTAMP) - INTERVAL 3 HOURS AS ts_event,
         ROW_NUMBER() OVER (PARTITION BY CAST(case_number AS INT) ORDER BY CAST(last_modified_date AS TIMESTAMP) DESC) AS rn,
@@ -87,10 +97,7 @@ status_historico AS (
         ) AS proximo_status
     FROM events_case_dirty
 ),
-
-
-
-
+                     
 spoc AS (
   SELECT 
     ft.sk_termination,
@@ -180,7 +187,7 @@ tp_dirty_ranked AS (
         *,
         ROW_NUMBER() OVER (PARTITION BY sk_ticket ORDER BY ts_load DESC) AS rn_dirty
     FROM dw_bpo_performance.tickets_perspective
-    WHERE MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 3 DAYS AND DATE('{load_end_date}')
+    WHERE MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')  - INTERVAL 3 DAYS AND DATE('{load_end_date}')
 ),
 
 tp_dirty AS (
@@ -236,8 +243,9 @@ tickets_perspective AS (
         tp.canal_de_entrada,
         tp.criticidade_ro,
         tp.group_name_ro,
+        spoc.ts_termination_finished,
         CASE WHEN (CASE WHEN ddend.is_brz_holiday = 'Holiday' OR dayofweek(deadline_ticket_reparos) = 1 THEN date_add(deadline_ticket_reparos, 1) ELSE deadline_ticket_reparos END) >= TS_SOLVED THEN 1 ELSE 0 END as flag_sla_reparos,
-        CASE WHEN COALESCE(date(spoc.ts_termination_finished), current_date()) >= ww_backlog.dt_end_9 THEN 0 ELSE 1 END as flag_sla_med,
+        CASE WHEN date(spoc.ts_termination_finished) > ww_backlog.dt_end_6 THEN 0 ELSE 1 END as flag_sla_med,
         IF(dt.group_name = 'Rescisão por Inadimplência [OFF][POS][BACK]' 
             AND tp.tipo_de_cliente LIKE '%proprietário%' AND tp.tipo_de_demanda IN ('demanda_de_processos') 
             AND tp.tipo_de_processo IN ('despejo/fraude') AND dt.subject LIKE '%Rescisão do contrato%', 'despejo', NULL ) as tkt_despejo,
@@ -253,13 +261,14 @@ tickets_perspective AS (
 ),
 
 solved_date AS (
-    -- Simplificado para o padrão do Spark: Primeiro ordena os eventos e depois qualifica
     SELECT 
         case_number,
         status,
         ts_event,
+        eu.email,
         ROW_NUMBER() OVER (PARTITION BY case_number ORDER BY ts_event ASC) AS rn
     FROM status_historico
+    LEFT JOIN events_user as eu on eu.id_record = status_historico.id_owner and rn_user = 1  
     WHERE status = 'Solved'
 ),
 
@@ -268,6 +277,7 @@ SELECT DISTINCT
     c.case_number,
     CASE WHEN h.proximo_status IS NULL OR h.proximo_status IN ('Closed','Solved') THEN s.ts_event END as ts_solved,
     c.closed_date,
+    CASE WHEN h.proximo_status IS NULL OR h.proximo_status IN ('Closed','Solved') THEN s.email END as agent_solved,
     CAST(c.created_date AS TIMESTAMP) - INTERVAL 3 HOURS as ts_created,
     h.proximo_status,
     COUNT(DISTINCT date(wh.dt_non_working)) AS total_non_working,
@@ -275,7 +285,7 @@ SELECT DISTINCT
 
 FROM events_case_dirty as c
 -- Filtramos apenas o primeiro registro de 'Solved' na junção (rn_primeiro_solved = 1)
-LEFT JOIN solved_date as s on s.case_number = CAST(c.case_number as INT) and s.rn = 1 
+LEFT JOIN solved_date as s on s.case_number = CAST(c.case_number as INT) and s.rn = 1
 LEFT JOIN status_historico as h on h.case_number = CAST(c.case_number as INT) and h.rn = 1
 LEFT JOIN weekends_and_holidays wh ON wh.dt_non_working BETWEEN CAST(CAST(c.created_date AS TIMESTAMP) - INTERVAL 3 HOURS AS DATE) 
     AND CAST(COALESCE(
@@ -285,7 +295,7 @@ LEFT JOIN weekends_and_holidays wh ON wh.dt_non_working BETWEEN CAST(CAST(c.crea
         ), 
         CURRENT_DATE
     ) AS DATE)
-GROUP BY 1,2,3,4,5
+GROUP BY 1,2,3,4,5,6
 ),
 
 cases_perspective AS (
@@ -325,22 +335,29 @@ cases_perspective AS (
             ELSE FALSE 
         END as is_ticket_solved_within_sla,
         u.email as agent_email,
-        CASE WHEN u.email LIKE '%webhelp%' THEN 'webhelp'
-             WHEN u.email LIKE '%atento%' THEN 'atento'
-             WHEN u.email LIKE '%aec%' THEN 'aec'
-             WHEN u.email LIKE '%quintoandar%' THEN 'quintoandar'
+        sd.agent_solved as agent_solved,
+        CASE WHEN u.email ILIKE '%webhelp%' THEN 'webhelp'
+             WHEN u.email ILIKE '%atento%' THEN 'atento'
+             WHEN u.email ILIKE '%aec%' THEN 'aec'
+             WHEN u.email ILIKE '%quintoandar%' THEN 'quintoandar'
              END as agent_organization,
+        CASE WHEN sd.agent_solved ILIKE '%webhelp%' THEN 'webhelp'
+             WHEN sd.agent_solved ILIKE '%atento%' THEN 'atento'
+             WHEN sd.agent_solved ILIKE '%aec%' THEN 'aec'
+             WHEN sd.agent_solved ILIKE '%quintoandar%' THEN 'quintoandar'
+             END as agent_solved_organization,
         CASE WHEN rt.record_type_name RLIKE '\\[NÃO UTILIZAR\\]' THEN 'Sim' ELSE 'Não' END as flag_teste,
         spoc.is_spoc_contract,
         spoc.spoc_wave,
         spoc.is_spoc_control_group,
         spoc.spoc_team,
         spoc.spoc_class,
+        spoc.ts_termination_finished,
         CASE WHEN spoc.is_spoc_contract = TRUE AND spoc.spoc_class IN ('before_wave_6_lab_test', 'lab_test', 'rollout') THEN TRUE ELSE FALSE END as is_spoc_test,
         c.origin as case_origin, 
         fr_res.first_resolution,
-        CASE WHEN c.type LIKE '%Mediation%' THEN 'MED' END as off_area, -- Ajustado do Código 2
-        CASE WHEN COALESCE(date(spoc.ts_termination_finished), current_date()) >= ww_backlog.dt_end_9 THEN 0 ELSE 1 END as flag_sla_med,
+        CASE WHEN c.type LIKE '%Mediation%' THEN 'MED' END as off_area,
+        CASE WHEN date(spoc.ts_termination_finished) > ww_backlog.dt_end_6 THEN 0 ELSE 1 END as flag_sla_med,
         c.supplied_email, 
         c.reason as case_reason,
         c.omni_channel_queue__c as fila_omni_channel,
@@ -365,7 +382,7 @@ cases_perspective AS (
     LEFT JOIN record_types as rt on rt.id_record_type = c.id_record_type and rt.rn = 1 
     LEFT JOIN csat as csat on csat.sk_case = c.id_record and csat.rn = 1
     LEFT JOIN sandbox.sla_target_salesforce as sla on sla.theme_type = COALESCE(CONCAT(rt.developer_name, c.type), rt.developer_name)
-    LEFT JOIN datalake_salesforce_clean.users as u on u.id_user_salesforce = c.id_owner
+    LEFT JOIN events_user as u on u.id_record = c.id_owner and rn_user = 1 
     LEFT JOIN datalake_salesforce_clean.account as a on a.id_account = c.id_account
     LEFT JOIN spoc ON CAST(c.contract_id__c AS STRING) = CAST(spoc.sk_contract AS STRING) 
     LEFT JOIN first_reply_sf AS fr ON fr.id_case = c.id_record 
@@ -380,6 +397,7 @@ cases_perspective AS (
 )
 
 SELECT
+    id_case,
     case_number,
     ts_created as ts_started,
     COALESCE(ts_solved, ts_closed) as ts_solved, 
@@ -407,6 +425,8 @@ SELECT
     is_ticket_solved_within_sla,
     agent_email as last_agent_email,
     agent_organization as last_agent_organization,
+    agent_solved as agent_solved,
+    agent_solved_organization,
     reopens AS reopens,
     is_spoc_test,
     is_pp_multi,
@@ -420,6 +440,7 @@ SELECT
     NULL AS group_name_ro,
     criticidade AS criticidade_ro,
     NULL AS flag_sla_reparos,
+    ts_termination_finished,
     flag_sla_med,
     tkt_despejo AS tkt_despejo,
     first_resolution as first_resolution_last_agent,
@@ -440,9 +461,11 @@ SELECT
 FROM cases_perspective
 WHERE rn = 1 
 
+
 UNION ALL 
 
 SELECT 
+    case_number as id_case,
     case_number,
     ts_started,
     ts_solved,
@@ -470,6 +493,8 @@ SELECT
     is_ticket_solved_within_sla,
     last_agent_email,
     last_agent_organization,
+    last_agent_email as agent_solved,
+    last_agent_organization as agent_solved_organization,
     reopens,
     is_spoc_test,
     is_pp_multi,
@@ -483,6 +508,7 @@ SELECT
     group_name_ro,
     criticidade_ro,
     flag_sla_reparos,
+    ts_termination_finished,
     flag_sla_med,
     tkt_despejo,
     first_resolution as first_resolution_last_agent,
