@@ -1,0 +1,36 @@
+dag:
+  name: idactum_scrapy_itbi
+  owner: Data Growth
+  schedule_start_date: 2026, 05, 07
+  documentation:
+    dag_purpose: |
+      Ingest Idactum Scrapy ITBI crawler outputs (Rio de Janeiro ITBI main, Osasco ITBI,
+      Goiânia ITBI and ITBI certidão) from crawler-scrapy-{forno|prod} into the shared
+      crawled_idactum_houses raw/clean databases. One EMR cluster per DAG run with
+      parallel raw+clean tasks per spider.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: crawled_idactum_houses
+  spark_job_prefix: crawled_idactum_houses
+  load_spark_job: load_idactum_scrapy_raw
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "crawled_idactum_houses"
+    - "{table_name}"
+  tables_customization:
+    rj_itbi_main:
+      partitions: [year, month, day]
+    sp_osasco_itbi:
+      partitions: [year, month, day]
+    go_goiania_itbi:
+      partitions: [year, month, day]
+    go_goiania_itbi_certidao:
+      partitions: [year, month, day]

@@ -1,0 +1,59 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: go_goiania_itbi_certidao
+description: |
+  Clean passthrough of Goiânia Scrapy crawler go_goiania_itbi_certidao (municipal ITBI certificates associated with property registrations).
+  Built from the shared crawled_idactum_houses raw table with crawl metadata
+  flattened and load provenance columns retained for analysis.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  response:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.response
+    description: |
+      Nested scraped payload fields returned by the spider (schema-on-read from JSONL).
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.go_goiania_itbi_certidao.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

@@ -1,0 +1,189 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: rj_itbi_main
+description: |
+  Flattened Rio de Janeiro ITBI certificates from the Scrapy crawler rj_itbi_main.
+  Built from the shared crawled_idactum_houses raw table (response + metadata)
+  with load provenance columns.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  guide_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.numero_guia
+    description: |
+      ITBI payment guide number issued by the municipality.
+  protocol_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.numero_protocolo
+    description: |
+      Municipal protocol number associated with the ITBI certificate.
+  certificate_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.numero_certidao
+    description: |
+      ITBI certificate number returned by the municipal portal.
+  authentication_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.numero_autenticacao
+    description: |
+      Authentication hash used to validate the ITBI certificate.
+  municipal_registration:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.inscricao_imobiliaria
+    description: |
+      Municipal property registration (inscrição imobiliária) for the house.
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.inscricao_imobiliaria
+    description: |
+      Municipal property registration used as the idactum_houses join key.
+  state:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.inscricao_imobiliaria
+    description: |
+      Brazilian state abbreviation for Rio de Janeiro properties (constant RJ).
+  city:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.inscricao_imobiliaria
+    description: |
+      Municipality name for Rio de Janeiro properties (constant Rio de Janeiro).
+  street:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.endereco_imovel
+    description: |
+      Street name parsed from the ITBI certificate address (before the first comma).
+  address_number:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.endereco_imovel
+    description: |
+      Street number parsed from the ITBI certificate address (after the comma).
+  address_details:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.endereco_imovel
+    description: |
+      Address complement parsed from the ITBI certificate (between slash and hyphen).
+  neighborhood:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.endereco_imovel
+    description: |
+      Neighborhood name parsed from the ITBI certificate address (after the last hyphen).
+  transaction_nature:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.natureza_transacao
+    description: |
+      Nature of the real estate transaction (e.g. purchase and sale).
+  property_address:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.endereco_imovel
+    description: |
+      Full property address as printed on the ITBI certificate.
+  transferred_share:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.parte_transferida
+    description: |
+      Share of the property being transferred in the transaction.
+  installment:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.parcela
+    description: |
+      Installment identifier when the ITBI payment is split.
+  declared_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.valor_declarado
+    description: |
+      Declared transaction value in Brazilian reais.
+  assessed_itbi_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.valor_declarado
+    description: |
+      Declared transaction value mapped to the idactum_houses assessed_itbi_value column.
+  calculation_base:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.base_calculo
+    description: |
+      Tax calculation base used for the ITBI amount due.
+  total_amount_due:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.valor_total_devido
+    description: |
+      Total ITBI amount due for the certificate.
+  total_amount_paid:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.valor_total_pago
+    description: |
+      Total ITBI amount effectively paid.
+  due_date:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.data_vencimento
+    description: |
+      Due date of the ITBI guide payment.
+  payment_date:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.data_pagamento
+    description: |
+      Date when the ITBI guide payment was made.
+  buyer_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.adquirente
+    description: |
+      Buyer name and document as printed on the certificate.
+  seller_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.transmitente
+    description: |
+      Seller name and document as printed on the certificate.
+  supplementary_page:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.folha_suplementar
+    description: |
+      Supplementary page text with amendments to the certificate.
+  observation:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.response.observacao
+    description: |
+      Free-text observation field from the municipal certificate.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.metadata.url
+    description: |
+      Source URL consulted by the crawler for this certificate.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.rj_itbi_main.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.

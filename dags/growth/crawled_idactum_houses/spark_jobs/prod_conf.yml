@@ -1,0 +1,1 @@
+feed_bucket: "s3://crawler-scrapy-prod"

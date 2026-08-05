@@ -1,0 +1,120 @@
+database_name: datalake_crawled_idactum_houses_clean
+table_name: sp_osasco_itbi
+description: |
+  Flattened Osasco ITBI records from the sp_osasco_itbi Scrapy spider. Each row
+  exposes municipal inscription, fiscal values, notary office, and transaction
+  attributes mapped toward the idactum_houses legacy contract.
+domain: Growth
+owner: gabriel.mota@quintoandar.com.br
+columns:
+  id_municipal_house:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.inscricao_cadastral
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.cdc
+    description: |
+      Municipal property identifier (inscrição cadastral or CDC) for the ITBI record.
+  municipal_inscription:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.inscricao_cadastral
+    description: |
+      Formatted municipal cadastral inscription from the ITBI declaration.
+  cdc:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.cdc
+    description: |
+      Osasco CDC numeric identifier for the property unit.
+  state:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.inscricao_cadastral
+    description: |
+      Brazilian state abbreviation for Osasco properties (constant SP).
+  city:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.inscricao_cadastral
+    description: |
+      Municipality name for Osasco properties (constant Osasco).
+  real_estate_register:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.cartorio_de_registro
+    description: |
+      Name of the notary office (cartório) where the property title is registered.
+  assessed_itbi_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.valor_da_transacao
+    description: |
+      Declared transaction value (valor da transação) parsed from Brazilian currency format.
+  assessed_iptu_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.valor_venal_do_imovel
+    description: |
+      Municipal assessed property value (valor venal do imóvel) parsed from Brazilian currency format.
+  building_assessed_value:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.valor_venal_da_edificacao
+    description: |
+      Assessed building value (valor venal da edificação) parsed from Brazilian currency format.
+  transaction_nature:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.natureza_da_operacao
+    description: |
+      Nature of the real estate transaction (e.g., Compra e Venda).
+  owner_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.proprietario
+    description: |
+      Property owner name as recorded in the ITBI declaration.
+  buyer_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.adquirente
+    description: |
+      Buyer (adquirente) name as recorded in the ITBI declaration.
+  payment_status:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.response.situacao
+    description: |
+      ITBI payment status (e.g., Quitada) from the municipal portal.
+  feed_source:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.metadata.source
+    description: |
+      Spider source tag embedded in the crawl metadata payload.
+  feed_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.metadata.url
+    description: |
+      Source URL consulted by the crawler when producing this record.
+  ts_accessed:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.metadata.accessed_at
+    description: |
+      Timestamp when the crawler accessed the municipal portal page or API.
+  referer_url:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.metadata.referer_url
+    description: |
+      HTTP referer URL captured during the crawl session, when available.
+  crawler_name:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.crawler_name
+    description: |
+      Scrapy spider name that produced the raw record.
+  dt_load:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.dt_load
+    description: |
+      Date when the raw JSONL batch was loaded into the datalake.
+  year:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.year
+    description: |
+      Partition year derived from the DAG execution date of the Scrapy feed.
+  month:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.month
+    description: |
+      Partition month derived from the DAG execution date of the Scrapy feed.
+  day:
+    lineage:
+      - datalake_crawled_idactum_houses_raw.sp_osasco_itbi.day
+    description: |
+      Partition day derived from the DAG execution date of the Scrapy feed.
