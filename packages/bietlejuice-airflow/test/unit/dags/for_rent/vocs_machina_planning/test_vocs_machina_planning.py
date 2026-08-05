@@ -4,34 +4,143 @@ Same convention as
 packages/bietlejuice-airflow/test/unit/dags/platform/dag_runtime_monitoring/test_dag_runtime_monitoring.py:
 import the DAG module via its dotted path (dags.<domain>.<name>.<name>),
 relying on ../../conftest.py to put the repo root on sys.path. Run as part of
-`make unit-tests` (uv run --directory packages/bietlejuice-airflow pytest),
-which is a shared uv workspace environment that also has databricks_plugin
-(bietlejuice-airflow-operators) installed, so importing the full DAG module
-(and therefore building the real `dag` object) works here.
+`make unit-tests` (uv run --directory packages/bietlejuice-airflow pytest).
 
-Only the pure S3-key -> status mapping logic is exercised (no real or mocked
-S3/Databricks/Spark needed), per VOCS-34 Slice 1's verification scope.
-Building `dag` at import time also doubles as an import-cleanliness check:
-ConfigurationService reads local YAML only, no network calls happen at parse
-time.
+conftest.py stubs the whole databricks_plugin module as a bare MagicMock
+(real Databricks deps only exist at runtime in Databricks/Composer) --
+QuintoAndarDatabricksCreateClusterOperator/SubmitRunOperator/
+TerminateClusterOperator therefore construct mock objects instead of real
+operators when this module is imported plainly. Slice 1's create-cluster ->
+submit-run -> terminate-cluster wiring is plain, un-templated ``>>``
+chaining, so that never mattered. Slice 3 added
+DatalakeTaskGroup.build_task_group_from_sql_files, whose internal
+_build_task_group calls chain(load_table_task, metadata_sync_task) (see
+datalake_task_group.py) -- and a bare MagicMock instance is not a
+DependencyMixin, so that chain() call raises TypeError at DAG-parse/import
+time. _import_dag_module_with_fake_databricks_operators() below swaps in a
+real (if inert) BaseOperator subclass for those three names just long enough
+to import the module once (imports are cached), then restores the original
+MagicMock attributes so no other test file in the suite is affected
+regardless of collection order.
+
+Wrinkle discovered while wiring this up: bietlejuice.base.airflow.task_groups.
+datalake_task_group does its OWN `from databricks_plugin import
+QuintoAndarDatabricksSubmitRunOperator` at that module's import time. When
+this test file is run in isolation, that import happens for the first time
+*after* our patch is applied, so it naturally picks up the fake class. But in
+a full-suite run, test_datalake_task_group.py / test_datalake_task_group_
+validation.py (collected earlier, under test/unit/base/...) already import
+and cache that module *before* our patch runs -- so its
+QuintoAndarDatabricksSubmitRunOperator name stays bound to the original
+MagicMock no matter what we set on the databricks_plugin module afterwards
+(Python caches the imported module and `from X import Y` copies the
+reference once, it does not re-read X.Y later). So we also
+importlib.reload() that already-imported module around the patch window,
+forcing it to re-bind against our fake class, then reload it again on the
+way out to restore it to the original MagicMock-bound state.
+
+Only the pure S3-key -> status mapping and skip/proceed logic is exercised
+otherwise (no real or mocked S3/Databricks/Spark needed). Building `dag` at
+import time also doubles as an import-cleanliness check: ConfigurationService
+reads local YAML only, no network calls happen at parse time.
 """
 
+import importlib
 import inspect
+import json
+import sys
 from datetime import date
+from unittest.mock import MagicMock, patch
 
 import pytest
+from airflow.models import BaseOperator
+from airflow.timetables.datasets import DatasetOrTimeSchedule
+from airflow.timetables.trigger import CronTriggerTimetable
 
-from dags.for_rent.vocs_machina_planning import vocs_machina_planning
-from dags.for_rent.vocs_machina_planning.vocs_machina_planning import (
-    DAG_ID,
-    active_prompts,
-    backfill_day_range,
-    build_snapshot_rows,
-    dag,
-    existing_marker_keys_for_days,
-    iter_partition_days,
-    success_marker_key,
+from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+
+_BASE_OPERATOR_PARAMS = set(inspect.signature(BaseOperator.__init__).parameters)
+_DATALAKE_TASK_GROUP_MODULE_NAME = (
+    "bietlejuice.base.airflow.task_groups.datalake_task_group"
 )
+
+
+class _FakeDatabricksOperator(BaseOperator):
+    """Real BaseOperator stand-in for the mocked Databricks operators.
+
+    Accepts (and silently drops) whatever Databricks-specific kwargs the
+    real QuintoAndarDatabricks*Operator classes take (json,
+    cluster_configuration, access_control_list, libraries,
+    polling_period_seconds, databricks_conn_id, do_output_xcom_push, ...) --
+    only params BaseOperator itself understands (task_id, dag, pool,
+    execution_timeout, ...) are forwarded. Never actually executed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        known_kwargs = {
+            key: value for key, value in kwargs.items() if key in _BASE_OPERATOR_PARAMS
+        }
+        super().__init__(*args, **known_kwargs)
+
+    def execute(self, context):
+        raise NotImplementedError("stub operator: not meant to run in unit tests")
+
+
+def _import_dag_module_with_fake_databricks_operators():
+    """Import vocs_machina_planning.py with real-but-inert Databricks operators.
+
+    See module docstring for why this is needed (Slice 3's DatalakeTaskGroup
+    enrich task group calls chain() on the built load/metadata-sync tasks at
+    import time, which requires DependencyMixin instances, not bare
+    MagicMocks). Restores conftest.py's original MagicMock stub afterwards.
+    """
+    databricks_plugin_stub = sys.modules.get("databricks_plugin")
+    operator_names = [
+        "QuintoAndarDatabricksCreateClusterOperator",
+        "QuintoAndarDatabricksSubmitRunOperator",
+        "QuintoAndarDatabricksTerminateClusterOperator",
+    ]
+    is_mocked = isinstance(databricks_plugin_stub, MagicMock)
+    originals = {}
+    datalake_task_group_module = sys.modules.get(_DATALAKE_TASK_GROUP_MODULE_NAME)
+    if is_mocked:
+        for name in operator_names:
+            originals[name] = getattr(databricks_plugin_stub, name)
+            setattr(databricks_plugin_stub, name, _FakeDatabricksOperator)
+        if datalake_task_group_module is not None:
+            # Already imported by an earlier-collected test (see module
+            # docstring) -- its QuintoAndarDatabricksSubmitRunOperator name
+            # is stale until reloaded against the patch above.
+            importlib.reload(datalake_task_group_module)
+    try:
+        import dags.for_rent.vocs_machina_planning.vocs_machina_planning as module
+    finally:
+        if is_mocked:
+            for name, original in originals.items():
+                setattr(databricks_plugin_stub, name, original)
+            if datalake_task_group_module is not None:
+                importlib.reload(datalake_task_group_module)
+    return module
+
+
+_vocs_machina_planning = _import_dag_module_with_fake_databricks_operators()
+
+BACKFILL_STATUS_SUMMARY_TABLE = _vocs_machina_planning.BACKFILL_STATUS_SUMMARY_TABLE
+BACKFILL_STATUS_TABLE = _vocs_machina_planning.BACKFILL_STATUS_TABLE
+DAG_ID = _vocs_machina_planning.DAG_ID
+FONTES = _vocs_machina_planning.FONTES
+SOURCE = _vocs_machina_planning.SOURCE
+active_prompts = _vocs_machina_planning.active_prompts
+backfill_day_range = _vocs_machina_planning.backfill_day_range
+build_snapshot_rows = _vocs_machina_planning.build_snapshot_rows
+dag = _vocs_machina_planning.dag
+existing_marker_keys_for_days = _vocs_machina_planning.existing_marker_keys_for_days
+hash_snapshot_rows = _vocs_machina_planning.hash_snapshot_rows
+iter_partition_days = _vocs_machina_planning.iter_partition_days
+should_skip_stage_task = _vocs_machina_planning.should_skip_stage_task
+stage_inference_status_to_s3 = _vocs_machina_planning.stage_inference_status_to_s3
+success_marker_key = _vocs_machina_planning.success_marker_key
 
 
 class FakeS3Hook:
@@ -100,9 +209,9 @@ def test_backfill_day_range_rejects_negative():
 def test_success_marker_key_zero_pads_month_and_day():
     # Regression: must match quintoml's vocs_machina/storage.py
     # build_partition_prefix + build_success_marker_uri byte-for-byte
-    # (zero-padded month/day). A non-padded key here would make every
-    # check_for_key() call return False and every partition report "missing",
-    # even for days quintoml already finalized.
+    # (zero-padded month/day). A non-padded key here would never match a
+    # listed key and every partition would report "missing", even for days
+    # quintoml already finalized.
     key = success_marker_key("nps_churn", "abc123", date(2026, 5, 3))
     assert key == (
         "post-contract/vocs-machina/raw/"
@@ -253,7 +362,8 @@ class TestExistingMarkerKeysForDays:
 class TestBuildSnapshotRows:
     """The pure function that decides done vs missing given a set of existing
     keys -- no S3/moto involved, matching the "existing_marker_keys" contract
-    stage_inference_status_to_s3 fills in by calling S3Hook.check_for_key."""
+    stage_inference_status_to_s3 fills in via existing_marker_keys_for_days
+    (batched S3Hook.list_keys, one call per unique backfill day)."""
 
     def test_marks_done_when_marker_key_present(self):
         day = date(2026, 5, 3)
@@ -305,10 +415,185 @@ class TestBuildSnapshotRows:
         assert rows[0]["inference_status"] == "missing"
 
 
-def test_dag_id_and_placeholder_schedule():
+def test_dag_id_and_hybrid_schedule():
+    # VOCS-34 Slice 3: schedule_interval=None placeholder is gone, replaced by
+    # a DatasetOrTimeSchedule (OR of FONTES) + a 6h CronTriggerTimetable
+    # safety net. max_active_runs=1 so a dataset event and a cron tick can't
+    # overlap.
     assert dag.dag_id == DAG_ID
     assert dag.dag_id == "bietlejuice.vocs_machina_planning"
-    assert dag.schedule_interval is None
+    assert isinstance(dag.timetable, DatasetOrTimeSchedule)
+    assert isinstance(dag.timetable.timetable, CronTriggerTimetable)
+    assert dag.timetable.timetable._expression == "0 */6 * * *"
+    assert dag.max_active_runs == 1
+
+
+def test_fontes_has_the_fourteen_reverse_birdie_sources_verbatim():
+    # Copied verbatim from quintoml's config/prod.yml job.schedule -- this
+    # list must not be altered independently of that file.
+    assert len(FONTES) == 14
+    uris = [dataset.uri for dataset in FONTES]
+    assert len(set(uris)) == 14
+    assert all(
+        uri.startswith("bietlejuice.reverse_birdie:load-reverse-") for uri in uris
+    )
+    assert all(uri.endswith(":first-run-of-day") for uri in uris)
+
+
+def test_dag_schedule_dataset_condition_covers_all_fontes():
+    # Confirms reduce(or_, FONTES) built a condition that actually references
+    # all 14 datasets (not e.g. silently collapsing to one via a typo), and
+    # that DatasetOrTimeSchedule accepted it without raising at DAG-parse
+    # time (this test only runs because `dag` above was importable).
+    dataset_uris_in_condition = {
+        name for name, _ in dag.timetable.dataset_condition.iter_datasets()
+    }
+    assert dataset_uris_in_condition == {dataset.uri for dataset in FONTES}
+
+
+def test_backfill_status_summary_load_task_id_and_dataset_uri():
+    # This is the cross-repo contract quintoml's Slice 4 hardcodes verbatim:
+    # bietlejuice.vocs_machina_planning:load-enrich-vocs-machina-backfill-status-summary:first-run-of-day
+    # Computed the same way DatalakeTaskGroup._build_task_group computes it
+    # internally (BaseTaskGroup.generate_default_task_id).
+    task_id = BaseTaskGroup.generate_default_task_id(
+        task_prefix=BaseTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.ENRICH,
+        schema=SOURCE,
+        table_name=BACKFILL_STATUS_SUMMARY_TABLE,
+    )
+    assert task_id == "load-enrich-vocs-machina-backfill-status-summary"
+
+    dataset_uri = f"{DAG_ID}:{task_id}:first-run-of-day"
+    assert dataset_uri == (
+        "bietlejuice.vocs_machina_planning:"
+        "load-enrich-vocs-machina-backfill-status-summary:first-run-of-day"
+    )
+
+    # Proves build_task_group_from_sql_files actually discovered and built
+    # this table's load task on the real `dag` (not just that
+    # generate_default_task_id() can format a plausible-looking string) --
+    # possible now thanks to _import_dag_module_with_fake_databricks_operators,
+    # which swaps in a real BaseOperator stand-in so DatalakeTaskGroup's
+    # tasks self-register instead of being unregistered MagicMocks.
+    detail_task_id = BaseTaskGroup.generate_default_task_id(
+        task_prefix=BaseTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.ENRICH,
+        schema=SOURCE,
+        table_name=BACKFILL_STATUS_TABLE,
+    )
+    assert task_id in dag.task_ids
+    assert detail_task_id in dag.task_ids
+
+
+def test_backfill_status_detail_load_task_id_differs_from_summary():
+    # Sanity check that the detail table's task id (which also gets an
+    # auto-attached dataset outlet, see vocs_machina_planning.py's comment
+    # above build_task_group_from_sql_files) is a different, unambiguous
+    # string -- nothing downstream could confuse the two.
+    task_id = BaseTaskGroup.generate_default_task_id(
+        task_prefix=BaseTaskGroup.LOAD_TASK_PREFIX,
+        layer=LayerEnum.ENRICH,
+        schema=SOURCE,
+        table_name=BACKFILL_STATUS_TABLE,
+    )
+    assert task_id == "load-enrich-vocs-machina-backfill-status"
+
+
+class TestHashSnapshotRows:
+    def test_same_rows_same_order_produce_same_hash(self):
+        rows = [
+            {
+                "day": "2026-05-01",
+                "prompt_id": "p1",
+                "prompt_hash": "h1",
+                "inference_status": "done",
+            }
+        ]
+        assert hash_snapshot_rows(rows) == hash_snapshot_rows(rows)
+
+    def test_reordered_rows_produce_the_same_hash(self):
+        row_a = {
+            "day": "2026-05-01",
+            "prompt_id": "p1",
+            "prompt_hash": "h1",
+            "inference_status": "done",
+        }
+        row_b = {
+            "day": "2026-05-02",
+            "prompt_id": "p2",
+            "prompt_hash": "h2",
+            "inference_status": "missing",
+        }
+        assert hash_snapshot_rows([row_a, row_b]) == hash_snapshot_rows([row_b, row_a])
+
+    def test_different_content_produces_a_different_hash(self):
+        rows = [
+            {
+                "day": "2026-05-01",
+                "prompt_id": "p1",
+                "prompt_hash": "h1",
+                "inference_status": "done",
+            }
+        ]
+        changed_rows = [{**rows[0], "inference_status": "missing"}]
+        assert hash_snapshot_rows(rows) != hash_snapshot_rows(changed_rows)
+
+
+class TestShouldSkipStageTask:
+    """VOCS-34 Slice 3 selective propagation: the pure skip-vs-proceed
+    decision, exercised mock-free per the four required scenarios."""
+
+    def test_dataset_event_present_and_unchanged_proceeds(self):
+        assert (
+            should_skip_stage_task(
+                triggering_dataset_events={"some:dataset:first-run-of-day": []},
+                previous_snapshot_hash="abc",
+                new_snapshot_hash="abc",
+            )
+            is False
+        )
+
+    def test_dataset_event_present_and_changed_proceeds(self):
+        assert (
+            should_skip_stage_task(
+                triggering_dataset_events={"some:dataset:first-run-of-day": []},
+                previous_snapshot_hash="abc",
+                new_snapshot_hash="def",
+            )
+            is False
+        )
+
+    def test_no_dataset_event_and_unchanged_skips(self):
+        assert (
+            should_skip_stage_task(
+                triggering_dataset_events={},
+                previous_snapshot_hash="abc",
+                new_snapshot_hash="abc",
+            )
+            is True
+        )
+
+    def test_no_dataset_event_and_changed_proceeds(self):
+        assert (
+            should_skip_stage_task(
+                triggering_dataset_events={},
+                previous_snapshot_hash="abc",
+                new_snapshot_hash="def",
+            )
+            is False
+        )
+
+    def test_no_dataset_event_and_no_previous_hash_proceeds(self):
+        # First run ever (Variable unset) must not be treated as "unchanged".
+        assert (
+            should_skip_stage_task(
+                triggering_dataset_events={},
+                previous_snapshot_hash=None,
+                new_snapshot_hash="def",
+            )
+            is False
+        )
 
 
 def test_dag_has_stage_inference_status_task():
@@ -339,7 +624,98 @@ def test_terminate_cluster_task_uses_none_skipped_trigger_rule():
     # with ONE shared MagicMock for the whole test session), so its
     # `.call_args` reflects whichever DAG test module happened to construct
     # a terminate-cluster operator last -- not reliably this DAG's call.
-    source = inspect.getsource(vocs_machina_planning)
+    source = inspect.getsource(_vocs_machina_planning)
     terminate_call = source[source.index("terminate_cluster_task = ") :]
     terminate_call = terminate_call[: terminate_call.index(")\n") + 1]
     assert "trigger_rule=TriggerRule.NONE_SKIPPED" in terminate_call
+
+
+class TestStageInferenceStatusToS3:
+    """Regression coverage for the VOCS-34 task-15 review fix: committing the
+    snapshot hash to LAST_SNAPSHOT_HASH_VARIABLE_KEY must happen strictly
+    AFTER hook.load_string() (the actual S3 publish) succeeds, never before.
+    Committing it earlier would mean a failed publish (network error,
+    permissions, ...) still leaves the hash updated, so a retry of this same
+    task recomputes the same hash, sees it "already published", and
+    self-skips via AirflowSkipException instead of retrying the publish.
+
+    Note: this only fixes the failed-publish case. If load_string succeeds
+    but a downstream task (raw Spark load / enrich task group) later fails,
+    the hash is still committed at successful-publish time, so the next
+    cron-only tick will see an "unchanged" hash and self-skip, silencing the
+    safety-net timer for that case too. That is a separate, accepted
+    out-of-scope tradeoff (would need deferring the commit to a final
+    DAG-wide "all succeeded" task with XCom plumbing) -- not addressed here.
+    """
+
+    _MANIFEST = {
+        "prompts": [
+            {
+                "prompt_id": "p1",
+                "prompt_hash": "h1",
+                "active": True,
+                "backfill_days": 0,
+            }
+        ]
+    }
+
+    @staticmethod
+    def _kwargs_with_dataset_event():
+        # A non-empty triggering_dataset_events makes should_skip_stage_task
+        # always proceed (see its docstring/TestShouldSkipStageTask above)
+        # regardless of the hash comparison, so these tests exercise the
+        # load_string/Variable.set ordering in isolation from the skip
+        # decision.
+        return {"triggering_dataset_events": {"some:dataset:first-run-of-day": []}}
+
+    @patch("dags.for_rent.vocs_machina_planning.vocs_machina_planning.Variable")
+    @patch("dags.for_rent.vocs_machina_planning.vocs_machina_planning.S3Hook")
+    def test_variable_set_not_called_when_load_string_raises(
+        self, mock_s3hook_cls, mock_variable
+    ):
+        mock_hook = mock_s3hook_cls.return_value
+        mock_hook.read_key.return_value = json.dumps(self._MANIFEST)
+        mock_hook.list_keys.return_value = []
+        mock_hook.load_string.side_effect = RuntimeError("network error")
+        mock_variable.get.return_value = None
+
+        with pytest.raises(RuntimeError):
+            stage_inference_status_to_s3(
+                "2026-07-30", **self._kwargs_with_dataset_event()
+            )
+
+        mock_hook.load_string.assert_called_once()
+        mock_variable.set.assert_not_called()
+
+    @patch("dags.for_rent.vocs_machina_planning.vocs_machina_planning.Variable")
+    @patch("dags.for_rent.vocs_machina_planning.vocs_machina_planning.S3Hook")
+    def test_variable_set_called_only_after_load_string_succeeds(
+        self, mock_s3hook_cls, mock_variable
+    ):
+        mock_hook = mock_s3hook_cls.return_value
+        mock_hook.read_key.return_value = json.dumps(self._MANIFEST)
+        mock_hook.list_keys.return_value = []
+        mock_variable.get.return_value = None
+
+        def _load_string(*args, **kwargs):
+            # At the moment the publish happens, the hash must not have been
+            # committed yet -- proves the ordering, not just that both were
+            # eventually called.
+            mock_variable.set.assert_not_called()
+
+        mock_hook.load_string.side_effect = _load_string
+
+        stage_inference_status_to_s3("2026-07-30", **self._kwargs_with_dataset_event())
+
+        mock_hook.load_string.assert_called_once()
+        mock_variable.set.assert_called_once_with(
+            _vocs_machina_planning.LAST_SNAPSHOT_HASH_VARIABLE_KEY,
+            hash_snapshot_rows(
+                build_snapshot_rows(
+                    iter_partition_days(
+                        active_prompts(self._MANIFEST), date(2026, 7, 30)
+                    ),
+                    existing_marker_keys=set(),
+                )
+            ),
+        )

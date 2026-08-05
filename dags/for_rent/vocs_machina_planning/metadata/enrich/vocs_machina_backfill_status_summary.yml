@@ -5,9 +5,11 @@ owner: data-ae-for-rent@quintoandar.com.br
 description: >
   Per-prompt rollup of vocs_machina_backfill_status (VOCS-34), meant as the
   single cheap "is there backlog?" check quintoml reads before deciding to
-  trigger more backfill work. Query view (not a materialized table) over
-  vocs_machina_backfill_status -- see that table's metadata for the row-level
-  definitions this aggregates.
+  trigger more backfill work. Materialized as a real Delta table (Slice 3,
+  via DatalakeTaskGroup) over vocs_machina_backfill_status -- see that
+  table's metadata for the row-level definitions this aggregates. Its load
+  task's dataset outlet (load-enrich-vocs-machina-backfill-status-summary) is
+  the cross-repo contract quintoml subscribes to.
 columns:
   prompt_id:
     description: Identifier of the vocs-machina prompt this row summarizes.
