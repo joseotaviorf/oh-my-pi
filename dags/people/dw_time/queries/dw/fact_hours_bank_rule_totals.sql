@@ -1,4 +1,4 @@
-WITH closed_balance_snapshots_ranked AS (
+WITH hours_bank_snapshots_ranked AS (
     SELECT
         id_employee_profile,
         dt_balanced AS dt_hours_bank_balanced,
@@ -6,44 +6,15 @@ WITH closed_balance_snapshots_ranked AS (
             TO_JSON(hours_bank_totals),
             'MAP<STRING, BIGINT>'
         ) AS hours_bank_totals_map,
-        TRUE AS is_closed,
-        ts_load,
-        year,
-        month,
-        day,
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                id_employee_profile,
-                dt_balanced
-            ORDER BY
-                ts_load DESC NULLS LAST,
-                year DESC,
-                month DESC,
-                day DESC
-        ) AS row_number_latest
-    FROM
-        datalake_oitchau_clean.hoursbank_totals_month_close
-),
-closed_balance_snapshots AS (
-    SELECT
-        id_employee_profile,
-        dt_hours_bank_balanced,
-        hours_bank_totals_map,
-        is_closed
-    FROM
-        closed_balance_snapshots_ranked
-    WHERE
-        row_number_latest = 1
-),
-open_balance_snapshots_ranked AS (
-    SELECT
-        id_employee_profile,
-        dt_balanced AS dt_hours_bank_balanced,
-        FROM_JSON(
-            TO_JSON(hours_bank_totals),
-            'MAP<STRING, BIGINT>'
-        ) AS hours_bank_totals_map,
-        FALSE AS is_closed,
+        CAST(
+            (
+                DATE_TRUNC('MONTH', dt_balanced) < ADD_MONTHS(
+                    DATE_TRUNC('MONTH', DATE('{load_end_date}')),
+                    -1
+                )
+                AND dt_balanced = LAST_DAY(dt_balanced)
+            ) AS BOOLEAN
+        ) AS is_closed,
         ts_load,
         year,
         month,
@@ -61,22 +32,6 @@ open_balance_snapshots_ranked AS (
     FROM
         datalake_oitchau_clean.hoursbank_totals
 ),
-open_balance_snapshots AS (
-    SELECT
-        open_balance.id_employee_profile,
-        open_balance.dt_hours_bank_balanced,
-        open_balance.hours_bank_totals_map,
-        open_balance.is_closed
-    FROM
-        open_balance_snapshots_ranked AS open_balance
-    LEFT JOIN
-        closed_balance_snapshots AS existing_closed
-            ON existing_closed.id_employee_profile = open_balance.id_employee_profile
-            AND existing_closed.dt_hours_bank_balanced = open_balance.dt_hours_bank_balanced
-    WHERE
-        open_balance.row_number_latest = 1
-        AND existing_closed.id_employee_profile IS NULL
-),
 hours_bank_snapshots AS (
     SELECT
         id_employee_profile,
@@ -84,15 +39,9 @@ hours_bank_snapshots AS (
         hours_bank_totals_map,
         is_closed
     FROM
-        closed_balance_snapshots
-    UNION ALL
-    SELECT
-        id_employee_profile,
-        dt_hours_bank_balanced,
-        hours_bank_totals_map,
-        is_closed
-    FROM
-        open_balance_snapshots
+        hours_bank_snapshots_ranked
+    WHERE
+        row_number_latest = 1
 ),
 employee_registration_ranked AS (
     SELECT

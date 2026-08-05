@@ -4,7 +4,7 @@ table_name: fact_hours_bank_rule_totals
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
-  Hours-bank balances from the workforce time integration and the monthly close snapshot, split by rule or bucket that
+  Hours-bank balances from the workforce time integration, split by rule or bucket that
   holds minutes for each employee on a calendar day. Grain: one row per employee (PIN person number) × balance date ×
   rule key. Summing minutes_balance_rule for the same person and date gives total minutes across buckets shown in that
   balance snapshot; slice by rule for workforce or payroll support analytics.
@@ -15,7 +15,11 @@ description: |
   are not payroll truth until a folha integration exists.
 
   Population: employees who exist in the time product whose Oitchau externalId (id_external in clean) matches an Oracle
-  HCM person_number in dw_employee_details.dim_employee. Reporting: filter is_closed = true for official monthly close balances.
+  HCM person_number in dw_employee_details.dim_employee. Reporting: filter is_closed = true for the month-end
+  (LAST_DAY) balance in calendar months before the previous month; current and previous month remain open for
+  retroactive updates. Daily snapshots in closed months stay is_closed = false so sums are not inflated.
+  Inactive employees are out of the daily active fan-out; their balances stop refreshing after deactivation
+  (accepted trade-off vs the retired month_close full-population refresh).
   Join dw_employee_details.dim_employee and dim_hours_bank_rule for labels and segment mapping.
 columns:
   sk_hours_bank_rule_total:
@@ -28,7 +32,6 @@ columns:
     description: "Date dimension key (YYYYMMDD style) for the balance snapshot day; use with dim_date for week, month, or fiscal reporting."
     lineage:
       - datalake_oitchau_clean.hoursbank_totals.dt_balanced
-      - datalake_oitchau_clean.hoursbank_totals_month_close.dt_balanced
       - dw_public.dim_date.sk_date
   sk_hours_bank_rule:
     description: "Foreign key to dw_time.dim_hours_bank_rule for rule package and segment labels. Populated when the normalized map key from the balance JSON matches a segment UUID on the dimension (leading underscores stripped, underscores mapped to hyphens). Null when there is no matching segment."
@@ -52,7 +55,6 @@ columns:
     description: "Rule or bucket identifier from the time product for this slice of the bank. Use with dim_hours_bank_rule for labels when sk_hours_bank_rule is populated."
     lineage:
       - datalake_oitchau_clean.hoursbank_totals.hours_bank_totals
-      - datalake_oitchau_clean.hoursbank_totals_month_close.hours_bank_totals
   person_number:
     description: "Oracle HCM person number (PIN employee code). Natural key for filters, exports, and alignment with HR systems; join dw_employee_details.dim_employee on person_number or sk_employee."
     lineage:
@@ -61,7 +63,6 @@ columns:
     description: "Balance minutes for that employee, date, and rule. Additive measure: sum across rows with the same person and date for total minutes in the snapshot; convert to hours in the reporting layer if needed."
     lineage:
       - datalake_oitchau_clean.hoursbank_totals.hours_bank_totals
-      - datalake_oitchau_clean.hoursbank_totals_month_close.hours_bank_totals
   hourly_rate_applied:
     description: "Hourly rate copied from the matched cost window when the balance date falls inside that segment. Null when no window matches, the employee has no cost rows, or employee mapping fails. Same currency as the source rate."
     lineage:
@@ -98,10 +99,10 @@ columns:
       amount_balance_base.
   is_in_overtime_realized:
     description: |
-      TRUE when the row is from a monthly close snapshot (is_closed) on a 50% or 60% overtime segment. Use with
+      TRUE when the row is a closed balance (is_closed) on a 50% or 60% overtime segment. Use with
       dt_reference_month for dashboard realized overtime filters.
   is_closed:
-    description: "True when the row comes from the official monthly close snapshot (validated balance); false when the row comes from the daily balance table and can still change after future adjustments."
+    description: "True only for the last calendar day of a month that is strictly before the previous month relative to the load date (month-end closed snapshot). Other daily rows in that month stay false so closed-period sums do not inflate; current and previous month remain open for retroactive updates."
   dt_reference_month:
     description: |
       First calendar day of the work month for the balance snapshot (month of dt_hours_bank_balanced). Use this column
@@ -110,7 +111,6 @@ columns:
     description: "Calendar date of the hours-bank snapshot (source column dt_balanced)."
     lineage:
       - datalake_oitchau_clean.hoursbank_totals.dt_balanced
-      - datalake_oitchau_clean.hoursbank_totals_month_close.dt_balanced
   dt_hourly_rate_segment_started:
     description: "Start date of the matched hourly-rate window, copied from fact_employee_hourly_cost_windows for audit and support."
     lineage:
