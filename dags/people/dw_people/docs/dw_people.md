@@ -4,6 +4,8 @@
 
 > Public employee data covering identity, employment snapshots, and management hierarchy. The reference schema for headcount, tenure, and reporting structure in People Analytics.
 
+> **Active employees only.** Every table in `dw_people` contains **only currently active** QuintoAndar employees. There are **no** terminated people, inactive assignments, or historical rows. There is **no** `is_active` column to filter — the grain is already active-only. For terminations, exits, or point-in-time history, use `dw_employee_details`.
+
 ## People Data Catalog
 
 This schema is indexed in the [People Data Catalog](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4635951235/People+Data+Catalog).
@@ -30,6 +32,9 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 **✅ Management Hierarchy** : Current reporting chain for each active employee, from the CEO (L0) down to the individual contributor. Exposes the full chain of managers to enable filtering and grouping by any level of the reporting structure.
 
+**✅ Product & Tech team formation** : **Wide** roster for **Product & Technology** only — `dim_product_tech_team` (one row per employee, mirroring the sheet: `line`, `chapter`, `team_1`…`team_10`, leaders). Not a company-wide team model — for other areas use cost center (`dw_organization`) and management hierarchy.
+
+
 ### Out of Scope
 
 ❌ **Organizational structure** : Business unit, cost center, and job definitions and attributes (name, hierarchy, validity periods) are not part of this schema. Use `dw_organization`.
@@ -44,10 +49,12 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 ### Data Sources and System Context
 
 * **PIN** : QuintoAndar's internal HR system (Oracle HCM). The single source of all employee identity, organizational placement, employment status, and management hierarchy data in this schema.
+* **Product & Tech team-formation sheet** : Manual roster (`datalake_gsheets_people_clean.team_formation_product_tech`) that maps assignments to line, chapter, and squad teams. Source for `dim_product_tech_team` only.
+
 
 ### About the data
 
-* **Temporal coverage:** All tables in this schema are **current state only** for the **active workforce**. `dim_employee`, `dim_management_hierarchy`, and `fact_employees` are overwritten on each load and reflect the latest known placement for employees who are active today. For month-end history, terminations, and inactive assignments, use `dw_employee_details`.
+* **Temporal coverage:** All tables in this schema are **current state only** for the **active workforce**. `dim_employee`, `dim_management_hierarchy`, `fact_employees`, and `dim_product_tech_team` are overwritten on each load and reflect the latest known placement (and P&T roster mapping) for employees who are active today. For month-end history, terminations, and inactive assignments, use `dw_employee_details`.
 * **Airflow DAG:** `bietlejuice.dw_people`
 * **SLA:** D-1 available by 08:00 BRT
 
@@ -56,6 +63,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 | `dim_employee` | **Current state only** · One row per active employee — latest identity | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.dim_employee,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/dim_employee.sql) |
 | `fact_employees` | **Current state only** · One row per active employee — latest org placement | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.fact_employees,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/fact_employees.sql) |
 | `dim_management_hierarchy` | **Current state only** · One row per active employee — latest reporting chain | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_people.dim_management_hierarchy,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/dim_management_hierarchy.sql) |
+| `dim_product_tech_team` | **Current state only** · One row per active employee on the P&T roster — wide sheet columns (`team_1`…`team_10`) | [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_people/queries/dw/dim_product_tech_team.sql) |
 
 > **Note:** VPN connection is required to access DataHub.
 
@@ -76,9 +84,10 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 ### Domain logic and core concepts
 
 * **fact_employees is current-state only** : One row per active employee on the latest reference date from `assignment_snapshots`. Terminated employees and month-end history are not stored here — use `dw_employee_details.fact_assignment_snapshots` for point-in-time or exit analysis.
-* **All tables exclude terminated employees** : `dim_employee`, `fact_employees`, and `dim_management_hierarchy` load only people with `is_active = TRUE` on their current assignment in the enrich source. The fact does not expose `is_active` or `is_current` columns.
+* **All tables exclude terminated employees** : `dim_employee`, `fact_employees`, `dim_management_hierarchy`, and `dim_product_tech_team` load only people with `is_active = TRUE` on their current assignment in the enrich source (the sheet roster is further restricted to active matches). The fact does not expose `is_active` or `is_current` columns.
 * **dim_employee and dim_management_hierarchy have no history** : Both dimensions are overwritten on each load. They cannot be used for time-travel on their own — use `dw_employee_details` for historical org structure.
-* **Management Hierarchy Depth** : `dim_management_hierarchy` exposes the full reporting chain from the CEO (L0) down to each employee. Depth varies by position — some employees sit at L3, others at L8 or beyond. Levels deeper than the employee's actual position are NULL.
+* **dim_product_tech_team is wide (Product & Tech only)** : One row per employee on the P&T sheet with `line`, `chapter`, `team_1`…`team_10`, `line_leader`, `team_leader`, and leader flags — mirroring the workbook. Outside P&T there is no row — use `LEFT JOIN`, or answer org questions with cost center + management hierarchy.
+* **Management Hierarchy Depth** : `dim_management_hierarchy` exposes the full reporting chain from the CEO (L0) down to each employee for the **whole active workforce**. Depth varies by position — some employees sit at L3, others at L8 or beyond. Levels deeper than the employee's actual position are NULL.
 * **Surrogate Keys for Joins** : `fact_employees` connects to `dim_management_hierarchy` through `sk_manager_hierarchy` for the current hierarchy version. Historical hierarchy versions are in `dw_employee_details`.
 
 ### Business Assumptions
@@ -90,6 +99,7 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 * **Public schema — not for history** : This schema is intended for public Trino consumption (replacing `org_chart`). Do not use it for terminated headcount, month-end archives, or termination reasons; use `dw_employee_details` instead.
 * **dim_management_hierarchy is always current** : Join on `person_number` or `sk_manager_hierarchy` for today's reporting chain only.
 * **dim_employee has no history** : Name and email always reflect the employee's latest values.
+* **dim_product_tech_team covers the P&T sheet only** : Employees outside the workbook have no row. Grain is one row per person (wide) — joining to `fact_employees` / `dim_employee` does not multiply rows.
 
 ## How to Use
 
@@ -125,7 +135,67 @@ LEFT JOIN dw_organization.dim_business_unit AS bu
     ON fact.sk_business_unit = bu.sk_business_unit
 ```
 
-For **Product & Tech team formation** (squad/line/chapter teams beyond cost-center attributes), use `datalake_gsheets_people_clean.team_formation_product_tech` today (sheet-maintained structure). A dedicated DW bridge table is planned under [DBP-1606](https://quintoandar.atlassian.net/browse/DBP-1606); until it ships, join on `person_number` or `assignment_number` per the reverse export `tech_team_formation` pattern.
+### Product & Tech Team Formation (P&T roster only — wide)
+
+Team formation is **Product & Technology only**, in a **wide** dimension: `dim_product_tech_team` (one row per employee; `line`, `chapter`, `team_1`…`team_10`, leaders — same shape as the sheet).
+
+**Question:** What is the line, chapter, and teams for active Product & Tech employees?
+
+```sql
+SELECT
+    emp.person_number,
+    emp.name,
+    pt.line,
+    pt.chapter,
+    pt.line_leader,
+    pt.team_leader,
+    pt.team_1,
+    pt.team_2,
+    pt.is_line_leader,
+    pt.is_team_leader
+FROM
+    dw_people.dim_employee AS emp
+INNER JOIN dw_people.dim_product_tech_team AS pt
+    ON emp.sk_employee = pt.sk_employee
+ORDER BY
+    pt.line,
+    pt.chapter,
+    emp.name
+```
+
+**Question:** Who has a given squad in any team slot? (person list)
+
+```sql
+SELECT
+    emp.person_number,
+    emp.name,
+    pt.line,
+    pt.chapter,
+    pt.team_1,
+    pt.team_2,
+    pt.team_3
+FROM
+    dw_people.dim_product_tech_team AS pt
+INNER JOIN dw_people.dim_employee AS emp
+    ON pt.sk_employee = emp.sk_employee
+WHERE
+    LOWER(pt.team_1) = LOWER('<squad_name>')
+    OR LOWER(pt.team_2) = LOWER('<squad_name>')
+    OR LOWER(pt.team_3) = LOWER('<squad_name>')
+    OR LOWER(pt.team_4) = LOWER('<squad_name>')
+    OR LOWER(pt.team_5) = LOWER('<squad_name>')
+    OR LOWER(pt.team_6) = LOWER('<squad_name>')
+    OR LOWER(pt.team_7) = LOWER('<squad_name>')
+    OR LOWER(pt.team_8) = LOWER('<squad_name>')
+    OR LOWER(pt.team_9) = LOWER('<squad_name>')
+    OR LOWER(pt.team_10) = LOWER('<squad_name>')
+ORDER BY
+    emp.name
+```
+
+Use `INNER JOIN` when the question is only about Product & Tech. Use `LEFT JOIN` when mixing non–P&T employees.
+
+For conversational “which team does this person belong to?” routing outside Product & Tech (cost center + direct reports + manager), see the TARS entity `docs/llm_context/business_entities/people_public.md`.
 
 ### Analytical Snapshot (Management Chain for an Employee)
 
@@ -179,5 +249,6 @@ LIMIT 100
 
 ## See Also
 
-* **dw_employee_details** : Extended employee data including additional HR attributes not available in this schema. Use when a richer profile beyond public identity fields is required.
+* **dw_employee_details** : Extended employee data including terminations, inactive assignments, month-end history, and additional HR attributes not available in this schema. Use whenever the question includes people who left or past dates.
 * **dw_organization** : Organizational reference tables for business units, cost centers, and job definitions — the structural dimensions used alongside employee snapshot data.
+* **datalake_people_public.org_chart** : Legacy denormalized public org chart. Prefer `dw_people` (plus `dw_organization` and `dim_product_tech_team`) for new consumers; `org_chart` remains available during migration.

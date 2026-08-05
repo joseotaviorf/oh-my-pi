@@ -3,14 +3,17 @@
 ## Ownership
 
 **Data Owner:**
-- isabella.araujo@quintoandar.com.br
+- pedro.prates@quintoandar.com.br
 
 **Data Steward:**
 - isabella.araujo@quintoandar.com.br
+- gabriel.berger@quintoandar.com.br
 
 ## Overview
 
 Employee Details (`dw_employee_details`) is the primary internal People DW schema for workforce identity, contact and legal documentation, emergency contacts, management hierarchy, and daily assignment snapshots. It is the starting point for headcount, tenure, admissions, exits, and org-structure analysis within the People domain.
+
+**Access (exclusive — People team only):** `dw_employee_details` is **not** a general-purpose dataset. Databricks/Trino access is **exclusive to the People team** and is granted **only on request through IDN**, with People data-owner approval. **Do not** direct analysts, TARS, or other consumers to open an IDN access request for this schema unless they are on People with a justified use case. For active-workforce org questions, use [`people_public.md`](people_public.md) (`dw_people`) instead.
 
 **Population:** all current and former employees with a valid HR assignment (contractors and full-time). Test users and automated system accounts are excluded.
 
@@ -36,7 +39,7 @@ PIN went live on **2024-03-01**; before that date, only `dt_employee_hired` and 
 
 ## TARS pilot scope (restricted audience)
 
-**Status:** pilot — validate in Trino before broader publication. Access is limited to users who already have People analytical authorization.
+**Status:** pilot — validate in Trino before broader publication. Access is **exclusive to the People team** via **IDN request**; not available to general analytical consumers.
 
 **Trino catalog:** `delta` — only the tables below are registered for this pilot. No salary or compensation data in any of them (`dw_compensation` is out of scope).
 
@@ -54,7 +57,39 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 ## Related Business Entities
 
 - `organization.md` — cost center, business unit, and job reference dimensions joined via `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version` on the fact.
-- `org_chart.md` — lightweight current org chart for active employees (`datalake_people_public.org_chart`) when DW joins are not needed.
+- `people_public.md` — **preferred** public active-workforce DW (`dw_people`) replacing `org_chart` for new consumers; **Product & Tech team formation** lives there (`dim_product_tech_team`).
+- `org_chart.md` — legacy lightweight current org chart (`datalake_people_public.org_chart`) during migration.
+
+## Teams / org placement
+
+`dw_employee_details` has **management hierarchy** and **cost center** (via `organization.md`), but it does **not** store Product & Tech squad / line / chapter from the team-formation sheet.
+
+| Need | Where |
+|------|--------|
+| Product & Tech line, chapter, teams, leaders | `dw_people.dim_product_tech_team` (wide) — see [`people_public.md`](people_public.md) |
+| Manager chain / who reports to whom (history-capable) | `dw_employee_details.dim_management_hierarchy` (+ fact FKs) |
+| Cost center / BU / job labels | [`organization.md`](organization.md) via fact SKs |
+| Active-only public “which team?” without history | Prefer [`people_public.md`](people_public.md) end-to-end |
+
+**Product & Tech filter example** (join on `person_number`; dim is **active-only** and **wide** — one row per person):
+
+```sql
+SELECT
+    emp.person_number,
+    emp.name,
+    pt.line,
+    pt.chapter,
+    pt.team_1,
+    pt.team_2,
+    pt.team_leader,
+    pt.is_team_leader
+FROM dw_employee_details.dim_employee AS emp
+INNER JOIN dw_people.dim_product_tech_team AS pt
+    ON emp.person_number = pt.person_number
+WHERE emp.person_number = '<person_number>'
+```
+
+If the person has **no** dim row, they are outside the Product & Tech roster — do not invent a squad. For team / org-placement answers, use cost center + manager + direct reports (full playbook in [`people_public.md`](people_public.md)).
 
 ## Related Metric Entities
 
@@ -87,6 +122,7 @@ Join to `organization.md` tables for cost center, BU, and job context (`sk_cost_
 - **Future / scheduled termination / desligamento futuro** → `dt_terminated` in the **future** while still active. These rows are **voluntary only** and can be reported in advance. Involuntary exits never appear with a future date — report them only after `dt_terminated` has passed (do not infer notice timing separately)
 - **HR movement / lifecycle event / action & reason** → `dim_termination`; join via `sk_termination_event_definition` on the fact
 - **Reporting chain / management hierarchy / org chart / hierarquia** → `dim_management_hierarchy` (`name_l0` … `name_l9`, `assignment_number_l0` … `assignment_number_l9`)
+- **Product & Tech team / squad / line / chapter (P&T)** → **not** in `dw_employee_details` — use `dw_people.dim_product_tech_team` ([`people_public.md`](people_public.md)); wide `team_1`…`team_10`
 - **CEO / L0 / top-level manager** → `name_l0`, `email_l0` (Layer 0)
 - **VP / director / manager (by level)** → `name_l1` (VP), `name_l2` (director), `name_l3` (manager), etc.
 - **Direct manager / line manager** → immediate level in hierarchy (lowest non-empty `name_l*` for the employee's chain)
@@ -175,6 +211,7 @@ Use [Related Metric Entities](#related-metric-entities) for **official** turnove
 
 **Do:**
 - Start from `fact_assignment_snapshots` with `is_current_for_employee = TRUE` for today's workforce state, or `is_monthly_snapshot_for_employee = TRUE` for historical state, one row per employee either way; reach for `is_current_for_assignment` / `is_monthly_snapshot_for_assignment` only when you need assignment-grain history.
+- Route Product & Tech squad / line / chapter questions to `dw_people.dim_product_tech_team` ([`people_public.md`](people_public.md)); join on `person_number` (wide, one row per person).
 - Use `dim_employee.name` for communications; reserve `dim_documentation.legal_name` for compliance.
 - Join versioned dimensions through the `sk_*_version` keys on the fact for the snapshot date in scope.
 - Use `dt_employee_hired` for company tenure (credits internal transfers, resets on rehire); `dt_assignment_started` for seniority in the current assignment only.
@@ -182,6 +219,8 @@ Use [Related Metric Entities](#related-metric-entities) for **official** turnove
 - Treat a future `dt_terminated` (while still active) as a scheduled termination.
 
 **Don't:**
+- Suggest or process **IDN access requests** for `dw_employee_details` for users **outside the People team** — route them to [`people_public.md`](people_public.md) (`dw_people`) instead.
+- Expect Product & Tech squad / line / chapter columns on `dw_employee_details` — those live only on `dw_people.dim_product_tech_team` ([`people_public.md`](people_public.md)).
 - Count `Global Transfer` termination events as dismissals or turnover — filter them out with `is_transfer_termination = FALSE`; the person remains employed under a new `assignment_number`.
 - Report a single-day active-headcount drop as attrition without first checking for a `Global Transfer` batch on that date (transferred employees are kept active on the transfer date, but always verify with `is_transfer_termination`).
 - Query `fact_assignment_snapshots` without a date scope — row counts inflate across every historical day.

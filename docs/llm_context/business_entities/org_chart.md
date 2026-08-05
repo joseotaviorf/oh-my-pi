@@ -1,8 +1,19 @@
 # Org Chart
 
+## Ownership
+
+**Data Owner:**
+- pedro.prates@quintoandar.com.br
+
+**Data Steward:**
+- isabella.araujo@quintoandar.com.br
+- gabriel.berger@quintoandar.com.br
+
 ## Overview
 
-`datalake_people_public.org_chart` is the public, denormalized organizational chart for **active employees and contractors** at QuintoAndar. Each row combines identity (name, work email), direct manager, job title, cost center, Codex taxonomy (business, product, vertical, directorate), and Product & Technology team-formation attributes (line, chapter, squad teams).
+`datalake_people_public.org_chart` is the **legacy** public, denormalized organizational chart for **active employees and contractors** at QuintoAndar. Each row combines identity (name, work email), direct manager, job title, cost center, Codex taxonomy (business, product, vertical, directorate), and Product & Technology team-formation attributes (line, chapter, squad teams).
+
+**Migration:** For **new** analysis, prefer [`people_public.md`](people_public.md) (`dw_people` + `dw_organization`). Use wide `dim_product_tech_team` for P&T (`team_1`…`team_10`); for other areas use cost center + `dim_management_hierarchy`. This enrich table remains available during cutover and will be deprecated once consumers migrate.
 
 **Population:** active assignments only (`assignment_status_type = 'ACTIVE'`; types E and C). Terminated and inactive workers are excluded at load time.
 
@@ -10,7 +21,7 @@
 
 **SLA:** D-1 with the `enrich_people_public` DAG. Grain: **one row per active `assignment_number`**.
 
-**Out of scope:** employment history, terminated employees, compensation, performance, and SCD2 validity windows — use `employee_details.md` (`dw_employee_details`) or `datalake_people.identifier_mapping` instead.
+**Out of scope:** employment history, terminated employees, compensation, performance, and SCD2 validity windows — use `employee_details.md` (`dw_employee_details`, **People-team exclusive — IDN request only**) or `datalake_people.identifier_mapping` instead.
 
 ## TARS pilot scope (restricted audience)
 
@@ -26,12 +37,13 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 
 ## Related Business Entities
 
+- `people_public.md` — **preferred** public DW replacement (`dw_people`: hierarchy company-wide; wide `dim_product_tech_team`; cost center via `organization.md` for other areas).
 - `employee_details.md` — full employee identity, daily snapshots, management hierarchy (L0–L9), and terminated workforce.
 - `organization.md` — SCD2 cost centers, business units, and job catalog in `dw_organization`.
 
 ## Glossary and Synonyms
 
-- **Org chart / organograma / estrutura organizacional** → `datalake_people_public.org_chart`
+- **Org chart / organograma / estrutura organizacional** → prefer `dw_people` ([`people_public.md`](people_public.md)); legacy table `datalake_people_public.org_chart`
 - **Active employee / colaborador ativo / quadro atual** → all rows in this table (pre-filtered at load)
 - **Manager / gestor / líder direto** → `manager_name`, `manager_email`
 - **Assignment number / matrícula** → `assignment_number` — unique grain key
@@ -41,17 +53,21 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 - **Business unit / BU / filial** → `business_unit_name`
 - **Codex taxonomy / planejamento financeiro** → `business`, `product`, `vertical`, `vice_presidency`, `directorate`, `subdirectorate`
 - **Vertical / vertical de negócio** → `vertical` — PIN Organization DFF values `Ops`, `Tech`, or `Corp`; NULL when unmatched or blank
-- **Product & Tech team formation / time P&T** → `line`, `chapter`, `line_leader`, `team_leader`, `product_and_tech_team_1` … `product_and_tech_team_10`
+- **Product & Tech team formation / time P&T** → prefer `dw_people.dim_product_tech_team` ([`people_public.md`](people_public.md); wide `team_1`…`team_10`); legacy columns `line`, `chapter`, `line_leader`, `team_leader`, `product_and_tech_team_1` … `product_and_tech_team_10` on this table
 - **Hire date / data de admissão** → `dt_hired`
 
 ## Tables
 
 | You need... | Use this table |
 |-------------|----------------|
-| Current org chart for active employees (name, manager, job, area) | `datalake_people_public.org_chart` (`oc`) — grain: one row per active `assignment_number`; no extra `is_active` filter needed |
-| Manager and employee contact for active workforce | `datalake_people_public.org_chart` — `work_email`, `manager_name`, `manager_email` |
-| Codex / financial taxonomy per active employee | `datalake_people_public.org_chart` — `business`, `product`, `vertical`, `directorate`, `subdirectorate` |
-| Product & Technology squad structure | `datalake_people_public.org_chart` — `line`, `chapter`, `product_and_tech_team_*` (NULL outside P&T) |
+| **New** current org (preferred) | `dw_people` + `dw_organization` — see [`people_public.md`](people_public.md) |
+| **New** P&T team formation (wide) | `dw_people.dim_product_tech_team` — see [`people_public.md`](people_public.md) |
+| **New** org outside P&T | Cost center + `dw_people.dim_management_hierarchy` — see [`people_public.md`](people_public.md) |
+| Current org chart for active employees (legacy single table) | `datalake_people_public.org_chart` (`oc`) — grain: one row per active `assignment_number`; no extra `is_active` filter needed |
+| Manager and employee contact for active workforce (legacy) | `datalake_people_public.org_chart` — `work_email`, `manager_name`, `manager_email` |
+| Codex / financial taxonomy per active employee (legacy) | `datalake_people_public.org_chart` — `business`, `product`, `vertical`, `directorate`, `subdirectorate` |
+| Product & Technology squad structure (**preferred**) | `dw_people.dim_product_tech_team` — see [`people_public.md`](people_public.md) |
+| Product & Technology squad structure (legacy) | `datalake_people_public.org_chart` — `line`, `chapter`, `product_and_tech_team_*` (NULL outside P&T) |
 | Historical headcount or terminated employees | `dw_employee_details.fact_assignment_snapshots` — see `employee_details.md` |
 | Full employment history (all statuses) | `datalake_people.identifier_mapping` |
 
@@ -91,16 +107,18 @@ This table is a **lighter alternative** to joining `dw_employee_details` + `dw_o
 ## Dos and Don'ts
 
 **Do:**
-- Use `datalake_people_public.org_chart` for quick questions about **who works where today** among active employees.
-- Join on `assignment_number` when linking to other People enrich tables.
-- Use `manager_email` or `manager_name` for direct-manager lookups.
+- Prefer [`people_public.md`](people_public.md) (`dw_people`) for **new** questions about who works where today.
+- Use `datalake_people_public.org_chart` only when a consumer is not yet migrated or needs the legacy single-table shape.
+- Join on `assignment_number` when linking this legacy table to other People enrich tables.
+- Use `manager_email` or `manager_name` for direct-manager lookups on this table.
 - Fall back to `employee_details.md` when the question mentions termination, historical dates, or monthly snapshots.
 
 **Don't:**
+- Start new P&T / org-chart analysis on this table once `dw_people` P&T tables are available — route to [`people_public.md`](people_public.md) (wide `team_1`…`team_10`).
 - Filter `is_active = TRUE` or `assignment_status_type = 'ACTIVE'` — the table is already scoped to active assignments.
 - Use this table for terminated-employee analysis or month-end headcount history — rows disappear after offboarding.
 - Confuse `manager_name` (direct manager) with cost-center owners (`owner_l1_name` in `dw_organization.dim_cost_center`).
-- Expect P&T team columns for non-Product & Technology areas — they come from a GSheets supplement and are often NULL.
+- Expect P&T team columns for non-Product & Technology areas — they come from a GSheets supplement and are often NULL; for those areas prefer cost center + management hierarchy via [`people_public.md`](people_public.md).
 - Use deprecated People sources (`datalake_hr_system`, `datalake_employment`, `enrich_employee`) for new queries.
 
 ## Golden Queries
@@ -136,7 +154,9 @@ FROM datalake_people_public.org_chart AS oc
 WHERE LOWER(oc.work_email) = LOWER('name.surname@quintoandar.com.br')
 ```
 
-### Query 3 — Product & Technology team roster
+### Query 3 — Product & Technology team roster (legacy)
+
+> Prefer [`people_public.md`](people_public.md) Query 1 / Query 2 (`dim_product_tech_team`, wide) for new work.
 
 ```sql
 SELECT

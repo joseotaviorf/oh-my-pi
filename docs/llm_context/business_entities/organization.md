@@ -1,5 +1,14 @@
 # Organization
 
+## Ownership
+
+**Data Owner:**
+- pedro.prates@quintoandar.com.br
+
+**Data Steward:**
+- isabella.araujo@quintoandar.com.br
+- gabriel.berger@quintoandar.com.br
+
 ## Overview
 
 Organization (`dw_organization`) is the People DW schema for organizational reference data: cost centers and teams (with Codex attributes), business units, and the public job catalog. These dimensions classify headcount and power joins from `dw_employee_details.fact_assignment_snapshots` and `metric_people.employee_snapshots`.
@@ -36,7 +45,8 @@ PIN went live on **2024-03-01**; cost center, business unit, job, and employee-t
 ## Related Business Entities
 
 - `employee_details.md` — daily assignment snapshots and employee identity; join on `sk_cost_center_version`, `sk_business_unit`, and `sk_job_version`.
-- `org_chart.md` — denormalized current org chart for active employees (`datalake_people_public.org_chart`) without DW joins.
+- `people_public.md` — **preferred** public active-workforce DW (`dw_people`) for current org placement, company-wide management hierarchy, and P&T team formation (P&T only: wide `dim_product_tech_team`; other areas use cost center from this entity).
+- `org_chart.md` — legacy denormalized current org chart (`datalake_people_public.org_chart`) during migration.
 
 ## Glossary and Synonyms
 
