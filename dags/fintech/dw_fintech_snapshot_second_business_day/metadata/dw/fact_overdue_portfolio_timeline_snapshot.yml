@@ -9,10 +9,22 @@ columns:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_overdue_portfolio_timeline
     description: Surrogate key of table. It is the concat between id_invoice and dt_reference
+  sk_region:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_region
+    description: Region ID associated with the contract.
   sk_contract:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_contract
     description: Data warehouse surrogate key for contract used in fintech dimensional joins.
+  sk_negotiation:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_negotiation
+    description: Surrogate key of the negotiation. Populated if the invoice payment_status is 'written-down' and there is an associated negotiation.
+  sk_origin_negotiation:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_origin_negotiation
+    description: Surrogate key for the original negotiation from which an 'extra' invoice (installment) originated. Populated only for 'extra' type invoices.
   id_invoice:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.id_invoice
@@ -21,6 +33,10 @@ columns:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.id_proposal
     description: Credit or rental guarantee proposal identifier from the underwriting flow.
+  negotiation_installment_number:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.negotiation_installment_number
+    description: The installment number of the negotiation, populated only for 'extra' type invoices that are part of a negotiation.
   contract_status:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.contract_status
@@ -33,21 +49,25 @@ columns:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.payment_status
     description: Payment status on the reference date
+  reason:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.reason
+    description: Reason for the current state or action related to the invoice.
+  paid_via:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.paid_via
+    description: Method by which the invoice was paid (e.g., Pix, Boleto, Credit Card).
   is_ssn:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_ssn
     description: "Boolean to indicate if the invoice was paid by SSN - Self Service Negotiation."
   type_ssn:
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.type_ssn
-    description: Indicate the type of SSN.
+    description: "[Legacy] Type of SSN. No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
     categories:
       "POSSN (payment of original)": "In this case, the customer paid the original invoice without a negotiation through the app's SSN screen."
       "BOSSN (single debt negotiation)": "Boletão. In this case, the customer himself paid the debts through a negotiation that resulted in a single installment/invoice. This was carried out without the help of external advisors or a 5A employee"
   recovery_method:
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.recovery_method
-    description: Financial attribute representing recovery method on the fact_overdue_portfolio_timeline_snapshot dataset.
+    description: "[Legacy] Recovery method. No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
     categories:
       Self Service Negotiation - Payment of original debt: ""
       Self Service Negotiation - Negotiation: ""
@@ -89,6 +109,10 @@ columns:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.recovered_amount
     description: Amount recovered between reference month start and reference date
+  net_recovered_amount:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.net_recovered_amount
+    description: The net amount recovered for the invoice. Accounts for the negotiation's net rate if the invoice was written down and part of a negotiation.
   contract_debt:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.contract_debt
@@ -101,18 +125,22 @@ columns:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_last_business_days
     description: Boolean to inform whether it is the most recent date among days with the same business day, same invoice and month. It deduplicates the calculations per business day.
+  is_write_off:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_write_off
+    description: Boolean indicating if the invoice has been written off.
+  is_contract_write_off:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_contract_write_off
+    description: Boolean indicating if the entire contract has been written off.
+  segmentation_queue:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.segmentation_queue
+    description: The ID of the segmentation queue the contract belonged to on the reference date.
   advisory:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.advisory
     description: The advisory responsible for the contract on the reference date
-  distributor:
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.distributor
-    description: The advisory responsible for the contract on the reference date
-  partner:
-    lineage:
-      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.partner
-    description: The partner responsible for the contract on the reference date. This field is created by the fallback (coalesce) between the advisory and the distributor
   is_most_recent_record_month:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_most_recent_record_month
@@ -129,6 +157,10 @@ columns:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_due_adjust
     description: Invoice due date adjust for next business day
+  dt_write_off:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_write_off
+    description: The date when the invoice was written off as unrecoverable.
   dt_month_start:
     lineage:
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_month_start
@@ -143,11 +175,69 @@ columns:
     description: Invoice timeline reference date
   ts_load:
     description: "Timestamp of when the data was inserted into the table"
-  day:
-    description: Day partition derived from the source event timestamp for incremental loading.
   ts_snapshot:
-    description: Timestamp when snapshot occurred in the upstream fintech system.
-  month:
-    description: Month partition derived from the source event timestamp for incremental loading.
+    description: Timestamp when the snapshot was taken (second business day of the month).
   year:
-    description: Year partition derived from the source event timestamp for incremental loading.
+    description: Year partition derived from the snapshot timestamp for incremental loading.
+  month:
+    description: Month partition derived from the snapshot timestamp for incremental loading.
+  day:
+    description: Day partition derived from the snapshot timestamp for incremental loading.
+  segmentation_queue_timeline:
+    description: "[Legacy] Segmentation queue (timeline). No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
+  segmentation_queue_description_timeline:
+    description: "[Legacy] Segmentation queue description (timeline). No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
+  agreement_queue_timeline:
+    description: "[Legacy] Agreement queue (timeline). No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
+  agreement_queue_description_timeline:
+    description: "[Legacy] Agreement queue description (timeline). No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
+  eviction_queue_timeline:
+    description: "[Legacy] Eviction queue (timeline). No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
+  eviction_queue_description_timeline:
+    description: "[Legacy] Eviction queue description (timeline). No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
+  delay_invoice_at_reference:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.delay_invoice_at_reference
+    description: Delay (in days) of the specific invoice at the given reference date.
+  delay_first_payment_default:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.delay_first_payment_default
+    description: Delay (in days) since the first payment default occurred for the contract.
+  is_first_payment_default:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_first_payment_default
+    description: Boolean indicating if this invoice represents the first payment default for the contract.
+  segmentation_queue_description:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.segmentation_queue_description
+    description: Description of the segmentation queue the contract belonged to on the reference date.
+  agreement_queue:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.agreement_queue
+    description: The ID of the agreement queue the contract belonged to on the reference date.
+  agreement_queue_description:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.agreement_queue_description
+    description: Description of the agreement queue the contract belonged to on the reference date.
+  eviction_queue:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.eviction_queue
+    description: The ID of the eviction queue the contract belonged to on the reference date.
+  eviction_queue_description:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.eviction_queue_description
+    description: Description of the eviction queue the contract belonged to on the reference date.
+  sk_agency:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_agency
+    description: Surrogate key for the agency responsible for the contract on the reference date.
+  recovery_channel:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.recovery_channel
+    description: The channel through which the debt recovery attempt was made.
+  has_app_action_event:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.has_app_action_event
+    description: Boolean to indicate if there was an app action event (e.g., opening the app, viewing contract/invoice page) within 5 days before the invoice payment date.
+  has_matthew_interaction:
+    description: "[Legacy] Boolean indicating whether there was a Matthew (AI collections agent) interaction. No longer sourced from dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline (column removed upstream); persisted as NULL to preserve the snapshot schema."
