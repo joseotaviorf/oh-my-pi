@@ -478,7 +478,7 @@ photo_session AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -497,7 +497,7 @@ listing AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -525,13 +525,12 @@ house_draft AS (
     FROM
         datalake_entities_views.house_draft
 ),
-/***
 collections_segment AS (
     SELECT
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -542,9 +541,8 @@ collections_segment AS (
     FROM
         datalake_entities_views.collections_segment
     WHERE
-        id_user IS NOT NULL
+        NULLIF(CAST(id_user AS STRING), '') IS NOT NULL
 ),
-***/
 reservation AS (
     WITH reservation_base AS (
         SELECT
@@ -809,7 +807,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -825,7 +823,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -841,7 +839,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -857,7 +855,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -873,7 +871,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -889,7 +887,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -905,7 +903,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -921,7 +919,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -937,7 +935,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -953,7 +951,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -969,7 +967,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -985,7 +983,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -1001,7 +999,7 @@ base AS (
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -1011,14 +1009,13 @@ base AS (
         ts_updated
     FROM
         house_draft
-/***
     UNION ALL
     SELECT
         {sk_entity} AS sk_entity,
         id_entity,
         id_house,
         id_contract,
-        CAST(id_user AS STRING) AS id_user,
+        id_user,
         entity,
         persona,
         business_context,
@@ -1028,7 +1025,6 @@ base AS (
         ts_updated
     FROM
         collections_segment
-***/
 )
 SELECT
     b.sk_entity,
@@ -1056,7 +1052,7 @@ LEFT JOIN
         ON h.id = b.id_house
 LEFT JOIN
     datalake_ebdb_clean.user AS u
-        ON CAST(u.id AS STRING) = b.id_user
+        ON u.id = b.id_user
 WHERE
-    COALESCE(b.id_user, '') <> ''
+    NULLIF(CAST(b.id_user AS STRING), '') IS NOT NULL
     AND b.persona IS NOT NULL

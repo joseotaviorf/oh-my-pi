@@ -24,14 +24,17 @@ columns:
     description: Priority contract ID for this customer segment distribution, sourced from the core contract model via join on customer_segment_distribution.id_priority_contract.
   id_user:
     lineage:
-      - datalake_trato_feito_clean.client.person_uuid
       - datalake_trato_feito_clean.client.id_external
+      - datalake_ebdb_clean.user.cpf
+      - datalake_ebdb_clean.user.id
     description: |
-      Datazord user key for the tenant associated with this customer segment distribution.
+      Main EBDB user id for the segmented customer associated with this customer segment distribution.
       Resolved from the latest non-deleted, non-landlord trato_feito client matching customer_document_type
-      and customer_document_value as COALESCE(person_uuid, id_external) cast to string (person UUID preferred,
-      else Main external id). Only the TENANT persona is present; one row is generated per
-      customer_segment_distribution record that has a matching client with a resolvable identifier.
+      and customer_document_value, using the first validated fallback in order: client.id_external (when it
+      exists in ebdb.user), or ebdb.user.cpf matched by exact document hash equality with
+      customer_document_value. Rows with null, empty, or unresolvable id_user are excluded. One row is
+      generated per customer_segment_distribution record; multiple segmented customers on the same contract
+      each get their own row with distinct id_entity and id_user.
   entity:
     description: Entity type. Always 'FR_COLLECTIONS_SEGMENT' for all rows in this view, indicating a rental collections segment entity.
   persona:

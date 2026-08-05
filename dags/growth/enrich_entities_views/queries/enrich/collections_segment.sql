@@ -22,15 +22,14 @@ customers_with_active_segmentation AS (
     WHERE
         is_active = TRUE
 ),
-collections_segment_ranked AS (
+collections_segment_client_ranked AS (
     SELECT
         csd.id_customer_segment_distribution AS id_entity,
         ct.id_house,
         ct.id_contract,
-        COALESCE(
-            CAST(cl.person_uuid AS STRING),
-            CAST(cl.id_external AS STRING)
-        ) AS id_user,
+        cl.id_external,
+        csd.customer_document_value,
+        CAST(csd.id_priority_contract AS BIGINT) AS id_priority_contract,
         'FR_COLLECTIONS_SEGMENT' AS entity,
         'RENT' AS business_context,
         CASE
@@ -49,7 +48,14 @@ collections_segment_ranked AS (
         csd.ts_updated,
         ROW_NUMBER() OVER (
             PARTITION BY csd.id_customer_segment_distribution
-            ORDER BY cl.ts_created DESC
+            ORDER BY
+                CASE
+                    WHEN cl.id_external IS NOT NULL
+                        AND NULLIF(TRIM(CAST(cl.id_external AS STRING)), '') IS NOT NULL
+                    THEN 0
+                    ELSE 1
+                END,
+                cl.ts_created DESC
         ) AS client_rank
     FROM
         datalake_trato_feito_clean.customer_segment_distribution AS csd
@@ -76,6 +82,73 @@ collections_segment_ranked AS (
         csd.is_active = TRUE
         OR active_segmentation.id_priority_contract IS NULL
 ),
+collections_segment_client AS (
+    SELECT
+        id_entity,
+        id_house,
+        id_contract,
+        id_external,
+        customer_document_value,
+        id_priority_contract,
+        entity,
+        business_context,
+        status,
+        ts_created,
+        ts_updated
+    FROM
+        collections_segment_client_ranked
+    WHERE
+        client_rank = 1
+),
+cpf_hash_user_ranked AS (
+    SELECT
+        base.id_entity,
+        u_cpf.id AS id_user_cpf_hash,
+        ROW_NUMBER() OVER (
+            PARTITION BY base.id_entity
+            ORDER BY u_cpf.id DESC
+        ) AS cpf_hash_user_rank
+    FROM
+        collections_segment_client AS base
+    INNER JOIN
+        datalake_ebdb_clean.user AS u_cpf
+            ON u_cpf.cpf = base.customer_document_value
+),
+cpf_hash_user AS (
+    SELECT
+        id_entity,
+        id_user_cpf_hash
+    FROM
+        cpf_hash_user_ranked
+    WHERE
+        cpf_hash_user_rank = 1
+),
+collections_segment_resolved AS (
+    SELECT
+        base.id_entity,
+        base.id_house,
+        base.id_contract,
+        COALESCE(
+            CASE
+                WHEN u_ext.id IS NOT NULL
+                THEN TRY_CAST(NULLIF(TRIM(CAST(base.id_external AS STRING)), '') AS BIGINT)
+            END,
+            chu.id_user_cpf_hash
+        ) AS id_user,
+        base.entity,
+        base.business_context,
+        base.status,
+        base.ts_created,
+        base.ts_updated
+    FROM
+        collections_segment_client AS base
+    LEFT JOIN
+        datalake_ebdb_clean.user AS u_ext
+            ON u_ext.id = TRY_CAST(NULLIF(TRIM(CAST(base.id_external AS STRING)), '') AS BIGINT)
+    LEFT JOIN
+        cpf_hash_user AS chu
+            ON base.id_entity = chu.id_entity
+),
 collections_segment_base AS (
     SELECT
         id_entity,
@@ -88,10 +161,11 @@ collections_segment_base AS (
         ts_created,
         ts_updated
     FROM
-        collections_segment_ranked
+        collections_segment_resolved
     WHERE
-        client_rank = 1
-        AND id_user IS NOT NULL
+        id_user IS NOT NULL
+        AND NULLIF(TRIM(CAST(id_user AS STRING)), '') IS NOT NULL
+        AND id_user > 0
 )
 SELECT
     id_entity,
